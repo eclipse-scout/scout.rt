@@ -10,42 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.servicetunnel.http.internal;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.service.SERVICES;
 
-public class ClientNotificationPollingJob extends ClientAsyncJob {
+public class ClientNotificationPollingJob implements IRunnable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationPollingJob.class);
 
-  private long m_pollInterval;
-  private boolean m_analyzeNetworkLatency;
-
-  public ClientNotificationPollingJob(IClientSession session, long pollInterval, boolean analyzeNetworkLatency) {
-    super("Client notification fetcher", session, true);
-    updatePollingValues(pollInterval, analyzeNetworkLatency);
-  }
-
-  public void updatePollingValues(long pollInterval, boolean analyzeNetworkLatency) {
-    m_pollInterval = Math.max(1000L, pollInterval);
-    m_analyzeNetworkLatency = analyzeNetworkLatency;
-  }
-
   @Override
-  protected IStatus runStatus(IProgressMonitor monitor) {
-    if (monitor.isCanceled()) {
-      return Status.CANCEL_STATUS;
+  public void run() throws Exception {
+    if (IProgressMonitor.CURRENT.get().isCancelled()) {
+      return;
     }
+
     IPingService pingService = SERVICES.getService(IPingService.class);
     try {
-      // side-effect of every service call (whether ping or any other) is to get
-      // client notifications
+      // side-effect of every service call (whether ping or any other) is to get client notifications
       pingService.ping("GetClientNotifications");
     }
     catch (Throwable t) {
@@ -53,17 +36,5 @@ public class ClientNotificationPollingJob extends ClientAsyncJob {
         LOG.info("polling", t);
       }
     }
-    if (monitor.isCanceled()) {
-      return Status.CANCEL_STATUS;
-    }
-    // re-schedule
-    long netLatency = 0L;
-    IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
-    if (perf != null) {
-      netLatency = perf.getNetworkLatency();
-    }
-    long sleepInterval = m_analyzeNetworkLatency ? Math.max(m_pollInterval, 10 * netLatency) : m_pollInterval;
-    schedule(sleepInterval);
-    return Status.OK_STATUS;
   }
 }

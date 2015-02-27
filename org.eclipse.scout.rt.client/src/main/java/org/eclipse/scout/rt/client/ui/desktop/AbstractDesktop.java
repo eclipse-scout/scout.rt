@@ -43,7 +43,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
@@ -58,6 +57,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPag
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageSearchFormChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopTablePageLoadedChain;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -2091,7 +2091,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       if (forcedClosing) {
         setOpenedInternal(false);
       }
-      ClientSyncJob.getCurrentSession().stopSession();
+      ClientSessionProvider.currentSession().stopSession();
     }
 
     @Override
@@ -2123,7 +2123,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
             SERVICES.getService(INavigationHistoryService.class).addStep(0, page);
           }
           try {
-            ClientSyncJob.getCurrentSession().getMemoryPolicy().afterOutlineSelectionChanged(AbstractDesktop.this);
+            ClientSessionProvider.currentSession().getMemoryPolicy().afterOutlineSelectionChanged(AbstractDesktop.this);
           }
           catch (Throwable t) {
             LOG.warn("MemoryPolicy.afterOutlineSelectionChanged", t);

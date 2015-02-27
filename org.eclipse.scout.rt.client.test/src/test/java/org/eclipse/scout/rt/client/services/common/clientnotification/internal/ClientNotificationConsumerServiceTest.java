@@ -20,10 +20,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.AbstractClientSession;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.AbstractClientNotification;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
@@ -61,7 +61,7 @@ public class ClientNotificationConsumerServiceTest {
   public void setup() {
     m_clientNotificationService = new ClientNotificationConsumerService();
     m_sessionListener = mock(IClientNotificationConsumerListener.class);
-    m_clientNotificationService.addClientNotificationConsumerListener(ClientSyncJob.getCurrentSession(), m_sessionListener);
+    m_clientNotificationService.addClientNotificationConsumerListener(ClientSessionProvider.currentSession(), m_sessionListener);
     m_globalListener = mock(IClientNotificationConsumerListener.class);
     m_clientNotificationService.addGlobalClientNotificationConsumerListener(m_globalListener);
     m_testSession = new AbstractClientSession(false) {
@@ -78,9 +78,9 @@ public class ClientNotificationConsumerServiceTest {
   @After
   public void tearDown() {
     m_clientNotificationService.removeGlobalClientNotificationConsumerListener(m_globalListener);
-    m_clientNotificationService.removeClientNotificationConsumerListener(ClientSyncJob.getCurrentSession(), m_sessionListener);
+    m_clientNotificationService.removeClientNotificationConsumerListener(ClientSessionProvider.currentSession(), m_sessionListener);
     m_clientNotificationService.removeClientNotificationConsumerListener(m_testSession, m_testSessionListener);
-    m_clientNotificationService.removeConsumedNotificationIds(getTestIdSet(), ClientSyncJob.getCurrentSession());
+    m_clientNotificationService.removeConsumedNotificationIds(getTestIdSet(), ClientSessionProvider.currentSession());
     m_clientNotificationService.removeConsumedNotificationIds(getTestIdSet(), m_testSession);
     m_clientNotificationService.removeGlobalConsumedNotificationIds(getTestIdSet());
   }
@@ -90,7 +90,7 @@ public class ClientNotificationConsumerServiceTest {
    */
   @Test
   public void testNoNotificationReceived() {
-    m_clientNotificationService.dispatchClientNotifications(new ArrayList<IClientNotification>(), ClientSyncJob.getCurrentSession());
+    m_clientNotificationService.dispatchClientNotifications(new ArrayList<IClientNotification>(), ClientSessionProvider.currentSession());
     verifyZeroInteractions(m_sessionListener);
     verifyZeroInteractions(m_globalListener);
   }
@@ -100,10 +100,10 @@ public class ClientNotificationConsumerServiceTest {
    */
   @Test
   public void testNotificationReceive() throws InterruptedException {
-    dispatchTestNotifications(ClientSyncJob.getCurrentSession());
+    dispatchTestNotifications(ClientSessionProvider.currentSession());
     verifyNotificationReceived(m_sessionListener);
     verifyNotificationReceived(m_globalListener);
-    assertSetEquals(getTestIdSet(), m_clientNotificationService.getConsumedNotificationIds(ClientSyncJob.getCurrentSession()));
+    assertSetEquals(getTestIdSet(), m_clientNotificationService.getConsumedNotificationIds(ClientSessionProvider.currentSession()));
   }
 
   /**
@@ -124,22 +124,22 @@ public class ClientNotificationConsumerServiceTest {
    */
   @Test
   public void testNotificationOnlyConsumedOnce() {
-    dispatchTestNotifications(ClientSyncJob.getCurrentSession());
+    dispatchTestNotifications(ClientSessionProvider.currentSession());
     verifyNotificationReceived(m_sessionListener);
     verifyNotificationReceived(m_globalListener);
-    assertSetEquals(getTestIdSet(), m_clientNotificationService.getConsumedNotificationIds(ClientSyncJob.getCurrentSession()));
-    dispatchTestNotifications(ClientSyncJob.getCurrentSession());
+    assertSetEquals(getTestIdSet(), m_clientNotificationService.getConsumedNotificationIds(ClientSessionProvider.currentSession()));
+    dispatchTestNotifications(ClientSessionProvider.currentSession());
     verifyNoMoreInteractions(m_sessionListener);
     verifyNoMoreInteractions(m_globalListener);
-    assertSetEquals(getTestIdSet(), m_clientNotificationService.getConsumedNotificationIds(ClientSyncJob.getCurrentSession()));
+    assertSetEquals(getTestIdSet(), m_clientNotificationService.getConsumedNotificationIds(ClientSessionProvider.currentSession()));
   }
 
   @Test
   public void testExpiredNotificationCleanedUp() {
     final int noncachedTimeout = -30000;
     ArrayList<IClientNotification> notifications = CollectionUtility.arrayList(createTestNotification(noncachedTimeout));
-    m_clientNotificationService.dispatchClientNotifications(notifications, ClientSyncJob.getCurrentSession());
-    m_clientNotificationService.dispatchClientNotifications(notifications, ClientSyncJob.getCurrentSession());
+    m_clientNotificationService.dispatchClientNotifications(notifications, ClientSessionProvider.currentSession());
+    m_clientNotificationService.dispatchClientNotifications(notifications, ClientSessionProvider.currentSession());
     verify(m_sessionListener, times(2)).handleEvent(any(ClientNotificationConsumerEvent.class), anyBoolean());
     verify(m_globalListener, times(2)).handleEvent(any(ClientNotificationConsumerEvent.class), anyBoolean());
   }
@@ -151,7 +151,7 @@ public class ClientNotificationConsumerServiceTest {
    */
   @Test
   public void testNotificationConsumedOnOtherSession() throws InterruptedException {
-    dispatchTestNotifications(ClientSyncJob.getCurrentSession());
+    dispatchTestNotifications(ClientSessionProvider.currentSession());
     m_clientNotificationService.dispatchClientNotifications(m_testNotifications, m_testSession);
     IClientNotification notification = m_testSessionListener.waitForHandleEvent();
     assertEquals(TEST_ID, notification.getId());

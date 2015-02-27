@@ -20,6 +20,7 @@ import java.util.Random;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.NlsLocale;
 
 public final class NumberUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(NumberUtility.class);
@@ -442,7 +443,7 @@ public final class NumberUtility {
   }
 
   /**
-   * Formats a number with the <code>LocaleThreadLocal</code>
+   * Formats a number with the <code>NlsLocale</code>
    *
    * @return The formatted number. Returns an empty string if the parameter is <code>null</code>.
    */
@@ -450,7 +451,7 @@ public final class NumberUtility {
     if (n == null) {
       return "";
     }
-    Locale loc = LocaleThreadLocal.get();
+    Locale loc = NlsLocale.get();
     return NumberFormat.getInstance(loc).format(n);
   }
 

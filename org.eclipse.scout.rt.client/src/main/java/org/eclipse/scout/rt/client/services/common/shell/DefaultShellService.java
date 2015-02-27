@@ -13,10 +13,14 @@ package org.eclipse.scout.rt.client.services.common.shell;
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.shell.IShellService;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
@@ -32,16 +36,17 @@ public class DefaultShellService extends AbstractService implements IShellServic
   public void shellOpen(final String path) throws ProcessingException {
     if (UserAgentUtility.isWebClient()) {
       // Bug 454897: Need to be in model thread for call
-      if (ClientSyncJob.isSyncClientJob()) {
-        ClientSyncJob.getCurrentSession().getDesktop().openUrlInBrowser(path);
+      final IClientSession clientSession = ClientSessionProvider.currentSession();
+      if (OBJ.one(IModelJobManager.class).isModelThread()) {
+        clientSession.getDesktop().openUrlInBrowser(path);
       }
       else {
-        new ClientSyncJob("Open url in browser", ClientSyncJob.getCurrentSession()) {
+        OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
           @Override
-          protected void runVoid(IProgressMonitor monitor) throws Throwable {
-            ClientSyncJob.getCurrentSession().getDesktop().openUrlInBrowser(path);
+          public void run() throws Exception {
+            clientSession.getDesktop().openUrlInBrowser(path);
           }
-        }.schedule();
+        }, ClientJobInput.defaults().session(clientSession).name("Open url in browser"));
       }
     }
     else {

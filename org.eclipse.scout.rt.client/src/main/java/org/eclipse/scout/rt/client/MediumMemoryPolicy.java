@@ -15,11 +15,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.AndFilter;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.job.filter.JobFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
@@ -31,6 +38,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
@@ -172,20 +180,22 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
   public void beforeTablePageLoadData(IPageWithTable<?> page) {
     if (m_release) {
       //make sure inactive outlines have no selection that "keeps" the pages
-      IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
+      IClientSession session = ClientSessionProvider.currentSession();
+      IDesktop desktop = session.getDesktop();
       for (IOutline o : desktop.getAvailableOutlines()) {
         if (o != desktop.getOutline()) {
           o.selectNode(null);
         }
       }
-      ClientJob.getCurrentSession().getDesktop().releaseUnusedPages();
+      desktop.releaseUnusedPages();
       System.gc();
-      for (Job j : Job.getJobManager().find(ClientJob.class)) {
-        if (j instanceof ForceGCJob) {
-          j.cancel();
-        }
+      OBJ.one(IClientJobManager.class).cancel(new AndFilter<IFuture<?>>(new ClientSessionFilter(session), new JobFilter(getClass().getName())), true);
+      try {
+        OBJ.one(IClientJobManager.class).schedule(new ForceGCJob(), ClientJobInput.defaults().session(session).name("release memory").id(getClass().getName()));
       }
-      new ForceGCJob().schedule();
+      catch (JobExecutionException e) {
+        LOG.error("", e);
+      }
       m_release = false;
     }
     if (page.getTable() != null && page.getTable().getRowCount() > 1000) {

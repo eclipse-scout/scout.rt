@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.navigation;
 
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.service.AbstractService;
 
@@ -32,14 +32,14 @@ public class BreadCrumbsNavigationService extends AbstractService implements IBr
       return;
     }
 
-    IClientSession session = ClientJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     IBreadCrumbsNavigation data = createBreadCrumbsNavigation(desktop);
     session.setData(SESSION_DATA_KEY, data);
   }
 
   @Override
   public void uninstall() {
-    IClientSession session = ClientJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     session.setData(SESSION_DATA_KEY, null);
   }
 
@@ -53,7 +53,7 @@ public class BreadCrumbsNavigationService extends AbstractService implements IBr
 
   @Override
   public IBreadCrumbsNavigation getBreadCrumbsNavigation() {
-    IClientSession session = ClientJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     return (IBreadCrumbsNavigation) session.getData(SESSION_DATA_KEY);
   }
 

@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.eclipse.scout.commons.nls.NlsLocale;
+
 public final class DateUtility {
 
   private DateUtility() {
@@ -40,7 +42,7 @@ public final class DateUtility {
     if (d == null) {
       return "";
     }
-    Locale loc = LocaleThreadLocal.get();
+    Locale loc = NlsLocale.get();
     return DateFormat.getDateInstance(DateFormat.DEFAULT, loc).format(d);
   }
 
@@ -51,7 +53,7 @@ public final class DateUtility {
     if (d == null) {
       return "";
     }
-    Locale loc = LocaleThreadLocal.get();
+    Locale loc = NlsLocale.get();
     return DateFormat.getTimeInstance(DateFormat.SHORT, loc).format(d);
   }
 
@@ -62,7 +64,7 @@ public final class DateUtility {
     if (d == null) {
       return "";
     }
-    Locale loc = LocaleThreadLocal.get();
+    Locale loc = NlsLocale.get();
     return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, loc).format(d);
   }
 
@@ -73,7 +75,7 @@ public final class DateUtility {
     if (d == null || !StringUtility.hasText(pattern)) {
       return "";
     }
-    Locale loc = LocaleThreadLocal.get();
+    Locale loc = NlsLocale.get();
     return new SimpleDateFormat(pattern, loc).format(d);
   }
 
@@ -82,7 +84,7 @@ public final class DateUtility {
       return null;
     }
     try {
-      Locale loc = LocaleThreadLocal.get();
+      Locale loc = NlsLocale.get();
       return new SimpleDateFormat(pattern, loc).parse(s);
     }
     catch (ParseException e) {
@@ -535,7 +537,7 @@ public final class DateUtility {
   }
 
   public static boolean isWeekend(Date d) {
-    return isWeekend(d, LocaleThreadLocal.get());
+    return isWeekend(d, NlsLocale.get());
   }
 
   public static boolean isWeekend(Date d, Locale locale) {

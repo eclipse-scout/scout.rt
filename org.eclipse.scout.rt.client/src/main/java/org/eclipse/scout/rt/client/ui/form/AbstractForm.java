@@ -59,7 +59,6 @@ import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.rt.client.BlockingCondition;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCheckFieldsChain;
@@ -79,6 +78,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormValidateChai
 import org.eclipse.scout.rt.client.extension.ui.form.IFormExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.MoveFormFieldsHandler;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IBlockingCondition;
 import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
@@ -152,7 +152,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private boolean m_closeTimerArmed;
   private boolean m_formStored;
   private boolean m_formLoading;
-  private final BlockingCondition m_blockingCondition;
+  private final IBlockingCondition m_blockingCondition;
   private boolean m_autoRegisterInDesktopOnStart;
   private int m_displayHint;// no property, is fixed
   private String m_displayViewId;// no property, is fixed
@@ -201,7 +201,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_enabledGranted = true;
     m_visibleGranted = true;
     m_formLoading = true;
-    m_blockingCondition = new BlockingCondition(false);
+    m_blockingCondition = OBJ.one(IModelJobManager.class).createBlockingCondition("block", false);
     m_objectExtensions = new ObjectExtensions<AbstractForm, IFormExtension<? extends AbstractForm>>(this);
     if (callInitializer) {
       callInitializer();
@@ -970,7 +970,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       m_blockingCondition.waitFor();
     }
-    catch (InterruptedException e) {
+    catch (ProcessingException e) {
       throw new ProcessingException(ScoutTexts.get("UserInterrupted"), e);
     }
   }
@@ -1328,7 +1328,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Convenience for ClientJob.getCurrentSession().getDesktop()
+   * Convenience for ClientSessionProvider.currentSession().getDesktop()
    */
   public IDesktop getDesktop() {
     return ClientSessionProvider.currentSession().getDesktop();
@@ -2113,7 +2113,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     finally {
       // unlock
-      m_blockingCondition.release();
+      m_blockingCondition.setBlocking(false);
       // fire
       fireFormClosed();
     }

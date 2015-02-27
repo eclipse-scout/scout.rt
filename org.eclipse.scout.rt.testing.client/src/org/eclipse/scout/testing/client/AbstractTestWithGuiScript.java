@@ -12,17 +12,21 @@ package org.eclipse.scout.testing.client;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.filter.AndFilter;
+import org.eclipse.scout.commons.filter.NotFilter;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.filter.FutureFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.filter.BlockedJobFilter;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -30,7 +34,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
-import org.eclipse.scout.rt.testing.commons.ScoutAssert;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.Assert;
 import org.junit.Test;
@@ -146,64 +150,65 @@ public abstract class AbstractTestWithGuiScript {
       if (failWhenSystemErrIsNotEmpty()) {
         startMonitoringSystemErr();
       }
-      final ClientSyncJob runModelJob = new ClientSyncJob("Run", m_clientSession) {
+
+      IRunnable runModelJob = new IRunnable() {
         @Override
-        protected void runVoid(IProgressMonitor m) throws Throwable {
-          resetSession();
-          runModel();
-        }
-      };
-      runModelJob.setUser(false);
-      runModelJob.setSystem(true);
-      //
-      final ClientSyncJob disposeModelJob = new ClientSyncJob("Dispose", m_clientSession) {
-        @Override
-        protected void runVoid(IProgressMonitor m) throws Throwable {
+        public void run() throws Exception {
           try {
-            disposeModel();
-          }
-          finally {
             resetSession();
+            runModel();
+          }
+          catch (Throwable t) {
+            throw new Exception(t);
           }
         }
       };
-      disposeModelJob.setUser(false);
-      disposeModelJob.setSystem(true);
-      //
-      JobEx guiScriptJob = new JobEx("Gui Script") {
+
+      IRunnable disposeModelJob = new IRunnable() {
         @Override
-        protected IStatus run(IProgressMonitor monitor) {
+        public void run() throws Exception {
+          try {
+            try {
+              disposeModel();
+            }
+            finally {
+              resetSession();
+            }
+          }
+          catch (Throwable t) {
+            throw new Exception(t);
+          }
+        }
+      };
+
+      IRunnable guiScriptJob = new IRunnable() {
+        @Override
+        public void run() throws Exception {
           try {
             gui.waitForIdle();
             runGui(gui);
-            return Status.OK_STATUS;
           }
           catch (Throwable t) {
-            return new Status(Status.WARNING, AbstractTestWithGuiScript.this.getClass().getName(), t.getMessage(), t);
+            throw new Exception(t);
           }
         }
       };
-      guiScriptJob.setUser(false);
-      guiScriptJob.setSystem(true);
-      //
+
+      IModelJobManager modelJobManager = OBJ.one(IModelJobManager.class);
+      IFuture<Void> runModelFuture = null;
       try {
         m_testActive = true;
-        runModelJob.schedule();
-        while (!runModelJob.isWaitFor() && runModelJob.getState() != Job.NONE) {
-          runModelJob.join(100);
-        }
-        guiScriptJob.schedule();
-        guiScriptJob.join();
+        runModelFuture = modelJobManager.schedule(runModelJob, ClientJobInput.defaults().session(m_clientSession).name("Run"));
+        modelJobManager.waitUntilDone(new AndFilter<IFuture<?>>(new FutureFilter(runModelFuture), new NotFilter<>(BlockedJobFilter.INSTANCE)), 1, TimeUnit.HOURS);
+        IFuture<Void> guiScriptFuture = OBJ.one(IClientJobManager.class).schedule(guiScriptJob, ClientJobInput.defaults().session(m_clientSession).name("Gui Script"));
+        guiScriptFuture.get();
       }
       finally {
         m_testActive = false;
-        disposeModelJob.schedule();
-        disposeModelJob.join();
+        IFuture<Void> disposeFuture = modelJobManager.schedule(disposeModelJob, ClientJobInput.defaults().session(m_clientSession).name("Dispose"));
+        disposeFuture.get();
       }
-      runModelJob.join();
-      ScoutAssert.jobSuccessfullyCompleted(runModelJob);
-      ScoutAssert.jobSuccessfullyCompleted(guiScriptJob);
-      ScoutAssert.jobSuccessfullyCompleted(disposeModelJob);
+      runModelFuture.get();
     }
     finally {
       gui.afterTest();

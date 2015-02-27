@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
@@ -42,7 +42,7 @@ public class PageFormMap {
 
       for (IPageForm pageForm : pageFormList) {
         if (page.equals(pageForm.getPage())) {
-          IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
+          IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
           if (!onlyVisible || desktop.isShowing(pageForm)) {
             return pageForm;
           }

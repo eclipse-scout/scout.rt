@@ -20,9 +20,9 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -122,7 +122,7 @@ public class AbstractDoubleFieldTest extends AbstractDoubleField {
   @Test
   public void testParseValueInternalRounding() throws ProcessingException {
     // expecting RoundingMode.HALF_UP as default
-    LocaleThreadLocal.get();
+    NlsLocale.get();
     setFractionDigits(1);
     assertEquals("parsing failed", Double.valueOf(123.5d), parseValueInternal(formatWithFractionDigits(123.457, 3)));
     assertEquals("parsing failed", Double.valueOf(12.6d), parseValueInternal(formatWithFractionDigits(12.55, 2)));

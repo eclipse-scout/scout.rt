@@ -460,7 +460,7 @@ public class MutualExclusionTest {
     // VERIFY
     verifyLatch.await();
     assertFalse(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
-    assertFalse(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 0, TimeUnit.SECONDS));
+    assertFalse(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 1, TimeUnit.MILLISECONDS));
     assertEquals(Arrays.asList("running-1", "running-2", "interrupted-1", "non-model-thread-1"), protocol);
   }
 
@@ -550,11 +550,11 @@ public class MutualExclusionTest {
 
     assertTrue(future1.isCancelled());
     try {
-      future1.get(0, TimeUnit.MILLISECONDS);
-      fail();
+      assertNull(future1.get(0, TimeUnit.MILLISECONDS));
+      assertTrue(future1.isCancelled());
     }
     catch (JobExecutionException e) {
-      assertTrue(e.isCancellation());
+      fail();
     }
 
     assertFalse(future2.isCancelled());
@@ -806,7 +806,7 @@ public class MutualExclusionTest {
     jobsScheduledLatch.countDown(); // notify that all jobs are scheduled.
 
     assertTrue(job3RunningLatch.await());
-    assertFalse(jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 0, TimeUnit.SECONDS)); // job-4 is pending
+    assertFalse(jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 1, TimeUnit.MILLISECONDS)); // job-4 is pending
     assertFalse(jobManager.isDone(new AlwaysFilter<IFuture<?>>())); // job-4 is pending
 
     List<String> expectedProtocol = new ArrayList<>();

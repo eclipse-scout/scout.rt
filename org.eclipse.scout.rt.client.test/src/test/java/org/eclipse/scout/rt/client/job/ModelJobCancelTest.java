@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.testing.commons.UncaughtExceptionRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -127,13 +128,10 @@ public class ModelJobCancelTest {
     assertTrue(future.isCancelled());
 
     try {
-      future.get(1, TimeUnit.SECONDS);
-      fail();
+      Assert.assertNull(future.get(1, TimeUnit.SECONDS));
     }
     catch (JobExecutionException e) {
-      assertFalse(e.isTimeout());
-      assertTrue(e.isCancellation());
-      assertFalse(e.isInterruption());
+      fail();
     }
   }
 
@@ -176,13 +174,10 @@ public class ModelJobCancelTest {
     assertEquals(Arrays.asList("interrupted", "cancelled-after"), protocol);
 
     try {
-      future.get(5, TimeUnit.SECONDS);
-      fail();
+      Assert.assertNull(future.get(5, TimeUnit.SECONDS));
     }
     catch (JobExecutionException e) {
-      assertFalse(e.isTimeout());
-      assertTrue(e.isCancellation());
-      assertFalse(e.isInterruption());
+      fail();
     }
   }
 
@@ -226,14 +221,10 @@ public class ModelJobCancelTest {
     try {
       assertTrue(future2.isCancelled());
       assertTrue(future2.isDone());
-      future2.get();
-      fail();
+      Assert.assertNull(future2.get());
     }
     catch (JobExecutionException e) {
-      assertTrue(e.isCancellation());
-      assertFalse(e.isRejection());
-      assertFalse(e.isInterruption());
-      assertFalse(e.isTimeout());
+      fail();
     }
   }
 
@@ -287,36 +278,24 @@ public class ModelJobCancelTest {
     assertEquals(CollectionUtility.arrayList("running-1", "interrupted-1", "done-1"), protocol);
 
     try {
-      future1.get(1, TimeUnit.SECONDS);
-      fail();
+      Assert.assertNull(future1.get(1, TimeUnit.SECONDS));
     }
     catch (JobExecutionException e) {
-      assertTrue(e.isCancellation());
-      assertFalse(e.isInterruption());
-      assertFalse(e.isRejection());
-      assertFalse(e.isTimeout());
+      fail();
     }
 
     try {
-      future2.get(1, TimeUnit.SECONDS);
-      fail();
+      Assert.assertNull(future2.get(1, TimeUnit.SECONDS));
     }
     catch (JobExecutionException e) {
-      assertTrue(e.isCancellation());
-      assertFalse(e.isInterruption());
-      assertFalse(e.isRejection());
-      assertFalse(e.isTimeout());
+      fail();
     }
 
     try {
-      future3.get(1, TimeUnit.SECONDS);
-      fail();
+      Assert.assertNull(future3.get(1, TimeUnit.SECONDS));
     }
     catch (JobExecutionException e) {
-      assertTrue(e.isCancellation());
-      assertFalse(e.isInterruption());
-      assertFalse(e.isRejection());
-      assertFalse(e.isTimeout());
+      fail();
     }
   }
 

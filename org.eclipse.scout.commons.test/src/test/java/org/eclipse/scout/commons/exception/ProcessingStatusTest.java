@@ -32,13 +32,11 @@ public class ProcessingStatusTest {
   private static final String BODY = "testMessage";
   private static final String TITLE = "title";
 
-  @SuppressWarnings("deprecation")
   @Before
   public void setup() {
     m_infoStatus = new ProcessingStatus("", IStatus.INFO);
     m_warningStatus = new ProcessingStatus("", IStatus.WARNING);
     m_errorStatus = new ProcessingStatus("", IStatus.ERROR);
-    m_cancelStatus = new ProcessingStatus("", IProcessingStatus.CANCEL);
     m_fatalStatus = new ProcessingStatus("", IProcessingStatus.FATAL);
     m_okStatus = new ProcessingStatus("", IProcessingStatus.OK);
   }
@@ -56,14 +54,12 @@ public class ProcessingStatusTest {
     assertTrue(m_okStatus.getSeverity() < m_infoStatus.getSeverity());
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   public void testMatches() {
     assertMatchesOnly(m_infoStatus, IStatus.INFO, getKnownStatuses());
     assertMatchesOnly(m_warningStatus, IStatus.WARNING, getKnownStatuses());
     assertMatchesOnly(m_errorStatus, IStatus.ERROR, getKnownStatuses());
     assertMatchesOnly(m_fatalStatus, IProcessingStatus.FATAL, getKnownStatuses());
-    assertMatchesOnly(m_cancelStatus, IProcessingStatus.CANCEL, getKnownStatuses());
     assertMatchesOnly(m_okStatus, IProcessingStatus.OK, getKnownStatuses());
   }
 
@@ -126,9 +122,8 @@ public class ProcessingStatusTest {
     assertTrue(psString.contains(exceptionMessage));
   }
 
-  @SuppressWarnings("deprecation")
   private int[] getKnownStatuses() {
-    return new int[]{IStatus.INFO, IStatus.ERROR, IStatus.WARNING, IProcessingStatus.FATAL, IProcessingStatus.CANCEL, IProcessingStatus.OK};
+    return new int[]{IStatus.INFO, IStatus.ERROR, IStatus.WARNING, IProcessingStatus.FATAL, IProcessingStatus.OK};
   }
 
   private void assertMatchesOnly(IStatus status, int match, int[] allStatuses) {

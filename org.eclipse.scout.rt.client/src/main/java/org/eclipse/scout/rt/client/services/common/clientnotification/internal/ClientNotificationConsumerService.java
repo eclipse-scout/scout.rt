@@ -15,18 +15,21 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.service.AbstractService;
 
@@ -65,18 +68,23 @@ public class ClientNotificationConsumerService extends AbstractService implement
     if (notifications.isEmpty()) {
       return;
     }
-    if (ClientJob.getCurrentSession() == session) {
+    if (ClientSessionProvider.currentSession() == session) {
       // we are sync
       fireEvent(session, notifications, true);
     }
     else {
       // async
-      new ClientAsyncJob("Dispatch client notifications", session) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          fireEvent(session, notifications, false);
-        }
-      }.schedule();
+      try {
+        OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
+          @Override
+          public void run() throws Exception {
+            fireEvent(session, notifications, false);
+          }
+        }, ClientJobInput.defaults().session(session).name("Dispatch client notifications"));
+      }
+      catch (JobExecutionException e) {
+        LOG.error("Unable to fire client notifications.", e);
+      }
     }
   }
 

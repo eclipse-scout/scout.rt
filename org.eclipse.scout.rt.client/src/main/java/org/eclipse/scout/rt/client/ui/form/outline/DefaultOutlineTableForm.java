@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -72,7 +72,7 @@ public class DefaultOutlineTableForm extends AbstractForm implements IOutlineTab
   public void startView() throws ProcessingException {
     setAutoAddRemoveOnDesktop(false);
     startInternal(new ViewHandler());
-    ClientSyncJob.getCurrentSession().getDesktop().setOutlineTableForm(this);
+    ClientSessionProvider.currentSession().getDesktop().setOutlineTableForm(this);
   }
 
   @Order(10.0f)
@@ -140,7 +140,7 @@ public class DefaultOutlineTableForm extends AbstractForm implements IOutlineTab
 
       @Override
       protected void execTableTitleChanged() {
-        IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+        IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
         ITreeNode node = null;
         if (getTable() != null) {
           if (desktop.getOutline() != null) {

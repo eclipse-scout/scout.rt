@@ -14,6 +14,7 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.mail.MailUtility;
 import org.eclipse.scout.service.IService;
 
 /**

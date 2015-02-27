@@ -13,21 +13,24 @@ package org.eclipse.scout.rt.ui.swing.services;
 import java.awt.AWTEvent;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.SwingUtilities;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.services.common.useractivity.IUserActivityProvider;
 
 public class UserActivityProvider extends AbstractPropertyObserver implements IUserActivityProvider {
   private long m_idleTrigger;
   private boolean m_userActive;
-  private UserInactiveJob m_userInactiveJob;
-  private Object m_jobLock = new Object();
+  private IFuture<Void> m_userInactiveJob;
+  private long m_postponed;
 
   public UserActivityProvider() {
     m_idleTrigger = 30000L;
@@ -55,48 +58,41 @@ public class UserActivityProvider extends AbstractPropertyObserver implements IU
     propertySupport.setPropertyBool(PROP_ACTIVE, b);
   }
 
-  private void userBusy() {
-    synchronized (m_jobLock) {
-      if (!m_userActive) {
-        setActiveInternal(true);
+  private synchronized void userBusy() {
+    if (!m_userActive) {
+      setActiveInternal(true);
+    }
+    if (m_userInactiveJob == null) {
+      try {
+        m_userInactiveJob = OBJ.one(IClientJobManager.class).schedule(new UserInactiveRunnable(), m_idleTrigger + 1000L, TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
       }
-      if (m_userInactiveJob == null) {
-        m_userInactiveJob = new UserInactiveJob();
-        m_userInactiveJob.schedule(m_idleTrigger + 1000L);
+      catch (JobExecutionException e) {
       }
-      m_userInactiveJob.postponed = System.currentTimeMillis() + m_idleTrigger;
+    }
+    m_postponed = System.currentTimeMillis() + m_idleTrigger;
+  }
+
+  private synchronized void userIdle() {
+    if (m_userInactiveJob != null) {
+      long delta = m_postponed - System.currentTimeMillis();
+      if (delta < 1000L) {
+        setActiveInternal(false);
+        m_userInactiveJob = null;
+      }
+      else {
+        try {
+          m_userInactiveJob = OBJ.one(IClientJobManager.class).schedule(new UserInactiveRunnable(), delta, TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
+        }
+        catch (JobExecutionException e) {
+        }
+      }
     }
   }
 
-  private void userIdle() {
-    synchronized (m_jobLock) {
-      if (m_userInactiveJob != null) {
-        long delta = m_userInactiveJob.postponed - System.currentTimeMillis();
-        if (delta < 1000L) {
-          setActiveInternal(false);
-          m_userInactiveJob = null;
-        }
-        else {
-          m_userInactiveJob.schedule(delta);
-        }
-      }
-    }
-  }
-
-  private class UserInactiveJob extends Job {
-    long postponed;
-
-    public UserInactiveJob() {
-      super("User activity");
-      setUser(false);
-      setSystem(true);
-      setPriority(Job.DECORATE);
-    }
-
+  private class UserInactiveRunnable implements IRunnable {
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
+    public void run() throws Exception {
       userIdle();
-      return Status.OK_STATUS;
     }
   }
 

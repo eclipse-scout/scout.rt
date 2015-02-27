@@ -32,8 +32,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
@@ -303,9 +305,9 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 5678).join(5678);
+        getSwingEnvironment().invokeScoutLater(t, 5678).get(5678, TimeUnit.MILLISECONDS);
       }
-      catch (InterruptedException e) {
+      catch (ProcessingException e) {
         //nop
       }
       // end notify

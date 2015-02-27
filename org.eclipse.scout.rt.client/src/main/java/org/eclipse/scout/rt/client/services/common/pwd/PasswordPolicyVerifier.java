@@ -15,7 +15,7 @@ import java.util.Date;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
@@ -50,7 +50,7 @@ public class PasswordPolicyVerifier {
       LOG.error("missing client service proxy for " + IPasswordManagementService.class.getName() + "; check plugin extensions");
       return false;
     }
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop == null) {
       LOG.error("desktop is null");
       return false;

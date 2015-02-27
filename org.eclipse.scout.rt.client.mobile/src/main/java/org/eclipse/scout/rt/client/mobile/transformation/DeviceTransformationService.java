@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.AbstractService;
@@ -33,14 +33,14 @@ public class DeviceTransformationService extends AbstractService implements IDev
       return;
     }
 
-    IClientSession session = ClientJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     IDeviceTransformer data = createDeviceTransformer(desktop);
     session.setData(SESSION_DATA_KEY, data);
   }
 
   @Override
   public void uninstall() {
-    IClientSession session = ClientJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     session.setData(SESSION_DATA_KEY, null);
   }
 
@@ -55,7 +55,7 @@ public class DeviceTransformationService extends AbstractService implements IDev
 
   @Override
   public IDeviceTransformer getDeviceTransformer() {
-    IClientSession session = ClientJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     return (IDeviceTransformer) session.getData(SESSION_DATA_KEY);
   }
 

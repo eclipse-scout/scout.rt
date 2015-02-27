@@ -17,14 +17,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
@@ -36,6 +37,7 @@ import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.osgi.framework.Bundle;
 
 /**
@@ -192,10 +194,9 @@ public class PrintFormsAction extends AbstractAction {
     }
 
     private void schedulePrintJob(final IForm f) {
-      new ClientSyncJob("print " + f.getClass().getSimpleName(), ClientSyncJob.getCurrentSession()) {
-
+      OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
         @Override
-        protected void runVoid(IProgressMonitor monitor) {
+        public void run() throws Exception {
           printForm(f, null);
           // set all tabboxes visible
           for (IFormField field : f.getAllFields()) {
@@ -241,9 +242,8 @@ public class PrintFormsAction extends AbstractAction {
               }
             }
           });
-
         }
-      }.schedule();
+      }, ClientJobInput.defaults().name("print " + f.getClass().getSimpleName()));
     }
   }
 

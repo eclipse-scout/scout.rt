@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.eventlistprofiler.IEventListenerSource;
  */
 public class EventListenerList implements IEventListenerSource {
   private static final Object[] NULL_ARRAY = new Object[0];
-  private Object listenerListLock = new Object();
+  private final Object listenerListLock = new Object();
   private transient Object[] listenerList = NULL_ARRAY;
 
   public EventListenerList() {
@@ -196,8 +196,7 @@ public class EventListenerList implements IEventListenerSource {
         Object[] tmp = new Object[listenerList.length - 2];
         System.arraycopy(listenerList, 0, tmp, 0, index);
         if (index < tmp.length) {
-          System.arraycopy(listenerList, index + 2, tmp, index,
-              tmp.length - index);
+          System.arraycopy(listenerList, index + 2, tmp, index, tmp.length - index);
         }
         listenerList = (tmp.length == 0) ? NULL_ARRAY : tmp;
       }

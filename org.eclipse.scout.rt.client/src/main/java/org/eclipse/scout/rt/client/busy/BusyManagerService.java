@@ -10,16 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.busy;
 
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.IJobChangeListener;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.commons.job.FutureJobChangeEventFilter;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IJobChangeEvent;
+import org.eclipse.scout.commons.job.IJobChangeEventFilter;
+import org.eclipse.scout.commons.job.IJobChangeListener;
+import org.eclipse.scout.commons.job.IJobInput;
+import org.eclipse.scout.commons.job.internal.JobChangeEvent;
+import org.eclipse.scout.commons.job.internal.JobChangeListeners;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.IClientSessionProvider;
-import org.eclipse.scout.rt.client.IJobChangeListenerEx;
-import org.eclipse.scout.rt.client.JobChangeAdapterEx;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.service.AbstractService;
 
 /**
@@ -35,7 +39,7 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
   private static final String HANDLER_CLIENT_SESSION_KEY = IBusyHandler.class.getName();
 
   private final IJobChangeListener m_jobChangeListener;
-  private final IJobChangeListenerEx m_jobChangeListenerEx;
+  private final IJobChangeListener m_jobChangeListenerEx;
 
   public BusyManagerService() {
     m_jobChangeListener = new P_JobChangeListener();
@@ -45,22 +49,28 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
   @Override
   public void initializeService() {
     super.initializeService();
-    Job.getJobManager().addJobChangeListener(m_jobChangeListener);
+    JobChangeListeners.DEFAULT.add(m_jobChangeListener);
   }
 
   @Override
   public void disposeServices() {
     try {
-      Job.getJobManager().removeJobChangeListener(m_jobChangeListener);
+      JobChangeListeners.DEFAULT.remove(m_jobChangeListener);
     }
     finally {
       super.disposeServices();
     }
   }
 
-  private IBusyHandler getHandlerInternal(Job job) {
-    if (job instanceof IClientSessionProvider) {
-      IClientSession session = ((IClientSessionProvider) job).getClientSession();
+  private IBusyHandler getHandlerInternal(IFuture<?> future) {
+    if (future == null) {
+      return null;
+    }
+
+    IJobInput input = future.getJobInput();
+    if (input instanceof ClientJobInput) {
+      ClientJobInput cji = (ClientJobInput) input;
+      IClientSession session = cji.getSession();
       return getHandler(session);
     }
     return null;
@@ -95,59 +105,79 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
     session.setData(HANDLER_CLIENT_SESSION_KEY, null);
   }
 
-  private class P_JobChangeListener extends JobChangeAdapter {
-    @Override
-    public void running(IJobChangeEvent event) {
-      final Job job = event.getJob();
-      IBusyHandler handler = getHandlerInternal(job);
+  private class P_JobChangeListener implements IJobChangeListener {
+
+    private final Map<IFuture<?>, IJobChangeEventFilter> m_filters = new HashMap<>();
+
+    private void running(IJobChangeEvent event) {
+      IFuture<?> future = event.getFuture();
+      IBusyHandler handler = getHandlerInternal(future);
       if (handler == null) {
         return;
       }
-      if (!handler.acceptJob(job)) {
+      if (!handler.acceptFuture(future, event.getSourceManager())) {
         return;
       }
-      if (job instanceof ClientJob) {
-        ((ClientJob) job).addJobChangeListenerEx(m_jobChangeListenerEx);
+      FutureJobChangeEventFilter eventFilter = new FutureJobChangeEventFilter(future);
+      m_filters.put(future, eventFilter);
+      JobChangeListeners.DEFAULT.add(m_jobChangeListenerEx, eventFilter);
+      handler.onJobBegin(future);
+    }
+
+    private void done(IJobChangeEvent event) {
+      IFuture<?> future = event.getFuture();
+      IBusyHandler handler = getHandlerInternal(future);
+      if (handler == null) {
+        return;
       }
-      handler.onJobBegin(job);
+      if (!handler.acceptFuture(future, event.getSourceManager())) {
+        return;
+      }
+      IJobChangeEventFilter eventFilter = m_filters.get(future);
+      JobChangeListeners.DEFAULT.remove(m_jobChangeListenerEx, eventFilter);
+      handler.onJobEnd(future);
     }
 
     @Override
-    public void done(IJobChangeEvent event) {
-      final Job job = event.getJob();
-      IBusyHandler handler = getHandlerInternal(job);
-      if (handler == null) {
-        return;
+    public void jobChanged(IJobChangeEvent event) {
+      if (event.getMode() == JobChangeEvent.EVENT_MODE_ASYNC) {
+        if (event.getType() == JobChangeEvent.EVENT_TYPE_DONE) {
+          done(event);
+        }
+        else if (event.getType() == JobChangeEvent.EVENT_TYPE_ABOUT_TO_RUN) {
+          running(event);
+        }
       }
-      if (!handler.acceptJob(job)) {
-        return;
-      }
-      if (job instanceof ClientJob) {
-        ((ClientJob) job).removeJobChangeListenerEx(m_jobChangeListenerEx);
-      }
-      handler.onJobEnd(job);
     }
   }
 
-  private class P_JobChangeListenerEx extends JobChangeAdapterEx {
-    @Override
-    public void blockingConditionStart(IJobChangeEvent event) {
-      final Job job = event.getJob();
-      IBusyHandler handler = getHandlerInternal(job);
+  private class P_JobChangeListenerEx implements IJobChangeListener {
+    private void blockingConditionStart(IJobChangeEvent event) {
+      IFuture<?> future = event.getFuture();
+      IBusyHandler handler = getHandlerInternal(future);
       if (handler == null) {
         return;
       }
-      handler.onJobEnd(job);
+      handler.onJobEnd(future);
+    }
+
+    private void blockingConditionEnd(IJobChangeEvent event) {
+      IFuture<?> future = event.getFuture();
+      IBusyHandler handler = getHandlerInternal(future);
+      if (handler == null) {
+        return;
+      }
+      handler.onJobBegin(future);
     }
 
     @Override
-    public void blockingConditionEnd(IJobChangeEvent event) {
-      final Job job = event.getJob();
-      IBusyHandler handler = getHandlerInternal(job);
-      if (handler == null) {
-        return;
+    public void jobChanged(IJobChangeEvent event) {
+      if (event.getType() == JobChangeEvent.EVENT_TYPE_BLOCKED) {
+        blockingConditionStart(event);
       }
-      handler.onJobBegin(job);
+      else if (event.getType() == JobChangeEvent.EVENT_TYPE_UN_BLOCKED) {
+        blockingConditionEnd(event);
+      }
     }
   }
 }

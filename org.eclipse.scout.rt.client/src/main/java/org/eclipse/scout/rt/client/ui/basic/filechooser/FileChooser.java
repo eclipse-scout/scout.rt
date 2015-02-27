@@ -17,11 +17,13 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.BlockingCondition;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.IBlockingCondition;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 
@@ -38,15 +40,17 @@ public class FileChooser implements IFileChooser {
   private boolean m_multiSelect;
   // result
   private List<File> m_files;
-  private final BlockingCondition m_blockingCondition = new BlockingCondition(false);
+  private final IBlockingCondition m_blockingCondition;
 
   public FileChooser() {
+    this(null, null, false);
   }
 
   public FileChooser(File directory, List<String> fileExtensions, boolean load) {
     m_directory = directory;
     m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(fileExtensions);
     m_load = load;
+    m_blockingCondition = OBJ.one(IModelJobManager.class).createBlockingCondition("block", false);
   }
 
   @Override
@@ -104,7 +108,7 @@ public class FileChooser implements IFileChooser {
   }
 
   public static String getCurrentDirectory() {
-    IClientSession session = ClientSyncJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     if (session == null) {
       return null;
     }
@@ -118,7 +122,7 @@ public class FileChooser implements IFileChooser {
   }
 
   public static void setCurrentDirectory(String dir) {
-    IClientSession session = ClientSyncJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     if (session == null) {
       return;
     }
@@ -145,14 +149,14 @@ public class FileChooser implements IFileChooser {
   @Override
   public void setFiles(List<File> files) {
     m_files = CollectionUtility.arrayListWithoutNullElements(files);
-    m_blockingCondition.release();
+    m_blockingCondition.setBlocking(false);
   }
 
   @Override
   public List<File> startChooser() {
     m_files = null;
     m_blockingCondition.setBlocking(true);
-    ClientSyncJob.getCurrentSession().getDesktop().addFileChooser(this);
+    ClientSessionProvider.currentSession().getDesktop().addFileChooser(this);
     try {
       waitFor();
     }
@@ -164,14 +168,14 @@ public class FileChooser implements IFileChooser {
 
   private void waitFor() throws ProcessingException {
     // check if the desktop is observing this process
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop == null || !desktop.isOpened()) {
       throw new ProcessingException("Cannot wait for " + getClass().getName() + ". There is no desktop or the desktop has not yet been opened in the ui");
     }
     try {
       m_blockingCondition.waitFor();
     }
-    catch (InterruptedException e) {
+    catch (ProcessingException e) {
       throw new ProcessingException(ScoutTexts.get("UserInterrupted"), e);
     }
   }

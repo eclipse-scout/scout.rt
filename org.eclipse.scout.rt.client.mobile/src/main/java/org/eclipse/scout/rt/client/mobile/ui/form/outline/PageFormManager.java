@@ -20,9 +20,9 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.ActiveOutlineObserver;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -61,7 +61,7 @@ public class PageFormManager {
 
   public PageFormManager(IDesktop desktop, String... pageSlotViewIds) {
     if (desktop == null) {
-      desktop = ClientSyncJob.getCurrentSession().getDesktop();
+      desktop = ClientSessionProvider.currentSession().getDesktop();
     }
     m_desktop = desktop;
     if (m_desktop == null) {

@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.valuecontainer;
 
 import java.text.DecimalFormat;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
 
 /**
@@ -46,7 +46,7 @@ public interface IDecimalValueContainer<T extends Number> extends INumberValueCo
   int getMaxFractionDigits();
 
   /**
-   * When set to true, the local specific (depending on {@link LocaleThreadLocal#get()}) positive and negative
+   * When set to true, the local specific (depending on {@link NlsLocale#get()}) positive and negative
    * percentage suffixes are set to the internal {@link DecimalFormat}.<br>
    * <b>Note:</b> This setting is independent from {@link #setMultiplier(int)}. For example if the parsed value for
    * "18 %" should be 0.18, set the multiplier to 100.
@@ -55,7 +55,7 @@ public interface IDecimalValueContainer<T extends Number> extends INumberValueCo
 
   /**
    * @return true when both positive and negative suffixes correspond to the local specific (depending on
-   *         {@link LocaleThreadLocal#get()}) percentage symbol
+   *         {@link NlsLocale#get()}) percentage symbol
    */
   boolean isPercent();
 

@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -30,6 +29,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -580,13 +580,13 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
     DateFormat df = null;
     if (hasDate && !hasTime) {
-      df = DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleThreadLocal.get());
+      df = DateFormat.getDateInstance(DateFormat.MEDIUM, NlsLocale.get());
     }
     else if (!hasDate && hasTime) {
-      df = DateFormat.getTimeInstance(DateFormat.SHORT, LocaleThreadLocal.get());
+      df = DateFormat.getTimeInstance(DateFormat.SHORT, NlsLocale.get());
     }
     else {
-      df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, LocaleThreadLocal.get());
+      df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, NlsLocale.get());
     }
     df.setLenient(true);
 
@@ -614,10 +614,10 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
     NumberFormat fmt = null;
     if (percent) {
-      fmt = NumberFormat.getPercentInstance(LocaleThreadLocal.get());
+      fmt = NumberFormat.getPercentInstance(NlsLocale.get());
     }
     else {
-      fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
+      fmt = NumberFormat.getNumberInstance(NlsLocale.get());
     }
 
     if (fmt instanceof DecimalFormat) {
@@ -647,7 +647,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   protected String formatInteger(Object rawValue, boolean groupingUsed) {
     Integer value = TypeCastUtility.castValue(rawValue, Integer.class);
 
-    NumberFormat fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
+    NumberFormat fmt = NumberFormat.getNumberInstance(NlsLocale.get());
     fmt.setMinimumFractionDigits(0);
     fmt.setMaximumFractionDigits(0);
     fmt.setGroupingUsed(groupingUsed);
@@ -670,7 +670,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   protected String formatLong(Object rawValue, boolean groupingUsed) {
     Long value = TypeCastUtility.castValue(rawValue, Long.class);
 
-    NumberFormat fmt = NumberFormat.getNumberInstance(LocaleThreadLocal.get());
+    NumberFormat fmt = NumberFormat.getNumberInstance(NlsLocale.get());
     fmt.setMinimumFractionDigits(0);
     fmt.setMaximumFractionDigits(0);
     fmt.setGroupingUsed(groupingUsed);

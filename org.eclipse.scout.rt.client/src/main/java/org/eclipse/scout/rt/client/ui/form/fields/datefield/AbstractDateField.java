@@ -20,7 +20,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.DateUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -30,6 +29,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftDateChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftTimeChain;
@@ -480,17 +480,17 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   public DateFormat getDateFormat() {
     DateFormat df = null;
     if (getFormat() != null) {
-      df = new SimpleDateFormat(getFormat(), LocaleThreadLocal.get());
+      df = new SimpleDateFormat(getFormat(), NlsLocale.get());
     }
     else {
       if (isHasDate() && !isHasTime()) {
-        df = DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleThreadLocal.get());
+        df = DateFormat.getDateInstance(DateFormat.MEDIUM, NlsLocale.get());
       }
       else if (!isHasDate() && isHasTime()) {
-        df = DateFormat.getTimeInstance(DateFormat.SHORT, LocaleThreadLocal.get());
+        df = DateFormat.getTimeInstance(DateFormat.SHORT, NlsLocale.get());
       }
       else {
-        df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, LocaleThreadLocal.get());
+        df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, NlsLocale.get());
       }
       df.setLenient(true);
     }
@@ -505,7 +505,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       int h = pat.toLowerCase().indexOf('h');
       if (h >= 0) {
         try {
-          return new SimpleDateFormat(pat.substring(0, h).trim(), LocaleThreadLocal.get());
+          return new SimpleDateFormat(pat.substring(0, h).trim(), NlsLocale.get());
         }
         catch (Throwable t) {
           LOG.error("could not isolate date pattern from '" + pat + "'", t);
@@ -523,7 +523,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       int h = pat.toLowerCase().indexOf('h');
       if (h >= 0) {
         try {
-          return new SimpleDateFormat(pat.substring(h).trim(), LocaleThreadLocal.get());
+          return new SimpleDateFormat(pat.substring(h).trim(), NlsLocale.get());
         }
         catch (Throwable t) {
           LOG.error("could not isolate time pattern from '" + pat + "'", t);
@@ -664,7 +664,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     }
     StringBuffer dateFormat = new StringBuffer();
     if (text.matches("[0-9]{6}")) {
-      DateFormat templateFmt = DateFormat.getDateInstance(DateFormat.SHORT, LocaleThreadLocal.get());
+      DateFormat templateFmt = DateFormat.getDateInstance(DateFormat.SHORT, NlsLocale.get());
       if (templateFmt instanceof SimpleDateFormat) {
         String pattern = ((SimpleDateFormat) templateFmt).toPattern();
         for (char c : pattern.toCharArray()) {
@@ -672,13 +672,13 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
             dateFormat.append(c);
           }
         }
-        d = parseHelper(new SimpleDateFormat(dateFormat.toString(), LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(dateFormat.toString(), NlsLocale.get()), text, includesTime);
         //no further checks
         return d;
       }
     }
     else if (text.matches("[0-9]{8}")) {
-      DateFormat templateFmt = DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleThreadLocal.get());
+      DateFormat templateFmt = DateFormat.getDateInstance(DateFormat.MEDIUM, NlsLocale.get());
       if (templateFmt instanceof SimpleDateFormat) {
         String pattern = ((SimpleDateFormat) templateFmt).toPattern();
         for (char c : pattern.toCharArray()) {
@@ -686,34 +686,34 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
             dateFormat.append(c);
           }
         }
-        d = parseHelper(new SimpleDateFormat(dateFormat.toString(), LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(dateFormat.toString(), NlsLocale.get()), text, includesTime);
         //no further checks
         return d;
       }
     }
-    d = parseHelper(DateFormat.getDateInstance(DateFormat.SHORT, LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(DateFormat.getDateInstance(DateFormat.SHORT, NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(DateFormat.getDateInstance(DateFormat.MEDIUM, NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(DateFormat.getDateInstance(DateFormat.LONG, LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(DateFormat.getDateInstance(DateFormat.LONG, NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
     //add convenience patterns for english locales
-    if (LocaleThreadLocal.get().getLanguage().equals("en")) {
-      d = parseHelper(new SimpleDateFormat("M / d / yy", LocaleThreadLocal.get()), text, includesTime);
+    if (NlsLocale.get().getLanguage().equals("en")) {
+      d = parseHelper(new SimpleDateFormat("M / d / yy", NlsLocale.get()), text, includesTime);
       if (d != null) {
         return d;
       }
-      d = parseHelper(new SimpleDateFormat("MMM d,yyyy", LocaleThreadLocal.get()), text, includesTime);
+      d = parseHelper(new SimpleDateFormat("MMM d,yyyy", NlsLocale.get()), text, includesTime);
       if (d != null) {
         return d;
       }
-      d = parseHelper(new SimpleDateFormat("MMMM d,yyyy", LocaleThreadLocal.get()), text, includesTime);
+      d = parseHelper(new SimpleDateFormat("MMMM d,yyyy", NlsLocale.get()), text, includesTime);
       if (d != null) {
         return d;
       }
@@ -735,7 +735,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     }
     StringBuffer dateFormat = new StringBuffer();
     if (text.matches("[0-9]{6}")) {
-      DateFormat templateFmt = DateFormat.getDateInstance(DateFormat.SHORT, LocaleThreadLocal.get());
+      DateFormat templateFmt = DateFormat.getDateInstance(DateFormat.SHORT, NlsLocale.get());
       if (templateFmt instanceof SimpleDateFormat) {
         String pattern = ((SimpleDateFormat) templateFmt).toPattern();
         for (char c : pattern.toCharArray()) {
@@ -743,13 +743,13 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
             dateFormat.append(c);
           }
         }
-        d = parseHelper(new SimpleDateFormat(dateFormat.toString(), LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(dateFormat.toString(), NlsLocale.get()), text, includesTime);
         //no further checks
         return d;
       }
     }
     else if (text.matches("[0-9]{8}")) {
-      DateFormat templateFmt = DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleThreadLocal.get());
+      DateFormat templateFmt = DateFormat.getDateInstance(DateFormat.MEDIUM, NlsLocale.get());
       if (templateFmt instanceof SimpleDateFormat) {
         String pattern = ((SimpleDateFormat) templateFmt).toPattern();
         for (char c : pattern.toCharArray()) {
@@ -757,102 +757,102 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
             dateFormat.append(c);
           }
         }
-        d = parseHelper(new SimpleDateFormat(dateFormat.toString(), LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(dateFormat.toString(), NlsLocale.get()), text, includesTime);
         //no further checks
         return d;
       }
     }
     //time
-    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, LocaleThreadLocal.get())).toPattern() + ":SSS", LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, NlsLocale.get())).toPattern() + ":SSS", NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG, LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG, NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG, LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG, NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM, LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM, NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
     for (DateFormat t : new DateFormat[]{
-        DateFormat.getDateInstance(DateFormat.SHORT, LocaleThreadLocal.get()),
-        DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleThreadLocal.get()),
-        DateFormat.getDateInstance(DateFormat.LONG, LocaleThreadLocal.get())}) {
+        DateFormat.getDateInstance(DateFormat.SHORT, NlsLocale.get()),
+        DateFormat.getDateInstance(DateFormat.MEDIUM, NlsLocale.get()),
+        DateFormat.getDateInstance(DateFormat.LONG, NlsLocale.get())}) {
       if (t instanceof SimpleDateFormat) {
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h:mm a", LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h:mm a", NlsLocale.get()), text, includesTime);
         if (d != null) {
           return d;
         }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hhmm a", LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hhmm a", NlsLocale.get()), text, includesTime);
         if (d != null) {
           return d;
         }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hmm a", LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hmm a", NlsLocale.get()), text, includesTime);
         if (d != null) {
           return d;
         }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h a", LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h a", NlsLocale.get()), text, includesTime);
         if (d != null) {
           return d;
         }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h:mma", LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " h:mma", NlsLocale.get()), text, includesTime);
         if (d != null) {
           return d;
         }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hhmma", LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " hhmma", NlsLocale.get()), text, includesTime);
         if (d != null) {
           return d;
         }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " ha", LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " ha", NlsLocale.get()), text, includesTime);
         if (d != null) {
           return d;
         }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " H:mm", LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " H:mm", NlsLocale.get()), text, includesTime);
         if (d != null) {
           return d;
         }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " HHmm", LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " HHmm", NlsLocale.get()), text, includesTime);
         if (d != null) {
           return d;
         }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " HH", LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " HH", NlsLocale.get()), text, includesTime);
         if (d != null) {
           return d;
         }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " Hmm", LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " Hmm", NlsLocale.get()), text, includesTime);
         if (d != null) {
           return d;
         }
-        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " H", LocaleThreadLocal.get()), text, includesTime);
+        d = parseHelper(new SimpleDateFormat(((SimpleDateFormat) t).toPattern() + " H", NlsLocale.get()), text, includesTime);
         if (d != null) {
           return d;
         }
@@ -864,16 +864,16 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     }
     //date
     //add convenience patterns for english locales
-    if (LocaleThreadLocal.get().getLanguage().equals("en")) {
-      d = parseHelper(new SimpleDateFormat("M / d / yy", LocaleThreadLocal.get()), text, includesTime);
+    if (NlsLocale.get().getLanguage().equals("en")) {
+      d = parseHelper(new SimpleDateFormat("M / d / yy", NlsLocale.get()), text, includesTime);
       if (d != null) {
         return d;
       }
-      d = parseHelper(new SimpleDateFormat("MMM d,yyyy", LocaleThreadLocal.get()), text, includesTime);
+      d = parseHelper(new SimpleDateFormat("MMM d,yyyy", NlsLocale.get()), text, includesTime);
       if (d != null) {
         return d;
       }
-      d = parseHelper(new SimpleDateFormat("MMMM d,yyyy", LocaleThreadLocal.get()), text, includesTime);
+      d = parseHelper(new SimpleDateFormat("MMMM d,yyyy", NlsLocale.get()), text, includesTime);
       if (d != null) {
         return d;
       }
@@ -905,55 +905,55 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
         return d;
       }
     }
-    d = parseHelper(DateFormat.getTimeInstance(DateFormat.SHORT, LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(DateFormat.getTimeInstance(DateFormat.SHORT, NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(new SimpleDateFormat("h:mm a", LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(new SimpleDateFormat("h:mm a", NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(new SimpleDateFormat("hhmm a", LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(new SimpleDateFormat("hhmm a", NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(new SimpleDateFormat("hmm a", LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(new SimpleDateFormat("hmm a", NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(new SimpleDateFormat("h a", LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(new SimpleDateFormat("h a", NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(new SimpleDateFormat("h:mma", LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(new SimpleDateFormat("h:mma", NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(new SimpleDateFormat("hhmma", LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(new SimpleDateFormat("hhmma", NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(new SimpleDateFormat("ha", LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(new SimpleDateFormat("ha", NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(new SimpleDateFormat("H:mm", LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(new SimpleDateFormat("H:mm", NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(new SimpleDateFormat("HHmm", LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(new SimpleDateFormat("HHmm", NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(new SimpleDateFormat("HH", LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(new SimpleDateFormat("HH", NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(new SimpleDateFormat("Hmm", LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(new SimpleDateFormat("Hmm", NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
-    d = parseHelper(new SimpleDateFormat("H", LocaleThreadLocal.get()), text, includesTime);
+    d = parseHelper(new SimpleDateFormat("H", NlsLocale.get()), text, includesTime);
     if (d != null) {
       return d;
     }
@@ -964,7 +964,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     // >>> ticket #105'126
     if (df instanceof SimpleDateFormat) {
       String pattern = ((SimpleDateFormat) df).toPattern();
-      df = new SimpleDateFormat(pattern.replaceAll("yyyy", "yy"), LocaleThreadLocal.get()); // Always use century interpretation
+      df = new SimpleDateFormat(pattern.replaceAll("yyyy", "yy"), NlsLocale.get()); // Always use century interpretation
     }
     // <<< ticket #105'126
 
@@ -985,7 +985,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
         if (df instanceof SimpleDateFormat) {
           String pattern = ((SimpleDateFormat) df).toPattern();
           if (pattern.contains(".")) {
-            SimpleDateFormat df2 = new SimpleDateFormat(pattern.replace('.', ','), LocaleThreadLocal.get());
+            SimpleDateFormat df2 = new SimpleDateFormat(pattern.replace('.', ','), NlsLocale.get());
             df2.setLenient(false);
             d = df2.parse(text);
           }

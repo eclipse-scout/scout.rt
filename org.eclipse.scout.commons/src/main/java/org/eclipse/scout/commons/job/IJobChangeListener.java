@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,16 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client;
+package org.eclipse.scout.commons.job;
+
+import java.util.EventListener;
 
 /**
- * Objects of this type can provide you with a {@link IClientSession}.
+ * Job change listener that will be notified about events occurred in a {@link IJobManager}.
+ *
+ * @since 5.1
+ * @see IJobChangeListeners#DEFAULT
+ * @see IJobChangeEvent
  */
-//TODO dwi remove
-public interface IClientSessionProvider {
+public interface IJobChangeListener extends EventListener {
 
   /**
-   * @return the {@link IClientSession} this object belongs to.
+   * Will be called when an event occurs.
+   * 
+   * @param event
+   *          Event meta information.
    */
-  IClientSession getClientSession();
+  void jobChanged(IJobChangeEvent event);
 }

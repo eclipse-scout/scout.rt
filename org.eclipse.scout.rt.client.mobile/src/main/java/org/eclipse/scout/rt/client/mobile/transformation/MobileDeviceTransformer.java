@@ -20,7 +20,6 @@ import java.util.WeakHashMap;
 
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
@@ -28,6 +27,7 @@ import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.IMobileButton;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -66,7 +66,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   public MobileDeviceTransformer(IDesktop desktop) {
     if (desktop == null) {
-      desktop = ClientSyncJob.getCurrentSession().getDesktop();
+      desktop = ClientSessionProvider.currentSession().getDesktop();
     }
     m_desktop = desktop;
     if (m_desktop == null) {

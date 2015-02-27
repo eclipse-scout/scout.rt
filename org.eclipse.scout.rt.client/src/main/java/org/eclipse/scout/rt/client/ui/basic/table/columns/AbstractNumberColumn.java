@@ -14,12 +14,12 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.INumberColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -117,7 +117,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   }
 
   protected void initFormat() {
-    DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
+    DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(NlsLocale.get());
     format.setParseBigDecimal(true);
     format.setMinimumFractionDigits(0);
     format.setMaximumFractionDigits(0);

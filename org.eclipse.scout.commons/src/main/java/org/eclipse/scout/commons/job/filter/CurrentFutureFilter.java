@@ -23,6 +23,11 @@ public class CurrentFutureFilter implements IFilter<IFuture<?>> {
 
   private final IFilter<IFuture<?>> m_filter = new FutureFilter(IFuture.CURRENT.get());
 
+  public static final IFilter<IFuture<?>> INSTANCE = new CurrentFutureFilter();
+
+  private CurrentFutureFilter() {
+  }
+
   @Override
   public boolean accept(final IFuture<?> future) {
     return m_filter.accept(future);

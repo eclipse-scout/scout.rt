@@ -58,7 +58,6 @@ public class BasicTransaction implements ITransaction {
     return getId();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void registerMember(ITransactionMember member) throws ProcessingException {
     synchronized (m_memberMapLock) {
@@ -77,7 +76,7 @@ public class BasicTransaction implements ITransaction {
       m_memberMap.put(memberId, member);
       //throw AFTER registering the resource in order to correctly release it later-on, bug 383736.
       if (m_cancelled) {
-        throw new ProcessingException("Interrupted", new InterruptedException(), 0, IProcessingStatus.CANCEL);
+        throw new ProcessingException("Interrupted", new InterruptedException(), 0, IProcessingStatus.INFO);
       }
     }
   }
@@ -235,7 +234,7 @@ public class BasicTransaction implements ITransaction {
         return true;
       }
       m_cancelled = true;
-      ProcessingException cancelException = new ProcessingException(ScoutTexts.get("SearchWasCanceled"), new InterruptedException(), 0, IProcessingStatus.CANCEL);
+      ProcessingException cancelException = new ProcessingException(ScoutTexts.get("SearchWasCanceled"), new InterruptedException(), 0, IProcessingStatus.INFO);
       addFailure(cancelException);
     }
     for (ITransactionMember mem : getMembers()) {

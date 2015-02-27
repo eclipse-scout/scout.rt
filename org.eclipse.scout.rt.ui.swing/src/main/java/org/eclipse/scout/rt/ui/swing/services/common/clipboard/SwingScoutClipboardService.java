@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,7 +22,6 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -33,12 +32,16 @@ import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.dnd.TransferObjectRequest;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardConsumer;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.service.AbstractService;
 
@@ -48,7 +51,8 @@ public class SwingScoutClipboardService extends AbstractService implements IClip
 
   @Override
   public void consumeContents(final IClipboardConsumer clipboardConsumer, final TransferObjectRequest... requests) throws ProcessingException {
-    final IClientSession clientSession = ClientSyncJob.getCurrentSession();
+    final IClientSession clientSession = ClientSessionProvider.currentSession();
+
     try {
       SwingUtilities.invokeLater(new Runnable() {
         @Override
@@ -56,13 +60,12 @@ public class SwingScoutClipboardService extends AbstractService implements IClip
           try {
             Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
             final TransferObject[] transferObjects = createScoutTransferables(contents, requests);
-            ClientSyncJob clipboardConsumerJob = new ClientSyncJob(SwingScoutClipboardService.class.getSimpleName() + " consume", clientSession) {
+            OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
               @Override
-              protected void runVoid(IProgressMonitor monitor) throws Throwable {
+              public void run() throws Exception {
                 clipboardConsumer.consume(transferObjects);
               }
-            };
-            clipboardConsumerJob.schedule();
+            }, ClientJobInput.defaults().session(clientSession));
           }
           catch (Throwable t) {
             LOG.debug("Cannot get system clipboard's contents", t);

@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
@@ -36,7 +35,9 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDataLoadedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDeactivatedChain;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -48,6 +49,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -298,7 +300,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
         tmp = tmp.getParentNode();
       }
     }
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     final boolean isActiveOutline = (desktop != null ? desktop.getOutline() == this.getOutline() : false);
     if (isActiveOutline && pathsToSelections.contains(this)) {
       try {
@@ -441,10 +443,14 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     return (IPage) getParentNode();
   }
 
+  private boolean isModelThread() {
+    return OBJ.one(IModelJobManager.class).isModelThread();
+  }
+
   @Override
   public IPage<?> getChildPage(final int childIndex) {
     ///make it model thread safe
-    if (ClientSyncJob.isSyncClientJob()) {
+    if (isModelThread()) {
       try {
         return (IPage) getTree().resolveVirtualNode(getChildNode(childIndex));
       }
@@ -457,7 +463,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public List<IPage<?>> getChildPages() {
-    if (ClientSyncJob.isSyncClientJob()) {
+    if (isModelThread()) {
       try {
         getTree().resolveVirtualNodes(getChildNodes());
       }
@@ -477,7 +483,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     try {
       initPage();
       //notify memory policy
-      IMemoryPolicy policy = ClientSyncJob.getCurrentSession().getMemoryPolicy();
+      IMemoryPolicy policy = ClientSessionProvider.currentSession().getMemoryPolicy();
       if (policy != null) {
         policy.pageCreated(this);
       }
@@ -504,7 +510,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
     // automatically remove all data change listeners
     if (m_internalDataChangeListener != null) {
-      IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+      IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
       if (desktop != null) {
         desktop.removeDataChangeListener(m_internalDataChangeListener);
       }
@@ -627,9 +633,9 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
         }
       };
     }
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop == null) {
-      desktop = ClientSyncJob.getCurrentSession().getVirtualDesktop();
+      desktop = ClientSessionProvider.currentSession().getVirtualDesktop();
     }
     desktop.addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
@@ -659,9 +665,9 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {
       //sle Ticket 92'909: AbstractPage unregisterDataChangeListener NullPointer
-      IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+      IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
       if (desktop == null) {
-        desktop = ClientSyncJob.getCurrentSession().getVirtualDesktop();
+        desktop = ClientSessionProvider.currentSession().getVirtualDesktop();
       }
       desktop.removeDataChangeListener(m_internalDataChangeListener, dataTypes);
     }

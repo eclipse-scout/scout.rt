@@ -15,9 +15,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -29,10 +26,8 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
  * A runnable which is executed by a Job, the run() method performs an HTTP request and returns the response.
- *
- * @author awe (refactoring)
  */
-public class HttpBackgroundExecutable {
+public class HttpBackgroundExecutable implements IHttpBackgroundExecutable {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HttpBackgroundExecutable.class);
 
@@ -54,11 +49,13 @@ public class HttpBackgroundExecutable {
     return ConfigIniUtility.getPropertyBoolean(AbstractHttpServiceTunnel.HTTP_DEBUG_PARAM, false);
   }
 
+  @Override
   public IServiceTunnelResponse getResponse() {
     return m_res;
   }
 
-  public IStatus run(IProgressMonitor monitor) {
+  @Override
+  public void run() {
     InputStream httpin = null;
     try {
       delayForDebug(m_req, 0);
@@ -82,7 +79,7 @@ public class HttpBackgroundExecutable {
       }
       else {
         m_res = new ServiceTunnelResponse(code, null, null, new HttpException(code));
-        return Status.CANCEL_STATUS;
+        return;
       }
       httpin = m_urlConn.getInputStream();
       m_res = m_tunnel.getContentHandler().readResponse(httpin);
@@ -92,14 +89,14 @@ public class HttpBackgroundExecutable {
         time2 = System.nanoTime();
         LOG.debug("TIME " + m_req.getServiceInterfaceClassName() + "." + m_req.getOperation() + " " + (time2 - time1) / 1000000L + "ms " + callData.length + " bytes");
       }
-      return Status.OK_STATUS;
+      return;
     }
     catch (Throwable e) {
       //cancel has precedence over failure
       if (m_res == null) {
         m_res = new ServiceTunnelResponse(null, null, e);
       }
-      return Status.CANCEL_STATUS;
+      return;
     }
     finally {
       if (httpin != null) {

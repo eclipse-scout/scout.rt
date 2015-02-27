@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.status.Status;
 /**
  * A Status for processing results.
  */
-@SuppressWarnings("deprecation")
 public class ProcessingStatus extends Status implements IProcessingStatus, Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -130,15 +129,6 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
     return false;
   }
 
-  /**
-   * @deprecated use {@link #getException()}
-   */
-  @Deprecated
-  @Override
-  public Throwable getCause() {
-    return m_exception;
-  }
-
   @Override
   public Throwable getException() {
     return m_exception;
@@ -233,8 +223,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
       case WARNING:
       case ERROR:
       case FATAL:
-      case OK:
-      case CANCEL: {
+      case OK: {
         return severity;
       }
       default: {
@@ -280,9 +269,6 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
     switch (getSeverity()) {
       case FATAL: {
         return "FATAL";
-      }
-      case CANCEL: {
-        return "CANCEL";
       }
       default:
         return super.getSeverityName();

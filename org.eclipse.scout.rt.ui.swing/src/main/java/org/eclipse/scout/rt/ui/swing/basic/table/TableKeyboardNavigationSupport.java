@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JTableEx;
 
@@ -30,12 +31,12 @@ public abstract class TableKeyboardNavigationSupport extends AbstractKeyboardNav
   private P_MouseListener m_mouseListener;
   private P_KeyListener m_keyListener;
 
-  public TableKeyboardNavigationSupport(JTableEx table) {
-    this(table, 500L);
+  public TableKeyboardNavigationSupport(JTableEx table, IClientSession session) {
+    this(table, 500L, session);
   }
 
-  public TableKeyboardNavigationSupport(JTableEx table, long delay) {
-    super(delay);
+  public TableKeyboardNavigationSupport(JTableEx table, long delay, IClientSession session) {
+    super(delay, session);
     m_table = table;
     attachListeners();
   }

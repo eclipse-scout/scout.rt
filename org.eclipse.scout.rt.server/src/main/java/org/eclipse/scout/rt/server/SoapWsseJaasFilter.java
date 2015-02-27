@@ -143,44 +143,44 @@ public class SoapWsseJaasFilter implements Filter {
       @Override
       public ServletInputStream getInputStream() throws IOException {
         return new ServletInputStream() {
-          private javax.servlet.ReadListener m_readListener;
-          private boolean m_finished = false;
+//          private javax.servlet.ReadListener m_readListener;
+//          private boolean m_finished = false;
 
           @Override
           public int read() throws IOException {
             final int next = cacheIn.read();
-            if (next == -1) {
-              m_finished = true;
-              if (m_readListener != null) {
-                m_readListener.onAllDataRead();
-              }
-            }
+//            if (next == -1) {
+//              m_finished = true;
+//              if (m_readListener != null) {
+//                m_readListener.onAllDataRead();
+//              }
+//            }
             return next;
           }
-
-          @Override
-          public boolean isFinished() {
-            return m_finished;
-          }
-
-          @Override
-          public boolean isReady() {
-            return true;
-          }
-
-          @Override
-          public void setReadListener(javax.servlet.ReadListener readListener) {
-            m_readListener = readListener;
-            if (m_readListener != null) {
-              try {
-                m_readListener.onDataAvailable();
-              }
-              catch (IOException e) {
-                LOG.error("Error reading stream", e);
-                m_readListener.onError(e);
-              }
-            }
-          }
+//
+//          @Override
+//          public boolean isFinished() {
+//            return m_finished;
+//          }
+//
+//          @Override
+//          public boolean isReady() {
+//            return true;
+//          }
+//
+//          @Override
+//          public void setReadListener(javax.servlet.ReadListener readListener) {
+//            m_readListener = readListener;
+//            if (m_readListener != null) {
+//              try {
+//                m_readListener.onDataAvailable();
+//              }
+//              catch (IOException e) {
+//                LOG.error("Error reading stream", e);
+//                m_readListener.onError(e);
+//              }
+//            }
+//          }
         };
       }
     };

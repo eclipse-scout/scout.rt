@@ -24,10 +24,13 @@ import org.eclipse.scout.rt.platform.cdi.OBJ;
  */
 public class BlockedJobFilter implements IFilter<IFuture<?>> {
 
-  private final IModelJobManager m_modelJobManager = OBJ.one(IModelJobManager.class);
+  public static final IFilter<IFuture<?>> INSTANCE = new BlockedJobFilter();
+
+  private BlockedJobFilter() {
+  }
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return m_modelJobManager.isBlocked(future);
+    return OBJ.one(IModelJobManager.class).isBlocked(future);
   }
 }

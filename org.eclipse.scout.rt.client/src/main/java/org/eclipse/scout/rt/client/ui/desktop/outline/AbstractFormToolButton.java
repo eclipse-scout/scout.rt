@@ -16,10 +16,10 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.extension.ui.desktop.outline.FormToolButtonChains.FormToolButtonInitFormChain;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.FormToolButtonChains.FormToolButtonInitFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IFormToolButtonExtension;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.tool.AbstractToolButton;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
@@ -83,7 +83,7 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
       return;
     }
     if (isToggleAction()) {
-      IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+      IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
       // unselect other form tool buttons
       for (IToolButton b : desktop.getToolButtons()) {
         if (b != this && b instanceof IFormToolButton && b.isSelected()) {

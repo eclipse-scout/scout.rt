@@ -10,9 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.session;
 
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IExecutable;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IJobInput;
+import org.eclipse.scout.commons.job.IJobManager;
+import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.service.IService;
 
 /**
@@ -22,31 +28,37 @@ import org.eclipse.scout.service.IService;
 public interface ISessionService extends IService {
 
   /**
-   * Returns the session which is assigned to the current client respectively server job.
-   * <p>
-   * It's recommended to use this service only if you don't have direct access to the session. Rather use
-   * ClientJob.getCurrentSession() respectively ServerJob.getCurrentSession().
-   * </p>
+   * see {@link IJobManager#runNow(IExecutable)}
    */
-  ISession getCurrentSession();
+  <RESULT> RESULT runNow(IExecutable<RESULT> executable) throws ProcessingException;
 
   /**
-   * @see ISessionService#createAsyncJob(String, IJobRunnable)
-   * @since 3.8.1
+   * see {@link IJobManager#runNow(IExecutable, IJobInput)}
    */
-  JobEx createAsyncJob(IJobRunnable runnable);
+  <RESULT> RESULT runNow(IExecutable<RESULT> executable, IJobInput input) throws ProcessingException;
 
   /**
-   * Creates a new asynchronous job that executes the given runnable. The job is attached to the current environment's
-   * {@link ISession} and implementors are required to use an appropriate {@link JobEx} extension (i.e. ClientAsyncJob
-   * or ServerJob).
-   * 
-   * @param name
-   *          the job's name or <code>null</code>.
-   * @param runnable
-   *          the runnable to execute within the created job.
-   * @return Returns a new {@link JobEx} implementation that executes the given runnable asynchronously.
-   * @since 3.8.1
+   * see {@link IJobManager#schedule(IExecutable)}
    */
-  JobEx createAsyncJob(String name, IJobRunnable runnable);
+  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable) throws JobExecutionException;
+
+  /**
+   * see {@link IJobManager#schedule(IExecutable, IJobInput)}
+   */
+  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, IJobInput input) throws JobExecutionException;
+
+  /**
+   * see {@link IJobManager#schedule(IExecutable, long, TimeUnit)}
+   */
+  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit) throws JobExecutionException;
+
+  /**
+   * see {@link IJobManager#schedule(IExecutable, long, TimeUnit, IJobInput)}
+   */
+  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, IJobInput input) throws JobExecutionException;
+
+  /**
+   * @return The default job input
+   */
+  IJobInput defaults();
 }

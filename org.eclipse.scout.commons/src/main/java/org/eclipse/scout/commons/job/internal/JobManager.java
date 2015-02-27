@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IExecutable;
 import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IJobChangeListeners;
 import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.IJobManager;
 import org.eclipse.scout.commons.job.IProgressMonitor;
@@ -81,9 +82,11 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
   @Override
   public final <RESULT> RESULT runNow(final IExecutable<RESULT> executable, final INPUT input) throws ProcessingException {
     validateInput(input);
+    setDefaultNameIfRequired(executable, input);
 
     final Callable<RESULT> command = Assertions.assertNotNull(interceptCallable(Executables.callable(executable), input));
-    if (IFuture.CURRENT.get() == null) {
+    IFuture<?> currentFuture = IFuture.CURRENT.get();
+    if (currentFuture == null) {
       final IFuture<RESULT> future = m_futures.add(new IFutureSupplier<RESULT>() {
 
         @Override
@@ -93,9 +96,11 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
       });
 
       try {
-        // Run the command on behalf of the Future created.
+        IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_ABOUT_TO_RUN, JobChangeEvent.EVENT_MODE_SYNC, this, future));
         final Callable<RESULT> c2 = new InitThreadLocalCallable<>(command, IProgressMonitor.CURRENT, future.getProgressMonitor());
         final Callable<RESULT> c1 = new InitThreadLocalCallable<>(c2, IFuture.CURRENT, future);
+
+        // Run the command on behalf of the Future created.
         return c1.call();
       }
       catch (final Exception e) {
@@ -103,15 +108,20 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
       }
       finally {
         m_futures.remove(future);
+        IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_DONE, JobChangeEvent.EVENT_MODE_SYNC, this, future));
       }
     }
     else {
       try {
         // Run the command on behalf of the current Future (nested job).
+        IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_ABOUT_TO_RUN, JobChangeEvent.EVENT_MODE_SYNC, this, currentFuture));
         return command.call();
       }
       catch (final Exception e) {
         throw ExceptionTranslator.translate(e);
+      }
+      finally {
+        IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_DONE, JobChangeEvent.EVENT_MODE_SYNC, this, currentFuture));
       }
     }
   }
@@ -124,6 +134,7 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
   @Override
   public final <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final INPUT input) throws JobExecutionException {
     validateInput(input);
+    setDefaultNameIfRequired(executable, input);
 
     final Callable<RESULT> command = Assertions.assertNotNull(interceptCallable(Executables.callable(executable), input));
     return m_futures.add(new IFutureSupplier<RESULT>() {
@@ -143,6 +154,7 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
   @Override
   public final <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit, final INPUT input) throws JobExecutionException {
     validateInput(input);
+    setDefaultNameIfRequired(executable, input);
 
     final Callable<RESULT> command = Assertions.assertNotNull(interceptCallable(Executables.callable(executable), input));
     return m_futures.add(new IFutureSupplier<RESULT>() {
@@ -157,6 +169,7 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
   @Override
   public final IFuture<Void> scheduleAtFixedRate(final IRunnable runnable, final long initialDelay, final long period, final TimeUnit unit, final INPUT input) throws JobExecutionException {
     validateInput(input);
+    setDefaultNameIfRequired(runnable, input);
 
     final Callable<Void> command = Assertions.assertNotNull(interceptCallable(Executables.callable(runnable), input));
     return m_futures.add(new IFutureSupplier<Void>() {
@@ -172,6 +185,7 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
   @Override
   public final IFuture<Void> scheduleWithFixedDelay(final IRunnable runnable, final long initialDelay, final long delay, final TimeUnit unit, final INPUT input) throws JobExecutionException {
     validateInput(input);
+    setDefaultNameIfRequired(runnable, input);
 
     final Callable<Void> command = Assertions.assertNotNull(interceptCallable(Executables.callable(runnable), input));
     return m_futures.add(new IFutureSupplier<Void>() {
@@ -186,6 +200,8 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
 
   @Override
   public final void shutdown() {
+    IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_SHUTDOWN, JobChangeEvent.EVENT_MODE_SYNC, this, null));
+
     cancel(new AlwaysFilter<IFuture<?>>(), true);
     m_futures.clear();
     m_executor.shutdownNow();
@@ -202,6 +218,13 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
       if (!visitor.visit(future)) {
         return;
       }
+    }
+  }
+
+  @Internal
+  protected void setDefaultNameIfRequired(IExecutable<?> executable, IJobInput input) {
+    if (input.getName() == null) {
+      input.name(executable.getClass().getName());
     }
   }
 
@@ -224,13 +247,17 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
       @Override
       protected <RESULT> RunnableScheduledFuture<RESULT> decorateTask(final Callable<RESULT> callable, final RunnableScheduledFuture<RESULT> javaFuture) {
         // This method is called before the Future is given to the executor for execution.
-        return interceptFuture(Futures.jobFuture(javaFuture, (CallableWithJobInput) callable, JobManager.this));
+        JobFuture<RESULT> jobFuture = interceptFuture(Futures.jobFuture(javaFuture, (CallableWithJobInput) callable, JobManager.this));
+        IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_SCHEDULED, JobChangeEvent.EVENT_MODE_ASYNC, JobManager.this, jobFuture.getFuture()));
+        return jobFuture;
       }
 
       @Override
       protected <RESULT> RunnableScheduledFuture<RESULT> decorateTask(final Runnable runnable, final RunnableScheduledFuture<RESULT> javaFuture) {
         // This method is called before the Future is given to the executor for execution.
-        return interceptFuture(Futures.jobFuture(javaFuture, (RunnableWithJobInput) runnable, JobManager.this));
+        JobFuture<RESULT> jobFuture = interceptFuture(Futures.jobFuture(javaFuture, (RunnableWithJobInput) runnable, JobManager.this));
+        IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_SCHEDULED, JobChangeEvent.EVENT_MODE_ASYNC, JobManager.this, jobFuture.getFuture()));
+        return jobFuture;
       }
 
       @Override
@@ -243,6 +270,7 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
         if (jobFuture.isExpired()) {
           jobFuture.cancel(true);
         }
+        IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_ABOUT_TO_RUN, JobChangeEvent.EVENT_MODE_ASYNC, JobManager.this, jobFuture.getFuture()));
 
         IFuture.CURRENT.set(jobFuture.getFuture());
         IProgressMonitor.CURRENT.set(jobFuture.getFuture().getProgressMonitor());
@@ -340,6 +368,7 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
   @Internal
   protected void handleJobRejected(final IFuture<?> future) {
     future.cancel(true); // to indicate the submitter that the job was not executed.
+    IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_REJECTED, JobChangeEvent.EVENT_MODE_ASYNC, this, future));
 
     if (m_executor.isShutdown()) {
       throw new RejectedExecutionException("Job rejected because the job manager is shutdown.");
@@ -357,6 +386,7 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
    */
   @Internal
   protected void handleJobCompleted(final IFuture<?> future) {
+    IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_DONE, JobChangeEvent.EVENT_MODE_ASYNC, this, future));
     m_futures.remove(future); // Remove the job from the map to allow the job to run again.
   }
 
@@ -382,9 +412,14 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
   @Override
   public boolean waitUntilDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException {
     final IFilter<IFuture<?>> f = AlwaysFilter.ifNull(filter);
+    Assertions.assertTrue(timeout > 0, "Invalid timeout: '%s'. Must be > 0.", timeout);
 
     // Determine the absolute deadline.
-    final Date deadline = new Date(System.currentTimeMillis() + unit.toMillis(timeout));
+    long now = System.currentTimeMillis();
+    long deadlineMillis = now + unit.toMillis(timeout);
+    Assertions.assertTrue(deadlineMillis > 0, "Timeout overflow. Value '%s' is to high.", timeout);
+
+    final Date deadline = new Date(deadlineMillis);
 
     // Wait until all jobs matching the filter are 'done' or the deadline is passed.
     m_futures.getLock().lockInterruptibly();

@@ -12,15 +12,15 @@ package org.eclipse.scout.rt.client.testenvironment;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.AbstractClientSession;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 
 /**
  * {@link IClientSession} for Client Test Environment
- * 
+ *
  * @author jbr
  */
 public class TestEnvironmentClientSession extends AbstractClientSession {
@@ -35,7 +35,7 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
    * @return session in current ThreadContext
    */
   public static TestEnvironmentClientSession get() {
-    return ClientJob.getCurrentSession(TestEnvironmentClientSession.class);
+    return ClientSessionProvider.currentSession(TestEnvironmentClientSession.class);
   }
 
   @Override
@@ -71,7 +71,7 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
    * Unlike {@link #setDesktop(IDesktop)} it will not check if the desktop is already active.
    * If a test desktop ({@link #m_testDesktop}) is set, {@link #getDesktop()} will return this instance.
    * Do not forget to set the test desktop to null at the end of your test.
-   * 
+   *
    * @param desktop
    *          the test desktop
    */

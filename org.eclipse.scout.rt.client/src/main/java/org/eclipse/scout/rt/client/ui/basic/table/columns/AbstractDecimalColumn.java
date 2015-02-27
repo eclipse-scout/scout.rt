@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IDecimalColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -153,7 +153,7 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
 
   @Override
   public void setPercent(boolean b) {
-    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(LocaleThreadLocal.get());
+    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(NlsLocale.get());
     DecimalFormat format = getFormat();
     if (b) {
       format.setPositiveSuffix(percentDF.getPositiveSuffix());
@@ -170,7 +170,7 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
 
   @Override
   public boolean isPercent() {
-    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(LocaleThreadLocal.get());
+    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(NlsLocale.get());
     DecimalFormat internalDF = getFormatInternal();
     return internalDF.getPositiveSuffix().equals(percentDF.getPositiveSuffix()) && internalDF.getNegativeSuffix().equals(percentDF.getNegativeSuffix());
   }

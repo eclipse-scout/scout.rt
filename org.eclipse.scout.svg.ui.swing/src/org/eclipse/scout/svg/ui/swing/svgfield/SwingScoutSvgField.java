@@ -21,8 +21,10 @@ import java.net.URL;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.SVGUserAgent;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
@@ -148,15 +150,15 @@ public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> impl
       try {
         final URL url = new URI(uri).toURL();
         //notify scout later
-        new ClientSyncJob("Hyperlink", getSwingEnvironment().getScoutSession()) {
+        OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
           @Override
-          protected void runVoid(IProgressMonitor monitor) {
+          public void run() throws Exception {
             getScoutObject().getUIFacade().fireHyperlinkFromUI(url);
           }
-        }.schedule();
+        }, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
         // end notify
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         //nop
       }
     }

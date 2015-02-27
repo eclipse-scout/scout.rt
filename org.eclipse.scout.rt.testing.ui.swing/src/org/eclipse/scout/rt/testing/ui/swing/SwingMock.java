@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.AbstractButton;
@@ -45,9 +45,6 @@ import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
@@ -55,8 +52,10 @@ import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -124,9 +123,10 @@ public class SwingMock extends AbstractGuiMock {
     if (SwingUtilities.isEventDispatchThread()) {
       return;
     }
-    //
+
     for (int pass = 0; pass < 2; pass++) {
       m_bot.sleep(80);
+
       //wait until gui queue is empty
       syncExec(new WaitCondition<Object>() {
         @Override
@@ -134,34 +134,14 @@ public class SwingMock extends AbstractGuiMock {
           return null;
         }
       });
+
       //wait until model queue is empty
-      ClientSyncJob idleJob = new ClientSyncJob("Check for idle", getClientSession()) {
-        @Override
-        protected void runVoid(IProgressMonitor m) throws Throwable {
-        }
-      };
-      idleJob.setSystem(true);
-
-      final CountDownLatch idleJobScheduledSignal = new CountDownLatch(1);
-      JobChangeAdapter listener = new JobChangeAdapter() {
-        @Override
-        public void done(IJobChangeEvent event) {
-          idleJobScheduledSignal.countDown();
-        }
-      };
-
       try {
-        idleJob.addJobChangeListener(listener);
-        idleJob.schedule();
-        try {
-          idleJobScheduledSignal.await();
-        }
-        catch (InterruptedException e) {
-          throw new IllegalStateException("Interrupted");
-        }
+        IClientSession clientSession = getClientSession();
+        OBJ.one(IModelJobManager.class).waitUntilDone(new ClientSessionFilter(clientSession), 1, TimeUnit.HOURS);
       }
-      finally {
-        idleJob.removeJobChangeListener(listener);
+      catch (InterruptedException e) {
+        throw new IllegalStateException("Interrupted", e);
       }
     }
   }

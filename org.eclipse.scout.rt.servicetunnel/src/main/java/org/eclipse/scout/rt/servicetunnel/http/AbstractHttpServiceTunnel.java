@@ -16,6 +16,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.servicetunnel.http.internal.AbstractInternalHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
@@ -112,7 +113,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
   }
 
   @Override
-  protected IServiceTunnelResponse tunnel(final IServiceTunnelRequest call) {
+  protected IServiceTunnelResponse tunnel(final IServiceTunnelRequest call) throws JobExecutionException {
     return super.tunnel(call);
   }
 

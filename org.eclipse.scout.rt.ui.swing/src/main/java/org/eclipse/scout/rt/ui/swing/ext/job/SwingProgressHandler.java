@@ -11,16 +11,23 @@
 package org.eclipse.scout.rt.ui.swing.ext.job;
 
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.EventListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.SwingUtilities;
 
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IJobChangeEvent;
+import org.eclipse.scout.commons.job.IJobChangeListener;
+import org.eclipse.scout.commons.job.internal.JobChangeEvent;
+import org.eclipse.scout.commons.job.internal.JobChangeListeners;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ModelJobFilter;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 
 /**
  * handler dealing with SwingProgressProvider events.
@@ -47,38 +54,50 @@ public class SwingProgressHandler {
   }
 
   private final EventListenerList m_listenerList = new EventListenerList();
-  private boolean m_jobRunning;
+  private final IJobChangeListener m_modelJobsListener;
+  private volatile boolean m_jobRunning;
   private MonitorProperties m_monitorProps;
 
   protected SwingProgressHandler() {
-    SwingProgressProvider p = new SwingProgressProvider();
-    Job.getJobManager().setProgressProvider(p);
-    p.addPropertyChangeListener(SwingProgressProvider.PROP_MONITOR_PROPERTIES,
-        new PropertyChangeListener() {
+    m_modelJobsListener = new IJobChangeListener() {
       @Override
-      public synchronized void propertyChange(final PropertyChangeEvent evt) {
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            propertyChangeInSwing((MonitorProperties) evt.getNewValue());
+      public void jobChanged(final IJobChangeEvent event) {
+        if (event.getMode() == JobChangeEvent.EVENT_MODE_ASYNC) {
+          if (event.getType() == JobChangeEvent.EVENT_TYPE_ABOUT_TO_RUN) {
+            SwingUtilities.invokeLater(new Runnable() {
+              @Override
+              public void run() {
+                propertyChangeInSwing(event.getFuture());
+              }
+            });
           }
-        });
+          else if (event.getType() == JobChangeEvent.EVENT_TYPE_DONE) {
+            SwingUtilities.invokeLater(new Runnable() {
+              @Override
+              public void run() {
+                propertyChangeInSwing(null);
+              }
+            });
+          }
+        }
       }
-    });
+    };
+
+    JobChangeListeners.DEFAULT.add(m_modelJobsListener, ModelJobFilter.INSTANCE);
   }
 
   private void dispose() {
-    Job.getJobManager().setProgressProvider(null);
+    JobChangeListeners.DEFAULT.remove(m_modelJobsListener, ModelJobFilter.INSTANCE);
   }
 
-  private void propertyChangeInSwing(MonitorProperties monitorProps) {
-    if (monitorProps == null) {
+  private void propertyChangeInSwing(IFuture<?> future) {
+    if (future == null) {
       m_jobRunning = false;
       m_monitorProps = MonitorProperties.NULL_INSTANCE;
     }
     else {
       m_jobRunning = true;
-      m_monitorProps = monitorProps;
+      m_monitorProps = new MonitorProperties(0, future.getJobInput().getIdentifier(), ""); //TODO: more progress required?
     }
     fireStateChanged();
   }
@@ -157,19 +176,8 @@ public class SwingProgressHandler {
 
     @Override
     public void actionPerformed(ActionEvent a) {
-      Job[] jobs = Job.getJobManager().find(null);
-      if (jobs != null) {
-        for (Job j : jobs) {
-          if (!j.isSystem() && j.getState() == Job.RUNNING) {
-            try {
-              j.cancel();
-            }
-            catch (Throwable t) {
-              //nop
-            }
-          }
-        }
-      }
+      OBJ.one(IClientJobManager.class).cancel(new AlwaysFilter<IFuture<?>>(), true);
+      OBJ.one(IModelJobManager.class).cancel(new AlwaysFilter<IFuture<?>>(), true);
     }
   }// end class
 

@@ -19,8 +19,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import org.easymock.EasyMock;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
@@ -51,7 +51,7 @@ public class AbstractDecimalColumnTest extends AbstractDecimalColumn<BigDecimal>
   @Test
   public void testDecimalFormatHandling() {
     DecimalFormat format = getFormat();
-    String percentSuffix = ((DecimalFormat) NumberFormat.getPercentInstance(LocaleThreadLocal.get())).getPositiveSuffix();
+    String percentSuffix = ((DecimalFormat) NumberFormat.getPercentInstance(NlsLocale.get())).getPositiveSuffix();
     assertTrue("expected groupingUsed-property set to true as default", format.isGroupingUsed());
     assertTrue("expected groupingUsed-property set to true as default", isGroupingUsed());
     assertEquals("expected minFractionDigits-property set to 2 as default", 2, getMinFractionDigits());
@@ -208,7 +208,7 @@ public class AbstractDecimalColumnTest extends AbstractDecimalColumn<BigDecimal>
 
   @Test
   public void testPropertySupportForPercent() {
-    DecimalFormat dfPercent = (DecimalFormat) DecimalFormat.getPercentInstance(LocaleThreadLocal.get());
+    DecimalFormat dfPercent = (DecimalFormat) DecimalFormat.getPercentInstance(NlsLocale.get());
     setPercent(false);
     // Bug in DecimalFormat: private members for suffix patterns (not suffix itself) are "" as default,
     // but become null when empty suffixes are set. These private members are checked in equals(Object)

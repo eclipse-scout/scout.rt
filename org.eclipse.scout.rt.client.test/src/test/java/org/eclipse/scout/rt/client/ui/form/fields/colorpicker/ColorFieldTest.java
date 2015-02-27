@@ -23,8 +23,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.colorpicker.ColorFieldTest.Tes
 import org.eclipse.scout.rt.client.ui.form.fields.colorpicker.ColorFieldTest.TestForm.MainBox.ColorField01.TestMenu1;
 import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.AbstractColorField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.testing.client.form.FormHandler;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.testing.client.form.FormHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -13,18 +13,21 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark.view;
 import java.security.Permission;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.AbstractBookmarkTreeField;
@@ -43,6 +46,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractLinkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.CreateUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.DeleteUserBookmarkPermission;
@@ -217,7 +221,7 @@ public class BookmarkViewForm extends AbstractForm {
           protected void execClickAction() throws ProcessingException {
             //createNewBookmark
             int kind = Bookmark.USER_BOOKMARK;
-            Bookmark b = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
+            Bookmark b = ClientSessionProvider.currentSession().getDesktop().createBookmark();
             if (b != null) {
               b.setKind(kind);
               IBookmarkForm form = null;
@@ -320,12 +324,13 @@ public class BookmarkViewForm extends AbstractForm {
       @Override
       public void handleEvent(ClientNotificationConsumerEvent e, boolean sync) {
         if (e.getClientNotification() instanceof BookmarkChangedClientNotification) {
-          new ClientSyncJob("Bookmarks changed", ClientSyncJob.getCurrentSession()) {
+          IClientSession clientSession = ClientSessionProvider.currentSession();
+          OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
             @Override
-            protected void runVoid(IProgressMonitor monitor) throws Throwable {
+            public void run() throws Exception {
               SERVICES.getService(IBookmarkService.class).loadBookmarks();
             }
-          }.schedule();
+          }, ClientJobInput.defaults().session(clientSession).name("Bookmarks changed"));
         }
       }
     };
@@ -347,8 +352,8 @@ public class BookmarkViewForm extends AbstractForm {
       //add listeners
       IClientNotificationConsumerService cncService = SERVICES.getService(IClientNotificationConsumerService.class);
       if (cncService != null) {
-        cncService.removeClientNotificationConsumerListener(ClientSyncJob.getCurrentSession(), m_cncListener);
-        cncService.addClientNotificationConsumerListener(ClientSyncJob.getCurrentSession(), m_cncListener);
+        cncService.removeClientNotificationConsumerListener(ClientSessionProvider.currentSession(), m_cncListener);
+        cncService.addClientNotificationConsumerListener(ClientSessionProvider.currentSession(), m_cncListener);
       }
       IBookmarkService bmService = SERVICES.getService(IBookmarkService.class);
       if (bmService != null) {
@@ -366,7 +371,7 @@ public class BookmarkViewForm extends AbstractForm {
         bmService.removeBookmarkServiceListener(m_bmListener);
       }
       if (cncService != null) {
-        cncService.removeClientNotificationConsumerListener(ClientSyncJob.getCurrentSession(), m_cncListener);
+        cncService.removeClientNotificationConsumerListener(ClientSessionProvider.currentSession(), m_cncListener);
       }
     }
   }

@@ -10,64 +10,60 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.session;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.shared.services.common.session.IJobRunnable;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IExecutable;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IJobInput;
+import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
 import org.eclipse.scout.service.AbstractService;
 
 /**
  * Default implementation of {@link ISessionService} used on client-side.
- * 
+ *
  * @since 3.8.1
  */
 @Priority(-1)
 public class DefaultClientSessionService extends AbstractService implements ISessionService {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultClientSessionService.class);
-
   @Override
-  public IClientSession getCurrentSession() {
-    return ClientJob.getCurrentSession();
+  public <RESULT> RESULT runNow(IExecutable<RESULT> executable) throws ProcessingException {
+    return OBJ.one(IClientJobManager.class).runNow(executable);
   }
 
   @Override
-  public JobEx createAsyncJob(IJobRunnable runnable) {
-    return createAsyncJob(null, runnable);
+  public <RESULT> RESULT runNow(IExecutable<RESULT> executable, IJobInput input) throws ProcessingException {
+    return OBJ.one(IClientJobManager.class).runNow(executable, (ClientJobInput) input);
   }
 
   @Override
-  public JobEx createAsyncJob(String name, IJobRunnable runnable) {
-    IClientSession session = getCurrentSession();
-    if (session == null) {
-      LOG.error("client session not available");
-      return null;
-    }
-    if (name == null) {
-      name = "client session async job";
-    }
-    return new P_ClientSessionAsyncJob(name, session, true, runnable);
+  public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable) throws JobExecutionException {
+    return OBJ.one(IClientJobManager.class).schedule(executable);
   }
 
-  private static class P_ClientSessionAsyncJob extends ClientAsyncJob {
+  @Override
+  public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, IJobInput input) throws JobExecutionException {
+    return OBJ.one(IClientJobManager.class).schedule(executable, (ClientJobInput) input);
+  }
 
-    private final IJobRunnable m_runnable;
+  @Override
+  public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit) throws JobExecutionException {
+    return OBJ.one(IClientJobManager.class).schedule(executable, delay, delayUnit);
+  }
 
-    public P_ClientSessionAsyncJob(String name, IClientSession session, boolean system, IJobRunnable runnable) {
-      super(name, session, system);
-      m_runnable = runnable;
-    }
+  @Override
+  public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, IJobInput input) throws JobExecutionException {
+    return OBJ.one(IClientJobManager.class).schedule(executable, delay, delayUnit, (ClientJobInput) input);
+  }
 
-    @Override
-    protected IStatus runStatus(IProgressMonitor monitor) {
-      return m_runnable.run(monitor);
-    }
+  @Override
+  public IJobInput defaults() {
+    return ClientJobInput.defaults();
   }
 }

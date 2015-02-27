@@ -12,11 +12,7 @@ package org.eclipse.scout.rt.client.services.common.clientnotification;
 
 import java.util.EventListener;
 
-import org.eclipse.core.runtime.jobs.IJobManager;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientRule;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
 import org.eclipse.scout.rt.servicetunnel.IServiceTunnel;
 
 public interface IClientNotificationConsumerListener extends EventListener {
@@ -25,16 +21,12 @@ public interface IClientNotificationConsumerListener extends EventListener {
    * @param e
    *          the event
    * @param sync
-   *          true if {@link IJobManager#currentJob()} instanceof {@link ClientJob} and {@link ClientJob#isSync()}
-   *          <p>
-   *          If a {@link ClientSyncJob} calls
-   *          {@link IServiceTunnel#invokeService(Class, java.lang.reflect.Method, Object[])} which directly returns
-   *          notifications, then these notifications are handled immediately.
-   *          <p>
-   *          Otherwise this method is called within a {@link ClientAsyncJob}.
-   *          <p>
-   *          Therefore when performing operations on the model check {@link ClientJob#isSync()} and eventually use
-   *          {@link ClientSyncJob} to have proper session monitors used. see {@link ClientSyncJob}, {@link ClientRule}
+   *          true if the current thread is the model thread (see {@link ModelJobManager#isModelThread()}).<br>
+   *          If a model thread calls {@link IServiceTunnel#invokeService(Class, java.lang.reflect.Method, Object[])}
+   *          which directly returns notifications, then these notifications are handled immediately. Otherwise this
+   *          method is called within sync=false.<br>
+   *          Therefore when performing operations on the model check the sync param and probably use
+   *          {@link ModelJobManager} to have proper session monitors used.
    */
   void handleEvent(ClientNotificationConsumerEvent e, boolean sync);
 

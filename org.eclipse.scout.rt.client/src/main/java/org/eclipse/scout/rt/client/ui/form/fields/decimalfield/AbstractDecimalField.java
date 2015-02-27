@@ -15,10 +15,10 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.decimalfield.IDecimalFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
@@ -83,7 +83,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
   /**
    * Default for {@link IDecimalField#setPercent(boolean)}
    * <p>
-   * When set to true, a percentage format (depending on {@link LocaleThreadLocal#get()}) is used for parsing an
+   * When set to true, a percentage format (depending on {@link NlsLocale#get()}) is used for parsing an
    * formatting.<br>
    * <b>Note:</b> This setting is independent from {@link #getConfiguredMultiplier()}
    */
@@ -178,7 +178,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
   @Override
   public void setPercent(boolean b) {
     try {
-      DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(LocaleThreadLocal.get());
+      DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(NlsLocale.get());
       DecimalFormat format = getFormat();
       if (b) {
         format.setPositiveSuffix(percentDF.getPositiveSuffix());
@@ -205,7 +205,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   @Override
   public boolean isPercent() {
-    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(LocaleThreadLocal.get());
+    DecimalFormat percentDF = (DecimalFormat) DecimalFormat.getPercentInstance(NlsLocale.get());
     DecimalFormat internalDF = getFormatInternal();
     return internalDF.getPositiveSuffix().equals(percentDF.getPositiveSuffix()) && internalDF.getNegativeSuffix().equals(percentDF.getNegativeSuffix());
   }

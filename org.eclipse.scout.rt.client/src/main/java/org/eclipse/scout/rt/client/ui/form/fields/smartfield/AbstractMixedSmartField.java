@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -24,18 +22,23 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.commons.job.ICallable;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IMixedSmartFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.MixedSmartFieldChains.MixedSmartFieldConvertKeyToValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.MixedSmartFieldChains.MixedSmartFieldConvertValueToKeyChain;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -55,7 +58,7 @@ import org.eclipse.scout.service.SERVICES;
 @ScoutSdkIgnore
 public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY> implements IMixedSmartField<VALUE, LOOKUP_KEY> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMixedSmartField.class);
-  private P_GetLookupRowByKeyJob m_currentGetLookupRowByKeyJob;
+  private IFuture<?> m_currentGetLookupRowByKeyJob;
   private P_UIFacade m_uiFacade;
 
   public AbstractMixedSmartField() {
@@ -179,9 +182,13 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   @Override
   public void applyLazyStyles() {
     // override: ensure that (async loading) lookup context has been set
-    if (m_currentGetLookupRowByKeyJob != null) {
-      if (m_currentGetLookupRowByKeyJob.getClientSession() == ClientSyncJob.getCurrentSession() && ClientSyncJob.isSyncClientJob()) {
-        m_currentGetLookupRowByKeyJob.runNow(new NullProgressMonitor());
+    IFuture<?> future = m_currentGetLookupRowByKeyJob;
+    if (future != null) {
+      try {
+        future.get();
+      }
+      catch (ProcessingException e) {
+        LOG.error("Unable to load smartfield data.", e);
       }
     }
   }
@@ -201,8 +208,9 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     /*
      * Ticket 76232
      */
-    if (m_currentGetLookupRowByKeyJob != null) {
-      m_currentGetLookupRowByKeyJob.cancel();
+    IFuture<?> future = m_currentGetLookupRowByKeyJob;
+    if (future != null) {
+      future.cancel(true);
       m_currentGetLookupRowByKeyJob = null;
     }
     //
@@ -239,8 +247,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
             // this will later on call installLookupRowContext()
             ILookupCall<LOOKUP_KEY> call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractMixedSmartField.this));
             prepareKeyLookup(call, interceptConvertValueToKey(validKey));
-            m_currentGetLookupRowByKeyJob = new P_GetLookupRowByKeyJob(call);
-            m_currentGetLookupRowByKeyJob.schedule();
+            m_currentGetLookupRowByKeyJob = OBJ.one(IClientJobManager.class).schedule(new P_GetLookupRowByKeyJob(call), ClientJobInput.defaults().name("Fetch smartfield data for " + getLabel()));
           }
         }
         catch (ProcessingException e) {
@@ -402,48 +409,38 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     }
   }
 
-  private class P_GetLookupRowByKeyJob extends ClientSyncJob {
-    private List<ILookupRow<LOOKUP_KEY>> m_rows;
-    private final ClientAsyncJob m_backgroundJob;
+  private class P_GetLookupRowByKeyJob implements IRunnable {
+    private final IFuture<List<ILookupRow<LOOKUP_KEY>>> m_backgroundJob;
 
-    public P_GetLookupRowByKeyJob(final ILookupCall<LOOKUP_KEY> call) {
-      super("Fetch smartfield data for " + getLabel(), getCurrentSession());
+    private P_GetLookupRowByKeyJob(final ILookupCall<LOOKUP_KEY> call) throws JobExecutionException {
       // immediately start a thread that fetches data async
-      m_backgroundJob = new ClientAsyncJob("Fetch smartfield data", ClientSyncJob.getCurrentSession()) {
+      m_backgroundJob = OBJ.one(IClientJobManager.class).schedule(new ICallable<List<ILookupRow<LOOKUP_KEY>>>() {
         @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<ILookupRow<LOOKUP_KEY>>(call.getDataByKey());
+        public List<ILookupRow<LOOKUP_KEY>> call() throws Exception {
+          List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(call.getDataByKey());
           filterKeyLookup(call, result);
-          m_rows = cleanupResultList(result);
+          return cleanupResultList(result);
         }
-      };
-      m_backgroundJob.schedule();
+      }, ClientJobInput.defaults().name("Fetch smartfield data"));
     }
 
     @Override
-    protected void runVoid(IProgressMonitor monitor) throws Throwable {
+    public void run() throws Exception {
       // here we are in the scout thread and simply need to wait until the
       // background thread finished fetching
-      if (this == m_currentGetLookupRowByKeyJob) {
+      if (IFuture.CURRENT.get() == m_currentGetLookupRowByKeyJob) {
         m_currentGetLookupRowByKeyJob = null;
         try {
-          m_backgroundJob.join();
-        }
-        catch (InterruptedException e) {
-          // nop
-        }
-        if (m_backgroundJob.getResult() != null) {
-          if (m_backgroundJob.getResult().getException() == null) {
-            if (m_rows != null && !m_rows.isEmpty()) {
-              installLookupRowContext(m_rows.get(0));
-            }
-            else {
-              installLookupRowContext(EMPTY_LOOKUP_ROW);
-            }
+          List<ILookupRow<LOOKUP_KEY>> rows = m_backgroundJob.get();
+          if (CollectionUtility.hasElements(rows)) {
+            installLookupRowContext(rows.get(0));
           }
           else {
-            LOG.error(null, m_backgroundJob.getResult().getException());
+            installLookupRowContext(EMPTY_LOOKUP_ROW);
           }
+        }
+        catch (ProcessingException e) {
+          LOG.error("Error loading smartfield data.", e);
         }
       }
     }

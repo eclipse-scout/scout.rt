@@ -11,9 +11,14 @@
 package org.eclipse.scout.rt.client.ui.form;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.testing.client.form.DynamicCancelButton;
 import org.eclipse.scout.testing.client.form.DynamicForm;
@@ -21,7 +26,6 @@ import org.eclipse.scout.testing.client.form.DynamicGroupBox;
 import org.eclipse.scout.testing.client.form.DynamicOkButton;
 import org.eclipse.scout.testing.client.form.DynamicStringField;
 import org.eclipse.scout.testing.client.form.FormHandler;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -54,21 +58,21 @@ public class FormBasicTest {
     testSequence.add(0);
     testSequence.add(1);
     //emulate that gui clicks on ok button
-    ClientSyncJob closeJob = new ClientSyncJob("Close", ClientSyncJob.getCurrentSession()) {
+    IFuture<Void> future = OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+      public void run() throws Exception {
         testSequence.add(2);
         f.getButton("ok").getUIFacade().fireButtonClickedFromUI();
         Thread.sleep(200L);
         testSequence.add(3);
       }
-    };
-    closeJob.schedule(200L);
+    }, 200, TimeUnit.MILLISECONDS, ClientJobInput.defaults().name("Close"));
+
     try {
       f.start(new FormHandler());
       f.waitFor();
       testSequence.add(4);
-      closeJob.join();
+      future.get();
       ScoutAssert.assertOrder(new Integer[]{0, 1, 2, 3, 4}, testSequence.toArray());
     }
     finally {

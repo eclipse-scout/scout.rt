@@ -14,8 +14,8 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryListener;
@@ -108,7 +108,7 @@ public class NavigationHistoryService extends AbstractService implements INaviga
   }
 
   private UserNavigationHistory getUserNavigationHistory() {
-    IClientSession session = ClientJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     if (session == null) {
       return new UserNavigationHistory();
     }

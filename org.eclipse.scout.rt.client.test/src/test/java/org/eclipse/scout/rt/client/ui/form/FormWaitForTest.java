@@ -12,10 +12,14 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.testing.client.form.DynamicCancelButton;
 import org.eclipse.scout.testing.client.form.DynamicForm;
@@ -23,7 +27,6 @@ import org.eclipse.scout.testing.client.form.DynamicGroupBox;
 import org.eclipse.scout.testing.client.form.DynamicOkButton;
 import org.eclipse.scout.testing.client.form.DynamicStringField;
 import org.eclipse.scout.testing.client.form.FormHandler;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -58,20 +61,19 @@ public class FormWaitForTest {
 
     testSequence.add(0);
 
-    ClientSyncJob closeJob = new ClientSyncJob("Close", ClientSyncJob.getCurrentSession()) {
+    IFuture<Void> future = OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+      public void run() throws Exception {
         testSequence.add(3);
         form.doClose();
         testSequence.add(4);
 
         LOG.debug("ClientSyncWaitForTest.testStartAndWaitImpl(...).new ClientSyncJob() {...}.runVoid() finished");
       }
-    };
-    closeJob.schedule();
+    }, ClientJobInput.defaults().name("Close"));
 
-    LOG.debug("ClientSyncJob.getCurrentSession()");
-    LOG.debug("ClientSyncJob.getCurrentSession().getDesktop()");
+    LOG.debug("ClientSessionProvider.currentSession()");
+    LOG.debug("ClientSessionProvider.currentSession().getDesktop()");
 
     testSequence.add(1);
     form.start(new FormHandler());
@@ -83,7 +85,7 @@ public class FormWaitForTest {
     LOG.debug("ClientSyncWaitForTest.testStartAndWaitImpl() after waitFor");
     testSequence.add(5);
 
-    closeJob.join();
+    future.get();
     ScoutAssert.assertOrder(new Integer[]{0, 1, 2, 3, 4, 5}, testSequence.toArray());
   }
 }

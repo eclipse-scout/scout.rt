@@ -15,8 +15,8 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.http.internal.InternalClientHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 /**
  * Client-side tunnel used to invoke a service through HTTP. This class re-defines methods of it's super class
  * since the internal class does not belong to the public API.
- * 
+ *
  * @author awe (refactoring)
  */
 public class ClientHttpServiceTunnel extends InternalClientHttpServiceTunnel {
@@ -78,7 +78,7 @@ public class ClientHttpServiceTunnel extends InternalClientHttpServiceTunnel {
 
   /**
    * Signals the server to cancel processing jobs for the current session.
-   * 
+   *
    * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
    */
   @Override
@@ -122,12 +122,12 @@ public class ClientHttpServiceTunnel extends InternalClientHttpServiceTunnel {
   }
 
   @Override
-  protected IServiceTunnelResponse tunnel(IServiceTunnelRequest call) {
+  protected IServiceTunnelResponse tunnel(IServiceTunnelRequest call) throws JobExecutionException {
     return super.tunnel(call);
   }
 
   @Override
-  protected IServiceTunnelResponse tunnelOnline(final IServiceTunnelRequest call) {
+  protected IServiceTunnelResponse tunnelOnline(final IServiceTunnelRequest call) throws JobExecutionException {
     return super.tunnelOnline(call);
   }
 
@@ -137,20 +137,10 @@ public class ClientHttpServiceTunnel extends InternalClientHttpServiceTunnel {
   }
 
   /**
-   * Override this method to decide when background jobs to the backend should be presented to the user or not (for
-   * cancelling)
-   * The default makes all jobs cancellable except IPingService (used for client notification polling)
-   */
-  @Override
-  protected void decorateBackgroundJob(IServiceTunnelRequest call, Job backgroundJob) {
-    super.decorateBackgroundJob(call, backgroundJob);
-  }
-
-  /**
    * This method is called just after the http response is received but before
    * the http response is processed by scout. This might be used to read and
    * interpret custom http headers.
-   * 
+   *
    * @since 06.07.2009
    */
   @Override

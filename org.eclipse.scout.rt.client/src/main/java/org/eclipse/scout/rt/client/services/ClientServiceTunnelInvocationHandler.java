@@ -16,8 +16,8 @@ import java.lang.reflect.Method;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.servicetunnel.IServiceTunnel;
 
 /**
@@ -39,7 +39,7 @@ public class ClientServiceTunnelInvocationHandler implements InvocationHandler {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Soap call to " + m_serviceInterfaceClass.getName() + "." + method.getName() + "(" + VerboseUtility.dumpObjects(args) + ")");
       }
-      IClientSession session = ClientJob.getCurrentSession();
+      IClientSession session = ClientSessionProvider.currentSession();
       return session.getServiceTunnel().invokeService(m_serviceInterfaceClass, method, args);
     }
     else {

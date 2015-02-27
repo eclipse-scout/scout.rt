@@ -34,11 +34,14 @@ import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IExecutable;
 import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IJobChangeListeners;
+import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.job.internal.Executables;
+import org.eclipse.scout.commons.job.internal.JobChangeEvent;
 import org.eclipse.scout.commons.job.internal.NamedThreadFactory;
 import org.eclipse.scout.commons.job.internal.ProgressMonitor;
 import org.eclipse.scout.commons.job.internal.callable.ExceptionTranslator;
@@ -99,17 +102,23 @@ public class ModelJobManager implements IModelJobManager {
   @Override
   public final <RESULT> RESULT runNow(final IExecutable<RESULT> executable, final ClientJobInput input) throws ProcessingException {
     validateInput(input);
+    setDefaultNameIfRequired(executable, input);
 
+    IFuture<?> currentFuture = IFuture.CURRENT.get();
     Assertions.assertTrue(isModelThread(), "Wrong thread: The calling thread must be the model-thread to run model jobs in 'runNow' style. [thread=%s, job=%s]", Thread.currentThread().getName(), input.getIdentifier());
-    Assertions.assertNotNull(IFuture.CURRENT.get(), "Unexpected inconsistency: No Future bound to current thread. [thread=%s, job=%s]", Thread.currentThread().getName(), input.getIdentifier());
+    Assertions.assertNotNull(currentFuture, "Unexpected inconsistency: No Future bound to current thread. [thread=%s, job=%s]", Thread.currentThread().getName(), input.getIdentifier());
 
     final Callable<RESULT> command = Assertions.assertNotNull(interceptCallable(Executables.callable(executable), input));
     try {
       // run the command on behalf of the current model-thread and Future.
+      IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_ABOUT_TO_RUN, JobChangeEvent.EVENT_MODE_SYNC, this, currentFuture));
       return command.call();
     }
     catch (final Exception e) {
       throw ExceptionTranslator.translate(e);
+    }
+    finally {
+      IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_DONE, JobChangeEvent.EVENT_MODE_SYNC, this, currentFuture));
     }
   }
 
@@ -121,10 +130,12 @@ public class ModelJobManager implements IModelJobManager {
   @Override
   public final <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final ClientJobInput input) {
     validateInput(input);
+    setDefaultNameIfRequired(executable, input);
 
     final Callable<RESULT> command = Assertions.assertNotNull(interceptCallable(Executables.callable(executable), input));
 
     final ModelFutureTask<RESULT> task = interceptFuture(createModelFutureTask(command, input));
+    IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_SCHEDULED, JobChangeEvent.EVENT_MODE_ASYNC, this, task.getFuture()));
 
     if (m_mutexSemaphores.tryAcquireElseOfferTail(task)) {
       m_executor.execute(task);
@@ -141,10 +152,12 @@ public class ModelJobManager implements IModelJobManager {
   @Override
   public <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit, final ClientJobInput input) {
     validateInput(input);
+    setDefaultNameIfRequired(executable, input);
 
     final Callable<RESULT> command = Assertions.assertNotNull(interceptCallable(Executables.callable(executable), input));
 
     final ModelFutureTask<RESULT> task = interceptFuture(createModelFutureTask(command, input));
+    IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_SCHEDULED, JobChangeEvent.EVENT_MODE_ASYNC, this, task.getFuture()));
 
     try {
       OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
@@ -210,9 +223,14 @@ public class ModelJobManager implements IModelJobManager {
   @Override
   public boolean waitUntilDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException {
     final IFilter<IFuture<?>> f = AlwaysFilter.ifNull(filter);
+    Assertions.assertTrue(timeout > 0, "Invalid timeout: '%s'. Must be > 0.", timeout);
 
     // Determine the absolute deadline.
-    final Date deadline = new Date(System.currentTimeMillis() + unit.toMillis(timeout));
+    long now = System.currentTimeMillis();
+    long deadlineMillis = now + unit.toMillis(timeout);
+    Assertions.assertTrue(deadlineMillis > 0, "Timeout overflow. Value '%s' is to high.", timeout);
+
+    final Date deadline = new Date(deadlineMillis);
 
     // Wait until all jobs matching the filter are 'done' or the deadline is passed.
     m_mutexSemaphores.getLock().lockInterruptibly();
@@ -248,6 +266,8 @@ public class ModelJobManager implements IModelJobManager {
 
   @Override
   public final void shutdown() {
+    IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_SHUTDOWN, JobChangeEvent.EVENT_MODE_SYNC, ModelJobManager.this, null));
+
     cancel(new AlwaysFilter<IFuture<?>>(), true);
     m_mutexSemaphores.invalidate();
     m_executor.shutdownNow();
@@ -278,6 +298,13 @@ public class ModelJobManager implements IModelJobManager {
   protected void validateInput(final ClientJobInput input) {
     Assertions.assertNotNull(input, "ClientJobInput must not be null");
     Assertions.assertNotNull(input.getSession(), "ClientSession must not be null; input-property 'sessionRequired' not applicable for model jobs");
+  }
+
+  @Internal
+  protected void setDefaultNameIfRequired(IExecutable<?> executable, IJobInput input) {
+    if (input.getName() == null) {
+      input.name(executable.getClass().getName());
+    }
   }
 
   /**
@@ -311,6 +338,7 @@ public class ModelJobManager implements IModelJobManager {
       @Override
       protected void rejected(final IFuture<RESULT> future) {
         future.cancel(true); // to interrupt the submitter if waiting for the job to complete.
+        IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_REJECTED, JobChangeEvent.EVENT_MODE_ASYNC, ModelJobManager.this, future));
         passMutexToNextJob(this);
       }
 
@@ -323,6 +351,8 @@ public class ModelJobManager implements IModelJobManager {
 
         registerModelThread(Thread.currentThread());
 
+        IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_ABOUT_TO_RUN, JobChangeEvent.EVENT_MODE_ASYNC, ModelJobManager.this, future));
+
         IFuture.CURRENT.set(future);
         IProgressMonitor.CURRENT.set(future.getProgressMonitor());
       }
@@ -331,6 +361,8 @@ public class ModelJobManager implements IModelJobManager {
       protected void afterExecute(final IFuture<RESULT> future) {
         IProgressMonitor.CURRENT.remove();
         IFuture.CURRENT.remove();
+
+        IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_DONE, JobChangeEvent.EVENT_MODE_ASYNC, ModelJobManager.this, future));
 
         if (isModelThread()) { // the current thread is not the model thread if being interrupted while waiting for a blocking condition to fall.
           passMutexToNextJob(this);
@@ -483,6 +515,7 @@ public class ModelJobManager implements IModelJobManager {
 
       final IFuture<?> currentFuture = IFuture.CURRENT.get();
       final ModelFutureTask<?> currentTask = ((ModelFutureTask<?>) currentFuture.getDelegate());
+      IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_BLOCKED, JobChangeEvent.EVENT_MODE_ASYNC, ModelJobManager.this, currentFuture));
 
       passMutexToNextJob(currentTask);
 
@@ -551,6 +584,7 @@ public class ModelJobManager implements IModelJobManager {
           }
         }
       }
+      IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_UN_BLOCKED, JobChangeEvent.EVENT_MODE_ASYNC, ModelJobManager.this, currentFuture));
     }
   }
 

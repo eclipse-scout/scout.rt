@@ -18,23 +18,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
@@ -49,7 +51,7 @@ import org.eclipse.scout.service.SERVICES;
  * methods loadCodeType, loadCodeTypes if getters and finders are called with
  * partitionId, cache is not used.
  * <p>
- * Service state is per [{@link IClientSession}.class,{@link LocaleThreadLocal#get()},partitionId]
+ * Service state is per [{@link IClientSession}.class,{@link NlsLocale#get()},partitionId]
  */
 @Priority(-3)
 public class CodeServiceClientProxy extends AbstractService implements ICodeService {
@@ -66,7 +68,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
   }
 
   private ServiceState getServiceState(Long partitionId) {
-    IClientSession session = ClientJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     if (session == null) {
       LOG.warn("could not find a client session");
       return null;
@@ -76,7 +78,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
         partitionId = (Long) session.getSharedVariableMap().get(ICodeType.PROP_PARTITION_ID);
       }
     }
-    CompositeObject key = new CompositeObject(session.getClass(), LocaleThreadLocal.get(), partitionId);
+    CompositeObject key = new CompositeObject(session.getClass(), NlsLocale.get(), partitionId);
     synchronized (m_stateLock) {
       ServiceState data = (ServiceState) m_stateMap.get(key);
       if (data == null) {
@@ -95,27 +97,26 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
       @Override
       public void handleEvent(final ClientNotificationConsumerEvent e, boolean sync) {
         if (e.getClientNotification().getClass() == CodeTypeChangedNotification.class) {
+          final CodeTypeChangedNotification notification = (CodeTypeChangedNotification) e.getClientNotification();
           if (sync) {
             try {
-              reloadCodeTypes(((CodeTypeChangedNotification) e.getClientNotification()).getCodeTypes());
+              reloadCodeTypes(notification.getCodeTypes());
             }
             catch (Throwable t) {
               LOG.error("update due to client notification", t);
-              // nop
             }
           }
           else {
-            new ClientSyncJob("Reload code types", ClientSyncJob.getCurrentSession()) {
+            OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
               @Override
-              protected void runVoid(IProgressMonitor monitor) throws Throwable {
-                reloadCodeTypes(((CodeTypeChangedNotification) e.getClientNotification()).getCodeTypes());
+              public void run() throws Exception {
+                reloadCodeTypes(notification.getCodeTypes());
               }
-            }.schedule();
+            }, ClientJobInput.defaults().name("Reload code types"));
           }
         }
       }
     });
-
   }
 
   @Override
@@ -393,7 +394,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
   }
 
   protected ICodeService getRemoteService() {
-    return ServiceTunnelUtility.createProxy(ICodeService.class, ClientSyncJob.getCurrentSession().getServiceTunnel());
+    return ServiceTunnelUtility.createProxy(ICodeService.class, ClientSessionProvider.currentSession().getServiceTunnel());
   }
 
   private static class ServiceState {

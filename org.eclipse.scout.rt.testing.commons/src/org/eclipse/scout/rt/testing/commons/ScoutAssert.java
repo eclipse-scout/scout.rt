@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.commons;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -20,10 +19,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.JobEx;
 
 public final class ScoutAssert {
 
@@ -118,32 +115,6 @@ public final class ScoutAssert {
       s = message + " ";
     }
     return s + "expected:<" + expected + "> but was:<" + actual + ">";
-  }
-
-  /**
-   * @param job
-   * @throws Throwable
-   *           throws the original exception of the job error, if a job completes with an error.
-   */
-  public static void jobSuccessfullyCompleted(JobEx job) throws Throwable {
-    assertEquals(job.getState(), Job.NONE);
-    try {
-      job.throwOnError();
-    }
-    catch (ProcessingException e) {
-      // unpack original exception if required
-      if (job.getLastResult() != null) {
-        Throwable originalException = job.getLastResult().getException();
-        if (originalException != null && originalException != e) {
-          throw originalException;
-        }
-      }
-      throw e;
-    }
-    // if there is no exception, but job result is not ok
-    if (job.getLastResult() != null && !job.getLastResult().isOK()) {
-      fail(job.getLastResult().getMessage());
-    }
   }
 
   /**

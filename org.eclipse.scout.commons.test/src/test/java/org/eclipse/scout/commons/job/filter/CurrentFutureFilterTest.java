@@ -33,18 +33,18 @@ public class CurrentFutureFilterTest {
   @Test
   public void test1() {
     IFuture.CURRENT.remove();
-    assertFalse(new CurrentFutureFilter().accept(mock(IFuture.class)));
+    assertFalse(CurrentFutureFilter.INSTANCE.accept(mock(IFuture.class)));
   }
 
   @Test
   public void test2() {
     IFuture.CURRENT.set(m_future);
-    assertFalse(new CurrentFutureFilter().accept(mock(IFuture.class)));
+    assertFalse(CurrentFutureFilter.INSTANCE.accept(mock(IFuture.class)));
   }
 
   @Test
   public void test3() {
     IFuture.CURRENT.set(m_future);
-    assertTrue(new CurrentFutureFilter().accept(m_future));
+    assertTrue(CurrentFutureFilter.INSTANCE.accept(m_future));
   }
 }

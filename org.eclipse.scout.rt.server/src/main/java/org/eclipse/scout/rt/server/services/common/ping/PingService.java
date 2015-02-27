@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.server.services.common.ping;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-1)

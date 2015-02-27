@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.shared.services.lookup;
 import java.io.Serializable;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
@@ -23,8 +20,12 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.rt.shared.services.common.session.IJobRunnable;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
 import org.eclipse.scout.rt.shared.validate.annotations.MaxLength;
 import org.eclipse.scout.service.SERVICES;
@@ -58,6 +59,8 @@ import org.eclipse.scout.service.SERVICES;
  * {@link LocalLookupCall#execCreateLookupRows()}
  */
 public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, Serializable, ITypeWithClassId {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LookupCall.class);
+
   private static final long serialVersionUID = 0L;
 
   private KEY_TYPE m_key;
@@ -310,31 +313,8 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
    * @return the created async job if applicable or null
    */
   @Override
-  public JobEx getDataByKeyInBackground(final ILookupCallFetcher<KEY_TYPE> caller) {
-    if (!(LookupCall.this instanceof LocalLookupCall)) {
-      JobEx job = createAsyncJob(getClass().getSimpleName() + ".getDataByKeyInBackground",
-          new IJobRunnable() {
-        @Override
-        public IStatus run(IProgressMonitor monitor) {
-          try {
-            List<? extends ILookupRow<KEY_TYPE>> rows = getDataByKey();
-            if (!JobEx.isCurrentJobCanceled()) {
-              caller.dataFetched(rows, null);
-            }
-          }
-          catch (ProcessingException e) {
-            if (!e.isInterruption() && !JobEx.isCurrentJobCanceled()) {
-              caller.dataFetched(null, e);
-            }
-          }
-          return Status.OK_STATUS;
-        }
-      });
-      job.setSystem(true);
-      job.schedule();
-      return job;
-    }
-    else {
+  public IFuture<?> getDataByKeyInBackground(final ILookupCallFetcher<KEY_TYPE> caller) {
+    if (this instanceof LocalLookupCall) {
       try {
         caller.dataFetched(getDataByKey(), null);
       }
@@ -342,6 +322,26 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
         caller.dataFetched(null, e);
       }
       return null;
+    }
+    else {
+      IRunnable runnable = new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          try {
+            List<? extends ILookupRow<KEY_TYPE>> rows = getDataByKey();
+            if (!IProgressMonitor.CURRENT.get().isCancelled()) {
+              caller.dataFetched(rows, null);
+            }
+          }
+          catch (ProcessingException e) {
+            if (!e.isInterruption() && !IProgressMonitor.CURRENT.get().isCancelled()) {
+              caller.dataFetched(null, e);
+            }
+          }
+        }
+      };
+
+      return scheduleAsync(getClass().getSimpleName() + ".getDataByKeyInBackground", runnable);
     }
   }
 
@@ -372,30 +372,8 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
    * @return the created async job if applicable or null
    */
   @Override
-  public JobEx getDataByTextInBackground(final ILookupCallFetcher<KEY_TYPE> caller) {
-    if (!(LookupCall.this instanceof LocalLookupCall)) {
-      JobEx job = createAsyncJob(getClass().getSimpleName() + ".getDataByTextInBackground", new IJobRunnable() {
-        @Override
-        public IStatus run(IProgressMonitor monitor) {
-          try {
-            List<? extends ILookupRow<KEY_TYPE>> rows = getDataByText();
-            if (!JobEx.isCurrentJobCanceled()) {
-              caller.dataFetched(rows, null);
-            }
-          }
-          catch (ProcessingException e) {
-            if (!e.isInterruption() && !JobEx.isCurrentJobCanceled()) {
-              caller.dataFetched(null, e);
-            }
-          }
-          return Status.OK_STATUS;
-        }
-      });
-      job.setSystem(true);
-      job.schedule();
-      return job;
-    }
-    else {
+  public IFuture<?> getDataByTextInBackground(final ILookupCallFetcher<KEY_TYPE> caller) {
+    if (this instanceof LocalLookupCall) {
       try {
         caller.dataFetched(getDataByText(), null);
       }
@@ -403,6 +381,26 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
         caller.dataFetched(null, e);
       }
       return null;
+    }
+    else {
+      IRunnable runnable = new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          try {
+            List<? extends ILookupRow<KEY_TYPE>> rows = getDataByText();
+            if (!IProgressMonitor.CURRENT.get().isCancelled()) {
+              caller.dataFetched(rows, null);
+            }
+          }
+          catch (ProcessingException e) {
+            if (!e.isInterruption() && !IProgressMonitor.CURRENT.get().isCancelled()) {
+              caller.dataFetched(null, e);
+            }
+          }
+        }
+      };
+
+      return scheduleAsync(getClass().getSimpleName() + ".getDataByTextInBackground", runnable);
     }
   }
 
@@ -433,31 +431,8 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
    * @return the created async job if applicable or null
    */
   @Override
-  public JobEx getDataByAllInBackground(final ILookupCallFetcher<KEY_TYPE> caller) {
-    if (!(LookupCall.this instanceof LocalLookupCall)) {
-      JobEx job = createAsyncJob(getClass().getSimpleName() + ".getDataByAllInBackground",
-          new IJobRunnable() {
-        @Override
-        public IStatus run(IProgressMonitor monitor) {
-          try {
-            List<? extends ILookupRow<KEY_TYPE>> rows = getDataByAll();
-            if (!JobEx.isCurrentJobCanceled()) {
-              caller.dataFetched(rows, null);
-            }
-          }
-          catch (ProcessingException e) {
-            if (!e.isInterruption() && !JobEx.isCurrentJobCanceled()) {
-              caller.dataFetched(null, e);
-            }
-          }
-          return Status.OK_STATUS;
-        }
-      });
-      job.setSystem(true);
-      job.schedule();
-      return job;
-    }
-    else {
+  public IFuture<?> getDataByAllInBackground(final ILookupCallFetcher<KEY_TYPE> caller) {
+    if (this instanceof LocalLookupCall) {
       try {
         caller.dataFetched(getDataByAll(), null);
       }
@@ -465,6 +440,26 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
         caller.dataFetched(null, e);
       }
       return null;
+    }
+    else {
+      IRunnable runnable = new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          try {
+            List<? extends ILookupRow<KEY_TYPE>> rows = getDataByAll();
+            if (!IProgressMonitor.CURRENT.get().isCancelled()) {
+              caller.dataFetched(rows, null);
+            }
+          }
+          catch (ProcessingException e) {
+            if (!e.isInterruption() && !IProgressMonitor.CURRENT.get().isCancelled()) {
+              caller.dataFetched(null, e);
+            }
+          }
+        }
+      };
+
+      return scheduleAsync(getClass().getSimpleName() + ".getDataByAllInBackground", runnable);
     }
   }
 
@@ -494,31 +489,8 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
    * @return the created async job if applicable or null
    */
   @Override
-  public JobEx getDataByRecInBackground(final ILookupCallFetcher<KEY_TYPE> caller) {
-    if (!(LookupCall.this instanceof LocalLookupCall)) {
-      JobEx job = createAsyncJob(getClass().getSimpleName() + ".getDataByRecInBackground",
-          new IJobRunnable() {
-        @Override
-        public IStatus run(IProgressMonitor monitor) {
-          try {
-            List<? extends ILookupRow<KEY_TYPE>> rows = getDataByRec();
-            if (!JobEx.isCurrentJobCanceled()) {
-              caller.dataFetched(rows, null);
-            }
-          }
-          catch (ProcessingException e) {
-            if (!e.isInterruption() && !JobEx.isCurrentJobCanceled()) {
-              caller.dataFetched(null, e);
-            }
-          }
-          return Status.OK_STATUS;
-        }
-      });
-      job.setSystem(true);
-      job.schedule();
-      return job;
-    }
-    else {
+  public IFuture<?> getDataByRecInBackground(final ILookupCallFetcher<KEY_TYPE> caller) {
+    if (this instanceof LocalLookupCall) {
       try {
         caller.dataFetched(getDataByRec(), null);
       }
@@ -527,14 +499,40 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       }
       return null;
     }
+    else {
+      IRunnable runnable = new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          try {
+            List<? extends ILookupRow<KEY_TYPE>> rows = getDataByRec();
+            if (!IProgressMonitor.CURRENT.get().isCancelled()) {
+              caller.dataFetched(rows, null);
+            }
+          }
+          catch (ProcessingException e) {
+            if (!e.isInterruption() && !IProgressMonitor.CURRENT.get().isCancelled()) {
+              caller.dataFetched(null, e);
+            }
+          }
+        }
+      };
+
+      return scheduleAsync(getClass().getSimpleName() + ".getDataByRecInBackground", runnable);
+    }
   }
 
-  private JobEx createAsyncJob(String name, IJobRunnable runnable) {
+  private IFuture<?> scheduleAsync(String name, IRunnable runnable) {
     ISessionService service = SERVICES.getService(ISessionService.class);
     if (service == null) {
       return null;
     }
-    return service.createAsyncJob(name, runnable);
+    try {
+      return service.schedule(runnable, service.defaults().name(name));
+    }
+    catch (JobExecutionException e) {
+      LOG.error("Unable to schedule lookup call job.", e);
+      return null;
+    }
   }
 
   @Override

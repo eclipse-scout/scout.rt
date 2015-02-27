@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job.filter;
 
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IFuture;
 
@@ -28,6 +29,6 @@ public class JobFilter implements IFilter<IFuture<?>> {
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return m_id == null || m_id.equals(future.getJobInput().getId());
+    return CompareUtility.equals(m_id, future.getJobInput().getId());
   }
 }

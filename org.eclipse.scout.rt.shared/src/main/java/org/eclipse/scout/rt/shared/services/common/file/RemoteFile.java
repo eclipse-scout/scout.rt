@@ -32,8 +32,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.scout.commons.FileUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 
 /**
@@ -79,7 +79,7 @@ public class RemoteFile implements Serializable {
       if (ignoreFolders) {
         m_dir = null;
       }
-      m_locale = LocaleThreadLocal.get();
+      m_locale = NlsLocale.get();
       // data
       URLConnection conn;
       try {

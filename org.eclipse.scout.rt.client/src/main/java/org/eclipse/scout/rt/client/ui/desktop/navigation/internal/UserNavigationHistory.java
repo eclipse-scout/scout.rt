@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -66,7 +66,7 @@ public class UserNavigationHistory {
 
     Bookmark bm = null;
     try {
-      bm = ClientSyncJob.getCurrentSession().getDesktop().createBookmark(page);
+      bm = ClientSessionProvider.currentSession().getDesktop().createBookmark(page);
       if (bm == null) {
         return null;
       }
@@ -86,7 +86,7 @@ public class UserNavigationHistory {
 
     Bookmark bm = null;
     try {
-      bm = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
+      bm = ClientSessionProvider.currentSession().getDesktop().createBookmark();
       if (bm == null) {
         return null;
       }
@@ -125,7 +125,7 @@ public class UserNavigationHistory {
   }
 
   protected void activateBookmark(Bookmark b) throws ProcessingException {
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     desktop.activateBookmark(b);
     //scroll to tree selection
     IOutline outline = desktop.getOutline();
@@ -219,7 +219,7 @@ public class UserNavigationHistory {
       // if last position was same as new one, overwrite it
       if (m_index == m_bookmarks.size() - 1) {
         Bookmark last = m_bookmarks.get(m_index);
-        Bookmark bm = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
+        Bookmark bm = ClientSessionProvider.currentSession().getDesktop().createBookmark();
         if (bm != null) {
           bm.setTitle(last.getTitle());
           bm.setIconId(last.getIconId());

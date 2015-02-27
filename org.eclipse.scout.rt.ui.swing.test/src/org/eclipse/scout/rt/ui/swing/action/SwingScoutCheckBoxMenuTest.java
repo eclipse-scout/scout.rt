@@ -23,9 +23,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JCheckBoxMenuItem;
 
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
+import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.rt.client.ui.action.menu.checkbox.AbstractCheckBoxMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.checkbox.ICheckBoxMenu;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -57,13 +57,14 @@ public class SwingScoutCheckBoxMenuTest {
     m_execActionCount = new AtomicInteger();
 
     // make dispatching into Scout model thread synchronously.
-    when(m_env.invokeScoutLater(any(Runnable.class), anyLong())).then(new Answer<Job>() {
+    when(m_env.invokeScoutLater(any(Runnable.class), anyLong())).then(new Answer<IFuture<Void>>() {
 
       @Override
-      public Job answer(InvocationOnMock invocation) throws Throwable {
+      @SuppressWarnings("unchecked")
+      public IFuture<Void> answer(InvocationOnMock invocation) throws Throwable {
         Runnable runnable = (Runnable) invocation.getArguments()[0];
         runnable.run();
-        return null;
+        return mock(IFuture.class);
       }
     });
 

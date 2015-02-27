@@ -14,7 +14,7 @@ import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
@@ -38,7 +38,7 @@ public class ActiveOutlineObserver {
 
   public ActiveOutlineObserver(IDesktop desktop) {
     if (desktop == null) {
-      desktop = ClientSyncJob.getCurrentSession().getDesktop();
+      desktop = ClientSessionProvider.currentSession().getDesktop();
     }
     m_desktop = desktop;
     if (m_desktop == null) {

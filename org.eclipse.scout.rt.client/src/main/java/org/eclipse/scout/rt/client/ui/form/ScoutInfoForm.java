@@ -22,11 +22,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.CloseButton;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.GroupBox.HtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
@@ -211,7 +211,7 @@ public class ScoutInfoForm extends AbstractForm {
   }
 
   protected void createHtmlPropertyTableContent(StringBuffer buf) {
-    IClientSession session = ClientSyncJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     long memUsed = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024 / 1024;
     long memTotal = Runtime.getRuntime().totalMemory() / 1024 / 1024;
     long memMax = Runtime.getRuntime().maxMemory() / 1024 / 1024;

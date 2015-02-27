@@ -38,7 +38,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.MultiStatus;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldCalculateVisibleChain;
@@ -51,6 +50,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.Form
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldMarkSavedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -945,9 +945,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         }
       };
     }
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop == null) {
-      desktop = ClientSyncJob.getCurrentSession().getVirtualDesktop();
+      desktop = ClientSessionProvider.currentSession().getVirtualDesktop();
     }
     desktop.addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
@@ -963,7 +963,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {
-      ClientSyncJob.getCurrentSession().getDesktop().removeDataChangeListener(m_internalDataChangeListener, dataTypes);
+      ClientSessionProvider.currentSession().getDesktop().removeDataChangeListener(m_internalDataChangeListener, dataTypes);
     }
   }
 

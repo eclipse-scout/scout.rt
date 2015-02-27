@@ -14,7 +14,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.NestedMenusTest.P_Desktop.HelpMenu.AboutMenu;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
@@ -65,7 +65,7 @@ public class NestedMenusTest {
 
         @Override
         protected void execAction() throws ProcessingException {
-          ClientSyncJob.getCurrentSession(TestEnvironmentClientSession.class).stopSession();
+          ClientSessionProvider.currentSession(TestEnvironmentClientSession.class).stopSession();
         }
       }
 

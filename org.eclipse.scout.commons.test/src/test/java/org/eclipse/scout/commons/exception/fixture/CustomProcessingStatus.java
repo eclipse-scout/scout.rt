@@ -31,12 +31,6 @@ public class CustomProcessingStatus implements IProcessingStatus {
     // nop
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public Throwable getCause() {
-    return m_cause;
-  }
-
   @Override
   public List<String> getContextMessages() {
     return new ArrayList<>();
@@ -54,7 +48,7 @@ public class CustomProcessingStatus implements IProcessingStatus {
 
   @Override
   public Throwable getException() {
-    return getCause();
+    return m_cause;
   }
 
   @Override

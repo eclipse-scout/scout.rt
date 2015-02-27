@@ -16,23 +16,8 @@ import org.eclipse.scout.commons.status.IStatus;
 
 public interface IProcessingStatus extends IStatus {
 
-  /**
-   * result was canceled
-   * TODO remove with new jobs.
-   */
-  @Deprecated
-  int CANCEL = 0x1000;
-
   /** a fatal error */
   int FATAL = 0x10000000;
-
-  /**
-   * alias for {@link #getException()}
-   * 
-   * @deprecated use {@link #getException()}
-   */
-  @Deprecated
-  Throwable getCause();
 
   /**
    * A title that may be used as message header for the status. {@link #getMessage()} is composed of {@link #getTitle()}

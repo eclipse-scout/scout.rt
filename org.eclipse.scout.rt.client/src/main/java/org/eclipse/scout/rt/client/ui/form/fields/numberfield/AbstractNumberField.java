@@ -18,7 +18,6 @@ import java.text.ParsePosition;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -26,6 +25,7 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.numberfield.INumberFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
@@ -115,7 +115,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
   }
 
   protected void initFormat() {
-    DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(LocaleThreadLocal.get());
+    DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(NlsLocale.get());
     format.setParseBigDecimal(true);
     format.setMinimumFractionDigits(0);
     format.setMaximumFractionDigits(0);

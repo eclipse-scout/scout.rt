@@ -10,33 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.servicetunnel.http.internal;
 
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 
 /**
- * This class is a composite of a Job and an HttpBackgroundExecutable instance.
- * 
+ * This interface is required because http background job must be executed in client or server jobs.
+ *
  * @author awe
  */
-class HttpBackgroundExecutor implements IHttpBackgroundExecutor {
+public interface IHttpBackgroundExecutable extends IRunnable {
 
-  private final JobEx m_job;
-
-  private final HttpBackgroundExecutable m_executable;
-
-  HttpBackgroundExecutor(JobEx job, HttpBackgroundExecutable executable) {
-    m_job = job;
-    m_executable = executable;
-  }
-
-  @Override
-  public JobEx getJob() {
-    return m_job;
-  }
-
-  @Override
-  public IServiceTunnelResponse getResponse() {
-    return m_executable.getResponse();
-  }
+  IServiceTunnelResponse getResponse();
 
 }

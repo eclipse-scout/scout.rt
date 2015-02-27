@@ -15,11 +15,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IDateColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -223,17 +223,17 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
   private DateFormat getDateFormat() {
     DateFormat df = null;
     if (getFormat() != null) {
-      df = new SimpleDateFormat(getFormat(), LocaleThreadLocal.get());
+      df = new SimpleDateFormat(getFormat(), NlsLocale.get());
     }
     else {
       if (isHasDate() && !isHasTime()) {
-        df = DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleThreadLocal.get());
+        df = DateFormat.getDateInstance(DateFormat.MEDIUM, NlsLocale.get());
       }
       else if (!isHasDate() && isHasTime()) {
-        df = DateFormat.getTimeInstance(DateFormat.SHORT, LocaleThreadLocal.get());
+        df = DateFormat.getTimeInstance(DateFormat.SHORT, NlsLocale.get());
       }
       else {
-        df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, LocaleThreadLocal.get());
+        df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, NlsLocale.get());
       }
       df.setLenient(true);
     }

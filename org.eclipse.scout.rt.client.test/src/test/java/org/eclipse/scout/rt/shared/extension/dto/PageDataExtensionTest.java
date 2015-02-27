@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.shared.extension.dto;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
-import org.eclipse.scout.rt.client.ClientSessionThreadLocal;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.MultiColumnExtension;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.MultiColumnExtensionData;
@@ -43,7 +43,7 @@ public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
       doTestSingle();
     }
     finally {
-      ClientSessionThreadLocal.set(null);
+      ISession.CURRENT.set(null);
       System.clearProperty("user.area");
     }
   }
@@ -57,7 +57,7 @@ public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
       doTestMulti();
     }
     finally {
-      ClientSessionThreadLocal.set(null);
+      ISession.CURRENT.set(null);
       System.clearProperty("user.area");
     }
   }
@@ -67,7 +67,7 @@ public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
     System.setProperty("user.area", "@user.home/test");
     Mockito.when(session.getUserId()).thenReturn("userid");
     Mockito.when(session.getUserAgent()).thenReturn(UserAgent.createDefault());
-    ClientSessionThreadLocal.set(session);
+    ISession.CURRENT.set(session);
   }
 
   private void doTestMulti() throws Exception {

@@ -18,10 +18,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.AbstractService;
@@ -35,7 +34,7 @@ public class InternalClientExceptionHandlerService extends AbstractService imple
   }
 
   private ServiceState getServiceState() {
-    IClientSession session = ClientJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     if (session == null) {
       throw new IllegalStateException("null client session in current job context");
     }
@@ -82,7 +81,7 @@ public class InternalClientExceptionHandlerService extends AbstractService imple
             differentiatedLog(InternalClientExceptionHandlerService.class.getName(), logLevel, logText, logThrowable ? pe : null);
           }
           // check if the desktop is observing this process
-          IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+          IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
           if (desktop != null && desktop.isOpened()) {
             showExceptionInUI(pe);
           }

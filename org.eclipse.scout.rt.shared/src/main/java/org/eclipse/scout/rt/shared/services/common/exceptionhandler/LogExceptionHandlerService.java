@@ -37,10 +37,6 @@ public class LogExceptionHandlerService extends AbstractService implements IExce
     }
     else {
       switch (s.getSeverity()) {
-        case IProcessingStatus.CANCEL: {
-          logLevel = IScoutLogger.LEVEL_DEBUG;
-          break;
-        }
         case IProcessingStatus.INFO: {
           logLevel = IScoutLogger.LEVEL_INFO;
           break;

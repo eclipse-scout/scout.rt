@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.pwd;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 
 /**
  * Title: BSI Scout V3 Copyright:
@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 public interface IPasswordPolicy {
 
   /**
-   * @return a localized text that describes the policy to the user use {@link LocaleThreadLocal#get()} to access the
+   * @return a localized text that describes the policy to the user use {@link NlsLocale#get()} to access the
    *         language for user
    *         messages
    */

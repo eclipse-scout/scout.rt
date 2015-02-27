@@ -24,7 +24,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.UIDefaults;
 
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
@@ -308,27 +308,14 @@ public interface ISwingEnvironment {
    * The job is only run when it reaches the model within the cancelTimeout. This means if the job is delayed longer
    * than cancelTimeout millis when the model job runs it, then the job is ignored.
    *
-   * @return the created and scheduled job, a {@link org.eclipse.scout.rt.client.ClientJob ClientJob}
+   * @return the created and scheduled {@link IFuture}
    */
-  JobEx invokeScoutLater(Runnable j, long cancelTimeout);
+  IFuture<Void> invokeScoutLater(Runnable j, long cancelTimeout);
 
   /**
    * calling from scout thread
    */
   void invokeSwingLater(Runnable j);
-
-  /**
-   * calling from scout thread
-   * <p>
-   * Executes the given {@link Runnable} and waits until it has finished.<br>
-   * If the waiting thread is interrupted, this method returns before the {@link Runnable} has finished!
-   *
-   * @param r
-   *          The {@link Runnable} to execute.
-   * @param timeout
-   *          The timeout in milliseconds. See {@link JobEx#join(long)}.
-   */
-  void invokeSwingAndWait(final Runnable r, long timeout);
 
   JStatusLabelEx createStatusLabel(IFormField formField);
 

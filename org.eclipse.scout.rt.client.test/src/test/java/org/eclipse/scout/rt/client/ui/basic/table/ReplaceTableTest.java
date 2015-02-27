@@ -6,8 +6,8 @@ import static org.junit.Assert.assertSame;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ReplaceTableTest.BaseForm.MainBox.FirstGroupBox;
 import org.eclipse.scout.rt.client.ui.basic.table.ReplaceTableTest.BaseForm.MainBox.FirstGroupBox.TableField;
@@ -46,14 +46,14 @@ public class ReplaceTableTest {
     // Since AbstractTable adds a different number of menus for web and rich client,
     // we set a web user agent here, since this will be the default user agent.
     // see: AbstractTable#addHeaderMenus()
-    IClientSession cs = ClientJob.getCurrentSession();
+    IClientSession cs = ClientSessionProvider.currentSession();
     m_originalUserAgent = cs.getUserAgent();
     cs.setUserAgent(WEB_USER_AGENT);
   }
 
   @AfterClass
   public static void tearDownAfterClass() throws Exception {
-    ClientJob.getCurrentSession().setUserAgent(m_originalUserAgent);
+    ClientSessionProvider.currentSession().setUserAgent(m_originalUserAgent);
   }
 
   @Test

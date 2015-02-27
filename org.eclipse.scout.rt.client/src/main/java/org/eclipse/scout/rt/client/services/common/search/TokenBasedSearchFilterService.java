@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.search;
 
-import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -58,7 +58,7 @@ public class TokenBasedSearchFilterService extends DefaultSearchFilterService {
       AbstractStringField valueField = (AbstractStringField) field;
       String value = valueField.getValue();
       if (value != null) {
-        if (ClientJob.getCurrentSession().getDesktop().isAutoPrefixWildcardForTextSearch()) {
+        if (ClientSessionProvider.currentSession().getDesktop().isAutoPrefixWildcardForTextSearch()) {
           value = "*" + value;
         }
         search.addWildcardStringToken(resolveTokenIdByClass(field.getClass()), value);

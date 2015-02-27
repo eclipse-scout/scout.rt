@@ -44,10 +44,10 @@ package org.eclipse.scout.service;
  *
  * <h3>Summary</h3>
  * <p>
- * ClientProxyServiceFactory.visible = ClientJob.getCurrentSession()!=null && FE
+ * ClientProxyServiceFactory.visible = ClientSessionProvider.currentSession()!=null && FE
  * </p>
  * <p>
- * ClientServiceFactory = ClientJob.getCurrentSession()!=null
+ * ClientServiceFactory = ClientSessionProvider.currentSession()!=null
  * </p>
  * <p>
  * ServerServiceFactory = ServerJob.getCurrentSession()!=null && (BE || OFF)

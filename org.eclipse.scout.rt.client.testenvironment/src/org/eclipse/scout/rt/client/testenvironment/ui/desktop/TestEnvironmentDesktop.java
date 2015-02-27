@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.testenvironment.ui.desktop;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
  * {@link IDesktop} for Client Test Environment
- * 
+ *
  * @author jbr
  */
 public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop {
@@ -64,8 +64,7 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
 
       @Override
       protected void execAction() throws ProcessingException {
-        ClientSyncJob.getCurrentSession(
-            TestEnvironmentClientSession.class).stopSession();
+        ClientSessionProvider.currentSession(TestEnvironmentClientSession.class).stopSession();
       }
     }
   }

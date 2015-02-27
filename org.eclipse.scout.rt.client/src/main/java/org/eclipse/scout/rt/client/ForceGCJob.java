@@ -10,32 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IRunnable;
 
 /**
  *
  */
-public class ForceGCJob extends ClientAsyncJob {
-  boolean m_cancel = false;
-
-  public ForceGCJob() {
-    super("Release memory", ClientAsyncJob.getCurrentSession());
-    setPriority(DECORATE);
-  }
-
+public class ForceGCJob implements IRunnable {
   @Override
-  protected void runVoid(IProgressMonitor monitor) throws Throwable {
+  public void run() throws Exception {
     int counter = 0;
     Thread.sleep(10000);
-    while (counter < 7 && !m_cancel && (Runtime.getRuntime().freeMemory() > 30000000 || counter < 2)) {
+    while (counter < 7 && !Thread.interrupted() && !IProgressMonitor.CURRENT.get().isCancelled() && (Runtime.getRuntime().freeMemory() > 30000000 || counter < 2)) {
       System.gc();
       counter++;
       Thread.sleep(10000);
     }
-  }
-
-  @Override
-  protected void canceling() {
-    m_cancel = true;
   }
 }

@@ -13,15 +13,19 @@ package org.eclipse.scout.rt.client.ui.wizard;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 
 @ClassId("6936b8b8-6612-4efa-bf29-80a26f80b9da")
 public abstract class AbstractWizardStatusField extends AbstractHtmlField {
@@ -116,9 +120,10 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
 
   private void markDirty() {
     m_dirty = true;
-    new ClientSyncJob("Wizard status - mark dirty", ClientSyncJob.getCurrentSession()) {
+    IClientSession clientSession = ClientSessionProvider.currentSession();
+    OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+      public void run() throws Exception {
         if (m_dirty) {
           try {
             refreshStatus();
@@ -128,7 +133,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
           }
         }
       }
-    }.schedule();
+    }, ClientJobInput.defaults().session(clientSession).name("Wizard status - mark dirty"));
   }
 
   public void refreshStatus() throws ProcessingException {

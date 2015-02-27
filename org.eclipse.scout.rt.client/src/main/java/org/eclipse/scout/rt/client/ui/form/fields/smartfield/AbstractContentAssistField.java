@@ -15,8 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
@@ -28,10 +26,10 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldBrowseNewChain;
@@ -46,11 +44,15 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAs
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldPrepareRecLookupChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldPrepareTextLookupChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IContentAssistFieldExtension;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -885,7 +887,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       textPattern = "";
     }
     textPattern = textPattern.toLowerCase();
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop != null && desktop.isAutoPrefixWildcardForTextSearch()) {
       textPattern = "*" + textPattern;
     }
@@ -989,21 +991,21 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   @Override
-  public JobEx callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher) {
+  public IFuture<?> callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher) {
     return callTextLookupInternal(text, maxRowCount, fetcher, true);
   }
 
-  private JobEx callTextLookupInternal(String text, int maxRowCount, final ILookupCallFetcher<LOOKUP_KEY> fetcher, final boolean background) {
+  private IFuture<?> callTextLookupInternal(String text, int maxRowCount, final ILookupCallFetcher<LOOKUP_KEY> fetcher, final boolean background) {
     final ILookupCall<LOOKUP_KEY> call = (getLookupCall() != null ? SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this)) : null);
-    final IClientSession session = ClientSyncJob.getCurrentSession();
+    final IClientSession session = ClientSessionProvider.currentSession();
     ILookupCallFetcher<LOOKUP_KEY> internalFetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
       public void dataFetched(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final ProcessingException failed) {
-        ClientSyncJob scoutSyncJob = new ClientSyncJob("Smartfield text lookup", session) {
+        IRunnable scoutSyncJob = new IRunnable() {
           @Override
-          protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          public void run() throws Exception {
             if (failed == null) {
-              ArrayList<ILookupRow<LOOKUP_KEY>> result = new ArrayList<ILookupRow<LOOKUP_KEY>>(rows);
+              List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(rows);
               try {
                 filterTextLookup(call, result);
                 fetcher.dataFetched(cleanupResultList(result), null);
@@ -1017,11 +1019,18 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
             }
           }
         };
+
+        ClientJobInput input = ClientJobInput.defaults().session(session).name("Smartfield text lookup");
         if (background) {
-          scoutSyncJob.schedule();
+          OBJ.one(IModelJobManager.class).schedule(scoutSyncJob, input);
         }
         else {
-          scoutSyncJob.runNow(new NullProgressMonitor());
+          try {
+            OBJ.one(IModelJobManager.class).runNow(scoutSyncJob, input);
+          }
+          catch (ProcessingException e) {
+            fetcher.dataFetched(null, e);
+          }
         }
       }
     };
@@ -1083,26 +1092,28 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   @Override
-  public JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher) {
+  public IFuture<?> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher) {
     return callBrowseLookupInBackground(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE, fetcher);
   }
 
   @Override
-  public JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher<LOOKUP_KEY> fetcher) {
+  public IFuture<?> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher<LOOKUP_KEY> fetcher) {
     return callBrowseLookupInternal(browseHint, maxRowCount, activeState, fetcher, true);
   }
 
-  private JobEx callBrowseLookupInternal(String browseHint, int maxRowCount, TriState activeState, final ILookupCallFetcher<LOOKUP_KEY> fetcher, final boolean background) {
+  private IFuture<?> callBrowseLookupInternal(String browseHint, int maxRowCount, TriState activeState, final ILookupCallFetcher<LOOKUP_KEY> fetcher, final boolean background) {
     final ILookupCall<LOOKUP_KEY> call = (getLookupCall() != null ? SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this)) : null);
-    final IClientSession session = ClientSyncJob.getCurrentSession();
+    final IClientSession session = ClientSessionProvider.currentSession();
+
     ILookupCallFetcher<LOOKUP_KEY> internalFetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
       public void dataFetched(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final ProcessingException failed) {
-        ClientSyncJob scoutSyncJob = new ClientSyncJob("ContentAssistField browse lookup", session) {
+
+        IRunnable scoutSyncJob = new IRunnable() {
           @Override
-          protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          public void run() throws Exception {
             if (failed == null) {
-              ArrayList<ILookupRow<LOOKUP_KEY>> result = new ArrayList<ILookupRow<LOOKUP_KEY>>(rows);
+              List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(rows);
               try {
                 filterBrowseLookup(call, result);
                 fetcher.dataFetched(cleanupResultList(result), null);
@@ -1116,15 +1127,22 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
             }
           }
         };
+
+        ClientJobInput input = ClientJobInput.defaults().session(session).name("ContentAssistField browse lookup");
         if (background) {
-          scoutSyncJob.schedule();
+          OBJ.one(IModelJobManager.class).schedule(scoutSyncJob, input);
         }
         else {
-          scoutSyncJob.runNow(new NullProgressMonitor());
+          try {
+            OBJ.one(IModelJobManager.class).runNow(scoutSyncJob, input);
+          }
+          catch (ProcessingException e) {
+            fetcher.dataFetched(null, e);
+          }
         }
       }
     };
-    //
+
     if (call != null) {
       if (maxRowCount > 0) {
         call.setMaxRowCount(maxRowCount);

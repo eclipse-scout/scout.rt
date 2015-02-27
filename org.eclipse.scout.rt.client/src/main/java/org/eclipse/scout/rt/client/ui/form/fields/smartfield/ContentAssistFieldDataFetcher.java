@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
  */
 public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
 
-  private JobEx m_dataLoadJob;
+  private IFuture<?> m_dataLoadJob;
 
   public ContentAssistFieldDataFetcher(IContentAssistField<?, LOOKUP_KEY> proposalField) {
     super(proposalField);
@@ -38,7 +38,7 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
     final String textNonNull = text;
     final int maxCount = getContentAssistField().getBrowseMaxRowCount();
     if (m_dataLoadJob != null) {
-      m_dataLoadJob.cancel();
+      m_dataLoadJob.cancel(true);
     }
     ILookupCallFetcher<LOOKUP_KEY> fetcher = new P_LookupCallFetcher(searchText, selectCurrentValue);
     // go async/sync

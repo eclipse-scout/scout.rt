@@ -17,10 +17,10 @@ import java.util.List;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineTableFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineTableFieldChains.OutlineTableFieldTableTitleChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -77,7 +77,7 @@ public abstract class AbstractOutlineTableField extends AbstractTableField<ITabl
   @Override
   protected void execDisposeField() throws ProcessingException {
     super.execDisposeField();
-    ClientSyncJob.getCurrentSession().getDesktop().removeDesktopListener(m_desktopListener);
+    ClientSessionProvider.currentSession().getDesktop().removeDesktopListener(m_desktopListener);
     m_desktopListener = null;
   }
 

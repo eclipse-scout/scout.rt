@@ -27,7 +27,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithTableExtension;
@@ -37,6 +36,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTa
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableLoadDataChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTablePopulateTableChain;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -500,7 +500,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         switch (e.getType()) {
           case FormEvent.TYPE_STORE_AFTER: {
             // save navigation history
-            IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+            IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
             IPage<?> page = AbstractPageWithTable.this;
             if (desktop != null && desktop.getOutline() != null && desktop.getOutline().getActivePage() == page) {
               SERVICES.getService(INavigationHistoryService.class).addStep(0, page);
@@ -559,7 +559,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   private void notifyMemoryPolicyOfSearchFormStart() {
     //use memory policy to handle content caching
     try {
-      IMemoryPolicy policy = ClientSyncJob.getCurrentSession().getMemoryPolicy();
+      IMemoryPolicy policy = ClientSessionProvider.currentSession().getMemoryPolicy();
       if (policy != null) {
         policy.pageSearchFormStarted(this);
       }
@@ -815,7 +815,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       }
       //
       setChildrenLoaded(false);
-      ClientSyncJob.getCurrentSession().getMemoryPolicy().beforeTablePageLoadData(this);
+      ClientSessionProvider.currentSession().getMemoryPolicy().beforeTablePageLoadData(this);
       try {
         loadTableDataImpl();
       }
@@ -825,7 +825,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         }
       }
       finally {
-        ClientSyncJob.getCurrentSession().getMemoryPolicy().afterTablePageLoadData(this);
+        ClientSessionProvider.currentSession().getMemoryPolicy().afterTablePageLoadData(this);
       }
       setChildrenLoaded(true);
       setChildrenDirty(false);
@@ -870,7 +870,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         tree.setTreeChanging(false);
       }
     }
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop != null) {
       desktop.afterTablePageLoaded(this);
     }

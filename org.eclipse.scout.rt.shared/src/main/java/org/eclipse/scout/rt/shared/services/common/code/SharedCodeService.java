@@ -20,10 +20,10 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
@@ -235,7 +235,7 @@ public class SharedCodeService extends AbstractService implements ICodeService {
   }
 
   private CodeTypeCache getCodeTypeCache(Long partitionId) {
-    return m_codeTypeStore.getCodeTypeCache(partitionId, LocaleThreadLocal.get());
+    return m_codeTypeStore.getCodeTypeCache(partitionId, NlsLocale.get());
   }
 
   /**

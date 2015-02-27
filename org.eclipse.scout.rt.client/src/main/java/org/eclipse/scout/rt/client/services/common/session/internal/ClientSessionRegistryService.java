@@ -12,15 +12,16 @@ package org.eclipse.scout.rt.client.services.common.session.internal;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.Bundle;
@@ -41,19 +42,15 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
   @SuppressWarnings("unchecked")
   private <T extends IClientSession> T createAndStartClientSession(Class<T> clazz, final Bundle bundle, Subject subject, UserAgent userAgent) {
     try {
-      IClientSession clientSession = clazz.newInstance();
+      final IClientSession clientSession = clazz.newInstance();
       clientSession.setSubject(subject);
       clientSession.setUserAgent(userAgent);
-      ClientSyncJob job = new ClientSyncJob("Session startup", clientSession) {
+      OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
         @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          getCurrentSession().startSession(bundle);
+        public void run() throws Exception {
+          clientSession.startSession(bundle);
         }
-      };
-      //must run now to use correct jaas and subject context of calling thread. Especially relevant when running in a servlet thread (rwt)
-      job.runNow(new NullProgressMonitor());
-      job.throwOnError();
-
+      }, ClientJobInput.defaults().session(clientSession).name("Session startup")).get();
       return (T) clientSession;
     }
     catch (Throwable t) {

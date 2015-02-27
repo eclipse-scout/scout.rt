@@ -17,9 +17,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.extension.fixture.BasicForm.MainBox.BottomBox;
+import org.eclipse.scout.rt.shared.extension.fixture.BasicForm.MainBox.BottomBox.FirstNameField;
 import org.eclipse.scout.rt.shared.extension.fixture.BasicForm.MainBox.CloseButton;
 import org.eclipse.scout.rt.shared.extension.fixture.BasicForm.MainBox.TopBox;
-import org.eclipse.scout.rt.shared.extension.fixture.BasicForm.MainBox.BottomBox.FirstNameField;
 import org.eclipse.scout.rt.shared.extension.fixture.BasicForm.MainBox.TopBox.NameField;
 
 public class BasicForm extends AbstractForm {

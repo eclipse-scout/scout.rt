@@ -16,9 +16,8 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 import org.eclipse.scout.service.AbstractService;
@@ -39,7 +38,7 @@ public class PermissionServiceClientProxy extends AbstractService implements IPe
   }
 
   private ServiceState getServiceState() {
-    IClientSession session = ClientJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     if (session == null) {
       LOG.warn("could not find a client session");
       return null;
@@ -71,7 +70,7 @@ public class PermissionServiceClientProxy extends AbstractService implements IPe
   }
 
   private IPermissionService getRemoteService() {
-    return ServiceTunnelUtility.createProxy(IPermissionService.class, ClientSyncJob.getCurrentSession().getServiceTunnel());
+    return ServiceTunnelUtility.createProxy(IPermissionService.class, ClientSessionProvider.currentSession().getServiceTunnel());
   }
 
   private static class ServiceState {

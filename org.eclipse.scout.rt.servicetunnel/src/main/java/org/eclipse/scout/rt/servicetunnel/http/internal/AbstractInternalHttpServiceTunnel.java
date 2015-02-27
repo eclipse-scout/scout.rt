@@ -15,11 +15,12 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.servicetunnel.AbstractServiceTunnel;
@@ -131,24 +132,22 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
   }
 
   @Override
-  protected IServiceTunnelResponse tunnel(final IServiceTunnelRequest req) {
+  protected IServiceTunnelResponse tunnel(final IServiceTunnelRequest req) throws JobExecutionException {
     final Object backgroundLock = new Object();
-    IHttpBackgroundExecutor executor = createHttpBackgroundExecutor("ServerCallProcessing", req, backgroundLock);
-    JobEx httpJob = executor.getJob();
-    decorateBackgroundJob(req, httpJob);
+    IHttpBackgroundExecutable executor = createHttpBackgroundExecutor(req, backgroundLock);
+
     // wait until done
     IServiceTunnelResponse res = null;
     boolean cancelled = false;
     boolean sentCancelRequest = false;
     synchronized (backgroundLock) {
-      httpJob.schedule();
+      IFuture<?> future = schedule(executor, req);
       while (true) {
         res = executor.getResponse();
         if (res != null) {
           break;
         }
-        IProgressMonitor mon = httpJob.getMonitor();
-        if ((!sentCancelRequest) && (JobEx.isCurrentJobCanceled() || (mon != null && mon.isCanceled()))) {
+        if ((!sentCancelRequest) && future.isCancelled()) {
           sentCancelRequest = true;
           boolean success = sendCancelRequest(req.getRequestSequence());
           if (success) {
@@ -160,7 +159,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
             // cancel was not possible, continue
           }
         }
-        if (httpJob.getState() == JobEx.NONE) {
+        if (future.isDone()) {
           break;
         }
         try {
@@ -178,16 +177,6 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
   }
 
   /**
-   * Override this method to decide when background jobs to the backend should be presented to the user or not (for
-   * cancelling). The default implementation does nothing.
-   *
-   * @param call
-   * @param backgroundJob
-   */
-  protected void decorateBackgroundJob(IServiceTunnelRequest call, Job backgroundJob) {
-  }
-
-  /**
    * Signals the server to cancel processing jobs for the current session.
    *
    * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
@@ -195,13 +184,10 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
   protected boolean sendCancelRequest(long requestSequence) {
     try {
       IServiceTunnelRequest cancelCall = createServiceTunnelRequest(getVersion(), IServerProcessingCancelService.class, IServerProcessingCancelService.class.getMethod("cancel", long.class), new Object[]{requestSequence});
-
-      IHttpBackgroundExecutor executor = createHttpBackgroundExecutor("ServerCallCancelProcessing", cancelCall, new Object());
-      JobEx cancelHttpJob = executor.getJob();
-      cancelHttpJob.setSystem(true);
-      cancelHttpJob.schedule();
+      IHttpBackgroundExecutable executor = createHttpBackgroundExecutor(cancelCall, new Object());
+      IFuture<?> future = schedule(executor, cancelCall);
       try {
-        cancelHttpJob.join(10000L);
+        future.get(10, TimeUnit.SECONDS);
         IServiceTunnelResponse cancelResult = executor.getResponse();
         if (cancelResult == null) {
           return false;
@@ -213,7 +199,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
         Boolean result = (Boolean) cancelResult.getData();
         return result != null && result.booleanValue();
       }
-      catch (InterruptedException ie) {
+      catch (ProcessingException ie) {
         return false;
       }
     }
@@ -223,13 +209,11 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
     }
   }
 
-  private IHttpBackgroundExecutor createHttpBackgroundExecutor(String name, IServiceTunnelRequest request, Object lock) {
-    HttpBackgroundExecutable executable = new HttpBackgroundExecutable(request, lock, this);
-    JobEx job = createHttpBackgroundJob(ScoutTexts.get(name), executable);
-    return new HttpBackgroundExecutor(job, executable);
-  }
+  protected abstract IFuture<?> schedule(IRunnable runnable, IServiceTunnelRequest req) throws JobExecutionException;
 
-  protected abstract JobEx createHttpBackgroundJob(String name, HttpBackgroundExecutable executable);
+  protected IHttpBackgroundExecutable createHttpBackgroundExecutor(IServiceTunnelRequest request, Object lock) {
+    return new HttpBackgroundExecutable(request, lock, this);
+  }
 
   /**
    * This method is called just after the http response is received but before

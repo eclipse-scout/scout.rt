@@ -26,9 +26,9 @@ import java.util.Locale;
 
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
@@ -71,12 +71,12 @@ public class DataModelAttributeTest {
 
   @Before
   public void before() {
-    m_oldLocale = LocaleThreadLocal.get(false);
+    m_oldLocale = NlsLocale.get(false);
   }
 
   @After
   public void after() {
-    LocaleThreadLocal.set(m_oldLocale);
+    NlsLocale.set(m_oldLocale);
   }
 
   @Test
@@ -129,10 +129,10 @@ public class DataModelAttributeTest {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_DATE);
     assertNull(att.formatValue(null));
 
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     assertEquals("27.04.2012", att.formatValue(DateUtility.parse("27.04.2012 14:03:45", "dd.MM.yyyy HH:mm:ss")));
 
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     assertEquals("Apr 27, 2012", att.formatValue(DateUtility.parse("27.04.2012 14:03:45", "dd.MM.yyyy HH:mm:ss")));
   }
 
@@ -141,10 +141,10 @@ public class DataModelAttributeTest {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_TIME);
     assertNull(att.formatValue(null));
 
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     assertEquals("14:03", att.formatValue(DateUtility.parse("27.04.2012 14:03:45", "dd.MM.yyyy HH:mm:ss")));
 
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     assertEquals("2:03 PM", att.formatValue(DateUtility.parse("27.04.2012 14:03:45", "dd.MM.yyyy HH:mm:ss")));
   }
 
@@ -153,10 +153,10 @@ public class DataModelAttributeTest {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_DATE_TIME);
     assertNull(att.formatValue(null));
 
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     assertEquals("27.04.12 14:03", att.formatValue(DateUtility.parse("27.04.2012 14:03:45", "dd.MM.yyyy HH:mm:ss")));
 
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     assertEquals("4/27/12 2:03 PM", att.formatValue(DateUtility.parse("27.04.2012 14:03:45", "dd.MM.yyyy HH:mm:ss")));
   }
 
@@ -165,19 +165,19 @@ public class DataModelAttributeTest {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_INTEGER);
     assertNull(att.formatValue(null));
 
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     assertEquals("10", att.formatValue(Integer.valueOf(10)));
     assertEquals("-1", att.formatValue(Integer.valueOf(-1)));
     assertEquals("1'000", att.formatValue(Integer.valueOf(1000)));
     assertEquals("-1'000", att.formatValue(Integer.valueOf(-1000)));
 
-    LocaleThreadLocal.set(new Locale("de", "DE"));
+    NlsLocale.set(new Locale("de", "DE"));
     assertEquals("10", att.formatValue(Integer.valueOf(10)));
     assertEquals("-1", att.formatValue(Integer.valueOf(-1)));
     assertEquals("1.000", att.formatValue(Integer.valueOf(1000)));
     assertEquals("-1.000", att.formatValue(Integer.valueOf(-1000)));
 
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     assertEquals("10", att.formatValue(Integer.valueOf(10)));
     assertEquals("-1", att.formatValue(Integer.valueOf(-1)));
     assertEquals("1,000", att.formatValue(Integer.valueOf(1000)));
@@ -189,19 +189,19 @@ public class DataModelAttributeTest {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_LONG);
     assertNull(att.formatValue(null));
 
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     assertEquals("10", att.formatValue(Long.valueOf(10)));
     assertEquals("-1", att.formatValue(Long.valueOf(-1)));
     assertEquals("1'000", att.formatValue(Long.valueOf(1000)));
     assertEquals("-1'000", att.formatValue(Long.valueOf(-1000)));
 
-    LocaleThreadLocal.set(new Locale("de", "DE"));
+    NlsLocale.set(new Locale("de", "DE"));
     assertEquals("10", att.formatValue(Long.valueOf(10)));
     assertEquals("-1", att.formatValue(Long.valueOf(-1)));
     assertEquals("1.000", att.formatValue(Long.valueOf(1000)));
     assertEquals("-1.000", att.formatValue(Long.valueOf(-1000)));
 
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     assertEquals("10", att.formatValue(Long.valueOf(10)));
     assertEquals("-1", att.formatValue(Long.valueOf(-1)));
     assertEquals("1,000", att.formatValue(Long.valueOf(1000)));
@@ -213,7 +213,7 @@ public class DataModelAttributeTest {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_DOUBLE);
     assertNull(att.formatValue(null));
 
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     assertEquals("10.00", att.formatValue(Double.valueOf(10)));
     assertEquals("-1.00", att.formatValue(Double.valueOf(-1)));
     assertEquals("1'000.00", att.formatValue(Double.valueOf(1000)));
@@ -223,7 +223,7 @@ public class DataModelAttributeTest {
     assertEquals("1'000.50", att.formatValue(Double.valueOf(1000.495)));
     assertEquals("-1'000.50", att.formatValue(Double.valueOf(-1000.495)));
 
-    LocaleThreadLocal.set(new Locale("de", "DE"));
+    NlsLocale.set(new Locale("de", "DE"));
     assertEquals("10,00", att.formatValue(Double.valueOf(10)));
     assertEquals("-1,00", att.formatValue(Double.valueOf(-1)));
     assertEquals("1.000,00", att.formatValue(Double.valueOf(1000)));
@@ -233,7 +233,7 @@ public class DataModelAttributeTest {
     assertEquals("1.000,50", att.formatValue(Double.valueOf(1000.495)));
     assertEquals("-1.000,50", att.formatValue(Double.valueOf(-1000.495)));
 
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     assertEquals("10.00", att.formatValue(Double.valueOf(10)));
     assertEquals("-1.00", att.formatValue(Double.valueOf(-1)));
     assertEquals("1,000.00", att.formatValue(Double.valueOf(1000)));
@@ -249,19 +249,19 @@ public class DataModelAttributeTest {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_PLAIN_INTEGER);
     assertNull(att.formatValue(null));
 
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     assertEquals("10", att.formatValue(Integer.valueOf(10)));
     assertEquals("-1", att.formatValue(Integer.valueOf(-1)));
     assertEquals("1000", att.formatValue(Integer.valueOf(1000)));
     assertEquals("-1000", att.formatValue(Integer.valueOf(-1000)));
 
-    LocaleThreadLocal.set(new Locale("de", "DE"));
+    NlsLocale.set(new Locale("de", "DE"));
     assertEquals("10", att.formatValue(Integer.valueOf(10)));
     assertEquals("-1", att.formatValue(Integer.valueOf(-1)));
     assertEquals("1000", att.formatValue(Integer.valueOf(1000)));
     assertEquals("-1000", att.formatValue(Integer.valueOf(-1000)));
 
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     assertEquals("10", att.formatValue(Integer.valueOf(10)));
     assertEquals("-1", att.formatValue(Integer.valueOf(-1)));
     assertEquals("1000", att.formatValue(Integer.valueOf(1000)));
@@ -273,19 +273,19 @@ public class DataModelAttributeTest {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_PLAIN_LONG);
     assertNull(att.formatValue(null));
 
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     assertEquals("10", att.formatValue(Long.valueOf(10)));
     assertEquals("-1", att.formatValue(Long.valueOf(-1)));
     assertEquals("1000", att.formatValue(Long.valueOf(1000)));
     assertEquals("-1000", att.formatValue(Long.valueOf(-1000)));
 
-    LocaleThreadLocal.set(new Locale("de", "DE"));
+    NlsLocale.set(new Locale("de", "DE"));
     assertEquals("10", att.formatValue(Long.valueOf(10)));
     assertEquals("-1", att.formatValue(Long.valueOf(-1)));
     assertEquals("1000", att.formatValue(Long.valueOf(1000)));
     assertEquals("-1000", att.formatValue(Long.valueOf(-1000)));
 
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     assertEquals("10", att.formatValue(Long.valueOf(10)));
     assertEquals("-1", att.formatValue(Long.valueOf(-1)));
     assertEquals("1000", att.formatValue(Long.valueOf(1000)));
@@ -297,7 +297,7 @@ public class DataModelAttributeTest {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_PLAIN_DOUBLE);
     assertNull(att.formatValue(null));
 
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     assertEquals("10.00", att.formatValue(Double.valueOf(10)));
     assertEquals("-1.00", att.formatValue(Double.valueOf(-1)));
     assertEquals("1000.00", att.formatValue(Double.valueOf(1000)));
@@ -307,7 +307,7 @@ public class DataModelAttributeTest {
     assertEquals("1000.50", att.formatValue(Double.valueOf(1000.495)));
     assertEquals("-1000.50", att.formatValue(Double.valueOf(-1000.495)));
 
-    LocaleThreadLocal.set(new Locale("de", "DE"));
+    NlsLocale.set(new Locale("de", "DE"));
     assertEquals("10,00", att.formatValue(Double.valueOf(10)));
     assertEquals("-1,00", att.formatValue(Double.valueOf(-1)));
     assertEquals("1000,00", att.formatValue(Double.valueOf(1000)));
@@ -317,7 +317,7 @@ public class DataModelAttributeTest {
     assertEquals("1000,50", att.formatValue(Double.valueOf(1000.495)));
     assertEquals("-1000,50", att.formatValue(Double.valueOf(-1000.495)));
 
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     assertEquals("10.00", att.formatValue(Double.valueOf(10)));
     assertEquals("-1.00", att.formatValue(Double.valueOf(-1)));
     assertEquals("1000.00", att.formatValue(Double.valueOf(1000)));
@@ -333,19 +333,19 @@ public class DataModelAttributeTest {
     IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_PERCENT);
     assertNull(att.formatValue(null));
 
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     assertEquals("10.00 %", att.formatValue(Double.valueOf(10)));
     assertEquals("35.46 %", att.formatValue(Double.valueOf(35.456)));
     assertEquals("-36.00 %", att.formatValue(Double.valueOf(-36)));
     assertEquals("120.00 %", att.formatValue(Double.valueOf(120)));
 
-    LocaleThreadLocal.set(new Locale("de", "DE"));
+    NlsLocale.set(new Locale("de", "DE"));
     assertEquals("10,00%", att.formatValue(Double.valueOf(10)));
     assertEquals("35,46%", att.formatValue(Double.valueOf(35.456)));
     assertEquals("-36,00%", att.formatValue(Double.valueOf(-36)));
     assertEquals("120,00%", att.formatValue(Double.valueOf(120)));
 
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     assertEquals("10.00%", att.formatValue(Double.valueOf(10)));
     assertEquals("35.46%", att.formatValue(Double.valueOf(35.456)));
     assertEquals("-36.00%", att.formatValue(Double.valueOf(-36)));

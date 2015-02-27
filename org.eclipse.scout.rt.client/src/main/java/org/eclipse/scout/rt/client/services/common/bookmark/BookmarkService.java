@@ -19,9 +19,8 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.ActivateBookmarkKeyStroke;
@@ -50,7 +49,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
   }
 
   private ServiceState getServiceState() {
-    IClientSession session = ClientJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     if (session == null) {
       throw new IllegalStateException("null client session in current job context");
     }
@@ -97,7 +96,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
         getBookmarkData().getUserBookmarks().visit(visitor);
         getBookmarkData().getGlobalBookmarks().visit(visitor);
 
-        IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+        IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
         if (desktop != null) {
           List<IKeyStroke> newKeyStrokes = new ArrayList<IKeyStroke>();
           for (IKeyStroke k : desktop.getKeyStrokes()) {
@@ -136,7 +135,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
   @Override
   public void setStartBookmark() throws ProcessingException {
     ServiceState state = getServiceState();
-    Bookmark b = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
+    Bookmark b = ClientSessionProvider.currentSession().getDesktop().createBookmark();
     if (b != null) {
       b.setKind(Bookmark.USER_BOOKMARK);
       state.m_model.getUserBookmarks().setStartupBookmark(b);
@@ -169,7 +168,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
   public void activate(Bookmark b) throws ProcessingException {
     if (b != null) {
       try {
-        ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(b);
+        ClientSessionProvider.currentSession().getDesktop().activateBookmark(b);
       }
       catch (Throwable t) {
         LOG.error(null, t);
@@ -181,7 +180,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
   public void updateBookmark(Bookmark bm) throws ProcessingException {
 
     // Create a new bookmark from the current view:
-    Bookmark newBookmark = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
+    Bookmark newBookmark = ClientSessionProvider.currentSession().getDesktop().createBookmark();
 
     // We want to preserve certain aspects of the old bookmark:
     int cachedKind = bm.getKind();

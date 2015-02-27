@@ -10,11 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.window.desktop;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import java.util.concurrent.TimeUnit;
+
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.IMultiSplitStrategy;
 
 /**
@@ -28,7 +32,7 @@ public class ColumnSplitStrategy implements IMultiSplitStrategy {
   protected int m_span;
   protected int[][] m_location;
   protected int[][] m_definedLocation;
-  private Job m_storageJob;
+  private IFuture<Void> m_storageJob;
   private final ClientUIPreferences m_prefs;
 
   public ColumnSplitStrategy(ClientUIPreferences prefs) {
@@ -156,16 +160,20 @@ public class ColumnSplitStrategy implements IMultiSplitStrategy {
     if (m_prefs == null) {
       return;
     }
+
     if (m_storageJob == null) {
-      m_storageJob = new Job("Store column splits") {
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-          m_prefs.setDesktopColumnSplits(m_definedLocation);
-          return Status.OK_STATUS;
-        }
-      };
+      m_storageJob.cancel(true);
     }
-    m_storageJob.cancel();
-    m_storageJob.schedule(400L);
+    IRunnable t = new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        m_prefs.setDesktopColumnSplits(m_definedLocation);
+      }
+    };
+    try {
+      m_storageJob = OBJ.one(IClientJobManager.class).schedule(t, 400, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(m_prefs.getSession()));
+    }
+    catch (JobExecutionException e) {
+    }
   }
 }

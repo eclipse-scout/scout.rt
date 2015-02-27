@@ -18,9 +18,11 @@ import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -85,9 +87,9 @@ public class SwingScoutTray extends SwingScoutComposite<IDesktop> implements ISw
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 5678).join(5678);
+        getSwingEnvironment().invokeScoutLater(t, 5678).get(5678, TimeUnit.MILLISECONDS);
       }
-      catch (InterruptedException e) {
+      catch (ProcessingException e) {
         //nop
       }
       // end notify

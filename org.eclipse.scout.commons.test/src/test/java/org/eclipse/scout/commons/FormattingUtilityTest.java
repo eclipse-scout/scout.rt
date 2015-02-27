@@ -18,6 +18,7 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.Locale;
 
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -194,16 +195,16 @@ public class FormattingUtilityTest {
   }
 
   private static void assertFormat(Locale locale, String expected, Object o) {
-    Locale oldLocale = LocaleThreadLocal.get(false);
+    Locale oldLocale = NlsLocale.get(false);
     try {
       if (locale == null) {
         fail("locale must not be null");
       }
-      LocaleThreadLocal.set(locale);
+      NlsLocale.set(locale);
       assertEquals(expected, FormattingUtility.formatObject(o));
     }
     finally {
-      LocaleThreadLocal.set(oldLocale);
+      NlsLocale.set(oldLocale);
     }
   }
 }

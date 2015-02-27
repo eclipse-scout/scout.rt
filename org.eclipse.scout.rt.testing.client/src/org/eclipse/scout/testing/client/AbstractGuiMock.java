@@ -10,11 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.testing.client;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 
 /**
@@ -34,9 +38,10 @@ public abstract class AbstractGuiMock implements IGuiMock {
     final AtomicReference<T> ret = new AtomicReference<T>(null);
     final AtomicReference<Throwable> throwables = new AtomicReference<Throwable>(null);
 
-    ClientSyncJob eclipseJob = new ClientSyncJob(r.toString(), getClientSession()) {
+    IClientSession clientSession = getClientSession();
+    IFuture<Void> future = OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) {
+      public void run() throws Exception {
         if (deadLine < 0 || deadLine > System.nanoTime()) {
           try {
             ret.set(r.run());
@@ -46,22 +51,16 @@ public abstract class AbstractGuiMock implements IGuiMock {
           }
         }
       }
-    };
-    eclipseJob.schedule();
+    }, ClientJobInput.defaults().session(clientSession).name(r.toString()));
 
-    try {
-      eclipseJob.join(runTimeout);
-      Throwable t = throwables.get();
-      if (t != null) {
-        throw t;
-      }
+    future.get(runTimeout, TimeUnit.MILLISECONDS);
+    Throwable t = throwables.get();
+    if (t != null) {
+      throw t;
+    }
 
-      waitForIdle(); // give the UI time to process all events that have been scheduled by the scout model runnable
-      return ret.get();
-    }
-    catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
+    waitForIdle(); // give the UI time to process all events that have been scheduled by the scout model runnable
+    return ret.get();
   }
 
   @Override

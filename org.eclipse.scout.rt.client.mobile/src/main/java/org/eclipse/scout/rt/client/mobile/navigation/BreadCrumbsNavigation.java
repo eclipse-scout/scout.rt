@@ -19,9 +19,9 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -49,7 +49,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
 
   public BreadCrumbsNavigation(IDesktop desktop) {
     if (desktop == null) {
-      desktop = ClientSyncJob.getCurrentSession().getDesktop();
+      desktop = ClientSessionProvider.currentSession().getDesktop();
     }
     m_desktop = desktop;
     if (m_desktop == null) {
@@ -80,7 +80,7 @@ public class BreadCrumbsNavigation implements IBreadCrumbsNavigation {
 
   @Override
   public void stepBack() throws ProcessingException {
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop == null) {
       return;
     }

@@ -13,13 +13,17 @@ package org.eclipse.scout.rt.client.services.common.test;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.BlockingCondition;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IBlockingCondition;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -35,6 +39,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
@@ -51,17 +56,19 @@ public final class ClientTestUtility {
     if (seconds <= 0) {
       return;
     }
-    final BlockingCondition bc = new BlockingCondition(true);
-    new ClientSyncJob("sleep", ClientSyncJob.getCurrentSession()) {
+    IModelJobManager modelJobManager = OBJ.one(IModelJobManager.class);
+    final IBlockingCondition bc = modelJobManager.createBlockingCondition("sleep", true);
+    modelJobManager.schedule(new IRunnable() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        bc.release();
+      public void run() throws Exception {
+        bc.setBlocking(false);
       }
-    }.schedule(1000L * seconds);
+    }, seconds, TimeUnit.SECONDS, ClientJobInput.defaults().name("sleep"));
+
     try {
       bc.waitFor();
     }
-    catch (InterruptedException e) {
+    catch (JobExecutionException e) {
       // nop
     }
   }
@@ -99,15 +106,15 @@ public final class ClientTestUtility {
   }
 
   public static IClientSession getClientSession() {
-    return ClientSyncJob.getCurrentSession();
+    return ClientSessionProvider.currentSession();
   }
 
   public static Bundle getClientBundle() {
-    return ClientSyncJob.getCurrentSession().getBundle();
+    return ClientSessionProvider.currentSession().getBundle();
   }
 
   public static IDesktop getDesktop() {
-    return ClientSyncJob.getCurrentSession().getDesktop();
+    return ClientSessionProvider.currentSession().getDesktop();
   }
 
   public static String getFormsPackage() {

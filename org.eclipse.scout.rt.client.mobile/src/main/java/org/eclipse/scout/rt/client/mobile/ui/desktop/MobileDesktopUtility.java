@@ -11,8 +11,7 @@
 package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
@@ -27,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 public class MobileDesktopUtility {
 
   public static void activateOutline(IOutline outline) {
-    IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     desktop.setOutlineTableFormVisible(true);
 
     if (desktop.getOutline() != outline) {
@@ -153,7 +152,7 @@ public class MobileDesktopUtility {
   }
 
   private static IDesktop getDesktop() {
-    return ClientSyncJob.getCurrentSession().getDesktop();
+    return ClientSessionProvider.currentSession().getDesktop();
   }
 
   public static boolean isAnyViewVisible(String displayViewId) {

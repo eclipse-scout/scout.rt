@@ -15,12 +15,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.shared.services.common.calendar.HolidayCalendarItemParser;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.shared.services.common.calendar.IHolidayCalendarService;
@@ -63,7 +63,7 @@ public class HolidayCalendarService extends AbstractService implements IHolidayC
     }
     final Set<? extends ICalendarItem> result;
     if (p != null) {
-      result = p.getItems(LocaleThreadLocal.get(), minDate, maxDate);
+      result = p.getItems(NlsLocale.get(), minDate, maxDate);
     }
     else {
       result = CollectionUtility.hashSet();

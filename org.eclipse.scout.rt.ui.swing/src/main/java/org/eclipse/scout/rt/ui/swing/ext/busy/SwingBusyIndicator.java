@@ -29,7 +29,7 @@ import javax.swing.JRootPane;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 
 /**
@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
  * {@link JRootPane#putClientProperty(Object, Object)} of {@value #BUSY_SUPPORTED_CLIENT_PROPERTY} set to true
  */
 public class SwingBusyIndicator {
+
   private static final String BUSY_SET_CLIENT_PROPERTY = "SwingBusyIndicator.busySet";
   private static SwingBusyIndicator instance = new SwingBusyIndicator();
 
@@ -290,10 +291,10 @@ public class SwingBusyIndicator {
           }
           else {
             Rectangle r = m_messageRect;
-            if (!mon.isCanceled() && (r != null && r.contains(e.getPoint())) || busyClickable != null) {
+            if (!mon.isCancelled() && (r != null && r.contains(e.getPoint())) || busyClickable != null) {
               //blocking state
               m_blockingMessage = null;
-              mon.setCanceled(true);
+              mon.cancel(true);
               repaint();
             }
           }

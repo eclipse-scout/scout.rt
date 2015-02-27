@@ -10,16 +10,18 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.ICallable;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -292,32 +294,32 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
   }
 
   protected boolean fireBeforeLocationChangedFromSwt(final String location) {
-    final AtomicReference<Boolean> accept = new AtomicReference<Boolean>(false);
-    ClientJob job = new ClientSyncJob("fireBeforeLocationChangedFromSwt", getSwingEnvironment().getScoutSession()) {
+    IModelJobManager modelJobManager = OBJ.one(IModelJobManager.class);
+    IFuture<Boolean> future = modelJobManager.schedule(new ICallable<Boolean>() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) {
-        accept.set(getScoutObject().getUIFacade().fireBeforeLocationChangedFromUI(location));
+      public Boolean call() throws Exception {
+        return Boolean.valueOf(getScoutObject().getUIFacade().fireBeforeLocationChangedFromUI(location));
       }
-    };
-    job.schedule();
+    }, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()).name("fireBeforeLocationChangedFromSwt"));
+
     try {
-      job.join(TimeUnit.SECONDS.toMillis(10));
-      return accept.get().booleanValue();
+      Boolean result = future.get(10, TimeUnit.SECONDS);
+      return result != null && result.booleanValue();
     }
-    catch (InterruptedException e) {
+    catch (ProcessingException e) {
       LOG.warn("Failed to wait for the Scout model to accept a location change.", e);
       return false;
     }
   }
 
   protected void fireAfterLocationChangedFromSwt(final String location) {
-    ClientSyncJob job = new ClientSyncJob("fireAfterLocationChangedFromSwt", getSwingEnvironment().getScoutSession()) {
+    IModelJobManager modelJobManager = OBJ.one(IModelJobManager.class);
+    modelJobManager.schedule(new IRunnable() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+      public void run() throws Exception {
         getScoutObject().getUIFacade().fireAfterLocationChangedFromUI(location);
       }
-    };
-    job.schedule();
+    }, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
   }
 
   /**

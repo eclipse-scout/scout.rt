@@ -28,8 +28,8 @@ import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.security.ReadDiagnosticServletPermission;
 import org.eclipse.scout.rt.shared.security.UpdateDiagnosticServletPermission;
@@ -307,7 +307,7 @@ public class DiagnosticSession {
     result.add(System.getProperty("user.home"));
     result.add(System.getProperty("user.country"));
     result.add(System.getProperty("user.timezone"));
-    result.add(LocaleThreadLocal.get().getDisplayLanguage() + " (L) / " + LocaleThreadLocal.get().getLanguage() + " (F)");
+    result.add(NlsLocale.get().getDisplayLanguage() + " (L) / " + NlsLocale.get().getLanguage() + " (F)");
 
     result.add(String.valueOf(rt.availableProcessors()));
 

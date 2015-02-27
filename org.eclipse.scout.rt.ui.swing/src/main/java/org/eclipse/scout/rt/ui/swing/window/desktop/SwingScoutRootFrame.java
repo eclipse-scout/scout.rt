@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -35,20 +36,27 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import javax.swing.RootPaneContainer;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -490,13 +498,23 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
           break;
         }
         case DesktopEvent.TYPE_DESKTOP_CLOSED: {
-          Runnable t = new Runnable() {
-            @Override
-            public void run() {
-              handleScoutDesktopClosedInSwing(e);
-            }
-          };
-          getSwingEnvironment().invokeSwingAndWait(t, 60000);
+          try {
+            IFuture<Void> run = OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
+              @Override
+              public void run() throws Exception {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                  @Override
+                  public void run() {
+                    handleScoutDesktopClosedInSwing(e);
+                  }
+                });
+              }
+            }, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
+            run.get(1, TimeUnit.MINUTES); // wait no longer than one minute
+          }
+          catch (ProcessingException ex) {
+            LOG.error("Error invoking desktop closed hook.", ex);
+          }
           break;
         }
         case DesktopEvent.TYPE_TRAVERSE_FOCUS_NEXT: {

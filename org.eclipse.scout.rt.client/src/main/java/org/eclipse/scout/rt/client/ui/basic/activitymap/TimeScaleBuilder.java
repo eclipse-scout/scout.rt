@@ -16,7 +16,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.scout.commons.DateUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class TimeScaleBuilder {
@@ -82,7 +82,7 @@ public class TimeScaleBuilder {
   }
 
   protected void buildWeekScale(Date[] days, TimeScale scale) {
-    scale.setDateFormat(new SimpleDateFormat("'" + ScoutTexts.get("Week") + "' w, yyyy", LocaleThreadLocal.get()));
+    scale.setDateFormat(new SimpleDateFormat("'" + ScoutTexts.get("Week") + "' w, yyyy", NlsLocale.get()));
     Calendar weekCal = Calendar.getInstance();
     MajorTimeColumn curMonthColumn = null;
     Calendar curMonthCal = Calendar.getInstance();
@@ -105,9 +105,9 @@ public class TimeScaleBuilder {
     // cal.add(Calendar.MONTH,1);
     // Date b=cal.getTime();
     MajorTimeColumn col = new MajorTimeColumn(scale);
-    col.setLargeText(new SimpleDateFormat("MMMMM, yyyy", LocaleThreadLocal.get()).format(a));
-    col.setMediumText(new SimpleDateFormat("MMM yy", LocaleThreadLocal.get()).format(a));
-    col.setSmallText(new SimpleDateFormat("MMM", LocaleThreadLocal.get()).format(a));
+    col.setLargeText(new SimpleDateFormat("MMMMM, yyyy", NlsLocale.get()).format(a));
+    col.setMediumText(new SimpleDateFormat("MMM yy", NlsLocale.get()).format(a));
+    col.setSmallText(new SimpleDateFormat("MMM", NlsLocale.get()).format(a));
     return col;
   }
 
@@ -124,17 +124,17 @@ public class TimeScaleBuilder {
     cal.setTimeInMillis(cal.getTimeInMillis() - 1);
     Date justBeforeEnd = cal.getTime();
     MinorTimeColumn col = new MinorTimeColumn(parent, a, justBeforeEnd);
-    col.setLargeText(new SimpleDateFormat("'" + ScoutTexts.get("Week") + "' w", LocaleThreadLocal.get()).format(a));
-    col.setMediumText(new SimpleDateFormat("w", LocaleThreadLocal.get()).format(a));
-    col.setSmallText(new SimpleDateFormat("w", LocaleThreadLocal.get()).format(a));
+    col.setLargeText(new SimpleDateFormat("'" + ScoutTexts.get("Week") + "' w", NlsLocale.get()).format(a));
+    col.setMediumText(new SimpleDateFormat("w", NlsLocale.get()).format(a));
+    col.setSmallText(new SimpleDateFormat("w", NlsLocale.get()).format(a));
     StringBuilder ttBuf = new StringBuilder();
-    ttBuf.append(new SimpleDateFormat("EEEEE", LocaleThreadLocal.get()).format(a));
+    ttBuf.append(new SimpleDateFormat("EEEEE", NlsLocale.get()).format(a));
     ttBuf.append(", ");
-    ttBuf.append(DateFormat.getDateInstance(DateFormat.LONG, LocaleThreadLocal.get()).format(a));
+    ttBuf.append(DateFormat.getDateInstance(DateFormat.LONG, NlsLocale.get()).format(a));
     ttBuf.append(" - ");
-    ttBuf.append(new SimpleDateFormat("EEEEE", LocaleThreadLocal.get()).format(justBeforeEnd));
+    ttBuf.append(new SimpleDateFormat("EEEEE", NlsLocale.get()).format(justBeforeEnd));
     ttBuf.append(", ");
-    ttBuf.append(DateFormat.getDateInstance(DateFormat.LONG, LocaleThreadLocal.get()).format(justBeforeEnd));
+    ttBuf.append(DateFormat.getDateInstance(DateFormat.LONG, NlsLocale.get()).format(justBeforeEnd));
     col.setTooltipText(ttBuf.toString());
     return col;
   }
@@ -148,8 +148,8 @@ public class TimeScaleBuilder {
     // Date b=cal.getTime();
     MajorTimeColumn col = new MajorTimeColumn(scale);
     col.setLargeText(createDayFormatWithWeekDay(DateFormat.MEDIUM).format(a));
-    col.setMediumText(DateFormat.getDateInstance(DateFormat.SHORT, LocaleThreadLocal.get()).format(a));
-    col.setSmallText(new SimpleDateFormat("dd.MM.", LocaleThreadLocal.get()).format(a));
+    col.setMediumText(DateFormat.getDateInstance(DateFormat.SHORT, NlsLocale.get()).format(a));
+    col.setSmallText(new SimpleDateFormat("dd.MM.", NlsLocale.get()).format(a));
     return col;
   }
 
@@ -161,13 +161,13 @@ public class TimeScaleBuilder {
     cal.setTimeInMillis(cal.getTimeInMillis() - 1);
     Date justBeforeEnd = cal.getTime();
     MinorTimeColumn col = new MinorTimeColumn(parent, a, justBeforeEnd);
-    col.setLargeText(new SimpleDateFormat("dd", LocaleThreadLocal.get()).format(a));
-    col.setMediumText(new SimpleDateFormat("dd", LocaleThreadLocal.get()).format(a));
-    col.setSmallText(new SimpleDateFormat("dd", LocaleThreadLocal.get()).format(a));
+    col.setLargeText(new SimpleDateFormat("dd", NlsLocale.get()).format(a));
+    col.setMediumText(new SimpleDateFormat("dd", NlsLocale.get()).format(a));
+    col.setSmallText(new SimpleDateFormat("dd", NlsLocale.get()).format(a));
     StringBuilder ttBuf = new StringBuilder();
-    ttBuf.append(new SimpleDateFormat("EEEEE", LocaleThreadLocal.get()).format(a));
+    ttBuf.append(new SimpleDateFormat("EEEEE", NlsLocale.get()).format(a));
     ttBuf.append(", ");
-    ttBuf.append(DateFormat.getDateInstance(DateFormat.LONG, LocaleThreadLocal.get()).format(a));
+    ttBuf.append(DateFormat.getDateInstance(DateFormat.LONG, NlsLocale.get()).format(a));
     col.setTooltipText(ttBuf.toString());
     return col;
   }
@@ -185,27 +185,27 @@ public class TimeScaleBuilder {
     Date justBeforeEnd = b;
     MinorTimeColumn col = new MinorTimeColumn(parent, a, b);
     if (hour >= 0) {
-      col.setLargeText(new SimpleDateFormat("HH:mm", LocaleThreadLocal.get()).format(a));
+      col.setLargeText(new SimpleDateFormat("HH:mm", NlsLocale.get()).format(a));
       if (hour == m_map.getFirstHourOfDay() || hour == 12) {
-        col.setMediumText(new SimpleDateFormat("HH:mm", LocaleThreadLocal.get()).format(a));
+        col.setMediumText(new SimpleDateFormat("HH:mm", NlsLocale.get()).format(a));
       }
       col.setSmallText("");
     }
     StringBuilder ttBuf = new StringBuilder();
-    ttBuf.append(new SimpleDateFormat("EEEEE", LocaleThreadLocal.get()).format(a));
+    ttBuf.append(new SimpleDateFormat("EEEEE", NlsLocale.get()).format(a));
     ttBuf.append(", ");
-    ttBuf.append(DateFormat.getDateInstance(DateFormat.LONG, LocaleThreadLocal.get()).format(a));
+    ttBuf.append(DateFormat.getDateInstance(DateFormat.LONG, NlsLocale.get()).format(a));
     ttBuf.append(", ");
-    ttBuf.append(new SimpleDateFormat("HH:mm", LocaleThreadLocal.get()).format(a));
+    ttBuf.append(new SimpleDateFormat("HH:mm", NlsLocale.get()).format(a));
     ttBuf.append(" - ");
-    ttBuf.append(new SimpleDateFormat("HH:mm", LocaleThreadLocal.get()).format(justBeforeEnd));
+    ttBuf.append(new SimpleDateFormat("HH:mm", NlsLocale.get()).format(justBeforeEnd));
     col.setTooltipText(ttBuf.toString());
     return col;
   }
 
   protected SimpleDateFormat createDayFormatWithWeekDay(int dateStyle) {
     String pat;
-    DateFormat df = DateFormat.getDateInstance(dateStyle, LocaleThreadLocal.get());
+    DateFormat df = DateFormat.getDateInstance(dateStyle, NlsLocale.get());
     if (df instanceof SimpleDateFormat) {
       pat = ((SimpleDateFormat) df).toPattern();
     }
@@ -214,12 +214,12 @@ public class TimeScaleBuilder {
     }
     pat = "EE " + pat;
     //
-    return new SimpleDateFormat(pat, LocaleThreadLocal.get());
+    return new SimpleDateFormat(pat, NlsLocale.get());
   }
 
   protected SimpleDateFormat createIntradayFormatWithWeekDay(int dateStyle, int timeStyle) {
     String pat;
-    DateFormat df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, LocaleThreadLocal.get());
+    DateFormat df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, NlsLocale.get());
     if (df instanceof SimpleDateFormat) {
       pat = ((SimpleDateFormat) df).toPattern();
     }
@@ -227,7 +227,7 @@ public class TimeScaleBuilder {
       pat = "dd.MM.yyyy HH:mm";
     }
     pat = "EE " + pat;
-    return new SimpleDateFormat(pat, LocaleThreadLocal.get());
+    return new SimpleDateFormat(pat, NlsLocale.get());
   }
 
 }

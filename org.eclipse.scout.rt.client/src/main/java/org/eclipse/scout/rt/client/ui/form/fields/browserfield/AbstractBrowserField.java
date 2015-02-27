@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldAcceptLocationChangeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldLocationChangedChain;
@@ -61,8 +60,6 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
   /**
    * This callback is invoked before the link is followed, it can be used as handler and vetoer. The default returns
    * true.<br>
-   * If there is more to do then simply return true/false, put the
-   * code in a {@link ClientSyncJob} to prevent deadlocks and other problems
    *
    * @return true to accept this location, false to prevent the browser from going to that location (equal to browser
    *         esc/stop button)

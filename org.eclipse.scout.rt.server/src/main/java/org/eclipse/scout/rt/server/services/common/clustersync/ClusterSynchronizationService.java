@@ -69,7 +69,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
   @Override
   public void initializeService() {
-    super.initializeService();
     m_nodeId = createNodeId();
   }
 

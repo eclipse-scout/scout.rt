@@ -14,18 +14,21 @@ import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.client.fixture.MockServerProcessingCancelService;
 import org.eclipse.scout.rt.client.fixture.MockServiceTunnel;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
@@ -105,9 +108,9 @@ public class ClientJobCancelTest {
     pingServiceDelay = delay;
     //
     final AtomicReference<Object> resultRef = new AtomicReference<Object>();
-    ClientSyncJob job = new ClientSyncJob("Client", m_session) {
+    IFuture<Void> future = OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
       @Override
-      protected IStatus runStatus(IProgressMonitor monitor) {
+      public void run() throws Exception {
         IPingService serviceProxy = ServiceTunnelUtility.createProxy(IPingService.class, m_session.getServiceTunnel());
         try {
           resultRef.set(serviceProxy.ping("ABC"));
@@ -115,39 +118,32 @@ public class ClientJobCancelTest {
         catch (Throwable t) {
           resultRef.set(t);
         }
-        return Status.OK_STATUS;
       }
-    };
-    job.schedule();
+    }, ClientJobInput.defaults().session(m_session).name("Client"));
+
     //make user interrupt the job in 1 sec
     if (interrupt) {
-      new JobThatInterrupts(job.getName()).schedule(1000);
+      OBJ.one(IClientJobManager.class).schedule(new JobThatInterrupts(future), 1, TimeUnit.SECONDS, ClientJobInput.defaults().session(m_session).name("Interrupter"));
     }
     //wait for user job
-    job.join();
+    future.get();
     return resultRef.get();
   }
 
-  private class JobThatInterrupts extends Job {
-    private final String m_jobToInterrupt;
+  private static class JobThatInterrupts implements IRunnable {
+    private IFuture<?> m_jobToInterrupt;
 
-    public JobThatInterrupts(String jobToInterrupt) {
-      super("Interrupter");
+    private JobThatInterrupts(IFuture<?> jobToInterrupt) {
       m_jobToInterrupt = jobToInterrupt;
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      for (Job j : Job.getJobManager().find(null)) {
-        if (m_jobToInterrupt.equals(j.getName())) {
-          j.cancel();
-        }
-      }
-      return Status.OK_STATUS;
+    public void run() throws Exception {
+      m_jobToInterrupt.cancel(true);
     }
   }
 
-  public static class MockPingService extends AbstractService implements IPingService {
+  private static class MockPingService extends AbstractService implements IPingService {
     @Override
     public String ping(String s) {
       try {

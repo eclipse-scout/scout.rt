@@ -19,10 +19,10 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -81,7 +81,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   }
 
   private void createNewBookmark(int kind) throws ProcessingException {
-    Bookmark b = ClientSyncJob.getCurrentSession().getDesktop().createBookmark();
+    Bookmark b = ClientSessionProvider.currentSession().getDesktop().createBookmark();
     if (b != null) {
       IBookmarkService service = SERVICES.getService(IBookmarkService.class);
       b.setKind(kind);
@@ -224,7 +224,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
         Bookmark b = service.getStartBookmark();
         if (b != null) {
           try {
-            ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(b);
+            ClientSessionProvider.currentSession().getDesktop().activateBookmark(b);
           }
           catch (Throwable t) {
             LOG.error(null, t);

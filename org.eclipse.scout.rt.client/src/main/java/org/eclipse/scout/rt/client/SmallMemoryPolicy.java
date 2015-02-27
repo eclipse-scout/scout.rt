@@ -10,12 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.AndFilter;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.job.filter.JobFilter;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 
 /**
  * dont cache table page search form contents, releaseUnusedPages before every page reload and force gc to free
@@ -23,26 +33,30 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
  */
 public class SmallMemoryPolicy extends AbstractMemoryPolicy {
 
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SmallMemoryPolicy.class);
+
   /**
    * clear table before loading new data, thus disabling "replaceRow" mechanism but saving memory
    */
   @Override
   public void beforeTablePageLoadData(IPageWithTable<?> page) {
     //make sure inactive outlines have no selection that "keeps" the pages
-    IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
+    IClientSession session = ClientSessionProvider.currentSession();
+    IDesktop desktop = session.getDesktop();
     for (IOutline o : desktop.getAvailableOutlines()) {
       if (o != desktop.getOutline()) {
         o.selectNode(null);
       }
     }
-    ClientJob.getCurrentSession().getDesktop().releaseUnusedPages();
+    desktop.releaseUnusedPages();
     System.gc();
-    for (Job j : Job.getJobManager().find(ClientJob.class)) {
-      if (j instanceof ForceGCJob) {
-        j.cancel();
-      }
+    OBJ.one(IClientJobManager.class).cancel(new AndFilter<IFuture<?>>(new JobFilter(getClass().getName()), new ClientSessionFilter(session)), true);
+    try {
+      OBJ.one(IClientJobManager.class).schedule(new ForceGCJob(), ClientJobInput.defaults().session(session).name("release memory").id(getClass().getName()));
     }
-    new ForceGCJob().schedule();
+    catch (JobExecutionException e) {
+      LOG.error("", e);
+    }
     if (page.getTable() != null) {
       page.getTable().discardAllRows();
     }

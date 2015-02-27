@@ -16,16 +16,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.IClientSessionProvider;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 
 /**
- * Authenticator implementation used for testing. It holds a session-to-user and a user-to-password mapping. This class
- * expectes that the HTTP connection to the server is done within a Job implementing {@link IClientSessionProvider}.
+ * Authenticator implementation used for testing. It holds a session-to-user and a user-to-password mapping.
  * <p>
  * <b>Note</b>: the authenticator must be set as default authenticator:
- * 
+ *
  * <pre>
  * Authenticator.setDefault(new MultiClientAuthenticator());
  * // set user-to-password mapping
@@ -43,7 +41,7 @@ public class MultiClientAuthenticator extends Authenticator {
 
   /**
    * Sets the default user if there is no session-to-user mapping available for the current session.
-   * 
+   *
    * @param username
    */
   public static void setDefaultUser(String username) {
@@ -52,7 +50,7 @@ public class MultiClientAuthenticator extends Authenticator {
 
   /**
    * Adds a user along with its password.
-   * 
+   *
    * @param username
    * @param password
    */
@@ -62,7 +60,7 @@ public class MultiClientAuthenticator extends Authenticator {
 
   /**
    * Assigns the given session with a user.
-   * 
+   *
    * @param clientSession
    * @param username
    */
@@ -72,7 +70,7 @@ public class MultiClientAuthenticator extends Authenticator {
 
   @Override
   protected PasswordAuthentication getPasswordAuthentication() {
-    IClientSession currentSession = ClientJob.getCurrentSession();
+    IClientSession currentSession = ClientSessionProvider.currentSession();
     String user = LOGIN_INFOS.get(currentSession);
     if (user == null) {
       user = s_defaultUser;

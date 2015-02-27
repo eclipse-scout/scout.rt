@@ -17,11 +17,11 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.testing.client.form.DynamicCancelButton;
 import org.eclipse.scout.testing.client.form.DynamicForm;
 import org.eclipse.scout.testing.client.form.DynamicGroupBox;
 import org.eclipse.scout.testing.client.form.FormHandler;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

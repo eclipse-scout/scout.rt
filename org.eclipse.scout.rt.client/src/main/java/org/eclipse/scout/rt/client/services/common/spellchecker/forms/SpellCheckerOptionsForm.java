@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.services.common.spellchecker.ISpellCheckerService;
 import org.eclipse.scout.rt.client.services.common.spellchecker.IUserDictionary;
 import org.eclipse.scout.rt.client.services.common.spellchecker.forms.SpellCheckerOptionsForm.MainBox.CancelButton;
@@ -403,7 +403,7 @@ public class SpellCheckerOptionsForm extends AbstractForm {
       protected void execClickAction() throws ProcessingException {
         getEnabledField().setValue(true);
         getShortcutField().setValue("f7");
-        getLanguageField().setValue(LocaleThreadLocal.get().toString());
+        getLanguageField().setValue(NlsLocale.get().toString());
         getIgnoreCaseField().setValue(false);
         getIgnoreDomainNamesField().setValue(true);
         getIgnoreWordsWithNumbersField().setValue(true);

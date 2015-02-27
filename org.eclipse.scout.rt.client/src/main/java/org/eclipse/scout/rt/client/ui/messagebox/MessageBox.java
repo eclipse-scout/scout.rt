@@ -15,19 +15,24 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EventListener;
+import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.BlockingCondition;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IBlockingCondition;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -81,7 +86,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
 
   /**
    * Convenience function for simple delete confirmation message box
-   * 
+   *
    * @param items
    *          one item or array of multiple items
    */
@@ -91,7 +96,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
 
   /**
    * Convenience function for simple delete confirmation message box
-   * 
+   *
    * @param items
    *          a list of multiple items
    * @since Scout 4.0.1
@@ -102,7 +107,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
 
   /**
    * Convenience function for simple delete confirmation message box
-   * 
+   *
    * @param itemType
    *          display text in plural such as "Persons", "Relations", "Tickets",
    *          ...
@@ -126,7 +131,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
 
   /**
    * Convenience function for simple delete confirmation message box
-   * 
+   *
    * @param itemType
    *          display text in plural such as "Persons", "Relations", "Tickets",
    *          ...
@@ -195,8 +200,8 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   // cached
   private String m_copyPasteTextInternal;
   // modality
-  private final BlockingCondition m_blockingCondition = new BlockingCondition(false);
-  private Job m_autoCloseJob;
+  private final IBlockingCondition m_blockingCondition;
+  private IFuture<Void> m_autoCloseJob;
   // result
   private int m_answer;
   private boolean m_answerSet;
@@ -221,9 +226,9 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
     m_cancelButtonText = cancelButtonText;
     m_iconId = iconId;
     m_autoCloseMillis = -1;
-    //
+    m_blockingCondition = OBJ.one(IModelJobManager.class).createBlockingCondition("block", false);
     if (m_title == null) {
-      IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+      IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
       if (desktop != null) {
         m_title = desktop.getTitle();
       }
@@ -444,11 +449,11 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   public int startMessageBox(int defaultResult) {
     m_answerSet = false;
     m_answer = defaultResult;
-    if (ClientSyncJob.getCurrentSession() != null) {
+    if (ClientSessionProvider.currentSession() != null) {
       m_blockingCondition.setBlocking(true);
       try {
         // check if the desktop is observing this process
-        IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+        IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
         if (desktop == null || !desktop.isOpened()) {
           LOG.warn("there is no desktop or the desktop has not yet been opened in the ui, default answer is CANCEL");
           m_answerSet = true;
@@ -460,21 +465,24 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
           // attach auto-cancel timer
           if (getAutoCloseMillis() > 0) {
             final long dt = getAutoCloseMillis();
-            m_autoCloseJob = new Job("Auto-close " + getTitle()) {
-              @Override
-              protected IStatus run(IProgressMonitor monitor) {
-                if (this == m_autoCloseJob) {
-                  closeMessageBox();
+            try {
+              m_autoCloseJob = OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
+                @Override
+                public void run() throws Exception {
+                  if (IFuture.CURRENT.get() == m_autoCloseJob) {
+                    closeMessageBox();
+                  }
                 }
-                return Status.OK_STATUS;
-              }
-            };
-            m_autoCloseJob.schedule(dt);
+              }, dt, TimeUnit.MILLISECONDS, ClientJobInput.defaults().name("Auto-close " + getTitle()));
+            }
+            catch (JobExecutionException e) {
+              LOG.error("Unable to schedule auto-close job.", e);
+            }
           }
           // start sub event dispatch thread
           waitFor();
           if (m_autoCloseJob != null) {
-            m_autoCloseJob.cancel();
+            m_autoCloseJob.cancel(true);
             m_autoCloseJob = null;
           }
         }
@@ -495,7 +503,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
     try {
       m_blockingCondition.waitFor();
     }
-    catch (InterruptedException e) {
+    catch (ProcessingException e) {
       LOG.info(ScoutTexts.get("UserInterrupted"));
     }
   }

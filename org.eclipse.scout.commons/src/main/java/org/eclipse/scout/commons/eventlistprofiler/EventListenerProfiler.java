@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.nls.NlsLocale;
 
 /**
  * This class is Thread safe
@@ -79,7 +79,7 @@ public final class EventListenerProfiler {
       EventListenerSnapshot snapshot = new EventListenerSnapshot();
       synchronized (m_sourcesLock) {
         manageNoLock();
-        NumberFormat fmt = NumberFormat.getIntegerInstance(LocaleThreadLocal.get());
+        NumberFormat fmt = NumberFormat.getIntegerInstance(NlsLocale.get());
         out.println("Max memory:   " + fmt.format(Runtime.getRuntime().maxMemory()));
         out.println("Total memory: " + fmt.format(Runtime.getRuntime().totalMemory()));
         out.println("Free memory:  " + fmt.format(Runtime.getRuntime().freeMemory()));

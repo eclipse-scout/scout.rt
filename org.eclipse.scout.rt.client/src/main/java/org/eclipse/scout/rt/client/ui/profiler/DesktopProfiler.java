@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -183,7 +183,7 @@ public final class DesktopProfiler {
       synchronized (m_listLock) {
         manageListsWithoutLocking();
         //
-        NumberFormat fmt = NumberFormat.getIntegerInstance(LocaleThreadLocal.get());
+        NumberFormat fmt = NumberFormat.getIntegerInstance(NlsLocale.get());
         out.println("Max memory:   " + fmt.format(Runtime.getRuntime().maxMemory()));
         out.println("Total memory: " + fmt.format(Runtime.getRuntime().totalMemory()));
         out.println("Free memory:  " + fmt.format(Runtime.getRuntime().freeMemory()));

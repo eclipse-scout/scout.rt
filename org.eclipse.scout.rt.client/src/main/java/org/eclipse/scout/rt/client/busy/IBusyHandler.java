@@ -10,16 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.busy;
 
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IJobManager;
+import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
 
 /**
- * Shows blocking progress on a long operation for a {@link IClientSession} {@link ClientJob} with respect to
- * {@link #acceptJob(Job)}s
+ * Shows blocking progress on a long operation for a {@link ModelJobManager} with respect to
+ * {@link #acceptFuture(IFuture, IJobManager)}.
  * <p>
  * The decision whether or not the progress should be visible is made in the acceptor
- * {@link IBusyHandler#acceptJob(Job)}
+ * {@link IBusyHandler#acceptFuture(IFuture, IJobManager)}
  *
  * @author imo
  * @since 3.8
@@ -29,17 +29,17 @@ public interface IBusyHandler {
   /**
    * Decides whether to block the ui based on that running job.
    */
-  boolean acceptJob(final Job job);
+  boolean acceptFuture(IFuture<?> future, IJobManager<?> mgr);
 
   /**
-   * callback when a job accepted by {@link #acceptJob(Job)} begun running
+   * callback when a job accepted by {@link #acceptFuture(IFuture, IJobManager)} begun running
    */
-  void onJobBegin(Job job);
+  void onJobBegin(IFuture<?> future);
 
   /**
    * callback when a job is done
    */
-  void onJobEnd(Job job);
+  void onJobEnd(IFuture<?> future);
 
   /**
    * callback when a {@link IBusyHandler} starts blocking the application.
@@ -75,4 +75,5 @@ public interface IBusyHandler {
   void setEnabled(boolean b);
 
   boolean isEnabled();
+
 }

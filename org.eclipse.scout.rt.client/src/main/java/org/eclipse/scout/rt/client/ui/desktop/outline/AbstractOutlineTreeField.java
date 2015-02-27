@@ -14,8 +14,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineTreeFieldExtension;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
@@ -61,14 +61,14 @@ public abstract class AbstractOutlineTreeField extends AbstractTreeField impleme
       }
     };
     //
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     desktop.addDesktopListener(m_desktopListener);
     installOutline(desktop.getOutline());
   }
 
   @Override
   protected void execDisposeField() throws ProcessingException {
-    ClientSyncJob.getCurrentSession().getDesktop().removeDesktopListener(m_desktopListener);
+    ClientSessionProvider.currentSession().getDesktop().removeDesktopListener(m_desktopListener);
     m_desktopListener = null;
   }
 

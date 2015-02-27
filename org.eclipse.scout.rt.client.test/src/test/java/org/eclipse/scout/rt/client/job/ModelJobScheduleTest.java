@@ -504,12 +504,12 @@ public class ModelJobScheduleTest {
 
     try {
       future.get();
-      fail();
     }
     catch (JobExecutionException e) {
-      assertFalse(executed.get());
-      assertTrue(e.isCancellation());
+      fail();
     }
+    assertFalse(executed.get());
+    assertTrue(future.isCancelled());
   }
 
   @Test

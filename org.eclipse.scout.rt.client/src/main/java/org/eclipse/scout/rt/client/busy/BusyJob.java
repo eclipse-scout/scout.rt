@@ -10,28 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.busy;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IRunnable;
 
 /**
  * This is the default busy job that runs the process of showing busy marker, blocking and canceling.
  * <p>
  * Subclass this job for custom handling.
  * <p>
- * The {@link #run(IProgressMonitor)} first calls {@link #runBusy(IProgressMonitor)} and then calls
- * {@link #runBlocking(IProgressMonitor)}
+ * The {@link #run()} first calls {@link #runBusy()} and then calls {@link #runBlocking()}
  *
  * @author imo
  * @since 3.8
  */
-public class BusyJob extends Job {
+public class BusyJob implements IRunnable {
   private final IBusyHandler m_handler;
   private boolean m_cancelApplied;
 
-  public BusyJob(String name, IBusyHandler handler) {
-    super(name);
+  public BusyJob(IBusyHandler handler) {
     m_handler = handler;
   }
 
@@ -40,27 +36,25 @@ public class BusyJob extends Job {
   }
 
   @Override
-  protected IStatus run(IProgressMonitor monitor) {
+  public void run() throws Exception {
     if (!getBusyHandler().isBusy() || !getBusyHandler().isEnabled()) {
-      return Status.OK_STATUS;
+      return;
     }
-    runBusy(monitor);
+    runBusy();
     if (!getBusyHandler().isBusy() || !getBusyHandler().isEnabled()) {
-      return Status.OK_STATUS;
+      return;
     }
 
     m_handler.onBlockingBegin();
     try {
-      runBlocking(monitor);
+      runBlocking();
     }
     finally {
       m_handler.onBlockingEnd();
     }
-
-    return Status.OK_STATUS;
   }
 
-  protected void runBusy(IProgressMonitor monitor) {
+  protected void runBusy() {
     IBusyHandler h = getBusyHandler();
     Object lock = h.getStateLock();
     long longOpTimestamp = System.currentTimeMillis() + h.getLongOperationMillis() - h.getShortOperationMillis();
@@ -69,7 +63,7 @@ public class BusyJob extends Job {
         if (!h.isBusy()) {
           return;
         }
-        if (!m_cancelApplied && monitor.isCanceled()) {
+        if (!m_cancelApplied && IProgressMonitor.CURRENT.get().isCancelled()) {
           m_cancelApplied = true;
           h.cancel();
         }
@@ -86,32 +80,25 @@ public class BusyJob extends Job {
     }
   }
 
-  protected void runBlocking(IProgressMonitor monitor) {
+  protected void runBlocking() {
     IBusyHandler h = getBusyHandler();
     Object lock = h.getStateLock();
-    try {
-      monitor.beginTask(null, IProgressMonitor.UNKNOWN);
-      while (true) {
-        synchronized (lock) {
-          if (!h.isBusy()) {
-            return;
-          }
-          if (!m_cancelApplied && monitor.isCanceled()) {
-            m_cancelApplied = true;
-            h.cancel();
-          }
-          try {
-            lock.wait(100);
-          }
-          catch (InterruptedException e) {
-            return;
-          }
+    while (true) {
+      synchronized (lock) {
+        if (!h.isBusy()) {
+          return;
+        }
+        if (!m_cancelApplied && IProgressMonitor.CURRENT.get().isCancelled()) {
+          m_cancelApplied = true;
+          h.cancel();
+        }
+        try {
+          lock.wait(100);
+        }
+        catch (InterruptedException e) {
+          return;
         }
       }
     }
-    finally {
-      monitor.done();
-    }
   }
-
 }

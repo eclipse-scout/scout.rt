@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.service.AbstractService;
 
@@ -46,7 +46,7 @@ public class PlatformService extends AbstractService implements IPlatformService
       curPath = FileChooser.getCurrentDirectory();
       if (curPath == null) {
         try {
-          IClientSession session = ClientSyncJob.getCurrentSession();
+          IClientSession session = ClientSessionProvider.currentSession();
           curPath = Platform.getStateLocation(session.getBundle()).toFile().getCanonicalPath();
         }
         catch (IOException io) {

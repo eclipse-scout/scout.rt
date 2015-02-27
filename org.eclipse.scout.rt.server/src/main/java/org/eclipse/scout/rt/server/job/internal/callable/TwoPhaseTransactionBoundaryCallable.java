@@ -15,14 +15,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.internal.callable.Chainable;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.job.internal.ServerJobFuture;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 
@@ -39,8 +36,6 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
  * @since 5.1
  */
 public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RESULT>, Chainable<RESULT> {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TwoPhaseTransactionBoundaryCallable.class);
 
   @Internal
   protected final Callable<RESULT> m_next;
@@ -136,9 +131,10 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RES
 
   @Internal
   protected void logTxFailures(final ITransaction tx) {
-    for (final Throwable failure : tx.getFailures()) {
-      LOG.error(String.format("Current transaction was rolled back because of a processing error. [reason=%s, job=%s, tx=%s]", StringUtility.nvl(failure.getMessage(), "n/a"), m_input.getIdentifier(), tx), failure);
-    }
+    // TODO [dwi]: see Scout ticket
+//    for (final Throwable failure : tx.getFailures()) {
+//      LOG.debug(String.format("Current transaction was rolled back because of a processing error. [reason=%s, job=%s, tx=%s]", StringUtility.nvl(failure.getMessage(), "n/a"), m_input.getIdentifier(), tx), failure);
+//    }
   }
 
   /**

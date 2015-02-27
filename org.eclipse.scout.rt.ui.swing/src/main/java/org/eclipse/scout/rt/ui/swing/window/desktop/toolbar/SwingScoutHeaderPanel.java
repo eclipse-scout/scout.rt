@@ -23,12 +23,13 @@ import javax.swing.Spring;
 import javax.swing.SpringLayout;
 import javax.swing.UIManager;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
@@ -38,6 +39,7 @@ import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
@@ -214,10 +216,11 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
   @Override
   protected void attachScout() {
     super.attachScout();
+
     //add listener and init values
-    new ClientSyncJob("add navigation listener", getSwingEnvironment().getScoutSession()) {
+    OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+      public void run() throws Exception {
         if (m_scoutNavListener == null) {
           m_scoutNavListener = new NavigationHistoryListener() {
             @Override
@@ -229,16 +232,16 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
           handleNavigationChangedFromScout();
         }
       }
-    }.schedule();
+    }, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
   }
 
   @Override
   protected void detachScout() {
     super.detachScout();
     //add listener and init values
-    new ClientSyncJob("remove navigation listener", getSwingEnvironment().getScoutSession()) {
+    OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+      public void run() throws Exception {
         if (m_scoutNavListener != null) {
           INavigationHistoryService nav = SERVICES.getService(INavigationHistoryService.class);
           if (nav != null) {
@@ -247,7 +250,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
           m_scoutNavListener = null;
         }
       }
-    }.schedule();
+    }, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
   }
 
   @Override

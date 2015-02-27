@@ -20,8 +20,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -75,7 +75,7 @@ public class StringColumnFilter implements ITableColumnFilter<String>, Serializa
 
   @Override
   public List<LookupRow<String>> createHistogram() {
-    Map<String, LookupRow<String>> hist = new TreeMap<String, LookupRow<String>>(Collator.getInstance(LocaleThreadLocal.get()));
+    Map<String, LookupRow<String>> hist = new TreeMap<String, LookupRow<String>>(Collator.getInstance(NlsLocale.get()));
     Map<String, Integer> countMap = new HashMap<String, Integer>();
     for (ITableRow row : m_column.getTable().getRows()) {
       String s = m_column.getDisplayText(row);

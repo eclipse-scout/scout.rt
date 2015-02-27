@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job.internal;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 
@@ -21,7 +22,7 @@ public class ProgressMonitor implements IProgressMonitor {
   private final IFuture<?> m_future;
 
   public ProgressMonitor(final IFuture<?> future) {
-    m_future = future;
+    m_future = Assertions.assertNotNull(future);
   }
 
   @Override

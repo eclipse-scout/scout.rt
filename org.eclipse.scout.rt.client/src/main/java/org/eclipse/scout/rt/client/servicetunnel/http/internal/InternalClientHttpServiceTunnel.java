@@ -12,23 +12,25 @@ package org.eclipse.scout.rt.client.servicetunnel.http.internal;
 
 import java.net.URL;
 import java.security.PrivilegedAction;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.servicetunnel.http.internal.AbstractInternalHttpServiceTunnel;
-import org.eclipse.scout.rt.servicetunnel.http.internal.HttpBackgroundExecutable;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
@@ -44,8 +46,10 @@ import org.eclipse.scout.service.SERVICES;
  * @author awe
  */
 public class InternalClientHttpServiceTunnel extends AbstractInternalHttpServiceTunnel<IClientSession> implements IClientServiceTunnel {
-  private ClientNotificationPollingJob m_pollingJob;
-  private final Object m_pollingJobLock = new Object();
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationPollingJob.class);
+
+  private IFuture<Void> m_pollingJob;
   private long m_pollInterval = -1L;
   private boolean m_analyzeNetworkLatency = true;
 
@@ -74,8 +78,11 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
 
   @Override
   public void setClientNotificationPollInterval(long intervallMillis) {
+    long oldInterval = m_pollInterval;
     m_pollInterval = intervallMillis;
-    updatePollingJobInternal();
+    if (m_pollInterval != oldInterval) {
+      updatePollingJobInternal();
+    }
   }
 
   @Override
@@ -86,7 +93,6 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
   @Override
   public void setAnalyzeNetworkLatency(boolean b) {
     m_analyzeNetworkLatency = b;
-    updatePollingJobInternal();
   }
 
   @Override
@@ -99,19 +105,22 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
 
   @Override
   protected void onInvokeService(long t0, IServiceTunnelResponse response) {
-    // performance analyzer
-    IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
-    if (perf != null) {
-      long totalMillis = (System.nanoTime() - t0) / 1000000L;
-      Long execMillis = response.getProcessingDuration();
-      if (execMillis != null) {
-        perf.addNetworkLatencySample(totalMillis - execMillis);
-        perf.addServerExecutionTimeSample(execMillis);
-      }
-      else {
-        perf.addNetworkLatencySample(totalMillis);
+    if (isAnalyzeNetworkLatency()) {
+      // performance analyzer
+      IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
+      if (perf != null) {
+        long totalMillis = (System.nanoTime() - t0) / 1000000L;
+        Long execMillis = response.getProcessingDuration();
+        if (execMillis != null) {
+          perf.addNetworkLatencySample(totalMillis - execMillis);
+          perf.addServerExecutionTimeSample(execMillis);
+        }
+        else {
+          perf.addNetworkLatencySample(totalMillis);
+        }
       }
     }
+
     // client notification handler
     IClientNotificationConsumerService cns = SERVICES.getService(IClientNotificationConsumerService.class);
     if (cns != null) {
@@ -119,30 +128,31 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
     }
   }
 
-  private void updatePollingJobInternal() {
-    synchronized (m_pollingJobLock) {
-      long p = getClientNotificationPollInterval();
-      boolean b = isAnalyzeNetworkLatency();
-      if (p > 0) {
-        if (m_pollingJob == null) {
-          m_pollingJob = new ClientNotificationPollingJob(getSession(), p, b);
-          m_pollingJob.schedule();
-        }
-        else {
-          m_pollingJob.updatePollingValues(p, b);
-        }
+  private synchronized void updatePollingJobInternal() {
+    long p = getClientNotificationPollInterval();
+    if (p > 0) {
+      if (m_pollingJob != null) {
+        // cancel the old
+        m_pollingJob.cancel(true);
       }
-      else {
-        if (m_pollingJob != null) {
-          m_pollingJob.cancel();
-          m_pollingJob = null;
-        }
+      try {
+        ClientJobInput input = ClientJobInput.defaults().session(getSession()).name("Client notification fetcher");
+        m_pollingJob = OBJ.one(IClientJobManager.class).scheduleWithFixedDelay(new ClientNotificationPollingJob(), p, p, TimeUnit.MILLISECONDS, input);
+      }
+      catch (JobExecutionException e) {
+        LOG.error("Unable to schedule client notification polling job.", e);
+      }
+    }
+    else {
+      if (m_pollingJob != null) {
+        m_pollingJob.cancel(true);
+        m_pollingJob = null;
       }
     }
   }
 
   @Override
-  protected IServiceTunnelResponse tunnel(IServiceTunnelRequest call) {
+  protected IServiceTunnelResponse tunnel(IServiceTunnelRequest call) throws JobExecutionException {
     boolean offline = OfflineState.isOfflineInCurrentThread();
     //
     if (offline) {
@@ -153,8 +163,8 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
     }
   }
 
-  protected IServiceTunnelResponse tunnelOnline(final IServiceTunnelRequest req) {
-    if (ClientJob.isCurrentJobCanceled()) {
+  protected IServiceTunnelResponse tunnelOnline(final IServiceTunnelRequest req) throws JobExecutionException {
+    if (IProgressMonitor.CURRENT.get().isCancelled()) {
       return new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted")));
     }
     return super.tunnel(req);
@@ -164,43 +174,23 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
    * Default for offline handling
    */
   protected IServiceTunnelResponse tunnelOffline(final IServiceTunnelRequest call) {
-    final IProgressMonitor monitor;
-    Job job = Job.getJobManager().currentJob();
-    if (job instanceof ClientJob) {
-      monitor = ((ClientJob) job).getMonitor();
-    }
-    else {
-      monitor = new NullProgressMonitor();
-    }
-    IClientSession clientSession = ClientSyncJob.getCurrentSession();
+    IClientSession clientSession = ClientSessionProvider.currentSession();
     if (clientSession != null && clientSession.getOfflineSubject() != null) {
       Object response = Subject.doAs(clientSession.getOfflineSubject(), new PrivilegedAction<IServiceTunnelResponse>() {
         @Override
         public IServiceTunnelResponse run() {
-          return SERVICES.getService(IOfflineDispatcherService.class).dispatch(call, monitor);
+          return SERVICES.getService(IOfflineDispatcherService.class).dispatch(call);
         }
       });
       return (IServiceTunnelResponse) response;
     }
     else {
-      return SERVICES.getService(IOfflineDispatcherService.class).dispatch(call, monitor);
+      return SERVICES.getService(IOfflineDispatcherService.class).dispatch(call);
     }
   }
 
   @Override
-  protected void decorateBackgroundJob(IServiceTunnelRequest call, Job backgroundJob) {
-    backgroundJob.setUser(false);
-    backgroundJob.setSystem(true);
+  protected IFuture<?> schedule(IRunnable runnable, IServiceTunnelRequest req) throws JobExecutionException {
+    return OBJ.one(IClientJobManager.class).schedule(runnable, ClientJobInput.defaults().session(getSession()));
   }
-
-  @Override
-  protected JobEx createHttpBackgroundJob(String name, final HttpBackgroundExecutable executable) {
-    return new ClientAsyncJob(name, getSession(), true) {
-      @Override
-      protected IStatus runStatus(IProgressMonitor monitor) {
-        return executable.run(monitor);
-      }
-    };
-  }
-
 }

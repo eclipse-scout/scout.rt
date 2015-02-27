@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventObject;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -62,16 +63,19 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -87,6 +91,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
@@ -123,8 +128,8 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
   private JTableHeader m_swingTableHeader;
   private JScrollPane m_swingScrollPane;
   private HtmlViewCache m_htmlViewCache;
-  private ClientSyncJob m_storeColumnWidthsJob;
-  private Job m_swingAutoOptimizeColumnWidthsJob;
+  private IFuture<Void> m_storeColumnWidthsJob;
+  private IFuture<Void> m_swingAutoOptimizeColumnWidthsJob;
 
   // cache
   private List<IKeyStroke> m_installedScoutKs;
@@ -573,11 +578,13 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       }
     }
     if (m_storeColumnWidthsJob != null) {
-      m_storeColumnWidthsJob.cancel();
+      m_storeColumnWidthsJob.cancel(true);
     }
-    m_storeColumnWidthsJob = new ClientSyncJob("Store column widths", getSwingEnvironment().getScoutSession()) {
+
+    // TODO [dwi]: delayed model job
+    m_storeColumnWidthsJob = OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
       @Override
-      protected IStatus runStatus(IProgressMonitor monitor) {
+      public void run() throws Exception {
         if (getScoutObject() != null) {
           for (int i = 0; i < scoutCols.length; i++) {
             if (scoutCols[i] != null) {
@@ -585,10 +592,8 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             }
           }
         }
-        return Status.OK_STATUS;
       }
-    };
-    m_storeColumnWidthsJob.schedule(400);
+    }, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
   }
 
   /**
@@ -765,10 +770,13 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
   private void enqueueAutoOptimizeColumnWidths() {
     if (m_swingAutoOptimizeColumnWidthsJob != null) {
-      m_swingAutoOptimizeColumnWidthsJob.cancel();
+      m_swingAutoOptimizeColumnWidthsJob.cancel(true);
     }
-    m_swingAutoOptimizeColumnWidthsJob = new P_SwingAutoOptimizeColumnWidthsJob();
-    m_swingAutoOptimizeColumnWidthsJob.schedule(200);
+    try {
+      m_swingAutoOptimizeColumnWidthsJob = OBJ.one(IClientJobManager.class).schedule(new P_SwingAutoOptimizeColumnWidthsJob(), 200, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
+    }
+    catch (JobExecutionException e) {
+    }
   }
 
   protected void handleSwingEmptySpaceSelection(final MouseEvent e) {
@@ -998,9 +1006,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 20000).join(20000);
+        getSwingEnvironment().invokeScoutLater(t, 20000).get(20000, TimeUnit.MILLISECONDS);
       }
-      catch (InterruptedException e) {
+      catch (ProcessingException e) {
         //nop
       }
       // end notify
@@ -1028,9 +1036,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 20000).join(20000);
+        getSwingEnvironment().invokeScoutLater(t, 20000).get(20000, TimeUnit.MILLISECONDS);
       }
-      catch (InterruptedException e) {
+      catch (ProcessingException e) {
         //nop
       }
       // end notify
@@ -1738,7 +1746,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
   private class P_KeyboardNavigationSupport extends TableKeyboardNavigationSupport {
     public P_KeyboardNavigationSupport(JTableEx table) {
-      super(table);
+      super(table, getSwingEnvironment().getScoutSession());
     }
 
     @Override
@@ -1758,16 +1766,10 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     }
   }// end private class
 
-  private class P_SwingAutoOptimizeColumnWidthsJob extends Job {
-    /**
-     * @param name
-     */
-    public P_SwingAutoOptimizeColumnWidthsJob() {
-      super("Swing:AutoOptimizeColumnWidths");
-    }
+  private class P_SwingAutoOptimizeColumnWidthsJob implements IRunnable {
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
+    public void run() throws Exception {
       SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() {
@@ -1787,7 +1789,6 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           }
         }
       });
-      return Status.OK_STATUS;
     }
   }
 }

@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.job;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -36,6 +35,7 @@ import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -117,10 +117,17 @@ public class ModelJobManagerTest {
 
   @Test
   public void testShutdown() throws Exception {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    for (int i = 0; i < 50; i++) {
+      System.out.println(i);
+      m_jobManager = new ModelJobManager();
+      testShutdown1();
+    }
+  }
+
+  public void testShutdown1() throws Exception {
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
-    final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(3);
 
     IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
 
@@ -131,10 +138,11 @@ public class ModelJobManagerTest {
           setupLatch.countDownAndBlock();
         }
         catch (InterruptedException e) {
+          System.out.println("ModelJobManagerTest.testShutdown().new IRunnable() {...}.run()  -- catch");
           protocol.add("interrupted-1");
         }
         finally {
-          verifyLatch.countDown();
+          System.out.println("ModelJobManagerTest.testShutdown().new IRunnable() {...}.run() -- finally");
         }
       }
     });
@@ -162,49 +170,38 @@ public class ModelJobManagerTest {
 
     // VERIFY
     assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    System.out.println("ModelJobManagerTest.testShutdown1()  -- waitUntilDone");
 
-    assertEquals(CollectionUtility.hashSet("running-1", "interrupted-1"), protocol);
+    assertEquals(CollectionUtility.arrayList("running-1", "interrupted-1"), protocol);
 
     // verify future 1
     assertTrue(future1.isCancelled());
     assertTrue(future1.isDone());
     try {
-      future1.get();
-      fail();
+      Assert.assertNull(future1.get());
     }
     catch (JobExecutionException e) {
-      assertTrue(e.isCancellation());
-      assertFalse(e.isRejection());
-      assertFalse(e.isInterruption());
-      assertFalse(e.isTimeout());
+      fail();
     }
 
     // verify future 2
     assertTrue(future2.isCancelled());
     assertTrue(future2.isDone());
     try {
-      future2.get();
-      fail();
+      Assert.assertNull(future2.get());
     }
     catch (JobExecutionException e) {
-      assertTrue(e.isCancellation());
-      assertFalse(e.isRejection());
-      assertFalse(e.isInterruption());
-      assertFalse(e.isTimeout());
+      fail();
     }
 
     // verify future 3
     assertTrue(future3.isCancelled());
     assertTrue(future3.isDone());
     try {
-      future3.get();
-      fail();
+      Assert.assertNull(future3.get());
     }
     catch (JobExecutionException e) {
-      assertTrue(e.isCancellation());
-      assertFalse(e.isRejection());
-      assertFalse(e.isInterruption());
-      assertFalse(e.isTimeout());
+      fail();
     }
   }
 

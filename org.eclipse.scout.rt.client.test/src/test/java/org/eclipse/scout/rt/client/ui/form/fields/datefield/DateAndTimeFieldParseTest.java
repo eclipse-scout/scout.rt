@@ -17,9 +17,9 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.DateUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
@@ -30,8 +30,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.datefield.DateAndTimeFieldPars
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.DateAndTimeFieldParseTest.TestForm.MainBox.TestsGroupBox.TimeOnlyField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.DateAndTimeFieldParseTest.TestForm.MainBox.TestsGroupBox.TimeOnlyWithFormatField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.testing.client.form.FormHandler;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.testing.client.form.FormHandler;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -203,14 +203,14 @@ public class DateAndTimeFieldParseTest {
 
   @Before
   public void setUp() throws Throwable {
-    m_oldLocale = LocaleThreadLocal.get(false);
+    m_oldLocale = NlsLocale.get(false);
     m_form = new TestForm();
     m_form.startForm();
   }
 
   @After
   public void tearDown() throws Throwable {
-    LocaleThreadLocal.set(m_oldLocale);
+    NlsLocale.set(m_oldLocale);
     m_form.doClose();
   }
 
@@ -218,7 +218,7 @@ public class DateAndTimeFieldParseTest {
   public void testDateOnly() throws Throwable {
     IDateField testField = m_form.getDateOnlyField();
     for (Locale locale : new Locale[]{new Locale("de", "CH"), new Locale("de", "DE")}) {
-      LocaleThreadLocal.set(locale);
+      NlsLocale.set(locale);
       expectError(testField, "gugus");
       expectError(testField, "2210");
       expectError(testField, "22.10.");
@@ -229,7 +229,7 @@ public class DateAndTimeFieldParseTest {
       expectSuccess(testField, "221017", "22.10.2017");
       expectSuccess(testField, "22,10,2017", "22.10.2017");
     }
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     expectError(testField, "gugus");
     expectError(testField, "2210");
     expectError(testField, "22.10.");
@@ -244,7 +244,7 @@ public class DateAndTimeFieldParseTest {
   public void testDateOnlyWithFormat() throws Throwable {
     IDateField testField = m_form.getDateOnlyWithFormatField();
     for (Locale locale : new Locale[]{new Locale("de", "CH"), new Locale("de", "DE")}) {
-      LocaleThreadLocal.set(locale);
+      NlsLocale.set(locale);
       expectError(testField, "gugus");
       expectError(testField, "2210");
       expectError(testField, "22.10.");
@@ -256,7 +256,7 @@ public class DateAndTimeFieldParseTest {
       expectSuccess(testField, "22,10,2017", "2017-10-22");
       expectSuccess(testField, "2017-10-22", "2017-10-22");
     }
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     expectError(testField, "gugus");
     expectError(testField, "2210");
     expectError(testField, "22.10.");
@@ -271,7 +271,7 @@ public class DateAndTimeFieldParseTest {
   public void testDateWithTime() throws Throwable {
     IDateField testField = m_form.getDateWithTimeField();
     for (Locale locale : new Locale[]{new Locale("de", "CH"), new Locale("de", "DE")}) {
-      LocaleThreadLocal.set(locale);
+      NlsLocale.set(locale);
       expectError(testField, "gugus");
       expectError(testField, "2210");
       expectError(testField, "22.10.");
@@ -287,7 +287,7 @@ public class DateAndTimeFieldParseTest {
       expectError(testField, "22102017 1314");
       expectSuccess(testField, "22,10,2017 13:14", "22.10.17 13:14");
     }
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     expectError(testField, "gugus");
     expectError(testField, "2210");
     expectError(testField, "22.10.");
@@ -303,7 +303,7 @@ public class DateAndTimeFieldParseTest {
   public void testDateWithTimeWithFormat() throws Throwable {
     IDateField testField = m_form.getDateWithTimeWithFormatField();
     for (Locale locale : new Locale[]{new Locale("de", "CH"), new Locale("de", "DE")}) {
-      LocaleThreadLocal.set(locale);
+      NlsLocale.set(locale);
       expectError(testField, "gugus");
       expectError(testField, "2210");
       expectError(testField, "22.10.");
@@ -315,7 +315,7 @@ public class DateAndTimeFieldParseTest {
       expectSuccess(testField, "22,10,2017", "2017-10-22@12.34.56");
       expectSuccess(testField, "2017-10-22@00.00.00", "2017-10-22@00.00.00");
     }
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     expectError(testField, "gugus");
     expectError(testField, "2210");
     expectError(testField, "22.10.");
@@ -330,7 +330,7 @@ public class DateAndTimeFieldParseTest {
   public void testTimeOnly() throws Throwable {
     IDateField testField = m_form.getTimeOnlyField();
     for (Locale locale : new Locale[]{new Locale("de", "CH"), new Locale("de", "DE")}) {
-      LocaleThreadLocal.set(locale);
+      NlsLocale.set(locale);
       expectError(testField, "gugus");
       expectSuccess(testField, "0930", "09:30");
       expectSuccess(testField, "11", "11:00");
@@ -342,7 +342,7 @@ public class DateAndTimeFieldParseTest {
       expectSuccess(testField, "2000", "20:00");
       expectSuccess(testField, "201", "02:01");
     }
-    LocaleThreadLocal.set(new Locale("en", "US"));
+    NlsLocale.set(new Locale("en", "US"));
     expectError(testField, "gugus");
     expectSuccess(testField, "0930", "9:30 AM");
     expectSuccess(testField, "11", "11:00 AM");
@@ -358,7 +358,7 @@ public class DateAndTimeFieldParseTest {
   public void testTimeOnlyWithFormat() throws Throwable {
     IDateField testField = m_form.getTimeOnlyWithFormatField();
     for (Locale locale : new Locale[]{new Locale("de", "CH"), new Locale("de", "DE"), new Locale("en", "US")}) {
-      LocaleThreadLocal.set(locale);
+      NlsLocale.set(locale);
       expectError(testField, "gugus");
       expectSuccess(testField, "59", "00.59.00");
       expectSuccess(testField, "0930", "09.30.00");
@@ -376,7 +376,7 @@ public class DateAndTimeFieldParseTest {
   public void testTimeAutoDate1() throws Exception {
     IDateField testField = m_form.getDateWithTimeField();
     testField.setValue(null);
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     testField.getUIFacade().setTimeFromUI(DateUtility.parse("02072012 0620", "ddMMyyyy hhmm"));
     String today = DateUtility.format(new Date(), "ddMMyyyy");
     Assert.assertEquals("Auto Date", today + " 0620", DateUtility.format(testField.getValue(), "ddMMyyyy hhmm"));
@@ -387,7 +387,7 @@ public class DateAndTimeFieldParseTest {
     IDateField testField = m_form.getDateWithTimeField();
     testField.setValue(null);
     testField.setAutoDate(DateUtility.parse("01012013", "ddMMyyyy"));
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     testField.getUIFacade().setTimeFromUI(DateUtility.parse("02072012 0620", "ddMMyyyy hhmm"));
     Assert.assertEquals("Auto Date", DateUtility.parse("01012013 0620", "ddMMyyyy hhmm"), testField.getValue());
   }
@@ -396,7 +396,7 @@ public class DateAndTimeFieldParseTest {
   public void testTimeAutoDate3() throws Exception {
     IDateField testField = m_form.getDateWithTimeField();
     testField.setValue(null);
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     testField.getUIFacade().setTimeTextFromUI("06:20");
     String today = DateUtility.format(new Date(), "ddMMyyyy");
     Assert.assertEquals("Auto Date", today + " 0620", DateUtility.format(testField.getValue(), "ddMMyyyy hhmm"));
@@ -407,7 +407,7 @@ public class DateAndTimeFieldParseTest {
     IDateField testField = m_form.getDateWithTimeField();
     testField.setValue(null);
     testField.setAutoDate(DateUtility.parse("01012013", "ddMMyyyy"));
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    NlsLocale.set(new Locale("de", "CH"));
     testField.getUIFacade().setTimeTextFromUI("06:20");
     Assert.assertEquals("Auto Date", DateUtility.parse("01012013 0620", "ddMMyyyy hhmm"), testField.getValue());
   }

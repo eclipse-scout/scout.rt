@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.offline;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
@@ -29,5 +28,5 @@ import org.eclipse.scout.service.IService;
 @InputValidation(IValidationStrategy.PROCESS.class)
 public interface IOfflineDispatcherService extends IService {
 
-  IServiceTunnelResponse dispatch(final IServiceTunnelRequest request, final IProgressMonitor monitor);
+  IServiceTunnelResponse dispatch(final IServiceTunnelRequest request);
 }

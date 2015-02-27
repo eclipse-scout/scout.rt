@@ -397,9 +397,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @return the effective live editable state ( {@link IColumn#isCellEditable(ITableRow)} and
    *         {@link IColumn#isVisible()} )
    *         <p>
-   *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside a
-   *         {@link org.eclipse.scout.rt.client.ClientSyncJob ClientSyncJob} resp. a job using the
-   *         {@link org.eclipse.scout.rt.client.ClientRule ClientRule}.
+   *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside the
+   *         scout model thread.
    */
   boolean isCellEditable(int rowIndex, int columnIndex);
 
@@ -407,9 +406,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @return the effective live editable state ( {@link IColumn#isCellEditable(ITableRow)} and
    *         {@link IColumn#isVisible()} )
    *         <p>
-   *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside a
-   *         {@link org.eclipse.scout.rt.client.ClientSyncJob ClientSyncJob} resp. a job using the
-   *         {@link org.eclipse.scout.rt.client.ClientRule ClientRule}.
+   *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside the
+   *         scout model thread.
    */
   boolean isCellEditable(ITableRow row, int visibleColumnIndex);
 
@@ -417,9 +415,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @return the effective live editable state ( {@link IColumn#isCellEditable(ITableRow)} and
    *         {@link IColumn#isVisible()} )
    *         <p>
-   *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside a
-   *         {@link org.eclipse.scout.rt.client.ClientSyncJob ClientSyncJob} resp. a job using the
-   *         {@link org.eclipse.scout.rt.client.ClientRule ClientRule}.
+   *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside the
+   *         scout model thread.
    */
   boolean isCellEditable(ITableRow row, IColumn<?> column);
 

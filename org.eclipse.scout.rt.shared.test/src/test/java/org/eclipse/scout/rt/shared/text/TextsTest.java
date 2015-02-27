@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.shared.TextsThreadLocal;
 import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -44,13 +43,13 @@ public class TextsTest {
   public void before() throws InterruptedException {
 
     m_testTextService = TestingUtility.registerServices(5, BeanInstanceUtil.create(TestTextProviderService.class));
-    TextsThreadLocal.set(new ScoutTexts(SERVICES.getServices(ITextProviderService.class)));
+    ScoutTexts.CURRENT.set(new ScoutTexts(SERVICES.getServices(ITextProviderService.class)));
   }
 
   @After
   public void after() {
     TestingUtility.unregisterServices(m_testTextService);
-    TextsThreadLocal.set(null);
+    ScoutTexts.CURRENT.set(null);
   }
 
   @Test

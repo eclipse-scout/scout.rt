@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.client.mobile.navigation;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -30,7 +30,7 @@ public class OutlineChooserBreadCrumb extends BreadCrumb {
     super.activate();
 
     //Clear any outline selection to make sure drill down works as expected again and again
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     for (IOutline outline : desktop.getAvailableOutlines()) {
       outline.selectNode(null);
     }

@@ -18,7 +18,6 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -140,7 +139,7 @@ public final class NlsUtility {
 
   public static Locale parseLocale(String pattern) {
     if (pattern == null) {
-      return LocaleThreadLocal.get();
+      return NlsLocale.get();
     }
     String[] a = pattern.split("_");
     switch (a.length) {
@@ -151,19 +150,19 @@ public final class NlsUtility {
       case 3:
         return new Locale(a[0], a[1], a[2]);
       default:
-        return LocaleThreadLocal.get();
+        return NlsLocale.get();
     }
   }
 
   /**
    * Only use this {@link Locale} resolver if the calling code is executed in both, server- and client side.
-   * On client side, use {@link Locale#getDefault()} whereas on server side use {@link LocaleThreadLocal#get()}.
+   * On client side, use {@link Locale#getDefault()} whereas on server side use {@link NlsLocale#get()}.
    * 
-   * @return the locale hold by the current thread in {@link LocaleThreadLocal} or if not set by the instance of the
+   * @return the locale hold by the current thread in {@link NlsLocale} or if not set by the instance of the
    *         Java Virtual Machine.
    */
   public static Locale getDefaultLocale() {
-    Locale locale = LocaleThreadLocal.get();
+    Locale locale = NlsLocale.get();
     if (locale == null) {
       locale = Locale.getDefault();
     }

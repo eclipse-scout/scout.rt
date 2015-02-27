@@ -31,8 +31,6 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.BlockingCondition;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.wizard.IWizardExtension;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardActiveStepChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAnyFieldChangedChain;
@@ -46,11 +44,15 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardRefres
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardResetChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardStartChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardSuspendChain;
+import org.eclipse.scout.rt.client.job.IBlockingCondition;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -80,7 +82,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   private boolean m_modal;
   private String m_displayViewId;
   private int m_displayHint;
-  private final BlockingCondition m_blockingCondition;
+  private final IBlockingCondition m_blockingCondition;
 
   private IWizardContainerForm m_containerForm;
   private PropertyChangeListener m_anyFieldChangeListener;
@@ -95,7 +97,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     m_accumulatedEvents = new ArrayList<WizardEvent>(3);
     m_availableStepList = new ArrayList<IWizardStep<? extends IForm>>(0);
     m_stepList = new ArrayList<IWizardStep<? extends IForm>>(0);
-    m_blockingCondition = new BlockingCondition(false);
+    m_blockingCondition = OBJ.one(IModelJobManager.class).createBlockingCondition("WizardBlock", false);
     m_objectExtensions = new ObjectExtensions<AbstractWizard, IWizardExtension<? extends AbstractWizard>>(this);
     if (callInitializer) {
       callInitializer();
@@ -618,7 +620,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   public IDesktop getDesktop() {
-    return ClientSyncJob.getCurrentSession().getDesktop();
+    return ClientSessionProvider.currentSession().getDesktop();
   }
 
   @Override
@@ -1042,21 +1044,21 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       propertySupport.setPropertyBool(PROP_CLOSED, true);
       fireClosed();
       // unlock
-      m_blockingCondition.release();
+      m_blockingCondition.setBlocking(false);
     }
   }
 
   @Override
   public void waitFor() throws ProcessingException {
     // check if the desktop is observing this process
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop == null || !desktop.isOpened()) {
       throw new ProcessingException("Cannot wait for " + getClass().getName() + ". There is no desktop or the desktop has not yet been opened in the ui", null, WAIT_FOR_ERROR_CODE);
     }
     try {
       m_blockingCondition.waitFor();
     }
-    catch (InterruptedException e) {
+    catch (ProcessingException e) {
       throw new ProcessingException(ScoutTexts.get("UserInterrupted"), e);
     }
   }

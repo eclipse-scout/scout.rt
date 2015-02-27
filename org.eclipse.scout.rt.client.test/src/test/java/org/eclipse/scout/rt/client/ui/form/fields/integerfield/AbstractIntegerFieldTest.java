@@ -19,9 +19,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
+import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Before;
@@ -37,8 +40,18 @@ public class AbstractIntegerFieldTest extends AbstractIntegerField {
   private NumberFormat m_formatter;
 
   @Before
-  public void setUp() {
-    m_formatter = DecimalFormat.getInstance();
+  public void setup() {
+    m_formatter = DecimalFormat.getInstance(Locale.TRADITIONAL_CHINESE);
+  }
+
+  @Override
+  protected void initFormat() {
+    DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(Locale.TRADITIONAL_CHINESE);
+    format.setParseBigDecimal(true);
+    format.setMinimumFractionDigits(0);
+    format.setMaximumFractionDigits(0);
+    format.setMaximumIntegerDigits(getConfiguredMaxIntegerDigits());
+    propertySupport.setProperty(INumberValueContainer.PROP_DECIMAL_FORMAT, format);
   }
 
   @Test
@@ -104,6 +117,7 @@ public class AbstractIntegerFieldTest extends AbstractIntegerField {
   @Test
   public void testParseValueInternalDecimal() throws ProcessingException {
     // expecting RoundingMode.UNNECESSARY as default
+    NlsLocale.set(Locale.TRADITIONAL_CHINESE);
     boolean exceptionOccured = false;
     try {
       parseValueInternal(formatWithFractionDigits(12.1, 1));

@@ -126,7 +126,8 @@ public class Futures {
           throw ExceptionTranslator.translate(e.getCause());
         }
         catch (final CancellationException e) {
-          throw ExceptionTranslator.translateCancellationException(e, input.getIdentifier());
+          // NOOP:
+          return null;
         }
         catch (final InterruptedException e) {
           throw ExceptionTranslator.translateInterruptedException(e, input.getIdentifier());
@@ -145,7 +146,8 @@ public class Futures {
           throw ExceptionTranslator.translate(e.getCause());
         }
         catch (final CancellationException e) {
-          throw ExceptionTranslator.translateCancellationException(e, input.getIdentifier());
+          // NOOP:
+          return null;
         }
         catch (final InterruptedException e) {
           throw ExceptionTranslator.translateInterruptedException(e, input.getIdentifier());

@@ -10,19 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.DefaultTableRowFormProvider;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.ITableRowForm;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.ITableRowFormProvider;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableUIFacade;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 
 /**
  * @since 3.9.0
@@ -257,15 +260,13 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
   }
 
   protected void clearSelectionDelayed() {
-    ClientSyncJob job = new ClientSyncJob("Clearing selection", ClientJob.getCurrentSession()) {
-
+    IClientSession clientSession = ClientSessionProvider.currentSession();
+    OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+      public void run() throws Exception {
         clearSelection();
       }
-
-    };
-    job.schedule();
+    }, ClientJobInput.defaults().session(clientSession).name("Clearing selection"));
   }
 
   protected void clearSelection() {

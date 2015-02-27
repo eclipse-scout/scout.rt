@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -35,8 +36,9 @@ import javax.swing.text.html.HTMLEditorKit;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
@@ -329,11 +331,11 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
         result.setValue(b);
       }
     };
-    JobEx job = getSwingEnvironment().invokeScoutLater(t, 0);
+    IFuture<Void> job = getSwingEnvironment().invokeScoutLater(t, 0);
     try {
-      job.join(2345);
+      job.get(2345, TimeUnit.MILLISECONDS);
     }
-    catch (InterruptedException e) {
+    catch (ProcessingException e) {
       //nop
     }
     // end notify

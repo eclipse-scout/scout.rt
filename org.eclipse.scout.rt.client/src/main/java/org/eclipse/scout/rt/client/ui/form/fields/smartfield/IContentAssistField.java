@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -226,7 +226,7 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    * @return the created async job if applicable or null, see
    *         {@link LookupCall#getDataByTextInBackground(ILookupCallFetcher)}
    */
-  JobEx callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher);
+  IFuture<?> callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher);
 
   List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount) throws ProcessingException;
 
@@ -241,7 +241,7 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    * @return the created async job if applicable or null, see
    *         {@link LookupCall#getDataByAllInBackground(ILookupCallFetcher)}
    */
-  JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher);
+  IFuture<?> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher);
 
   /**
    * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
@@ -252,7 +252,7 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    * @return the created async job if applicable or null, see
    *         {@link LookupCall#getDataByAllInBackground(ILookupCallFetcher)}
    */
-  JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher<LOOKUP_KEY> fetcher);
+  IFuture<?> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher<LOOKUP_KEY> fetcher);
 
   List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey) throws ProcessingException;
 

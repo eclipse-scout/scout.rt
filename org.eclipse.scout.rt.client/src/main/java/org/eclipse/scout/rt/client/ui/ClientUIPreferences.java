@@ -20,8 +20,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.eclipse.scout.rt.client.ClientSessionThreadLocal;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -47,7 +47,7 @@ public class ClientUIPreferences {
    *           ({@link ClientSessionThreadLocal}).
    */
   public static ClientUIPreferences getInstance() {
-    return new ClientUIPreferences(ClientSessionThreadLocal.get());
+    return new ClientUIPreferences(ClientSessionProvider.currentSession());
   }
 
   /**
@@ -160,8 +160,8 @@ public class ClientUIPreferences {
 
   private String getUserAgentPrefix() {
     UserAgent currentUserAgent = null;
-    if (m_session != null) {
-      currentUserAgent = m_session.getUserAgent();
+    if (getSession() != null) {
+      currentUserAgent = getSession().getUserAgent();
     }
     else {
       currentUserAgent = UserAgentUtility.getCurrentUserAgent();
@@ -821,7 +821,7 @@ public class ClientUIPreferences {
   }
 
   protected void load() {
-    m_env = getClientPreferences(m_session);
+    m_env = getClientPreferences(getSession());
   }
 
   protected void flush() {
@@ -835,5 +835,9 @@ public class ClientUIPreferences {
     catch (ProcessingException t) {
       LOG.error("Unable to flush preferences.", t);
     }
+  }
+
+  public IClientSession getSession() {
+    return m_session;
   }
 }

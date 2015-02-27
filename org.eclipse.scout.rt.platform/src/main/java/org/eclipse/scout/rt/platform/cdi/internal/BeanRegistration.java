@@ -42,6 +42,7 @@ public class BeanRegistration<T> implements IBeanRegistration<T> {
       return null;
     }
     if (BeanContext.isApplicationScoped(m_bean)) {
+      //TODO: loop detection? when an OBJ.one() is used inside a constructor
       m_instanceLock.acquireUninterruptibly();
       try {
         if (m_instance == null) {

@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -43,7 +43,7 @@ public class MessageBoxTest {
 
   @Before
   public void setUp() {
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     m_desktopSpy = Mockito.spy(desktop);
     TestEnvironmentClientSession.get().replaceDesktop(m_desktopSpy);
   }

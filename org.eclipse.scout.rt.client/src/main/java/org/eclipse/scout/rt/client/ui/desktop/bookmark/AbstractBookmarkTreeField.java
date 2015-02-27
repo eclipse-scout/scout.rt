@@ -30,8 +30,8 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
@@ -345,7 +345,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     protected void execNodeAction(ITreeNode node) throws ProcessingException {
       if (isBookmarkNode(node)) {
         Bookmark bm = (Bookmark) node.getCell().getValue();
-        ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(bm);
+        ClientSessionProvider.currentSession().getDesktop().activateBookmark(bm);
       }
     }
 
@@ -721,7 +721,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           m_openBookmarkCommand.openBookmark(bm);
         }
         else {
-          ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(bm);
+          ClientSessionProvider.currentSession().getDesktop().activateBookmark(bm);
         }
       }
     }
@@ -931,7 +931,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       protected void execAction() throws ProcessingException {
         ITreeNode node = BookmarkNode.this;
         Bookmark bm = (Bookmark) node.getCell().getValue();
-        IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+        IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
         Boolean success = null;
         if (desktop != null) {
           IForm searchForm = desktop.getPageSearchForm();

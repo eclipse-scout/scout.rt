@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.ext.busy;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.busy.BusyJob;
 import org.eclipse.scout.rt.client.busy.IBusyHandler;
 
@@ -25,32 +25,36 @@ import org.eclipse.scout.rt.client.busy.IBusyHandler;
  * <p>
  * To enable/disable the manager just call {@link SwingBusyJob#install()}.
  * <p>
- * The handler is by default active on {@link Activator}.
  *
  * @author imo
  * @since 3.8
  */
 public class SwingBusyJob extends BusyJob {
 
-  public SwingBusyJob(String name, IBusyHandler handler) {
-    super(name, handler);
-    setSystem(true);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingBusyJob.class);
+
+  public SwingBusyJob(IBusyHandler handler) {
+    super(handler);
   }
 
   @Override
-  protected IStatus run(final IProgressMonitor monitor) {
+  public void run() throws Exception {
     SwingBusyIndicator.getInstance().showWhile(new Runnable() {
       @Override
       public void run() {
-        SwingBusyJob.super.run(monitor);
+        try {
+          SwingBusyJob.super.run();
+        }
+        catch (Exception e) {
+          LOG.error("", e);
+        }
       }
     });
-    return Status.OK_STATUS;
   }
 
   @Override
-  protected void runBlocking(IProgressMonitor monitor) {
-    SwingBusyIndicator.getInstance().startBlocking(monitor);
-    super.runBlocking(monitor);
+  protected void runBlocking() {
+    SwingBusyIndicator.getInstance().startBlocking(IProgressMonitor.CURRENT.get());
+    super.runBlocking();
   }
 }

@@ -17,6 +17,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -30,8 +31,9 @@ import javax.swing.text.JTextComponent;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
@@ -229,11 +231,11 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
         result.setValue(b);
       }
     };
-    JobEx job = getSwingEnvironment().invokeScoutLater(t, 0);
+    IFuture<Void> job = getSwingEnvironment().invokeScoutLater(t, 0);
     try {
-      job.join(2345);
+      job.get(2345, TimeUnit.MILLISECONDS);
     }
-    catch (InterruptedException e) {
+    catch (ProcessingException e) {
       //nop
     }
     // end notify

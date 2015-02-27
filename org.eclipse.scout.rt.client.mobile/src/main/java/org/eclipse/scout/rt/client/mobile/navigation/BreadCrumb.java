@@ -14,8 +14,8 @@ import java.util.List;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
@@ -37,7 +37,7 @@ public class BreadCrumb implements IBreadCrumb {
 
     //Add form to desktop if it is open but has been removed
     if (getForm() != null) {
-      IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
+      IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
       if (getForm().isFormOpen() && !desktop.isShowing(getForm())) {
         if (MobileDesktopUtility.isToolForm(getForm())) {
           MobileDesktopUtility.openToolForm(getForm());
@@ -50,7 +50,7 @@ public class BreadCrumb implements IBreadCrumb {
   }
 
   private void autoCloseNavigationForms() throws ProcessingException {
-    IDesktop desktop = ClientJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
 
     List<IForm> currentNavigationForms = getBreadCrumbsNavigation().getCurrentNavigationForms();
     for (IForm form : currentNavigationForms) {

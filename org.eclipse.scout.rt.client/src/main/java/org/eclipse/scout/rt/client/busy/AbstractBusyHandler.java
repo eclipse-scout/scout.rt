@@ -13,26 +13,28 @@ package org.eclipse.scout.rt.client.busy;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IJobManager;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTreeForm;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 
 /**
  * <p>
- * Shows blocking progress when {@link ClientSyncJob} or {@link ClientJob} with {@link ClientJob#isSync()} are doing a
- * long operation.
+ * Shows blocking progress when {@link ModelJobManager} is doing a long operation.
  * </p>
  * <p>
  * The decision whether or not the progress should be visible is made in the acceptor
- * {@link AbstractBusyHandler#acceptJob(Job)}
+ * {@link AbstractBusyHandler#acceptFuture(IFuture, IJobManager)}
  * </p>
  * <p>
  * The strategy to display busy and blocking progress can be changed by overriding {@link #runBusy(Object)} and
@@ -51,7 +53,7 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
   private static final QualifiedName BUSY_OPERATION_PROPERTY = new QualifiedName(AbstractBusyHandler.class.getName(), "busy");
 
   private final Object m_stateLock = new Object();
-  private final Set<Job> m_list = Collections.synchronizedSet(new HashSet<Job>());
+  private final Set<IFuture<?>> m_list = Collections.synchronizedSet(new HashSet<IFuture<?>>());
   private long m_shortOperationMillis = 200L;
   private long m_longOperationMillis = 3000L;
   private boolean m_enabled = true;
@@ -63,27 +65,25 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
   }
 
   @Override
-  public boolean acceptJob(final Job job) {
-    if (job == null) {
-      return false;
-    }
-    if (job instanceof ClientJob && ((ClientJob) job).isSync()) {
+  public boolean acceptFuture(IFuture<?> future, IJobManager<?> mgr) {
+    if (OBJ.one(IModelJobManager.class) == mgr) {
+      // only model jobs
       return true;
     }
     return false;
   }
 
   @Override
-  public void onJobBegin(Job job) {
-    addTimer(job);
+  public void onJobBegin(IFuture<?> future) {
+    addTimer(future);
   }
 
   @Override
-  public void onJobEnd(Job job) {
-    removeTimer(job);
+  public void onJobEnd(IFuture<?> future) {
+    removeTimer(future);
     //avoid unnecessary locks
-    if (isBusyOperationNoLock(job)) {
-      removeBusyOperation(job);
+    if (isBusyOperationNoLock(future)) {
+      removeBusyOperation(future);
     }
   }
 
@@ -139,9 +139,9 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
   @Override
   public void cancel() {
     synchronized (getStateLock()) {
-      for (Job job : m_list) {
+      for (IFuture<?> job : m_list) {
         try {
-          job.cancel();
+          job.cancel(true);
         }
         catch (Throwable t) {
           //nop
@@ -157,25 +157,19 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
    * The default checks if the job is in a smart tree operation and ignores busy, see
    * {@link ContentAssistTreeForm#JOB_PROPERTY_LOAD_TREE}.
    */
-  protected boolean shouldRunBusy(Job job) {
-    Boolean b = (Boolean) job.getProperty(ContentAssistTreeForm.JOB_PROPERTY_LOAD_TREE);
-    if (b != null && b.booleanValue()) {
-      return false;
-    }
+  protected boolean shouldRunBusy(IFuture<?> future) {
     return true;
   }
 
   /**
    * This method is called directly from the job listener after {@link #getShortOperationMillis()}.
    * <p>
-   * You may call {@link #runDefaultBusy(Object, IProgressMonitor)} to use default handling.
-   * <p>
    * {@link #getStateLock()} can be used synchronized to check {@link #isBusy()}
    * <p>
    * Be careful what to do, since this might be expensive. The default starts a {@link BusyJob} or a subclass of the
    * {@link BusyJob}
    */
-  protected abstract void runBusy(Job job);
+  protected abstract void runBusy(IFuture<?> future);
 
   /**
    * @retrun true if blocking is active
@@ -213,86 +207,89 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
     m_enabled = enabled;
   }
 
-  private void addTimer(Job job) {
-    P_TimerJob t = new P_TimerJob(job);
-    job.setProperty(TIMER_PROPERTY, t);
-    t.schedule(getShortOperationMillis());
-  }
-
-  private void removeTimer(Job job) {
-    P_TimerJob t = (P_TimerJob) job.getProperty(TIMER_PROPERTY);
-    if (t != null) {
-      t.cancel();
-      job.setProperty(TIMER_PROPERTY, null);
+  private void addTimer(IFuture<?> future) {
+    try {
+      P_TimerJob runnable = new P_TimerJob(future);
+      future.getJobInput().getContext().set(TIMER_PROPERTY, runnable);
+      OBJ.one(IClientJobManager.class).schedule(runnable, getShortOperationMillis(), TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
+    }
+    catch (JobExecutionException e) {
+      LOG.warn("Unable to schedule busy timer.", e);
     }
   }
 
-  private P_TimerJob getTimer(Job job) {
-    return (P_TimerJob) job.getProperty(TIMER_PROPERTY);
+  private void removeTimer(IFuture<?> future) {
+    P_TimerJob t = (P_TimerJob) future.getJobInput().getContext().get(TIMER_PROPERTY);
+    if (t != null) {
+      future.getJobInput().getContext().set(TIMER_PROPERTY, null);
+    }
   }
 
-  private void addBusyOperation(Job job) {
+  private P_TimerJob getTimer(IFuture<?> future) {
+    return (P_TimerJob) future.getJobInput().getContext().get(TIMER_PROPERTY);
+  }
+
+  private void addBusyOperation(IFuture<?> future) {
     int oldSize, newSize;
     synchronized (getStateLock()) {
-      job.setProperty(BUSY_OPERATION_PROPERTY, "true");
+      future.getJobInput().getContext().set(BUSY_OPERATION_PROPERTY, "true");
       oldSize = m_list.size();
-      m_list.add(job);
+      m_list.add(future);
       newSize = m_list.size();
       getStateLock().notifyAll();
     }
     if (oldSize == 0 && newSize == 1) {
-      runBusy(job);
+      runBusy(future);
     }
   }
 
-  private void removeBusyOperation(Job job) {
+  private void removeBusyOperation(IFuture<?> future) {
     synchronized (getStateLock()) {
-      job.setProperty(BUSY_OPERATION_PROPERTY, null);
-      m_list.remove(job);
+      future.getJobInput().getContext().set(BUSY_OPERATION_PROPERTY, null);
+      m_list.remove(future);
       getStateLock().notifyAll();
     }
   }
 
-  private boolean isBusyOperationNoLock(Job job) {
-    return "true".equals(job.getProperty(BUSY_OPERATION_PROPERTY));
+  private boolean isBusyOperationNoLock(IFuture<?> future) {
+    return "true".equals(future.getJobInput().getContext().get(BUSY_OPERATION_PROPERTY));
   }
 
-  private static boolean isJobActive(final Job job) {
-    if (job.getState() != Job.RUNNING) {
+  private static boolean isJobActive(IFuture<?> future) {
+    if (future.isCancelled() || future.isDone()) {
       return false;
     }
-    if (job instanceof ClientJob && ((ClientJob) job).isWaitFor()) {
+    boolean isBlocked = OBJ.one(IModelJobManager.class).isBlocked(future);
+    if (isBlocked) {
       return false;
     }
     return true;
   }
 
-  private class P_TimerJob extends Job {
-    private final Job m_job;
+  private class P_TimerJob implements IRunnable {
+    private final IFuture<?> m_future;
 
-    public P_TimerJob(Job job) {
-      super("TimerJob");
-      setSystem(true);
-      m_job = job;
+    public P_TimerJob(IFuture<?> future) {
+      m_future = future;
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      if (P_TimerJob.this != getTimer(m_job)) {
-        return Status.OK_STATUS;
+    public void run() throws Exception {
+      if (P_TimerJob.this != getTimer(m_future)) {
+        return;
       }
-      removeTimer(m_job);
-      if (isJobActive(m_job)) {
-        if (!isEnabled() || !shouldRunBusy(m_job)) {
-          return Status.OK_STATUS;
+      removeTimer(m_future);
+      if (isJobActive(m_future)) {
+        if (!isEnabled() || !shouldRunBusy(m_future)) {
+          return;
         }
-        addBusyOperation(m_job);
+        addBusyOperation(m_future);
       }
       //double check after queuing (avoid unnecessary locks)
-      if (!isJobActive(m_job)) {
-        removeBusyOperation(m_job);
+      if (!isJobActive(m_future)) {
+        removeBusyOperation(m_future);
       }
-      return Status.OK_STATUS;
+      return;
     }
   }
 

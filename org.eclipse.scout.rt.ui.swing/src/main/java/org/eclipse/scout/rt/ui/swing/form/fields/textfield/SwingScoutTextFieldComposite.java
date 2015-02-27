@@ -27,6 +27,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JComponent;
 import javax.swing.text.AbstractDocument;
@@ -39,6 +40,7 @@ import javax.swing.text.JTextComponent;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -347,9 +349,9 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 5678).join(5678);
+        getSwingEnvironment().invokeScoutLater(t, 5678).get(5678, TimeUnit.MILLISECONDS);
       }
-      catch (InterruptedException e) {
+      catch (ProcessingException e) {
         //nop
       }
       // end notify

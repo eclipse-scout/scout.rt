@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TooManyListenersException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.AbstractAction;
@@ -53,10 +54,10 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -67,6 +68,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
@@ -509,8 +511,8 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        ClientJob.getCurrentSession().setData(Scrollbar.VERTICAL.getType() + "_" + getScoutObject().toString(), verticalValue);
-        ClientJob.getCurrentSession().setData(Scrollbar.HORIZONTAL.getType() + "_" + getScoutObject().toString(), horizontalValue);
+        ISession.CURRENT.get().setData(Scrollbar.VERTICAL.getType() + "_" + getScoutObject().toString(), verticalValue);
+        ISession.CURRENT.get().setData(Scrollbar.HORIZONTAL.getType() + "_" + getScoutObject().toString(), horizontalValue);
       }
     };
 
@@ -532,8 +534,8 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        Integer verticalValue = (Integer) ClientJob.getCurrentSession().getData(Scrollbar.VERTICAL.getType() + "_" + getScoutObject().toString());
-        Integer horizontalValue = (Integer) ClientJob.getCurrentSession().getData(Scrollbar.HORIZONTAL.getType() + "_" + getScoutObject().toString());
+        Integer verticalValue = (Integer) ISession.CURRENT.get().getData(Scrollbar.VERTICAL.getType() + "_" + getScoutObject().toString());
+        Integer horizontalValue = (Integer) ISession.CURRENT.get().getData(Scrollbar.HORIZONTAL.getType() + "_" + getScoutObject().toString());
 
         if (horizontalValue != null || verticalValue != null) {
           scrollbarValues.set(new ScrollbarValues(horizontalValue, verticalValue));
@@ -542,9 +544,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     };
 
     try {
-      getSwingEnvironment().invokeScoutLater(t, 1234).join(1234);
+      getSwingEnvironment().invokeScoutLater(t, 1234).get(1234, TimeUnit.MILLISECONDS);
     }
-    catch (InterruptedException e) {
+    catch (ProcessingException e) {
       LOG.debug("exception occured while joining on model thread: " + e);
     }
     if (scrollbarValues.get() != null) {
@@ -763,9 +765,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 20000).join(20000);
+        getSwingEnvironment().invokeScoutLater(t, 20000).get(20000, TimeUnit.MILLISECONDS);
       }
-      catch (InterruptedException e) {
+      catch (ProcessingException e) {
         //nop
       }
       // end notify

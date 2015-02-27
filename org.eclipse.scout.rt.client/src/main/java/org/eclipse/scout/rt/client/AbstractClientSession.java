@@ -20,23 +20,23 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -44,6 +44,10 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
@@ -53,6 +57,7 @@ import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -91,7 +96,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   private ScoutTexts m_scoutTexts;
   private Locale m_locale;
   private UserAgent m_userAgent;
-  private Vector<ILocaleListener> m_localeListener = new Vector<ILocaleListener>();
+  private final Vector<ILocaleListener> m_localeListener = new Vector<ILocaleListener>();
   private long m_maxShutdownWaitTime = 4567;
   private final ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>> m_objectExtensions;
 
@@ -257,22 +262,22 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
         @Override
         public void handleEvent(final ClientNotificationConsumerEvent e, boolean sync) {
           if (e.getClientNotification().getClass() == SharedContextChangedNotification.class) {
+            final SharedContextChangedNotification notification = (SharedContextChangedNotification) e.getClientNotification();
             if (sync) {
               try {
-                updateSharedVariableMap(((SharedContextChangedNotification) e.getClientNotification()).getSharedVariableMap());
+                updateSharedVariableMap(notification.getSharedVariableMap());
               }
               catch (Throwable t) {
                 LOG.error("update of shared contex", t);
-                // nop
               }
             }
             else {
-              new ClientSyncJob("Update shared context", ClientSyncJob.getCurrentSession()) {
+              OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
                 @Override
-                protected void runVoid(IProgressMonitor monitor) throws Throwable {
-                  updateSharedVariableMap(((SharedContextChangedNotification) e.getClientNotification()).getSharedVariableMap());
+                public void run() throws Exception {
+                  updateSharedVariableMap(notification.getSharedVariableMap());
                 }
-              }.schedule();
+              }, ClientJobInput.defaults().session(AbstractClientSession.this).name("Update shared context"));
             }
           }
         }
@@ -460,49 +465,61 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
    * finished. This method does not block the caller.
    */
   protected void scheduleSessionInactivation() {
-    new ClientAsyncJob("Wait for client jobs to finish before inactivating the session", this) {
-      @Override
-      protected IStatus runStatus(IProgressMonitor monitor) {
-        final long timeout = getMaxShutdownWaitTime();
+    try {
+      final Set<IFuture<?>> runningFutures = findRunningFutures();
+      OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          long timeout = getMaxShutdownWaitTime();
 
-        // Wait for the client jobs to finish for a maximal period of time.
-        for (ClientJob clientJob : findClientJobs()) {
           try {
-            clientJob.join(timeout);
+            // Wait for the client jobs to finish for a maximal period of time.
+            for (IFuture<?> clientJob : runningFutures) {
+              clientJob.get(timeout, TimeUnit.MILLISECONDS);
+            }
           }
-          catch (InterruptedException e) {
-            LOG.info(String.format("Interrupted while waiting for the client job to finish. [job=%s]", clientJob), e);
+          finally {
+            // Inactivate the client session.
+            inactivateSession();
           }
         }
-
-        // Inactivate the client session.
-        inactivateSession();
-
-        return Status.OK_STATUS;
-      }
-    }.schedule();
+      }, ClientJobInput.defaults().session(this).name("Wait for client jobs to finish before inactivating the session"));
+    }
+    catch (ProcessingException e1) {
+      LOG.warn("unable to wait for jobs to finish.", e1);
+    }
   }
 
   /**
-   * Finds all client jobs that belong to this client session. If called on behalf of a client job, that job is not
-   * returned.
+   * Finds all running {@link IFuture}s that belong to this client session. The own future is never part of the result.
    *
    * @return {@link Set} of client jobs.
    */
-  protected Set<ClientJob> findClientJobs() {
-    Job currentJob = ClientJob.getJobManager().currentJob();
-    Set<ClientJob> clientJobs = new HashSet<ClientJob>();
-    for (Job job : Job.getJobManager().find(ClientJob.class)) {
-      ClientJob candidateJob = (ClientJob) job;
-      if (candidateJob.getClientSession() == AbstractClientSession.this && candidateJob != currentJob) {
-        clientJobs.add(candidateJob);
+  protected Set<IFuture<?>> findRunningFutures() {
+    final IFuture<?> currentFuture = IFuture.CURRENT.get();
+    final Set<IFuture<?>> futures = new HashSet<>();
+
+    IVisitor<IFuture<?>> visitor = new IVisitor<IFuture<?>>() {
+      @Override
+      public boolean visit(IFuture<?> future) {
+        if (future == currentFuture) {
+          // exclude own
+          return true;
+        }
+        futures.add(future);
+        return true;
       }
-    }
-    return clientJobs;
+    };
+
+    ClientSessionFilter filter = new ClientSessionFilter(this);
+    OBJ.one(IModelJobManager.class).visit(filter, visitor);
+    OBJ.one(IClientJobManager.class).visit(filter, visitor);
+
+    return futures;
   }
 
   protected void inactivateSession() {
-    Set<ClientJob> runningClientJobs = findClientJobs();
+    Set<IFuture<?>> runningClientJobs = findRunningFutures();
     if (!runningClientJobs.isEmpty()) {
       LOG.warn(""
           + "Some running client jobs found while client session is going to shutdown. "

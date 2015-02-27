@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark.menu;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
@@ -36,7 +36,7 @@ public class ActivateBookmarkKeyStroke extends KeyStroke {
   protected void execAction() throws ProcessingException {
     if (m_bookmark != null) {
       try {
-        ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(m_bookmark);
+        ClientSessionProvider.currentSession().getDesktop().activateBookmark(m_bookmark);
       }
       catch (Throwable t) {
         LOG.error(null, t);

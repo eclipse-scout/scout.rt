@@ -19,6 +19,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -31,7 +32,8 @@ import javax.swing.text.JTextComponent;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -169,11 +171,11 @@ public class SwingPopupWorker implements Runnable {
         }
       }
     };
-    JobEx prepareJob = m_environment.invokeScoutLater(t, 0);
+    IFuture<Void> prepareJob = m_environment.invokeScoutLater(t, 0);
     try {
-      prepareJob.join(1200);
+      prepareJob.get(1200, TimeUnit.MILLISECONDS);
     }
-    catch (InterruptedException e) {
+    catch (ProcessingException e) {
       LOG.error("error during prepare menus.", e);
     }
 

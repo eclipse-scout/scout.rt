@@ -18,6 +18,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import org.eclipse.scout.commons.nls.NlsLocale;
+
 public final class FormattingUtility {
   private FormattingUtility() {
   }
@@ -31,7 +33,7 @@ public final class FormattingUtility {
   }
 
   /**
-   * Formats the given object respecting the current thread's {@link LocaleThreadLocal} and converts it to a String.
+   * Formats the given object respecting the current thread's {@link NlsLocale} and converts it to a String.
    * Supported types are:
    * <ul>
    * <li>{@link String}</li>
@@ -49,7 +51,7 @@ public final class FormattingUtility {
    * @return Returns formatted string representation, never <code>null</code>.
    */
   public static String formatObject(Object o) {
-    Locale loc = LocaleThreadLocal.get();
+    Locale loc = NlsLocale.get();
     String ret = null;
     if (o instanceof String) {
       ret = (String) o;

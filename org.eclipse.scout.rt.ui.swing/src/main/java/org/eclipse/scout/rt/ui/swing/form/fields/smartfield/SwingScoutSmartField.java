@@ -21,6 +21,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -45,18 +46,23 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooser;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -87,9 +93,11 @@ import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutPopup;
  * in the proposal popup
  */
 public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContentAssistField<?, ?>> implements ISwingScoutSmartField {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutSmartField.class);
+
   // proposal support
   private SwingScoutDropDownPopup m_proposalPopup;
-  private P_PendingProposalJob m_pendingProposalJob;
+  private IFuture<Void> m_pendingProposalFuture;
   private Object m_pendingProposalJobLock;
 
   private ContextMenuDecorationItem m_contextMenuMarker;
@@ -345,22 +353,24 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
 
   private void requestProposalSupportFromSwing(String text, boolean selectCurrentValue, long initialDelay) {
     synchronized (m_pendingProposalJobLock) {
-      if (m_pendingProposalJob == null) {
-        m_pendingProposalJob = new P_PendingProposalJob();
+      if (m_pendingProposalFuture != null) {
+        m_pendingProposalFuture.cancel(true);
       }
-      else {
-        m_pendingProposalJob.cancel();
+      P_PendingProposalRunnable job = new P_PendingProposalRunnable(text, selectCurrentValue);
+      try {
+        m_pendingProposalFuture = OBJ.one(IClientJobManager.class).schedule(job, initialDelay, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
       }
-      m_pendingProposalJob.update(text, selectCurrentValue);
-      m_pendingProposalJob.schedule(initialDelay);
+      catch (JobExecutionException e) {
+        LOG.error("Unable to request proposal support for smartfield.", e);
+      }
     }
   }
 
   private void acceptProposalFromSwing() {
     synchronized (m_pendingProposalJobLock) {
-      if (m_pendingProposalJob != null) {
-        m_pendingProposalJob.cancel();
-        m_pendingProposalJob = null;
+      if (m_pendingProposalFuture != null) {
+        m_pendingProposalFuture.cancel(true);
+        m_pendingProposalFuture = null;
       }
     }
     final String text = getSwingTextField().getText();
@@ -607,9 +617,9 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
   @Override
   protected boolean handleSwingInputVerifier() {
     synchronized (m_pendingProposalJobLock) {
-      if (m_pendingProposalJob != null) {
-        m_pendingProposalJob.cancel();
-        m_pendingProposalJob = null;
+      if (m_pendingProposalFuture != null) {
+        m_pendingProposalFuture.cancel(true);
+        m_pendingProposalFuture = null;
       }
     }
     final String text = getSwingTextField().getText();
@@ -622,17 +632,19 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
         result.setValue(b);
       }
     };
-    JobEx job = getSwingEnvironment().invokeScoutLater(t, 0);
+
+    boolean hasFinished = false;
+    IFuture<Void> job = getSwingEnvironment().invokeScoutLater(t, 0);
     try {
-      job.join(2345);
+      job.get(2345, TimeUnit.MILLISECONDS);
+      hasFinished = true;
     }
-    catch (InterruptedException e) {
-      //nop
+    catch (ProcessingException e) {
     }
-    boolean processed = job.getState() == JobEx.NONE;
+
     // end notify
     getSwingEnvironment().dispatchImmediateSwingJobs();
-    if (processed && (!result.getValue())) {
+    if (hasFinished && !result.getValue()) {
       // keep focus
       return false;
     }
@@ -705,49 +717,43 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     }
   }
 
-  private class P_PendingProposalJob extends JobEx implements Runnable {
+  private class P_PendingProposalRunnable implements IRunnable {
 
-    private String m_text;
-    private boolean m_selectCurrentValue;
+    private final String m_text;
+    private final boolean m_selectCurrentValue;
 
-    public P_PendingProposalJob() {
-      super("");
-      setSystem(true);
-    }
-
-    @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      if (monitor.isCanceled()) {
-        return Status.CANCEL_STATUS;
-      }
-      SwingUtilities.invokeLater(this);
-      return Status.OK_STATUS;
+    public P_PendingProposalRunnable(String text, boolean selectCurrentValue) {
+      m_text = text;
+      m_selectCurrentValue = selectCurrentValue;
     }
 
     @Override
     public void run() {
       synchronized (m_pendingProposalJobLock) {
-        if (m_pendingProposalJob == this) {
-          m_pendingProposalJob = null;
+        if (m_pendingProposalFuture == IFuture.CURRENT.get() && !m_pendingProposalFuture.isCancelled()) {
+          m_pendingProposalFuture = null;
         }
         else {
           return;
         }
       }
-      if (getSwingField().isFocusOwner()) {
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            getScoutObject().getUIFacade().openProposalFromUI(m_text, m_selectCurrentValue);
-          }
-        };
-        getSwingEnvironment().invokeScoutLater(t, 0);
-      }
-    }
 
-    public void update(String text, boolean selectCurrentValue) {
-      m_text = text;
-      m_selectCurrentValue = selectCurrentValue;
+      Runnable swingRunnable = new Runnable() {
+        @Override
+        public void run() {
+          if (getSwingField().isFocusOwner()) {
+            Runnable t = new Runnable() {
+              @Override
+              public void run() {
+                getScoutObject().getUIFacade().openProposalFromUI(m_text, m_selectCurrentValue);
+              }
+            };
+            getSwingEnvironment().invokeScoutLater(t, 0);
+          }
+        }
+      };
+
+      SwingUtilities.invokeLater(swingRunnable);
     }
   }
 

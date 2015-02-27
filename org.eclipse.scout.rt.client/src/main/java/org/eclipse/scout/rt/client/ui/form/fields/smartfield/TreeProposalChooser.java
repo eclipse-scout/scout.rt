@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -25,10 +23,9 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.status.Status;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
@@ -51,8 +48,6 @@ import org.eclipse.scout.service.SERVICES;
 
 public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITree, LOOKUP_KEY> {
 
-  public static final QualifiedName JOB_PROPERTY_LOAD_TREE = new QualifiedName(ContentAssistTreeForm.class.getName(), "loadTree");
-
   class P_Tree extends AbstractTree {
 
     @Override
@@ -65,7 +60,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   private P_MatchingNodesFilter m_matchingNodesFilter;
   private boolean m_selectCurrentValueRequested;
   private boolean m_populateInitialTreeDone;
-  private JobEx m_populateInitialTreeJob;
+  private IFuture<?> m_populateInitialTreeJob;
 
   public TreeProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) throws ProcessingException {
     super(contentAssistField, allowCustomText);
@@ -118,7 +113,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   @Override
   public void dispose() {
     if (m_populateInitialTreeJob != null) {
-      m_populateInitialTreeJob.cancel();
+      m_populateInitialTreeJob.cancel(true);
     }
     m_model.disposeTree();
     m_model = null;
@@ -450,22 +445,15 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   @SuppressWarnings("unchecked")
   protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
     if (m_contentAssistField.isBrowseLoadIncremental()) {
-      Job currentJob = Job.getJobManager().currentJob();
       //show loading status
       boolean statusWasVisible = isStatusVisible();
       setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.OK));
       setStatusVisible(true);
-      try {
-        currentJob.setProperty(JOB_PROPERTY_LOAD_TREE, Boolean.TRUE);
-        //load node
-        ILookupRow<LOOKUP_KEY> b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
-        List<? extends ILookupRow<LOOKUP_KEY>> data = m_contentAssistField.callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
-        List<ITreeNode> subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
-        updateSubTree(m_model, parentNode, subTree);
-      }
-      finally {
-        currentJob.setProperty(JOB_PROPERTY_LOAD_TREE, null);
-      }
+      //load node
+      ILookupRow<LOOKUP_KEY> b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
+      List<? extends ILookupRow<LOOKUP_KEY>> data = m_contentAssistField.callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
+      List<ITreeNode> subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
+      updateSubTree(m_model, parentNode, subTree);
       //hide loading status
       setStatusVisible(statusWasVisible);
     }
@@ -503,7 +491,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       s = "";
     }
     s = s.toLowerCase();
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop != null && desktop.isAutoPrefixWildcardForTextSearch()) {
       s = "*" + s;
     }

@@ -15,7 +15,6 @@ import java.security.AccessController;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -41,7 +40,7 @@ import org.eclipse.scout.service.ServiceUtility;
 public class OfflineDispatcherService extends AbstractService implements IOfflineDispatcherService {
 
   @Override
-  public IServiceTunnelResponse dispatch(final IServiceTunnelRequest request, final IProgressMonitor monitor) {
+  public IServiceTunnelResponse dispatch(final IServiceTunnelRequest request) {
     try {
       // Create the job-input on behalf of which the server-job is run.
       ServerJobInput input = ServerJobInput.empty();

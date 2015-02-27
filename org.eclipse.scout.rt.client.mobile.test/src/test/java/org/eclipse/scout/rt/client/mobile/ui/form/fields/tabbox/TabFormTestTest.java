@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.AbstractTemplate2GroupBox;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.AbstractTemplate3GroupBox;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm;
@@ -21,6 +20,7 @@ import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm.MainBox.TabBox.TemplateExGroupBox;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm.MainBox.TabBox.TemplateGroupBox;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestFormData;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -42,7 +42,7 @@ public class TabFormTestTest {
 
       //Select first groupBox
       mobileTabBox.getTableField().getTable().selectFirstRow();
-      tabForm = ClientJob.getCurrentSession().getDesktop().findForm(TabForm.class);
+      tabForm = ClientSessionProvider.currentSession().getDesktop().findForm(TabForm.class);
 
       tabForm.getRootGroupBox().getFieldByClass(SimpleGroupBox.TextSimpleField.class).setValue("s1");
 
@@ -72,7 +72,7 @@ public class TabFormTestTest {
       //Select template groupBox
       mobileTabBox.getTableField().getTable().selectRow(1);
 
-      tabForm = ClientJob.getCurrentSession().getDesktop().findForm(TabForm.class);
+      tabForm = ClientSessionProvider.currentSession().getDesktop().findForm(TabForm.class);
       tabForm.getRootGroupBox().getFieldByClass(TemplateGroupBox.Text1Field.class).setValue("s1");
       tabForm.getRootGroupBox().getFieldByClass(TemplateGroupBox.Text2Field.class).setValue("s2");
       tabForm.getRootGroupBox().getFieldByClass(AbstractTemplate2GroupBox.T2Text1Field.class).setValue("t1");
@@ -106,7 +106,7 @@ public class TabFormTestTest {
       //Select templateEx groupBox
       mobileTabBox.getTableField().getTable().selectRow(2);
 
-      tabForm = ClientJob.getCurrentSession().getDesktop().findForm(TabForm.class);
+      tabForm = ClientSessionProvider.currentSession().getDesktop().findForm(TabForm.class);
       tabForm.getRootGroupBox().getFieldByClass(TemplateExGroupBox.Text1Field.class).setValue("s1");
       tabForm.getRootGroupBox().getFieldByClass(TemplateExGroupBox.Text2Field.class).setValue("s2");
       tabForm.getRootGroupBox().getFieldByClass(TemplateExGroupBox.Text3Field.class).setValue("s3");

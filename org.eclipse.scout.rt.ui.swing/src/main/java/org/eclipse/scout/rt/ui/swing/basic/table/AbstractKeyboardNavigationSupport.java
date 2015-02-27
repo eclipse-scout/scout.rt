@@ -10,11 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.basic.table;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 
 /**
  *
@@ -23,16 +29,18 @@ public abstract class AbstractKeyboardNavigationSupport {
   private final long m_delay;
   private long m_timeoutTimestamp;
   private String m_filterText = "";
-  private Object navigationLock = new Object();
-  private P_NavigationJob m_navigationJob;
+  private final Object navigationLock = new Object();
+  private IFuture<Void> m_navigationJob;
+  private IClientSession m_session;
 
-  public AbstractKeyboardNavigationSupport() {
-    this(1000L);
+  public AbstractKeyboardNavigationSupport(IClientSession session) {
+    this(1000L, session);
   }
 
-  public AbstractKeyboardNavigationSupport(long delay) {
+  public AbstractKeyboardNavigationSupport(long delay, IClientSession session) {
     m_delay = delay;
-    m_navigationJob = new P_NavigationJob();
+    m_session = session;
+    m_navigationJob = null;
   }
 
   public void addChar(char c) {
@@ -44,12 +52,13 @@ public abstract class AbstractKeyboardNavigationSupport {
         String newText = "" + Character.toLowerCase(c);
         m_filterText += newText;
         if (m_navigationJob != null) {
-          m_navigationJob.cancel();
+          m_navigationJob.cancel(true);
         }
-        else {
-          m_navigationJob = new P_NavigationJob();
+        try {
+          m_navigationJob = OBJ.one(IClientJobManager.class).schedule(new P_NavigationJob(), 250, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(m_session));
         }
-        m_navigationJob.schedule(250L);
+        catch (JobExecutionException e) {
+        }
         m_timeoutTimestamp = System.currentTimeMillis() + m_delay;
       }
     }
@@ -57,26 +66,21 @@ public abstract class AbstractKeyboardNavigationSupport {
 
   abstract void handleSearchPattern(String regex);
 
-  private class P_NavigationJob extends Job {
-
-    public P_NavigationJob() {
-      super("");
-      setSystem(true);
-    }
+  private class P_NavigationJob implements IRunnable {
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
+    public void run() throws Exception {
       String pattern;
       synchronized (navigationLock) {
-        if (monitor.isCanceled() || StringUtility.isNullOrEmpty(m_filterText)) {
-          return Status.CANCEL_STATUS;
+        if (IProgressMonitor.CURRENT.get().isCancelled() || StringUtility.isNullOrEmpty(m_filterText)) {
+          return;
         }
         pattern = StringUtility.toRegExPattern(m_filterText.toLowerCase());
         pattern = pattern + ".*";
       }
       //this call must be outside lock!
       handleSearchPattern(pattern);
-      return Status.OK_STATUS;
+      return;
     }
   } // end class P_NavigationJob
 }

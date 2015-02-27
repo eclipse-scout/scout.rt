@@ -17,7 +17,6 @@ import static org.mockito.Mockito.mock;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
@@ -30,9 +29,13 @@ import org.eclipse.scout.commons.job.filter.JobFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.filter.BlockedJobFilter;
 import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
+import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
+import org.eclipse.scout.rt.platform.AnnotationFactory;
+import org.eclipse.scout.rt.platform.cdi.BeanImplementor;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,12 +54,16 @@ public class ModelJobFutureVisitTest {
 
   private IBlockingCondition bc1;
   private IBlockingCondition bc2;
+  private BeanImplementor<IModelJobManager> m_bean;
 
   @Before
   public void before() throws InterruptedException {
-    m_jobManager = OBJ.one(IModelJobManager.class);
-    m_jobManager.cancel(new AlwaysFilter<IFuture<?>>(), true);
-    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS)); // TODO DWI: own job manager for this test.
+
+    m_jobManager = new ModelJobManager();
+    m_bean = new BeanImplementor<IModelJobManager>(IModelJobManager.class);
+    m_bean.addAnnotation(AnnotationFactory.createPriority(100));
+    m_bean.addAnnotation(AnnotationFactory.createApplicationScoped());
+    OBJ.registerBean(m_bean, m_jobManager);
 
     m_session1 = mock(IClientSession.class);
     m_session2 = mock(IClientSession.class);
@@ -152,6 +159,11 @@ public class ModelJobFutureVisitTest {
     assertTrue(latch.await());
   }
 
+  @After
+  public void after() {
+    OBJ.unregisterBean(m_bean);
+  }
+
   @Test
   public void testProtocol() throws JobExecutionException, InterruptedException {
     Set<String> expected = new HashSet<>();
@@ -216,7 +228,7 @@ public class ModelJobFutureVisitTest {
   @Test
   public void testVisitBlockedFilter() throws JobExecutionException, InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(new BlockedJobFilter(), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(BlockedJobFilter.INSTANCE, new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -239,7 +251,7 @@ public class ModelJobFutureVisitTest {
   @Test
   public void testVisitNotBlockedFilter() throws JobExecutionException, InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(new NotFilter<>(new BlockedJobFilter()), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(new NotFilter<>(BlockedJobFilter.INSTANCE), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -308,7 +320,7 @@ public class ModelJobFutureVisitTest {
   @Test
   public void testVisitSessionFilterAndBlocked() throws JobExecutionException, InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(new AndFilter<IFuture<?>>(new ClientSessionFilter(m_session1), new BlockedJobFilter()), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(new AndFilter<IFuture<?>>(new ClientSessionFilter(m_session1), BlockedJobFilter.INSTANCE), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {

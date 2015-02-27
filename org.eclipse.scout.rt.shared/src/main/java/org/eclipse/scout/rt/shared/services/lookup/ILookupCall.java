@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.job.IFuture;
 
 /**
  *
@@ -92,7 +92,7 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
    * @param caller
    * @return
    */
-  JobEx getDataByKeyInBackground(ILookupCallFetcher<KEY_TYPE> caller);
+  IFuture<?> getDataByKeyInBackground(ILookupCallFetcher<KEY_TYPE> caller);
 
   /**
    * @return
@@ -104,7 +104,7 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
    * @param caller
    * @return
    */
-  JobEx getDataByTextInBackground(ILookupCallFetcher<KEY_TYPE> caller);
+  IFuture<?> getDataByTextInBackground(ILookupCallFetcher<KEY_TYPE> caller);
 
   /**
    * @return
@@ -116,7 +116,7 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
    * @param caller
    * @return
    */
-  JobEx getDataByAllInBackground(ILookupCallFetcher<KEY_TYPE> caller);
+  IFuture<?> getDataByAllInBackground(ILookupCallFetcher<KEY_TYPE> caller);
 
   /**
    * @return
@@ -128,7 +128,7 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
    * @param caller
    * @return
    */
-  JobEx getDataByRecInBackground(ILookupCallFetcher<KEY_TYPE> caller);
+  IFuture<?> getDataByRecInBackground(ILookupCallFetcher<KEY_TYPE> caller);
 
   /**
    * @return

@@ -16,7 +16,7 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -88,7 +88,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
    */
   @Override
   protected void execInitField() throws ProcessingException {
-    final IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    final IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     for (IOutline o : desktop.getAvailableOutlines()) {
       if (o.getClass() == getConfiguredOutline()) {
         m_outline = o;
@@ -151,7 +151,7 @@ public abstract class AbstractOutlineButton extends AbstractButton {
   @Override
   protected final void execSelectionChanged(boolean selection) throws ProcessingException {
     if (selection) {
-      IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+      IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
       if (desktop != null) {
         // activate outline
         desktop.setOutline(m_outline);

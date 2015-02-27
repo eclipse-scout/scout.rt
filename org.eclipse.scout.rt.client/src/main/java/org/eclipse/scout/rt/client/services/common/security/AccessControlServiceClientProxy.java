@@ -21,12 +21,11 @@ import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.security.FineGrainedAccessCheckRequiredException;
@@ -47,7 +46,7 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   private static final String SESSION_DATA_KEY = "accessControlServiceState";
 
   private ServiceState getServiceState() {
-    IClientSession session = ClientJob.getCurrentSession();
+    IClientSession session = ClientSessionProvider.currentSession();
     if (session == null) {
       LOG.warn("could not find a client session");
       return null;
@@ -194,7 +193,7 @@ public class AccessControlServiceClientProxy extends AbstractService implements 
   }
 
   private IAccessControlService getRemoteService() {
-    return ServiceTunnelUtility.createProxy(IAccessControlService.class, ClientSyncJob.getCurrentSession().getServiceTunnel());
+    return ServiceTunnelUtility.createProxy(IAccessControlService.class, ClientSessionProvider.currentSession().getServiceTunnel());
   }
 
   private static class ServiceState {
