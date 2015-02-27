@@ -1140,19 +1140,25 @@ scout.Table.prototype.columnById = function(columnId) {
 scout.Table.prototype.filter = function() {
   var that = this,
     rowCount = 0,
-    $allRows = this.$rows();
+    $allRows = this.$rows(),
+    i;
 
-  // TODO BSH Table Selection | Selection should be preserved if possible
-  that.clearSelection();
   this.$sumRows().hide();
+
+  // Remember current selection
+  var oldSelectedRowIds = {};
+  if (this.selectedRowIds) {
+    for (i = 0; i < this.selectedRowIds.length; i++) {
+      oldSelectedRowIds[this.selectedRowIds[i]] = true;
+    }
+  }
 
   // Filter rows
   var rowsToHide = [];
   var rowsToShow = [];
   $allRows.each(function() {
     var $row = $(this),
-      show = true,
-      i;
+      show = true;
 
     for (i = 0; i < that.columns.length; i++) {
       if (that.columns[i].filterFunc) {
@@ -1180,13 +1186,28 @@ scout.Table.prototype.filter = function() {
   // Show / hide rows that changed their state during filtering
   var useAnimation = ((rowsToShow.length + rowsToHide.length) <= that.animationRowLimit);
   $(rowsToHide).each(function() {
-    that.hideRow($(this), useAnimation);
+    var $row = $(this);
+    that.hideRow($row, useAnimation);
+    // Remove hidden rows from the map of previously selected rows
+    var rowId = $row.attr('id');
+    if (oldSelectedRowIds[rowId]) {
+      oldSelectedRowIds[rowId] = false;
+    }
   });
   $(rowsToShow).each(function() {
     that.showRow($(this), useAnimation);
   });
 
-  //Used by table footer
+  // Restore selection
+  var newSelectedRowIds = [];
+  for (var rowId in oldSelectedRowIds) {
+    if (oldSelectedRowIds[rowId]) {
+      newSelectedRowIds.push(rowId);
+    }
+  }
+  this.selectRowsByIds(newSelectedRowIds); // this will update the server model if necessary
+
+  // Used by table footer
   this.filteredRowCount = rowCount;
 
   this._triggerRowsFiltered(rowCount, this.filteredBy());
