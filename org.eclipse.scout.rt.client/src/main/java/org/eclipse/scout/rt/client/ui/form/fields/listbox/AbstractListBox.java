@@ -630,7 +630,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
 
   @Override
   protected final Set<KEY> validateValueInternal(Set<KEY> rawValue0) throws ProcessingException {
-    Set<KEY> rawValue = CollectionUtility.hashSetWithoutNullElements(rawValue0);
+    Set<KEY> rawValue = CollectionUtility.hashSet(rawValue0);
     return doValidateValueInternal(rawValue);
   }
 

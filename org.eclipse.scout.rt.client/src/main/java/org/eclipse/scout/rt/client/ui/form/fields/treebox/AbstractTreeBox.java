@@ -651,7 +651,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   @Override
   protected final Set<T> validateValueInternal(Set<T> rawValue0) throws ProcessingException {
     // ensure a copy of the input values
-    Set<T> rawValue = CollectionUtility.hashSetWithoutNullElements(rawValue0);
+    Set<T> rawValue = CollectionUtility.hashSet(rawValue0);
     return doValidateValueInternal(rawValue);
   }
 
