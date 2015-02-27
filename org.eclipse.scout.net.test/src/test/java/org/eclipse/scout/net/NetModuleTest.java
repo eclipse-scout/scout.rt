@@ -5,13 +5,16 @@ import java.net.URL;
 
 import org.eclipse.scout.net.internal.NetModule;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link NetModule}
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class NetModuleTest {
   private static final String TEST_URL = "http://www.eclipse.org";
 
