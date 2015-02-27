@@ -15,19 +15,23 @@ import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.cdi.Bean;
 import org.eclipse.scout.rt.platform.cdi.DynamicAnnotations;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * JUnit tests for {@link SERVICES}
  *
  * @since 3.9.0
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class SERVICESTest {
   private IBean<?> m_ref1;
   private IBean<?> m_ref2;
@@ -85,7 +89,7 @@ public class SERVICESTest {
   /**
    * Test for {@link SERVICES#getService(Class)} for a service that was not registered.
    */
-  @Test
+  @Test(expected = AssertionException.class)
   public void testGetServiceNull() {
     IUnregisteredTestService service = SERVICES.getService(IUnregisteredTestService.class);
     assertNull("No service should be found. ", service);

@@ -49,7 +49,9 @@ public final class SERVICES {
     }
     else {
       // workaround since interceptors are only possible on interfaces (Proxy instances). So we try to finde the wrapped original bean and return it without interceptors.
-      return getServicesWithoutInterceptors(serviceClass, true).get(0);
+      List<T> servicesWithoutInterceptors = getServicesWithoutInterceptors(serviceClass, true);
+      Assertions.assertFalse(servicesWithoutInterceptors.size() == 0, "No beans bound to '%s'", serviceClass);
+      return servicesWithoutInterceptors.get(0);
     }
   }
 
