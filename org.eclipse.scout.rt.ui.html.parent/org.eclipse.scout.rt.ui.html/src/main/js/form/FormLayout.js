@@ -6,14 +6,14 @@ scout.inherits(scout.FormLayout, scout.AbstractLayout);
 
 scout.FormLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
-    htmlRootGb = this._getHtmlRootGroupBox($container),
+    htmlRootGb = this._htmlRootGroupBox($container),
     rootGbSize;
 
   rootGbSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets())
     .subtract(htmlRootGb.getMargins());
-  rootGbSize.height -= this._getMenuBarHeight($container);
-  rootGbSize.height -= this._getTitleHeight($container);
+  rootGbSize.height -= this._menuBarHeight($container);
+  rootGbSize.height -= this._titleHeight($container);
 
   $.log.trace('(FormLayout#layout) rootGbSize=' + rootGbSize);
   htmlRootGb.setSize(rootGbSize);
@@ -21,28 +21,30 @@ scout.FormLayout.prototype.layout = function($container) {
 
 scout.FormLayout.prototype.preferredLayoutSize = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
-    htmlRootGb = this._getHtmlRootGroupBox($container),
+    htmlRootGb = this._htmlRootGroupBox($container),
     prefSize;
 
   prefSize = htmlRootGb.getPreferredSize()
     .add(htmlContainer.getInsets())
     .add(htmlRootGb.getMargins());
-  prefSize.height += this._getMenuBarHeight($container);
-  prefSize.height += this._getTitleHeight($container);
+  prefSize.height += this._menuBarHeight($container);
+  prefSize.height += this._titleHeight($container);
 
   return prefSize;
 };
 
-scout.FormLayout.prototype._getHtmlRootGroupBox = function($container) {
-  var $rootGb = $container.children('.root-group-box');
-  return scout.HtmlComponent.get($rootGb);
+scout.FormLayout.prototype._htmlRootGroupBox = function($container) {
+  return scout.HtmlComponent.get($container.children('.root-group-box'));
 };
 
-scout.FormLayout.prototype._getMenuBarHeight = function($container) {
+scout.FormLayout.prototype._menuBarHeight = function($container) {
   return scout.graphics.getVisibleSize($container.children('.menubar'), true).height;
 };
 
-scout.FormLayout.prototype._getTitleHeight = function($container) {
+scout.FormLayout.prototype._titleHeight = function($container) {
+  // getVisibleSize doesn't work for dialogs, because the are still invisible when
+  // the render() method is called (they'll become visible later, when the fade-in
+  // animation is completed). That's why we must calculate the title size here:
   var height = 0,
     insets = scout.graphics.getInsets($container.children('.title-box'), {includeMargin: true});
   if (this._form.title) {
@@ -51,7 +53,6 @@ scout.FormLayout.prototype._getTitleHeight = function($container) {
   if (this._form.subTitle) {
     height += scout.graphics.measureString(this._form.subTitle).height;
   }
-  height += insets.top + insets.bottom;
-  return height;
-};
+  return height + insets.top + insets.bottom;
 
+};

@@ -1,6 +1,6 @@
 scout.GroupBoxLayout = function(groupBox) {
   scout.GroupBoxLayout.parent.call(this);
-  this.groupBox = groupBox;
+  this._groupBox = groupBox;
 };
 scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
@@ -37,21 +37,13 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.GroupBoxLayout.prototype._titleHeight = function($container) {
-  if (this.groupBox.label) {
-    var height = scout.graphics.measureString(this.groupBox.label).height,
-      insets = scout.graphics.getInsets($container.children('.group-box-title'), {includeMargin: true});
-    height += insets.top + insets.bottom;
-    $.log.info('_titleHeight='+height);
-    return height;
-  } else {
-    return 0;
-  }
+  return scout.graphics.getVisibleSize($container.children('.group-box-title'), true).height;
 };
 
 scout.GroupBoxLayout.prototype._htmlGbBody = function() {
-  return scout.HtmlComponent.get(this.groupBox.$body);
+  return scout.HtmlComponent.get(this._groupBox.$body);
 };
 
 scout.GroupBoxLayout.prototype._htmlGbBodyContainer = function() {
-  return scout.HtmlComponent.get(this.groupBox.$body);
+  return scout.HtmlComponent.get(this._groupBox.$body);
 };
