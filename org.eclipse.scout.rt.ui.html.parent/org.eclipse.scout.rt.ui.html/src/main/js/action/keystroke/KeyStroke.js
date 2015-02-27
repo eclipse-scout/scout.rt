@@ -6,11 +6,17 @@ scout.KeyStroke = function() {
   this.alt = false;
   this.shift = false;
   this.meta = false;
+  this.bubbleUp=false;
 };
 scout.inherits(scout.KeyStroke, scout.Action);
 
+scout.KeyStroke.prototype.init = function(model, session) {
+  scout.KeyStroke.parent.prototype.init.call(this, model, session);
+  this.initKeyStrokeParts();
+};
+
 scout.KeyStroke.prototype._remove = function() {
-  scout.Action.parent.prototype._remove.call(this);
+  scout.KeyStroke.parent.prototype._remove.call(this);
 };
 
 /**
@@ -26,7 +32,7 @@ scout.KeyStroke.prototype.accept = function(event) {
   if (this.ignore()) {
     return false;
   }
-  if (event && event.ctrlKey === this.ctrl && event.altKey === this.alt && event.metaKey === this.meta && event.altKey === this.shift && event.which === this.keyStrokeKeyPart) {
+  if (event && event.ctrlKey === this.ctrl && event.altKey === this.alt && event.metaKey === this.meta && event.shiftKey === this.shift && event.which === this.keyStrokeKeyPart) {
     return true;
   }
   return false;
@@ -43,10 +49,6 @@ scout.KeyStroke._syncKeyStroke = function(keyStroke) {
 };
 
 scout.KeyStroke.prototype.initKeyStrokeParts = function() {
-  this.alt = undefined;
-  this.ctrl = undefined;
-  this.meta = undefined;
-  this.shift = undefined;
   this.keyStrokeKeyPart = undefined;
   if (!this.keyStroke) {
     return;

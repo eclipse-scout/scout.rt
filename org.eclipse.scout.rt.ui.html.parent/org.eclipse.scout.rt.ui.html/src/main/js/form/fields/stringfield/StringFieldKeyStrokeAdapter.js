@@ -19,7 +19,7 @@ scout.inherits(scout.StringFieldEnterKeyStroke, scout.KeyStroke);
 scout.StringFieldEnterKeyStroke.prototype.handle = function(event) {};
 
 scout.StringFieldEnterKeyStroke.prototype.accept = function(event) {
-  var acceptKey = scout.KeyStroke.prototype.accept.call(this, event);
+  var acceptKey = scout.StringFieldEnterKeyStroke.parent.prototype.accept.call(this, event);
   var elementType = document.activeElement.tagName.toLowerCase();
 
   if (acceptKey && elementType === 'textarea') {
