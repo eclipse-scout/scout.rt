@@ -196,6 +196,20 @@ scout.Session.prototype._sendRequest = function(request) {
     return;
   }
 
+  if (request.unload && navigator.sendBeacon) {
+    // The unload request must _not_ be sent asynchronously, because the browser would cancel
+    // it when the page unload is completed. Because the support for synchronous AJAX request
+    // will apparently be dropped eventually, we use the "sendBeacon" method to send the unload
+    // request to the server (we don't expect an answer). Not all browsers support this method,
+    // therefore we check for its existence and fall back to (legacy) synchronous AJAX call
+    // when it is missing. More information:
+    // - http://stackoverflow.com/questions/15479103/can-beforeunload-unload-be-used-to-send-xmlhttprequests-reliably
+    // - https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/7nKMdg_ALcc
+    // - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
+    navigator.sendBeacon(this.url, JSON.stringify(request));
+    return;
+  }
+
   if (!this.areRequestsPending() && !request.unload) {
     this.setBusy(true);
   }
