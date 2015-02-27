@@ -130,3 +130,6 @@ Also the implementation to check child nodes of a tree when a parent is checked 
 can be done on the AbstractTreeBox. A node should be set to checked from the model even if the node is disabled. For this, the method setNodesChecked
 is extended with a new param to identify if only enabled nodes should be checked or not. The ui should only check enabled nodes, so the ui-facade
 calls the method with true.
+
+NBU 27.02.2015
+Renamed constant PROP_KEYSTROKE to PROP_KEY_STROKE and changed the value of it to keyStroke for consitancy reasons.

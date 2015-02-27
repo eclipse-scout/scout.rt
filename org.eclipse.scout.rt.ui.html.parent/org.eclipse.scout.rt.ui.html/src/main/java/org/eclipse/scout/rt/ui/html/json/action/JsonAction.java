@@ -76,7 +76,7 @@ public abstract class JsonAction<T extends IAction> extends AbstractJsonProperty
       }
     });
 
-    putJsonProperty(new JsonProperty<T>(IAction.PROP_KEYSTROKE, model) {
+    putJsonProperty(new JsonProperty<T>(IAction.PROP_KEY_STROKE, model) {
       @Override
       protected String modelValue() {
         return getModel().getKeyStroke();
