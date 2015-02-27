@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.server.fixture;
+package org.eclipse.scout.rt.server;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.AbstractServerSession;
