@@ -15,6 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -58,6 +59,7 @@ public class ClientJobInputTest {
     assertEquals(0, input.getId());
     assertNull(input.getSubject());
     assertNull(input.getSession());
+    assertTrue(input.isSessionRequired());
     assertNull(input.getUserAgent());
     assertNull(input.getLocale());
   }
@@ -133,6 +135,11 @@ public class ClientJobInputTest {
 
     ISession.CURRENT.set(session);
     assertNull(ClientJobInput.defaults().session(null).getSession());
+  }
+
+  @Test
+  public void testDefaultSessionRequired() {
+    assertTrue(ClientJobInput.defaults().isSessionRequired());
   }
 
   @Test

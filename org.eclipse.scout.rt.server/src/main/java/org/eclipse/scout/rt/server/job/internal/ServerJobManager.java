@@ -47,7 +47,9 @@ public class ServerJobManager extends JobManager<ServerJobInput> implements ISer
   @Override
   protected void validateInput(final ServerJobInput input) {
     Assertions.assertNotNull(input, "ServerJobInput must not be null");
-    Assertions.assertNotNull(input.getSession(), "ServerSession must not be null");
+    if (input.isSessionRequired()) {
+      Assertions.assertNotNull(input.getSession(), "ServerSession must not be null");
+    }
   }
 
   @Override
@@ -61,7 +63,7 @@ public class ServerJobManager extends JobManager<ServerJobInput> implements ISer
 
     final Callable<RESULT> c8 = new TwoPhaseTransactionBoundaryCallable<>(next, tx, input);
     final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ITransaction.CURRENT, tx);
-    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ScoutTexts.CURRENT, input.getSession().getTexts());
+    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ScoutTexts.CURRENT, (input.getSession() != null ? input.getSession().getTexts() : ScoutTexts.CURRENT.get()));
     final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, UserAgent.CURRENT, input.getUserAgent());
     final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, ISession.CURRENT, input.getSession());
     final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, input.getServletResponse());

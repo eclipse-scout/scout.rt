@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 public class ServerJobInput extends JobInput {
 
   private IServerSession m_session;
+  private boolean m_sessionRequired;
   private HttpServletRequest m_servletRequest;
   private HttpServletResponse m_servletResponse;
   private UserAgent m_userAgent;
@@ -51,6 +52,7 @@ public class ServerJobInput extends JobInput {
   protected ServerJobInput(final ServerJobInput origin) {
     super(origin);
     m_session = origin.getSession();
+    m_sessionRequired = origin.isSessionRequired();
     m_servletRequest = origin.getServletRequest();
     m_servletResponse = origin.getServletResponse();
     m_userAgent = origin.getUserAgent();
@@ -93,11 +95,23 @@ public class ServerJobInput extends JobInput {
 
   /**
    * @param session
-   *          {@link IServerSession} of behalf of which the job is to be executed; must not be <code>null</code>.
+   *          {@link IServerSession} of behalf of which the job is to be executed; must not be <code>null</code> if
+   *          <code>sessionRequired=true (default)</code>.
    * @return {@link IJobInput} to be used as builder.
    */
   public ServerJobInput session(final IServerSession session) {
     m_session = session;
+    return this;
+  }
+
+  /**
+   * @param sessionRequired
+   *          <code>true</code> if the job requires to work on behalf of a session; by default, this property is
+   *          <code>true</code> and should only be changed with caution.
+   * @return {@link IJobInput} to be used as builder.
+   */
+  public ServerJobInput sessionRequired(final boolean sessionRequired) {
+    m_sessionRequired = sessionRequired;
     return this;
   }
 
@@ -135,10 +149,19 @@ public class ServerJobInput extends JobInput {
   }
 
   /**
-   * @return {@link IServerSession} of behalf of which the job is to be executed; must not be <code>null</code>.
+   * @return {@link IServerSession} of behalf of which the job is to be executed; must not be <code>null</code> if
+   *         <code>sessionRequired=true (default)</code>.
    */
   public IServerSession getSession() {
     return m_session;
+  }
+
+  /**
+   * @return <code>true</code> if the job manager asserts to have a session provided, either explicitly or by the
+   *         current calling context; is <code>true</code> by default.
+   */
+  public boolean isSessionRequired() {
+    return m_sessionRequired;
   }
 
   /**
@@ -167,7 +190,7 @@ public class ServerJobInput extends JobInput {
    * available, an empty one.
    */
   public static ServerJobInput empty() {
-    return new ServerJobInput(JobInput.empty());
+    return new ServerJobInput(JobInput.empty()).sessionRequired(true);
   }
 
   /**
@@ -189,6 +212,7 @@ public class ServerJobInput extends JobInput {
     final ServerJobInput defaults = new ServerJobInput(JobInput.defaults());
 
     defaults.session((IServerSession) ISession.CURRENT.get());
+    defaults.sessionRequired(true);
     defaults.servletRequest(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
     defaults.servletResponse(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
     defaults.locale(NlsLocale.CURRENT.get());

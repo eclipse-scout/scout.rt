@@ -160,7 +160,7 @@ public class ModelJobManager implements IModelJobManager {
    */
   protected void validateInput(final ClientJobInput input) {
     Assertions.assertNotNull(input, "ClientJobInput must not be null");
-    Assertions.assertNotNull(input.getSession(), "ClientSession must not be null");
+    Assertions.assertNotNull(input.getSession(), "ClientSession must not be null; input-property 'sessionRequired' not applicable for model jobs");
   }
 
   /**

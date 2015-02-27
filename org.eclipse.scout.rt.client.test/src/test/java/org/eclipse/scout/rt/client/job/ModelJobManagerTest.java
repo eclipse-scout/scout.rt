@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IFuture;
@@ -220,11 +221,53 @@ public class ModelJobManagerTest {
     assertEquals(Locale.CANADA_FRENCH, new _ModelJobManager().interceptLocale(Locale.CANADA_FRENCH, ClientJobInput.empty().session(session)));
   }
 
+  @Test(expected = AssertionException.class)
+  public void testSessionRequiredEmtpyInput() throws ProcessingException {
+    IClientSession.CURRENT.remove();
+    new _ModelJobManager().validateInput(ClientJobInput.empty());
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testSessionRequiredDefaultInputNOK() throws ProcessingException {
+    IClientSession.CURRENT.remove();
+    new _ModelJobManager().validateInput(ClientJobInput.defaults());
+  }
+
+  @Test
+  public void testSessionRequiredDefaultInputOK1() throws ProcessingException {
+    IClientSession.CURRENT.set(mock(IClientSession.class));
+    new _ModelJobManager().validateInput(ClientJobInput.defaults());
+    assertTrue(true); // no exception expected
+  }
+
+  @Test
+  public void testSessionRequiredDefaultInputOK2() throws ProcessingException {
+    IClientSession.CURRENT.remove();
+    new _ModelJobManager().validateInput(ClientJobInput.defaults().session(mock(IClientSession.class)));
+    assertTrue(true); // no exception expected
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testSessionNotRequiredWithoutSession() throws ProcessingException {
+    new _ModelJobManager().validateInput(ClientJobInput.defaults().sessionRequired(false).session(null)); // for model jobs a session is always required because interacting with the model.
+  }
+
+  @Test
+  public void testSessionNotRequiredWithSession() throws ProcessingException {
+    new _ModelJobManager().validateInput(ClientJobInput.defaults().sessionRequired(false).session(mock(IClientSession.class)));
+    assertTrue(true); // no exception expected
+  }
+
   private static class _ModelJobManager extends ModelJobManager {
 
     @Override
-    public Locale interceptLocale(Locale locale, ClientJobInput input) {
+    public Locale interceptLocale(Locale locale, ClientJobInput input) { // public to make accessible for test.
       return super.interceptLocale(locale, input);
+    }
+
+    @Override
+    public void validateInput(ClientJobInput input) { // public to make accessible for test.
+      super.validateInput(input);
     }
   }
 }

@@ -43,7 +43,9 @@ public class ClientJobManager extends JobManager<ClientJobInput> implements ICli
   @Override
   protected void validateInput(final ClientJobInput input) {
     Assertions.assertNotNull(input, "ClientJobInput must not be null");
-    Assertions.assertNotNull(input.getSession(), "ClientSession must not be null");
+    if (input.isSessionRequired()) {
+      Assertions.assertNotNull(input.getSession(), "ClientSession must not be null");
+    }
   }
 
   @Override
@@ -53,7 +55,7 @@ public class ClientJobManager extends JobManager<ClientJobInput> implements ICli
 
   @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final ClientJobInput input) {
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, input.getSession().getTexts());
+    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, (input.getSession() != null ? input.getSession().getTexts() : ScoutTexts.CURRENT.get()));
     final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, UserAgent.CURRENT, input.getUserAgent());
     final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, input.getSession());
     final Callable<RESULT> c1 = super.interceptCallable(c2, input);

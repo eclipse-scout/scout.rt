@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 public class ClientJobInput extends JobInput {
 
   private IClientSession m_session;
+  private boolean m_sessionRequired;
   private UserAgent m_userAgent;
 
   private ClientJobInput(final IJobInput origin) {
@@ -47,6 +48,7 @@ public class ClientJobInput extends JobInput {
   protected ClientJobInput(final ClientJobInput origin) {
     super(origin);
     m_session = origin.getSession();
+    m_sessionRequired = origin.isSessionRequired();
     m_userAgent = origin.getUserAgent();
   }
 
@@ -91,6 +93,17 @@ public class ClientJobInput extends JobInput {
   }
 
   /**
+   * @param sessionRequired
+   *          <code>true</code> if the job requires to work on behalf of a session; by default, this property is
+   *          <code>true</code> and should only be changed with caution.
+   * @return {@link IJobInput} to be used as builder.
+   */
+  public ClientJobInput sessionRequired(final boolean sessionRequired) {
+    m_sessionRequired = sessionRequired;
+    return this;
+  }
+
+  /**
    * @param userAgent
    *          {@link UserAgent} to describe the user agent used by the client; if set, the job's execution thread is
    *          associated with the given {@link UserAgent}.
@@ -102,10 +115,19 @@ public class ClientJobInput extends JobInput {
   }
 
   /**
-   * @return {@link IClientSession} of behalf of which the job is to be executed; must not be <code>null</code>.
+   * @return {@link IClientSession} of behalf of which the job is to be executed; must not be <code>null</code> if
+   *         <code>sessionRequired=true (default)</code>.
    */
   public IClientSession getSession() {
     return m_session;
+  }
+
+  /**
+   * @return <code>true</code> if the job manager asserts to have a session provided, either explicitly or by the
+   *         current calling context; is <code>true</code> by default.
+   */
+  public boolean isSessionRequired() {
+    return m_sessionRequired;
   }
 
   /**
@@ -120,7 +142,7 @@ public class ClientJobInput extends JobInput {
    * available, an empty one.
    */
   public static ClientJobInput empty() {
-    return new ClientJobInput(JobInput.empty());
+    return new ClientJobInput(JobInput.empty()).sessionRequired(true);
   }
 
   /**
@@ -139,6 +161,7 @@ public class ClientJobInput extends JobInput {
     final ClientJobInput defaults = new ClientJobInput(JobInput.defaults());
 
     defaults.session((IClientSession) ISession.CURRENT.get());
+    defaults.sessionRequired(true);
     defaults.locale(resolveDefaultLocale());
     defaults.userAgent(UserAgent.CURRENT.get());
 

@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IProgressMonitor;
@@ -528,11 +529,54 @@ public class ServerJobManagerTest {
     assertEquals(Locale.CANADA_FRENCH, new _ServerJobManager().interceptLocale(Locale.CANADA_FRENCH, ServerJobInput.empty().session(session)));
   }
 
+  @Test(expected = AssertionException.class)
+  public void testSessionRequiredEmtpyInput() throws ProcessingException {
+    IServerSession.CURRENT.remove();
+    new _ServerJobManager().validateInput(ServerJobInput.empty());
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testSessionRequiredDefaultInputNOK() throws ProcessingException {
+    IServerSession.CURRENT.remove();
+    new _ServerJobManager().validateInput(ServerJobInput.defaults());
+  }
+
+  @Test
+  public void testSessionRequiredDefaultInputOK1() throws ProcessingException {
+    IServerSession.CURRENT.set(mock(IServerSession.class));
+    new _ServerJobManager().validateInput(ServerJobInput.defaults());
+    assertTrue(true); // no exception expected
+  }
+
+  @Test
+  public void testSessionRequiredDefaultInputOK2() throws ProcessingException {
+    IServerSession.CURRENT.remove();
+    new _ServerJobManager().validateInput(ServerJobInput.defaults().session(mock(IServerSession.class)));
+    assertTrue(true); // no exception expected
+  }
+
+  @Test
+  public void testSessionNotRequiredWithoutSession() throws ProcessingException {
+    new _ServerJobManager().validateInput(ServerJobInput.defaults().sessionRequired(false).session(null));
+    assertTrue(true); // no exception expected
+  }
+
+  @Test
+  public void testSessionNotRequiredWithSession() throws ProcessingException {
+    new _ServerJobManager().validateInput(ServerJobInput.defaults().sessionRequired(false).session(mock(IServerSession.class)));
+    assertTrue(true); // no exception expected
+  }
+
   private static class _ServerJobManager extends ServerJobManager {
 
     @Override
-    public Locale interceptLocale(Locale locale, ServerJobInput input) {
+    public Locale interceptLocale(Locale locale, ServerJobInput input) { // public to make accessible for test.
       return super.interceptLocale(locale, input);
+    }
+
+    @Override
+    public void validateInput(ServerJobInput input) { // public to make accessible for test.
+      super.validateInput(input);
     }
   }
 }
