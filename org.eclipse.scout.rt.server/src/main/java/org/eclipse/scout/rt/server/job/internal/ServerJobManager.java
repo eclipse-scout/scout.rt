@@ -89,15 +89,16 @@ public class ServerJobManager extends JobManager<ServerJobInput> implements ISer
 
   @Override
   public boolean cancel(final long id, final IServerSession serverSession) {
-    final Set<Boolean> status = new HashSet<>();
+    Assertions.assertNotNull(serverSession);
 
+    final Set<Boolean> status = new HashSet<>();
     visit(new IFutureVisitor() {
 
       @Override
       public boolean visit(final Future<?> future) {
         final ServerJobInput input = ((ServerJobFuture) future).getInput();
         if (serverSession.equals(input.getSession()) && id == input.getId()) {
-          status.add(future.cancel(true));
+          status.add(future.cancel(true)); // do not return because multiple jobs might belong to the same id.
         }
         return true;
       }

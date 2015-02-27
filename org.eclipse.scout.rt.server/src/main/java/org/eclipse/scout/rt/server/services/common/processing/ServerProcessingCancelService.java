@@ -11,7 +11,8 @@
 package org.eclipse.scout.rt.server.services.common.processing;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
+import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.service.AbstractService;
 
@@ -19,7 +20,7 @@ import org.eclipse.scout.service.AbstractService;
 public class ServerProcessingCancelService extends AbstractService implements IServerProcessingCancelService {
 
   @Override
-  public boolean cancel(long transcationSequence) {
-    return ActiveTransactionRegistry.cancel(transcationSequence);
+  public boolean cancel(long requestSequence) {
+    return ServerJobManager.DEFAULT.cancel(requestSequence, (IServerSession) IServerSession.CURRENT);
   }
 }

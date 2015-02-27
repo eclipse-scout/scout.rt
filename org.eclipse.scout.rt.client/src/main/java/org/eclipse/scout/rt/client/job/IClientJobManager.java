@@ -41,17 +41,16 @@ public interface IClientJobManager extends IJobManager<ClientJobInput> {
   IClientJobManager DEFAULT = new ClientJobManager();
 
   /**
-   * Cancels all jobs that belong to the given <code>id</code> and {@link IClientSession}. The jobs to be cancelled are
-   * cancelled 'hard', meaning that their executing threads are <code>interrupted</code>. If canceling a job that
-   * executed nested jobs in 'runNow'-style, those are cancelled as well - however, only the very outermost job can be
-   * cancelled.
+   * Cancels a job.
+   * <p/>
+   * Also, any nested 'runNow'-style jobs, which where run on behalf of that job and did not complete yet, are
+   * cancelled. In order to be cancelled, the given session must be the same as the job's session.
    *
    * @param id
-   *          the <code>id</code> of the job to be cancelled; the same <code>id</code> may be shared by multiple jobs.
-   * @param clientSession
-   *          the {@link IClientSession} which jobs to be cancelled must belong to; must not be <code>null</code>.
-   * @return <code>true</code> if cancelled successfully, <code>false</code> if no job was found or could not be
-   *         cancelled.
+   *          id of the job to be cancelled.
+   * @param serverSession
+   *          session which the job to be cancelled must belong to; must not be <code>null</code>.
+   * @return <code>true</code> if cancel was successful, <code>false</code> otherwise.
    */
   boolean cancel(long id, IClientSession clientSession);
 }
