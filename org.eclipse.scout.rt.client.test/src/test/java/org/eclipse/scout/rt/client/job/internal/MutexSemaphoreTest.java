@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -31,12 +30,27 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.commons.UncaughtExceptionRunnable;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class MutexSemaphoreTest {
+
+  private static ExecutorService s_executor;
+
+  @BeforeClass
+  public static void beforeClass() {
+    s_executor = Executors.newCachedThreadPool();
+  }
+
+  @AfterClass
+  public static void afterClass() {
+    s_executor.shutdown();
+  }
 
   @Mock
   private Task<Object> m_task1;
@@ -159,7 +173,7 @@ public class MutexSemaphoreTest {
   }
 
   @Test
-  public void testWaitForIdle() throws InterruptedException {
+  public void testWaitForIdle() throws Throwable {
     final MutexSemaphore mutexSemaphore = new MutexSemaphore();
 
     // state: []
@@ -186,28 +200,35 @@ public class MutexSemaphoreTest {
     assertNotIdle(mutexSemaphore);
 
     final AtomicInteger protocolCount = new AtomicInteger(5);
-    final ExecutorService executor = Executors.newFixedThreadPool(1);
 
     final BooleanHolder waitForIdleResult = new BooleanHolder(false);
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-    executor.submit(new Callable<Void>() {
+
+    UncaughtExceptionRunnable runnable = new UncaughtExceptionRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      protected void runSafe() throws Exception {
         setupLatch.countDown();
         try {
           waitForIdleResult.setValue(mutexSemaphore.waitForIdle(10, TimeUnit.SECONDS));
         }
         finally {
           verifyLatch.countDown();
-          executor.shutdown();
         }
-        return null;
       }
-    });
 
+      @Override
+      protected void onUncaughtException(Throwable t) {
+        setupLatch.release();
+        verifyLatch.release();
+      }
+    };
+    s_executor.execute(runnable);
+
+    setupLatch.await();
+    runnable.throwOnError();
     assertTrue(setupLatch.await());
 
     Thread.sleep(500); // Wait for the other thread to invoke 'waitForIdle'.
@@ -234,6 +255,8 @@ public class MutexSemaphoreTest {
     assertNull(mutexSemaphore.pollElseRelease());
     // state: []
 
+    verifyLatch.await();
+    runnable.throwOnError();
     assertTrue(verifyLatch.await());
 
     assertTrue(waitForIdleResult.getValue());

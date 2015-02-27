@@ -88,6 +88,20 @@ public final class BlockingCountDownLatch {
   }
 
   /**
+   * Releases all waiting threads blocked by {@link #await()}.
+   */
+  public void release() {
+    m_lock.lock();
+    try {
+      m_count = 0;
+      m_zeroCountCondition.signalAll();
+    }
+    finally {
+      m_lock.unlock();
+    }
+  }
+
+  /**
    * Releases all waiting threads blocked by {@link #countDownAndBlock()}.
    */
   public void unblock() {

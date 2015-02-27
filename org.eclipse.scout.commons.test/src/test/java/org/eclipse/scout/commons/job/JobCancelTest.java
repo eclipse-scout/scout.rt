@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +31,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.commons.UncaughtExceptionRunnable;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -353,22 +353,27 @@ public class JobCancelTest {
   }
 
   @Test
-  public void testRunNowAndShutdownJobManager() throws Exception {
+  public void testRunNowAndShutdownJobManager() throws Throwable {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
 
     // This job will cancel the job manager.
-    s_executor.submit(new Callable<Void>() {
+    UncaughtExceptionRunnable runnable = new UncaughtExceptionRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      protected void runSafe() throws Exception {
         setupLatch.await();
         m_jobManager.shutdown();
-        return null;
       }
-    });
+
+      @Override
+      protected void onUncaughtException(Throwable t) {
+        setupLatch.unblock();
+      }
+    };
+    s_executor.execute(runnable);
 
     m_jobManager.runNow(new IRunnable() {
 
@@ -394,7 +399,10 @@ public class JobCancelTest {
     });
 
     // VERIFY
+    verifyLatch.await();
+    runnable.throwOnError();
     assertTrue(verifyLatch.await());
+
     assertEquals(CollectionUtility.arrayList("1: running", "3: interrupted", "4: cancelled"), protocol);
   }
 }

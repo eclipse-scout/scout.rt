@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +36,7 @@ import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.commons.UncaughtExceptionRunnable;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -345,21 +345,26 @@ public class ModelJobCancelTest {
   }
 
   @Test
-  public void testRunNowAndShutdownJobManager() throws Exception {
+  public void testRunNowAndShutdownJobManager() throws Throwable {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // This job will cancel the job manager.
-    s_executor.submit(new Callable<Void>() {
+    final UncaughtExceptionRunnable runnable = new UncaughtExceptionRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      protected void runSafe() throws Exception {
         setupLatch.await();
         m_jobManager.shutdown();
-        return null;
       }
-    });
+
+      @Override
+      protected void onUncaughtException(Throwable e) {
+        setupLatch.unblock();
+      }
+    };
+    s_executor.execute(runnable);
 
     m_jobManager.schedule(new IRunnable() {
 
@@ -388,7 +393,9 @@ public class ModelJobCancelTest {
     });
 
     // VERIFY
-    assertTrue(m_jobManager.waitForIdle(30, TimeUnit.SECONDS));
+    m_jobManager.waitForIdle(30, TimeUnit.SECONDS);
+    runnable.throwOnError();
+    assertTrue(m_jobManager.isIdle());
     assertEquals(CollectionUtility.arrayList("1: running", "3: interrupted", "4: cancelled"), protocol);
   }
 }
