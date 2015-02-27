@@ -25,9 +25,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.SynchronousBundleListener;
 
 public class Activator extends Plugin {
@@ -71,23 +71,26 @@ public class Activator extends Plugin {
 
   private Object findApplicationClass(IProduct product) throws CoreException {
     if (product != null) {
-      IExtensionRegistry reg = SERVICES.getService(IExtensionRegistry.class);
-      if (reg != null) {
-        IExtensionPoint xpProd = reg.getExtensionPoint("org.eclipse.core.runtime.products");
-        if (xpProd != null) {
-          IExtension xProd = xpProd.getExtension(product.getId());
-          if (xProd != null) {
-            for (IConfigurationElement cProd : xProd.getConfigurationElements()) {
-              if (cProd.getName().equals("product")) {
-                String appId = cProd.getAttribute("application");
-                IExtensionPoint xpApp = reg.getExtensionPoint("org.eclipse.core.runtime.applications");
-                if (xpApp != null) {
-                  IExtension xApp = xpApp.getExtension(appId);
-                  if (xApp != null) {
-                    for (IConfigurationElement cApp : xApp.getConfigurationElements()) {
-                      if (cApp.getName().equals("application")) {
-                        for (IConfigurationElement cRun : cApp.getChildren("run")) {
-                          return cRun.createExecutableExtension("class");
+      ServiceReference serviceRef = getBundle().getBundleContext().getServiceReference(IExtensionRegistry.class.getName());
+      try {
+        IExtensionRegistry reg = (IExtensionRegistry) getBundle().getBundleContext().getService(serviceRef);
+        if (reg != null) {
+          IExtensionPoint xpProd = reg.getExtensionPoint("org.eclipse.core.runtime.products");
+          if (xpProd != null) {
+            IExtension xProd = xpProd.getExtension(product.getId());
+            if (xProd != null) {
+              for (IConfigurationElement cProd : xProd.getConfigurationElements()) {
+                if (cProd.getName().equals("product")) {
+                  String appId = cProd.getAttribute("application");
+                  IExtensionPoint xpApp = reg.getExtensionPoint("org.eclipse.core.runtime.applications");
+                  if (xpApp != null) {
+                    IExtension xApp = xpApp.getExtension(appId);
+                    if (xApp != null) {
+                      for (IConfigurationElement cApp : xApp.getConfigurationElements()) {
+                        if (cApp.getName().equals("application")) {
+                          for (IConfigurationElement cRun : cApp.getChildren("run")) {
+                            return cRun.createExecutableExtension("class");
+                          }
                         }
                       }
                     }
@@ -97,6 +100,9 @@ public class Activator extends Plugin {
             }
           }
         }
+      }
+      finally {
+        getBundle().getBundleContext().ungetService(serviceRef);
       }
     }
     return null;
