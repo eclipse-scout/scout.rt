@@ -113,6 +113,7 @@ public final class Platform implements IPlatform {
     stopApplications();
     // stop modules
     stopModules();
+    CDI.stop();
     m_state = State.Stopped;
   }
 

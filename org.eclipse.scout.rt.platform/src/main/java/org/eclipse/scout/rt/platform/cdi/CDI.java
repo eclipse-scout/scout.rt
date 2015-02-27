@@ -30,6 +30,10 @@ public final class CDI {
     instance.startInternal();
   }
 
+  public static void stop() {
+    instance.stopInternal();
+  }
+
   public static synchronized IBeanContext getBeanContext() {
     return instance.getBeanContextInternal();
   }
@@ -47,6 +51,13 @@ public final class CDI {
     // instantiate @CreateImmediatly beans
     instantiateCreateImmediately(context);
     m_beanContext = context;
+  }
+
+  /**
+   *
+   */
+  private synchronized void stopInternal() {
+    m_beanContext = null;
   }
 
   /**
