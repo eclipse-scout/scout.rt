@@ -16,8 +16,7 @@ import java.io.InterruptedIOException;
 import java.net.SocketException;
 import java.security.AccessController;
 import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletConfig;
@@ -25,14 +24,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.ConfigIniUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.ICallable;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -40,6 +37,8 @@ import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -77,14 +76,13 @@ public class ServiceTunnelServlet extends HttpServletEx {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelServlet.class);
 
   private transient IServiceTunnelContentHandler m_contentHandler;
-  private final Object m_msgEncoderLock = new Object();
   private Class<? extends IServerSession> m_serverSessionClass;
   private Version m_requestMinVersion;
   private final boolean m_debug;
   private final boolean m_isMultiClientSessionCookieStore;
 
-  private final VirtualSessionCache m_ajaxSessionCache = new VirtualSessionCache();
-  private volatile boolean m_isAjaxSessionTimeoutInitialized = false;
+  private final VirtualSessionCache m_virtualSessionCache = new VirtualSessionCache();
+  private volatile boolean m_virtualSessionTimeoutInitialized = false;
 
   public ServiceTunnelServlet(boolean multiClientSessionCookieStore, boolean debug) {
     m_isMultiClientSessionCookieStore = multiClientSessionCookieStore;
@@ -95,12 +93,162 @@ public class ServiceTunnelServlet extends HttpServletEx {
     this(ConfigIniUtility.getPropertyBoolean(MULTI_CLIENT_SESSION_COOKIESTORE, true), ConfigIniUtility.getPropertyBoolean(HTTP_DEBUG_PARAM, false));
   }
 
+  // === HTTP-GET ===
+
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    Subject subject = Subject.getSubject(AccessController.getContext());
+    if (subject == null) {
+      res.sendError(HttpServletResponse.SC_FORBIDDEN);
+      return;
+    }
+
+    lazyInit(req, res);
+
+    try {
+      // Create the job-input on behalf of which the server-job is run.
+      ServerJobInput input = ServerJobInput.empty();
+      input.name("AdminServiceCall");
+      input.subject(subject);
+      input.servletRequest(req);
+      input.servletResponse(res);
+      input.locale(Locale.getDefault());
+      input.userAgent(UserAgent.createDefault());
+      input.session(lookupScoutServerSessionOnHttpSession(input.copy()));
+
+      invokeAdminServiceInServerJob(input);
+    }
+    catch (ProcessingException e) {
+      throw new ServletException("Failed to invoke AdminServlet", e);
+    }
+  }
+
+  // === HTTP-POST ===
+
+  @Override
+  protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    Subject subject = Subject.getSubject(AccessController.getContext());
+    if (subject == null) {
+      res.sendError(HttpServletResponse.SC_FORBIDDEN);
+      return;
+    }
+
+    lazyInit(req, res);
+
+    try {
+      IServiceTunnelRequest serviceRequest = deserializeServiceRequest(req.getInputStream());
+
+      // Create the job-input on behalf of which the server-job is run.
+      ServerJobInput input = ServerJobInput.empty();
+      input.name("RemoteServiceCall");
+      input.id(serviceRequest.getRequestSequence()); // to cancel server jobs and associated transactions.
+      input.subject(subject);
+      input.servletRequest(req);
+      input.servletResponse(res);
+      input.locale(serviceRequest.getLocale());
+      input.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
+      input.session(lookupServerSession(input.copy(), serviceRequest.getVirtualSessionId()));
+
+      IServiceTunnelResponse serviceResponse = invokeServiceInServerJob(input, serviceRequest);
+
+      serializeServiceResponse(res, serviceResponse);
+    }
+    catch (Exception e) {
+      if (isConnectionError(e)) {
+        // NOOP: Ignore disconnect errors: we do not want to throw an exception, if the client closed the connection.
+      }
+      else {
+        LOG.error(String.format("Client=%s@%s/%s", req.getRemoteUser(), req.getRemoteAddr(), req.getRemoteHost()), e);
+        res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      }
+    }
+  }
+
+  // === SERVICE INVOCATION ===
+
+  /**
+   * Method invoked to delegate the HTTP request to the 'admin service' on behalf of a server job.
+   *
+   * @param input
+   *          input to be used to run the server job with current context information set.
+   */
+  protected void invokeAdminServiceInServerJob(final ServerJobInput input) throws ProcessingException {
+    final HttpServletRequest request = input.getServletRequest();
+    final HttpServletResponse response = input.getServletResponse();
+
+    ServerJobManager.DEFAULT.runNow(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        String key = AdminSession.class.getName();
+
+        AdminSession adminSession = (AdminSession) SERVICES.getService(IHttpSessionCacheService.class).getAndTouch(key, request, response);
+        if (adminSession == null) {
+          adminSession = new AdminSession();
+          SERVICES.getService(IHttpSessionCacheService.class).put(key, adminSession, request, response);
+        }
+        adminSession.serviceRequest(request, response);
+      }
+    }, input);
+  }
+
+  /**
+   * Method invoked to delegate the HTTP request to the 'process service' on behalf of a server job.
+   *
+   * @param input
+   *          input to be used to run the server job with current context information set.
+   * @param serviceTunnelRequest
+   *          describes the service to be invoked.
+   * @return {@link IServiceTunnelResponse} response sent back to the client.
+   */
+  protected IServiceTunnelResponse invokeServiceInServerJob(final ServerJobInput input, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
+    return ServerJobManager.DEFAULT.runNow(new ICallable<IServiceTunnelResponse>() {
+
+      @Override
+      public IServiceTunnelResponse call() throws Exception {
+        return new DefaultTransactionDelegate(getRequestMinVersion(), isDebug()).invoke(serviceTunnelRequest);
+      }
+    }, input);
+  }
+
+  // === MESSAGE UNMARSHALLING / MARSHALLING ===
+
+  /**
+   * Method invoked to deserialize a service request to be given to the service handler.
+   */
+  protected IServiceTunnelRequest deserializeServiceRequest(InputStream in) throws Exception {
+    return m_contentHandler.readRequest(in);
+  }
+
+  /**
+   * Method invoked to serialize a service response to be sent back to the client.
+   */
+  protected void serializeServiceResponse(HttpServletResponse httpResponse, IServiceTunnelResponse res) throws Exception {
+    // security: do not send back error stack trace
+    if (res.getException() != null) {
+      res.getException().setStackTrace(new StackTraceElement[0]);
+    }
+
+    httpResponse.setDateHeader("Expires", -1);
+    httpResponse.setHeader("Cache-Control", "no-cache");
+    httpResponse.setHeader("pragma", "no-cache");
+    httpResponse.setContentType("text/xml");
+    m_contentHandler.writeResponse(httpResponse.getOutputStream(), res);
+  }
+
+  // === INITIALIZATION ===
+
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
     m_requestMinVersion = initRequestMinVersion(config);
   }
 
+  /**
+   * Method invoked by 'HTTP-GET' and 'HTTP-POST' to identify the session-class and to initialize the content handler
+   * for serialization/deserialization.
+   */
+  @Internal
   protected void lazyInit(HttpServletRequest req, HttpServletResponse res) throws ServletException {
     if (m_serverSessionClass == null) {
       m_serverSessionClass = locateServerSessionClass(req, res);
@@ -111,55 +259,20 @@ public class ServiceTunnelServlet extends HttpServletEx {
     if (m_serverSessionClass == null) {
       throw new ServletException("Expected init-param \"session\"");
     }
+
+    m_contentHandler = createContentHandler(m_serverSessionClass);
   }
 
   /**
-   * Load the IServerSession class by servlet config parameter
-   *
-   * @throws ServletException
-   */
-  @SuppressWarnings("unchecked")
-  private Class<? extends IServerSession> loadSessionClassByParam() throws ServletException {
-    String qname = getServletConfig().getInitParameter("session");
-    if (qname != null) {
-      int i = qname.lastIndexOf('.');
-      try {
-        m_serverSessionClass = (Class<? extends IServerSession>) Platform.getBundle(qname.substring(0, i)).loadClass(qname);
-      }
-      catch (ClassNotFoundException e) {
-        throw new ServletException("Loading class " + qname, e);
-      }
-    }
-    return null;
-  }
-
-  protected Class<? extends IServerSession> locateServerSessionClass(HttpServletRequest req, HttpServletResponse res) {
-    try {
-      return SERVICES.getService(IServerJobService.class).getServerSessionClass();
-    }
-    catch (ProcessingException e) {
-      LOG.debug("No server session found");
-    }
-    return null;
-  }
-
-  /**
-   * <p>
    * Reads the minimum version a request must have.
-   * </p>
-   * <p>
+   * <p/>
    * The version has to be defined as init parameter in the servlet configuration. <br/>
    * This can be done by adding a new init-param at the {@link DefaultHttpProxyHandlerServlet} on the extension point
    * org.eclipse.equinox.http.registry.servlets and setting its name to min-version and its value to the desired version
-   * (like 1.2.3).
-   * </p>
-   * <p>
+   * (like 1.2.3). <br/>
    * If there is no min-version defined it uses the Bundle-Version of the bundle which contains the running product.
-   * </p>
-   *
-   * @param config
-   * @return
    */
+  @Internal
   protected Version initRequestMinVersion(ServletConfig config) {
     Version version = null;
     String v = config.getInitParameter("min-version");
@@ -187,27 +300,64 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return e;
   }
 
-  private IServiceTunnelContentHandler getServiceTunnelContentHandler() {
-    synchronized (m_msgEncoderLock) {
-      if (m_contentHandler == null) {
-        m_contentHandler = createContentHandler(m_serverSessionClass);
+  /**
+   * Initialize virtual session timeout; only once from the HTTP session
+   */
+  @Internal
+  protected void initializeVirtualSessionTimeout(HttpServletRequest req) {
+    if (!m_virtualSessionTimeoutInitialized) {
+      m_virtualSessionCache.setSessionTimeoutMillis(Math.max(TimeUnit.MINUTES.toMillis(30), TimeUnit.SECONDS.toMillis(req.getSession().getMaxInactiveInterval())));
+      m_virtualSessionTimeoutInitialized = true;
+    }
+  }
+
+  // === SESSION CLASS, SESSION LOOKUP, SESSION CREATION ===
+  @Internal
+  protected Class<? extends IServerSession> locateServerSessionClass(HttpServletRequest req, HttpServletResponse res) {
+    try {
+      return SERVICES.getService(IServerJobService.class).getServerSessionClass();
+    }
+    catch (ProcessingException e) {
+      LOG.debug("No server session found");
+    }
+    return null;
+  }
+
+  /**
+   * Load the IServerSession class by servlet config parameter
+   *
+   * @throws ServletException
+   */
+  @SuppressWarnings("unchecked")
+  private Class<? extends IServerSession> loadSessionClassByParam() throws ServletException {
+    String qname = getServletConfig().getInitParameter("session");
+    if (qname != null) {
+      int i = qname.lastIndexOf('.');
+      try {
+        m_serverSessionClass = (Class<? extends IServerSession>) Platform.getBundle(qname.substring(0, i)).loadClass(qname);
+      }
+      catch (ClassNotFoundException e) {
+        throw new ServletException("Loading class " + qname, e);
       }
     }
-    return m_contentHandler;
+    return null;
   }
 
-  protected IServerSession lookupServerSession(HttpServletRequest req, HttpServletResponse res, Subject subject, IServiceTunnelRequest serviceRequest) throws ProcessingException, ServletException {
-    UserAgent userAgent = UserAgent.createByIdentifier(serviceRequest.getUserAgent());
-    String virtualSessionId = serviceRequest.getVirtualSessionId();
+  @Internal
+  protected IServerSession lookupServerSession(ServerJobInput input, String virtualSessionId) throws ProcessingException, ServletException {
     if (virtualSessionId != null && !m_isMultiClientSessionCookieStore) {
-      return lookupScoutServerSessionOnVirtualSession(req, res, virtualSessionId, subject, userAgent);
+      return lookupScoutServerSessionOnVirtualSession(input, virtualSessionId);
     }
     else {
-      return lookupScoutServerSessionOnHttpSession(req, res, subject, userAgent);
+      return lookupScoutServerSessionOnHttpSession(input);
     }
   }
 
-  protected IServerSession lookupScoutServerSessionOnHttpSession(HttpServletRequest req, HttpServletResponse res, Subject subject, UserAgent userAgent) throws ProcessingException, ServletException {
+  @Internal
+  protected IServerSession lookupScoutServerSessionOnHttpSession(ServerJobInput jobInput) throws ProcessingException, ServletException {
+    HttpServletRequest req = jobInput.getServletRequest();
+    HttpServletResponse res = jobInput.getServletResponse();
+
     //external request: apply locking, this is the session initialization phase
     IHttpSessionCacheService cacheService = SERVICES.getService(IHttpSessionCacheService.class);
     IServerSession serverSession = (IServerSession) cacheService.getAndTouch(IServerSession.class.getName(), req, res);
@@ -215,8 +365,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       synchronized (req.getSession()) {
         serverSession = (IServerSession) cacheService.get(IServerSession.class.getName(), req, res); // double checking
         if (serverSession == null) {
-          serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject, userAgent);
-          serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(req, res));
+          serverSession = createAndLoadServerSession(m_serverSessionClass, jobInput);
           cacheService.put(IServerSession.class.getName(), serverSession, req, res);
         }
       }
@@ -224,211 +373,65 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return serverSession;
   }
 
-  private IServerSession lookupScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, String ajaxSessionId, Subject subject, UserAgent userAgent) throws ProcessingException, ServletException {
-    initializeAjaxSessionTimeout(req);
-    IServerSession serverSession = m_ajaxSessionCache.get(ajaxSessionId);
+  @Internal
+  protected IServerSession lookupScoutServerSessionOnVirtualSession(ServerJobInput input, String virtualSessionId) throws ProcessingException, ServletException {
+    initializeVirtualSessionTimeout(input.getServletRequest());
+    IServerSession serverSession = m_virtualSessionCache.get(virtualSessionId);
     if (serverSession == null) {
-      synchronized (m_ajaxSessionCache) {
-        serverSession = m_ajaxSessionCache.get(ajaxSessionId);
+      synchronized (m_virtualSessionCache) {
+        serverSession = m_virtualSessionCache.get(virtualSessionId);
         if (serverSession == null) { // double checking
-          return createAndCacheNewServerSession(ajaxSessionId, subject, userAgent, req, res);
+          serverSession = createAndLoadServerSession(m_serverSessionClass, input);
+          m_virtualSessionCache.put(virtualSessionId, serverSession);
         }
       }
     }
-    m_ajaxSessionCache.touch(ajaxSessionId);
+    m_virtualSessionCache.touch(virtualSessionId);
     return serverSession;
   }
 
-  /**
-   * Initialize Ajax Session timeout only once from the HTTP session
-   */
-  protected void initializeAjaxSessionTimeout(HttpServletRequest req) {
-    if (!m_isAjaxSessionTimeoutInitialized) {
-      final long defaultSessionTimeout = 1800L;
-      final long millisecondsInSeconds = 1000L;
-      m_ajaxSessionCache.setSessionTimeoutMillis(Math.max(millisecondsInSeconds * defaultSessionTimeout, millisecondsInSeconds * req.getSession().getMaxInactiveInterval()));
-      m_isAjaxSessionTimeoutInitialized = true;
-    }
-  }
+  @Internal
+  protected IServerSession createAndLoadServerSession(final Class<? extends IServerSession> clazz, ServerJobInput input) throws ProcessingException {
+    IServerSessionRegistryService sessionService = SERVICES.getService(IServerSessionRegistryService.class);
+    final IServerSession serverSession = sessionService.newServerSession(clazz, input);
+    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(input.getServletRequest(), input.getServletResponse()));
 
-  private IServerSession createAndCacheNewServerSession(String ajaxSessionId, Subject subject, UserAgent userAgent, HttpServletRequest req, HttpServletResponse res) throws ProcessingException {
-    IServerSession serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject, userAgent);
-    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(req, res));
-    m_ajaxSessionCache.put(ajaxSessionId, serverSession);
     return serverSession;
   }
 
-  @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
-    Subject subject = Subject.getSubject(AccessController.getContext());
-    if (subject == null) {
-      res.sendError(HttpServletResponse.SC_FORBIDDEN);
-      return;
-    }
-    //invoke
-    Map<Class, Object> backup = ThreadContext.backup();
-    try {
-      lazyInit(req, res);
-      //
-      //legacy, deprecated, do not use servlet request/response in scout code
-      ThreadContext.putHttpServletRequest(req);
-      ThreadContext.putHttpServletResponse(res);
-      //
-      UserAgent userAgent = UserAgent.createDefault();
-      IServerSession serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject, userAgent);
-      //
-      ServerJob job = new AdminServiceJob(serverSession, subject, req, res);
-      job.runNow(new NullProgressMonitor());
-      job.throwOnError();
-    }
-    catch (ProcessingException e) {
-      throw new ServletException(e);
-    }
-    finally {
-      ThreadContext.restore(backup);
-    }
-  }
+  // === Helper methods ===
 
-  @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-    Subject subject = Subject.getSubject(AccessController.getContext());
-    if (subject == null) {
-      res.sendError(HttpServletResponse.SC_FORBIDDEN);
-      return;
-    }
-    try {
-      lazyInit(req, res);
-      Map<Class, Object> backup = ThreadContext.backup();
-      Locale oldLocale = LocaleThreadLocal.get(false);
-      try {
-        ThreadContext.putHttpServletRequest(req);
-        ThreadContext.putHttpServletResponse(res);
-        //read request
-        IServiceTunnelRequest serviceRequest = deserializeInput(req.getInputStream());
-        LocaleThreadLocal.set(serviceRequest.getLocale());
-        //virtual or http session?
-        IServerSession serverSession = lookupServerSession(req, res, subject, serviceRequest);
-        //invoke
-        AtomicReference<IServiceTunnelResponse> serviceResponseHolder = new AtomicReference<IServiceTunnelResponse>();
-        ServerJob job = createServiceTunnelServerJob(serverSession, serviceRequest, serviceResponseHolder, subject);
-        job.setTransactionSequence(serviceRequest.getRequestSequence());
-        job.runNow(new NullProgressMonitor());
-        job.throwOnError();
-        serializeOutput(res, serviceResponseHolder.get());
-      }
-      finally {
-        ThreadContext.restore(backup);
-        LocaleThreadLocal.set(oldLocale);
-      }
-    }
-    catch (Throwable t) {
-      //ignore disconnect errors
-      // we don't want to throw an exception, if the client closed the connection
-      Throwable cause = t;
-      while (cause != null) {
-        if (cause instanceof SocketException) {
-          return;
-        }
-        else if (cause.getClass().getSimpleName().equalsIgnoreCase("EofException")) {
-          return;
-        }
-        else if (cause instanceof InterruptedIOException) {
-          return;
-        }
-        // next
-        cause = cause.getCause();
-      }
-      LOG.error("Client=" + req.getRemoteUser() + "@" + req.getRemoteAddr() + "/" + req.getRemoteHost(), t);
-      res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  protected IServiceTunnelRequest deserializeInput(InputStream in) throws Exception {
-    return getServiceTunnelContentHandler().readRequest(in);
-  }
-
-  protected void serializeOutput(HttpServletResponse httpResponse, IServiceTunnelResponse res) throws Exception {
-    // security: do not send back error stack trace
-    if (res.getException() != null) {
-      res.getException().setStackTrace(new StackTraceElement[0]);
-    }
-    //
-    httpResponse.setDateHeader("Expires", -1);
-    httpResponse.setHeader("Cache-Control", "no-cache");
-    httpResponse.setHeader("pragma", "no-cache");
-    httpResponse.setContentType("text/xml");
-    getServiceTunnelContentHandler().writeResponse(httpResponse.getOutputStream(), res);
+  /**
+   * @return minimal version a service request must have.
+   */
+  protected Version getRequestMinVersion() {
+    return m_requestMinVersion;
   }
 
   /**
-   * Create the {@link ServerJob} that runs the request as a single atomic transaction
+   * @return <code>true</code> if the {@link ServiceTunnelServlet} runs in debug mode; see property
+   *         {@link ServiceTunnelServlet#HTTP_DEBUG_PARAM}.
    */
-  protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, IServiceTunnelRequest serviceRequest, AtomicReference<IServiceTunnelResponse> serviceResponseHolder, Subject subject) {
-    return new RemoteServiceJob(serverSession, serviceRequest, serviceResponseHolder, subject);
+  protected boolean isDebug() {
+    return m_debug;
   }
 
-  /**
-   * runnable content of the {@link ServerJob}, thzis is the atomic transaction
-   * <p>
-   * This method is part of the protected api and can be overridden.
-   */
-  protected IServiceTunnelResponse runServerJobTransaction(IServiceTunnelRequest req) throws Exception {
-    return runServerJobTransactionWithDelegate(req, m_requestMinVersion, m_debug);
-  }
-
-  protected IServiceTunnelResponse runServerJobTransactionWithDelegate(IServiceTunnelRequest req, Version requestMinVersion, boolean debug) throws Exception {
-    return new DefaultTransactionDelegate(requestMinVersion, debug).invoke(req);
-  }
-
-  private class RemoteServiceJob extends ServerJob {
-
-    private final IServiceTunnelRequest m_serviceRequest;
-    private final AtomicReference<IServiceTunnelResponse> m_serviceResponseHolder;
-
-    public RemoteServiceJob(IServerSession serverSession, IServiceTunnelRequest serviceRequest, AtomicReference<IServiceTunnelResponse> serviceResponseHolder, Subject subject) {
-      super("RemoteServiceCall", serverSession, subject);
-      m_serviceRequest = serviceRequest;
-      m_serviceResponseHolder = serviceResponseHolder;
-    }
-
-    public IServiceTunnelRequest getServiceRequest() {
-      return m_serviceRequest;
-    }
-
-    public AtomicReference<IServiceTunnelResponse> getServiceResponseHolder() {
-      return m_serviceResponseHolder;
-    }
-
-    @Override
-    protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      IServiceTunnelResponse serviceRes = runServerJobTransaction(getServiceRequest());
-      getServiceResponseHolder().set(serviceRes);
-      return Status.OK_STATUS;
-    }
-  }
-
-  private class AdminServiceJob extends ServerJob {
-
-    protected HttpServletRequest m_request;
-    protected HttpServletResponse m_response;
-
-    public AdminServiceJob(IServerSession serverSession, Subject subject, HttpServletRequest request, HttpServletResponse response) {
-      super("AdminServiceCall", serverSession, subject);
-      m_request = request;
-      m_response = response;
-    }
-
-    @Override
-    protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      String key = AdminSession.class.getName();
-      AdminSession as = (AdminSession) SERVICES.getService(IHttpSessionCacheService.class).getAndTouch(key, m_request, m_response);
-      if (as == null) {
-        as = new AdminSession();
-        SERVICES.getService(IHttpSessionCacheService.class).put(key, as, m_request, m_response);
+  @Internal
+  protected boolean isConnectionError(Exception e) {
+    Throwable cause = e;
+    while (cause != null) {
+      if (cause instanceof SocketException) {
+        return true;
       }
-      as.serviceRequest(m_request, m_response);
-      return Status.OK_STATUS;
+      else if (cause.getClass().getSimpleName().equalsIgnoreCase("EofException")) {
+        return true;
+      }
+      else if (cause instanceof InterruptedIOException) {
+        return true;
+      }
+      // next
+      cause = cause.getCause();
     }
+    return false;
   }
-
 }

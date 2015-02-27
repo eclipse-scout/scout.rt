@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -179,7 +180,7 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
    *         value.
    */
   protected Class<? extends IServerSession> defaultServerSessionClass() {
-    return getDefaultServerSessionClass();
+    return ScoutServerTestRunner.getDefaultServerSessionClass();
   }
 
   /**
@@ -188,7 +189,7 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
    *         value.
    */
   protected ITestServerSessionProvider defaultServerSessionProvider() {
-    return getDefaultServerSessionProvider();
+    return ScoutServerTestRunner.getDefaultServerSessionProvider();
   }
 
   /**
@@ -196,7 +197,7 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
    *         Subclasses may override this method to provide another default value.
    */
   protected String defaultPrincipalName() {
-    return getDefaultPrincipalName();
+    return ScoutServerTestRunner.getDefaultPrincipalName();
   }
 
   protected IServerJobFactory createServerJobFactory(LoginInfo loginInfo) throws ProcessingException {
@@ -290,7 +291,8 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
 
     // return existing or create new server session
     Subject subject = sessionProvider.login(runAs);
-    IServerSession serverSession = sessionProvider.createServerSession(serverSessionClass, subject);
+    IServerSession serverSession = sessionProvider.newServerSession(serverSessionClass, subject);
+
     return new LoginInfo(subject, serverSession);
   }
 
@@ -321,14 +323,13 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
    * @return
    */
   protected String extractRunAs(ServerTest serverTest, String defaultValue) {
-    String runAs = defaultValue;
-    if (serverTest != null && serverTest.runAs() != null) {
-      String s = serverTest.runAs().trim();
-      if (s.length() > 0) {
-        runAs = s;
-      }
+    if (serverTest != null) {
+      String runAs = StringUtility.trim(serverTest.runAs());
+      return StringUtility.hasText(runAs) ? runAs : defaultValue;
     }
-    return runAs;
+    else {
+      return defaultValue;
+    }
   }
 
   public static class LoginInfo {

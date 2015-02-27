@@ -10,10 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server;
 
+import javax.security.auth.Subject;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
  * Factory for creating {@link ServerJob}s
+ * TODO [dwi]: remove me
  *
  * @since 4.2
  */
@@ -38,5 +41,9 @@ public interface IServerJobFactory {
    * @throws ProcessingException
    */
   ServerJob runNow(String name, final ITransactionRunnable runnable) throws ProcessingException;
+
+  IServerSession getServerSession();
+
+  Subject getSubject();
 
 }

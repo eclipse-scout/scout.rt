@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -23,19 +24,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
-import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.commons.UncaughtExceptionRunnable;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -47,9 +51,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(ScoutPlatformTestRunner.class)
-public class ServerJobManagerCancelTest {
+public class ServerJobManagerTest {
 
-  private static ScheduledExecutorService s_executor;
+  private static ExecutorService s_executor;
 
   @Mock
   private IServerSession m_serverSession1;
@@ -61,7 +65,7 @@ public class ServerJobManagerCancelTest {
 
   @BeforeClass
   public static void beforeClass() {
-    s_executor = Executors.newScheduledThreadPool(5);
+    s_executor = Executors.newCachedThreadPool();
   }
 
   @AfterClass
@@ -98,16 +102,16 @@ public class ServerJobManagerCancelTest {
    * Cancel a 'runNow-job'.
    */
   @Test
-  public void testCancel1() throws Exception {
+  public void testCancel1() throws Throwable {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>());
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
 
-    s_executor.submit(new Callable<Void>() {
+    UncaughtExceptionRunnable runnable = new UncaughtExceptionRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      protected void runSafe() throws Exception {
         m_jobManager.runNow(new IRunnable() {
 
           @Override
@@ -123,11 +127,17 @@ public class ServerJobManagerCancelTest {
             }
           }
         }, ServerJobInput.empty().id(1).session(m_serverSession1));
-        return null;
       }
-    });
+
+      @Override
+      protected void onUncaughtException(Throwable t) {
+        setupLatch.release();
+      }
+    };
+    s_executor.execute(runnable);
 
     assertTrue(setupLatch.await());
+    runnable.throwOnError();
 
     assertEquals(1, m_transactions.size());
 
@@ -185,16 +195,16 @@ public class ServerJobManagerCancelTest {
    * Cancel a 'runNow-job' that has nested jobs.
    */
   @Test
-  public void testCancelCascade1() throws Exception {
+  public void testCancelCascade1() throws Throwable {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>());
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(3);
 
-    s_executor.submit(new Callable<Void>() {
+    UncaughtExceptionRunnable runnable = new UncaughtExceptionRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      protected void runSafe() throws Exception {
         // The outermost job is 'runNow'.
         m_jobManager.runNow(new IRunnable() {
 
@@ -258,11 +268,17 @@ public class ServerJobManagerCancelTest {
             verifyLatch.countDown();
           }
         }, ServerJobInput.empty().id(1).session(m_serverSession1));
-        return null;
       }
-    });
+
+      @Override
+      protected void onUncaughtException(Throwable t) {
+        setupLatch.release();
+      }
+    };
+    s_executor.execute(runnable);
 
     assertTrue(setupLatch.await());
+    runnable.throwOnError();
 
     assertEquals(5, m_transactions.size());
 
@@ -501,5 +517,22 @@ public class ServerJobManagerCancelTest {
     verify(m_transactions.get(2), times(1)).cancel(); // TX of job-3
     verify(m_transactions.get(3), times(1)).cancel(); // TX of job-3a
     verify(m_transactions.get(4), never()).cancel(); // TX of job-4 (other session)
+  }
+
+  @Test
+  public void testLocale() throws ProcessingException {
+    IServerSession session = mock(IServerSession.class);
+    NlsLocale.CURRENT.set(Locale.CHINA); // just to test to not to be considered.
+
+    assertNull(new _ServerJobManager().interceptLocale(null, ServerJobInput.empty().session(session)));
+    assertEquals(Locale.CANADA_FRENCH, new _ServerJobManager().interceptLocale(Locale.CANADA_FRENCH, ServerJobInput.empty().session(session)));
+  }
+
+  private static class _ServerJobManager extends ServerJobManager {
+
+    @Override
+    public Locale interceptLocale(Locale locale, ServerJobInput input) {
+      return super.interceptLocale(locale, input);
+    }
   }
 }

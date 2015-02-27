@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.job.internal.callable.ExceptionTranslator;
 import org.eclipse.scout.commons.job.internal.callable.InitThreadLocalCallable;
 import org.eclipse.scout.commons.job.internal.callable.SubjectCallable;
 import org.eclipse.scout.commons.job.internal.callable.ThreadNameDecorator;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -60,8 +61,12 @@ public class JobCallableChainTest {
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
     assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    // 6. Target
-    assertSame(m_targetCallable, c5.getNext());
+    // 6. InitThreadLocalCallable for ScoutTexts.CURRENT
+    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
+
+    // 7. Target
+    assertSame(m_targetCallable, c6.getNext());
   }
 
   /**
@@ -98,14 +103,18 @@ public class JobCallableChainTest {
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
     assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    // 6. Contribution1
-    Contribution1 c6 = getNextAndAssert(c5, Contribution1.class);
+    // 6. InitThreadLocalCallable for ScoutTexts.CURRENT
+    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. Contribution2
-    Contribution2 c7 = getNextAndAssert(c6, Contribution2.class);
+    // 7. Contribution1
+    Contribution1 c7 = getNextAndAssert(c6, Contribution1.class);
 
-    // 8. Target
-    assertSame(m_targetCallable, c7.getNext());
+    // 8. Contribution2
+    Contribution2 c8 = getNextAndAssert(c7, Contribution2.class);
+
+    // 9. Target
+    assertSame(m_targetCallable, c8.getNext());
   }
 
   /**
@@ -148,8 +157,12 @@ public class JobCallableChainTest {
     InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
     assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
 
-    // 8. Target
-    assertSame(m_targetCallable, c7.getNext());
+    // 8. InitThreadLocalCallable for ScoutTexts.CURRENT
+    InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
+
+    // 9. Target
+    assertSame(m_targetCallable, c8.getNext());
   }
 
   @SuppressWarnings("unchecked")

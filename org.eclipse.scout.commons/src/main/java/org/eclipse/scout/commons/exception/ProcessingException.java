@@ -83,9 +83,29 @@ public class ProcessingException extends Exception implements Serializable {
     m_status = new ProcessingStatus(status);
   }
 
-  public void addContextMessage(String s) {
+  /**
+   * Adds the given message to the list of context messages at first position.
+   *
+   * @param msg
+   *          context message to be added.
+   */
+  public void addContextMessage(String msg) {
     if (m_status != null) {
-      m_status.addContextMessage(s);
+      m_status.addContextMessage(msg);
+    }
+  }
+
+  /**
+   * Adds the given message to the list of context messages at first position.
+   *
+   * @param msg
+   *          context message to be added.
+   * @param msgArgs
+   *          arguments to be used in the message; see {@link String#format(String, Object...)}.
+   */
+  public void addContextMessage(String msg, Object... msgArgs) {
+    if (m_status != null) {
+      m_status.addContextMessage(String.format(msg, msgArgs));
     }
   }
 

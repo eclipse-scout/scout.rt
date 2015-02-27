@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.server.admin.diagnostic;
 
 import java.io.IOException;
 import java.security.AccessController;
-import java.util.Map;
+import java.util.Locale;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletException;
@@ -20,15 +20,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
-import org.eclipse.scout.rt.server.ThreadContext;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 public class DiagnosticServlet extends ServiceTunnelServlet {
@@ -46,53 +42,51 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
       res.sendError(HttpServletResponse.SC_FORBIDDEN);
       return;
     }
-    //invoke
-    Map<Class, Object> backup = ThreadContext.backup();
+
+    lazyInit(req, res);
+
     try {
-      lazyInit(req, res);
-      //
-      //legacy, deprecated, do not use servlet request/response in scout code
-      ThreadContext.putHttpServletRequest(req);
-      ThreadContext.putHttpServletResponse(res);
-      //
-      UserAgent userAgent = UserAgent.createDefault();
-      IServerSession serverSession = lookupScoutServerSessionOnHttpSession(req, res, subject, userAgent);
-      //
-      ServerJob job = new DiagnosticServiceJob(serverSession, subject, req, res);
-      job.runNow(new NullProgressMonitor());
-      job.throwOnError();
+      // Create the job-input on behalf of which the server-job is run.
+      ServerJobInput input = ServerJobInput.empty();
+      input.name("DiagnosticServiceCall");
+      input.subject(subject);
+      input.servletRequest(req);
+      input.servletResponse(res);
+      input.locale(Locale.getDefault());
+      input.userAgent(UserAgent.createDefault());
+      input.session(lookupScoutServerSessionOnHttpSession(input.copy()));
+
+      invokeDiagnosticServiceInServerJob(input);
+
     }
     catch (ProcessingException e) {
-      throw new ServletException(e);
-    }
-    finally {
-      ThreadContext.restore(backup);
+      throw new ServletException("Failed to invoke DiagnosticServlet", e);
     }
   }
 
-  private class DiagnosticServiceJob extends ServerJob {
+  /**
+   * Method invoked to delegate the HTTP request to the 'diagnostic service' on behalf of a server job.
+   *
+   * @param input
+   *          input to be used to run the server job with current context information set.
+   */
+  protected void invokeDiagnosticServiceInServerJob(final ServerJobInput input) throws ProcessingException {
+    ServerJobManager.DEFAULT.runNow(new IRunnable() {
 
-    protected HttpServletRequest m_request;
-    protected HttpServletResponse m_response;
+      @Override
+      public void run() throws Exception {
+        final HttpServletRequest request = input.getServletRequest();
+        final HttpServletResponse response = input.getServletResponse();
+        final HttpSession httpSession = request.getSession();
+        final String key = DiagnosticSession.class.getName();
 
-    public DiagnosticServiceJob(IServerSession serverSession, Subject subject, HttpServletRequest request, HttpServletResponse response) {
-      super("DiagnosticServiceCall", serverSession, subject);
-      m_request = request;
-      m_response = response;
-    }
-
-    @Override
-    protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      // get session
-      HttpSession session = m_request.getSession();
-      String key = DiagnosticSession.class.getName();
-      DiagnosticSession ds = (DiagnosticSession) session.getAttribute(key);
-      if (ds == null) {
-        ds = new DiagnosticSession();
-        session.setAttribute(key, ds);
+        DiagnosticSession diagnosticSession = (DiagnosticSession) httpSession.getAttribute(key);
+        if (diagnosticSession == null) {
+          diagnosticSession = new DiagnosticSession();
+          httpSession.setAttribute(key, diagnosticSession);
+        }
+        diagnosticSession.serviceRequest(request, response);
       }
-      ds.serviceRequest(m_request, m_response);
-      return Status.OK_STATUS;
-    }
+    }, input);
   }
 }

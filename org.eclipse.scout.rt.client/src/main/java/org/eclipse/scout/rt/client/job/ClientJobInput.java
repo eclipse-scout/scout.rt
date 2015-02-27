@@ -11,14 +11,17 @@
 package org.eclipse.scout.rt.client.job;
 
 import java.security.AccessControlContext;
+import java.util.Locale;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobInput;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
  * Implementation of {@link IJobInput} with some additional data used for client-side jobs.
@@ -29,12 +32,32 @@ import org.eclipse.scout.rt.shared.ISession;
 public class ClientJobInput extends JobInput {
 
   private IClientSession m_session;
+  private UserAgent m_userAgent;
+
+  private ClientJobInput(final IJobInput origin) {
+    super(origin);
+  }
 
   /**
-   * Use {@link #empty()} or {@link #defaults()} to create a {@link ClientJobInput}.
+   * Creates a copy of the given {@link ClientJobInput}.
+   *
+   * @param origin
+   *          to be copied.
    */
-  private ClientJobInput(final IJobInput template) {
-    super(template);
+  protected ClientJobInput(final ClientJobInput origin) {
+    super(origin);
+    m_session = origin.getSession();
+    m_userAgent = origin.getUserAgent();
+  }
+
+  /**
+   * Creates a copy of the current {@link ClientJobInput}.
+   *
+   * @return copy of the current {@link ClientJobInput}.
+   */
+  @Override
+  public ClientJobInput copy() {
+    return new ClientJobInput(this);
   }
 
   @Override
@@ -68,10 +91,28 @@ public class ClientJobInput extends JobInput {
   }
 
   /**
+   * @param userAgent
+   *          {@link UserAgent} to describe the user agent used by the client; if set, the job's execution thread is
+   *          associated with the given {@link UserAgent}.
+   * @return {@link IJobInput} to be used as builder.
+   */
+  public ClientJobInput userAgent(final UserAgent userAgent) {
+    m_userAgent = userAgent;
+    return this;
+  }
+
+  /**
    * @return {@link IClientSession} of behalf of which the job is to be executed; must not be <code>null</code>.
    */
   public IClientSession getSession() {
     return m_session;
+  }
+
+  /**
+   * @return {@link UserAgent} that describes the agent used by the client; must not be set.
+   */
+  public UserAgent getUserAgent() {
+    return m_userAgent;
   }
 
   /**
@@ -85,13 +126,40 @@ public class ClientJobInput extends JobInput {
   /**
    * Creates a {@link ClientJobInput} filled with the defaults from the current calling context.
    * <ul>
-   * <li>{@link ClientJobInput#getSubject()}: subject of the current {@link AccessControlContext};</li>
-   * <li>{@link ClientJobInput#getSession()}: session associated with the current thread;</li>
+   * <li>{@link ClientJobInput#getSubject()}: Subject associated with the current {@link AccessControlContext};</li>
+   * <li>{@link ClientJobInput#getLocale()}: the session's {@link Locale} if set, or the current thread's Locale if set,
+   * or the JVM default otherwise;</li>
    * <li>{@link ClientJobInput#getContext()}: copy of the job-context associated with the current thread, or if not
    * available, an empty {@link JobContext};
+   * <li>{@link ClientJobInput#getSession()}: session associated with the current thread;</li>
+   * <li>{@link ServerJobInput#getUserAgent()}: {@link UserAgent} associated with the current thread;</li>
    * </ul>
    */
   public static ClientJobInput defaults() {
-    return new ClientJobInput(JobInput.defaults()).session((IClientSession) ISession.CURRENT.get());
+    final ClientJobInput defaults = new ClientJobInput(JobInput.defaults());
+
+    defaults.session((IClientSession) ISession.CURRENT.get());
+    defaults.locale(resolveDefaultLocale());
+    defaults.userAgent(UserAgent.CURRENT.get());
+
+    return defaults;
+  }
+
+  /**
+   * @return the session's {@link Locale} if set, or the current thread's Locale if set, or the JVM default otherwise.
+   */
+  private static Locale resolveDefaultLocale() {
+    final IClientSession currentSession = (IClientSession) ISession.CURRENT.get();
+    final Locale sessionLocale = (currentSession != null ? currentSession.getLocale() : null);
+
+    if (sessionLocale != null) {
+      return sessionLocale; // 1st priority
+    }
+    else if (NlsLocale.CURRENT.get() != null) {
+      return NlsLocale.CURRENT.get(); // 2nd priority
+    }
+    else {
+      return Locale.getDefault(); // 3th priority
+    }
   }
 }

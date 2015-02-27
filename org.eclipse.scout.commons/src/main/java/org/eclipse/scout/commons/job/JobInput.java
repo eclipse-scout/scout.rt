@@ -12,10 +12,12 @@ package org.eclipse.scout.commons.job;
 
 import java.security.AccessControlContext;
 import java.security.AccessController;
+import java.util.Locale;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.nls.NlsLocale;
 
 /**
  * Default implementation of {@link IJobInput}.
@@ -27,41 +29,61 @@ public class JobInput implements IJobInput {
   private long m_id;
   private String m_name;
   private Subject m_subject;
+  private Locale m_locale;
   private JobContext m_context;
 
-  protected JobInput() {
+  private JobInput() {
   }
 
   /**
-   * Creates a copy from the given template.
+   * Creates a copy of the given {@link IJobInput}.
+   *
+   * @param origin
+   *          to be copied.
    */
-  protected JobInput(final IJobInput template) {
-    id(template.getId());
-    name(template.getName());
-    context(template.getContext());
-    subject(template.getSubject());
+  protected JobInput(final IJobInput origin) {
+    m_id = origin.getId();
+    m_name = origin.getName();
+    m_subject = origin.getSubject();
+    m_locale = origin.getLocale();
+    m_context = JobContext.copy(origin.getContext());
+  }
+
+  /**
+   * Creates a copy of the current {@link JobInput}.
+   *
+   * @return copy of the current {@link JobInput}.
+   */
+  public JobInput copy() {
+    return new JobInput(this);
   }
 
   @Override
-  public IJobInput id(final long id) {
+  public JobInput id(final long id) {
     m_id = id;
     return this;
   }
 
   @Override
-  public IJobInput name(final String name) {
+  public JobInput name(final String name) {
     m_name = name;
     return this;
   }
 
   @Override
-  public IJobInput subject(final Subject subject) {
+  public JobInput subject(final Subject subject) {
     m_subject = subject;
     return this;
   }
 
   @Override
-  public IJobInput context(final JobContext context) {
+  public JobInput locale(final Locale locale) {
+    m_locale = locale;
+    return this;
+  }
+
+  @Override
+  public JobInput context(final JobContext context) {
     m_context = context;
     return this;
   }
@@ -79,6 +101,11 @@ public class JobInput implements IJobInput {
   @Override
   public Subject getSubject() {
     return m_subject;
+  }
+
+  @Override
+  public Locale getLocale() {
+    return m_locale;
   }
 
   @Override
@@ -106,19 +133,30 @@ public class JobInput implements IJobInput {
    * Creates a {@link IJobInput} that is only filled with the {@link JobContext} of the current thread, or if not
    * available, an empty one.
    */
-  public static IJobInput empty() {
-    return new JobInput().context(JobContext.copy(JobContext.CURRENT.get()));
+  public static JobInput empty() {
+    final JobInput empty = new JobInput();
+
+    empty.context(JobContext.copy(JobContext.CURRENT.get()));
+
+    return empty;
   }
 
   /**
    * Creates a {@link JobInput} filled with the defaults from the current calling context.
    * <ul>
-   * <li>{@link IJobInput#getSubject()}: subject of the current {@link AccessControlContext};</li>
-   * <li>{@link IJobInput#getContext()}: copy of the job-context associated with the current thread, or if not
+   * <li>{@link IJobInput#getSubject()}: Subject associated with the current {@link AccessControlContext};</li>
+   * <li>{@link IJobInput#getLocale()}: Locale associated with the current thread or <code>null</code> if not set;</li>
+   * <li>{@link ServerJobInput#getContext()}: copy of the job-context associated with the current thread, or if not
    * available, an empty {@link JobContext};
    * </ul>
    */
-  public static IJobInput defaults() {
-    return JobInput.empty().subject(Subject.getSubject(AccessController.getContext()));
+  public static JobInput defaults() {
+    final JobInput defaults = new JobInput();
+
+    defaults.subject(Subject.getSubject(AccessController.getContext()));
+    defaults.locale(NlsLocale.CURRENT.get());
+    defaults.context(JobContext.copy(JobContext.CURRENT.get()));
+
+    return defaults;
   }
 }

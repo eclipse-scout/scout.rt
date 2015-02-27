@@ -10,15 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import java.util.Locale;
 import java.util.Map;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.osgi.framework.Bundle;
 
 public interface IClientSession extends ISession {
@@ -28,6 +31,34 @@ public interface IClientSession extends ISession {
    *         execution order.
    */
   IModelJobManager getModelJobManager();
+
+  /**
+   * @return the session's {@link Locale} or the JVM-default if unknown; is never <code>null</code>.
+   */
+  Locale getLocale();
+
+  /**
+   * To set the session's Locale. By default, this Locale will be included in every client-server-request unless the
+   * client job is configured to run with another Locale.<br/>
+   * By updating the session's Locale, the Locale of {@link NlsLocale#CURRENT} is updated as well.
+   *
+   * @param locale
+   *          Locale to be set.
+   */
+  void setLocale(Locale locale);
+
+  /**
+   * @return {@link UserAgent} used; contains information about the UI; is never <code>null</code>.
+   */
+  UserAgent getUserAgent();
+
+  /**
+   * To set the user's {@link UserAgent}; contains information about the UI.
+   *
+   * @param userAgent
+   *          {@link UserAgent} used;
+   */
+  void setUserAgent(UserAgent userAgent);
 
   /**
    * Monitor can be used to wait for changes of the states 'active' and 'loaded'

@@ -2,80 +2,46 @@ package org.eclipse.scout.rt.testing.server;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.server.IServerJobFactory;
+import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ITransactionRunnable;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.services.common.session.ServerSessionRegistryService;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.service.SERVICES;
+import org.osgi.framework.Bundle;
 
 /**
  * Default implementation of {@link ITestServerSessionProvider}.
  */
 public class DefaultTestServerSessionProvider extends ServerSessionRegistryService implements ITestServerSessionProvider {
 
-  /**
-   *
-   */
-  protected DefaultTestServerSessionProvider() {
-    super();
-  }
-
-  @SuppressWarnings("unchecked")
   @Override
-  public <T extends IServerSession> T createServerSession(Class<T> clazz, final Subject subject) throws ProcessingException {
-    final IServerSession serverSession = createSessionInstance(clazz);
-    serverSession.setUserAgent(UserAgent.createDefault());
-    final IServerJobFactory jobFactory = getBackendService().createJobFactory(serverSession, subject);
-    runBeforeLoadJob(subject, serverSession, jobFactory);
-    runLoadSessionJob(serverSession, jobFactory);
-    runAfterLoadLob(subject, serverSession, jobFactory);
-    return (T) serverSession;
-  }
+  protected void loadSessionInServerJob(final ServerJobInput input, final Bundle bundle, final IServerSession serverSession) throws ProcessingException {
+    final Subject subject = input.getSubject();
 
-  private void runBeforeLoadJob(final Subject subject, final IServerSession serverSession, final IServerJobFactory jobFactory) throws ProcessingException {
-    jobFactory.runNow("before creating " + serverSession.getClass().getSimpleName(), new ITransactionRunnable() {
-      @Override
-      public IStatus run(IProgressMonitor monitor) throws ProcessingException {
-        beforeStartSession(serverSession, subject);
-        return Status.OK_STATUS;
-      }
-    });
-  }
-
-  private void runAfterLoadLob(final Subject subject, final IServerSession serverSession, final IServerJobFactory jobFactory) throws ProcessingException {
-    jobFactory.runNow("after creating " + serverSession.getClass().getSimpleName(), new ITransactionRunnable() {
-      @Override
-      public IStatus run(IProgressMonitor monitor) throws ProcessingException {
-        afterStartSession(serverSession, subject);
-        return Status.OK_STATUS;
-      }
-    });
+    beforeStartSession(serverSession, input.getSubject());
+    try {
+      super.loadSessionInServerJob(input, bundle, serverSession);
+    }
+    finally {
+      afterStartSession(serverSession, subject);
+    }
   }
 
   @Override
-  public Subject login(String runAs) {
-    return getBackendService().createSubject(runAs);
+  public Subject login(final String runAs) {
+    return SERVICES.getService(IServerJobService.class).createSubject(runAs);
   }
 
   /**
-   * Performs custom operations before the server session is started.
-   *
-   * @param serverSession
-   * @param subject
+   * Method invoked before the session is started.
    */
-  protected void beforeStartSession(IServerSession serverSession, Subject subject) {
+  protected void beforeStartSession(final IServerSession serverSession, final Subject subject) {
   }
 
   /**
-   * Performs custom operations after the server session has been started.
-   *
-   * @param serverSession
-   * @param subject
+   * Method invoked after the session was started; is also invoked in case the session could not be started.
    */
-  protected void afterStartSession(IServerSession serverSession, Subject subject) {
+  protected void afterStartSession(final IServerSession serverSession, final Subject subject) {
   }
 }

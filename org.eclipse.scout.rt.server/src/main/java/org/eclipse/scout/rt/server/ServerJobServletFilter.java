@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.server;
 
 import java.io.IOException;
-import java.util.Map;
 
+import javax.security.auth.Subject;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -22,16 +22,15 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -63,16 +62,16 @@ public class ServerJobServletFilter implements Filter {
       return;
     }
     //
-    HttpServletRequest req = (HttpServletRequest) sreq;
-    HttpServletResponse res = (HttpServletResponse) sres;
-    if ("/process".equals(req.getServletPath())) {
+    HttpServletRequest httpRequest = (HttpServletRequest) sreq;
+    HttpServletResponse httpResponse = (HttpServletResponse) sres;
+    if ("/process".equals(httpRequest.getServletPath())) {
       chain.doFilter(sreq, sres);
       return;
     }
     IServerSession serverSession;
     // create new session
-    synchronized (req.getSession()) {
-      serverSession = (IServerSession) SERVICES.getService(IHttpSessionCacheService.class).getAndTouch(IServerSession.class.getName(), req, res);
+    synchronized (httpRequest.getSession()) {
+      serverSession = (IServerSession) SERVICES.getService(IHttpSessionCacheService.class).getAndTouch(IServerSession.class.getName(), httpRequest, httpResponse);
       if (serverSession == null) {
         String qname = config.getInitParameter("session");
         Class<? extends IServerSession> serverSessionClass;
@@ -87,63 +86,61 @@ public class ServerJobServletFilter implements Filter {
           throw new ServletException("Loading class " + qname, e);
         }
         try {
-          serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(serverSessionClass, null);
+          serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(serverSessionClass, (Subject) null);
           // store new session
-          SERVICES.getService(IHttpSessionCacheService.class).put(IServerSession.class.getName(), serverSession, req, res);
+          SERVICES.getService(IHttpSessionCacheService.class).put(IServerSession.class.getName(), serverSession, httpRequest, httpResponse);
         }
         catch (Throwable t) {
-          LOG.error("create session " + serverSessionClass, t);
-          res.sendError(HttpServletResponse.SC_FORBIDDEN);
+          LOG.error(String.format("Failed to create and start session '%s'", serverSessionClass), t);
+          httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
           return;
         }
       }
     }
 
-    Map<Class, Object> backup = ThreadContext.backup();
+    // Create the job-input on behalf of which the server-job is run.
+    ServerJobInput input = ServerJobInput.empty();
+    input.name(ServerJobServletFilter.class.getSimpleName());
+    input.servletRequest(httpRequest);
+    input.servletResponse(httpResponse);
+    input.session(serverSession);
     try {
-      ThreadContext.putHttpServletRequest(req);
-      ThreadContext.putHttpServletResponse(res);
+      continueChainInServerJob(chain, input);
+    }
+    catch (ProcessingException e) {
+      handleException(e, httpRequest);
+    }
+    catch (RuntimeException e) {
+      handleException(new ProcessingException("Unexpected error while processing HTTP request", e), httpRequest);
+    }
+  }
 
-      ServerJob job = createServiceTunnelServerJob(serverSession, chain, sreq, sres);
-      IStatus status = job.runNow(new NullProgressMonitor());
-      if (!status.isOK()) {
-        try {
-          ProcessingException p = new ProcessingException(status.getMessage(), status.getException());
-          p.addContextMessage("Client=" + req.getRemoteUser() + "@" + req.getRemoteAddr() + "/" + req.getRemoteHost());
-          SERVICES.getService(IExceptionHandlerService.class).handleException(p);
-        }
-        catch (Throwable fatal) {
-          // nop
-        }
+  /**
+   * Method invoked to handle exceptions which are thrown while continuing chain.
+   */
+  protected void handleException(ProcessingException pe, HttpServletRequest request) {
+    pe.addContextMessage("Client=%s@%s/%s", request.getRemoteUser(), request.getRemoteAddr(), request.getRemoteHost());
+    try {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
+    }
+    catch (RuntimeException e) {
+      LOG.warn("Failed to handle request exception", e);
+    }
+  }
+
+  /**
+   * Method invoked to continue chain on behalf of a server job.
+   *
+   * @param input
+   *          input to be used to run the server job with current context information set.
+   */
+  protected void continueChainInServerJob(final FilterChain chain, final ServerJobInput input) throws ProcessingException {
+    ServerJobManager.DEFAULT.runNow(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        chain.doFilter(input.getServletRequest(), input.getServletResponse());
       }
-    }
-    finally {
-      ThreadContext.restore(backup);
-    }
-  }
-
-  protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, FilterChain chain, ServletRequest request, ServletResponse response) {
-    return new ServiceTunnelServiceJob(serverSession, chain, request, response);
-  }
-
-  protected class ServiceTunnelServiceJob extends ServerJob {
-
-    protected FilterChain m_chain;
-    protected ServletRequest m_request;
-    protected ServletResponse m_response;
-
-    public ServiceTunnelServiceJob(IServerSession serverSession, FilterChain chain, ServletRequest request, ServletResponse response) {
-      super("ServiceTunnel", serverSession);
-      m_chain = chain;
-      m_request = request;
-      m_response = response;
-    }
-
-    @Override
-    protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      // delegate to filter chain
-      m_chain.doFilter(m_request, m_response);
-      return Status.OK_STATUS;
-    }
+    }, input);
   }
 }

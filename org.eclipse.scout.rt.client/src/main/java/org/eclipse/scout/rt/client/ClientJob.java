@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TextsThreadLocal;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
  * Job operating on a {@link IClientSession} Job may be sync or async. Sync jobs
@@ -164,11 +165,13 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
     Locale oldLocale = LocaleThreadLocal.get(false);
     ScoutTexts oldTexts = TextsThreadLocal.get();
     ClientJobContext oldContext = ClientJobContextThreadLocal.get();
+    UserAgent oldUserAgent = UserAgent.CURRENT.get();
     try {
       ClientSessionThreadLocal.set(getClientSession());
       LocaleThreadLocal.set(m_session.getLocale());
       TextsThreadLocal.set(m_session.getTexts());
       ClientJobContextThreadLocal.set(m_context);
+      UserAgent.CURRENT.set(m_session.getUserAgent());
       return runStatus(monitor);
     }
     finally {
@@ -176,6 +179,7 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
       LocaleThreadLocal.set(oldLocale);
       TextsThreadLocal.set(oldTexts);
       ClientJobContextThreadLocal.set(oldContext);
+      UserAgent.CURRENT.set(oldUserAgent);
     }
   }
 

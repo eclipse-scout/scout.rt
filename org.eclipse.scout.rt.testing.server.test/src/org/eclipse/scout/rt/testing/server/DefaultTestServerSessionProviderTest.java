@@ -11,12 +11,16 @@
 package org.eclipse.scout.rt.testing.server;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.rt.testing.server.test.TestServerSession;
 import org.junit.Ignore;
@@ -30,22 +34,18 @@ import org.mockito.Mockito;
 @RunWith(ScoutPlatformTestRunner.class)
 public class DefaultTestServerSessionProviderTest {
 
-  /**
-   * A new ServerSession should be created and loaded in
-   * {@link DefaultTestServerSessionProvider#createServerSession(Class, Subject)}
-   *
-   * @throws ProcessingException
-   */
-  //TODO aho this test fails since the introduction of the new services
+  //TODO aho this test fails in NOSGI because bundle cannot be resolved when loading server session.
   @Ignore
   @Test
   public void testCreateServerSession() throws ProcessingException {
     DefaultTestServerSessionProvider serverSessionProvider = BeanInstanceCreator.create(DefaultTestServerSessionProvider.class);
-    final DefaultTestServerSessionProvider d = Mockito.spy(serverSessionProvider);
+    final DefaultTestServerSessionProvider testee = Mockito.spy(serverSessionProvider);
     final Subject subject = new Subject();
-    final TestServerSession session = d.createServerSession(TestServerSession.class, subject);
+
+    final TestServerSession session = testee.newServerSession(TestServerSession.class, subject, UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a"));
+
     assertTrue(session.isActive());
-    verify(d, Mockito.times(1)).afterStartSession(session, subject);
-    verify(d, Mockito.times(1)).beforeStartSession(session, subject);
+    verify(testee, times(1)).afterStartSession(session, subject);
+    verify(testee, times(1)).beforeStartSession(session, subject);
   }
 }

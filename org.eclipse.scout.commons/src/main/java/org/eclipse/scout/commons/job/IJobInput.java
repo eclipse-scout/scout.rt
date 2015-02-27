@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job;
 
+import java.util.Locale;
+
 import javax.security.auth.Subject;
 
 /**
@@ -43,6 +45,13 @@ public interface IJobInput {
   IJobInput subject(Subject subject);
 
   /**
+   * @param locale
+   *          if set, the job's execution thread is associated with that {@link Locale}.
+   * @return {@link IJobInput} to be used as builder.
+   */
+  IJobInput locale(Locale locale);
+
+  /**
    * @param context
    *          {@link JobContext} to propagate data along with nested jobs; must not be <code>null</code>.
    * @return {@link IJobInput} to be used as builder.
@@ -63,6 +72,11 @@ public interface IJobInput {
    * @return {@link Subject} of behalf of which the job is to be executed; must not be set.
    */
   Subject getSubject();
+
+  /**
+   * @return {@link Locale} to be set onto the job's execution thread, if set.
+   */
+  Locale getLocale();
 
   /**
    * @return {@link JobContext} to propagate data along with nested jobs; must not be <code>null</code>.

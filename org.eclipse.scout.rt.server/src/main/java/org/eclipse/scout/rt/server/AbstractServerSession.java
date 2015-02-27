@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -43,9 +44,6 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
-import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
-import org.eclipse.scout.rt.shared.ui.IUiLayer;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 
@@ -56,13 +54,11 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private transient Bundle m_bundle;
   private boolean m_initialized;
   private boolean m_active;
-  private Locale m_locale;
   private final HashMap<String, Object> m_attributes;
   private transient Object m_attributesLock;
   private final SharedVariableMap m_sharedVariableMap;
   private boolean m_singleThreadSession;
   private transient ScoutTexts m_scoutTexts;
-  private UserAgent m_userAgent;
   private String m_virtualSessionId;
   private Subject m_subject;
   private String m_sessionId;
@@ -70,7 +66,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private final ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>> m_objectExtensions;
 
   public AbstractServerSession(boolean autoInitConfig) {
-    m_locale = NlsLocale.get();
     m_attributesLock = new Object();
     m_attributes = new HashMap<String, Object>();
     m_sharedVariableMap = new SharedVariableMap();
@@ -148,14 +143,10 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     setSharedContextVariable("userId", String.class, newValue);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public Locale getLocale() {
-    return m_locale;
-  }
-
-  @Override
-  public void setLocale(Locale locale) {
-    m_locale = locale;
+    return NlsLocale.get(); // This method will be removed in release 5.2.
   }
 
   /**
@@ -234,13 +225,9 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   @Override
   public final void loadSession(Bundle bundle) throws ProcessingException {
-    if (isActive()) {
-      throw new IllegalStateException("session is active");
-    }
-    if (bundle == null) {
-      throw new IllegalArgumentException("bundle must not be null");
-    }
-    m_bundle = bundle;
+    Assertions.assertFalse(isActive(), "Session already started");
+
+    m_bundle = Assertions.assertNotNull(bundle, "Bundle must not be null");
     m_symbolicBundleName = bundle.getSymbolicName();
     m_active = true;
     m_scoutTexts = new ScoutTexts();
@@ -266,20 +253,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   @Override
   public boolean isSingleThreadSession() {
     return m_singleThreadSession;
-  }
-
-  /**
-   * @return information about the kind of user interface used on the client side like {@link IUiLayer} and
-   *         {@link IUiDeviceType}.
-   */
-  @Override
-  public UserAgent getUserAgent() {
-    return m_userAgent;
-  }
-
-  @Override
-  public void setUserAgent(UserAgent userAgent) {
-    m_userAgent = userAgent;
   }
 
   @Override

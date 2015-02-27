@@ -10,13 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared;
 
-import java.util.Locale;
 import java.util.Map;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.osgi.framework.Bundle;
 
 /**
@@ -48,21 +46,6 @@ public interface ISession {
   boolean isActive();
 
   ScoutTexts getTexts();
-
-  /**
-   * @return Returns the session's locale.
-   */
-  Locale getLocale();
-
-  /**
-   * Sets the session's locale used for formatting values and for translating texts.
-   * TODO [dwi][nosgi]: why does this method exist?
-   */
-  void setLocale(Locale l);
-
-  UserAgent getUserAgent();
-
-  void setUserAgent(UserAgent userAgent);
 
   /**
    * Used to force immediate (in-thread) execution of jobs.

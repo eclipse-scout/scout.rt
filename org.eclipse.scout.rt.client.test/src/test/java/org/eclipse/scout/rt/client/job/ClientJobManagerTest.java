@@ -12,24 +12,29 @@ package org.eclipse.scout.rt.client.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
-import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.internal.ClientJobManager;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.commons.UncaughtExceptionRunnable;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -41,9 +46,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(ScoutPlatformTestRunner.class)
-public class ClientJobManagerCancelTest {
+public class ClientJobManagerTest {
 
-  private static ScheduledExecutorService s_executor;
+  private static ExecutorService s_executor;
 
   @Mock
   private IClientSession m_clientSession1;
@@ -54,7 +59,7 @@ public class ClientJobManagerCancelTest {
 
   @BeforeClass
   public static void beforeClass() {
-    s_executor = Executors.newScheduledThreadPool(5);
+    s_executor = Executors.newCachedThreadPool();
   }
 
   @AfterClass
@@ -82,16 +87,16 @@ public class ClientJobManagerCancelTest {
    * Cancel a 'runNow-job'.
    */
   @Test
-  public void testCancel1() throws Exception {
+  public void testCancel1() throws Throwable {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>());
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
 
-    s_executor.submit(new Callable<Void>() {
+    UncaughtExceptionRunnable runnable = new UncaughtExceptionRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      protected void runSafe() throws Exception {
         m_jobManager.runNow(new IRunnable() {
 
           @Override
@@ -107,11 +112,17 @@ public class ClientJobManagerCancelTest {
             }
           }
         }, ClientJobInput.empty().id(1).session(m_clientSession1));
-        return null;
       }
-    });
+
+      @Override
+      protected void onUncaughtException(Throwable t) {
+        setupLatch.release();
+      }
+    };
+    s_executor.execute(runnable);
 
     assertTrue(setupLatch.await());
+    runnable.throwOnError();
 
     // run the test
     assertTrue(m_jobManager.cancel(1, m_clientSession1));
@@ -163,16 +174,16 @@ public class ClientJobManagerCancelTest {
    * Cancel a 'runNow-job' that has nested jobs.
    */
   @Test
-  public void testCancelCascade1() throws Exception {
+  public void testCancelCascade1() throws Throwable {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>());
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(3);
 
-    s_executor.submit(new Callable<Void>() {
+    UncaughtExceptionRunnable runnable = new UncaughtExceptionRunnable() {
 
       @Override
-      public Void call() throws Exception {
+      protected void runSafe() throws Exception {
         // The outermost job is 'runNow'.
         m_jobManager.runNow(new IRunnable() {
 
@@ -236,11 +247,17 @@ public class ClientJobManagerCancelTest {
             verifyLatch.countDown();
           }
         }, ClientJobInput.empty().id(1).session(m_clientSession1));
-        return null;
       }
-    });
+
+      @Override
+      protected void onUncaughtException(Throwable t) {
+        setupLatch.release();
+      }
+    };
+    s_executor.execute(runnable);
 
     assertTrue(setupLatch.await());
+    runnable.throwOnError();
 
     // test cancel of inner jobs (expected=no effect)
     assertFalse(m_jobManager.cancel(5, m_clientSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
@@ -449,5 +466,22 @@ public class ClientJobManagerCancelTest {
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.hashSet("job-1-interrupted", "job-2-interrupted", "job-3a-interrupted"), protocol);
+  }
+
+  @Test
+  public void testLocale() throws ProcessingException {
+    IClientSession session = mock(IClientSession.class);
+    NlsLocale.CURRENT.set(Locale.CHINA); // just to test to not to be considered.
+
+    assertNull(new _ClientJobManager().interceptLocale(null, ClientJobInput.empty().session(session)));
+    assertEquals(Locale.CANADA_FRENCH, new _ClientJobManager().interceptLocale(Locale.CANADA_FRENCH, ClientJobInput.empty().session(session)));
+  }
+
+  private static class _ClientJobManager extends ClientJobManager {
+
+    @Override
+    public Locale interceptLocale(Locale locale, ClientJobInput input) {
+      return super.interceptLocale(locale, input);
+    }
   }
 }

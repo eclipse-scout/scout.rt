@@ -11,9 +11,6 @@ package org.eclipse.scout.rt.shared.ui;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * @since 3.8.0
@@ -57,23 +54,14 @@ public final class UserAgentUtility {
   }
 
   public static UserAgent getCurrentUserAgent() {
-    if (ISession.CURRENT.get() == null) {
-      LOG.warn("No session service found! Returning default user agent object.");
+    UserAgent userAgent = UserAgent.CURRENT.get();
+    if (userAgent != null) {
+      return userAgent;
+    }
+    else {
+      LOG.warn("No UserAgent in calling context found; using default UserAgent");
       return UserAgent.createDefault();
     }
-    ISession session = SERVICES.getService(ISessionService.class).getCurrentSession();
-    if (session == null) {
-      LOG.warn("No session found! Returning default user agent object.");
-      return UserAgent.createDefault();
-    }
-
-    UserAgent userAgent = session.getUserAgent();
-    if (userAgent == null) {
-      LOG.warn("User agent on session is null! Returning default user agent object.");
-      return UserAgent.createDefault();
-    }
-
-    return userAgent;
   }
 
   // FIXME AWE: (UiLayer) remove this method when wizard refactoring is done

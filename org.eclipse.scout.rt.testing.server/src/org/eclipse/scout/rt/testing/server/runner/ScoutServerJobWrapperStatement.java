@@ -12,16 +12,13 @@ package org.eclipse.scout.rt.testing.server.runner;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.IServerJobFactory;
-import org.eclipse.scout.rt.server.ITransactionRunnable;
 import org.eclipse.scout.rt.server.ServerJob;
-import org.eclipse.scout.rt.testing.commons.ScoutAssert;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.WrappingProcessingRuntimeExceptionHandlerService;
 import org.junit.runners.model.Statement;
@@ -45,16 +42,13 @@ public class ScoutServerJobWrapperStatement extends Statement {
       doEvaluateWrappingExceptions();
     }
     else {
-      ServerJob job = m_factory.create("JUnit Server Job Runner", new ITransactionRunnable() {
+      ServerJobManager.DEFAULT.runNow(new IRunnable() {
+
         @Override
-        public IStatus run(IProgressMonitor monitor) throws ProcessingException {
+        public void run() throws Exception {
           doEvaluateWrappingExceptions();
-          return Status.OK_STATUS;
         }
-      });
-      job.setSystem(true);
-      job.runNow(new NullProgressMonitor());
-      ScoutAssert.jobSuccessfullyCompleted(job);
+      }, ServerJobInput.defaults().name("JUnit Server Job Runner").session(m_factory.getServerSession()).subject(m_factory.getSubject()));
     }
   }
 

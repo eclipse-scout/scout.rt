@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.ui;
 
 import java.io.Serializable;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ConfigIniUtility;
 
 /**
@@ -31,19 +32,20 @@ import org.eclipse.scout.commons.ConfigIniUtility;
  */
 public final class UserAgent implements Serializable {
 
+  /**
+   * The {@link UserAgent} which is currently associated with the current thread.
+   */
+  public static final ThreadLocal<UserAgent> CURRENT = new ThreadLocal<>();
+
   private static final long serialVersionUID = 6194949468393137650L;
   private String m_uiDeviceId;
   private IUiLayer m_uiLayer;
   private IUiDeviceType m_uiDeviceType;
 
   private UserAgent(IUiLayer uiLayer, IUiDeviceType uiDeviceType, String uiDeviceId) {
-    if (uiLayer == null || uiDeviceType == null || uiDeviceId == null) {
-      throw new IllegalArgumentException("Arguments must not be null.");
-    }
-
-    m_uiLayer = uiLayer;
-    m_uiDeviceType = uiDeviceType;
-    m_uiDeviceId = uiDeviceId;
+    m_uiLayer = Assertions.assertNotNull(uiLayer, "UI Layer must not be null");
+    m_uiDeviceType = Assertions.assertNotNull(uiDeviceType, "UI device type must not be null");
+    m_uiDeviceId = Assertions.assertNotNull(uiDeviceId, "UI device id must not be null");
   }
 
   public IUiDeviceType getUiDeviceType() {

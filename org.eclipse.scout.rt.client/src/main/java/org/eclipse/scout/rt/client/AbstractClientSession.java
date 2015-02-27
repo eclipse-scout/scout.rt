@@ -186,6 +186,21 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   }
 
   @Override
+  public UserAgent getUserAgent() {
+    if (m_userAgent == null) {
+      m_userAgent = UserAgent.createDefault();
+      LOG.warn("UserAgent not set; using default [default={}]", m_userAgent);
+    }
+    return m_userAgent;
+  }
+
+  @Override
+  public void setUserAgent(UserAgent userAgent) {
+    UserAgent.CURRENT.set(userAgent);
+    m_userAgent = userAgent;
+  }
+
+  @Override
   public Subject getOfflineSubject() {
     return m_offlineSubject;
   }
@@ -625,20 +640,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   @Override
   public Object getData(String key) {
     return m_clientSessionData.get(key);
-  }
-
-  @Override
-  public UserAgent getUserAgent() {
-    if (m_userAgent == null) {
-      LOG.warn("UserAgent has not been initialied correctly. Using default.");
-      m_userAgent = UserAgent.createDefault();
-    }
-    return m_userAgent;
-  }
-
-  @Override
-  public void setUserAgent(UserAgent userAgent) {
-    m_userAgent = userAgent;
   }
 
   @Override

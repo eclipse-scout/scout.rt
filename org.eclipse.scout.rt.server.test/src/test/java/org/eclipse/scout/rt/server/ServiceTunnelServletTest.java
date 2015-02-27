@@ -35,14 +35,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.job.Executables.IExecutable;
+import org.eclipse.scout.commons.job.ICallable;
+import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.commons.cache.ICacheEntry;
 import org.eclipse.scout.rt.server.commons.cache.StickySessionCacheService;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.server.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -70,7 +71,7 @@ public class ServiceTunnelServletTest {
   private HttpSession m_testHttpSession;
 
   @Before
-  public void setup() throws ServletException {
+  public void before() throws ServletException {
     m_serviceReg = TestingUtility.registerServices(TEST_SERVICE_RANKING, new StickySessionCacheService(), new AbstractAccessControlService() {
     });
     m_testServiceTunnelServlet = getServiceTunnelServletWithTestSession();
@@ -83,13 +84,13 @@ public class ServiceTunnelServletTest {
   }
 
   @After
-  public void tearDown() {
+  public void after() {
     TestingUtility.unregisterServices(m_serviceReg);
   }
 
   @Test
   public void testNewSessionCreatedOnLookupHttpSession() throws ProcessingException, ServletException {
-    IServerSession session = m_testServiceTunnelServlet.lookupScoutServerSessionOnHttpSession(m_requestMock, m_responseMock, null, null);
+    IServerSession session = m_testServiceTunnelServlet.lookupScoutServerSessionOnHttpSession(ServerJobInput.empty().servletRequest(m_requestMock).servletResponse(m_responseMock));
     assertNotNull(session);
   }
 
@@ -101,7 +102,7 @@ public class ServiceTunnelServletTest {
     when(cacheMock.isActive()).thenReturn(true);
 
     when(m_testHttpSession.getAttribute(IServerSession.class.getName())).thenReturn(cacheMock);
-    IServerSession session = m_testServiceTunnelServlet.lookupScoutServerSessionOnHttpSession(m_requestMock, m_responseMock, null, null);
+    IServerSession session = m_testServiceTunnelServlet.lookupScoutServerSessionOnHttpSession(ServerJobInput.empty().servletRequest(m_requestMock).servletResponse(m_responseMock));
     assertEquals(testSession, session);
   }
 
@@ -111,7 +112,7 @@ public class ServiceTunnelServletTest {
    * in 4
    * different threads within the same HTTP session.
    * Test ensures that the same server session is returned in all threads and that
-   * {@link IServerSessionRegistryService#newServerSession(Class, Subject, UserAgent)} is called only once.
+   * {@link IServerSessionRegistryService#newServerSession(Class, ServerJobInput)} is called only once.
    */
   @Test
   public void testLookupScoutServerSessionOnHttpSessionMultipleThreads() throws ProcessingException, ServletException, InterruptedException {
@@ -130,26 +131,26 @@ public class ServiceTunnelServletTest {
     when(testHttpSession.getAttribute(IServerSession.class.getName())).thenAnswer(getCachedValue(cache));
 
     IServerSessionRegistryService serverSessionRegistryServiceMock = mock(IServerSessionRegistryService.class);
-    when(serverSessionRegistryServiceMock.newServerSession(eq(TestServerSession.class), any(Subject.class), any(UserAgent.class))).thenAnswer(slowCreateTestsession(testSession));
+    when(serverSessionRegistryServiceMock.newServerSession(eq(TestServerSession.class), any(ServerJobInput.class))).thenAnswer(slowCreateTestsession(testSession));
 
     List<IBean<?>> registerServices = TestingUtility.registerServices(TEST_SERVICE_RANKING, serverSessionRegistryServiceMock);
     try {
-      List<HttpSessionJob> jobs = new ArrayList<HttpSessionJob>();
+      List<HttpSessionLookupRunnable> jobs = new ArrayList<>();
       for (int i = 0; i < 4; i++) {
-        jobs.add(new HttpSessionJob("HttpSessionJobId " + i, m_testServiceTunnelServlet, requestMock, m_responseMock));
+        jobs.add(new HttpSessionLookupRunnable(m_testServiceTunnelServlet, requestMock, m_responseMock));
       }
 
-      scheduleAndJoinJobs(jobs);
+      List<IFuture<?>> futures = scheduleAndJoinJobs(jobs);
 
       Set<IServerSession> serverSessions = new HashSet<IServerSession>();
-      for (int i = 0; i < jobs.size(); i++) {
-        serverSessions.add(jobs.get(i).getServerSession());
+      for (IFuture<?> future : futures) {
+        serverSessions.add((IServerSession) future.get());
       }
 
       assertEquals(1, serverSessions.size());
       assertTrue(serverSessions.contains(testSession));
 
-      verify(serverSessionRegistryServiceMock, times(1)).newServerSession(eq(TestServerSession.class), any(Subject.class), any(UserAgent.class));
+      verify(serverSessionRegistryServiceMock, times(1)).newServerSession(eq(TestServerSession.class), any(ServerJobInput.class));
     }
     finally {
       TestingUtility.unregisterServices(registerServices);
@@ -195,28 +196,29 @@ public class ServiceTunnelServletTest {
     final TestServerSession testSession = new TestServerSession();
     final TestServerSession anotherTestSession = new TestServerSession();
 
-    ServiceTunnelRequest serviceTunnelRequestMock = mock(ServiceTunnelRequest.class);
-    when(serviceTunnelRequestMock.getVirtualSessionId()).thenReturn("VirtualSession1", "VirtualSession2", "VirtualSession1", "VirtualSession2");
-    when(serviceTunnelRequestMock.getUserAgent()).thenReturn("SWING|DESKTOP|Windows7");
-
     IServerSessionRegistryService serverSessionRegistryServiceMock = mock(IServerSessionRegistryService.class);
-    when(serverSessionRegistryServiceMock.newServerSession(eq(TestServerSession.class), any(Subject.class), any(UserAgent.class))).thenReturn(testSession, anotherTestSession, testSession, anotherTestSession);
+    when(serverSessionRegistryServiceMock.newServerSession(eq(TestServerSession.class), any(ServerJobInput.class))).thenReturn(testSession, anotherTestSession, testSession, anotherTestSession);
 
     List<IBean<?>> registerServices = TestingUtility.registerServices(TEST_SERVICE_RANKING, serverSessionRegistryServiceMock);
     try {
-      IServerSession session = m_testServiceTunnelServlet.lookupServerSession(m_requestMock, m_responseMock, null, serviceTunnelRequestMock);
+      ServerJobInput input = ServerJobInput.empty();
+      input.servletRequest(m_requestMock);
+      input.servletResponse(m_responseMock);
+      input.userAgent(UserAgent.createByIdentifier("SWING|DESKTOP|Windows7"));
+
+      IServerSession session = m_testServiceTunnelServlet.lookupScoutServerSessionOnVirtualSession(input, "VirtualSession1");
       assertEquals(testSession, session);
 
-      session = m_testServiceTunnelServlet.lookupServerSession(m_requestMock, m_responseMock, null, serviceTunnelRequestMock);
+      session = m_testServiceTunnelServlet.lookupScoutServerSessionOnVirtualSession(input, "VirtualSession2");
       assertEquals(anotherTestSession, session);
 
-      session = m_testServiceTunnelServlet.lookupServerSession(m_requestMock, m_responseMock, null, serviceTunnelRequestMock);
+      session = m_testServiceTunnelServlet.lookupScoutServerSessionOnVirtualSession(input, "VirtualSession1");
       assertEquals(testSession, session);
 
-      session = m_testServiceTunnelServlet.lookupServerSession(m_requestMock, m_responseMock, null, serviceTunnelRequestMock);
+      session = m_testServiceTunnelServlet.lookupScoutServerSessionOnVirtualSession(input, "VirtualSession2");
       assertEquals(anotherTestSession, session);
 
-      verify(serverSessionRegistryServiceMock, times(2)).newServerSession(eq(TestServerSession.class), any(Subject.class), any(UserAgent.class));
+      verify(serverSessionRegistryServiceMock, times(2)).newServerSession(eq(TestServerSession.class), any(ServerJobInput.class));
     }
     finally {
       TestingUtility.unregisterServices(registerServices);
@@ -235,33 +237,36 @@ public class ServiceTunnelServletTest {
     final TestServerSession testSession = new TestServerSession();
     final TestServerSession anotherTestSession = new TestServerSession();
 
-    final ServiceTunnelRequest serviceTunnelRequestMock = mock(ServiceTunnelRequest.class);
-    when(serviceTunnelRequestMock.getVirtualSessionId()).thenReturn("VirtualSession1", "VirtualSession2", "VirtualSession1", "VirtualSession2");
-    when(serviceTunnelRequestMock.getUserAgent()).thenReturn("SWING|DESKTOP|Windows7");
+    List<String> virtualSessionIds = new ArrayList<>();
+    virtualSessionIds.add("VirtualSession1");
+    virtualSessionIds.add("VirtualSession2");
+    virtualSessionIds.add("VirtualSession1");
+    virtualSessionIds.add("VirtualSession2");
+
     when(m_requestMock.getSession().getMaxInactiveInterval()).thenReturn(6000); // set large timeout
 
     IServerSessionRegistryService serverSessionRegistryServiceMock = mock(IServerSessionRegistryService.class);
-    when(serverSessionRegistryServiceMock.newServerSession(eq(TestServerSession.class), any(Subject.class), any(UserAgent.class))).thenAnswer(testOrOtherSession(testSession, anotherTestSession));
+    when(serverSessionRegistryServiceMock.newServerSession(eq(TestServerSession.class), any(ServerJobInput.class))).thenAnswer(testOrOtherSession(testSession, anotherTestSession));
 
     List<IBean<?>> registerServices = TestingUtility.registerServices(TEST_SERVICE_RANKING, serverSessionRegistryServiceMock);
     try {
-      List<VirtualSessionJob> jobs = new ArrayList<VirtualSessionJob>();
+      List<VirtualSessionLookupRunnable> jobs = new ArrayList<>();
       for (int i = 0; i < 4; i++) {
-        jobs.add(new VirtualSessionJob("VirtualSessionJobId " + i, m_testServiceTunnelServlet, m_requestMock, m_responseMock, serviceTunnelRequestMock));
+        jobs.add(new VirtualSessionLookupRunnable(m_testServiceTunnelServlet, m_requestMock, m_responseMock, virtualSessionIds.get(i)));
       }
 
-      scheduleAndJoinJobs(jobs);
+      List<IFuture<?>> futures = scheduleAndJoinJobs(jobs);
 
       Set<IServerSession> serverSessions = new HashSet<IServerSession>();
-      for (int i = 0; i < jobs.size(); i++) {
-        serverSessions.add(jobs.get(i).getServerSession());
+      for (IFuture<?> future : futures) {
+        serverSessions.add((IServerSession) future.get());
       }
 
       assertEquals(2, serverSessions.size());
       assertTrue(serverSessions.contains(testSession));
       assertTrue(serverSessions.contains(anotherTestSession));
 
-      verify(serverSessionRegistryServiceMock, times(2)).newServerSession(eq(TestServerSession.class), any(Subject.class), any(UserAgent.class));
+      verify(serverSessionRegistryServiceMock, times(2)).newServerSession(eq(TestServerSession.class), any(ServerJobInput.class));
     }
     finally {
       TestingUtility.unregisterServices(registerServices);
@@ -292,83 +297,57 @@ public class ServiceTunnelServletTest {
     return new TestServiceTunnelServlet(false, false);
   }
 
-  private void scheduleAndJoinJobs(List<? extends JobEx> jobs) throws InterruptedException {
-    for (int i = 0; i < jobs.size(); i++) {
-      jobs.get(i).schedule();
+  private List<IFuture<?>> scheduleAndJoinJobs(List<? extends IExecutable<?>> jobs) throws ProcessingException {
+    List<IFuture<?>> futures = new ArrayList<>();
+
+    for (IExecutable<?> job : jobs) {
+      futures.add(ServerJobManager.DEFAULT.schedule(job));
     }
 
-    for (int i = 0; i < jobs.size(); i++) {
-      jobs.get(i).join();
+    for (IFuture<?> future : futures) {
+      future.get();
     }
+
+    return futures;
   }
 
-  private static class VirtualSessionJob extends JobEx {
+  private static class VirtualSessionLookupRunnable implements ICallable<IServerSession> {
 
     private final ServiceTunnelServlet m_serviceTunnelServlet;
     private final HttpServletRequest m_request;
     private final HttpServletResponse m_response;
-    private final ServiceTunnelRequest m_serviceTunnelRequest;
+    private final String m_virtualSessionId;
 
-    private IServerSession m_serverSession;
-
-    public VirtualSessionJob(String name, ServiceTunnelServlet serviceTunnelServlet, HttpServletRequest request, HttpServletResponse response, ServiceTunnelRequest serviceTunnelRequest) {
-      super(name);
+    public VirtualSessionLookupRunnable(ServiceTunnelServlet serviceTunnelServlet, HttpServletRequest request, HttpServletResponse response, String virtualSessionId) {
       m_serviceTunnelServlet = serviceTunnelServlet;
       m_request = request;
       m_response = response;
-      m_serviceTunnelRequest = serviceTunnelRequest;
-    }
-
-    public IServerSession getServerSession() {
-      return m_serverSession;
+      m_virtualSessionId = virtualSessionId;
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      try {
-        m_serverSession = m_serviceTunnelServlet.lookupServerSession(m_request, m_response, null, m_serviceTunnelRequest);
-        return Status.OK_STATUS;
-      }
-      catch (ProcessingException e) {
-        return new Status(IStatus.ERROR, "org.eclipse.scout.rt.server", 0, "Error executing lookup virtual session", e);
-      }
-      catch (ServletException e) {
-        return new Status(IStatus.ERROR, "org.eclipse.scout.rt.server", 0, "Error executing lookup virtual session", e);
-      }
+    public IServerSession call() throws Exception {
+      ServerJobInput input = ServerJobInput.empty().servletRequest(m_request).servletResponse(m_response);
+
+      return m_serviceTunnelServlet.lookupScoutServerSessionOnVirtualSession(input, m_virtualSessionId);
     }
   }
 
-  private static class HttpSessionJob extends JobEx {
+  private static class HttpSessionLookupRunnable implements ICallable<IServerSession> {
 
     private final ServiceTunnelServlet m_serviceTunnelServlet;
     private final HttpServletRequest m_request;
     private final HttpServletResponse m_response;
 
-    private IServerSession m_serverSession;
-
-    public HttpSessionJob(String name, ServiceTunnelServlet serviceTunnelServlet, HttpServletRequest request, HttpServletResponse response) {
-      super(name);
+    public HttpSessionLookupRunnable(ServiceTunnelServlet serviceTunnelServlet, HttpServletRequest request, HttpServletResponse response) {
       m_serviceTunnelServlet = serviceTunnelServlet;
       m_request = request;
       m_response = response;
     }
 
-    public IServerSession getServerSession() {
-      return m_serverSession;
-    }
-
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      try {
-        m_serverSession = m_serviceTunnelServlet.lookupScoutServerSessionOnHttpSession(m_request, m_response, null, null);
-        return Status.OK_STATUS;
-      }
-      catch (ProcessingException e) {
-        return new Status(IStatus.ERROR, "org.eclipse.scout.rt.server", 0, "Error executing lookup http session", e);
-      }
-      catch (ServletException e) {
-        return new Status(IStatus.ERROR, "org.eclipse.scout.rt.server", 0, "Error executing lookup http session", e);
-      }
+    public IServerSession call() throws Exception {
+      return m_serviceTunnelServlet.lookupScoutServerSessionOnHttpSession(ServerJobInput.empty().servletRequest(m_request).servletResponse(m_response));
     }
   }
 
@@ -379,12 +358,9 @@ public class ServiceTunnelServletTest {
       super(multiClientSessionCookieStore, debug);
     }
 
-    /**
-     *
-     */
     @Override
-    public void initializeAjaxSessionTimeout(HttpServletRequest req) {
-      super.initializeAjaxSessionTimeout(req);
+    public void initializeVirtualSessionTimeout(HttpServletRequest req) {
+      super.initializeVirtualSessionTimeout(req);
     }
 
     @Override
@@ -401,8 +377,8 @@ public class ServiceTunnelServletTest {
     final TestServiceTunnelServlet s = new TestServiceTunnelServlet(false, false);
     final HttpServletRequest mock = mock(HttpServletRequest.class);
     when(mock.getSession()).thenReturn(mock(HttpSession.class));
-    s.initializeAjaxSessionTimeout(mock);
-    s.initializeAjaxSessionTimeout(mock);
+    s.initializeVirtualSessionTimeout(mock);
+    s.initializeVirtualSessionTimeout(mock);
     verify(mock, times(1)).getSession();
   }
 }

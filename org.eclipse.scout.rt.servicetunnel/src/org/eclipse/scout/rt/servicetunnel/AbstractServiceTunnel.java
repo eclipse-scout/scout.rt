@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.VersionMismatchException;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.ServiceUtility;
 
 /**
@@ -137,11 +138,18 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
   }
 
   protected IServiceTunnelRequest createServiceTunnelRequest(String version, Class serviceInterfaceClass, Method operation, Object[] args) {
+    UserAgent userAgent = UserAgent.CURRENT.get();
+    if (userAgent == null) {
+      LOG.warn("No UserAgent set on calling context; include default in service-request");
+      userAgent = UserAgent.createDefault();
+    }
+
     // default implementation
     ServiceTunnelRequest call = new ServiceTunnelRequest(version, serviceInterfaceClass, operation, args);
     call.setClientSubject(getSession().getSubject());
     call.setVirtualSessionId(getSession().getVirtualSessionId());
-    call.setUserAgent(getSession().getUserAgent().createIdentifier());
+    call.setUserAgent(userAgent.createIdentifier());
+
     return call;
   }
 

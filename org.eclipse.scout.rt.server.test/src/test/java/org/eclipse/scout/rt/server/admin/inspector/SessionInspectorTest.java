@@ -17,7 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ThreadContext;
+import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -35,18 +36,18 @@ public class SessionInspectorTest {
 
   @Before
   public void setUp() throws Exception {
-    servletRequestBackup = ThreadContext.getHttpServletRequest();
+    servletRequestBackup = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
   }
 
   @After
   public void tearDown() throws Exception {
-    ThreadContext.putHttpServletRequest(servletRequestBackup);
+    IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.set(servletRequestBackup);
   }
 
   @Test
   public void testSessionInspectorWithoutServletRequest() {
-    ThreadContext.putHttpServletRequest(null);
-    SessionInspector inspector = new SessionInspector(ProcessInspector.instance(), ThreadContext.getServerSession());
+    IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.set(null);
+    SessionInspector inspector = new SessionInspector(ProcessInspector.instance(), (IServerSession) ISession.CURRENT.get());
     assertNull(inspector.getInfo().getCreationTime());
     assertNull(inspector.getInfo().getLastAccessedTime());
   }
@@ -54,8 +55,8 @@ public class SessionInspectorTest {
   @Test
   public void testSessionInspectorWithoutHttpSession() {
     HttpServletRequest servletRequest = Mockito.mock(HttpServletRequest.class);
-    ThreadContext.putHttpServletRequest(servletRequest);
-    SessionInspector inspector = new SessionInspector(ProcessInspector.instance(), ThreadContext.getServerSession());
+    IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.set(servletRequest);
+    SessionInspector inspector = new SessionInspector(ProcessInspector.instance(), (IServerSession) ISession.CURRENT.get());
     assertNull(inspector.getInfo().getCreationTime());
     assertNull(inspector.getInfo().getLastAccessedTime());
   }
@@ -67,20 +68,19 @@ public class SessionInspectorTest {
     Mockito.when(servletRequest.getSession()).thenReturn(httpSession);
     Mockito.when(httpSession.getCreationTime()).thenReturn(CREATION_TIME);
     Mockito.when(httpSession.getLastAccessedTime()).thenReturn(LAST_ACCESS_TIME);
-    ThreadContext.putHttpServletRequest(servletRequest);
-    SessionInspector inspector = new SessionInspector(ProcessInspector.instance(), ThreadContext.getServerSession());
+    IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.set(servletRequest);
+    SessionInspector inspector = new SessionInspector(ProcessInspector.instance(), (IServerSession) ISession.CURRENT.get());
     assertEquals(CREATION_TIME, inspector.getInfo().getCreationTime());
     assertEquals(LAST_ACCESS_TIME, inspector.getInfo().getLastAccessedTime());
   }
 
   @Test
   public void testSessionInspectorWithServerSession() {
-    IServerSession serverSession = ThreadContext.getServerSession();
+    IServerSession serverSession = (IServerSession) ISession.CURRENT.get();
     SessionInspector inspector = new SessionInspector(ProcessInspector.instance(), serverSession);
     assertEquals(ProcessInspector.instance(), inspector.getProcessInspector());
     assertEquals(serverSession, inspector.getServerSession());
     assertEquals(serverSession.getId(), inspector.getInfo().getSessionId());
     assertEquals(serverSession.getUserId(), inspector.getInfo().getUserId());
-    assertEquals(serverSession.getUserAgent(), inspector.getInfo().getUserAgent());
   }
 }

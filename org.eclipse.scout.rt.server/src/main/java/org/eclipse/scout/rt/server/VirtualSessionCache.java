@@ -1,12 +1,14 @@
 package org.eclipse.scout.rt.server;
 
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.scout.commons.AbstractDynamicHashMap;
 
 class VirtualSessionCache extends AbstractDynamicHashMap<String, IServerSession> {
   private static final long serialVersionUID = 1L;
 
-  private long m_sessionTimeoutMillis = 300000L;//default 5 minutes
-  private long m_nextMaintenance = 0L;//default 5 minutes
+  private long m_sessionTimeoutMillis = TimeUnit.MINUTES.toMillis(5);
+  private long m_nextMaintenance = TimeUnit.MINUTES.toMillis(0);
 
   public long getSessionTimeoutMillis() {
     return m_sessionTimeoutMillis;

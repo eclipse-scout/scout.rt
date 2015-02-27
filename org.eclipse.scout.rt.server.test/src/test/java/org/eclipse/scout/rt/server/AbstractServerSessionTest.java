@@ -64,8 +64,6 @@ public class AbstractServerSessionTest {
 
   private void assertSessionsEquals(IServerSession expected, IServerSession actual) {
     assertEquals(expected.getId(), actual.getId());
-    assertEquals(expected.getLocale(), actual.getLocale());
-    assertEquals(expected.getUserAgent(), actual.getUserAgent());
     assertEquals(expected.getUserId(), actual.getUserId());
     assertEquals(expected.getBundle(), actual.getBundle());
     assertEquals(expected.getVirtualSessionId(), actual.getVirtualSessionId());

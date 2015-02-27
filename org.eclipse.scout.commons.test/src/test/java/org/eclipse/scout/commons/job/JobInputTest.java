@@ -17,66 +17,122 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import java.security.PrivilegedAction;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.nls.NlsLocale;
+import org.junit.Before;
 import org.junit.Test;
 
 public class JobInputTest {
 
+  @Before
+  public void before() {
+    NlsLocale.CURRENT.remove();
+  }
+
   @Test
   public void testEmpty() {
-    IJobInput input = JobInput.empty();
+    JobInput input = JobInput.empty();
     assertNotNull(input.getContext());
     assertNull(input.getName());
     assertEquals(0, input.getId());
     assertNull(input.getSubject());
+    assertNull(input.getLocale());
   }
 
   @Test
-  public void testDefault1() {
-    IJobInput input = JobInput.defaults();
-    assertNotNull(input.getContext());
-    assertNull(input.getName());
-    assertEquals(0, input.getId());
-    assertNull(input.getSubject());
+  public void testCopy() {
+    JobInput input = JobInput.empty();
+    input.getContext().set("A", "B");
+    input.name("name");
+    input.id(123);
+    input.subject(new Subject());
+    input.locale(Locale.CANADA_FRENCH);
+
+    JobInput copy = input.copy();
+
+    assertNotSame(input.getContext(), copy.getContext());
+    assertEquals(toSet(input.getContext().iterator()), toSet(copy.getContext().iterator()));
+    assertEquals(input.getName(), copy.getName());
+    assertEquals(input.getId(), copy.getId());
+    assertSame(input.getSubject(), copy.getSubject());
+    assertSame(input.getLocale(), copy.getLocale());
   }
 
   @Test
-  public void testDefault2() {
+  public void testDefaultName() {
+    assertNull(JobInput.defaults().getName());
+    assertEquals("ABC", JobInput.defaults().name("ABC").getName());
+  }
+
+  @Test
+  public void testDefaultId() {
+    assertEquals(0, JobInput.defaults().getId());
+    assertEquals(123, JobInput.defaults().id(123).getId());
+  }
+
+  @Test
+  public void testDefaultSubject() {
+    assertNull(JobInput.defaults().getSubject());
+
     Subject subject = new Subject();
-
-    JobContext ctx = new JobContext();
-    ctx.set("prop", "value");
-    JobContext.CURRENT.set(new JobContext());
-
-    IJobInput input = Subject.doAs(subject, new PrivilegedAction<IJobInput>() {
+    JobInput input = Subject.doAs(subject, new PrivilegedAction<JobInput>() {
 
       @Override
-      public IJobInput run() {
+      public JobInput run() {
         return JobInput.defaults();
       }
     });
-
-    assertNotSame(JobContext.CURRENT.get(), input.getContext());
-    assertEquals(JobContext.CURRENT.get().iterator(), input.getContext().iterator());
-    assertNull(input.getName());
-    assertEquals(0, input.getId());
     assertSame(subject, input.getSubject());
+
+    subject = new Subject();
+    input = Subject.doAs(subject, new PrivilegedAction<JobInput>() {
+
+      @Override
+      public JobInput run() {
+        return JobInput.defaults();
+      }
+    });
+    input.subject(null);
+    assertNull(input.getSubject());
   }
 
   @Test
-  public void testIdentifier() {
-    assertNull(JobInput.empty().getIdentifier(null));
-    assertEquals("n/a", JobInput.empty().getIdentifier("n/a"));
+  public void testDefaultJobContext() {
+    JobContext ctx = new JobContext();
+    ctx.set("prop", "value");
 
-    assertEquals("JOB", JobInput.empty().name("JOB").getIdentifier("n/a"));
-    assertEquals("123", JobInput.empty().id(123).getIdentifier("n/a"));
-    assertEquals("123;JOB", JobInput.empty().name("JOB").id(123).getIdentifier("n/a"));
+    JobContext.CURRENT.remove();
+    assertNotNull(JobInput.defaults().getContext());
 
-    assertEquals("JOB", JobInput.empty().name("JOB").getIdentifier(null));
-    assertEquals("123", JobInput.empty().id(123).getIdentifier(null));
-    assertEquals("123;JOB", JobInput.empty().name("JOB").id(123).getIdentifier(null));
+    JobContext.CURRENT.set(ctx);
+    assertNotNull(ctx);
+    assertNotSame(ctx, JobInput.defaults().getContext());
+    assertEquals(toSet(ctx.iterator()), toSet(JobInput.defaults().getContext().iterator()));
 
+    JobContext.CURRENT.set(ctx);
+    assertNull(JobInput.defaults().context(null).getContext());
+  }
+
+  @Test
+  public void testDefaultLocale() {
+    NlsLocale.CURRENT.remove();
+    assertNull(JobInput.defaults().getLocale());
+
+    NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
+    assertEquals(Locale.CANADA_FRENCH, JobInput.defaults().getLocale());
+  }
+
+  private static Set<Object> toSet(Iterator<?> iterator) {
+    Set<Object> set = new HashSet<>();
+    while (iterator.hasNext()) {
+      set.add(iterator.next());
+    }
+    return set;
   }
 }

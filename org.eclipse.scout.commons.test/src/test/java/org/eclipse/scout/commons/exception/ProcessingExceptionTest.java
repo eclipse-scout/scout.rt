@@ -15,6 +15,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+
 import org.eclipse.scout.commons.status.IStatus;
 import org.junit.Test;
 
@@ -82,6 +84,26 @@ public class ProcessingExceptionTest {
     assertTrue(exText.contains("VetoException"));
     assertTrue(exText.contains("consumed"));
     assertTrue(exText.contains(context));
+  }
+
+  @Test
+  public void testAddContextMessage1() {
+    ProcessingException e = new ProcessingException("exception");
+    e.addContextMessage("3");
+    e.addContextMessage("2");
+    e.addContextMessage("1");
+
+    assertEquals(Arrays.asList("1", "2", "3"), e.getStatus().getContextMessages());
+  }
+
+  @Test
+  public void testAddContextMessage2() {
+    ProcessingException e = new ProcessingException("exception");
+    e.addContextMessage("position=%s", 3);
+    e.addContextMessage("position=%s", 2);
+    e.addContextMessage("position=%s", 1);
+
+    assertEquals(Arrays.asList("position=1", "position=2", "position=3"), e.getStatus().getContextMessages());
   }
 
   private void assertContainsExceptionAttributes(String exText) {

@@ -19,9 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.admin.inspector.info.SessionInfo;
+import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 public class SessionInspector {
   private ProcessInspector m_parent;
@@ -37,9 +38,9 @@ public class SessionInspector {
 
     m_info.setSessionId(session.getId());
     m_info.setUserId(session.getUserId());
-    m_info.setUserAgent(session.getUserAgent());
+    m_info.setUserAgent(UserAgent.CURRENT.get());
 
-    HttpServletRequest httpReq = ThreadContext.getHttpServletRequest();
+    HttpServletRequest httpReq = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
     if (httpReq != null) {
       HttpSession httpSession = httpReq.getSession();
       if (httpSession != null) {

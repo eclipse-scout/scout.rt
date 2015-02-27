@@ -44,4 +44,13 @@ public class ServerJobFactory implements IServerJobFactory {
     return job;
   }
 
+  @Override
+  public IServerSession getServerSession() {
+    return m_serverSession;
+  }
+
+  @Override
+  public Subject getSubject() {
+    return m_subject;
+  }
 }

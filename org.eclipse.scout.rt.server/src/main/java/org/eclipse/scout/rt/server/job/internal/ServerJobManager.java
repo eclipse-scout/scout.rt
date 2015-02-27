@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.internal.JobFuture;
 import org.eclipse.scout.commons.job.internal.JobManager;
 import org.eclipse.scout.commons.job.internal.callable.InitThreadLocalCallable;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
@@ -31,6 +30,7 @@ import org.eclipse.scout.rt.server.transaction.BasicTransaction;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
  * Default implementation of {@link IServerJobManager}.
@@ -62,7 +62,7 @@ public class ServerJobManager extends JobManager<ServerJobInput> implements ISer
     final Callable<RESULT> c8 = new TwoPhaseTransactionBoundaryCallable<>(next, tx, input);
     final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ITransaction.CURRENT, tx);
     final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ScoutTexts.CURRENT, input.getSession().getTexts());
-    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, NlsLocale.CURRENT, input.getSession().getLocale());
+    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, UserAgent.CURRENT, input.getUserAgent());
     final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, ISession.CURRENT, input.getSession());
     final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, input.getServletResponse());
     final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, input.getServletRequest());

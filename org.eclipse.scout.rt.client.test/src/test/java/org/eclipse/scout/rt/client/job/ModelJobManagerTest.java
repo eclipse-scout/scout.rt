@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -20,33 +21,30 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(ScoutPlatformTestRunner.class)
 public class ModelJobManagerTest {
-
-  private static ExecutorService s_executor;
 
   private IModelJobManager m_jobManager;
 
@@ -62,16 +60,6 @@ public class ModelJobManagerTest {
     m_jobManager.shutdown();
 
     ISession.CURRENT.remove();
-  }
-
-  @BeforeClass
-  public static void beforeClass() {
-    s_executor = Executors.newCachedThreadPool();
-  }
-
-  @AfterClass
-  public static void afterClass() {
-    s_executor.shutdown();
   }
 
   @Test
@@ -220,6 +208,23 @@ public class ModelJobManagerTest {
       assertFalse(e.isRejection());
       assertFalse(e.isInterruption());
       assertFalse(e.isTimeout());
+    }
+  }
+
+  @Test
+  public void testLocale() throws ProcessingException {
+    IClientSession session = mock(IClientSession.class);
+    NlsLocale.CURRENT.set(Locale.CHINA); // just to test to not to be considered.
+
+    assertNull(new _ModelJobManager().interceptLocale(null, ClientJobInput.empty().session(session)));
+    assertEquals(Locale.CANADA_FRENCH, new _ModelJobManager().interceptLocale(Locale.CANADA_FRENCH, ClientJobInput.empty().session(session)));
+  }
+
+  private static class _ModelJobManager extends ModelJobManager {
+
+    @Override
+    public Locale interceptLocale(Locale locale, ClientJobInput input) {
+      return super.interceptLocale(locale, input);
     }
   }
 }

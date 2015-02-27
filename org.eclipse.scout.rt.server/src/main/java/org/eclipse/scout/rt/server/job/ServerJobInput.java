@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.job;
 
 import java.security.AccessControlContext;
+import java.util.Locale;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +20,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobInput;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
  * Implementation of {@link IJobInput} with some additional data used for server-side jobs.
@@ -33,12 +36,34 @@ public class ServerJobInput extends JobInput {
   private IServerSession m_session;
   private HttpServletRequest m_servletRequest;
   private HttpServletResponse m_servletResponse;
+  private UserAgent m_userAgent;
+
+  private ServerJobInput(final IJobInput origin) {
+    super(origin);
+  }
 
   /**
-   * Use {@link #empty()} or {@link #defaults()} to create a {@link ServerJobInput}.
+   * Creates a copy of the given {@link ServerJobInput}.
+   *
+   * @param origin
+   *          to be copied.
    */
-  private ServerJobInput(final IJobInput template) {
-    super(template);
+  protected ServerJobInput(final ServerJobInput origin) {
+    super(origin);
+    m_session = origin.getSession();
+    m_servletRequest = origin.getServletRequest();
+    m_servletResponse = origin.getServletResponse();
+    m_userAgent = origin.getUserAgent();
+  }
+
+  /**
+   * Creates a copy of the current {@link ServerJobInput}.
+   *
+   * @return copy of the current {@link ServerJobInput}.
+   */
+  @Override
+  public ServerJobInput copy() {
+    return new ServerJobInput(this);
   }
 
   @Override
@@ -54,6 +79,11 @@ public class ServerJobInput extends JobInput {
   @Override
   public ServerJobInput subject(final Subject subject) {
     return (ServerJobInput) super.subject(subject);
+  }
+
+  @Override
+  public ServerJobInput locale(final Locale locale) {
+    return (ServerJobInput) super.locale(locale);
   }
 
   @Override
@@ -74,7 +104,7 @@ public class ServerJobInput extends JobInput {
   /**
    * @param servletRequest
    *          {@link HttpServletRequest} of the ongoing HTTP Servlet call; if set, the job's execution thread is
-   *          associated with that {@link HttpServletRequest}.
+   *          associated with the given {@link HttpServletRequest}.
    * @return {@link IJobInput} to be used as builder.
    */
   public ServerJobInput servletRequest(final HttpServletRequest servletRequest) {
@@ -85,11 +115,22 @@ public class ServerJobInput extends JobInput {
   /**
    * @param servletResponse
    *          {@link HttpServletResponse} of the ongoing HTTP Servlet call; if set, the job's execution thread is
-   *          associated with that {@link HttpServletResponse}.
+   *          associated with the given {@link HttpServletResponse}.
    * @return {@link IJobInput} to be used as builder.
    */
   public ServerJobInput servletResponse(final HttpServletResponse servletResponse) {
     m_servletResponse = servletResponse;
+    return this;
+  }
+
+  /**
+   * @param userAgent
+   *          {@link UserAgent} to describe the user agent used by the client; if set, the job's execution thread is
+   *          associated with the given {@link UserAgent}; must not be set for background-jobs.
+   * @return {@link IJobInput} to be used as builder.
+   */
+  public ServerJobInput userAgent(final UserAgent userAgent) {
+    m_userAgent = userAgent;
     return this;
   }
 
@@ -115,6 +156,13 @@ public class ServerJobInput extends JobInput {
   }
 
   /**
+   * @return {@link UserAgent} that describes the agent used by the client; must not be set, e.g. for background-jobs.
+   */
+  public UserAgent getUserAgent() {
+    return m_userAgent;
+  }
+
+  /**
    * Creates a {@link ServerJobInput} that is only filled with the job-context of the current thread, or if not
    * available, an empty one.
    */
@@ -125,18 +173,27 @@ public class ServerJobInput extends JobInput {
   /**
    * Creates a {@link ServerJobInput} filled with the defaults from the current calling context.
    * <ul>
-   * <li>{@link ServerJobInput#getSubject()}: subject of the current {@link AccessControlContext};</li>
+   * <li>{@link ServerJobInput#getSubject()}: Subject associated with the current {@link AccessControlContext};</li>
+   * <li>{@link ServerJobInput#getLocale()}: Locale associated with the current thread - in case of a
+   * client-server-request, this is typically the Locale provided with the request unless not overwritten explicitly by
+   * a dependent job; if not set on the current thread, the Locale is not set;</li>
+   * <li>{@link ServerJobInput#getContext()}: copy of the job-context associated with the current thread, or if not
+   * available, an empty {@link JobContext};
    * <li>{@link ServerJobInput#getSession()}: session associated with the current thread;</li>
    * <li>{@link ServerJobInput#getServletRequest()}: {@link HttpServletRequest} associated with the current thread;
    * <li>{@link ServerJobInput#getServletResponse()}: {@link HttpServletResponse} associated with the current thread;</li>
-   * <li>{@link ServerJobInput#getContext()}: copy of the job-context associated with the current thread, or if not
-   * available, an empty {@link JobContext};
+   * <li>{@link ServerJobInput#getUserAgent()}: {@link UserAgent} associated with the current thread;</li>
    * </ul>
    */
   public static ServerJobInput defaults() {
-    return new ServerJobInput(JobInput.defaults())
-        .session((IServerSession) ISession.CURRENT.get())
-        .servletRequest(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get())
-        .servletResponse(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
+    final ServerJobInput defaults = new ServerJobInput(JobInput.defaults());
+
+    defaults.session((IServerSession) ISession.CURRENT.get());
+    defaults.servletRequest(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
+    defaults.servletResponse(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
+    defaults.locale(NlsLocale.CURRENT.get());
+    defaults.userAgent(UserAgent.CURRENT.get());
+
+    return defaults;
   }
 }
