@@ -138,12 +138,12 @@ public final class BeansXmlParser {
         if (StringUtility.hasText(interceptorFqn)) {
           try {
             Class<?> interceptorClass = beansXml.loadClass(interceptorFqn);
-            Object interceptor = BeanContext.createInstance(interceptorClass);
+            Object interceptor = BeanInstanceCreator.createInstance(interceptorClass);
             for (Annotation a : readInterceptorAnnotations(interceptorClass)) {
               interceptors.put(a.annotationType(), interceptor);
             }
           }
-          catch (ClassNotFoundException e) {
+          catch (Exception e) {
             LOG.error(String.format("Could not instanicate %s.", interceptorFqn), e);
           }
         }

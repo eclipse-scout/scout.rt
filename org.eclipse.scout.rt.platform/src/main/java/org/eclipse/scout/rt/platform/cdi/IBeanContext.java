@@ -29,7 +29,7 @@ public interface IBeanContext {
 
   /**
    * Nullsave {@link #getInstance(Class)}
-   * 
+   *
    * @param beanClazz
    * @return
    */
@@ -50,7 +50,7 @@ public interface IBeanContext {
 
   /**
    * Nullsave {@link #getBean(Class)}
-   * 
+   *
    * @param beanClazz
    * @return
    */

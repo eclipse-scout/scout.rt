@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.cdi.internal;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -139,6 +138,10 @@ public class BeanContext implements IBeanContext {
 
   @Override
   public <T> IBean<T> registerClass(Class<T> beanClazz) {
+    TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
+    if (beans.size() == 1) {
+      return (IBean<T>) beans.first();
+    }
     Bean<T> bean = new Bean<T>(beanClazz);
     registerBean(bean);
     return bean;
@@ -194,26 +197,6 @@ public class BeanContext implements IBeanContext {
         }
       }
     }
-  }
-
-  public static <T> T createInstance(Class<T> clazz) {
-    Assertions.assertNotNull(clazz);
-    T instance = null;
-    try {
-      Constructor<? extends T> constructor = clazz.getDeclaredConstructor();
-      if (constructor != null) {
-        constructor.setAccessible(true);
-        instance = constructor.newInstance();
-
-      }
-      else {
-        LOG.error(String.format("Default constructor of '%s' not found. Ensure to have an empty constructor.", clazz.getName()));
-      }
-    }
-    catch (Exception e) {
-      LOG.error(String.format("Could not instantiate '%s'.", clazz), e);
-    }
-    return instance;
   }
 
   private class P_BeanComparator implements Comparator<IBean<?>> {

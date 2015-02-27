@@ -34,6 +34,41 @@ public final class DynamicAnnotations {
       public float value() {
         return priority;
       }
+
+      @Override
+      public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((annotationType() == null) ? 0 : annotationType().hashCode());
+        result = prime * result + Float.floatToIntBits(value());
+        return result;
+      }
+
+      @Override
+      public boolean equals(Object obj) {
+        if (this == obj) {
+          return true;
+        }
+        if (obj == null) {
+          return false;
+        }
+        if (!(obj instanceof Priority)) {
+          return false;
+        }
+        Priority other = (Priority) obj;
+        if (annotationType() == null) {
+          if (other.annotationType() != null) {
+            return false;
+          }
+        }
+        else if (!annotationType().equals(other.annotationType())) {
+          return false;
+        }
+        if (Float.floatToIntBits(value()) != Float.floatToIntBits(other.value())) {
+          return false;
+        }
+        return true;
+      }
     };
   }
 
@@ -44,6 +79,37 @@ public final class DynamicAnnotations {
       public Class<? extends Annotation> annotationType() {
         return ApplicationScoped.class;
       }
+
+      @Override
+      public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((annotationType() == null) ? 0 : annotationType().hashCode());
+        return result;
+      }
+
+      @Override
+      public boolean equals(Object obj) {
+        if (this == obj) {
+          return true;
+        }
+        if (obj == null) {
+          return false;
+        }
+        if (!(obj instanceof ApplicationScoped)) {
+          return false;
+        }
+        ApplicationScoped other = (ApplicationScoped) obj;
+        if (annotationType() == null) {
+          if (other.annotationType() != null) {
+            return false;
+          }
+        }
+        else if (!annotationType().equals(other.annotationType())) {
+          return false;
+        }
+        return true;
+      }
     };
   }
 
@@ -53,6 +119,38 @@ public final class DynamicAnnotations {
       public Class<? extends Annotation> annotationType() {
         return CreateImmediately.class;
       }
+
+      @Override
+      public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((annotationType() == null) ? 0 : annotationType().hashCode());
+        return result;
+      }
+
+      @Override
+      public boolean equals(Object obj) {
+        if (this == obj) {
+          return true;
+        }
+        if (obj == null) {
+          return false;
+        }
+        if (!(obj instanceof CreateImmediately)) {
+          return false;
+        }
+        CreateImmediately other = (CreateImmediately) obj;
+        if (annotationType() == null) {
+          if (other.annotationType() != null) {
+            return false;
+          }
+        }
+        else if (!annotationType().equals(other.annotationType())) {
+          return false;
+        }
+        return true;
+      }
     };
   }
+
 }

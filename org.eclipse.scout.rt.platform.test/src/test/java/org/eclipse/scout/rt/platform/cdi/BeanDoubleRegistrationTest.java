@@ -11,23 +11,20 @@
 package org.eclipse.scout.rt.platform.cdi;
 
 import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  *
  */
-@RunWith(ScoutPlatformTestRunner.class)
 public class BeanDoubleRegistrationTest {
 
   @Test
   public void testDoubleRegistration() {
     BeanContext context = new BeanContext();
-    @SuppressWarnings("unused")
     IBean<?> reg1 = context.registerClass(Bean01.class);
     IBean<?> reg2 = context.registerClass(Bean01.class);
+    Assert.assertTrue(reg1 == reg2);
     Assert.assertEquals(1, context.getAllRegisteredBeans().size());
     context.unregisterBean(reg2);
     Assert.assertEquals(0, context.getAllRegisteredBeans().size());

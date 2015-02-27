@@ -18,8 +18,6 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
 import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
 
@@ -27,19 +25,15 @@ import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
  *
  */
 public class Bean<T> implements IBean<T> {
-  @SuppressWarnings("unused")
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(Bean.class);
 
   private final Class<? extends T> m_beanClazz;
   private final Map<Class<? extends Annotation>, Annotation> m_beanAnnotations;
 
+  private final boolean m_isInstanceBasedBean;
   private T m_instance;
 
   public Bean(Class<? extends T> clazz) {
-    m_beanClazz = Assertions.assertNotNull(clazz);
-    m_beanAnnotations = new HashMap<>();
-    // read initial annotations
-    readStaticAnnoations(clazz, false);
+    this(clazz, null, CollectionUtility.<Annotation> emptyArrayList());
   }
 
   public Bean(T instance) {
@@ -48,14 +42,23 @@ public class Bean<T> implements IBean<T> {
 
   @SuppressWarnings("unchecked")
   public Bean(T instance, List<Annotation> beanAnnotations) {
-    this((Class<? extends T>) instance.getClass());
-    for (Annotation annotation : beanAnnotations) {
-      addAnnotation(annotation);
+    this((Class<? extends T>) instance.getClass(), instance, beanAnnotations);
+  }
+
+  private Bean(Class<? extends T> clazz, T instance, List<Annotation> beanAnnotations) {
+    m_beanClazz = Assertions.assertNotNull(clazz);
+    m_instance = instance;
+    m_isInstanceBasedBean = instance != null;
+    m_beanAnnotations = new HashMap<>();
+    readStaticAnnoations(clazz, false);
+    if (beanAnnotations != null) {
+      for (Annotation annotation : beanAnnotations) {
+        addAnnotation(annotation);
+      }
     }
-    if (getBeanAnnotation(ApplicationScoped.class) == null) {
+    if (m_isInstanceBasedBean && getBeanAnnotation(ApplicationScoped.class) == null) {
       throw new IllegalArgumentException(String.format("Instance constructor only allows application scoped instances. Class '%s' does not have the '%s' annotation.", m_beanClazz.getName(), ApplicationScoped.class.getName()));
     }
-    m_instance = instance;
   }
 
   /**
@@ -147,4 +150,61 @@ public class Bean<T> implements IBean<T> {
     return false;
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((m_beanAnnotations == null) ? 0 : CollectionUtility.hashCode(m_beanAnnotations.values()));
+    result = prime * result + ((m_beanClazz == null) ? 0 : m_beanClazz.hashCode());
+    result = prime * result + (m_isInstanceBasedBean ? 1231 : 1237);
+    if (m_isInstanceBasedBean) {
+      result = prime * result + ((m_instance == null) ? 0 : m_instance.hashCode());
+    }
+    return result;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    Bean other = (Bean) obj;
+    if (m_beanAnnotations == null) {
+      if (other.m_beanAnnotations != null) {
+        return false;
+      }
+    }
+    else if (!CollectionUtility.equalsCollection(m_beanAnnotations.values(), other.m_beanAnnotations.values())) {
+      return false;
+    }
+    if (m_beanClazz == null) {
+      if (other.m_beanClazz != null) {
+        return false;
+      }
+    }
+    else if (!m_beanClazz.equals(other.m_beanClazz)) {
+      return false;
+    }
+    if (m_isInstanceBasedBean != other.m_isInstanceBasedBean) {
+      return false;
+    }
+    if (m_isInstanceBasedBean) {
+      if (m_instance == null) {
+        if (other.m_instance != null) {
+          return false;
+        }
+      }
+      else if (!m_instance.equals(other.m_instance)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
