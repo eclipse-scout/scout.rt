@@ -10,17 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services;
 
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.services.cdi.SessionRequired;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
+import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,46 +26,27 @@ import org.junit.runner.RunWith;
 /**
  *
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(ScoutClientTestRunner.class)
 public class ServiceWithSessionInterceptorTest {
 
-  private static TestEnvironmentClientSession clientSession;
+  private static IBean<TestService> m_bean01;
 
   @BeforeClass
   public static void setUp() {
-    clientSession = new TestEnvironmentClientSession();
-    OBJ.registerClass(TestService.class);
+    m_bean01 = OBJ.registerClass(TestService.class);
   }
 
   @AfterClass
   public static void tearDown() {
-    clientSession = null;
+    OBJ.unregisterBean(m_bean01);
   }
 
   @Test
   public void testService() throws Exception {
-    IClientJobManager.DEFAULT.runNow(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        runInClientJob();
-      }
-    }, ClientJobInput.defaults().session(clientSession));
-  }
-
-  /**
-   *
-   */
-  protected void runInClientJob() {
     OBJ.one(ITestService.class).doit();
-
   }
 
   private static interface ITestService extends IService {
-
-    /**
-     *
-     */
     void doit();
 
   }
@@ -78,7 +56,6 @@ public class ServiceWithSessionInterceptorTest {
   private static class TestService extends AbstractService implements ITestService {
     @Override
     public void doit() {
-
     }
   }
 }

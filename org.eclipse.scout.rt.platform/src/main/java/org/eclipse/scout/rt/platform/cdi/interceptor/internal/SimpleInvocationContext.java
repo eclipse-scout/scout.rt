@@ -13,12 +13,15 @@ package org.eclipse.scout.rt.platform.cdi.interceptor.internal;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.interceptor.InvocationContext;
 
 /**
  *
  */
 public class SimpleInvocationContext implements InvocationContext {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SimpleInvocationContext.class);
 
   private final Object m_target;
   private final Method m_targetMethod;
@@ -65,7 +68,13 @@ public class SimpleInvocationContext implements InvocationContext {
 
   @Override
   public Object proceed() throws Exception {
-    return m_proceed.invoke(getTarget(), getParameters());
+    try {
+      m_proceed.setAccessible(true);
+      return m_proceed.invoke(getTarget(), getParameters());
+    }
+    catch (Exception ex) {
+      LOG.error(String.format("Could not invoke method '%s' on '%s'. ", m_proceed.getName(), getTarget().getClass().getName()));
+      throw ex;
+    }
   }
-
 }
