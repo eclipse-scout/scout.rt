@@ -24,6 +24,7 @@ import javax.xml.ws.Binding;
 import javax.xml.ws.http.HTTPBinding;
 
 import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.JaxWs216Module;
@@ -69,25 +70,31 @@ public abstract class EndpointServlet extends HttpServlet {
     handleRequest(request, response, HTTPBinding.class);
   }
 
-  protected void handleRequest(HttpServletRequest request, HttpServletResponse response) {
+  protected void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     handleRequest(request, response, null);
   }
 
-  protected void handleRequest(HttpServletRequest request, HttpServletResponse response, Class<? extends Binding> bindingTypeFilter) {
-    try {
-      ServletAdapter adapter = resolveServletAdapter(request);
-      if (adapter == null) {
-        // status page
-        if (request.getMethod().equals("GET") && m_publishStatusPage) {
-          IJaxWsEndpointService endpointService = SERVICES.getService(IJaxWsEndpointService.class);
-          Collection<ServletAdapter> servletAdapters = m_urlAdapterMap.values();
+  protected void handleRequest(HttpServletRequest request, HttpServletResponse response, Class<? extends Binding> bindingTypeFilter) throws ServletException, IOException {
+    ServletAdapter adapter = resolveServletAdapter(request);
+    if (adapter == null) {
+      // No webservice endpoint found: return status page if installed.
+      if (StringUtility.equalsIgnoreCase(request.getMethod(), "GET") && m_publishStatusPage) {
+        IJaxWsEndpointService endpointService = SERVICES.getService(IJaxWsEndpointService.class);
+        Collection<ServletAdapter> servletAdapters = m_urlAdapterMap.values();
+        try {
           endpointService.onGetRequest(request, response, servletAdapters.toArray(new ServletAdapter[servletAdapters.size()]));
-          return;
         }
-        response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        return;
+        catch (Exception e) {
+          LOG.error("Failed to provide JAX-WS status page", e);
+          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
       }
-
+      else {
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+      }
+    }
+    else {
+      // This is a webservice request to an installed endpoint.
       if (bindingTypeFilter != null) {
         Binding candidateBinding = adapter.getEndpoint().getBinding();
         if (!bindingTypeFilter.isAssignableFrom(candidateBinding.getClass())) {
@@ -97,15 +104,6 @@ public abstract class EndpointServlet extends HttpServlet {
         }
       }
       adapter.handle(getServletContext(), request, response);
-    }
-    catch (Exception e) {
-      LOG.error("webservice request failed", e);
-      try {
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      }
-      catch (IOException ioe) {
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      }
     }
   }
 
