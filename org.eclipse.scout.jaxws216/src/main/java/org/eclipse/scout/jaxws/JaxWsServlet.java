@@ -12,7 +12,6 @@ package org.eclipse.scout.jaxws;
 
 import java.io.IOException;
 import java.security.AccessController;
-import java.security.Principal;
 import java.util.Locale;
 
 import javax.security.auth.Subject;
@@ -31,10 +30,9 @@ import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 
 /**
- * Runs the request in a Subject context.
- * Soap handlers may add {@link Principal}'s to {@link Subject#getSubject(java.security.AccessControlContext)}
+ * Runs the webservice request in a server-job to propagate the current request-context and to run on behalf of a
+ * Subject. SOAP handlers may add Principals later.
  *
- * @see {@link Subject#doAs(Subject, java.security.PrivilegedAction)}.
  * @see {@link IAuthenticationHandler}.
  */
 public class JaxWsServlet extends EndpointServlet {
