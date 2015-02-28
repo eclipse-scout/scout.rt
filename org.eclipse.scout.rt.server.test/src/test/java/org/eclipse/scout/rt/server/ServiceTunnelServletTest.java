@@ -39,11 +39,13 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.Executables.IExecutable;
 import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IJobManager;
+import org.eclipse.scout.commons.job.JobInput;
+import org.eclipse.scout.commons.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.commons.cache.ICacheEntry;
 import org.eclipse.scout.rt.server.commons.cache.StickySessionCacheService;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.server.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -70,6 +72,8 @@ public class ServiceTunnelServletTest {
   private HttpServletResponse m_responseMock;
   private HttpSession m_testHttpSession;
 
+  private IJobManager<JobInput> m_jobManager;
+
   @Before
   public void before() throws ServletException {
     m_serviceReg = TestingUtility.registerServices(TEST_SERVICE_RANKING, new StickySessionCacheService(), new AbstractAccessControlService() {
@@ -81,11 +85,15 @@ public class ServiceTunnelServletTest {
     m_testHttpSession = mock(HttpSession.class);
     when(m_requestMock.getSession()).thenReturn(m_testHttpSession);
     when(m_requestMock.getSession(true)).thenReturn(m_testHttpSession);
+
+    m_jobManager = new JobManager<>("test-manager");
   }
 
   @After
   public void after() {
     TestingUtility.unregisterServices(m_serviceReg);
+
+    m_jobManager.shutdown();
   }
 
   @Test
@@ -301,7 +309,7 @@ public class ServiceTunnelServletTest {
     List<IFuture<?>> futures = new ArrayList<>();
 
     for (IExecutable<?> job : jobs) {
-      futures.add(ServerJobManager.DEFAULT.schedule(job));
+      futures.add(m_jobManager.schedule(job));
     }
 
     for (IFuture<?> future : futures) {
