@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -24,17 +23,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -520,63 +516,28 @@ public class ServerJobManagerTest {
     verify(m_transactions.get(4), never()).cancel(); // TX of job-4 (other session)
   }
 
-  @Test
-  public void testLocale() throws ProcessingException {
-    IServerSession session = mock(IServerSession.class);
-    NlsLocale.CURRENT.set(Locale.CHINA); // just to test to not to be considered.
-
-    assertNull(new _ServerJobManager().interceptLocale(null, ServerJobInput.empty().session(session)));
-    assertEquals(Locale.CANADA_FRENCH, new _ServerJobManager().interceptLocale(Locale.CANADA_FRENCH, ServerJobInput.empty().session(session)));
-  }
-
   @Test(expected = AssertionException.class)
-  public void testSessionRequiredEmtpyInput() throws ProcessingException {
-    IServerSession.CURRENT.remove();
-    new _ServerJobManager().validateInput(ServerJobInput.empty());
-  }
-
-  @Test(expected = AssertionException.class)
-  public void testSessionRequiredDefaultInputNOK() throws ProcessingException {
-    IServerSession.CURRENT.remove();
-    new _ServerJobManager().validateInput(ServerJobInput.defaults());
+  public void testValidateInput() {
+    new _ServerJobManager().validateInput(null);
   }
 
   @Test
-  public void testSessionRequiredDefaultInputOK1() throws ProcessingException {
-    IServerSession.CURRENT.set(mock(IServerSession.class));
-    new _ServerJobManager().validateInput(ServerJobInput.defaults());
-    assertTrue(true); // no exception expected
+  public void testValidateInputNullSession() {
+    new _ServerJobManager().validateInput(ServerJobInput.defaults().session(null));
+    // no assertion exception expected
   }
 
-  @Test
-  public void testSessionRequiredDefaultInputOK2() throws ProcessingException {
-    IServerSession.CURRENT.remove();
-    new _ServerJobManager().validateInput(ServerJobInput.defaults().session(mock(IServerSession.class)));
-    assertTrue(true); // no exception expected
-  }
-
-  @Test
-  public void testSessionNotRequiredWithoutSession() throws ProcessingException {
-    new _ServerJobManager().validateInput(ServerJobInput.defaults().sessionRequired(false).session(null));
-    assertTrue(true); // no exception expected
-  }
-
-  @Test
-  public void testSessionNotRequiredWithSession() throws ProcessingException {
-    new _ServerJobManager().validateInput(ServerJobInput.defaults().sessionRequired(false).session(mock(IServerSession.class)));
-    assertTrue(true); // no exception expected
-  }
-
-  private static class _ServerJobManager extends ServerJobManager {
+  private class _ServerJobManager extends ServerJobManager {
 
     @Override
-    public Locale interceptLocale(Locale locale, ServerJobInput input) { // public to make accessible for test.
-      return super.interceptLocale(locale, input);
+    public void validateInput(ServerJobInput input) {
+      super.validateInput(input);
     }
 
     @Override
-    public void validateInput(ServerJobInput input) { // public to make accessible for test.
-      super.validateInput(input);
+    protected void finalize() throws Throwable {
+      shutdown();
+      super.finalize();
     }
   }
 }

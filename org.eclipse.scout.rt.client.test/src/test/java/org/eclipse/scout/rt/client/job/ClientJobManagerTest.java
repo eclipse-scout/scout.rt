@@ -12,25 +12,20 @@ package org.eclipse.scout.rt.client.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.internal.ClientJobManager;
 import org.eclipse.scout.rt.shared.ISession;
@@ -469,63 +464,28 @@ public class ClientJobManagerTest {
     assertEquals(CollectionUtility.hashSet("job-1-interrupted", "job-2-interrupted", "job-3a-interrupted"), protocol);
   }
 
-  @Test
-  public void testLocale() throws ProcessingException {
-    IClientSession session = mock(IClientSession.class);
-    NlsLocale.CURRENT.set(Locale.CHINA); // just to test to not to be considered.
-
-    assertNull(new _ClientJobManager().interceptLocale(null, ClientJobInput.empty().session(session)));
-    assertEquals(Locale.CANADA_FRENCH, new _ClientJobManager().interceptLocale(Locale.CANADA_FRENCH, ClientJobInput.empty().session(session)));
-  }
-
   @Test(expected = AssertionException.class)
-  public void testSessionRequiredEmtpyInput() throws ProcessingException {
-    IClientSession.CURRENT.remove();
-    new _ClientJobManager().validateInput(ClientJobInput.empty());
-  }
-
-  @Test(expected = AssertionException.class)
-  public void testSessionRequiredDefaultInputNOK() throws ProcessingException {
-    IClientSession.CURRENT.remove();
-    new _ClientJobManager().validateInput(ClientJobInput.defaults());
+  public void testValidateInput() {
+    new _ClientJobManager().validateInput(null);
   }
 
   @Test
-  public void testSessionRequiredDefaultInputOK1() throws ProcessingException {
-    IClientSession.CURRENT.set(mock(IClientSession.class));
-    new _ClientJobManager().validateInput(ClientJobInput.defaults());
-    assertTrue(true); // no exception expected
+  public void testValidateInputNullSession() {
+    new _ClientJobManager().validateInput(ClientJobInput.defaults().session(null));
+    // no assertion exception expected
   }
 
-  @Test
-  public void testSessionRequiredDefaultInputOK2() throws ProcessingException {
-    IClientSession.CURRENT.remove();
-    new _ClientJobManager().validateInput(ClientJobInput.defaults().session(mock(IClientSession.class)));
-    assertTrue(true); // no exception expected
-  }
-
-  @Test
-  public void testSessionNotRequiredWithoutSession() throws ProcessingException {
-    new _ClientJobManager().validateInput(ClientJobInput.defaults().sessionRequired(false).session(null));
-    assertTrue(true); // no exception expected
-  }
-
-  @Test
-  public void testSessionNotRequiredWithSession() throws ProcessingException {
-    new _ClientJobManager().validateInput(ClientJobInput.defaults().sessionRequired(false).session(mock(IClientSession.class)));
-    assertTrue(true); // no exception expected
-  }
-
-  private static class _ClientJobManager extends ClientJobManager {
+  private class _ClientJobManager extends ClientJobManager {
 
     @Override
-    public Locale interceptLocale(Locale locale, ClientJobInput input) { // public to make accessible for test.
-      return super.interceptLocale(locale, input);
+    public void validateInput(ClientJobInput input) {
+      super.validateInput(input);
     }
 
     @Override
-    public void validateInput(ClientJobInput input) { // public to make accessible for test.
-      super.validateInput(input);
+    protected void finalize() throws Throwable {
+      shutdown();
+      super.finalize();
     }
   }
 }

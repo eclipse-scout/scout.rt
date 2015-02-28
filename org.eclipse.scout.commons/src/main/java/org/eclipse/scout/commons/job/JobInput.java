@@ -30,6 +30,7 @@ public class JobInput implements IJobInput {
   private String m_name;
   private Subject m_subject;
   private Locale m_locale;
+  private boolean m_preferredLocaleSet;
   private JobContext m_context;
 
   private JobInput() {
@@ -37,22 +38,18 @@ public class JobInput implements IJobInput {
 
   /**
    * Creates a copy of the given {@link IJobInput}.
-   *
-   * @param origin
-   *          to be copied.
    */
-  protected JobInput(final IJobInput origin) {
-    m_id = origin.getId();
-    m_name = origin.getName();
-    m_subject = origin.getSubject();
-    m_locale = origin.getLocale();
-    m_context = JobContext.copy(origin.getContext());
+  protected JobInput(final JobInput origin) {
+    m_id = origin.m_id;
+    m_name = origin.m_name;
+    m_subject = origin.m_subject;
+    m_locale = origin.m_locale;
+    m_preferredLocaleSet = origin.m_preferredLocaleSet;
+    m_context = JobContext.copy(origin.m_context);
   }
 
   /**
    * Creates a copy of the current {@link JobInput}.
-   *
-   * @return copy of the current {@link JobInput}.
    */
   public JobInput copy() {
     return new JobInput(this);
@@ -78,8 +75,30 @@ public class JobInput implements IJobInput {
 
   @Override
   public JobInput locale(final Locale locale) {
-    m_locale = locale;
+    return locale(locale, true); // set as preferred Locale.
+  }
+
+  /**
+   * Sets the given {@link Locale} only if <code>preferred</code> or no preferred {@link Locale} is set yet.
+   *
+   * @return {@link JobInput} to be used as builder.
+   */
+  protected JobInput locale(final Locale locale, final boolean preferred) {
+    if (preferred || !isPreferredLocaleSet()) {
+      m_locale = locale;
+    }
+
+    if (preferred) {
+      m_preferredLocaleSet = true;
+    }
     return this;
+  }
+
+  /**
+   * @return <code>true</code> if the {@link Locale} was set explicitly as preferred value.
+   */
+  protected boolean isPreferredLocaleSet() {
+    return m_preferredLocaleSet;
   }
 
   @Override
@@ -110,7 +129,7 @@ public class JobInput implements IJobInput {
 
   @Override
   public JobContext getContext() {
-    return m_context;
+    return m_context != null ? m_context : new JobContext();
   }
 
   @Override
@@ -130,33 +149,25 @@ public class JobInput implements IJobInput {
   }
 
   /**
-   * Creates a {@link IJobInput} that is only filled with the {@link JobContext} of the current thread, or if not
-   * available, an empty one.
+   * Creates a {@link JobInput} filled with a <code>null</code>-Locale as preferred value.
    */
   public static JobInput empty() {
-    final JobInput empty = new JobInput();
-
-    empty.context(JobContext.copy(JobContext.CURRENT.get()));
-
-    return empty;
+    return new JobInput().locale(null, true); // explicitly set null as preferred Locale.
   }
 
   /**
-   * Creates a {@link JobInput} filled with the defaults from the current calling context.
+   * Creates a {@link JobInput} filled with the defaults from the current calling context:
    * <ul>
-   * <li>{@link IJobInput#getSubject()}: Subject associated with the current {@link AccessControlContext};</li>
-   * <li>{@link IJobInput#getLocale()}: Locale associated with the current thread or <code>null</code> if not set;</li>
-   * <li>{@link ServerJobInput#getContext()}: copy of the job-context associated with the current thread, or if not
-   * available, an empty {@link JobContext};
+   * <li>{@link Subject} which is associated with the current {@link AccessControlContext};</li>
+   * <li>{@link JobContext} which is associated with the the current thread;</li>
+   * <li>{@link Locale} which is associated with the current thread; is set as non-preferred value;</li>
    * </ul>
    */
   public static JobInput defaults() {
     final JobInput defaults = new JobInput();
-
     defaults.subject(Subject.getSubject(AccessController.getContext()));
-    defaults.locale(NlsLocale.CURRENT.get());
+    defaults.locale(NlsLocale.CURRENT.get(), false); // set as not-preferred Locale.
     defaults.context(JobContext.copy(JobContext.CURRENT.get()));
-
     return defaults;
   }
 }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job.internal;
 
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -291,7 +290,7 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT> {
    * @return the head of the chain to be invoked first.
    */
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final INPUT input) {
-    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(next, NlsLocale.CURRENT, interceptLocale(input.getLocale(), input));
+    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(next, NlsLocale.CURRENT, input.getLocale());
     final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, JobContext.CURRENT, input.getContext());
     final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, IProgressMonitor.CURRENT, createProgressMonitor());
     final Callable<RESULT> c3 = new SubjectCallable<>(c4, input.getSubject());
@@ -311,20 +310,6 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT> {
    */
   protected <RESULT> JobFuture<RESULT> interceptFuture(final JobFuture<RESULT> future) {
     return future;
-  }
-
-  /**
-   * Overwrite this method to intercept the Locale which is to be associated with the current job.<br/>
-   * The default implementation returns the Locale provided with the job input.
-   *
-   * @param locale
-   *          Locale as provided by the job input.
-   * @param input
-   *          describes the {@link Callable} and contains execution instructions.
-   * @return Locale
-   */
-  protected Locale interceptLocale(final Locale locale, final INPUT input) {
-    return locale;
   }
 
   /**
@@ -360,6 +345,7 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT> {
    * Method invoked prior scheduling a job to validate its input.
    */
   protected void validateInput(final INPUT input) {
+    Assertions.assertNotNull(input, "JobInput must not be null");
   }
 
   /**

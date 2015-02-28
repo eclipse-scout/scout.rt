@@ -44,6 +44,8 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 
@@ -147,6 +149,12 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   @Override
   public Locale getLocale() {
     return NlsLocale.get(); // This method will be removed in release 5.2.
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public UserAgent getUserAgent() {
+    return UserAgentUtility.getCurrentUserAgent();
   }
 
   /**

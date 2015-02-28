@@ -33,14 +33,12 @@ public interface IClientSession extends ISession {
   IModelJobManager getModelJobManager();
 
   /**
-   * @return the session's {@link Locale} or the JVM-default if unknown; is never <code>null</code>.
+   * @return the session's {@link Locale} or <code>null</code> if not set.
    */
   Locale getLocale();
 
   /**
-   * To set the session's Locale. By default, this Locale will be included in every client-server-request unless the
-   * client job is configured to run with another Locale.<br/>
-   * By updating the session's Locale, the Locale of {@link NlsLocale#CURRENT} is updated as well.
+   * Sets the given {@link Locale} to the session and {@link NlsLocale#CURRENT}.
    *
    * @param locale
    *          Locale to be set.
@@ -48,15 +46,15 @@ public interface IClientSession extends ISession {
   void setLocale(Locale locale);
 
   /**
-   * @return {@link UserAgent} used; contains information about the UI; is never <code>null</code>.
+   * @return the session's {@link UserAgent}; is never <code>null</code>; contains information about the UI.
    */
   UserAgent getUserAgent();
 
   /**
-   * To set the user's {@link UserAgent}; contains information about the UI.
+   * Sets the given {@link UserAgent} to the session and {@link UserAgent#CURRENT}.
    *
    * @param userAgent
-   *          {@link UserAgent} used;
+   *          {@link UserAgent} to be set.
    */
   void setUserAgent(UserAgent userAgent);
 

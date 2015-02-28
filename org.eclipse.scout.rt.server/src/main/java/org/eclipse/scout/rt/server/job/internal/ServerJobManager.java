@@ -45,14 +45,6 @@ public class ServerJobManager extends JobManager<ServerJobInput> implements ISer
   }
 
   @Override
-  protected void validateInput(final ServerJobInput input) {
-    Assertions.assertNotNull(input, "ServerJobInput must not be null");
-    if (input.isSessionRequired()) {
-      Assertions.assertNotNull(input.getSession(), "ServerSession must not be null");
-    }
-  }
-
-  @Override
   protected ServerJobInput createDefaultJobInput() {
     return ServerJobInput.defaults();
   }

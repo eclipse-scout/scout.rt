@@ -47,6 +47,9 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -77,11 +80,13 @@ public class ModelJobRunNowTest {
     // initialize ClientSession1
     when(m_clientSession1.getLocale()).thenReturn(new Locale("de", "DE"));
     when(m_clientSession1.getTexts()).thenReturn(new ScoutTexts());
+    when(m_clientSession1.getUserAgent()).thenReturn(newUserAgent());
 
     // initialize ClientSession2
     m_clientSession2 = mock(IClientSession.class);
     when(m_clientSession2.getLocale()).thenReturn(new Locale("de", "CH"));
     when(m_clientSession2.getTexts()).thenReturn(new ScoutTexts());
+    when(m_clientSession2.getUserAgent()).thenReturn(newUserAgent());
 
     ISession.CURRENT.set(m_clientSession1);
   }
@@ -527,6 +532,7 @@ public class ModelJobRunNowTest {
         ISession.CURRENT.remove();
         NlsLocale.CURRENT.remove();
         ScoutTexts.CURRENT.remove();
+        UserAgent.CURRENT.remove();
 
         final Holder<JobContext> actualJobContext1 = new Holder<>();
         final Holder<JobContext> actualJobContext2 = new Holder<>();
@@ -536,6 +542,9 @@ public class ModelJobRunNowTest {
 
         final Holder<Locale> actualLocale1 = new Holder<>();
         final Holder<Locale> actualLocale2 = new Holder<>();
+
+        final Holder<UserAgent> actualUserAgent1 = new Holder<>();
+        final Holder<UserAgent> actualUserAgent2 = new Holder<>();
 
         final Holder<ScoutTexts> actualTexts1 = new Holder<>();
         final Holder<ScoutTexts> actualTexts2 = new Holder<>();
@@ -551,6 +560,7 @@ public class ModelJobRunNowTest {
             actualLocale1.setValue(NlsLocale.CURRENT.get());
             actualTexts1.setValue(ScoutTexts.CURRENT.get());
             actualSubject1.setValue(Subject.getSubject(AccessController.getContext()));
+            actualUserAgent1.setValue(UserAgent.CURRENT.get());
 
             // Job context
             JobContext ctx1 = JobContext.CURRENT.get();
@@ -566,6 +576,7 @@ public class ModelJobRunNowTest {
                 actualLocale2.setValue(NlsLocale.CURRENT.get());
                 actualTexts2.setValue(ScoutTexts.CURRENT.get());
                 actualSubject2.setValue(Subject.getSubject(AccessController.getContext()));
+                actualUserAgent2.setValue(UserAgent.CURRENT.get());
 
                 // Job context
                 JobContext ctx2 = JobContext.CURRENT.get();
@@ -584,6 +595,10 @@ public class ModelJobRunNowTest {
         assertSame(m_clientSession1.getLocale(), actualLocale1.getValue());
         assertSame(m_clientSession2.getLocale(), actualLocale2.getValue());
         assertNull(NlsLocale.CURRENT.get());
+
+        assertSame(m_clientSession1.getUserAgent(), actualUserAgent1.getValue());
+        assertSame(m_clientSession2.getUserAgent(), actualUserAgent2.getValue());
+        assertNull(UserAgent.CURRENT.get());
 
         assertSame(m_clientSession1.getTexts(), actualTexts1.getValue());
         assertSame(m_clientSession2.getTexts(), actualTexts2.getValue());
@@ -621,5 +636,9 @@ public class ModelJobRunNowTest {
     catch (ProcessingException e) {
       throw e.getCause();
     }
+  }
+
+  private static UserAgent newUserAgent() {
+    return UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a");
   }
 }

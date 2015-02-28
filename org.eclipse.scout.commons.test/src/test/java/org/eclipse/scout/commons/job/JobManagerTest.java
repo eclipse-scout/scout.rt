@@ -11,19 +11,16 @@
 package org.eclipse.scout.commons.job;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.Future;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.internal.JobManager;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.junit.After;
 import org.junit.Before;
@@ -154,23 +151,26 @@ public class JobManagerTest {
     assertEquals(CollectionUtility.hashSet("interrupted-1", "interrupted-2", "interrupted-3"), protocol);
   }
 
-  @Test
-  public void testLocale() throws ProcessingException {
-    NlsLocale.CURRENT.set(Locale.CHINA); // just to test to not to be considered.
-
-    assertNull(new _JobManager().interceptLocale(null, JobInput.empty()));
-    assertEquals(Locale.CANADA_FRENCH, new _JobManager().interceptLocale(Locale.CANADA_FRENCH, JobInput.empty()));
+  @Test(expected = AssertionException.class)
+  public void testValidateInput() {
+    new _JobManager().validateInput(null);
   }
 
-  private static class _JobManager extends JobManager<JobInput> {
+  private class _JobManager extends JobManager<JobInput> {
 
     public _JobManager() {
       super("scout-thread");
     }
 
     @Override
-    public Locale interceptLocale(Locale locale, JobInput input) {
-      return super.interceptLocale(locale, input);
+    public void validateInput(JobInput input) {
+      super.validateInput(input);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+      shutdown();
+      super.finalize();
     }
   }
 }

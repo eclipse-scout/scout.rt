@@ -32,7 +32,8 @@ public interface IJobInput {
 
   /**
    * @param name
-   *          name of a job; is primarily used for logging purpose; must not be set.
+   *          name of a job; is used to decorate the name of the executing worker thread and for logging; must not be
+   *          set.
    * @return {@link IJobInput} to be used as builder.
    */
   IJobInput name(String name);
@@ -46,40 +47,41 @@ public interface IJobInput {
 
   /**
    * @param locale
-   *          if set, the job's execution thread is associated with that {@link Locale}.
+   *          {@link Locale} which the job's execution thread is to be associated with.
    * @return {@link IJobInput} to be used as builder.
    */
   IJobInput locale(Locale locale);
 
   /**
    * @param context
-   *          {@link JobContext} to propagate data along with nested jobs; must not be <code>null</code>.
+   *          {@link JobContext} to propagate data along with nested jobs; must not be set.
    * @return {@link IJobInput} to be used as builder.
    */
   IJobInput context(JobContext context);
 
   /**
-   * @return <code>id</code> of a job; must not be set.
+   * @see #id(long)
    */
   long getId();
 
   /**
-   * @return name of a job; is primarily used for logging purpose; must not be set.
+   * @see #name(String)
    */
   String getName();
 
   /**
-   * @return {@link Subject} of behalf of which the job is to be executed; must not be set.
+   * @see #subject(Subject)
    */
   Subject getSubject();
 
   /**
-   * @return {@link Locale} to be set onto the job's execution thread, if set.
+   * @see #locale(Locale)
    */
   Locale getLocale();
 
   /**
-   * @return {@link JobContext} to propagate data along with nested jobs; must not be <code>null</code>.
+   * @return {@link JobContext} as set or an empty context if not set.
+   * @see #context(JobContext)
    */
   JobContext getContext();
 

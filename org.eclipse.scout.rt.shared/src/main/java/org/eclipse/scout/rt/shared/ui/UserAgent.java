@@ -126,4 +126,22 @@ public final class UserAgent implements Serializable {
     return createByIdentifier(new DefaultUserAgentParser(), userAgent);
   }
 
+  /**
+   * Associates the current thread with the given {@link UserAgent}.
+   */
+  public static void set(final UserAgent userAgent) {
+    if (userAgent == null) {
+      CURRENT.remove();
+    }
+    else {
+      CURRENT.set(userAgent);
+    }
+  }
+
+  /**
+   * @return {@link UserAgent} associated with the current thread.
+   */
+  public static UserAgent get() {
+    return UserAgent.CURRENT.get();
+  }
 }

@@ -196,7 +196,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
 
   @Override
   public void setUserAgent(UserAgent userAgent) {
-    UserAgent.CURRENT.set(userAgent);
+    UserAgent.set(userAgent);
     m_userAgent = userAgent;
   }
 

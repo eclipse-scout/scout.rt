@@ -11,10 +11,12 @@
 package org.eclipse.scout.commons.job;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.security.PrivilegedAction;
 import java.util.HashSet;
@@ -104,19 +106,29 @@ public class JobInputTest {
 
   @Test
   public void testDefaultJobContext() {
-    JobContext ctx = new JobContext();
-    ctx.set("prop", "value");
+    JobContext threadLocalContext = new JobContext();
+    threadLocalContext.set("prop", "value");
 
+    // No context on ThreadLocal
     JobContext.CURRENT.remove();
     assertNotNull(JobInput.defaults().getContext());
 
-    JobContext.CURRENT.set(ctx);
-    assertNotNull(ctx);
-    assertNotSame(ctx, JobInput.defaults().getContext());
-    assertEquals(toSet(ctx.iterator()), toSet(JobInput.defaults().getContext().iterator()));
+    // Context on ThreadLocal
+    JobContext.CURRENT.set(threadLocalContext);
+    assertNotSame(threadLocalContext, JobInput.defaults().getContext());
+    assertEquals(toSet(threadLocalContext.iterator()), toSet(JobInput.defaults().getContext().iterator()));
 
-    JobContext.CURRENT.set(ctx);
-    assertNull(JobInput.defaults().context(null).getContext());
+    // Session on ThreadLocal, but set explicitly
+    JobContext.CURRENT.set(threadLocalContext);
+    JobContext explicitContext = new JobContext();
+    assertSame(explicitContext, JobInput.defaults().context(explicitContext).getContext());
+    assertTrue(toSet(JobInput.defaults().context(explicitContext).getContext().iterator()).isEmpty());
+
+    // Context on ThreadLocal, but set explicity to null
+    JobContext.CURRENT.set(threadLocalContext);
+    assertNotNull(JobInput.defaults().context(null).getContext());
+    assertNotEquals(threadLocalContext, JobInput.defaults().context(null).getContext());
+    assertTrue(toSet(JobInput.defaults().context(null).getContext().iterator()).isEmpty());
   }
 
   @Test
@@ -126,6 +138,9 @@ public class JobInputTest {
 
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
     assertEquals(Locale.CANADA_FRENCH, JobInput.defaults().getLocale());
+
+    NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
+    assertEquals(Locale.KOREAN, JobInput.defaults().locale(Locale.KOREAN).getLocale());
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

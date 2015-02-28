@@ -15,10 +15,11 @@ import java.util.Locale;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobInput;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -34,28 +35,25 @@ public class ClientJobInput extends JobInput {
   private IClientSession m_session;
   private boolean m_sessionRequired;
   private UserAgent m_userAgent;
+  private boolean m_preferredUserAgentSet;
 
-  private ClientJobInput(final IJobInput origin) {
+  private ClientJobInput(final JobInput origin) {
     super(origin);
   }
 
   /**
    * Creates a copy of the given {@link ClientJobInput}.
-   *
-   * @param origin
-   *          to be copied.
    */
   protected ClientJobInput(final ClientJobInput origin) {
     super(origin);
-    m_session = origin.getSession();
-    m_sessionRequired = origin.isSessionRequired();
-    m_userAgent = origin.getUserAgent();
+    m_session = origin.m_session;
+    m_sessionRequired = origin.m_sessionRequired;
+    m_userAgent = origin.m_userAgent;
+    m_preferredUserAgentSet = origin.m_preferredUserAgentSet;
   }
 
   /**
    * Creates a copy of the current {@link ClientJobInput}.
-   *
-   * @return copy of the current {@link ClientJobInput}.
    */
   @Override
   public ClientJobInput copy() {
@@ -78,25 +76,43 @@ public class ClientJobInput extends JobInput {
   }
 
   @Override
+  public ClientJobInput locale(final Locale locale) {
+    return (ClientJobInput) super.locale(locale);
+  }
+
+  @Override
   public ClientJobInput context(final JobContext context) {
     return (ClientJobInput) super.context(context);
   }
 
   /**
    * @param session
-   *          {@link IClientSession} of behalf of which the job is to be executed; must not be <code>null</code>.
-   * @return {@link IJobInput} to be used as builder.
+   *          {@link IClientSession} to associate the executing job with; must not be <code>null</code>, unless
+   *          {@link #sessionRequired(boolean)} is set explicitly to <code>false</code>.<br/>
+   *          If set, the {@link Locale} and {@link UserAgent} are set accordingly, unless set explicitly as preferred
+   *          values.
+   * @return {@link ClientJobInput} to be used as builder.
+   * @see #sessionRequired(boolean)
    */
   public ClientJobInput session(final IClientSession session) {
     m_session = session;
+
+    if (session != null) {
+      // Update the Locale with the session's Locale if not set explicitly yet.
+      locale(session.getLocale(), false);
+
+      // Update the UserAgent with the session's UserAgent if not set explicitly yet.
+      userAgent(session.getUserAgent(), false);
+    }
+
     return this;
   }
 
   /**
    * @param sessionRequired
-   *          <code>true</code> if the job requires to work on behalf of a session; by default, this property is
-   *          <code>true</code> and should only be changed with caution.
-   * @return {@link IJobInput} to be used as builder.
+   *          <code>true</code> if the job requires to work on behalf of a session; is <code>true</code> by default.
+   * @return {@link ClientJobInput} to be used as builder.
+   * @see #session(IClientSession)
    */
   public ClientJobInput sessionRequired(final boolean sessionRequired) {
     m_sessionRequired = sessionRequired;
@@ -105,84 +121,92 @@ public class ClientJobInput extends JobInput {
 
   /**
    * @param userAgent
-   *          {@link UserAgent} to describe the user agent used by the client; if set, the job's execution thread is
-   *          associated with the given {@link UserAgent}.
-   * @return {@link IJobInput} to be used as builder.
+   *          {@link UserAgent} which the job's execution thread is to be associated with.
+   * @return {@link ClientJobInput} to be used as builder.
    */
   public ClientJobInput userAgent(final UserAgent userAgent) {
-    m_userAgent = userAgent;
+    return userAgent(userAgent, true); // set as preferred Locale.
+  }
+
+  /**
+   * Sets the given {@link UserAgent} only if <code>preferred</code> or no preferred {@link UserAgent} is set yet.
+   *
+   * @return {@link ClientJobInput} to be used as builder.
+   */
+  protected ClientJobInput userAgent(final UserAgent userAgent, final boolean preferred) {
+    if (preferred || !isPreferredUserAgentSet()) {
+      m_userAgent = userAgent;
+    }
+
+    if (preferred) {
+      m_preferredUserAgentSet = true;
+    }
     return this;
   }
 
   /**
-   * @return {@link IClientSession} of behalf of which the job is to be executed; must not be <code>null</code> if
-   *         <code>sessionRequired=true (default)</code>.
+   * @return <code>true</code> if the {@link UserAgent} was set explicitly as preferred value.
+   */
+  protected boolean isPreferredUserAgentSet() {
+    return m_preferredUserAgentSet;
+  }
+
+  /**
+   * @see #session(IClientSession)
+   * @see #sessionRequired(boolean)
+   * @throws AssertionException
+   *           if the session is <code>null</code> but required.
    */
   public IClientSession getSession() {
+    if (isSessionRequired()) {
+      Assertions.assertNotNull(m_session, "ClientSession must not be null");
+    }
     return m_session;
   }
 
   /**
-   * @return <code>true</code> if the job manager asserts to have a session provided, either explicitly or by the
-   *         current calling context; is <code>true</code> by default.
+   * @see #sessionRequired(boolean)
    */
-  public boolean isSessionRequired() {
+  protected boolean isSessionRequired() {
     return m_sessionRequired;
   }
 
   /**
-   * @return {@link UserAgent} that describes the agent used by the client; must not be set.
+   * @see #userAgent(UserAgent)
    */
   public UserAgent getUserAgent() {
     return m_userAgent;
   }
 
   /**
-   * Creates a {@link ClientJobInput} that is only filled with the job-context of the current thread, or if not
-   * available, an empty one.
+   * Creates an empty {@link ClientJobInput} filled with an explicit <code>null</code>-Locale and <code>null</code>
+   * -UserAgent as preferred values.
+   *
+   * @return {@link ClientJobInput}; requires a <code>not-null</code> {@link IClientSession} to be set.
    */
   public static ClientJobInput empty() {
-    return new ClientJobInput(JobInput.empty()).sessionRequired(true);
+    return new ClientJobInput(JobInput.empty()).sessionRequired(true).userAgent(null, true); // explicitly set null as preferred UserAgent.
   }
 
   /**
-   * Creates a {@link ClientJobInput} filled with the defaults from the current calling context.
+   * Creates a {@link ClientJobInput} filled with the defaults from the current calling context:
    * <ul>
-   * <li>{@link ClientJobInput#getSubject()}: Subject associated with the current {@link AccessControlContext};</li>
-   * <li>{@link ClientJobInput#getLocale()}: the session's {@link Locale} if set, or the current thread's Locale if set,
-   * or the JVM default otherwise;</li>
-   * <li>{@link ClientJobInput#getContext()}: copy of the job-context associated with the current thread, or if not
-   * available, an empty {@link JobContext};
-   * <li>{@link ClientJobInput#getSession()}: session associated with the current thread;</li>
-   * <li>{@link ServerJobInput#getUserAgent()}: {@link UserAgent} associated with the current thread;</li>
+   * <li>{@link Subject} which is associated with the current {@link AccessControlContext};</li>
+   * <li>{@link JobContext} which is associated with the the current thread;</li>
+   * <li>{@link Locale} which is associated with the current thread or the current session's Locale if applicable; is
+   * set as non-preferred value, meaning that if setting the session explicitly, the Locale is derived as well;</li>
+   * <li>{@link UserAgent} which is associated with the current thread or the current session's UserAgent if applicable;
+   * is set as non-preferred value, meaning that if setting the session explicitly, the UserAgent is derived as well;</li>
+   * <li>{@link IClientSession} which is associated with the current thread;</li>
    * </ul>
+   *
+   * @return {@link ClientJobInput}; requires a <code>not-null</code> {@link IClientSession} to be set.
    */
   public static ClientJobInput defaults() {
     final ClientJobInput defaults = new ClientJobInput(JobInput.defaults());
-
-    defaults.session((IClientSession) ISession.CURRENT.get());
+    defaults.userAgent(UserAgent.CURRENT.get(), false); // set as not-preferred UserAgent.
+    defaults.session((IClientSession) ISession.CURRENT.get()); // must be set after setting the Locale and the UserAgent because session-bound values have precedence.
     defaults.sessionRequired(true);
-    defaults.locale(resolveDefaultLocale());
-    defaults.userAgent(UserAgent.CURRENT.get());
-
     return defaults;
-  }
-
-  /**
-   * @return the session's {@link Locale} if set, or the current thread's Locale if set, or the JVM default otherwise.
-   */
-  private static Locale resolveDefaultLocale() {
-    final IClientSession currentSession = (IClientSession) ISession.CURRENT.get();
-    final Locale sessionLocale = (currentSession != null ? currentSession.getLocale() : null);
-
-    if (sessionLocale != null) {
-      return sessionLocale; // 1st priority
-    }
-    else if (NlsLocale.CURRENT.get() != null) {
-      return NlsLocale.CURRENT.get(); // 2nd priority
-    }
-    else {
-      return Locale.getDefault(); // 3th priority
-    }
   }
 }

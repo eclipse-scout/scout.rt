@@ -34,13 +34,15 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.internal.ClientJobManager;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiLayer;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(ScoutPlatformTestRunner.class)
@@ -51,25 +53,11 @@ public class ClientJobScheduleTest {
   private Subject m_subject1 = new Subject();
   private Subject m_subject2 = new Subject();
 
-  @Mock
-  private IClientSession m_clientSession1;
-  @Mock
-  private IClientSession m_clientSession2;
-
   @Before
   public void before() {
     MockitoAnnotations.initMocks(this);
 
     m_jobManager = new ClientJobManager();
-
-    // initialize ClientSession1
-    when(m_clientSession1.getLocale()).thenReturn(new Locale("de", "DE"));
-    when(m_clientSession1.getTexts()).thenReturn(new ScoutTexts());
-
-    // initialize ClientSession2
-    m_clientSession2 = mock(IClientSession.class);
-    when(m_clientSession2.getLocale()).thenReturn(new Locale("de", "CH"));
-    when(m_clientSession2.getTexts()).thenReturn(new ScoutTexts());
   }
 
   @After
@@ -123,15 +111,29 @@ public class ClientJobScheduleTest {
 
   @Test
   public void testClientContext() throws Exception {
+    final IClientSession clientSession1 = mock(IClientSession.class);
+    when(clientSession1.getLocale()).thenReturn(new Locale("de", "DE"));
+    when(clientSession1.getTexts()).thenReturn(new ScoutTexts());
+    when(clientSession1.getUserAgent()).thenReturn(newUserAgent());
+
+    final IClientSession clientSession2 = mock(IClientSession.class);
+    when(clientSession2.getLocale()).thenReturn(new Locale("de", "CH"));
+    when(clientSession2.getTexts()).thenReturn(new ScoutTexts());
+    when(clientSession2.getUserAgent()).thenReturn(newUserAgent());
+
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.remove();
     ScoutTexts.CURRENT.remove();
+    UserAgent.CURRENT.remove();
 
     final Holder<ISession> actualClientSession1 = new Holder<>();
     final Holder<ISession> actualClientSession2 = new Holder<>();
 
     final Holder<Locale> actualLocale1 = new Holder<>();
     final Holder<Locale> actualLocale2 = new Holder<>();
+
+    final Holder<UserAgent> actualUserAgent1 = new Holder<>();
+    final Holder<UserAgent> actualUserAgent2 = new Holder<>();
 
     final Holder<ScoutTexts> actualTexts1 = new Holder<>();
     final Holder<ScoutTexts> actualTexts2 = new Holder<>();
@@ -149,6 +151,7 @@ public class ClientJobScheduleTest {
         actualLocale1.setValue(NlsLocale.CURRENT.get());
         actualTexts1.setValue(ScoutTexts.CURRENT.get());
         actualSubject1.setValue(Subject.getSubject(AccessController.getContext()));
+        actualUserAgent1.setValue(UserAgent.CURRENT.get());
 
         setupLatch.countDown();
 
@@ -160,29 +163,38 @@ public class ClientJobScheduleTest {
             actualLocale2.setValue(NlsLocale.CURRENT.get());
             actualTexts2.setValue(ScoutTexts.CURRENT.get());
             actualSubject2.setValue(Subject.getSubject(AccessController.getContext()));
+            actualUserAgent2.setValue(UserAgent.CURRENT.get());
 
             setupLatch.countDown();
           }
-        }, ClientJobInput.defaults().session(m_clientSession2).subject(m_subject2));
+        }, ClientJobInput.defaults().session(clientSession2).subject(m_subject2));
       }
-    }, ClientJobInput.defaults().session(m_clientSession1).subject(m_subject1));
+    }, ClientJobInput.defaults().session(clientSession1).subject(m_subject1));
 
     assertTrue(setupLatch.await());
 
-    assertSame(m_clientSession1, actualClientSession1.getValue());
-    assertSame(m_clientSession2, actualClientSession2.getValue());
+    assertSame(clientSession1, actualClientSession1.getValue());
+    assertSame(clientSession2, actualClientSession2.getValue());
     assertNull(ISession.CURRENT.get());
 
-    assertSame(m_clientSession1.getLocale(), actualLocale1.getValue());
-    assertSame(m_clientSession2.getLocale(), actualLocale2.getValue());
+    assertSame(clientSession1.getLocale(), actualLocale1.getValue());
+    assertSame(clientSession2.getLocale(), actualLocale2.getValue());
     assertNull(NlsLocale.CURRENT.get());
 
-    assertSame(m_clientSession1.getTexts(), actualTexts1.getValue());
-    assertSame(m_clientSession2.getTexts(), actualTexts2.getValue());
+    assertSame(clientSession1.getUserAgent(), actualUserAgent1.getValue());
+    assertSame(clientSession2.getUserAgent(), actualUserAgent2.getValue());
+    assertNull(UserAgent.CURRENT.get());
+
+    assertSame(clientSession1.getTexts(), actualTexts1.getValue());
+    assertSame(clientSession2.getTexts(), actualTexts2.getValue());
     assertNull(ScoutTexts.CURRENT.get());
 
     assertSame(m_subject1, actualSubject1.getValue());
     assertSame(m_subject2, actualSubject2.getValue());
     assertNull(Subject.getSubject(AccessController.getContext()));
+  }
+
+  private static UserAgent newUserAgent() {
+    return UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a");
   }
 }

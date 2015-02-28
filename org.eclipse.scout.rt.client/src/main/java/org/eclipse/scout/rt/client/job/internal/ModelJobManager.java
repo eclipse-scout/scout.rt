@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.job.internal;
 
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -305,7 +304,7 @@ public class ModelJobManager implements IModelJobManager {
     final Callable<RESULT> c9 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, input.getSession().getTexts());
     final Callable<RESULT> c8 = new InitThreadLocalCallable<>(c9, UserAgent.CURRENT, input.getUserAgent());
     final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ISession.CURRENT, input.getSession());
-    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, NlsLocale.CURRENT, interceptLocale(input.getLocale(), input));
+    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, NlsLocale.CURRENT, input.getLocale());
     final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, JobContext.CURRENT, input.getContext());
     final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, IProgressMonitor.CURRENT, createProgressMonitor());
     final Callable<RESULT> c3 = new SubjectCallable<>(c4, input.getSubject());
@@ -325,20 +324,6 @@ public class ModelJobManager implements IModelJobManager {
    */
   protected <RESULT> ModelJobFuture<RESULT> interceptFuture(final ModelJobFuture<RESULT> future) {
     return future;
-  }
-
-  /**
-   * Overwrite this method to intercept the Locale which is to be associated with the current job.<br/>
-   * The default implementation returns the Locale provided with the job input.
-   *
-   * @param locale
-   *          Locale as provided by the job input.
-   * @param input
-   *          describes the {@link Callable} and contains execution instructions.
-   * @return Locale
-   */
-  protected Locale interceptLocale(final Locale locale, final ClientJobInput input) {
-    return locale;
   }
 
   /**

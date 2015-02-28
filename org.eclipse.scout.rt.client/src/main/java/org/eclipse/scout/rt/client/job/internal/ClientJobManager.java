@@ -41,14 +41,6 @@ public class ClientJobManager extends JobManager<ClientJobInput> implements ICli
   }
 
   @Override
-  protected void validateInput(final ClientJobInput input) {
-    Assertions.assertNotNull(input, "ClientJobInput must not be null");
-    if (input.isSessionRequired()) {
-      Assertions.assertNotNull(input.getSession(), "ClientSession must not be null");
-    }
-  }
-
-  @Override
   protected ClientJobInput createDefaultJobInput() {
     return ClientJobInput.defaults();
   }

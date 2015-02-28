@@ -17,10 +17,11 @@ import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobInput;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.ISession;
@@ -38,30 +39,27 @@ public class ServerJobInput extends JobInput {
   private HttpServletRequest m_servletRequest;
   private HttpServletResponse m_servletResponse;
   private UserAgent m_userAgent;
+  private boolean m_preferredUserAgentSet;
 
-  private ServerJobInput(final IJobInput origin) {
+  private ServerJobInput(final JobInput origin) {
     super(origin);
   }
 
   /**
    * Creates a copy of the given {@link ServerJobInput}.
-   *
-   * @param origin
-   *          to be copied.
    */
   protected ServerJobInput(final ServerJobInput origin) {
     super(origin);
-    m_session = origin.getSession();
-    m_sessionRequired = origin.isSessionRequired();
-    m_servletRequest = origin.getServletRequest();
-    m_servletResponse = origin.getServletResponse();
-    m_userAgent = origin.getUserAgent();
+    m_session = origin.m_session;
+    m_sessionRequired = origin.m_sessionRequired;
+    m_servletRequest = origin.m_servletRequest;
+    m_servletResponse = origin.m_servletResponse;
+    m_userAgent = origin.m_userAgent;
+    m_preferredUserAgentSet = origin.m_preferredUserAgentSet;
   }
 
   /**
    * Creates a copy of the current {@link ServerJobInput}.
-   *
-   * @return copy of the current {@link ServerJobInput}.
    */
   @Override
   public ServerJobInput copy() {
@@ -95,20 +93,22 @@ public class ServerJobInput extends JobInput {
 
   /**
    * @param session
-   *          {@link IServerSession} of behalf of which the job is to be executed; must not be <code>null</code> if
-   *          <code>sessionRequired=true (default)</code>.
-   * @return {@link IJobInput} to be used as builder.
+   *          {@link IServerSession} to associate the executing job with; must not be <code>null</code>, unless
+   *          {@link #sessionRequired(boolean)} is set explicitly to <code>false</code>.
+   * @return {@link ServerJobInput} to be used as builder.
+   * @see #sessionRequired(boolean)
    */
   public ServerJobInput session(final IServerSession session) {
     m_session = session;
+    // do not update the Locale and UserAgent with derived values from the session, as not referring to real value-members but Thread-Locals instead.
     return this;
   }
 
   /**
    * @param sessionRequired
-   *          <code>true</code> if the job requires to work on behalf of a session; by default, this property is
-   *          <code>true</code> and should only be changed with caution.
-   * @return {@link IJobInput} to be used as builder.
+   *          <code>true</code> if the job requires to work on behalf of a session; is <code>true</code> by default.
+   * @return {@link ServerJobInput} to be used as builder.
+   * @see #session(IServerSession)
    */
   public ServerJobInput sessionRequired(final boolean sessionRequired) {
     m_sessionRequired = sessionRequired;
@@ -117,9 +117,8 @@ public class ServerJobInput extends JobInput {
 
   /**
    * @param servletRequest
-   *          {@link HttpServletRequest} of the ongoing HTTP Servlet call; if set, the job's execution thread is
-   *          associated with the given {@link HttpServletRequest}.
-   * @return {@link IJobInput} to be used as builder.
+   *          {@link HttpServletRequest} which the job's execution thread is to be associated with.
+   * @return {@link ServerJobInput} to be used as builder.
    */
   public ServerJobInput servletRequest(final HttpServletRequest servletRequest) {
     m_servletRequest = servletRequest;
@@ -128,9 +127,8 @@ public class ServerJobInput extends JobInput {
 
   /**
    * @param servletResponse
-   *          {@link HttpServletResponse} of the ongoing HTTP Servlet call; if set, the job's execution thread is
-   *          associated with the given {@link HttpServletResponse}.
-   * @return {@link IJobInput} to be used as builder.
+   *          {@link HttpServletResponse} which the job's execution thread is to be associated with.
+   * @return {@link ServerJobInput} to be used as builder.
    */
   public ServerJobInput servletResponse(final HttpServletResponse servletResponse) {
     m_servletResponse = servletResponse;
@@ -139,85 +137,108 @@ public class ServerJobInput extends JobInput {
 
   /**
    * @param userAgent
-   *          {@link UserAgent} to describe the user agent used by the client; if set, the job's execution thread is
-   *          associated with the given {@link UserAgent}; must not be set for background-jobs.
-   * @return {@link IJobInput} to be used as builder.
+   *          {@link UserAgent} which the job's execution thread is to be associated with.
+   * @return {@link ServerJobInput} to be used as builder.
    */
   public ServerJobInput userAgent(final UserAgent userAgent) {
-    m_userAgent = userAgent;
+    return userAgent(userAgent, true); // set as preferred UserAgent.
+  }
+
+  /**
+   * Sets the given {@link UserAgent} only if <code>preferred</code> or no preferred {@link UserAgent} is set yet.
+   *
+   * @return {@link ServerJobInput} to be used as builder.
+   */
+  protected ServerJobInput userAgent(final UserAgent userAgent, final boolean preferred) {
+    if (preferred || !isPreferredUserAgentSet()) {
+      m_userAgent = userAgent;
+    }
+
+    if (preferred) {
+      m_preferredUserAgentSet = true;
+    }
     return this;
   }
 
   /**
-   * @return {@link IServerSession} of behalf of which the job is to be executed; must not be <code>null</code> if
-   *         <code>sessionRequired=true (default)</code>.
+   * @return <code>true</code> if the {@link UserAgent} was set explicitly as preferred value.
+   */
+  protected boolean isPreferredUserAgentSet() {
+    return m_preferredUserAgentSet;
+  }
+
+  /**
+   * @see #session(IServerSession)
+   * @see #sessionRequired(boolean)
+   * @throws AssertionException
+   *           if the session is <code>null</code> but required.
    */
   public IServerSession getSession() {
+    if (isSessionRequired()) {
+      Assertions.assertNotNull(m_session, "ServerSession must not be null");
+    }
     return m_session;
   }
 
   /**
-   * @return <code>true</code> if the job manager asserts to have a session provided, either explicitly or by the
-   *         current calling context; is <code>true</code> by default.
+   * @see #sessionRequired(boolean)
    */
-  public boolean isSessionRequired() {
+  protected boolean isSessionRequired() {
     return m_sessionRequired;
   }
 
   /**
-   * @return {@link HttpServletRequest} of the ongoing HTTP Servlet call.
+   * @see #servletRequest(HttpServletRequest)
    */
   public HttpServletRequest getServletRequest() {
     return m_servletRequest;
   }
 
   /**
-   * @return {@link HttpServletResponse} of the ongoing HTTP Servlet call.
+   * @see #servletResponse(HttpServletResponse)
    */
   public HttpServletResponse getServletResponse() {
     return m_servletResponse;
   }
 
   /**
-   * @return {@link UserAgent} that describes the agent used by the client; must not be set, e.g. for background-jobs.
+   * @see #userAgent(UserAgent)
    */
   public UserAgent getUserAgent() {
     return m_userAgent;
   }
 
   /**
-   * Creates a {@link ServerJobInput} that is only filled with the job-context of the current thread, or if not
-   * available, an empty one.
+   * Creates an empty {@link ServerJobInput} filled with an explicit <code>null</code>-Locale and <code>null</code>
+   * -UserAgent as preferred values.
+   *
+   * @return {@link ServerJobInput}; requires a <code>not-null</code> {@link IServerSession} to be set.
    */
   public static ServerJobInput empty() {
-    return new ServerJobInput(JobInput.empty()).sessionRequired(true);
+    return new ServerJobInput(JobInput.empty()).sessionRequired(true).userAgent(null, true); // explicitly set null as preferred UserAgent.
   }
 
   /**
-   * Creates a {@link ServerJobInput} filled with the defaults from the current calling context.
+   * Creates a {@link ServerJobInput} filled with the defaults from the current calling context:
    * <ul>
-   * <li>{@link ServerJobInput#getSubject()}: Subject associated with the current {@link AccessControlContext};</li>
-   * <li>{@link ServerJobInput#getLocale()}: Locale associated with the current thread - in case of a
-   * client-server-request, this is typically the Locale provided with the request unless not overwritten explicitly by
-   * a dependent job; if not set on the current thread, the Locale is not set;</li>
-   * <li>{@link ServerJobInput#getContext()}: copy of the job-context associated with the current thread, or if not
-   * available, an empty {@link JobContext};
-   * <li>{@link ServerJobInput#getSession()}: session associated with the current thread;</li>
-   * <li>{@link ServerJobInput#getServletRequest()}: {@link HttpServletRequest} associated with the current thread;
-   * <li>{@link ServerJobInput#getServletResponse()}: {@link HttpServletResponse} associated with the current thread;</li>
-   * <li>{@link ServerJobInput#getUserAgent()}: {@link UserAgent} associated with the current thread;</li>
+   * <li>{@link Subject} which is associated with the current {@link AccessControlContext};</li>
+   * <li>{@link JobContext} which is associated with the the current thread;</li>
+   * <li>{@link Locale} which is associated with the current thread; is set as non-preferred value;</li>
+   * <li>{@link UserAgent} which is associated with the current thread; is set as non-preferred value;</li>
+   * <li>{@link IServerSession} which is associated with the current thread;</li>
+   * <li>{@link HttpServletRequest} which is associated with the current thread;</li>
+   * <li>{@link HttpServletResponse} which is associated with the current thread;</li>
    * </ul>
+   *
+   * @return {@link ServerJobInput}; requires a <code>not-null</code> {@link IServerSession} to be set.
    */
   public static ServerJobInput defaults() {
     final ServerJobInput defaults = new ServerJobInput(JobInput.defaults());
-
-    defaults.session((IServerSession) ISession.CURRENT.get());
-    defaults.sessionRequired(true);
+    defaults.userAgent(UserAgent.CURRENT.get(), false); // set as not-preferred UserAgent.
     defaults.servletRequest(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
     defaults.servletResponse(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
-    defaults.locale(NlsLocale.CURRENT.get());
-    defaults.userAgent(UserAgent.CURRENT.get());
-
+    defaults.session((IServerSession) ISession.CURRENT.get()); // must be set after setting the Locale and the UserAgent because session-bound values have precedence.
+    defaults.sessionRequired(true);
     return defaults;
   }
 }
