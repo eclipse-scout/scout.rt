@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.internal.JobManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -105,6 +106,12 @@ public class ClientJobRunNowTest {
 
   @Test
   public void testClientContext() throws ProcessingException {
+    ISession.CURRENT.remove();
+    NlsLocale.CURRENT.remove();
+    ScoutTexts.CURRENT.remove();
+    UserAgent.CURRENT.remove();
+    JobContext.CURRENT.remove();
+
     final IClientSession clientSession1 = mock(IClientSession.class);
     when(clientSession1.getLocale()).thenReturn(new Locale("de", "DE"));
     when(clientSession1.getTexts()).thenReturn(new ScoutTexts());
@@ -114,11 +121,6 @@ public class ClientJobRunNowTest {
     when(clientSession2.getLocale()).thenReturn(new Locale("de", "CH"));
     when(clientSession2.getTexts()).thenReturn(new ScoutTexts());
     when(clientSession2.getUserAgent()).thenReturn(newUserAgent());
-
-    ISession.CURRENT.remove();
-    NlsLocale.CURRENT.remove();
-    ScoutTexts.CURRENT.remove();
-    UserAgent.CURRENT.remove();
 
     final Holder<ISession> actualClientSession1 = new Holder<>();
     final Holder<ISession> actualClientSession2 = new Holder<>();

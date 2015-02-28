@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -111,6 +112,12 @@ public class ClientJobScheduleTest {
 
   @Test
   public void testClientContext() throws Exception {
+    ISession.CURRENT.remove();
+    NlsLocale.CURRENT.remove();
+    ScoutTexts.CURRENT.remove();
+    UserAgent.CURRENT.remove();
+    JobContext.CURRENT.remove();
+
     final IClientSession clientSession1 = mock(IClientSession.class);
     when(clientSession1.getLocale()).thenReturn(new Locale("de", "DE"));
     when(clientSession1.getTexts()).thenReturn(new ScoutTexts());
@@ -120,11 +127,6 @@ public class ClientJobScheduleTest {
     when(clientSession2.getLocale()).thenReturn(new Locale("de", "CH"));
     when(clientSession2.getTexts()).thenReturn(new ScoutTexts());
     when(clientSession2.getUserAgent()).thenReturn(newUserAgent());
-
-    ISession.CURRENT.remove();
-    NlsLocale.CURRENT.remove();
-    ScoutTexts.CURRENT.remove();
-    UserAgent.CURRENT.remove();
 
     final Holder<ISession> actualClientSession1 = new Holder<>();
     final Holder<ISession> actualClientSession2 = new Holder<>();

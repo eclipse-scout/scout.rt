@@ -361,7 +361,6 @@ public class JobScheduleTest {
 
   @Test
   public void testJobContext() throws ProcessingException {
-    Thread.currentThread().setName("main");
     JobContext.CURRENT.remove();
 
     final Holder<JobContext> actualJobContext1 = new Holder<>();

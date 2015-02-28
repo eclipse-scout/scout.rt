@@ -473,6 +473,7 @@ public class ModelJobScheduleTest {
     NlsLocale.CURRENT.remove();
     ScoutTexts.CURRENT.remove();
     UserAgent.CURRENT.remove();
+    JobContext.CURRENT.remove();
 
     final Holder<JobContext> actualJobContext1 = new Holder<>();
     final Holder<JobContext> actualJobContext2 = new Holder<>();

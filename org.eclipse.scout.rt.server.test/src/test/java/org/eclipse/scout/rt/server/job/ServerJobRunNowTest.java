@@ -31,6 +31,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.internal.JobManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -129,6 +130,15 @@ public class ServerJobRunNowTest {
 
   @Test
   public void testServerContext() throws ProcessingException {
+    ISession.CURRENT.remove();
+    NlsLocale.CURRENT.remove();
+    ScoutTexts.CURRENT.remove();
+    UserAgent.CURRENT.remove();
+    JobContext.CURRENT.remove();
+    IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.remove();
+    IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.remove();
+    ITransaction.CURRENT.remove();
+
     final IServerSession serverSession1 = mock(IServerSession.class);
     when(serverSession1.getTexts()).thenReturn(new ScoutTexts());
     final IServerSession serverSession2 = mock(IServerSession.class);
@@ -136,14 +146,6 @@ public class ServerJobRunNowTest {
 
     final UserAgent userAgent1 = newUserAgent();
     final UserAgent userAgent2 = newUserAgent();
-
-    ISession.CURRENT.remove();
-    IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.remove();
-    IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.remove();
-    NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    UserAgent.CURRENT.set(userAgent1);
-    ScoutTexts.CURRENT.remove();
-    ITransaction.CURRENT.remove();
 
     final Holder<ISession> actualServerSession1 = new Holder<>();
     final Holder<ISession> actualServerSession2 = new Holder<>();
@@ -168,6 +170,9 @@ public class ServerJobRunNowTest {
 
     final Holder<HttpServletResponse> actualHttpServletResponse1 = new Holder<>();
     final Holder<HttpServletResponse> actualHttpServletResponse2 = new Holder<>();
+
+    UserAgent.CURRENT.set(userAgent1);
+    NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
 
     m_jobManager.runNow(new IRunnable() {
 
