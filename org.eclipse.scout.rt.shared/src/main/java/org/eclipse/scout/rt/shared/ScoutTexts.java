@@ -35,7 +35,7 @@ public class ScoutTexts {
    */
   public static final ThreadLocal<ScoutTexts> CURRENT = new ThreadLocal<>();
 
-  private static final ScoutTexts DEFAULT = new ScoutTexts();
+  private static volatile ScoutTexts DEFAULT;
 
   private final List<? extends ITextProviderService> m_textProviders;
 
@@ -63,9 +63,16 @@ public class ScoutTexts {
     if (texts != null) {
       return texts;
     }
-    else {
-      return DEFAULT;
+
+    // Create the global instance lazy because of the service call in the default constructor.
+    if (DEFAULT == null) {
+      synchronized (ScoutTexts.class) {
+        if (DEFAULT == null) {
+          DEFAULT = new ScoutTexts();
+        }
+      }
     }
+    return DEFAULT;
   }
 
   public final String getText(String key, String... messageArguments) {
