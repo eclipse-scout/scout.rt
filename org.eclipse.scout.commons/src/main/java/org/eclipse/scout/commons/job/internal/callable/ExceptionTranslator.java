@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job.internal.callable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.security.AccessController;
 import java.security.Principal;
@@ -30,7 +31,8 @@ import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.JobExecutionException;
 
 /**
- * Processor and utility to translate computing exceptions into {@link ProcessingException}s.
+ * Processor and utility to translate computing exceptions into {@link ProcessingException}s. If the exception is a
+ * {@link UndeclaredThrowableException} or {@link InvocationTargetException}, its cause is translated instead.
  * <p/>
  * This {@link Callable} is a processing object in the language of the design pattern 'chain-of-responsibility'.
  *
@@ -79,6 +81,9 @@ public class ExceptionTranslator<RESULT> implements Callable<RESULT>, Chainable<
    */
   public static ProcessingException translate(final Throwable t) {
     if (t instanceof UndeclaredThrowableException && t.getCause() != null) {
+      return translate(t.getCause());
+    }
+    else if (t instanceof InvocationTargetException && t.getCause() != null) {
       return translate(t.getCause());
     }
     else if (t instanceof ProcessingException) {

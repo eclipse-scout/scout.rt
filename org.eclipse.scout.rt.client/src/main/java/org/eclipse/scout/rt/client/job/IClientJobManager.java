@@ -7,6 +7,7 @@ import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IJobManager;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.JobContext;
+import org.eclipse.scout.commons.job.internal.callable.ExceptionTranslator;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.internal.ClientJobManager;
@@ -25,7 +26,8 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  * <li>are optionally executed on behalf of a {@link Subject};</li>
  * <li>operate on named worker threads;</li>
  * <li>have a {@link JobContext} installed to propagate properties among nested jobs;</li>
- * <li>exceptions are translated into {@link ProcessingException}s;</li>
+ * <li>exceptions are translated into {@link ProcessingException}s; see {@link ExceptionTranslator} for more
+ * information;</li>
  * <li>have job relevant data bound to {@link ThreadLocal ThreadLocals}:<br/>
  * {@link IFuture#CURRENT}, {@link IProgressMonitor#CURRENT}, {@link JobContext#CURRENT}, {@link ISession#CURRENT},
  * {@link NlsLocale#CURRENT}, {@link ScoutTexts#CURRENT};</li>

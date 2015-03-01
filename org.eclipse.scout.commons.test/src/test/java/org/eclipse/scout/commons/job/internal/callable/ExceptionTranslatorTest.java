@@ -19,6 +19,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.security.PrivilegedAction;
 import java.util.concurrent.Callable;
@@ -70,6 +71,18 @@ public class ExceptionTranslatorTest {
 
     UndeclaredThrowableException ute4 = new UndeclaredThrowableException(reWithPe);
     assertSame(reWithPe.getCause(), ExceptionTranslator.translate(ute4));
+
+    InvocationTargetException ite1 = new InvocationTargetException(null);
+    assertSame(ite1, ExceptionTranslator.translate(ite1).getCause());
+
+    UndeclaredThrowableException ite2 = new UndeclaredThrowableException(e1);
+    assertSame(e1, ExceptionTranslator.translate(ite2).getCause());
+
+    UndeclaredThrowableException ite3 = new UndeclaredThrowableException(re1);
+    assertSame(re1, ExceptionTranslator.translate(ite3).getCause());
+
+    UndeclaredThrowableException ite4 = new UndeclaredThrowableException(reWithPe);
+    assertSame(reWithPe.getCause(), ExceptionTranslator.translate(ite4));
   }
 
   @Test
