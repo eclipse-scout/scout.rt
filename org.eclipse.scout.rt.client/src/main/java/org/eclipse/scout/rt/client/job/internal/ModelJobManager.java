@@ -68,6 +68,8 @@ public class ModelJobManager implements IModelJobManager {
   protected final MutexSemaphore m_mutexSemaphore;
   @Internal
   protected final Set<Future<?>> m_blockedFutures = new HashSet<>();
+  @Internal
+  protected volatile Thread m_modelThread; // The thread currently representing the model-thread.
 
   public ModelJobManager() {
     m_mutexSemaphore = Assertions.assertNotNull(createMutexSemaphore());
@@ -121,9 +123,17 @@ public class ModelJobManager implements IModelJobManager {
     return m_blockedFutures.contains(future);
   }
 
+  /**
+   * Sets the given thread as model-thread.
+   */
+  @Internal
+  protected void setModelThread(final Thread thread) {
+    m_modelThread = thread;
+  }
+
   @Override
   public final boolean isModelThread() {
-    return m_mutexSemaphore.isModelThread();
+    return Thread.currentThread() == m_modelThread;
   }
 
   @Override
@@ -163,6 +173,24 @@ public class ModelJobManager implements IModelJobManager {
   }
 
   /**
+   * Use this method to pass the mutex to the next job in the queue:
+   * <ol>
+   * <li>sets the model-thread to <code>null</code></li>
+   * <li>releases the mutex-owner</li>
+   * <li>polls for the next pending job and schedules it if available</li>
+   * </ol>
+   */
+  @Internal
+  protected void passMutexToNextJob() {
+    m_modelThread = null;
+
+    final Task<?> nextTask = m_mutexSemaphore.releaseAndPoll();
+    if (nextTask != null) {
+      nextTask.schedule();
+    }
+  }
+
+  /**
    * Creates a task representing the given {@link Callable} to be passed to the executor.
    *
    * @param callable
@@ -173,7 +201,7 @@ public class ModelJobManager implements IModelJobManager {
    */
   @Internal
   protected <RESULT> Task<RESULT> createModelTask(final Callable<RESULT> callable, final ClientJobInput input) {
-    return new Task<RESULT>(m_executor, input) {
+    return new Task<RESULT>(m_executor, m_mutexSemaphore, input) {
 
       @Override
       protected ModelJobFuture<RESULT> interceptFuture(final ModelJobFuture<RESULT> future) {
@@ -181,45 +209,26 @@ public class ModelJobManager implements IModelJobManager {
       }
 
       @Override
+      public void rejected(final ModelJobFuture<RESULT> future) {
+        future.cancel(true); // to interrupt the submitter if waiting for the job to complete.
+        passMutexToNextJob();
+      }
+
+      @Override
       public void beforeExecute(final ModelJobFuture<RESULT> future) {
-        m_mutexSemaphore.registerAsModelThread(); // the model-mutex was already acquired the time being scheduled.
+        setModelThread(Thread.currentThread());
       }
 
       @Override
       protected RESULT execute(final ModelJobFuture<RESULT> future) throws Exception {
-        // Run the command on behalf of its Future.
-        return new InitThreadLocalCallable<>(callable, IFuture.CURRENT, future).call();
+        return new InitThreadLocalCallable<>(callable, IFuture.CURRENT, future).call(); // Run the command on behalf of its Future.
       }
 
       @Override
       public void afterExecute(final ModelJobFuture<RESULT> future) {
-        // Check, if this job was interrupted while waiting for a blocking condition to fall.
-        final boolean interruptedWhileBlocking = m_blockedFutures.remove(future);
-
-        if (interruptedWhileBlocking) {
-          // NOOP: This job does not own the mutex and therefore must not pass the mutex to the next queued job.
+        if (isModelThread()) { // the current thread is not the model thread if being interrupted while waiting for a blocking condition to fall.
+          passMutexToNextJob();
         }
-        else {
-          final Task<?> nextTask = m_mutexSemaphore.pollElseRelease();
-          if (nextTask != null) {
-            nextTask.schedule();
-          }
-        }
-      }
-
-      @Override
-      public void rejected(final ModelJobFuture<RESULT> future) {
-        future.cancel(true); // to interrupt the submitter if waiting for the job to complete.
-
-        final Task<?> nextTask = m_mutexSemaphore.pollElseRelease();
-        if (nextTask != null) {
-          nextTask.schedule();
-        }
-      }
-
-      @Override
-      protected boolean isMutexOwner() {
-        return m_mutexSemaphore.getMutexOwner() == this;
       }
     };
   }
@@ -372,84 +381,87 @@ public class ModelJobManager implements IModelJobManager {
 
     @Override
     public void block() throws JobExecutionException {
-      if (!isModelThread()) {
-        throw new JobExecutionException(String.format("Wrong thread: A job can only be blocked on behalf of the model thread. [thread=%s]", Thread.currentThread().getName()));
-      }
+      Assertions.assertTrue(isModelThread(), "Wrong thread: A job can only be blocked on behalf of the model thread. [thread=%s]", Thread.currentThread().getName());
 
       final ModelJobFuture<?> currentFuture = (ModelJobFuture<?>) IFuture.CURRENT.get();
       final ClientJobInput input = currentFuture.getInput();
 
-      // Pass the model-mutex to the next queued job or release the mutex.
-      final Task<?> nextTask = m_mutexSemaphore.pollElseRelease();
-      if (nextTask != null) {
-        nextTask.schedule();
-      }
+      passMutexToNextJob();
 
-      // [mutex] The following code is not synchronized with the model-mutex anymore.
+      // NOT-SYNCHRONIZED-WITH-MUTEX anymore
 
       // Block the calling thread until the blocking condition falls (IBlockingCondition#signalAll).
       synchronized (m_blocking) {
         m_blocking.set(true);
-        m_blockedFutures.add(currentFuture);
 
+        m_blockedFutures.add(currentFuture);
         while (m_blocking.get()) { // spurious-wakeup safe
           try {
             m_blocking.wait();
           }
           catch (final InterruptedException e) {
             throw new JobExecutionException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, job=%s]", m_name, input.getIdentifier("n/a")), e);
-
+          }
+          finally {
+            m_blockedFutures.remove(currentFuture);
           }
         }
-        m_blockedFutures.remove(currentFuture); // do not put into a 'finally'-block to not pass the mutex to the next job if being interrupted; see Task#afterExecute.
       }
 
-      // [re-acquire] phase 1: Compete for the model-mutex anew.
-      final CountDownLatch mutexReAcquiredLatch = new CountDownLatch(1);
-      final AtomicBoolean rejectedByExecutor = new AtomicBoolean(false);
+      // Compete for the model-mutex anew.
+      final Thread blockedThread = Thread.currentThread();
+      final AtomicBoolean blockedThreadInterrupted = new AtomicBoolean(false);
 
-      final Task<Void> task = new Task<Void>(m_executor, input) {
+      final CountDownLatch mutexReAcquiredLatch = new CountDownLatch(1);
+      final Task<Void> mutexReAcquireTask = new Task<Void>(m_executor, m_mutexSemaphore, input) {
+
+        @Override
+        public void rejected(final ModelJobFuture<Void> future) {
+          onMutexAcquired();
+        }
 
         @Override
         protected Void execute(final ModelJobFuture<Void> future) throws Exception {
-          rejectedByExecutor.set(false);
-          mutexReAcquiredLatch.countDown(); // simply release the blocking thread.
+          // NOOP because only invoked if not cancelled.
           return null;
         }
 
         @Override
-        public void rejected(final ModelJobFuture<Void> future) {
-          rejectedByExecutor.set(true);
-          mutexReAcquiredLatch.countDown(); // simply release the blocking thread.
+        protected void afterExecute(ModelJobFuture<Void> future) {
+          onMutexAcquired();
         }
 
-        @Override
-        protected boolean isMutexOwner() {
-          return m_mutexSemaphore.getMutexOwner() == this;
+        private void onMutexAcquired() {
+          synchronized (blockedThreadInterrupted) {
+            if (blockedThreadInterrupted.get()) {
+              passMutexToNextJob();
+            }
+            else {
+              setModelThread(blockedThread);
+              mutexReAcquiredLatch.countDown();
+            }
+          }
         }
       };
-      boolean acquired = m_mutexSemaphore.tryAcquireElseOfferHead(task);
 
-      // [re-acquire] phase 2: If not being the mutex-owner yet, wait until having re-acquired the model-mutex.
-      while (!acquired && !m_executor.isShutdown()) {
-        try {
-          mutexReAcquiredLatch.await();
-          acquired = true;
-        }
-        catch (final InterruptedException e) {
-          // Ignore thread interruptions to not enter an inconsistent state of having multiple concurrent model-threads.
-          LOG.warn(String.format("Ignored thread's interruption while waiting for the model-mutex to be re-acquired. [blockingCondition=%s, job=%s]", m_name, input.getIdentifier("n/a")), e);
-        }
-      }
-
-      // Check if the model-mutex could be acquired successfully.
-      if (rejectedByExecutor.get()) {
-        currentFuture.cancel(true); // to interrupt the submitter if waiting for the job to complete.
-        throw JobExecutionException.newRejectedJobExecutionException("Failed to re-acquire the model-mutex because being rejected by the executor. Maybe there are no more threads or queue slots available, or the executor was shutdown. [blockingCondition=%s, job=%s, shutdown=%s]", m_name, input.getIdentifier("n/a"), m_executor.isShutdown());
+      if (m_mutexSemaphore.tryAcquireElseOfferHead(mutexReAcquireTask)) {
+        setModelThread(blockedThread);
       }
       else {
-        // [mutex] The following code is synchronized with the model-mutex anew.
-        m_mutexSemaphore.registerAsModelThread();
+        // Wait until the model-mutex is re-acquired.
+        while (!isModelThread()) { // spurious-wakeup safe
+          try {
+            mutexReAcquiredLatch.await();
+          }
+          catch (final InterruptedException e) {
+            synchronized (blockedThreadInterrupted) {
+              blockedThreadInterrupted.set(true);
+            }
+
+            currentFuture.cancel(true);
+            throw new JobExecutionException(String.format("Interrupted while re-acquiring the model-mutex [job=%s]", input.getIdentifier("n/a")), e);
+          }
+        }
       }
     }
 

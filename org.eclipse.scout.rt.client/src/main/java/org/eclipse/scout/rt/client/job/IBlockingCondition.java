@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.client.job;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.job.JobExecutionException;
 
 /**
@@ -26,14 +27,14 @@ public interface IBlockingCondition {
    * Thereby, the model-mutex is released and passed to another competing and prospective model-thread. The current
    * thread becomes disabled for thread scheduling purposes and lies dormant until it is unblocked or interrupted.
    * <p/>
-   * <strong>Precondition: The calling thread must be the model-thread.</strong>
+   * <strong>Precondition: The calling thread must be the model-thread.</strong> <br/>
    *
+   * @throws AssertionException
+   *           is thrown if the current thread is not the model-thread.
    * @throws JobExecutionException
-   *           is thrown if the calling thread is not the model-thread or because the waiting thread was interrupted
-   *           (e.g. cancellation of the current job), or if the job fails to re-acquire the model-mutex upon
-   *           {@link #unblock()}; if thrown, the current thread is not synchronized with the model-mutex and
-   *           therefore must terminate its work.
-   * @see #unblock()
+   *           is thrown if the current thread is interrupted while waiting for the blocking condition to fall, or if
+   *           the current thread fails to re-acquire the model-mutex upon {@link #unblock()}. However, the current
+   *           thread is not synchronized with the model-mutex anymore and should terminate its work.</li>
    */
   void block() throws JobExecutionException;
 

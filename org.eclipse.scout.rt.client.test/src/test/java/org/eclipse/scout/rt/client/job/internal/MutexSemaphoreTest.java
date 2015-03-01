@@ -89,19 +89,13 @@ public class MutexSemaphoreTest {
     MutexSemaphore mutexSemaphore = new MutexSemaphore();
 
     // state: []
-    assertFalse(mutexSemaphore.isModelThread());
     assertIdle(mutexSemaphore);
     assertEquals(0, mutexSemaphore.getPermitCount());
 
     assertTrue(mutexSemaphore.tryAcquireElseOfferTail(m_task1));
     // state: [(obj1)]
     assertNotIdle(mutexSemaphore);
-    assertFalse(mutexSemaphore.isModelThread());
     assertEquals(1, mutexSemaphore.getPermitCount());
-
-    // Test model thread
-    mutexSemaphore.registerAsModelThread();
-    assertTrue(mutexSemaphore.isModelThread());
 
     assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task2));
     // state: [(obj1), obj2]
@@ -118,14 +112,13 @@ public class MutexSemaphoreTest {
     assertNotIdle(mutexSemaphore);
     assertEquals(4, mutexSemaphore.getPermitCount());
 
-    assertSame(m_task3, mutexSemaphore.pollElseRelease());
+    assertSame(m_task3, mutexSemaphore.releaseAndPoll());
     // state: [(obj3), obj2, obj4]
     assertEquals(3, mutexSemaphore.getPermitCount());
 
-    assertFalse(mutexSemaphore.isModelThread());
     assertNotIdle(mutexSemaphore);
 
-    assertSame(m_task2, mutexSemaphore.pollElseRelease());
+    assertSame(m_task2, mutexSemaphore.releaseAndPoll());
     // state: [(obj2), obj4]
     assertNotIdle(mutexSemaphore);
     assertEquals(2, mutexSemaphore.getPermitCount());
@@ -135,20 +128,20 @@ public class MutexSemaphoreTest {
     assertNotIdle(mutexSemaphore);
     assertEquals(3, mutexSemaphore.getPermitCount());
 
-    assertSame(m_task5, mutexSemaphore.pollElseRelease());
+    assertSame(m_task5, mutexSemaphore.releaseAndPoll());
     // state: [(obj5), obj4]
     assertNotIdle(mutexSemaphore);
     assertEquals(2, mutexSemaphore.getPermitCount());
 
-    assertSame(m_task4, mutexSemaphore.pollElseRelease());
+    assertSame(m_task4, mutexSemaphore.releaseAndPoll());
     // state: [(obj4)]
     assertNotIdle(mutexSemaphore);
     assertEquals(1, mutexSemaphore.getPermitCount());
 
-    assertNull(mutexSemaphore.pollElseRelease());
+    assertNull(mutexSemaphore.releaseAndPoll());
     // state: []
     assertIdle(mutexSemaphore);
-    assertNull(mutexSemaphore.pollElseRelease());
+    assertNull(mutexSemaphore.releaseAndPoll());
     assertEquals(0, mutexSemaphore.getPermitCount());
 
     // state: []
@@ -162,12 +155,12 @@ public class MutexSemaphoreTest {
     // state: [(obj1), obj2]
 
     assertNotIdle(mutexSemaphore);
-    assertSame(m_task2, mutexSemaphore.pollElseRelease());
+    assertSame(m_task2, mutexSemaphore.releaseAndPoll());
     // state: [(obj2)]
 
     assertNotIdle(mutexSemaphore);
 
-    assertNull(mutexSemaphore.pollElseRelease());
+    assertNull(mutexSemaphore.releaseAndPoll());
     // state: []
     assertIdle(mutexSemaphore);
   }
@@ -234,25 +227,25 @@ public class MutexSemaphoreTest {
     Thread.sleep(500); // Wait for the other thread to invoke 'waitForIdle'.
 
     protocolCount.decrementAndGet();
-    assertSame(m_task5, mutexSemaphore.pollElseRelease());
+    assertSame(m_task5, mutexSemaphore.releaseAndPoll());
     // state: [(obj5), obj2, obj3, obj4]
 
     protocolCount.decrementAndGet();
-    assertSame(m_task2, mutexSemaphore.pollElseRelease());
+    assertSame(m_task2, mutexSemaphore.releaseAndPoll());
     // state: [(obj2), obj3, obj4]
 
     simulateWaitForIdleSpuriousWakeup(mutexSemaphore);
 
     protocolCount.decrementAndGet();
-    assertSame(m_task3, mutexSemaphore.pollElseRelease());
+    assertSame(m_task3, mutexSemaphore.releaseAndPoll());
     // state: [(obj3), obj4]
 
     protocolCount.decrementAndGet();
-    assertSame(m_task4, mutexSemaphore.pollElseRelease());
+    assertSame(m_task4, mutexSemaphore.releaseAndPoll());
     // state: [(obj4)]
 
     protocolCount.decrementAndGet();
-    assertNull(mutexSemaphore.pollElseRelease());
+    assertNull(mutexSemaphore.releaseAndPoll());
     // state: []
 
     verifyLatch.await();
@@ -277,22 +270,17 @@ public class MutexSemaphoreTest {
     assertEquals(3, mutexSemaphore.getPermitCount());
     assertFalse(mutexSemaphore.isIdle());
 
-    mutexSemaphore.registerAsModelThread();
-    assertTrue(mutexSemaphore.isModelThread());
-
     mutexSemaphore.clearAndCancel();
 
     assertEquals(1, mutexSemaphore.getPermitCount()); // mutex-owner
     assertFalse(mutexSemaphore.isIdle()); // mutex-owner
     assertSame(m_task1, mutexSemaphore.getMutexOwner());
-    assertTrue(mutexSemaphore.isModelThread());
 
     // Release the model mutex
-    assertNull(mutexSemaphore.pollElseRelease());
+    assertNull(mutexSemaphore.releaseAndPoll());
     assertEquals(0, mutexSemaphore.getPermitCount());
     assertTrue(mutexSemaphore.isIdle());
     assertNull(mutexSemaphore.getMutexOwner());
-    assertFalse(mutexSemaphore.isModelThread());
   }
 
   @Test

@@ -30,10 +30,12 @@ public abstract class Task<RESULT> implements Callable<RESULT> {
   private final Executor m_executor;
   private final ClientJobInput m_input;
   private final ModelJobFuture<RESULT> m_runnableFuture;
+  private final MutexSemaphore m_mutexSemaphore;
 
-  public Task(final Executor executor, final ClientJobInput input) {
+  public Task(final Executor executor, final MutexSemaphore mutexSemaphore, final ClientJobInput input) {
     m_executor = executor;
     m_input = input;
+    m_mutexSemaphore = mutexSemaphore;
     m_runnableFuture = Assertions.assertNotNull(interceptFuture(new ModelJobFuture<>(this, input)));
   }
 
@@ -58,7 +60,7 @@ public abstract class Task<RESULT> implements Callable<RESULT> {
    * the mutex-owner.
    */
   public final void schedule() {
-    Assertions.assertTrue(isMutexOwner(), "Unexpected inconsistency: Task rejected because not being the mutex-owner. [task=%s]", this);
+    Assertions.assertTrue(m_mutexSemaphore.getMutexOwner() == this, "Unexpected inconsistency: Task rejected because not being the mutex-owner. [task=%s]", this);
     m_executor.execute(m_runnableFuture);
   }
 
@@ -67,6 +69,17 @@ public abstract class Task<RESULT> implements Callable<RESULT> {
    */
   public ModelJobFuture<RESULT> getFuture() {
     return m_runnableFuture;
+  }
+
+  /**
+   * Method invoked if the executor rejected this task from being scheduled. This may occur when no more threads or
+   * queue slots are available because their bounds would be exceeded, or upon shutdown of the executor. This method is
+   * invoked from the thread that scheduled this task. When being invoked, this task is the mutex-owner.
+   *
+   * @param future
+   *          the Future associated with this task.
+   */
+  protected void rejected(final ModelJobFuture<RESULT> future) {
   }
 
   /**
@@ -101,22 +114,6 @@ public abstract class Task<RESULT> implements Callable<RESULT> {
    */
   protected void afterExecute(final ModelJobFuture<RESULT> future) {
   }
-
-  /**
-   * Method invoked if the executor rejected this task from being scheduled. This may occur when no more threads or
-   * queue slots are available because their bounds would be exceeded, or upon shutdown of the executor. This method is
-   * invoked from the thread that scheduled this task. When being invoked, this task is the mutex-owner.
-   *
-   * @param future
-   *          the Future associated with this task.
-   */
-  protected void rejected(final ModelJobFuture<RESULT> future) {
-  }
-
-  /**
-   * @return <code>true</code> if the current task is the mutex-owner.
-   */
-  protected abstract boolean isMutexOwner();
 
   @Override
   public String toString() {

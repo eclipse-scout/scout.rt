@@ -69,7 +69,7 @@ public class FutureSet {
         future = Assertions.assertNotNull(futureSupplier.get());
       }
       catch (final RejectedExecutionException e) {
-        throw JobExecutionException.newRejectedJobExecutionException(e.getMessage()); // Task was rejected for execution.
+        throw new JobExecutionException(e.getMessage(), e); // Task was rejected for execution.
       }
 
       // Depending of the implementation of the Executor, the Future might be marked cancelled if not being accepted for execution.

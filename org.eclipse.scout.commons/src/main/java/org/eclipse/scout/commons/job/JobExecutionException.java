@@ -63,11 +63,4 @@ public class JobExecutionException extends ProcessingException {
   public boolean isRejection() {
     return getStatus() != null && (getStatus().getException() instanceof RejectedExecutionException);
   }
-
-  /**
-   * Creates a {@link JobExecutionException} to represent a job's rejection from being scheduled.
-   */
-  public static JobExecutionException newRejectedJobExecutionException(String msg, Object... msgArgs) {
-    return new JobExecutionException(msg == null ? "N/A" : String.format(msg, msgArgs), new RejectedExecutionException());
-  }
 }

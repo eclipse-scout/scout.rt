@@ -49,24 +49,7 @@ public class MutexSemaphore {
   final Lock m_idleLock = new ReentrantLock();
   final Condition m_idleCondition = m_idleLock.newCondition();
 
-  private Thread m_modelThread; // The one thread currently representing the model-thread.
   private Task<?> m_mutexOwner; // The task currently owning the mutex.
-
-  /**
-   * Registers the current thread as model-thread.
-   */
-  public void registerAsModelThread() {
-    synchronized (m_pendingQueue) {
-      m_modelThread = Thread.currentThread();
-    }
-  }
-
-  /**
-   * @return <code>true</code> if the calling thread is the model-thread.
-   */
-  public boolean isModelThread() {
-    return Thread.currentThread() == m_modelThread;
-  }
 
   /**
    * @return the task currently owning the mutex.
@@ -82,7 +65,7 @@ public class MutexSemaphore {
    * @param task
    *          the model-task to acquire the mutex.
    * @return <code>true</code> if the mutex was acquired, <code>false</code> if being queued.
-   * @see #pollElseRelease()
+   * @see #releaseAndPoll()
    */
   public boolean tryAcquireElseOfferTail(final Task<?> task) {
     return tryAcquireElseOffer(task, POSITION_TAIL);
@@ -95,7 +78,7 @@ public class MutexSemaphore {
    * @param task
    *          the task to acquire the mutex.
    * @return <code>true</code> if the mutex was acquired, <code>false</code> if being queued.
-   * @see #pollElseRelease()
+   * @see #releaseAndPoll()
    */
   public boolean tryAcquireElseOfferHead(final Task<?> task) {
     return tryAcquireElseOffer(task, POSITION_HEAD);
@@ -120,21 +103,16 @@ public class MutexSemaphore {
   }
 
   /**
-   * Passes the mutex to the oldest task in the queue. If no such competing task is available, the mutex is
-   * released.
+   * Passes the mutex to the first task in the queue.
    *
-   * @return the oldest task in the queue competing for the mutex or <code>null</code> if no such task is
-   *         available and therefore the mutex was released.
+   * @return task which is the new mutex-owner, <code>null</code> if the queue was empty.
    * @see #tryAcquireElseOffer(Object)
    */
-  public Task<?> pollElseRelease() {
+  public Task<?> releaseAndPoll() {
     synchronized (m_pendingQueue) {
       if (m_mutexOwner == null) {
         LOG.error("Unexpected inconsistency while releasing model mutex: mutex owner must not be null.");
       }
-
-      m_modelThread = null;
-      m_mutexOwner = null;
 
       m_mutexOwner = m_pendingQueue.poll();
 
@@ -256,7 +234,6 @@ public class MutexSemaphore {
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("mutexOwner", m_mutexOwner);
-    builder.attr("modelThread", m_modelThread);
     builder.attr("permits", m_permits);
     return builder.toString();
   }
