@@ -23,12 +23,13 @@ import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
+import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
@@ -78,7 +79,7 @@ public class GeneralView extends DefaultView {
       p.print("There is no HTTP-Session needed ");
     }
     p.br();
-    IServerSession serverSession = ThreadContext.getServerSession();
+    IServerSession serverSession = (IServerSession) ISession.CURRENT.get();
     if (serverSession != null) {
       p.print("Session ID (ThreadContext): " + serverSession.getId());
     }
@@ -86,7 +87,7 @@ public class GeneralView extends DefaultView {
       p.print("There is no Session found");
     }
 
-    String sessionID = SERVICES.getService(IClientIdentificationService.class).getClientId(ThreadContext.getHttpServletRequest(), ThreadContext.getHttpServletResponse());
+    String sessionID = SERVICES.getService(IClientIdentificationService.class).getClientId(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get(), IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
     p.br();
     p.print("Session ID (IClientIdentificationService): " + sessionID);
     p.p();

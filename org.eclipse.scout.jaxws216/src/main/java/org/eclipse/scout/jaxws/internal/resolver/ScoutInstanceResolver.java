@@ -18,27 +18,19 @@ import javax.security.auth.Subject;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.MessageContext;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.holders.ObjectHolder;
+import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.annotation.ScoutWebService;
 import org.eclipse.scout.jaxws.internal.ContextHelper;
 import org.eclipse.scout.jaxws.internal.SessionHelper;
 import org.eclipse.scout.jaxws.session.IServerSessionFactory;
-import org.eclipse.scout.rt.server.IServerJobFactory;
-import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ITransactionRunnable;
-import org.eclipse.scout.rt.server.ServerJob;
-import org.eclipse.scout.rt.server.ThreadContext;
-import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 
 import com.sun.xml.internal.ws.api.message.Packet;
 import com.sun.xml.internal.ws.api.server.Invoker;
@@ -128,86 +120,47 @@ public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
     }
 
     @Override
-    public Object invoke(final Packet packet, final Method method, final Object... aobj) throws InvocationTargetException, IllegalAccessException {
-      final T portType = ScoutInstanceResolver.this.resolve(packet);
-      if (portType == null) {
-        throw new WebServiceException("No port type found");
-      }
-
-      Subject subject = null;
-      try {
-        subject = Subject.getSubject(AccessController.getContext());
-      }
-      catch (Exception e) {
-        LOG.error("Failed to get subject of calling access context", e);
-      }
-      if (subject == null) {
-        throw new WebServiceException("Webservice request was NOT dispatched due to security reasons: request must run on behalf of a subject context.");
-      }
+    public Object invoke(final Packet packet, final Method method, final Object... args) throws InvocationTargetException, IllegalAccessException {
+      T portType = Assertions.assertNotNull(ScoutInstanceResolver.this.resolve(packet), "no port type found");
+      Subject subject = Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "Webservice request was not dispatched due to security reasons: request must run on behalf of a subject context.");
       IServerSession session = getSession(m_context.getMessageContext());
-      if (session == null) {
-        LOG.warn("Webservice request is not run in a session context as no server session is configured.");
-        return method.invoke(portType, aobj);
-      }
 
       try {
-        final ObjectHolder resultHolder = new ObjectHolder();
-        final Holder<InvocationTargetException> invocationTargetExceptionHolder = new Holder<InvocationTargetException>(InvocationTargetException.class);
-        final Holder<IllegalAccessException> illegalAccessExceptionHolder = new Holder<IllegalAccessException>(IllegalAccessException.class);
-        final Holder<RuntimeException> runtimeExceptionHolder = new Holder<RuntimeException>(RuntimeException.class);
-        // run server job
-        final IServerJobFactory jobFactory = SERVICES.getService(IServerJobService.class).createJobFactory(session, subject);
-        ServerJob serverJob = jobFactory.create("Tx", new ITransactionRunnable() {
+        return invokePortTypeMethodInServerJob(subject, session, portType, method, args);
+      }
+      catch (ProcessingException e) {
+        Throwable cause = e.getCause();
 
-          @Override
-          public IStatus run(IProgressMonitor monitor) throws ProcessingException {
-            try {
-              resultHolder.setValue(method.invoke(portType, aobj));
-            }
-            catch (InvocationTargetException e) {
-              Throwable cause = e.getCause();
-              ThreadContext.getTransaction().addFailure(cause); // rollback transaction
-
-              if (cause instanceof RuntimeException) {
-                LOG.warn("Webservice processing exception occured. Please handle faults by respective checked SOAP faults.", cause);
-                invocationTargetExceptionHolder.setValue(new InvocationTargetException(new WebServiceException("Internal Server Error")));
-              }
-              else {
-                // business exception (SOAP faults are checked exceptions)
-                LOG.info("Webservice processing exception occured.", cause);
-                invocationTargetExceptionHolder.setValue(e);
-              }
-            }
-            catch (IllegalAccessException e) {
-              ThreadContext.getTransaction().addFailure(e); // rollback transaction
-              LOG.error("Illegal access exception occured while dispatching webservice request. This might be caused because of Java security settings.", e);
-              illegalAccessExceptionHolder.setValue(e);
-            }
-            catch (RuntimeException e) {
-              ThreadContext.getTransaction().addFailure(e); // rollback transaction
-              LOG.error("Unexpected error occured while dispatching webservice request.", e);
-              runtimeExceptionHolder.setValue(e);
-            }
-
-            return Status.OK_STATUS;
-          }
-        });
-        serverJob.setSystem(true);
-        serverJob.runNow(new NullProgressMonitor());
-        if (invocationTargetExceptionHolder.getValue() != null) {
-          throw invocationTargetExceptionHolder.getValue();
+        if (cause instanceof InvocationTargetException) {
+          throw (InvocationTargetException) cause;
         }
-        if (illegalAccessExceptionHolder.getValue() != null) {
-          throw illegalAccessExceptionHolder.getValue();
+        else if (cause instanceof IllegalAccessException) {
+          throw (IllegalAccessException) cause;
         }
-        if (runtimeExceptionHolder.getValue() != null) {
-          throw runtimeExceptionHolder.getValue();
+        else if (cause instanceof RuntimeException) {
+          throw (RuntimeException) cause;
         }
-        return resultHolder.getValue();
+        else {
+          throw new WebServiceException("Unexpected error while dispatching webservice request.", cause);
+        }
       }
       finally {
         postInvoke(packet, portType);
       }
+    }
+
+    protected Object invokePortTypeMethodInServerJob(Subject subject, final IServerSession session, final T portType, final Method method, final Object... args) throws ProcessingException {
+      if (session == null) {
+        LOG.warn("Webservice request is not run in a session context as no server session is configured.");
+      }
+
+      return ServerJobManager.DEFAULT.runNow(new ICallable<Object>() {
+
+        @Override
+        public Object call() throws Exception {
+          return method.invoke(portType, args);
+        }
+      }, ServerJobInput.defaults().session(session).sessionRequired(false).subject(subject));
     }
   }
 }

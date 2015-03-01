@@ -19,11 +19,11 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNotificationQueueEvent;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationQueueElement;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationQueueListener;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 
 /**
@@ -74,7 +74,7 @@ public class ClientNotificationQueue {
     synchronized (m_queueLock) {
       while (true) {
         if (!m_queue.isEmpty()) {
-          IServerSession serverSession = ThreadContext.getServerSession();
+          IServerSession serverSession = (IServerSession) ISession.CURRENT.get();
           for (Iterator<ConsumableClientNotificationQueueElement> it = m_queue.iterator(); it.hasNext();) {
             ConsumableClientNotificationQueueElement e = it.next();
             if (!e.isActive()) {
@@ -122,7 +122,7 @@ public class ClientNotificationQueue {
   public void ackNotifications(Set<String> consumedNotificationIds) {
     synchronized (m_queueLock) {
       if (!m_queue.isEmpty()) {
-        IServerSession serverSession = ThreadContext.getServerSession();
+        IServerSession serverSession = (IServerSession) ISession.CURRENT.get();
         for (Iterator<ConsumableClientNotificationQueueElement> it = m_queue.iterator(); it.hasNext();) {
           ConsumableClientNotificationQueueElement e = it.next();
           if (e.isConsumable(serverSession)

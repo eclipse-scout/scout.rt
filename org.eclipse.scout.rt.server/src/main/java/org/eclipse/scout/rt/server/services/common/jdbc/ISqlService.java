@@ -18,7 +18,6 @@ import javax.sql.DataSource;
 
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
@@ -34,16 +33,16 @@ import org.eclipse.scout.service.IService;
  * helps writing database SQL statements.
  * </p>
  * <h2>Simple example</h2>
- * 
+ *
  * <pre>
  * ISqlService service = SERVICES.getService(ISqlService.class);
  * String sql = &quot;SELECT PERSON_NR, PERSON_NAME FROM PERSON WHERE COMPANY_NR = :companyNr&quot;;
  * Object[][] queryResult = service.select(sql,
- *         new NVPair(&quot;companyNr&quot;, companyNr));
+ *     new NVPair(&quot;companyNr&quot;, companyNr));
  * Long firstPersonNr = queryResult[0][0];
  * Long thirdPersonName = queryResult[2][1];
  * </pre>
- * 
+ *
  * <h2>Bind Variables</h2>
  * <p>
  * The statements passed to be executed can contain bind variables (<code>:variableName</code>). The values to be bound
@@ -149,7 +148,7 @@ import org.eclipse.scout.service.IService;
  * these properties have a prefix of jndi...</li>
  * </ol>
  * </p>
- * 
+ *
  * @see SQL
  * @see ISqlStyle
  */
@@ -157,7 +156,7 @@ public interface ISqlService extends IService {
 
   /**
    * Provides {@link ISqlStyle} to write database independent SQL statements.
-   * 
+   *
    * @return the {@link ISqlStyle} for the database used
    */
   ISqlStyle getSqlStyle();
@@ -169,7 +168,7 @@ public interface ISqlService extends IService {
    * <p>
    * See the interface comment of {@link ISqlService} for description of how to use bind variables
    * </p>
-   * 
+   *
    * @return a two dimensional array, the first index referencing the rows, the second referencing the column. Cannot be
    *         <code>null</code>
    */
@@ -180,7 +179,7 @@ public interface ISqlService extends IService {
    * <p>
    * See the interface comment of {@link ISqlService} for description of how to use bind variables
    * </p>
-   * 
+   *
    * @param maxRowCount
    *          the maximum number of rows returned
    * @return a two dimensional array, the first index referencing the rows, the second referencing the column. Cannot be
@@ -193,7 +192,7 @@ public interface ISqlService extends IService {
    * <p>
    * See the interface comment of {@link ISqlService} for description of how to use bind variables
    * </p>
-   * 
+   *
    * @see #select(String, Object...)
    */
   void selectInto(String s, Object... bindBases) throws ProcessingException;
@@ -203,7 +202,7 @@ public interface ISqlService extends IService {
    * <p>
    * See the interface comment of {@link ISqlService} for description of how to use bind variables
    * </p>
-   * 
+   *
    * @see #selectLimited(String, int, Object...)
    */
   void selectIntoLimited(String s, int maxRowCount, Object... bindBases) throws ProcessingException;
@@ -213,7 +212,7 @@ public interface ISqlService extends IService {
    * <p>
    * See the interface comment of {@link ISqlService} for description of how to use bind variables
    * </p>
-   * 
+   *
    * @param handler
    *          callback to handle individual rows
    * @see #select(String, Object...)
@@ -225,7 +224,7 @@ public interface ISqlService extends IService {
    * <p>
    * See the interface comment of {@link ISqlService} for description of how to use bind variables
    * </p>
-   * 
+   *
    * @param handler
    *          callback to handle individual rows
    * @see #selectLimited(String, int, Object...)
@@ -237,7 +236,7 @@ public interface ISqlService extends IService {
    * <p>
    * See the interface comment of {@link ISqlService} for description of how to use bind variables
    * </p>
-   * 
+   *
    * @return number of inserted rows
    */
   int insert(String s, Object... bindBases) throws ProcessingException;
@@ -247,7 +246,7 @@ public interface ISqlService extends IService {
    * <p>
    * See the interface comment of {@link ISqlService} for description of how to use bind variables
    * </p>
-   * 
+   *
    * @return number of updated rows
    */
   int update(String s, Object... bindBases) throws ProcessingException;
@@ -257,7 +256,7 @@ public interface ISqlService extends IService {
    * <p>
    * See the interface comment of {@link ISqlService} for description of how to use bind variables
    * </p>
-   * 
+   *
    * @return number of deleted rows
    */
   int delete(String s, Object... bindBases) throws ProcessingException;
@@ -267,7 +266,7 @@ public interface ISqlService extends IService {
    * <p>
    * See the interface comment of {@link ISqlService} for description of how to use bind variables
    * </p>
-   * 
+   *
    * @return result code
    */
   boolean callStoredProcedure(String s, Object... bindBases) throws ProcessingException;
@@ -288,7 +287,7 @@ public interface ISqlService extends IService {
    * Normally not necessary. When the service completes work with an exception, a xa rollback is done on ALL used
    * service request resources
    * </p>
-   * 
+   *
    * @see #commit()
    */
   void rollback() throws ProcessingException;
@@ -300,7 +299,7 @@ public interface ISqlService extends IService {
 
   /**
    * Creates plaintext SQL from the given SQL part by plaining all binds
-   * 
+   *
    * @see ISqlStyle.createPlainText()
    */
   String createPlainText(String s, Object... bindBases) throws ProcessingException;
@@ -308,8 +307,7 @@ public interface ISqlService extends IService {
   String getTransactionMemberId();
 
   /**
-   * @return current connection from {@link ITransactionMember} that is registered inside the {@link ITransaction} (see
-   *         {@link ThreadContext#getTransaction()}) as {@link #getTransactionMemberId()}
+   * @return current connection from {@link ITransactionMember} that is registered inside the {@link ITransaction}.
    */
   Connection getConnection() throws ProcessingException;
 

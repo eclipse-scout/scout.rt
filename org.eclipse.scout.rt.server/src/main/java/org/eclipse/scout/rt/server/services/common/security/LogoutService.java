@@ -11,14 +11,16 @@
 package org.eclipse.scout.rt.server.services.common.security;
 
 import javax.security.auth.Subject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
+import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
@@ -29,17 +31,20 @@ public class LogoutService extends AbstractService implements ILogoutService {
 
   @Override
   public void logout() {
-    SERVICES.getService(IHttpSessionCacheService.class).remove(IServerSession.class.getName(), ThreadContext.getHttpServletRequest(), ThreadContext.getHttpServletResponse());
-    SERVICES.getService(IHttpSessionCacheService.class).remove(Subject.class.getName(), ThreadContext.getHttpServletRequest(), ThreadContext.getHttpServletResponse());
+    HttpServletRequest httpRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+    HttpServletResponse httpResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
+
+    SERVICES.getService(IHttpSessionCacheService.class).remove(IServerSession.class.getName(), httpRequest, httpResponse);
+    SERVICES.getService(IHttpSessionCacheService.class).remove(Subject.class.getName(), httpRequest, httpResponse);
     try {
-      HttpSession session = ThreadContext.getHttpServletRequest().getSession();
+      HttpSession session = httpRequest.getSession();
       session.invalidate();
     }
     catch (IllegalStateException e) {
       //already invalid
     }
     catch (Throwable t) {
-      LOG.warn("Session logout failed");
+      LOG.warn("Failed to invalidate HTTP session.", t);
     }
   }
 }

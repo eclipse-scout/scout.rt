@@ -18,13 +18,11 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.clientnotification.AllUserFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.AbstractClientNotification;
@@ -45,28 +43,19 @@ public class ClientNotificationQueueTest {
 
   private IServerSession m_testServerSession;
   private IServerSession m_testServerSession2;
-  private Map<Class, Object> m_threadContextBackup;
 
   @Before
-  public void setup() {
+  public void before() {
     m_testNotification = createTestNotification(1000);
     m_clientNotificationQueue = new ClientNotificationQueue();
     m_testServerSession = createTestServerSession();
     m_testServerSession2 = createTestServerSession();
-    m_threadContextBackup = ThreadContext.backup();
-    ThreadContext.putServerSession(m_testServerSession);
-  }
-
-  private AbstractServerSession createTestServerSession() {
-    return new AbstractServerSession(true) {
-
-      private static final long serialVersionUID = 1L;
-    };
+    IServerSession.CURRENT.set(m_testServerSession);
   }
 
   @After
-  public void tearDown() {
-    ThreadContext.restore(m_threadContextBackup);
+  public void after() {
+    IServerSession.CURRENT.remove();
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -112,7 +101,7 @@ public class ClientNotificationQueueTest {
     m_clientNotificationQueue.putNotification(m_testNotification, inactiveFilter);
     m_clientNotificationQueue.ackNotifications(getIds(CollectionUtility.hashSet((m_testNotification))));
     assertFalse(m_clientNotificationQueue.getNextNotifications(0).contains(m_testNotification));
-    ThreadContext.putServerSession(m_testServerSession2);
+    IServerSession.CURRENT.set(m_testServerSession2);
     assertTrue(m_clientNotificationQueue.getNextNotifications(0).contains(m_testNotification));
   }
 
@@ -125,7 +114,7 @@ public class ClientNotificationQueueTest {
     m_clientNotificationQueue.putNotification(m_testNotification, inactiveFilter);
     m_clientNotificationQueue.ackNotifications(getIds(CollectionUtility.hashSet((m_testNotification))));
     assertFalse(m_clientNotificationQueue.getNextNotifications(0).contains(m_testNotification));
-    ThreadContext.putServerSession(m_testServerSession2);
+    IServerSession.CURRENT.set(m_testServerSession2);
     assertFalse(m_clientNotificationQueue.getNextNotifications(0).contains(m_testNotification));
   }
 
@@ -186,6 +175,13 @@ public class ClientNotificationQueueTest {
     public String getId() {
       return "test2";
     }
+  }
+
+  private AbstractServerSession createTestServerSession() {
+    return new AbstractServerSession(true) {
+
+      private static final long serialVersionUID = 1L;
+    };
   }
 
 }

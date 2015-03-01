@@ -16,13 +16,13 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerJobService;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueue;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueueElement;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ConsumableClientNotificationQueueElement;
@@ -100,14 +100,11 @@ public class ClientNotificationService extends AbstractService implements IClien
   }
 
   private ClientNotificationTransactionMember ensureTransactionMember() throws ProcessingException {
-    ITransaction t = ThreadContext.getTransaction();
-    if (t == null) {
-      throw new IllegalStateException("not inside a scout transaction (ServerJob.schedule)");
-    }
-    ClientNotificationTransactionMember m = (ClientNotificationTransactionMember) t.getMember(TRANSACTION_MEMBER_ID);
+    ITransaction tx = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required");
+    ClientNotificationTransactionMember m = (ClientNotificationTransactionMember) tx.getMember(TRANSACTION_MEMBER_ID);
     if (m == null) {
       m = new ClientNotificationTransactionMember();
-      t.registerMember(m);
+      tx.registerMember(m);
     }
     return m;
   }

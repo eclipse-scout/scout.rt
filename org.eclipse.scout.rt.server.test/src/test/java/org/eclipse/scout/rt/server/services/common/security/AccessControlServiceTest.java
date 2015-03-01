@@ -19,13 +19,13 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNotificationQueueEvent;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clientnotification.SingleUserFilter;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestAccessControlService;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestClientNotificationQueueListener;
+import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.AbstractClientNotification;
 import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
@@ -136,27 +136,27 @@ public class AccessControlServiceTest {
 
   private void callGetPermissions() {
     m_accessControlService.getPermissions();
-    ThreadContext.getTransaction().commitPhase2();
+    ITransaction.CURRENT.get().commitPhase2();
   }
 
   private void callClearCache() {
     m_accessControlService.clearCache();
-    ThreadContext.getTransaction().commitPhase2();
+    ITransaction.CURRENT.get().commitPhase2();
   }
 
   private void callClearCacheNoFire() {
     ((TestAccessControlService) m_accessControlService).callClearCacheNoFire();
-    ThreadContext.getTransaction().commitPhase2();
+    ITransaction.CURRENT.get().commitPhase2();
   }
 
   private void callClearCacheOfUserIds(Collection<String> testUsers) {
     m_accessControlService.clearCacheOfUserIds(testUsers);
-    ThreadContext.getTransaction().commitPhase2();
+    ITransaction.CURRENT.get().commitPhase2();
   }
 
   private void callClearCacheOfUserIdsNoFire(Collection<String> testUsers) {
     ((TestAccessControlService) m_accessControlService).callClearCacheOfUserIdsNoFire(testUsers);
-    ThreadContext.getTransaction().commitPhase2();
+    ITransaction.CURRENT.get().commitPhase2();
   }
 
   private void verifyOneNotificationSent(Class<? extends AbstractClientNotification> clientNotificationType, Class<SingleUserFilter> notificationFilterType, String userId) {

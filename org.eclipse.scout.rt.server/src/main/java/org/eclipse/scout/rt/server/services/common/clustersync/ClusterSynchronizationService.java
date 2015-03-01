@@ -24,6 +24,7 @@ import java.util.UUID;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
@@ -35,7 +36,6 @@ import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ITransactionRunnable;
 import org.eclipse.scout.rt.server.ServerJob;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
@@ -300,14 +300,11 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   }
 
   protected ClusterSynchronizationTransaction getTransaction() throws ProcessingException {
-    ITransaction t = ThreadContext.getTransaction();
-    if (t == null) {
-      throw new IllegalStateException("not inside a scout transaction (ServerJob.schedule)");
-    }
-    ClusterSynchronizationTransaction m = (ClusterSynchronizationTransaction) t.getMember(TRANSACTION_MEMBER_ID);
+    ITransaction tx = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required");
+    ClusterSynchronizationTransaction m = (ClusterSynchronizationTransaction) tx.getMember(TRANSACTION_MEMBER_ID);
     if (m == null) {
       m = new ClusterSynchronizationTransaction(TRANSACTION_MEMBER_ID, getMessageService());
-      t.registerMember(m);
+      tx.registerMember(m);
     }
     return m;
   }

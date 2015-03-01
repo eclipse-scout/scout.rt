@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -32,7 +33,6 @@ import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.PreparedStatementCache;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.StatementProcessor;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.pool.SqlConnectionBuilder;
@@ -656,17 +656,14 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   }
 
   protected Connection getTransaction() throws ProcessingException {
-    ITransaction reg = ThreadContext.getTransaction();
-    if (reg == null) {
-      throw new ProcessingException("no ITransaction available, use ServerJob to run truncactions");
-    }
-    SqlTransactionMember member = (SqlTransactionMember) reg.getMember(getTransactionMemberId());
+    ITransaction tx = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required");
+
+    SqlTransactionMember member = (SqlTransactionMember) tx.getMember(getTransactionMemberId());
     if (member == null) {
-      Connection conn;
       try {
-        conn = leaseConnection();
-        member = new SqlTransactionMember(getTransactionMemberId(), conn);
-        reg.registerMember(member);
+        Connection connection = leaseConnection();
+        member = new SqlTransactionMember(getTransactionMemberId(), connection);
+        tx.registerMember(member);
         // this is the start of the transaction
         execBeginTransaction();
       }
@@ -674,7 +671,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
         throw e;
       }
       catch (Throwable e) {
-        throw new ProcessingException("getTransaction", e);
+        throw new ProcessingException("Failed to get SQL connection", e);
       }
     }
     return member.getConnection();
@@ -684,14 +681,11 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
    * @return the statement cache used for this {@link ITransaction} transaction
    */
   protected final IStatementCache getStatementCache() throws ProcessingException {
-    ITransaction reg = ThreadContext.getTransaction();
-    if (reg == null) {
-      throw new ProcessingException("no ITransaction available, use ServerJob to run truncactions");
-    }
-    IStatementCache res = (IStatementCache) reg.getMember(PreparedStatementCache.TRANSACTION_MEMBER_ID);
+    ITransaction tx = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required");
+    IStatementCache res = (IStatementCache) tx.getMember(PreparedStatementCache.TRANSACTION_MEMBER_ID);
     if (res == null) {
       res = new PreparedStatementCache(getJdbcStatementCacheSize());
-      reg.registerMember((ITransactionMember) res);
+      tx.registerMember((ITransactionMember) res);
     }
     return res;
   }
@@ -873,7 +867,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
         m_conn.commit();
       }
       catch (Exception e) {
-        LOG.error(null, e);
+        LOG.error("Failed to commit transaction", e);
       }
     }
 
@@ -891,8 +885,8 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
         m_conn.rollback();
       }
       catch (Exception e) {
-        if (!ThreadContext.getTransaction().isCancelled()) {
-          LOG.error(null, e);
+        if (!ITransaction.CURRENT.get().isCancelled()) {
+          LOG.error("Failed to rollback transaction", e);
         }
       }
     }

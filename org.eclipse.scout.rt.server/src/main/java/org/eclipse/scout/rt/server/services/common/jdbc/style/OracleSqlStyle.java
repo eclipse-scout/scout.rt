@@ -20,9 +20,9 @@ import java.sql.Types;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
@@ -166,16 +166,13 @@ public class OracleSqlStyle extends AbstractSqlStyle {
   }
 
   private OracleLobTransactionMember getOrCreateLobTransactionMember(boolean autoCreate) {
-    ITransaction reg = ThreadContext.getTransaction();
-    if (reg == null) {
-      LOG.warn("no ITransaction available, use ServerJob to run truncactions");
-      return null;
-    }
-    OracleLobTransactionMember member = (OracleLobTransactionMember) reg.getMember(OracleLobTransactionMember.TRANSACTION_MEMBER_ID);
+    ITransaction tx = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required");
+
+    OracleLobTransactionMember member = (OracleLobTransactionMember) tx.getMember(OracleLobTransactionMember.TRANSACTION_MEMBER_ID);
     if (member == null && autoCreate) {
       try {
         member = new OracleLobTransactionMember();
-        reg.registerMember(member);
+        tx.registerMember(member);
       }
       catch (Throwable t) {
         LOG.warn("Unexpected error while registering transaction member", t);

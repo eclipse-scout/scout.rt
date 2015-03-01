@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.admin.inspector;
 
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.admin.inspector.info.CallInfo;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
@@ -64,7 +63,7 @@ public class CallInspector {
   }
 
   public void update() {
-    ITransaction xa = ThreadContext.getTransaction();
+    ITransaction xa = ITransaction.CURRENT.get();
     if (xa != null) {
       m_info.setXaResources(xa.getMembers());
     }

@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.ServerJob;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.LogExceptionHandlerService;
 import org.eclipse.scout.rt.testing.server.runner.fixture.TestTransactionMember;
@@ -55,7 +54,7 @@ public class ScoutServerTransactionTest {
 
       @Override
       protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-        ITransaction transaction = ThreadContext.getTransaction();
+        ITransaction transaction = ITransaction.CURRENT.get();
         transaction.registerMember(transactionMember);
         return Status.OK_STATUS;
       }
@@ -81,7 +80,7 @@ public class ScoutServerTransactionTest {
 
       @Override
       protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-        ITransaction transaction = ThreadContext.getTransaction();
+        ITransaction transaction = ITransaction.CURRENT.get();
         transaction.registerMember(transactionMember1);
         transaction.registerMember(transactionMember2);
         return Status.OK_STATUS;
@@ -112,7 +111,7 @@ public class ScoutServerTransactionTest {
 
       @Override
       protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-        ITransaction transaction = ThreadContext.getTransaction();
+        ITransaction transaction = ITransaction.CURRENT.get();
         transaction.registerMember(transactionMember1);
         transaction.registerMember(transactionMember2);
         return Status.OK_STATUS;
@@ -143,7 +142,7 @@ public class ScoutServerTransactionTest {
 
       @Override
       protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-        ITransaction transaction = ThreadContext.getTransaction();
+        ITransaction transaction = ITransaction.CURRENT.get();
         transaction.registerMember(transactionMember1);
         transaction.registerMember(transactionMember2);
         return Status.OK_STATUS;
@@ -173,7 +172,7 @@ public class ScoutServerTransactionTest {
 
         @Override
         protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-          ITransaction transaction = ThreadContext.getTransaction();
+          ITransaction transaction = ITransaction.CURRENT.get();
           transaction.registerMember(transactionMember1);
           transaction.registerMember(transactionMember2);
           throw new ProcessingException("Blubber");

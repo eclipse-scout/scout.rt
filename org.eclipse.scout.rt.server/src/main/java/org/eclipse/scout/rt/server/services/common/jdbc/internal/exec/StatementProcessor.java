@@ -51,7 +51,6 @@ import org.eclipse.scout.commons.parsers.token.ValueInputToken;
 import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlTransactionMember;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISelectStreamHandler;
@@ -1487,7 +1486,7 @@ public class StatementProcessor implements IStatementProcessor {
   }
 
   protected void registerActiveStatement(Statement s) throws SQLException {
-    ITransaction tx = ThreadContext.getTransaction();
+    ITransaction tx = ITransaction.CURRENT.get();
     if (tx == null) {
       return;
     }
@@ -1498,7 +1497,7 @@ public class StatementProcessor implements IStatementProcessor {
   }
 
   protected void unregisterActiveStatement(Statement s) throws SQLException {
-    ITransaction tx = ThreadContext.getTransaction();
+    ITransaction tx = ITransaction.CURRENT.get();
     if (tx == null) {
       return;
     }

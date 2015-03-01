@@ -14,11 +14,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.AbstractServerSession;
-import org.eclipse.scout.rt.server.ThreadContext;
+import org.eclipse.scout.rt.shared.ISession;
 
 /**
  * {@link org.eclipse.scout.rt.server.IServerSession} for Server Test Environment
- * 
+ *
  * @author jbr
  */
 public class TestEnvironmentServerSession extends AbstractServerSession {
@@ -33,7 +33,7 @@ public class TestEnvironmentServerSession extends AbstractServerSession {
    * @return session in current ThreadContext
    */
   public static TestEnvironmentServerSession get() {
-    return (TestEnvironmentServerSession) ThreadContext.getServerSession();
+    return (TestEnvironmentServerSession) ISession.CURRENT.get();
   }
 
   @Override

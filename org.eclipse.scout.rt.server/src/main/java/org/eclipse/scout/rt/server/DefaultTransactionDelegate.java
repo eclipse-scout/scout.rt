@@ -14,6 +14,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
@@ -73,53 +75,35 @@ public class DefaultTransactionDelegate {
 
   private final Version m_requestMinVersion;
   private final boolean m_debug;
-  private long m_requestStart;
-  private long m_requestEnd;
 
   public DefaultTransactionDelegate(Version requestMinVersion, boolean debug) {
     m_requestMinVersion = requestMinVersion;
     m_debug = debug;
-
   }
 
   public IServiceTunnelResponse invoke(IServiceTunnelRequest serviceReq) throws Exception {
+    long t0 = System.nanoTime();
+    long elapsedMillis;
+
     IServiceTunnelResponse response;
-    m_requestStart = System.nanoTime();
     try {
       response = invokeImpl(serviceReq);
     }
     catch (Throwable t) {
-      ITransaction transaction = ThreadContext.getTransaction();
-      try {
-        // cancel tx
-        if (transaction != null) {
-          transaction.addFailure(t);
-        }
-      }
-      catch (Throwable ignore) {
-        // nop
-      }
-      //log it
-      if (transaction == null || !transaction.isCancelled()) {
-        if (t instanceof ProcessingException) {
-          ((ProcessingException) t).addContextMessage("invoking " + serviceReq.getServiceInterfaceClassName() + ":" + serviceReq.getOperation());
-          SERVICES.getService(IExceptionHandlerService.class).handleException((ProcessingException) t);
-        }
-        else {
-          LOG.error("invoking " + serviceReq.getServiceInterfaceClassName() + ":" + serviceReq.getOperation(), t);
-        }
-      }
-      Throwable p = replaceOutboundException(t);
-      response = new ServiceTunnelResponse(null, null, p);
+      ITransaction.CURRENT.get().addFailure(t);
+      handleException(t, serviceReq);
+      response = new ServiceTunnelResponse(null, null, replaceOutboundException(t));
     }
     finally {
-      if (m_debug) {
-        LOG.debug("TIME " + serviceReq.getServiceInterfaceClassName() + "." + serviceReq.getOperation() + " " + (m_requestEnd - m_requestStart) / 1000000L + "ms");
-      }
+      elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0);
     }
-    m_requestEnd = System.nanoTime();
+
+    if (m_debug) {
+      LOG.debug("TIME {}.{} {}ms", new Object[]{serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), elapsedMillis});
+    }
+
     if (response instanceof ServiceTunnelResponse) {
-      ((ServiceTunnelResponse) response).setProcessingDuration((m_requestEnd - m_requestStart) / 1000000L);
+      ((ServiceTunnelResponse) response).setProcessingDuration(elapsedMillis);
     }
     return response;
   }
@@ -152,7 +136,7 @@ public class DefaultTransactionDelegate {
    */
   protected IServiceTunnelResponse invokeImpl(IServiceTunnelRequest serviceReq) throws Throwable {
     String soapOperation = ServiceTunnelRequest.toSoapOperation(serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation());
-    IServerSession serverSession = ThreadContext.getServerSession();
+    IServerSession serverSession = (IServerSession) ISession.CURRENT.get();
     String authenticatedUser = serverSession.getUserId();
     if (LOG.isDebugEnabled()) {
       LOG.debug("started " + serviceReq.getServiceInterfaceClassName() + "." + serviceReq.getOperation() + " by " + authenticatedUser + " at " + new Date());
@@ -165,8 +149,7 @@ public class DefaultTransactionDelegate {
       }
       Version requestVersion = Version.parseVersion(v);
       if (requestVersion.compareTo(m_requestMinVersion) < 0) {
-        IServiceTunnelResponse serviceRes = new ServiceTunnelResponse(null, null, new VersionMismatchException(requestVersion.toString(), m_requestMinVersion.toString()));
-        return serviceRes;
+        return new ServiceTunnelResponse(null, null, new VersionMismatchException(requestVersion.toString(), m_requestMinVersion.toString()));
       }
     }
     Set<String> consumedNotifications = serviceReq.getConsumedNotifications();
@@ -225,7 +208,7 @@ public class DefaultTransactionDelegate {
       serviceRes = new ServiceTunnelResponse(data, outParameters, null);
       serviceRes.setSoapOperation(soapOperation);
 
-      ThreadContext.getTransaction().registerMember(new P_ClientNotificationTransactionMember(serviceRes));
+      ITransaction.CURRENT.get().registerMember(new P_ClientNotificationTransactionMember(serviceRes));
       return serviceRes;
     }
     finally {
@@ -502,6 +485,25 @@ public class DefaultTransactionDelegate {
    */
   protected Class<? extends IValidationStrategy> findOutputValidationStrategyByPolicy(Object serviceImpl, Method op) {
     return IValidationStrategy.NO_CHECK.class;
+  }
+
+  /**
+   * Method invoked to handle service exceptions.
+   */
+  protected void handleException(Throwable t, IServiceTunnelRequest serviceTunnelRequest) {
+    if (ITransaction.CURRENT.get().isCancelled()) {
+      return;
+    }
+
+    String serviceOperation = String.format("service=%s, method=%s", serviceTunnelRequest.getServiceInterfaceClassName(), serviceTunnelRequest.getOperation());
+    if (t instanceof ProcessingException) {
+      ProcessingException pe = (ProcessingException) t;
+      pe.addContextMessage(serviceOperation);
+      SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
+    }
+    else {
+      LOG.error(String.format("Unexpected error while invoking service operation [%s]", serviceOperation), t);
+    }
   }
 
   /**

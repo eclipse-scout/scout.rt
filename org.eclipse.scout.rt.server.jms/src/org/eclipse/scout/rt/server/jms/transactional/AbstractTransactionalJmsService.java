@@ -14,8 +14,8 @@ import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Session;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.jms.AbstractJmsService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 
@@ -62,16 +62,13 @@ public abstract class AbstractTransactionalJmsService<T> extends AbstractJmsServ
   }
 
   protected JmsTransactionMember<T> getTransaction() throws ProcessingException {
-    ITransaction t = ThreadContext.getTransaction();
-    if (t == null) {
-      throw new IllegalStateException("not inside a scout transaction (ServerJob.schedule)");
-    }
+    ITransaction tx = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required");
     @SuppressWarnings("unchecked")
-    JmsTransactionMember<T> m = (JmsTransactionMember<T>) t.getMember(getTransactionId());
+    JmsTransactionMember<T> m = (JmsTransactionMember<T>) tx.getMember(getTransactionId());
     if (m == null) {
       Connection connection = getConnection();
       m = new JmsTransactionMember<T>(getTransactionId(), connection, createSession(connection), lookupDestination(), createMessageSerializer());
-      t.registerMember(m);
+      tx.registerMember(m);
     }
     return m;
   }

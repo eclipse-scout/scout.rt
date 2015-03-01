@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.testenvironment.TestEnvironmentServerSession;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.junit.After;
@@ -103,9 +102,9 @@ public class ScoutServerTestRunnerTransactionBehaviorTest {
    */
   private static void checkBeforeClassTransactionBehavior() {
     assertNotNull(TestEnvironmentServerSession.get());
-    assertNotNull(ThreadContext.getTransaction());
-    assertTrue(s_beforeClassTransaction == null || s_beforeClassTransaction == ThreadContext.getTransaction());
-    s_beforeClassTransaction = ThreadContext.getTransaction();
+    assertNotNull(ITransaction.CURRENT.get());
+    assertTrue(s_beforeClassTransaction == null || s_beforeClassTransaction == ITransaction.CURRENT.get());
+    s_beforeClassTransaction = ITransaction.CURRENT.get();
   }
 
   /**
@@ -113,10 +112,10 @@ public class ScoutServerTestRunnerTransactionBehaviorTest {
    */
   private static void checkAfterClassTransactionBehavior() {
     assertNotNull(TestEnvironmentServerSession.get());
-    assertNotNull(ThreadContext.getTransaction());
-    assertNotSame(s_beforeClassTransaction, ThreadContext.getTransaction());
-    assertTrue(s_afterClassTransaction == null || s_afterClassTransaction == ThreadContext.getTransaction());
-    s_afterClassTransaction = ThreadContext.getTransaction();
+    assertNotNull(ITransaction.CURRENT.get());
+    assertNotSame(s_beforeClassTransaction, ITransaction.CURRENT.get());
+    assertTrue(s_afterClassTransaction == null || s_afterClassTransaction == ITransaction.CURRENT.get());
+    s_afterClassTransaction = ITransaction.CURRENT.get();
   }
 
   /**
@@ -124,11 +123,11 @@ public class ScoutServerTestRunnerTransactionBehaviorTest {
    */
   private static void checkBeforeTransactionBehavior() {
     assertNotNull(TestEnvironmentServerSession.get());
-    assertNotNull(ThreadContext.getTransaction());
-    assertNotSame(s_beforeClassTransaction, ThreadContext.getTransaction());
-    assertTrue(s_thisTestBeforeTransaction == null || s_thisTestBeforeTransaction == ThreadContext.getTransaction());
-    assertTrue(s_otherTestTransaction == null || s_otherTestTransaction != ThreadContext.getTransaction());
-    s_thisTestBeforeTransaction = ThreadContext.getTransaction();
+    assertNotNull(ITransaction.CURRENT.get());
+    assertNotSame(s_beforeClassTransaction, ITransaction.CURRENT.get());
+    assertTrue(s_thisTestBeforeTransaction == null || s_thisTestBeforeTransaction == ITransaction.CURRENT.get());
+    assertTrue(s_otherTestTransaction == null || s_otherTestTransaction != ITransaction.CURRENT.get());
+    s_thisTestBeforeTransaction = ITransaction.CURRENT.get();
   }
 
   /**
@@ -136,9 +135,9 @@ public class ScoutServerTestRunnerTransactionBehaviorTest {
    */
   private static void checkAfterTransactionBehavior() {
     assertNotNull(TestEnvironmentServerSession.get());
-    assertNotNull(ThreadContext.getTransaction());
-    assertNotSame(s_beforeClassTransaction, ThreadContext.getTransaction());
-    assertSame(s_thisTestAfterTransaction, ThreadContext.getTransaction());
+    assertNotNull(ITransaction.CURRENT.get());
+    assertNotSame(s_beforeClassTransaction, ITransaction.CURRENT.get());
+    assertSame(s_thisTestAfterTransaction, ITransaction.CURRENT.get());
   }
 
   /**
@@ -146,10 +145,10 @@ public class ScoutServerTestRunnerTransactionBehaviorTest {
    */
   private void checkTestTransactionBehavior() {
     assertNotNull(TestEnvironmentServerSession.get());
-    assertNotNull(ThreadContext.getTransaction());
-    assertNotSame(s_beforeClassTransaction, ThreadContext.getTransaction());
-    assertTrue(s_otherTestTransaction == null || s_otherTestTransaction != ThreadContext.getTransaction());
-    s_otherTestTransaction = ThreadContext.getTransaction();
+    assertNotNull(ITransaction.CURRENT.get());
+    assertNotSame(s_beforeClassTransaction, ITransaction.CURRENT.get());
+    assertTrue(s_otherTestTransaction == null || s_otherTestTransaction != ITransaction.CURRENT.get());
+    s_otherTestTransaction = ITransaction.CURRENT.get();
     s_thisTestAfterTransaction = s_thisTestBeforeTransaction;
     s_thisTestBeforeTransaction = null;
   }
