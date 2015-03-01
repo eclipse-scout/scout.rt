@@ -11,7 +11,6 @@
 package org.eclipse.scout.jaxws.session;
 
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ServerJob;
 
 /**
  * Factory to create a {@link IServerSession} creation strategy.
@@ -19,7 +18,7 @@ import org.eclipse.scout.rt.server.ServerJob;
 public interface IServerSessionFactory {
 
   /**
-   * @return the server session or null to not run in a {@link ServerJob}
+   * @return the server session used to process a webservice request.
    */
   IServerSession create();
 }

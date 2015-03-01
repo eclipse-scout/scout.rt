@@ -12,6 +12,9 @@ package org.eclipse.scout.commons;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Reflection Utility to change final modifiers on fields
@@ -37,5 +40,22 @@ public class ReflectionUtility {
     modifiers = modifiers | Modifier.FINAL;
     reflectedModifier.set(f, modifiers);
     reflectedModifier.setAccessible(false);
+  }
+
+  /**
+   * Returns the interfaces which are implemented by the given class or its super types. However, only direct
+   * interfaces are returned, and not the whole interface hierarchy.
+   */
+  public static Class<?>[] getInterfaces(Class<?> clazz) {
+    if (clazz.isInterface()) {
+      return new Class<?>[]{clazz};
+    }
+
+    final List<Class<?>> interfaces = new ArrayList<>();
+    while (!Object.class.equals(clazz)) {
+      interfaces.addAll(Arrays.asList(clazz.getInterfaces()));
+      clazz = clazz.getSuperclass();
+    }
+    return interfaces.toArray(new Class<?>[interfaces.size()]);
   }
 }

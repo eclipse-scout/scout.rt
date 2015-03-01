@@ -32,7 +32,6 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.jaxws.handler.internal.IScoutTransactionHandlerWrapper;
 import org.eclipse.scout.jaxws.internal.resources.BundleProxyClassLoader;
 import org.eclipse.scout.jaxws.internal.resources.BundleProxyResourceLoader;
 import org.eclipse.scout.jaxws.internal.resources.SunJaxWsXml;
@@ -90,9 +89,6 @@ public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpo
   public String getAuthenticationMethod(final ServletAdapter adapter) {
     List<Handler> handlers = adapter.getEndpoint().getBinding().getHandlerChain();
     for (Handler handler : handlers) {
-      if (handler instanceof IScoutTransactionHandlerWrapper) {
-        handler = ((IScoutTransactionHandlerWrapper) handler).getHandler();
-      }
       if (handler instanceof IAuthenticationHandler) {
         return ((IAuthenticationHandler) handler).getName();
       }

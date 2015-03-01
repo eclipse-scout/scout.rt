@@ -11,36 +11,42 @@
 package org.eclipse.scout.jaxws.internal.tube;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Binding;
+import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.LogicalHandler;
-import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.annotation.ScoutTransaction;
 import org.eclipse.scout.jaxws.annotation.ScoutWebService;
-import org.eclipse.scout.jaxws.handler.internal.ScoutTransactionLogicalHandlerWrapper;
-import org.eclipse.scout.jaxws.handler.internal.ScoutTransactionMessageHandlerWrapper;
-import org.eclipse.scout.jaxws.handler.internal.ScoutTransactionSOAPHandlerWrapper;
 import org.eclipse.scout.jaxws.internal.ContextHelper;
+import org.eclipse.scout.jaxws.internal.SessionHelper;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
 import org.eclipse.scout.jaxws.security.provider.ICredentialValidationStrategy;
 import org.eclipse.scout.jaxws.session.IServerSessionFactory;
+import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 
-import com.sun.xml.internal.ws.api.handler.MessageHandler;
-import com.sun.xml.internal.ws.api.handler.MessageHandlerContext;
+import com.sun.xml.internal.ws.api.WSBinding;
 import com.sun.xml.internal.ws.api.pipe.ClientTubeAssemblerContext;
 import com.sun.xml.internal.ws.api.pipe.ServerTubeAssemblerContext;
 import com.sun.xml.internal.ws.api.pipe.Tube;
@@ -54,10 +60,13 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScoutTubelineAssembler.class);
 
+  private static final Set<Method> TRANSACTIONAL_HANDLER_METHODS = CollectionUtility.hashSet(javax.xml.ws.handler.Handler.class.getDeclaredMethods());
+
   @Override
   public Tube createClient(ClientTubeAssemblerContext context) {
-    // wrap handlers with transactional context
-    wrapScoutTransactionHandlers(context.getBinding());
+    // proxy transactional handler to run in a separate transaction.
+    WSBinding binding = context.getBinding();
+    binding.setHandlerChain(interceptHandlers(binding.getHandlerChain()));
 
     // assemble tubes
     Tube head = context.createTransportTube();
@@ -74,8 +83,9 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
     // This must precede wrapping handlers with a transactional context
     installServerAuthenticationHandler(context);
 
-    // wrap handlers with transactional context
-    wrapScoutTransactionHandlers(context.getEndpoint().getBinding());
+    // proxy transactional handler to run in a separate transaction.
+    WSBinding binding = context.getEndpoint().getBinding();
+    binding.setHandlerChain(interceptHandlers(binding.getHandlerChain()));
 
     // assemble tubes
     Tube head = context.getTerminalTube();
@@ -88,42 +98,108 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
     return head;
   }
 
-  private void wrapScoutTransactionHandlers(Binding binding) {
-    List<Handler> handlerChain = new ArrayList<Handler>();
-
-    for (Handler handler : binding.getHandlerChain()) {
-      if (handler instanceof LogicalHandler ||
-          handler instanceof SOAPHandler ||
-          handler instanceof MessageHandler) {
-
-        ScoutTransaction annotation = getAnnotation(handler.getClass(), ScoutTransaction.class);
-        if (annotation != null) {
-          handler = createScoutTransactionHandlerWrapper(handler, annotation);
-        }
+  /**
+   * Method invoked to change the handlers to be installed.<br/>
+   * The default implementation proxies transactional handlers to run on behalf of a new server-job.
+   */
+  @Internal
+  protected List<Handler> interceptHandlers(final List<Handler> handlers) {
+    for (int i = 0; i < handlers.size(); i++) {
+      final Handler handler = handlers.get(i);
+      final ScoutTransaction transactionalAnnotation = getAnnotation(handler.getClass(), ScoutTransaction.class);
+      if (transactionalAnnotation != null) {
+        handlers.set(i, proxyTransactionalHandler(handler, transactionalAnnotation));
       }
-      handlerChain.add(handler);
     }
-    binding.setHandlerChain(handlerChain);
+    return handlers;
   }
 
-  @SuppressWarnings("unchecked")
-  private Handler createScoutTransactionHandlerWrapper(final Handler handler, final ScoutTransaction scoutTransaction) {
-    if (scoutTransaction == null || handler == null) {
+  /**
+   * Method invoked to create a transactional proxy for the given {@link Handler}.
+   */
+  @Internal
+  protected Handler proxyTransactionalHandler(final Handler handler, final ScoutTransaction scoutTransaction) {
+    if (scoutTransaction.sessionFactory() == null) {
+      LOG.error("Failed to initialize transactional handler because no session-factory configured [handler={}]", handler.getClass().getName());
       return handler;
     }
 
-    if (handler instanceof LogicalHandler) {
-      return new ScoutTransactionLogicalHandlerWrapper<LogicalMessageContext>((LogicalHandler<LogicalMessageContext>) handler, scoutTransaction);
+    final IServerSessionFactory sessionFactory;
+    try {
+      sessionFactory = scoutTransaction.sessionFactory().newInstance();
     }
-    else if (handler instanceof SOAPHandler) {
-      return new ScoutTransactionSOAPHandlerWrapper<SOAPMessageContext>((SOAPHandler) handler, scoutTransaction);
-    }
-    else if (handler instanceof MessageHandler) {
-      return new ScoutTransactionMessageHandlerWrapper<MessageHandlerContext>((MessageHandler<MessageHandlerContext>) handler, scoutTransaction);
-    }
-    else {
-      LOG.warn("Unsupported handler type  '" + handler.getClass().getName() + "' for Scout transaction.");
+    catch (final ReflectiveOperationException e) {
+      LOG.error(String.format("Failed to initialize transactional handler because session-factory could not be instantiated [handler=%s, sessionFactory=%s]", handler.getClass().getName(), scoutTransaction.sessionFactory().getName()), e);
       return handler;
+    }
+
+    // Create a proxy for the given handler with TX-support.
+    return (Handler) Proxy.newProxyInstance(handler.getClass().getClassLoader(), ReflectionUtility.getInterfaces(handler.getClass()), new InvocationHandler() {
+
+      @Override
+      public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+        if (TRANSACTIONAL_HANDLER_METHODS.contains(method)) {
+          Assertions.assertTrue(args.length == 1 && args[0] instanceof MessageContext, "Wrong method signature: %s argument expected. [handler=%s, method=%s]", MessageContext.class.getSimpleName(), handler.getClass().getName(), method.getName());
+          final MessageContext messageContext = Assertions.assertNotNull((MessageContext) args[0], "MessageContext must not be null");
+
+          final IServerSession session = lookupServerSession(messageContext, sessionFactory);
+          if (session != null) {
+            return ScoutTubelineAssembler.this.invokeInServerJob(ServerJobInput.defaults().name("JAX-WS TX-Handler").session(session), handler, method, args);
+          }
+          else {
+            throw new WebServiceException("JAX-WS request rejected because no server-session available.");
+          }
+        }
+        else {
+          return method.invoke(handler, args);
+        }
+      }
+    });
+  }
+
+  /**
+   * Method invoked to run the given method on behalf of a new server job.
+   */
+  @Internal
+  protected Object invokeInServerJob(final ServerJobInput input, final Object object, final Method method, final Object[] args) throws Throwable {
+    try {
+      return ServerJobManager.DEFAULT.runNow(new ICallable<Object>() {
+
+        @Override
+        public Object call() throws Exception {
+          try {
+            return (Object) method.invoke(object, args); // InvocationTargetException is unpacked in server-job.
+          }
+          catch (IllegalAccessException | IllegalArgumentException e) {
+            throw new WebServiceException("Failed to invoke proxy method", e);
+          }
+        }
+      }, input);
+    }
+    catch (final ProcessingException e) {
+      throw e.getCause(); // propagate the real cause.
+    }
+  }
+
+  /**
+   * Method invoked to lookup the current server session on the message context or if not exists, to create a new one
+   * and register it with the context.
+   */
+  @Internal
+  protected IServerSession lookupServerSession(final MessageContext messageContext, final IServerSessionFactory sessionFactory) {
+    IServerSession serverSession = ContextHelper.getContextSession(messageContext);
+    if (serverSession != null) {
+      return serverSession;
+    }
+
+    try {
+      serverSession = SessionHelper.createNewServerSession(sessionFactory);
+      ContextHelper.setContextSession(messageContext, sessionFactory, serverSession);
+      return serverSession;
+    }
+    catch (final RuntimeException e) {
+      LOG.error("Failed to create server session for transactional handler", e);
+      return null;
     }
   }
 
