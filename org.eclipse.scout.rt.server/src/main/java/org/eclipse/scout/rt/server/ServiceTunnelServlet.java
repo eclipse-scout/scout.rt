@@ -16,7 +16,6 @@ import java.io.InterruptedIOException;
 import java.net.SocketException;
 import java.security.AccessController;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletConfig;
@@ -67,11 +66,6 @@ import org.osgi.framework.Version;
 public class ServiceTunnelServlet extends HttpServletEx {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.server.http.debug";
 
-  /**
-   * HTTP connection distinguishes between different {@link IClientSession} connecting concurrently
-   */
-  public static final String MULTI_CLIENT_SESSION_COOKIESTORE = "org.eclipse.scout.rt.multiClientSessionCookieStoreEnabled";
-
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelServlet.class);
 
@@ -79,18 +73,13 @@ public class ServiceTunnelServlet extends HttpServletEx {
   private Class<? extends IServerSession> m_serverSessionClass;
   private Version m_requestMinVersion;
   private final boolean m_debug;
-  private final boolean m_isMultiClientSessionCookieStore;
-
-  private final VirtualSessionCache m_virtualSessionCache = new VirtualSessionCache();
-  private volatile boolean m_virtualSessionTimeoutInitialized = false;
-
-  public ServiceTunnelServlet(boolean multiClientSessionCookieStore, boolean debug) {
-    m_isMultiClientSessionCookieStore = multiClientSessionCookieStore;
-    m_debug = debug;
-  }
 
   public ServiceTunnelServlet() {
-    this(ConfigIniUtility.getPropertyBoolean(MULTI_CLIENT_SESSION_COOKIESTORE, true), ConfigIniUtility.getPropertyBoolean(HTTP_DEBUG_PARAM, false));
+    this(ConfigIniUtility.getPropertyBoolean(HTTP_DEBUG_PARAM, false));
+  }
+
+  public ServiceTunnelServlet(boolean debug) {
+    m_debug = debug;
   }
 
   // === HTTP-GET ===
@@ -147,7 +136,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       input.servletResponse(res);
       input.locale(serviceRequest.getLocale());
       input.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
-      input.session(lookupServerSession(input.copy(), serviceRequest.getVirtualSessionId()));
+      input.session(lookupScoutServerSessionOnHttpSession(input.copy()));
 
       IServiceTunnelResponse serviceResponse = invokeServiceInServerJob(input, serviceRequest);
 
@@ -300,17 +289,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return e;
   }
 
-  /**
-   * Initialize virtual session timeout; only once from the HTTP session
-   */
-  @Internal
-  protected void initializeVirtualSessionTimeout(HttpServletRequest req) {
-    if (!m_virtualSessionTimeoutInitialized) {
-      m_virtualSessionCache.setSessionTimeoutMillis(Math.max(TimeUnit.MINUTES.toMillis(30), TimeUnit.SECONDS.toMillis(req.getSession().getMaxInactiveInterval())));
-      m_virtualSessionTimeoutInitialized = true;
-    }
-  }
-
   // === SESSION CLASS, SESSION LOOKUP, SESSION CREATION ===
   @Internal
   protected Class<? extends IServerSession> locateServerSessionClass(HttpServletRequest req, HttpServletResponse res) {
@@ -344,16 +322,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   @Internal
-  protected IServerSession lookupServerSession(ServerJobInput input, String virtualSessionId) throws ProcessingException, ServletException {
-    if (virtualSessionId != null && !m_isMultiClientSessionCookieStore) {
-      return lookupScoutServerSessionOnVirtualSession(input, virtualSessionId);
-    }
-    else {
-      return lookupScoutServerSessionOnHttpSession(input);
-    }
-  }
-
-  @Internal
   protected IServerSession lookupScoutServerSessionOnHttpSession(ServerJobInput jobInput) throws ProcessingException, ServletException {
     HttpServletRequest req = jobInput.getServletRequest();
     HttpServletResponse res = jobInput.getServletResponse();
@@ -370,23 +338,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
         }
       }
     }
-    return serverSession;
-  }
-
-  @Internal
-  protected IServerSession lookupScoutServerSessionOnVirtualSession(ServerJobInput input, String virtualSessionId) throws ProcessingException, ServletException {
-    initializeVirtualSessionTimeout(input.getServletRequest());
-    IServerSession serverSession = m_virtualSessionCache.get(virtualSessionId);
-    if (serverSession == null) {
-      synchronized (m_virtualSessionCache) {
-        serverSession = m_virtualSessionCache.get(virtualSessionId);
-        if (serverSession == null) { // double checking
-          serverSession = createAndLoadServerSession(m_serverSessionClass, input);
-          m_virtualSessionCache.put(virtualSessionId, serverSession);
-        }
-      }
-    }
-    m_virtualSessionCache.touch(virtualSessionId);
     return serverSession;
   }
 
