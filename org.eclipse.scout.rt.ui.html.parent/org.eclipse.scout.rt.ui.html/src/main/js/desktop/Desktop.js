@@ -169,6 +169,10 @@ scout.Desktop.prototype._selectTab = function(tab) {
 
   tab.$container.select(true);
   this._selectedTab = tab;
+  if (tab.content && tab.content.objectType === 'Table') {
+    // Install adapter on parent (no table focus required)
+    scout.keyStrokeManager.installAdapter(this.$parent, tab.content.keystrokeAdapter);
+  }
   if (tab.$storage && tab.$storage.length > 0) {
     this.$bench.append(tab.$storage);
     this.session.detachHelper.afterAttach(tab.$storage);
@@ -181,6 +185,11 @@ scout.Desktop.prototype._selectTab = function(tab) {
 };
 
 scout.Desktop.prototype._unselectTab = function(tab) {
+  //remove registered keyStrokeAdapters
+  if (tab.content && scout.keyStrokeManager.isAdapterInstalled(tab.content.keystrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(tab.content.keystrokeAdapter);
+  }
+
   tab.$storage = this.$bench.children();
   if (tab.$storage.length > 0) {
     scout.Tooltip.removeTooltips(tab.$storage);
@@ -260,6 +269,9 @@ scout.Desktop.prototype._openUrlInBrowser = function(event) {
 
 scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   if (this._outlineTab.content && this._outlineTab.content !== content) {
+    if (scout.keyStrokeManager.isAdapterInstalled(this._outlineTab.keystrokeAdapter)) {
+      scout.keyStrokeManager.uninstallAdapter(this._outlineTab.keystrokeAdapter);
+    }
     this._outlineTab.content.remove();
     // Also remove storage to make sure selectTab does not restore the content
     this._outlineTab.$storage = null;
@@ -278,12 +290,12 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   this._outlineTab._update(content, title, subTitle);
   this._updateTab(this._outlineTab);
   this._selectTab(this._outlineTab);
-
-  if (!content.rendered) {
-    if (content.objectType === 'Table') {
-      // Install adapter on parent (no table focus required)
+  if (content.objectType === 'Table') {
+    if (!scout.keyStrokeManager.isAdapterInstalled(content.keystrokeAdapter)) {
       scout.keyStrokeManager.installAdapter(this.$parent, content.keystrokeAdapter);
     }
+  }
+  if (!content.rendered) {
     content.render(this.$bench);
     // FIXME CGU: maybe include in render?
     content.htmlComp.layout();
