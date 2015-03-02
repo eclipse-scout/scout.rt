@@ -133,3 +133,16 @@ calls the method with true.
 
 NBU 27.02.2015
 Renamed constant PROP_KEYSTROKE to PROP_KEY_STROKE and changed the value of it to keyStroke for consitancy reasons.
+
+BSH 02.03.2015
+Moved MultiClientSessionCookieStore to org.eclipse.scout.rt.servicetunnel and renamed it to MultiSessionCookieStore.
+It can now be used in client and server environments. Migration: Rename any class reference (API remains unchanged).
+To make the service tunnel work with multiple sessions over HTTP, the MultiSessionCookieStore has to be installed.
+This is _not_ done automatically, because the cookie manager is global for the entire JVM. Overriding this global
+variable may break things in a JEE environment with multiple applications or a pre-installed custom cookie manager.
+There are two options to install Scout's MultiSessionCookieStore:
+1. Set the default cookie manager programmatically somewhere in your code. This is the way provided by the JVM,
+   see http://docs.oracle.com/javase/tutorial/networking/cookies/cookiemanager.html for details.
+2. Use Scout's auto-install mechanism by setting the property "org.eclipse.scout.rt.servicetunnel.multiSessionCookieStoreEnabled"
+   in your config.ini to "true". This is the recommended way.
+
