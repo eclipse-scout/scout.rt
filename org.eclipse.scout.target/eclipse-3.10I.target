@@ -27,7 +27,7 @@
     </location>
 
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="orbit_R" location="http://download.eclipse.org/tools/orbit/downloads/drops/R20140525021250/repository/"/>
+      <repository id="orbit_M" location="http://download.eclipse.org/tools/orbit/downloads/drops/M20141202175304/repository/"/>
 
       <unit id="javax.servlet" version="3.0.0.v201112011016"/>
       <unit id="javax.servlet.source" version="3.0.0.v201112011016"/>
@@ -64,10 +64,10 @@
       <unit id="org.apache.commons.exec.source" version="1.1.0.v201301240602"/>
       <unit id="org.apache.commons.logging" version="1.1.1.v201101211721"/>
       <unit id="org.apache.commons.logging.source" version="1.1.1.v201101211721"/>
-      <unit id="org.apache.httpcomponents.httpclient" version="4.2.6.v201311072007"/>
-      <unit id="org.apache.httpcomponents.httpclient.source" version="4.2.6.v201311072007"/>
-      <unit id="org.apache.httpcomponents.httpcore" version="4.2.5.v201311072007"/>
-      <unit id="org.apache.httpcomponents.httpcore.source" version="4.2.5.v201311072007"/>
+      <unit id="org.apache.httpcomponents.httpclient" version="4.3.6.v201411290715"/>
+      <unit id="org.apache.httpcomponents.httpclient.source" version="4.3.6.v201411290715"/>
+      <unit id="org.apache.httpcomponents.httpcore" version="4.3.3.v201411290715"/>
+      <unit id="org.apache.httpcomponents.httpcore.source" version="4.3.3.v201411290715"/>
       <unit id="org.apache.xerces" version="2.9.0.v201101211617"/>
       <unit id="org.apache.xml.resolver" version="1.2.0.v201005080400"/>
       <unit id="org.apache.xml.serializer" version="2.7.1.v201005080400"/>
