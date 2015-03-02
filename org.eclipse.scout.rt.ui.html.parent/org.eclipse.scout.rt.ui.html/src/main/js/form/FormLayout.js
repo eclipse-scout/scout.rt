@@ -13,7 +13,9 @@ scout.FormLayout.prototype.layout = function($container) {
     .subtract(htmlContainer.getInsets())
     .subtract(htmlRootGb.getMargins());
   rootGbSize.height -= this._menuBarHeight($container);
-  rootGbSize.height -= this._titleHeight($container);
+  if (this._form.isDialog()) {
+    rootGbSize.height -= this._titleHeight($container);
+  }
 
   $.log.trace('(FormLayout#layout) rootGbSize=' + rootGbSize);
   htmlRootGb.setSize(rootGbSize);
