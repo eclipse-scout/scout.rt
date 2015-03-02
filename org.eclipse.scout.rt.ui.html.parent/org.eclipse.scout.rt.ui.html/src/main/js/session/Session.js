@@ -54,6 +54,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this._busyCounter = 0; //  >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper();
+  this.partId = jsonSessionId.substring(0, jsonSessionId.indexOf(':'));
 
   // TODO BSH Detach | Check if there is another way
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
@@ -635,4 +636,8 @@ scout.Session.prototype.optText = function(textKey, defaultValue) {
 
 scout.Session.prototype.textExists = function(textKey) {
   return this._texts.exists(textKey);
+};
+
+scout.Session.prototype.getUniqueFieldIdPrefix = function() {
+  return 'scout-' + this.partId + '-';
 };

@@ -96,6 +96,7 @@ __include("form/fields/radiobutton/RadioButtonLayout.js");
 __include("form/fields/ValueField.js");
 __include("form/fields/CompositeField.js");
 __include("form/fields/button/Button.js");
+__include("form/fields/button/ButtonMnemonicKeyStroke.js");
 __include("form/fields/button/ButtonLayout.js");
 __include("form/fields/calendarfield/CalendarField.js");
 __include("form/fields/checkbox/CheckBoxField.js");

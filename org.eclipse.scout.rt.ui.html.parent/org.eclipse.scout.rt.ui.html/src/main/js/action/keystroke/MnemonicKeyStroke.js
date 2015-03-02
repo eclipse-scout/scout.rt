@@ -10,7 +10,7 @@ scout.MnemonicKeyStroke = function(keyStroke, field) {
 scout.inherits(scout.MnemonicKeyStroke, scout.KeyStroke);
 
 scout.MnemonicKeyStroke.prototype.handle = function(event) {
-  this.field.$field.trigger('click');
+  this.field.$label.trigger('click');
 };
 
 scout.MnemonicKeyStroke.prototype.addHintOnLabel = function() {

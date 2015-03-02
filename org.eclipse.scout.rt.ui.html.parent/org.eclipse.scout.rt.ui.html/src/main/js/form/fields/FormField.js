@@ -21,6 +21,7 @@ scout.FormField = function() {
   this.keyStrokes = [];
   this._addAdapterProperties('keyStrokes');
   this.keyStrokeAdapter;
+  this.refFieldId;
 };
 scout.inherits(scout.FormField, scout.ModelAdapter);
 
@@ -32,6 +33,7 @@ scout.FormField.LABEL_POSITION_TOP = 4;
 
 scout.FormField.prototype.init = function(model, session) {
   scout.FormField.parent.prototype.init.call(this, model, session);
+  this.refFieldId = this.session.getUniqueFieldIdPrefix() + this.id;
   this._registerKeyStrokeAdapter();
 };
 
@@ -259,7 +261,8 @@ scout.FormField.prototype._goOnline = function() {
 scout.FormField.prototype.addLabel = function() {
   this.$label = $('<label>')
     .appendTo(this.$container)
-    .attr('title', this.label);
+    .attr('title', this.label)
+    .attr('for', this.refFieldId);
 };
 
 /**
@@ -280,6 +283,7 @@ scout.FormField.prototype.addField = function($field, $fieldContainer) {
     this.$fieldContainer = $field;
     $field.appendTo(this.$container);
   }
+  this.$field.attr('id', this.refFieldId);
   this.$fieldContainer.addClass('field');
 };
 

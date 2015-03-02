@@ -60,15 +60,14 @@ scout.GroupBox.prototype._prepareFields = function() {
   this.customButtons = [];
   this.processButtons = [];
 
-  var i, field;
+  var i, field, res;
   for (i = 0; i < this.formFields.length; i++) {
+    res = undefined;
     field = this.formFields[i];
     if (field.label !== scout.strings.removeAmpersand(field.label)) {
       //Add mnemonic keyStrokevar
       var mnemonic = field.label.match(/(^|[^&]|&&)&($|[^&]|&&)/g)[0].replace('&', '');
-      var res = mnemonic.charAt(mnemonic.length - 1);
-      var key = new scout.MnemonicKeyStroke(res, field);
-      this.keyStrokeAdapter.registerKeyStroke(key);
+      res = mnemonic.charAt(mnemonic.length - 1);
     }
 
     if (field instanceof scout.Button) {
@@ -82,8 +81,15 @@ scout.GroupBox.prototype._prepareFields = function() {
       } else {
         this.controls.push(field);
       }
+      if(res){
+        this.keyStrokeAdapter.registerKeyStroke(new scout.ButtonMnemonicKeyStroke(res, field));
+      }
+
     } else {
       this.controls.push(field);
+      if(res){
+        this.keyStrokeAdapter.registerKeyStroke(new scout.MnemonicKeyStroke(res, field));
+      }
     }
   }
 };
