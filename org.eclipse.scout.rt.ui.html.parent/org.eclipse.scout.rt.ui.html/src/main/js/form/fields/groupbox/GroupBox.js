@@ -42,8 +42,7 @@ scout.GroupBox.prototype._render = function($parent) {
     scout.scrollbars.install(this.$body);
     this.session.detachHelper.pushScrollable(this.$body);
   }
-
-  this._createFieldArraysByType();
+  this._prepareFields();
   for (var i = 0; i < this.controls.length; i++) {
     this.controls[i].render(this.$body);
   }
@@ -55,7 +54,7 @@ scout.GroupBox.prototype._remove = function() {
   }
 };
 
-scout.GroupBox.prototype._createFieldArraysByType = function() {
+scout.GroupBox.prototype._prepareFields = function() {
   this.controls = [];
   this.systemButtons = [];
   this.customButtons = [];
@@ -64,13 +63,20 @@ scout.GroupBox.prototype._createFieldArraysByType = function() {
   var i, field;
   for (i = 0; i < this.formFields.length; i++) {
     field = this.formFields[i];
+    if (field.label !== scout.strings.removeAmpersand(field.label)) {
+      //Add mnemonic keyStrokevar
+      var mnemonic = field.label.match(/(^|[^&]|&&)&($|[^&]|&&)/g)[0].replace('&', '');
+      var res = mnemonic.charAt(mnemonic.length - 1);
+      var key = new scout.MnemonicKeyStroke(res, field);
+      this.keyStrokeAdapter.registerKeyStroke(key);
+    }
+
     if (field instanceof scout.Button) {
       if (field.processButton) {
         this.processButtons.push(field);
         if (field.systemType !== scout.Button.SYSTEM_TYPE.NONE) {
           this.systemButtons.push(field);
-        }
-        else {
+        } else {
           this.customButtons.push(field);
         }
       } else {
@@ -126,4 +132,11 @@ scout.GroupBox.prototype._renderLabelVisible = function(visible) {
   // TODO AWE: (concept) discuss with C.GU -> auf dem GUI server korrigieren oder im Browser UI?
   // --> kein hack für main-box, wenn die auf dem model ein label hat, hat es im UI auch eins
   this._$groupBoxTitle.setVisible(visible && this.label && !this.mainBox);
+};
+
+/**
+ * @override FormField.js
+ */
+scout.GroupBox.prototype._registerKeyStrokeAdapter = function() {
+  this.keyStrokeAdapter = new scout.GroupBoxKeyStrokeAdapter(this);
 };
