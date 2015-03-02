@@ -121,7 +121,6 @@ __include("form/fields/datefield/DatePicker.js");
 __include("form/fields/groupbox/GroupBox.js");
 __include("form/fields/groupbox/GroupBoxLayout.js");
 __include("form/fields/groupbox/GroupBoxKeyStrokeAdapter.js");
-__include("form/fields/groupbox/GroupBoxKeyStroke.js");
 __include("form/fields/sequencebox/SequenceBox.js");
 __include("form/fields/tablefield/TableField.js");
 __include("form/fields/treebox/TreeBox.js");
