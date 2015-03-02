@@ -55,11 +55,6 @@ public interface IServiceTunnelRequest extends Serializable {
   Subject getClientSubject();
 
   /**
-   * The web (ajax) session under which the request is done
-   */
-  String getVirtualSessionId();
-
-  /**
    * Represents the user interface on client side.<br/>
    * To parse an identifier use {@link UserAgent#createByIdentifier(String)}
    */

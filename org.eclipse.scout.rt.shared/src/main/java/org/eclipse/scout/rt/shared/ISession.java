@@ -14,7 +14,6 @@ import java.util.Map;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.annotations.FormData;
 import org.osgi.framework.Bundle;
 
 /**
@@ -27,12 +26,12 @@ public interface ISession {
    */
   ThreadLocal<ISession> CURRENT = new ThreadLocal<>();
 
+  //TODO imo remove
   Bundle getBundle();
 
   /**
    * Shared context variable containing the authenticated userId in lowercase
    */
-  @FormData
   String getUserId();
 
   /**
@@ -47,34 +46,9 @@ public interface ISession {
 
   ScoutTexts getTexts();
 
-  /**
-   * Used to force immediate (in-thread) execution of jobs.
-   */
-  boolean isSingleThreadSession();
-
   Object getData(String key);
 
   void setData(String key, Object value);
-
-  /**
-   * If {@link IClientSession#getVirtualSessionId()} is not null then it is sent as part of the wsse security header to
-   * the
-   * server.
-   * <p>
-   * This is necessary since the web-gui-servlet is itself a single servlet that is calling the server-servlet /process
-   * with a single cookie and therefore a single http session. When this session is set, the ServiceTunnelServlet
-   * /process recognizes this and is not associating the scout server session with the HttpSession but with a custom
-   * cache associated with this ajax (remote) session id.
-   * <p>
-   *
-   * @return rap/rwt/ajax session id (this is a uuid) or null if app is not running as web app
-   */
-  String getVirtualSessionId();
-
-  /**
-   * see {@link #getVirtualSessionId()}
-   */
-  void setVirtualSessionId(String sessionId);
 
   /**
    * The {@link IServiceTunnel} used by {@link IClientSession#getServiceTunnel()} checks for the Subject

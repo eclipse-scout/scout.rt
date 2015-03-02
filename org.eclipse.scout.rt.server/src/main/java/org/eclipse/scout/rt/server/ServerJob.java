@@ -22,7 +22,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -135,17 +134,6 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
       throw new IllegalStateException("This job is already scheduled/running");
     }
     m_transactionSequence = seq;
-  }
-
-  @Override
-  public boolean shouldSchedule() {
-    if (getServerSession() != null && getServerSession().isSingleThreadSession()) {
-      runNow(new NullProgressMonitor());
-      return false;
-    }
-    else {
-      return super.shouldSchedule();
-    }
   }
 
   /**

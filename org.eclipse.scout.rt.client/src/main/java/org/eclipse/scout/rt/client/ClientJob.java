@@ -15,7 +15,6 @@ import java.util.Locale;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobManager;
@@ -136,17 +135,6 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
 
   public final boolean isWaitFor() {
     return m_waitFor;
-  }
-
-  @Override
-  public boolean shouldSchedule() {
-    if (getClientSession() != null && getClientSession().isSingleThreadSession()) {
-      runNow(new NullProgressMonitor());
-      return false;
-    }
-    else {
-      return super.shouldSchedule();
-    }
   }
 
   /**

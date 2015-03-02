@@ -65,7 +65,7 @@ public class JUnitSwingJob extends Job {
         @Override
         public Object run() {
           try {
-            IClientSession session = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClass, UserAgent.create(UiLayer.SWING, UiDeviceType.DESKTOP));
+            IClientSession session = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClass, null, UserAgent.create(UiLayer.SWING, UiDeviceType.DESKTOP));
             if (session != null) {
               IDesktop desktop = session.getDesktop();
               if (desktop != null) {

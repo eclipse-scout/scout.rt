@@ -83,32 +83,14 @@ public class TestingClientSessionRegistryService extends AbstractService impleme
    * is created and put into the cache.
    */
   @Override
-  public <T extends IClientSession> T newClientSession(Class<T> clazz, UserAgent userAgent) {
+  public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, UserAgent userAgent) {
     synchronized (m_cacheLock) {
       @SuppressWarnings("unchecked")
       T clientSession = (T) m_cache.get(clazz.getName());
       if (clientSession != null) {
         return clientSession;
       }
-      clientSession = m_delegate.newClientSession(clazz, userAgent);
-      m_cache.put(clazz.getName(), clientSession);
-      return clientSession;
-    }
-  }
-
-  /**
-   * {@inheritDoc} Returns an already cached client session if available. Otherwise, a new ClientSession object
-   * is created and put into the cache.
-   */
-  @Override
-  public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId, UserAgent userAgent) {
-    synchronized (m_cacheLock) {
-      @SuppressWarnings("unchecked")
-      T clientSession = (T) m_cache.get(clazz.getName());
-      if (clientSession != null) {
-        return clientSession;
-      }
-      clientSession = m_delegate.newClientSession(clazz, subject, virtualSessionId, userAgent);
+      clientSession = m_delegate.newClientSession(clazz, subject, userAgent);
       m_cache.put(clazz.getName(), clientSession);
       return clientSession;
     }

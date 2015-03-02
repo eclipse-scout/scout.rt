@@ -59,7 +59,7 @@ public class ScoutClientGUITestRunner extends ScoutClientTestRunner {
         }
         IClientSessionRegistryService service = SERVICES.getService(IClientSessionRegistryService.class);
         UserAgent initUserAgent = guiMockService.initUserAgent();
-        IClientSession clientSession = service.newClientSession(session.getClass(), initUserAgent);
+        IClientSession clientSession = service.newClientSession(session.getClass(), null, initUserAgent);
         final IGuiMock gui = guiMockService.createMock(clientSession);
         gui.beforeTest();
         try {

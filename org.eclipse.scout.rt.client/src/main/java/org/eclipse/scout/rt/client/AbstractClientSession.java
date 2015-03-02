@@ -86,8 +86,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   private Subject m_offlineSubject;
   private Subject m_subject;
   private final SharedVariableMap m_sharedVariableMap;
-  private boolean m_singleThreadSession;
-  private String m_virtualSessionId;
   private IMemoryPolicy m_memoryPolicy;
   private final Map<String, Object> m_clientSessionData;
   private ScoutTexts m_scoutTexts;
@@ -259,7 +257,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
    */
 
   protected void initConfig() {
-    m_singleThreadSession = getConfiguredSingleThreadSession();
     m_virtualDesktop = new VirtualDesktop();
     setMemoryPolicy(new LargeMemoryPolicy());
     // add client notification listener
@@ -600,21 +597,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     m_offlineSubject = new Subject();
     m_offlineSubject.getPrincipals().add(new SimplePrincipal(offlineUser));
     OfflineState.setOfflineDefault(true);
-  }
-
-  @Override
-  public boolean isSingleThreadSession() {
-    return m_singleThreadSession;
-  }
-
-  @Override
-  public String getVirtualSessionId() {
-    return m_virtualSessionId;
-  }
-
-  @Override
-  public void setVirtualSessionId(String sessionId) {
-    m_virtualSessionId = sessionId;
   }
 
   @Override

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.services.common.platform;
 
 import org.eclipse.scout.service.IService;
 
+//TODO imo remove together with ISession.getBundle
 public interface IPlatformService extends IService {
 
   String getFile();

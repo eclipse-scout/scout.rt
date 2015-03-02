@@ -27,7 +27,6 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -59,9 +58,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private final HashMap<String, Object> m_attributes;
   private transient Object m_attributesLock;
   private final SharedVariableMap m_sharedVariableMap;
-  private boolean m_singleThreadSession;
   private transient ScoutTexts m_scoutTexts;
-  private String m_virtualSessionId;
   private Subject m_subject;
   private String m_sessionId;
   private String m_symbolicBundleName;
@@ -94,12 +91,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     if (m_attributesLock == null) {
       m_attributesLock = new Object();
     }
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(100)
-  protected boolean getConfiguredSingleThreadSession() {
-    return false;
   }
 
   @Override
@@ -194,18 +185,15 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   protected void initConfig() {
-    m_singleThreadSession = getConfiguredSingleThreadSession();
-    if (!isSingleThreadSession()) {
-      m_sharedVariableMap.addPropertyChangeListener(new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent e) {
-          if (OfflineState.isOfflineDefault() == OfflineState.isOfflineInCurrentThread()) {
-            // notify this session
-            SERVICES.getService(IClientNotificationService.class).putNotification(new SharedContextChangedNotification(new SharedVariableMap(m_sharedVariableMap)), new SessionFilter(AbstractServerSession.this, 60000L));
-          }
+    m_sharedVariableMap.addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent e) {
+        if (OfflineState.isOfflineDefault() == OfflineState.isOfflineInCurrentThread()) {
+          // notify this session
+          SERVICES.getService(IClientNotificationService.class).putNotification(new SharedContextChangedNotification(new SharedVariableMap(m_sharedVariableMap)), new SessionFilter(AbstractServerSession.this, 60000L));
         }
-      });
-    }
+      }
+    });
     if (m_initialized) {
       return;
     }
@@ -256,21 +244,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   @ConfigOperation
   @Order(10)
   protected void execLoadSession() throws ProcessingException {
-  }
-
-  @Override
-  public boolean isSingleThreadSession() {
-    return m_singleThreadSession;
-  }
-
-  @Override
-  public String getVirtualSessionId() {
-    return m_virtualSessionId;
-  }
-
-  @Override
-  public void setVirtualSessionId(String sessionId) {
-    m_virtualSessionId = sessionId;
   }
 
   @Override

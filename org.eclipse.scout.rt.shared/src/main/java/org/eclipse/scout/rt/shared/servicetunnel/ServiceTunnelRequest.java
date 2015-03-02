@@ -40,10 +40,6 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
   /**
    * @since 3.8
    */
-  private String m_virtualSessionId;
-  /**
-   * @since 3.8
-   */
   private transient Subject m_clientSubject;
 
   // for serialization
@@ -116,18 +112,6 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
    */
   public void setClientSubject(Subject requestSubject) {
     m_clientSubject = requestSubject;
-  }
-
-  @Override
-  public String getVirtualSessionId() {
-    return m_virtualSessionId;
-  }
-
-  /**
-   * The web (ajax) session under which the request is done
-   */
-  public void setVirtualSessionId(String virtualSessionId) {
-    m_virtualSessionId = virtualSessionId;
   }
 
   @Override

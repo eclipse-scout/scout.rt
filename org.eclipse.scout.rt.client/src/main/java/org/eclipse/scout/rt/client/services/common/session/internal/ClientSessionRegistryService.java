@@ -30,33 +30,19 @@ public class ClientSessionRegistryService extends AbstractService implements ICl
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientSessionRegistryService.class);
 
   @Override
-  public <T extends IClientSession> T newClientSession(Class<T> clazz, UserAgent userAgent) {
+  public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, UserAgent userAgent) {
     final Bundle bundle = getDefiningBundle(clazz);
     if (bundle == null) {
       return null;
     }
-
-    return createAndStartClientSession(clazz, bundle, null, null, userAgent);
-  }
-
-  @Override
-  public <T extends IClientSession> T newClientSession(Class<T> clazz, Subject subject, String virtualSessionId, UserAgent userAgent) {
-    final Bundle bundle = getDefiningBundle(clazz);
-    if (bundle == null) {
-      return null;
-    }
-
-    return createAndStartClientSession(clazz, bundle, subject, virtualSessionId, userAgent);
+    return createAndStartClientSession(clazz, bundle, subject, userAgent);
   }
 
   @SuppressWarnings("unchecked")
-  private <T extends IClientSession> T createAndStartClientSession(Class<T> clazz, final Bundle bundle, Subject subject, String virtualSessionId, UserAgent userAgent) {
+  private <T extends IClientSession> T createAndStartClientSession(Class<T> clazz, final Bundle bundle, Subject subject, UserAgent userAgent) {
     try {
       IClientSession clientSession = clazz.newInstance();
       clientSession.setSubject(subject);
-      if (virtualSessionId != null) {
-        clientSession.setVirtualSessionId(virtualSessionId);
-      }
       clientSession.setUserAgent(userAgent);
       ClientSyncJob job = new ClientSyncJob("Session startup", clientSession) {
         @Override

@@ -58,7 +58,7 @@ public class ClientJobCancelTest {
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
-    TestEnvironmentClientSession clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(TestEnvironmentClientSession.class, UserAgent.createDefault());
+    TestEnvironmentClientSession clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(TestEnvironmentClientSession.class, null, UserAgent.createDefault());
     if (clientSession != null) {
       oldServiceTunnel = clientSession.getServiceTunnel();
     }
@@ -66,13 +66,13 @@ public class ClientJobCancelTest {
 
   @AfterClass
   public static void tearDownAfterClass() throws Exception {
-    TestEnvironmentClientSession clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(TestEnvironmentClientSession.class, UserAgent.createDefault());
+    TestEnvironmentClientSession clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(TestEnvironmentClientSession.class, null, UserAgent.createDefault());
     clientSession.setServiceTunnel(oldServiceTunnel);
   }
 
   @Before
   public void setUp() throws Exception {
-    m_session = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(TestEnvironmentClientSession.class, UserAgent.createDefault());
+    m_session = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(TestEnvironmentClientSession.class, null, UserAgent.createDefault());
     MockServiceTunnel tunnel = new MockServiceTunnel(m_session);
     m_session.setServiceTunnel(tunnel);
     m_serviceReg = TestingUtility.registerServices(0, new MockPingService(), new MockServerProcessingCancelService(tunnel));
