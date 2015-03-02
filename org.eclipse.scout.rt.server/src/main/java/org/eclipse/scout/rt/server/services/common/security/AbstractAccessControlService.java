@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clientnotification.SingleUserFilter;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
@@ -54,7 +55,7 @@ public abstract class AbstractAccessControlService extends AbstractSharedAccessC
 
     //notify clusters:
     try {
-      IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
+      IClusterSynchronizationService s = OBJ.oneOrNull(IClusterSynchronizationService.class);
       if (s != null) {
         s.publishNotification(new AccessControlCacheChangedClusterNotification());
       }
@@ -70,7 +71,7 @@ public abstract class AbstractAccessControlService extends AbstractSharedAccessC
 
     //notify clusters:
     try {
-      IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
+      IClusterSynchronizationService s = OBJ.oneOrNull(IClusterSynchronizationService.class);
       if (s != null) {
         s.publishNotification(new AccessControlCacheChangedClusterNotification(userIds));
       }

@@ -33,16 +33,19 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.cache.TestHttpSession;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.IService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 
 /**
  * Test for {@link BasicSecurityFilter}
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class BasicSecurityFilterTest {
   private HttpServletRequest m_requestMock;
   private HttpServletResponse m_responseMock;
