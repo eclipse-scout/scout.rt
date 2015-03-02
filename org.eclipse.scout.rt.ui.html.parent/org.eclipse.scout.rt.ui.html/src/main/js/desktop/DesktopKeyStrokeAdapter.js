@@ -1,3 +1,5 @@
+//TODO nbu add view keystrokes to change viewStackForms with CTRL+[0...9]
+
 scout.DesktopKeyStrokeAdapter = function(navigation, taskbar) {
   scout.DesktopKeyStrokeAdapter.parent.call(this, navigation);
   var that = this;
