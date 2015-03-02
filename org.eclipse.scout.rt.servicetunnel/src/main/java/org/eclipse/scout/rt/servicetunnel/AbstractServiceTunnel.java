@@ -145,7 +145,7 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
     }
 
     // default implementation
-    ServiceTunnelRequest call = new ServiceTunnelRequest(version, serviceInterfaceClass, operation, args);
+    ServiceTunnelRequest call = new ServiceTunnelRequest(version, serviceInterfaceClass.getName(), operation.getName(), operation.getParameterTypes(), args);
     call.setClientSubject(getSession().getSubject());
     call.setVirtualSessionId(getSession().getVirtualSessionId());
     call.setUserAgent(userAgent.createIdentifier());

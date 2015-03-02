@@ -10,15 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel;
 
-import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.VerboseUtility;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
@@ -52,20 +51,16 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
   private ServiceTunnelRequest() {
   }
 
-  public ServiceTunnelRequest(String version, Class serviceInterfaceClass, Method operation, Object[] args) {
-    this(version, serviceInterfaceClass.getName(), operation.getName(), operation.getParameterTypes(), args);
-  }
-
   public ServiceTunnelRequest(String version, String serviceInterfaceName, String op, Class[] parameterTypes, Object[] args) {
     m_version = version;
     m_serviceInterfaceClassName = serviceInterfaceName;
     m_operation = op;
     m_parameterTypes = parameterTypes;
-    m_args = args;
-    if (m_args == null) {
-      m_args = new Object[0];
+    if (args == null) {
+      args = new Object[0];
     }
-    m_locale = LocaleThreadLocal.get();
+    m_args = args;
+    m_locale = NlsLocale.get();
   }
 
   /**
