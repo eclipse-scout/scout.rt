@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
@@ -252,7 +251,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     UserAgent userAgent = createUserAgent(jsonStartupRequest);
     clientSession.setUserAgent(userAgent);
     clientSession.setSubject(currentSubject());
-    clientSession.setVirtualSessionId(UUID.randomUUID().toString());
     //custom props
     HashMap<String, String> customProps = new HashMap<String, String>();
     JSONObject obj = jsonStartupRequest.getCustomParams();

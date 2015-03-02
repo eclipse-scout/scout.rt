@@ -332,7 +332,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     public static final int SLEEP_TIME_MILLIS = 100;
 
     public P_WaitForAllClientJobsJob(IClientSession session) {
-      super("Wait for all client jobs [session: " + session.getVirtualSessionId() + " / " + session.getUserId() + " / " + System.nanoTime() + "]", session);
+      super("Wait for all client jobs [session: " + session.getUserId() + " / " + System.nanoTime() + "]", session);
     }
 
     @Override
