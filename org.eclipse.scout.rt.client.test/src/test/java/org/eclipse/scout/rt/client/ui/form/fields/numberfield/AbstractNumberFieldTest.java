@@ -25,13 +25,16 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(ScoutPlatformTestRunner.class)
 public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
   private static Locale ORIGINAL_LOCALE;
@@ -40,13 +43,13 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
   @BeforeClass
   public static void setupBeforeClass() {
-    ORIGINAL_LOCALE = LocaleThreadLocal.get(false);
-    LocaleThreadLocal.set(new Locale("de", "CH"));
+    ORIGINAL_LOCALE = NlsLocale.get(false);
+    NlsLocale.set(new Locale("de", "CH"));
   }
 
   @AfterClass
   public static void tearDownAfterClass() {
-    LocaleThreadLocal.set(ORIGINAL_LOCALE);
+    NlsLocale.set(ORIGINAL_LOCALE);
   }
 
   @Override
@@ -123,7 +126,7 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     setRoundingMode(RoundingMode.HALF_UP);
     assertEquals("13", formatValueInternal(BigDecimal.valueOf(12.5)));
 
-    char groupingSeparator = new DecimalFormatSymbols(LocaleThreadLocal.get()).getGroupingSeparator();
+    char groupingSeparator = new DecimalFormatSymbols(NlsLocale.get()).getGroupingSeparator();
     assertEquals("123" + groupingSeparator + "456" + groupingSeparator + "789", formatValueInternal(BigDecimal.valueOf(123456789)));
 
     setGroupingUsed(false);

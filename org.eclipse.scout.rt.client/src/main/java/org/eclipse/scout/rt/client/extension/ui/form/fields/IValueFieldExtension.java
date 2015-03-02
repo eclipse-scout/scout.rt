@@ -31,7 +31,7 @@ public interface IValueFieldExtension<VALUE, OWNER extends AbstractValueField<VA
    */
   VALUE execValidateValue(ValueFieldExecValidateChain<VALUE> chain, VALUE rawValue) throws ProcessingException;
 
-  String execFormatValue(ValueFieldFormatValueChain<VALUE> chain, VALUE validValue);
+  String execFormatValue(ValueFieldFormatValueChain<VALUE> chain, VALUE value);
 
   VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue) throws ProcessingException;
 

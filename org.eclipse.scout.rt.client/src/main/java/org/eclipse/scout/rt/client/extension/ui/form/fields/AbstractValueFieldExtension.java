@@ -39,8 +39,8 @@ public abstract class AbstractValueFieldExtension<VALUE, OWNER extends AbstractV
   }
 
   @Override
-  public String execFormatValue(ValueFieldFormatValueChain<VALUE> chain, VALUE validValue) {
-    return chain.execFormatValue(validValue);
+  public String execFormatValue(ValueFieldFormatValueChain<VALUE> chain, VALUE value) {
+    return chain.execFormatValue(value);
   }
 
   @Override

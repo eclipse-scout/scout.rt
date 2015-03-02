@@ -86,6 +86,9 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * Configuration
    */
 
+  /**
+   * Indicates whether setting the field's value results in an update of the display text.
+   */
   @Order(200)
   @ConfigProperty(ConfigProperty.BOOLEAN)
   protected boolean getConfiguredAutoDisplayText() {
@@ -360,6 +363,10 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
         //parsing error remains unchanged, regardless of validation error
         if (!(getErrorStatus() instanceof ParsingFailedStatus)) {
           setErrorStatus(new ValidationFailedStatus(e.getStatus().getMessage()));
+          if (shouldUpdateDisplayText(false)) {
+            String formattedValue = interceptFormatValue(rawValue);
+            setDisplayText(formattedValue);
+          }
         }
 
         e.consume();
@@ -375,8 +382,8 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
       boolean changed = propertySupport.setPropertyNoFire(PROP_VALUE, validatedValue);
       // change text if auto-set-text enabled
       if (shouldUpdateDisplayText(CompareUtility.notEquals(rawValue, validatedValue))) {
-        String t = interceptFormatValue(validatedValue);
-        setDisplayText(t);
+        String formattedValue = interceptFormatValue(validatedValue);
+        setDisplayText(formattedValue);
       }
       if (changed) {
         propertySupport.firePropertyChange(PROP_VALUE, oldValue, validatedValue);
@@ -605,21 +612,21 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   /**
-   * format a valid value for display
+   * format a value for display
    *
    * @return formatted value
    */
   @ConfigOperation
   @Order(210)
-  protected String execFormatValue(VALUE validValue) {
-    return formatValueInternal(validValue);
+  protected String execFormatValue(VALUE value) {
+    return formatValueInternal(value);
   }
 
   /**
    * override this method to perform detailed formatting in subclasses
    */
-  protected String formatValueInternal(VALUE validValue) {
-    return validValue != null ? validValue.toString() : "";
+  protected String formatValueInternal(VALUE value) {
+    return value != null ? value.toString() : "";
   }
 
   @Override
@@ -700,8 +707,8 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     }
 
     @Override
-    public String execFormatValue(ValueFieldFormatValueChain<VALUE> chain, VALUE validValue) {
-      return getOwner().execFormatValue(validValue);
+    public String execFormatValue(ValueFieldFormatValueChain<VALUE> chain, VALUE value) {
+      return getOwner().execFormatValue(value);
     }
 
     @Override
