@@ -17,9 +17,6 @@ import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
 import org.eclipse.scout.rt.platform.pluginxml.internal.PluginXmlParser;
 
-/**
- *
- */
 public class ClientBeanContributor implements IBeanContributor {
 
   @Override
@@ -28,5 +25,4 @@ public class ClientBeanContributor implements IBeanContributor {
     PluginXmlParser.get().visit(new ProxyXmlVisitor(context));
     context.registerClass(IconLocator.class);
   }
-
 }

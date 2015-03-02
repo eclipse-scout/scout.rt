@@ -49,7 +49,7 @@ public interface IBeanContext {
   <T> IBean<T> getBean(Class<T> beanClazz);
 
   /**
-   * Nullsave {@link #getBean(Class)}
+   * Null-safe {@link #getBean(Class)}
    *
    * @param beanClazz
    * @return
@@ -82,5 +82,4 @@ public interface IBeanContext {
    * @param bean
    */
   void unregisterBean(IBean<?> bean);
-
 }
