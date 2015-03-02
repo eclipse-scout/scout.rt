@@ -15,7 +15,7 @@ import java.net.CookieManager;
 
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.MultiClientSessionCookieStore;
+import org.eclipse.scout.rt.servicetunnel.http.MultiSessionCookieStore;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner.ClientTest;
 import org.eclipse.scout.testing.client.servicetunnel.http.MultiClientAuthenticator;
 
@@ -27,7 +27,7 @@ import org.eclipse.scout.testing.client.servicetunnel.http.MultiClientAuthentica
  * The custom {@link IClientTestEnvironment} class must use the following <b>fully qualified</b> class name:
  * <p/>
  * <code>org.eclipse.scout.testing.client.runner.CustomClientTestEnvironment</code>
- * 
+ *
  * @author Adrian Moser
  */
 public interface IClientTestEnvironment {
@@ -41,8 +41,8 @@ public interface IClientTestEnvironment {
    * users. The default user can be set using {@link MultiClientAuthenticator#setDefaultUser()}, as opposed to the
    * {@link IServerTestEnvironment} where the default user can be directly set on the test environment. The default user
    * can be overriden by using the {@link ClientTest#runAs()} annotation on your test class.</li>
-   * <li>Set the default {@link CookieManager} to a custom manager based on {@link MultiClientSessionCookieStore} to
-   * support tests with different users.
+   * <li>Set the default {@link CookieManager} to a custom manager based on {@link MultiSessionCookieStore} to support
+   * tests with different users.
    * <li>Use {@link ScoutClientTestRunner#setDefaultClientSessionClass(Class) to set a {@link IClientSession}
    * implementation used for running tests when {@link ClientTest#clientSessionClass()} is not set.</li>
    * </ul>

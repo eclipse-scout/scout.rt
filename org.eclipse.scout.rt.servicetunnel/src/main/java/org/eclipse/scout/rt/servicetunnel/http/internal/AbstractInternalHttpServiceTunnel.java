@@ -240,5 +240,4 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
    */
   protected void preprocessHttpRepsonse(URLConnection urlConn, IServiceTunnelRequest call, int httpCode) {
   }
-
 }

@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.client;
+package org.eclipse.scout.rt.servicetunnel.http;
 
 import java.net.CookieManager;
 import java.net.CookieStore;
@@ -10,23 +10,31 @@ import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
+import org.eclipse.scout.service.SERVICES;
+
 /**
- * HTTP cookie store implementation that distinguishes between different {@link IClientSession} connecting concurrently
- * to the same backend (i.e. same URL).
+ * HTTP cookie store implementation that manages different sets of cookies ("cookie jars"), one per {@link ISession}.
  */
-public class MultiClientSessionCookieStore implements CookieStore {
+public class MultiSessionCookieStore implements CookieStore {
 
   private final ReadWriteLock m_cookieStoresLock = new ReentrantReadWriteLock();
   /**
    * Access to this map synchronized with the ReadWriteLock {@link #m_cookieStoresLock}.
    */
-  private final Map<IClientSession, CookieStore> m_cookieStores;
+  private final Map<ISession, CookieStore> m_cookieStores;
   private final CookieStore m_defaultCookieStore;
 
-  public MultiClientSessionCookieStore() {
+  public MultiSessionCookieStore() {
     // Use a WeakHashMap to ensure that client sessions are not retained when no longer needed.
-    m_cookieStores = new WeakHashMap<IClientSession, CookieStore>();
-    m_defaultCookieStore = new CookieManager().getCookieStore();
+    m_cookieStores = new WeakHashMap<ISession, CookieStore>();
+    m_defaultCookieStore = createInMemoryCookieStore();
+  }
+
+  private CookieStore createInMemoryCookieStore() {
+    // Because java.net.InMemoryCookieStore is package private, this is the only way to create a new instance.
+    return new CookieManager().getCookieStore();
   }
 
   @Override
@@ -60,7 +68,7 @@ public class MultiClientSessionCookieStore implements CookieStore {
   }
 
   private CookieStore getDelegate() {
-    IClientSession currentSession = getClientSession();
+    ISession currentSession = getCurrentSession();
     if (currentSession == null) {
       return m_defaultCookieStore;
     }
@@ -85,7 +93,7 @@ public class MultiClientSessionCookieStore implements CookieStore {
         return cookieStore;
       }
       else {
-        cookieStore = new CookieManager().getCookieStore();
+        cookieStore = createInMemoryCookieStore();
         m_cookieStores.put(currentSession, cookieStore);
         return cookieStore;
       }
@@ -95,14 +103,14 @@ public class MultiClientSessionCookieStore implements CookieStore {
     }
   }
 
-  protected IClientSession getClientSession() {
-    return ClientJob.getCurrentSession();
+  protected ISession getCurrentSession() {
+    return SERVICES.getService(ISessionService.class).getCurrentSession();
   }
 
-  public void sessionStopped(IClientSession clientSession) {
+  public void sessionStopped(ISession session) {
     m_cookieStoresLock.writeLock().lock();
     try {
-      m_cookieStores.remove(clientSession);
+      m_cookieStores.remove(session);
     }
     finally {
       m_cookieStoresLock.writeLock().unlock();

@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.servicetunnel.http.MultiSessionCookieStore;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -29,7 +30,7 @@ import org.mockito.Mockito;
 /**
  * Test class for {@link MultiClientSessionCookieStore}
  */
-public class MultiClientSessionCookieStoreTest {
+public class MultiSessionCookieStoreTest {
 
   private static final HttpCookie COOKIE1 = new HttpCookie("Testname1", "Testvalue1");
   private static final HttpCookie COOKIE2 = new HttpCookie("Testname2", "Testvalue2");
@@ -50,7 +51,7 @@ public class MultiClientSessionCookieStoreTest {
   public void testAddBasic() throws Exception {
     final IClientSession session1 = Mockito.mock(IClientSession.class);
 
-    TestMultiClientSessionCookieStore cookieStore = new TestMultiClientSessionCookieStore();
+    P_TestMultiClientSessionCookieStore cookieStore = new P_TestMultiClientSessionCookieStore();
     // Basic storage test
     cookieStore.setTestClientSession(session1);
     cookieStore.add(s_testuri1, COOKIE1);
@@ -67,7 +68,7 @@ public class MultiClientSessionCookieStoreTest {
    */
   @Test
   public void testNullSession() {
-    TestMultiClientSessionCookieStore cookieStore = new TestMultiClientSessionCookieStore();
+    P_TestMultiClientSessionCookieStore cookieStore = new P_TestMultiClientSessionCookieStore();
     // Dont set a client session. Default handling should happen.
     cookieStore.add(s_testuri1, COOKIE1);
     List<HttpCookie> storedCookies = cookieStore.get(s_testuri1);
@@ -93,7 +94,7 @@ public class MultiClientSessionCookieStoreTest {
   @Test
   public void testAddMultipleClients() throws Exception {
     // Simulate concurrency by changing the client session
-    TestMultiClientSessionCookieStore cookieStore = new TestMultiClientSessionCookieStore();
+    P_TestMultiClientSessionCookieStore cookieStore = new P_TestMultiClientSessionCookieStore();
     cookieStore.setTestClientSession(SESSION1);
     cookieStore.add(s_testuri1, COOKIE1);
 
@@ -116,7 +117,7 @@ public class MultiClientSessionCookieStoreTest {
 
   @Test
   public void testGetCookies() throws Exception {
-    TestMultiClientSessionCookieStore cookieStore = new TestMultiClientSessionCookieStore();
+    P_TestMultiClientSessionCookieStore cookieStore = new P_TestMultiClientSessionCookieStore();
     cookieStore.setTestClientSession(SESSION1);
     createCookies(cookieStore);
 
@@ -128,7 +129,7 @@ public class MultiClientSessionCookieStoreTest {
 
   @Test
   public void testGetURIs() throws Exception {
-    TestMultiClientSessionCookieStore cookieStore = new TestMultiClientSessionCookieStore();
+    P_TestMultiClientSessionCookieStore cookieStore = new P_TestMultiClientSessionCookieStore();
     cookieStore.setTestClientSession(SESSION1);
     createCookies(cookieStore);
 
@@ -138,7 +139,7 @@ public class MultiClientSessionCookieStoreTest {
 
   @Test
   public void testRemoveAll() throws Exception {
-    TestMultiClientSessionCookieStore cookieStore = new TestMultiClientSessionCookieStore();
+    P_TestMultiClientSessionCookieStore cookieStore = new P_TestMultiClientSessionCookieStore();
     cookieStore.setTestClientSession(SESSION1);
     createCookies(cookieStore);
     assertFalse(CollectionUtility.isEmpty(cookieStore.getCookies()));
@@ -153,7 +154,7 @@ public class MultiClientSessionCookieStoreTest {
 
   @Test
   public void testRemoveByUri() throws Exception {
-    TestMultiClientSessionCookieStore cookieStore = new TestMultiClientSessionCookieStore();
+    P_TestMultiClientSessionCookieStore cookieStore = new P_TestMultiClientSessionCookieStore();
     cookieStore.setTestClientSession(SESSION1);
     createCookies(cookieStore);
     assertEquals(2, CollectionUtility.size(cookieStore.getCookies()));
@@ -168,7 +169,7 @@ public class MultiClientSessionCookieStoreTest {
 
   @Test
   public void testSessionStopped() throws Exception {
-    TestMultiClientSessionCookieStore cookieStore = new TestMultiClientSessionCookieStore();
+    P_TestMultiClientSessionCookieStore cookieStore = new P_TestMultiClientSessionCookieStore();
     cookieStore.setTestClientSession(SESSION1);
     createCookies(cookieStore);
     assertFalse(CollectionUtility.isEmpty(cookieStore.getCookies()));
@@ -195,7 +196,7 @@ public class MultiClientSessionCookieStoreTest {
     }
   }
 
-  private void createCookies(TestMultiClientSessionCookieStore cookieStore) {
+  private void createCookies(P_TestMultiClientSessionCookieStore cookieStore) {
     cookieStore.add(s_testuri1, COOKIE1);
     cookieStore.add(s_testuri2, COOKIE2);
   }
@@ -215,19 +216,17 @@ public class MultiClientSessionCookieStoreTest {
     assertEquals(expected.getValue(), actual.getValue());
   }
 
-  private static class TestMultiClientSessionCookieStore extends MultiClientSessionCookieStore {
+  private static class P_TestMultiClientSessionCookieStore extends MultiSessionCookieStore {
 
     private IClientSession m_clientSession;
 
     @Override
-    protected IClientSession getClientSession() {
+    protected IClientSession getCurrentSession() {
       return m_clientSession;
     }
 
     public void setTestClientSession(IClientSession session) {
       m_clientSession = session;
     }
-
   }
-
 }
