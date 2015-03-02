@@ -9,7 +9,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.Executables.IExecutable;
 import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IFutureVisitor;
+import org.eclipse.scout.commons.job.IJobManager;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobContext;
@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  *
  * @since 5.1
  */
-public interface IModelJobManager {
+public interface IModelJobManager extends IJobManager<ClientJobInput> {
 
   /**
    * Runs the given job immediately on behalf of the current model-thread. This call blocks the calling thread as long
@@ -62,6 +62,7 @@ public interface IModelJobManager {
    * @see #runNow(IExecutable, ClientJobInput)
    * @see ClientJobInput#defaults()
    */
+  @Override
   <RESULT> RESULT runNow(IExecutable<RESULT> executable) throws ProcessingException;
 
   /**
@@ -80,6 +81,7 @@ public interface IModelJobManager {
    *           if the executable throws an exception during execution.
    * @see #runNow(IExecutable)
    */
+  @Override
   <RESULT> RESULT runNow(IExecutable<RESULT> executable, ClientJobInput input) throws ProcessingException;
 
   /**
@@ -105,6 +107,7 @@ public interface IModelJobManager {
    * @see #schedule(IExecutable, ClientJobInput)
    * @see ClientJobInput#defaults()
    */
+  @Override
   <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable);
 
   /**
@@ -128,21 +131,62 @@ public interface IModelJobManager {
    * @return {@link IFuture} to wait for the job's completion or to cancel the job execution.
    * @see #schedule(IExecutable)
    */
+  @Override
   <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, ClientJobInput input);
 
   /**
-   * To visit the Futures of the running and pending model jobs.
+   * Runs the given job asynchronously on behalf of the model-thread after the specified delay has elapsed. The caller
+   * of this method continues to run in parallel.The job manager will use a default {@link ClientJobInput} with values
+   * from the current calling context.
+   * <p/>
+   * If the given job is rejected by the job manager the time being scheduled, the job is <code>cancelled</code>. This
+   * occurs if no more threads or queue slots are available, or upon shutdown of the job manager.
+   * <p/>
+   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
+   * immediately block waiting for a job to complete, you can use constructions of the form
+   * <code>result = jobManager.schedule(...).get();</code>.
+   * <p/>
+   * <strong>Do not wait for this job to complete if being a model-job yourself as this would cause a deadlock.</strong>
    *
-   * @param visitor
-   *          {@link IFutureVisitor} called for each {@link Future}.
+   * @param executable
+   *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
+   *          job.
+   * @param delay
+   *          the delay after which the job is to be run.
+   * @param delayUnit
+   *          the time unit of the <code>delay</code> argument.
+   * @return {@link IFuture} to wait for the job's completion or to cancel the job execution.
+   * @see #schedule(IExecutable, long, TimeUnit, ClientJobInput)
+   * @see ClientJobInput#defaults()
    */
-  void visit(IFutureVisitor visitor);
+  @Override
+  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit);
 
   /**
-   * Interrupts a possible running job, rejects pending jobs and interrupts jobs waiting for a blocking condition to
-   * fall. After having shutdown, this job manager cannot be used anymore.
+   * Runs the given job asynchronously on behalf of the model-thread after the specified delay has elapsed. The caller
+   * of this method continues to run in parallel.
+   * <p/>
+   * If the given job is rejected by the job manager the time being scheduled, the job is <code>cancelled</code>. This
+   * occurs if no more threads or queue slots are available, or upon shutdown of the job manager.
+   * <p/>
+   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
+   * immediately block waiting for a job to complete, you can use constructions of the form
+   * <code>result = jobManager.schedule(...).get();</code>.
+   *
+   * @param executable
+   *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
+   *          job.
+   * @param delay
+   *          the delay after which the job is to be run.
+   * @param delayUnit
+   *          the time unit of the <code>delay</code> argument.
+   * @param input
+   *          gives the executable a semantic meaning and contains instructions about its execution.
+   * @return {@link IFuture} to wait for the job's completion or to cancel the job execution.
+   * @see #schedule(IExecutable, long, TimeUnit)
    */
-  void shutdown();
+  @Override
+  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, ClientJobInput input);
 
   /**
    * @return <code>true</code> if the job belonging to the given Future is blocked because waiting for a

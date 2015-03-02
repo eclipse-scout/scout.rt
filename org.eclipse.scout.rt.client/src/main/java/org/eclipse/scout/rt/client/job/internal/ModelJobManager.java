@@ -119,6 +119,17 @@ public class ModelJobManager implements IModelJobManager {
   }
 
   @Override
+  public <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit) {
+    return schedule(executable, delay, delayUnit, createDefaultJobInput());
+  }
+
+  @Override
+  public <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit, final ClientJobInput input) {
+    // TODO [dwi] implement this method.
+    return schedule(executable, input);
+  }
+
+  @Override
   public boolean isBlocked(final Future<?> future) {
     return m_blockedFutures.contains(future);
   }
@@ -427,7 +438,7 @@ public class ModelJobManager implements IModelJobManager {
         }
 
         @Override
-        protected void afterExecute(ModelJobFuture<Void> future) {
+        protected void afterExecute(final ModelJobFuture<Void> future) {
           onMutexAcquired();
         }
 

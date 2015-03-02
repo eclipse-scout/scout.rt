@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.IJobManager;
+import org.eclipse.scout.commons.job.IScheduler;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobContext;
@@ -50,7 +51,7 @@ import org.eclipse.scout.commons.nls.NlsLocale;
  *
  * @since 5.1
  */
-public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT> {
+public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, IScheduler<INPUT> {
 
   protected static final String PROP_CORE_POOL_SIZE = "org.eclipse.scout.job.corePoolSize";
   protected static final int DEFAULT_CORE_POOL_SIZE = 5; // The number of threads to keep in the pool, even if they are idle.

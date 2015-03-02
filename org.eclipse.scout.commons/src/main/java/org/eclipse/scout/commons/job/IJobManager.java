@@ -148,57 +148,6 @@ public interface IJobManager<INPUT extends IJobInput> {
   <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, INPUT input) throws JobExecutionException;
 
   /**
-   * Periodically runs the given job on behalf of a worker thread.<br/>
-   * The first execution is after the given <code>initialDelay</code>, the second after <code>initialDelay+period</code>
-   * , the third after <code>initialDelay+period+period</code> and so on. If an execution takes longer than the
-   * <code>period</code>, the subsequent execution is delayed and starts only once the current execution completed. So
-   * you have kind of mutual exclusion meaning that at any given time, there is only one job running.<br/>
-   * If any execution throws an exception, subsequent executions are suppressed. Otherwise, the job only terminates via
-   * cancellation or termination of the job manager.
-   *
-   * @param runnable
-   *          the runnable to be executed periodically.
-   * @param initialDelay
-   *          the time to delay first run.
-   * @param period
-   *          the period between successive runs.
-   * @param unit
-   *          the time unit of the <code>initialDelay</code> and <code>period</code> arguments.
-   * @param input
-   *          gives the runnable a semantic meaning and contains instructions about its execution.
-   * @return {@link IFuture} to cancel the periodic action.
-   * @throws JobExecutionException
-   *           if the job is rejected by the job manager because no more threads or queue slots are available, or upon
-   *           shutdown of the job manager.
-   */
-  IFuture<Void> scheduleAtFixedRate(IRunnable runnable, long initialDelay, long period, TimeUnit unit, INPUT input) throws JobExecutionException;
-
-  /**
-   * Periodically runs the given job on behalf of a worker thread.<br/>
-   * The first execution is after the given <code>initialDelay</code>, and subsequently with the given
-   * <code>delay</code> between the termination of one execution and the commencement of the next. So you have kind of
-   * mutual exclusion meaning that at any given time, there is only one job running.<br/>
-   * If any execution throws an exception, subsequent executions are suppressed. Otherwise, the job will only terminate
-   * via cancellation or termination of the the job manager.
-   *
-   * @param runnable
-   *          the runnable to be executed periodically.
-   * @param initialDelay
-   *          the time to delay first run.
-   * @param delay
-   *          the fixed delay between successive runs.
-   * @param unit
-   *          the time unit of the <code>initialDelay</code> and <code>period</code> arguments.
-   * @param input
-   *          gives the runnable a semantic meaning and contains instructions about its execution.
-   * @return {@link IFuture} to cancel the periodic action.
-   * @throws JobExecutionException
-   *           if the job is rejected by the job manager because no more threads or queue slots are available, or upon
-   *           shutdown of the job manager.
-   */
-  IFuture<Void> scheduleWithFixedDelay(IRunnable runnable, long initialDelay, long delay, TimeUnit unit, INPUT input) throws JobExecutionException;
-
-  /**
    * To visit all Futures which did not complete yet.
    *
    * @param visitor

@@ -5,6 +5,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IJobManager;
+import org.eclipse.scout.commons.job.IScheduler;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.internal.callable.ExceptionTranslator;
@@ -35,7 +36,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  *
  * @since 5.1
  */
-public interface IClientJobManager extends IJobManager<ClientJobInput> {
+public interface IClientJobManager extends IJobManager<ClientJobInput>, IScheduler<ClientJobInput> {
 
   /**
    * TODO [dwi/aho]: Remove me and replace with CDI.

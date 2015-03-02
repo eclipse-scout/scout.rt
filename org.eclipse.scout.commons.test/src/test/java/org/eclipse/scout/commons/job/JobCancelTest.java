@@ -40,7 +40,7 @@ import org.junit.Test;
 
 public class JobCancelTest {
 
-  private IJobManager<IJobInput> m_jobManager;
+  private JobManager<IJobInput> m_jobManager;
   private static ScheduledExecutorService s_executor;
 
   @BeforeClass
