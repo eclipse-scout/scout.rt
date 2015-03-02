@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
@@ -45,6 +46,7 @@ public class JobInputTest {
     assertEquals(0, input.getId());
     assertNull(input.getSubject());
     assertNull(input.getLocale());
+    assertEquals(IJobInput.INFINITE_EXPIRATION, input.getExpirationTimeMillis());
   }
 
   @Test
@@ -55,6 +57,7 @@ public class JobInputTest {
     input.id(123);
     input.subject(new Subject());
     input.locale(Locale.CANADA_FRENCH);
+    input.expirationTime(10, TimeUnit.MINUTES);
 
     JobInput copy = input.copy();
 
@@ -64,6 +67,7 @@ public class JobInputTest {
     assertEquals(input.getId(), copy.getId());
     assertSame(input.getSubject(), copy.getSubject());
     assertSame(input.getLocale(), copy.getLocale());
+    assertEquals(TimeUnit.MINUTES.toMillis(10), copy.getExpirationTimeMillis());
   }
 
   @Test

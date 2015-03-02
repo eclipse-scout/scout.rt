@@ -13,6 +13,7 @@ package org.eclipse.scout.commons.job;
 import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
@@ -28,6 +29,7 @@ public class JobInput implements IJobInput {
 
   private long m_id;
   private String m_name;
+  private long m_expirationTime = IJobInput.INFINITE_EXPIRATION;
   private Subject m_subject;
   private Locale m_locale;
   private boolean m_preferredLocaleSet;
@@ -42,6 +44,7 @@ public class JobInput implements IJobInput {
   protected JobInput(final JobInput origin) {
     m_id = origin.m_id;
     m_name = origin.m_name;
+    m_expirationTime = origin.m_expirationTime;
     m_subject = origin.m_subject;
     m_locale = origin.m_locale;
     m_preferredLocaleSet = origin.m_preferredLocaleSet;
@@ -64,6 +67,12 @@ public class JobInput implements IJobInput {
   @Override
   public JobInput name(final String name) {
     m_name = name;
+    return this;
+  }
+
+  @Override
+  public JobInput expirationTime(final long time, final TimeUnit timeUnit) {
+    m_expirationTime = timeUnit.toMillis(time);
     return this;
   }
 
@@ -115,6 +124,11 @@ public class JobInput implements IJobInput {
   @Override
   public String getName() {
     return m_name;
+  }
+
+  @Override
+  public long getExpirationTimeMillis() {
+    return m_expirationTime;
   }
 
   @Override

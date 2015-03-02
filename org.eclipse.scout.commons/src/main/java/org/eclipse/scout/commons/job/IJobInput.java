@@ -11,8 +11,11 @@
 package org.eclipse.scout.commons.job;
 
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
+
+import org.eclipse.scout.commons.job.Executables.IExecutable;
 
 /**
  * Describes a job to be executed with instruction details about the job's execution.<br/>
@@ -21,6 +24,12 @@ import javax.security.auth.Subject;
  * @since 5.1
  */
 public interface IJobInput {
+
+  /**
+   * Indicates that an executable always commence execution regardless of how long it was waiting for its execution to
+   * start.
+   */
+  long INFINITE_EXPIRATION = 0;
 
   /**
    * @param id
@@ -37,6 +46,19 @@ public interface IJobInput {
    * @return {@link IJobInput} to be used as builder.
    */
   IJobInput name(String name);
+
+  /**
+   * Sets the maximal expiration time, until a {@link IExecutable} must commence execution; if elapsed, the executable
+   * is discarded and never commence execution; is useful, if using a job manager which, according to its scheduling
+   * rules, might queue scheduled executables prior execution. By default, there is no expiration time used.
+   *
+   * @param time
+   *          the maximal expiration time until an executable must commence execution.
+   * @param timeUnit
+   *          the time unit of the <code>time</code> argument.
+   * @return {@link IJobInput} to be used as builder.
+   */
+  IJobInput expirationTime(long time, TimeUnit timeUnit);
 
   /**
    * @param subject
@@ -68,6 +90,12 @@ public interface IJobInput {
    * @see #name(String)
    */
   String getName();
+
+  /**
+   * @return the maximal expiration time until an executable must commence execution or if elapsed, is discarded; if
+   *         {@link #INFINITE_EXPIRATION}, the executable will always be executed.
+   */
+  long getExpirationTimeMillis();
 
   /**
    * @see #subject(Subject)
