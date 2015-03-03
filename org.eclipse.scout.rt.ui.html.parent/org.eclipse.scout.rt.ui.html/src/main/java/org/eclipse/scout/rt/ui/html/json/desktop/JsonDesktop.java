@@ -86,7 +86,6 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
       attachGlobalAdapter(getModel().getOutline());
       attachGlobalAdapter(getSearchOutline());
     }
-    attachAdapter(getBreadcrumbNavigation());
   }
 
   /**
@@ -196,8 +195,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   protected boolean isFormBased() {
-    // FIXME CGU: add property to desktop.  PROP_FORM_BASED Devicetransformer should set it to true in case of mobile
-    return getJsonSession().getClientSession().getUserAgent().getUiDeviceType().isTouchDevice();
+    return false;
   }
 
   protected List<IForm> getViews() {

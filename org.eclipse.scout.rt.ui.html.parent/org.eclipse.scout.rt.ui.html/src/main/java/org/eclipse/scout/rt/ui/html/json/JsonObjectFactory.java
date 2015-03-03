@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -62,7 +61,6 @@ import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.basic.activitymap.JsonActivityMap;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendar;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonBreadCrumbNavigation;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormToolButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
@@ -264,9 +262,6 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     else if (model instanceof IDataModel) {
       return new JsonDataModel((IDataModel) model, session, id, parent);
-    }
-    else if (model instanceof IBreadCrumbsNavigation) {
-      return new JsonBreadCrumbNavigation((IBreadCrumbsNavigation) model, session, id, parent);
     }
     else if (model instanceof ICalendar) {
       return new JsonCalendar((ICalendar) model, session, id, parent);
