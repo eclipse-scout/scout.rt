@@ -17,15 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
-import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
@@ -46,13 +37,11 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
-import org.eclipse.scout.service.SERVICES;
 import org.json.JSONObject;
 
 public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserver<T> implements IBinaryResourceProvider {
@@ -163,35 +152,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
       putAdapterIdProperty(json, "outline", getModel().getOutline());
       putAdapterIdProperty(json, "searchOutline", getSearchOutline());
     }
-    putAdapterIdProperty(json, "breadCrumbNavigation", getBreadcrumbNavigation());
     return json;
-  }
-
-  protected IBreadCrumbsNavigation getBreadcrumbNavigation() {
-    // Ensure call is in client session context (service will not be available otherwise)
-    if (ClientJob.getCurrentSession() == null) {
-      final IHolder<IBreadCrumbsNavigation> breadCrumbsNavigation = new Holder<>();
-      ClientJob job = new ClientAsyncJob("getBreadcrumbNavigation", getJsonSession().getClientSession()) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          breadCrumbsNavigation.setValue(getBreadcrumbNavigation());
-        }
-      };
-      job.runNow(new NullProgressMonitor());
-      try {
-        job.throwOnError();
-      }
-      catch (ProcessingException e) {
-        throw new JsonException(e);
-      }
-      return breadCrumbsNavigation.getValue();
-    }
-
-    IBreadCrumbsNavigationService service = SERVICES.getService(IBreadCrumbsNavigationService.class);
-    if (service != null) {
-      return service.getBreadCrumbsNavigation();
-    }
-    return null;
   }
 
   protected boolean isFormBased() {

@@ -48,6 +48,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this.url = 'json';
   this._adapterDataCache = {};
   this.objectFactory = new scout.ObjectFactory(this);
+  this._initObjectFactory(options);
   this._texts = new scout.Texts();
   this._customParams;
   this._requestsPendingCounter = 0; // TODO CGU do we really want to have multiple requests pending?
@@ -75,14 +76,31 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this.rootAdapter.init({
     id: '1'
   }, this);
-  this.objectFactory.register(options.objectFactories || scout.defaultObjectFactories);
 
-  // Extract custom parameters from URL
+  this._initCustomParams();
+};
+
+/**
+ * Extracts custom parameters from URL
+ */
+scout.Session.prototype._initCustomParams = function() {
   var customParamMap = new scout.URL().parameterMap;
   for (var prop in customParamMap) {
     this._customParams = this._customParams || {};
     this._customParams[prop] = customParamMap[prop];
   }
+};
+
+scout.Session.prototype._initObjectFactory = function(options) {
+  if (!options.objectFactories) {
+    if (this.userAgent.deviceType === scout.UserAgent.DEVICE_TYPE_MOBILE) {
+      options.objectFactories = scout.mobileObjectFactories;
+    } else {
+      options.objectFactories = scout.defaultObjectFactories;
+    }
+  }
+
+  this.objectFactory.register(options.objectFactories);
 };
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {

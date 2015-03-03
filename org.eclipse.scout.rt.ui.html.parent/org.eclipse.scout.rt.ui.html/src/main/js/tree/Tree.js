@@ -134,6 +134,7 @@ scout.Tree.prototype._render = function($parent) {
   if (this.selectedNodeIds.length > 0) {
     this._renderSelection();
   }
+  this._updateItemPath();
 };
 
 scout.Tree.prototype._remove = function() {
@@ -149,26 +150,24 @@ scout.Tree.prototype.updateScrollbar = function() {
   scout.scrollbars.update(this.$data);
 };
 
-scout.Tree.prototype.setBreadcrumb = function(bread) {
-  if (bread) {
-    this._breadcrumb = true;
+scout.Tree.prototype.setBreadcrumbEnabled = function(enabled) {
+  this._breadcrumb = enabled;
+  if (!enabled) {
+    return;
+  }
 
-    var $selected = this.$selectedNodes();
+  var $selected = this.$selectedNodes();
+  if ($selected.length > 0) {
+    var nodeId = $selected.attr('id'),
+      expanded = $selected.hasClass('expanded'),
+      node = this.nodesMap[nodeId];
 
-    if ($selected.length > 0) {
-      var nodeId = $selected.attr('id'),
-        expanded = $selected.hasClass('expanded'),
-        node = this.nodesMap[nodeId];
-
-      if (!expanded) {
-        this.session.send(this.id, 'nodeAction', {
-          nodeId: nodeId
-        });
-        this.setNodeExpanded(node, $selected, true);
-      }
+    if (!expanded) {
+      this.session.send(this.id, 'nodeAction', {
+        nodeId: nodeId
+      });
+      this.setNodeExpanded(node, $selected, true);
     }
-  } else {
-    this._breadcrumb = false;
   }
 };
 
@@ -860,20 +859,21 @@ scout.Tree.prototype._onNodeControlClick = function(event) {
 };
 
 scout.Tree.prototype._updateItemPath = function() {
-  var $selected = this.$selectedNodes(),
-    level = parseFloat($selected.attr('data-level'));
+  var $selectedNodes, $node, level;
 
   // first remove and select selected
   this.$data.find('.tree-item').removeClass('parent children group');
 
   // if no selection: mark all top elements as children
-  if ($selected.length === 0) {
+  if (this.selectedNodeIds.length === 0) {
     this.$data.children().addClass('children');
     return;
   }
 
   // find direct children
-  var $node = $selected.next();
+  $selectedNodes = this.$selectedNodes();
+  $node = $selectedNodes.next();
+  level = parseFloat($selectedNodes.attr('data-level'));
   while ($node.length > 0) {
     if ($node.hasClass('animationWrapper')) {
       $node = $node.children().first();
@@ -893,11 +893,11 @@ scout.Tree.prototype._updateItemPath = function() {
 
   // find parents
   var $ultimate;
-  if ($selected.parent().hasClass('animationWrapper')) {
+  if ($selectedNodes.parent().hasClass('animationWrapper')) {
     //If node expansion animation is in progress, the nodes are wrapped by a div
-    $selected = $selected.parent();
+    $selectedNodes = $selectedNodes.parent();
   }
-  $node = $selected.prev();
+  $node = $selectedNodes.prev();
   while ($node.length > 0) {
     var k = parseFloat($node.attr('data-level'));
     if (k < level) {
@@ -912,7 +912,7 @@ scout.Tree.prototype._updateItemPath = function() {
   }
 
   // find group with same ultimate parent
-  $ultimate = $ultimate || $selected;
+  $ultimate = $ultimate || $selectedNodes;
   $node = $ultimate;
   while ($node.length > 0) {
     $node.addClass('group');

@@ -231,11 +231,11 @@ scout.DesktopNavigation.prototype._addSplitter = function() {
       if (w <= WIDTH_BREADCRUMB) {
         if (!that.$navigation.hasClass('navigation-breadcrumb')) {
           that.$navigation.addClass('navigation-breadcrumb');
-          that.outline.setBreadcrumb(true);
+          that.outline.setBreadcrumbEnabled(true);
         }
       } else {
         that.$navigation.removeClass('navigation-breadcrumb');
-        that.outline.setBreadcrumb(false);
+        that.outline.setBreadcrumbEnabled(false);
       }
 
       scout.scrollbars.update(that.outline.$container);
