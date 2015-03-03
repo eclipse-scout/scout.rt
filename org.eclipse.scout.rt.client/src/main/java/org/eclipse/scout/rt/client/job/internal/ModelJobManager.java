@@ -248,6 +248,11 @@ public class ModelJobManager implements IModelJobManager {
 
       @Override
       protected void beforeExecute(final IFuture<RESULT> future) {
+        // Check, if the Future is expired and therefore should not be executed.
+        if (isExpired()) {
+          future.cancel(true);
+        }
+
         setModelThread(Thread.currentThread());
 
         IFuture.CURRENT.set(future);

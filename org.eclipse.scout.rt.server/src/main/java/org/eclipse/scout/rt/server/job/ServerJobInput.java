@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.job;
 
 import java.security.AccessControlContext;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
@@ -75,6 +76,11 @@ public class ServerJobInput extends JobInput {
   @Override
   public ServerJobInput name(final String name) {
     return (ServerJobInput) super.name(name);
+  }
+
+  @Override
+  public ServerJobInput expirationTime(final long time, final TimeUnit timeUnit) {
+    return (ServerJobInput) super.expirationTime(time, timeUnit);
   }
 
   @Override

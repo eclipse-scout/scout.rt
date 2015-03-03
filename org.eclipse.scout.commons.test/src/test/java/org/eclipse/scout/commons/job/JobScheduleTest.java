@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -356,6 +358,44 @@ public class JobScheduleTest {
 
     assertTrue(barrier.await());
     barrier.unblock();
+  }
+
+  @Test
+  public void testExpired() throws ProcessingException {
+    final AtomicBoolean executed = new AtomicBoolean(false);
+
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        executed.set(true);
+      }
+    }, 1, TimeUnit.SECONDS, JobInput.empty().expirationTime(500, TimeUnit.MILLISECONDS));
+
+    try {
+      future.get();
+      fail();
+    }
+    catch (JobExecutionException e) {
+      assertFalse(executed.get());
+      assertTrue(e.isCancellation());
+    }
+  }
+
+  @Test
+  public void testExpireNever() throws ProcessingException {
+    final AtomicBoolean executed = new AtomicBoolean(false);
+
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        executed.set(true);
+      }
+    }, 1, TimeUnit.SECONDS, JobInput.empty().expirationTime(IJobInput.INFINITE_EXPIRATION, TimeUnit.MILLISECONDS));
+
+    future.get();
+    assertTrue(executed.get());
   }
 
   @Test

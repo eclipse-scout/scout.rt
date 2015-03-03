@@ -15,6 +15,7 @@ import java.util.concurrent.FutureTask;
 
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.internal.Futures;
 import org.eclipse.scout.commons.job.internal.IProgressMonitorProvider;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -32,10 +33,14 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ModelFutureTask.class);
 
   private final IFuture<RESULT> m_future;
+  private final Long m_expirationDate;
 
   public ModelFutureTask(final Callable<RESULT> callable, final ClientJobInput input, final IProgressMonitorProvider progressMonitorProvider) {
     super(callable);
     m_future = Futures.iFuture(this, input, progressMonitorProvider);
+
+    long expirationTime = input.getExpirationTimeMillis();
+    m_expirationDate = (expirationTime != IJobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + expirationTime : null);
   }
 
   public ModelFutureTask(final ClientJobInput input, final IProgressMonitorProvider progressMonitorProvider) {
@@ -76,6 +81,14 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
         LOG.error("Unexpected error in 'afterExecute'", e);
       }
     }
+  }
+
+  /**
+   * @return <code>true</code> if the expiration time of this Future has elapsed and should be discarded by the job
+   *         manager without running, <code>false</code> otherwise.
+   */
+  protected boolean isExpired() {
+    return (m_expirationDate == null ? false : System.currentTimeMillis() > m_expirationDate);
   }
 
   /**

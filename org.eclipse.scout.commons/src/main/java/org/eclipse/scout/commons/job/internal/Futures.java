@@ -250,6 +250,7 @@ public class Futures {
   public static class JobFuture<RESULT> extends RunnableScheduledFutureDelegate<RESULT> {
 
     private final IFuture<RESULT> m_future;
+    private final Long m_expirationDate;
 
     /**
      * Creates a {@link JobFuture} that delegates to the given Future.
@@ -257,6 +258,8 @@ public class Futures {
     private JobFuture(final RunnableScheduledFuture<RESULT> delegate, final IJobInput input, final IProgressMonitorProvider progressMonitorProvider) {
       super(delegate);
       m_future = Futures.iFuture(this, input, progressMonitorProvider);
+      long expirationTime = input.getExpirationTimeMillis();
+      m_expirationDate = (expirationTime != IJobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + expirationTime : null);
     }
 
     /**
@@ -275,6 +278,14 @@ public class Futures {
 
     public IFuture<RESULT> getFuture() {
       return m_future;
+    }
+
+    /**
+     * @return <code>true</code> if the expiration time of this Future has elapsed and should be discarded by the job
+     *         manager without running, <code>false</code> otherwise.
+     */
+    public boolean isExpired() {
+      return (m_expirationDate == null ? false : System.currentTimeMillis() > m_expirationDate);
     }
   }
 

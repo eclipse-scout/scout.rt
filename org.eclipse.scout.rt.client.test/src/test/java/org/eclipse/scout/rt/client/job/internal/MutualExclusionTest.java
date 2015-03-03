@@ -1179,6 +1179,51 @@ public class MutualExclusionTest {
   }
 
   /**
+   * Tests that a job continues execution after waiting for a blocking condition to fall.
+   */
+  @Test
+  public void testExpiredWhenReAcquiringMutex() throws ProcessingException, InterruptedException {
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+
+    final IBlockingCondition BC = m_jobManager.createBlockingCondition("BC", true);
+
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        protocol.add("1: running");
+        m_jobManager.schedule(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+            BC.setBlocking(false);
+            Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+          }
+        });
+        BC.waitFor();
+        protocol.add("2: running");
+      }
+    }, ClientJobInput.defaults().expirationTime(1, TimeUnit.MILLISECONDS));
+
+    // Wait until entering blocking condition
+    waitForPermitsAcquired(m_jobManager, 0);
+
+    // Expect the job to continue running.
+    try {
+      future.get();
+
+      List<String> expected = new ArrayList<>();
+      expected.add("1: running");
+      expected.add("2: running");
+      assertEquals(expected, protocol);
+    }
+    catch (JobExecutionException e) {
+      fail();
+    }
+  }
+
+  /**
    * Blocks the current thread until the expected number of mutex-permits is acquired; Waits for maximal 30s.
    */
   private static void waitForPermitsAcquired(ModelJobManager jobManager, int expectedPermitCount) throws InterruptedException {

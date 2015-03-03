@@ -226,6 +226,11 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
       protected void beforeExecute(final Thread thread, final Runnable runnableFuture) {
         final JobFuture jobFuture = (JobFuture) runnableFuture;
 
+        // Check, if the Future is expired and therefore should not be executed.
+        if (jobFuture.isExpired()) {
+          jobFuture.cancel(true);
+        }
+
         IFuture.CURRENT.set(jobFuture.getFuture());
         IProgressMonitor.CURRENT.set(jobFuture.getFuture().getProgressMonitor());
       }

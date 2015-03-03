@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -41,6 +42,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobExecutionException;
@@ -484,6 +486,44 @@ public class ModelJobScheduleTest {
     assertEquals("executed", result);
     long delta = tRunning.get() - tScheduled;
     assertTrue(delta >= TimeUnit.SECONDS.toNanos(2));
+  }
+
+  @Test
+  public void testExpired() throws ProcessingException {
+    final AtomicBoolean executed = new AtomicBoolean(false);
+
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        executed.set(true);
+      }
+    }, 1, TimeUnit.SECONDS, ClientJobInput.defaults().expirationTime(500, TimeUnit.MILLISECONDS));
+
+    try {
+      future.get();
+      fail();
+    }
+    catch (JobExecutionException e) {
+      assertFalse(executed.get());
+      assertTrue(e.isCancellation());
+    }
+  }
+
+  @Test
+  public void testExpireNever() throws ProcessingException {
+    final AtomicBoolean executed = new AtomicBoolean(false);
+
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        executed.set(true);
+      }
+    }, 1, TimeUnit.SECONDS, ClientJobInput.defaults().expirationTime(IJobInput.INFINITE_EXPIRATION, TimeUnit.MILLISECONDS));
+
+    future.get();
+    assertTrue(executed.get());
   }
 
   @Test
