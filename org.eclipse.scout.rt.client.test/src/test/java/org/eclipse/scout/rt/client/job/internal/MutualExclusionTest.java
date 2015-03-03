@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.client.job.IBlockingCondition;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.commons.UncaughtExceptionRunnable;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -99,7 +100,7 @@ public class MutualExclusionTest {
 
   @Test(expected = AssertionException.class)
   public void testModelThread() throws ProcessingException {
-    m_jobManager.createBlockingCondition("bc").block();
+    m_jobManager.createBlockingCondition("bc", true).waitFor();
   }
 
   /**
@@ -287,7 +288,7 @@ public class MutualExclusionTest {
   public void testBlockingConditionSingle() throws ProcessingException, InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc");
+    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
 
     IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
 
@@ -306,7 +307,7 @@ public class MutualExclusionTest {
         }
 
         protocol.add("1: beforeAwait");
-        BC.block();
+        BC.waitFor();
         protocol.add("1: afterAwait");
 
         if (m_jobManager.isIdle()) {
@@ -339,7 +340,7 @@ public class MutualExclusionTest {
 
         // RELEASE THE BlockingCondition
         protocol.add("2: beforeSignaling");
-        BC.unblock();
+        BC.setBlocking(false);
         protocol.add("2: afterSignaling");
 
         if (m_jobManager.isIdle()) {
@@ -379,7 +380,7 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockingConditionMultipleFlat() throws ProcessingException, InterruptedException {
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc");
+    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
 
     // run the test 2 times to also test reusability of a blocking condition.
     runTestBlockingConditionMultipleFlat(BC);
@@ -391,7 +392,7 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockingConditionMultipleNested() throws ProcessingException, InterruptedException {
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc");
+    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
 
     // run the test 2 times to also test reusability of a blocking condition.
     runTestBlockingCondition(BC);
@@ -406,7 +407,7 @@ public class MutualExclusionTest {
   @Test
   public void testBlockingCondition_InterruptedWhileBeingBlocked() throws JobExecutionException, InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc");
+    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
@@ -418,7 +419,7 @@ public class MutualExclusionTest {
         protocol.add("running-1");
 
         try {
-          BC.block();
+          BC.waitFor();
         }
         catch (ProcessingException e) {
           if (e.isInterruption()) {
@@ -473,7 +474,7 @@ public class MutualExclusionTest {
   @Test
   public void testBlockingCondition_InterruptedWhileReAcquiringTheMutex() throws ProcessingException, InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc");
+    final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
 
     final BlockingCountDownLatch latchJob2 = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch job1FinishLatch = new BlockingCountDownLatch(1);
@@ -486,7 +487,7 @@ public class MutualExclusionTest {
 
         try {
           protocol.add("before-blocking-1");
-          BC.block();
+          BC.waitFor();
           protocol.add("not-interrupted-1");
         }
         catch (JobExecutionException e) {
@@ -508,7 +509,7 @@ public class MutualExclusionTest {
       @Override
       public void run() throws Exception {
         protocol.add("running-2a");
-        BC.unblock();
+        BC.setBlocking(false);
         protocol.add("before-cancel-job1-2");
         future1.cancel(true); // interrupt job1 while acquiring the mutex
         assertTrue(job1FinishLatch.await());
@@ -750,7 +751,7 @@ public class MutualExclusionTest {
       }
     }).when(executorMock).execute(any(Runnable.class));
 
-    final IBlockingCondition BC = jobManager.createBlockingCondition("bc");
+    final IBlockingCondition BC = jobManager.createBlockingCondition("bc", true);
 
     IFuture<Void> future1 = jobManager.schedule(new IRunnable() {
 
@@ -758,7 +759,7 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         try {
           protocol.add("running-job-1 (a)");
-          BC.block();
+          BC.waitFor();
           protocol.add("running-job-1 (b)");
         }
         catch (JobExecutionException e) {
@@ -776,7 +777,7 @@ public class MutualExclusionTest {
       @Override
       public void run() throws Exception {
         protocol.add("running-job-2 (a)");
-        BC.unblock();
+        BC.setBlocking(false);
 
         // Wait until job-1 tried to re-acquire the mutex.
         waitForPermitsAcquired(jobManager, 4); // 4 = job1(re-acquiring), job2(owner), job3, job4
@@ -845,6 +846,8 @@ public class MutualExclusionTest {
   }
 
   public void runTestBlockingConditionMultipleFlat(final IBlockingCondition BC) throws ProcessingException, InterruptedException {
+    BC.setBlocking(true);
+
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
@@ -852,7 +855,7 @@ public class MutualExclusionTest {
       @Override
       public void run() throws Exception {
         protocol.add("job-1-beforeAwait");
-        BC.block();
+        BC.waitFor();
         protocol.add("job-X-afterAwait");
       }
     });
@@ -862,7 +865,7 @@ public class MutualExclusionTest {
       @Override
       public void run() throws Exception {
         protocol.add("job-2-beforeAwait");
-        BC.block();
+        BC.waitFor();
         protocol.add("job-X-afterAwait");
       }
     });
@@ -872,7 +875,7 @@ public class MutualExclusionTest {
       @Override
       public void run() throws Exception {
         protocol.add("job-3-beforeAwait");
-        BC.block();
+        BC.waitFor();
         protocol.add("job-X-afterAwait");
       }
     });
@@ -901,7 +904,7 @@ public class MutualExclusionTest {
         }
 
         protocol.add("job-5-signaling");
-        BC.unblock();
+        BC.setBlocking(false);
 
         // Wait until the other jobs tried to re-acquire the mutex.
         waitForPermitsAcquired(m_jobManager, 4);
@@ -957,6 +960,8 @@ public class MutualExclusionTest {
   }
 
   private void runTestBlockingCondition(final IBlockingCondition BC) throws InterruptedException, JobExecutionException {
+    BC.setBlocking(true);
+
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     m_jobManager.schedule(new IRunnable() {
@@ -1001,10 +1006,7 @@ public class MutualExclusionTest {
                 });
 
                 protocol.add("job-3-before-signaling");
-                if (BC.hasWaitingThreads()) {
-                  protocol.add("job-3-hasWaitingThreads");
-                }
-                BC.unblock();
+                BC.setBlocking(false);
 
                 waitForPermitsAcquired(m_jobManager, 4); // Wait for the other jobs to have tried re-acquiring the mutex.
 
@@ -1021,13 +1023,13 @@ public class MutualExclusionTest {
             });
 
             protocol.add("job-2-beforeAwait");
-            BC.block();
+            BC.waitFor();
             protocol.add("JOB-X-AFTERAWAIT");
           }
         });
 
         protocol.add("job-1-beforeAwait");
-        BC.block();
+        BC.waitFor();
         protocol.add("JOB-X-AFTERAWAIT");
       }
     });
@@ -1043,7 +1045,6 @@ public class MutualExclusionTest {
     expected.add("job-1-blocked");
     expected.add("job-2-blocked");
     expected.add("job-3-before-signaling");
-    expected.add("job-3-hasWaitingThreads");
     expected.add("job-3-after-signaling");
     expected.add("JOB-X-AFTERAWAIT"); // no guarantee about the sequence in which waiting threads are released when the blocking condition falls.
     expected.add("JOB-X-AFTERAWAIT"); // no guarantee about the sequence in which waiting threads are released when the blocking condition falls.
@@ -1051,6 +1052,130 @@ public class MutualExclusionTest {
     expected.add("job-5-running");
 
     assertEquals(expected, protocol);
+  }
+
+  /**
+   * Tests that an invalidated Blocking condition does not block.
+   */
+  @Test
+  public void testBlockingConditionNotBlocking() throws InterruptedException {
+    final IBlockingCondition BC = m_jobManager.createBlockingCondition("BC", false);
+    m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        BC.waitFor();
+      }
+    });
+    m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        BC.waitFor();
+      }
+    });
+
+    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+
+  }
+
+  /**
+   * A job enters a blocking condition, which in the meantime was invalidated. This test verifies, that the job is not
+   * blocked when calling waitFor.
+   */
+  @Test
+  public void testEnterUnblockedBlockingCondition() throws Throwable {
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+
+    final BlockingCountDownLatch unblockedLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch done = new BlockingCountDownLatch(1);
+
+    final IBlockingCondition BC = m_jobManager.createBlockingCondition("BC", true);
+
+    final UncaughtExceptionRunnable runnable = new UncaughtExceptionRunnable() {
+      @Override
+      protected void runSafe() throws Exception {
+        BC.setBlocking(false);
+        protocol.add("1: afterUnblock [inner]");
+        unblockedLatch.countDown();
+        done.await();
+        protocol.add("4: done");
+      }
+    };
+
+    m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        s_executor.execute(runnable);
+
+        assertTrue(unblockedLatch.await()); // wait until the BC in unblocked
+
+        protocol.add("2: beforeWaitFor [outer]");
+        BC.waitFor();
+        protocol.add("3: afterWaitFor [outer]");
+        done.release();
+      }
+    });
+
+    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    runnable.throwOnError();
+
+    List<String> expected = new ArrayList<>();
+    expected.add("1: afterUnblock [inner]");
+    expected.add("2: beforeWaitFor [outer]");
+    expected.add("3: afterWaitFor [outer]");
+    expected.add("4: done");
+  }
+
+  /**
+   * Job1 gets scheduled and enters blocking condition. If waiting for the condition to fall, the main thread
+   * invalidates the condition. Afterwards, another job gets scheduled which should not wait for the blocking condition
+   * to fall because still invalidated.
+   *
+   * @throws Throwable
+   */
+  @Test
+  public void testReuseUnblockedBlockingCondition() throws Throwable {
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+
+    final IBlockingCondition BC = m_jobManager.createBlockingCondition("BC", true);
+
+    m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        protocol.add("1: beforeWaitFor");
+        BC.waitFor();
+        protocol.add("3: afterWaitFor");
+      }
+    });
+
+    waitForPermitsAcquired(m_jobManager, 0); // Wait until job1 is blocked
+    assertTrue(BC.isBlocking());
+    protocol.add("2: setBlocking=false");
+    BC.setBlocking(false);
+    assertFalse(BC.isBlocking());
+    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+
+    m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        protocol.add("4: beforeWaitFor");
+        BC.waitFor();
+        protocol.add("5: afterWaitFor");
+      }
+    }).get();
+
+    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+
+    List<String> expected = new ArrayList<>();
+    expected.add("1: beforeWaitFor");
+    expected.add("2: setBlocking=false");
+    expected.add("3: afterWaitFor");
+    expected.add("4: beforeWaitFor");
+    expected.add("5: afterWaitFor");
   }
 
   /**

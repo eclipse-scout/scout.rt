@@ -223,8 +223,10 @@ public interface IModelJobManager extends IJobManager<ClientJobInput> {
    * condition is reusable upon unblocking.
    *
    * @param name
-   *          the name of the blocking condition; primarily used for debugging purpose.
+   *          the name of the blocking condition; primarily used for logging purpose.
+   * @param blocking
+   *          initial blocking-state of the blocking condition.
    * @return {@link IBlockingCondition}.
    */
-  IBlockingCondition createBlockingCondition(String name);
+  IBlockingCondition createBlockingCondition(String name, boolean blocking);
 }

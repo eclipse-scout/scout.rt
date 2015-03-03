@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IExecutable;
@@ -171,8 +172,8 @@ public class ModelJobManager implements IModelJobManager {
   }
 
   @Override
-  public IBlockingCondition createBlockingCondition(final String name) {
-    return new BlockingCondition(name);
+  public IBlockingCondition createBlockingCondition(final String name, final boolean blocking) {
+    return new BlockingCondition(name, blocking);
   }
 
   /**
@@ -347,21 +348,40 @@ public class ModelJobManager implements IModelJobManager {
   @Internal
   protected class BlockingCondition implements IBlockingCondition {
 
-    private final AtomicBoolean m_blocking = new AtomicBoolean(); // true if at least one thread is waiting for the condition to fall.
+    private volatile boolean m_blocking;
     private final String m_name;
 
-    public BlockingCondition(final String name) {
-      m_name = Assertions.assertNotNull(name);
+    protected BlockingCondition(final String name, final boolean blocking) {
+      m_name = StringUtility.nvl(name, "n/a");
+      m_blocking = blocking;
     }
 
     @Override
-    public boolean hasWaitingThreads() {
-      return m_blocking.get();
+    public boolean isBlocking() {
+      return m_blocking;
     }
 
     @Override
-    public void block() throws JobExecutionException {
+    public void setBlocking(final boolean blocking) {
+      if (m_blocking != blocking) {
+        synchronized (BlockingCondition.this) {
+          if (m_blocking != blocking) {
+            m_blocking = blocking;
+            if (!blocking) {
+              BlockingCondition.this.notifyAll();
+            }
+          }
+        }
+      }
+    }
+
+    @Override
+    public void waitFor() throws JobExecutionException {
       Assertions.assertTrue(isModelThread(), "Wrong thread: A job can only be blocked on behalf of the model thread. [thread=%s]", Thread.currentThread().getName());
+
+      if (!m_blocking) { // not in monitor yet (volatile)
+        return;
+      }
 
       final IFuture<?> currentFuture = IFuture.CURRENT.get();
 
@@ -370,13 +390,11 @@ public class ModelJobManager implements IModelJobManager {
       // NOT-SYNCHRONIZED-WITH-MUTEX anymore
 
       // Block the calling thread until the blocking condition falls (IBlockingCondition#signalAll).
-      synchronized (m_blocking) {
-        m_blocking.set(true);
-
+      synchronized (BlockingCondition.this) {
         m_blockedFutures.add(currentFuture);
-        while (m_blocking.get()) { // spurious-wakeup safe
+        while (m_blocking) { // spurious-wakeup safe
           try {
-            m_blocking.wait();
+            BlockingCondition.this.wait();
           }
           catch (final InterruptedException e) {
             throw new JobExecutionException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, job=%s]", m_name, currentFuture.getJobInput().getIdentifier()), e);
@@ -435,14 +453,6 @@ public class ModelJobManager implements IModelJobManager {
             throw new JobExecutionException(String.format("Interrupted while re-acquiring the model-mutex [job=%s]", currentFuture.getJobInput().getIdentifier()), e);
           }
         }
-      }
-    }
-
-    @Override
-    public void unblock() {
-      synchronized (m_blocking) {
-        m_blocking.set(false);
-        m_blocking.notifyAll();
       }
     }
   }
