@@ -143,6 +143,7 @@ __include("form/fields/tagcloudfield/TagCloudField.js");
 __include("form/fields/treebox/TreeBox.js");
 __include("form/fields/treebox/TreeBoxLayout.js");
 __include("form/fields/treefield/TreeField.js");
+__include("form/fields/wrappedform/WrappedFormField.js");
 // More misc. elements
 __include("menu/AbstractNavigationButton.js"); // requires Button.js
 __include("menu/NavigateDownButton.js");

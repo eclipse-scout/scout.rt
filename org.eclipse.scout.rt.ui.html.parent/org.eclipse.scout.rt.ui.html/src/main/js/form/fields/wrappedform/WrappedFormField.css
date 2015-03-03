@@ -1,0 +1,15 @@
+.wrapped-form-field > .form {
+
+  /* Reset padding set in GroupBox.css */
+  & > .root-group-box > .group-box-body,
+  & > .root-group-box > .group-box-title {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Reset margin set in Menu.css */
+  & > .menubar {
+    margin-left: @mandatory-indicator-width;
+    margin-right: 0;
+  }
+}

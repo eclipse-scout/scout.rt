@@ -287,6 +287,11 @@ scout.defaultObjectFactories = [{
     return new scout.PlannerField();
   }
 }, {
+  objectType: 'WrappedFormField',
+  create: function() {
+    return new scout.WrappedFormField();
+  }
+}, {
   objectType: 'KeyStroke',
   create: function() {
     return new scout.KeyStroke();

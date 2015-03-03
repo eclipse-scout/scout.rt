@@ -55,6 +55,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.client.ui.form.fields.tagcloudfield.ITagCloudField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
+import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
@@ -89,6 +90,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tagcloudfield.JsonTagCloudField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treebox.JsonTreeBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treefield.JsonTreeField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.wrappedform.JsonWrappedFormField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
@@ -184,6 +186,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (model instanceof IPlannerField<?, ?, ?, ?>) {
       return new JsonPlannerField((IPlannerField<?, ?, ?, ?>) model, session, id, parent);
+    }
+    if (model instanceof IWrappedFormField<?>) {
+      return new JsonWrappedFormField((IWrappedFormField<?>) model, session, id, parent);
     }
 
     // Fallback for all other form fields (will generate a 'not implemented' placeholder). Note: insert more form fields _before_ this line!
