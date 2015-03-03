@@ -25,7 +25,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.IProgressMonitor;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.job.internal.Executables.CallableWithJobInput;
 import org.eclipse.scout.commons.job.internal.Executables.RunnableWithJobInput;
 import org.eclipse.scout.commons.job.internal.callable.ExceptionTranslator;
@@ -119,7 +118,7 @@ public class Futures {
       }
 
       @Override
-      public RESULT get() throws ProcessingException, JobExecutionException {
+      public RESULT get() throws ProcessingException {
         try {
           return delegate.get();
         }
@@ -138,7 +137,7 @@ public class Futures {
       }
 
       @Override
-      public RESULT get(final long timeout, final TimeUnit unit) throws ProcessingException, JobExecutionException {
+      public RESULT get(final long timeout, final TimeUnit unit) throws ProcessingException {
         try {
           return delegate.get(timeout, unit);
         }

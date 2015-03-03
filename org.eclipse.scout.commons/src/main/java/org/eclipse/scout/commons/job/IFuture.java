@@ -85,7 +85,7 @@ public interface IFuture<RESULT> {
    *           see {@link JobExecutionException#isInterruption()};</li>
    *           </ul>
    */
-  RESULT get() throws ProcessingException, JobExecutionException;
+  RESULT get() throws ProcessingException;
 
   /**
    * Blocks the calling thread until the job completed to return its execution result. This call returns immediately if
@@ -109,7 +109,7 @@ public interface IFuture<RESULT> {
    *           see {@link JobExecutionException#isTimeout()};</li>
    *           </ul>
    */
-  RESULT get(long timeout, TimeUnit unit) throws ProcessingException, JobExecutionException;
+  RESULT get(long timeout, TimeUnit unit) throws ProcessingException;
 
   /**
    * @return the {@link Future} this {@link IFuture} delegates to.
