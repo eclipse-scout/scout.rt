@@ -69,10 +69,14 @@ scout.RemoteLookupStrategy.prototype = {
   },
 
   onOptionsLoaded: function(options) {
-    var sf = this._smartField;
     $.log.debug('options loaded: ' + options.length);
-    sf._emptyOptions();
 
+    var sf = this._smartField;
+    if (!sf._$popup) {
+      // Popup might have been closed in the meantime -> ignore result
+      return;
+    }
+    sf._emptyOptions();
     // adjust size of popup to loaded options (cannot know in advance)
     var oldBounds = scout.graphics.getBounds(sf._$popup),
       optionHeight = scout.HtmlEnvironment.formRowHeight,
