@@ -35,8 +35,13 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
     // The client will request the image in a separate http request. See: StaticResourceRequestInterceptor
     putJsonProperty(new JsonProperty<T>(IImageField.PROP_IMAGE, model) {
       @Override
-      protected String modelValue() {
-        BinaryResource image = extractBinaryResource();
+      protected Object modelValue() {
+        return getModel().getImage();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        BinaryResource image = extractBinaryResource(value);
         return image != null ? BinaryResourceUrlUtility.createCallbackUrl(JsonImageField.this, image.getFilename()) : null;
       }
     });
@@ -48,8 +53,7 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
     });
   }
 
-  protected BinaryResource extractBinaryResource() {
-    Object raw = getModel().getImage();
+  protected BinaryResource extractBinaryResource(Object raw) {
     if (raw instanceof BinaryResource) {
       return (BinaryResource) raw;
     }
@@ -65,7 +69,7 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
   // add a sequence-number to the contentId to distinct between different images.
   @Override
   public BinaryResource loadDynamicResource(String filename) {
-    BinaryResource res = extractBinaryResource();
+    BinaryResource res = extractBinaryResource(getModel().getImage());
     if (res != null && filename.equals(res.getFilename())) {
       return res;
     }
