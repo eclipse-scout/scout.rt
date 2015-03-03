@@ -91,6 +91,10 @@
     font-weight: bold;
   }
 
+  &.checkable-col {
+    padding: @table-row-padding-y 4px @table-row-padding-y 4px;
+  }
+
   & label {
     cursor: pointer;
   }

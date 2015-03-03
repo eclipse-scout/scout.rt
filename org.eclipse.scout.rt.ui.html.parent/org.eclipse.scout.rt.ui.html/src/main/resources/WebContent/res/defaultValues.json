@@ -128,7 +128,8 @@
       "sortIndex": -1,
       "summary": false,
       "type": "text",
-      "width": 60
+      "width": 60,
+      "fixedWidth": false
     },
     "TreeNode": {
       "expanded": false,

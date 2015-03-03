@@ -57,6 +57,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     if (getColumn() instanceof ICustomColumn) {
       JsonObjectUtility.putProperty(json, "custom", true);
     }
+    JsonObjectUtility.putProperty(json, IColumn.PROP_FIXED_WIDTH, getColumn().isFixedWidth());
     // FIXME CGU: complete
     return json;
   }

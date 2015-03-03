@@ -10,13 +10,6 @@ scout.TableHeader = function(table, session) {
   this.$container = table.$data.beforeDiv('table-header');
   this.table = table;
   this.columns = table.columns;
-  if (table.checkable) {
-    $defaultCheckedColumHeader = this.$container.appendDiv('header-item')
-      .css('min-width', scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE + 'px')
-      .css('max-width', scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE + 'px')
-      .on('click', '', onHeaderClick);
-    this.$container.appendDiv('header-resize', '');
-  }
 
   for (var i = 0; i < columns.length; i++) {
     column = columns[i];

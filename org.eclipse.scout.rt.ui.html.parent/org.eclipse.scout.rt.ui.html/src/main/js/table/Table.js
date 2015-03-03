@@ -88,6 +88,7 @@ scout.Table.prototype._renderProperties = function() {
   this._renderMenus();
   this._renderTableHeader();
   this._renderTableFooter();
+  this._renderCheckable();
 };
 
 scout.Table.prototype._remove = function() {
@@ -369,10 +370,6 @@ scout.Table.prototype._buildRowDiv = function(row) {
     rowClass += ' selected';
   }
   var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute + '>';
-  if (this.checkable) {
-    // FIXME NBU/CGU maybe better to have a checkbox column added in this.columns instead of treating this case here? would allow for real checkbox columns
-    rowDiv += new scout.CheckBoxColumn().buildCell(row);
-  }
   for (var c = 0; c < this.columns.length; c++) {
     rowDiv += this.columns[c].buildCell(row);
   }
@@ -393,11 +390,6 @@ scout.Table.prototype._getTableRowBorderWidth = function() {
 
 scout.Table.prototype._updateRowWidth = function() {
   this._rowWidth = 0;
-  if (this.checkable) {
-    //TODO NBU if customised checkable colum is implemented use size of customised checkable colum
-    //use size for a checkable column
-    this._rowWidth += scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE;
-  }
   for (var i = 0; i < this.columns.length; i++) {
     this._rowWidth += this.columns[i].width;
   }
@@ -459,7 +451,6 @@ scout.Table.prototype._installRows = function($rows) {
       .on('mouseup', '', onMouseUp)
       .on('dblclick', '', onDoubleClick)
       .on('contextmenu', onContextMenu); // mouseup is used instead of click to make sure the event is fired before mouseup in table selection handler
-    $('.checkable-col label', $row).on('mouseup', $row, onRowChecked);
   });
 
   // update info and scrollbar
@@ -494,7 +485,7 @@ scout.Table.prototype._installRows = function($rows) {
     var hyperLink = that._findHyperLink(event);
     if (hyperLink) {
       that.sendHyperlinkAction($row.data('row').id, column.id, hyperLink);
-    } else {
+    } else if (column.objectType !== 'CheckBoxColumn') {
       that.sendRowClicked($row, column.id);
     }
   }
@@ -548,12 +539,6 @@ scout.Table.prototype._installRows = function($rows) {
         popup.setLocation(new scout.Point(x, y));
       }
     }
-  }
-
-  function onRowChecked(event) {
-    var $row = event.data;
-    var row = $row.data('row');
-    that.checkRow(row, !row.checked);
   }
 };
 
@@ -1076,7 +1061,7 @@ scout.Table.prototype.filteredRows = function(includeSumRows) {
   var filteredRows = [];
   for (var i = 0; i < this.rows.length; i++) {
     var row = this.rows[i];
-    if (row.$row.isVisible()){
+    if (row.$row.isVisible()) {
       filteredRows.push(row);
     }
   }
@@ -1326,8 +1311,10 @@ scout.Table.prototype.hideRow = function($row, useAnimation) {
  * @param resizingInProgress set this to true when calling this function several times in a row. If resizing is finished you have to call resizingColumnFinished.
  */
 scout.Table.prototype.resizeColumn = function(column, width, resizingInProgress) {
+  if (column.fixedWith) {
+    return;
+  }
   var colNum = this.columns.indexOf(column) + 1;
-
   column.width = width;
   this._updateRowWidth();
 
@@ -1355,7 +1342,11 @@ scout.Table.prototype.resizingColumnFinished = function(column, width) {
 };
 
 scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
-  var uiOnlyColumnOffset = 0;
+  var uiOnlyColumnOffset = 0,
+    sendPos = 0;
+  if(this.checkable){
+    sendPos = newPos-1;
+  }
 
   if (this.checkable && newPos === 0) {
     uiOnlyColumnOffset = 1;
@@ -1366,7 +1357,7 @@ scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
 
   var data = {
     columnId: column.id,
-    index: newPos
+    index: sendPos
   };
   this.session.send(this.id, 'columnMoved', data);
 
@@ -1456,6 +1447,39 @@ scout.Table.prototype._renderHeaderVisible = function() {
   this._renderTableHeader();
 };
 
+scout.Table.prototype._renderCheckable = function() {
+  var that = this;
+  if (this.checkable && this.columns[0].objectType !== "CheckBoxColumn") {
+    //checkable column is always set as first col
+    var column = new scout.CheckBoxColumn();
+    column.init();
+    scout.arrays.insert(this.columns, column, 0);
+    for (var i = 0; i < this.rows.length; i++) {
+      var $row = this.rows[i].$row;
+      $row.prepend(column.buildCell(this.rows[i]));
+      $('.checkable-col label', $row).on('mouseup', $row, onRowChecked);
+    }
+    if (this.header) {
+      column.buildHeaderCell(this.header);
+    }
+    this._updateRowWidth();
+    this.$rows(true).css('width', this._rowWidth);
+  } else if (!this.checkable && this.columns[0].objectType === "CheckBoxColumn") {
+    this.splice(0, 1);
+    for (var j = 0; j < this.$rows.length; j++) {
+      this.$rows[j].remove();
+    }
+    this._updateRowWidth();
+    this.$rows(true).css('width', this._rowWidth);
+  }
+
+   function onRowChecked(event) {
+    var $row = event.data;
+    var row = $row.data('row');
+    that.checkRow(row, !row.checked);
+  }
+};
+
 scout.Table.prototype._renderTableHeader = function() {
   if (this.headerVisible && !this.header) {
     this.header = this._createHeader();
@@ -1525,6 +1549,7 @@ scout.Table.prototype._onColumnStructureChanged = function(columns) {
     }
     this._updateRowWidth();
     this.drawData();
+    this._renderCheckable();
   }
 };
 
