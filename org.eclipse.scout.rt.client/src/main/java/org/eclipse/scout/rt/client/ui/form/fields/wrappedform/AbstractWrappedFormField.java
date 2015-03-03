@@ -47,6 +47,11 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     return false;
   }
 
+  @Override
+  protected boolean getConfiguredStatusVisible() {
+    return false;
+  }
+
   @ConfigProperty(ConfigProperty.FORM)
   @Order(200)
   protected Class<? extends IForm> getConfiguredInnerForm() {
