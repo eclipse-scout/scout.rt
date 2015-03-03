@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -464,10 +463,10 @@ public class ModelJobRunNowTest {
 
       @Override
       public void run() throws Exception {
-        final AtomicReference<Future<?>> actualFuture1 = new AtomicReference<>();
-        final AtomicReference<Future<?>> actualFuture2 = new AtomicReference<>();
+        final AtomicReference<IFuture<?>> actualFuture1 = new AtomicReference<>();
+        final AtomicReference<IFuture<?>> actualFuture2 = new AtomicReference<>();
 
-        Future<?> currentFuture = IFuture.CURRENT.get();
+        IFuture<?> currentFuture = IFuture.CURRENT.get();
 
         m_jobManager.runNow(new IRunnable() {
 

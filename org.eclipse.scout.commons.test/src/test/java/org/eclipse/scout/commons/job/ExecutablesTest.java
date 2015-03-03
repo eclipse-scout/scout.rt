@@ -21,12 +21,11 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
-import org.eclipse.scout.commons.job.Executables.CallableWithJobInput;
-import org.eclipse.scout.commons.job.Executables.IExecutable;
-import org.eclipse.scout.commons.job.Executables.RunnableWithJobInput;
+import org.eclipse.scout.commons.job.internal.Executables;
+import org.eclipse.scout.commons.job.internal.Executables.CallableWithJobInput;
+import org.eclipse.scout.commons.job.internal.Executables.RunnableWithJobInput;
 import org.junit.Test;
 
 public class ExecutablesTest {
@@ -119,13 +118,5 @@ public class ExecutablesTest {
     verify(origin, times(1)).call();
     verifyNoMoreInteractions(origin);
     assertSame(input, runnable.getInput());
-  }
-
-  @Test
-  public void testFuture() throws Exception {
-    Future<?> origin = mock(Future.class);
-
-    IFuture<?> future = Executables.future(origin, "FUTURE");
-    assertSame(origin, future.getDelegate());
   }
 }

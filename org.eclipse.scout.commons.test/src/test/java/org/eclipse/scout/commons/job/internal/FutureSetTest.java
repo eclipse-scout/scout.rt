@@ -20,15 +20,15 @@ import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.JobExecutionException;
-import org.eclipse.scout.commons.job.internal.FutureSet.FutureSupplier;
+import org.eclipse.scout.commons.job.internal.FutureSet.IFutureSupplier;
+import org.eclipse.scout.commons.job.internal.Futures.JobFuture;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -37,69 +37,73 @@ import org.mockito.MockitoAnnotations;
 public class FutureSetTest {
 
   @Mock
-  private Future<Void> m_future;
+  private IFuture<Void> m_iFuture;
+
+  @Mock
+  private JobFuture<Void> m_jobFuture;
 
   @Before
   public void before() {
     MockitoAnnotations.initMocks(this);
+    when(m_jobFuture.getFuture()).thenReturn(m_iFuture);
   }
 
   @Test
   public void testPut() throws JobExecutionException {
     FutureSet futureSet = new FutureSet();
-    IFuture<Void> iFuture = futureSet.add("job", new FutureSupplier<Void>() {
+    IFuture<Void> iFuture = futureSet.add(new IFutureSupplier<Void>() {
 
       @Override
-      public Future<Void> get() {
-        return m_future;
+      public JobFuture<Void> supply() {
+        return m_jobFuture;
       }
     });
 
-    assertSame(m_future, iFuture.getDelegate());
-    assertEquals(CollectionUtility.hashSet(m_future), futureSet.copy());
-    assertFalse(m_future.isCancelled());
-    assertFalse(m_future.isDone());
+    assertSame(m_iFuture, iFuture);
+    assertEquals(CollectionUtility.hashSet(m_iFuture), futureSet.copy());
+    assertFalse(m_iFuture.isCancelled());
+    assertFalse(m_iFuture.isDone());
   }
 
   @Test
   public void testPutAndRemove() throws JobExecutionException {
     FutureSet futureSet = new FutureSet();
-    futureSet.add("job", new FutureSupplier<Void>() {
+    futureSet.add(new IFutureSupplier<Void>() {
 
       @Override
-      public Future<Void> get() {
-        return m_future;
+      public JobFuture<Void> supply() {
+        return m_jobFuture;
       }
     });
 
     assertFalse(futureSet.isEmpty());
-    futureSet.remove(m_future);
+    futureSet.remove(m_iFuture);
     assertTrue(futureSet.isEmpty());
   }
 
   @Test
   public void testPutAndClear() throws JobExecutionException {
     FutureSet futureSet = new FutureSet();
-    futureSet.add("job", new FutureSupplier<Void>() {
+    futureSet.add(new IFutureSupplier<Void>() {
 
       @Override
-      public Future<Void> get() {
-        return m_future;
+      public JobFuture<Void> supply() {
+        return m_jobFuture;
       }
     });
 
     assertFalse(futureSet.isEmpty());
-    assertEquals(CollectionUtility.hashSet(m_future), futureSet.clear());
+    assertEquals(CollectionUtility.hashSet(m_iFuture), futureSet.clear());
     assertTrue(futureSet.isEmpty());
   }
 
   @Test(expected = AssertionException.class)
   public void testPutNullFuture() throws JobExecutionException {
     FutureSet futureSet = new FutureSet();
-    futureSet.add("job", new FutureSupplier<Void>() {
+    futureSet.add(new IFutureSupplier<Void>() {
 
       @Override
-      public Future<Void> get() {
+      public JobFuture<Void> supply() {
         return null;
       }
     });
@@ -109,10 +113,10 @@ public class FutureSetTest {
   public void testPutRejected() throws JobExecutionException {
     FutureSet futureSet = new FutureSet();
     try {
-      futureSet.add("job", new FutureSupplier<Void>() {
+      futureSet.add(new IFutureSupplier<Void>() {
 
         @Override
-        public Future<Void> get() {
+        public JobFuture<Void> supply() {
           throw new RejectedExecutionException();
         }
       });
@@ -125,192 +129,168 @@ public class FutureSetTest {
       assertFalse(e.isTimeout());
 
       assertTrue(futureSet.isEmpty());
-      assertFalse(m_future.isCancelled());
-      assertFalse(m_future.isDone());
+      assertFalse(m_iFuture.isCancelled());
+      assertFalse(m_iFuture.isDone());
     }
-  }
-
-  @Test
-  public void testPutCancelled() throws JobExecutionException {
-    FutureSet futureSet = new FutureSet();
-    IFuture<Void> iFuture = futureSet.add("job", new FutureSupplier<Void>() {
-
-      @Override
-      public Future<Void> get() {
-        when(m_future.isCancelled()).thenReturn(true);
-        return m_future;
-      }
-    });
-
-    assertTrue(futureSet.isEmpty());
-    assertSame(m_future, iFuture.getDelegate());
-    assertTrue(m_future.isCancelled());
-    assertFalse(m_future.isDone());
-  }
-
-  @Test
-  public void testPutDone() throws JobExecutionException {
-    FutureSet futureSet = new FutureSet();
-    IFuture<Void> iFuture = futureSet.add("job", new FutureSupplier<Void>() {
-
-      @Override
-      public Future<Void> get() {
-        when(m_future.isDone()).thenReturn(true);
-        return m_future;
-      }
-    });
-
-    assertTrue(futureSet.isEmpty());
-    assertSame(m_future, iFuture.getDelegate());
-    assertTrue(m_future.isDone());
-    assertFalse(m_future.isCancelled());
   }
 
   @SuppressWarnings("unchecked")
   @Test
   public void testVisitAll() throws JobExecutionException {
-    final Future<Void> future1 = mock(Future.class);
-    final Future<Void> future2 = mock(Future.class);
+    final IFuture<Void> iFuture1 = mock(IFuture.class);
+    final IFuture<Void> iFuture2 = mock(IFuture.class);
 
     FutureSet futureSet = new FutureSet();
-    futureSet.add("job", new FutureSupplier<Void>() {
+    futureSet.add(new IFutureSupplier<Void>() {
 
       @Override
-      public Future<Void> get() {
-        return future1;
+      public JobFuture<Void> supply() {
+        final JobFuture<Void> jobFuture = mock(JobFuture.class);
+        when(jobFuture.getFuture()).thenReturn(iFuture1);
+        return jobFuture;
       }
     });
-    futureSet.add("job", new FutureSupplier<Void>() {
+    futureSet.add(new IFutureSupplier<Void>() {
 
       @Override
-      public Future<Void> get() {
-        return future2;
+      public JobFuture<Void> supply() {
+        final JobFuture<Void> jobFuture = mock(JobFuture.class);
+        when(jobFuture.getFuture()).thenReturn(iFuture2);
+        return jobFuture;
       }
     });
 
-    assertEquals(CollectionUtility.hashSet(future1, future2), futureSet.copy());
-
-    final Set<Future<?>> visitedFutures = new HashSet<>();
+    final Set<IFuture<?>> visitedFutures = new HashSet<>();
     futureSet.visit(new IFutureVisitor() {
 
       @Override
-      public boolean visit(Future<?> future) {
+      public boolean visit(IFuture<?> future) {
         visitedFutures.add(future);
         return true;
       }
     });
-    assertEquals(CollectionUtility.hashSet(future1, future2), futureSet.copy());
-    assertEquals(CollectionUtility.hashSet(future1, future2), visitedFutures);
+    assertEquals(CollectionUtility.hashSet(iFuture1, iFuture2), futureSet.copy());
+    assertEquals(CollectionUtility.hashSet(iFuture1, iFuture2), visitedFutures);
   }
 
   @SuppressWarnings("unchecked")
   @Test
   public void testVisitAbort() throws JobExecutionException {
-    final Future<Void> future1 = mock(Future.class);
-    final Future<Void> future2 = mock(Future.class);
+    final IFuture<Void> iFuture1 = mock(IFuture.class);
+    final IFuture<Void> iFuture2 = mock(IFuture.class);
 
     FutureSet futureSet = new FutureSet();
-    futureSet.add("job", new FutureSupplier<Void>() {
+    futureSet.add(new IFutureSupplier<Void>() {
 
       @Override
-      public Future<Void> get() {
-        return future1;
+      public JobFuture<Void> supply() {
+        final JobFuture<Void> jobFuture = mock(JobFuture.class);
+        when(jobFuture.getFuture()).thenReturn(iFuture1);
+        return jobFuture;
       }
     });
-    futureSet.add("job", new FutureSupplier<Void>() {
+    futureSet.add(new IFutureSupplier<Void>() {
 
       @Override
-      public Future<Void> get() {
-        return future2;
+      public JobFuture<Void> supply() {
+        final JobFuture<Void> jobFuture = mock(JobFuture.class);
+        when(jobFuture.getFuture()).thenReturn(iFuture2);
+        return jobFuture;
       }
     });
 
-    assertEquals(CollectionUtility.hashSet(future1, future2), futureSet.copy());
-
-    final Set<Future<?>> visitedFutures = new HashSet<>();
+    final Set<IFuture<?>> visitedFutures = new HashSet<>();
     futureSet.visit(new IFutureVisitor() {
 
       @Override
-      public boolean visit(Future<?> future) {
+      public boolean visit(IFuture<?> future) {
         visitedFutures.add(future);
         return false;
       }
     });
-    assertEquals(CollectionUtility.hashSet(future1, future2), futureSet.copy());
+    assertEquals(CollectionUtility.hashSet(iFuture1, iFuture2), futureSet.copy());
     assertEquals(1, visitedFutures.size());
   }
 
   @SuppressWarnings("unchecked")
   @Test
   public void testVisitDoneFuture() throws JobExecutionException {
-    final Future<Void> future1 = mock(Future.class);
-    final Future<Void> future2 = mock(Future.class);
+    final IFuture<Void> iFuture1 = mock(IFuture.class);
+    final IFuture<Void> iFuture2 = mock(IFuture.class);
 
     FutureSet futureSet = new FutureSet();
-    futureSet.add("job", new FutureSupplier<Void>() {
+    futureSet.add(new IFutureSupplier<Void>() {
 
       @Override
-      public Future<Void> get() {
-        return future1;
+      public JobFuture<Void> supply() {
+        final JobFuture<Void> jobFuture = mock(JobFuture.class);
+        when(jobFuture.getFuture()).thenReturn(iFuture1);
+        return jobFuture;
       }
     });
-    futureSet.add("job", new FutureSupplier<Void>() {
+    futureSet.add(new IFutureSupplier<Void>() {
 
       @Override
-      public Future<Void> get() {
-        return future2;
+      public JobFuture<Void> supply() {
+        final JobFuture<Void> jobFuture = mock(JobFuture.class);
+        when(jobFuture.getFuture()).thenReturn(iFuture2);
+        return jobFuture;
       }
     });
 
     // 'future1' is done in the meantime.
-    when(future1.isDone()).thenReturn(true);
+    when(iFuture1.isDone()).thenReturn(true);
 
-    final Set<Future<?>> visitedFutures = new HashSet<>();
+    final Set<IFuture<?>> visitedFutures = new HashSet<>();
     futureSet.visit(new IFutureVisitor() {
 
       @Override
-      public boolean visit(Future<?> future) {
+      public boolean visit(IFuture<?> future) {
         visitedFutures.add(future);
         return true;
       }
     });
-    assertEquals(CollectionUtility.hashSet(future2), visitedFutures);
+    assertEquals(CollectionUtility.hashSet(iFuture2), visitedFutures);
   }
 
   @SuppressWarnings("unchecked")
   @Test
   public void testVisitCancelledFuture() throws JobExecutionException {
-    final Future<Void> future1 = mock(Future.class);
-    final Future<Void> future2 = mock(Future.class);
+    final IFuture<Void> iFuture1 = mock(IFuture.class);
+    final IFuture<Void> iFuture2 = mock(IFuture.class);
 
     FutureSet futureSet = new FutureSet();
-    futureSet.add("job", new FutureSupplier<Void>() {
+    futureSet.add(new IFutureSupplier<Void>() {
 
       @Override
-      public Future<Void> get() {
-        return future1;
+      public JobFuture<Void> supply() {
+        final JobFuture<Void> jobFuture = mock(JobFuture.class);
+        when(jobFuture.getFuture()).thenReturn(iFuture1);
+        return jobFuture;
       }
     });
-    futureSet.add("job", new FutureSupplier<Void>() {
+    futureSet.add(new IFutureSupplier<Void>() {
 
       @Override
-      public Future<Void> get() {
-        return future2;
+      public JobFuture<Void> supply() {
+        final JobFuture<Void> jobFuture = mock(JobFuture.class);
+        when(jobFuture.getFuture()).thenReturn(iFuture2);
+        return jobFuture;
       }
     });
 
     // 'future1' is cancelled in the meantime.
-    when(future1.isCancelled()).thenReturn(true);
+    when(iFuture1.isCancelled()).thenReturn(true);
 
-    final Set<Future<?>> visitedFutures = new HashSet<>();
+    final Set<IFuture<?>> visitedFutures = new HashSet<>();
     futureSet.visit(new IFutureVisitor() {
 
       @Override
-      public boolean visit(Future<?> future) {
+      public boolean visit(IFuture<?> future) {
         visitedFutures.add(future);
         return true;
       }
     });
-    assertEquals(CollectionUtility.hashSet(future1, future2), visitedFutures);
+    assertEquals(CollectionUtility.hashSet(iFuture1, iFuture2), visitedFutures);
   }
 }

@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -248,8 +247,8 @@ public class JobRunNowTest {
 
   @Test
   public void testCurrentFuture1() throws ProcessingException {
-    final AtomicReference<Future<?>> actualFuture1 = new AtomicReference<>();
-    final AtomicReference<Future<?>> actualFuture2 = new AtomicReference<>();
+    final AtomicReference<IFuture<?>> actualFuture1 = new AtomicReference<>();
+    final AtomicReference<IFuture<?>> actualFuture2 = new AtomicReference<>();
 
     IFuture.CURRENT.remove();
 
@@ -279,8 +278,8 @@ public class JobRunNowTest {
 
   @Test
   public void testCurrentFuture() throws ProcessingException {
-    final AtomicReference<Future<?>> actualFuture1 = new AtomicReference<>();
-    final AtomicReference<Future<?>> actualFuture2 = new AtomicReference<>();
+    final AtomicReference<IFuture<?>> actualFuture1 = new AtomicReference<>();
+    final AtomicReference<IFuture<?>> actualFuture2 = new AtomicReference<>();
 
     IFuture.CURRENT.remove();
 
@@ -303,7 +302,7 @@ public class JobRunNowTest {
 
     future.get();
 
-    assertEquals("same future expected", CollectionUtility.hashSet(future.getDelegate()), CollectionUtility.hashSet(actualFuture1.get(), actualFuture2.get()));
+    assertEquals("same future expected", CollectionUtility.hashSet(future), CollectionUtility.hashSet(actualFuture1.get(), actualFuture2.get()));
 
     assertNull(IFuture.CURRENT.get());
   }

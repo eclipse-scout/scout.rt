@@ -14,11 +14,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IFutureVisitor;
-import org.eclipse.scout.commons.job.internal.JobFuture;
 import org.eclipse.scout.commons.job.internal.JobManager;
 import org.eclipse.scout.commons.job.internal.callable.InitThreadLocalCallable;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -56,22 +56,17 @@ public class ClientJobManager extends JobManager<ClientJobInput> implements ICli
   }
 
   @Override
-  protected <RESULT> JobFuture<RESULT> interceptFuture(final JobFuture<RESULT> future) {
-    return new ClientJobFuture<>(future, (ClientJobInput) future.getInput());
-  }
-
-  @Override
-  public boolean cancel(final long id, final IClientSession clientSession) {
+  public boolean cancel(final String id, final IClientSession clientSession) {
     Assertions.assertNotNull(clientSession);
 
     final Set<Boolean> status = new HashSet<>();
     visit(new IFutureVisitor() {
 
       @Override
-      public boolean visit(final Future<?> future) {
-        final ClientJobInput input = ((ClientJobFuture) future).getInput();
-        if (clientSession.equals(input.getSession()) && id == input.getId()) {
-          status.add(future.cancel(true)); // do not return because multiple jobs might belong to the same id.
+      public boolean visit(final IFuture<?> future) {
+        final ClientJobInput input = (ClientJobInput) future.getJobInput();
+        if (CompareUtility.equals(clientSession, input.getSession()) && CompareUtility.equals(input.getId(), id)) {
+          status.add(future.cancel(true)); // continue visiting because multiple jobs might belong to the same id.
         }
         return true;
       }

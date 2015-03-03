@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.RunnableScheduledFuture;
 
-import org.eclipse.scout.commons.job.internal.JobFuture;
+import org.eclipse.scout.commons.job.internal.Futures.JobFuture;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
@@ -37,8 +37,8 @@ public class ServerJobFuture<RESULT> extends JobFuture<RESULT> {
 
   private final Queue<ITransaction> m_transactions = new ConcurrentLinkedQueue<>(); // because register/unregister and cancel might occur in parallel.
 
-  public ServerJobFuture(final RunnableScheduledFuture<RESULT> delegate, final ServerJobInput input) {
-    super(delegate, input);
+  public ServerJobFuture(final JobFuture<RESULT> delegate) {
+    super(delegate);
   }
 
   /**
@@ -57,11 +57,6 @@ public class ServerJobFuture<RESULT> extends JobFuture<RESULT> {
    */
   public void unregister(final ITransaction transaction) {
     m_transactions.remove(transaction);
-  }
-
-  @Override
-  public ServerJobInput getInput() {
-    return (ServerJobInput) super.getInput();
   }
 
   @Override

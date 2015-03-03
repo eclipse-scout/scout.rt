@@ -12,8 +12,6 @@ package org.eclipse.scout.commons.job;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.job.Executables.IExecutable;
-
 /**
  * Represents a callable to be given to a job manager for execution.
  *

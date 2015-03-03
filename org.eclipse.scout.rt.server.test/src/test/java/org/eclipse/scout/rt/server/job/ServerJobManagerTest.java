@@ -123,7 +123,7 @@ public class ServerJobManagerTest {
               verifyLatch.countDown();
             }
           }
-        }, ServerJobInput.empty().id(1).session(m_serverSession1));
+        }, ServerJobInput.empty().id("1").session(m_serverSession1));
       }
 
       @Override
@@ -139,7 +139,7 @@ public class ServerJobManagerTest {
     assertEquals(1, m_transactions.size());
 
     // run the test
-    assertTrue(m_jobManager.cancel(1, m_serverSession1));
+    assertTrue(m_jobManager.cancel("1", m_serverSession1));
 
     assertTrue(verifyLatch.await());
 
@@ -172,14 +172,14 @@ public class ServerJobManagerTest {
           verifyLatch.countDown();
         }
       }
-    }, ServerJobInput.defaults().id(1));
+    }, ServerJobInput.defaults().id("1"));
 
     assertTrue(setupLatch.await());
 
     assertEquals(1, m_transactions.size());
 
     // run the test
-    assertTrue(m_jobManager.cancel(1, m_serverSession1));
+    assertTrue(m_jobManager.cancel("1", m_serverSession1));
 
     assertTrue(verifyLatch.await());
 
@@ -223,7 +223,7 @@ public class ServerJobManagerTest {
                       protocol.add("job-3-interrupted");
                     }
                   }
-                }, ServerJobInput.empty().id(3).session(m_serverSession1));
+                }, ServerJobInput.empty().id("3").session(m_serverSession1));
                 latch3.await();
 
                 m_jobManager.runNow(new IRunnable() {
@@ -232,7 +232,7 @@ public class ServerJobManagerTest {
                   public void run() throws Exception {
                     // NOOP
                   }
-                }, ServerJobInput.empty().id(4).session(m_serverSession1));
+                }, ServerJobInput.empty().id("4").session(m_serverSession1));
 
                 m_jobManager.runNow(new IRunnable() {
 
@@ -250,21 +250,21 @@ public class ServerJobManagerTest {
                     }
                     verifyLatch.countDown();
                   }
-                }, ServerJobInput.empty().id(5).session(m_serverSession1));
+                }, ServerJobInput.empty().id("5").session(m_serverSession1));
 
                 if (IProgressMonitor.CURRENT.get().isCancelled()) {
                   protocol.add("job-2-cancelled");
                 }
                 verifyLatch.countDown();
               }
-            }, ServerJobInput.empty().id(2).session(m_serverSession2));
+            }, ServerJobInput.empty().id("2").session(m_serverSession2));
 
             if (IProgressMonitor.CURRENT.get().isCancelled()) {
               protocol.add("job-1-cancelled");
             }
             verifyLatch.countDown();
           }
-        }, ServerJobInput.empty().id(1).session(m_serverSession1));
+        }, ServerJobInput.empty().id("1").session(m_serverSession1));
       }
 
       @Override
@@ -280,12 +280,12 @@ public class ServerJobManagerTest {
     assertEquals(5, m_transactions.size());
 
     // test cancel of inner jobs (expected=no effect)
-    assertFalse(m_jobManager.cancel(5, m_serverSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
-    assertFalse(m_jobManager.cancel(4, m_serverSession1)); // already finished
-    assertFalse(m_jobManager.cancel(2, m_serverSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
+    assertFalse(m_jobManager.cancel("5", m_serverSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
+    assertFalse(m_jobManager.cancel("4", m_serverSession1)); // already finished
+    assertFalse(m_jobManager.cancel("2", m_serverSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
 
     // test cancel with wrong session (expected=no effect)
-    assertFalse(m_jobManager.cancel(1, m_serverSession2));
+    assertFalse(m_jobManager.cancel("1", m_serverSession2));
     verify(m_transactions.get(0), never()).cancel();
     verify(m_transactions.get(1), never()).cancel();
     verify(m_transactions.get(2), never()).cancel();
@@ -293,7 +293,7 @@ public class ServerJobManagerTest {
     verify(m_transactions.get(4), never()).cancel();
 
     // test cancel
-    assertTrue(m_jobManager.cancel(1, m_serverSession1));
+    assertTrue(m_jobManager.cancel("1", m_serverSession1));
 
     assertTrue(verifyLatch.await());
 
@@ -337,7 +337,7 @@ public class ServerJobManagerTest {
                   protocol.add("job-3-interrupted");
                 }
               }
-            }, ServerJobInput.defaults().id(3));
+            }, ServerJobInput.defaults().id("3"));
             latch3.await();
 
             m_jobManager.runNow(new IRunnable() {
@@ -346,7 +346,7 @@ public class ServerJobManagerTest {
               public void run() throws Exception {
                 // NOOP
               }
-            }, ServerJobInput.defaults().id(4));
+            }, ServerJobInput.defaults().id("4"));
 
             m_jobManager.runNow(new IRunnable() {
 
@@ -364,33 +364,33 @@ public class ServerJobManagerTest {
                 }
                 verifyLatch.countDown();
               }
-            }, ServerJobInput.defaults().id(5));
+            }, ServerJobInput.defaults().id("5"));
 
             if (IProgressMonitor.CURRENT.get().isCancelled()) {
               protocol.add("job-2-cancelled");
             }
             verifyLatch.countDown();
           }
-        }, ServerJobInput.defaults().id(2).session(m_serverSession2));
+        }, ServerJobInput.defaults().id("2").session(m_serverSession2));
 
         if (IProgressMonitor.CURRENT.get().isCancelled()) {
           protocol.add("job-1-cancelled");
         }
         verifyLatch.countDown();
       }
-    }, ServerJobInput.defaults().id(1));
+    }, ServerJobInput.defaults().id("1"));
 
     assertTrue(setupLatch.await());
 
     assertEquals(5, m_transactions.size());
 
     // test cancel of inner jobs (expected=no effect)
-    assertFalse(m_jobManager.cancel(5, m_serverSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
-    assertFalse(m_jobManager.cancel(4, m_serverSession1)); // already finished
-    assertFalse(m_jobManager.cancel(2, m_serverSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
+    assertFalse(m_jobManager.cancel("5", m_serverSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
+    assertFalse(m_jobManager.cancel("4", m_serverSession1)); // already finished
+    assertFalse(m_jobManager.cancel("2", m_serverSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
 
     // test cancel with wrong session (expected=no effect)
-    assertFalse(m_jobManager.cancel(1, m_serverSession2));
+    assertFalse(m_jobManager.cancel("1", m_serverSession2));
     verify(m_transactions.get(0), never()).cancel();
     verify(m_transactions.get(1), never()).cancel();
     verify(m_transactions.get(2), never()).cancel();
@@ -398,7 +398,7 @@ public class ServerJobManagerTest {
     verify(m_transactions.get(4), never()).cancel();
 
     // test cancel
-    assertTrue(m_jobManager.cancel(1, m_serverSession1));
+    assertTrue(m_jobManager.cancel("1", m_serverSession1));
 
     assertTrue(verifyLatch.await());
 
@@ -418,7 +418,7 @@ public class ServerJobManagerTest {
   public void testCancelMultipleJobsWithSameId() throws Exception {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>());
 
-    final int commonJobId = 777;
+    final String commonJobId = "777";
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(4);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(3);
@@ -479,7 +479,7 @@ public class ServerJobManagerTest {
             }
             verifyLatch.countDown();
           }
-        }, ServerJobInput.defaults().id(123));
+        }, ServerJobInput.defaults().id("123"));
       }
     }, ServerJobInput.defaults().id(commonJobId));
     assertTrue(txOrderLatch3.await());

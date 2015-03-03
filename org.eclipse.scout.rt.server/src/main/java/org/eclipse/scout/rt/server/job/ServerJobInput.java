@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.Assertions.AssertionException;
+import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobInput;
@@ -67,7 +68,7 @@ public class ServerJobInput extends JobInput {
   }
 
   @Override
-  public ServerJobInput id(final long id) {
+  public ServerJobInput id(final String id) {
     return (ServerJobInput) super.id(id);
   }
 
@@ -206,6 +207,21 @@ public class ServerJobInput extends JobInput {
    */
   public UserAgent getUserAgent() {
     return m_userAgent;
+  }
+
+  @Override
+  public String toString() {
+    final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("id", getId());
+    builder.attr("name", getName());
+    builder.attr("subject", getSubject());
+    builder.attr("locale", getLocale());
+    builder.ref("session", getSession());
+    builder.attr("sessionRequired", isSessionRequired());
+    builder.attr("userAgent", getUserAgent());
+    builder.ref("servletRequest", getUserAgent());
+    builder.ref("servletResponse", getUserAgent());
+    return builder.toString();
   }
 
   /**

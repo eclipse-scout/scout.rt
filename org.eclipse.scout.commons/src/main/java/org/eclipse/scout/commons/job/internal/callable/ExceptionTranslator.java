@@ -66,7 +66,7 @@ public class ExceptionTranslator<RESULT> implements Callable<RESULT>, Chainable<
     catch (final Throwable t) {
       final ProcessingException pe = ExceptionTranslator.translate(t);
       pe.addContextMessage(String.format("identity=%s", getIdentity()));
-      pe.addContextMessage(String.format("job=%s", m_input.getIdentifier("n/a")));
+      pe.addContextMessage(String.format("job=%s", m_input.getIdentifier()));
 
       throw pe;
     }

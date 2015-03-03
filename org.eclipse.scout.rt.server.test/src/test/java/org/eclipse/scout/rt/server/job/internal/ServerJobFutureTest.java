@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,8 +25,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.concurrent.RunnableScheduledFuture;
 
+import org.eclipse.scout.commons.job.internal.Futures;
+import org.eclipse.scout.commons.job.internal.Futures.JobFuture;
+import org.eclipse.scout.commons.job.internal.IProgressMonitorProvider;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.internal.ServerJobFuture;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,13 +41,13 @@ public class ServerJobFutureTest {
   @Mock
   private RunnableScheduledFuture<Void> m_delegate;
   @Mock
-  private ServerJobInput m_input;
-  @Mock
   private ITransaction m_tx1;
   @Mock
   private ITransaction m_tx2;
   @Mock
   private ITransaction m_tx3;
+
+  private JobFuture<Void> m_jobFuture;
 
   @Before
   public void before() {
@@ -54,11 +57,14 @@ public class ServerJobFutureTest {
     when(m_tx1.cancel()).thenReturn(true);
     when(m_tx2.cancel()).thenReturn(true);
     when(m_tx3.cancel()).thenReturn(true);
+
+    m_jobFuture = Futures.jobFuture(m_delegate, ServerJobInput.empty(), mock(IProgressMonitorProvider.class));
   }
 
   @Test
   public void testCancelSuccess() {
-    ServerJobFuture future = new ServerJobFuture<>(m_delegate, m_input);
+    ServerJobFuture future = new ServerJobFuture<>(m_jobFuture);
+
     future.register(m_tx1);
     future.register(m_tx2);
     future.register(m_tx3);
@@ -85,7 +91,8 @@ public class ServerJobFutureTest {
   public void testCancelFailed() {
     when(m_delegate.cancel(anyBoolean())).thenReturn(false);
 
-    ServerJobFuture future = new ServerJobFuture<>(m_delegate, m_input);
+    ServerJobFuture future = new ServerJobFuture<>(m_jobFuture);
+
     future.register(m_tx1);
     future.register(m_tx2);
     future.register(m_tx3);
@@ -112,7 +119,8 @@ public class ServerJobFutureTest {
   public void testAlreadyCancelled() {
     when(m_delegate.isCancelled()).thenReturn(true);
 
-    ServerJobFuture future = new ServerJobFuture<>(m_delegate, m_input);
+    ServerJobFuture future = new ServerJobFuture<>(m_jobFuture);
+
     future.register(m_tx1);
     future.register(m_tx2);
     future.register(m_tx3);
@@ -132,7 +140,8 @@ public class ServerJobFutureTest {
   public void testTxCancelFailed() {
     when(m_tx2.cancel()).thenReturn(false);
 
-    ServerJobFuture future = new ServerJobFuture<>(m_delegate, m_input);
+    ServerJobFuture future = new ServerJobFuture<>(m_jobFuture);
+
     future.register(m_tx1);
     future.register(m_tx2);
     future.register(m_tx3);
@@ -159,7 +168,8 @@ public class ServerJobFutureTest {
   public void testTxCancelException() {
     when(m_tx2.cancel()).thenThrow(new RuntimeException("tx-cancel-exception"));
 
-    ServerJobFuture future = new ServerJobFuture<>(m_delegate, m_input);
+    ServerJobFuture future = new ServerJobFuture<>(m_jobFuture);
+
     future.register(m_tx1);
     future.register(m_tx2);
     future.register(m_tx3);

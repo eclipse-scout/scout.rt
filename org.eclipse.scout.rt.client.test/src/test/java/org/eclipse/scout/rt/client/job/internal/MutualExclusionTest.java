@@ -29,7 +29,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -451,7 +450,7 @@ public class MutualExclusionTest {
     });
 
     setupLatch.await();
-    assertTrue(m_jobManager.isBlocked(future1.getDelegate()));
+    assertTrue(m_jobManager.isBlocked(future1));
 
     // RUN THE TEST
     future1.cancel(true);
@@ -543,9 +542,9 @@ public class MutualExclusionTest {
 
     assertEquals(expectedProtocol, protocol);
 
-    assertFalse(m_jobManager.isBlocked(future1.getDelegate())); // the blocking condition is reversed but still job1 is  not running yet because waiting for the mutex.
-    assertFalse(m_jobManager.isBlocked(future2.getDelegate()));
-    assertFalse(m_jobManager.isBlocked(future3.getDelegate()));
+    assertFalse(m_jobManager.isBlocked(future1)); // the blocking condition is reversed but still job1 is  not running yet because waiting for the mutex.
+    assertFalse(m_jobManager.isBlocked(future2));
+    assertFalse(m_jobManager.isBlocked(future3));
 
     assertTrue(future1.isCancelled());
     try {
@@ -620,7 +619,7 @@ public class MutualExclusionTest {
 
       @Override
       public Void answer(InvocationOnMock invocation) throws Throwable {
-        final ModelJobFuture<?> runnable = (ModelJobFuture) invocation.getArguments()[0];
+        final ModelFutureTask<?> runnable = (ModelFutureTask<?>) invocation.getArguments()[0];
 
         switch (count.incrementAndGet()) {
           case 1: // job-1: RUN
@@ -639,7 +638,7 @@ public class MutualExclusionTest {
             });
             break;
           case 2: // job-2: REJECT
-            jobManager.handleJobRejected(runnable);
+            runnable.reject();
             break;
           case 3: // job-3: RUN
             s_executor.execute(new Runnable() {
@@ -714,7 +713,7 @@ public class MutualExclusionTest {
 
       @Override
       public Void answer(InvocationOnMock invocation) throws Throwable {
-        final ModelJobFuture<?> runnable = (ModelJobFuture) invocation.getArguments()[0];
+        final ModelFutureTask<?> runnable = (ModelFutureTask<?>) invocation.getArguments()[0];
 
         switch (count.incrementAndGet()) {
           case 1: // job-1: RUN
@@ -744,7 +743,7 @@ public class MutualExclusionTest {
             });
             break;
           case 3: // job-1:  re-acquires the mutex after being released from the blocking condition
-            jobManager.handleJobRejected(runnable);
+            runnable.reject();
             break;
         }
         return null;
@@ -891,13 +890,13 @@ public class MutualExclusionTest {
       @Override
       public void run() throws Exception {
         protocol.add("job-5-running");
-        if (m_jobManager.isBlocked(future1.getDelegate())) {
+        if (m_jobManager.isBlocked(future1)) {
           protocol.add("job-1-blocked");
         }
-        if (m_jobManager.isBlocked(future2.getDelegate())) {
+        if (m_jobManager.isBlocked(future2)) {
           protocol.add("job-2-blocked");
         }
-        if (m_jobManager.isBlocked(future3.getDelegate())) {
+        if (m_jobManager.isBlocked(future3)) {
           protocol.add("job-3-blocked");
         }
 
@@ -907,13 +906,13 @@ public class MutualExclusionTest {
         // Wait until the other jobs tried to re-acquire the mutex.
         waitForPermitsAcquired(m_jobManager, 4);
 
-        if (!m_jobManager.isBlocked(future1.getDelegate())) {
+        if (!m_jobManager.isBlocked(future1)) {
           protocol.add("job-1-unblocked");
         }
-        if (!m_jobManager.isBlocked(future2.getDelegate())) {
+        if (!m_jobManager.isBlocked(future2)) {
           protocol.add("job-2-unblocked");
         }
-        if (!m_jobManager.isBlocked(future3.getDelegate())) {
+        if (!m_jobManager.isBlocked(future3)) {
           protocol.add("job-3-unblocked");
         }
 
@@ -964,7 +963,7 @@ public class MutualExclusionTest {
 
       @Override
       public void run() throws Exception {
-        final Future<?> future1 = IFuture.CURRENT.get();
+        final IFuture<?> iFuture1 = IFuture.CURRENT.get();
 
         protocol.add("job-1-running");
 
@@ -972,11 +971,11 @@ public class MutualExclusionTest {
 
           @Override
           public void run() throws Exception {
-            final Future<?> future2 = IFuture.CURRENT.get();
+            final IFuture<?> iFuture2 = IFuture.CURRENT.get();
 
             protocol.add("job-2-running");
 
-            if (m_jobManager.isBlocked(future1)) {
+            if (m_jobManager.isBlocked(iFuture1)) {
               protocol.add("job-1-blocked");
             }
 
@@ -986,10 +985,10 @@ public class MutualExclusionTest {
               public void run() throws Exception {
                 protocol.add("job-3-running");
 
-                if (m_jobManager.isBlocked(future1)) {
+                if (m_jobManager.isBlocked(iFuture1)) {
                   protocol.add("job-1-blocked");
                 }
-                if (m_jobManager.isBlocked(future2)) {
+                if (m_jobManager.isBlocked(iFuture2)) {
                   protocol.add("job-2-blocked");
                 }
 

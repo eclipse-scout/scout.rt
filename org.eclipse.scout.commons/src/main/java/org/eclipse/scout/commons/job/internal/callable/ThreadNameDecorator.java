@@ -34,7 +34,7 @@ public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, Chainable<
   @Internal
   protected final Callable<RESULT> m_next;
   @Internal
-  protected final String m_name;
+  protected final String m_identifier;
 
   /**
    * Creates a processor to decorate the thread-name of the worker-thread with the job name.
@@ -46,7 +46,7 @@ public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, Chainable<
    */
   public ThreadNameDecorator(final Callable<RESULT> next, final IJobInput input) {
     m_next = Assertions.assertNotNull(next);
-    m_name = input.getIdentifier(null);
+    m_identifier = input.getIdentifier();
   }
 
   @Override
@@ -57,11 +57,11 @@ public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, Chainable<
     final String originalThreadName = getOriginalThreadName(oldThreadName);
 
     final String newThreadName;
-    if (m_name == null) {
+    if (IJobInput.IDENTIFIER_UNKNOWN.equals(m_identifier)) {
       newThreadName = originalThreadName;
     }
     else {
-      newThreadName = String.format("%s;job:%s", originalThreadName, m_name);
+      newThreadName = String.format("%s;job:%s", originalThreadName, m_identifier);
     }
 
     thread.setName(newThreadName);

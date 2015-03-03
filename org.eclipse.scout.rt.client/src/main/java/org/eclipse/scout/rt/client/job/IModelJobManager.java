@@ -1,13 +1,12 @@
 package org.eclipse.scout.rt.client.job;
 
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.Executables.IExecutable;
 import org.eclipse.scout.commons.job.ICallable;
+import org.eclipse.scout.commons.job.IExecutable;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IJobManager;
 import org.eclipse.scout.commons.job.IProgressMonitor;
@@ -193,7 +192,7 @@ public interface IModelJobManager extends IJobManager<ClientJobInput> {
    *         {@link IBlockingCondition} to fall.
    * @see IBlockingCondition
    */
-  boolean isBlocked(Future<?> future);
+  boolean isBlocked(IFuture<?> future);
 
   /**
    * @return <code>true</code> if the calling thread is the model-thread.

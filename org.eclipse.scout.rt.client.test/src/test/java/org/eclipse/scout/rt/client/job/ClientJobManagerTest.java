@@ -107,7 +107,7 @@ public class ClientJobManagerTest {
               verifyLatch.countDown();
             }
           }
-        }, ClientJobInput.empty().id(1).session(m_clientSession1));
+        }, ClientJobInput.empty().id("1").session(m_clientSession1));
       }
 
       @Override
@@ -121,7 +121,7 @@ public class ClientJobManagerTest {
     runnable.throwOnError();
 
     // run the test
-    assertTrue(m_jobManager.cancel(1, m_clientSession1));
+    assertTrue(m_jobManager.cancel("1", m_clientSession1));
 
     assertTrue(verifyLatch.await());
 
@@ -153,12 +153,12 @@ public class ClientJobManagerTest {
           verifyLatch.countDown();
         }
       }
-    }, ClientJobInput.defaults().id(1));
+    }, ClientJobInput.defaults().id("1"));
 
     assertTrue(setupLatch.await());
 
     // run the test
-    assertTrue(m_jobManager.cancel(1, m_clientSession1));
+    assertTrue(m_jobManager.cancel("1", m_clientSession1));
 
     assertTrue(verifyLatch.await());
 
@@ -201,7 +201,7 @@ public class ClientJobManagerTest {
                       protocol.add("job-3-interrupted");
                     }
                   }
-                }, ClientJobInput.empty().id(3).session(m_clientSession1));
+                }, ClientJobInput.empty().id("3").session(m_clientSession1));
                 latch3.await();
 
                 m_jobManager.runNow(new IRunnable() {
@@ -210,7 +210,7 @@ public class ClientJobManagerTest {
                   public void run() throws Exception {
                     // NOOP
                   }
-                }, ClientJobInput.empty().id(4).session(m_clientSession1));
+                }, ClientJobInput.empty().id("4").session(m_clientSession1));
 
                 m_jobManager.runNow(new IRunnable() {
 
@@ -228,21 +228,21 @@ public class ClientJobManagerTest {
                     }
                     verifyLatch.countDown();
                   }
-                }, ClientJobInput.empty().id(5).session(m_clientSession1));
+                }, ClientJobInput.empty().id("5").session(m_clientSession1));
 
                 if (IProgressMonitor.CURRENT.get().isCancelled()) {
                   protocol.add("job-2-cancelled");
                 }
                 verifyLatch.countDown();
               }
-            }, ClientJobInput.empty().id(2).session(m_clientSession2));
+            }, ClientJobInput.empty().id("2").session(m_clientSession2));
 
             if (IProgressMonitor.CURRENT.get().isCancelled()) {
               protocol.add("job-1-cancelled");
             }
             verifyLatch.countDown();
           }
-        }, ClientJobInput.empty().id(1).session(m_clientSession1));
+        }, ClientJobInput.empty().id("1").session(m_clientSession1));
       }
 
       @Override
@@ -256,15 +256,15 @@ public class ClientJobManagerTest {
     runnable.throwOnError();
 
     // test cancel of inner jobs (expected=no effect)
-    assertFalse(m_jobManager.cancel(5, m_clientSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
-    assertFalse(m_jobManager.cancel(4, m_clientSession1)); // already finished
-    assertFalse(m_jobManager.cancel(2, m_clientSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
+    assertFalse(m_jobManager.cancel("5", m_clientSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
+    assertFalse(m_jobManager.cancel("4", m_clientSession1)); // already finished
+    assertFalse(m_jobManager.cancel("2", m_clientSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
 
     // test cancel with wrong session (expected=no effect)
-    assertFalse(m_jobManager.cancel(1, m_clientSession2));
+    assertFalse(m_jobManager.cancel("1", m_clientSession2));
 
     // test cancel
-    assertTrue(m_jobManager.cancel(1, m_clientSession1));
+    assertTrue(m_jobManager.cancel("1", m_clientSession1));
 
     assertTrue(verifyLatch.await());
 
@@ -303,7 +303,7 @@ public class ClientJobManagerTest {
                   protocol.add("job-3-interrupted");
                 }
               }
-            }, ClientJobInput.defaults().id(3).session(m_clientSession1));
+            }, ClientJobInput.defaults().id("3").session(m_clientSession1));
             latch3.await();
 
             m_jobManager.runNow(new IRunnable() {
@@ -312,7 +312,7 @@ public class ClientJobManagerTest {
               public void run() throws Exception {
                 // NOOP
               }
-            }, ClientJobInput.defaults().id(4).session(m_clientSession1));
+            }, ClientJobInput.defaults().id("4").session(m_clientSession1));
 
             m_jobManager.runNow(new IRunnable() {
 
@@ -330,34 +330,34 @@ public class ClientJobManagerTest {
                 }
                 verifyLatch.countDown();
               }
-            }, ClientJobInput.defaults().id(5).session(m_clientSession1));
+            }, ClientJobInput.defaults().id("5").session(m_clientSession1));
 
             if (IProgressMonitor.CURRENT.get().isCancelled()) {
               protocol.add("job-2-cancelled");
             }
             verifyLatch.countDown();
           }
-        }, ClientJobInput.defaults().id(2).session(m_clientSession1));
+        }, ClientJobInput.defaults().id("2").session(m_clientSession1));
 
         if (IProgressMonitor.CURRENT.get().isCancelled()) {
           protocol.add("job-1-cancelled");
         }
         verifyLatch.countDown();
       }
-    }, ClientJobInput.defaults().id(1).session(m_clientSession1));
+    }, ClientJobInput.defaults().id("1").session(m_clientSession1));
 
     assertTrue(setupLatch.await());
 
     // test cancel of inner jobs (expected=no effect)
-    assertFalse(m_jobManager.cancel(5, m_clientSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
-    assertFalse(m_jobManager.cancel(4, m_clientSession1)); // already finished
-    assertFalse(m_jobManager.cancel(2, m_clientSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
+    assertFalse(m_jobManager.cancel("5", m_clientSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
+    assertFalse(m_jobManager.cancel("4", m_clientSession1)); // already finished
+    assertFalse(m_jobManager.cancel("2", m_clientSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
 
     // test cancel with wrong session (expected=no effect)
-    assertFalse(m_jobManager.cancel(1, m_clientSession2));
+    assertFalse(m_jobManager.cancel("1", m_clientSession2));
 
     // test cancel
-    assertTrue(m_jobManager.cancel(1, m_clientSession1));
+    assertTrue(m_jobManager.cancel("1", m_clientSession1));
 
     assertTrue(verifyLatch.await());
 
@@ -372,7 +372,7 @@ public class ClientJobManagerTest {
   public void testCancelMultipleJobsWithSameId() throws Exception {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>());
 
-    final int commonJobId = 777;
+    final String commonJobId = "777";
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(4);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(3);
@@ -433,7 +433,7 @@ public class ClientJobManagerTest {
             }
             verifyLatch.countDown();
           }
-        }, ClientJobInput.defaults().id(123));
+        }, ClientJobInput.defaults().id("123"));
       }
     }, ClientJobInput.defaults().id(commonJobId));
     assertTrue(txOrderLatch3.await());

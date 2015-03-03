@@ -13,7 +13,6 @@ package org.eclipse.scout.commons.job.internal;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
@@ -21,20 +20,20 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.job.Executables;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.job.internal.Futures.JobFuture;
 
 /**
- * Thread-Safe implementation of a {@link Set} to contain {@link Future}s.
+ * Thread-Safe implementation of a {@link Set} to contain {@link IFuture}s.
  *
  * @since 5.1
  */
 @Internal
 public class FutureSet {
 
-  private final Set<Future<?>> m_futures;
+  private final Set<IFuture<?>> m_futures;
 
   private final ReadLock m_readLock;
   private final WriteLock m_writeLock;
@@ -48,36 +47,31 @@ public class FutureSet {
   }
 
   /**
-   * Adds the {@link Future} supplied by the given {@link FutureSupplier} to this {@link FutureSet}. The Future is only
-   * added if not being 'cancelled' or 'done'. Typically, the supplier obtains the Future by a {@link ExecutorService}.<br/>
+   * Adds the Future supplied by the given {@link IFutureSupplier} to this {@link FutureSet}. Typically, the supplier
+   * obtains the Future by a {@link ExecutorService}.<br/>
    * This {@link FutureSet} is locked exclusively during the time of supplying and adding the Future to this
    * {@link FutureSet}.
    *
-   * @param identifier
-   *          the identifier of the associated task used to create the {@link IFuture} to be returned.
    * @param futureSupplier
-   *          supplier to obtain the {@link Future} to be added to this {@link FutureSet}.
-   * @return {@link IFuture} that represents the added {@link Future}.
+   *          supplier to obtain the {@link IFuture} to be added to this {@link FutureSet}.
+   * @return {@link IFuture} that represents the added Future.
    * @throws JobExecutionException
-   *           thrown if {@link FutureSupplier#get()} throws a {@link RejectedExecutionException}.
+   *           thrown if {@link IFutureSupplier#get()} throws a {@link RejectedExecutionException}.
    */
-  public <RESULT, FUTURE extends IFuture<RESULT>> IFuture<RESULT> add(final String identifier, final FutureSupplier<RESULT> futureSupplier) throws JobExecutionException {
+  public <RESULT, FUTURE extends IFuture<RESULT>> IFuture<RESULT> add(final IFutureSupplier<RESULT> futureSupplier) throws JobExecutionException {
     m_writeLock.lock();
     try {
-      final Future<RESULT> future;
+      final IFuture<RESULT> future;
       try {
-        future = Assertions.assertNotNull(futureSupplier.get());
+        future = Assertions.assertNotNull(futureSupplier.supply()).getFuture();
       }
       catch (final RejectedExecutionException e) {
         throw new JobExecutionException(e.getMessage(), e); // Task was rejected for execution.
       }
+      
+      m_futures.add(future);
 
-      // Depending of the implementation of the Executor, the Future might be marked cancelled if not being accepted for execution.
-      if (!future.isCancelled() && !future.isDone()) {
-        m_futures.add(future);
-      }
-
-      return Executables.future(future, identifier);
+      return future;
     }
     finally {
       m_writeLock.unlock();
@@ -85,13 +79,13 @@ public class FutureSet {
   }
 
   /**
-   * Removes the given {@link Future} from this {@link FutureSet}; during removal, the {@link FutureSet} is locked
+   * Removes the given {@link IFuture} from this {@link FutureSet}; during removal, the {@link FutureSet} is locked
    * exclusively.
    *
    * @param future
-   *          {@link Future} to be removed.
+   *          {@link IFuture} to be removed.
    */
-  public void remove(final Future<?> future) {
+  public void remove(final IFuture<?> future) {
     m_writeLock.lock();
     try {
       m_futures.remove(future);
@@ -106,10 +100,10 @@ public class FutureSet {
    *
    * @return {@link Set} of removed Futures.
    */
-  public Set<Future<?>> clear() {
+  public Set<IFuture<?>> clear() {
     m_writeLock.lock();
     try {
-      final Set<Future<?>> futures = copy();
+      final Set<IFuture<?>> futures = copy();
       m_futures.clear();
       return futures;
     }
@@ -134,7 +128,7 @@ public class FutureSet {
   /**
    * @return a copy of the underlying {@link Set}.
    */
-  public Set<Future<?>> copy() {
+  public Set<IFuture<?>> copy() {
     m_readLock.lock();
     try {
       return new HashSet<>(m_futures);
@@ -145,13 +139,13 @@ public class FutureSet {
   }
 
   /**
-   * To visit all {@link Future}s which did not complete yet.
+   * To visit all {@link IFuture}s which did not complete yet.
    *
    * @param visitor
-   *          {@link IFutureVisitor} called for each {@link Future}.
+   *          {@link IFutureVisitor} called for each {@link IFuture}.
    */
   public void visit(final IFutureVisitor visitor) {
-    for (final Future<?> future : copy()) {
+    for (final IFuture<?> future : copy()) {
       if (future.isDone()) {
         continue; // in case the job completed in the meantime.
       }
@@ -162,23 +156,22 @@ public class FutureSet {
   }
 
   /**
-   * Supplies the {@link FutureSet} with a {@link Future}.
+   * Supplies the {@link FutureSet} with a {@link JobFuture}.
    *
    * @param <RESULT>
-   *          the result-type of the {@link Future}.
+   *          the result-type of the {@link IFuture}.
    */
-  public interface FutureSupplier<RESULT> {
+  public interface IFutureSupplier<RESULT> {
 
     /**
-     * This method is invoked to supply this {@link FutureSet} with a {@link Future}. Typically, the implementation
-     * obtains the {@link Future} by scheduling the task on behalf of an {@link ExecutorService}. The {@link Future}
-     * returned must not be <code>null</code>.
+     * This method is invoked to supply this {@link FutureSet} with a Future. Typically, the implementation obtains the
+     * Future by scheduling the task on behalf of an {@link ExecutorService}. The Future returned must not be
+     * <code>null</code>.
      *
-     * @return {@link Future} to be added to the {@link FutureSet}; is not added if being 'cancelled' or 'done'; must
-     *         not be <code>null</code>.
+     * @return Future to be added to the {@link FutureSet}; must not be <code>null</code>.
      * @throws RejectedExecutionException
      *           if the task was not accepted for execution and therefore is not to be added to the {@link FutureSet}.
      */
-    Future<RESULT> get();
+    JobFuture<RESULT> supply();
   }
 }

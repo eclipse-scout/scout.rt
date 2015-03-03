@@ -23,8 +23,18 @@ public interface IProgressMonitor {
   ThreadLocal<IProgressMonitor> CURRENT = new ThreadLocal<>();
 
   /**
-   * @return <code>true</code> if this job was cancelled and the job should terminate its work; must be invoked from
-   *         within the job.
+   * @return <code>true</code> if this job was cancelled and the job should terminate its work.
    */
   boolean isCancelled();
+
+  /**
+   * Attempts to cancel the execution of the associated job. The <code>interruptIfRunning</code> parameter determines
+   * whether the thread executing the job should be interrupted in an attempt to stop the job.
+   *
+   * @param interruptIfRunning
+   *          <code>true</code> if the thread executing the job should be interrupted; otherwise, in-progress jobs are
+   *          allowed to complete.
+   * @return <code>false</code> if the job could not be cancelled, typically because it has already completed normally.
+   */
+  boolean cancel(boolean interruptIfRunning);
 }

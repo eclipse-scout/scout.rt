@@ -68,10 +68,11 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RES
 
   @Override
   public RESULT call() throws Exception {
-    // Register the transaction on the current Future.
-    final Future<?> future = Assertions.assertNotNull(IFuture.CURRENT.get(), "Unexpected inconsistency: No Future bound to current thread. [thread=%s, job=%s]", Thread.currentThread().getName(), m_input.getIdentifier("n/a"));
-    Assertions.assertTrue(future instanceof ServerJobFuture, "Unexpected inconsistency: Current Future of the wrong type. [expected=%s, actual=%s, thread=%s, job=%s]", ServerJobFuture.class.getSimpleName(), future.getClass().getSimpleName(), Thread.currentThread().getName(), m_input.getIdentifier("n/a"));
+    final IFuture<?> iFuture = Assertions.assertNotNull(IFuture.CURRENT.get(), "Unexpected inconsistency: No Future bound to current thread. [thread=%s, job=%s]", Thread.currentThread().getName(), m_input.getIdentifier());
+    final Future<?> future = iFuture.getDelegate();
+    Assertions.assertTrue(future instanceof ServerJobFuture, "Unexpected inconsistency: Current Future of the wrong type. [expected=%s, actual=%s, thread=%s, job=%s]", ServerJobFuture.class.getSimpleName(), iFuture.getClass().getSimpleName(), Thread.currentThread().getName(), m_input.getIdentifier());
 
+    // Register the transaction on the current Future.
     ((ServerJobFuture) future).register(m_transaction);
     try {
       return runAsTransaction(m_transaction);
@@ -136,7 +137,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RES
   @Internal
   protected void logTxFailures(final ITransaction tx) {
     for (final Throwable failure : tx.getFailures()) {
-      LOG.error(String.format("Current transaction was rolled back because of a processing error. [reason=%s, job=%s, tx=%s]", StringUtility.nvl(failure.getMessage(), "n/a"), m_input.getIdentifier("n/a"), tx), failure);
+      LOG.error(String.format("Current transaction was rolled back because of a processing error. [reason=%s, job=%s, tx=%s]", StringUtility.nvl(failure.getMessage(), "n/a"), m_input.getIdentifier(), tx), failure);
     }
   }
 

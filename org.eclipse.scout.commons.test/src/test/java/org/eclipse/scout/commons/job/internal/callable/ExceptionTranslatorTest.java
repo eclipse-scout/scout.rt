@@ -125,7 +125,7 @@ public class ExceptionTranslatorTest {
 
   @Test
   public void testCallableContextMessage1() throws Exception {
-    m_input.id(7);
+    m_input.id("7");
     m_input.name("job");
 
     Callable<?> next = mock(Callable.class);
@@ -144,7 +144,7 @@ public class ExceptionTranslatorTest {
 
   @Test
   public void testCallableContextMessage2() throws Exception {
-    m_input.id(7);
+    m_input.id("7");
     m_input.name("job");
 
     Subject s = new Subject();
@@ -182,7 +182,7 @@ public class ExceptionTranslatorTest {
 
   @Test
   public void testCallableException() throws Exception {
-    m_input.id(7);
+    m_input.id("7");
     m_input.name("job");
 
     Callable<?> next = mock(Callable.class);

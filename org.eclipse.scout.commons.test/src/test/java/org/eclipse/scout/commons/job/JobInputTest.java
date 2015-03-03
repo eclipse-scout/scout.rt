@@ -43,7 +43,7 @@ public class JobInputTest {
     JobInput input = JobInput.empty();
     assertNotNull(input.getContext());
     assertNull(input.getName());
-    assertEquals(0, input.getId());
+    assertNull(input.getId());
     assertNull(input.getSubject());
     assertNull(input.getLocale());
     assertEquals(IJobInput.INFINITE_EXPIRATION, input.getExpirationTimeMillis());
@@ -54,7 +54,7 @@ public class JobInputTest {
     JobInput input = JobInput.empty();
     input.getContext().set("A", "B");
     input.name("name");
-    input.id(123);
+    input.id("123");
     input.subject(new Subject());
     input.locale(Locale.CANADA_FRENCH);
     input.expirationTime(10, TimeUnit.MINUTES);
@@ -78,8 +78,8 @@ public class JobInputTest {
 
   @Test
   public void testDefaultId() {
-    assertEquals(0, JobInput.defaults().getId());
-    assertEquals(123, JobInput.defaults().id(123).getId());
+    assertNull(JobInput.defaults().getId());
+    assertEquals("123", JobInput.defaults().id("123").getId());
   }
 
   @Test

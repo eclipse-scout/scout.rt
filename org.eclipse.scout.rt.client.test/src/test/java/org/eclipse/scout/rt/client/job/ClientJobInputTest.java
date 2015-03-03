@@ -60,7 +60,7 @@ public class ClientJobInputTest {
     ClientJobInput input = ClientJobInput.empty();
     assertNotNull(input.getContext());
     assertNull(input.getName());
-    assertEquals(0, input.getId());
+    assertNull(input.getId());
     assertNull(input.getSubject());
     try {
       assertNull(input.getSession());
@@ -79,7 +79,7 @@ public class ClientJobInputTest {
     ClientJobInput input = ClientJobInput.empty();
     input.getContext().set("A", "B");
     input.name("name");
-    input.id(123);
+    input.id("123");
     input.subject(new Subject());
     input.session(mock(IClientSession.class));
     input.userAgent(UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a"));
@@ -105,8 +105,8 @@ public class ClientJobInputTest {
 
   @Test
   public void testDefaultId() {
-    assertEquals(0, ClientJobInput.defaults().getId());
-    assertEquals(123, ClientJobInput.defaults().id(123).getId());
+    assertNull(ClientJobInput.defaults().getId());
+    assertEquals("123", ClientJobInput.defaults().id("123").getId());
   }
 
   @Test

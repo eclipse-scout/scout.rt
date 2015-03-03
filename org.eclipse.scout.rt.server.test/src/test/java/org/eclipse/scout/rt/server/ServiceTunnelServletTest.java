@@ -36,8 +36,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.Executables.IExecutable;
 import org.eclipse.scout.commons.job.ICallable;
+import org.eclipse.scout.commons.job.IExecutable;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IJobManager;
 import org.eclipse.scout.commons.job.JobInput;

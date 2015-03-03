@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job;
 
-import java.util.concurrent.Future;
+import org.eclipse.scout.commons.job.internal.Futures;
 
 /**
  * Visitor for visiting {@link Futures}.
@@ -20,9 +20,9 @@ import java.util.concurrent.Future;
 public interface IFutureVisitor {
 
   /**
-   * Is called upon visiting a {@link Future}.
+   * Is called upon visiting a {@link IFuture}.
    *
    * @return <code>true</code>=continue visiting, <code>false</code>=end visiting.
    */
-  boolean visit(Future<?> future);
+  boolean visit(IFuture<?> future);
 }

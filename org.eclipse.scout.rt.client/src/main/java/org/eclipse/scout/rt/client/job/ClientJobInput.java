@@ -17,6 +17,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.Assertions.AssertionException;
+import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobInput;
@@ -61,7 +62,7 @@ public class ClientJobInput extends JobInput {
   }
 
   @Override
-  public ClientJobInput id(final long id) {
+  public ClientJobInput id(final String id) {
     return (ClientJobInput) super.id(id);
   }
 
@@ -176,6 +177,19 @@ public class ClientJobInput extends JobInput {
    */
   public UserAgent getUserAgent() {
     return m_userAgent;
+  }
+
+  @Override
+  public String toString() {
+    final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("id", getId());
+    builder.attr("name", getName());
+    builder.attr("subject", getSubject());
+    builder.attr("locale", getLocale());
+    builder.ref("session", getSession());
+    builder.attr("sessionRequired", isSessionRequired());
+    builder.attr("userAgent", getUserAgent());
+    return builder.toString();
   }
 
   /**

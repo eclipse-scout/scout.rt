@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
@@ -100,18 +99,18 @@ public class ModelJobManagerTest {
     assertTrue(latch.await());
 
     // RUN THE TEST
-    final Set<Future<?>> futureProtocol = new HashSet<>();
+    final Set<IFuture<?>> futureProtocol = new HashSet<>();
     m_jobManager.visit(new IFutureVisitor() {
 
       @Override
-      public boolean visit(Future<?> future) {
+      public boolean visit(IFuture<?> future) {
         futureProtocol.add(future);
         return true;
       }
     });
 
     // VERIFY
-    assertEquals(CollectionUtility.hashSet(future1.getDelegate(), future2.getDelegate(), future3.getDelegate()), futureProtocol);
+    assertEquals(CollectionUtility.hashSet(future1, future2, future3), futureProtocol);
     assertEquals(CollectionUtility.arrayList("running-1"), runningProtocol);
   }
 

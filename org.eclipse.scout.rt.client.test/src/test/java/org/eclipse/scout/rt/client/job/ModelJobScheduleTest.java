@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -381,8 +380,8 @@ public class ModelJobScheduleTest {
     final Holder<IFuture<?>> expectedFuture1 = new Holder<>();
     final Holder<IFuture<?>> expectedFuture2 = new Holder<>();
 
-    final Holder<Future<?>> actualFuture1 = new Holder<>();
-    final Holder<Future<?>> actualFuture2 = new Holder<>();
+    final Holder<IFuture<?>> actualFuture1 = new Holder<>();
+    final Holder<IFuture<?>> actualFuture2 = new Holder<>();
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(2);
 
@@ -411,8 +410,8 @@ public class ModelJobScheduleTest {
     assertNotNull(expectedFuture1.getValue());
     assertNotNull(expectedFuture2.getValue());
 
-    assertSame(expectedFuture1.getValue().getDelegate(), actualFuture1.getValue());
-    assertSame(expectedFuture2.getValue().getDelegate(), actualFuture2.getValue());
+    assertSame(expectedFuture1.getValue(), actualFuture1.getValue());
+    assertSame(expectedFuture2.getValue(), actualFuture2.getValue());
 
     assertNull(IFuture.CURRENT.get());
   }

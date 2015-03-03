@@ -15,8 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.job.Executables.IExecutable;
-
 /**
  * Describes a job to be executed with instruction details about the job's execution.<br/>
  * This interface is designed to be used as fluent builder to make the client code more readable.
@@ -24,6 +22,8 @@ import org.eclipse.scout.commons.job.Executables.IExecutable;
  * @since 5.1
  */
 public interface IJobInput {
+
+  String IDENTIFIER_UNKNOWN = "n/a";
 
   /**
    * Indicates that an executable always commence execution regardless of how long it was waiting for its execution to
@@ -37,7 +37,7 @@ public interface IJobInput {
    *          Future, e.g. for canceling that job without knowing its Future.
    * @return {@link IJobInput} to be used as builder.
    */
-  IJobInput id(long id);
+  IJobInput id(String id);
 
   /**
    * @param name
@@ -82,9 +82,9 @@ public interface IJobInput {
   IJobInput context(JobContext context);
 
   /**
-   * @see #id(long)
+   * @see #id(String)
    */
-  long getId();
+  String getId();
 
   /**
    * @see #name(String)
@@ -114,8 +114,8 @@ public interface IJobInput {
   JobContext getContext();
 
   /**
-   * Returns the identifier that consists of the job's <code>id</code> and name, or <code>defaultIdentifier</code> if
-   * not set.
+   * Returns the identifier that consists of the job's <code>id</code> and <code>name</code>, or
+   * {@link #IDENTIFIER_UNKNOWN} if unknown.
    */
-  String getIdentifier(String defaultIdentifier);
+  String getIdentifier();
 }

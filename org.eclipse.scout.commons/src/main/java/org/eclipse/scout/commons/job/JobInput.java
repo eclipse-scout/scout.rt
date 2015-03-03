@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 
 /**
@@ -27,7 +28,7 @@ import org.eclipse.scout.commons.nls.NlsLocale;
  */
 public class JobInput implements IJobInput {
 
-  private long m_id;
+  private String m_id;
   private String m_name;
   private long m_expirationTime = IJobInput.INFINITE_EXPIRATION;
   private Subject m_subject;
@@ -59,7 +60,7 @@ public class JobInput implements IJobInput {
   }
 
   @Override
-  public JobInput id(final long id) {
+  public JobInput id(final String id) {
     m_id = id;
     return this;
   }
@@ -117,7 +118,7 @@ public class JobInput implements IJobInput {
   }
 
   @Override
-  public long getId() {
+  public String getId() {
     return m_id;
   }
 
@@ -147,19 +148,29 @@ public class JobInput implements IJobInput {
   }
 
   @Override
-  public String getIdentifier(final String defaultIdentifier) {
-    if (m_id != 0L && StringUtility.hasText(m_name)) {
+  public String getIdentifier() {
+    if (m_id != null && StringUtility.hasText(m_name)) {
       return String.format("%s;%s", m_id, m_name);
     }
     else if (StringUtility.hasText(m_name)) {
       return m_name;
     }
-    else if (m_id != 0L) {
-      return String.valueOf(m_id);
+    else if (m_id != null) {
+      return m_id;
     }
     else {
-      return defaultIdentifier;
+      return IJobInput.IDENTIFIER_UNKNOWN;
     }
+  }
+
+  @Override
+  public String toString() {
+    final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("id", getId());
+    builder.attr("name", getName());
+    builder.attr("subject", getSubject());
+    builder.attr("locale", getLocale());
+    return builder.toString();
   }
 
   /**

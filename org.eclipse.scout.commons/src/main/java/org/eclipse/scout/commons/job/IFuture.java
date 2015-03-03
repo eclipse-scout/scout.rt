@@ -34,7 +34,17 @@ public interface IFuture<RESULT> {
   /**
    * The {@link IFuture} which is currently associated with the current thread.
    */
-  ThreadLocal<Future<?>> CURRENT = new ThreadLocal<>();
+  ThreadLocal<IFuture<?>> CURRENT = new ThreadLocal<>();
+
+  /**
+   * @return {@link IProgressMonitor} which belongs to this Future to track progress.
+   */
+  IProgressMonitor getProgressMonitor();
+
+  /**
+   * @return {@link IJobInput} the job was instrumented with.
+   */
+  IJobInput getJobInput();
 
   /**
    * Attempts to cancel the execution of the associated job. This attempt will be ignored if the job has already
@@ -102,7 +112,7 @@ public interface IFuture<RESULT> {
   RESULT get(long timeout, TimeUnit unit) throws ProcessingException, JobExecutionException;
 
   /**
-   * @return {@link Future} which this {@link IFuture} delegates to.
+   * @return the {@link Future} this {@link IFuture} delegates to.
    */
-  Future<RESULT> getDelegate();
+  Future<?> getDelegate();
 }

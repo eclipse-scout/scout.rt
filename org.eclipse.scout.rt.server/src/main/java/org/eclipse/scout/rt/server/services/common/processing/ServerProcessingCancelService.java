@@ -21,6 +21,6 @@ public class ServerProcessingCancelService extends AbstractService implements IS
 
   @Override
   public boolean cancel(long requestSequence) {
-    return ServerJobManager.DEFAULT.cancel(requestSequence, (IServerSession) IServerSession.CURRENT);
+    return ServerJobManager.DEFAULT.cancel(String.valueOf(requestSequence), (IServerSession) IServerSession.CURRENT);
   }
 }

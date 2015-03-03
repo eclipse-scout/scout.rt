@@ -15,28 +15,28 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.holders.BooleanHolder;
+import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IFutureVisitor;
+import org.eclipse.scout.commons.job.internal.IProgressMonitorProvider;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.commons.UncaughtExceptionRunnable;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 public class MutexSemaphoreTest {
 
@@ -52,36 +52,27 @@ public class MutexSemaphoreTest {
     s_executor.shutdown();
   }
 
-  @Mock
-  private Task<Object> m_task1;
-  @Mock
-  private Task<Object> m_task2;
-  @Mock
-  private Task<Object> m_task3;
-  @Mock
-  private Task<Object> m_task4;
-  @Mock
-  private Task<Object> m_task5;
+  private ModelFutureTask<Object> m_task1;
+  private ModelFutureTask<Object> m_task2;
+  private ModelFutureTask<Object> m_task3;
+  private ModelFutureTask<Object> m_task4;
+  private ModelFutureTask<Object> m_task5;
 
-  @Mock
-  private ModelJobFuture<Object> m_future1;
-  @Mock
-  private ModelJobFuture<Object> m_future2;
-  @Mock
-  private ModelJobFuture<Object> m_future3;
-  @Mock
-  private ModelJobFuture<Object> m_future4;
-  @Mock
-  private ModelJobFuture<Object> m_future5;
+  private IFuture<Object> m_iFuture1;
+  private IFuture<Object> m_iFuture2;
+  private IFuture<Object> m_iFuture3;
 
   @Before
   public void before() {
-    MockitoAnnotations.initMocks(this);
-    when(m_task1.getFuture()).thenReturn(m_future1);
-    when(m_task2.getFuture()).thenReturn(m_future2);
-    when(m_task3.getFuture()).thenReturn(m_future3);
-    when(m_task4.getFuture()).thenReturn(m_future4);
-    when(m_task5.getFuture()).thenReturn(m_future5);
+    m_task1 = new ModelFutureTask<>(ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
+    m_task2 = new ModelFutureTask<>(ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
+    m_task3 = new ModelFutureTask<>(ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
+    m_task4 = new ModelFutureTask<>(ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
+    m_task5 = new ModelFutureTask<>(ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
+
+    m_iFuture1 = m_task1.getFuture();
+    m_iFuture2 = m_task2.getFuture();
+    m_iFuture3 = m_task3.getFuture();
   }
 
   @Test
@@ -291,28 +282,28 @@ public class MutexSemaphoreTest {
     assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task2));
     assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task3));
 
-    final List<Future<?>> visitedFutures = new ArrayList<>();
+    final List<IFuture<?>> visitedFutures = new ArrayList<>();
     mutexSemaphore.visit(new IFutureVisitor() {
 
       @Override
-      public boolean visit(Future<?> future) {
+      public boolean visit(IFuture<?> future) {
         visitedFutures.add(future);
         return true;
       }
     });
 
-    assertEquals(CollectionUtility.arrayList(m_future1, m_future2, m_future3), visitedFutures);
+    assertEquals(CollectionUtility.arrayList(m_iFuture1, m_iFuture2, m_iFuture3), visitedFutures);
   }
 
   @Test
   public void testVisitEmpty() {
     final MutexSemaphore mutexSemaphore = new MutexSemaphore();
 
-    final List<Future<?>> visitedFutures = new ArrayList<>();
+    final List<IFuture<?>> visitedFutures = new ArrayList<>();
     mutexSemaphore.visit(new IFutureVisitor() {
 
       @Override
-      public boolean visit(Future<?> future) {
+      public boolean visit(IFuture<?> future) {
         visitedFutures.add(future);
         return true;
       }
@@ -329,17 +320,17 @@ public class MutexSemaphoreTest {
     assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task2));
     assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task3));
 
-    final List<Future<?>> visitedFutures = new ArrayList<>();
+    final List<IFuture<?>> visitedFutures = new ArrayList<>();
     mutexSemaphore.visit(new IFutureVisitor() {
 
       @Override
-      public boolean visit(Future<?> future) {
+      public boolean visit(IFuture<?> future) {
         visitedFutures.add(future);
         return false;
       }
     });
 
-    assertEquals(CollectionUtility.arrayList(m_future1), visitedFutures);
+    assertEquals(CollectionUtility.arrayList(m_iFuture1), visitedFutures);
   }
 
   private void assertNotIdle(MutexSemaphore mutexSemaphore) throws InterruptedException {

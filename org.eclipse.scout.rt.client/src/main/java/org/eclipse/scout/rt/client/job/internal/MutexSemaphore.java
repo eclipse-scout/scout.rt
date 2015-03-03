@@ -44,17 +44,17 @@ public class MutexSemaphore {
   private static final boolean POSITION_HEAD = false;
 
   private final AtomicInteger m_permits = new AtomicInteger(0);
-  private final Deque<Task<?>> m_pendingQueue = new ArrayDeque<>();
+  private final Deque<ModelFutureTask<?>> m_pendingQueue = new ArrayDeque<>();
 
   final Lock m_idleLock = new ReentrantLock();
   final Condition m_idleCondition = m_idleLock.newCondition();
 
-  private Task<?> m_mutexOwner; // The task currently owning the mutex.
+  private ModelFutureTask<?> m_mutexOwner; // The task currently owning the mutex.
 
   /**
    * @return the task currently owning the mutex.
    */
-  public Task<?> getMutexOwner() {
+  public ModelFutureTask<?> getMutexOwner() {
     return m_mutexOwner;
   }
 
@@ -67,7 +67,7 @@ public class MutexSemaphore {
    * @return <code>true</code> if the mutex was acquired, <code>false</code> if being queued.
    * @see #releaseAndPoll()
    */
-  public boolean tryAcquireElseOfferTail(final Task<?> task) {
+  public boolean tryAcquireElseOfferTail(final ModelFutureTask<?> task) {
     return tryAcquireElseOffer(task, POSITION_TAIL);
   }
 
@@ -80,11 +80,11 @@ public class MutexSemaphore {
    * @return <code>true</code> if the mutex was acquired, <code>false</code> if being queued.
    * @see #releaseAndPoll()
    */
-  public boolean tryAcquireElseOfferHead(final Task<?> task) {
+  public boolean tryAcquireElseOfferHead(final ModelFutureTask<?> task) {
     return tryAcquireElseOffer(task, POSITION_HEAD);
   }
 
-  protected boolean tryAcquireElseOffer(final Task<?> task, final boolean position) {
+  protected boolean tryAcquireElseOffer(final ModelFutureTask<?> task, final boolean position) {
     synchronized (m_pendingQueue) {
       if (m_permits.getAndIncrement() == 0) {
         m_mutexOwner = task;
@@ -108,7 +108,7 @@ public class MutexSemaphore {
    * @return task which is the new mutex-owner, <code>null</code> if the queue was empty.
    * @see #tryAcquireElseOffer(Object)
    */
-  public Task<?> releaseAndPoll() {
+  public ModelFutureTask<?> releaseAndPoll() {
     synchronized (m_pendingQueue) {
       if (m_mutexOwner == null) {
         LOG.error("Unexpected inconsistency while releasing model mutex: mutex owner must not be null.");
@@ -188,7 +188,7 @@ public class MutexSemaphore {
         m_mutexOwner.getFuture().cancel(true);
       }
 
-      for (final Task<?> pendingTask : m_pendingQueue) {
+      for (final ModelFutureTask<?> pendingTask : m_pendingQueue) {
         pendingTask.getFuture().cancel(true);
       }
       m_permits.addAndGet(-m_pendingQueue.size()); // do not subtract the mutex-owner.
@@ -203,14 +203,14 @@ public class MutexSemaphore {
    *          {@link IFutureVisitor} called for each {@link Future}.
    */
   public void visit(final IFutureVisitor visitor) {
-    final List<Task<?>> tasks = new ArrayList<>();
+    final List<ModelFutureTask<?>> tasks = new ArrayList<>();
 
     synchronized (m_pendingQueue) {
       tasks.add(m_mutexOwner);
       tasks.addAll(m_pendingQueue);
     }
 
-    for (final Task<?> task : tasks) {
+    for (final ModelFutureTask<?> task : tasks) {
       if (task == null) {
         continue;
       }

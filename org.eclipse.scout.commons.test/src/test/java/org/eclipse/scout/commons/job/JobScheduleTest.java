@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Future;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -275,8 +274,8 @@ public class JobScheduleTest {
     final Holder<IFuture<?>> expectedFuture1 = new Holder<>();
     final Holder<IFuture<?>> expectedFuture2 = new Holder<>();
 
-    final Holder<Future<?>> actualFuture1 = new Holder<>();
-    final Holder<Future<?>> actualFuture2 = new Holder<>();
+    final Holder<IFuture<?>> actualFuture1 = new Holder<>();
+    final Holder<IFuture<?>> actualFuture2 = new Holder<>();
 
     IFuture.CURRENT.remove();
 
@@ -303,8 +302,8 @@ public class JobScheduleTest {
     assertNotNull(expectedFuture1.getValue());
     assertNotNull(expectedFuture2.getValue());
 
-    assertSame(expectedFuture1.getValue().getDelegate(), actualFuture1.getValue());
-    assertSame(expectedFuture2.getValue().getDelegate(), actualFuture2.getValue());
+    assertSame(expectedFuture1.getValue(), actualFuture1.getValue());
+    assertSame(expectedFuture2.getValue(), actualFuture2.getValue());
 
     assertNull(IFuture.CURRENT.get());
   }

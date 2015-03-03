@@ -36,7 +36,7 @@ public class ThreadNameDecoratorTest {
 
     Thread.currentThread().setName("worker-1");
 
-    IJobInput input = JobInput.empty().id(123).name("job1");
+    IJobInput input = JobInput.empty().id("123").name("job1");
 
     new ThreadNameDecorator<Void>(next, input).call();
     assertEquals("worker-1;job:123;job1", threadName.getValue());
@@ -78,7 +78,7 @@ public class ThreadNameDecoratorTest {
 
     Thread.currentThread().setName("worker-1;job:job1");
 
-    IJobInput input = JobInput.empty().id(123).name("job2");
+    IJobInput input = JobInput.empty().id("123").name("job2");
 
     // nested job
     new ThreadNameDecorator<Void>(next, input).call();
@@ -101,7 +101,7 @@ public class ThreadNameDecoratorTest {
 
     Thread.currentThread().setName("worker-1;job:2;job1");
 
-    IJobInput input = JobInput.empty().id(123).name("job2");
+    IJobInput input = JobInput.empty().id("123").name("job2");
 
     // nested job
     new ThreadNameDecorator<Void>(next, input).call();

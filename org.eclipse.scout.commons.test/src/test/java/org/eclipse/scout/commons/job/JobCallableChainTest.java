@@ -53,20 +53,16 @@ public class JobCallableChainTest {
     // 3. SubjectCallable
     SubjectCallable c3 = getNextAndAssert(c2, SubjectCallable.class);
 
-    // 4. InitThreadLocalCallable for IProgressMonitor.CURRENT
+    // 4. InitThreadLocalCallable for JobContext.CURRENT
     InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
-    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
+    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
 
-    // 5. InitThreadLocalCallable for JobContext.CURRENT
+    // 5. InitThreadLocalCallable for ScoutTexts.CURRENT
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    // 6. InitThreadLocalCallable for ScoutTexts.CURRENT
-    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
-
-    // 7. Target
-    assertSame(m_targetCallable, c6.getNext());
+    // 6. Target
+    assertSame(m_targetCallable, c5.getNext());
   }
 
   /**
@@ -95,26 +91,22 @@ public class JobCallableChainTest {
     // 3. SubjectCallable
     SubjectCallable c3 = getNextAndAssert(c2, SubjectCallable.class);
 
-    // 4. InitThreadLocalCallable for IProgressMonitor.CURRENT
+    // 4. InitThreadLocalCallable for JobContext.CURRENT
     InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
-    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
+    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
 
-    // 5. InitThreadLocalCallable for JobContext.CURRENT
+    // 5. InitThreadLocalCallable for ScoutTexts.CURRENT
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    // 6. InitThreadLocalCallable for ScoutTexts.CURRENT
-    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
+    // 6. Contribution1
+    Contribution1 c6 = getNextAndAssert(c5, Contribution1.class);
 
-    // 7. Contribution1
-    Contribution1 c7 = getNextAndAssert(c6, Contribution1.class);
+    // 7. Contribution2
+    Contribution2 c7 = getNextAndAssert(c6, Contribution2.class);
 
-    // 8. Contribution2
-    Contribution2 c8 = getNextAndAssert(c7, Contribution2.class);
-
-    // 9. Target
-    assertSame(m_targetCallable, c8.getNext());
+    // 8. Target
+    assertSame(m_targetCallable, c7.getNext());
   }
 
   /**
@@ -149,20 +141,16 @@ public class JobCallableChainTest {
     // 5. SubjectCallable
     SubjectCallable c5 = getNextAndAssert(c4, SubjectCallable.class);
 
-    // 6. InitThreadLocalCallable for IProgressMonitor.CURRENT
+    // 6. InitThreadLocalCallable for JobContext.CURRENT
     InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
+    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. InitThreadLocalCallable for JobContext.CURRENT
+    // 7. InitThreadLocalCallable for ScoutTexts.CURRENT
     InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
-    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
 
-    // 8. InitThreadLocalCallable for ScoutTexts.CURRENT
-    InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
-
-    // 9. Target
-    assertSame(m_targetCallable, c8.getNext());
+    // 8. Target
+    assertSame(m_targetCallable, c7.getNext());
   }
 
   @SuppressWarnings("unchecked")

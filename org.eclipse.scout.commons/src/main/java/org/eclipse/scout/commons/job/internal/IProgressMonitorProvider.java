@@ -8,21 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.job;
+package org.eclipse.scout.commons.job.internal;
 
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IProgressMonitor;
 
 /**
- * Represents a runnable to be given to a job manager for execution.
- *
- * @see Runnable
- * @see 5.1
+ * Objects of this type can provide you with a {@link IProgressMonitor}.
  */
-public interface IRunnable extends IExecutable<Void> {
+public interface IProgressMonitorProvider {
 
   /**
-   * Computes a result, or throws an exception if unable to do so.
+   * Creates a {@link IProgressMonitorProvider} for the given {@link IFuture}.
    *
-   * @throws Exception
+   * @param future
+   *          {@link IFuture}
+   * @return {@link IProgressMonitor}; must not be <code>null</code>.
    */
-  void run() throws Exception;
+  <RESULT> IProgressMonitor create(IFuture<RESULT> future);
 }

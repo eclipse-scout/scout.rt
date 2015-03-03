@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Future;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
@@ -71,18 +70,18 @@ public class JobManagerTest {
     assertTrue(latch.await());
 
     // RUN THE TEST
-    final Set<Future<?>> protocol = new HashSet<>();
+    final Set<IFuture<?>> protocol = new HashSet<>();
     m_jobManager.visit(new IFutureVisitor() {
 
       @Override
-      public boolean visit(Future<?> future) {
+      public boolean visit(IFuture<?> future) {
         protocol.add(future);
         return true;
       }
     });
 
     // VERIFY
-    assertEquals(CollectionUtility.hashSet(future1.getDelegate(), future2.getDelegate(), future3.getDelegate()), protocol);
+    assertEquals(CollectionUtility.hashSet(future1, future2, future3), protocol);
   }
 
   @Test

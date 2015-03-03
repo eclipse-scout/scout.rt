@@ -16,7 +16,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.job.internal.ServerJobFuture;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 
 /**
@@ -113,7 +112,6 @@ class TransactionSafeDelegator {
    * @return job's identifier.
    */
   private String getJobIdentifier() {
-    final ServerJobFuture<?> future = (ServerJobFuture<?>) IFuture.CURRENT.get();
-    return future.getInput().getIdentifier("n/a");
+    return ((IFuture<?>) IFuture.CURRENT.get()).getJobInput().getIdentifier();
   }
 }

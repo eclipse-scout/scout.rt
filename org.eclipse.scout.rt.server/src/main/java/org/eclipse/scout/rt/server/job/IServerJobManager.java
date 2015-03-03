@@ -5,8 +5,8 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IJobManager;
-import org.eclipse.scout.commons.job.IScheduler;
 import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IScheduler;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.internal.callable.ExceptionTranslator;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -48,18 +48,19 @@ public interface IServerJobManager extends IJobManager<ServerJobInput>, ISchedul
   IServerJobManager DEFAULT = new ServerJobManager();
 
   /**
-   * Cancels a job with its associated transaction.
+   * Cancels jobs and associated transactions that belong to the given <code>id</code> and {@link IServerSession}.
    * <p/>
    * Also, any nested 'runNow'-style jobs, which where run on behalf of that job and did not complete yet, are
    * cancelled, as well as any associated transactions. In order to be cancelled, the given session must be the same as
    * the job's session.
    *
    * @param id
-   *          id of the job to be cancelled.
+   *          id of the job to be cancelled; use <code>null</code> to cancel jobs with a <code>null</code>-id.
    * @param serverSession
-   *          session which the job to be cancelled must belong to; must not be <code>null</code>.
+   *          session which the job to be cancelled must belong to; use <code>null</code> to cancel jobs without a
+   *          session associated.
    * @return <code>true</code> if cancel was successful and transaction was in fact cancelled, <code>false</code>
    *         otherwise.
    */
-  boolean cancel(long id, IServerSession serverSession);
+  boolean cancel(String id, IServerSession serverSession);
 }

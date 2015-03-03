@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -26,14 +25,15 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.Executables;
-import org.eclipse.scout.commons.job.Executables.IExecutable;
+import org.eclipse.scout.commons.job.IExecutable;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.job.internal.Executables;
 import org.eclipse.scout.commons.job.internal.NamedThreadFactory;
+import org.eclipse.scout.commons.job.internal.ProgressMonitor;
 import org.eclipse.scout.commons.job.internal.callable.ExceptionTranslator;
 import org.eclipse.scout.commons.job.internal.callable.InitThreadLocalCallable;
 import org.eclipse.scout.commons.job.internal.callable.SubjectCallable;
@@ -67,7 +67,7 @@ public class ModelJobManager implements IModelJobManager {
   @Internal
   protected final MutexSemaphore m_mutexSemaphore;
   @Internal
-  protected final Set<Future<?>> m_blockedFutures = new HashSet<>();
+  protected final Set<IFuture<?>> m_blockedFutures = new HashSet<>();
   @Internal
   protected volatile Thread m_modelThread; // The thread currently representing the model-thread.
 
@@ -85,8 +85,8 @@ public class ModelJobManager implements IModelJobManager {
   public final <RESULT> RESULT runNow(final IExecutable<RESULT> executable, final ClientJobInput input) throws ProcessingException {
     validateInput(input);
 
-    Assertions.assertTrue(isModelThread(), "Wrong thread: The calling thread must be the model-thread to run model jobs in 'runNow' style. [thread=%s, job=%s]", Thread.currentThread().getName(), input.getIdentifier("n/a"));
-    Assertions.assertNotNull(IFuture.CURRENT.get(), "Unexpected inconsistency: No Future bound to current thread. [thread=%s, job=%s]", Thread.currentThread().getName(), input.getIdentifier("n/a"));
+    Assertions.assertTrue(isModelThread(), "Wrong thread: The calling thread must be the model-thread to run model jobs in 'runNow' style. [thread=%s, job=%s]", Thread.currentThread().getName(), input.getIdentifier());
+    Assertions.assertNotNull(IFuture.CURRENT.get(), "Unexpected inconsistency: No Future bound to current thread. [thread=%s, job=%s]", Thread.currentThread().getName(), input.getIdentifier());
 
     final Callable<RESULT> command = Assertions.assertNotNull(interceptCallable(Executables.callable(executable), input));
     try {
@@ -109,13 +109,13 @@ public class ModelJobManager implements IModelJobManager {
 
     final Callable<RESULT> command = Assertions.assertNotNull(interceptCallable(Executables.callable(executable), input));
 
-    final Task<RESULT> task = createModelTask(command, input);
+    final ModelFutureTask<RESULT> task = interceptFuture(createModelFutureTask(command, input));
 
     if (m_mutexSemaphore.tryAcquireElseOfferTail(task)) {
-      task.schedule();
+      m_executor.execute(task);
     }
 
-    return Executables.future(task.getFuture(), input.getIdentifier("n/a"));
+    return task.getFuture();
   }
 
   @Override
@@ -130,7 +130,7 @@ public class ModelJobManager implements IModelJobManager {
   }
 
   @Override
-  public boolean isBlocked(final Future<?> future) {
+  public boolean isBlocked(final IFuture<?> future) {
     return m_blockedFutures.contains(future);
   }
 
@@ -195,66 +195,47 @@ public class ModelJobManager implements IModelJobManager {
   protected void passMutexToNextJob() {
     m_modelThread = null;
 
-    final Task<?> nextTask = m_mutexSemaphore.releaseAndPoll();
+    final ModelFutureTask<?> nextTask = m_mutexSemaphore.releaseAndPoll();
     if (nextTask != null) {
-      nextTask.schedule();
+      m_executor.execute(nextTask);
     }
   }
 
   /**
-   * Creates a task representing the given {@link Callable} to be passed to the executor.
+   * Creates a model-task representing the given {@link Callable} to be passed to the executor for serial execution.
    *
    * @param callable
    *          {@link Callable} to be executed.
    * @param input
    *          describes the {@link Callable} and contains execution instructions.
-   * @return {@link Task} to be passed to the executor.
+   * @return {@link ModelFutureTask} to be passed to the executor.
    */
   @Internal
-  protected <RESULT> Task<RESULT> createModelTask(final Callable<RESULT> callable, final ClientJobInput input) {
-    return new Task<RESULT>(m_executor, m_mutexSemaphore, input) {
+  protected <RESULT> ModelFutureTask<RESULT> createModelFutureTask(final Callable<RESULT> callable, final ClientJobInput input) {
+    return new ModelFutureTask<RESULT>(callable, input, this) {
 
       @Override
-      protected ModelJobFuture<RESULT> interceptFuture(final ModelJobFuture<RESULT> future) {
-        return ModelJobManager.this.interceptFuture(future);
-      }
-
-      @Override
-      public void rejected(final ModelJobFuture<RESULT> future) {
+      protected void rejected(final IFuture<RESULT> future) {
         future.cancel(true); // to interrupt the submitter if waiting for the job to complete.
         passMutexToNextJob();
       }
 
       @Override
-      public void beforeExecute(final ModelJobFuture<RESULT> future) {
+      protected void beforeExecute(final IFuture<RESULT> future) {
         setModelThread(Thread.currentThread());
+
+        IFuture.CURRENT.set(future);
+        IProgressMonitor.CURRENT.set(future.getProgressMonitor());
       }
 
       @Override
-      protected RESULT execute(final ModelJobFuture<RESULT> future) throws Exception {
-        return new InitThreadLocalCallable<>(callable, IFuture.CURRENT, future).call(); // Run the command on behalf of its Future.
-      }
+      protected void afterExecute(final IFuture<RESULT> future) {
+        IProgressMonitor.CURRENT.remove();
+        IFuture.CURRENT.remove();
 
-      @Override
-      public void afterExecute(final ModelJobFuture<RESULT> future) {
         if (isModelThread()) { // the current thread is not the model thread if being interrupted while waiting for a blocking condition to fall.
           passMutexToNextJob();
         }
-      }
-    };
-  }
-
-  /**
-   * @return Creates a {@link IProgressMonitor} to track the progress of an activity and query the job's
-   *         cancellation state.
-   */
-  @Internal
-  protected <RESULT> IProgressMonitor createProgressMonitor() {
-    return new IProgressMonitor() {
-
-      @Override
-      public boolean isCancelled() {
-        return IFuture.CURRENT.get().isCancelled();
       }
     };
   }
@@ -280,7 +261,15 @@ public class ModelJobManager implements IModelJobManager {
 
       @Override
       public void rejectedExecution(final Runnable runnable, final ThreadPoolExecutor executor) {
-        handleJobRejected((ModelJobFuture) runnable);
+        ((ModelFutureTask) runnable).reject();
+
+        // Do not throw a 'RejectedExecutionException' because the invoker will not be the job's submitter if this task was queued.
+        if (m_executor.isShutdown()) {
+          LOG.debug("Job rejected because the job manager is shutdown.");
+        }
+        else {
+          LOG.error("Job rejected because no more threads or queue slots available.");
+        }
       }
     };
 
@@ -321,12 +310,11 @@ public class ModelJobManager implements IModelJobManager {
    * @return the head of the chain to be invoked first.
    */
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final ClientJobInput input) {
-    final Callable<RESULT> c9 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, input.getSession().getTexts());
-    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(c9, UserAgent.CURRENT, input.getUserAgent());
-    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ISession.CURRENT, input.getSession());
-    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, NlsLocale.CURRENT, input.getLocale());
-    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, JobContext.CURRENT, input.getContext());
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, IProgressMonitor.CURRENT, createProgressMonitor());
+    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, input.getSession().getTexts());
+    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, UserAgent.CURRENT, input.getUserAgent());
+    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ISession.CURRENT, input.getSession());
+    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, NlsLocale.CURRENT, input.getLocale());
+    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, JobContext.CURRENT, input.getContext());
     final Callable<RESULT> c3 = new SubjectCallable<>(c4, input.getSubject());
     final Callable<RESULT> c2 = new ThreadNameDecorator<RESULT>(c3, input);
     final Callable<RESULT> c1 = new ExceptionTranslator<>(c2, input);
@@ -342,27 +330,8 @@ public class ModelJobManager implements IModelJobManager {
    *          Future to be adapted.
    * @return adapted Future.
    */
-  protected <RESULT> ModelJobFuture<RESULT> interceptFuture(final ModelJobFuture<RESULT> future) {
+  protected <RESULT> ModelFutureTask<RESULT> interceptFuture(final ModelFutureTask<RESULT> future) {
     return future;
-  }
-
-  /**
-   * Method invoked if a job was rejected from being scheduled.<br/>
-   *
-   * @param future
-   *          rejected {@link Future}.
-   */
-  @Internal
-  protected void handleJobRejected(final ModelJobFuture<?> future) {
-    future.reject(); // see Task#rejected
-
-    // Do not throw a 'RejectedExecutionException' because the invoker will not be the job's submitter if this task was queued.
-    if (m_executor.isShutdown()) {
-      LOG.debug("Job rejected because the job manager is shutdown.");
-    }
-    else {
-      LOG.error("Job rejected because no more threads or queue slots available.");
-    }
   }
 
   /**
@@ -394,8 +363,7 @@ public class ModelJobManager implements IModelJobManager {
     public void block() throws JobExecutionException {
       Assertions.assertTrue(isModelThread(), "Wrong thread: A job can only be blocked on behalf of the model thread. [thread=%s]", Thread.currentThread().getName());
 
-      final ModelJobFuture<?> currentFuture = (ModelJobFuture<?>) IFuture.CURRENT.get();
-      final ClientJobInput input = currentFuture.getInput();
+      final IFuture<?> currentFuture = IFuture.CURRENT.get();
 
       passMutexToNextJob();
 
@@ -411,7 +379,7 @@ public class ModelJobManager implements IModelJobManager {
             m_blocking.wait();
           }
           catch (final InterruptedException e) {
-            throw new JobExecutionException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, job=%s]", m_name, input.getIdentifier("n/a")), e);
+            throw new JobExecutionException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, job=%s]", m_name, currentFuture.getJobInput().getIdentifier()), e);
           }
           finally {
             m_blockedFutures.remove(currentFuture);
@@ -424,21 +392,15 @@ public class ModelJobManager implements IModelJobManager {
       final AtomicBoolean blockedThreadInterrupted = new AtomicBoolean(false);
 
       final CountDownLatch mutexReAcquiredLatch = new CountDownLatch(1);
-      final Task<Void> mutexReAcquireTask = new Task<Void>(m_executor, m_mutexSemaphore, input) {
+      final ModelFutureTask<Void> mutexReAcquireTask = new ModelFutureTask<Void>(ClientJobInput.empty().sessionRequired(false), ModelJobManager.this) {
 
         @Override
-        public void rejected(final ModelJobFuture<Void> future) {
+        protected void rejected(final IFuture<Void> future) {
           onMutexAcquired();
         }
 
         @Override
-        protected Void execute(final ModelJobFuture<Void> future) throws Exception {
-          // NOOP because only invoked if not cancelled.
-          return null;
-        }
-
-        @Override
-        protected void afterExecute(final ModelJobFuture<Void> future) {
+        protected void afterExecute(final IFuture<Void> future) {
           onMutexAcquired();
         }
 
@@ -470,7 +432,7 @@ public class ModelJobManager implements IModelJobManager {
             }
 
             currentFuture.cancel(true);
-            throw new JobExecutionException(String.format("Interrupted while re-acquiring the model-mutex [job=%s]", input.getIdentifier("n/a")), e);
+            throw new JobExecutionException(String.format("Interrupted while re-acquiring the model-mutex [job=%s]", currentFuture.getJobInput().getIdentifier()), e);
           }
         }
       }
@@ -483,5 +445,12 @@ public class ModelJobManager implements IModelJobManager {
         m_blocking.notifyAll();
       }
     }
+  }
+
+  // === IProgressMonitorProvider
+
+  @Override
+  public <RESULT> IProgressMonitor create(final IFuture<RESULT> future) {
+    return new ProgressMonitor(future);
   }
 }

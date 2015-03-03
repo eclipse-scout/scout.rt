@@ -24,11 +24,12 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.RunnableScheduledFuture;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.internal.Futures;
+import org.eclipse.scout.commons.job.internal.IProgressMonitorProvider;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.job.internal.ServerJobFuture;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -47,13 +48,13 @@ public class TwoPhaseTransactionBoundaryCallableTest {
   @Mock
   private Callable<String> m_next;
 
+  @Mock
+  private ServerJobFuture<String> m_serverJobFuture;
+
   @Before
   public void before() {
     MockitoAnnotations.initMocks(this);
-
-    @SuppressWarnings("unchecked")
-    ServerJobFuture future = new ServerJobFuture<>(mock(RunnableScheduledFuture.class), ServerJobInput.empty());
-    IFuture.CURRENT.set(future);
+    IFuture.CURRENT.set(Futures.iFuture(m_serverJobFuture, ServerJobInput.empty(), mock(IProgressMonitorProvider.class)));
   }
 
   @After
@@ -69,16 +70,13 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Test
   public void testRegisterTransaction() throws Exception {
-    ServerJobFuture<?> future = mock(ServerJobFuture.class);
-    IFuture.CURRENT.set(future);
-
     TwoPhaseTransactionBoundaryCallable<String> testee = new TwoPhaseTransactionBoundaryCallable<>(m_next, m_transaction, ServerJobInput.empty());
     testee.call();
 
     // VERIFY
-    verify(future, times(1)).register(same(m_transaction));
-    verify(future, times(1)).unregister(same(m_transaction));
-    verifyNoMoreInteractions(future);
+    verify(m_serverJobFuture, times(1)).register(same(m_transaction));
+    verify(m_serverJobFuture, times(1)).unregister(same(m_transaction));
+    verifyNoMoreInteractions(m_serverJobFuture);
 
     IFuture.CURRENT.remove();
   }

@@ -14,14 +14,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.Executables.IExecutable;
+import org.eclipse.scout.commons.job.internal.IProgressMonitorProvider;
 
 /**
  * Job manager to execute jobs in parallel.
  *
  * @since 5.1
  */
-public interface IJobManager<INPUT extends IJobInput> {
+public interface IJobManager<INPUT extends IJobInput> extends IProgressMonitorProvider {
 
   /**
    * Runs the given job immediately on behalf of the current thread. This call blocks the calling thread as long as
