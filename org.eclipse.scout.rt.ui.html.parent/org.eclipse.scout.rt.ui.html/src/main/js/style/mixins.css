@@ -112,6 +112,7 @@
   font-size: 11px;
   text-align: center;
   line-height: 15px;
+  padding-left: 1px;
 }
 
 .checkboxLabelBeforeBorder {
