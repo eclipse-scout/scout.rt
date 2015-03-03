@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.job.IExecutable;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.job.internal.Executables;
@@ -44,7 +45,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IBlockingCondition;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -126,8 +129,30 @@ public class ModelJobManager implements IModelJobManager {
 
   @Override
   public <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit, final ClientJobInput input) {
-    // TODO [dwi] implement this method.
-    return schedule(executable, input);
+    validateInput(input);
+
+    final Callable<RESULT> command = Assertions.assertNotNull(interceptCallable(Executables.callable(executable), input));
+
+    final ModelFutureTask<RESULT> task = interceptFuture(createModelFutureTask(command, input));
+
+    try {
+      OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          if (m_mutexSemaphore.tryAcquireElseOfferTail(task)) {
+            m_executor.execute(task);
+          }
+        }
+      }, delay, delayUnit, ClientJobInput.empty().sessionRequired(false));
+      // TODO [dwi]: Install listener on client-job-future to listen for cancellations.
+    }
+    catch (final JobExecutionException e) {
+      LOG.error("Failed to delayed schedule the given executable.", e);
+      task.getFuture().cancel(true);
+    }
+
+    return task.getFuture();
   }
 
   @Override

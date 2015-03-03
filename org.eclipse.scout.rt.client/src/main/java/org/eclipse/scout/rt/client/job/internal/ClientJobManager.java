@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.job.internal.callable.InitThreadLocalCallable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -34,6 +35,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * @see IClientJobManager
  * @since 5.1
  */
+@ApplicationScoped
 public class ClientJobManager extends JobManager<ClientJobInput> implements IClientJobManager {
 
   public ClientJobManager() {

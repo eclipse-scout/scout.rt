@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.internal.Futures.JobFuture;
 import org.eclipse.scout.commons.job.internal.JobManager;
 import org.eclipse.scout.commons.job.internal.callable.InitThreadLocalCallable;
+import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
@@ -39,6 +40,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * @see IServerJobManager
  * @since 5.1
  */
+@ApplicationScoped
 public class ServerJobManager extends JobManager<ServerJobInput> implements IServerJobManager {
 
   public ServerJobManager() {

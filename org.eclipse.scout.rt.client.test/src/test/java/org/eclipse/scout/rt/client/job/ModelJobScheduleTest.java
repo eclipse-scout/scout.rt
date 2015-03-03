@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.security.auth.Subject;
@@ -464,6 +465,25 @@ public class ModelJobScheduleTest {
 
     assertFalse(barrier.await());
     barrier.unblock();
+  }
+
+  @Test
+  public void testScheduleDelayed() throws ProcessingException {
+    final AtomicLong tRunning = new AtomicLong();
+
+    long tScheduled = System.nanoTime();
+    String result = m_jobManager.schedule(new ICallable<String>() {
+
+      @Override
+      public String call() throws Exception {
+        tRunning.set(System.nanoTime());
+        return "executed";
+      }
+    }, 2, TimeUnit.SECONDS).get(5, TimeUnit.SECONDS);
+
+    assertEquals("executed", result);
+    long delta = tRunning.get() - tScheduled;
+    assertTrue(delta >= TimeUnit.SECONDS.toNanos(2));
   }
 
   @Test
