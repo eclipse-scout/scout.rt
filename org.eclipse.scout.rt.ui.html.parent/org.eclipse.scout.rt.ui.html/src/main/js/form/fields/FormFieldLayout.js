@@ -41,17 +41,19 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     rightWidth += formField.$status.outerWidth(true);
   }
 
-  fieldSize = containerSize.subtract(scout.graphics.getMargins(formField.$fieldContainer));
-  fieldBounds = new scout.Rectangle(leftWidth, 0, fieldSize.width - leftWidth - rightWidth, fieldSize.height);
-  htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
-  if (htmlField) {
-    htmlField.setBounds(fieldBounds);
-  } else {
-    scout.graphics.setBounds(formField.$fieldContainer, fieldBounds);
+  if (formField.$fieldContainer) {
+    fieldSize = containerSize.subtract(scout.graphics.getMargins(formField.$fieldContainer));
+    fieldBounds = new scout.Rectangle(leftWidth, 0, fieldSize.width - leftWidth - rightWidth, fieldSize.height);
+    htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
+    if (htmlField) {
+      htmlField.setBounds(fieldBounds);
+    } else {
+      scout.graphics.setBounds(formField.$fieldContainer, fieldBounds);
+    }
   }
 
   // Icon is placed inside the field (as overlay)
-  if (formField.$icon) {
+  if (formField.$icon && formField.$field) {
     formField.$icon.cssRight(formField.$field.cssBorderRightWidth() + rightWidth);
   }
 
@@ -78,13 +80,18 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     width += formField.$status.outerWidth(true);
   }
 
-  htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
-  if (htmlField) {
-    prefSize = htmlField.getPreferredSize()
-      .add(htmlContainer.getInsets())
-      .add(htmlField.getMargins());
-  } else {
-    prefSize = this.naturalSize(formField);
+  if (formField.$fieldContainer) {
+    htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
+    if (htmlField) {
+      prefSize = htmlField.getPreferredSize()
+        .add(htmlContainer.getInsets())
+        .add(htmlField.getMargins());
+    } else {
+      prefSize = this.naturalSize(formField);
+    }
+  }
+  else {
+    prefSize = new scout.Dimension(0, 0);
   }
   width += prefSize.width;
   height = Math.max(height, prefSize.height);
