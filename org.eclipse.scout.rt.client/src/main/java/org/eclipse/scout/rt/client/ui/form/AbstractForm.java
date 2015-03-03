@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
@@ -53,11 +53,13 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.BlockingCondition;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCheckFieldsChain;
@@ -76,6 +78,9 @@ import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormTimerChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormValidateChain;
 import org.eclipse.scout.rt.client.extension.ui.form.IFormExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.MoveFormFieldsHandler;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -106,6 +111,8 @@ import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -168,7 +175,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   // current timers
   private P_CloseTimer m_scoutCloseTimer;
-  private Map<String, P_Timer> m_scoutTimerMap;
+  private Map<String, IFuture<Void>> m_timerFutureMap;
   private DataChangeListener m_internalDataChangeListener;
   private final IEventHistory<FormEvent> m_eventHistory;
 
@@ -567,7 +574,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   protected void initConfig() throws ProcessingException {
     m_uiFacade = new P_UIFacade();
-    m_scoutTimerMap = new HashMap<String, P_Timer>();
+    m_timerFutureMap = new HashMap<>();
     m_autoRegisterInDesktopOnStart = true;
     m_contributionHolder = new ContributionComposite(this);
     setToolbarLocation(getConfiguredToolbarLocation());
@@ -806,7 +813,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     IDesktop desktop = getDesktop();
     if (desktop == null) {
-      desktop = ClientSyncJob.getCurrentSession().getVirtualDesktop();
+      desktop = ((IClientSession) IClientSession.CURRENT.get()).getVirtualDesktop();
     }
     desktop.addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
@@ -953,7 +960,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void waitFor() throws ProcessingException {
     // check if the desktop is observing this process
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+    IDesktop desktop = ((IClientSession) IClientSession.CURRENT.get()).getDesktop();
     if (desktop == null || !desktop.isOpened()) {
       throw new ProcessingException("Cannot wait for " + getClass().getName() + ". There is no desktop or the desktop has not yet been opened in the ui", null, WAIT_FOR_ERROR_CODE);
     }
@@ -1322,7 +1329,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * Convenience for ClientJob.getCurrentSession().getDesktop()
    */
   public IDesktop getDesktop() {
-    return ClientSyncJob.getCurrentSession().getDesktop();
+    return ((IClientSession) IClientSession.CURRENT.get()).getDesktop();
   }
 
   @Override
@@ -1709,9 +1716,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   public void setTimer(String timerId, int seconds) {
     removeTimer(timerId);
     if (seconds > 0) {
-      P_Timer tim = new P_Timer(seconds, timerId);
-      m_scoutTimerMap.put(timerId, tim);
-      tim.start();
+      try {
+        IFuture<Void> future = startTimer(seconds, timerId);
+        m_timerFutureMap.put(timerId, future);
+      }
+      catch (JobExecutionException e) {
+        LOG.error("Failed to start timer");
+      }
     }
   }
 
@@ -1722,9 +1733,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    */
   @Override
   public void removeTimer(String timerId) {
-    P_Timer tim = m_scoutTimerMap.remove(timerId);
-    if (tim != null) {
-      tim.setStopSignal();
+    IFuture<Void> future = m_timerFutureMap.remove(timerId);
+    if (future != null) {
+      future.cancel(false);
     }
   }
 
@@ -2070,10 +2081,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       setCloseTimerArmed(false);
       //
       m_scoutCloseTimer = null;
-      for (Iterator it = m_scoutTimerMap.values().iterator(); it.hasNext();) {
-        ((P_Timer) it.next()).setStopSignal();
+
+      for (IFuture<?> future : m_timerFutureMap.values()) {
+        future.cancel(false);
       }
-      m_scoutTimerMap.clear();
+      m_timerFutureMap.clear();
       m_formLoading = true;
     }
     catch (Throwable t) {
@@ -2883,62 +2895,34 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * form custom timer
+   * Starts the timer that periodically invokes {@link AbstractForm#interceptTimer(String).
    */
-  private class P_Timer extends StoppableThread {
-    private final long m_intervalMillis;
-    private final String m_timerId;
-    private boolean m_execPending = false;// do not execute while exec is pending
-    private final IClientSession m_session;
+  protected IFuture<Void> startTimer(long intervalSeconds, final String timerId) throws JobExecutionException {
+    final IModelJobManager modelJobManager = ((IClientSession) IClientSession.CURRENT.get()).getModelJobManager();
 
-    public P_Timer(long seconds, String timerId) {
-      setDaemon(true);
-      m_intervalMillis = seconds * 1000L;
-      m_timerId = timerId;
-      m_session = ClientSyncJob.getCurrentSession();
-    }
+    return OBJ.one(IClientJobManager.class).scheduleAtFixedRate(new IRunnable() {
 
-    @Override
-    public void run() {
-      long next = ((System.currentTimeMillis() + 999L) / 1000L) * 1000L + m_intervalMillis;
-      while (m_scoutTimerMap != null && !isStopSignal()) {
-        try {
-          sleep(250);
-        }
-        catch (InterruptedException ex) {
-        }
-        // active?
-        if ((!m_execPending) && (!isStopSignal())) {
-          // next ready?
-          if (next < System.currentTimeMillis()) {
-            m_execPending = true;
-            new ClientSyncJob("Form timer", m_session) {
-              @Override
-              protected void runVoid(IProgressMonitor monitor) throws Throwable {
-                try {
-                  if (LOG.isInfoEnabled()) {
-                    LOG.info("timer " + m_timerId);
-                  }
-                  interceptTimer(m_timerId);
-                }
-                catch (ProcessingException se) {
-                  se.addContextMessage(ScoutTexts.get("FormTimerActivated") + " " + getTitle() + "." + m_timerId);
-                  SERVICES.getService(IExceptionHandlerService.class).handleException(se);
-                }
-                finally {
-                  m_execPending = false;// continue scheduling
-                }
+      @Override
+      public void run() throws Exception {
+        modelJobManager.schedule(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            try {
+              if (LOG.isInfoEnabled()) {
+                LOG.info("timer {}", timerId);
               }
-            }.schedule();
+              interceptTimer(timerId);
+            }
+            catch (ProcessingException pe) {
+              pe.addContextMessage("%s %s.%s", ScoutTexts.get("FormTimerActivated"), getTitle(), timerId);
+              SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
+            }
           }
-        }
-        // update next
-        while (next < System.currentTimeMillis()) {
-          next = next + m_intervalMillis;
-        }
+        }, ClientJobInput.defaults().name("Form timer")).get(); // Wait for the job to complete.
       }
-    }
-  }// end private class
+    }, intervalSeconds, intervalSeconds, TimeUnit.SECONDS, ClientJobInput.defaults());
+  }
 
   /**
    * form close timer
@@ -2951,29 +2935,32 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       setName("IForm.P_CloseTimer");
       setDaemon(true);
       m_seconds = seconds;
-      m_session = ClientSyncJob.getCurrentSession();
+      m_session = (IClientSession) ISession.CURRENT.get();
     }
 
     @Override
     public void run() {
       while (this == m_scoutCloseTimer && m_seconds > 0 && isCloseTimerArmed()) {
-        new ClientSyncJob("Form close countdown", m_session) {
+        m_session.getModelJobManager().schedule(new IRunnable() {
+
           @Override
-          protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          public void run() throws Exception {
             setSubTitle("" + m_seconds);
           }
-        }.schedule();
+        }, ClientJobInput.defaults().name("Form close countdown").session(m_session));
+
         try {
-          sleep(1000);
+          sleep(TimeUnit.SECONDS.toMillis(1));
         }
         catch (InterruptedException ex) {
         }
         m_seconds--;
       }
       if (this == m_scoutCloseTimer) {
-        new ClientSyncJob("Form close timer", m_session) {
+        m_session.getModelJobManager().schedule(new IRunnable() {
+
           @Override
-          protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          public void run() throws Exception {
             try {
               if (isCloseTimerArmed()) {
                 interceptCloseTimer();
@@ -2987,7 +2974,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               SERVICES.getService(IExceptionHandlerService.class).handleException(se);
             }
           }
-        }.schedule();
+        }, ClientJobInput.defaults().name("Form close timer").session(m_session));
       }
     }
   }// end private class
