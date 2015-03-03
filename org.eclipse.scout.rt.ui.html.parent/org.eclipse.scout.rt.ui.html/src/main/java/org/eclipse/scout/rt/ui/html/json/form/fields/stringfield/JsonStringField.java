@@ -45,7 +45,7 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
     });
     putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_INPUT_MASKED, model) {
       @Override
-      protected Object modelValue() {
+      protected Boolean modelValue() {
         return getModel().isInputMasked();
       }
     });
@@ -60,5 +60,4 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
     // also sets the value of the field, setDisplayTextFromUI does not.
     getModel().getUIFacade().setTextFromUI(displayText, whileTyping);
   }
-
 }

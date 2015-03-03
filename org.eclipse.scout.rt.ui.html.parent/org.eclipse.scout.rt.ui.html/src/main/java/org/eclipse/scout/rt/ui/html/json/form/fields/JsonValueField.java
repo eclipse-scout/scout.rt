@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
  *
  * @param <T>
  */
-public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
+public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
   public static final String EVENT_DISPLAY_TEXT_CHANGED = "displayTextChanged";
 
   public JsonValueField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
