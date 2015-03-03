@@ -10,11 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services;
 
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
-import org.eclipse.scout.rt.shared.services.cdi.SessionRequired;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
@@ -51,7 +49,6 @@ public class ServiceWithSessionInterceptorTest {
 
   }
 
-  @SessionRequired(IClientSession.class)
   @ApplicationScoped
   private static class TestService extends AbstractService implements ITestService {
     @Override

@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.service.internal;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -41,8 +39,6 @@ import org.w3c.dom.NodeList;
 public class ServiceXmlVisitor implements IPluginXmlVisitor {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceXmlVisitor.class);
-
-  private static final String LegacySessionRequiredAnnotationFactory = "org.eclipse.scout.rt.shared.services.cdi.LegacySessionRequiredAnnotationFactory";
 
   private static final String ClientServiceFactory = "org.eclipse.scout.rt.client.services.ClientServiceFactory";
   private static final String CommonProxyServiceFactory = "org.eclipse.scout.rt.services.CommonProxyServiceFactory";
@@ -90,12 +86,6 @@ public class ServiceXmlVisitor implements IPluginXmlVisitor {
   }
 
   public static void fillServiceAnnotations(Bean<?> bean, IPluginXml pluginXml, IServiceReference ref) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
-    // require session
-    if (ref.getSession() != null) {
-      Method createSessionRequiredAnnotationMethod = pluginXml.loadClass(LegacySessionRequiredAnnotationFactory).getDeclaredMethod("createSessionRequiredAnnotation", Class.class);
-      Annotation annotation = (Annotation) createSessionRequiredAnnotationMethod.invoke(null, ref.getSession());
-      bean.addAnnotation(annotation);
-    }
     // ranking
     bean.addAnnotation(DynamicAnnotations.createPriority(ref.getRanking()));
   }

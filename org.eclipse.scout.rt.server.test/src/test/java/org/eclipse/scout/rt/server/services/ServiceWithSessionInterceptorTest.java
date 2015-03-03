@@ -15,10 +15,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.TestServerSession;
-import org.eclipse.scout.rt.shared.services.cdi.SessionRequired;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
@@ -27,9 +25,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- *
- */
 @RunWith(ScoutPlatformTestRunner.class)
 public class ServiceWithSessionInterceptorTest {
 
@@ -59,9 +54,6 @@ public class ServiceWithSessionInterceptorTest {
     job.join();
   }
 
-  /**
-   *
-   */
   protected void runInServerJob() {
     OBJ.one(ITestService.class).doit();
 
@@ -69,14 +61,10 @@ public class ServiceWithSessionInterceptorTest {
 
   public static interface ITestService extends IService {
 
-    /**
-     *
-     */
     void doit();
 
   }
 
-  @SessionRequired(IServerSession.class)
   @ApplicationScoped
   public static class TestService extends AbstractService implements ITestService {
     @Override

@@ -12,25 +12,15 @@ package org.eclipse.scout.service;
 
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.service.internal.ITestService;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-/**
- *
- */
 public class ServiceTest {
 
   @BeforeClass
   public static void setup() {
-    Platform.get().start();
-  }
-
-  @AfterClass
-  public static void tearDown() {
-    Platform.get().stop();
-
+    ((Platform) Platform.get()).ensureStarted();
   }
 
   @Test
@@ -38,5 +28,4 @@ public class ServiceTest {
     ITestService service = SERVICES.getService(ITestService.class);
     Assert.assertNotNull(service);
   }
-
 }
