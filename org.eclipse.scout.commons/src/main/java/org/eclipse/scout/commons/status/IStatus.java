@@ -79,7 +79,7 @@ public interface IStatus extends Comparable<IStatus> {
   boolean matches(int severityMask);
 
   /**
-   * Returns the localized message describing the outcome.
+   * Returns the localized message describing the outcome. Not <code>null</code>
    *
    * @return a localized message
    */
@@ -101,6 +101,14 @@ public interface IStatus extends Comparable<IStatus> {
    */
   int getCode();
 
+  /**
+   * @return true, if the severity is #OK
+   */
   boolean isOK();
+
+  /**
+   * @return Returns the object's order. Statuses are ordered first by severity then by priority.
+   */
+  double getOrder();
 
 }

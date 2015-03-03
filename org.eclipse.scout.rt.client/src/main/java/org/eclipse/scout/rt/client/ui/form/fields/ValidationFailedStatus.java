@@ -10,24 +10,44 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.ProcessingException;
+
 /**
- * Marker subclass so we know inside setValue that this was a previous
- * validation failure that was catched. Once validation is successful the error
- * status of this type can safely be cleared.
+ * Internal marker status for validation errors during setValue.
+ *
+ * @see AbstractValueField#validateValueInternal(Object)
+ * @param invalid
+ *          value type
  */
-public class ValidationFailedStatus extends ScoutFieldStatus {
+@Order(20.0)
+public final class ValidationFailedStatus<VALUE> extends ScoutFieldStatus {
   private static final long serialVersionUID = 1L;
+  private final VALUE m_invalidValue;
 
   public ValidationFailedStatus(String message) {
-    this(message, WARNING);
+    this(message, ERROR);
   }
 
   public ValidationFailedStatus(String message, int severity) {
-    super(message, severity);
+    this(message, severity, 0);
   }
 
   public ValidationFailedStatus(String message, int severity, int code) {
+    this(message, severity, code, null);
+  }
+
+  public ValidationFailedStatus(String message, int severity, int code, VALUE invalidValue) {
     super(message, severity, code);
+    m_invalidValue = invalidValue;
+  }
+
+  public ValidationFailedStatus(ProcessingException e, VALUE invalidValue) {
+    this(e.getStatus().getMessage(), e.getStatus().getSeverity(), e.getStatus().getCode(), invalidValue);
+  }
+
+  public VALUE getInvalidValue() {
+    return m_invalidValue;
   }
 
 }

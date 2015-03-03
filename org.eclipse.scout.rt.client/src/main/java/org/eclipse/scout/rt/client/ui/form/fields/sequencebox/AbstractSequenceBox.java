@@ -24,7 +24,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.ISequenceBoxExtension;
@@ -104,55 +103,61 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   @Order(200)
   protected <T extends Comparable<T>> void execCheckFromTo(IValueField<T>[] valueFields, int changedIndex) throws ProcessingException {
     ArrayList<IValueField<T>> nonEmptyFields = new ArrayList<IValueField<T>>();
-    HashSet<Class> beanTypes = new HashSet<Class>();
     int nonEmptyIndex = -1;
     for (int i = 0; i < valueFields.length; i++) {
       if (valueFields[i].getValue() != null) {
-        beanTypes.add(valueFields[i].getValue().getClass());
         nonEmptyFields.add(valueFields[i]);
         if (i == changedIndex) {
           nonEmptyIndex = nonEmptyFields.size() - 1;
         }
       }
     }
+
     //check if there are exactly two field and all of them are comparable with same type
-    if (nonEmptyFields.size() != 2 || beanTypes.size() != 1) {
+    if (nonEmptyIndex < 0 || nonEmptyFields.size() != 2 || equalTypes(nonEmptyFields)) {
       clearInvalidSequenceStatus(valueFields);
       return;
     }
     // check changed field against its non-empty neighbours
-    if (nonEmptyIndex >= 0) {
-      IValueField<T> v = nonEmptyFields.get(nonEmptyIndex);
-      if (nonEmptyIndex - 1 >= 0) {
-        IValueField<T> left = nonEmptyFields.get(nonEmptyIndex - 1);
-        if (CompareUtility.compareTo(left.getValue(), v.getValue()) > 0) {
-          InvalidSequenceStatus errorStatus = new InvalidSequenceStatus(ScoutTexts.get("XMustBeGreaterThanOrEqualY", v.getLabel(), left.getLabel()));
-          if (!v.isLabelSuppressed()) {
-            v.setErrorStatus(errorStatus);
-          }
-          else {
-            //first field's label is suppressed and error status updated on own label
-            setErrorStatus(errorStatus);
-          }
-          return;
-        }
-      }
-      if (nonEmptyIndex + 1 < nonEmptyFields.size()) {
-        IValueField<T> right = nonEmptyFields.get(nonEmptyIndex + 1);
-        if (CompareUtility.compareTo(v.getValue(), right.getValue()) > 0) {
-          InvalidSequenceStatus errorStatus = new InvalidSequenceStatus(ScoutTexts.get("XMustBeLessThanOrEqualY", v.getLabel(), right.getLabel()));
-          if (!v.isLabelSuppressed()) {
-            v.setErrorStatus(errorStatus);
-          }
-          else {
-            //first field's label is suppressed and error status updated on own label
-            setErrorStatus(errorStatus);
-          }
-          return;
-        }
+    IValueField<T> v = nonEmptyFields.get(nonEmptyIndex);
+
+    //check greater left neighbor
+    if (nonEmptyIndex - 1 >= 0) {
+      IValueField<T> left = nonEmptyFields.get(nonEmptyIndex - 1);
+      if (CompareUtility.compareTo(left.getValue(), v.getValue()) > 0) {
+        setSequenceErrorToField(v, ScoutTexts.get("XMustBeGreaterThanOrEqualY", v.getLabel(), left.getLabel()));
+        return;
       }
     }
+
+    //check right neighbor greater
+    if (nonEmptyIndex + 1 < nonEmptyFields.size()) {
+      IValueField<T> right = nonEmptyFields.get(nonEmptyIndex + 1);
+      if (CompareUtility.compareTo(v.getValue(), right.getValue()) > 0) {
+        setSequenceErrorToField(v, ScoutTexts.get("XMustBeLessThanOrEqualY", v.getLabel(), right.getLabel()));
+        return;
+      }
+    }
+
     clearInvalidSequenceStatus(valueFields);
+  }
+
+  private <T extends Comparable<T>> boolean equalTypes(ArrayList<IValueField<T>> nonEmptyFields) {
+    HashSet<Class> beanTypes = new HashSet<Class>();
+    for (IValueField<T> f : nonEmptyFields) {
+      beanTypes.add(f.getValue().getClass());
+    }
+    return beanTypes.size() != 1;
+  }
+
+  private <T extends Comparable<T>> void setSequenceErrorToField(IValueField<T> v, String errorMessage) {
+    if (!v.isLabelSuppressed()) {
+      v.addErrorStatus(new InvalidSequenceStatus(errorMessage));
+    }
+    else {
+      //first field's label is suppressed and error status updated on own label
+      addErrorStatus(new InvalidSequenceStatus(errorMessage));
+    }
   }
 
   /**
@@ -161,16 +166,11 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
    *
    * @param valueFields
    */
-  private void clearInvalidSequenceStatus(IValueField[] valueFields) {
-    for (IValueField v : valueFields) {
-      if (v.getErrorStatus() instanceof InvalidSequenceStatus) {
-        v.clearErrorStatus();
-      }
+  private <T extends Comparable<T>> void clearInvalidSequenceStatus(IValueField<T>[] valueFields) {
+    for (IValueField<T> v : valueFields) {
+      v.removeErrorStatus(InvalidSequenceStatus.class);
     }
-    //remove error status on own
-    if (getErrorStatus() instanceof InvalidSequenceStatus) {
-      clearErrorStatus();
-    }
+    removeErrorStatus(InvalidSequenceStatus.class);
   }
 
   @Override
@@ -299,11 +299,8 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     try {
       interceptCheckFromTo(valueFields, changedIndex);
     }
-    catch (VetoException e) {
-      valueFields[changedIndex].setErrorStatus(e.getStatus());
-    }
     catch (ProcessingException e) {
-      valueFields[changedIndex].setErrorStatus(e.getStatus());
+      valueFields[changedIndex].addErrorStatus(e.getStatus());
     }
   }
 

@@ -10,12 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.status;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.IOrdered;
 
 /**
  * Implementation of a {@link IMultiStatus}: A status with child statuses.
@@ -29,23 +33,70 @@ public class MultiStatus extends Status implements IMultiStatus {
   //children ordered by severity and message
   private final SortedSet<IStatus> m_children = new TreeSet<>();
 
-  public MultiStatus(String message) {
-    super(message, IStatus.OK);
-  }
-
   public MultiStatus() {
-    this(null);
+    super(null);
   }
 
-  /**
-   * @return maximum severity of the children or {@link #DEFAULT_SEVERITY}, if no children available
-   */
+  public MultiStatus(IMultiStatus ms) {
+    this();
+    Assertions.assertNotNull(ms);
+    for (IStatus s : ms.getChildren()) {
+      add(s);
+    }
+  }
+
   @Override
   public int getSeverity() {
     if (m_children.size() > 0) {
       return m_children.first().getSeverity();
     }
     return IStatus.OK;
+  }
+
+  @Override
+  public double getOrder() {
+    if (m_children.size() > 0) {
+      return m_children.first().getOrder();
+    }
+    return IOrdered.DEFAULT_ORDER;
+  }
+
+  /**
+   * The messages of the children with max severity and priority, or an empty message, if no children are available.
+   */
+  @Override
+  public String getMessage() {
+    return formatMessages(filterSameOrder(filterSameSeverity(m_children)));
+  }
+
+  private List<IStatus> filterSameOrder(Collection<IStatus> statuses) {
+    List<IStatus> res = new ArrayList<>();
+    for (IStatus s : statuses) {
+      if (s.getOrder() != getOrder()) {
+        break;
+      }
+      res.add(s);
+    }
+    return res;
+  }
+
+  private List<IStatus> filterSameSeverity(Collection<IStatus> statuses) {
+    List<IStatus> res = new ArrayList<>();
+    for (IStatus s : statuses) {
+      if (s.getSeverity() != getSeverity()) {
+        break;
+      }
+      res.add(s);
+    }
+    return res;
+  }
+
+  protected String formatMessages(List<IStatus> statuses) {
+    List<String> messages = new ArrayList<>();
+    for (IStatus s : statuses) {
+      messages.add(s.getMessage());
+    }
+    return StringUtility.join("\n", messages);
   }
 
   /**
@@ -59,6 +110,21 @@ public class MultiStatus extends Status implements IMultiStatus {
     m_children.add(Assertions.assertNotNull(status));
   }
 
+  public void remove(IStatus status) {
+    m_children.remove(Assertions.assertNotNull(status));
+  }
+
+  /**
+   * Remove all children with the given class
+   */
+  public void removeAll(Class<? extends IStatus> clazz) {
+    for (IStatus child : getChildren()) {
+      if (Assertions.assertNotNull(clazz).isAssignableFrom(child.getClass())) {
+        m_children.remove(Assertions.assertNotNull(child));
+      }
+    }
+  }
+
   @Override
   public boolean isMultiStatus() {
     return true;
@@ -67,6 +133,18 @@ public class MultiStatus extends Status implements IMultiStatus {
   @Override
   public List<IStatus> getChildren() {
     return CollectionUtility.arrayList(m_children);
+  }
+
+  @Override
+  public boolean containsStatus(Class<? extends IStatus> clazz) {
+    Assertions.assertNotNull(clazz);
+    for (IStatus child : getChildren()) {
+      if (clazz.isAssignableFrom(child.getClass())
+          || child instanceof IMultiStatus && ((IMultiStatus) child).containsStatus(clazz)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

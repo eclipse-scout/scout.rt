@@ -35,8 +35,9 @@ import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.commons.status.Status;
+import org.eclipse.scout.commons.status.MultiStatus;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldAddSearchTermsChain;
@@ -1615,23 +1616,87 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public IStatus getErrorStatus() {
-    return (IStatus) propertySupport.getProperty(PROP_ERROR_STATUS);
+  public IMultiStatus getErrorStatus() {
+    final IMultiStatus ms = getErrorStatusInternal();
+    return (ms == null) ? null : new MultiStatus(ms);
   }
 
-  @Override
-  public void setErrorStatus(String message) {
-    setErrorStatus(new Status(message));
+  /**
+   * @return the live error status
+   */
+  protected MultiStatus getErrorStatusInternal() {
+    return (MultiStatus) propertySupport.getProperty(PROP_ERROR_STATUS);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void setErrorStatus(IStatus status) {
+    addErrorStatus(status);
+  }
+
+  @Override
+  public void setErrorStatus(IMultiStatus status) {
+    setErrorStatusInternal(new MultiStatus(status));
+  }
+
+  protected void setErrorStatusInternal(MultiStatus status) {
     propertySupport.setProperty(PROP_ERROR_STATUS, status);
   }
 
   @Override
   public void clearErrorStatus() {
     propertySupport.setProperty(PROP_ERROR_STATUS, null);
+  }
+
+  /**
+   * use {@link #addErrorStatus(message)}
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  @Override
+  public void setErrorStatus(String message) {
+    addErrorStatus(message);
+  }
+
+  @Override
+  public void addErrorStatus(String message) {
+    addErrorStatus(new DefaultFieldStatus(message));
+  }
+
+  /**
+   * Adds an error status
+   */
+  @Override
+  public void addErrorStatus(IStatus newStatus) {
+    final MultiStatus status = ensureMultiStatus(getErrorStatusInternal());
+    status.add(newStatus);
+    setErrorStatus(status);
+  }
+
+  /**
+   * Remove IStatus of a specific type
+   */
+  @Override
+  public void removeErrorStatus(Class<? extends IStatus> statusClazz) {
+    final MultiStatus ms = getErrorStatusInternal();
+    if (ms != null) {
+      ms.removeAll(statusClazz);
+      if (ms.getChildren().isEmpty()) {
+        clearErrorStatus();
+      }
+    }
+  }
+
+  private MultiStatus ensureMultiStatus(IStatus s) {
+    if (s instanceof MultiStatus) {
+      return (MultiStatus) s;
+    }
+    final MultiStatus ms = new MultiStatus();
+    if (s != null) {
+      ms.add(s);
+    }
+    return ms;
   }
 
   @Override

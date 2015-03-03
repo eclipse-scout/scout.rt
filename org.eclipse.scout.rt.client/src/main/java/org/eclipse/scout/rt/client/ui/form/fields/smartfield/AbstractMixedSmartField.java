@@ -122,7 +122,8 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     //
     try {
       String oldText = getDisplayText();
-      boolean parsingError = (getErrorStatus() instanceof ParsingFailedStatus);
+
+      boolean parsingError = getErrorStatus() != null && getErrorStatus().containsStatus(ParsingFailedStatus.class);
       if (acceptedProposalRow == null && (!parsingError) && getCurrentLookupRow() != null && StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(oldText))) {
         // no change
         return getValue();

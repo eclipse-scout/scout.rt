@@ -12,39 +12,20 @@ package org.eclipse.scout.commons.status;
 
 import java.io.Serializable;
 
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.IOrdered;
+import org.eclipse.scout.commons.annotations.Order;
+
 /**
  * Status
  */
+@Order(IOrdered.DEFAULT_ORDER)
 public class Status implements IStatus, Serializable {
   private static final long serialVersionUID = 382223180907716448L;
 
   private final int m_severity;
   private final String m_message;
   private final int m_code;
-
-  /**
-   * Status with error message and severity, error code
-   *
-   * @param message
-   * @param severity
-   *          {@link #ERROR}, {@link #WARNING}, {@link #INFO}
-   */
-  public Status(String message, int severity, int code) {
-    m_severity = severity;
-    m_message = message;
-    m_code = code;
-  }
-
-  /**
-   * Status with error message and severity.
-   *
-   * @param message
-   * @param severity
-   *          {@link #ERROR}, {@link #WARNING}, {@link #INFO}
-   */
-  public Status(String message, int severity) {
-    this(message, severity, 0);
-  }
 
   /**
    * @param severity
@@ -61,6 +42,30 @@ public class Status implements IStatus, Serializable {
    */
   public Status(String message) {
     this(message, IStatus.ERROR);
+  }
+
+  /**
+   * Status with error message and severity.
+   *
+   * @param message
+   * @param severity
+   *          {@link #ERROR}, {@link #WARNING}, {@link #INFO}
+   */
+  public Status(String message, int severity) {
+    this(message, severity, 0);
+  }
+
+  /**
+   * Status with error message and severity, error code
+   *
+   * @param message
+   * @param severity
+   *          {@link #ERROR}, {@link #WARNING}, {@link #INFO}
+   */
+  public Status(String message, int severity, int code) {
+    m_severity = severity;
+    m_message = message;
+    m_code = code;
   }
 
   /**
@@ -82,7 +87,7 @@ public class Status implements IStatus, Serializable {
 
   @Override
   public String getMessage() {
-    return m_message;
+    return StringUtility.emptyIfNull(m_message);
   }
 
   @Override
@@ -94,6 +99,9 @@ public class Status implements IStatus, Serializable {
   public int compareTo(IStatus o) {
     if (o.getSeverity() - getSeverity() != 0) {
       return o.getSeverity() - getSeverity();
+    }
+    else if (o.getOrder() - getOrder() != 0) {
+      return Double.valueOf(getOrder() - o.getOrder()).intValue();
     }
     else if (getMessage() != null && o.getMessage() != null) {
       return getMessage().compareTo(o.getMessage());
@@ -165,6 +173,9 @@ public class Status implements IStatus, Serializable {
     if (m_severity != other.m_severity) {
       return false;
     }
+    if (getOrder() != other.getOrder()) {
+      return false;
+    }
     return true;
   }
 
@@ -176,6 +187,15 @@ public class Status implements IStatus, Serializable {
   @Override
   public boolean isOK() {
     return m_severity == OK;
+  }
+
+  @Override
+  public double getOrder() {
+    Class<?> clazz = getClass();
+    while (clazz.getAnnotation(Order.class) == null) {
+      clazz = clazz.getSuperclass();
+    }
+    return clazz.getAnnotation(Order.class).value();
   }
 
 }

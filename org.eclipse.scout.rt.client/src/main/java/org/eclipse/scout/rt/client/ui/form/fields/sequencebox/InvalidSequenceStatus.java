@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
 
 /**
@@ -18,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
  * previous failure was due to invalid sequence values and can safely be
  * cleared once the sequence is valid again.
  */
+@Order(50.0)
 public class InvalidSequenceStatus extends ScoutFieldStatus {
   private static final long serialVersionUID = 1L;
 

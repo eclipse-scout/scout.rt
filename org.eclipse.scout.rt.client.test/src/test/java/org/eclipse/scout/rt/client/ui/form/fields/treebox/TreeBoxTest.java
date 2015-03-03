@@ -220,7 +220,7 @@ public class TreeBoxTest {
   @Test
   public void testContentInvalidError() throws ProcessingException {
     SimpleTreeBox treeBox = createSimpleTreeBox();
-    treeBox.setErrorStatus("Error");
+    treeBox.addErrorStatus("Error");
     assertFalse(treeBox.isContentValid());
   }
 

@@ -310,6 +310,11 @@ public class Cell implements ICell {
     setErrorStatus((IStatus) null);
   }
 
+  public boolean isContentValid() {
+    IStatus errorStatus = getErrorStatus();
+    return errorStatus == null || (errorStatus.getSeverity() < IStatus.ERROR);
+  }
+
   @Override
   public String toString() {
     String s = getText();

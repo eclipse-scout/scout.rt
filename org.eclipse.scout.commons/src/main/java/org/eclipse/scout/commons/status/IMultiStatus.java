@@ -12,6 +12,8 @@ package org.eclipse.scout.commons.status;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.annotations.IOrdered;
+
 /**
  * A multi-status may have other status objects as children.
  */
@@ -21,7 +23,8 @@ public interface IMultiStatus extends IStatus {
    * Returns a list of status objects immediately contained in this
    * multi-status, or an empty list if there are no children available.
    * <p>
-   * The list of children is sorted from highest to lowest severity. ({@link IStatus#ERROR} to {@link IStatus#OK})
+   * The list of children is sorted from highest to lowest severity ({@link IStatus#ERROR} to {@link IStatus#OK}), then
+   * by lowest to highest order (see {@link IOrdered}), then by message.
    * </p>
    * *
    * <p>
@@ -33,5 +36,25 @@ public interface IMultiStatus extends IStatus {
    * @see #isMultiStatus()
    */
   List<IStatus> getChildren();
+
+  /**
+   * @param clazz
+   *          not <code>null<code>
+   * @return <code>true</code>, if any of the direct or indirect children is of the given type, <code>false</code>
+   *         otherwise.
+   */
+  boolean containsStatus(Class<? extends IStatus> clazz);
+
+  /**
+   * @return maximum severity of the children or {@link #DEFAULT_SEVERITY}, if no children available
+   */
+  @Override
+  public int getSeverity();
+
+  /**
+   * @return the minimum order of the children or {@link IOrdered#DEFAULT_ORDER}, if no children available
+   */
+  @Override
+  public double getOrder();
 
 }

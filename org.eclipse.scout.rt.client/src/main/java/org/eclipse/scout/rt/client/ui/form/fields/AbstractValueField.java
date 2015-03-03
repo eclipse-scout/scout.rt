@@ -330,61 +330,39 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
 
   @Override
   public final void setValue(VALUE rawValue) {
-    /**
-     * @rn imo, 22.02.2006, set verifyInput flag while firing triggers when a
-     *     message box is shown, the doOK of the form might overrun this
-     *     command. setting isVerifyInput() cancels the ok task
-     */
     if (isValueChanging()) {
-      Exception caller1 = new Exception();
-      LOG.warn("Loop detection in " + getClass().getName() + " with value " + rawValue, caller1);
+      LOG.warn("Loop detection in " + getClass().getName() + " with value " + rawValue, new Exception());
       return;
     }
     try {
       setFieldChanging(true);
       setValueChanging(true);
-      //
-      VALUE validatedValue = null;
 
-      if (getErrorStatus() instanceof ValidationFailedStatus) {
-        clearErrorStatus();
-      }
+      removeErrorStatus(ParsingFailedStatus.class);
+      removeErrorStatus(ValidationFailedStatus.class);
+      VALUE validatedValue = null;
       try {
         validatedValue = validateValue(rawValue);
-
-        //parsing error may be cleared after successful validation
-        if (getErrorStatus() instanceof ParsingFailedStatus) {
-          clearErrorStatus();
-        }
       }
-      catch (Throwable t) {
-        ProcessingException e = (t instanceof ProcessingException ? (ProcessingException) t : new ProcessingException("Unexpected", t));
-
-        //parsing error remains unchanged, regardless of validation error
-        if (!(getErrorStatus() instanceof ParsingFailedStatus)) {
-          setErrorStatus(new ValidationFailedStatus(e.getStatus().getMessage()));
-          if (shouldUpdateDisplayText(false)) {
-            String formattedValue = interceptFormatValue(rawValue);
-            setDisplayText(formattedValue);
-          }
-        }
-
-        e.consume();
-        e.addContextMessage(getLabel() + " = " + rawValue);
-        if (!(e instanceof VetoException)) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-        }
-        // break up
+      catch (ProcessingException v) {
+        addErrorStatus(new ValidationFailedStatus<VALUE>(v, rawValue));
+        updateDisplayText(rawValue, false);
+        return;
+      }
+      catch (Exception e) {
+        final String message = ScoutTexts.get("InvalidValueMessageX", StringUtility.emptyIfNull(rawValue));
+        ProcessingException pe = new ProcessingException(message, e);
+        LOG.warn("Unexpected Error: ", pe);
+        addErrorStatus(new ValidationFailedStatus<VALUE>(pe, rawValue));
+        updateDisplayText(rawValue, false);
         return;
       }
       //
       VALUE oldValue = getValue();
       boolean changed = propertySupport.setPropertyNoFire(PROP_VALUE, validatedValue);
       // change text if auto-set-text enabled
-      if (shouldUpdateDisplayText(CompareUtility.notEquals(rawValue, validatedValue))) {
-        String formattedValue = interceptFormatValue(validatedValue);
-        setDisplayText(formattedValue);
-      }
+      updateDisplayText(rawValue, CompareUtility.notEquals(rawValue, validatedValue));
+
       if (changed) {
         propertySupport.firePropertyChange(PROP_VALUE, oldValue, validatedValue);
         //
@@ -405,6 +383,16 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     finally {
       setValueChanging(false);
       setFieldChanging(false);
+    }
+  }
+
+  /**
+   * @param rawValue
+   * @param validValueDiffersFromRawValue
+   */
+  private void updateDisplayText(VALUE rawValue, boolean validValueDiffersFromRawValue) {
+    if (shouldUpdateDisplayText(validValueDiffersFromRawValue)) {
+      setDisplayText(interceptFormatValue(rawValue));
     }
   }
 
@@ -541,6 +529,9 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   protected void execChangedValue() throws ProcessingException {
   }
 
+  /**
+   * Parses and sets either the value or an errorStatus, if parsing or validation fails.
+   */
   @Override
   public final boolean parseValue(String text) {
     if (isValueParsing()) {
@@ -550,41 +541,20 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     try {
       setFieldChanging(true);
       setValueParsing(true);
-      //
+
+      removeErrorStatus(ParsingFailedStatus.class);
       VALUE parsedValue = interceptParseValue(text);
-
-      //
-      IStatus oldErrorStatus = getErrorStatus();
-      String oldDisplayText = getDisplayText();
-
-      if (getErrorStatus() instanceof ParsingFailedStatus) {
-        clearErrorStatus();
-      }
-
       setValue(parsedValue);
-
-      //do not clear validation errors, if the display text has not changed
-      if (oldErrorStatus instanceof ValidationFailedStatus && getErrorStatus() == null &&
-          StringUtility.nvl(text, "").equals(StringUtility.nvl(oldDisplayText, ""))) {
-        setErrorStatus(oldErrorStatus);
-      }
-      //convert validation error to parsing error
-      else if (getErrorStatus() instanceof ValidationFailedStatus) {
-        setErrorStatus(new ParsingFailedStatus(getErrorStatus().getMessage(), text));
-      }
       return true;
     }
-    catch (Throwable t) {
-      ProcessingException e;
-      if (t instanceof ProcessingException) {
-        e = (ProcessingException) t;
-      }
-      else {
-        LOG.warn(null, t);
-        e = new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), t);
-      }
-      ParsingFailedStatus internalStatus = new ParsingFailedStatus(e.getStatus().getMessage(), text);
-      setErrorStatus(internalStatus);
+    catch (ProcessingException pe) {
+      addErrorStatus(new ParsingFailedStatus(pe, text));
+      return false;
+    }
+    catch (Exception e) {
+      LOG.warn("Unexpected Error: ", e);
+      ProcessingException pe = new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), e);
+      addErrorStatus(new ParsingFailedStatus(pe, text));
       return false;
     }
     finally {
@@ -679,15 +649,11 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
 
   @Override
   public boolean isContentValid() {
-    boolean b = super.isContentValid();
-    if (b) {
-      if (isMandatory()) {
-        if (getValue() == null) {
-          return false;
-        }
-      }
-    }
-    return b;
+    return super.isContentValid() && isMandatoryFulfilled();
+  }
+
+  private boolean isMandatoryFulfilled() {
+    return !isMandatory() || getValue() != null;
   }
 
   /**
@@ -695,7 +661,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * any further chain elements.
    */
   protected static class LocalValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends AbstractFormField.LocalFormFieldExtension<OWNER>
-      implements IValueFieldExtension<VALUE, OWNER> {
+  implements IValueFieldExtension<VALUE, OWNER> {
 
     public LocalValueFieldExtension(OWNER owner) {
       super(owner);

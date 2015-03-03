@@ -91,4 +91,10 @@ public class CustomProcessingStatus implements IProcessingStatus {
   public String getBody() {
     return null;
   }
+
+  @Override
+  public double getOrder() {
+    return 0;
+  }
+
 }

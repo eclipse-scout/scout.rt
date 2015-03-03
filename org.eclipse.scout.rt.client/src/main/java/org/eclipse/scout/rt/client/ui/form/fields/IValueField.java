@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 
 /**
  * Basic interface for all user fields where user inputs a value
- * 
+ *
  * @see ITextField, ISmartField, INumberField, IDateField, IFileChooser,
  *      IListBox, ITreeBox, ICheckBox, IRadioButton, IToogleButton
  */
@@ -113,7 +113,7 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE> {
    * force a fire of valueChanged even if the value has not changed This can be
    * used to manually re-trigger value change processing in complex business
    * logic
-   * 
+   *
    * @see setValue()
    */
   void fireValueChanged();
@@ -130,14 +130,14 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE> {
 
   /**
    * Gets if the default system menus (cut, copy, paste) should be added automatically to the menus of this field.
-   * 
+   *
    * @return true if the default system menus should be available automatically, false otherwise.
    */
   boolean isAutoAddDefaultMenus();
 
   /**
    * Sets if the default system menus (cut, copy, paste) should be added automatically to the menus of this field.
-   * 
+   *
    * @param b
    *          true if the menus should be available automatically, false otherwise.
    */

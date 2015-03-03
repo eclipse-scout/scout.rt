@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -452,24 +453,49 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   void setMandatory(boolean b);
 
   /**
-   * @return null iff value is valid, non-null if the currently set value has
-   *         semantic errors
+   * Adds an error status to field. use {@link ScoutFieldStatus} in order to set a custom icon.
+   *
+   * @param newStatus
    */
-  IStatus getErrorStatus();
+  void addErrorStatus(IStatus newStatus);
+
+  /**
+   * Adds an error status of type {@link DefaultFieldStatus} with the given message to the field.
+   *
+   * @param message
+   */
+  void addErrorStatus(String message);
+
+  /**
+   * Removes all error status of the given type.
+   */
+  void removeErrorStatus(Class<? extends IStatus> statusClazz);
+
+  /**
+   * @return null iff no status (e.g. error status) is set, non-null if a status is set, e.g. if the value has semantic
+   *         errors.
+   */
+  IMultiStatus getErrorStatus();
 
   /**
    * @param status
-   *          error status of currently set value In order to set a custom icon
-   *          as the field status, use {@link ScoutFieldStatus}
+   *          Sets the error multi-status. Use {@link #addErrorStatus(IStatus)} to add a single error.
    */
-  void setErrorStatus(IStatus status);
+  void setErrorStatus(IMultiStatus status);
 
   /**
    * @param message
    *          error status of currently set value In order to set a custom icon
    *          as the field status, use {@link ScoutFieldStatus}
    */
+  @Deprecated
   void setErrorStatus(String message);
+
+  /**
+   * @deprecated use {@link #addErrorStatus(IStatus)} or setErrorStatus(IMultiStatus status)
+   */
+  @Deprecated
+  void setErrorStatus(IStatus status);
 
   /**
    * @param clear

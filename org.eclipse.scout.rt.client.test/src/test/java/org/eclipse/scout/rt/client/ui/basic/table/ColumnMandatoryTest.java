@@ -10,18 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.client.ui.basic.table.ColumnMandatoryTest.MandatoryTestTable.NonMandatoryTestColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.junit.Assert;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests the mandatory property in a table (model)
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class ColumnMandatoryTest {
 
   /**
@@ -30,7 +37,7 @@ public class ColumnMandatoryTest {
   @Test
   public void testInitiallyMandatory() throws ProcessingException {
     AbstractColumn<String> column = getEmptyStringColumn();
-    Assert.assertFalse(column.isMandatory());
+    assertFalse(column.isMandatory());
   }
 
   /**
@@ -38,9 +45,63 @@ public class ColumnMandatoryTest {
    */
   @Test
   public void testSettingProperty() throws ProcessingException {
-    AbstractColumn<String> column = getEmptyStringColumn();
+    MandatoryTestTable testTable = new MandatoryTestTable();
+    final NonMandatoryTestColumn column = testTable.getNonMandatoryTestColumn();
     column.setMandatory(true);
-    Assert.assertTrue(column.isMandatory());
+    testTable.addRowByArray(getEmptyTestRow());
+    final Cell cell = (Cell) testTable.getCell(0, 0);
+    assertFalse(cell.isContentValid());
+    assertTrue(column.isMandatory());
+  }
+
+  /**
+   * Tests, if a field is mandatory by setting value
+   */
+  @Test
+  public void testMandatoryErrorIfNoValue() throws ProcessingException {
+    MandatoryTestTable testTable = new MandatoryTestTable();
+    testTable.addRowByArray(getTestRow());
+    IColumn mandatoryCol = testTable.getMandatoryTestColumn();
+    IFormField field = mandatoryCol.prepareEdit(testTable.getRow(0));
+    assertTrue(mandatoryCol.isMandatory());
+    assertTrue(field.isMandatory());
+    assertTrue(field.isContentValid());
+  }
+
+  /**
+   * Tests mandatory column with empty value
+   */
+  @Test
+  public void testFieldMandatoryInColumn() throws ProcessingException {
+    MandatoryTestTable testTable = new MandatoryTestTable();
+    testTable.addRowByArray(getEmptyTestRow());
+    final Cell cell = (Cell) testTable.getCell(0, 0);
+    assertFalse(cell.isContentValid());
+  }
+
+  /**
+   * Tests, if a field is mandatory in a mandatory column
+   */
+  @Test
+  public void testValidationOnMandatoryColumn() throws ProcessingException {
+    MandatoryTestTable testTable = new MandatoryTestTable();
+    testTable.addRowByArray(getEmptyTestRow());
+    IColumn mandatoryCol = testTable.getMandatoryTestColumn();
+    IFormField field = mandatoryCol.prepareEdit(testTable.getRow(0));
+    assertFalse(field.isContentValid());
+  }
+
+  /**
+   * Tests, if a field is not mandatory in a non-mandatory column
+   */
+  @Test
+  public void testFieldNotMandatoryInColumn() throws ProcessingException {
+    MandatoryTestTable testTable = new MandatoryTestTable();
+    testTable.addRowByArray(getTestRow());
+    IColumn col = testTable.getNonMandatoryTestColumn();
+    IFormField field = col.prepareEdit(testTable.getRow(0));
+    assertFalse(col.isMandatory());
+    assertFalse(field.isMandatory());
   }
 
   private AbstractColumn<String> getEmptyStringColumn() {
@@ -54,45 +115,6 @@ public class ColumnMandatoryTest {
 
   private String[] getEmptyTestRow() {
     return new String[]{null, null};
-  }
-
-  /**
-   * Tests, if a field is mandatory in a mandatory column
-   */
-  @Test
-  public void testFieldMandatoryInColumn() throws ProcessingException {
-    MandatoryTestTable testTable = new MandatoryTestTable();
-    testTable.addRowByArray(getTestRow());
-    IColumn mandatoryCol = testTable.getMandatoryTestColumn();
-    IFormField field = mandatoryCol.prepareEdit(testTable.getRow(0));
-    Assert.assertTrue(mandatoryCol.isMandatory());
-    Assert.assertTrue(field.isMandatory());
-    Assert.assertTrue(field.isContentValid());
-  }
-
-  /**
-   * Tests, if a field is mandatory in a mandatory column
-   */
-  @Test
-  public void testValidationOnMandatoryColumn() throws ProcessingException {
-    MandatoryTestTable testTable = new MandatoryTestTable();
-    testTable.addRowByArray(getEmptyTestRow());
-    IColumn mandatoryCol = testTable.getMandatoryTestColumn();
-    IFormField field = mandatoryCol.prepareEdit(testTable.getRow(0));
-    Assert.assertFalse(field.isContentValid());
-  }
-
-  /**
-   * Tests, if a field is not mandatory in a non-mandatory column
-   */
-  @Test
-  public void testFieldNotMandatoryInColumn() throws ProcessingException {
-    MandatoryTestTable testTable = new MandatoryTestTable();
-    testTable.addRowByArray(getTestRow());
-    IColumn col = testTable.getNonMandatoryTestColumn();
-    IFormField field = col.prepareEdit(testTable.getRow(0));
-    Assert.assertFalse(col.isMandatory());
-    Assert.assertFalse(field.isMandatory());
   }
 
   /**

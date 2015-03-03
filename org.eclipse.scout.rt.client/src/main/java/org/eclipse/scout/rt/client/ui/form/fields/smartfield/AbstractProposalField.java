@@ -86,7 +86,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     }
     try {
       String oldText = getDisplayText();
-      boolean parsingError = (getErrorStatus() instanceof ParsingFailedStatus);
+      boolean parsingError = getErrorStatus() != null && getErrorStatus().containsStatus(ParsingFailedStatus.class);
       if (acceptedProposalRow == null && (!parsingError) && getCurrentLookupRow() != null && StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(oldText))) {
         // no change
         return getValue();

@@ -10,18 +10,26 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.ProcessingException;
+
 /**
- * Marker subclass so we know inside setValue that a previous parse failure was
- * catched inside the local parse method and can safely be cleared once parsing
- * succeeded.
+ * Internal marker status for parsing errors.
+ *
+ * @see AbstractValueField#parseValue(String)
  */
-public class ParsingFailedStatus extends ScoutFieldStatus {
+@Order(10.0)
+public final class ParsingFailedStatus extends ScoutFieldStatus {
   private static final long serialVersionUID = 1L;
   private final String m_parseInputString;
 
   public ParsingFailedStatus(String message, String parseInputString) {
     super(message, ERROR);
     m_parseInputString = parseInputString;
+  }
+
+  public ParsingFailedStatus(ProcessingException exception, String parseInputString) {
+    this(exception.getMessage(), parseInputString);
   }
 
   public String getParseInputString() {
