@@ -23,6 +23,7 @@ scout.ImageField.prototype._render = function($parent) {
 
   this.addContainer($parent, 'image-field', new scout.ImageFieldLayout(this));
   this.addLabel();
+  this.addMandatoryIndicator();
   this.addField($field, this.$fieldContainer);
   this.addStatus();
 };
@@ -36,6 +37,7 @@ scout.ImageField.prototype._onImageLoad = function(event) {
 scout.ImageField.prototype._renderProperties = function() {
   scout.ImageField.parent.prototype._renderProperties.call(this);
   this._renderImageOrId();
+  this._renderAutoFit();
 };
 
 scout.ImageField.prototype._remove = function() {
@@ -58,4 +60,8 @@ scout.ImageField.prototype._renderImageOrId = function() {
   } else if (this.image) {
     this.$field.attr('src', scout.helpers.dynamicResourceUrl(this, this.image));
   }
+};
+
+scout.ImageField.prototype._renderAutoFit = function() {
+  this.$field.toggleClass('autofit', this.autoFit);
 };

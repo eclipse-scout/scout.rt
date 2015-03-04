@@ -31,8 +31,6 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
         return BinaryResourceUrlUtility.createIconUrl(JsonImageField.this, getModel().getImageId());
       }
     });
-    // We don't send the image via JSON to the client, we only set a flag that this adapter has an image
-    // The client will request the image in a separate http request. See: StaticResourceRequestInterceptor
     putJsonProperty(new JsonProperty<T>(IImageField.PROP_IMAGE, model) {
       @Override
       protected Object modelValue() {
@@ -41,6 +39,8 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
 
       @Override
       public Object prepareValueForToJson(Object value) {
+        // We don't send the image via JSON to the client, we only set a flag that this adapter has an image
+        // The client will request the image in a separate http request. See: StaticResourceRequestInterceptor
         BinaryResource image = extractBinaryResource(value);
         return image != null ? BinaryResourceUrlUtility.createCallbackUrl(JsonImageField.this, image.getFilename()) : null;
       }
@@ -49,6 +49,12 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
       @Override
       protected Boolean modelValue() {
         return getModel().isScrollBarEnabled();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IImageField.PROP_AUTO_FIT, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isAutoFit();
       }
     });
   }
