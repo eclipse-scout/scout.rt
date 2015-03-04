@@ -1,0 +1,8 @@
+.outline > .tree-data {
+
+  .navigation-breadcrumb & > .tree-item > .form {
+    /* reset alignment */
+    text-align: initial;
+  }
+
+}
