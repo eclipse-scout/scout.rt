@@ -19,6 +19,8 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.wrappedform.IWrappedFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -31,8 +33,10 @@ import org.w3c.dom.Element;
 public abstract class AbstractWrappedFormField<T extends IForm> extends AbstractFormField implements IWrappedFormField<T> {
 
   private T m_innerForm;
+  private boolean m_manageInnerFormLifeCycle;
   private P_InnerFormPropertyChangeListener m_innerFormPropertyListener;
   private P_InnerFormSubtreePropertyChangeListener m_innerFormSubtreePropertyListener;
+  private P_InnerFormListener m_innerFormListener;
 
   public AbstractWrappedFormField() {
     this(true);
@@ -52,6 +56,10 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     return false;
   }
 
+  /**
+   * If set, an instance of this form class is created on field initialization and is then set as inner form. The form's
+   * life cycle is managed automatically by the field (i.e. it is started and closed).
+   */
   @ConfigProperty(ConfigProperty.FORM)
   @Order(200)
   protected Class<? extends IForm> getConfiguredInnerForm() {
@@ -89,14 +97,22 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     super.initConfig();
     m_innerFormPropertyListener = new P_InnerFormPropertyChangeListener();
     m_innerFormSubtreePropertyListener = new P_InnerFormSubtreePropertyChangeListener();
+    m_innerFormListener = new P_InnerFormListener();
     if (getConfiguredInnerForm() != null) {
       try {
-        setInnerForm((T) getConfiguredInnerForm().newInstance());
+        setInnerForm((T) getConfiguredInnerForm().newInstance(), true);
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredInnerForm().getName() + "'.", e));
       }
     }
+  }
+
+  @Override
+  protected void disposeFieldInternal() {
+    super.disposeFieldInternal();
+    // Remove listeners, close the form if life cycle is not externally managed
+    setInnerForm(null);
   }
 
   @Override
@@ -122,6 +138,17 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
 
   @Override
   public void setInnerForm(T form) {
+    try {
+      setInnerForm(form, false);
+    }
+    catch (ProcessingException e) {
+      // May occur during form life cycle management (start, close).
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void setInnerForm(T form, boolean manageFormLifeCycle) throws ProcessingException {
     if (m_innerForm == form) {
       return;
     }
@@ -129,10 +156,15 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
       fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
       m_innerForm.removePropertyChangeListener(m_innerFormPropertyListener);
       m_innerForm.getRootGroupBox().removeSubtreePropertyChangeListener(m_innerFormSubtreePropertyListener);
+      m_innerForm.removeFormListener(m_innerFormListener);
       m_innerForm.setWrapperFieldInternal(null);
+      if (m_manageInnerFormLifeCycle) {
+        m_innerForm.doClose();
+      }
       m_innerForm = null;
     }
     m_innerForm = form;
+    m_manageInnerFormLifeCycle = manageFormLifeCycle;
     if (m_innerForm != null) {
       if (!m_innerForm.isFormOpen()) {
         m_innerForm.setModal(false);
@@ -143,13 +175,18 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
       m_innerForm.getRootGroupBox().updateKeyStrokes();
       m_innerForm.addPropertyChangeListener(m_innerFormPropertyListener);
       m_innerForm.getRootGroupBox().addSubtreePropertyChangeListener(m_innerFormSubtreePropertyListener);
+      m_innerForm.addFormListener(m_innerFormListener);
     }
     boolean changed = propertySupport.setProperty(PROP_INNER_FORM, m_innerForm);
     calculateVisibleInternal();
     if (m_innerForm != null) {
       fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
+      if (!m_innerForm.isFormOpen() && m_manageInnerFormLifeCycle) {
+        m_innerForm.start();
+      }
     }
     if (changed) {
+      // Information parent form (update layout etc.)
       if (getForm() != null) {
         getForm().structureChanged(this);
       }
@@ -224,6 +261,15 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
     }
   }// end private class
 
+  private class P_InnerFormListener implements FormListener {
+    @Override
+    public void formChanged(FormEvent e) throws ProcessingException {
+      if (e.getType() == FormEvent.TYPE_CLOSED) {
+        setInnerForm(null);
+      }
+    }
+  }// end private class
+
   protected static class LocalWrappedFormFieldExtension<T extends IForm, OWNER extends AbstractWrappedFormField<T>> extends LocalFormFieldExtension<OWNER> implements IWrappedFormFieldExtension<T, OWNER> {
 
     public LocalWrappedFormFieldExtension(OWNER owner) {
@@ -235,5 +281,4 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   protected IWrappedFormFieldExtension<T, ? extends AbstractWrappedFormField<T>> createLocalExtension() {
     return new LocalWrappedFormFieldExtension<T, AbstractWrappedFormField<T>>(this);
   }
-
 }
