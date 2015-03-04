@@ -164,7 +164,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private P_SystemButtonListener m_systemButtonListener;
   private List<IToolButton> m_toolbuttons;
 
-  private IFormHandler m_handler;
+  private IFormHandler m_handler; // never null (ensured by setHandler())
   // access control
   private boolean m_enabledGranted;
   private boolean m_visibleGranted;
@@ -197,6 +197,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       DesktopProfiler.getInstance().registerForm(this);
     }
     m_eventHistory = createEventHistory();
+    setHandler(new NullFormHandler());
     m_enabledGranted = true;
     m_visibleGranted = true;
     m_formLoading = true;
@@ -850,9 +851,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void start() throws ProcessingException {
-    if (getHandler() == null) {
-      throw new ProcessingException("Handler must not be null.");
-    }
     startInternal(getHandler());
   }
 
@@ -928,11 +926,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void startWizardStep(IWizardStep wizardStep, Class<? extends IFormHandler> handlerType) throws ProcessingException {
-    setAutoAddRemoveOnDesktop(false);
-    IFormHandler formHandler = null;
     if (handlerType != null) {
       try {
-        formHandler = ConfigurationUtility.newInnerInstance(this, handlerType);
+        IFormHandler formHandler = ConfigurationUtility.newInnerInstance(this, handlerType);
+        setHandler(formHandler);
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + handlerType.getName() + "'.", e));
@@ -940,6 +937,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     m_wizardStep = wizardStep;
     setModal(false);
+    setAutoAddRemoveOnDesktop(false);
     setAskIfNeedSave(false);
     // hide top level process buttons with a system type
     for (IFormField f : getRootGroupBox().getFields()) {
@@ -952,9 +950,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         }
       }
     }
-    //
     // start
-    startInternal(formHandler);
+    start();
+  }
+
+  @Override
+  public void startWizardStep(IWizardStep<?> wizardStep) throws ProcessingException {
+    startWizardStep(wizardStep, null);
   }
 
   @Override

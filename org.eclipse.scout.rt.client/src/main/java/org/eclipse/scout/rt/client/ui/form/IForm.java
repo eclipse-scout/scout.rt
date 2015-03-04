@@ -183,18 +183,25 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   /**
    * @param wizardStep
-   *          the step that starts this form
+   *          the step that starts this form. The form can then access the step with {@link #getWizardStep()}.
    * @param handlerType
-   *          the inner handler type used to load / store the form, null when no
-   *          automatic load/store should be performed
+   *          the inner handler type used to load / store the form. An instance of this
+   *          handler type is created automatically and set to the form using {@link #setHandler(IFormHandler)}.
+   *          If this parameter is <code>null</code>, the current handler is used instead.
    */
   void startWizardStep(IWizardStep wizardStep, Class<? extends IFormHandler> handlerType) throws ProcessingException;
+
+  /**
+   * Like {@link #startWizardStep(IWizardStep, Class)} but without a custom handler type (uses the currently
+   * set handler).
+   */
+  void startWizardStep(IWizardStep<?> wizardStep) throws ProcessingException;
 
   /**
    * Starts the form using {@link #getHandler()}.
    *
    * @throws ProcessingException
-   *           if no handler has been set.
+   *           if an error occurs in the handler.
    */
   void start() throws ProcessingException;
 
@@ -656,5 +663,4 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
    * @return
    */
   int getToolbarLocation();
-
 }
