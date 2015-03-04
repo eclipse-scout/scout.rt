@@ -18,6 +18,7 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.rt.client.services.common.spellchecker.ISpellingMonitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.menu.SwingScoutContextMenu;
@@ -28,7 +29,6 @@ import org.eclipse.scout.rt.ui.swing.ext.decoration.ContextMenuDecorationItem;
 import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons;
 import org.eclipse.scout.rt.ui.swing.spellchecker.ISwingSpellCheckerService;
 import org.eclipse.scout.rt.ui.swing.spellchecker.SwingFieldHolder;
-import org.eclipse.scout.service.SERVICES;
 
 public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringField> implements ISwingScoutTextField {
 
@@ -99,7 +99,7 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
   protected void attachScout() {
     super.attachScout();
     // spell checking
-    ISwingSpellCheckerService spellCheckerService = SERVICES.getService(ISwingSpellCheckerService.class);
+    ISwingSpellCheckerService spellCheckerService = OBJ.oneOrNull(ISwingSpellCheckerService.class);
     if (spellCheckerService != null && spellCheckerService.isInstalled()) {
       m_spellingMonitor = spellCheckerService.createSpellingMonitor(new SwingFieldHolder(this, this.getSwingTextField()));
     }
