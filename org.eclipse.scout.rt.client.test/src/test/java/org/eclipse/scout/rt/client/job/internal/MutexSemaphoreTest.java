@@ -253,7 +253,7 @@ public class MutexSemaphoreTest {
     assertEquals(3, mutexSemaphore.getPermitCount());
     assertFalse(mutexSemaphore.isEmpty(new AlwaysFilter<IFuture<?>>()));
 
-    mutexSemaphore.reset();
+    mutexSemaphore.clear();
 
     assertEquals(0, mutexSemaphore.getPermitCount());
     assertTrue(mutexSemaphore.isEmpty(new AlwaysFilter<IFuture<?>>())); // mutex-owner

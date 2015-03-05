@@ -212,7 +212,7 @@ public class ModelJobManager implements IModelJobManager {
   @Override
   public final void shutdown() {
     cancel(new AlwaysFilter<IFuture<?>>());
-    m_mutexSemaphores.reset();
+    m_mutexSemaphores.clear();
     m_executor.shutdownNow();
   }
 

@@ -52,6 +52,8 @@ public class MutexSemaphores {
 
   private final Map<IClientSession, MutexSemaphore> m_mutexSemaphores;
 
+  private boolean m_reject = false; // once the job manager is shutdown, new tasks are rejected and cancelled.
+
   public MutexSemaphores() {
     m_mutexSemaphores = new HashMap<>();
 
@@ -108,6 +110,11 @@ public class MutexSemaphores {
 
     m_writeLock.lock();
     try {
+      if (m_reject) {
+        task.cancel(true);
+        return false;
+      }
+
       MutexSemaphore mutexSemaphore = m_mutexSemaphores.get(session);
       if (mutexSemaphore == null) {
         mutexSemaphore = new MutexSemaphore();
@@ -132,6 +139,10 @@ public class MutexSemaphores {
 
     m_writeLock.lock();
     try {
+      if (m_reject) {
+        return null;
+      }
+
       final MutexSemaphore mutexSemaphore = m_mutexSemaphores.get(session);
       if (mutexSemaphore == null) {
         LOG.error("Unexpected inconsistency while releasing model mutex: session-mutex-semaphore must not be null.");
@@ -256,19 +267,20 @@ public class MutexSemaphores {
   }
 
   /**
-   * Resets the semaphore.
+   * Clear the queue. The semaphore cannot be used afterwards and offered tasks are rejected.
    */
-  public void reset() {
+  public void clear() {
     m_writeLock.lock();
     try {
       for (final MutexSemaphore mutexSemaphore : m_mutexSemaphores.values()) {
-        mutexSemaphore.reset();
+        mutexSemaphore.clear();
       }
+      m_mutexSemaphores.clear();
+      m_reject = true;
     }
     finally {
       m_writeLock.unlock();
     }
-    m_mutexSemaphores.clear();
   }
 
   @Override

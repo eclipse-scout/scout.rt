@@ -52,11 +52,6 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
     m_mutexAcquiredListeners = new ArrayList<>();
   }
 
-  @Override
-  public boolean cancel(boolean mayInterruptIfRunning) {
-    return super.cancel(mayInterruptIfRunning);
-  }
-
   /**
    * @return {@link IFuture} associated with this {@link FutureTask}.
    */
@@ -76,7 +71,9 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
   public void run() {
     notifyMutexAcquiredListeners();
 
-    if (!m_running) { // is already running if re-acquiring the mutex.
+    // If this task is already in 'running'-state, the task was waiting for a blocking condition to fall and now tries to re-acquire the mutex.
+    // If so, do not run the task again. By notifying the listeners about the mutex-acquisition, the blocked task is now continuing its work.
+    if (!m_running) {
       m_running = true;
       notifyBefore();
       try {
@@ -102,7 +99,9 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
   public final void reject() {
     notifyMutexAcquiredListeners();
 
-    if (!m_running) { // is already running if re-acquiring the mutex.
+    // If this task is already in 'running'-state, the task was waiting for a blocking condition to fall and now tries to re-acquire the mutex.
+    // If so, ignore rejection because the blocked task lives in its own thread.
+    if (!m_running) {
       rejected(m_future);
     }
   }

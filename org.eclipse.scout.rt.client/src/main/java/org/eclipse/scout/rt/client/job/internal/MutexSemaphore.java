@@ -169,12 +169,12 @@ class MutexSemaphore {
     }
   }
 
-  public void reset() {
+  public void clear() {
     m_writeLock.lock();
     try {
       m_permits = 0;
-      m_mutexOwner = null;
       m_pendingQueue.clear();
+      m_mutexOwner = null;
     }
     finally {
       m_writeLock.unlock();
