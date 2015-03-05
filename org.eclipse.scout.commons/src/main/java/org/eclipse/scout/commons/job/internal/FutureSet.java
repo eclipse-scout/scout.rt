@@ -10,18 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job.internal;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.job.internal.Futures.JobFuture;
 
@@ -38,12 +44,18 @@ public class FutureSet {
   private final ReadLock m_readLock;
   private final WriteLock m_writeLock;
 
+  private final Lock m_changedLock;
+  private final Condition m_changedCondition;
+
   public FutureSet() {
     m_futures = new HashSet<>();
 
     final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     m_readLock = lock.readLock();
     m_writeLock = lock.writeLock();
+
+    m_changedLock = new ReentrantLock();
+    m_changedCondition = m_changedLock.newCondition();
   }
 
   /**
@@ -68,13 +80,14 @@ public class FutureSet {
       catch (final RejectedExecutionException e) {
         throw new JobExecutionException(e.getMessage(), e); // Task was rejected for execution.
       }
-      
+
       m_futures.add(future);
 
       return future;
     }
     finally {
       m_writeLock.unlock();
+      signalChanged(); // signal outside the monitor.
     }
   }
 
@@ -92,6 +105,7 @@ public class FutureSet {
     }
     finally {
       m_writeLock.unlock();
+      signalChanged(); // signal outside the monitor.
     }
   }
 
@@ -103,12 +117,46 @@ public class FutureSet {
   public Set<IFuture<?>> clear() {
     m_writeLock.lock();
     try {
-      final Set<IFuture<?>> futures = copy();
+      final Set<IFuture<?>> futures = values();
       m_futures.clear();
       return futures;
     }
     finally {
       m_writeLock.unlock();
+      signalChanged(); // signal outside the monitor.
+    }
+  }
+
+  /**
+   * @return a copy of the underlying {@link Set}.
+   */
+  public Set<IFuture<?>> values() {
+    m_readLock.lock();
+    try {
+      return new HashSet<>(m_futures);
+    }
+    finally {
+      m_readLock.unlock();
+    }
+  }
+
+  /**
+   * To visit Futures which did not complete yet and passes the filter.
+   *
+   * @param filter
+   *          to limit the Futures to be visited.
+   * @param visitor
+   *          called for each Futures that passed the filter.
+   */
+  public void visit(final IFilter<IFuture<?>> filter, final IVisitor<IFuture<?>> visitor) {
+    for (final IFuture<?> future : values()) {
+      if (future.isDone() || !filter.accept(future)) {
+        continue;
+      }
+
+      if (!visitor.visit(future)) {
+        return;
+      }
     }
   }
 
@@ -126,12 +174,17 @@ public class FutureSet {
   }
 
   /**
-   * @return a copy of the underlying {@link Set}.
+   * @return <code>true</code> if there is no Future matching the given Filter at the time of invocation.
    */
-  public Set<IFuture<?>> copy() {
+  public boolean isEmpty(final IFilter<IFuture<?>> filter) {
     m_readLock.lock();
     try {
-      return new HashSet<>(m_futures);
+      for (final IFuture<?> future : m_futures) {
+        if (filter.accept(future)) {
+          return false;
+        }
+      }
+      return true;
     }
     finally {
       m_readLock.unlock();
@@ -139,19 +192,47 @@ public class FutureSet {
   }
 
   /**
-   * To visit all {@link IFuture}s which did not complete yet.
+   * Blocks the calling thread until all Futures which match the given Filter are removed from this Set, or the given
+   * timeout elapses.
    *
-   * @param visitor
-   *          {@link IFutureVisitor} called for each {@link IFuture}.
+   * @param timeout
+   *          the maximal time to wait.
+   * @param unit
+   *          unit of the given timeout.
+   * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
+   * @throws InterruptedException
+   *           if the current thread is interrupted while waiting.
    */
-  public void visit(final IFutureVisitor visitor) {
-    for (final IFuture<?> future : copy()) {
-      if (future.isDone()) {
-        continue; // in case the job completed in the meantime.
+  public boolean waitUntilEmpty(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException {
+    // Determine the absolute deadline.
+    final Date deadline = new Date(System.currentTimeMillis() + unit.toMillis(timeout));
+
+    if (isEmpty(filter)) {
+      return true;
+    }
+
+    // Wait until empty or the deadline is passed.
+    m_changedLock.lockInterruptibly();
+    try {
+      while (!isEmpty(filter)) { // spurious-wakeup-safe
+        if (!m_changedCondition.awaitUntil(deadline)) {
+          return false; // timeout expired
+        }
       }
-      if (!visitor.visit(future)) {
-        return;
-      }
+      return true;
+    }
+    finally {
+      m_changedLock.unlock();
+    }
+  }
+
+  private void signalChanged() {
+    m_changedLock.lock();
+    try {
+      m_changedCondition.signalAll();
+    }
+    finally {
+      m_changedLock.unlock();
     }
   }
 

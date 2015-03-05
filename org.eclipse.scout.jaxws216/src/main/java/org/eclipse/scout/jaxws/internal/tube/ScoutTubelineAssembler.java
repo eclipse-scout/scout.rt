@@ -42,9 +42,10 @@ import org.eclipse.scout.jaxws.internal.SessionHelper;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
 import org.eclipse.scout.jaxws.security.provider.ICredentialValidationStrategy;
 import org.eclipse.scout.jaxws.session.IServerSessionFactory;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 
 import com.sun.xml.internal.ws.api.WSBinding;
 import com.sun.xml.internal.ws.api.pipe.ClientTubeAssemblerContext;
@@ -163,7 +164,7 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
   @Internal
   protected Object invokeInServerJob(final ServerJobInput input, final Object object, final Method method, final Object[] args) throws Throwable {
     try {
-      return ServerJobManager.DEFAULT.runNow(new ICallable<Object>() {
+      return OBJ.one(IServerJobManager.class).runNow(new ICallable<Object>() {
 
         @Override
         public Object call() throws Exception {

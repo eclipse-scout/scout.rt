@@ -15,83 +15,74 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Deque;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.Future;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.job.IFutureVisitor;
+import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * Provides a thread-safe implementation of a non-blocking 1-permit {@link Semaphore} backed with a fair {@link Queue}.
+ * Provides a thread-safe implementation of a non-blocking 1-permit semaphore backed with a fair queue.
  *
  * @since 5.1
  */
 @Internal
-public class MutexSemaphore {
+class MutexSemaphore {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MutexSemaphore.class);
 
-  private static final boolean POSITION_TAIL = true;
-  private static final boolean POSITION_HEAD = false;
+  private final Deque<ModelFutureTask<?>> m_pendingQueue;
 
-  private final AtomicInteger m_permits = new AtomicInteger(0);
-  private final Deque<ModelFutureTask<?>> m_pendingQueue = new ArrayDeque<>();
+  private volatile int m_permits; // volatile because being read by different threads.
+  private volatile ModelFutureTask<?> m_mutexOwner; // volatile because being read by different threads.
 
-  final Lock m_idleLock = new ReentrantLock();
-  final Condition m_idleCondition = m_idleLock.newCondition();
+  private final ReadLock m_readLock;
+  private final WriteLock m_writeLock;
 
-  private ModelFutureTask<?> m_mutexOwner; // The task currently owning the mutex.
+  protected final Lock m_changedLock;
+  protected final Condition m_changedCondition;
 
-  /**
-   * @return the task currently owning the mutex.
-   */
-  public ModelFutureTask<?> getMutexOwner() {
+  MutexSemaphore() {
+    m_permits = 0;
+    m_pendingQueue = new ArrayDeque<>();
+
+    final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    m_readLock = lock.readLock();
+    m_writeLock = lock.writeLock();
+
+    m_changedLock = new ReentrantLock();
+    m_changedCondition = m_changedLock.newCondition();
+  }
+
+  int getPermitCount() {
+    return m_permits;
+  }
+
+  boolean isMutexOwner(final ModelFutureTask<?> task) {
+    return m_mutexOwner == task;
+  }
+
+  ModelFutureTask<?> getMutexOwner() {
     return m_mutexOwner;
   }
 
-  /**
-   * Tries to acquire the mutex if available at the time of invocation. Otherwise, the task is put into the queue of
-   * pending tasks and will compete for the mutex once all queued tasks acquired/released the mutex.
-   *
-   * @param task
-   *          the model-task to acquire the mutex.
-   * @return <code>true</code> if the mutex was acquired, <code>false</code> if being queued.
-   * @see #releaseAndPoll()
-   */
-  public boolean tryAcquireElseOfferTail(final ModelFutureTask<?> task) {
-    return tryAcquireElseOffer(task, POSITION_TAIL);
-  }
-
-  /**
-   * Tries to acquire the mutex if available at the time of invocation. Otherwise, the task is put into the queue of
-   * pending tasks and will compete for the mutex as the very next task.
-   *
-   * @param task
-   *          the task to acquire the mutex.
-   * @return <code>true</code> if the mutex was acquired, <code>false</code> if being queued.
-   * @see #releaseAndPoll()
-   */
-  public boolean tryAcquireElseOfferHead(final ModelFutureTask<?> task) {
-    return tryAcquireElseOffer(task, POSITION_HEAD);
-  }
-
-  protected boolean tryAcquireElseOffer(final ModelFutureTask<?> task, final boolean position) {
-    synchronized (m_pendingQueue) {
-      if (m_permits.getAndIncrement() == 0) {
+  boolean tryAcquireElseOffer(final ModelFutureTask<?> task, final boolean tail) {
+    m_writeLock.lock();
+    try {
+      if (m_permits++ == 0) {
         m_mutexOwner = task;
         return true;
       }
       else {
-        if (position == POSITION_TAIL) {
+        if (tail) {
           m_pendingQueue.offerLast(task);
         }
         else {
@@ -100,133 +91,104 @@ public class MutexSemaphore {
         return false;
       }
     }
+    finally {
+      m_writeLock.unlock();
+      signalChanged(); // signal outside the monitor.
+    }
   }
 
-  /**
-   * Passes the mutex to the first task in the queue.
-   *
-   * @return task which is the new mutex-owner, <code>null</code> if the queue was empty.
-   * @see #tryAcquireElseOffer(Object)
-   */
-  public ModelFutureTask<?> releaseAndPoll() {
-    synchronized (m_pendingQueue) {
-      if (m_mutexOwner == null) {
-        LOG.error("Unexpected inconsistency while releasing model mutex: mutex owner must not be null.");
-      }
-
+  ModelFutureTask<?> releaseAndPoll() {
+    m_writeLock.lock();
+    try {
       m_mutexOwner = m_pendingQueue.poll();
 
-      if (m_permits.get() > 0) {
-        m_permits.decrementAndGet();
-      }
-      else {
-        LOG.error("Unexpected inconsistency while releasing model mutex: permit count must not be 0.");
-      }
+      m_permits--;
 
-      if (m_permits.get() == 0) {
-        signalIdle();
+      if (m_permits < 0) {
+        LOG.error("Unexpected inconsistency while releasing model mutex: permit count must not be 0.");
+        m_permits = 0;
       }
       return m_mutexOwner;
     }
+    finally {
+      m_writeLock.unlock();
+      signalChanged(); // signal outside the monitor.
+    }
+
   }
 
-  /**
-   * @return <code>true</code> if the mutex is currently not acquired.
-   */
-  public boolean isIdle() {
-    return m_permits.get() == 0;
+  List<IFuture<?>> getFutures() {
+    m_readLock.lock();
+    try {
+      final List<IFuture<?>> futures = new ArrayList<>();
+      if (m_mutexOwner != null) {
+        futures.add(m_mutexOwner.getFuture());
+      }
+      for (final ModelFutureTask<?> futureTask : m_pendingQueue) {
+        futures.add(futureTask.getFuture());
+      }
+      return futures;
+    }
+    finally {
+      m_readLock.unlock();
+    }
   }
 
-  /**
-   * @return the number of tasks currently competing for the mutex - this is the mutex-owner plus all pending
-   *         tasks; if <code>0</code>, the mutex is not acquired.
-   */
-  public int getPermitCount() {
-    return m_permits.get();
+  public boolean isEmpty(final IFilter<IFuture<?>> filter) {
+    m_readLock.lock();
+    try {
+      for (final IFuture<?> future : getFutures()) {
+        if (filter.accept(future)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    finally {
+      m_readLock.unlock();
+    }
   }
 
-  /**
-   * Blocks the calling thread until the mutex gets available. Does not block if available at time of invocation.
-   *
-   * @param timeout
-   *          the maximal time to wait for the mutex to become available.
-   * @param unit
-   *          unit of the given timeout.
-   * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
-   * @throws InterruptedException
-   * @see {@link #isIdle()}
-   */
-  public boolean waitForIdle(final long timeout, final TimeUnit unit) throws InterruptedException {
-    if (isIdle()) {
+  public boolean waitUntilEmpty(final IFilter<IFuture<?>> filter, final Date deadline) throws InterruptedException {
+    if (isEmpty(filter)) {
       return true;
     }
 
-    // Determine the absolute deadline.
-    final Date deadline = new Date(System.currentTimeMillis() + unit.toMillis(timeout));
-
-    // Wait until idle or the deadline is passed.
-    m_idleLock.lockInterruptibly();
+    // Wait until empty or the deadline is passed.
+    m_changedLock.lockInterruptibly();
     try {
-      while (!isIdle()) { // spurious-wakeup-safe
-        if (!m_idleCondition.awaitUntil(deadline)) {
+      while (!isEmpty(filter)) { // spurious-wakeup-safe
+        if (!m_changedCondition.awaitUntil(deadline)) {
           return false; // timeout expired
         }
       }
       return true;
     }
     finally {
-      m_idleLock.unlock();
+      m_changedLock.unlock();
     }
   }
 
-  /**
-   * Cancels the current mutex-owner and cancels and clears all queued tasks.
-   */
-  public void clearAndCancel() {
-    synchronized (m_pendingQueue) {
-      if (m_mutexOwner != null) {
-        m_mutexOwner.getFuture().cancel(true);
-      }
-
-      for (final ModelFutureTask<?> pendingTask : m_pendingQueue) {
-        pendingTask.getFuture().cancel(true);
-      }
-      m_permits.addAndGet(-m_pendingQueue.size()); // do not subtract the mutex-owner.
+  public void reset() {
+    m_writeLock.lock();
+    try {
+      m_permits = 0;
+      m_mutexOwner = null;
       m_pendingQueue.clear();
     }
-  }
-
-  /**
-   * To visit all {@link Future}s which did not complete yet.
-   *
-   * @param visitor
-   *          {@link IFutureVisitor} called for each {@link Future}.
-   */
-  public void visit(final IFutureVisitor visitor) {
-    final List<ModelFutureTask<?>> tasks = new ArrayList<>();
-
-    synchronized (m_pendingQueue) {
-      tasks.add(m_mutexOwner);
-      tasks.addAll(m_pendingQueue);
-    }
-
-    for (final ModelFutureTask<?> task : tasks) {
-      if (task == null) {
-        continue;
-      }
-      if (!visitor.visit(task.getFuture())) {
-        return;
-      }
+    finally {
+      m_writeLock.unlock();
+      signalChanged(); // signal outside the monitor.
     }
   }
 
-  private void signalIdle() {
-    m_idleLock.lock();
+  private void signalChanged() {
+    m_changedLock.lock();
     try {
-      m_idleCondition.signalAll();
+      m_changedCondition.signalAll();
     }
     finally {
-      m_idleLock.unlock();
+      m_changedLock.unlock();
     }
   }
 

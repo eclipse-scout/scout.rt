@@ -15,10 +15,11 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerJobFactory;
 import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.WrappingProcessingRuntimeExceptionHandlerService;
 import org.junit.runners.model.Statement;
@@ -42,7 +43,7 @@ public class ScoutServerJobWrapperStatement extends Statement {
       doEvaluateWrappingExceptions();
     }
     else {
-      ServerJobManager.DEFAULT.runNow(new IRunnable() {
+      OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
 
         @Override
         public void run() throws Exception {

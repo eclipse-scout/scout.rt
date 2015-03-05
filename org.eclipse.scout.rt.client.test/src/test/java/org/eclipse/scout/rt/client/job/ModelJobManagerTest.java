@@ -25,8 +25,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.IVisitor;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -100,7 +101,7 @@ public class ModelJobManagerTest {
 
     // RUN THE TEST
     final Set<IFuture<?>> futureProtocol = new HashSet<>();
-    m_jobManager.visit(new IFutureVisitor() {
+    m_jobManager.visit(new AlwaysFilter<IFuture<?>>(), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -160,7 +161,7 @@ public class ModelJobManagerTest {
     m_jobManager.shutdown();
 
     // VERIFY
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     assertEquals(CollectionUtility.hashSet("running-1", "interrupted-1"), protocol);
 

@@ -27,10 +27,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
+import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -135,7 +136,7 @@ public class ServerJobServletFilter implements Filter {
    *          input to be used to run the server job with current context information set.
    */
   protected void continueChainInServerJob(final FilterChain chain, final ServerJobInput input) throws ProcessingException {
-    ServerJobManager.DEFAULT.runNow(new IRunnable() {
+    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {

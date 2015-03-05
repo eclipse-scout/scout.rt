@@ -24,8 +24,9 @@ import java.util.concurrent.RejectedExecutionException;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.IVisitor;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.job.internal.FutureSet.IFutureSupplier;
 import org.eclipse.scout.commons.job.internal.Futures.JobFuture;
@@ -60,7 +61,7 @@ public class FutureSetTest {
     });
 
     assertSame(m_iFuture, iFuture);
-    assertEquals(CollectionUtility.hashSet(m_iFuture), futureSet.copy());
+    assertEquals(CollectionUtility.hashSet(m_iFuture), futureSet.values());
     assertFalse(m_iFuture.isCancelled());
     assertFalse(m_iFuture.isDone());
   }
@@ -161,7 +162,7 @@ public class FutureSetTest {
     });
 
     final Set<IFuture<?>> visitedFutures = new HashSet<>();
-    futureSet.visit(new IFutureVisitor() {
+    futureSet.visit(new AlwaysFilter<IFuture<?>>(), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -169,7 +170,7 @@ public class FutureSetTest {
         return true;
       }
     });
-    assertEquals(CollectionUtility.hashSet(iFuture1, iFuture2), futureSet.copy());
+    assertEquals(CollectionUtility.hashSet(iFuture1, iFuture2), futureSet.values());
     assertEquals(CollectionUtility.hashSet(iFuture1, iFuture2), visitedFutures);
   }
 
@@ -200,7 +201,7 @@ public class FutureSetTest {
     });
 
     final Set<IFuture<?>> visitedFutures = new HashSet<>();
-    futureSet.visit(new IFutureVisitor() {
+    futureSet.visit(new AlwaysFilter<IFuture<?>>(), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -208,7 +209,7 @@ public class FutureSetTest {
         return false;
       }
     });
-    assertEquals(CollectionUtility.hashSet(iFuture1, iFuture2), futureSet.copy());
+    assertEquals(CollectionUtility.hashSet(iFuture1, iFuture2), futureSet.values());
     assertEquals(1, visitedFutures.size());
   }
 
@@ -242,7 +243,7 @@ public class FutureSetTest {
     when(iFuture1.isDone()).thenReturn(true);
 
     final Set<IFuture<?>> visitedFutures = new HashSet<>();
-    futureSet.visit(new IFutureVisitor() {
+    futureSet.visit(new AlwaysFilter<IFuture<?>>(), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -283,7 +284,7 @@ public class FutureSetTest {
     when(iFuture1.isCancelled()).thenReturn(true);
 
     final Set<IFuture<?>> visitedFutures = new HashSet<>();
-    futureSet.visit(new IFutureVisitor() {
+    futureSet.visit(new AlwaysFilter<IFuture<?>>(), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {

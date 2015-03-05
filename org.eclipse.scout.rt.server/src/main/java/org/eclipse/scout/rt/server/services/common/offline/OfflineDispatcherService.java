@@ -25,9 +25,10 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.ISession;
@@ -168,7 +169,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     try {
       IServerSession session = getOrCreateSession(subject, request.getUserAgent());
 
-      return ServerJobManager.DEFAULT.runNow(new ICallable<ServiceTunnelResponse>() {
+      return OBJ.one(IServerJobManager.class).runNow(new ICallable<ServiceTunnelResponse>() {
 
         @Override
         public ServiceTunnelResponse call() throws Exception {

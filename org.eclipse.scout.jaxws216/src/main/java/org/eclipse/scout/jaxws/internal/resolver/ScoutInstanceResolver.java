@@ -28,9 +28,10 @@ import org.eclipse.scout.jaxws.annotation.ScoutWebService;
 import org.eclipse.scout.jaxws.internal.ContextHelper;
 import org.eclipse.scout.jaxws.internal.SessionHelper;
 import org.eclipse.scout.jaxws.session.IServerSessionFactory;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 
 import com.sun.xml.internal.ws.api.message.Packet;
 import com.sun.xml.internal.ws.api.server.Invoker;
@@ -154,7 +155,7 @@ public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
         LOG.warn("Webservice request is not run in a session context as no server session is configured.");
       }
 
-      return ServerJobManager.DEFAULT.runNow(new ICallable<Object>() {
+      return OBJ.one(IServerJobManager.class).runNow(new ICallable<Object>() {
 
         @Override
         public Object call() throws Exception {

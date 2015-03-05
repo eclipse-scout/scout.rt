@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job.internal;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -23,11 +25,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IExecutable;
 import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.IJobManager;
 import org.eclipse.scout.commons.job.IProgressMonitor;
@@ -181,19 +185,14 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
 
   @Override
   public final void shutdown() {
-    // 1. Cancel executing futures.
-    final Set<IFuture<?>> futures = m_futures.clear();
-    for (final IFuture future : futures) {
-      future.cancel(true);
-    }
-
-    // 2. Shutdown the job manager.
+    cancel(new AlwaysFilter<IFuture<?>>());
+    m_futures.clear();
     m_executor.shutdownNow();
   }
 
   @Override
-  public final void visit(final IFutureVisitor visitor) {
-    m_futures.visit(visitor);
+  public final void visit(final IFilter<IFuture<?>> filter, final IVisitor<IFuture<?>> visitor) {
+    m_futures.visit(filter, visitor);
   }
 
   /**
@@ -350,6 +349,32 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
     @SuppressWarnings("unchecked")
     final INPUT input = (INPUT) JobInput.defaults();
     return input;
+  }
+
+  @Override
+  public boolean isDone(final IFilter<IFuture<?>> filter) {
+    return m_futures.isEmpty(filter);
+  }
+
+  @Override
+  public boolean waitUntilDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException {
+    return m_futures.waitUntilEmpty(filter, timeout, unit);
+  }
+
+  @Override
+  public boolean cancel(final IFilter<IFuture<?>> filter) {
+    final Set<Boolean> success = new HashSet<>();
+
+    visit(filter, new IVisitor<IFuture<?>>() {
+
+      @Override
+      public boolean visit(final IFuture<?> future) {
+        success.add(future.cancel(true));
+        return true;
+      }
+    });
+
+    return Collections.singleton(Boolean.TRUE).equals(success);
   }
 
   // === IProgressMonitorProvider

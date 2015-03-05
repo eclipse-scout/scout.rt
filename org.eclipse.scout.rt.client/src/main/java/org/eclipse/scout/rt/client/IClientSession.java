@@ -17,7 +17,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ISession;
@@ -25,12 +24,6 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.osgi.framework.Bundle;
 
 public interface IClientSession extends ISession {
-
-  /**
-   * @return dedicated job manager to schedule model jobs on behalf of this {@link IClientServiceTunnel} in serial
-   *         execution order.
-   */
-  IModelJobManager getModelJobManager();
 
   /**
    * @return the session's {@link Locale} or <code>null</code> if not set.

@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.IRunnable;
@@ -119,7 +120,7 @@ public class ModelJobCancelTest {
     // RUN THE TEST
     assertTrue(future.cancel(false /* soft */));
 
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     // VERIFY
     assertEquals(Arrays.asList("cancelled-after"), protocol);
@@ -168,7 +169,7 @@ public class ModelJobCancelTest {
     // RUN THE TEST
     assertTrue(future.cancel(true /* force */));
 
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     // VERIFY
     assertTrue(future.isCancelled());
@@ -213,7 +214,7 @@ public class ModelJobCancelTest {
     future2.cancel(true);
     job1RunningLatch.unblock();
 
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     // VERIFY
     assertEquals(CollectionUtility.arrayList("running-1"), protocol);
@@ -280,7 +281,7 @@ public class ModelJobCancelTest {
       }
     });
 
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS)); // Wait until job-1 finished.
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS)); // Wait until job-1 finished.
 
     // VERIFY
     assertEquals(CollectionUtility.arrayList("running-1", "interrupted-1", "done-1"), protocol);
@@ -323,11 +324,15 @@ public class ModelJobCancelTest {
   public void testShutdownJobManagerAndRunNow() throws Exception {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
+    final BlockingCountDownLatch shutdownLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch runLatch = new BlockingCountDownLatch(1);
+
     IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         m_jobManager.shutdown();
+        shutdownLatch.countDown();
 
         m_jobManager.runNow(new IRunnable() {
 
@@ -336,11 +341,14 @@ public class ModelJobCancelTest {
             protocol.add("running");
           }
         });
+        runLatch.countDown();
       }
     });
 
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    assertTrue(shutdownLatch.await());
     assertTrue(future.isCancelled());
+    assertTrue(runLatch.await());
     assertEquals(CollectionUtility.arrayList("running"), protocol);
   }
 
@@ -349,6 +357,7 @@ public class ModelJobCancelTest {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch finishLatch = new BlockingCountDownLatch(1);
 
     // This job will cancel the job manager.
     final UncaughtExceptionRunnable runnable = new UncaughtExceptionRunnable() {
@@ -386,6 +395,7 @@ public class ModelJobCancelTest {
               if (IProgressMonitor.CURRENT.get().isCancelled()) {
                 protocol.add("4: cancelled");
               }
+              finishLatch.countDown();
             }
           }
         });
@@ -393,9 +403,10 @@ public class ModelJobCancelTest {
     });
 
     // VERIFY
-    m_jobManager.waitForIdle(30, TimeUnit.SECONDS);
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
     runnable.throwOnError();
-    assertTrue(m_jobManager.isIdle());
+    assertTrue(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
+    finishLatch.await();
     assertEquals(CollectionUtility.arrayList("1: running", "3: interrupted", "4: cancelled"), protocol);
   }
 }

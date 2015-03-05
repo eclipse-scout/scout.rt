@@ -34,7 +34,7 @@ public class ScoutTextsTest {
 
   @Before
   public void before() {
-    m_jobManager = ServerJobManager.DEFAULT;
+    m_jobManager = new ServerJobManager();
   }
 
   @After

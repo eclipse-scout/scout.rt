@@ -24,8 +24,12 @@ import java.util.concurrent.Executors;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.filter.AndFilter;
+import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.filter.JobIdFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.internal.ClientJobManager;
 import org.eclipse.scout.rt.shared.ISession;
@@ -121,7 +125,7 @@ public class ClientJobManagerTest {
     runnable.throwOnError();
 
     // run the test
-    assertTrue(m_jobManager.cancel("1", m_clientSession1));
+    assertTrue(m_jobManager.cancel(newAndFilter("1", m_clientSession1)));
 
     assertTrue(verifyLatch.await());
 
@@ -158,7 +162,7 @@ public class ClientJobManagerTest {
     assertTrue(setupLatch.await());
 
     // run the test
-    assertTrue(m_jobManager.cancel("1", m_clientSession1));
+    assertTrue(m_jobManager.cancel(newAndFilter("1", m_clientSession1)));
 
     assertTrue(verifyLatch.await());
 
@@ -256,15 +260,15 @@ public class ClientJobManagerTest {
     runnable.throwOnError();
 
     // test cancel of inner jobs (expected=no effect)
-    assertFalse(m_jobManager.cancel("5", m_clientSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
-    assertFalse(m_jobManager.cancel("4", m_clientSession1)); // already finished
-    assertFalse(m_jobManager.cancel("2", m_clientSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
+    assertFalse(m_jobManager.cancel(newAndFilter("5", m_clientSession1))); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
+    assertFalse(m_jobManager.cancel(newAndFilter("4", m_clientSession1))); // already finished
+    assertFalse(m_jobManager.cancel(newAndFilter("2", m_clientSession1))); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
 
     // test cancel with wrong session (expected=no effect)
-    assertFalse(m_jobManager.cancel("1", m_clientSession2));
+    assertFalse(m_jobManager.cancel(newAndFilter("1", m_clientSession2)));
 
     // test cancel
-    assertTrue(m_jobManager.cancel("1", m_clientSession1));
+    assertTrue(m_jobManager.cancel(newAndFilter("1", m_clientSession1)));
 
     assertTrue(verifyLatch.await());
 
@@ -349,15 +353,15 @@ public class ClientJobManagerTest {
     assertTrue(setupLatch.await());
 
     // test cancel of inner jobs (expected=no effect)
-    assertFalse(m_jobManager.cancel("5", m_clientSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
-    assertFalse(m_jobManager.cancel("4", m_clientSession1)); // already finished
-    assertFalse(m_jobManager.cancel("2", m_clientSession1)); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
+    assertFalse(m_jobManager.cancel(newAndFilter("5", m_clientSession1))); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
+    assertFalse(m_jobManager.cancel(newAndFilter("4", m_clientSession1))); // already finished
+    assertFalse(m_jobManager.cancel(newAndFilter("2", m_clientSession1))); // only outermost 'runNow'-job can be cancelled directly or not at all if nested in a scheduled job.
 
     // test cancel with wrong session (expected=no effect)
-    assertFalse(m_jobManager.cancel("1", m_clientSession2));
+    assertFalse(m_jobManager.cancel(newAndFilter("1", m_clientSession2)));
 
     // test cancel
-    assertTrue(m_jobManager.cancel("1", m_clientSession1));
+    assertTrue(m_jobManager.cancel(newAndFilter("1", m_clientSession1)));
 
     assertTrue(verifyLatch.await());
 
@@ -457,7 +461,7 @@ public class ClientJobManagerTest {
 
     assertTrue(setupLatch.await());
 
-    m_jobManager.cancel(commonJobId, m_clientSession1);
+    m_jobManager.cancel(newAndFilter(commonJobId, m_clientSession1));
 
     assertTrue(verifyLatch.await());
 
@@ -487,5 +491,12 @@ public class ClientJobManagerTest {
       shutdown();
       super.finalize();
     }
+  }
+
+  private static AndFilter<IFuture<?>> newAndFilter(String id, IClientSession session) {
+    final IFilter<IFuture<?>> requestIdFilter = new JobIdFilter(String.valueOf(id));
+    final IFilter<IFuture<?>> currentSessionFilter = new ClientSessionFilter(session);
+
+    return new AndFilter<>(requestIdFilter, currentSessionFilter);
   }
 }

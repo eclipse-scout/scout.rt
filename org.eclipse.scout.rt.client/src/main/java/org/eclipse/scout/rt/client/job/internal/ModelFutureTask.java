@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.job.internal;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
@@ -33,24 +35,26 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ModelFutureTask.class);
 
   private final IFuture<RESULT> m_future;
+  private final ClientJobInput m_jobInput;
   private final Long m_expirationDate;
+
+  private volatile boolean m_running;
+  private final List<IMutexAcquiredListener> m_mutexAcquiredListeners;
 
   public ModelFutureTask(final Callable<RESULT> callable, final ClientJobInput input, final IProgressMonitorProvider progressMonitorProvider) {
     super(callable);
+    m_jobInput = input;
     m_future = Futures.iFuture(this, input, progressMonitorProvider);
 
-    long expirationTime = input.getExpirationTimeMillis();
+    final long expirationTime = input.getExpirationTimeMillis();
     m_expirationDate = (expirationTime != IJobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + expirationTime : null);
+
+    m_mutexAcquiredListeners = new ArrayList<>();
   }
 
-  public ModelFutureTask(final ClientJobInput input, final IProgressMonitorProvider progressMonitorProvider) {
-    this(new Callable<RESULT>() {
-
-      @Override
-      public RESULT call() throws Exception {
-        return null; // NOOP
-      }
-    }, input, progressMonitorProvider);
+  @Override
+  public boolean cancel(boolean mayInterruptIfRunning) {
+    return super.cancel(mayInterruptIfRunning);
   }
 
   /**
@@ -60,25 +64,26 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
     return m_future;
   }
 
+  /**
+   * @return {@link ClientJobInput} associated with this {@link FutureTask}.
+   */
+  public ClientJobInput getJobInput() {
+    return m_jobInput;
+  }
+
   @Override
   @Internal
   public void run() {
-    try {
-      beforeExecute(m_future);
-    }
-    catch (final RuntimeException e) {
-      LOG.error("Unexpected error in 'beforeExecute'", e);
-    }
+    notifyMutexAcquiredListeners();
 
-    try {
-      super.run(); // delegate control to the FutureTask which in turn calls 'Callable.call'.
-    }
-    finally {
+    if (!m_running) { // is already running if re-acquiring the mutex.
+      m_running = true;
+      notifyBefore();
       try {
-        afterExecute(m_future);
+        super.run(); // delegate control to the FutureTask which in turn calls 'Callable.call'.
       }
-      catch (final RuntimeException e) {
-        LOG.error("Unexpected error in 'afterExecute'", e);
+      finally {
+        notifyAfter();
       }
     }
   }
@@ -95,7 +100,11 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
    * Invoke this method if the Future was rejected for execution.
    */
   public final void reject() {
-    rejected(m_future);
+    notifyMutexAcquiredListeners();
+
+    if (!m_running) { // is already running if re-acquiring the mutex.
+      rejected(m_future);
+    }
   }
 
   /**
@@ -129,5 +138,63 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
    *          {@link IFuture} representing this task.
    */
   protected void afterExecute(final IFuture<RESULT> future) {
+  }
+
+  /**
+   * Add the given listener to be notified about mutex-acquisition.
+   */
+  void addMutexAcquiredListener(final IMutexAcquiredListener listener) {
+    m_mutexAcquiredListeners.add(listener);
+  }
+
+  /**
+   * Remove the given listener.
+   */
+  void removeMutexAcquiredListener(final IMutexAcquiredListener listener) {
+    m_mutexAcquiredListeners.remove(listener);
+  }
+
+  private void notifyBefore() {
+    try {
+      beforeExecute(m_future);
+    }
+    catch (final RuntimeException e) {
+      LOG.error("Unexpected error in 'beforeExecute'", e);
+    }
+  }
+
+  private void notifyAfter() {
+    try {
+      afterExecute(m_future);
+    }
+    catch (final RuntimeException e) {
+      LOG.error("Unexpected error in 'afterExecute'", e);
+    }
+  }
+
+  private void notifyMutexAcquiredListeners() {
+    if (m_mutexAcquiredListeners.isEmpty()) {
+      return;
+    }
+
+    for (final IMutexAcquiredListener listener : new ArrayList<>(m_mutexAcquiredListeners)) { // iterate over a copy so that listeners can remove themself upon notification.
+      try {
+        listener.onMutexAcquired();
+      }
+      catch (final RuntimeException e) {
+        LOG.error("Unexpected error while notifying listener about mutex-acquisition", e);
+      }
+    }
+  }
+
+  /**
+   * Listener to be notified once acquiring the model-mutex.
+   */
+  interface IMutexAcquiredListener {
+
+    /**
+     * Method invoked once the model-mutex is acquired.
+     */
+    void onMutexAcquired();
   }
 }

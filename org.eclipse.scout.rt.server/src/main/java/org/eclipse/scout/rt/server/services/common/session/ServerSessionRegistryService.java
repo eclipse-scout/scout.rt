@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
@@ -75,7 +76,7 @@ public class ServerSessionRegistryService extends AbstractService implements ISe
    */
   @Internal
   protected void loadSessionInServerJob(final ServerJobInput input, final Bundle bundle, final IServerSession serverSession) throws ProcessingException {
-    IServerJobManager.DEFAULT.runNow(new IRunnable() {
+    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {

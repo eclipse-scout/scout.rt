@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.server.job;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IJobManager;
 import org.eclipse.scout.commons.job.IProgressMonitor;
@@ -12,7 +13,6 @@ import org.eclipse.scout.commons.job.internal.callable.ExceptionTranslator;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -43,24 +43,13 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 public interface IServerJobManager extends IJobManager<ServerJobInput>, IScheduler<ServerJobInput> {
 
   /**
-   * TODO [dwi/aho]: Remove me and replace with CDI.
-   */
-  IServerJobManager DEFAULT = new ServerJobManager();
-
-  /**
-   * Cancels jobs and associated transactions that belong to the given <code>id</code> and {@link IServerSession}.
-   * <p/>
-   * Also, any nested 'runNow'-style jobs, which where run on behalf of that job and did not complete yet, are
-   * cancelled, as well as any associated transactions. In order to be cancelled, the given session must be the same as
-   * the job's session.
+   * Cancels all Futures and associated transactions which are accepted by the given Filter. Also, any nested
+   * 'runNow'-style jobs, which where run on behalf of accepted jobs and did not complete yet, are cancelled as well.
    *
-   * @param id
-   *          id of the job to be cancelled; use <code>null</code> to cancel jobs with a <code>null</code>-id.
-   * @param serverSession
-   *          session which the job to be cancelled must belong to; use <code>null</code> to cancel jobs without a
-   *          session associated.
-   * @return <code>true</code> if cancel was successful and transaction was in fact cancelled, <code>false</code>
-   *         otherwise.
+   * @param filter
+   *          Filter to control the Futures to be cancelled.
+   * @return <code>true</code> if cancel was successful, <code>false</code> otherwise.
    */
-  boolean cancel(String id, IServerSession serverSession);
+  @Override
+  public boolean cancel(IFilter<IFuture<?>> filter);
 }

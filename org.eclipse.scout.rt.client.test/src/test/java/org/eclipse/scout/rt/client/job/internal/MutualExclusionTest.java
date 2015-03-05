@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobExecutionException;
@@ -144,11 +145,11 @@ public class MutualExclusionTest {
       }
     });
 
-    m_jobManager.waitForIdle(10, TimeUnit.SECONDS);
+    m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS);
 
     assertEquals(CollectionUtility.hashSet(1, 2, 3), protocol);
     assertEquals(CollectionUtility.arrayList("model-thread-1", "model-thread-2", "model-thread-3"), modelThreadProtocol);
-    assertNull(m_jobManager.m_modelThread);
+    assertTrue(m_jobManager.m_modelThreads.isEmpty());
   }
 
   /**
@@ -240,7 +241,7 @@ public class MutualExclusionTest {
       }
     });
 
-    assertTrue(m_jobManager.waitForIdle(30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.arrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14), protocol);
   }
 
@@ -277,7 +278,7 @@ public class MutualExclusionTest {
       }
     });
 
-    assertTrue(m_jobManager.waitForIdle(30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.arrayList(1, 2, 3, 4), protocol);
   }
 
@@ -296,7 +297,7 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("1: running");
 
-        if (m_jobManager.isIdle()) {
+        if (m_jobManager.isDone(new AlwaysFilter<IFuture<?>>())) {
           protocol.add("1: idle [a]");
         }
         if (m_jobManager.isBlocked(IFuture.CURRENT.get())) {
@@ -310,7 +311,7 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("1: afterAwait");
 
-        if (m_jobManager.isIdle()) {
+        if (m_jobManager.isDone(new AlwaysFilter<IFuture<?>>())) {
           protocol.add("1: idle [b]");
         }
         if (m_jobManager.isBlocked(IFuture.CURRENT.get())) {
@@ -328,7 +329,7 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("2: running");
 
-        if (m_jobManager.isIdle()) {
+        if (m_jobManager.isDone(new AlwaysFilter<IFuture<?>>())) {
           protocol.add("2: idle [a]");
         }
         if (m_jobManager.isBlocked(IFuture.CURRENT.get())) {
@@ -343,7 +344,7 @@ public class MutualExclusionTest {
         BC.setBlocking(false);
         protocol.add("2: afterSignaling");
 
-        if (m_jobManager.isIdle()) {
+        if (m_jobManager.isDone(new AlwaysFilter<IFuture<?>>())) {
           protocol.add("2: idle [b]");
         }
         if (m_jobManager.isBlocked(IFuture.CURRENT.get())) {
@@ -358,7 +359,7 @@ public class MutualExclusionTest {
     // Wait until job1 completed.
     future1.get(30, TimeUnit.SECONDS);
 
-    assertTrue(m_jobManager.waitForIdle(30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
 
     List<String> expected = new ArrayList<>();
     expected.add("1: running");
@@ -458,8 +459,8 @@ public class MutualExclusionTest {
 
     // VERIFY
     verifyLatch.await();
-    assertFalse(m_jobManager.isIdle());
-    assertFalse(m_jobManager.waitForIdle(0, TimeUnit.SECONDS));
+    assertFalse(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
+    assertFalse(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 0, TimeUnit.SECONDS));
     assertEquals(Arrays.asList("running-1", "running-2", "interrupted-1", "non-model-thread-1"), protocol);
   }
 
@@ -528,7 +529,7 @@ public class MutualExclusionTest {
     }, ClientJobInput.defaults().name("job-3"));
 
     assertTrue(latchJob2.await());
-    waitForPermitsAcquired(m_jobManager, 3); // job-1 (interrupted, but re-acquire mutex task still pending), job32 (latch), job-3 (pending)
+    waitForPermitsAcquired(m_jobManager, m_clientSession, 3); // job-1 (interrupted, but re-acquire mutex task still pending), job32 (latch), job-3 (pending)
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("running-1");
@@ -576,7 +577,7 @@ public class MutualExclusionTest {
 
     // let job2 finish its work so that job1 can re-acquire the mutex.
     latchJob2.unblock();
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     expectedProtocol.add("done-2");
     expectedProtocol.add("done-3");
@@ -678,10 +679,10 @@ public class MutualExclusionTest {
     });
 
     jobsScheduledLatch.countDown(); // notify that all jobs are scheduled.
-    assertTrue(jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     assertEquals(Arrays.asList("running-job-1", "running-job-3"), protocol);
-    assertTrue(jobManager.isIdle());
+    assertTrue(jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
     assertFalse(future1.isCancelled());
     assertTrue(future2.isCancelled());
     assertFalse(future3.isCancelled());
@@ -770,7 +771,7 @@ public class MutualExclusionTest {
           protocol.add("running-job-1 (e) [model-thread]");
         }
       }
-    });
+    }, ClientJobInput.defaults().name("job-1"));
 
     IFuture<Void> future2 = jobManager.schedule(new IRunnable() {
 
@@ -780,10 +781,10 @@ public class MutualExclusionTest {
         BC.setBlocking(false);
 
         // Wait until job-1 tried to re-acquire the mutex.
-        waitForPermitsAcquired(jobManager, 4); // 4 = job1(re-acquiring), job2(owner), job3, job4
+        waitForPermitsAcquired(jobManager, m_clientSession, 4); // 4 = job1(re-acquiring), job2(owner), job3, job4
         protocol.add("running-job-2 (b)");
       }
-    });
+    }, ClientJobInput.defaults().name("job-2"));
 
     IFuture<Void> future3 = jobManager.schedule(new IRunnable() {
 
@@ -792,7 +793,7 @@ public class MutualExclusionTest {
         protocol.add("running-job-3");
         job3RunningLatch.countDownAndBlock();
       }
-    });
+    }, ClientJobInput.defaults().name("job-3"));
 
     IFuture<Void> future4 = jobManager.schedule(new IRunnable() {
 
@@ -800,13 +801,13 @@ public class MutualExclusionTest {
       public void run() throws Exception {
         protocol.add("running-job-4");
       }
-    });
+    }, ClientJobInput.defaults().name("job-4"));
 
     jobsScheduledLatch.countDown(); // notify that all jobs are scheduled.
 
     assertTrue(job3RunningLatch.await());
-    assertFalse(jobManager.waitForIdle(0, TimeUnit.SECONDS)); // job-4 is pending
-    assertFalse(jobManager.isIdle()); // job-4 is pending
+    assertFalse(jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 0, TimeUnit.SECONDS)); // job-4 is pending
+    assertFalse(jobManager.isDone(new AlwaysFilter<IFuture<?>>())); // job-4 is pending
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("running-job-1 (a)");
@@ -831,12 +832,12 @@ public class MutualExclusionTest {
 
     // cancel job3
     future3.cancel(true);
-    assertTrue(jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     expectedProtocol.add("running-job-4");
     assertEquals(expectedProtocol, protocol);
 
-    assertTrue(jobManager.isIdle());
+    assertTrue(jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
 
     assertTrue(future3.isCancelled());
     assertTrue(future3.isDone());
@@ -907,7 +908,7 @@ public class MutualExclusionTest {
         BC.setBlocking(false);
 
         // Wait until the other jobs tried to re-acquire the mutex.
-        waitForPermitsAcquired(m_jobManager, 4);
+        waitForPermitsAcquired(m_jobManager, m_clientSession, 4);
 
         if (!m_jobManager.isBlocked(future1)) {
           protocol.add("job-1-unblocked");
@@ -933,7 +934,7 @@ public class MutualExclusionTest {
       }
     });
 
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     List<String> expected = new ArrayList<>();
     expected.add("job-1-beforeAwait");
@@ -1008,7 +1009,7 @@ public class MutualExclusionTest {
                 protocol.add("job-3-before-signaling");
                 BC.setBlocking(false);
 
-                waitForPermitsAcquired(m_jobManager, 4); // Wait for the other jobs to have tried re-acquiring the mutex.
+                waitForPermitsAcquired(m_jobManager, m_clientSession, 4); // Wait for the other jobs to have tried re-acquiring the mutex.
 
                 protocol.add("job-3-after-signaling");
 
@@ -1033,7 +1034,7 @@ public class MutualExclusionTest {
         protocol.add("JOB-X-AFTERAWAIT");
       }
     });
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     List<String> expected = new ArrayList<>();
     expected.add("job-1-running");
@@ -1075,8 +1076,7 @@ public class MutualExclusionTest {
       }
     });
 
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
-
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
   }
 
   /**
@@ -1118,7 +1118,7 @@ public class MutualExclusionTest {
       }
     });
 
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
     runnable.throwOnError();
 
     List<String> expected = new ArrayList<>();
@@ -1151,12 +1151,12 @@ public class MutualExclusionTest {
       }
     });
 
-    waitForPermitsAcquired(m_jobManager, 0); // Wait until job1 is blocked
+    waitForPermitsAcquired(m_jobManager, m_clientSession, 0); // Wait until job1 is blocked
     assertTrue(BC.isBlocking());
     protocol.add("2: setBlocking=false");
     BC.setBlocking(false);
     assertFalse(BC.isBlocking());
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     m_jobManager.schedule(new IRunnable() {
 
@@ -1168,7 +1168,7 @@ public class MutualExclusionTest {
       }
     }).get();
 
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     List<String> expected = new ArrayList<>();
     expected.add("1: beforeWaitFor");
@@ -1207,7 +1207,7 @@ public class MutualExclusionTest {
     }, ClientJobInput.defaults().expirationTime(1, TimeUnit.MILLISECONDS));
 
     // Wait until entering blocking condition
-    waitForPermitsAcquired(m_jobManager, 0);
+    waitForPermitsAcquired(m_jobManager, m_clientSession, 0);
 
     // Expect the job to continue running.
     try {
@@ -1226,13 +1226,13 @@ public class MutualExclusionTest {
   /**
    * Blocks the current thread until the expected number of mutex-permits is acquired; Waits for maximal 30s.
    */
-  private static void waitForPermitsAcquired(ModelJobManager jobManager, int expectedPermitCount) throws InterruptedException {
+  private static void waitForPermitsAcquired(ModelJobManager jobManager, IClientSession session, int expectedPermitCount) throws InterruptedException {
     long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
 
     // Wait until the other jobs tried to re-acquire the mutex.
-    while (jobManager.m_mutexSemaphore.getPermitCount() != expectedPermitCount) {
+    while (jobManager.m_mutexSemaphores.getPermitCount(session) != expectedPermitCount) {
       if (System.currentTimeMillis() > deadline) {
-        fail(String.format("Timeout elapsed while waiting for a mutex-permit count. [expectedPermitCount=%s, actualPermitCount=%s]", expectedPermitCount, jobManager.m_mutexSemaphore.getPermitCount()));
+        fail(String.format("Timeout elapsed while waiting for a mutex-permit count. [expectedPermitCount=%s, actualPermitCount=%s]", expectedPermitCount, jobManager.m_mutexSemaphores.getPermitCount(session)));
       }
       Thread.sleep(10);
     }

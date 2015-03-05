@@ -10,20 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.job.internal;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.internal.Futures.JobFuture;
 import org.eclipse.scout.commons.job.internal.JobManager;
 import org.eclipse.scout.commons.job.internal.callable.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
@@ -80,25 +73,5 @@ public class ServerJobManager extends JobManager<ServerJobInput> implements ISer
    */
   protected ITransaction createTransaction() {
     return new BasicTransaction();
-  }
-
-  @Override
-  public boolean cancel(final String id, final IServerSession serverSession) {
-    Assertions.assertNotNull(serverSession);
-
-    final Set<Boolean> status = new HashSet<>();
-    visit(new IFutureVisitor() {
-
-      @Override
-      public boolean visit(final IFuture<?> future) {
-        final ServerJobInput input = (ServerJobInput) future.getJobInput();
-        if (CompareUtility.equals(serverSession, input.getSession()) && CompareUtility.equals(input.getId(), id)) {
-          status.add(future.cancel(true)); // continue visiting because multiple jobs might belong to the same id.
-        }
-        return true;
-      }
-    });
-
-    return Collections.singleton(true).equals(status);
   }
 }

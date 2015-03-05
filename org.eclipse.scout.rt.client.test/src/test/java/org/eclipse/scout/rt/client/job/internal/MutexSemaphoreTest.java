@@ -17,18 +17,16 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Date;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.internal.IProgressMonitorProvider;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
@@ -58,21 +56,14 @@ public class MutexSemaphoreTest {
   private ModelFutureTask<Object> m_task4;
   private ModelFutureTask<Object> m_task5;
 
-  private IFuture<Object> m_iFuture1;
-  private IFuture<Object> m_iFuture2;
-  private IFuture<Object> m_iFuture3;
-
   @Before
+  @SuppressWarnings("unchecked")
   public void before() {
-    m_task1 = new ModelFutureTask<>(ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
-    m_task2 = new ModelFutureTask<>(ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
-    m_task3 = new ModelFutureTask<>(ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
-    m_task4 = new ModelFutureTask<>(ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
-    m_task5 = new ModelFutureTask<>(ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
-
-    m_iFuture1 = m_task1.getFuture();
-    m_iFuture2 = m_task2.getFuture();
-    m_iFuture3 = m_task3.getFuture();
+    m_task1 = new ModelFutureTask<>(mock(Callable.class), ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
+    m_task2 = new ModelFutureTask<>(mock(Callable.class), ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
+    m_task3 = new ModelFutureTask<>(mock(Callable.class), ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
+    m_task4 = new ModelFutureTask<>(mock(Callable.class), ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
+    m_task5 = new ModelFutureTask<>(mock(Callable.class), ClientJobInput.empty(), mock(IProgressMonitorProvider.class));
   }
 
   @Test
@@ -80,112 +71,113 @@ public class MutexSemaphoreTest {
     MutexSemaphore mutexSemaphore = new MutexSemaphore();
 
     // state: []
-    assertIdle(mutexSemaphore);
+    assertEmpty(mutexSemaphore);
     assertEquals(0, mutexSemaphore.getPermitCount());
 
-    assertTrue(mutexSemaphore.tryAcquireElseOfferTail(m_task1));
+    assertTrue(mutexSemaphore.tryAcquireElseOffer(m_task1, true));
     // state: [(obj1)]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
     assertEquals(1, mutexSemaphore.getPermitCount());
 
-    assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task2));
+    assertFalse(mutexSemaphore.tryAcquireElseOffer(m_task2, true));
     // state: [(obj1), obj2]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
     assertEquals(2, mutexSemaphore.getPermitCount());
 
-    assertFalse(mutexSemaphore.tryAcquireElseOfferHead(m_task3 /* Head */));
+    assertFalse(mutexSemaphore.tryAcquireElseOffer(m_task3, false /* head */));
     // state: [(obj1), obj3, obj2]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
     assertEquals(3, mutexSemaphore.getPermitCount());
 
-    assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task4));
+    assertFalse(mutexSemaphore.tryAcquireElseOffer(m_task4, true));
     // state: [(obj1), obj3, obj2, obj4]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
     assertEquals(4, mutexSemaphore.getPermitCount());
 
     assertSame(m_task3, mutexSemaphore.releaseAndPoll());
     // state: [(obj3), obj2, obj4]
     assertEquals(3, mutexSemaphore.getPermitCount());
 
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
 
     assertSame(m_task2, mutexSemaphore.releaseAndPoll());
     // state: [(obj2), obj4]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
     assertEquals(2, mutexSemaphore.getPermitCount());
 
-    assertFalse(mutexSemaphore.tryAcquireElseOfferHead(m_task5));
+    assertFalse(mutexSemaphore.tryAcquireElseOffer(m_task5, false /* head */));
     // state: [(obj2), obj5, obj4]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
     assertEquals(3, mutexSemaphore.getPermitCount());
 
     assertSame(m_task5, mutexSemaphore.releaseAndPoll());
     // state: [(obj5), obj4]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
     assertEquals(2, mutexSemaphore.getPermitCount());
 
     assertSame(m_task4, mutexSemaphore.releaseAndPoll());
     // state: [(obj4)]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
     assertEquals(1, mutexSemaphore.getPermitCount());
 
     assertNull(mutexSemaphore.releaseAndPoll());
     // state: []
-    assertIdle(mutexSemaphore);
+    assertEmpty(mutexSemaphore);
     assertNull(mutexSemaphore.releaseAndPoll());
     assertEquals(0, mutexSemaphore.getPermitCount());
 
     // state: []
-    assertIdle(mutexSemaphore);
+    assertEmpty(mutexSemaphore);
 
-    assertTrue(mutexSemaphore.tryAcquireElseOfferHead(m_task1));
+    assertTrue(mutexSemaphore.tryAcquireElseOffer(m_task1, false /* head */));
     // state: [(obj1)]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
 
-    assertFalse(mutexSemaphore.tryAcquireElseOfferHead(m_task2));
+    assertFalse(mutexSemaphore.tryAcquireElseOffer(m_task2, false /* head */));
     // state: [(obj1), obj2]
 
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
     assertSame(m_task2, mutexSemaphore.releaseAndPoll());
     // state: [(obj2)]
 
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
 
     assertNull(mutexSemaphore.releaseAndPoll());
     // state: []
-    assertIdle(mutexSemaphore);
+    assertEmpty(mutexSemaphore);
   }
 
   @Test
-  public void testWaitForIdle() throws Throwable {
+  public void waitUntilEmpty() throws Throwable {
+
     final MutexSemaphore mutexSemaphore = new MutexSemaphore();
 
     // state: []
-    assertIdle(mutexSemaphore);
+    assertEmpty(mutexSemaphore);
 
-    assertTrue(mutexSemaphore.tryAcquireElseOfferTail(m_task1));
+    assertTrue(mutexSemaphore.tryAcquireElseOffer(m_task1, true));
     // state: [(obj1)]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
 
-    assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task2));
+    assertFalse(mutexSemaphore.tryAcquireElseOffer(m_task2, true));
     // state: [(obj1), obj2]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
 
-    assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task3));
+    assertFalse(mutexSemaphore.tryAcquireElseOffer(m_task3, true));
     // state: [(obj1), obj2, obj3]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
 
-    assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task4));
+    assertFalse(mutexSemaphore.tryAcquireElseOffer(m_task4, true));
     // state: [(obj1), obj2, obj3, obj4]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
 
-    assertFalse(mutexSemaphore.tryAcquireElseOfferHead(m_task5));
+    assertFalse(mutexSemaphore.tryAcquireElseOffer(m_task5, false /* head */));
     // state: [(obj1), obj5, obj2, obj3, obj4]
-    assertNotIdle(mutexSemaphore);
+    assertNotEmpty(mutexSemaphore);
 
     final AtomicInteger protocolCount = new AtomicInteger(5);
 
-    final BooleanHolder waitForIdleResult = new BooleanHolder(false);
+    final BooleanHolder waitUntilEmptyResult = new BooleanHolder(false);
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
@@ -196,7 +188,7 @@ public class MutexSemaphoreTest {
       protected void runSafe() throws Exception {
         setupLatch.countDown();
         try {
-          waitForIdleResult.setValue(mutexSemaphore.waitForIdle(10, TimeUnit.SECONDS));
+          waitUntilEmptyResult.setValue(mutexSemaphore.waitUntilEmpty(new AlwaysFilter<IFuture<?>>(), newDeadline(TimeUnit.SECONDS.toMillis(10))));
         }
         finally {
           verifyLatch.countDown();
@@ -215,7 +207,7 @@ public class MutexSemaphoreTest {
     runnable.throwOnError();
     assertTrue(setupLatch.await());
 
-    Thread.sleep(500); // Wait for the other thread to invoke 'waitForIdle'.
+    Thread.sleep(500); // Wait for the other thread to invoke 'waitUntilEmpty'.
 
     protocolCount.decrementAndGet();
     assertSame(m_task5, mutexSemaphore.releaseAndPoll());
@@ -225,7 +217,7 @@ public class MutexSemaphoreTest {
     assertSame(m_task2, mutexSemaphore.releaseAndPoll());
     // state: [(obj2), obj3, obj4]
 
-    simulateWaitForIdleSpuriousWakeup(mutexSemaphore);
+    simulateWaitUntilEmptySpuriousWakeup(mutexSemaphore);
 
     protocolCount.decrementAndGet();
     assertSame(m_task3, mutexSemaphore.releaseAndPoll());
@@ -243,113 +235,58 @@ public class MutexSemaphoreTest {
     runnable.throwOnError();
     assertTrue(verifyLatch.await());
 
-    assertTrue(waitForIdleResult.getValue());
-    assertTrue(mutexSemaphore.isIdle());
-    assertTrue(mutexSemaphore.waitForIdle(0, TimeUnit.SECONDS));
+    assertTrue(waitUntilEmptyResult.getValue());
+    assertTrue(mutexSemaphore.isEmpty(new AlwaysFilter<IFuture<?>>()));
+    assertTrue(mutexSemaphore.waitUntilEmpty(new AlwaysFilter<IFuture<?>>(), newDeadline(TimeUnit.SECONDS.toMillis(10))));
   }
 
   @Test
   public void testClearAndCancel() {
     final MutexSemaphore mutexSemaphore = new MutexSemaphore();
 
-    assertTrue(mutexSemaphore.tryAcquireElseOfferTail(m_task1));
-    assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task2));
-    assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task3));
+    assertTrue(mutexSemaphore.tryAcquireElseOffer(m_task1, true));
+    assertFalse(mutexSemaphore.tryAcquireElseOffer(m_task2, true));
+    assertFalse(mutexSemaphore.tryAcquireElseOffer(m_task3, true));
 
     assertSame(m_task1, mutexSemaphore.getMutexOwner());
 
     assertEquals(3, mutexSemaphore.getPermitCount());
-    assertFalse(mutexSemaphore.isIdle());
+    assertFalse(mutexSemaphore.isEmpty(new AlwaysFilter<IFuture<?>>()));
 
-    mutexSemaphore.clearAndCancel();
+    mutexSemaphore.reset();
 
-    assertEquals(1, mutexSemaphore.getPermitCount()); // mutex-owner
-    assertFalse(mutexSemaphore.isIdle()); // mutex-owner
-    assertSame(m_task1, mutexSemaphore.getMutexOwner());
+    assertEquals(0, mutexSemaphore.getPermitCount());
+    assertTrue(mutexSemaphore.isEmpty(new AlwaysFilter<IFuture<?>>())); // mutex-owner
+    assertNull(mutexSemaphore.getMutexOwner());
 
     // Release the model mutex
     assertNull(mutexSemaphore.releaseAndPoll());
     assertEquals(0, mutexSemaphore.getPermitCount());
-    assertTrue(mutexSemaphore.isIdle());
+    assertTrue(mutexSemaphore.isEmpty(new AlwaysFilter<IFuture<?>>()));
     assertNull(mutexSemaphore.getMutexOwner());
   }
 
-  @Test
-  public void testVisit() {
-    final MutexSemaphore mutexSemaphore = new MutexSemaphore();
-
-    assertTrue(mutexSemaphore.tryAcquireElseOfferTail(m_task1));
-    assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task2));
-    assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task3));
-
-    final List<IFuture<?>> visitedFutures = new ArrayList<>();
-    mutexSemaphore.visit(new IFutureVisitor() {
-
-      @Override
-      public boolean visit(IFuture<?> future) {
-        visitedFutures.add(future);
-        return true;
-      }
-    });
-
-    assertEquals(CollectionUtility.arrayList(m_iFuture1, m_iFuture2, m_iFuture3), visitedFutures);
+  private void assertNotEmpty(MutexSemaphore mutexSemaphore) throws InterruptedException {
+    assertFalse(mutexSemaphore.isEmpty(new AlwaysFilter<IFuture<?>>()));
+    assertFalse(mutexSemaphore.waitUntilEmpty(new AlwaysFilter<IFuture<?>>(), newDeadline(10)));
   }
 
-  @Test
-  public void testVisitEmpty() {
-    final MutexSemaphore mutexSemaphore = new MutexSemaphore();
-
-    final List<IFuture<?>> visitedFutures = new ArrayList<>();
-    mutexSemaphore.visit(new IFutureVisitor() {
-
-      @Override
-      public boolean visit(IFuture<?> future) {
-        visitedFutures.add(future);
-        return true;
-      }
-    });
-
-    assertEquals(Collections.emptyList(), visitedFutures);
+  private void assertEmpty(MutexSemaphore mutexSemaphore) throws InterruptedException {
+    assertTrue(mutexSemaphore.isEmpty(new AlwaysFilter<IFuture<?>>()));
+    assertTrue(mutexSemaphore.waitUntilEmpty(new AlwaysFilter<IFuture<?>>(), newDeadline(10)));
   }
 
-  @Test
-  public void testVisitAbort() {
-    final MutexSemaphore mutexSemaphore = new MutexSemaphore();
-
-    assertTrue(mutexSemaphore.tryAcquireElseOfferTail(m_task1));
-    assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task2));
-    assertFalse(mutexSemaphore.tryAcquireElseOfferTail(m_task3));
-
-    final List<IFuture<?>> visitedFutures = new ArrayList<>();
-    mutexSemaphore.visit(new IFutureVisitor() {
-
-      @Override
-      public boolean visit(IFuture<?> future) {
-        visitedFutures.add(future);
-        return false;
-      }
-    });
-
-    assertEquals(CollectionUtility.arrayList(m_iFuture1), visitedFutures);
-  }
-
-  private void assertNotIdle(MutexSemaphore mutexSemaphore) throws InterruptedException {
-    assertFalse(mutexSemaphore.isIdle());
-    assertFalse(mutexSemaphore.waitForIdle(100, TimeUnit.MILLISECONDS));
-  }
-
-  private void assertIdle(MutexSemaphore mutexSemaphore) throws InterruptedException {
-    assertTrue(mutexSemaphore.isIdle());
-    assertTrue(mutexSemaphore.waitForIdle(100, TimeUnit.MILLISECONDS));
-  }
-
-  private static void simulateWaitForIdleSpuriousWakeup(final MutexSemaphore mutexSemaphore) {
-    mutexSemaphore.m_idleLock.lock();
+  private static void simulateWaitUntilEmptySpuriousWakeup(final MutexSemaphore mutexSemaphore) {
+    mutexSemaphore.m_changedLock.lock();
     try {
-      mutexSemaphore.m_idleCondition.signalAll();
+      mutexSemaphore.m_changedCondition.signalAll();
     }
     finally {
-      mutexSemaphore.m_idleLock.unlock();
+      mutexSemaphore.m_changedLock.unlock();
     }
+  }
+
+  private static Date newDeadline(long millis) {
+    return new Date(System.currentTimeMillis() + millis);
   }
 }

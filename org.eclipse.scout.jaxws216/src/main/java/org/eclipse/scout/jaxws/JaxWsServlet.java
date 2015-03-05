@@ -26,8 +26,9 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.internal.servlet.EndpointServlet;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 
 /**
  * Runs the webservice request in a server-job to propagate the current request-context and to run on behalf of a
@@ -53,7 +54,7 @@ public class JaxWsServlet extends EndpointServlet {
       input.locale(Locale.getDefault());
       input.sessionRequired(false);
 
-      ServerJobManager.DEFAULT.runNow(new IRunnable() {
+      OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
 
         @Override
         public void run() throws Exception {

@@ -8,21 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.job;
-
-import org.eclipse.scout.commons.job.internal.Futures;
+package org.eclipse.scout.commons.filter;
 
 /**
- * Visitor for visiting {@link Futures}.
+ * Filter to accept elements for processing.
  *
  * @since 5.1
  */
-public interface IFutureVisitor {
+public interface IFilter<ELEMENT> {
 
   /**
-   * Is called upon visiting a {@link IFuture}.
-   *
-   * @return <code>true</code>=continue visiting, <code>false</code>=end visiting.
+   * @return <code>true</code> to accept the given element, <code>false</code> otherwise.
    */
-  boolean visit(IFuture<?> future);
+  boolean accept(ELEMENT element);
 }

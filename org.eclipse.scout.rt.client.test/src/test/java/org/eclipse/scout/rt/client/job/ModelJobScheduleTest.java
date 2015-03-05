@@ -39,6 +39,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.job.IFuture;
@@ -588,7 +589,7 @@ public class ModelJobScheduleTest {
       }
     }, ClientJobInput.defaults().session(m_clientSession1).subject(m_subject1));
 
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
     assertSame(m_clientSession1, actualClientSession1.getValue());
     assertSame(m_clientSession2, actualClientSession2.getValue());

@@ -19,6 +19,8 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.IVisitor;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.junit.After;
@@ -71,7 +73,7 @@ public class JobManagerTest {
 
     // RUN THE TEST
     final Set<IFuture<?>> protocol = new HashSet<>();
-    m_jobManager.visit(new IFutureVisitor() {
+    m_jobManager.visit(new AlwaysFilter<IFuture<?>>(), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {

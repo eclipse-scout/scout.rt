@@ -11,7 +11,6 @@ import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.internal.callable.ExceptionTranslator;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.internal.ClientJobManager;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -37,25 +36,4 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  * @since 5.1
  */
 public interface IClientJobManager extends IJobManager<ClientJobInput>, IScheduler<ClientJobInput> {
-
-  /**
-   * TODO [dwi/aho]: Remove me and replace with CDI.
-   */
-  IClientJobManager DEFAULT = new ClientJobManager();
-
-  /**
-   * Cancels jobs that belong to the given <code>id</code> and {@link IClientSession}.
-   * <p/>
-   * Also, any nested 'runNow'-style jobs, which where run on behalf of that job and did not complete yet, are
-   * cancelled. In order to be cancelled, the given session must be the same as the job's session.
-   *
-   * @param id
-   *          id of the job to be cancelled; use <code>null</code> to cancel jobs with a <code>null</code>-id.
-   * @param clientSession
-   *          session which the job to be cancelled must belong to; use <code>null</code> to cancel jobs without a
-   *          session associated.
-   * @return <code>true</code> if cancel was successful and transaction was in fact cancelled, <code>false</code>
-   *         otherwise.
-   */
-  boolean cancel(String id, IClientSession clientSession);
 }

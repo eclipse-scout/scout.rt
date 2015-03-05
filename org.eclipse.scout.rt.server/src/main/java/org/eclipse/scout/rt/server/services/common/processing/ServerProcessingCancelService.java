@@ -11,8 +11,14 @@
 package org.eclipse.scout.rt.server.services.common.processing;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.filter.AndFilter;
+import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.filter.JobIdFilter;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
+import org.eclipse.scout.rt.server.job.IServerJobManager;
+import org.eclipse.scout.rt.server.job.ServerSessionFilter;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.service.AbstractService;
 
@@ -20,7 +26,10 @@ import org.eclipse.scout.service.AbstractService;
 public class ServerProcessingCancelService extends AbstractService implements IServerProcessingCancelService {
 
   @Override
-  public boolean cancel(long requestSequence) {
-    return ServerJobManager.DEFAULT.cancel(String.valueOf(requestSequence), (IServerSession) IServerSession.CURRENT);
+  public boolean cancel(final long requestSequence) {
+    final IFilter<IFuture<?>> requestIdFilter = new JobIdFilter(String.valueOf(requestSequence));
+    final IFilter<IFuture<?>> currentSessionFilter = new ServerSessionFilter((IServerSession) IServerSession.CURRENT.get());
+
+    return OBJ.one(IServerJobManager.class).cancel(new AndFilter<>(requestIdFilter, currentSessionFilter));
   }
 }

@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job;
 
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.internal.IProgressMonitorProvider;
 
 /**
@@ -148,12 +149,44 @@ public interface IJobManager<INPUT extends IJobInput> extends IProgressMonitorPr
   <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, INPUT input) throws JobExecutionException;
 
   /**
-   * To visit all Futures which did not complete yet.
-   *
-   * @param visitor
-   *          {@link IFutureVisitor} called for each {@link Future}.
+   * @return <code>true</code> if there is no running nor scheduled job matching the given Filter at the time of
+   *         invocation.
    */
-  void visit(IFutureVisitor visitor);
+  boolean isDone(IFilter<IFuture<?>> filter);
+
+  /**
+   * Blocks the calling thread until all jobs which match the given Filter completed their execution, or the given
+   * timeout elapses.
+   *
+   * @param timeout
+   *          the maximal time to wait.
+   * @param unit
+   *          unit of the given timeout.
+   * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
+   * @throws InterruptedException
+   *           if the current thread is interrupted while waiting for job completion.
+   */
+  boolean waitUntilDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit) throws InterruptedException;
+
+  /**
+   * To visit Futures which did not complete yet and match the filter.
+   *
+   * @param filter
+   *          to limit the Futures to be visited.
+   * @param visitor
+   *          called for each Futures that passed the filter.
+   */
+  void visit(IFilter<IFuture<?>> filter, IVisitor<IFuture<?>> visitor);
+
+  /**
+   * Cancels all Futures which are accepted by the given Filter. Also, any nested 'runNow'-style jobs, which where run
+   * on behalf of accepted jobs and did not complete yet, are cancelled as well.
+   *
+   * @param filter
+   *          Filter to control the Futures to be cancelled.
+   * @return <code>true</code> if cancel was successful, <code>false</code> otherwise.
+   */
+  boolean cancel(IFilter<IFuture<?>> filter);
 
   /**
    * Interrupts all running jobs and prevents scheduled jobs from running. After having shutdown, this job manager

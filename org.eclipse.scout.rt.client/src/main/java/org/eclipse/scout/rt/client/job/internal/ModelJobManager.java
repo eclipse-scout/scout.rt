@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.job.internal;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -23,12 +24,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IExecutable;
 import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IFutureVisitor;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobContext;
@@ -47,6 +50,8 @@ import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IBlockingCondition;
 import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.internal.ModelFutureTask.IMutexAcquiredListener;
+import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -57,27 +62,31 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  *
  * @since 5.1
  */
+@ApplicationScoped
 public class ModelJobManager implements IModelJobManager {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ModelJobManager.class);
 
   protected static final String PROP_CORE_POOL_SIZE = "org.eclipse.scout.job.model.corePoolSize";
-  protected static final int DEFAULT_CORE_POOL_SIZE = 0; // The number of threads to keep in the pool, even if they are idle; The default is 0 to have no worker-thread alive if idle to save resources if having inactive clients.
+  protected static final int DEFAULT_CORE_POOL_SIZE = 20; // The number of threads to keep in the pool, even if they are idle;
   protected static final String PROP_KEEP_ALIVE_TIME = "org.eclipse.scout.job.model.keepAliveTime";
   protected static final long DEFAULT_KEEP_ALIVE_TIME = 60L;
 
   @Internal
   protected final ExecutorService m_executor;
   @Internal
-  protected final MutexSemaphore m_mutexSemaphore;
+  protected final MutexSemaphores m_mutexSemaphores;
   @Internal
-  protected final Set<IFuture<?>> m_blockedFutures = new HashSet<>();
+  protected final Set<IFuture<?>> m_blockedFutures;
   @Internal
-  protected volatile Thread m_modelThread; // The thread currently representing the model-thread.
+  protected final Set<Thread> m_modelThreads; // The threads currently representing the model-thread. There is one model-thread per session.
 
   public ModelJobManager() {
-    m_mutexSemaphore = Assertions.assertNotNull(createMutexSemaphore());
+    m_mutexSemaphores = Assertions.assertNotNull(createMutexSemaphores());
     m_executor = Assertions.assertNotNull(createExecutor());
+
+    m_blockedFutures = new HashSet<>();
+    m_modelThreads = new HashSet<>();
   }
 
   @Override
@@ -115,7 +124,7 @@ public class ModelJobManager implements IModelJobManager {
 
     final ModelFutureTask<RESULT> task = interceptFuture(createModelFutureTask(command, input));
 
-    if (m_mutexSemaphore.tryAcquireElseOfferTail(task)) {
+    if (m_mutexSemaphores.tryAcquireElseOfferTail(task)) {
       m_executor.execute(task);
     }
 
@@ -140,12 +149,11 @@ public class ModelJobManager implements IModelJobManager {
 
         @Override
         public void run() throws Exception {
-          if (m_mutexSemaphore.tryAcquireElseOfferTail(task)) {
+          if (m_mutexSemaphores.tryAcquireElseOfferTail(task)) {
             m_executor.execute(task);
           }
         }
       }, delay, delayUnit, ClientJobInput.empty().sessionRequired(false));
-      // TODO [dwi]: Install listener on client-job-future to listen for cancellations.
     }
     catch (final JobExecutionException e) {
       LOG.error("Failed to delayed schedule the given executable.", e);
@@ -160,40 +168,57 @@ public class ModelJobManager implements IModelJobManager {
     return m_blockedFutures.contains(future);
   }
 
-  /**
-   * Sets the given thread as model-thread.
-   */
   @Internal
-  protected void setModelThread(final Thread thread) {
-    m_modelThread = thread;
+  protected void registerModelThread(final Thread thread) {
+    m_modelThreads.add(thread);
+  }
+
+  @Internal
+  protected void unregisterModelThread(final Thread thread) {
+    m_modelThreads.remove(thread);
   }
 
   @Override
   public final boolean isModelThread() {
-    return Thread.currentThread() == m_modelThread;
+    return m_modelThreads.contains(Thread.currentThread());
   }
 
   @Override
-  public final boolean isIdle() {
-    return m_mutexSemaphore.isIdle();
+  public boolean isDone(final IFilter<IFuture<?>> filter) {
+    return m_mutexSemaphores.isEmpty(filter);
   }
 
   @Override
-  public final boolean waitForIdle(final long timeout, final TimeUnit unit) throws InterruptedException {
-    return m_mutexSemaphore.waitForIdle(timeout, unit);
+  public boolean waitUntilDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException {
+    return m_mutexSemaphores.waitUntilEmpty(filter, timeout, unit);
+  }
+
+  @Override
+  public boolean cancel(final IFilter<IFuture<?>> filter) {
+    final Set<Boolean> success = new HashSet<>();
+
+    visit(filter, new IVisitor<IFuture<?>>() {
+
+      @Override
+      public boolean visit(final IFuture<?> future) {
+        success.add(future.cancel(true));
+        return true;
+      }
+    });
+
+    return Collections.singleton(Boolean.TRUE).equals(success);
   }
 
   @Override
   public final void shutdown() {
-    // 1. Cancel executing and pending futures.
-    m_mutexSemaphore.clearAndCancel();
-    // 2. Shutdown the job manager.
+    cancel(new AlwaysFilter<IFuture<?>>());
+    m_mutexSemaphores.reset();
     m_executor.shutdownNow();
   }
 
   @Override
-  public final void visit(final IFutureVisitor visitor) {
-    m_mutexSemaphore.visit(visitor);
+  public final void visit(final IFilter<IFuture<?>> filter, final IVisitor<IFuture<?>> visitor) {
+    m_mutexSemaphores.visit(filter, visitor);
   }
 
   @Override
@@ -218,10 +243,10 @@ public class ModelJobManager implements IModelJobManager {
    * </ol>
    */
   @Internal
-  protected void passMutexToNextJob() {
-    m_modelThread = null;
+  protected void passMutexToNextJob(final ModelFutureTask<?> currentMutexOwner) {
+    unregisterModelThread(Thread.currentThread());
 
-    final ModelFutureTask<?> nextTask = m_mutexSemaphore.releaseAndPoll();
+    final ModelFutureTask<?> nextTask = m_mutexSemaphores.releaseAndPoll(currentMutexOwner);
     if (nextTask != null) {
       m_executor.execute(nextTask);
     }
@@ -243,7 +268,7 @@ public class ModelJobManager implements IModelJobManager {
       @Override
       protected void rejected(final IFuture<RESULT> future) {
         future.cancel(true); // to interrupt the submitter if waiting for the job to complete.
-        passMutexToNextJob();
+        passMutexToNextJob(this);
       }
 
       @Override
@@ -253,7 +278,7 @@ public class ModelJobManager implements IModelJobManager {
           future.cancel(true);
         }
 
-        setModelThread(Thread.currentThread());
+        registerModelThread(Thread.currentThread());
 
         IFuture.CURRENT.set(future);
         IProgressMonitor.CURRENT.set(future.getProgressMonitor());
@@ -265,18 +290,18 @@ public class ModelJobManager implements IModelJobManager {
         IFuture.CURRENT.remove();
 
         if (isModelThread()) { // the current thread is not the model thread if being interrupted while waiting for a blocking condition to fall.
-          passMutexToNextJob();
+          passMutexToNextJob(this);
         }
       }
     };
   }
 
   /**
-   * Creates a {@link MutexSemaphore} to manage acquisition of the model-mutex.
+   * Creates a {@link MutexSemaphores} to manage acquisition of the model-mutex.
    */
   @Internal
-  protected MutexSemaphore createMutexSemaphore() {
-    return new MutexSemaphore();
+  protected MutexSemaphores createMutexSemaphores() {
+    return new MutexSemaphores();
   }
 
   /**
@@ -414,8 +439,9 @@ public class ModelJobManager implements IModelJobManager {
       }
 
       final IFuture<?> currentFuture = IFuture.CURRENT.get();
+      final ModelFutureTask<?> currentTask = ((ModelFutureTask<?>) currentFuture.getDelegate());
 
-      passMutexToNextJob();
+      passMutexToNextJob(currentTask);
 
       // NOT-SYNCHRONIZED-WITH-MUTEX anymore
 
@@ -438,35 +464,30 @@ public class ModelJobManager implements IModelJobManager {
       // Compete for the model-mutex anew.
       final Thread blockedThread = Thread.currentThread();
       final AtomicBoolean blockedThreadInterrupted = new AtomicBoolean(false);
-
       final CountDownLatch mutexReAcquiredLatch = new CountDownLatch(1);
-      final ModelFutureTask<Void> mutexReAcquireTask = new ModelFutureTask<Void>(ClientJobInput.empty().sessionRequired(false), ModelJobManager.this) {
+
+      final IMutexAcquiredListener mutexAcquiredListener = new IMutexAcquiredListener() {
 
         @Override
-        protected void rejected(final IFuture<Void> future) {
-          onMutexAcquired();
-        }
+        public void onMutexAcquired() {
+          currentTask.removeMutexAcquiredListener(this);
 
-        @Override
-        protected void afterExecute(final IFuture<Void> future) {
-          onMutexAcquired();
-        }
-
-        private void onMutexAcquired() {
           synchronized (blockedThreadInterrupted) {
             if (blockedThreadInterrupted.get()) {
-              passMutexToNextJob();
+              passMutexToNextJob(currentTask);
             }
             else {
-              setModelThread(blockedThread);
+              registerModelThread(blockedThread);
               mutexReAcquiredLatch.countDown();
             }
           }
         }
       };
+      currentTask.addMutexAcquiredListener(mutexAcquiredListener);
 
-      if (m_mutexSemaphore.tryAcquireElseOfferHead(mutexReAcquireTask)) {
-        setModelThread(blockedThread);
+      if (m_mutexSemaphores.tryAcquireElseOfferHead(currentTask)) {
+        currentTask.removeMutexAcquiredListener(mutexAcquiredListener);
+        registerModelThread(blockedThread);
       }
       else {
         // Wait until the model-mutex is re-acquired.

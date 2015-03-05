@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.job.IExecutable;
 import org.eclipse.scout.commons.job.IFuture;
@@ -200,22 +201,26 @@ public interface IModelJobManager extends IJobManager<ClientJobInput> {
   boolean isModelThread();
 
   /**
-   * @return <code>true</code> if the model-mutex is currently not acquired.
+   * @return <code>true</code> if all submitted jobs which match the given filter completed their execution, or are
+   *         waiting for a blocking condition to fall.
    */
-  boolean isIdle();
+  @Override
+  boolean isDone(IFilter<IFuture<?>> filter);
 
   /**
-   * Blocks the calling thread until the model-mutex gets available. Does not block if available at time of invocation.
+   * Blocks the calling thread until all jobs which match the given Filter completed their execution, or are waiting for
+   * a blocking condition to fall, or the given timeout elapses.
    *
    * @param timeout
-   *          the maximal time to wait for the model-mutex to become available.
+   *          the maximal time to wait.
    * @param unit
    *          unit of the given timeout.
    * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
    * @throws InterruptedException
-   * @see {@link #isIdle()}
+   *           if the current thread is interrupted while waiting for job completion.
    */
-  boolean waitForIdle(long timeout, TimeUnit unit) throws InterruptedException;
+  @Override
+  boolean waitUntilDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit) throws InterruptedException;
 
   /**
    * Creates a blocking condition to put a model job into waiting mode and let another job acquire the

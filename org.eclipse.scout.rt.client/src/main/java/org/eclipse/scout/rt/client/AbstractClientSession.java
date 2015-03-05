@@ -42,8 +42,6 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
@@ -95,12 +93,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   private long m_maxShutdownWaitTime = 4567;
   private final ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>> m_objectExtensions;
 
-  private final IModelJobManager m_jobManager;
-
   public AbstractClientSession(boolean autoInitConfig) {
-    // Instantiate a dedicated ModelJobManager for this ClientSession so that model-jobs scheduled on behalf of this session are executed in serial execution order.
-    m_jobManager = new ModelJobManager(); // TODO [dwi][nosgi]: Job API v5: Obtain ModelJobManager by OBJ.NEW
-
     m_clientSessionData = new HashMap<String, Object>();
     m_stateLock = new Object();
     m_isStopping = false;
@@ -110,11 +103,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     if (autoInitConfig) {
       interceptInitConfig();
     }
-  }
-
-  @Override
-  public IModelJobManager getModelJobManager() {
-    return m_jobManager;
   }
 
   @Override
@@ -505,32 +493,26 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   }
 
   protected void inactivateSession() {
-    try {
-      // TODO [dwi]: Job API v5
-      Set<ClientJob> runningClientJobs = findClientJobs();
-      if (!runningClientJobs.isEmpty()) {
-        LOG.warn(""
-            + "Some running client jobs found while client session is going to shutdown. "
-            + "If waiting for a condition or running a scheduled executor, the associated worker threads may never been released. "
-            + "Please ensure to terminate all client jobs when the session is going down. [session={0}, user={1}, jobs={2}]"
-            , new Object[]{AbstractClientSession.this, getUserId(), runningClientJobs});
-      }
+    Set<ClientJob> runningClientJobs = findClientJobs();
+    if (!runningClientJobs.isEmpty()) {
+      LOG.warn(""
+          + "Some running client jobs found while client session is going to shutdown. "
+          + "If waiting for a condition or running a scheduled executor, the associated worker threads may never been released. "
+          + "Please ensure to terminate all client jobs when the session is going down. [session={0}, user={1}, jobs={2}]"
+          , new Object[]{AbstractClientSession.this, getUserId(), runningClientJobs});
+    }
 
-      if (getServiceTunnel() != null) {
-        try {
-          SERVICES.getService(ILogoutService.class).logout();
-        }
-        catch (Throwable e) {
-          LOG.info("Failed to logout from server.", e);
-        }
+    if (getServiceTunnel() != null) {
+      try {
+        SERVICES.getService(ILogoutService.class).logout();
       }
-      setActive(false);
-      if (LOG.isInfoEnabled()) {
-        LOG.info("Client session was shutdown successfully [session={0}, user={1}]", AbstractClientSession.this, getUserId());
+      catch (Throwable e) {
+        LOG.info("Failed to logout from server.", e);
       }
     }
-    finally {
-      m_jobManager.shutdown();
+    setActive(false);
+    if (LOG.isInfoEnabled()) {
+      LOG.info("Client session was shutdown successfully [session={0}, user={1}]", AbstractClientSession.this, getUserId());
     }
   }
 

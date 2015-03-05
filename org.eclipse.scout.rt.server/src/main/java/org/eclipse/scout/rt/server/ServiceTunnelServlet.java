@@ -31,13 +31,14 @@ import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter;
+import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -165,7 +166,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     final HttpServletRequest request = input.getServletRequest();
     final HttpServletResponse response = input.getServletResponse();
 
-    ServerJobManager.DEFAULT.runNow(new IRunnable() {
+    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -191,7 +192,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
    * @return {@link IServiceTunnelResponse} response sent back to the client.
    */
   protected IServiceTunnelResponse invokeServiceInServerJob(final ServerJobInput input, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
-    return ServerJobManager.DEFAULT.runNow(new ICallable<IServiceTunnelResponse>() {
+    return OBJ.one(IServerJobManager.class).runNow(new ICallable<IServiceTunnelResponse>() {
 
       @Override
       public IServiceTunnelResponse call() throws Exception {
