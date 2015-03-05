@@ -923,6 +923,10 @@ scout.Table.prototype._onRowsUpdated = function(rows) {
 
     // Replace old row
     var oldRow = this.rowsMap[updatedRow.id];
+    if (!oldRow) {
+      throw new Error('Update event received for non existing row. RowId: ' + updatedRow.id);
+    }
+
     scout.arrays.replace(this.rows, oldRow, updatedRow);
     this.rowsMap[updatedRow.id] = updatedRow;
 

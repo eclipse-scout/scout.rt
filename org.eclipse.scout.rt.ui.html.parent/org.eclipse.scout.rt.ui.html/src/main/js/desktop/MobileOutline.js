@@ -29,7 +29,7 @@ scout.MobileOutline.prototype._updateOutlineTab = function(node) {
   // May happen in the following case:
   // The form gets closed on execPageDeactivated.
   // No pageChanged event will be fired because the deactivated page is not selected anymore
-  var content, parentText, nodeText, title, subTitle, prefSize;
+  var prefSize;
   if (node.detailForm && node.detailForm.destroyed) {
     node.detailForm = null;
   }
