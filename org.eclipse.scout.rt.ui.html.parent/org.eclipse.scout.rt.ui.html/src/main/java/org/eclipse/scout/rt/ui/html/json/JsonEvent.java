@@ -76,9 +76,10 @@ public class JsonEvent implements IJsonObject {
 
   @Override
   public JSONObject toJson() {
-    JSONObject json = JsonObjectUtility.newJSONObject(m_data.toString());
+    JSONObject json = JsonObjectUtility.newLinkedJSONObject();
     JsonObjectUtility.putProperty(json, TARGET, m_target);
     JsonObjectUtility.putProperty(json, TYPE, m_type);
+    JsonObjectUtility.putProperties(json, m_data);
     return json;
   }
 

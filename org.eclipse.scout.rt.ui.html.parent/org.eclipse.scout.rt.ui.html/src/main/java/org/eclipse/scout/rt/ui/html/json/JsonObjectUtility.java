@@ -17,6 +17,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
 
 import org.eclipse.scout.commons.Base64Utility;
@@ -48,6 +49,25 @@ public final class JsonObjectUtility {
     try {
       json.put(key, value);
       return json;
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  /**
+   * Puts every property from source to json.
+   */
+  public static void putProperties(JSONObject json, JSONObject source) {
+    String[] names = JSONObject.getNames(source);
+    if (names == null) {
+      return;
+    }
+
+    try {
+      for (String name : names) {
+        json.putOnce(name, source.opt(name));
+      }
     }
     catch (JSONException e) {
       throw toRuntimeException(e);
@@ -178,6 +198,10 @@ public final class JsonObjectUtility {
     catch (JSONException e) {
       throw toRuntimeException(e);
     }
+  }
+
+  public static JSONObject newLinkedJSONObject() {
+    return new JSONObject(new LinkedHashMap<>());
   }
 
   public static JSONObject newJSONObject(String source) {
