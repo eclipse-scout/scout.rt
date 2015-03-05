@@ -8,24 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.job.filter;
+package org.eclipse.scout.rt.client.job.filter;
 
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
 
 /**
- * Filter which accepts all Futures except the current one.
+ * Filter which accepts Futures only if belonging to the given session.
  *
- * @see IFuture#CURRENT
  * @since 5.1
  */
-public class NotCurrentFutureFilter implements IFilter<IFuture<?>> {
+public class ClientSessionFilter implements IFilter<IFuture<?>> {
 
-  private final IFilter<IFuture<?>> m_filter = new NotFilter<>(new CurrentFutureFilter());
+  private final IClientSession m_session;
+
+  public ClientSessionFilter(final IClientSession session) {
+    m_session = session;
+  }
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return m_filter.accept(future);
+    return m_session == ((ClientJobInput) future.getJobInput()).getSession();
   }
 }

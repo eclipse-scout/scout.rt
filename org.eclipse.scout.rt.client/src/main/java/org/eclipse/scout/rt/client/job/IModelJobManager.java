@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.job.IExecutable;
 import org.eclipse.scout.commons.job.IFuture;
@@ -15,23 +14,23 @@ import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.internal.callable.ExceptionTranslator;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
- * Job manager to execute jobs interacting with the client model on behalf of the model-thread. There is one
- * {@link IModelJobManager} per {@link IClientSession}.
+ * Job manager to execute jobs interacting with the client model on behalf of the model-thread. Typically, there is a
+ * single {@link IModelJobManager} installed per application.
  * <p/>
  * <strong>If not interacting with the client-model, use {@link IClientJobManager}.</strong>
  * <p/>
- * Jobs are executed in sequence so that no more than one job will be active at any given time. If a model job gets
- * blocked by entering a {@link IBlockingCondition}, the model-mutex will be released which allows another model job to
- * run. When being unblocked, the job must compete for the model-mutex anew in order to continue execution.
+ * Jobs are executed in sequence among the same session, so that no more than one job will be active at any given time
+ * for that session. If a model job gets blocked by entering a {@link IBlockingCondition}, the model-mutex will be
+ * released which allows another model job of that session to run. When being unblocked, the job must compete for the
+ * model-mutex anew in order to continue execution.
  * <p/>
  * While running, jobs executed on behalf of this job manager comply with the following characteristics:
  * <ul>
- * <li>run in sequence among other model jobs (mutual exclusion);</li>
+ * <li>run in sequence among other model jobs within the same session (mutual exclusion);</li>
  * <li>are optionally executed on behalf of a {@link Subject};</li>
  * <li>operate on named worker threads;</li>
  * <li>have a {@link JobContext} installed to propagate properties among nested jobs;</li>
@@ -199,28 +198,6 @@ public interface IModelJobManager extends IJobManager<ClientJobInput> {
    * @return <code>true</code> if the calling thread is the model-thread.
    */
   boolean isModelThread();
-
-  /**
-   * @return <code>true</code> if all submitted jobs which match the given filter completed their execution, or are
-   *         waiting for a blocking condition to fall.
-   */
-  @Override
-  boolean isDone(IFilter<IFuture<?>> filter);
-
-  /**
-   * Blocks the calling thread until all jobs which match the given Filter completed their execution, or are waiting for
-   * a blocking condition to fall, or the given timeout elapses.
-   *
-   * @param timeout
-   *          the maximal time to wait.
-   * @param unit
-   *          unit of the given timeout.
-   * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
-   * @throws InterruptedException
-   *           if the current thread is interrupted while waiting for job completion.
-   */
-  @Override
-  boolean waitUntilDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit) throws InterruptedException;
 
   /**
    * Creates a blocking condition to put a model job into waiting mode and let another job acquire the

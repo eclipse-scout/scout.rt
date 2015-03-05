@@ -11,6 +11,7 @@
 package org.eclipse.scout.commons.job.internal;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -185,14 +186,23 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
 
   @Override
   public final void shutdown() {
-    cancel(new AlwaysFilter<IFuture<?>>());
+    cancel(new AlwaysFilter<IFuture<?>>(), true);
     m_futures.clear();
     m_executor.shutdownNow();
   }
 
   @Override
   public final void visit(final IFilter<IFuture<?>> filter, final IVisitor<IFuture<?>> visitor) {
-    m_futures.visit(filter, visitor);
+    final IFilter<IFuture<?>> f = AlwaysFilter.ifNull(filter);
+
+    for (final IFuture<?> future : m_futures.values()) {
+      if (future.isDone() || !f.accept(future)) {
+        continue;
+      }
+      if (!visitor.visit(future)) {
+        return;
+      }
+    }
   }
 
   /**
@@ -213,16 +223,20 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
 
       @Override
       protected <RESULT> RunnableScheduledFuture<RESULT> decorateTask(final Callable<RESULT> callable, final RunnableScheduledFuture<RESULT> javaFuture) {
+        // This method is called before the Future is given to the executor for execution.
         return interceptFuture(Futures.jobFuture(javaFuture, (CallableWithJobInput) callable, JobManager.this));
       }
 
       @Override
       protected <RESULT> RunnableScheduledFuture<RESULT> decorateTask(final Runnable runnable, final RunnableScheduledFuture<RESULT> javaFuture) {
+        // This method is called before the Future is given to the executor for execution.
         return interceptFuture(Futures.jobFuture(javaFuture, (RunnableWithJobInput) runnable, JobManager.this));
       }
 
       @Override
       protected void beforeExecute(final Thread thread, final Runnable runnableFuture) {
+        // This method is called immediately before running the executable.
+
         final JobFuture jobFuture = (JobFuture) runnableFuture;
 
         // Check, if the Future is expired and therefore should not be executed.
@@ -236,6 +250,8 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
 
       @Override
       protected void afterExecute(final Runnable runnableFuture, final Throwable t) {
+        // This method is called immediately after running the executable, even if the Future was not run or the execution threw an exception.
+
         IProgressMonitor.CURRENT.remove();
         IFuture.CURRENT.remove();
 
@@ -249,6 +265,15 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
       }
 
     };
+  }
+
+  /**
+   * Method invoked to create a {@link IJobInput} filled with default values.
+   */
+  protected INPUT createDefaultJobInput() {
+    @SuppressWarnings("unchecked")
+    final INPUT input = (INPUT) JobInput.defaults();
+    return input;
   }
 
   /**
@@ -342,34 +367,50 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
     Assertions.assertNotNull(input, "JobInput must not be null");
   }
 
-  /**
-   * Method invoked to create a {@link IJobInput} filled with default values.
-   */
-  protected INPUT createDefaultJobInput() {
-    @SuppressWarnings("unchecked")
-    final INPUT input = (INPUT) JobInput.defaults();
-    return input;
-  }
-
   @Override
   public boolean isDone(final IFilter<IFuture<?>> filter) {
-    return m_futures.isEmpty(filter);
+    final IFilter<IFuture<?>> f = AlwaysFilter.ifNull(filter);
+
+    for (final IFuture<?> future : m_futures.values()) {
+      if (f.accept(future)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
   public boolean waitUntilDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException {
-    return m_futures.waitUntilEmpty(filter, timeout, unit);
+    final IFilter<IFuture<?>> f = AlwaysFilter.ifNull(filter);
+
+    // Determine the absolute deadline.
+    final Date deadline = new Date(System.currentTimeMillis() + unit.toMillis(timeout));
+
+    // Wait until all jobs matching the filter are 'done' or the deadline is passed.
+    m_futures.getChangedLock().lockInterruptibly();
+    try {
+      while (!isDone(f)) {
+        if (!m_futures.getChangedCondition().awaitUntil(deadline)) {
+          return false; // timeout expired
+        }
+      }
+    }
+    finally {
+      m_futures.getChangedLock().unlock();
+    }
+    return true;
   }
 
   @Override
-  public boolean cancel(final IFilter<IFuture<?>> filter) {
+  public boolean cancel(final IFilter<IFuture<?>> filter, final boolean interruptIfRunning) {
+    final IFilter<IFuture<?>> f = AlwaysFilter.ifNull(filter);
     final Set<Boolean> success = new HashSet<>();
 
-    visit(filter, new IVisitor<IFuture<?>>() {
+    visit(f, new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(final IFuture<?> future) {
-        success.add(future.cancel(true));
+        success.add(future.cancel(interruptIfRunning));
         return true;
       }
     });

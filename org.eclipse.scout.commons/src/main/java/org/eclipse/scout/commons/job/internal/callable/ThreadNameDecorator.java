@@ -11,8 +11,6 @@
 package org.eclipse.scout.commons.job.internal.callable;
 
 import java.util.concurrent.Callable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.Internal;
@@ -29,8 +27,6 @@ import org.eclipse.scout.commons.job.IJobInput;
  */
 public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, Chainable<RESULT> {
 
-  @Internal
-  protected static final Pattern PATTERN_THREAD_NAME = Pattern.compile("(.+?)\\;job\\:.+");
   @Internal
   protected final Callable<RESULT> m_next;
   @Internal
@@ -54,15 +50,7 @@ public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, Chainable<
     final Thread thread = Thread.currentThread();
 
     final String oldThreadName = thread.getName();
-    final String originalThreadName = getOriginalThreadName(oldThreadName);
-
-    final String newThreadName;
-    if (IJobInput.IDENTIFIER_UNKNOWN.equals(m_identifier)) {
-      newThreadName = originalThreadName;
-    }
-    else {
-      newThreadName = String.format("%s;job:%s", originalThreadName, m_identifier);
-    }
+    final String newThreadName = (IJobInput.ANONYMOUS_IDENTIFIER.equals(m_identifier) ? oldThreadName : String.format("%s;%s", oldThreadName, m_identifier));
 
     thread.setName(newThreadName);
     try {
@@ -70,22 +58,6 @@ public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, Chainable<
     }
     finally {
       thread.setName(oldThreadName);
-    }
-  }
-
-  /**
-   * Removes a potential job decoration contributed by a dependent job.
-   *
-   * @return the original thread name as defined by the worker-thread.
-   */
-  @Internal
-  protected String getOriginalThreadName(final String threadName) {
-    final Matcher matcher = PATTERN_THREAD_NAME.matcher(threadName);
-    if (matcher.find()) {
-      return matcher.group(1);
-    }
-    else {
-      return threadName;
     }
   }
 

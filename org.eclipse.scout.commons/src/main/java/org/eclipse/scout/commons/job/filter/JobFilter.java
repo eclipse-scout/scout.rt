@@ -14,20 +14,20 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IFuture;
 
 /**
- * Filter which discards all Futures except the given one.
+ * Filter which discards all Futures which do not belong to the given <code>job-id</code>.
  *
  * @since 5.1
  */
-public class SameFutureFilter implements IFilter<IFuture<?>> {
+public class JobFilter implements IFilter<IFuture<?>> {
 
-  private final IFuture<?> m_future;
+  private final String m_id;
 
-  public SameFutureFilter(final IFuture<?> future) {
-    m_future = future;
+  public JobFilter(final String id) {
+    m_id = id;
   }
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return m_future == future;
+    return m_id == null || m_id.equals(future.getJobInput().getId());
   }
 }

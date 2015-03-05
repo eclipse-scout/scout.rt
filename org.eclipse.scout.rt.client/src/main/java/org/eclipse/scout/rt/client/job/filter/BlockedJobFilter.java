@@ -8,28 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.job;
+package org.eclipse.scout.rt.client.job.filter;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.IBlockingCondition;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 
 /**
- * Filter which accepts Futures only if belonging to the given session.
+ * Filter which accepts Futures which are waiting for a blocking condition to fall.
  *
+ * @see IBlockingCondition
  * @since 5.1
  */
-public class ClientSessionFilter implements IFilter<IFuture<?>> {
+public class BlockedJobFilter implements IFilter<IFuture<?>> {
 
-  private final IClientSession m_session;
-
-  public ClientSessionFilter(final IClientSession session) {
-    m_session = Assertions.assertNotNull(session, "Session must not be null");
-  }
+  private final IModelJobManager m_modelJobManager = OBJ.one(IModelJobManager.class);
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return m_session == ((ClientJobInput) future.getJobInput()).getSession();
+    return m_modelJobManager.isBlocked(future);
   }
 }

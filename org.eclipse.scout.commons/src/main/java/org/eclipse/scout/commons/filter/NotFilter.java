@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.filter;
 
+import org.eclipse.scout.commons.Assertions;
+
 /**
  * Filter which negates the result of another filter.
  *
@@ -20,6 +22,7 @@ public class NotFilter<ELEMENT> implements IFilter<ELEMENT> {
   private final IFilter<ELEMENT> m_filter;
 
   public NotFilter(final IFilter<ELEMENT> filter) {
+    Assertions.assertNotNull(filter, "Filter to negate must not be null");
     m_filter = filter;
   }
 

@@ -138,7 +138,7 @@ public class ExceptionTranslatorTest {
     catch (Exception e) {
       assertTrue(e instanceof ProcessingException);
       ProcessingException pe = ((ProcessingException) e);
-      assertEquals(pe.getStatus().getContextMessages(), CollectionUtility.arrayList("job=7;job", "identity=anonymous"));
+      assertEquals(CollectionUtility.arrayList("job=7[job]", "identity=anonymous"), pe.getStatus().getContextMessages());
     }
   }
 
@@ -177,7 +177,7 @@ public class ExceptionTranslatorTest {
     Exception e = errorHolder.getValue();
     assertTrue(e instanceof ProcessingException);
     ProcessingException pe = ((ProcessingException) e);
-    assertEquals(pe.getStatus().getContextMessages(), CollectionUtility.arrayList("job=7;job", "identity=jack, john"));
+    assertEquals(CollectionUtility.arrayList("job=7[job]", "identity=jack, john"), pe.getStatus().getContextMessages());
   }
 
   @Test
@@ -200,7 +200,7 @@ public class ExceptionTranslatorTest {
       assertSame(r1, e.getCause());
 
       ProcessingException pe = ((ProcessingException) e);
-      assertEquals(pe.getStatus().getContextMessages(), CollectionUtility.arrayList("job=7;job", "identity=anonymous"));
+      assertEquals(CollectionUtility.arrayList("job=7[job]", "identity=anonymous"), pe.getStatus().getContextMessages());
     }
 
     // Exception

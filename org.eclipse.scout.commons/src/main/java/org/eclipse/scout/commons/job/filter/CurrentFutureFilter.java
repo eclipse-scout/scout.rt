@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.job.IFuture;
  */
 public class CurrentFutureFilter implements IFilter<IFuture<?>> {
 
-  private final IFilter<IFuture<?>> m_filter = new SameFutureFilter(IFuture.CURRENT.get());
+  private final IFilter<IFuture<?>> m_filter = new FutureFilter(IFuture.CURRENT.get());
 
   @Override
   public boolean accept(final IFuture<?> future) {

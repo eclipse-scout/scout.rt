@@ -23,7 +23,7 @@ import javax.security.auth.Subject;
  */
 public interface IJobInput {
 
-  String IDENTIFIER_UNKNOWN = "n/a";
+  String ANONYMOUS_IDENTIFIER = "anonymous";
 
   /**
    * Indicates that an executable always commence execution regardless of how long it was waiting for its execution to
@@ -115,7 +115,7 @@ public interface IJobInput {
 
   /**
    * Returns the identifier that consists of the job's <code>id</code> and <code>name</code>, or
-   * {@link #IDENTIFIER_UNKNOWN} if unknown.
+   * {@link #ANONYMOUS_IDENTIFIER} if unknown.
    */
   String getIdentifier();
 }

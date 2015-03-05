@@ -14,7 +14,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
+import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.commons.filter.NotFilter;
+import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.commons.job.internal.IProgressMonitorProvider;
 
 /**
@@ -149,6 +153,9 @@ public interface IJobManager<INPUT extends IJobInput> extends IProgressMonitorPr
   <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, INPUT input) throws JobExecutionException;
 
   /**
+   * @param filter
+   *          to limit the Futures to query for completion. If <code>null</code>, all Futures are accepted, which is the
+   *          same as using {@link AlwaysFilter}.
    * @return <code>true</code> if there is no running nor scheduled job matching the given Filter at the time of
    *         invocation.
    */
@@ -157,7 +164,14 @@ public interface IJobManager<INPUT extends IJobInput> extends IProgressMonitorPr
   /**
    * Blocks the calling thread until all jobs which match the given Filter completed their execution, or the given
    * timeout elapses.
+   * <p/>
+   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
+   * a filter in {@link NotFilter}.<br/>
+   * e.g. <code>new AndFilter(new ClientSessionFilter(...), new NotFilter(new BlockedJobFilter()));</code>
    *
+   * @param filter
+   *          to limit the Futures to wait for. If <code>null</code>, all Futures are accepted, which is the same as
+   *          using {@link AlwaysFilter}.
    * @param timeout
    *          the maximal time to wait.
    * @param unit
@@ -170,9 +184,14 @@ public interface IJobManager<INPUT extends IJobInput> extends IProgressMonitorPr
 
   /**
    * To visit Futures which did not complete yet and match the filter.
+   * <p/>
+   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
+   * a filter in {@link NotFilter}.<br/>
+   * e.g. <code>new AndFilter(new ClientSessionFilter(...), new NotFilter(new BlockedJobFilter()));</code>
    *
    * @param filter
-   *          to limit the Futures to be visited.
+   *          to limit the Futures to be visited. If <code>null</code>, all Futures are accepted, which is the same as
+   *          using {@link AlwaysFilter}.
    * @param visitor
    *          called for each Futures that passed the filter.
    */
@@ -181,12 +200,20 @@ public interface IJobManager<INPUT extends IJobInput> extends IProgressMonitorPr
   /**
    * Cancels all Futures which are accepted by the given Filter. Also, any nested 'runNow'-style jobs, which where run
    * on behalf of accepted jobs and did not complete yet, are cancelled as well.
+   * <p/>
+   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
+   * a filter in {@link NotFilter}.<br/>
+   * e.g. <code>new AndFilter(new ClientSessionFilter(...), new NotFilter(new BlockedJobFilter()));</code>
    *
    * @param filter
-   *          Filter to control the Futures to be cancelled.
-   * @return <code>true</code> if cancel was successful, <code>false</code> otherwise.
+   *          Filter to accept the Futures to be cancelled. If <code>null</code>, all Futures are accepted, which is the
+   *          same as using {@link AlwaysFilter}.
+   * @param interruptIfRunning
+   *          <code>true</code> to interrupt in-progress jobs.
+   * @return <code>true</code> if all Futures are cancelled successfully, or <code>false</code>, if some Futures could
+   *         not be cancelled, typically because already completed normally.
    */
-  boolean cancel(IFilter<IFuture<?>> filter);
+  boolean cancel(IFilter<IFuture<?>> filter, boolean interruptIfRunning);
 
   /**
    * Interrupts all running jobs and prevents scheduled jobs from running. After having shutdown, this job manager

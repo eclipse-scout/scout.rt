@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.filter;
 
+import org.eclipse.scout.commons.Assertions;
+
 /**
  * Filter which returns the logical 'AND' of two other filters.
  *
@@ -17,16 +19,21 @@ package org.eclipse.scout.commons.filter;
  */
 public class AndFilter<ELEMENT> implements IFilter<ELEMENT> {
 
-  private final IFilter<ELEMENT> m_filter1;
-  private final IFilter<ELEMENT> m_filter2;
+  private final IFilter<ELEMENT>[] m_filters;
 
-  public AndFilter(final IFilter<ELEMENT> filter1, final IFilter<ELEMENT> filter2) {
-    m_filter1 = filter1;
-    m_filter2 = filter2;
+  @SafeVarargs
+  public AndFilter(final IFilter<ELEMENT>... filters) {
+    Assertions.assertTrue(filters.length > 0, "Must have one filter at minimum");
+    m_filters = filters;
   }
 
   @Override
   public boolean accept(final ELEMENT element) {
-    return m_filter1.accept(element) && m_filter2.accept(element);
+    for (final IFilter<ELEMENT> filter : m_filters) {
+      if (!filter.accept(element)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

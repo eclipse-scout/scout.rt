@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
 import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
@@ -176,7 +177,7 @@ public class MultipleSessionTest {
     assertTrue(latch1.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2"), protocol);
 
-    m_jobManager.cancel(new ClientSessionFilter(m_clientSession1)); // cancel all jobs of session1
+    m_jobManager.cancel(new ClientSessionFilter(m_clientSession1), true); // cancel all jobs of session1
 
     assertTrue(interruptedLatch.await());
 

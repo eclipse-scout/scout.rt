@@ -3,7 +3,11 @@ package org.eclipse.scout.rt.server.job;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
+import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.commons.filter.NotFilter;
+import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IJobManager;
 import org.eclipse.scout.commons.job.IProgressMonitor;
@@ -45,11 +49,20 @@ public interface IServerJobManager extends IJobManager<ServerJobInput>, ISchedul
   /**
    * Cancels all Futures and associated transactions which are accepted by the given Filter. Also, any nested
    * 'runNow'-style jobs, which where run on behalf of accepted jobs and did not complete yet, are cancelled as well.
+   * <p/>
+   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
+   * a filter in {@link NotFilter}.<br/>
+   * e.g. <code>new AndFilter(new ServerSessionFilter(...), new NotFilter(new CurrentFuture()));</code>
    *
    * @param filter
-   *          Filter to control the Futures to be cancelled.
-   * @return <code>true</code> if cancel was successful, <code>false</code> otherwise.
+   *          Filter to accept the Futures to be cancelled. If <code>null</code>, all Futures are accepted, which is the
+   *          same as using {@link AlwaysFilter}.
+   * @param interruptIfRunning
+   *          <code>true</code> to interrupt in-progress jobs.
+   * @return <code>true</code> if all Futures and associated transactions are cancelled successfully, or
+   *         <code>false</code>, if some Futures could
+   *         not be cancelled, typically because already completed normally.
    */
   @Override
-  public boolean cancel(IFilter<IFuture<?>> filter);
+  boolean cancel(IFilter<IFuture<?>> filter, boolean interruptIfRunning);
 }

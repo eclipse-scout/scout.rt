@@ -369,13 +369,14 @@ public class ModelJobScheduleTest {
             setupLatch.countDown();
           }
         }, ClientJobInput.defaults().name("XYZ"));
+        System.out.println("ASDF");
       }
     }, ClientJobInput.defaults().name("ABC"));
 
     assertTrue(setupLatch.await());
 
-    assertTrue(actualThreadName1.getValue().matches("scout-model-thread-(\\d)+;job:ABC"));
-    assertTrue(actualThreadName2.getValue().matches("scout-model-thread-(\\d)+;job:XYZ"));
+    assertTrue(actualThreadName1.getValue().matches("scout-model-thread-(\\d)+;ABC"));
+    assertTrue(actualThreadName2.getValue().matches("scout-model-thread-(\\d)+;XYZ"));
     assertEquals("main", Thread.currentThread().getName());
   }
 

@@ -10,12 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job.internal;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,9 +22,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.job.internal.Futures.JobFuture;
@@ -87,7 +83,7 @@ public class FutureSet {
     }
     finally {
       m_writeLock.unlock();
-      signalChanged(); // signal outside the monitor.
+      signalChanged(); // signal outside the monitor to not enter a deadlock.
     }
   }
 
@@ -105,7 +101,7 @@ public class FutureSet {
     }
     finally {
       m_writeLock.unlock();
-      signalChanged(); // signal outside the monitor.
+      signalChanged(); // signal outside the monitor to not enter a deadlock.
     }
   }
 
@@ -123,7 +119,20 @@ public class FutureSet {
     }
     finally {
       m_writeLock.unlock();
-      signalChanged(); // signal outside the monitor.
+      signalChanged(); // signal outside the monitor to not enter a deadlock.
+    }
+  }
+
+  /**
+   * @return <code>true</code> if there are no Futures contained.
+   */
+  public boolean isEmpty() {
+    m_readLock.lock();
+    try {
+      return m_futures.isEmpty();
+    }
+    finally {
+      m_readLock.unlock();
     }
   }
 
@@ -141,89 +150,19 @@ public class FutureSet {
   }
 
   /**
-   * To visit Futures which did not complete yet and passes the filter.
-   *
-   * @param filter
-   *          to limit the Futures to be visited.
-   * @param visitor
-   *          called for each Futures that passed the filter.
+   * @return Lock used to signal changes to the {@link FutureSet}.
+   * @see #getChangedCondition()
    */
-  public void visit(final IFilter<IFuture<?>> filter, final IVisitor<IFuture<?>> visitor) {
-    for (final IFuture<?> future : values()) {
-      if (future.isDone() || !filter.accept(future)) {
-        continue;
-      }
-
-      if (!visitor.visit(future)) {
-        return;
-      }
-    }
+  public Lock getChangedLock() {
+    return m_changedLock;
   }
 
   /**
-   * @return <code>true</code> if empty, <code>false</code> otherwise.
+   * @return Condition used to signal changes to the {@link FutureSet}.
+   * @see #getChangedLock()
    */
-  public boolean isEmpty() {
-    m_readLock.lock();
-    try {
-      return m_futures.isEmpty();
-    }
-    finally {
-      m_readLock.unlock();
-    }
-  }
-
-  /**
-   * @return <code>true</code> if there is no Future matching the given Filter at the time of invocation.
-   */
-  public boolean isEmpty(final IFilter<IFuture<?>> filter) {
-    m_readLock.lock();
-    try {
-      for (final IFuture<?> future : m_futures) {
-        if (filter.accept(future)) {
-          return false;
-        }
-      }
-      return true;
-    }
-    finally {
-      m_readLock.unlock();
-    }
-  }
-
-  /**
-   * Blocks the calling thread until all Futures which match the given Filter are removed from this Set, or the given
-   * timeout elapses.
-   *
-   * @param timeout
-   *          the maximal time to wait.
-   * @param unit
-   *          unit of the given timeout.
-   * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
-   * @throws InterruptedException
-   *           if the current thread is interrupted while waiting.
-   */
-  public boolean waitUntilEmpty(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException {
-    // Determine the absolute deadline.
-    final Date deadline = new Date(System.currentTimeMillis() + unit.toMillis(timeout));
-
-    if (isEmpty(filter)) {
-      return true;
-    }
-
-    // Wait until empty or the deadline is passed.
-    m_changedLock.lockInterruptibly();
-    try {
-      while (!isEmpty(filter)) { // spurious-wakeup-safe
-        if (!m_changedCondition.awaitUntil(deadline)) {
-          return false; // timeout expired
-        }
-      }
-      return true;
-    }
-    finally {
-      m_changedLock.unlock();
-    }
+  public Condition getChangedCondition() {
+    return m_changedCondition;
   }
 
   private void signalChanged() {

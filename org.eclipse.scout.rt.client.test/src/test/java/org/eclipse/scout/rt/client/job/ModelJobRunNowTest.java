@@ -447,8 +447,8 @@ public class ModelJobRunNowTest {
           }
         }, ClientJobInput.defaults().name("ABC"));
 
-        assertEquals("scout-model-thread;job:ABC", actualThreadName1.getValue());
-        assertEquals("scout-model-thread;job:XYZ", actualThreadName2.getValue());
+        assertEquals("scout-model-thread;ABC", actualThreadName1.getValue());
+        assertEquals("scout-model-thread;ABC;XYZ", actualThreadName2.getValue());
         assertEquals("scout-model-thread", Thread.currentThread().getName());
       }
     });

@@ -10,11 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.job.internal;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
+import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IJobInput;
@@ -25,7 +24,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 
 /**
- * {@link Callable} to be scheduled once the model-mutex is acquired.
+ * Future to be scheduled once the model-mutex is acquired.
  *
  * @since 5.1
  */
@@ -38,8 +37,8 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
   private final ClientJobInput m_jobInput;
   private final Long m_expirationDate;
 
-  private volatile boolean m_running;
-  private final List<IMutexAcquiredListener> m_mutexAcquiredListeners;
+  private volatile boolean m_running; // indicates that this Future started running.
+  private volatile IMutexAcquiredListener m_mutexAcquiredListener;
 
   public ModelFutureTask(final Callable<RESULT> callable, final ClientJobInput input, final IProgressMonitorProvider progressMonitorProvider) {
     super(callable);
@@ -48,8 +47,6 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
 
     final long expirationTime = input.getExpirationTimeMillis();
     m_expirationDate = (expirationTime != IJobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + expirationTime : null);
-
-    m_mutexAcquiredListeners = new ArrayList<>();
   }
 
   /**
@@ -74,9 +71,9 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
     // If this task is already in 'running'-state, the task was waiting for a blocking condition to fall and now tries to re-acquire the mutex.
     // If so, do not run the task again. By notifying the listeners about the mutex-acquisition, the blocked task is now continuing its work.
     if (!m_running) {
-      m_running = true;
       notifyBefore();
       try {
+        m_running = true;
         super.run(); // delegate control to the FutureTask which in turn calls 'Callable.call'.
       }
       finally {
@@ -90,7 +87,12 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
    *         manager without running, <code>false</code> otherwise.
    */
   protected boolean isExpired() {
-    return (m_expirationDate == null ? false : System.currentTimeMillis() > m_expirationDate);
+    if (m_running) {
+      return false;
+    }
+    else {
+      return (m_expirationDate == null ? false : System.currentTimeMillis() > m_expirationDate);
+    }
   }
 
   /**
@@ -140,17 +142,10 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
   }
 
   /**
-   * Add the given listener to be notified about mutex-acquisition.
+   * Sets the given listener to be notified once the mutex is acquired.
    */
-  void addMutexAcquiredListener(final IMutexAcquiredListener listener) {
-    m_mutexAcquiredListeners.add(listener);
-  }
-
-  /**
-   * Remove the given listener.
-   */
-  void removeMutexAcquiredListener(final IMutexAcquiredListener listener) {
-    m_mutexAcquiredListeners.remove(listener);
+  void setMutexAcquiredListener(final IMutexAcquiredListener listener) {
+    m_mutexAcquiredListener = listener;
   }
 
   private void notifyBefore() {
@@ -172,17 +167,18 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
   }
 
   private void notifyMutexAcquiredListeners() {
-    if (m_mutexAcquiredListeners.isEmpty()) {
-      return;
-    }
+    final IMutexAcquiredListener listener = m_mutexAcquiredListener;
 
-    for (final IMutexAcquiredListener listener : new ArrayList<>(m_mutexAcquiredListeners)) { // iterate over a copy so that listeners can remove themself upon notification.
+    if (listener != null) {
       try {
         listener.onMutexAcquired();
       }
       catch (final RuntimeException e) {
         LOG.error("Unexpected error while notifying listener about mutex-acquisition", e);
       }
+    }
+    else if (m_running) {
+      LOG.error("Unexpected: Job re-acquired model-mutex but no {} is installed. [job={}]", IMutexAcquiredListener.class.getSimpleName(), this);
     }
   }
 
@@ -195,5 +191,12 @@ public class ModelFutureTask<RESULT> extends FutureTask<RESULT> {
      * Method invoked once the model-mutex is acquired.
      */
     void onMutexAcquired();
+  }
+
+  @Override
+  public String toString() {
+    final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("job", m_jobInput.getIdentifier());
+    return builder.toString();
   }
 }

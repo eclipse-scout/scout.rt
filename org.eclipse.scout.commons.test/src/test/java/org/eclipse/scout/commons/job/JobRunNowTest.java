@@ -240,8 +240,8 @@ public class JobRunNowTest {
       }
     }, JobInput.defaults().name("ABC"));
 
-    assertEquals("main;job:ABC", actualThreadName1.getValue());
-    assertEquals("main;job:XYZ", actualThreadName2.getValue());
+    assertEquals("main;ABC", actualThreadName1.getValue());
+    assertEquals("main;ABC;XYZ", actualThreadName2.getValue());
     assertEquals("main", Thread.currentThread().getName());
   }
 

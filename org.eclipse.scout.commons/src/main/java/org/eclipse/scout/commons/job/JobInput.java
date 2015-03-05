@@ -150,7 +150,7 @@ public class JobInput implements IJobInput {
   @Override
   public String getIdentifier() {
     if (m_id != null && StringUtility.hasText(m_name)) {
-      return String.format("%s;%s", m_id, m_name);
+      return String.format("%s[%s]", m_id, m_name);
     }
     else if (StringUtility.hasText(m_name)) {
       return m_name;
@@ -159,7 +159,7 @@ public class JobInput implements IJobInput {
       return m_id;
     }
     else {
-      return IJobInput.IDENTIFIER_UNKNOWN;
+      return IJobInput.ANONYMOUS_IDENTIFIER;
     }
   }
 

@@ -39,7 +39,7 @@ public class ThreadNameDecoratorTest {
     IJobInput input = JobInput.empty().id("123").name("job1");
 
     new ThreadNameDecorator<Void>(next, input).call();
-    assertEquals("worker-1;job:123;job1", threadName.getValue());
+    assertEquals("worker-1;123[job1]", threadName.getValue());
     assertEquals("worker-1", Thread.currentThread().getName());
   }
 
@@ -76,14 +76,14 @@ public class ThreadNameDecoratorTest {
       }
     };
 
-    Thread.currentThread().setName("worker-1;job:job1");
+    Thread.currentThread().setName("worker-1;job1");
 
     IJobInput input = JobInput.empty().id("123").name("job2");
 
     // nested job
     new ThreadNameDecorator<Void>(next, input).call();
-    assertEquals("worker-1;job:123;job2", threadName.getValue());
-    assertEquals("worker-1;job:job1", Thread.currentThread().getName());
+    assertEquals("worker-1;job1;123[job2]", threadName.getValue());
+    assertEquals("worker-1;job1", Thread.currentThread().getName());
   }
 
   @Test
@@ -99,14 +99,14 @@ public class ThreadNameDecoratorTest {
       }
     };
 
-    Thread.currentThread().setName("worker-1;job:2;job1");
+    Thread.currentThread().setName("worker-1;2[job1]");
 
     IJobInput input = JobInput.empty().id("123").name("job2");
 
     // nested job
     new ThreadNameDecorator<Void>(next, input).call();
-    assertEquals("worker-1;job:123;job2", threadName.getValue());
-    assertEquals("worker-1;job:2;job1", Thread.currentThread().getName());
+    assertEquals("worker-1;2[job1];123[job2]", threadName.getValue());
+    assertEquals("worker-1;2[job1]", Thread.currentThread().getName());
   }
 
   @Test
@@ -122,12 +122,12 @@ public class ThreadNameDecoratorTest {
       }
     };
 
-    Thread.currentThread().setName("worker-1;job:2;ABC");
+    Thread.currentThread().setName("worker-1;2[ABC]");
 
     // nested job
     new ThreadNameDecorator<Void>(next, JobInput.empty()).call();
-    assertEquals("worker-1", threadName.getValue());
-    assertEquals("worker-1;job:2;ABC", Thread.currentThread().getName());
+    assertEquals("worker-1;2[ABC]", threadName.getValue());
+    assertEquals("worker-1;2[ABC]", Thread.currentThread().getName());
   }
 
 }

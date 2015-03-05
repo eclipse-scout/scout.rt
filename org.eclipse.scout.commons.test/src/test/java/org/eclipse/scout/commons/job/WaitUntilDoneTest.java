@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
-import org.eclipse.scout.commons.job.filter.SameFutureFilter;
+import org.eclipse.scout.commons.job.filter.FutureFilter;
 import org.eclipse.scout.commons.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.junit.After;
@@ -43,7 +43,7 @@ public class WaitUntilDoneTest {
   }
 
   @Test
-  public void testWaitAll() throws JobExecutionException, InterruptedException {
+  public void testWaitUntilAllCompleted() throws JobExecutionException, InterruptedException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     m_jobManager.schedule(new IRunnable() {
@@ -61,7 +61,7 @@ public class WaitUntilDoneTest {
   }
 
   @Test
-  public void testWaitForFuture1() throws JobExecutionException, InterruptedException {
+  public void testWaitUntilFutureCompletion1() throws JobExecutionException, InterruptedException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
@@ -73,14 +73,14 @@ public class WaitUntilDoneTest {
       }
     });
 
-    assertTrue(m_jobManager.waitUntilDone(new SameFutureFilter(future1), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.waitUntilDone(new FutureFilter(future1), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
     assertTrue(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
-    assertTrue(m_jobManager.isDone(new SameFutureFilter(future1)));
+    assertTrue(m_jobManager.isDone(new FutureFilter(future1)));
   }
 
   @Test
-  public void testWaitForFuture2() throws JobExecutionException, InterruptedException {
+  public void testWaitUntilFutureCompletion2() throws JobExecutionException, InterruptedException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch latchJob2 = new BlockingCountDownLatch(1);
@@ -103,8 +103,8 @@ public class WaitUntilDoneTest {
       }
     });
 
-    assertTrue(m_jobManager.waitUntilDone(new SameFutureFilter(future1), 30, TimeUnit.SECONDS));
-    assertTrue(m_jobManager.isDone(new SameFutureFilter(future1)));
+    assertTrue(m_jobManager.waitUntilDone(new FutureFilter(future1), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.isDone(new FutureFilter(future1)));
     assertFalse(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
     assertFalse(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 500, TimeUnit.MILLISECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);

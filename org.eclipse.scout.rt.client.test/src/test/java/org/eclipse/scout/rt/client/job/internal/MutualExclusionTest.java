@@ -1156,7 +1156,10 @@ public class MutualExclusionTest {
     protocol.add("2: setBlocking=false");
     BC.setBlocking(false);
     assertFalse(BC.isBlocking());
-    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
+    boolean status = m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 100, TimeUnit.SECONDS);
+    if (status == false) {
+      System.out.println("grr");
+    }
 
     m_jobManager.schedule(new IRunnable() {
 

@@ -266,8 +266,8 @@ public class JobScheduleTest {
       }
     }, JobInput.defaults().name("ABC")).get();
 
-    assertTrue(actualThreadName1.getValue().matches("scout-(\\d)+;job:ABC"));
-    assertTrue(actualThreadName2.getValue().matches("scout-(\\d)+;job:XYZ"));
+    assertTrue(actualThreadName1.getValue().matches("scout-(\\d)+;ABC"));
+    assertTrue(actualThreadName2.getValue().matches("scout-(\\d)+;XYZ"));
     assertEquals("main", Thread.currentThread().getName());
   }
 

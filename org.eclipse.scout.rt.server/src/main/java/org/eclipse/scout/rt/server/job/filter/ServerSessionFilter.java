@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.job;
+package org.eclipse.scout.rt.server.job.filter;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
 
 /**
  * Filter which accepts Futures only if belonging to the given session.
@@ -25,7 +25,7 @@ public class ServerSessionFilter implements IFilter<IFuture<?>> {
   private final IServerSession m_session;
 
   public ServerSessionFilter(final IServerSession session) {
-    m_session = Assertions.assertNotNull(session, "Session must not be null");
+    m_session = session;
   }
 
   @Override

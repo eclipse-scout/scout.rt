@@ -11,9 +11,11 @@
 package org.eclipse.scout.rt.client.job.internal;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -85,7 +87,7 @@ public class ModelJobManager implements IModelJobManager {
     m_mutexSemaphores = Assertions.assertNotNull(createMutexSemaphores());
     m_executor = Assertions.assertNotNull(createExecutor());
 
-    m_blockedFutures = new HashSet<>();
+    m_blockedFutures = new CopyOnWriteArraySet<>(); // CopyOnWriteArraySet because concurrent iteration if querying all Futures.
     m_modelThreads = new HashSet<>();
   }
 
@@ -183,25 +185,60 @@ public class ModelJobManager implements IModelJobManager {
     return m_modelThreads.contains(Thread.currentThread());
   }
 
+  /**
+   * @return all Futures managed by this job manager which is all blocked, scheduled and running Futures.
+   */
+  private Set<IFuture<?>> getFutures() {
+    final Set<IFuture<?>> futures = new HashSet<>();
+    futures.addAll(m_mutexSemaphores.getFutures());
+    futures.addAll(m_blockedFutures);
+    return futures;
+  }
+
   @Override
   public boolean isDone(final IFilter<IFuture<?>> filter) {
-    return m_mutexSemaphores.isEmpty(filter);
+    final IFilter<IFuture<?>> f = AlwaysFilter.ifNull(filter);
+
+    for (final IFuture<?> future : getFutures()) {
+      if (f.accept(future)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
   public boolean waitUntilDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException {
-    return m_mutexSemaphores.waitUntilEmpty(filter, timeout, unit);
+    final IFilter<IFuture<?>> f = AlwaysFilter.ifNull(filter);
+
+    // Determine the absolute deadline.
+    final Date deadline = new Date(System.currentTimeMillis() + unit.toMillis(timeout));
+
+    // Wait until all jobs matching the filter are 'done' or the deadline is passed.
+    m_mutexSemaphores.getMutexChangedLock().lockInterruptibly();
+    try {
+      while (!isDone(f)) {
+        if (!m_mutexSemaphores.getMutexChangedCondition().awaitUntil(deadline)) {
+          return false; // timeout expired
+        }
+      }
+    }
+    finally {
+      m_mutexSemaphores.getMutexChangedLock().unlock();
+    }
+    return true;
   }
 
   @Override
-  public boolean cancel(final IFilter<IFuture<?>> filter) {
+  public boolean cancel(final IFilter<IFuture<?>> filter, final boolean interruptIfRunning) {
+    final IFilter<IFuture<?>> f = AlwaysFilter.ifNull(filter);
     final Set<Boolean> success = new HashSet<>();
 
-    visit(filter, new IVisitor<IFuture<?>>() {
+    visit(f, new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(final IFuture<?> future) {
-        success.add(future.cancel(true));
+        success.add(future.cancel(interruptIfRunning));
         return true;
       }
     });
@@ -211,14 +248,23 @@ public class ModelJobManager implements IModelJobManager {
 
   @Override
   public final void shutdown() {
-    cancel(new AlwaysFilter<IFuture<?>>());
-    m_mutexSemaphores.clear();
+    cancel(new AlwaysFilter<IFuture<?>>(), true);
+    m_mutexSemaphores.invalidate();
     m_executor.shutdownNow();
   }
 
   @Override
   public final void visit(final IFilter<IFuture<?>> filter, final IVisitor<IFuture<?>> visitor) {
-    m_mutexSemaphores.visit(filter, visitor);
+    final IFilter<IFuture<?>> f = AlwaysFilter.ifNull(filter);
+
+    for (final IFuture<?> future : getFutures()) {
+      if (future.isDone() || !f.accept(future)) {
+        continue;
+      }
+      if (!visitor.visit(future)) {
+        return;
+      }
+    }
   }
 
   @Override
@@ -235,12 +281,8 @@ public class ModelJobManager implements IModelJobManager {
   }
 
   /**
-   * Use this method to pass the mutex to the next job in the queue:
-   * <ol>
-   * <li>sets the model-thread to <code>null</code></li>
-   * <li>releases the mutex-owner</li>
-   * <li>polls for the next pending job and schedules it if available</li>
-   * </ol>
+   * Use this method to pass the mutex to the next job in the queue. Thereby, the current model-thread is unregistered
+   * and the next task scheduled.
    */
   @Internal
   protected void passMutexToNextJob(final ModelFutureTask<?> currentMutexOwner) {
@@ -253,7 +295,8 @@ public class ModelJobManager implements IModelJobManager {
   }
 
   /**
-   * Creates a model-task representing the given {@link Callable} to be passed to the executor for serial execution.
+   * Creates a model-task representing the given {@link Callable} to be passed to the executor for serial execution
+   * within the session.
    *
    * @param callable
    *          {@link Callable} to be executed.
@@ -333,6 +376,13 @@ public class ModelJobManager implements IModelJobManager {
   }
 
   /**
+   * Method invoked to create a {@link ClientJobInput} filled with default values.
+   */
+  protected ClientJobInput createDefaultJobInput() {
+    return ClientJobInput.defaults();
+  }
+
+  /**
    * Overwrite this method to contribute some behavior to the {@link Callable} given to the executor for execution.
    * <p/>
    * Contributions are plugged according to the design pattern: 'chain-of-responsibility' - it is easiest to read the
@@ -391,13 +441,6 @@ public class ModelJobManager implements IModelJobManager {
   }
 
   /**
-   * Method invoked to create a {@link ClientJobInput} filled with default values.
-   */
-  protected ClientJobInput createDefaultJobInput() {
-    return ClientJobInput.defaults();
-  }
-
-  /**
    * @see IBlockingCondition
    */
   @Internal
@@ -434,7 +477,7 @@ public class ModelJobManager implements IModelJobManager {
     public void waitFor() throws JobExecutionException {
       Assertions.assertTrue(isModelThread(), "Wrong thread: A job can only be blocked on behalf of the model thread. [thread=%s]", Thread.currentThread().getName());
 
-      if (!m_blocking) { // not in monitor yet (volatile)
+      if (!m_blocking) { // the blocking condition is not armed yet.
         return;
       }
 
@@ -445,14 +488,16 @@ public class ModelJobManager implements IModelJobManager {
 
       // NOT-SYNCHRONIZED-WITH-MUTEX anymore
 
-      // Block the calling thread until the blocking condition falls (IBlockingCondition#signalAll).
+      // Block the calling thread until the blocking condition falls.
       synchronized (BlockingCondition.this) {
         m_blockedFutures.add(currentFuture);
-        while (m_blocking) { // spurious-wakeup safe
+        while (m_blocking) { // guard for spurious-wakeups
           try {
             BlockingCondition.this.wait();
           }
           catch (final InterruptedException e) {
+            Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
+
             throw new JobExecutionException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, job=%s]", m_name, currentFuture.getJobInput().getIdentifier()), e);
           }
           finally {
@@ -466,11 +511,11 @@ public class ModelJobManager implements IModelJobManager {
       final AtomicBoolean blockedThreadInterrupted = new AtomicBoolean(false);
       final CountDownLatch mutexReAcquiredLatch = new CountDownLatch(1);
 
-      final IMutexAcquiredListener mutexAcquiredListener = new IMutexAcquiredListener() {
+      currentTask.setMutexAcquiredListener(new IMutexAcquiredListener() {
 
         @Override
         public void onMutexAcquired() {
-          currentTask.removeMutexAcquiredListener(this);
+          currentTask.setMutexAcquiredListener(null);
 
           synchronized (blockedThreadInterrupted) {
             if (blockedThreadInterrupted.get()) {
@@ -482,20 +527,21 @@ public class ModelJobManager implements IModelJobManager {
             }
           }
         }
-      };
-      currentTask.addMutexAcquiredListener(mutexAcquiredListener);
+      });
 
       if (m_mutexSemaphores.tryAcquireElseOfferHead(currentTask)) {
-        currentTask.removeMutexAcquiredListener(mutexAcquiredListener);
         registerModelThread(blockedThread);
+        currentTask.setMutexAcquiredListener(null);
       }
       else {
         // Wait until the model-mutex is re-acquired.
-        while (!isModelThread()) { // spurious-wakeup safe
+        while (!isModelThread()) { // guard for spurious-wakeups
           try {
             mutexReAcquiredLatch.await();
           }
           catch (final InterruptedException e) {
+            Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
+
             synchronized (blockedThreadInterrupted) {
               blockedThreadInterrupted.set(true);
             }
