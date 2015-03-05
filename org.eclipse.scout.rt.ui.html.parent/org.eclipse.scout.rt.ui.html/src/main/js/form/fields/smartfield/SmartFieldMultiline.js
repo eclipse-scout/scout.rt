@@ -6,26 +6,26 @@ scout.SmartFieldMultiline = function(lookupStrategy) {
 scout.inherits(scout.SmartFieldMultiline, scout.AbstractSmartField);
 
 scout.SmartFieldMultiline.prototype._render = function($parent) {
-  this.addContainer($parent, 'smart-field');
+  var $field, htmlComp;
 
+  this.addContainer($parent, 'smart-field');
   this.addLabel();
   this.addMandatoryIndicator();
-
-  var $fieldContainer = $('<div>');
-  var htmlComp = new scout.HtmlComponent($fieldContainer, this.session);
+  this.addFieldContainer($('<div>'));
+  htmlComp = new scout.HtmlComponent(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.SmartFieldMultilineLayout());
 
-  var $field = scout.fields.new$TextField().
+  $field = scout.fields.new$TextField().
       addClass('multiline').
       blur(this._onFieldBlur.bind(this)).
       click(this._onClick.bind(this)).
       keyup(this._onKeyUp.bind(this)).
       keydown(this._onKeyDown.bind(this)).
-      appendTo($fieldContainer);
-  this.addField($field, $fieldContainer);
-  this.addIcon($fieldContainer);
+      appendTo(this.$fieldContainer);
+  this.addField($field);
+  this.addIcon(this.$fieldContainer);
   this._$multilineField = $.makeDiv('multiline-field')
-    .appendTo($fieldContainer);
+    .appendTo(this.$fieldContainer);
 
   this.addStatus();
 };

@@ -12,26 +12,26 @@ scout.ListBox.prototype._render = function($parent) {
 
   this.addLabel();
   this.addMandatoryIndicator();
+  this.addFieldContainer($('<div>'));
 
-  var $fieldContainer = $('<div>');
-  var htmlComp = new scout.HtmlComponent($fieldContainer, this.session);
+  var htmlComp = new scout.HtmlComponent(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.ListBoxLayout(this, this.table, this.filterBox));
 
   if (this.table) {
-    this._renderTable($fieldContainer);
+    this._renderTable();
   }
   if(this.filterBox){
-    this._renderFilterBox($fieldContainer);
+    this._renderFilterBox();
   }
 
   this.addStatus();
 };
 
-scout.ListBox.prototype._renderTable = function($fieldContainer) {
-  this.table.render($fieldContainer);
-  this.addField(this.table.$container, $fieldContainer);
+scout.ListBox.prototype._renderTable = function() {
+  this.table.render(this.$fieldContainer);
+  this.addField(this.table.$container);
 };
 
-scout.ListBox.prototype._renderFilterBox = function($fieldContainer) {
-  this.filterBox.render($fieldContainer);
+scout.ListBox.prototype._renderFilterBox = function() {
+  this.filterBox.render(this.$fieldContainer);
 };

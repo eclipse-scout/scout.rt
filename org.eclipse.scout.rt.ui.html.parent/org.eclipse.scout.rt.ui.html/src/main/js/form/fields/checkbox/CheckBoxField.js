@@ -18,7 +18,8 @@ scout.CheckBoxField.prototype._render = function($parent) {
     .attr('id', this.refFieldId)
     .attr('type', 'checkbox');
 
-  this.addField(this._$checkBox, $('<span>'));
+  this.addFieldContainer($('<span>'));
+  this.addField(this._$checkBox);
   this._$checkBox.appendTo(this.$fieldContainer);
 
   this._$checkBoxLabel = $('<label>')

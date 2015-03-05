@@ -12,8 +12,8 @@ scout.RichTextField.prototype._render = function($parent) {
   this.addLabel();
   this.addMandatoryIndicator();
 
-  var $editorContainer = this.$container.appendDiv('rich-text-editor');
-  var $editorContent = $editorContainer.appendDiv('rich-text-editor-content');
+  this.addFieldContainer($.makeDiv('rich-text-editor'));
+  var $editorContent = this.$fieldContainer.appendDiv('rich-text-editor-content');
 
   scout.scrollbars.install($editorContent, {
     updateScrollbarPos: false
@@ -25,13 +25,13 @@ scout.RichTextField.prototype._render = function($parent) {
     .on('keydown keyup paste', this._onChange.bind(this))
     .on('focus', this._onFocus.bind(this))
     .on('blur', this._onBlur.bind(this));
-  this.addField($editorContent, $editorContainer);
+  this.addField($editorContent);
 
   // demo data
   this.$field.appendDiv("", "Beispielstext");
 
   // command bar
-  this.$commandBar = $editorContainer.appendDiv('rich-text-bar');
+  this.$commandBar = this.$fieldContainer.appendDiv('rich-text-bar');
 
   this.$commandFormat = this.$commandBar.appendDiv('rich-text-bar-group');
   this.$commandFormat.appendDiv('rich-text-command rich-text-bar-bold', 'a')

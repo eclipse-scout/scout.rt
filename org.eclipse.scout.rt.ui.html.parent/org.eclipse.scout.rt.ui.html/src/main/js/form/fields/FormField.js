@@ -87,6 +87,11 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderStatusVisible(this.statusVisible);
 };
 
+scout.FormField.prototype._remove = function() {
+  scout.FormField.parent.prototype._remove.call(this);
+  this.removeField();
+};
+
 scout.FormField.prototype._renderMandatory = function(mandatory) {
   this.$container.toggleClass('mandatory', mandatory);
 };
@@ -266,25 +271,24 @@ scout.FormField.prototype.addLabel = function() {
 };
 
 /**
- * Appends the given field to the this.$container and sets the properties this.$field and
- * this.$fieldContainer referencing the field. When $fieldContainer should point to another
- * element you must do this explicitly after calling this method.
- *
- * @param $field
- * @param $fieldContainer (optional)
+ * Appends the given field to the this.$container and sets the property this.$field.
+ * The $field is used as $fieldContainer as long as you don't explicitly call addFieldContainer before calling addField.
  */
-scout.FormField.prototype.addField = function($field, $fieldContainer) {
-  if ($fieldContainer) {
-    this.$field = $field;
-    this.$fieldContainer = $fieldContainer;
-    $fieldContainer.appendTo(this.$container);
-  } else {
-    this.$field = $field;
-    this.$fieldContainer = $field;
-    $field.appendTo(this.$container);
+scout.FormField.prototype.addField = function($field) {
+  if (!this.$fieldContainer) {
+    this.addFieldContainer($field);
   }
+  this.$field = $field;
   this.$field.attr('id', this.refFieldId);
+};
+
+/**
+ * Call this method before addField if you'd like to have a different field container than $field.
+ */
+scout.FormField.prototype.addFieldContainer = function($fieldContainer) {
+  this.$fieldContainer = $fieldContainer;
   this.$fieldContainer.addClass('field');
+  $fieldContainer.appendTo(this.$container);
 };
 
 /**
@@ -341,8 +345,7 @@ scout.FormField.prototype._onIconClick = function(event) {
  * @return The HtmlComponent created for this.$container
  */
 scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
-  this.$container =
-    $.makeDiv('form-field')
+  this.$container = $.makeDiv('form-field')
     .appendTo($parent);
 
   if (typeName) {

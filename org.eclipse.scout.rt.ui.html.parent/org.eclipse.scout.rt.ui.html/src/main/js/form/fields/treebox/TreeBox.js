@@ -12,27 +12,26 @@ scout.TreeBox.prototype._render = function($parent) {
 
   this.addLabel();
   this.addMandatoryIndicator();
-
-  var $fieldContainer = $('<div>');
-  var htmlComp = new scout.HtmlComponent($fieldContainer, this.session);
+  this.addFieldContainer($('<div>'));
+  var htmlComp = new scout.HtmlComponent(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.TreeBoxLayout(this, this.tree, this.filterBox));
 
   if (this.tree) {
-    this._renderTree($fieldContainer);
+    this._renderTree();
   }
   if (this.filterBox) {
     // TODO BSH Tree | Only render when filter active
-    this._renderFilterBox($fieldContainer);
+    this._renderFilterBox();
   }
 
   this.addStatus();
 };
 
 scout.TreeBox.prototype._renderTree = function($fieldContainer) {
-  this.tree.render($fieldContainer);
-  this.addField(this.tree.$container, $fieldContainer);
+  this.tree.render(this.$fieldContainer);
+  this.addField(this.tree.$container);
 };
 
 scout.TreeBox.prototype._renderFilterBox = function($fieldContainer) {
-  this.filterBox.render($fieldContainer);
+  this.filterBox.render(this.$fieldContainer);
 };
