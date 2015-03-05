@@ -28,14 +28,15 @@ import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.IMobileButton;
-import org.eclipse.scout.rt.client.mobile.ui.form.outline.PageFormManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
@@ -57,7 +58,8 @@ import org.eclipse.scout.service.SERVICES;
 public class MobileDeviceTransformer implements IDeviceTransformer {
   private final Map<IForm, WeakReference<IForm>> m_modifiedForms = new WeakHashMap<IForm, WeakReference<IForm>>();
   private IDesktop m_desktop;
-  private PageFormManager m_pageFormManager;
+  private P_PageChangedListener m_outlineListener;
+  private List<IOutline> m_outlines;
   private ToolFormHandler m_toolFormHandler;
   private boolean m_gridDataDirty;
   private DeviceTransformationConfig m_deviceTransformationConfig;
@@ -74,7 +76,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     m_deviceTransformationConfig = createDeviceTransformationConfig();
     initTransformationConfig();
 
-    m_pageFormManager = createPageFormManager(desktop);
     m_toolFormHandler = createToolFormHandler(desktop);
 
     IBreadCrumbsNavigation breadCrumbsNavigation = SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation();
@@ -85,14 +86,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   public MobileDeviceTransformer() {
     this(null);
-  }
-
-  protected PageFormManager createPageFormManager(IDesktop desktop) {
-    return new PageFormManager(desktop, getAcceptedViewIds().toArray(new String[getAcceptedViewIds().size()]));
-  }
-
-  public PageFormManager getPageFormManager() {
-    return m_pageFormManager;
   }
 
   protected ToolFormHandler createToolFormHandler(IDesktop desktop) {
@@ -123,7 +116,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     transformations.add(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION);
     transformations.add(MobileDeviceTransformation.DISPLAY_FORM_HEADER);
     transformations.add(MobileDeviceTransformation.ADD_MISSING_BACK_ACTION_TO_FORM_HEADER);
-    transformations.add(MobileDeviceTransformation.DISPLAY_OUTLINE_ROOT_NODE);
     transformations.add(MobileDeviceTransformation.DISPLAY_PAGE_TABLE);
 
     for (IDeviceTransformation transformation : transformations) {
@@ -147,13 +139,13 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   /**
-   * Remove outline buttons, keystrokes and menus
+   * Remove keystrokes
    */
   @Override
   public void adaptDesktopActions(Collection<IAction> actions) {
     for (Iterator<IAction> iterator = actions.iterator(); iterator.hasNext();) {
       IAction action = iterator.next();
-      if (action instanceof IViewButton || action instanceof IKeyStroke || action instanceof IMenu) {
+      if (action instanceof IKeyStroke) {
         iterator.remove();
       }
     }
@@ -161,6 +153,22 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void adaptDesktopOutlines(OrderedCollection<IOutline> outlines) {
+    m_outlines = outlines.getOrderedList();
+    m_outlineListener = new P_PageChangedListener();
+    for (IOutline outline : m_outlines) {
+      outline.addTreeListener(m_outlineListener);
+    }
+  }
+
+  @Override
+  public void notifyDesktopClosing() {
+    if (m_outlines != null) {
+      for (IOutline outline : m_outlines) {
+        outline.removeTreeListener(m_outlineListener);
+      }
+      m_outlineListener = null;
+      m_outlines.clear();
+    }
   }
 
   @Override
@@ -222,7 +230,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public boolean acceptFormAddingToDesktop(IForm form) {
-    return m_pageFormManager.acceptForm(form);
+    return true;
   }
 
   private void makeSurePageDetailTableIsVisible() {
@@ -451,6 +459,28 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   private class P_BackAction extends AbstractMobileBackAction {
 
+  }
+
+  private class P_PageChangedListener extends TreeAdapter {
+
+    @Override
+    public void treeChanged(TreeEvent e) {
+      if (OutlineEvent.TYPE_PAGE_CHANGED == e.getType()) {
+        onPageChanged((OutlineEvent) e);
+      }
+    }
+
+    protected void onPageChanged(OutlineEvent e) {
+      IPage page = (IPage) e.getChildNode();
+      try {
+        if (page.isDetailFormVisible() && page.getDetailForm() != null) {
+          transformForm(page.getDetailForm());
+        }
+      }
+      catch (ProcessingException e1) {
+        throw new RuntimeException(e1);
+      }
+    }
   }
 
 }

@@ -604,9 +604,9 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       form.setAutoAddRemoveOnDesktop(false);
     }
     m_detailForm = form;
+    firePageChanged(this);
     if (isSelectedNode()) {
       getOutline().setDetailForm(m_detailForm);
-      firePageChanged(this);
     }
   }
 

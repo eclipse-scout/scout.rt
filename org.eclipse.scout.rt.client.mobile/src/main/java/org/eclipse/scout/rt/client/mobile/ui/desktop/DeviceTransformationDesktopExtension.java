@@ -77,6 +77,16 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   }
 
   @Override
+  protected ContributionCommand execClosing() throws ProcessingException {
+    if (!isActive()) {
+      return super.execClosing();
+    }
+
+    getDeviceTransformer().notifyDesktopClosing();
+    return ContributionCommand.Continue;
+  }
+
+  @Override
   public void contributeActions(Collection<IAction> actions) {
     if (!isActive()) {
       return;
