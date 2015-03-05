@@ -27,10 +27,6 @@
     <target-groupid>com.bsiag.tools</target-groupid>
     <target-artifactid>com.bsiag.tools.rt.target</target-artifactid>
 
-    <sonar.exclusions>
-      file:src/main/resources/**
-    </sonar.exclusions>
-
     <compileSource>1.7</compileSource>
   </properties>
 
