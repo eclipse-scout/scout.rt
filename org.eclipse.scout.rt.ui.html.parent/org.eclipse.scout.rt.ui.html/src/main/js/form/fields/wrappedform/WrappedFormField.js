@@ -10,6 +10,7 @@ scout.inherits(scout.WrappedFormField, scout.FormField);
 scout.WrappedFormField.prototype._render = function($parent) {
   this.addContainer($parent, 'wrapped-form-field');
   this.addLabel();
+  this.addMandatoryIndicator();
   this.addStatus();
 
   this._renderInnerForm();

@@ -73,7 +73,6 @@ scout.FormField.prototype._render = function($parent) {
     .addClass('not-implemented'));
   this.addMandatoryIndicator(); // TODO BSH Layout | Need global solution for field alignment... maybe getConfiguredMandatoryIndicatorVisible?
   this.addStatus();
-
 };
 
 scout.FormField.prototype._renderProperties = function() {

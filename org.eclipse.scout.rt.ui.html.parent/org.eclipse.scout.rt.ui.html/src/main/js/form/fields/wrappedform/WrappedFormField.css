@@ -5,11 +5,12 @@
   & > .root-group-box > .group-box-title {
     padding-left: 0;
     padding-right: 0;
+    margin-left: -@mandatory-indicator-width;
   }
 
   /* Reset margin set in Menu.css */
   & > .menubar {
-    margin-left: @mandatory-indicator-width;
+    margin-left: 0;
     margin-right: 0;
   }
 }
