@@ -217,6 +217,26 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public boolean isAutoTabKeyStrokesEnabled() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void setAutoTabKeyStrokesEnabled(boolean b) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public String getAutoTabKeyStrokeModifier() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void setAutoTabKeyStrokeModifier(String modifier) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public void activateBookmark(Bookmark bm) throws ProcessingException {
     throw createUnsupportedOperationException();
   }

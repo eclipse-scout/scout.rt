@@ -254,6 +254,31 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return null;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(30)
+  protected boolean getConfiguredAutoTabKeyStrokesEnabled() {
+    return true;
+  }
+
+  /**
+   * If isAutoTabKeyStrokesEnabled is true this modifier is used in combination with a number to select tab.
+   * possible values:
+   * <ul>
+   * <li>control</li>
+   * <li>alternate</li>
+   * <li>meta</li>
+   * <li>shift</li>
+   * </ul>
+   * default
+   *
+   * @return
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(40)
+  protected String getConfiguredAutoTabKeyStrokeModifier() {
+    return "control";
+  }
+
   private List<Class<? extends IAction>> getConfiguredActions() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IAction>> fca = ConfigurationUtility.filterClasses(dca, IAction.class);
@@ -481,6 +506,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     initDesktopExtensions();
     setTitle(getConfiguredTitle());
     setTrayVisible(getConfiguredTrayVisible());
+    setAutoTabKeyStrokesEnabled(getConfiguredAutoTabKeyStrokesEnabled());
+    setAutoTabKeyStrokeModifier(getConfiguredAutoTabKeyStrokeModifier());
     List<IDesktopExtension> extensions = getDesktopExtensions();
     m_contributionHolder = new ContributionComposite(this);
 
@@ -1282,6 +1309,26 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void setTitle(String s) {
     propertySupport.setPropertyString(PROP_TITLE, s);
+  }
+
+  @Override
+  public boolean isAutoTabKeyStrokesEnabled() {
+    return propertySupport.getPropertyBool(PROP_AUTO_TAB_KEY_STROKES_ENABLED);
+  }
+
+  @Override
+  public void setAutoTabKeyStrokesEnabled(boolean b) {
+    propertySupport.setPropertyBool(PROP_AUTO_TAB_KEY_STROKES_ENABLED, b);
+  }
+
+  @Override
+  public String getAutoTabKeyStrokeModifier() {
+    return propertySupport.getPropertyString(PROP_AUTO_TAB_KEY_STROKE_MODIFIER);
+  }
+
+  @Override
+  public void setAutoTabKeyStrokeModifier(String modifier) {
+    propertySupport.setPropertyString(PROP_AUTO_TAB_KEY_STROKE_MODIFIER, modifier);
   }
 
   @Override

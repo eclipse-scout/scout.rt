@@ -78,6 +78,14 @@ public interface IDesktop extends IPropertyObserver {
    * {@link Boolean}
    */
   String PROP_GUI_AVAILABLE = "guiAvailable";
+  /**
+   * {@link Boolean}
+   */
+  String PROP_AUTO_TAB_KEY_STROKES_ENABLED = "autoTabKeyStrokesEnabled";
+  /**
+   * {@link Boolean}
+   */
+  String PROP_AUTO_TAB_KEY_STROKE_MODIFIER = "autoTabKeyStrokeModifier";
 
   void initDesktop() throws ProcessingException;
 
@@ -391,6 +399,14 @@ public interface IDesktop extends IPropertyObserver {
   String getTitle();
 
   void setTitle(String s);
+
+  boolean isAutoTabKeyStrokesEnabled();
+
+  void setAutoTabKeyStrokesEnabled(boolean b);
+
+  String getAutoTabKeyStrokeModifier();
+
+  void setAutoTabKeyStrokeModifier(String modifier);
 
   /**
    * @return true: automatically prefix a * on any text field's search value
