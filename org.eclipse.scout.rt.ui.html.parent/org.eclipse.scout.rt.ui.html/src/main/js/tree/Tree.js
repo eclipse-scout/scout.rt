@@ -11,7 +11,7 @@ scout.Tree = function() {
   this._breadcrumb = false;
   this.events = new scout.EventSupport();
   this._addAdapterProperties('menus');
-
+  this.containerClasses = ''; // may be set if additional classes are required
   this._treeItemPaddingLeft = 20;
   this._treeItemCheckBoxPaddingLeft = 28;
   this._treeItemPaddingLevel = 15;
@@ -120,6 +120,9 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
 scout.Tree.prototype._render = function($parent) {
   this.$parent = $parent;
   this.$container = $parent.appendDiv('tree');
+  if (this.containerClasses) {
+    this.$container.addClass(this.containerClasses);
+  }
 
   var layout = new scout.TreeLayout(this);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);

@@ -80,6 +80,7 @@
     &.selected {
       background-color: @navigation-background-selected-color;
       color: @text-color;
+      cursor: default;
     }
 
     &.parent::before,

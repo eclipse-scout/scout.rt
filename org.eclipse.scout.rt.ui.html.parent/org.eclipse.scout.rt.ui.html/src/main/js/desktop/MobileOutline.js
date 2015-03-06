@@ -6,10 +6,9 @@ scout.MobileOutline = function() {
 scout.inherits(scout.MobileOutline, scout.Outline);
 
 scout.MobileOutline.prototype._render = function($parent) {
-  scout.MobileOutline.parent.prototype._render.call(this, $parent);
-
-  //FIXME CGU really?
+  //FIXME CGU improve this, it should not be necesary to modify the parent
   $parent.addClass('navigation-breadcrumb');
+  scout.MobileOutline.parent.prototype._render.call(this, $parent);
 };
 
 scout.MobileOutline.prototype._showDefaultDetailForm = function() {
@@ -47,5 +46,13 @@ scout.MobileOutline.prototype._updateOutlineTab = function(node) {
     node.detailForm.$container.width(node.$node.width());
     node.detailForm.htmlComp.layout();
     this._currentDetailForm = node.detailForm;
+  }
+};
+
+scout.MobileOutline.prototype.onResize = function() {
+  scout.MobileOutline.parent.prototype.onResize.call(this);
+
+  if (this._currentDetailForm) {
+    this._currentDetailForm.onResize();
   }
 };
