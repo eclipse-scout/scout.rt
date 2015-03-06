@@ -17,7 +17,7 @@ import java.util.Date;
 import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.commons.holders.LongHolder;
 import org.eclipse.scout.commons.holders.NVPair;
-import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
+import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -42,7 +42,7 @@ public class StatementProcessorTest {
     //
     AbstractSqlService sqlService = new AbstractSqlService() {
     };
-    BeanInstanceCreator.initializeInstance(sqlService);
+    BeanInstanceUtil.initializeInstance(sqlService);
     StatementProcessor sp = new StatementProcessor(
         sqlService,
         "SELECT P.PERSON_NR,P.NAME" +
@@ -60,7 +60,7 @@ public class StatementProcessorTest {
   public void testSelectLike() throws Exception {
     AbstractSqlService sqlService = new AbstractSqlService() {
     };
-    BeanInstanceCreator.initializeInstance(sqlService);
+    BeanInstanceUtil.initializeInstance(sqlService);
     StatementProcessor sp = new StatementProcessor(
         sqlService,
         "SELECT BP_NR FROM FLM_BP WHERE BP_NO LIKE :bpNo INTO :bpNr",
@@ -80,7 +80,7 @@ public class StatementProcessorTest {
     //
     AbstractSqlService sqlService = new AbstractSqlService() {
     };
-    BeanInstanceCreator.initializeInstance(sqlService);
+    BeanInstanceUtil.initializeInstance(sqlService);
     StatementProcessor sp = new StatementProcessor(
         sqlService,
         "SELECT COUNT(*) " +

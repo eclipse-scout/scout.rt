@@ -22,7 +22,7 @@ public class ServiceBeanContributor implements IBeanContributor {
 
   @Override
   public void contributeBeans(IBeanContext context) {
-    // register default inistializer
+    // register default initializer
     context.registerClass(DefaultServiceInitializer.class);
 
     // parse all servies registered as extensions in plugin.xml.

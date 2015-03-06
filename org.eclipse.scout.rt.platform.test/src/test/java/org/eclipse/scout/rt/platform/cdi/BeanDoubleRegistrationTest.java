@@ -22,6 +22,8 @@ public class BeanDoubleRegistrationTest {
   @Test
   public void testDoubleRegistration() {
     BeanContext context = new BeanContext();
+    context.initBeanInstanceFactory();
+
     IBean<?> reg1 = context.registerClass(Bean01.class);
     IBean<?> reg2 = context.registerClass(Bean01.class);
     Assert.assertTrue(reg1 == reg2);

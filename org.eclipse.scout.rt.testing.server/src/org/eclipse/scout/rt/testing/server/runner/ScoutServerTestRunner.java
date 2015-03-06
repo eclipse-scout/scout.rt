@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
+import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.server.IServerJobFactory;
 import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -94,7 +94,7 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
 
   static {
     ((Platform) Platform.get()).ensureStarted();
-    s_defaultServerSessionProvider = BeanInstanceCreator.create(DefaultTestServerSessionProvider.class);
+    s_defaultServerSessionProvider = BeanInstanceUtil.create(DefaultTestServerSessionProvider.class);
     LOG = ScoutLogManager.getLogger(ScoutServerTestRunner.class);
     FACTORY = createServerTestEnvironmentFactory();
     BACKEND_JOB_SERVICE = SERVICES.getService(IServerJobService.class);

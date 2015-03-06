@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.cdi;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 
@@ -28,10 +29,10 @@ public interface IBeanContext {
   <T> T getInstance(Class<T> beanClazz);
 
   /**
-   * Nullsave {@link #getInstance(Class)}
-   *
    * @param beanClazz
-   * @return
+   * @return the instance of the given bean.
+   * @throws AssertionException
+   *           when no bean is registered to the given beanClazz
    */
   <T> T getInstanceOrNull(Class<T> beanClazz);
 
@@ -42,21 +43,6 @@ public interface IBeanContext {
   <T> List<T> getInstances(Class<T> beanClazz);
 
   /**
-   * @return the bean registered under the given beanClazz
-   * @throws AssertionException
-   *           when no bean is registered to the given beanClazz
-   */
-  <T> IBean<T> getBean(Class<T> beanClazz);
-
-  /**
-   * Null-safe {@link #getBean(Class)}
-   *
-   * @param beanClazz
-   * @return
-   */
-  <T> IBean<T> getBeanOrNull(Class<T> beanClazz);
-
-  /**
    * @param beanClazz
    * @return
    */
@@ -65,7 +51,7 @@ public interface IBeanContext {
   /**
    * @return
    */
-  List<IBean<?>> getAllRegisteredBeans();
+  Set<IBean<?>> getAllRegisteredBeans();
 
   /**
    * @param beanClazz
@@ -75,11 +61,14 @@ public interface IBeanContext {
 
   /**
    * @param bean
+   * @param instance
+   *          optional initial raw instance value of the bean, undecorated, not intercepted by
+   *          {@link IBeanInstanceFactory}
    */
-  void registerBean(IBean<?> bean);
+  void registerBean(IBean bean, Object instance);
 
   /**
    * @param bean
    */
-  void unregisterBean(IBean<?> bean);
+  void unregisterBean(IBean bean);
 }

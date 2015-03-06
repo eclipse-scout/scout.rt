@@ -16,8 +16,8 @@ import static org.junit.Assert.assertNull;
 import java.util.List;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.cdi.Bean;
-import org.eclipse.scout.rt.platform.cdi.DynamicAnnotations;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
@@ -50,8 +50,8 @@ public class SERVICESTest {
   private IBean<?> registerService(Class<? extends ITestService> serviceClazz, float priority) {
 
     Bean<? extends ITestService> bean = new Bean<ITestService>(serviceClazz);
-    bean.addAnnotation(DynamicAnnotations.createPriority(priority));
-    OBJ.registerBean(bean);
+    bean.addAnnotation(AnnotationFactory.createPriority(priority));
+    OBJ.registerBean(bean, null);
     return bean;
   }
 

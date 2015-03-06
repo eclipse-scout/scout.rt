@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
  *
  */
 @RunWith(ScoutPlatformTestRunner.class)
-public class PriotrityTest {
+public class PriorityTest {
 
   private static IBean<TestBean01> m_bean01;
   private static IBean<TestBean02> m_bean02;

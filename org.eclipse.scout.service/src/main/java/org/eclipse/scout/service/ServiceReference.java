@@ -17,9 +17,10 @@ package org.eclipse.scout.service;
 public class ServiceReference implements IServiceReference {
 
   private Class<? extends Object> m_service;
-  private Class<?> m_session;
+  private Class<?> m_clientSession;
+  private Class<?> m_serverSession;
   private boolean m_createImmediately;
-  private float m_ranking;
+  private double m_ranking;
   private boolean m_proxy;
 
   public void setService(Class<? extends Object> service) {
@@ -31,13 +32,22 @@ public class ServiceReference implements IServiceReference {
     return m_service;
   }
 
-  public void setSession(Class<?> session) {
-    m_session = session;
+  public void setClientSession(Class<?> clientSession) {
+    m_clientSession = clientSession;
   }
 
   @Override
-  public Class<?> getSession() {
-    return m_session;
+  public Class<?> getClientSession() {
+    return m_clientSession;
+  }
+
+  @Override
+  public Class<?> getServerSession() {
+    return m_serverSession;
+  }
+
+  public void setServerSession(Class<?> serverSession) {
+    m_serverSession = serverSession;
   }
 
   public void setCreateImmediately(boolean createImmediately) {
@@ -49,12 +59,12 @@ public class ServiceReference implements IServiceReference {
     return m_createImmediately;
   }
 
-  public void setRanking(float ranking) {
+  public void setRanking(double ranking) {
     m_ranking = ranking;
   }
 
   @Override
-  public float getRanking() {
+  public double getRanking() {
     return m_ranking;
   }
 
@@ -71,8 +81,9 @@ public class ServiceReference implements IServiceReference {
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("service='").append(getService() != null ? getService().getName() : "null").append("'");
-    builder.append(", session='").append(getSession() != null ? getSession().getName() : "null").append("'");
-    builder.append(", ranking='").append(Float.toString(getRanking())).append("'");
+    builder.append(", clientSession='").append(getClientSession() != null ? getClientSession().getName() : "null").append("'");
+    builder.append(", serverSession='").append(getServerSession() != null ? getServerSession().getName() : "null").append("'");
+    builder.append(", ranking='").append(Double.toString(getRanking())).append("'");
     builder.append(", isProxy='").append(Boolean.toString(isProxy())).append("'");
     builder.append(", createImmediately='").append(Boolean.toString(isCreateImmediately())).append("'");
     return builder.toString();

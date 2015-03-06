@@ -19,7 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
+import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.TextsThreadLocal;
@@ -43,7 +43,7 @@ public class TextsTest {
   @Before
   public void before() throws InterruptedException {
 
-    m_testTextService = TestingUtility.registerServices(5, BeanInstanceCreator.create(TestTextProviderService.class));
+    m_testTextService = TestingUtility.registerServices(5, BeanInstanceUtil.create(TestTextProviderService.class));
     TextsThreadLocal.set(new ScoutTexts(SERVICES.getServices(ITextProviderService.class)));
   }
 

@@ -8,32 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.cdi.internal;
+package org.eclipse.scout.rt.platform.cdi;
 
-import java.util.Iterator;
 import java.util.List;
-
-import org.eclipse.scout.rt.platform.cdi.Instance;
+import java.util.SortedSet;
 
 /**
- *
+ * Used in {@link IBeanContext}
+ * <p>
+ * Knows how to create an object instance of a {@link IBean} wrapped with (multiple) interceptors
  */
-public class InstanceImpl<T> implements Instance<T> {
+public interface IBeanInstanceFactory {
+  /**
+   * @return an object instance for the bean or null if none was created
+   */
+  <T> T select(Class<T> queryClass, SortedSet<IBeanRegistration> regs);
 
-  private final List<T> m_elements;
-
-  public InstanceImpl(List<T> elements) {
-    m_elements = elements;
-  }
-
-  @Override
-  public Iterator<T> iterator() {
-    return m_elements.iterator();
-  }
-
-  @Override
-  public boolean isAmbiguous() {
-    return false;
-  }
-
+  /**
+   * @return all object instances for the beans, never null
+   */
+  <T> List<T> selectAll(Class<T> queryClass, SortedSet<IBeanRegistration> regs);
 }

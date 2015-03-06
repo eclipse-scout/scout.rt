@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.AfterClass;
@@ -88,12 +86,10 @@ public class InjectInstancesTest {
 
   @ApplicationScoped
   private static class MyBean01 {
-    @Inject
-    private Instance<ITestBean> testbeans;
 
     protected List<ITestBean> getTestBeans() {
       List<ITestBean> result = new ArrayList<>();
-      Iterator<ITestBean> it = testbeans.iterator();
+      Iterator<ITestBean> it = OBJ.all(ITestBean.class).iterator();
       while (it.hasNext()) {
         result.add(it.next());
       }
@@ -103,16 +99,7 @@ public class InjectInstancesTest {
 
   @ApplicationScoped
   private static class MyBean02 {
-    private List<ITestBean> testBeans;
-
-    @Inject
-    private void setBeans(Instance<ITestBean> instances) {
-      testBeans = new ArrayList<>();
-      Iterator<ITestBean> it = instances.iterator();
-      while (it.hasNext()) {
-        testBeans.add(it.next());
-      }
-    }
+    private List<ITestBean> testBeans = OBJ.all(ITestBean.class);
 
     public List<ITestBean> getTestBeans() {
       return testBeans;

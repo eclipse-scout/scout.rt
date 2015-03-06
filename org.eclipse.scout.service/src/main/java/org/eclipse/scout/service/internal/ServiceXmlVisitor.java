@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.service.internal;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.xml.xpath.XPath;
@@ -22,7 +23,6 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.Bean;
-import org.eclipse.scout.rt.platform.cdi.DynamicAnnotations;
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 import org.eclipse.scout.rt.platform.pluginxml.IPluginXmlVisitor;
 import org.eclipse.scout.rt.platform.pluginxml.internal.IPluginXml;
@@ -57,7 +57,7 @@ public class ServiceXmlVisitor implements IPluginXmlVisitor {
   @Override
   public void visit(IPluginXml xmlFile, Document xmlDoc) {
     XPath xPath = XPathFactory.newInstance().newXPath();
-    String expression = "//extension[@point='org.eclipse.scout.service.services']/service";
+    String expression = "//extension[@point='org.eclipse.scout.service.services']/service | //extension[@point='org.eclipse.scout.service.services']/proxy";
     try {
       NodeList services = (NodeList) xPath.compile(expression).evaluate(xmlDoc, XPathConstants.NODESET);
       for (int i = 0; i < services.getLength(); i++) {
@@ -82,12 +82,29 @@ public class ServiceXmlVisitor implements IPluginXmlVisitor {
   private void registerService(IServiceReference ref, IPluginXml xmlFile) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
     Bean<?> bean = new Bean<Object>(ref.getService());
     fillServiceAnnotations(bean, xmlFile, ref);
-    m_context.registerBean(bean);
+    m_context.registerBean(bean, null);
   }
 
   public static void fillServiceAnnotations(Bean<?> bean, IPluginXml pluginXml, IServiceReference ref) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
     // ranking
-    bean.addAnnotation(DynamicAnnotations.createPriority(ref.getRanking()));
+    bean.addAnnotation(org.eclipse.scout.rt.platform.AnnotationFactory.createPriority(ref.getRanking()));
+
+    // services are always application scoped
+    bean.addAnnotation(org.eclipse.scout.rt.platform.AnnotationFactory.createApplicationScoped());
+
+    if (ref.isCreateImmediately()) {
+      bean.addAnnotation(org.eclipse.scout.rt.platform.AnnotationFactory.createCreateImmediately());
+    }
+
+    if (ref.isProxy()) {
+      bean.addAnnotation((Annotation) pluginXml.loadClass("org.eclipse.scout.rt.shared.AnnotationFactory").getMethod("createTunnelToServer").invoke(null));
+    }
+    else if (ref.getClientSession() != null) {
+      bean.addAnnotation((Annotation) pluginXml.loadClass("org.eclipse.scout.rt.client.AnnotationFactory").getMethod("createClient", Class.class).invoke(null, ref.getClientSession()));
+    }
+    else if (ref.getServerSession() != null) {
+      bean.addAnnotation((Annotation) pluginXml.loadClass("org.eclipse.scout.rt.server.AnnotationFactory").getMethod("createServer", Class.class).invoke(null, ref.getServerSession()));
+    }
   }
 
   /**
@@ -120,43 +137,56 @@ public class ServiceXmlVisitor implements IPluginXmlVisitor {
       throw new IllegalArgumentException("service must have a 'class' attribute (service class)");
     }
     // session
-    String sessionFqn = null;
+    String clientSessionFqn = null;
+    String serverSessionFqn = null;
     String factoryFqn = proxyElement.getAttribute("factory");
     if (StringUtility.hasText(factoryFqn)) {
       String sessionAttrib = proxyElement.getAttribute("session");
       if (StringUtility.hasText(sessionAttrib)) {
-        sessionFqn = sessionAttrib.trim();
+        switch (factoryFqn) {
+          case ServerServiceFactory:
+            serverSessionFqn = sessionAttrib.trim();
+            break;
+          case ClientServiceFactory:
+          case CommonProxyServiceFactory:
+          case ClientProxyServiceFactory:
+            clientSessionFqn = sessionAttrib.trim();
+            break;
+        }
       }
       else {
         // init with defaults
         switch (factoryFqn) {
           case ServerServiceFactory:
-            sessionFqn = IServerSession;
+            serverSessionFqn = IServerSession;
             break;
           case ClientServiceFactory:
           case CommonProxyServiceFactory:
           case ClientProxyServiceFactory:
-            sessionFqn = IClientSession;
+            clientSessionFqn = IClientSession;
             break;
         }
       }
     }
-    if (sessionFqn != null) {
-      svc.setSession(pluginXml.loadClass(sessionFqn));
+    if (clientSessionFqn != null) {
+      svc.setClientSession(pluginXml.loadClass(clientSessionFqn));
+    }
+    if (serverSessionFqn != null) {
+      svc.setServerSession(pluginXml.loadClass(serverSessionFqn));
     }
     // ranking
-    float ranking = 0;
+    double ranking = 0;
     if (svc.isProxy()) {
       ranking = -2; // default ranking for proxies
     }
     Priority prio = svc.getService().getAnnotation(Priority.class);
     if (prio != null) {
-      ranking = (float) prio.value();
+      ranking = prio.value();
     }
     else {
       String rankingString = proxyElement.getAttribute("ranking");
       if (StringUtility.hasText(rankingString)) {
-        ranking = Float.parseFloat(rankingString);
+        ranking = Double.parseDouble(rankingString);
       }
     }
     svc.setRanking(ranking);
@@ -167,4 +197,5 @@ public class ServiceXmlVisitor implements IPluginXmlVisitor {
     }
     return svc;
   }
+
 }

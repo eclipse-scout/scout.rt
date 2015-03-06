@@ -15,8 +15,11 @@ import java.util.List;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.cdi.CDI;
+import org.eclipse.scout.rt.platform.cdi.IBeanContext;
+import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
+import org.eclipse.scout.rt.platform.internal.ScoutServiceLoader;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
@@ -32,6 +35,7 @@ public final class Platform implements IPlatform {
 
   private State m_state = State.Stopped;
   private EventListenerList m_platformListeners = new EventListenerList();
+  private BeanContext m_beanContext;
   private List<IModule> m_startedModules;
   private IApplication m_application;
 
@@ -51,17 +55,25 @@ public final class Platform implements IPlatform {
   }
 
   @Override
+  public IBeanContext getBeanContext() {
+    return m_beanContext;
+  }
+
+  @Override
   public synchronized void start() {
     if (getState() != State.Stopped) {
       throw new IllegalStateException("Platform is already started or starting.");
     }
     m_state = State.Starting;
     notifyListeners(new PlatformEvent(this, PlatformEvent.ABOUT_TO_START));
-    CDI.start();
+    startBeanContext();
+    m_beanContext.initBeanInstanceFactory();
     startModules();
     // parse xml
 
     notifyListeners(new PlatformEvent(this, PlatformEvent.MODULES_STARTED));
+
+    m_beanContext.startCreateImmediatelyBeans();
 
     startApplications();
     notifyListeners(new PlatformEvent(this, PlatformEvent.STARTED));
@@ -74,8 +86,17 @@ public final class Platform implements IPlatform {
     }
   }
 
+  protected void startBeanContext() {
+    BeanContext context = new BeanContext();
+    //register beans
+    for (IBeanContributor contributor : ScoutServiceLoader.loadServices(IBeanContributor.class)) {
+      contributor.contributeBeans(context);
+    }
+    m_beanContext = context;
+  }
+
   protected void startModules() {
-    m_startedModules = CDI.getBeanContext().getInstances(IModule.class);
+    m_startedModules = getBeanContext().getInstances(IModule.class);
     for (IModule module : m_startedModules) {
       try {
         module.start();
@@ -86,10 +107,7 @@ public final class Platform implements IPlatform {
     }
   }
 
-  /**
-   *
-   */
-  private void startApplications() {
+  protected void startApplications() {
     m_application = OBJ.oneOrNull(IApplication.class);
     if (m_application != null) {
       try {
@@ -113,7 +131,7 @@ public final class Platform implements IPlatform {
     stopApplications();
     // stop modules
     stopModules();
-    CDI.stop();
+    stopBeanContext();
     m_state = State.Stopped;
   }
 
@@ -140,6 +158,10 @@ public final class Platform implements IPlatform {
         LOG.error(String.format("Could not stop module '%s'.", module.getClass().getName()), e);
       }
     }
+  }
+
+  protected void stopBeanContext() {
+    m_beanContext = null;
   }
 
   @Override

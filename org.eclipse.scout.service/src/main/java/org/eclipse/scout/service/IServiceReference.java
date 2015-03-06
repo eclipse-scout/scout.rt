@@ -23,7 +23,12 @@ public interface IServiceReference {
   /**
    * @return
    */
-  Class<?> getSession();
+  Class<?> getClientSession();
+
+  /**
+   * @return
+   */
+  Class<?> getServerSession();
 
   /**
    * @return
@@ -33,7 +38,7 @@ public interface IServiceReference {
   /**
    * @return
    */
-  float getRanking();
+  double getRanking();
 
   /**
    * @return

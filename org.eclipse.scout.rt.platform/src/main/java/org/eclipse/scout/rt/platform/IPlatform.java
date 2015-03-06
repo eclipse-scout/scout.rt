@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
+import org.eclipse.scout.rt.platform.cdi.IBeanContext;
+
 /**
  *
  */
@@ -45,6 +47,8 @@ public interface IPlatform {
    * @return
    */
   State getState();
+
+  IBeanContext getBeanContext();
 
   /**
    * @param listener

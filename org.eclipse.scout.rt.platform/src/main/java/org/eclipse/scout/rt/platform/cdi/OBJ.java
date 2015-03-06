@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.cdi;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
 
 /**
@@ -27,29 +28,35 @@ public final class OBJ {
    * @return the first instance of this type, the one with the highest {@link Priority}
    */
   public static <T> T one(Class<T> beanClazz) {
-    return CDI.getBeanContext().getInstance(beanClazz);
+    return Platform.get().getBeanContext().getInstance(beanClazz);
   }
 
   public static <T> T oneOrNull(Class<T> beanClazz) {
-    return CDI.getBeanContext().getInstanceOrNull(beanClazz);
+    return Platform.get().getBeanContext().getInstanceOrNull(beanClazz);
   }
 
   /**
    * @return all instances of this type
    */
   public static <T> List<T> all(Class<T> beanClazz) {
-    return CDI.getBeanContext().getInstances(beanClazz);
+    return Platform.get().getBeanContext().getInstances(beanClazz);
   }
 
   public static <T> IBean<T> registerClass(Class<T> clazz) {
-    return CDI.getBeanContext().registerClass(clazz);
+    return Platform.get().getBeanContext().registerClass(clazz);
   }
 
-  public static void registerBean(IBean<?> bean) {
-    CDI.getBeanContext().registerBean(bean);
+  /**
+   * @param bean
+   * @param instance
+   *          optional initial raw instance value of the bean, undecorated, not intercepted by
+   *          {@link IBeanInstanceFactory}
+   */
+  public static void registerBean(IBean<?> bean, Object instance) {
+    Platform.get().getBeanContext().registerBean(bean, instance);
   }
 
   public static void unregisterBean(IBean<?> bean) {
-    CDI.getBeanContext().unregisterBean(bean);
+    Platform.get().getBeanContext().unregisterBean(bean);
   }
 }

@@ -10,15 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.service;
 
-import java.util.Iterator;
-
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
+import javax.annotation.PreDestroy;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-import org.eclipse.scout.rt.platform.cdi.Instance;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.service.IServiceInitializer.ServiceInitializerResult;
 
 /**
@@ -30,9 +28,6 @@ public abstract class AbstractService implements IService {
   @SuppressWarnings("unused")
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractService.class);
 
-  @Inject
-  private Instance<IServiceInitializer> m_initializers;
-
   /**
    * This default implementation calls the default initializer {@link DefaultServiceInitializer} which calls
    * {@link org.eclipse.scout.service.ServiceUtility#injectConfigParams}(this).
@@ -41,25 +36,18 @@ public abstract class AbstractService implements IService {
    */
   @PostConstruct
   protected void initializeService() {
-    Instance<IServiceInitializer> initializers = getInitializers();
-    if (initializers != null) {
-      Iterator<IServiceInitializer> it = initializers.iterator();
-      while (it.hasNext()) {
-        ServiceInitializerResult res = it.next().initializeService(this);
-        if (ServiceInitializerResult.STOP.equals(res)) {
-          break;
-        }
+    for (IServiceInitializer i : OBJ.all(IServiceInitializer.class)) {
+      ServiceInitializerResult res = i.initializeService(this);
+      if (ServiceInitializerResult.STOP.equals(res)) {
+        break;
       }
     }
-  }
-
-  protected Instance<IServiceInitializer> getInitializers() {
-    return m_initializers;
   }
 
   /**
    * This default implementation does nothing
    */
+  @PreDestroy
   public void disposeServices() {
   }
 }

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
+import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNotificationQueueEvent;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -50,7 +50,7 @@ public class AccessControlServiceTest {
   @Before
   public void setup() {
 
-    m_accessControlService = BeanInstanceCreator.create(TestAccessControlService.class);
+    m_accessControlService = BeanInstanceUtil.create(TestAccessControlService.class);
 
     //Register this IAccessControlService with an higher priority than AllAccessControlService registered in CustomServerTestEnvironment
     m_registerServices = TestingUtility.registerServices(500, m_accessControlService);

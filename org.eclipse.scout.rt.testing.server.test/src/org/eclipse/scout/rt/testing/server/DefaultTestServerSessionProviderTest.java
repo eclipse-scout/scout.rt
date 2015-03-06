@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
+import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -38,7 +38,7 @@ public class DefaultTestServerSessionProviderTest {
   @Ignore
   @Test
   public void testCreateServerSession() throws ProcessingException {
-    DefaultTestServerSessionProvider serverSessionProvider = BeanInstanceCreator.create(DefaultTestServerSessionProvider.class);
+    DefaultTestServerSessionProvider serverSessionProvider = BeanInstanceUtil.create(DefaultTestServerSessionProvider.class);
     final DefaultTestServerSessionProvider testee = Mockito.spy(serverSessionProvider);
     final Subject subject = new Subject();
 

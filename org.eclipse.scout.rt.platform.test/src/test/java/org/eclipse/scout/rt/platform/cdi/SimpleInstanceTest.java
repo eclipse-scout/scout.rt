@@ -26,6 +26,8 @@ public class SimpleInstanceTest {
   @BeforeClass
   public static void registerBeans() {
     context = new BeanContext();
+    context.initBeanInstanceFactory();
+
     context.registerClass(TestObject.class);
   }
 

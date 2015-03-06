@@ -22,6 +22,8 @@ public class BeanRegisterUnregisterTest {
   @Test
   public void test() {
     BeanContext context = new BeanContext();
+    context.initBeanInstanceFactory();
+
     IBean<?> reg = context.registerClass(TestObject.class);
     Assert.assertEquals(1, context.getAllRegisteredBeans().size());
     context.unregisterBean(reg);

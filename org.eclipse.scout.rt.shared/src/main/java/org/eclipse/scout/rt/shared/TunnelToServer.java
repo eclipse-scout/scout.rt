@@ -8,29 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.cdi.internal;
+package org.eclipse.scout.rt.shared;
 
-import java.net.URL;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- *
+ * Marks an interface (typically a service) that is capable of being called as client proxy to the back-end server if
+ * there is
+ * no real implementation available for the service
  */
-public class BeansXml implements IBeansXml {
-
-  private final URL m_beanXmlUrl;
-
-  public BeansXml(URL beanXmlUrl) {
-    m_beanXmlUrl = beanXmlUrl;
-  }
-
-  @Override
-  public URL getUrl() {
-    return m_beanXmlUrl;
-  }
-
-  @Override
-  public Class<?> loadClass(String fullyQuallifiedName) throws ClassNotFoundException {
-    return Class.forName(fullyQuallifiedName);
-  }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+public @interface TunnelToServer {
 
 }

@@ -19,11 +19,6 @@ import java.util.Map;
 public interface IBean<T> {
 
   /**
-   * @return
-   */
-  T get();
-
-  /**
    * To access all annotations of the bean.
    */
   Map<Class<? extends Annotation>, Annotation> getBeanAnnotations();
@@ -34,7 +29,5 @@ public interface IBean<T> {
    * @return
    */
   Class<? extends T> getBeanClazz();
-
-  boolean isIntercepted();
 
 }

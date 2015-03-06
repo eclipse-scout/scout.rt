@@ -22,6 +22,8 @@ public class BeanContextTest {
   @Test
   public void testRegistration() {
     BeanContext context = new BeanContext();
+    context.initBeanInstanceFactory();
+
     context.registerClass(Bean01.class);
     Assert.assertEquals(1, context.getInstances(ITestBean.class).size());
     // register a second
@@ -37,12 +39,14 @@ public class BeanContextTest {
   @Test
   public void testUnregisterByBean() {
     BeanContext context = new BeanContext();
+    context.initBeanInstanceFactory();
+
     context.registerClass(Bean01.class);
     context.registerClass(Bean02.class);
 
-    Assert.assertEquals(6, context.getAllRegisteredBeans().size());
+    Assert.assertEquals(2, context.getAllRegisteredBeans().size());
     context.unregisterBean(new Bean<Bean01>(Bean01.class));
-    Assert.assertEquals(3, context.getAllRegisteredBeans().size());
+    Assert.assertEquals(1, context.getAllRegisteredBeans().size());
     context.unregisterBean(new Bean<Bean02>(Bean02.class));
     Assert.assertEquals(0, context.getAllRegisteredBeans().size());
   }

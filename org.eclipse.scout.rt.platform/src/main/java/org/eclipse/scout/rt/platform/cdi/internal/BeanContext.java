@@ -10,23 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.cdi.internal;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.interceptor.InterceptorBinding;
-
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.exception.InitializationException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
@@ -34,199 +30,143 @@ import org.eclipse.scout.rt.platform.cdi.Bean;
 import org.eclipse.scout.rt.platform.cdi.CreateImmediately;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
+import org.eclipse.scout.rt.platform.cdi.IBeanInstanceFactory;
+import org.eclipse.scout.rt.platform.cdi.IBeanRegistration;
+import org.eclipse.scout.rt.platform.cdi.SimpleBeanInstanceFactory;
 
 public class BeanContext implements IBeanContext {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BeanContext.class);
-  private final Map<Class<?>, TreeSet<IBean<?>>> m_beans;
-  private final Map<Class<? extends Annotation>, ?> m_interceptors;
+
+  private final Map<Class<?>, TreeSet<IBeanRegistration>> m_regs;
+  private IBeanInstanceFactory m_beanInstanceFactory;
 
   public BeanContext() {
-    m_beans = new HashMap<Class<?>, TreeSet<IBean<?>>>();
-    m_interceptors = new BeansXmlParser().getInterceptors();
+    m_regs = new HashMap<Class<?>, TreeSet<IBeanRegistration>>();
   }
 
   @Override
   public <T> T getInstance(Class<T> beanClazz) {
-    return getBean(beanClazz).get();
+    TreeSet<IBeanRegistration> regs = getRegistrationsInternal(beanClazz);
+    T instance = m_beanInstanceFactory.select(beanClazz, regs);
+    if (instance != null) {
+      return instance;
+    }
+    throw new Assertions.AssertionException("no instance found for query: " + beanClazz);
   }
 
   @Override
   public <T> T getInstanceOrNull(Class<T> beanClazz) {
-    IBean<T> bean = getBeanInternal(beanClazz);
-    if (bean != null) {
-      return bean.get();
-    }
-    return null;
+    TreeSet<IBeanRegistration> regs = getRegistrationsInternal(beanClazz);
+    return m_beanInstanceFactory.select(beanClazz, regs);
   }
 
   @Override
   public <T> List<T> getInstances(Class<T> beanClazz) {
-    List<IBean<T>> beans = getBeans(beanClazz);
-    List<T> instances = new ArrayList<T>(beans.size());
-    for (IBean<T> bean : beans) {
-      instances.add(bean.get());
-    }
-    return instances;
-  }
-
-  @Override
-  public <T> IBean<T> getBean(Class<T> beanClazz) {
-    return Assertions.assertNotNull(getBeanInternal(beanClazz), "No beans bound to '%s'", beanClazz);
-  }
-
-  @Override
-  public <T> IBean<T> getBeanOrNull(Class<T> beanClazz) {
-    return getBeanInternal(beanClazz);
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> IBean<T> getBeanInternal(Class<T> beanClazz) {
-    TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
-    if (beans.size() > 0) {
-      IBean<T> bean = (IBean<T>) beans.first();
-      if (!beanClazz.isInterface() && bean.isIntercepted()) {
-        throw new IllegalArgumentException(String.format("Intercepted beans can only be accessed with an interface. '%s' is not an interface.", beanClazz.getName()));
-      }
-      return bean;
-    }
-    return null;
+    TreeSet<IBeanRegistration> regs = getRegistrationsInternal(beanClazz);
+    return m_beanInstanceFactory.selectAll(beanClazz, regs);
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
-    TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
-    List<IBean<T>> result = new ArrayList<IBean<T>>(beans.size());
-    final boolean isInterface = beanClazz.isInterface();
-    for (IBean<?> bean : beans) {
-      result.add((IBean<T>) bean);
-      if (!isInterface && bean.isIntercepted()) {
-        throw new IllegalArgumentException(String.format("Intercepted beans can only be accessed with an interface. '%s' is not an interface.", beanClazz.getName()));
-      }
-
+    TreeSet<IBeanRegistration> regs = getRegistrationsInternal(beanClazz);
+    List<IBean<T>> result = new ArrayList<IBean<T>>(regs.size());
+    for (IBeanRegistration reg : regs) {
+      result.add((IBean<T>) reg.getBean());
     }
     return result;
   }
 
-  @SuppressWarnings("unchecked")
-  public <T> List<IBean<T>> getBeansWithoutInterceptionCheck(Class<T> beanClazz) {
-    TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
-    List<IBean<T>> result = new ArrayList<IBean<T>>(beans.size());
-    for (IBean<?> bean : beans) {
-      result.add((IBean<T>) bean);
-    }
-    return result;
-  }
-
-  private synchronized TreeSet<IBean<?>> getBeansInternal(Class<?> beanClazz) {
+  protected TreeSet<IBeanRegistration> getRegistrationsInternal(Class<?> beanClazz) {
     Assertions.assertNotNull(beanClazz);
-    TreeSet<IBean<?>> beans = m_beans.get(beanClazz);
-    if (beans == null) {
+    TreeSet<IBeanRegistration> regs = m_regs.get(beanClazz);
+    if (regs == null) {
       return CollectionUtility.emptyTreeSet();
     }
-    return beans;
+    return regs;
   }
 
   @Override
-  public List<IBean<?>> getAllRegisteredBeans() {
-    List<IBean<?>> allBeans = new LinkedList<IBean<?>>();
-    for (Set<IBean<?>> beans : m_beans.values()) {
-      allBeans.addAll(beans);
+  public Set<IBean<?>> getAllRegisteredBeans() {
+    HashSet<IBean<?>> allBeans = new HashSet<IBean<?>>();
+    for (Set<IBeanRegistration> regs : m_regs.values()) {
+      for (IBeanRegistration reg : regs) {
+        allBeans.add(reg.getBean());
+      }
     }
     return allBeans;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T> IBean<T> registerClass(Class<T> beanClazz) {
-    TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
-    if (beans.size() == 1) {
-      return (IBean<T>) beans.first();
+    TreeSet<IBeanRegistration> regs = getRegistrationsInternal(beanClazz);
+    if (regs.size() == 1) {
+      return (IBean<T>) regs.first().getBean();
     }
     Bean<T> bean = new Bean<T>(beanClazz);
-    registerBean(bean);
+    registerBean(bean, null);
     return bean;
   }
 
   @Override
-  public void registerBean(IBean<?> bean) {
+  public void registerBean(IBean bean, Object instance) {
     Class[] interfacesHierarchy = BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class);
     List<Class<?>> clazzes = new ArrayList<Class<?>>(interfacesHierarchy.length + 1);
     clazzes.add(bean.getBeanClazz());
     for (Class<?> c : interfacesHierarchy) {
       clazzes.add(c);
     }
-    registerBean(clazzes, bean);
-  }
 
-  public synchronized void registerBean(List<Class<?>> clazzes, IBean<?> bean) {
-    IBean<?> interceptedBean = createInterceptedBean(bean);
+    @SuppressWarnings("unchecked")
+    IBeanRegistration reg = new BeanRegistration(bean, instance);
     for (Class<?> clazz : clazzes) {
-      TreeSet<IBean<?>> beans = m_beans.get(clazz);
-      if (beans == null) {
-        beans = new TreeSet<IBean<?>>(new P_BeanComparator());
-        m_beans.put(clazz, beans);
+      TreeSet<IBeanRegistration> regs = m_regs.get(clazz);
+      if (regs == null) {
+        regs = new TreeSet<IBeanRegistration>();
+        m_regs.put(clazz, regs);
       }
-      beans.add(interceptedBean);
+      regs.add(reg);
     }
-  }
-
-  /**
-   * @param bean
-   * @return
-   */
-  private <T> IBean<T> createInterceptedBean(IBean<T> bean) {
-    for (Annotation a : bean.getBeanAnnotations().values()) {
-      if (a.annotationType().getAnnotation(InterceptorBinding.class) != null) {
-        Object interceptor = m_interceptors.get(a.annotationType());
-        if (interceptor != null) {
-          return new InterceptedBean<T>(bean, interceptor);
-        }
-      }
-    }
-    return bean;
   }
 
   @Override
-  public synchronized void unregisterBean(IBean<?> bean) {
+  public synchronized void unregisterBean(IBean bean) {
     Assertions.assertNotNull(bean);
-    for (Set<IBean<?>> beans : m_beans.values()) {
-      Iterator<IBean<?>> beanIt = beans.iterator();
-      while (beanIt.hasNext()) {
-        if (beanIt.next().equals(bean)) {
-          beanIt.remove();
+    for (Set<IBeanRegistration> regs : m_regs.values()) {
+      Iterator<IBeanRegistration> regIt = regs.iterator();
+      while (regIt.hasNext()) {
+        if (regIt.next().getBean().equals(bean)) {
+          regIt.remove();
         }
       }
     }
   }
 
-  private class P_BeanComparator implements Comparator<IBean<?>> {
-    @Override
-    public int compare(IBean<?> bean1, IBean<?> bean2) {
-      if (bean1 == bean2) {
-        return 0;
-      }
-      if (bean1 == null) {
-        return -1;
-      }
-      if (bean2 == null) {
-        return 1;
-      }
-
-      int result = Float.compare(getPriority(bean2), getPriority(bean1));
-      if (result != 0) {
-        return result;
-      }
-
-      return bean1.getBeanClazz().getName().compareTo(bean2.getBeanClazz().getName());
+  public void initBeanInstanceFactory() {
+    //TODO imo shortcut code here: use config.ini or other concept to set correct m_beanInstanceFactory, also create a CompositeBeanInstanceFactory that knows client AND server
+    TreeSet<IBeanRegistration> regs = getRegistrationsInternal(IBeanInstanceFactory.class);
+    if (regs.size() > 0) {
+      m_beanInstanceFactory = (IBeanInstanceFactory) regs.first().getInstance();
     }
+    if (m_beanInstanceFactory == null) {
+      m_beanInstanceFactory = new SimpleBeanInstanceFactory();
+      LOG.warn("Using " + m_beanInstanceFactory.getClass().getName() + ". Please verify that this application really has no client or server side " + IBeanInstanceFactory.class.getSimpleName());
+    }
+  }
 
-    public float getPriority(IBean<?> bean) {
-      float prio = -1;
-      Priority priorityAnnotation = bean.getBeanAnnotation(Priority.class);
-      if (priorityAnnotation != null) {
-        prio = priorityAnnotation.value();
+  public void startCreateImmediatelyBeans() {
+    for (Set<IBeanRegistration> regs : m_regs.values()) {
+      for (IBeanRegistration reg : regs) {
+        if (BeanContext.isCreateImmediately(reg.getBean())) {
+          if (BeanContext.isApplicationScoped(reg.getBean())) {
+            reg.getInstance();
+          }
+          else {
+            throw new InitializationException(String.format("Bean '%s' is marked with @CreateImmediately and is not application scoped (@ApplicationScoped) - unexpected configuration! ", reg.getBean().getBeanClazz()));
+          }
+        }
       }
-      return prio;
     }
   }
 

@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.platform.cdi;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -11,10 +12,10 @@ public class DynamicAnnotationTest {
 
   @Test
   public void testAnnotationEquality() {
-    Assert.assertEquals(Bean01.class.getAnnotation(CreateImmediately.class), DynamicAnnotations.createCreateImmediately());
-    Assert.assertEquals(Bean01.class.getAnnotation(ApplicationScoped.class), DynamicAnnotations.createApplicationScoped());
-    Assert.assertEquals(Bean01.class.getAnnotation(Priority.class), DynamicAnnotations.createPriority(30));
-    Assert.assertNotEquals(Bean01.class.getAnnotation(Priority.class), DynamicAnnotations.createPriority(20));
+    Assert.assertEquals(Bean01.class.getAnnotation(CreateImmediately.class), AnnotationFactory.createCreateImmediately());
+    Assert.assertEquals(Bean01.class.getAnnotation(ApplicationScoped.class), AnnotationFactory.createApplicationScoped());
+    Assert.assertEquals(Bean01.class.getAnnotation(Priority.class), AnnotationFactory.createPriority(30));
+    Assert.assertNotEquals(Bean01.class.getAnnotation(Priority.class), AnnotationFactory.createPriority(20));
   }
 
   private static interface IBean01 {

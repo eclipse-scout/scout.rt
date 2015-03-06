@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -32,8 +32,8 @@ public class PriorityComparator implements Comparator<Object> {
     if (b == null) {
       return 1;
     }
-    float pa = getPriorityOf(a);
-    float pb = getPriorityOf(b);
+    double pa = getPriorityOf(a);
+    double pb = getPriorityOf(b);
     if (pa > pb) {
       return -1;
     }
@@ -43,22 +43,22 @@ public class PriorityComparator implements Comparator<Object> {
     return a.getClass().getCanonicalName().compareTo(b.getClass().getCanonicalName());
   }
 
-  public static float getPriorityOf(Object o) {
+  public static double getPriorityOf(Object o) {
     if (o == null) {
       return 0;
     }
-    float f;
+    double d;
     Priority prio = o.getClass().getAnnotation(Priority.class);
     if (prio != null) {
-      f = prio.value();
+      d = prio.value();
     }
     else if (Proxy.isProxyClass(o.getClass())) {
-      f = -1;
+      d = -1;
     }
     else {
-      f = 0;
+      d = 0;
     }
-    return f;
+    return d;
   }
 
 }

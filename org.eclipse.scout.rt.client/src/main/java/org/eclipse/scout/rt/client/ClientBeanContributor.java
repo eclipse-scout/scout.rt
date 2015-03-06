@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import org.eclipse.scout.rt.client.cdi.ClientBeanInstanceFactory;
 import org.eclipse.scout.rt.client.job.internal.ClientJobManager;
 import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
-import org.eclipse.scout.rt.client.services.ProxyXmlVisitor;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopExtensionPluginXmlVisitor;
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
@@ -24,9 +24,9 @@ public class ClientBeanContributor implements IBeanContributor {
   @Override
   public void contributeBeans(IBeanContext context) {
     PluginXmlParser.get().visit(new DesktopExtensionPluginXmlVisitor(context));
-    PluginXmlParser.get().visit(new ProxyXmlVisitor(context));
     context.registerClass(IconLocator.class);
     context.registerClass(ClientJobManager.class);
     context.registerClass(ModelJobManager.class);
+    context.registerClass(ClientBeanInstanceFactory.class);
   }
 }
