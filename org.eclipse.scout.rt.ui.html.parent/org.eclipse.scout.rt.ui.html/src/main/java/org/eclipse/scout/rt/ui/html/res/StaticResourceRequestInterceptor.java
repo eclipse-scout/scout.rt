@@ -200,41 +200,6 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    */
   protected HttpCacheObject loadIcon(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) {
     final String imageId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
-    /*TODO imo icons are considered GLOBAL resources, not session or call-stack specific!
-    HttpSession httpSession = req.getSession();
-    IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(IJsonSession.HTTP_SESSION_ATTRIBUTE_PREFIX + req.getParameter(JsonRequest.PROP_JSON_SESSION_ID));
-    if (jsonSession == null) {
-      return null;
-    }
-    final IHolder<IconSpec> iconSpecHolder = new Holder<IconSpec>(IconSpec.class);
-    ClientSyncJob job = new ClientSyncJob("processEvents", jsonSession.getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        ClientJobUtility.runAsSubject(new Runnable() {
-          @Override
-          public void run() {
-            IconSpec iconSpec = IconLocator.instance().getIconSpec(imageId);
-            iconSpecHolder.setValue(iconSpec);
-          }
-        });
-      }
-    };
-    if (ClientJob.isSyncClientJob()) {
-      job.runNow(new NullProgressMonitor());
-    }
-    else {
-      job.schedule();
-      ClientJobUtility.waitForSyncJob(job);
-    }
-    try {
-      job.throwOnError();
-    }
-    catch (ProcessingException e) {
-      throw new JsonException(e); // TODO BSH Exception | Try to eliminate this pattern (5 others in html bundle)
-    }
-    IconSpec iconSpec = iconSpecHolder.getValue();
-     */
-
     IconSpec iconSpec = IconLocator.instance().getIconSpec(imageId);
     if (iconSpec != null) {
       // cache: use max-age caching for at most 4 hours
