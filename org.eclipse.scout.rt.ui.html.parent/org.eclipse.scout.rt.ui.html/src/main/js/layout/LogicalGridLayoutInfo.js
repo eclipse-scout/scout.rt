@@ -458,8 +458,11 @@ scout.LogicalGridLayoutInfo.prototype.logicalWidthInPixel = function(cons) {
 };
 
 scout.LogicalGridLayoutInfo.prototype.logicalHeightInPixel = function(cons) {
-  var gridH = cons.gridh, env = scout.HtmlEnvironment;
-  return env.formRowHeight * gridH + env.formRowGap * Math.max(0, gridH - 1);
+  var gridH = cons.gridh,
+    env = scout.HtmlEnvironment,
+    addition = cons.logicalRowHeightAddition || 0;
+
+  return env.formRowHeight * gridH + env.formRowGap * Math.max(0, gridH - 1) + addition;
 };
 
 scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function($comp) {

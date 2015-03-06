@@ -54,14 +54,12 @@ scout.LogicalGridData.prototype.validate = function() {
   }
   this.useUiWidth = data.useUiWidth;
 
-  // TODO AWE: (layout) schauen ob wir label-position unterstützen wollen für Html UI
-  // when having the label on top the container of the field must not have a fix size but use the calculated ui height instead.
-  // if (this.formField.getLabelPosition() === IFormField.LABEL_POSITION_TOP) {
-  // this.useUiHeight = true;
-  // } else {
-    this.useUiHeight = data.useUiHeight;
-  // }
+  // when having the label on top, the the row size has to be increased
+   if (this.model.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
+     this.logicalRowHeightAddition = scout.HtmlEnvironment.formRowHeight;
+   }
 
+  this.useUiHeight = data.useUiHeight;
   this.horizontalAlignment = data.horizontalAlignment;
   this.verticalAlignment = data.verticalAlignment;
   this.fillHorizontal = data.fillHorizontal;
