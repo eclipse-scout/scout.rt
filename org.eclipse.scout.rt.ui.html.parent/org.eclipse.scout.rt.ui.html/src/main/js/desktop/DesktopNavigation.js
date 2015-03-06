@@ -12,6 +12,7 @@ scout.DesktopNavigation = function(desktop) {
   this.$queryField;
   this.$outlineTitle;
   this.previousOutline;
+  this.breadcrumbSwitchWidth = 190;
 };
 
 scout.DesktopNavigation.prototype.render = function($parent) {
@@ -41,7 +42,6 @@ scout.DesktopNavigation.prototype.render = function($parent) {
   }
 
   this.$container = this.$navigation.appendDiv('navigation-container');
-  this._addSplitter();
 };
 
 scout.DesktopNavigation.prototype._selectTab = function(tab, outline) {
@@ -182,7 +182,7 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
   }
 
   if (outline === this.desktop.searchOutline) {
-    //Remember previous outline when switching to search outline
+    // Remember previous outline when switching to search outline
     this.previousOutline = this.outline;
 
     this._setActiveTab(this.searchTab);
@@ -198,63 +198,28 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
   this.$header.removeClass('tab-menu-open');
 
   if (outline === this.desktop.searchOutline) {
-    //Focus and select content AFTER the search outline was rendered (and therefore the query field filled)
+    // Focus and select content AFTER the search outline was rendered (and therefore the query field filled)
     this.$queryField.focus();
     this.$queryField[0].select();
   }
 };
 
-//vertical splitter
+// vertical splitter
+scout.DesktopNavigation.prototype.onResize = function(event) {
+  var w = event.pageX;
 
-scout.DesktopNavigation.prototype._addSplitter = function() {
-  this._$splitter = this.$navigation.appendDiv('navigation-splitter-vertical')
-    .on('mousedown', '', resize);
+  this.$navigation.width(w);
+  this.desktop.$bar.css('left', w);
+  this.desktop.$bench.css('left', w);
 
-  var WIDTH_BREADCRUMB = 190;
-
-  var that = this;
-
-  function resize() {
-    var w;
-
-    $('body').addClass('col-resize')
-      .on('mousemove', '', resizeMove)
-      .one('mouseup', '', resizeEnd);
-
-    function resizeMove(event) {
-      w = event.pageX;
-
-      that.$navigation.width(w);
-      that.desktop.$bar.css('left', w);
-      that.desktop.$bench.css('left', w);
-
-      if (w <= WIDTH_BREADCRUMB) {
-        if (!that.$navigation.hasClass('navigation-breadcrumb')) {
-          that.$navigation.addClass('navigation-breadcrumb');
-          that.outline.setBreadcrumbEnabled(true);
-        }
-      } else {
-        that.$navigation.removeClass('navigation-breadcrumb');
-        that.outline.setBreadcrumbEnabled(false);
-      }
-
-      scout.scrollbars.update(that.outline.$container);
+  if (w <= this.breadcrumbSwitchWidth) {
+    if (!this.$navigation.hasClass('navigation-breadcrumb')) {
+      this.$navigation.addClass('navigation-breadcrumb');
+      this.outline.setBreadcrumbEnabled(true);
     }
-
-    function resizeEnd() {
-      $('body').off('mousemove')
-        .removeClass('col-resize');
-
-      if (w < WIDTH_BREADCRUMB) {
-        that.$navigation.animateAVCSD('width', WIDTH_BREADCRUMB);
-        that.desktop.$bar.animateAVCSD('left', WIDTH_BREADCRUMB);
-        that.desktop.$bench.animateAVCSD('left', WIDTH_BREADCRUMB);
-      }
-
-      that.desktop.onResize();
-    }
-
-    return false;
+  } else {
+    this.$navigation.removeClass('navigation-breadcrumb');
+    this.outline.setBreadcrumbEnabled(false);
   }
 };
 

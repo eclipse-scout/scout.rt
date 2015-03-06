@@ -162,7 +162,12 @@ scout.Tree.prototype.updateScrollbar = function() {
 };
 
 scout.Tree.prototype.setBreadcrumbEnabled = function(enabled) {
+  if (this._breadcrumb !== enabled) {
+    // update scrollbar if mode has changed (from tree to bc or vice versa)
+    this.updateScrollbar();
+  }
   this._breadcrumb = enabled;
+
   if (!enabled) {
     return;
   }

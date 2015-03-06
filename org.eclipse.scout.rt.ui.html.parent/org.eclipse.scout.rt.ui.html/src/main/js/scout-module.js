@@ -46,6 +46,7 @@ __include("layout/SingleLayout.js");
 __include("datamodel/DataModel.js");
 __include("scrollbar/Scrollbar.js");
 __include("scrollbar/scrollbars.js");
+__include("splitter/Splitter.js");
 __include("text/DateFormat.js");
 __include("text/DecimalFormat.js");
 __include("tooltip/Tooltip.js");

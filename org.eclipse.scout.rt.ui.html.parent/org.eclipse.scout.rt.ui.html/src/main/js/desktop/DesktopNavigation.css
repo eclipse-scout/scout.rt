@@ -42,16 +42,6 @@
   }
 }
 
-.navigation-splitter-vertical {
-  position: absolute;
-  top: 0px;
-  right: -8px;
-  height: 100%;
-  width: 16px;
-  cursor: col-resize;
-  z-index: 1;
-}
-
 .navigation-tab-outline,
 .navigation-tab-search {
   position: relative;

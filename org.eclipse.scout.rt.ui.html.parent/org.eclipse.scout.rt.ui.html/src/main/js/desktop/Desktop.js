@@ -35,9 +35,15 @@ scout.Desktop.prototype._render = function($parent) {
   var i, action;
 
   this.$parent = $parent;
-
   this.navigation = new scout.DesktopNavigation(this);
   this.navigation.render($parent);
+
+  this.splitter = new scout.Splitter({
+    $anchor: this.navigation.$navigation
+  });
+  this.splitter.render($parent);
+  this.splitter.on('resize', this.onResize.bind(this));
+  this.splitter.on('resizeend', this.onResizeEnd.bind(this));
 
   this.$bar = $parent.appendDiv('desktop-taskbar');
   this.$bar.appendDiv('taskbar-logo')
@@ -93,12 +99,27 @@ scout.Desktop.prototype._render = function($parent) {
   scout.keyStrokeManager.installAdapter($parent, new scout.DesktopKeyStrokeAdapter(this));
 };
 
-scout.Desktop.prototype.onResize = function() {
+scout.Desktop.prototype.onResize = function(event) {
+  this.navigation.onResize(event);
+
   if (this._selectedTab && this._selectedTab.content) {
     this._selectedTab.content.onResize();
   }
   if (this.outline) {
     this.outline.onResize();
+  }
+};
+
+scout.Desktop.prototype.onResizeEnd = function(event) {
+  var w = event.pageX;
+  if (w < this.navigation.breadcrumbSwitchWidth) {
+    this.navigation.$navigation.animateAVCSD('width', this.navigation.breadcrumbSwitchWidth);
+    this.$bar.animateAVCSD('left', this.navigation.breadcrumbSwitchWidth);
+    this.$bench.animate({
+      left: this.navigation.breadcrumbSwitchWidth
+    }, {
+      progress: this.splitter.position.bind(this.splitter)
+    });
   }
 };
 
