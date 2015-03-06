@@ -65,6 +65,9 @@
       "mainBox": false,
       "scrollable": false
     },
+    "SequenceBox": {
+      "fields": []
+    },
     "SmartField": {
       "multiline": false,
       "validateOnAnyKey": false,
