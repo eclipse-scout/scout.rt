@@ -24,7 +24,7 @@ public final class FormFieldExtensions {
 
   private final List<IFormFieldExtension> m_extensions;
 
-  FormFieldExtensions() {
+  public FormFieldExtensions() {
     m_extensions = new ArrayList<>();
   }
 

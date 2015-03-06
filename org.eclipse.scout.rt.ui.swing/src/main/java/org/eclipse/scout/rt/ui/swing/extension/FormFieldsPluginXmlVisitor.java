@@ -46,25 +46,33 @@ public class FormFieldsPluginXmlVisitor implements IPluginXmlVisitor {
   public static final String ATTR_UICLASS_CLASS = "class";
   public static final String ATTR_FACTORY_CLASS = "class";
 
-  private IBeanContext m_context;
+  private final IBeanContext m_context;
+  private final FormFieldExtensions m_formFieldExtensions;
 
-  public FormFieldsPluginXmlVisitor(IBeanContext context) {
+  public FormFieldsPluginXmlVisitor(IBeanContext context, FormFieldExtensions formFieldExtensions) {
     m_context = context;
+    m_formFieldExtensions = formFieldExtensions;
+  }
 
+  protected IBeanContext getContext() {
+    return m_context;
+  }
+
+  protected FormFieldExtensions getFormFieldExtensions() {
+    return m_formFieldExtensions;
   }
 
   @Override
   public void visit(IPluginXml xmlFile, Document xmlDoc) {
     XPath xPath = XPathFactory.newInstance().newXPath();
     String expression = "//extension[@point='org.eclipse.scout.rt.ui.swing.formfields']/formField";
-    FormFieldExtensions collector = m_context.getInstance(FormFieldExtensions.class);
     try {
       NodeList formFields = (NodeList) xPath.compile(expression).evaluate(xmlDoc, XPathConstants.NODESET);
       for (int i = 0; i < formFields.getLength(); i++) {
         Node formField = formFields.item(i);
         if (formField.getNodeType() == Node.ELEMENT_NODE) {
           Element formFieldElement = (Element) formField;
-          parseFormFieldElement(xmlFile, formFieldElement, collector);
+          parseFormFieldElement(xmlFile, formFieldElement);
         }
       }
     }
@@ -74,7 +82,7 @@ public class FormFieldsPluginXmlVisitor implements IPluginXmlVisitor {
   }
 
   @SuppressWarnings("unchecked")
-  private void parseFormFieldElement(IPluginXml xmlFile, Element element, FormFieldExtensions collector) {
+  private void parseFormFieldElement(IPluginXml xmlFile, Element element) {
     String name = element.getAttribute(ATTR_FORMFIELD_NAME);
     boolean active = "true".equalsIgnoreCase(element.getAttribute(ATTR_FORMFIELD_ACTIVE));
 
@@ -98,7 +106,7 @@ public class FormFieldsPluginXmlVisitor implements IPluginXmlVisitor {
       formFieldExt.setModelClass((Class<? extends IFormField>) loadClass);
       formFieldExt.setFactoryClass(getClassName(element, ELEM_FACTORY, ATTR_FACTORY_CLASS, IFormFieldFactory.class, xmlFile));
       formFieldExt.setUiClass(getClassName(element, ELEM_UICLASS, ATTR_UICLASS_CLASS, ISwingScoutFormField.class, xmlFile));
-      collector.add(formFieldExt);
+      getFormFieldExtensions().add(formFieldExt);
     }
     catch (ClassNotFoundException e) {
       //TODO
