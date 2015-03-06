@@ -4,6 +4,7 @@
 scout.Tree = function() {
   scout.Tree.parent.call(this);
   this.$data;
+  this.menuBar;
   this.selectedNodeIds = [];
   this.nodes = []; // top-level nodes
   this.nodesMap = {}; // all nodes by id
@@ -14,8 +15,6 @@ scout.Tree = function() {
   this._treeItemPaddingLeft = 20;
   this._treeItemCheckBoxPaddingLeft = 28;
   this._treeItemPaddingLevel = 15;
-
-  this.menuBar;
 
   this.keyStrokeAdapter = new scout.TreeKeyStrokeAdapter(this);
 };

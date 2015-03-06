@@ -7,7 +7,6 @@ scout.Splitter = function(options) {
 
 scout.Splitter.prototype.render = function($parent) {
   this.$parent = $parent;
-  var anchor = scout.graphics.offsetBounds(this.$anchor);
 
   this.$splitter = $parent.appendDiv('splitter')
     .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
