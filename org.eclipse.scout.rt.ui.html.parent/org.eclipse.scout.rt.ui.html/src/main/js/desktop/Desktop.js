@@ -42,8 +42,8 @@ scout.Desktop.prototype._render = function($parent) {
     $anchor: this.navigation.$navigation
   });
   this.splitter.render($parent);
-  this.splitter.on('resize', this.onResize.bind(this));
-  this.splitter.on('resizeend', this.onResizeEnd.bind(this));
+  this.splitter.on('resize', this.onSplitterResize.bind(this));
+  this.splitter.on('resizeend', this.onSplitterResizeEnd.bind(this));
 
   this.$bar = $parent.appendDiv('desktop-taskbar');
   this.$bar.appendDiv('taskbar-logo')
@@ -100,8 +100,7 @@ scout.Desktop.prototype._render = function($parent) {
 };
 
 scout.Desktop.prototype.onResize = function(event) {
-  this.navigation.onResize(event);
-
+  //FIXME AWE/CGU this is called by jquery ui when the dialog gets resized, why?
   if (this._selectedTab && this._selectedTab.content) {
     this._selectedTab.content.onResize();
   }
@@ -110,7 +109,12 @@ scout.Desktop.prototype.onResize = function(event) {
   }
 };
 
-scout.Desktop.prototype.onResizeEnd = function(event) {
+scout.Desktop.prototype.onSplitterResize = function(event) {
+  this.navigation.onResize(event);
+  this.onResize(event);
+};
+
+scout.Desktop.prototype.onSplitterResizeEnd = function(event) {
   var w = event.pageX;
   if (w < this.navigation.breadcrumbSwitchWidth) {
     this.navigation.$navigation.animateAVCSD('width', this.navigation.breadcrumbSwitchWidth);
