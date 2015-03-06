@@ -33,31 +33,19 @@ public class JsonTabBox<T extends ITabBox> extends JsonFormField<T> {
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
-    // instead of returning a whole adapter here, we simply return the index of the group-box (=tab)
     putJsonProperty(new JsonProperty<ITabBox>(ITabBox.PROP_SELECTED_TAB, model) {
+      @Override
+      protected IGroupBox modelValue() {
+        return getModel().getSelectedTab();
+      }
 
       @Override
       public Integer prepareValueForToJson(Object value) {
+        // instead of returning a whole adapter here, we simply return the index of the group-box (=tab)
         IGroupBox selectedTab = (IGroupBox) value;
         return getIndexForGroupBox(selectedTab);
       }
-
-      private int getIndexForGroupBox(IGroupBox groupBox) {
-        List<IGroupBox> groupBoxes = getModel().getGroupBoxes();
-        for (int i = 0; i < groupBoxes.size(); i++) {
-          if (groupBox == groupBoxes.get(i)) {
-            return i;
-          }
-        }
-        throw new IllegalStateException("selected tab not found in group-boxes list");
-      }
-
-      @Override
-      protected Object modelValue() {
-        return getModel().getSelectedTab();
-      }
     });
-
   }
 
   @Override
@@ -86,7 +74,7 @@ public class JsonTabBox<T extends ITabBox> extends JsonFormField<T> {
     }
   }
 
-  void handleUiTabSelected(JsonEvent event) {
+  protected void handleUiTabSelected(JsonEvent event) {
     int tabIndex = event.getData().optInt("tabIndex");
     List<IGroupBox> groupBoxes = getModel().getGroupBoxes();
     if (tabIndex >= 0 && tabIndex < groupBoxes.size()) {
@@ -94,5 +82,15 @@ public class JsonTabBox<T extends ITabBox> extends JsonFormField<T> {
       addPropertyEventFilterCondition(ITabBox.PROP_SELECTED_TAB, groupBox);
       getModel().getUIFacade().setSelectedTabFromUI(groupBox);
     }
+  }
+
+  protected int getIndexForGroupBox(IGroupBox groupBox) {
+    List<IGroupBox> groupBoxes = getModel().getGroupBoxes();
+    for (int i = 0; i < groupBoxes.size(); i++) {
+      if (groupBox == groupBoxes.get(i)) {
+        return i;
+      }
+    }
+    throw new IllegalStateException("selected tab not found in group-boxes list");
   }
 }

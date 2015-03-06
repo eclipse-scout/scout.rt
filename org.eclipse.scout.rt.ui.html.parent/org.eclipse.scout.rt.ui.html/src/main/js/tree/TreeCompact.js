@@ -19,7 +19,7 @@ scout.TreeCompact.prototype._render = function($parent) {
     addClass('text-field').
     appendTo(this.$container).
     on('input', this._onInput.bind(this)).
-    keydown(this._onKeydown.bind(this));
+    keydown(this._onKeyDown.bind(this));
 
   this._$nodesWrapperDiv = $.makeDiv('nodes-wrapper').appendTo(this.$container);
   scout.scrollbars.install(this._$nodesWrapperDiv, {invertColors:true, borderless:true});
@@ -83,7 +83,7 @@ scout.TreeCompact.prototype._onInput = function(event) {
   this._updateNodes();
 };
 
-scout.TreeCompact.prototype._onKeydown = function(event) {
+scout.TreeCompact.prototype._onKeyDown = function(event) {
   switch (event.which) {
     case scout.keys.UP:
       this._moveSelection(-1);
