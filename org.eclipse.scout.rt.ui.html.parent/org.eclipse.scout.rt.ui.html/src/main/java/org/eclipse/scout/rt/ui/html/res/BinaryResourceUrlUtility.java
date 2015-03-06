@@ -15,7 +15,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 
 public class BinaryResourceUrlUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BinaryResourceUrlUtility.class);
@@ -43,7 +42,7 @@ public class BinaryResourceUrlUtility {
     }
     IconSpec iconSpec = IconLocator.instance().getIconSpec(iconId);
     if (iconSpec != null) {
-      return "icon/" + iconSpec.getName() + "?" + JsonRequest.PROP_JSON_SESSION_ID + "=" + jsonAdapter.getJsonSession().getJsonSessionId(); // includes file extension
+      return "icon/" + iconSpec.getName(); // includes file extension
     }
     return null; // may happen, when no icon is available for the requested iconName
   }
@@ -54,7 +53,7 @@ public class BinaryResourceUrlUtility {
    *         <p>
    *         The calling adapter must implement {@link IBinaryResourceProvider}
    */
-  public static String createCallbackUrl(IJsonAdapter<?> jsonAdapter, String filename) {
+  public static String createDynamicAdapterResourceUrl(IJsonAdapter<?> jsonAdapter, String filename) {
     if (jsonAdapter == null) {
       return null;
     }
@@ -65,6 +64,6 @@ public class BinaryResourceUrlUtility {
     if (filename == null) {
       return null;
     }
-    return "tmp/" + filename + "?" + JsonRequest.PROP_JSON_SESSION_ID + "=" + jsonAdapter.getJsonSession().getJsonSessionId() + "&adapterId=" + jsonAdapter.getId();
+    return "dynamic/" + jsonAdapter.getJsonSession().getJsonSessionId() + "/" + jsonAdapter.getId() + "/" + filename;
   }
 }

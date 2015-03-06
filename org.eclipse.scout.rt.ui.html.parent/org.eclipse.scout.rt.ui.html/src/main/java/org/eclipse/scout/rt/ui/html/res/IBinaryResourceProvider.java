@@ -10,10 +10,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
  * back to them.
  * <p>
  * URLs that call back to this method are defined using
- * {@link BinaryResourceUrlUtility#createCallbackUrl(IJsonAdapter, String)}
+ * {@link BinaryResourceUrlUtility#createDynamicAdapterResourceUrl(IJsonAdapter, String)}
  */
 public interface IBinaryResourceProvider {
 
   BinaryResource loadDynamicResource(String filename);
-
 }

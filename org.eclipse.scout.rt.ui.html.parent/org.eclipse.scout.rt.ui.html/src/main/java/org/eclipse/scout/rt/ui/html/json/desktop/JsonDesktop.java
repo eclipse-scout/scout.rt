@@ -240,7 +240,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     }
     manageDownloadHandlers();
     m_downloadHandlers.put(handler.getResource().getFilename(), handler);
-    String path = BinaryResourceUrlUtility.createCallbackUrl(this, handler.getResource().getFilename());
+    String path = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, handler.getResource().getFilename());
     JSONObject json = new JSONObject();
     putProperty(json, "path", path);
     putProperty(json, "urlTarget", UrlTarget.SELF);

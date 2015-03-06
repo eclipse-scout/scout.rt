@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +39,6 @@ import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonUtility;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
@@ -84,6 +84,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
       "application/zip",
   }));
+  private static final Pattern PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH = Pattern.compile("^/dynamic/([^/]*)/([^/]*)/(.*)$");
 
   private ScriptProcessor m_scriptProcessor;
 
@@ -173,7 +174,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    * Loads a resource with an appropriate method, based on the URL
    */
   protected HttpCacheObject loadResource(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
-    if (pathInfo.matches("^/?icon/.*")) {
+    if (pathInfo.matches("^/icon/.*")) {
       return loadIcon(servlet, req, pathInfo);
     }
     if ((pathInfo.endsWith(".js") || pathInfo.endsWith(".css"))) {
@@ -185,8 +186,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     if (pathInfo.endsWith(".json")) {
       return loadJsonFile(servlet, req, pathInfo);
     }
-    // TODO BSH Use a better name than "tmp" (resources are more dynamic than temporary)
-    if (pathInfo.matches("^/?tmp/.*")) {
+    if (pathInfo.matches("^/dynamic/.*")) {
       return loadDynamicAdapterResource(servlet, req, pathInfo);
     }
     return loadBinaryFile(servlet, req, pathInfo);
@@ -262,23 +262,27 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    * adapter/form-fields such as the image field, WordAddIn docx documents, temporary and time-limited landing page
    * files etc.
    * <p>
-   * The {@link HttpServletRequest} must contain the parameters <code>jsonSessionId</code> and <code>adapterId</code>
+   * The pathInfo is expected to have the following form: <code>/dynamic/[jsonSessionId]/[adapterId]/[filename]</code>
    */
   protected HttpCacheObject loadDynamicAdapterResource(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) {
+    Matcher m = PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH.matcher(pathInfo);
+    if (!m.matches()) {
+      return null;
+    }
+    String jsonSessionId = m.group(1);
+    String adapterId = m.group(2);
+    String filename = m.group(3);
+
     HttpSession httpSession = req.getSession();
-    IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(IJsonSession.HTTP_SESSION_ATTRIBUTE_PREFIX + req.getParameter(JsonRequest.PROP_JSON_SESSION_ID));
+    IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(IJsonSession.HTTP_SESSION_ATTRIBUTE_PREFIX + jsonSessionId);
     if (jsonSession == null) {
       return null;
     }
-    IJsonAdapter<?> jsonAdapter = jsonSession.getJsonAdapter(req.getParameter("adapterId"));
-    if (jsonAdapter == null) {
-      return null;
-    }
+    IJsonAdapter<?> jsonAdapter = jsonSession.getJsonAdapter(adapterId);
     if (!(jsonAdapter instanceof IBinaryResourceProvider)) {
       return null;
     }
     IBinaryResourceProvider provider = (IBinaryResourceProvider) jsonAdapter;
-    String filename = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
     BinaryResource content0 = provider.loadDynamicResource(filename);
     if (content0 == null) {
       return null;
@@ -288,6 +292,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       contentType = detectContentType(servlet, pathInfo);
     }
     BinaryResource content = new BinaryResource(pathInfo, contentType, content0.getContent(), content0.getLastModified());
+
     // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
     return new HttpCacheObject(pathInfo, content.getLastModified() > 0, -1, content);
   }

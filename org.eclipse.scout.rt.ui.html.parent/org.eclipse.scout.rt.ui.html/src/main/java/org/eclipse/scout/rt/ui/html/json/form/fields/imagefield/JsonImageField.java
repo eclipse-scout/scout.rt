@@ -42,7 +42,7 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
         // We don't send the image via JSON to the client, we only set a flag that this adapter has an image
         // The client will request the image in a separate http request. See: StaticResourceRequestInterceptor
         BinaryResource image = extractBinaryResource(value);
-        return image != null ? BinaryResourceUrlUtility.createCallbackUrl(JsonImageField.this, image.getFilename()) : null;
+        return image != null ? BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(JsonImageField.this, image.getFilename()) : null;
       }
     });
     putJsonProperty(new JsonProperty<T>(IImageField.PROP_SCROLL_BAR_ENABLED, model) {

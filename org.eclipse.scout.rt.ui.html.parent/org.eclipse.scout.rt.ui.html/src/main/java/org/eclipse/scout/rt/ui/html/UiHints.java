@@ -64,7 +64,7 @@ public final class UiHints {
       return;
     }
     for (String attName : sessionAttributeNameToStoreTo) {
-      LOG.info("set ScoputAppHint: " + attName + "=" + value);
+      LOG.info("Set UiHint: " + attName + "=" + value);
       session.setAttribute(attName, value);
     }
   }
