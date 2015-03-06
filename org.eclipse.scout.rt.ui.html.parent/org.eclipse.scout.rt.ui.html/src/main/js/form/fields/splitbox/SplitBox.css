@@ -1,0 +1,64 @@
+.split-box {
+
+  & > .split-area {
+    @splitter-size: 15px;
+    @splitter-line-size: 3px;
+    @temp-splitter-line-size: 1px;
+
+    & > .splitter {
+      position: absolute;
+      background-color: @border-color;
+
+      &:hover {
+        background-color: @hover-color;
+      }
+
+      /* | */
+      &.x-axis {
+        height: 100%;
+        width: @splitter-size;
+        border-left: ((@splitter-size - @splitter-line-size) / 2) solid @body-background-color;
+        border-right: ((@splitter-size - @splitter-line-size) / 2) solid @body-background-color;
+        cursor: col-resize;
+      }
+
+      /* -- */
+      &.y-axis {
+        margin-left: @mandatory-indicator-width;
+        width: calc(~"100%" - @mandatory-indicator-width);
+        height: @splitter-size;
+        border-top: ((@splitter-size - @splitter-line-size) / 2) solid @body-background-color;
+        border-bottom: ((@splitter-size - @splitter-line-size) / 2) solid @body-background-color;
+        cursor: row-resize;
+      }
+
+      &.dragging {
+        background-color: @border-color;
+        opacity: 0.25;
+      }
+    }
+
+    & > .temp-splitter {
+      position: absolute;
+
+      /* | */
+      &.x-axis {
+        height: 100%;
+        width: @temp-splitter-line-size;
+        border-left: @temp-splitter-line-size dashed @focus-color;
+        margin-left: (@splitter-size - @temp-splitter-line-size) / 2;
+        margin-right: (@splitter-size - @temp-splitter-line-size) / 2;
+      }
+
+      /* -- */
+      &.y-axis {
+        margin-left: @mandatory-indicator-width;
+        width: calc(~"100%" - @mandatory-indicator-width);
+        height: @temp-splitter-line-size;
+        border-top: @temp-splitter-line-size dashed @focus-color;
+        margin-top: (@splitter-size - @temp-splitter-line-size) / 2;
+        margin-bottom: (@splitter-size - @temp-splitter-line-size) / 2;
+      }
+    }
+  }
+}

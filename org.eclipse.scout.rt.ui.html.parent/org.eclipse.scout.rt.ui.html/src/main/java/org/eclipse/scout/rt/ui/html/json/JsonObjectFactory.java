@@ -49,6 +49,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonG
 import org.eclipse.scout.rt.client.ui.form.fields.richtextfield.IRichTextField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
+import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
@@ -83,6 +84,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButton
 import org.eclipse.scout.rt.ui.html.json.form.fields.richtextfield.JsonRichTextField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox.JsonSequenceBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.smartfield.JsonSmartField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.splitbox.JsonSplitBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.stringfield.JsonStringField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabItem;
@@ -189,6 +191,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (model instanceof IWrappedFormField<?>) {
       return new JsonWrappedFormField((IWrappedFormField<?>) model, session, id, parent);
+    }
+    if (model instanceof ISplitBox) {
+      return new JsonSplitBox((ISplitBox) model, session, id, parent);
     }
 
     // Fallback for all other form fields (will generate a 'not implemented' placeholder). Note: insert more form fields _before_ this line!

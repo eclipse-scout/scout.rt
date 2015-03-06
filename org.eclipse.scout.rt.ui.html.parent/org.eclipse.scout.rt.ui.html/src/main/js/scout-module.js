@@ -133,6 +133,8 @@ __include("form/fields/smartfield/LookupStrategy.js");
 __include("form/fields/smartfield/SmartField.js");
 __include("form/fields/smartfield/SmartFieldMultiline.js");
 __include("form/fields/smartfield/SmartFieldMultilineLayout.js");
+__include("form/fields/splitbox/SplitBox.js");
+__include("form/fields/splitbox/SplitBoxLayout.js");
 __include("form/fields/stringfield/StringField.js");
 __include("form/fields/stringfield/StringFieldKeyStrokeAdapter.js");
 __include("form/fields/tabbox/TabBox.js");
