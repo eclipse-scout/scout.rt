@@ -16,6 +16,8 @@ scout.Tree = function() {
   this._treeItemPaddingLevel = 15;
 
   this.menuBar;
+
+  this.keyStrokeAdapter = new scout.TreeKeyStrokeAdapter(this);
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
@@ -125,6 +127,8 @@ scout.Tree.prototype._render = function($parent) {
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
 
+  this.installKeyStrokeAdapter();
+
   this.$data = this.$container.appendDiv('tree-data');
 
   scout.scrollbars.install(this.$data);
@@ -135,6 +139,13 @@ scout.Tree.prototype._render = function($parent) {
     this._renderSelection();
   }
   this._updateItemPath();
+};
+
+scout.Tree.prototype.installKeyStrokeAdapter = function(){
+  if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    this.$container.attr('tabIndex', 0);
+    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+  }
 };
 
 scout.Tree.prototype._remove = function() {
@@ -1013,6 +1024,9 @@ scout.Tree.prototype._renderEnabled = function() {
   });
 };
 
+scout.Tree.prototype.dispose = function() {
+  scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+};
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 

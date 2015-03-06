@@ -10,7 +10,6 @@
   border: 1px solid @border-color;
   border-radius: 4px;
   opacity: 0.9;
-  left: 4px;
   font-weight: bold;
   .glow(@focus-color-glow);
 }
@@ -24,8 +23,6 @@
   color: @text-color;
   line-height: 25px;
   text-align: center;
-  background-color: @desktop-background-color;
-  opacity: 0.9;
-  left: 28px;
+  background: rgba(0, 0, 0, 0);
   font-weight: bold;
 }

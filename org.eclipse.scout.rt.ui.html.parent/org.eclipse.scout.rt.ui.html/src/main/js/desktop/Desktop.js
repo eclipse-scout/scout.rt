@@ -90,7 +90,7 @@ scout.Desktop.prototype._render = function($parent) {
   });
 
   // TODO CRU: split and move
-  scout.keyStrokeManager.installAdapter($parent, new scout.DesktopKeyStrokeAdapter(this.navigation, this.taskbar));
+  scout.keyStrokeManager.installAdapter($parent, new scout.DesktopKeyStrokeAdapter(this));
 };
 
 scout.Desktop.prototype.onResize = function() {
@@ -171,7 +171,11 @@ scout.Desktop.prototype._selectTab = function(tab) {
   this._selectedTab = tab;
   if (tab.content && tab.content.objectType === 'Table') {
     // Install adapter on parent (no table focus required)
-    scout.keyStrokeManager.installAdapter(this.$parent, tab.content.keystrokeAdapter);
+    if (tab.content.keyStrokeAdapter.objectType !== 'TableKeyStrokeAdapter') {
+      tab.content.injectKeyStrokeAdapter(new scout.DesktopTableKeyStrokeAdapter(tab.content), this.$parent);
+    } else {
+      scout.keyStrokeManager.installAdapter(this.$parent, tab.content.keyStrokeAdapter);
+    }
   }
   if (tab.$storage && tab.$storage.length > 0) {
     this.$bench.append(tab.$storage);
@@ -186,8 +190,8 @@ scout.Desktop.prototype._selectTab = function(tab) {
 
 scout.Desktop.prototype._unselectTab = function(tab) {
   //remove registered keyStrokeAdapters
-  if (tab.content && scout.keyStrokeManager.isAdapterInstalled(tab.content.keystrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(tab.content.keystrokeAdapter);
+  if (tab.content && scout.keyStrokeManager.isAdapterInstalled(tab.content.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(tab.content.keyStrokeAdapter);
   }
 
   tab.$storage = this.$bench.children();
@@ -269,8 +273,8 @@ scout.Desktop.prototype._openUrlInBrowser = function(event) {
 
 scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   if (this._outlineTab.content && this._outlineTab.content !== content) {
-    if (scout.keyStrokeManager.isAdapterInstalled(this._outlineTab.keystrokeAdapter)) {
-      scout.keyStrokeManager.uninstallAdapter(this._outlineTab.keystrokeAdapter);
+    if (scout.keyStrokeManager.isAdapterInstalled(this._outlineTab.keyStrokeAdapter)) {
+      scout.keyStrokeManager.uninstallAdapter(this._outlineTab.keyStrokeAdapter);
     }
     this._outlineTab.content.remove();
     // Also remove storage to make sure selectTab does not restore the content
@@ -291,8 +295,12 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   this._updateTab(this._outlineTab);
   this._selectTab(this._outlineTab);
   if (content.objectType === 'Table') {
-    if (!scout.keyStrokeManager.isAdapterInstalled(content.keystrokeAdapter)) {
-      scout.keyStrokeManager.installAdapter(this.$parent, content.keystrokeAdapter);
+    if (!scout.keyStrokeManager.isAdapterInstalled(content.keyStrokeAdapter)) {
+      if (content.keyStrokeAdapter.objectType !== 'TableKeyStrokeAdapter') {
+        content.injectKeyStrokeAdapter(new scout.DesktopTableKeyStrokeAdapter(content), this.$parent);
+      } else {
+        scout.keyStrokeManager.installAdapter(this.$parent, content.keyStrokeAdapter);
+      }
     }
   }
   if (!content.rendered) {

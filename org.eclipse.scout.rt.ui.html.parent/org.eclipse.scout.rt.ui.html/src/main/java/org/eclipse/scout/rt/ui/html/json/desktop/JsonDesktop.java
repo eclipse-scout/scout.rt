@@ -136,6 +136,18 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
         return getModel().getTitle();
       }
     });
+    putJsonProperty(new JsonProperty<T>(IDesktop.PROP_AUTO_TAB_KEY_STROKES_ENABLED, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isAutoTabKeyStrokesEnabled();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IDesktop.PROP_AUTO_TAB_KEY_STROKE_MODIFIER, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().getAutoTabKeyStrokeModifier();
+      }
+    });
   }
 
   @Override

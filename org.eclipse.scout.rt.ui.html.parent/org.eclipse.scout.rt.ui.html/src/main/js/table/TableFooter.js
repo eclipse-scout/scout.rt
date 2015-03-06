@@ -1,5 +1,6 @@
 scout.TableFooter = function(table) {
   this._table = table;
+  this.filterKeyStrokeAdapter = new scout.FilterInputKeyStrokeAdapter(this._table);
   this._render(table.$container);
 };
 
@@ -24,6 +25,8 @@ scout.TableFooter.prototype._render = function($parent) {
   if (filter) {
     this._$filterField.val(filter.text);
   }
+
+  scout.keyStrokeManager.installAdapter(this._$filterField, this.filterKeyStrokeAdapter);
 
   // info section
   this._$controlInfo = this.$container
@@ -68,6 +71,7 @@ scout.TableFooter.prototype._render = function($parent) {
 };
 
 scout.TableFooter.prototype.remove = function() {
+  scout.keyStrokeManager.uninstallAdapter(this.filterKeyStrokeAdapter);
   this.$container.remove();
 };
 

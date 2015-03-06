@@ -25,11 +25,10 @@ scout.KeyStroke.prototype._remove = function() {
  */
 scout.KeyStroke.prototype.handle = function(event) {
   this.sendDoAction();
-  return false;
 };
 
 scout.KeyStroke.prototype.accept = function(event) {
-  if (this.ignore()) {
+  if (this.ignore(event)) {
     return false;
   }
   if (event && event.ctrlKey === this.ctrl && event.altKey === this.alt && event.metaKey === this.meta && event.shiftKey === this.shift && event.which === this.keyStrokeKeyPart) {
@@ -38,7 +37,7 @@ scout.KeyStroke.prototype.accept = function(event) {
   return false;
 };
 
-scout.KeyStroke.prototype.ignore = function() {
+scout.KeyStroke.prototype.ignore = function(event) {
   return false;
 };
 

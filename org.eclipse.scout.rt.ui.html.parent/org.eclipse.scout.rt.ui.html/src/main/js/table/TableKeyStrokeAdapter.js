@@ -1,10 +1,10 @@
-scout.TableKeystrokeAdapter = function(field) {
-  scout.TableKeystrokeAdapter.parent.call(this, field);
+scout.TableKeyStrokeAdapter = function(field) {
+  scout.TableKeyStrokeAdapter.parent.call(this, field);
   var that = this;
 
   this.keyStrokes.push({
     accept: function(event) {
-      if (event && event.which >= 65 && event.which <= 90 && // a-z
+      if (event && ((event.which >= 65 && event.which <= 90) || (event.which >= 48 && event.which <= 57)) && // a-z
         !event.ctrlKey && !event.altKey && !event.metaKey) {
         return true;
       }
@@ -129,9 +129,9 @@ scout.TableKeystrokeAdapter = function(field) {
     bubbleUp: false
   });
 };
-scout.inherits(scout.TableKeystrokeAdapter, scout.AbstractKeyStrokeAdapter);
+scout.inherits(scout.TableKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
-scout.TableKeystrokeAdapter.prototype.drawKeyBox = function() {
+scout.TableKeyStrokeAdapter.prototype.drawKeyBox = function() {
   if (this.keyBoxDrawn) {
     return;
   }

@@ -89,3 +89,16 @@ scout.AbstractKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
     this.keyStrokes = this._field.keyStrokes;
   }
 };
+/**
+ * It is possible that key strokes should only be accepted if a precondition is true.
+ * @param event
+ * @returns {Boolean}
+ */
+scout.AbstractKeyStrokeAdapter.prototype.accept = function(event){
+  return true;
+};
+
+
+scout.AbstractKeyStrokeAdapter.prototype.preventBubbleUp = function(event){
+  return false;
+};

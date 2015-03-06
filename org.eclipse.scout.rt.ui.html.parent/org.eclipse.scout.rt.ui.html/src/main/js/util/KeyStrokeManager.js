@@ -62,8 +62,8 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
   var controller = function(event) {
     var i, keyStroke;
     var bubbleUp = true;
-
-    if (!adapter.keyStrokes) {
+    //if bubble up should be prevented then continue and prevent bubble up also if no key strokes are registered
+    if ((!adapter.keyStrokes || !adapter.accept(event)) && !adapter.preventBubbleUp(event)) {
       return;
     }
     for (i = 0; i < adapter.keyStrokes.length; i++) {
@@ -76,7 +76,7 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
         }
       }
     }
-    if (!bubbleUp) {
+    if (!bubbleUp || adapter.preventBubbleUp(event)) {
       adapter.removeKeyBox();
       event.stopPropagation();
     }

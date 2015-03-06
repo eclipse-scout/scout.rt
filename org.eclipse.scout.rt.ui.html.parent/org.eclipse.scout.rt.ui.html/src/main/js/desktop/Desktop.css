@@ -52,6 +52,7 @@
 
 .taskbar-tab-item,
 .taskbar-tool-item {
+  position: relative;
   vertical-align: top;
   display: inline-block;
   height: @desktop-taskbar-height;
@@ -135,9 +136,7 @@
 
 .taskbar-tab-item .key-box,
 .taskbar-tool-item .key-box {
-  left: 4px;
   top: 8px;
-  width: 22px;
 
   &.disabled {
     background-color: @disabled-color;

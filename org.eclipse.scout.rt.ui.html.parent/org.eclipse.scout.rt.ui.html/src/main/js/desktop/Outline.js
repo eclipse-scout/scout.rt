@@ -5,6 +5,8 @@ scout.Outline = function() {
 
   this._treeItemPaddingLeft = 37;
   this._treeItemPaddingLevel = 20;
+
+  this.keyStrokeAdapter = new scout.DesktopTreeKeyStrokeAdapter(this);
 };
 scout.inherits(scout.Outline, scout.Tree);
 
@@ -16,6 +18,12 @@ scout.Outline.prototype._render = function($parent) {
   this.$container.addClass('outline');
   if (this.selectedNodeIds.length === 0) {
     this._showDefaultDetailForm();
+  }
+};
+
+scout.Outline.prototype.installKeyStrokeAdapter = function(){
+  if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.installAdapter(this.$container.closest('.scout'), this.keyStrokeAdapter);
   }
 };
 

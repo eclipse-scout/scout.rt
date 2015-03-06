@@ -7,7 +7,7 @@ scout.Table = function() {
   this.$data;
   this.header;
   this.selectionHandler;
-  this.keystrokeAdapter;
+  this.keyStrokeAdapter;
   this.columns = [];
   this.tableControls = [];
   this.menus = [];
@@ -34,7 +34,7 @@ scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
 
 scout.Table.prototype.init = function(model, session) {
   scout.Table.parent.prototype.init.call(this, model, session);
-  this.keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
+  this.keyStrokeAdapter = new scout.TableKeyStrokeAdapter(this);
 
   this._initColumns();
   for (var i = 0; i < this.rows.length; i++) {
@@ -58,7 +58,7 @@ scout.Table.prototype._initColumns = function() {
 };
 
 scout.Table.prototype.dispose = function() {
-  scout.keyStrokeManager.uninstallAdapter(this.keystrokeAdapter);
+  scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
 };
 
 scout.Table.prototype._render = function($parent) {
@@ -68,9 +68,9 @@ scout.Table.prototype._render = function($parent) {
   this.htmlComp.setLayout(new scout.TableLayout(this));
   this.htmlComp.pixelBasedSizing = false;
 
-  if (!scout.keyStrokeManager.isAdapterInstalled(this.keystrokeAdapter)) {
+  if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
     this.$container.attr('tabIndex', 0);
-    scout.keyStrokeManager.installAdapter(this.$container, this.keystrokeAdapter);
+    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
   }
 
   this.$data = this.$container.appendDiv('table-data');
@@ -1668,4 +1668,15 @@ scout.Table.linkRowToDiv = function(row, $row) {
   if ($row) {
     $row.data('row', row);
   }
+};
+
+scout.Table.prototype.injectKeyStrokeAdapter = function(adapter, target) {
+  if(adapter === this.keyStrokeAdapter){
+   return;
+  }
+  if(scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)){
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  }
+    this.keyStrokeAdapter = adapter;
+    scout.keyStrokeManager.installAdapter(target, this.keyStrokeAdapter);
 };
