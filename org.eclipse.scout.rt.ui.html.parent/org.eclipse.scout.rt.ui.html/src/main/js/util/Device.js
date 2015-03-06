@@ -33,11 +33,17 @@ scout.Device.prototype.supportsInternationalization = function() {
   return window.Intl && typeof window.Intl === 'object';
 };
 
-scout.Device.prototype.supportsCssProperty = function(property) {
-  if (this.features[property] === undefined) {
-    this.features[property] = check(property);
+scout.Device.prototype.hasPrettyScrollbars = function() {
+  return this.supportsFeature('prettyScrollbars', check.bind(this));
+
+  function check(property) {
+    //FIXME CGU check for android, osx, or just exclude windows?
+    return scout.Device.SYSTEM_IOS === this.system;
   }
-  return this.features[property];
+};
+
+scout.Device.prototype.supportsCssProperty = function(property) {
+  return this.supportsFeature(property, check);
 
   function check(property) {
     var i;
@@ -54,6 +60,13 @@ scout.Device.prototype.supportsCssProperty = function(property) {
 
     return false;
   }
+};
+
+scout.Device.prototype.supportsFeature = function(property, checkFunc) {
+  if (this.features[property] === undefined) {
+    this.features[property] = checkFunc(property);
+  }
+  return this.features[property];
 };
 
 scout.Device.prototype.initUnselectableAttribute = function() {
@@ -87,5 +100,5 @@ scout.Device.prototype.parseUserAgent = function(userAgent) {
 
 scout.Device.SYSTEM_IOS = 'IOS';
 
-//singleton
+// singleton
 scout.device = new scout.Device(navigator.userAgent);

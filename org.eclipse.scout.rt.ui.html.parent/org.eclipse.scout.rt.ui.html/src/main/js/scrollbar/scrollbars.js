@@ -9,11 +9,15 @@ scout.scrollbars = {
    *
    */
   install: function($container, options) {
-    var scrollbar,
-      nativeScrollbars = false,
+    var scrollbar, nativeScrollbars,
       htmlContainer = scout.HtmlComponent.optGet($container);
 
     options = options || {};
+    if (options.nativeScrollbars !== undefined) {
+      nativeScrollbars = options.nativeScrollbars;
+    } else {
+      nativeScrollbars = scout.device.hasPrettyScrollbars();
+    }
     if (nativeScrollbars) {
       $.log.debug('use native scrollbars for container ' + scout.graphics.debugOutput($container));
       $container.
