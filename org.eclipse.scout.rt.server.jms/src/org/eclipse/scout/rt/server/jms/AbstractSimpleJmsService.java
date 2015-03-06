@@ -110,7 +110,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
   protected synchronized void startMessageConsumer() throws ProcessingException {
     stopMessageConsumer();
-    m_messageConsumerFuture = OBJ.one(IServerJobManager.class).schedule(createMessageConsumerRunnable(), ServerJobInput.empty().transactional(false));
+    m_messageConsumerFuture = OBJ.one(IServerJobManager.class).schedule(createMessageConsumerRunnable(), ServerJobInput.empty().sessionRequired(false).transactional(false));
   }
 
   protected synchronized void stopMessageConsumer() throws ProcessingException {
