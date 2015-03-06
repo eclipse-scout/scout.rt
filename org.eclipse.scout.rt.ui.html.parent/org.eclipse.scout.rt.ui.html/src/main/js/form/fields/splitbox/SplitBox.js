@@ -27,12 +27,20 @@ scout.SplitBox.prototype._render = function($parent) {
   // Add fields and splitter
   if (this.firstField) {
     this.firstField.render(this._$splitArea);
+    this.firstField.$container
+      .addClass('first-field')
+      .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
+
     if (this.secondField) {
       this._$splitter = $.makeDiv('splitter')
         .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
         .on('mousedown', resizeSplitter)
         .appendTo(this._$splitArea);
+
       this.secondField.render(this._$splitArea);
+      this.secondField.$container
+        .addClass('second-field')
+        .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
     }
   }
   // Add splitArea as field

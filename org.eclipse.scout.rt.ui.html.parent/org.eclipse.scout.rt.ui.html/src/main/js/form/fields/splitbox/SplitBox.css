@@ -5,6 +5,16 @@
     @splitter-line-size: 3px;
     @temp-splitter-line-size: 1px;
 
+    & > .first-field {
+    }
+
+    & > .second-field {
+      /* | */
+      &.x-axis {
+        margin-left: -@mandatory-indicator-width;
+      }
+    }
+
     & > .splitter {
       position: absolute;
       background-color: @border-color;
@@ -15,6 +25,7 @@
 
       /* | */
       &.x-axis {
+        margin-left: 0; /* Override margin from Splitter.css TODO BSH Improve this */
         height: 100%;
         width: @splitter-size;
         border-left: ((@splitter-size - @splitter-line-size) / 2) solid @body-background-color;
