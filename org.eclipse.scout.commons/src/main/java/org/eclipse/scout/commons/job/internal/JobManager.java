@@ -387,16 +387,16 @@ public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT>, 
     final Date deadline = new Date(System.currentTimeMillis() + unit.toMillis(timeout));
 
     // Wait until all jobs matching the filter are 'done' or the deadline is passed.
-    m_futures.getChangedLock().lockInterruptibly();
+    m_futures.getLock().lockInterruptibly();
     try {
       while (!isDone(f)) {
-        if (!m_futures.getChangedCondition().awaitUntil(deadline)) {
+        if (!m_futures.getFutureRemovedCondition().awaitUntil(deadline)) {
           return false; // timeout expired
         }
       }
     }
     finally {
-      m_futures.getChangedLock().unlock();
+      m_futures.getLock().unlock();
     }
     return true;
   }

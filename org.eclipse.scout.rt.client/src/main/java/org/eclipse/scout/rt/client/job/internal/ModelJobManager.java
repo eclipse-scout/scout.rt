@@ -215,16 +215,16 @@ public class ModelJobManager implements IModelJobManager {
     final Date deadline = new Date(System.currentTimeMillis() + unit.toMillis(timeout));
 
     // Wait until all jobs matching the filter are 'done' or the deadline is passed.
-    m_mutexSemaphores.getMutexChangedLock().lockInterruptibly();
+    m_mutexSemaphores.getLock().lockInterruptibly();
     try {
       while (!isDone(f)) {
-        if (!m_mutexSemaphores.getMutexChangedCondition().awaitUntil(deadline)) {
+        if (!m_mutexSemaphores.getTaskRemovedCondition().awaitUntil(deadline)) {
           return false; // timeout expired
         }
       }
     }
     finally {
-      m_mutexSemaphores.getMutexChangedLock().unlock();
+      m_mutexSemaphores.getLock().unlock();
     }
     return true;
   }

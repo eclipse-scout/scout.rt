@@ -16,7 +16,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -39,9 +38,7 @@ public class FutureSet {
 
   private final ReadLock m_readLock;
   private final WriteLock m_writeLock;
-
-  private final Lock m_changedLock;
-  private final Condition m_changedCondition;
+  private final Condition m_futureRemovedCondition;
 
   public FutureSet() {
     m_futures = new HashSet<>();
@@ -49,9 +46,7 @@ public class FutureSet {
     final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     m_readLock = lock.readLock();
     m_writeLock = lock.writeLock();
-
-    m_changedLock = new ReentrantLock();
-    m_changedCondition = m_changedLock.newCondition();
+    m_futureRemovedCondition = m_writeLock.newCondition();
   }
 
   /**
@@ -83,7 +78,6 @@ public class FutureSet {
     }
     finally {
       m_writeLock.unlock();
-      signalChanged(); // signal outside the monitor to not enter a deadlock.
     }
   }
 
@@ -98,10 +92,10 @@ public class FutureSet {
     m_writeLock.lock();
     try {
       m_futures.remove(future);
+      m_futureRemovedCondition.signalAll();
     }
     finally {
       m_writeLock.unlock();
-      signalChanged(); // signal outside the monitor to not enter a deadlock.
     }
   }
 
@@ -115,11 +109,11 @@ public class FutureSet {
     try {
       final Set<IFuture<?>> futures = values();
       m_futures.clear();
+      m_futureRemovedCondition.signalAll();
       return futures;
     }
     finally {
       m_writeLock.unlock();
-      signalChanged(); // signal outside the monitor to not enter a deadlock.
     }
   }
 
@@ -150,29 +144,19 @@ public class FutureSet {
   }
 
   /**
-   * @return Lock used to signal changes to the {@link FutureSet}.
-   * @see #getChangedCondition()
+   * @return exclusive {@link Lock} to access Futures.
+   * @see #getFutureRemovedCondition()
    */
-  public Lock getChangedLock() {
-    return m_changedLock;
+  Lock getLock() {
+    return m_writeLock;
   }
 
   /**
-   * @return Condition used to signal changes to the {@link FutureSet}.
-   * @see #getChangedLock()
+   * @return Condition used to signal once Futures are removed from this Set.
+   * @see #getLock()
    */
-  public Condition getChangedCondition() {
-    return m_changedCondition;
-  }
-
-  private void signalChanged() {
-    m_changedLock.lock();
-    try {
-      m_changedCondition.signalAll();
-    }
-    finally {
-      m_changedLock.unlock();
-    }
+  Condition getFutureRemovedCondition() {
+    return m_futureRemovedCondition;
   }
 
   /**

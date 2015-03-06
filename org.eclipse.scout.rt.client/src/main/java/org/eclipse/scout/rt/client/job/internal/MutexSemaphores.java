@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -52,8 +51,7 @@ class MutexSemaphores {
   private final ReadLock m_readLock;
   private final WriteLock m_writeLock;
 
-  protected final Lock m_mutexChangedLock;
-  protected final Condition m_mutexChangedCondition;
+  private final Condition m_taskRemovedCondition;
 
   private final Map<IClientSession, MutexSemaphore> m_mutexSemaphores;
 
@@ -65,9 +63,7 @@ class MutexSemaphores {
     final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     m_readLock = lock.readLock();
     m_writeLock = lock.writeLock();
-
-    m_mutexChangedLock = new ReentrantLock();
-    m_mutexChangedCondition = m_mutexChangedLock.newCondition();
+    m_taskRemovedCondition = m_writeLock.newCondition();
   }
 
   /**
@@ -133,7 +129,6 @@ class MutexSemaphores {
     }
     finally {
       m_writeLock.unlock();
-      signalMutexChanged(); // signal outside the monitor to not enter a deadlock.
     }
   }
 
@@ -167,11 +162,13 @@ class MutexSemaphores {
       if (nextTask == null) {
         m_mutexSemaphores.remove(session);
       }
+
+      m_taskRemovedCondition.signalAll();
+
       return nextTask;
     }
     finally {
       m_writeLock.unlock();
-      signalMutexChanged(); // signal outside the monitor to not enter a deadlock.
     }
   }
 
@@ -205,10 +202,11 @@ class MutexSemaphores {
       }
       m_mutexSemaphores.clear();
       m_invalidated = true;
+
+      m_taskRemovedCondition.signalAll();
     }
     finally {
       m_writeLock.unlock();
-      signalMutexChanged(); // signal outside the monitor to not enter a deadlock.
     }
   }
 
@@ -230,29 +228,19 @@ class MutexSemaphores {
   }
 
   /**
-   * @return Lock used to signal changes to the mutex-semaphores.
-   * @see #getMutexChangedCondition()
+   * @return exclusive {@link Lock} to access tasks.
+   * @see #getTaskRemovedCondition()
    */
-  Lock getMutexChangedLock() {
-    return m_mutexChangedLock;
+  Lock getLock() {
+    return m_writeLock;
   }
 
   /**
-   * @return Condition used to signal changes to the mutex-semaphores.
-   * @see #getMutexChangedLock()
+   * @return Condition used to signal once tasks are removed from this semaphore.
+   * @see #getLock()
    */
-  Condition getMutexChangedCondition() {
-    return m_mutexChangedCondition;
-  }
-
-  private void signalMutexChanged() {
-    m_mutexChangedLock.lock();
-    try {
-      m_mutexChangedCondition.signalAll();
-    }
-    finally {
-      m_mutexChangedLock.unlock();
-    }
+  Condition getTaskRemovedCondition() {
+    return m_taskRemovedCondition;
   }
 
   // === Mutex-Semaphore per session ===
