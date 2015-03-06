@@ -7,6 +7,8 @@ scout.inherits(scout.ImageField, scout.FormField);
 scout.ImageField.prototype._render = function($parent) {
   var $field;
 
+  this.addContainer($parent, 'image-field', new scout.ImageFieldLayout(this));
+
   // Create div to avoid resizing of the <img>
   this.addFieldContainer($('<div>').css('overflow', 'hidden'));
 
@@ -21,7 +23,6 @@ scout.ImageField.prototype._render = function($parent) {
     .appendTo(this.$fieldContainer)
     .on('load', this._onImageLoad.bind(this));
 
-  this.addContainer($parent, 'image-field', new scout.ImageFieldLayout(this));
   this.addLabel();
   this.addMandatoryIndicator();
   this.addField($field);
