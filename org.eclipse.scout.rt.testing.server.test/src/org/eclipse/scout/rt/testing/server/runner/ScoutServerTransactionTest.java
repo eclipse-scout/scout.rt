@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.testing.server.runner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -169,22 +170,25 @@ public class ScoutServerTransactionTest {
           ITransaction transaction = ITransaction.CURRENT.get();
           transaction.registerMember(transactionMember1);
           transaction.registerMember(transactionMember2);
+          throw new ProcessingException("Blubber");
         }
       });
+      fail();
+    }
+    catch (ProcessingException e) {
+      assertEquals("CommitPhase1MethodCallCount", 0, transactionMember1.getCommitPhase1MethodCallCount());
+      assertEquals("CommitPhase2MethodCallCount", 0, transactionMember1.getCommitPhase2MethodCallCount());
+      assertEquals("ReleaseMethodCallCount", 1, transactionMember1.getReleaseMethodCallCount());
+      assertEquals("RollbackMethodCallCount", 1, transactionMember1.getRollbackMethodCallCount());
+      assertEquals("CommitPhase1MethodCallCount", 0, transactionMember2.getCommitPhase1MethodCallCount());
+      assertEquals("CommitPhase2MethodCallCount", 0, transactionMember2.getCommitPhase2MethodCallCount());
+      assertEquals("ReleaseMethodCallCount", 1, transactionMember2.getReleaseMethodCallCount());
+      assertEquals("RollbackMethodCallCount", 1, transactionMember2.getRollbackMethodCallCount());
     }
     finally {
       if (serviceReg != null) {
         TestingUtility.unregisterServices(serviceReg);
       }
     }
-    assertEquals("CommitPhase1MethodCallCount", 0, transactionMember1.getCommitPhase1MethodCallCount());
-    assertEquals("CommitPhase2MethodCallCount", 0, transactionMember1.getCommitPhase2MethodCallCount());
-    assertEquals("ReleaseMethodCallCount", 1, transactionMember1.getReleaseMethodCallCount());
-    assertEquals("RollbackMethodCallCount", 1, transactionMember1.getRollbackMethodCallCount());
-    assertEquals("CommitPhase1MethodCallCount", 0, transactionMember2.getCommitPhase1MethodCallCount());
-    assertEquals("CommitPhase2MethodCallCount", 0, transactionMember2.getCommitPhase2MethodCallCount());
-    assertEquals("ReleaseMethodCallCount", 1, transactionMember2.getReleaseMethodCallCount());
-    assertEquals("RollbackMethodCallCount", 1, transactionMember2.getRollbackMethodCallCount());
   }
-
 }
