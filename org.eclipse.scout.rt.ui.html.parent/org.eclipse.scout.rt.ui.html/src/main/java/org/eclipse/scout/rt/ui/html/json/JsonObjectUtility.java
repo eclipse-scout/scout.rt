@@ -200,7 +200,7 @@ public final class JsonObjectUtility {
     }
   }
 
-  public static JSONObject newLinkedJSONObject() {
+  public static JSONObject newOrderedJSONObject() {
     return new JSONObject(new LinkedHashMap<>());
   }
 

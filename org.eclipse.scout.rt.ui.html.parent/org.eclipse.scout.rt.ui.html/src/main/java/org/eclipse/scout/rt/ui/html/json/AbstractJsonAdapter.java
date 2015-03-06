@@ -123,7 +123,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   @Override
   public JSONObject toJson() {
-    JSONObject json = JsonObjectUtility.newLinkedJSONObject();
+    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     putProperty(json, "id", getId());
     putProperty(json, "objectType", getObjectTypeVariant());
 
