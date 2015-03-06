@@ -297,6 +297,11 @@ scout.defaultObjectFactories = [{
     return new scout.SplitBox();
   }
 }, {
+  objectType: 'PlaceholderField',
+  create: function() {
+    return new scout.PlaceholderField();
+  }
+}, {
   objectType: 'KeyStroke',
   create: function() {
     return new scout.KeyStroke();

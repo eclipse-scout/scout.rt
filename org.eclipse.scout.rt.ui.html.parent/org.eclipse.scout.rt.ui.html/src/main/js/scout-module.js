@@ -128,6 +128,7 @@ __include("form/fields/labelfield/LabelField.js");
 __include("form/fields/listbox/ListBox.js");
 __include("form/fields/listbox/ListBoxLayout.js");
 __include("form/fields/numberfield/NumberField.js");
+__include("form/fields/placeholder/PlaceholderField.js");
 __include("form/fields/plannerfield/PlannerField.js");
 __include("form/fields/radiobutton/RadioButton.js");
 __include("form/fields/radiobutton/RadioButtonGroup.js");

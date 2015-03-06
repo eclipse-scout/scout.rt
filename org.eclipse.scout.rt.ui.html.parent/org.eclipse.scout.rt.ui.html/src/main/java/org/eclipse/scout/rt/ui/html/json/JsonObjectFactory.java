@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
+import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.richtextfield.IRichTextField;
@@ -78,6 +79,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.imagefield.JsonImageField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.labelfield.JsonLabelField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.listbox.JsonListBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.numberfield.JsonNumberField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.placeholder.JsonPlaceholderField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.plannerfield.JsonPlannerField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButtonGroup;
@@ -194,6 +196,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (model instanceof ISplitBox) {
       return new JsonSplitBox((ISplitBox) model, session, id, parent);
+    }
+    if (model instanceof IPlaceholderField) {
+      return new JsonPlaceholderField((IPlaceholderField) model, session, id, parent);
     }
 
     // Fallback for all other form fields (will generate a 'not implemented' placeholder). Note: insert more form fields _before_ this line!
