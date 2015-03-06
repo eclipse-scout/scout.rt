@@ -18,13 +18,14 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.services.common.session.IJobRunnable;
 import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
 import org.eclipse.scout.service.AbstractService;
 
 /**
  * Default implementation of {@link ISessionService} used on server-side.
- * 
+ *
  * @since 3.8.1
  */
 @Priority(-1)
@@ -34,7 +35,8 @@ public class DefaultServerSessionService extends AbstractService implements ISes
 
   @Override
   public IServerSession getCurrentSession() {
-    return ServerJob.getCurrentSession();
+    ISession session = ISession.CURRENT.get();
+    return (IServerSession) (session instanceof IServerSession ? session : null);
   }
 
   @Override

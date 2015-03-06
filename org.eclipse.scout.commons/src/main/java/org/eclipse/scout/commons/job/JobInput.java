@@ -55,6 +55,7 @@ public class JobInput implements IJobInput {
   /**
    * Creates a copy of the current {@link JobInput}.
    */
+  @Override
   public JobInput copy() {
     return new JobInput(this);
   }

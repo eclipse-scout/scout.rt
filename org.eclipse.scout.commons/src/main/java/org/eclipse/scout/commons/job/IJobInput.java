@@ -118,4 +118,9 @@ public interface IJobInput {
    * {@link #ANONYMOUS_IDENTIFIER} if unknown.
    */
   String getIdentifier();
+
+  /**
+   * Creates a copy of the current {@link IJobInput}.
+   */
+  IJobInput copy();
 }

@@ -15,13 +15,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.LogExceptionHandlerService;
 import org.eclipse.scout.rt.testing.server.runner.fixture.TestTransactionMember;
@@ -48,18 +46,17 @@ public class ScoutServerTransactionTest {
   }
 
   @Test
-  public void testValidTransactionMember() {
+  public void testValidTransactionMember() throws ProcessingException {
     final TestTransactionMember transactionMember = new TestTransactionMember("01");
-    ServerJob job = new ServerJob("", ServerJob.getCurrentSession()) {
+    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
-      protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+      public void run() throws Exception {
         ITransaction transaction = ITransaction.CURRENT.get();
         transaction.registerMember(transactionMember);
-        return Status.OK_STATUS;
       }
-    };
-    job.runNow(new NullProgressMonitor());
+    });
+
     assertEquals("CommitPhase1MethodCallCount", 1, transactionMember.getCommitPhase1MethodCallCount());
     assertEquals("CommitPhase2MethodCallCount", 1, transactionMember.getCommitPhase2MethodCallCount());
     assertEquals("ReleaseMethodCallCount", 1, transactionMember.getReleaseMethodCallCount());
@@ -67,26 +64,25 @@ public class ScoutServerTransactionTest {
   }
 
   @Test
-  public void testTransactionWithoutParticipationOfAMember() {
+  public void testTransactionWithoutParticipationOfAMember() throws ProcessingException {
     final TestTransactionMember transactionMember1 = new TestTransactionMember("01");
     final TestTransactionMember transactionMember2 = new TestTransactionMember("02") {
       @Override
       protected boolean execNeedsCommit() {
-
         return false;
       }
     };
-    ServerJob job = new ServerJob("", ServerJob.getCurrentSession()) {
+
+    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
-      protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+      public void run() throws Exception {
         ITransaction transaction = ITransaction.CURRENT.get();
         transaction.registerMember(transactionMember1);
         transaction.registerMember(transactionMember2);
-        return Status.OK_STATUS;
       }
-    };
-    job.runNow(new NullProgressMonitor());
+    });
+
     assertEquals("CommitPhase1MethodCallCount", 1, transactionMember1.getCommitPhase1MethodCallCount());
     assertEquals("CommitPhase2MethodCallCount", 1, transactionMember1.getCommitPhase2MethodCallCount());
     assertEquals("ReleaseMethodCallCount", 1, transactionMember1.getReleaseMethodCallCount());
@@ -98,26 +94,25 @@ public class ScoutServerTransactionTest {
   }
 
   @Test
-  public void testTransactionWithFailureInMember2() {
+  public void testTransactionWithFailureInMember2() throws ProcessingException {
     final TestTransactionMember transactionMember1 = new TestTransactionMember("01");
     final TestTransactionMember transactionMember2 = new TestTransactionMember("02") {
       @Override
       protected boolean execCommitPhase1() {
         return false;
       }
-
     };
-    ServerJob job = new ServerJob("", ServerJob.getCurrentSession()) {
+
+    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
-      protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+      public void run() throws Exception {
         ITransaction transaction = ITransaction.CURRENT.get();
         transaction.registerMember(transactionMember1);
         transaction.registerMember(transactionMember2);
-        return Status.OK_STATUS;
       }
-    };
-    job.runNow(new NullProgressMonitor());
+    });
+
     assertEquals("CommitPhase1MethodCallCount", 1, transactionMember1.getCommitPhase1MethodCallCount());
     assertEquals("CommitPhase2MethodCallCount", 0, transactionMember1.getCommitPhase2MethodCallCount());
     assertEquals("ReleaseMethodCallCount", 1, transactionMember1.getReleaseMethodCallCount());
@@ -129,26 +124,25 @@ public class ScoutServerTransactionTest {
   }
 
   @Test
-  public void testTransactionWithExceptionInTransactionMember2() {
+  public void testTransactionWithExceptionInTransactionMember2() throws ProcessingException {
     final TestTransactionMember transactionMember1 = new TestTransactionMember("01");
     final TestTransactionMember transactionMember2 = new TestTransactionMember("02") {
       @Override
       protected boolean execCommitPhase1() {
         throw new NullPointerException();
       }
-
     };
-    ServerJob job = new ServerJob("", ServerJob.getCurrentSession()) {
+
+    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
-      protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+      public void run() throws Exception {
         ITransaction transaction = ITransaction.CURRENT.get();
         transaction.registerMember(transactionMember1);
         transaction.registerMember(transactionMember2);
-        return Status.OK_STATUS;
       }
-    };
-    job.runNow(new NullProgressMonitor());
+    });
+
     assertEquals("CommitPhase1MethodCallCount", 1, transactionMember1.getCommitPhase1MethodCallCount());
     assertEquals("CommitPhase2MethodCallCount", 0, transactionMember1.getCommitPhase2MethodCallCount());
     assertEquals("ReleaseMethodCallCount", 1, transactionMember1.getReleaseMethodCallCount());
@@ -160,7 +154,7 @@ public class ScoutServerTransactionTest {
   }
 
   @Test
-  public void testTransactionWithException() {
+  public void testTransactionWithException() throws ProcessingException {
     final TestTransactionMember transactionMember1 = new TestTransactionMember("01");
     final TestTransactionMember transactionMember2 = new TestTransactionMember("02");
     List<IBean<?>> serviceReg = null;
@@ -168,17 +162,15 @@ public class ScoutServerTransactionTest {
     try {
       serviceReg = TestingUtility.registerServices(1100, new LogExceptionHandlerService());
 
-      ServerJob job = new ServerJob("", ServerJob.getCurrentSession()) {
+      OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
 
         @Override
-        protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+        public void run() throws Exception {
           ITransaction transaction = ITransaction.CURRENT.get();
           transaction.registerMember(transactionMember1);
           transaction.registerMember(transactionMember2);
-          throw new ProcessingException("Blubber");
         }
-      };
-      job.runNow(new NullProgressMonitor());
+      });
     }
     finally {
       if (serviceReg != null) {

@@ -10,13 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
-import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.TestServerSession;
+import org.eclipse.scout.rt.server.job.IServerJobManager;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
@@ -42,16 +41,14 @@ public class ServiceWithSessionInterceptorTest {
   }
 
   @Test
-  public void testService() throws InterruptedException {
-    ServerJob job = new ServerJob("testJob", serverSession) {
+  public void testService() throws Exception {
+    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
+
       @Override
-      protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+      public void run() throws Exception {
         runInServerJob();
-        return Status.OK_STATUS;
       }
-    };
-    job.schedule();
-    job.join();
+    }, ServerJobInput.empty().name("test-job").session(serverSession));
   }
 
   protected void runInServerJob() {

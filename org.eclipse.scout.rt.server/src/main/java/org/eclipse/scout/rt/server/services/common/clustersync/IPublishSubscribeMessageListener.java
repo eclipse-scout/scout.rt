@@ -10,15 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
-import org.eclipse.scout.rt.server.ServerJob;
-
 public interface IPublishSubscribeMessageListener {
 
   /**
-   * This method is <strong>not</strong> called within a scout transaction. Therefore a message listener should insure
-   * that a new {@link ServerJob} is created and the message is handled in this job.
-   * 
+   * Method invoked to handle a message received from a subscribed channel. There is no transaction startet yet.
+   *
    * @param message
+   *          message received.
    */
   void onMessage(IClusterNotificationMessage message);
 }

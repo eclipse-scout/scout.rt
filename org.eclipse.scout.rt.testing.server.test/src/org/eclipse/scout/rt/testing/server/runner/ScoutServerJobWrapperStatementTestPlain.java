@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ITransactionRunnable;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ServerJobFactory;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.server.test.TestServerSession;
 import org.junit.Test;
 import org.junit.runners.model.Statement;
@@ -44,7 +45,7 @@ public class ScoutServerJobWrapperStatementTestPlain {
     ScoutServerJobWrapperStatement statement = new WrapperStatementNoActivator(new ServerJobFactory(session, session.getSubject()), new Statement() {
       @Override
       public void evaluate() throws Throwable {
-        assertEquals(TestServerSession.class, ServerJob.getCurrentSession().getClass());
+        assertEquals(TestServerSession.class, ISession.CURRENT.get().getClass());
       }
     });
     statement.evaluate();
@@ -59,8 +60,8 @@ public class ScoutServerJobWrapperStatementTestPlain {
     ScoutServerJobWrapperStatement statement = new WrapperStatementNoActivator(new TestFactory(session, session.getSubject()), new Statement() {
       @Override
       public void evaluate() throws Throwable {
-        assertEquals(TestServerSession.class, ServerJob.getCurrentSession().getClass());
-        assertTrue(ServerJob.getCurrentSession().getId().startsWith(CUSTOM_ID_PREFIX));
+        assertEquals(TestServerSession.class, ISession.CURRENT.get().getClass());
+        assertTrue(((IServerSession) ISession.CURRENT.get()).getId().startsWith(CUSTOM_ID_PREFIX));
       }
     });
     statement.evaluate();

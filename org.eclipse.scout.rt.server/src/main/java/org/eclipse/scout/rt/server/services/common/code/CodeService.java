@@ -16,7 +16,6 @@ import java.util.Map;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
-import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.services.common.clientnotification.AllUserFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
@@ -24,6 +23,7 @@ import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificat
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListenerService;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -36,7 +36,7 @@ public class CodeService extends SharedCodeService implements IClusterNotificati
 
   @Override
   protected Long provideCurrentPartitionId() {
-    Map<String, Object> sharedVariableMap = ServerJob.getCurrentSession().getSharedVariableMap();
+    Map<String, Object> sharedVariableMap = ISession.CURRENT.get().getSharedVariableMap();
     if (sharedVariableMap.containsKey(ICodeType.PROP_PARTITION_ID)) {
       return (Long) sharedVariableMap.get(ICodeType.PROP_PARTITION_ID);
     }

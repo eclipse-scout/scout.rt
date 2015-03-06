@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.UpdateUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
@@ -73,7 +73,7 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
 
   @Override
   protected Object getCurrentUserId() {
-    return ServerJob.getCurrentSession().getUserId();
+    return ISession.CURRENT.get().getUserId();
   }
 
   @Override
@@ -98,7 +98,7 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
 
   /**
    * Reads a bookmark folder.
-   * 
+   *
    * @since 3.8.2
    */
   private BookmarkFolder readBookmarkFolder(String filename) throws ProcessingException {
@@ -118,7 +118,7 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
 
   /**
    * Writes a bookmark folder.
-   * 
+   *
    * @since 3.8.2
    */
   private void writeBookmarkFolder(BookmarkFolder folder, String filename, Permission permission) throws ProcessingException {

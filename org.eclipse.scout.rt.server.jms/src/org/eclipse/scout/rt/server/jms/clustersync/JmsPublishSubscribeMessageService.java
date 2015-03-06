@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.jms.Session;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -39,7 +38,7 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
       throw new ProcessingException("Cluster synchronization is not enabled: missing connectionFactory or topic configuration properties.");
     }
     setupConnection();
-    startMessageConsumerJob();
+    startMessageConsumer();
     LOG.info("Cluster synchronization is enabled and JMS message listener is registered");
   }
 
@@ -50,7 +49,7 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
       return;
     }
     try {
-      stopMessageConsumerJob();
+      stopMessageConsumer();
     }
     finally {
       closeConnection();
@@ -64,7 +63,7 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   }
 
   @Override
-  protected void execOnMessage(IClusterNotificationMessage message, Session session, IProgressMonitor monitor) {
+  protected void execOnMessage(IClusterNotificationMessage message, Session session) {
     IPublishSubscribeMessageListener listener = getListener();
     if (listener != null) {
       listener.onMessage(message);

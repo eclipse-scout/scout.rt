@@ -132,7 +132,7 @@ public class DefaultTransactionDelegate {
   }
 
   /**
-   * This method is executed within a {@link IServerSession} context using a {@link ServerJob}
+   * This method is executed within a {@link IServerSession} context on behalf of a server job.
    */
   protected IServiceTunnelResponse invokeImpl(IServiceTunnelRequest serviceReq) throws Throwable {
     String soapOperation = ServiceTunnelRequest.toSoapOperation(serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation());

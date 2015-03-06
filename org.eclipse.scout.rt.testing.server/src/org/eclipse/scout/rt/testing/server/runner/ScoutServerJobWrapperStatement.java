@@ -17,15 +17,16 @@ import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerJobFactory;
-import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.WrappingProcessingRuntimeExceptionHandlerService;
 import org.junit.runners.model.Statement;
 
 /**
- * JUnit statements that runs the JUnit test within a Scout {@link ServerJob}.
+ * JUnit statements that runs the JUnit test within a server job.
  */
 public class ScoutServerJobWrapperStatement extends Statement {
   private static final int EXCEPTIONHANDLER_SERVICE_RANKING = 1000;
@@ -39,7 +40,8 @@ public class ScoutServerJobWrapperStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
-    if (ServerJob.getCurrentSession() != null) {
+    ISession session = ISession.CURRENT.get();
+    if (session instanceof IServerSession) {
       doEvaluateWrappingExceptions();
     }
     else {

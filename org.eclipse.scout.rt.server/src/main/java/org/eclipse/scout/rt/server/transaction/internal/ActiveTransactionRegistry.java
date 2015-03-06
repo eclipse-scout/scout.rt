@@ -16,9 +16,8 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.shared.ISession;
 
 /**
  * Cache the transactions per session to enable for cancelling
@@ -31,7 +30,7 @@ public class ActiveTransactionRegistry {
   }
 
   private static SessionState getSessionState(boolean autoCreate) {
-    IServerSession session = ServerJob.getCurrentSession();
+    ISession session = ISession.CURRENT.get();
     if (session == null) {
       return null;
     }

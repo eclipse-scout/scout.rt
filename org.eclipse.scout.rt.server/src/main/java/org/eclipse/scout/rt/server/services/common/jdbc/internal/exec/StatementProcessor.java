@@ -50,7 +50,6 @@ import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.ValueInputToken;
 import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlTransactionMember;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISelectStreamHandler;
@@ -63,6 +62,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
+import org.eclipse.scout.rt.shared.ISession;
 
 public class StatementProcessor implements IStatementProcessor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(StatementProcessor.class);
@@ -117,7 +117,7 @@ public class StatementProcessor implements IStatementProcessor {
         }
       }
       // add server session as default
-      IServerSession session = ServerJob.getCurrentSession();
+      IServerSession session = (IServerSession) ISession.CURRENT.get();
       if (session != null) {
         bases.add(session);
       }

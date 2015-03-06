@@ -12,8 +12,9 @@ package org.eclipse.scout.rt.testing.server.runner;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJobFactory;
+import org.eclipse.scout.rt.shared.ISession;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.model.Statement;
@@ -26,7 +27,7 @@ public class ScoutServerJobWrapperStatementTest {
 
   @Test(expected = ProcessingException.class)
   public void testEvaluate1() throws Throwable {
-    ScoutServerJobWrapperStatement statement = new ScoutServerJobWrapperStatement(new ServerJobFactory(ServerJob.getCurrentSession(), ServerJob.getCurrentSession().getSubject()), new Statement() {
+    ScoutServerJobWrapperStatement statement = new ScoutServerJobWrapperStatement(new ServerJobFactory((IServerSession) ISession.CURRENT.get(), ISession.CURRENT.get().getSubject()), new Statement() {
       @Override
       public void evaluate() throws Throwable {
         throw new ProcessingException("TestException");
@@ -37,7 +38,7 @@ public class ScoutServerJobWrapperStatementTest {
 
   @Test(expected = Throwable.class)
   public void testEvaluate2() throws Throwable {
-    ScoutServerJobWrapperStatement statement = new ScoutServerJobWrapperStatement(new ServerJobFactory(ServerJob.getCurrentSession(), ServerJob.getCurrentSession().getSubject()), new Statement() {
+    ScoutServerJobWrapperStatement statement = new ScoutServerJobWrapperStatement(new ServerJobFactory((IServerSession) ISession.CURRENT.get(), ISession.CURRENT.get().getSubject()), new Statement() {
       @Override
       public void evaluate() throws Throwable {
         throw new Throwable("Test");

@@ -42,6 +42,7 @@ public class ServerJobInput extends JobInput {
   private HttpServletResponse m_servletResponse;
   private UserAgent m_userAgent;
   private boolean m_preferredUserAgentSet;
+  private boolean m_transactional;
 
   private ServerJobInput(final JobInput origin) {
     super(origin);
@@ -58,6 +59,7 @@ public class ServerJobInput extends JobInput {
     m_servletResponse = origin.m_servletResponse;
     m_userAgent = origin.m_userAgent;
     m_preferredUserAgentSet = origin.m_preferredUserAgentSet;
+    m_transactional = origin.m_transactional;
   }
 
   /**
@@ -168,6 +170,17 @@ public class ServerJobInput extends JobInput {
   }
 
   /**
+   * @param transactional
+   *          <code>true</code> if the job should run on behalf of a transaction; is <code>true</code> by default.
+   * @return {@link ServerJobInput} to be used as builder.
+   * @see #isTransactional()
+   */
+  public ServerJobInput transactional(final boolean transactional) {
+    m_transactional = transactional;
+    return this;
+  }
+
+  /**
    * @return <code>true</code> if the {@link UserAgent} was set explicitly as preferred value.
    */
   protected boolean isPreferredUserAgentSet() {
@@ -215,6 +228,13 @@ public class ServerJobInput extends JobInput {
     return m_userAgent;
   }
 
+  /**
+   * @see #transactional(boolean)
+   */
+  public boolean isTransactional() {
+    return m_transactional;
+  }
+
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
@@ -237,7 +257,7 @@ public class ServerJobInput extends JobInput {
    * @return {@link ServerJobInput}; requires a <code>not-null</code> {@link IServerSession} to be set.
    */
   public static ServerJobInput empty() {
-    return new ServerJobInput(JobInput.empty()).sessionRequired(true).userAgent(null, true); // explicitly set null as preferred UserAgent.
+    return new ServerJobInput(JobInput.empty()).sessionRequired(true).transactional(true).userAgent(null, true); // explicitly set null as preferred UserAgent.
   }
 
   /**
@@ -261,6 +281,7 @@ public class ServerJobInput extends JobInput {
     defaults.servletResponse(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
     defaults.session((IServerSession) ISession.CURRENT.get()); // must be set after setting the Locale and the UserAgent because session-bound values have precedence.
     defaults.sessionRequired(true);
+    defaults.transactional(true);
     return defaults;
   }
 }

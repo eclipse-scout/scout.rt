@@ -11,23 +11,29 @@
 package org.eclipse.scout.rt.server.jms;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.jms.Connection;
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.filter.FutureFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService;
+import org.eclipse.scout.rt.server.job.IServerJobManager;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 
 /**
@@ -38,13 +44,16 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  * A services extending this class must <strong>not</strong> be registered with a session based service factory.
  * <p>
  * Before one can send messages or start the message consumer you must call {@link #setupConnection()}. After that one
- * can start receiving messages by calling {@link #startMessageConsumerJob()} and stopping by calling
- * {@link #stopMessageConsumerJob()}.
+ * can start receiving messages by calling {@link #startMessageConsumer()} and stopping by calling
+ * {@link #stopMessageConsumer()}.
  */
 public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSimpleJmsService.class);
 
-  private MessageConsumerJob m_messageConsumerJob;
+  private volatile IFuture<Void> m_messageConsumerFuture;
+
+  private static final String PROP_REQUEST_TIMEOUT = String.format("%s#requestTimeout", AbstractSimpleJmsService.class.getName());
+  private final long m_receiveTimeout = ConfigIniUtility.getPropertyLong(PROP_REQUEST_TIMEOUT, TimeUnit.SECONDS.toMillis(1));
 
   protected Session createSession(Connection connection) throws JMSException {
     return connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -94,122 +103,110 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
     }
   }
 
-  /**
-   * A message consumer job calls this method if it receives any messages. This method is not called within a scout
-   * server transaction. Also the method should not throw any exception. Therefore, it is recommended to start in this
-   * method a new {@link ServerJob} to handle the message.
-   *
-   * @param message
-   *          not null
-   * @param session
-   *          The jms session. In case of a transacted session, one can commit an reject on it.
-   * @param monitor
-   *          The currents job monitor. If one has a blocking operation within this method, the monitors cancel status
-   *          should be checked.
-   */
-  protected void execOnMessage(T message, Session session, IProgressMonitor monitor) {
+  protected boolean isMessageConsumerRunning() {
+    IFuture<Void> future = m_messageConsumerFuture;
+    return future != null && !future.isCancelled();
   }
 
-  protected synchronized boolean isMessageConsumerJobRunning() {
-    return m_messageConsumerJob != null;
+  protected synchronized void startMessageConsumer() throws ProcessingException {
+    stopMessageConsumer();
+    m_messageConsumerFuture = OBJ.one(IServerJobManager.class).schedule(createMessageConsumerRunnable(), ServerJobInput.empty().transactional(false));
   }
 
-  protected synchronized void startMessageConsumerJob() throws ProcessingException {
-    stopMessageConsumerJob();
-    m_messageConsumerJob = createMessageConsumerJob();
-    m_messageConsumerJob.schedule();
-  }
+  protected synchronized void stopMessageConsumer() throws ProcessingException {
+    if (m_messageConsumerFuture != null) {
+      m_messageConsumerFuture.cancel(true);
 
-  protected synchronized void stopMessageConsumerJob() throws ProcessingException {
-    MessageConsumerJob job = m_messageConsumerJob;
-    if (job != null) {
-      m_messageConsumerJob = null;
-      job.cancel();
-      // waiting for job to be stopped
+      // Wait for the consumer to be stopped.
       try {
-        job.join(job.getReceiveTimeout() * 3);
+        OBJ.one(IServerJobManager.class).waitUntilDone(new FutureFilter(m_messageConsumerFuture), m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
       }
       catch (InterruptedException e) {
-        throw new ProcessingException("Interrupted", e);
+        // NOOP
       }
-      job.throwOnError();
+      finally {
+        m_messageConsumerFuture = null;
+      }
     }
   }
 
-  protected MessageConsumerJob createMessageConsumerJob() throws ProcessingException {
-    return new MessageConsumerJob(getConnection());
+  protected MessageConsumerRunnable createMessageConsumerRunnable() throws ProcessingException {
+    return new MessageConsumerRunnable(getConnection(), lookupDestination(), createMessageSerializer(), m_receiveTimeout);
   }
 
   /**
-   * This is by intend not a ServerJob; we do not want to running a in scout transaction.
+   * Method invoked to handle a message received from a subscribed channel. This method is not called within a
+   * transaction.
+   *
+   * @param message
+   *          message received; is is not <code>null</code>.
+   * @param session
+   *          The JMS-session; in case of a transacted JMS-session, one can commit an reject on it.
    */
-  protected class MessageConsumerJob extends JobEx {
-    private final IJmsMessageSerializer<T> m_messageSerializer;
+  protected void execOnMessage(T message, Session session) {
+  }
+
+  /**
+   * Runnable to wait for incoming JMS-messages.
+   */
+  protected class MessageConsumerRunnable implements IRunnable {
+
     private final Connection m_connection;
+    private final IJmsMessageSerializer<T> m_messageSerializer;
+    private final long m_receiveTimeout;
+
     private final Session m_session;
     private final MessageConsumer m_consumer;
 
-    public MessageConsumerJob(Connection connection) throws ProcessingException {
-      super("JMS message receiver");
-      m_messageSerializer = createMessageSerializer();
-      m_connection = connection;
+    public MessageConsumerRunnable(final Connection connection, final Destination destination, final IJmsMessageSerializer<T> messageSerializer, final long receiveTimeout) throws ProcessingException {
+      m_connection = Assertions.assertNotNull(connection, "JMS-connection must not be null");
+      m_messageSerializer = Assertions.assertNotNull(messageSerializer, "Message serializer must not be null");
+      m_receiveTimeout = receiveTimeout;
+
       try {
         m_session = createSession(connection);
-        m_consumer = m_session.createConsumer(lookupDestination());
+        m_consumer = Assertions.assertNotNull(m_session.createConsumer(Assertions.assertNotNull(destination, "JMS-destination must not be null")), "Message consumer must not be null");
       }
       catch (JMSException e) {
-        throw new ProcessingException("Failed initializing MessageConsumerJob", e);
+        throw new ProcessingException("Failed to initialize JMS-session", e);
       }
-      if (m_messageSerializer == null || m_consumer == null) {
-        throw new IllegalArgumentException("Connection nor consumer can be null");
-      }
-    }
-
-    protected long getReceiveTimeout() {
-      return 1000;
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      LOG.info("JMS message consumer job started.");
-      IStatus result = Status.OK_STATUS;
-      try {
-        m_connection.start();
-        while (!monitor.isCanceled()) {
-          onMessage(m_consumer.receive(getReceiveTimeout()), monitor);
-        }
-      }
-      catch (Exception e) {
-        LOG.error("Unexpected exception while receiving messages from consumer.", e);
-        result = new Status(IStatus.ERROR, "org.eclipse.scout.rt.server.jms", e.getMessage());
-      }
-      finally {
-        LOG.trace("Stopping JMS message consumer job...");
-        try {
-          m_connection.stop();
-          // only need to close session, producer must then not be closed.
-          m_session.close();
-        }
-        catch (Exception e) {
-          LOG.error("Unexpected exception", e);
-          result = new Status(IStatus.ERROR, "org.eclipse.scout.rt.server.jms", e.getMessage());
-        }
-      }
-      LOG.info("JMS message consumer job stopped.");
-      return result;
-    }
+    public void run() throws Exception {
+      LOG.info("JMS message consumer started.");
 
-    protected void onMessage(Message jmsMessage, IProgressMonitor monitor) {
-      if (jmsMessage != null) {
-        try {
-          T message = m_messageSerializer.extractMessage(jmsMessage);
-          if (message != null) {
-            execOnMessage(message, m_session, monitor);
+      m_connection.start();
+      try {
+        while (!IProgressMonitor.CURRENT.get().isCancelled()) {
+          try {
+            final Message jmsMessage = m_consumer.receive(m_receiveTimeout);
+            if (jmsMessage != null) {
+              onMessage(jmsMessage);
+            }
+          }
+          catch (final Exception e) {
+            LOG.error("Failed to process JMS-message", e);
           }
         }
-        catch (Exception e) {
-          LOG.error("Unexpected exception", e);
-        }
+      }
+      finally {
+        m_connection.stop();
+        m_session.close(); // only need to close session, producer must then not be closed.
+      }
+      LOG.info("JMS message consumer stopped.");
+    }
+
+    /**
+     * Method invoked once a JMS-message is received.
+     *
+     * @param jmsMessage
+     *          JMS-message; is not <code>null</code>.
+     */
+    protected void onMessage(final Message jmsMessage) throws Exception {
+      final T message = m_messageSerializer.extractMessage(jmsMessage);
+      if (message != null) {
+        execOnMessage(message, m_session);
       }
     }
   }
