@@ -60,9 +60,6 @@ import org.osgi.framework.Version;
  * <p>
  * By default there is a jaas convenience filter {@link HttpAuthJaasFilter} on /process and a {@link SoapWsseJaasFilter}
  * on /ajax with priority 1000
- * <p>
- * When using RAP (rich ajax platform) as the ui web app then there must be a {@link WebSessionIdPrincipal} in the
- * subject, in order to map those requests to virtual sessions instead of (the unique) http session.
  */
 public class ServiceTunnelServlet extends HttpServletEx {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.server.http.debug";
