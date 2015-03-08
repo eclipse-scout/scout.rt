@@ -148,7 +148,7 @@ public class ServerJobRule implements TestRule {
   protected Subject newTestSubject(final Description description) {
     // 1. Get 'runAs' from current invocation context, e.g. before, test-method, after, ...
     RunAs runAsAnnotation = description.getAnnotation(RunAs.class);
-    if (runAsAnnotation == null) {
+    if (runAsAnnotation == null && description.getTestClass() != null) {
       // 2. Get 'runAs' as defined on test-class.
       runAsAnnotation = description.getTestClass().getAnnotation(RunAs.class);
     }
