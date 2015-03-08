@@ -16,18 +16,11 @@ import java.security.AccessController;
 
 import javax.security.auth.Subject;
 import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.ICallable;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.jaxws.annotation.ScoutWebService;
-import org.eclipse.scout.jaxws.internal.ContextHelper;
-import org.eclipse.scout.jaxws.internal.SessionHelper;
-import org.eclipse.scout.jaxws.session.IServerSessionFactory;
+import org.eclipse.scout.jaxws.internal.JaxWsHelper;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
@@ -40,63 +33,18 @@ import com.sun.xml.internal.ws.api.server.WSWebServiceContext;
 import com.sun.xml.internal.ws.server.AbstractMultiInstanceResolver;
 
 /**
- * This resolver intercepts webservice requests prior to being propagated to the port type in order to
- * bind the call to a {@link IServerSession} context.
+ * This resolver intercepts webservice requests to be run in a server job.
  */
 @SuppressWarnings("restriction")
 public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScoutInstanceResolver.class);
-
-  private IServerSessionFactory m_sessionFactory;
-
   public ScoutInstanceResolver(Class<T> portTypeClass) {
-    super(portTypeClass);
-    if (portTypeClass == null) {
-      throw new WebServiceException("No port type class configured in sun-jaxws.xml");
-    }
-  }
-
-  @Override
-  public void start(WSWebServiceContext context, WSEndpoint endpoint) {
-    m_sessionFactory = createSessionFactory(clazz);
-    super.start(context, endpoint);
+    super(Assertions.assertNotNull(portTypeClass, "No port type class configured in sun-jaxws.xml"));
   }
 
   @Override
   public T resolve(Packet packet) {
     return super.create(); // creates a new port type instance, injects the @{WebServiceContext} and invokes the method annotated with @{link PostConstruct}
-  }
-
-  protected IServerSessionFactory createSessionFactory(Class<?> portTypeClass) {
-    ScoutWebService annotation = portTypeClass.getAnnotation(ScoutWebService.class);
-    if (annotation == null) {
-      return null;
-    }
-    try {
-      return annotation.sessionFactory().newInstance();
-    }
-    catch (Exception e) {
-      LOG.error("Error occured while creating session factory.", e);
-    }
-    return null;
-  }
-
-  protected IServerSession getSession(MessageContext context) {
-    if (m_sessionFactory == null) {
-      return null;
-    }
-    // Prefer cached session over creating a new one.
-    // However, the session is only considered if created by the same type of factory.
-    // This is to ensure a proper session context which is what the user is expecting.
-    IServerSession contextSession = ContextHelper.getContextSession(context);
-    Class<? extends IServerSessionFactory> contextSessionFactory = ContextHelper.getContextSessionFactoryClass(context);
-    if (contextSession == null || !CompareUtility.equals(m_sessionFactory.getClass(), contextSessionFactory)) {
-      // create a new session
-      return SessionHelper.createNewServerSession(m_sessionFactory);
-    }
-    // cached session
-    return contextSession;
   }
 
   @Override
@@ -122,12 +70,12 @@ public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
 
     @Override
     public Object invoke(final Packet packet, final Method method, final Object... args) throws InvocationTargetException, IllegalAccessException {
-      T portType = Assertions.assertNotNull(ScoutInstanceResolver.this.resolve(packet), "no port type found");
-      Subject subject = Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "Webservice request was not dispatched due to security reasons: request must run on behalf of a subject context.");
-      IServerSession session = getSession(m_context.getMessageContext());
+      final T portType = Assertions.assertNotNull(ScoutInstanceResolver.this.resolve(packet), "port-type not found");
+      final Subject subject = Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "subject must not be null.");
+      final IServerSession serverSession = Assertions.assertNotNull(JaxWsHelper.getContextSession(m_context.getMessageContext()), "server-session must not be null");
 
       try {
-        return invokePortTypeMethodInServerJob(subject, session, portType, method, args);
+        return invokeInServerJob(ServerJobInput.defaults().name("JAX-WS request").session(serverSession).subject(subject), portType, method, args);
       }
       catch (ProcessingException e) {
         Throwable cause = e.getCause();
@@ -142,7 +90,7 @@ public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
           throw (RuntimeException) cause;
         }
         else {
-          throw new WebServiceException("Unexpected error while dispatching webservice request.", cause);
+          throw new WebServiceException("Unexpected error while processing webservice request.", cause);
         }
       }
       finally {
@@ -150,18 +98,17 @@ public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
       }
     }
 
-    protected Object invokePortTypeMethodInServerJob(Subject subject, final IServerSession session, final T portType, final Method method, final Object... args) throws ProcessingException {
-      if (session == null) {
-        LOG.warn("Webservice request is not run in a session context as no server session is configured.");
-      }
-
+    /**
+     * Method invoked to invoke the port-type method on behalf of a server job.
+     */
+    protected Object invokeInServerJob(ServerJobInput input, final T portType, final Method method, final Object... args) throws ProcessingException {
       return OBJ.one(IServerJobManager.class).runNow(new ICallable<Object>() {
 
         @Override
         public Object call() throws Exception {
           return method.invoke(portType, args);
         }
-      }, ServerJobInput.defaults().session(session).sessionRequired(false).subject(subject));
+      }, input);
     }
   }
 }

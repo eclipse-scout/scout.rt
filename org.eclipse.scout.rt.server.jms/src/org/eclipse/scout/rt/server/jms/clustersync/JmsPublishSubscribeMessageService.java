@@ -63,7 +63,7 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   }
 
   @Override
-  protected void execOnMessage(IClusterNotificationMessage message, Session session) {
+  protected void execOnMessage(IClusterNotificationMessage message, Session session) throws ProcessingException {
     IPublishSubscribeMessageListener listener = getListener();
     if (listener != null) {
       listener.onMessage(message);

@@ -4,15 +4,15 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.jaxws.security.consumer;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.annotation.ScoutTransaction;
+import org.eclipse.scout.jaxws.internal.JaxWsConstants;
 import org.eclipse.scout.jaxws.service.AbstractWebServiceClient;
 
 /**
@@ -86,10 +87,7 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
   protected void installAuthHeader(Map<String, List<String>> httpRequestHeaders) throws Exception {
     String credentials = StringUtility.join(":", m_username, m_password);
     String credentialsEncoded = Base64Utility.encode(credentials.getBytes());
-
-    List<String> basicAuthToken = new LinkedList<String>();
-    basicAuthToken.add("Basic " + credentialsEncoded);
-    httpRequestHeaders.put("Authorization", basicAuthToken);
+    httpRequestHeaders.put(JaxWsConstants.AUTH_BASIC_AUTHORIZATION, Collections.singletonList(JaxWsConstants.AUTH_BASIC_PREFIX + credentialsEncoded));
   }
 
   @Override

@@ -53,6 +53,7 @@ public class JaxWsServlet extends EndpointServlet {
       input.servletResponse(response);
       input.locale(Locale.getDefault());
       input.sessionRequired(false);
+      input.transactional(false);
 
       OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
 

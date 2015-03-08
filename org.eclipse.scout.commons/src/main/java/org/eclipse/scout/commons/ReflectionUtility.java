@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -57,5 +58,17 @@ public class ReflectionUtility {
       clazz = clazz.getSuperclass();
     }
     return interfaces.toArray(new Class<?>[interfaces.size()]);
+  }
+
+  /**
+   * Returns the constructor with the given parameter types, or <code>null</code> if not found.
+   */
+  public static Constructor<?> getConstructor(final Class<?> clazz, final Class<?>[] paramTypes) {
+    for (final Constructor<?> candidate : clazz.getConstructors()) {
+      if (Arrays.equals(paramTypes, candidate.getParameterTypes())) {
+        return candidate;
+      }
+    }
+    return null;
   }
 }

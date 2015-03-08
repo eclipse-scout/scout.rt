@@ -21,22 +21,23 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
+import javax.security.auth.Subject;
+
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.IServerJobFactory;
-import org.eclipse.scout.rt.server.IServerJobService;
-import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ITransactionRunnable;
+import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.server.job.IServerJobManager;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
+import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ISession;
@@ -47,34 +48,29 @@ import org.eclipse.scout.service.SERVICES;
 public class ClusterSynchronizationService extends AbstractService implements IClusterSynchronizationService, IPublishSubscribeMessageListener {
   private static final String TRANSACTION_MEMBER_ID = ClusterSynchronizationService.class.getName();
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClusterSynchronizationService.class);
-
+  private static final String PROP_USER_CLUSTER_SYNC = String.format("%s#user", ClusterSynchronizationService.class.getName());
   private static final String CLUSTER_NODE_ID_PARAM = "org.eclipse.scout.rt.server.clusterNodeId";
+
   private final EventListenerList m_listenerList = new EventListenerList();
   private final ClusterNodeStatusInfo m_statusInfo = new ClusterNodeStatusInfo();
 
   // variables must not be synchronized as they are only set at initialization
   private String m_nodeId;
-  private IServerSession m_session;
-  private IServerJobFactory m_jobFactory;
+  private final Subject m_subject;
 
   private volatile boolean m_enabled;
   private volatile IPublishSubscribeMessageService m_messageService;
+
+  public ClusterSynchronizationService() {
+    m_subject = new Subject();
+    m_subject.getPrincipals().add(new SimplePrincipal(ConfigIniUtility.getProperty(PROP_USER_CLUSTER_SYNC, "cluster-synchronization")));
+    m_subject.setReadOnly();
+  }
 
   @Override
   public void initializeService() {
     super.initializeService();
     m_nodeId = createNodeId();
-    m_session = createBackendSession();
-    m_jobFactory = createJobFactory();
-
-  }
-
-  protected IServerJobFactory getJobFactory() {
-    return m_jobFactory;
-  }
-
-  private IServerJobFactory createJobFactory() {
-    return SERVICES.getService(IServerJobService.class).createJobFactory(getBackendSession(), getBackendSession().getSubject());
   }
 
   protected String createNodeId() {
@@ -114,17 +110,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     return nodeId;
   }
 
-  protected IServerSession createBackendSession() {
-    IServerSession serverSession = null;
-    try {
-      serverSession = SERVICES.getService(IServerJobService.class).createServerSession();
-    }
-    catch (ProcessingException e) {
-      LOG.error("Error creating backend session for cluster synchronization.", e);
-    }
-    return serverSession;
-  }
-
   protected EventListenerList getListenerList() {
     return m_listenerList;
   }
@@ -151,11 +136,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   @Override
   public String getNodeId() {
     return m_nodeId;
-  }
-
-  // used to handle incoming notification messages
-  protected IServerSession getBackendSession() {
-    return m_session;
   }
 
   protected IPublishSubscribeMessageService getMessageService() {
@@ -204,10 +184,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     }
     if (getNodeId() == null) {
       LOG.error("Clustersync could not be enabled. No cluster nodeId could be determined.");
-      return false;
-    }
-    if (getBackendSession() == null) {
-      LOG.error("Clustersync could not be enabled. Backend session could not be initialized.");
       return false;
     }
     IPublishSubscribeMessageService messageService = SERVICES.getService(IPublishSubscribeMessageService.class);
@@ -266,31 +242,33 @@ public class ClusterSynchronizationService extends AbstractService implements IC
         listener.onNotification(message);
       }
       catch (Exception e) {
-        LOG.error("Failed notification of message " + message + " to listener " + listener.getClass().getName(), e);
+        LOG.error(String.format("Failed to notify listener about cluster-sync-message [message=%s, listener=%s]", message, listener.getClass().getName()), e);
       }
     }
   }
 
   @Override
-  public void onMessage(final IClusterNotificationMessage message) {
+  public void onMessage(final IClusterNotificationMessage message) throws ProcessingException {
     //Do not progress notifications sent by node itself
     String originNode = message.getProperties().getOriginNode();
-    if (!getNodeId().equals(originNode)) {
-      getClusterNodeStatusInfo().updateReceiveStatus(message);
-      try {
-        m_jobFactory.runNow("NotificationProcessingJob", new ITransactionRunnable() {
-
-          @Override
-          public IStatus run(IProgressMonitor monitor) throws ProcessingException {
-            notifyListeners(message);
-            return Status.OK_STATUS;
-          }
-        });
-      }
-      catch (ProcessingException e) {
-        LOG.error("Error processing message", e);
-      }
+    if (getNodeId().equals(originNode)) {
+      return;
     }
+
+    getClusterNodeStatusInfo().updateReceiveStatus(message);
+
+    ServerJobInput jobInput = ServerJobInput.empty();
+    jobInput.name("cluster-sync-receive");
+    jobInput.subject(m_subject);
+    jobInput.session(OBJ.one(ServerSessionProviderWithCache.class).provide(jobInput.copy()));
+
+    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        notifyListeners(message);
+      }
+    }, jobInput);
   }
 
   @Override

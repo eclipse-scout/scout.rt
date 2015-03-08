@@ -237,9 +237,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
    */
   @Internal
   protected void lazyInit(HttpServletRequest req, HttpServletResponse res) throws ServletException {
-    if (m_serverSessionClass == null) {
-      m_serverSessionClass = locateServerSessionClass(req, res);
-    }
+    // TODO [dwi]: Session class should be resolved by OBJ.one(IServerSession.class); remove once there is only one session class.
     if (m_serverSessionClass == null) {
       m_serverSessionClass = loadSessionClassByParam();
     }
@@ -288,16 +286,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   // === SESSION CLASS, SESSION LOOKUP, SESSION CREATION ===
-  @Internal
-  protected Class<? extends IServerSession> locateServerSessionClass(HttpServletRequest req, HttpServletResponse res) {
-    try {
-      return SERVICES.getService(IServerJobService.class).getServerSessionClass();
-    }
-    catch (ProcessingException e) {
-      LOG.debug("No server session found");
-    }
-    return null;
-  }
 
   /**
    * Load the IServerSession class by servlet config parameter
@@ -310,7 +298,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     if (qname != null) {
       int i = qname.lastIndexOf('.');
       try {
-        m_serverSessionClass = (Class<? extends IServerSession>) Platform.getBundle(qname.substring(0, i)).loadClass(qname);
+        return (Class<? extends IServerSession>) Platform.getBundle(qname.substring(0, i)).loadClass(qname);
       }
       catch (ClassNotFoundException e) {
         throw new ServletException("Loading class " + qname, e);

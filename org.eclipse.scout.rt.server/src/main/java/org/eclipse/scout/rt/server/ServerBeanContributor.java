@@ -5,6 +5,8 @@ import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.cdi.ServerBeanInstanceFactory;
 import org.eclipse.scout.rt.server.job.internal.ServerJobManager;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 
 public class ServerBeanContributor implements IBeanContributor {
 
@@ -13,6 +15,7 @@ public class ServerBeanContributor implements IBeanContributor {
     context.registerClass(ProcessInspector.class);
     context.registerClass(ServerJobManager.class);
     context.registerClass(ServerBeanInstanceFactory.class);
+    context.registerClass(ServerSessionProvider.class);
+    context.registerClass(ServerSessionProviderWithCache.class);
   }
-
 }

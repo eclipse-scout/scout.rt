@@ -32,7 +32,7 @@ public interface IAuthenticationHandler extends SOAPHandler<SOAPMessageContext> 
    * Used in {@link ScoutWebServiceClient#authenticationHandler()} to
    * signal that authentication handler is not used.
    */
-  static final class NONE implements IAuthenticationHandler {
+  static final class None implements IAuthenticationHandler {
 
     @Override
     public void setPassword(String password) {

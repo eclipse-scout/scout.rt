@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
-import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
@@ -42,7 +42,8 @@ import org.osgi.framework.FrameworkUtil;
  * {@link IValidationStrategy.PROCESS}. Use the query strategy if the service method does only reads else use process.
  * The strategy is either defined by an annotation or by a policy according to the method name.
  */
-@RunWith(ScoutServerTestRunner.class)
+@RunWith(ScoutPlatformTestRunner.class)
+// TODO [dwi]: ask jgu whether to remove
 public abstract class AbstractInputValidationStrategyTest {
 
   private Set<String> m_sharedBundles;

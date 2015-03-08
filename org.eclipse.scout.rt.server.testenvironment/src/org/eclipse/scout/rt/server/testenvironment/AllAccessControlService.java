@@ -11,12 +11,15 @@
 
 package org.eclipse.scout.rt.server.testenvironment;
 
+import java.security.AccessController;
 import java.security.AllPermission;
 import java.security.Permission;
 import java.security.Permissions;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
@@ -102,6 +105,12 @@ public class AllAccessControlService extends AbstractService implements IAccessC
 
   @Override
   public String getUserIdOfCurrentSubject() {
-    return null;
+    Subject subject = Subject.getSubject(AccessController.getContext());
+    if (subject == null || subject.getPrincipals().isEmpty()) {
+      return null;
+    }
+    else {
+      return subject.getPrincipals().iterator().next().getName();
+    }
   }
 }

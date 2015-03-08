@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.handler.MessageContext;
 
+import org.eclipse.scout.jaxws.internal.JaxWsHelper;
+
 import com.sun.xml.internal.ws.api.message.Packet;
 import com.sun.xml.internal.ws.api.server.WebServiceContextDelegate;
 import com.sun.xml.internal.ws.developer.JAXWSProperties;

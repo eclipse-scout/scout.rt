@@ -19,21 +19,40 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.testenvironment.TestEnvironmentServerSession;
-import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
+import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * Tests for IScheduler
  */
-// TODO remove OSGi dependencies
-@RunWith(ScoutServerTestRunner.class)
+@RunWith(ScoutPlatformTestRunner.class)
 public class SchedulerTest {
+
+  private ServerJobInput m_input;
+  private Ticker m_ticker;
+
+  @Before
+  public void before() throws ProcessingException {
+    Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal("john"));
+    subject.setReadOnly();
+
+    m_input = ServerJobInput.empty();
+    m_input.subject(subject);
+    m_input.session(OBJ.one(ServerSessionProvider.class).provide(m_input.copy()));
+
+    m_ticker = new Ticker(Calendar.SECOND);
+  }
 
   @Test
   public void testRunningJobCount() throws ProcessingException, InterruptedException {
-    IScheduler scheduler = new TestScheduler();
+    IScheduler scheduler = new TestScheduler(m_ticker, m_input);
     scheduler.addJob(new JobAcceptTick("groupId", "jobIdAccept"));
     scheduler.addJob(new JobDontAcceptTick("groupId", "jobIdDontAccept"));
     assertEquals("JobCount must be 2", 2, scheduler.getJobCount());
@@ -54,7 +73,7 @@ public class SchedulerTest {
 
   @Test
   public void testServerJobName() throws ProcessingException {
-    TestScheduler scheduler = new TestScheduler();
+    TestScheduler scheduler = new TestScheduler(m_ticker, m_input);
     JobAcceptTick job = new JobAcceptTick("groupId", "jobId");
     assertEquals("Scheduler.groupId.jobId", scheduler.getJobName(job));
   }
@@ -62,8 +81,8 @@ public class SchedulerTest {
 
 class TestScheduler extends Scheduler {
 
-  public TestScheduler() throws ProcessingException {
-    super(new Subject(), TestEnvironmentServerSession.class, new Ticker(Calendar.SECOND));
+  public TestScheduler(Ticker ticker, ServerJobInput jobInput) throws ProcessingException {
+    super(ticker, jobInput);
   }
 
   @Override

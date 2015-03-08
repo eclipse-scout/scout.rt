@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.services.common.session;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IRunnable;
@@ -22,7 +21,6 @@ import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.AbstractService;
-import org.osgi.framework.Bundle;
 
 /**
  * Default implementation of {@link IServerSessionRegistryService}.
@@ -43,9 +41,7 @@ public class ServerSessionRegistryService extends AbstractService implements ISe
   public <T extends IServerSession> T newServerSession(final Class<T> clazz, final ServerJobInput input) throws ProcessingException {
     final T serverSession = newInstance(clazz);
 
-    final Bundle bundle = Platform.getBundle(clazz.getPackage().getName());
-
-    loadSessionInServerJob(input.copy().session(serverSession), bundle, serverSession);
+    loadSessionInServerJob(input.copy().session(serverSession), serverSession);
 
     return serverSession;
   }
@@ -68,19 +64,17 @@ public class ServerSessionRegistryService extends AbstractService implements ISe
    *
    * @param input
    *          input with the context to create a {@link IServerSession}.
-   * @param bundle
-   *          the bundle that contains the session class.
    * @param serverSession
    *          session to be loaded.
    * @throws ProcessingException
    */
   @Internal
-  protected void loadSessionInServerJob(final ServerJobInput input, final Bundle bundle, final IServerSession serverSession) throws ProcessingException {
+  protected void loadSessionInServerJob(final ServerJobInput input, final IServerSession serverSession) throws ProcessingException {
     OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        serverSession.loadSession(bundle);
+        serverSession.loadSession();
       }
     }, input);
   }

@@ -353,7 +353,7 @@ public abstract class AbstractWebServiceClient<S extends Service, P> extends Abs
     }
 
     Class<? extends IAuthenticationHandler> authenticationHandlerClazz = annotation.authenticationHandler();
-    if (authenticationHandlerClazz == null || authenticationHandlerClazz == IAuthenticationHandler.NONE.class) {
+    if (authenticationHandlerClazz == null || authenticationHandlerClazz == IAuthenticationHandler.None.class) {
       return null;
     }
 

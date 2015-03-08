@@ -11,52 +11,30 @@
 package org.eclipse.scout.jaxws.annotation;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.eclipse.scout.jaxws.internal.resolver.ScoutInstanceResolver;
 import org.eclipse.scout.jaxws.security.provider.BasicAuthenticationHandler;
-import org.eclipse.scout.jaxws.security.provider.ConfigIniCredentialValidationStrategy;
+import org.eclipse.scout.jaxws.security.provider.ConfigIniAuthenticator;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
-import org.eclipse.scout.jaxws.security.provider.ICredentialValidationStrategy;
-import org.eclipse.scout.jaxws.session.DefaultServerSessionFactory;
-import org.eclipse.scout.jaxws.session.IServerSessionFactory;
+import org.eclipse.scout.jaxws.security.provider.IAuthenticator;
 
 import com.sun.xml.internal.ws.api.server.InstanceResolverAnnotation;
 
 /**
- * <p>
- * Annotation to specify session, authentication and credential validation strategy.<br/>
- * By default, the following configuration is applied:
- * </p>
- * <table border="1">
- * <tr>
- * <td><b>property</b></td>
- * <td><b>default</b></td>
- * </tr>
- * <tr>
- * <td>sessionFactory</td>
- * <td>{@link DefaultServerSessionFactory}</td>
- * </tr>
- * <tr>
- * <td>authenticationHandler</td>
- * <td>{@link BasicAuthenticationHandler}</td>
- * </tr>
- * <tr>
- * <td>credentialValidationStrategy</td>
- * <td>{@link ConfigIniCredentialValidationStrategy}</td>
- * </tr>
- * </table>
+ * Annotation to specify authentication mechanism and authenticator on a port type. By default,
+ * {@link BasicAuthenticationHandler} and {@link ConfigIniAuthenticator} are used.
  */
 @SuppressWarnings("restriction")
 @Target(ElementType.TYPE)
 @InstanceResolverAnnotation(ScoutInstanceResolver.class)
 @Retention(RetentionPolicy.RUNTIME)
+@Inherited
 public @interface ScoutWebService {
-  Class<? extends IServerSessionFactory> sessionFactory() default DefaultServerSessionFactory.class;
-
   Class<? extends IAuthenticationHandler> authenticationHandler() default BasicAuthenticationHandler.class;
 
-  Class<? extends ICredentialValidationStrategy> credentialValidationStrategy() default ConfigIniCredentialValidationStrategy.class;
+  Class<? extends IAuthenticator> authenticator() default ConfigIniAuthenticator.class;
 }

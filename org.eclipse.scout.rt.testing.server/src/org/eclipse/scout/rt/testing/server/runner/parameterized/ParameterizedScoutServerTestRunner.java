@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.testing.server.runner.parameterized;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.IScoutTestParameter;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedFrameworkMethod;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedTestRunnerExtension;
@@ -30,7 +30,7 @@ import org.junit.runners.model.Statement;
  * <pre>
  * &#064;RunWith(ParameterizedScoutServerTestRunner.class)
  * public class SampleParameterizedServerTest {
- *
+ * 
  *   &#064;Parameters
  *   public static List&lt;IScoutTestParameter&gt; getParameters() {
  *     List&lt;IScoutTestParameter&gt; parametersList = new LinkedList&lt;IScoutTestParameter&gt;();
@@ -38,32 +38,32 @@ import org.junit.runners.model.Statement;
  *     parametersList.add(new MathTestParameter(&quot;Scenario 2&quot;, 5));
  *     return parametersList;
  *   }
- *
+ * 
  *   private final MathTestParameter m_testParameter;
- *
+ * 
  *   public SampleParameterizedServerTest(MathTestParameter testParameter) {
  *     m_testParameter = testParameter;
  *   }
- *
+ * 
  *   &#064;Test
  *   public void testIsGreaterZero() {
  *     assertTrue(m_testParameter.getX() &gt; 0);
  *   }
- *
+ * 
  *   &#064;Test
  *   &#064;NonParameterized
  *   public void testGeneral() {
  *     assertFalse(0 &gt; 0);
  *   }
- *
+ * 
  *   static class MathTestParameter extends AbstractScoutTestParameter {
  *     private int m_x;
- *
+ * 
  *     public MathTestParameter(String name, int x) {
  *       super(name);
  *       m_x = x;
  *     }
- *
+ * 
  *     public int getX() {
  *       return m_x;
  *     }
@@ -75,7 +75,8 @@ import org.junit.runners.model.Statement;
  * @see Parameterized
  * @see Parameters
  */
-public class ParameterizedScoutServerTestRunner extends ScoutServerTestRunner {
+// TODO [dwi/abr] do we need this class?
+public class ParameterizedScoutServerTestRunner extends ScoutPlatformTestRunner {
 
   /** Parameters returned by the <code>@</code>{@link Parameters} annotated method in the test class. */
   private List<IScoutTestParameter> m_parameterList;

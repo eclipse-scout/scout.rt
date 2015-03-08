@@ -143,7 +143,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
    * @param session
    *          The JMS-session; in case of a transacted JMS-session, one can commit an reject on it.
    */
-  protected void execOnMessage(T message, Session session) {
+  protected void execOnMessage(T message, Session session) throws ProcessingException {
   }
 
   /**

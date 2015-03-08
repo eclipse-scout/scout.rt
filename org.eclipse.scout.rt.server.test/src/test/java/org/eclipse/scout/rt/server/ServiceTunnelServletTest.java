@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.security.auth.Subject;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,7 +50,7 @@ import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
@@ -61,7 +62,7 @@ import org.mockito.stubbing.Answer;
 /**
  * Test for {@link ServiceTunnelServlet}
  */
-@RunWith(ScoutServerTestRunner.class)
+@RunWith(ScoutPlatformTestRunner.class)
 public class ServiceTunnelServletTest {
 
   private static final int TEST_SERVICE_RANKING = 1000;
@@ -242,9 +243,11 @@ public class ServiceTunnelServletTest {
     }
 
     @Override
-    protected Class<? extends IServerSession> locateServerSessionClass(HttpServletRequest req, HttpServletResponse res) {
-      return TestServerSession.class;
+    public ServletConfig getServletConfig() {
+      // TODO [dwi]: remove me once there is only one session class.
+      ServletConfig config = mock(ServletConfig.class);
+      when(config.getInitParameter(eq("session"))).thenReturn(TestServerSession.class.getName());
+      return config;
     }
   }
-
 }

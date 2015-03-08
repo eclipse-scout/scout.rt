@@ -23,6 +23,12 @@ import org.osgi.framework.Bundle;
  */
 public interface IServerSession extends ISession {
 
+  /**
+   * Invoke this method to initialize the session.
+   */
+  void loadSession() throws ProcessingException;
+
+  @Deprecated
   void loadSession(Bundle bundle) throws ProcessingException;
 
   /**

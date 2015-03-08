@@ -10,13 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
+
 public interface IPublishSubscribeMessageListener {
 
   /**
-   * Method invoked to handle a message received from a subscribed channel. There is no transaction startet yet.
+   * Method invoked to handle a message received from a subscribed channel.
    *
    * @param message
    *          message received.
    */
-  void onMessage(IClusterNotificationMessage message);
+  void onMessage(IClusterNotificationMessage message) throws ProcessingException;
 }

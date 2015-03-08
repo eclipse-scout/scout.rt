@@ -29,23 +29,29 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.AbstractClientNotification;
 import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
-import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
-import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner.ServerTest;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.server.junit.rule.RunAs;
+import org.eclipse.scout.rt.testing.server.junit.rule.ServerJobRule;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
 /**
  * Test for {@link AbstractAccessControlService}
  */
-@RunWith(ScoutServerTestRunner.class)
+@RunWith(ScoutPlatformTestRunner.class)
 public class AccessControlServiceTest {
   private AbstractAccessControlService m_accessControlService;
   private TestClientNotificationQueueListener m_listener;
   private List<IBean<?>> m_registerServices;
+
+  @Rule
+  public TestRule serverJobRule = new ServerJobRule();
 
   @Before
   public void setup() {
@@ -69,7 +75,7 @@ public class AccessControlServiceTest {
    * {@link AbstractAccessControlService#getPermissions()}
    */
   @Test
-  @ServerTest(runAs = "thisuser")
+  @RunAs("thisuser")
   public void testClientNotificationSentForGetPermissions() {
     callGetPermissions();
 

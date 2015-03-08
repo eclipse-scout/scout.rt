@@ -19,20 +19,26 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.server.junit.rule.ServerJobRule;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
-@RunWith(ScoutServerTestRunner.class)
+@RunWith(ScoutPlatformTestRunner.class)
 public class SessionInspectorTest {
 
   private static final Long CREATION_TIME = 23456789L;
   private static final Long LAST_ACCESS_TIME = 23459999L;
 
   private HttpServletRequest servletRequestBackup;
+
+  @Rule
+  public TestRule serverJobRule = new ServerJobRule();
 
   @Before
   public void setUp() throws Exception {

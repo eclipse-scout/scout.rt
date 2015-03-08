@@ -220,6 +220,12 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   @Override
+  public void loadSession() throws ProcessingException {
+    loadSession(Platform.getBundle(getClass().getPackage().getName()));
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
   public final void loadSession(Bundle bundle) throws ProcessingException {
     Assertions.assertFalse(isActive(), "Session already started");
 

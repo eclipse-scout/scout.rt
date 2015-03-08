@@ -25,5 +25,5 @@ import org.eclipse.scout.jaxws.security.consumer.IAuthenticationHandler;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScoutWebServiceClient {
-  Class<? extends IAuthenticationHandler> authenticationHandler() default IAuthenticationHandler.NONE.class;
+  Class<? extends IAuthenticationHandler> authenticationHandler() default IAuthenticationHandler.None.class;
 }

@@ -13,10 +13,13 @@ package org.eclipse.scout.commons;
 import static org.eclipse.scout.commons.CollectionUtility.emptyHashSet;
 import static org.eclipse.scout.commons.CollectionUtility.hashSet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 
+import org.eclipse.scout.commons.annotations.Data;
 import org.eclipse.scout.commons.job.ICallable;
 import org.junit.Test;
 
@@ -33,8 +36,15 @@ public class ReflectionUtilityTest {
     assertEquals(hashSet(Callable.class, Runnable.class, Serializable.class), hashSet(ReflectionUtility.getInterfaces(Bottom.class)));
   }
 
+  @Test
+  public void testConstructor() {
+    assertNotNull(ReflectionUtility.getConstructor(Bottom.class, new Class<?>[]{String.class, Integer.class}));
+    assertNull(ReflectionUtility.getConstructor(Bottom.class, new Class<?>[]{Integer.class, String.class}));
+  }
+
   // === Test classes ===
 
+  @Data
   public static class Top {
   }
 
@@ -50,6 +60,9 @@ public class ReflectionUtilityTest {
   public static class Bottom extends Middle implements Callable {
 
     private static final long serialVersionUID = 1L;
+
+    public Bottom(String string, Integer integer) {
+    }
 
     @Override
     public Object call() throws Exception {

@@ -11,16 +11,18 @@
 package org.eclipse.scout.jaxws.internal;
 
 import org.eclipse.scout.jaxws.JaxWs216Module;
+import org.eclipse.scout.jaxws.security.provider.ConfigIniAuthenticator;
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
 
 /**
- *
+ * Bean Contributor for JAX-WS Scout RT.
  */
 public class BeanContributor implements IBeanContributor {
 
   @Override
   public void contributeBeans(IBeanContext context) {
     context.registerClass(JaxWs216Module.class);
+    context.registerClass(ConfigIniAuthenticator.class);
   }
 }

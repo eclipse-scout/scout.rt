@@ -14,53 +14,86 @@ import java.util.Calendar;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.server.IServerJobFactory;
-import org.eclipse.scout.rt.server.IServerJobService;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ITransactionRunnable;
-import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.rt.server.job.IServerJobManager;
+import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 
 public class Scheduler extends AbstractScheduler implements IScheduler {
-  private final IServerJobFactory m_serverJobFactory;
+
+  private ServerJobInput m_jobInput;
 
   public Scheduler() throws ProcessingException {
-    super(new Ticker(Calendar.MINUTE));
-    final IServerJobService backendService = SERVICES.getService(IServerJobService.class);
-    m_serverJobFactory = backendService.createJobFactory();
+    this(new Ticker(Calendar.MINUTE), ServerJobInput.defaults().sessionRequired(false).transactional(false));
   }
 
+  @Deprecated
+  // TODO [dwi] [session]: remove me until session class is registered in platform.
   public Scheduler(Subject subject, Class<? extends IServerSession> serverSessionType) throws ProcessingException {
     this(subject, serverSessionType, new Ticker(Calendar.MINUTE));
   }
 
+  @Deprecated
+  // TODO [dwi] [session]: remove me until session class is registered in platform.
   public Scheduler(Subject subject, Class<? extends IServerSession> serverSessionType, Ticker ticker) throws ProcessingException {
+    this(ticker, ServerJobInput.empty().subject(subject).session(loadServerSession(serverSessionType, subject)));
+  }
+
+  public Scheduler(Ticker ticker, ServerJobInput jobInput) throws ProcessingException {
     super(ticker);
-    final IServerJobService backendService = SERVICES.getService(IServerJobService.class);
-    m_serverJobFactory = backendService.createJobFactory(backendService.createServerSession(serverSessionType, subject), subject);
+    m_jobInput = jobInput;
   }
 
   @Override
   public void handleJobExecution(final ISchedulerJob job, final TickSignal signal) throws ProcessingException {
-    m_serverJobFactory.runNow(getJobName(job), new ITransactionRunnable() {
+    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
-      public IStatus run(IProgressMonitor monitor) throws ProcessingException {
+      public void run() throws Exception {
         job.run(Scheduler.this, signal);
-        return Status.OK_STATUS;
       }
-    });
+    }, m_jobInput.copy().name(getJobName(job)));
   }
 
   /**
-   * @return name of the Scheduler {@link Job}
+   * @return name of the {@link ISchedulerJob}.
    */
   protected String getJobName(ISchedulerJob job) {
     return "Scheduler." + job.getGroupId() + "." + job.getJobId();
   }
 
+  // TODO [dwi] [session]: remove temporary workaround until session class is registered in platform.
+  @Deprecated
+  private static IServerSession loadServerSession(Class<? extends IServerSession> serverSessionType, Subject subject) throws ProcessingException {
+    IServerSession currentServerSession = OBJ.oneOrNull(IServerSession.class);
+    if (currentServerSession != null) {
+      IBean<?> oldServerSessionBean = OBJ.registerClass(currentServerSession.getClass());
+      OBJ.unregisterBean(oldServerSessionBean);
+      try {
+        return loadServerSessionInternal(serverSessionType, subject);
+      }
+      finally {
+        OBJ.registerBean(oldServerSessionBean, null);
+      }
+    }
+    else {
+      return loadServerSessionInternal(serverSessionType, subject);
+    }
+  }
+
+  // TODO [dwi] [session]: remove temporary workaround until session class is registered in platform.
+  @Deprecated
+  private static IServerSession loadServerSessionInternal(Class<? extends IServerSession> serverSessionType, Subject subject) throws ProcessingException {
+    IBean<?> newServerSessionBean = OBJ.registerClass(serverSessionType);
+    try {
+      return OBJ.one(ServerSessionProviderWithCache.class).provide(ServerJobInput.empty().subject(subject));
+    }
+    finally {
+      OBJ.unregisterBean(newServerSessionBean);
+    }
+  }
 }

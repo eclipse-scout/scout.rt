@@ -17,6 +17,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceException;
 
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.jaxws.internal.JaxWsHelper;
 
 import com.sun.xml.internal.ws.api.message.Packet;
 import com.sun.xml.internal.ws.api.server.PortAddressResolver;
