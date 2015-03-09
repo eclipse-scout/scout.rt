@@ -5,8 +5,6 @@ scout.AbstractKeyStrokeAdapter = function(field) {
   this._field = field;
   this.installModelKeystrokes();
   this.keyBoxDrawn = false;
-  this.marginLeft = 50;
-  this.additionalMarginLeft = 28;
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function() {
@@ -15,56 +13,14 @@ scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function() {
     return;
   }
   this.keyBoxDrawn = true;
-  var offset = 0;
+  var offsetLeft = 4;
   for (var i = 0; i < this.keyStrokes.length; i++) {
     if (!this.keyStrokes[i].drawHint) {
       continue;
     }
     var keyBoxText = scout.codesToKeys[this.keyStrokes[i].keystrokeKeyPart];
 
-    var $boxToAlignKeyBox = this._field.$container;
-    if (offset > 0) {
-      $boxToAlignKeyBox.prependDiv('key-box-additional', ';');
-      additionalKeyBox.css('left', '' + this._calcKeyboxSeparator(offset) + 'px');
-    }
-    if ($boxToAlignKeyBox && keyBoxText) {
-      if (this.keyStrokes[i].ctrl) {
-        $boxToAlignKeyBox.prependDiv('key-box ', 'ctrl');
-        $boxToAlignKeyBox.prependDiv('key-box-additional', '+');
-        offset++;
-      }
-      if (this.keyStrokes[i].alt) {
-        altKeybox = $boxToAlignKeyBox.prependDiv('key-box ', 'alt');
-        additionalKeyBox = $boxToAlignKeyBox.prependDiv('key-box-additional ', '+');
-        if (offset > 0) {
-          altKeybox.css('left', '' + this._calcKeybox(offset) + 'px');
-          additionalKeyBox.css('left', '' + this._calcKeyboxSeparator(offset) + 'px');
-        }
-        offset++;
-      }
-      if (this.keyStrokes[i].shift) {
-        shiftKeyBox = $boxToAlignKeyBox.prependDiv('key-box ', 'shift');
-        additionalKeyBox = $boxToAlignKeyBox.prependDiv('key-box-additional ', '+');
-        if (offset > 0) {
-          shiftKeyBox.css('left', '' + this._calcKeybox(offset) + 'px');
-          additionalKeyBox.css('left', '' + this._calcKeyboxSeparator(offset) + 'px');
-        }
-        offset++;
-      }
-      if (this.keyStrokes[i].meta) {
-        metaKeyBox = $boxToAlignKeyBox.prependDiv('key-box ', 'meta');
-        additionalKeyBox = $boxToAlignKeyBox.prependDiv('key-box-additional ', '+');
-        if (offset > 0) {
-          metaKeyBox.css('left', '' + this._calcKeybox(offset) + 'px');
-          additionalKeyBox.css('left', '' + this._calcKeyboxSeparator(offset) + 'px');
-        }
-        offset++;
-      }
-      keyBox = $boxToAlignKeyBox.prependDiv('key-box ', keyBoxText);
-      if (offset > 0) {
-        keyBox.css('left', '' + this._calcKeybox(offset) + 'px');
-      }
-    }
+    scout.KeyStrokeUtil.drawSingleKeyBoxItem(offsetLeft, '0', this._field.$container, this.ctrl, this.alt, this.shift);
   }
 };
 

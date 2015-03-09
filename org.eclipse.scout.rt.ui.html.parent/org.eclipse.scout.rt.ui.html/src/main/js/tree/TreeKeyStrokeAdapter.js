@@ -3,15 +3,15 @@ scout.TreeKeyStrokeAdapter = function(field) {
   var that = this;
 
   this._field = field;
-  this.ctrl= false;
-  this.alt= false;
-  this.shift= false;
-  this.meta= false;
+  this.ctrl = false;
+  this.alt = false;
+  this.shift = false;
+  this.meta = false;
 
   this.keyStrokes.push({
     accept: function(event) {
       return event &&
-        $.inArray(event.which, [scout.keys.UP, scout.keys.DOWN, scout.keys.LEFT, scout.keys.RIGHT]) >= 0 &&
+        $.inArray(event.which, [scout.keys.UP, scout.keys.DOWN, scout.keys.LEFT, scout.keys.RIGHT, scout.keys.SPACE]) >= 0 &&
         event.ctrlKey === that.ctrl && event.altKey === that.alt && event.shiftKey === that.shift && event.metaKey === that.meta;
     },
     handle: function(event) {
@@ -20,6 +20,15 @@ scout.TreeKeyStrokeAdapter = function(field) {
         $currentNode = that._field.$selectedNodes().eq(0),
         currentNode = $currentNode.data('node');
 
+      if (keycode === scout.keys.SPACE) {
+        if ($currentNode.length > 0) {
+          var check = !$($currentNode[0]).data('node').checked;
+          for (var j = 0; j < $currentNode.length; j++) {
+            var node = $($currentNode[j]).data('node');
+            that._field.checkNodeAndRender(node, check);
+          }
+        }
+      }
       if (keycode === scout.keys.UP) {
         if ($currentNode.length === 0) {
           $targetNode = that._field.$nodes().last();
@@ -65,6 +74,36 @@ scout.TreeKeyStrokeAdapter.prototype.drawKeyBox = function() {
   if (this.keyBoxDrawn) {
     return;
   }
-  //TODO nbu draw.
+
+  var $currentNode = this._field.$selectedNodes().eq(0);
+  var currentNode = $currentNode.data('node');
+  var $upNode, $downNode, $leftNode, $rightNode;
+  var offset = 4;
+  if (currentNode) {
+    if ($currentNode.length === 0) {
+      $upNode = this._field.$nodes().last();
+    } else {
+      $upNode = $currentNode.prev('.tree-item');
+    }
+    if ($upNode) {
+      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '↑', $upNode, false, false, false);
+    }
+
+    if ($currentNode.length === 0) {
+      $downNode = this._field.$nodes().first();
+    } else {
+      $downNode = $currentNode.next('.tree-item');
+    }
+    if ($downNode) {
+      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '↓', $downNode, false, false, false);
+    }
+
+    if (currentNode.expanded) {
+      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '←', $currentNode, false, false, false);
+    } else if (!currentNode.expanded && !currentNode.leaf) {
+      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '→', $currentNode, false, false, false);
+    }
+
+  }
   this.keyBoxDrawn = true;
 };

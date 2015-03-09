@@ -1,7 +1,5 @@
 scout.DesktopKeyStrokeAdapter = function(desktop) {
   scout.DesktopKeyStrokeAdapter.parent.call(this, desktop.navigation);
-  var that = this;
-
   this.$target = undefined; // set by KeystrokeManager
   this.controller = undefined; // set by KeystrokeManager
   this._navigation = desktop.navigation;

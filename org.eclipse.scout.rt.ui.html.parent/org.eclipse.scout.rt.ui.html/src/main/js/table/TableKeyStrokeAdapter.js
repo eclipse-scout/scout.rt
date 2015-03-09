@@ -135,19 +135,65 @@ scout.TableKeyStrokeAdapter.prototype.drawKeyBox = function() {
   if (this.keyBoxDrawn) {
     return;
   }
-  var $tableData = $('.table-data', this._field.$container);
-  if ($tableData.length) {
-    $tableData.appendDiv('key-box top3', 'Home');
-    $tableData.prependDiv('key-box-additional ', ';');
-    $tableData.appendDiv('key-box ', 'PgUp').css('left', '' + this._calcKeybox(1) + 'px');
-    $tableData.prependDiv('key-box-additional ', ';').css('left', '' + this._calcKeyboxSeparator(1) + 'px');
-    $tableData.appendDiv('key-box ', '↑').css('left', '' + this._calcKeybox(2) + 'px');
-    $tableData.prependDiv('key-box-additional ', ';').css('left', '' + this._calcKeyboxSeparator(2) + 'px');
-    $tableData.appendDiv('key-box ', '↓').css('left', '' + this._calcKeybox(3) + 'px');
-    $tableData.prependDiv('key-box-additional ', ';').css('left', '' + this._calcKeyboxSeparator(3) + 'px');
-    $tableData.appendDiv('key-box ', 'PgDn').css('left', '' + this._calcKeybox(4) + 'px');
-    $tableData.prependDiv('key-box-additional ', ';').css('left', '' + this._calcKeyboxSeparator(4) + 'px');
-    $tableData.appendDiv('key-box ', 'End').css('left', '' + this._calcKeybox(5) + 'px');
+  if (this._field.$rows.length >> 0) {
+    var offset = 4;
+    var $allRows = this._field.$rows();
+    var $firstRow = $allRows.first();
+    var $lastRow = $allRows.last();
+    scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, 'Home', $firstRow, false, false, false);
+
+    var $rowsSelected = this._field.$selectedRows();
+    var $pageUpRow;
+    var $prev;
+    if ($rowsSelected.length > 0) {
+      $prev = this._field.$prevFilteredRows($rowsSelected.first());
+      if ($prev.length > 10) {
+        $pageUpRow = $prev.eq(10);
+      } else {
+        $pageUpRow = $allRows.first();
+      }
+    } else {
+      $pageUpRow = $allRows.last();
+    }
+
+    scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, 'PgUp', $firstRow, false, false, false);
+
+    var $upRow, $downRow;
+    if ($allRows.length > $rowsSelected.length) {
+      if ($rowsSelected.first()[0] !== $firstRow[0]) {
+        //take pageUpOffset when upRow is the same as PgUp otherwise take firstRowOffset if up row is equal first row when not take 4.
+        if ($rowsSelected.length > 0) {
+          $upRow = this._field.$prevFilteredRows($rowsSelected.first()).first();
+        } else {
+          $upRow = $allRows.first();
+        }
+        scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '↑', $upRow, false, false, false);
+      }
+      if ($rowsSelected.last()[0] !== $lastRow[0]) {
+        //take upRowOffset when $downRow = $upRow if not take pageUpOffset when upRow is the same as PgUp otherwise take
+        //firstRowOffset if up row is equal first row when not take 4.
+        if ($rowsSelected.length > 0) {
+          $downRow = this._field.$nextFilteredRows($rowsSelected.last()).first();
+        } else {
+          $downRow = $allRows.first();
+        }
+        scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '↓', $downRow, false, false, false);
+      }
+    }
+    // pgdn: jump down
+    var $pgDownRow;
+    if ($rowsSelected.length > 0) {
+      var $next = this._field.$nextFilteredRows($rowsSelected.last());
+      if ($next.length > 10) {
+        $pgDownRow = $next.eq(10);
+      } else {
+        $pgDownRow = $allRows.last();
+      }
+    } else {
+      $pgDownRow = $allRows.first();
+    }
+    scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, 'PgDn', $pgDownRow, false, false, false);
+    scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, 'End', $lastRow, false, false, false);
   }
 
   // keys for header
