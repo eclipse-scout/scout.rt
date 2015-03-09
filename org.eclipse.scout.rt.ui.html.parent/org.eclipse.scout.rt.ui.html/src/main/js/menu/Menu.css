@@ -33,7 +33,6 @@
 
 .menubar {
   position: relative;
-  box-sizing: border-box;
   height: 55px;
   margin: 0 @menu-margin-x;
   padding: 6px 0 10px 0;
@@ -48,11 +47,9 @@
     min-width: 110px;
     margin: 6px 0 3px 0;
   }
-
 }
 
 .menu-separator {
-  box-sizing: content-box;
   width: 1px;
   height: 30px;
   margin: 6px 19px 3px 19px - @menu-item-margin-right;
@@ -109,7 +106,6 @@
      */
     margin-left: 20px;
   }
-
 }
 
 .menu-right {
@@ -131,7 +127,6 @@
 
   & > .popup-head {
     position: absolute;
-    box-sizing: border-box;
     line-height: 39px;
     padding: 0 13px;
     white-space: nowrap;
@@ -190,4 +185,3 @@
   left: 1px;
   background-color:@body-background-color;
 }
-
