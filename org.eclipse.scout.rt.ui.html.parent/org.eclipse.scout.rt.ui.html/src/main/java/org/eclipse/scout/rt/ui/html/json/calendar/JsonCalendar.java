@@ -15,20 +15,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.Range;
+import org.eclipse.scout.commons.filter.AndFilter;
+import org.eclipse.scout.commons.filter.NotFilter;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.job.filter.FutureFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.IBlockingCondition;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarAdapter;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarListener;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -270,19 +279,19 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   protected void handleUiComponentAction(JsonEvent event, JsonResponse res) {
     getModel().getUIFacade().fireComponentActionFromUI();
-    P_WaitForAllClientJobsJob.waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
+    waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected void handleUiComponentMoved(JsonEvent event, JsonResponse res) {
     CalendarComponent comp = resolveCalendarComponent(event.getData().optString("component"));
     Date newDate = new JsonDate(event.getData().optString("newDate")).asJavaDate();
     getModel().getUIFacade().fireComponentMovedFromUI(comp, newDate);
-    P_WaitForAllClientJobsJob.waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
+    waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected void handleUiReload(JsonEvent event, JsonResponse res) {
     getModel().getUIFacade().fireReloadFromUI();
-    P_WaitForAllClientJobsJob.waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
+    waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected void handleUiSetVisibleRange(JsonEvent event, JsonResponse res) {
@@ -290,21 +299,21 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     Date fromDate = new JsonDate(dateRange.optString("from")).asJavaDate();
     Date toDate = new JsonDate(dateRange.optString("to")).asJavaDate();
     getModel().getUIFacade().setVisibleRangeFromUI(fromDate, toDate);
-    P_WaitForAllClientJobsJob.waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
+    waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected void handleUiSetSelection(JsonEvent event, JsonResponse res) {
     Date date = new JsonDate(event.getData().optString("date")).asJavaDate();
     CalendarComponent comp = resolveCalendarComponent(event.getData().optString("component"));
     getModel().getUIFacade().setSelectionFromUI(date, comp);
-    P_WaitForAllClientJobsJob.waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
+    waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected void handleUiSetDisplayMode(JsonEvent event, JsonResponse res) {
     int displayMode = event.getData().optInt("displayMode");
     // TODO BSH Calendar | Check if we should add this method to the UI facade
     getModel().setDisplayMode(displayMode);
-    P_WaitForAllClientJobsJob.waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
+    waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected class P_CalendarListener extends CalendarAdapter {
@@ -326,37 +335,26 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     }
   }
 
-  // FIXME BSH Server Push | Remove this code when server push is implemented!
-  protected static class P_WaitForAllClientJobsJob extends ClientSyncJob {
+  private static void waitForAllOtherJobs() {
+    final IClientSession session = ClientSessionProvider.currentSession();
+    final IBlockingCondition waitForClientJobsToComplete = OBJ.one(IModelJobManager.class).createBlockingCondition("Wait for ClientJobs to complete", true);
+    try {
+      OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          try {
+            OBJ.one(IClientJobManager.class).waitUntilDone(new AndFilter<>(new ClientSessionFilter(session), new NotFilter<>(new FutureFilter(IFuture.CURRENT.get()))), 1, TimeUnit.MINUTES);
+          }
+          finally {
+            waitForClientJobsToComplete.setBlocking(false);
+          }
+        }
+      });
 
-    public static final int SLEEP_TIME_MILLIS = 100;
-
-    public P_WaitForAllClientJobsJob(IClientSession session) {
-      super("Wait for all client jobs [session: " + session.getUserId() + " / " + System.nanoTime() + "]", session);
+      waitForClientJobsToComplete.waitFor();
     }
-
-    @Override
-    protected void runVoid(IProgressMonitor monitor) throws Throwable {
-      for (Job job : Job.getJobManager().find(ClientJob.class)) {
-        ClientJob clientJob = (ClientJob) job;
-        // Any job (sync or async) from the current session, except this job itself, or "waitFor" job
-        if (clientJob.getClientSession() != getClientSession()) {
-          continue;
-        }
-        if (clientJob instanceof JsonCalendar.P_WaitForAllClientJobsJob) {
-          continue;
-        }
-        if (clientJob.isWaitFor()) {
-          continue;
-        }
-        LOG.info("Waiting for running job: " + clientJob + " (" + clientJob.getClass().getName() + ")");
-        // Re-schedule
-        this.schedule(SLEEP_TIME_MILLIS);
-      }
-    }
-
-    public static void waitForAllOtherJobs() {
-      new P_WaitForAllClientJobsJob(ClientSyncJob.getCurrentSession()).schedule(SLEEP_TIME_MILLIS);
+    catch (JobExecutionException e) {
+      LOG.error("Could not schedule waiting job.", e);
     }
   }
 }

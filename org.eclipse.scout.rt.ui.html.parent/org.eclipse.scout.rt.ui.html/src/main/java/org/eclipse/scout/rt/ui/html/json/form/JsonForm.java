@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
@@ -158,7 +158,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
 
   protected void handleModelFormClosed(IForm form) {
     // FIXME CGU: what happens if isAutoAddRemoveOnDesktop = false and form removed comes after closing? maybe remove form first?
-    if (ClientJob.getCurrentSession().getDesktop().isShowing(form)) {
+    if (ClientSessionProvider.currentSession().getDesktop().isShowing(form)) {
       LOG.error("Form closed but is still showing on desktop.");
       // handleModelFormRemoved(form);
     }

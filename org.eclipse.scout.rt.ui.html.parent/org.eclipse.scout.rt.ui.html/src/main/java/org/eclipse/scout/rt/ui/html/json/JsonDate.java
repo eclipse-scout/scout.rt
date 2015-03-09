@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.shared.servicetunnel.StaticDate;
 
 /**
@@ -143,7 +143,7 @@ public class JsonDate {
     if (date == null || pattern == null) {
       return null;
     }
-    Locale loc = LocaleThreadLocal.get();
+    Locale loc = NlsLocale.get();
     SimpleDateFormat sdf = new SimpleDateFormat(pattern, loc);
     if (utc) {
       sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -156,7 +156,7 @@ public class JsonDate {
       return null;
     }
     try {
-      Locale loc = LocaleThreadLocal.get();
+      Locale loc = NlsLocale.get();
       SimpleDateFormat sdf = new SimpleDateFormat(pattern, loc);
       if (input.endsWith(UTC_MARKER)) {
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));

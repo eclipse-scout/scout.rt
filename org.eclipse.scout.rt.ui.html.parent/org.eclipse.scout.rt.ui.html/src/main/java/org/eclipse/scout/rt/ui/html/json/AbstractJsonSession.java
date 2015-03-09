@@ -26,19 +26,14 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
@@ -46,7 +41,7 @@ import org.eclipse.scout.rt.shared.ui.IUiLayer;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.rt.ui.html.ClientJobUtility;
+import org.eclipse.scout.rt.ui.html.ModelJobUtility;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -77,42 +72,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
     m_rootJsonAdapter = new P_RootAdapter(this);
     m_customHtmlRenderer = createCustomHtmlRenderer();
-
     m_asyncStartedJobs.set(new ArrayList<Job>());
-
-    // FIXME AWE: remove when disposed, thread safety
-    Job.getJobManager().addJobChangeListener(new JobChangeAdapter() {
-
-      private Job isJobElegible(IJobChangeEvent event) {
-        if (isProcessingClientRequest()) {
-          Job job = event.getJob();
-          if (ClientJobUtility.isAsyncJobFromClientSession(job, getClientSession())) {
-            return job;
-          }
-        }
-        return null;
-      }
-
-      @Override
-      public void scheduled(IJobChangeEvent event) {
-        Job job = isJobElegible(event);
-        if (job != null) {
-          List<Job> list = m_asyncStartedJobs.get();
-          list.add(job);
-          LOG.debug("Async Job " + job + " was scheduled while no request was processing --> Add to list, size=" + list.size());
-        }
-      }
-
-      @Override
-      public void done(IJobChangeEvent event) {
-        List<Job> list = m_asyncStartedJobs.get();
-        Job job = event.getJob();
-        if (list.contains(job)) {
-          list.remove(job);
-          LOG.debug("Async Job " + job + " has terminated --> Remove from list, size=" + list.size());
-        }
-      }
-    });
   }
 
   protected JsonResponse createJsonResponse() {
@@ -307,10 +267,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   protected void startUpClientSession(IClientSession clientSession) {
-    ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#startClientSession", clientSession) {
+    IRunnable runnable = new IRunnable() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        ClientJobUtility.runAsSubject(new Runnable() {
+      public void run() throws Exception {
+        ModelJobUtility.runAsSubject(new Runnable() {
           @Override
           public void run() {
             m_jsonClientSession.startUp();
@@ -318,19 +278,14 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         });
       }
     };
-    if (ClientJob.isSyncClientJob()) {
-      job.runNow(new NullProgressMonitor());
-    }
-    else {
-      job.schedule();
-      ClientJobUtility.waitForSyncJob(job);
-    }
+
     try {
-      job.throwOnError();
+      ModelJobUtility.runInModelThreadAndWait(clientSession, runnable);
     }
     catch (ProcessingException e) {
       throw new JsonException(e);
     }
+
     if (!clientSession.isActive()) {
       throw new JsonException("ClientSession is not active, there must have been a problem with loading or starting");
     }
@@ -595,38 +550,22 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   protected JSONObject jsonResponseToJson() {
     final IHolder<JSONObject> resultHolder = new Holder<JSONObject>(JSONObject.class);
-    ClientSyncJob job = new ClientSyncJob("processEvents", getClientSession()) {
+
+    IRunnable runnable = new IRunnable() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        ClientJobUtility.runAsSubject(new Runnable() {
+      public void run() throws Exception {
+        ModelJobUtility.runAsSubject(new Runnable() {
           @Override
           public void run() {
-            // Note: must be called within ClientJob because adapters could call a Service in their toJson() method
-            // FIXME AWE: (jobs) Nicht an jeder Ecke einen neuen Job starten, besser einen einzigen Job für alles
-            // starten, siehe auch AbstractJsonSession#init, Local-Handling, etc
             JSONObject result = currentJsonResponse().toJson();
-
-            // FIXME AWE: den pullAsync Request so umbauen, dass er den haupt-thread nicht blockiert
-            // aber blockiert bis ein ergebnis vorliegt (long-polling))
-            if (!m_asyncStartedJobs.get().isEmpty()) {
-              LOG.debug("FOUND async started jobs, add checkAsync property to response");
-              JsonObjectUtility.putProperty(result, "checkAsync", "true");
-            }
-
             resultHolder.setValue(result);
           }
         });
       }
     };
-    if (ClientJob.isSyncClientJob()) {
-      job.runNow(new NullProgressMonitor());
-    }
-    else {
-      job.schedule();
-      ClientJobUtility.waitForSyncJob(job);
-    }
+
     try {
-      job.throwOnError();
+      ModelJobUtility.runInModelThreadAndWait(getClientSession(), runnable);
     }
     catch (ProcessingException e) {
       throw new JsonException(e); // TODO BSH Exception | Try to eliminate this pattern (5 others in html bundle)
@@ -680,10 +619,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
       // Dispose model (if session was not already stopped earlier by itself)
       if (m_clientSession.isActive()) {
-        ClientJob job = new ClientSyncJob("Disposing client session", m_clientSession) {
+        IRunnable runnable = new IRunnable() {
+
           @Override
-          protected void runVoid(IProgressMonitor monitor) throws Throwable {
-            ClientJobUtility.runAsSubject(new Runnable() {
+          public void run() throws Exception {
+            ModelJobUtility.runAsSubject(new Runnable() {
               @Override
               public void run() {
                 m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
@@ -691,15 +631,9 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
             });
           }
         };
-        if (ClientJob.isSyncClientJob()) {
-          job.runNow(new NullProgressMonitor());
-        }
-        else {
-          job.schedule();
-          ClientJobUtility.waitForSyncJob(job);
-        }
+
         try {
-          job.throwOnError();
+          ModelJobUtility.runInModelThreadAndWait(m_clientSession, runnable);
         }
         catch (ProcessingException e) {
           throw new JsonException(e);

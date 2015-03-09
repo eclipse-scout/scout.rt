@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.ui.html.ClientJobUtility;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.ui.html.ModelJobUtility;
 
 /**
  * Processes JSON events from the UI in a Scout client job and waits until all sync jobs have been finished.
@@ -31,10 +33,11 @@ public class JsonEventProcessor {
   }
 
   public void processEvents(final JsonRequest request, final JsonResponse response) {
-    ClientSyncJob job = new ClientSyncJob("processEvents", m_jsonSession.getClientSession()) {
+    IClientSession clientSession = m_jsonSession.getClientSession();
+    OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        ClientJobUtility.runAsSubject(new Runnable() {
+      public void run() throws Exception {
+        ModelJobUtility.runAsSubject(new Runnable() {
           @Override
           public void run() {
             for (final JsonEvent event : request.getEvents()) {
@@ -43,15 +46,8 @@ public class JsonEventProcessor {
           }
         });
       }
-    };
-    job.schedule();
-    ClientJobUtility.waitUntilJobsHaveFinished(m_jsonSession.getClientSession());
-    try {
-      job.throwOnError();
-    }
-    catch (ProcessingException e) {
-      throw new JsonException(e); // TODO BSH Exception | Try to eliminate this pattern (5 others in html bundle)
-    }
+    }, ClientJobInput.defaults().session(clientSession).name("processEvents"));
+    ModelJobUtility.waitUntilJobsHaveFinished(clientSession);
   }
 
   protected void processEvent(JsonEvent event, JsonResponse response) {

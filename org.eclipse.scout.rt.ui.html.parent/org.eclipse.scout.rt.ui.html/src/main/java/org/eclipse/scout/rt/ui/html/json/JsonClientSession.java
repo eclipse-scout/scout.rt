@@ -20,19 +20,16 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.ui.html.ClientJobUtility;
+import org.eclipse.scout.rt.ui.html.ModelJobUtility;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.json.JSONObject;
 import org.osgi.framework.FrameworkUtil;
@@ -117,10 +114,10 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
     if (m_localeManagedByModel) {
       return;
     }
-    ClientJob job = new ClientSyncJob("Desktop opened", getJsonSession().getClientSession()) {
+    IRunnable runnable = new IRunnable() {
       @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        ClientJobUtility.runAsSubject(new Runnable() {
+      public void run() throws Exception {
+        ModelJobUtility.runAsSubject(new Runnable() {
           @Override
           public void run() {
             if (!getModel().getLocale().equals(locale)) {
@@ -130,15 +127,9 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
         });
       }
     };
-    if (ClientJob.isSyncClientJob()) {
-      job.runNow(new NullProgressMonitor());
-    }
-    else {
-      job.schedule();
-      ClientJobUtility.waitForSyncJob(job);
-    }
+
     try {
-      job.throwOnError();
+      ModelJobUtility.runInModelThreadAndWait(getJsonSession().getClientSession(), runnable);
     }
     catch (ProcessingException e) {
       throw new JsonException(e);
