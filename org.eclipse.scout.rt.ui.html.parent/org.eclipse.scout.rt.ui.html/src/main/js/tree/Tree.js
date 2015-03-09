@@ -174,17 +174,16 @@ scout.Tree.prototype.setBreadcrumbEnabled = function(enabled) {
     return;
   }
 
-  var $selected = this.$selectedNodes();
-  if ($selected.length > 0) {
-    var nodeId = $selected.attr('id'),
-      expanded = $selected.hasClass('expanded'),
+  if (this.selectedNodes.length > 0) {
+    var nodeId = this.selectedNodes[0].id,
+      expanded = this.selectedNodes[0].expanded,
       node = this.nodesMap[nodeId];
 
     if (!expanded) {
       this.session.send(this.id, 'nodeAction', {
         nodeId: nodeId
       });
-      this.setNodeExpanded(node, $selected, true);
+      this.setNodeExpanded(node, true);
     }
   }
 };
@@ -192,19 +191,19 @@ scout.Tree.prototype.setBreadcrumbEnabled = function(enabled) {
 scout.Tree.prototype.collapseAll = function() {
   var that = this;
 
-  //Collapse root nodes
+  // Collapse root nodes
   this.$data.find('[data-level="0"]').each(function() {
     var $node = $(this);
-    that.setNodeExpanded($node.data('node'), $node, false);
+    that.setNodeExpanded($node.data('node'), false);
   });
 
-  //Collapse all expanded child nodes (only model)
+  // Collapse all expanded child nodes (only model)
   this._visitNodes(this.nodes, function(parentNode, node) {
-    this.setNodeExpanded(node, null, false);
+    this.setNodeExpanded(node, false);
   }.bind(this));
 };
 
-scout.Tree.prototype.setNodeExpanded = function(node, $node, expanded) {
+scout.Tree.prototype.setNodeExpanded = function(node, expanded) {
   if (node.expanded !== expanded) {
     node.expanded = expanded;
 
@@ -214,14 +213,20 @@ scout.Tree.prototype.setNodeExpanded = function(node, $node, expanded) {
     });
   }
 
-  //Only render if $node is given to make it possible to expand/collapse currently invisible nodes (used by collapseAll).
-  if ($node && $node.length > 0) {
-    this._renderExpansion(node, $node, expanded);
+  if (this.rendered) {
+    this._renderExpansion(node);
   }
 };
 
-scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
-  var $wrapper;
+scout.Tree.prototype._renderExpansion = function(node) {
+  var $wrapper,
+    $node = node.$node,
+    expanded = node.expanded;
+
+  // Only render if node is rendered to make it possible to expand/collapse currently invisible nodes (used by collapseAll).
+  if (!$node || $node.length === 0) {
+    return;
+  }
 
   if (expanded === $node.hasClass('expanded')) {
     return;
@@ -273,14 +278,14 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
 };
 
 scout.Tree.prototype.clearSelection = function() {
-  this.setNodesSelected([], []);
+  this.setNodesSelected([]);
 };
 
-scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {
-  var i, nodeIds = scout.arrays.init(nodes.length);
+scout.Tree.prototype.setNodesSelected = function(nodes) {
+  var i,
+    nodeIds = scout.arrays.init(nodes.length);
 
   nodes = scout.arrays.ensure(nodes);
-  $nodes = scout.arrays.ensure($nodes);
   for (i = 0; i < nodes.length; i++) {
     nodeIds[i] = nodes[i].id;
   }
@@ -290,7 +295,7 @@ scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {
       nodeIds: nodeIds
     });
     // FIXME BSH Keystroke | "scroll into view"
-    this._renderSelection($nodes);
+    this._renderSelection();
     this._triggerNodesSelected(nodeIds);
     this._renderMenus();
   }
@@ -305,27 +310,24 @@ scout.Tree.prototype._triggerNodesSelected = function(nodeIds) {
 /**
  * @param $nodes if undefined the nodes will be resolved using this.selectedNodeIds
  */
-scout.Tree.prototype._renderSelection = function($nodes) {
-  var i, node, $node;
-
-  // If $nodes are not given collect the nodes based on this.selectedNodeIds
-  if (!$nodes || $nodes.length === 0) {
+scout.Tree.prototype._renderSelection = function() {
+  var i, node, $node,
     $nodes = [];
-    for (i = 0; i < this.selectedNodeIds.length; i++) {
-      node = this.nodesMap[this.selectedNodeIds[i]];
+
+  for (i = 0; i < this.selectedNodeIds.length; i++) {
+    node = this.nodesMap[this.selectedNodeIds[i]];
+    $node = node.$node;
+
+    // If $node is currently not displayed (due to a collapsed parent node), expand the parents
+    if (!$node) {
+      this._expandAllParentNodes(node);
       $node = node.$node;
-
-      // If $node is currently not displayed (due to a collapsed parent node), expand the parents
-      if (!$node) {
-        this._expandAllParentNodes(node);
-        $node = node.$node;
-        if (!$node || $node.length === 0) {
-          throw new Error('Still no node found. node=' + node);
-        }
+      if (!$node || $node.length === 0) {
+        throw new Error('Still no node found. node=' + node);
       }
-
-      $nodes.push($node);
     }
+
+    $nodes.push($node);
   }
 
   this.$data.children().select(false);
@@ -337,7 +339,7 @@ scout.Tree.prototype._renderSelection = function($nodes) {
 
     // in case of breadcrumb, expand
     if (this._breadcrumb) {
-      this.setNodeExpanded($nodes[i].data('node'), $nodes[i], true);
+      this.setNodeExpanded($nodes[i].data('node'), true);
     }
   }
 
@@ -367,7 +369,7 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
       if (!$parentNode) {
         throw new Error('Illegal state, $parentNode should be displayed. Rendered: ' + this.rendered + ', parentNode: ' + parentNodes[i]);
       }
-      this.setNodeExpanded(parentNodes[i], $parentNode, true);
+      this.setNodeExpanded(parentNodes[i], true);
     }
   }
 };
@@ -383,19 +385,19 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   }
   this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
 
-  //update parent with new child nodes
+  // Update parent with new child nodes
   if (parentNode) {
     scout.arrays.pushAll(parentNode.childNodes, nodes);
 
     if (this.rendered && parentNode.$node) {
       $parentNode = parentNode.$node;
       if (parentNode.expanded) {
-        //If parent is already expanded just add the nodes at the end.
-        //Otherwise render the expansion
+        // If parent is already expanded just add the nodes at the end.
+        // Otherwise render the expansion
         if ($parentNode.hasClass('expanded')) {
           this._addNodes(nodes, $parentNode);
         } else {
-          this._renderExpansion(parentNode, $parentNode, true);
+          this._renderExpansion(parentNode);
         }
       }
     }
@@ -525,8 +527,8 @@ scout.Tree.prototype._onNodeExpanded = function(nodeId, expanded) {
   var node = this.nodesMap[nodeId];
   node.expanded = expanded;
 
-  if (this.rendered && node.$node) {
-    this._renderExpansion(node, node.$node, expanded);
+  if (this.rendered) {
+    this._renderExpansion(node);
   }
 };
 
@@ -837,7 +839,7 @@ scout.Tree.prototype._onNodeClick = function(event) {
     nodeId: nodeId
   });
 
-  this.setNodesSelected([node], [$node]);
+  this.setNodesSelected(node);
 };
 
 scout.Tree.prototype._onNodeDoubleClick = function(event) {
@@ -854,7 +856,7 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
     nodeId: nodeId
   });
 
-  this.setNodeExpanded(node, $node, expanded);
+  this.setNodeExpanded(node, expanded);
 };
 
 scout.Tree.prototype._onNodeControlClick = function(event) {
@@ -869,8 +871,8 @@ scout.Tree.prototype._onNodeControlClick = function(event) {
     node = $node.data('node');
 
   //TODO cru/cgu: talk about click on not selected nodes
-  this.setNodesSelected([node], [$node]);
-  this.setNodeExpanded(node, $node, expanded);
+  this.setNodesSelected(node);
+  this.setNodeExpanded(node, expanded);
 
   // prevent immediately reopening
   return false;

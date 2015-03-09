@@ -38,6 +38,6 @@ scout.NavigateDownButton.prototype._drill = function() {
   if (drillNode) {
     $.log.debug('drill down to node ' + drillNode);
     this.outline.setNodesSelected(drillNode); // this also expands the parent node, if required
-    this.outline.setNodeExpanded(drillNode, undefined, false);
+    this.outline.setNodeExpanded(drillNode, false);
   }
 };

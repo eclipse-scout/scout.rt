@@ -62,13 +62,13 @@ describe("NavigateDownButton", function() {
     };
     outline.nodesMap = {'123': drillNode};
     outline.setNodesSelected = function(node) {};
-    outline.setNodeExpanded = function(node, $node, expanded) {};
+    outline.setNodeExpanded = function(node, expanded) {};
 
     spyOn(outline, 'setNodesSelected');
     spyOn(outline, 'setNodeExpanded');
     menu._drill();
     expect(outline.setNodesSelected).toHaveBeenCalledWith(drillNode);
-    expect(outline.setNodeExpanded).toHaveBeenCalledWith(drillNode, undefined, false);
+    expect(outline.setNodeExpanded).toHaveBeenCalledWith(drillNode, false);
   });
 
 });

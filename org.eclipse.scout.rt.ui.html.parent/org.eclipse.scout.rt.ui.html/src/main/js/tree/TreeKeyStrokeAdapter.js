@@ -29,7 +29,7 @@ scout.TreeKeyStrokeAdapter = function(field) {
           targetNode = $targetNode.data('node');
         }
         if (targetNode) {
-          that._field.setNodesSelected(targetNode, $targetNode);
+          that._field.setNodesSelected(targetNode);
         }
       } else if (keycode === scout.keys.DOWN) {
         if ($currentNode.length === 0) {
@@ -40,17 +40,17 @@ scout.TreeKeyStrokeAdapter = function(field) {
           targetNode = $targetNode.data('node');
         }
         if (targetNode) {
-          that._field.setNodesSelected(targetNode, $targetNode);
+          that._field.setNodesSelected(targetNode);
         }
       } else if (currentNode && keycode === scout.keys.LEFT) {
         if (currentNode.expanded) {
-          that._field.setNodeExpanded(currentNode, $currentNode, false);
+          that._field.setNodeExpanded(currentNode, false);
         } else if (currentNode.parentNode) {
           that._field.setNodesSelected(currentNode.parentNode);
         }
       } else if (currentNode && keycode === scout.keys.RIGHT) {
         if (!currentNode.expanded && !currentNode.leaf) {
-          that._field.setNodeExpanded(currentNode, $currentNode, true);
+          that._field.setNodeExpanded(currentNode, true);
         } else if (currentNode.childNodes.length > 0) {
           that._field.setNodesSelected(currentNode.childNodes[0]);
         }

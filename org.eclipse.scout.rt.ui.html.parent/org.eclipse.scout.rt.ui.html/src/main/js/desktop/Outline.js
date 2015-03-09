@@ -71,17 +71,11 @@ scout.Outline.prototype._onNodeDeleted = function(node) {
   }
 };
 
-scout.Outline.prototype._renderSelection = function($nodes) {
-  scout.Outline.parent.prototype._renderSelection.call(this, $nodes);
+scout.Outline.prototype._renderSelection = function() {
+  scout.Outline.parent.prototype._renderSelection.call(this);
 
-  var node;
-  if (!$nodes || $nodes.length === 0) {
-    // Outline does not support multi selection -> [0]
-    node = this.nodesMap[this.selectedNodeIds[0]];
-  } else {
-    node = $nodes[0].data('node');
-  }
-
+  // Outline does not support multi selection -> [0]
+  var node = this.nodesMap[this.selectedNodeIds[0]];
   if (node) {
     this._updateOutlineTab(node);
   } else {
@@ -90,8 +84,8 @@ scout.Outline.prototype._renderSelection = function($nodes) {
 };
 
 // FIXME AWE: (page) unit-test setNodesSelected
-scout.Outline.prototype.setNodesSelected = function(nodes, $nodes) {
-  scout.Outline.parent.prototype.setNodesSelected.call(this, nodes, $nodes);
+scout.Outline.prototype.setNodesSelected = function(nodes) {
+  scout.Outline.parent.prototype.setNodesSelected.call(this, nodes);
   if (this.navigateUpInProgress) {
     this.navigateUpInProgress = false;
   } else {
