@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestForm
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTemplateUsingOtherTemplateGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTestGroupBox;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +49,7 @@ import org.junit.runner.RunWith;
  *
  * @since 3.10.0
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class AbstractFormFieldTest {
   private static final String DUPLICATE_CLASS_ID = "DUPLICATE";
   private static final String TEST_CLASS_ID = "TEST_CLASS_ID1";

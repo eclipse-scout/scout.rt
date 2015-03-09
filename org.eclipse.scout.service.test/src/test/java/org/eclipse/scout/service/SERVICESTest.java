@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.cdi.Bean;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
  *
  * @since 3.9.0
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class SERVICESTest {
   private IBean<?> m_ref1;
   private IBean<?> m_ref2;

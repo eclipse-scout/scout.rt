@@ -10,14 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.cdi;
 
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class ApplicationsScopedTest {
 
   private static IBean<TestObject> m_bean01;

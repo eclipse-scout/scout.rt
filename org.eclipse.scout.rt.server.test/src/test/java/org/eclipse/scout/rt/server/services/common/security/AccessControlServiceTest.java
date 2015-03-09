@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.AbstractClientNotification;
 import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.server.junit.rule.RunAs;
 import org.eclipse.scout.rt.testing.server.junit.rule.ServerJobRule;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -44,7 +44,7 @@ import org.junit.runner.RunWith;
 /**
  * Test for {@link AbstractAccessControlService}
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class AccessControlServiceTest {
   private AbstractAccessControlService m_accessControlService;
   private TestClientNotificationQueueListener m_listener;

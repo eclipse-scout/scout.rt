@@ -19,7 +19,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.server.junit.rule.ServerJobRule;
 import org.junit.After;
 import org.junit.Before;
@@ -29,7 +29,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class SessionInspectorTest {
 
   private static final Long CREATION_TIME = 23456789L;

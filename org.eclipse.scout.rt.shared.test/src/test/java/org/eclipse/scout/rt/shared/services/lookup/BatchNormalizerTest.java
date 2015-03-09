@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
@@ -32,7 +32,7 @@ import org.mockito.stubbing.Answer;
  *
  * @since 4.3.0 (Mars-M5)
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class BatchNormalizerTest {
   private List<? extends IBean<?>> m_reg;
   private IFruitLookupService m_lookupService;

@@ -22,14 +22,14 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.ValueFieldTest.ValidateTestForm.MainBox.AField;
 import org.eclipse.scout.rt.client.ui.form.fields.ValueFieldTest.ValidateTestForm.MainBox.BField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link AbstractValueField}
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class ValueFieldTest {
   private static final String PARSE_ERROR_MESSAGE = "Parse Error Message";
   private static final String UNPARSABLE_VALUE = "unparsable";

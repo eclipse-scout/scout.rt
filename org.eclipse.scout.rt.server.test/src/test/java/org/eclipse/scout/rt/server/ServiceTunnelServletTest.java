@@ -50,7 +50,7 @@ import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
@@ -62,7 +62,7 @@ import org.mockito.stubbing.Answer;
 /**
  * Test for {@link ServiceTunnelServlet}
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class ServiceTunnelServletTest {
 
   private static final int TEST_SERVICE_RANKING = 1000;

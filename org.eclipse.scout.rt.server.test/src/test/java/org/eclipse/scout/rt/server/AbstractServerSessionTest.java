@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.server.junit.rule.ServerJobRule;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 /**
  * Test for {@link AbstractServerSession}
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class AbstractServerSessionTest {
 
   private IObjectSerializer m_objs;

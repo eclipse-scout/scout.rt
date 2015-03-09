@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
 import org.eclipse.scout.rt.shared.services.lookup.fixture.ILegacyCodeLookupCallVisitor;
 import org.eclipse.scout.rt.shared.services.lookup.fixture.LegacyCodeLookupCall;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.common.code.TestingCodeService;
 import org.junit.AfterClass;
@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
  * JUnit test for {@link CodeLookupCall}.
  * Test that the implementation of Bug 364312 does not affect the lookup call's behaviour (no side effects).
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class CodeLookupCallTest {
   private static final Integer ROW10_KEY = Integer.valueOf(10);
   private static final String ROW10_TEXT = "lorem";

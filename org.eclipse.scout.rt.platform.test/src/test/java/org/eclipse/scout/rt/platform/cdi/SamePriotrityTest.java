@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.cdi;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 /**
  *
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class SamePriotrityTest {
 
   private static IBean<ABean> m_bean01;

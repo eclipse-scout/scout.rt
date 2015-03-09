@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission1;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission2;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
@@ -34,7 +34,7 @@ import org.osgi.framework.Bundle;
 /**
  * Test for {@link IPermissionService}
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class PermissionServiceTest {
 
   /* ---------------------------------------------------------------------------------------------- */

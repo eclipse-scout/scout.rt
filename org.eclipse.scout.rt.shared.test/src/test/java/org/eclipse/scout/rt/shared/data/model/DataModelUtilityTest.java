@@ -23,14 +23,14 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.fixture.CustomDataModel;
 import org.eclipse.scout.rt.shared.data.model.fixture.CustomDataModelExtension;
 import org.eclipse.scout.rt.shared.test.ResourceBase;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * JUnit test for {@link DataModelUtility}
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class DataModelUtilityTest {
 
   @Test
