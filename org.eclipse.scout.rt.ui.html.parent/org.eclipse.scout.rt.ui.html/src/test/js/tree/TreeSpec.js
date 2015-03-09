@@ -170,7 +170,7 @@ describe("Tree", function() {
       expect(tree._onNodeClick).toHaveBeenCalled();
     });
 
-    it("sends click and selection events in one call in this order", function() {
+    it("sends selection and click events in one call in this order", function() {
       var model = createModelFixture(1);
       var tree = createTree(model);
       tree.render(session.$entryPoint);
@@ -182,7 +182,23 @@ describe("Tree", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodesSelected']);
+      expect(requestData).toContainEventTypesExactly(['nodesSelected', 'nodeClicked']);
+    });
+
+    it("sends selection, check and click events if tree is checkable and checkbox has been clicked", function() {
+      var model = createModelFixture(1);
+      var tree = createTree(model);
+      tree.checkable = true;
+      tree.render(session.$entryPoint);
+
+      var $checkbox = tree.$container.find('.tree-item:first').find('.tree-item-checkbox label').first();
+      $checkbox.triggerClick();
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      var requestData = mostRecentJsonRequest();
+      expect(requestData).toContainEventTypesExactly(['nodesSelected', 'nodesChecked', 'nodeClicked']);
     });
 
     it("updates model (selection)", function() {
@@ -469,7 +485,7 @@ describe("Tree", function() {
 
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['nodeClicked', 'nodesSelected', 'nodeAction', 'nodeExpanded']);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['nodesSelected', 'nodeClicked', 'nodeAction', 'nodeExpanded']);
     });
   });
 
@@ -511,7 +527,8 @@ describe("Tree", function() {
 
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['nodeClicked', 'nodesSelected', 'nodeAction', 'nodeExpanded']);
+      // clicked has to be after selected otherwise it is not possible to get the selected row in execNodeClick
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['nodesSelected', 'nodeClicked', 'nodeAction', 'nodeExpanded']);
     });
   });
 

@@ -505,7 +505,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected IColumn extractColumn(JSONObject json) {
-    String columnId = JsonObjectUtility.getString(json, PROP_COLUMN_ID);
+    String columnId = JsonObjectUtility.optString(json, PROP_COLUMN_ID);
     if (columnId == null) {
       return null;
     }

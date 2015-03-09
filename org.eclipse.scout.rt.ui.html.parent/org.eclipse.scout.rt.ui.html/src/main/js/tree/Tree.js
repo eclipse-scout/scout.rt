@@ -682,7 +682,8 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
 scout.Tree.prototype._$buildNode = function(node, $parent) {
   var level = $parent ? parseFloat($parent.attr('data-level')) + 1 : 0;
 
-  var $node = $.makeDiv('tree-item', undefined, node.id)
+  var $node = $.makeDiv('tree-item')
+    .attr('id', node.id)
     .on('click', '', this._onNodeClick.bind(this))
     .on('dblclick', '', this._onNodeDoubleClick.bind(this))
     .data('node', node)
@@ -694,7 +695,7 @@ scout.Tree.prototype._$buildNode = function(node, $parent) {
   this._renderTreeItemControl($node);
 
   if (this.checkable) {
-    this._renderTreeItemCheckbox($node, node);
+    this._renderTreeItemCheckbox(node);
   }
 
   return $node;
@@ -737,10 +738,10 @@ scout.Tree.prototype._renderNodeChecked = function(node) {
 };
 
 scout.Tree.prototype.checkNodeAndRender = function(node, checked) {
-  this.checkNode(node, checked, true);
+  this.checkNode(node, checked);
 };
 
-scout.Tree.prototype.checkNode = function(node, checked, render, suppressSend) {
+scout.Tree.prototype.checkNode = function(node, checked, suppressSend) {
   var updatedNodes = [];
   if (!this.enabled || !this.checkable || !node.enabled || node.checked === checked) {
     return updatedNodes;
@@ -764,7 +765,7 @@ scout.Tree.prototype.checkNode = function(node, checked, render, suppressSend) {
   if (!suppressSend) {
     this.sendNodesChecked(updatedNodes);
   }
-  if (this.rendered && render) {
+  if (this.rendered) {
     this._renderNodeChecked(node);
   }
   return updatedNodes;
@@ -774,7 +775,7 @@ scout.Tree.prototype.checkChildren = function(node) {
   var updatedNodes = [];
   if (this.autoCheckChildren && node && node.checked) {
     for (var i = 0; i < node.childNodes.length; i++) {
-      updatedNodes = updatedNodes.concat(this.checkNode(node.childNodes[i], true, node.checked, true));
+      updatedNodes = updatedNodes.concat(this.checkNode(node.childNodes[i], node.checked, true));
     }
   }
   return updatedNodes;
@@ -805,20 +806,19 @@ scout.Tree.prototype._renderTreeItemControl = function($node) {
   }
 };
 
-scout.Tree.prototype._renderTreeItemCheckbox = function($node, node) {
+scout.Tree.prototype._renderTreeItemCheckbox = function(node) {
   var that = this,
+    $node = node.$node,
     $controlItem = $node.prependDiv('tree-item-checkbox'),
     forRefId = node.id + '-tree-checkable';
   var $checkbox = $('<input>')
     .attr('tabindex', '-1')
     .attr('id', forRefId)
     .attr('type', 'checkbox')
-    .appendTo($controlItem)
-    .prop('checked', node.checked);
+    .prop('checked', node.checked)
+    .appendTo($controlItem);
   var $label = $('<label>')
-    .attr('for', forRefId)
-    .appendTo($controlItem)
-    .on('mouseup', node, onNodeChecked);
+    .appendTo($controlItem);
 
   $checkbox.setEnabled(this.enabled && node.enabled);
 
@@ -826,11 +826,6 @@ scout.Tree.prototype._renderTreeItemCheckbox = function($node, node) {
     $label.addClass('childrenChecked');
   } else {
     $label.removeClass('childrenChecked');
-  }
-
-  function onNodeChecked(event) {
-    var node = event.data;
-    that.checkNode(node, !node.checked);
   }
 };
 
@@ -844,11 +839,20 @@ scout.Tree.prototype._onNodeClick = function(event) {
     nodeId = $node.attr('id'),
     node = this.nodesMap[nodeId];
 
+  this.setNodesSelected(node);
+
+  if (this.checkable && this._isCheckboxClicked(event)) {
+    this.checkNode(node, !node.checked);
+  }
+
   this.session.send(this.id, 'nodeClicked', {
     nodeId: nodeId
   });
+};
 
-  this.setNodesSelected(node);
+scout.Tree.prototype._isCheckboxClicked = function(event) {
+  var $target = $(event.target);
+  return $target.is('label') && $target.parent().hasClass('tree-item-checkbox');
 };
 
 scout.Tree.prototype._onNodeDoubleClick = function(event) {

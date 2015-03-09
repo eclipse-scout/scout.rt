@@ -7,98 +7,87 @@
 scout.TableSelectionHandler = function(table) {
   this.table = table;
   this.mouseMoveSelectionEnabled = true;
-
-  var that = this;
-  this.table.events.on(scout.Table.GUI_EVENT_ROWS_DRAWN, function(event) {
-    that._onRowsDrawn(event.$rows);
-  });
+  this._mouseDown;
+  this._$selectedRows;
+  this._$allRows;
 };
 
-scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
-  if (!$rows) {
+// TODO BSH Table Selection | Improve selection handling (up, down)
+// TODO BSH Table Selection | Try to merge this with TableKeystrokeAdapter
+scout.TableSelectionHandler.prototype.onMouseDown = function(event, $row) {
+  var fromIndex, toIndex,
+    select = true;
+
+  this._mouseDown = true;
+  this._$allRows = this.table.$filteredRows();
+  this._$selectedRows = this.table.$selectedRows();
+
+  // Click without ctrl always starts new selection, with ctrl toggle
+  if (this.table.multiSelect && event.shiftKey) {
+    fromIndex = this._$allRows.index(this._$selectedRows.first());
+  } else if (this.table.multiSelect && event.ctrlKey) {
+    select = !$row.isSelected();
+  } else {
+    // Click on the already selected row must not clear the selection it to avoid another selection event sent to the server
+    // Right click on already selected rows must not clear the selection
+    if (!$row.isSelected() ||
+      (this._$selectedRows.length > 1 && event.which !== 3)) {
+      this._$selectedRows.select(false);
+      this._clearSelectionBorder(this._$selectedRows);
+    }
+  }
+
+  if (fromIndex === undefined) {
+    fromIndex = this._$allRows.index($row);
+  }
+
+  // just a click... right click do not select if clicked in selection
+  if (event.which !== 3 || !$row.is(this._$selectedRows)) {
+    toIndex = this._$allRows.index($row);
+    this._selectRange(fromIndex, toIndex, select);
+  }
+
+  if (this.table.multiSelect && this.mouseMoveSelectionEnabled) {
+    // ...or movement with held mouse button
+    this._$allRows.one('mousemove.selectionHandler', function(event) {
+      var $row = $(event.delegateTarget);
+      toIndex = this._$allRows.index($row);
+      this._selectRange(fromIndex, toIndex, select);
+    }.bind(this));
+  }
+};
+
+scout.TableSelectionHandler.prototype._selectRange = function(fromIndex, toIndex, select) {
+  var startIndex = Math.min(fromIndex, toIndex),
+    endIndex = Math.max(fromIndex, toIndex) + 1,
+    $actionRow = this._$allRows.slice(startIndex, endIndex);
+
+  // set/remove selection
+  if (select) {
+    $actionRow.select(true);
+  } else {
+    $actionRow.select(false);
+    this._clearSelectionBorder(this._$selectedRows);
+  }
+
+  this._$selectedRows = this.table.$selectedRows();
+  this._clearSelectionBorder(this._$selectedRows);
+  this._drawSelectionBorder(this._$selectedRows);
+  this.table.triggerRowsSelected(this._$selectedRows);
+};
+
+scout.TableSelectionHandler.prototype.onMouseUp = function(event) {
+  if (!this._mouseDown) {
+    // May happen when selecting elements with chrome dev tools
     return;
   }
+  this._mouseDown = false;
+  this.table.onRowsSelected(this._$selectedRows);
 
-  $rows.on('mousedown', '', onMouseDown);
-
-  var that = this;
-
-  // TODO BSH Table Selection | Improve selection handling (up, down)
-  // TODO BSH Table Selection | Try to merge this with TableKeystrokeAdapter
-  function onMouseDown(event) {
-    var $row = $(event.delegateTarget),
-      add = true,
-      first,
-      $selectedRows = that.table.$selectedRows(),
-      $allRows = that.table.$filteredRows(),
-      selectionChanged = false;
-
-    // click without ctrl always starts new selection, with ctrl toggle
-    if (that.table.multiSelect && event.shiftKey) {
-      first = $allRows.index($selectedRows.first());
-    } else if (that.table.multiSelect && event.ctrlKey) {
-      add = !$row.isSelected();
-    } else {
-      //Click on the already selected row must not clear the selection it to avoid another selection event sent to the server
-      //Right click on already selected rows must not clear the selection
-      if (!$row.isSelected() ||
-        ($selectedRows.length > 1 && event.which !== 3)) {
-        $selectedRows.select(false);
-        that._clearSelectionBorder($selectedRows);
-      }
-    }
-
-    // just a click... right click do not select if clicked in selection
-    if (event.which !== 3 || !$row.is($selectedRows)) {
-      selectData(event);
-    }
-
-    if (that.table.multiSelect && that.mouseMoveSelectionEnabled) {
-      // ...or movement with held mouse button
-      $allRows.one('mousemove.selectionHandler', function(event) {
-        selectData(event);
-      });
-    }
-    $allRows.one('mouseup.selectionHandler', function(event) {
-      onMouseUp(event);
-    });
-
-    // action for all affected rows
-    function selectData(event) {
-      // affected rows between $row and Target
-      var firstIndex = (first !== undefined ? first : $allRows.index($row));
-      var lastIndex = $allRows.index($(event.delegateTarget));
-
-      var startIndex = Math.min(firstIndex, lastIndex);
-      var endIndex = Math.max(firstIndex, lastIndex) + 1;
-
-      var $actionRow = $allRows.slice(startIndex, endIndex);
-
-      // set/remove selection
-      if (add) {
-        $actionRow.select(true);
-      } else {
-        $actionRow.select(false);
-        that._clearSelectionBorder($selectedRows);
-      }
-
-      $selectedRows = that.table.$selectedRows();
-      that._clearSelectionBorder($selectedRows);
-      that._drawSelectionBorder($selectedRows);
-      that.table.triggerRowsSelected($selectedRows);
-
-      //FIXME currently also set if selection hasn't changed (same row clicked again). maybe optimize
-      selectionChanged = true;
-    }
-
-    function onMouseUp(event) {
-      // TODO BSH Table Selection | This is way too inefficient for many rows!
-      $allRows.off('.selectionHandler');
-
-      that.table.onRowsSelected($selectedRows);
-    }
-
-  }
+  // TODO BSH Table Selection | This is way too inefficient for many rows!
+  this._$allRows.off('mousemove.selectionHandler');
+  this._$allRows = null;
+  this._$selectedRows = null;
 };
 
 scout.TableSelectionHandler.prototype.drawSelection = function() {

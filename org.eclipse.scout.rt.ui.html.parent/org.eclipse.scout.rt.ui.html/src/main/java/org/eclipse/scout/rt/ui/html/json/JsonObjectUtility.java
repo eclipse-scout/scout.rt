@@ -83,6 +83,10 @@ public final class JsonObjectUtility {
     }
   }
 
+  public static String optString(JSONObject json, String key) {
+    return json.optString(key, null);
+  }
+
   public static String getString(JSONArray json, int index) {
     try {
       return json.getString(index);

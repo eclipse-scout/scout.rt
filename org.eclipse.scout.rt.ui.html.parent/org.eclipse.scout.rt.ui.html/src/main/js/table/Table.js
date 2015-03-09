@@ -467,25 +467,32 @@ scout.Table.prototype._installRows = function($rows) {
 
   function onMouseDown(event) {
     $mouseDownRow = $(event.delegateTarget);
+    that.selectionHandler.onMouseDown(event, $mouseDownRow);
   }
 
   function onMouseUp(event) {
     if (event.originalEvent.detail > 1) {
-      //don't execute on double click events
+      // Don't execute on double click events
       return;
     }
+
+    that.selectionHandler.onMouseUp(event, $mouseUpRow);
 
     var $mouseUpRow = $(event.delegateTarget);
     if ($mouseDownRow && $mouseDownRow[0] !== $mouseUpRow[0]) {
       return;
     }
 
-    var $row = $(event.delegateTarget);
+    var $row = $mouseUpRow;
     var column = that._columnAtX(event.pageX);
+    column.onMouseUp(event, $row);
+
     var hyperLink = that._findHyperLink(event);
     if (hyperLink) {
       that.sendHyperlinkAction($row.data('row').id, column.id, hyperLink);
-    } else if (column.objectType !== 'CheckBoxColumn') {
+    } else if (column.guiOnly) {
+      that.sendRowClicked($row);
+    } else {
       that.sendRowClicked($row, column.id);
     }
   }
@@ -631,11 +638,14 @@ scout.Table.prototype.onResize = function() {
   scout.scrollbars.update(this.$data);
 };
 
-scout.Table.prototype.sendRowClicked = function($row, columnIdParam) {
-  this.session.send(this.id, 'rowClicked', {
-    rowId: $row.attr('id'),
-    columnId: columnIdParam
-  });
+scout.Table.prototype.sendRowClicked = function($row, columnId) {
+  var data = {
+    rowId: $row.attr('id')
+  };
+  if (columnId !== undefined) {
+    data.columnId = columnId;
+  }
+  this.session.send(this.id, 'rowClicked', data);
 };
 
 scout.Table.prototype.sendRowsChecked = function(rows) {
@@ -1454,14 +1464,14 @@ scout.Table.prototype._renderHeaderVisible = function() {
 scout.Table.prototype._renderCheckable = function() {
   var that = this;
   if (this.checkable && this.columns[0].objectType !== "CheckBoxColumn") {
-    //checkable column is always set as first col
+    // Checkable column is always set as first col
     var column = new scout.CheckBoxColumn();
     column.init();
+    column.table = this;
     scout.arrays.insert(this.columns, column, 0);
     for (var i = 0; i < this.rows.length; i++) {
       var $row = this.rows[i].$row;
       $row.prepend(column.buildCell(this.rows[i]));
-      $('.checkable-col label', $row).on('mouseup', $row, onRowChecked);
     }
     if (this.header) {
       column.buildHeaderCell(this.header);
@@ -1475,12 +1485,6 @@ scout.Table.prototype._renderCheckable = function() {
     }
     this._updateRowWidth();
     this.$rows(true).css('width', this._rowWidth);
-  }
-
-   function onRowChecked(event) {
-    var $row = event.data;
-    var row = $row.data('row');
-    that.checkRow(row, !row.checked);
   }
 };
 

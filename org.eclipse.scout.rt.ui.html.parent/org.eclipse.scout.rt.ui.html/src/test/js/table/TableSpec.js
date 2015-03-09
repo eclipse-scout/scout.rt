@@ -728,7 +728,7 @@ describe("Table", function() {
       var $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
-      var $rows = table.$data.children('.table-row');
+      var $rows = table.$rows();
       clickRowAndAssertSelection(table, $rows.eq(1));
       clickRowAndAssertSelection(table, $rows.eq(2));
 
@@ -736,17 +736,18 @@ describe("Table", function() {
       clickRowAndAssertSelection(table, $rows.eq(4));
     });
 
-    it("sends click and selection events", function() {
+    it("sends selection and click events", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $row = table.$data.children('.table-row').first();
+      var $row = table.$rows().first();
       $row.triggerClick();
 
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowClicked', 'rowsSelected']);
+      // clicked has to be after selected otherwise it is not possible to get the selected row in execRowClick
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'rowClicked']);
     });
 
     it("sends only click if row already is selected", function() {
@@ -754,17 +755,31 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $row = table.$data.children('.table-row').first();
+      var $row = table.$rows().first();
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowClicked', 'rowsSelected']);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'rowClicked']);
 
       jasmine.Ajax.requests.reset();
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
 
       expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowClicked']);
+    });
+
+    it("sends selection, checked and click events if table is checkable and checkbox has been clicked", function() {
+      var model = helper.createModelFixture(2, 5);
+      model.checkable = true;
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $checkbox = table.$rows().first().find('.checkable-col label').first();
+      $checkbox.triggerClick();
+
+      sendQueuedAjaxCalls();
+
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'rowsChecked', 'rowClicked']);
     });
 
   });
@@ -778,12 +793,12 @@ describe("Table", function() {
       table._columnAtX = function() {
         return table.columns[0];
       };
-      var $row = table.$data.children('.table-row').first();
+      var $row = table.$rows().first();
       $row.triggerDoubleClick();
 
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowClicked', 'rowsSelected', 'rowAction']);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowsSelected', 'rowClicked', 'rowAction']);
     });
   });
 

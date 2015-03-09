@@ -1,5 +1,6 @@
 scout.CheckBoxColumn = function() {
   scout.CheckBoxColumn.parent.call(this);
+  this.guiOnly = true;
 };
 scout.inherits(scout.CheckBoxColumn, scout.Column);
 
@@ -33,4 +34,12 @@ scout.CheckBoxColumn.prototype.buildHeaderCell = function(header) {
   this.header = header.$container.prependDiv('header-item')
     .css('min-width', scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE + 'px')
     .css('max-width', scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE + 'px');
+};
+
+scout.CheckBoxColumn.prototype.onMouseUp = function(event, $row) {
+  var row = $row.data('row');
+  var $target = $(event.target);
+  if ($target.is('label') && $target.parent().hasClass('checkable-col')) {
+    this.table.checkRow(row, !row.checked);
+  }
 };

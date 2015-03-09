@@ -4,7 +4,7 @@ scout.Column = function() {
 scout.Column.prototype.init = function(model, session) {
   this.session = session;
 
-  // copy all properties from model to this
+  // Copy all properties from model to this
   $.extend(this, model);
 
   // Fill in the missing default values
@@ -19,4 +19,8 @@ scout.Column.prototype.buildCell = function(row) {
   tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
 
   return '<div class="table-cell" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + value + '</div>';
+};
+
+scout.Column.prototype.onMouseUp = function(event, $row) {
+  // May be implemented by subclasses
 };
