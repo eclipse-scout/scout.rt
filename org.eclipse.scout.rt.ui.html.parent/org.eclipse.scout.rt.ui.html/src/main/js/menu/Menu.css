@@ -38,8 +38,8 @@
   margin: 0 @menu-margin-x;
   padding: 6px 0 10px 0;
 
-  & div, button {
-    box-sizing: border-box;
+  & div {
+    position: relative; /* reset a possible different value (e.g. set by .form-field) which might cause 'display: inline-block' to be ignored for the computed style */
     display: inline-block;
     vertical-align: middle;
   }
