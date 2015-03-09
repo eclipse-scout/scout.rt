@@ -20,6 +20,7 @@ import java.lang.annotation.Target;
  *
  * @see {@link ServerJobRule}
  * @since 5.1
+ * TODO dwi use RunWithSubject
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
