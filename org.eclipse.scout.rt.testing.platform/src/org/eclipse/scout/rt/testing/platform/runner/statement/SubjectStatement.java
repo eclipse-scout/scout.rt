@@ -15,7 +15,6 @@ import java.security.PrivilegedExceptionAction;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -23,7 +22,7 @@ import org.junit.runners.model.Statement;
 
 /**
  * Statement to execute the following statements under a particular user.
- * 
+ *
  * @since5.1
  */
 public class SubjectStatement extends Statement {
@@ -43,30 +42,40 @@ public class SubjectStatement extends Statement {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
 
     final String principal = (annotation != null ? annotation.value() : null);
-    m_subject = new Subject();
-    m_subject.getPrincipals().add(new SimplePrincipal(StringUtility.nvl(principal, "anonymous")));
-    m_subject.setReadOnly();
+    if (principal != null) {
+      m_subject = new Subject();
+      m_subject.getPrincipals().add(new SimplePrincipal(principal));
+      m_subject.setReadOnly();
+    }
+    else {
+      m_subject = null;
+    }
   }
 
   @Override
   public void evaluate() throws Throwable {
-    final Holder<Throwable> throwable = new Holder<>();
-    Subject.doAs(m_subject, new PrivilegedExceptionAction<Void>() {
+    if (m_subject != null) {
+      final Holder<Throwable> throwable = new Holder<>();
+      Subject.doAs(m_subject, new PrivilegedExceptionAction<Void>() {
 
-      @Override
-      public Void run() throws Exception {
-        try {
-          m_next.evaluate();
+        @Override
+        public Void run() throws Exception {
+          try {
+            m_next.evaluate();
+          }
+          catch (final Throwable t) {
+            throwable.setValue(t);
+          }
+          return null;
         }
-        catch (final Throwable t) {
-          throwable.setValue(t);
-        }
-        return null;
+      });
+
+      if (throwable.getValue() != null) {
+        throw throwable.getValue();
       }
-    });
-
-    if (throwable.getValue() != null) {
-      throw throwable.getValue();
+    }
+    else {
+      m_next.evaluate();
     }
   }
 }

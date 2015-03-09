@@ -10,18 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.server.runner.statement;
 
+import java.security.AccessController;
+
+import javax.security.auth.Subject;
+
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.runners.model.Statement;
 
 /**
  * Statement to provide the calling context with a server session. The session is created based on values of the current
  * thread-context.
- * 
+ *
  * @since5.1
  */
 public class ProvideServerSessionStatement extends Statement {
@@ -44,6 +49,8 @@ public class ProvideServerSessionStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
+    Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "Subject must not be null. Use the annotation '%s' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
+
     final IServerSession serverSession = OBJ.one(m_providerClass).provide(ServerJobInput.defaults().copy());
 
     final ISession oldSession = ISession.CURRENT.get();
