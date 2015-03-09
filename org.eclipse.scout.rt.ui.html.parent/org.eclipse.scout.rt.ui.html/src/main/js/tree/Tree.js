@@ -128,8 +128,9 @@ scout.Tree.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
-
-  this.installKeyStrokeAdapter();
+  if(this.enabled){
+    this.installKeyStrokeAdapter();
+  }
 
   this.$data = this.$container.appendDiv('tree-data');
 
@@ -144,9 +145,16 @@ scout.Tree.prototype._render = function($parent) {
 };
 
 scout.Tree.prototype.installKeyStrokeAdapter = function(){
+  this.$container.attr('tabIndex', 0);
   if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    this.$container.attr('tabIndex', 0);
     scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+  }
+};
+
+scout.Tree.prototype.uninstallKeyStrokeAdapter = function(){
+  this.$container.attr('tabIndex', -1);
+  if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.$container, this.keyStrokeAdapter);
   }
 };
 
@@ -1032,6 +1040,11 @@ scout.Tree.prototype._renderEnabled = function() {
       node = $node.data('node');
     $node.find('input').setEnabled(enabled && node.enabled);
   });
+  if(enabled){
+    this.installKeyStrokeAdapter();
+  } else{
+    this.uninstallKeyStrokeAdapter();
+  }
 };
 
 scout.Tree.prototype.dispose = function() {
