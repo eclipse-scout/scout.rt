@@ -1,6 +1,5 @@
 scout.CheckBoxColumn = function() {
   scout.CheckBoxColumn.parent.call(this);
-  this.guiOnly = true;
 };
 scout.inherits(scout.CheckBoxColumn, scout.Column);
 
@@ -8,6 +7,7 @@ scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE = 30;
 
 scout.CheckBoxColumn.prototype.init = function(model, session) {
   this.fixedWidth = true;
+  this.guiOnlyCheckBoxColumn = true;
   // Fill in the missing default values
   scout.defaultValues.applyTo(this);
   this.width = scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE;

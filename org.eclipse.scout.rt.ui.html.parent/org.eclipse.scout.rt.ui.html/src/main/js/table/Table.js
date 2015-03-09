@@ -47,14 +47,24 @@ scout.Table.prototype.init = function(model, session) {
 };
 
 scout.Table.prototype._initColumns = function() {
-  for (var i = 0; i < this.columns.length; i++) {
-    // Unwrap data
-    scout.defaultValues.applyTo(this.columns[i], 'TableColumn');
-
-    var column = this.session.objectFactory.create(this.columns[i]);
+  var column, i;
+  for (i = 0; i < this.columns.length; i++) {
+    column = this.session.objectFactory.create(this.columns[i]);
     column.table = this;
     this.columns[i] = column;
   }
+
+  // Add gui only checkbox column at the beginning
+  if (this.checkable) {
+    this._insertCheckBoxColumn();
+  }
+};
+
+scout.Table.prototype._insertCheckBoxColumn = function() {
+  var column = new scout.CheckBoxColumn();
+  column.init();
+  column.table = this;
+  scout.arrays.insert(this.columns, column, 0);
 };
 
 scout.Table.prototype.dispose = function() {
@@ -88,7 +98,6 @@ scout.Table.prototype._renderProperties = function() {
   this._renderMenus();
   this._renderTableHeader();
   this._renderTableFooter();
-  this._renderCheckable();
 };
 
 scout.Table.prototype._remove = function() {
@@ -476,9 +485,9 @@ scout.Table.prototype._installRows = function($rows) {
       return;
     }
 
+    var $mouseUpRow = $(event.delegateTarget);
     that.selectionHandler.onMouseUp(event, $mouseUpRow);
 
-    var $mouseUpRow = $(event.delegateTarget);
     if ($mouseDownRow && $mouseDownRow[0] !== $mouseUpRow[0]) {
       return;
     }
@@ -490,7 +499,7 @@ scout.Table.prototype._installRows = function($rows) {
     var hyperLink = that._findHyperLink(event);
     if (hyperLink) {
       that.sendHyperlinkAction($row.data('row').id, column.id, hyperLink);
-    } else if (column.guiOnly) {
+    } else if (column.guiOnlyCheckBoxColumn) {
       that.sendRowClicked($row);
     } else {
       that.sendRowClicked($row, column.id);
@@ -1325,7 +1334,7 @@ scout.Table.prototype.hideRow = function($row, useAnimation) {
  * @param resizingInProgress set this to true when calling this function several times in a row. If resizing is finished you have to call resizingColumnFinished.
  */
 scout.Table.prototype.resizeColumn = function(column, width, resizingInProgress) {
-  if (column.fixedWith) {
+  if (column.fixedWidth) {
     return;
   }
   var colNum = this.columns.indexOf(column) + 1;
@@ -1348,6 +1357,9 @@ scout.Table.prototype.resizeColumn = function(column, width, resizingInProgress)
 };
 
 scout.Table.prototype.resizingColumnFinished = function(column, width) {
+  if (column.fixedWidth) {
+    return;
+  }
   var data = {
     columnId: column.id,
     width: width
@@ -1356,36 +1368,39 @@ scout.Table.prototype.resizingColumnFinished = function(column, width) {
 };
 
 scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
-  var uiOnlyColumnOffset = 0,
-    sendPos = 0;
-  if(this.checkable){
-    sendPos = newPos-1;
-  }
+  var data,
+    index = newPos,
+    column0 = this.columns[0];
 
-  if (this.checkable && newPos === 0) {
-    uiOnlyColumnOffset = 1;
+  // If column 0 is the gui only checkbox column, don't allow moving a column before this one.
+  if (column0.guiOnlyCheckBoxColumn) {
+    if (newPos === 0) {
+      newPos = 1;
+    }
+    // Adjust index because column is only known on the gui
+    index = newPos - 1;
   }
 
   scout.arrays.remove(this.columns, column);
-  scout.arrays.insert(this.columns, column, newPos + uiOnlyColumnOffset);
+  scout.arrays.insert(this.columns, column, newPos);
 
-  var data = {
+  data = {
     columnId: column.id,
-    index: sendPos
+    index: index
   };
   this.session.send(this.id, 'columnMoved', data);
 
   if (this.header) {
-    this.header.onColumnMoved(column, oldPos, newPos + uiOnlyColumnOffset, dragged);
+    this.header.onColumnMoved(column, oldPos, newPos, dragged);
   }
 
   // move cells
   this.$rows(true).each(function() {
     var $cells = $(this).children();
-    if (newPos + uiOnlyColumnOffset < oldPos) {
-      $cells.eq(newPos + uiOnlyColumnOffset).before($cells.eq(oldPos));
+    if (newPos < oldPos) {
+      $cells.eq(newPos).before($cells.eq(oldPos));
     } else {
-      $cells.eq(newPos + uiOnlyColumnOffset).after($cells.eq(oldPos));
+      $cells.eq(newPos).after($cells.eq(oldPos));
     }
   });
 };
@@ -1461,31 +1476,28 @@ scout.Table.prototype._renderHeaderVisible = function() {
   this._renderTableHeader();
 };
 
-scout.Table.prototype._renderCheckable = function() {
-  var that = this;
-  if (this.checkable && this.columns[0].objectType !== "CheckBoxColumn") {
-    // Checkable column is always set as first col
-    var column = new scout.CheckBoxColumn();
-    column.init();
-    column.table = this;
-    scout.arrays.insert(this.columns, column, 0);
-    for (var i = 0; i < this.rows.length; i++) {
-      var $row = this.rows[i].$row;
-      $row.prepend(column.buildCell(this.rows[i]));
-    }
-    if (this.header) {
-      column.buildHeaderCell(this.header);
-    }
-    this._updateRowWidth();
-    this.$rows(true).css('width', this._rowWidth);
-  } else if (!this.checkable && this.columns[0].objectType === "CheckBoxColumn") {
-    this.splice(0, 1);
-    for (var j = 0; j < this.$rows.length; j++) {
-      this.$rows[j].remove();
-    }
-    this._updateRowWidth();
-    this.$rows(true).css('width', this._rowWidth);
+scout.Table.prototype._syncCheckable = function(checkable) {
+  this.checkable = checkable;
+
+  var column = this.columns[0];
+  if (this.checkable && !column.guiOnlyCheckBoxColumn) {
+    this._insertCheckBoxColumn();
+  } else if (!this.checkable && column.guiOnlyCheckBoxColumn) {
+    scout.arrays.remove(this.columns, column);
   }
+};
+
+scout.Table.prototype._renderCheckable = function() {
+  this._redraw();
+};
+
+scout.Table.prototype._redraw = function() {
+  if (this.header) {
+    this.header.remove();
+    this.header = this._createHeader();
+  }
+  this._updateRowWidth();
+  this.drawData();
 };
 
 scout.Table.prototype._renderTableHeader = function() {
@@ -1551,13 +1563,7 @@ scout.Table.prototype._onColumnStructureChanged = function(columns) {
   this._initColumns();
 
   if (this.rendered) {
-    if (this.header) {
-      this.header.remove();
-      this.header = this._createHeader();
-    }
-    this._updateRowWidth();
-    this.drawData();
-    this._renderCheckable();
+    this._redraw();
   }
 };
 

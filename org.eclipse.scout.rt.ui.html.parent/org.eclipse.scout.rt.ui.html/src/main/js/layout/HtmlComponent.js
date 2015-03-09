@@ -199,7 +199,12 @@ scout.HtmlComponent.prototype.debug = function() {
 scout.HtmlComponent.get = function($comp) {
   var htmlComp = this.optGet($comp);
   if (!htmlComp) {
-    throw new Error('data "htmlComponent" is undefined');
+    var details = '';
+    if ($comp) {
+      details = 'Class: ' + $comp.attr('class');
+      details += '. Id: ' + $comp.attr('id');
+    }
+    throw new Error('data "htmlComponent" is undefined. Details: ' + details);
   }
   return htmlComp;
 };

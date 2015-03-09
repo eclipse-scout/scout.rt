@@ -74,6 +74,10 @@
   cursor: col-resize;
   z-index: 1;
 
+  &.fixed {
+    cursor: default;
+  }
+
   .header-move & {
     background-color: @panel-background-color;
   }

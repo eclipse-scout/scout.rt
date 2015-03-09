@@ -99,8 +99,9 @@ describe("Table", function() {
 
   });
 
-  describe("Check Rows", function() {
-    it("check two rows in multicheckable table", function() {
+  describe("checkRow", function() {
+
+    it("checks the row, does not uncheck others if multiCheck is set to true", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       table.multiCheck = true;
@@ -109,8 +110,8 @@ describe("Table", function() {
 
       var rows = table.rows;
       var checkedRows = [];
-      for(var i = 0; i<rows.length; i++){
-        if(rows[i].checked){
+      for (var i = 0; i < rows.length; i++){
+        if (rows[i].checked){
           checkedRows.push(rows[i]);
         }
       }
@@ -120,8 +121,8 @@ describe("Table", function() {
       table.checkRow(rows[4], true, true);
 
       checkedRows = [];
-      for(var j = 0; j<rows.length; j++){
-        if(rows[j].checked){
+      for (var j = 0; j < rows.length; j++){
+        if (rows[j].checked){
           checkedRows.push(rows[j]);
         }
       }
@@ -130,8 +131,8 @@ describe("Table", function() {
       table.checkRow(rows[4], false, true);
 
       checkedRows = [];
-      for(var z = 0; z<rows.length; z++){
-        if(rows[z].checked){
+      for (var z = 0; z < rows.length; z++){
+        if (rows[z].checked){
           checkedRows.push(rows[z]);
         }
       }
@@ -139,7 +140,7 @@ describe("Table", function() {
     });
 
 
-    it("check two rows in multicheckable table, only one should be checked", function() {
+    it("unchecks other rows if multiCheck is set to false", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       table.multiCheck = false;
@@ -148,8 +149,8 @@ describe("Table", function() {
 
       var rows = table.rows;
       var checkedRows = [];
-      for(var i = 0; i<rows.length; i++){
-        if(rows[i].checked){
+      for (var i = 0; i < rows.length; i++){
+        if (rows[i].checked){
           checkedRows.push(rows[i]);
         }
       }
@@ -159,8 +160,8 @@ describe("Table", function() {
       table.checkRow(rows[4], true, true);
 
       checkedRows = [];
-      for(var j = 0; j<rows.length; j++){
-        if(rows[j].checked){
+      for (var j = 0; j < rows.length; j++){
+        if (rows[j].checked){
           checkedRows.push(rows[j]);
         }
       }
@@ -169,15 +170,15 @@ describe("Table", function() {
       table.checkRow(rows[4], false, true);
 
       checkedRows = [];
-      for(var z = 0; z<rows.length; z++){
-        if(rows[z].checked){
+      for (var z = 0; z < rows.length; z++){
+        if (rows[z].checked){
           checkedRows.push(rows[z]);
         }
       }
       expect(checkedRows.length).toBe(0);
     });
 
-    it("try to check a row in uncheckable table", function() {
+    it("does not check the row if checkable is set to false", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       table.multiCheck = false;
@@ -203,7 +204,7 @@ describe("Table", function() {
       expect(checkedRows.length).toBe(0);
     });
 
-    it("try to check a disabled row ", function() {
+    it("does not check the row if the row is disabled", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       table.multiCheck = false;
@@ -229,7 +230,7 @@ describe("Table", function() {
       expect(checkedRows.length).toBe(0);
     });
 
-    it("try to check a row in disabled table", function() {
+    it("does not check the row if the table is disabled", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       table.multiCheck = true;

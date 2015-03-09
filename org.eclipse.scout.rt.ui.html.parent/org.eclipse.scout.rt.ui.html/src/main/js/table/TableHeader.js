@@ -2,9 +2,9 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.TableHeader = function(table, session) {
-  var that = this,
-    columns = table.columns,
-    column, $header, alignment, $defaultCheckedColumHeader;
+  var column, $header, alignment, $defaultCheckedColumHeader, $separator,
+    that = this,
+    columns = table.columns;
 
   this.dragging = false;
   this.$container = table.$data.beforeDiv('table-header');
@@ -28,8 +28,12 @@ scout.TableHeader = function(table, session) {
       $header.css('text-align', alignment);
     }
 
-    this.$container.appendDiv('header-resize', '')
-      .on('mousedown', '', resizeHeader);
+    $separator = this.$container.appendDiv('header-resize');
+    if (!column.fixedWidth) {
+      $separator.on('mousedown', '', resizeHeader);
+    } else {
+      $separator.addClass('fixed');
+    }
 
     column.$header = $header;
     column.filter = [];
