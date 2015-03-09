@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence.EndField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence.StartField;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
  * Tests from to check in Sequence Box
  * {@link org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox}
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class SequenceBoxTest {
 
   private static final int ONE_MINUTE = 60000;
