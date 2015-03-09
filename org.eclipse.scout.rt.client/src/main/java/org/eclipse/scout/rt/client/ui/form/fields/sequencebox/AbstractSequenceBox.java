@@ -208,20 +208,16 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     }
     updateLabelComposition();
     // attach change triggers
-    Class<?> sharedType = null;
-    ArrayList<IValueField> valueFieldList = new ArrayList<IValueField>();
-    for (IFormField f : getFields()) {
-      if (f instanceof IValueField) {
-        IValueField v = (IValueField) f;
-        Class<?> valueType = v.getHolderType();
-        if (Comparable.class.isAssignableFrom(valueType)) {
-          if (sharedType == null || valueType == sharedType) {
-            sharedType = valueType;
-            valueFieldList.add(v);
-          }
-        }
-      }
-    }
+    attachCheckFromToListeners();
+  }
+
+  /**
+   * Attach a property change listener to all {@link IValueField}s with the same holder type than the first comparable
+   * value type {@link IValueField}.
+   */
+  private void attachCheckFromToListeners() {
+    //fields with equal types
+    ArrayList<IValueField> valueFieldList = getComparableValueFields();
     if (valueFieldList.size() >= 2) {
       final IValueField[] valueFields = valueFieldList.toArray(new IValueField[valueFieldList.size()]);
       for (int i = 0; i < valueFields.length; i++) {
@@ -241,6 +237,26 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     }
   }
 
+  /**
+   * @return Comparable {@link IValueField}s with the same holder type than the first one
+   */
+  private ArrayList<IValueField> getComparableValueFields() {
+    ArrayList<IValueField> valueFieldList = new ArrayList<IValueField>();
+    Class<?> sharedType = null;
+    for (IFormField f : getFields()) {
+      if (f instanceof IValueField) {
+        IValueField v = (IValueField) f;
+        Class<?> valueType = v.getHolderType();
+        if (Comparable.class.isAssignableFrom(valueType)
+            && (sharedType == null || valueType == sharedType)) {
+          sharedType = valueType;
+          valueFieldList.add(v);
+        }
+      }
+    }
+    return valueFieldList;
+  }
+
   /*
    * Runtime
    */
@@ -258,10 +274,8 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   @Override
   public void rebuildFieldGrid() {
     m_grid.validate();
-    if (isInitialized()) {
-      if (getForm() != null) {
-        getForm().structureChanged(this);
-      }
+    if (isInitialized() && getForm() != null) {
+      getForm().structureChanged(this);
     }
   }
 

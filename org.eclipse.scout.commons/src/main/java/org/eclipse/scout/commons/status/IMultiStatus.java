@@ -49,12 +49,12 @@ public interface IMultiStatus extends IStatus {
    * @return maximum severity of the children or {@link #DEFAULT_SEVERITY}, if no children available
    */
   @Override
-  public int getSeverity();
+  int getSeverity();
 
   /**
    * @return the minimum order of the children or {@link IOrdered#DEFAULT_ORDER}, if no children available
    */
   @Override
-  public double getOrder();
+  double getOrder();
 
 }

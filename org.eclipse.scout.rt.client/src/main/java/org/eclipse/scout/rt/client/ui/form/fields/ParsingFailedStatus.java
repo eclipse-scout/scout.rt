@@ -35,4 +35,35 @@ public final class ParsingFailedStatus extends ScoutFieldStatus {
   public String getParseInputString() {
     return m_parseInputString;
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((m_parseInputString == null) ? 0 : m_parseInputString.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    ParsingFailedStatus other = (ParsingFailedStatus) obj;
+    if (m_parseInputString == null) {
+      if (other.m_parseInputString != null) {
+        return false;
+      }
+    }
+    else if (!m_parseInputString.equals(other.m_parseInputString)) {
+      return false;
+    }
+    return true;
+  }
 }

@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  */
 @Order(20.0)
 public final class ValidationFailedStatus<VALUE> extends ScoutFieldStatus {
+
   private static final long serialVersionUID = 1L;
   private final VALUE m_invalidValue;
 
@@ -48,6 +49,37 @@ public final class ValidationFailedStatus<VALUE> extends ScoutFieldStatus {
 
   public VALUE getInvalidValue() {
     return m_invalidValue;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((m_invalidValue == null) ? 0 : m_invalidValue.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    ValidationFailedStatus other = (ValidationFailedStatus) obj;
+    if (m_invalidValue == null) {
+      if (other.m_invalidValue != null) {
+        return false;
+      }
+    }
+    else if (!m_invalidValue.equals(other.m_invalidValue)) {
+      return false;
+    }
+    return true;
   }
 
 }

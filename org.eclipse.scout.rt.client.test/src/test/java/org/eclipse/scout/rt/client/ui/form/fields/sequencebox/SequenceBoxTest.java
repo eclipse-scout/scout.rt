@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
-import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractTimeField;
@@ -28,8 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence.EndField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence.StartField;
-import org.eclipse.scout.testing.client.form.FormHandler;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,7 +35,7 @@ import org.junit.runner.RunWith;
  * Tests from to check in Sequence Box
  * {@link org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox}
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ScoutPlatformTestRunner.class)
 public class SequenceBoxTest {
 
   private static final int ONE_MINUTE = 60000;
@@ -52,7 +50,6 @@ public class SequenceBoxTest {
     //check standard case
     SequenceTestForm f = new SequenceTestForm();
     f.setModal(false);
-    f.start(new FormHandler());
 
     TwoElementSequence box = f.getTwoElementSequence();
     StartField start = f.getStartField();
@@ -126,10 +123,6 @@ public class SequenceBoxTest {
    * Form with some sequence boxes for testing.
    */
   public static class SequenceTestForm extends AbstractForm {
-
-    public void start(IFormHandler handler) throws ProcessingException {
-      startInternal(handler);
-    }
 
     public SequenceTestForm() throws ProcessingException {
       super();

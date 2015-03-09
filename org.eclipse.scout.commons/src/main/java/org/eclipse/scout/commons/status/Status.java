@@ -114,9 +114,7 @@ public class Status implements IStatus, Serializable {
 
   @Override
   public String toString() {
-    final String severityName = getSeverityName();
-    final String severity = severityName != null ? severityName : "severity=" + getSeverity();
-    return "Status [" + severity + ", m_message=" + m_message + "]";
+    return "Status [" + "severity=" + getSeverityName() + ", message=" + m_message + "]";
   }
 
   /**

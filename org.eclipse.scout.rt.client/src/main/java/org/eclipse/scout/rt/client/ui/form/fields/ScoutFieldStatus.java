@@ -65,4 +65,35 @@ public class ScoutFieldStatus extends Status implements IFieldStatus {
     }
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((m_iconId == null) ? 0 : m_iconId.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    ScoutFieldStatus other = (ScoutFieldStatus) obj;
+    if (m_iconId == null) {
+      if (other.m_iconId != null) {
+        return false;
+      }
+    }
+    else if (!m_iconId.equals(other.m_iconId)) {
+      return false;
+    }
+    return true;
+  }
+
 }
