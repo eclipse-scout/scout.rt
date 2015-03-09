@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.shared.extension.ExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +25,7 @@ import org.junit.runner.RunWith;
  * use this superclass for test requiring a local extension registry ({@link IExtensionRegistry}). Extensions can be
  * added in every test method of subclasses and will be available only for that test method.
  */
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public abstract class AbstractLocalExtensionTestCase {
 
   private List<IBean<?>> m_localServiceRegistrations;

@@ -14,10 +14,10 @@ import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 import org.junit.runner.Description;
 
 /**
- * Listener to be notified about JUnit test execution events for tests using {@link ScoutPlatformTestRunner}. By
+ * Listener to be notified about JUnit test execution events for tests using {@link PlatformTestRunner}. By
  * default, there is no listener installed. A listener is installed by registering it on the global {@link IBeanContext}
  *
- * @see ScoutPlatformTestRunner
+ * @see PlatformTestRunner
  */
 public interface ITestExecutionListener {
 

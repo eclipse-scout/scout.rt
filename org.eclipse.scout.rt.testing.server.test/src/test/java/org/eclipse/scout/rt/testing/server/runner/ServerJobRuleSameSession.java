@@ -18,7 +18,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.server.junit.rule.RunAs;
 import org.eclipse.scout.rt.testing.server.junit.rule.ServerJobRule;
 import org.junit.AfterClass;
@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
-@RunWith(ScoutPlatformTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 @RunAs("Anna")
 public class ServerJobRuleSameSession {
 

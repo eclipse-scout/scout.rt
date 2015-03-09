@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.testing.server.runner.parameterized;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.IScoutTestParameter;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedFrameworkMethod;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedTestRunnerExtension;
@@ -76,7 +76,7 @@ import org.junit.runners.model.Statement;
  * @see Parameters
  */
 // TODO [dwi/abr] do we need this class?
-public class ParameterizedScoutServerTestRunner extends ScoutPlatformTestRunner {
+public class ParameterizedScoutServerTestRunner extends PlatformTestRunner {
 
   /** Parameters returned by the <code>@</code>{@link Parameters} annotated method in the test class. */
   private List<IScoutTestParameter> m_parameterList;

@@ -26,11 +26,11 @@ import org.junit.runners.model.Statement;
  *
  * @since 5.1
  */
-public class ScoutPlatformTestRunner extends BlockJUnit4ClassRunner {
+public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   private static final AtomicBoolean INIT = new AtomicBoolean();
 
-  public ScoutPlatformTestRunner(final Class<?> clazz) throws InitializationError {
+  public PlatformTestRunner(final Class<?> clazz) throws InitializationError {
     super(clazz);
   }
 
