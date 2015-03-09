@@ -78,7 +78,7 @@ public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
 
     // setup table
     OrigPageWithTable pwt = new OrigPageWithTable();
-    pwt.getTable().addRowsByMatrix(new Object[][]{{new BigDecimal("1"), Long.valueOf(2), EXT_TEST_VAL1_EXPORT, EXT_TEST_VAL2_EXPORT}});
+    pwt.getTable().addRowsByMatrix(new Object[][]{{BigDecimal.ONE, Long.valueOf(2), EXT_TEST_VAL1_EXPORT, EXT_TEST_VAL2_EXPORT}});
     int columnCount = pwt.getTable().getColumnSet().getColumnCount();
     Assert.assertEquals(4, columnCount);
     Assert.assertEquals(1, pwt.getTable().getRowCount());

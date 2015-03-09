@@ -35,19 +35,19 @@ import org.junit.runner.RunWith;
 public class StoreAndLoadXml2FormTest {
 
   static final Object[][] TABLE_DATA = new Object[][]{
-    new Object[]{1L, "One", new java.util.Date()},
-    new Object[]{2L, "Two", new StoreAndLoadXml2FormTest.InnerClass()},
-    new Object[]{3L, "Three", new StoreAndLoadXml2FormTest.InnerClass.InnerInnerClass()}
+      new Object[]{1L, "One", new java.util.Date()},
+      new Object[]{2L, "Two", new StoreAndLoadXml2FormTest.InnerClass()},
+      new Object[]{3L, "Three", new StoreAndLoadXml2FormTest.InnerClass.InnerInnerClass()}
   };
 
   public static class InnerClass implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final String m_value = "Inner Level 1";
+    private static final String VALUE = "Inner Level 1";
 
     @Override
     public int hashCode() {
-      return m_value.hashCode();
+      return VALUE.hashCode();
     }
 
     @Override
@@ -55,17 +55,17 @@ public class StoreAndLoadXml2FormTest {
       if (obj == null || obj.getClass() != this.getClass()) {
         return false;
       }
-      return ((InnerClass) obj).m_value.equals(this.m_value);
+      return ((InnerClass) obj).VALUE.equals(this.VALUE);
     }
 
     public static class InnerInnerClass implements Serializable {
       private static final long serialVersionUID = 2L;
 
-      private final String m_value = "Inner Level 2";
+      private static final String VALUE = "Inner Level 2";
 
       @Override
       public int hashCode() {
-        return m_value.hashCode();
+        return VALUE.hashCode();
       }
 
       @Override
@@ -73,7 +73,7 @@ public class StoreAndLoadXml2FormTest {
         if (obj == null || obj.getClass() != this.getClass()) {
           return false;
         }
-        return ((InnerInnerClass) obj).m_value.equals(this.m_value);
+        return ((InnerInnerClass) obj).VALUE.equals(this.VALUE);
       }
     }
   }

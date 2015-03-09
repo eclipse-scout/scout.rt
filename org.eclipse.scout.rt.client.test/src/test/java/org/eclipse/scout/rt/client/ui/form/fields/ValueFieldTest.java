@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests for {@link AbstractValueField}
+ * Tests for {@link AbstractValueField}.
  */
 @RunWith(PlatformTestRunner.class)
 public class ValueFieldTest {

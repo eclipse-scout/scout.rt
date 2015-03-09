@@ -27,7 +27,7 @@ import org.eclipse.scout.commons.annotations.Extends;
 public class ThirdIntegerColumnData implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  public static final String thirdInteger = "thirdInteger";
+  public static final String THIRD_INTEGER = "thirdInteger";
   private Integer m_thirdInteger;
 
   public ThirdIntegerColumnData() {

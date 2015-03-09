@@ -29,7 +29,7 @@ public class MoveCodesCodeType extends AbstractCodeTypeWithGeneric<Long, String,
   @Order(10)
   public static class Top1Code extends AbstractCode<String> {
     private static final long serialVersionUID = 1L;
-    public static String ID = "Top1";
+    public static final String ID = "Top1";
 
     @Override
     public String getId() {
@@ -39,7 +39,7 @@ public class MoveCodesCodeType extends AbstractCodeTypeWithGeneric<Long, String,
     @Order(5)
     public static class Sub1Top1Code extends AbstractCode<String> {
       private static final long serialVersionUID = 1L;
-      public static String ID = "Sub1Top1";
+      public static final String ID = "Sub1Top1";
 
       @Override
       public String getId() {
@@ -49,7 +49,7 @@ public class MoveCodesCodeType extends AbstractCodeTypeWithGeneric<Long, String,
       @Order(10)
       public static class Sub1Sub1Top1Code extends AbstractCode<String> {
         private static final long serialVersionUID = 1L;
-        public static String ID = "Sub1Sub1Top1";
+        public static final String ID = "Sub1Sub1Top1";
 
         @Override
         public String getId() {
@@ -61,7 +61,7 @@ public class MoveCodesCodeType extends AbstractCodeTypeWithGeneric<Long, String,
     @Order(20)
     public static class Sub2Top1Code extends AbstractCode<String> {
       private static final long serialVersionUID = 1L;
-      public static String ID = "Sub2Top1";
+      public static final String ID = "Sub2Top1";
 
       @Override
       public String getId() {
@@ -73,7 +73,7 @@ public class MoveCodesCodeType extends AbstractCodeTypeWithGeneric<Long, String,
   @Order(20)
   public static class Top2Code extends AbstractCode<String> {
     private static final long serialVersionUID = 1L;
-    public static String ID = "Top2";
+    public static final String ID = "Top2";
 
     @Override
     public String getId() {
@@ -83,7 +83,7 @@ public class MoveCodesCodeType extends AbstractCodeTypeWithGeneric<Long, String,
     @Order(10)
     public static class Sub1Top2Code extends AbstractCode<String> {
       private static final long serialVersionUID = 1L;
-      public static String ID = "Sub1Top2";
+      public static final String ID = "Sub1Top2";
 
       @Override
       public String getId() {
@@ -94,7 +94,7 @@ public class MoveCodesCodeType extends AbstractCodeTypeWithGeneric<Long, String,
     @Order(20)
     public static class Sub2Top2Code extends AbstractCode<String> {
       private static final long serialVersionUID = 1L;
-      public static String ID = "Sub2Top2";
+      public static final String ID = "Sub2Top2";
 
       @Override
       public String getId() {

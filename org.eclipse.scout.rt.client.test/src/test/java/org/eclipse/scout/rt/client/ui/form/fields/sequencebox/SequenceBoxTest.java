@@ -11,23 +11,32 @@
 package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractTimeField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence.EndField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence.StartField;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,6 +46,16 @@ import org.junit.runner.RunWith;
  */
 @RunWith(PlatformTestRunner.class)
 public class SequenceBoxTest {
+
+  @Before
+  public void setUp() {
+    NlsLocale.set(new Locale("de", "CH"));
+  }
+
+  @After
+  public void tearDown() {
+    NlsLocale.set(null);
+  }
 
   private static final int ONE_MINUTE = 60000;
 
@@ -119,6 +138,87 @@ public class SequenceBoxTest {
     assertEquals("baseLabel = " + DateUtility.formatTime(cal.getTime()), searchFilterText);
   }
 
+  @Test
+  public void testRightNeighbor() throws Exception {
+    ThreeElementSequence sb = new ThreeElementSequence();
+    sb.clearErrorStatus();
+    sb.getFirstField().setValue(3);
+    sb.getSecondField().setValue(2);
+    sb.getThirdField().setValue(1);
+    sb.execCheckFromTo(0);
+    assertFalse(sb.isContentValid());
+    assertEquals(getLessThanText(sb.getFirstField(), sb.getSecondField()), sb.getErrorStatus().getMessage());
+  }
+
+  @Test
+  public void testRightNeighborNull() throws Exception {
+    ThreeElementSequence sb = new ThreeElementSequence();
+    sb.clearErrorStatus();
+    sb.getFirstField().setValue(3);
+    sb.getSecondField().setValue(null);
+    sb.getThirdField().setValue(1);
+    sb.execCheckFromTo(0);
+    assertFalse(sb.isContentValid());
+    assertEquals(getLessThanText(sb.getFirstField(), sb.getThirdField()), sb.getErrorStatus().getMessage());
+  }
+
+  @Test
+  public void testLeftNeighbor() throws Exception {
+    ThreeElementSequence sb = new ThreeElementSequence();
+    sb.clearErrorStatus();
+    sb.getFirstField().setValue(3);
+    sb.getSecondField().setValue(2);
+    sb.getThirdField().setValue(1);
+    sb.execCheckFromTo(1);
+    assertFalse(sb.getSecondField().isContentValid());
+    assertEquals(getGreaterThanText(sb.getSecondField(), sb.getFirstField()), sb.getSecondField().getErrorStatus().getMessage());
+  }
+
+  @Test
+  public void testLeftNeighborNull() throws Exception {
+    ThreeElementSequence sb = new ThreeElementSequence();
+    sb.clearErrorStatus();
+    sb.getFirstField().setValue(null);
+    sb.getSecondField().setValue(2);
+    sb.getThirdField().setValue(1);
+    sb.execCheckFromTo(1);
+    assertFalse(sb.getSecondField().isContentValid());
+    assertEquals(getLessThanText(sb.getSecondField(), sb.getThirdField()), sb.getSecondField().getErrorStatus().getMessage());
+  }
+
+  @Test
+  public void testAllEmpty() throws Exception {
+    ThreeElementSequence sb = new ThreeElementSequence();
+    sb.addErrorStatus(new InvalidSequenceStatus(""));
+    sb.getFirstField().setValue(null);
+    sb.getSecondField().setValue(null);
+    sb.getThirdField().setValue(null);
+    sb.execCheckFromTo(0);
+    assertTrue(sb.isContentValid());
+  }
+
+  private String getLessThanText(IFormField f1, IFormField f2) {
+    return TEXTS.get("XMustBeLessThanOrEqualY", f1.getLabel(), f2.getLabel());
+  }
+
+  private String getGreaterThanText(IFormField f1, IFormField f2) {
+    return TEXTS.get("XMustBeGreaterThanOrEqualY", f1.getLabel(), f2.getLabel());
+  }
+
+  @Test
+  public void testThreeFieldsValid() throws ProcessingException {
+    ThreeElementSequence sb = new ThreeElementSequence();
+    sb.clearErrorStatus();
+    sb.getFirstField().setValue(1);
+    sb.getSecondField().setValue(2);
+    sb.getThirdField().setValue(3);
+    sb.execCheckFromTo(0);
+    assertTrue(sb.isContentValid());
+    assertTrue(sb.getFirstField().isContentValid());
+    assertTrue(sb.getSecondField().isContentValid());
+    assertTrue(sb.getThirdField().isContentValid());
+  }
+
   /**
    * Form with some sequence boxes for testing.
    */
@@ -188,6 +288,58 @@ public class SequenceBoxTest {
         protected String getConfiguredLabel() {
           return "Close";
         }
+      }
+    }
+  }
+
+  @Order(10)
+  public class ThreeElementSequence extends AbstractSequenceBox {
+
+    @Override
+    protected String getConfiguredLabel() {
+      return "baseLabel";
+    }
+
+    public FirstField getFirstField() {
+      return getFieldByClass(FirstField.class);
+    }
+
+    public SecondField getSecondField() {
+      return getFieldByClass(SecondField.class);
+    }
+
+    public ThirdField getThirdField() {
+      return getFieldByClass(ThirdField.class);
+    }
+
+    /**
+     * force field check
+     */
+    public void execCheckFromTo(int changedIndex) throws ProcessingException {
+      super.execCheckFromTo(new AbstractIntegerField[]{getFirstField(), getSecondField(), getThirdField()}, changedIndex);
+    }
+
+    @Order(10)
+    public class FirstField extends AbstractIntegerField {
+      @Override
+      protected String getConfiguredLabel() {
+        return getClass().getSimpleName();
+      }
+    }
+
+    @Order(20)
+    public class SecondField extends AbstractIntegerField {
+      @Override
+      protected String getConfiguredLabel() {
+        return getClass().getSimpleName();
+      }
+    }
+
+    @Order(30)
+    public class ThirdField extends AbstractIntegerField {
+      @Override
+      protected String getConfiguredLabel() {
+        return getClass().getSimpleName();
       }
     }
   }

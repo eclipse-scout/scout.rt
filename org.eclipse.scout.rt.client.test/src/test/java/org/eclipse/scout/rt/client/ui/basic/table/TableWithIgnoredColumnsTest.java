@@ -206,8 +206,8 @@ public class TableWithIgnoredColumnsTest {
     public static class TableBeanRowData extends AbstractTableRowData {
 
       private static final long serialVersionUID = 1L;
-      public static final String default_ = "default";
-      public static final String create = "create";
+      public static final String DEFAULT = "default";
+      public static final String CREATE = "create";
       private String m_default;
       private String m_create;
 
@@ -364,7 +364,7 @@ public class TableWithIgnoredColumnsTest {
     public static class TableCreateBeanRowData extends TableBeanRowData {
 
       private static final long serialVersionUID = 1L;
-      public static final String ignore = "ignore";
+      public static final String IGNORE = "ignore";
       private String m_ignore;
 
       public TableCreateBeanRowData() {

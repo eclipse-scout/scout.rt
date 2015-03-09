@@ -53,8 +53,8 @@ public class SmartFieldTest {
   public static final String ICON_BOOKMARK = "bookmark";
   public static final String ICON_FILE = "file";
 
-  protected TestForm form;
-  private List<IBean<?>> reg;
+  protected TestForm m_form;
+  private List<IBean<?>> m_reg;
 
   public static class TestForm extends AbstractForm {
 
@@ -186,15 +186,15 @@ public class SmartFieldTest {
 
   @Before
   public void setUp() throws Throwable {
-    reg = TestingUtility.registerServices(0, BeanInstanceUtil.create(StyleLookupService.class));
-    form = new TestForm();
-    form.startForm();
+    m_reg = TestingUtility.registerServices(0, BeanInstanceUtil.create(StyleLookupService.class));
+    m_form = new TestForm();
+    m_form.startForm();
   }
 
   @Test
   public void testSmartfieldStyle() throws Throwable {
 
-    StyleField f = form.getStyleField();
+    StyleField f = m_form.getStyleField();
     //model-side test
     f.setValue(10L);
     assertFieldStyle(f, ICON_FILE, "Red tooltip", "ff8888", "880000", "italic");
@@ -227,14 +227,14 @@ public class SmartFieldTest {
 
   @After
   public void tearDown() throws Throwable {
-    TestingUtility.unregisterServices(reg);
-    form.doClose();
+    TestingUtility.unregisterServices(m_reg);
+    m_form.doClose();
   }
 
   @Test
   public void testSmartfieldMenus() {
 
-    List<IMenu> smartfieldMenus = form.getStyleField().getMenus();
+    List<IMenu> smartfieldMenus = m_form.getStyleField().getMenus();
     Assert.assertEquals("Smartfield should have 2 menus", 2, smartfieldMenus.size());
     Assert.assertEquals("TestMenu1", smartfieldMenus.get(0).getText());
     Assert.assertEquals("&TestMenu1", smartfieldMenus.get(0).getTextWithMnemonic());
@@ -244,7 +244,7 @@ public class SmartFieldTest {
     Assert.assertEquals("T&estMenu2", smartfieldMenus.get(1).getTextWithMnemonic());
     Assert.assertEquals("control-alternate-f11", smartfieldMenus.get(1).getKeyStroke());
 
-    List<IKeyStroke> smartfieldKeyStrokes = form.getStyleField().getContributedKeyStrokes();
+    List<IKeyStroke> smartfieldKeyStrokes = m_form.getStyleField().getContributedKeyStrokes();
     Assert.assertNotNull("KeyStrokes of Smartfield should not be null", smartfieldKeyStrokes);
     Assert.assertEquals("Smartfield should have 2 keyStrokes registered", 2, smartfieldKeyStrokes.size());
   }

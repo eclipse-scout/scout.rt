@@ -66,7 +66,7 @@ public class FormDataTemplateExtensionTest extends AbstractLocalExtensionTestCas
   }
 
   private void doValueFieldTemplateTest() throws Exception {
-    String CHANGED_VALUE = "other value";
+    String changedValue = "other value";
     OrigForm origForm = new OrigForm();
     origForm.initForm();
 
@@ -79,9 +79,9 @@ public class FormDataTemplateExtensionTest extends AbstractLocalExtensionTestCas
     assertEquals(SpecialStringField.INIT_VAL, contributionData.getValue());
 
     // test import formData
-    contributionData.setValue(CHANGED_VALUE);
+    contributionData.setValue(changedValue);
     origForm.importFormData(data);
-    assertEquals(CHANGED_VALUE, origForm.getFieldByClass(SpecialStringField.class).getValue());
+    assertEquals(changedValue, origForm.getFieldByClass(SpecialStringField.class).getValue());
   }
 
   private void doTestOnlyInOneTemplateUse() throws Exception {

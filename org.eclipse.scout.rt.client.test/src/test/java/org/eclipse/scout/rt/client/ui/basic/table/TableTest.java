@@ -172,9 +172,9 @@ public class TableTest {
     assertEquals("SortEnabled", false, table.isSortEnabled());
     assertEquals("FirstColumn - sort index", -1, table.getFirstColumn().getSortIndex());
     assertEquals("SecondColumn - sort index", -1, table.getSecondColumn().getSortIndex());
-    assertEquals("ThirdColumn - sort index", 0, table.getThridColumn().getSortIndex());
-    assertEquals("ThirdColumn - initial sort index", 20, table.getThridColumn().getInitialSortIndex());
-    assertEquals("ThirdColumn - initial alwaysIncludeSortAtBegin", true, table.getThridColumn().isInitialAlwaysIncludeSortAtBegin());
+    assertEquals("ThirdColumn - sort index", 0, table.getThirdColumn().getSortIndex());
+    assertEquals("ThirdColumn - initial sort index", 20, table.getThirdColumn().getInitialSortIndex());
+    assertEquals("ThirdColumn - initial alwaysIncludeSortAtBegin", true, table.getThirdColumn().isInitialAlwaysIncludeSortAtBegin());
 
     //fill the table and sort:
     fillTable(table);
@@ -209,9 +209,9 @@ public class TableTest {
     assertEquals("FirstColumn - sort index", 1, table.getFirstColumn().getSortIndex());
     assertEquals("FirstColumn - sort ascending", false, table.getFirstColumn().isSortAscending());
     assertEquals("SecondColumn - sort index", -1, table.getSecondColumn().getSortIndex());
-    assertEquals("ThirdColumn - sort index", 0, table.getThridColumn().getSortIndex());
-    assertEquals("ThirdColumn - initial sort index", 20, table.getThridColumn().getInitialSortIndex());
-    assertEquals("ThirdColumn - initial alwaysIncludeSortAtBegin", true, table.getThridColumn().isInitialAlwaysIncludeSortAtBegin());
+    assertEquals("ThirdColumn - sort index", 0, table.getThirdColumn().getSortIndex());
+    assertEquals("ThirdColumn - initial sort index", 20, table.getThirdColumn().getInitialSortIndex());
+    assertEquals("ThirdColumn - initial alwaysIncludeSortAtBegin", true, table.getThirdColumn().isInitialAlwaysIncludeSortAtBegin());
     assertEquals("ColumnSet PermanentHeadSortColumns size", 1, table.getColumnSet().getPermanentHeadSortColumns().size());
     assertEquals("ColumnSet SortColumns size", 2, table.getColumnSet().getSortColumns().size());
 
@@ -251,9 +251,9 @@ public class TableTest {
     assertEquals("FirstColumn - sort ascending", true, table.getFirstColumn().isSortAscending());
     assertEquals("SecondColumn - sort index", 1, table.getSecondColumn().getSortIndex());
     assertEquals("SecondColumn - sort ascending", false, table.getSecondColumn().isSortAscending());
-    assertEquals("ThirdColumn - sort index", 0, table.getThridColumn().getSortIndex());
-    assertEquals("ThirdColumn - initial sort index", 20, table.getThridColumn().getInitialSortIndex());
-    assertEquals("ThirdColumn - initial alwaysIncludeSortAtBegin", true, table.getThridColumn().isInitialAlwaysIncludeSortAtBegin());
+    assertEquals("ThirdColumn - sort index", 0, table.getThirdColumn().getSortIndex());
+    assertEquals("ThirdColumn - initial sort index", 20, table.getThirdColumn().getInitialSortIndex());
+    assertEquals("ThirdColumn - initial alwaysIncludeSortAtBegin", true, table.getThirdColumn().isInitialAlwaysIncludeSortAtBegin());
     assertEquals("ColumnSet PermanentHeadSortColumns size", 1, table.getColumnSet().getPermanentHeadSortColumns().size());
     assertEquals("ColumnSet SortColumns size", 3, table.getColumnSet().getSortColumns().size());
 
@@ -285,9 +285,9 @@ public class TableTest {
     assertEquals("SortEnabled", true, table.isSortEnabled());
     assertEquals("FirstColumn - sort index", -1, table.getFirstColumn().getSortIndex());
     assertEquals("SecondColumn - sort index", -1, table.getSecondColumn().getSortIndex());
-    assertEquals("ThirdColumn - sort index", 0, table.getThridColumn().getSortIndex());
-    assertEquals("ThirdColumn - initial sort index", 20, table.getThridColumn().getInitialSortIndex());
-    assertEquals("ThirdColumn - initial alwaysIncludeSortAtBegin", true, table.getThridColumn().isInitialAlwaysIncludeSortAtBegin());
+    assertEquals("ThirdColumn - sort index", 0, table.getThirdColumn().getSortIndex());
+    assertEquals("ThirdColumn - initial sort index", 20, table.getThirdColumn().getInitialSortIndex());
+    assertEquals("ThirdColumn - initial alwaysIncludeSortAtBegin", true, table.getThirdColumn().isInitialAlwaysIncludeSortAtBegin());
     assertEquals("ColumnSet PermanentHeadSortColumns size", 1, table.getColumnSet().getPermanentHeadSortColumns().size());
     assertEquals("ColumnSet SortColumns size", 1, table.getColumnSet().getSortColumns().size());
 
@@ -334,7 +334,7 @@ public class TableTest {
     ITableRow r = table.addRow(table.createRow());
     table.getFirstColumn().setValue(r, first);
     table.getSecondColumn().setValue(r, second);
-    table.getThridColumn().setValue(r, third);
+    table.getThirdColumn().setValue(r, third);
   }
 
   private static void assertRowCount(int expectedRowCount, int expectedDeletedRowCount, P_Table table) {
@@ -374,7 +374,7 @@ public class TableTest {
     ITableRow row = rows.get(i);
     assertEquals("Row [" + i + "] First Value", expectedFirst, table.getFirstColumn().getValue(row));
     assertEquals("Row [" + i + "] Second Value", expectedSecond, table.getSecondColumn().getValue(row));
-    assertEquals("Row [" + i + "] Third Value", expectedThird, table.getThridColumn().getValue(row));
+    assertEquals("Row [" + i + "] Third Value", expectedThird, table.getThirdColumn().getValue(row));
   }
 
   public static class P_Table extends AbstractTable {
@@ -392,7 +392,7 @@ public class TableTest {
       return getColumnSet().getColumnByClass(SecondColumn.class);
     }
 
-    public ThirdColumn getThridColumn() {
+    public ThirdColumn getThirdColumn() {
       return getColumnSet().getColumnByClass(ThirdColumn.class);
     }
 

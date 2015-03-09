@@ -1,10 +1,9 @@
 package org.eclipse.scout.rt.client.ui.basic.activitymap;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
-import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.junit.Before;
@@ -15,11 +14,11 @@ import org.junit.Test;
  */
 public class ActivityMapTest {
 
-  private ActivityMap activityMap = null;
+  private ActivityMap m_activityMap = null;
 
   @Before
   public void setUp() {
-    activityMap = new ActivityMap();
+    m_activityMap = new ActivityMap();
   }
 
   @Test(expected = ClassCastException.class)
@@ -38,11 +37,11 @@ public class ActivityMapTest {
   public void testSetAndGetActivityCells() {
     ActivityCell<String, Double> cell = getTestCell();
 
-    activityMap.addActivityCells(CollectionUtility.arrayList(cell));
-    activityMap.setSelectedActivityCell(cell);
+    m_activityMap.addActivityCells(CollectionUtility.arrayList(cell));
+    m_activityMap.setSelectedActivityCell(cell);
 
-    assertEquals(cell.getResourceId(), activityMap.getSelectedActivityCell().getResourceId());
-    assertEquals(cell.getActivityId().intValue(), activityMap.getSelectedActivityCell().getActivityId().intValue());
+    assertEquals(cell.getResourceId(), m_activityMap.getSelectedActivityCell().getResourceId());
+    assertEquals(cell.getActivityId().intValue(), m_activityMap.getSelectedActivityCell().getActivityId().intValue());
   }
 
   private ActivityCell<String, Double> getTestCell() {
@@ -56,8 +55,8 @@ public class ActivityMapTest {
 
   @Test
   public void testSetAndGetResourceIds() {
-    activityMap.setResourceIds(null);
-    assertTrue(activityMap.getResourceIds() instanceof List);
+    m_activityMap.setResourceIds(null);
+    assertNotNull(m_activityMap.getResourceIds());
   }
 
   /**

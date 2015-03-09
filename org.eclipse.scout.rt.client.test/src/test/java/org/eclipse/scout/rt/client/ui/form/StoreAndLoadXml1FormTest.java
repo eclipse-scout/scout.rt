@@ -70,7 +70,7 @@ public class StoreAndLoadXml1FormTest {
     }
   }
 
-  public final static class DynamicFormWithProperties extends DynamicForm {
+  public static final class DynamicFormWithProperties extends DynamicForm {
     private boolean m_primitiveBoolean;
     private int m_primitiveInteger;
     private String m_text;

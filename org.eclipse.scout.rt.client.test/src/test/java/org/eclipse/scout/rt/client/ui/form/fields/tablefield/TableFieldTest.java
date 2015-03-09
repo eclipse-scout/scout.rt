@@ -241,26 +241,26 @@ public class TableFieldTest {
     tableField.getTable().updateRow(updatedRow);
   }
 
-  private P_Table createTableData(boolean r1_value, boolean r2_value, boolean r3_value, int state) {
+  private P_Table createTableData(boolean r1Value, boolean r2Value, boolean r3Value, int state) {
     int r;
     P_Table tableData = new P_Table();
     r = tableData.addRow();
     tableData.setRowState(r, state);
     tableData.setKey(r, 1);
     tableData.setString(r, "Lorem");
-    tableData.setHidden(r, r1_value);
+    tableData.setHidden(r, r1Value);
 
     r = tableData.addRow();
     tableData.setRowState(r, state);
     tableData.setKey(r, 2);
     tableData.setString(r, "Ipsum");
-    tableData.setHidden(r, r2_value);
+    tableData.setHidden(r, r2Value);
 
     r = tableData.addRow();
     tableData.setKey(r, 3);
     tableData.setRowState(r, state);
     tableData.setString(r, "Dolor");
-    tableData.setHidden(r, r3_value);
+    tableData.setHidden(r, r3Value);
 
     return tableData;
   }
@@ -605,9 +605,9 @@ public class TableFieldTest {
     public static class TableBeanRowData extends AbstractTableRowData {
 
       private static final long serialVersionUID = 1L;
-      public static final String key = "key";
-      public static final String string = "string";
-      public static final String hidden = "hidden";
+      public static final String KEY = "key";
+      public static final String STRING = "string";
+      public static final String HIDDEN = "hidden";
       private Integer m_key;
       private String m_string;
       private Boolean m_hidden;

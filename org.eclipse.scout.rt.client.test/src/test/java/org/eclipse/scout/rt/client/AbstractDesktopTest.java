@@ -136,8 +136,8 @@ public class AbstractDesktopTest {
   protected void verifyDataChanged(Holder<Object[]> resultHolder) throws ProcessingException {
     Object[] result = resultHolder.getValue();
     assertTrue(result.length == 2);
-    assertTrue(result[0] == TEST_DATA_TYPE_1 && result[1] == TEST_DATA_TYPE_2 ||
-        result[0] == TEST_DATA_TYPE_2 && result[1] == TEST_DATA_TYPE_1);
+    assertTrue(result[0] == TEST_DATA_TYPE_1 && result[1] == TEST_DATA_TYPE_2
+        || result[0] == TEST_DATA_TYPE_2 && result[1] == TEST_DATA_TYPE_1);
   }
 
   @ClassId("d090cc19-ba7a-4f79-b147-e58765a837fb")

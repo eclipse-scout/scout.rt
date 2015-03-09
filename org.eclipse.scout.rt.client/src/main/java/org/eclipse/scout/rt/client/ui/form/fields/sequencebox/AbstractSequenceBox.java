@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -25,6 +26,9 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.ISequenceBoxExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.SequenceBoxChains.SequenceBoxCheckFromToChain;
@@ -39,8 +43,18 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.internal.SequenceBoxGrid;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
+/**
+ * A {@link IFormField} that contains an ordered sequence of {@link IFormField}s.<br>
+ * E.g. a range with start and end date.
+ * <p>
+ * The Default implementation ensures that all fields in the range box have ascending values. Overwrite
+ * {@link #execCheckFromTo(IValueField[], int)} to change that behaviour or disable any checks with
+ * {@link #getConfiguredAutoCheckFromTo()}.
+ * </p>
+ */
 @ClassId("e71e8b93-1168-4f5e-8781-4774f01eee26")
 public abstract class AbstractSequenceBox extends AbstractCompositeField implements ISequenceBox {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSequenceBox.class);
 
   private boolean m_autoCheckFromTo;
   private OptimisticLock m_labelCompositionLock;
@@ -113,50 +127,65 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
       }
     }
 
-    //check if there are exactly two field and all of them are comparable with same type
-    if (nonEmptyIndex < 0 || nonEmptyFields.size() != 2 || equalTypes(nonEmptyFields)) {
-      clearInvalidSequenceStatus(valueFields);
-      return;
+    //check if the fields are comparable with same type
+    if (nonEmptyIndex < 0 || !equalTypes(nonEmptyFields)) {
+      clearSequenceErrors(Arrays.asList(valueFields));
     }
+    else {
+      checkNonEmptyFromTo(nonEmptyFields, nonEmptyIndex);
+    }
+  }
+
+  private <T extends Comparable<T>> void checkNonEmptyFromTo(ArrayList<IValueField<T>> nonEmptyFields, int nonEmptyIndex) throws ProcessingException {
     // check changed field against its non-empty neighbours
     IValueField<T> v = nonEmptyFields.get(nonEmptyIndex);
 
     //check greater left neighbor
-    if (nonEmptyIndex - 1 >= 0) {
-      IValueField<T> left = nonEmptyFields.get(nonEmptyIndex - 1);
-      if (CompareUtility.compareTo(left.getValue(), v.getValue()) > 0) {
-        setSequenceErrorToField(v, ScoutTexts.get("XMustBeGreaterThanOrEqualY", v.getLabel(), left.getLabel()));
-        return;
+    IValueField<T> left = (nonEmptyIndex - 1 >= 0) ? nonEmptyFields.get(nonEmptyIndex - 1) : null;
+    IStatus leftError = checkFromTo(left, v, false);
+    if (leftError != null) {
+      addSequenceError(v, leftError);
+    }
+    else {
+      //check right neighbor greater
+      IValueField<T> right = (nonEmptyIndex + 1 < nonEmptyFields.size()) ? nonEmptyFields.get(nonEmptyIndex + 1) : null;
+      IStatus rightError = checkFromTo(v, right, true);
+      if (rightError != null) {
+        addSequenceError(v, rightError);
+      }
+      else {
+        clearSequenceErrors(nonEmptyFields);
       }
     }
-
-    //check right neighbor greater
-    if (nonEmptyIndex + 1 < nonEmptyFields.size()) {
-      IValueField<T> right = nonEmptyFields.get(nonEmptyIndex + 1);
-      if (CompareUtility.compareTo(v.getValue(), right.getValue()) > 0) {
-        setSequenceErrorToField(v, ScoutTexts.get("XMustBeLessThanOrEqualY", v.getLabel(), right.getLabel()));
-        return;
-      }
-    }
-
-    clearInvalidSequenceStatus(valueFields);
   }
 
-  private <T extends Comparable<T>> boolean equalTypes(ArrayList<IValueField<T>> nonEmptyFields) {
+  private <T extends Comparable<T>> IStatus checkFromTo(IValueField<T> from, IValueField<T> to, boolean lessMessage) {
+    if (from != null && to != null && CompareUtility.compareTo(from.getValue(), to.getValue()) > 0) {
+      if (lessMessage) {
+        return new InvalidSequenceStatus(ScoutTexts.get("XMustBeLessThanOrEqualY", from.getLabel(), to.getLabel()));
+      }
+      else {
+        return new InvalidSequenceStatus(ScoutTexts.get("XMustBeGreaterThanOrEqualY", to.getLabel(), from.getLabel()));
+      }
+    }
+    return null;
+  }
+
+  private <T extends Comparable<T>> boolean equalTypes(List<IValueField<T>> nonEmptyFields) {
     HashSet<Class> beanTypes = new HashSet<Class>();
     for (IValueField<T> f : nonEmptyFields) {
       beanTypes.add(f.getValue().getClass());
     }
-    return beanTypes.size() != 1;
+    return beanTypes.size() == 1;
   }
 
-  private <T extends Comparable<T>> void setSequenceErrorToField(IValueField<T> v, String errorMessage) {
+  private <T extends Comparable<T>> void addSequenceError(IValueField<T> v, IStatus errorStatus) {
     if (!v.isLabelSuppressed()) {
-      v.addErrorStatus(new InvalidSequenceStatus(errorMessage));
+      v.addErrorStatus(errorStatus);
     }
     else {
       //first field's label is suppressed and error status updated on own label
-      addErrorStatus(new InvalidSequenceStatus(errorMessage));
+      addErrorStatus(errorStatus);
     }
   }
 
@@ -166,7 +195,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
    *
    * @param valueFields
    */
-  private <T extends Comparable<T>> void clearInvalidSequenceStatus(IValueField<T>[] valueFields) {
+  private <T extends Comparable<T>> void clearSequenceErrors(List<IValueField<T>> valueFields) {
     for (IValueField<T> v : valueFields) {
       v.removeErrorStatus(InvalidSequenceStatus.class);
     }
@@ -257,9 +286,9 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     return valueFieldList;
   }
 
-  /*
-   * Runtime
-   */
+/*
+ * Runtime
+ */
 
   @Override
   public boolean isEqualColumnWidths() {
@@ -279,7 +308,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     }
   }
 
-  // box is only visible when it has at least one visible item
+// box is only visible when it has at least one visible item
   @Override
   protected void handleFieldVisibilityChanged() {
     super.handleFieldVisibilityChanged();
@@ -314,6 +343,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
       interceptCheckFromTo(valueFields, changedIndex);
     }
     catch (ProcessingException e) {
+      LOG.debug("Sequence Error", e);
       valueFields[changedIndex].addErrorStatus(e.getStatus());
     }
   }

@@ -15,6 +15,9 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 
+/**
+ * A {@link IFormField} that contains other {@link IFormField}s.
+ */
 public interface ICompositeField extends IFormField {
 
   String PROP_VISIBLE_FIELD_COUNT = "visibleFieldCount";

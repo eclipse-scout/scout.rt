@@ -66,11 +66,11 @@ public class PageWithTable7Test {
   public static class PageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
     public List<String> m_protocol = new ArrayList<String>();
     public int m_counter = 0;
-    private String[] data = new String[]{"first", "second", "third", "fourth"};
+    private String[] m_data = new String[]{"first", "second", "third", "fourth"};
 
     @Override
     protected void execLoadData(SearchFilter filter) throws ProcessingException {
-      importTableData(new Object[][]{new Object[]{data[m_counter]}});
+      importTableData(new Object[][]{new Object[]{m_data[m_counter]}});
     }
 
     @Override

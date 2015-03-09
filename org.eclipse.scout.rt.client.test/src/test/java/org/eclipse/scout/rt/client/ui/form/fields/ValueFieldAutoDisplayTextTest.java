@@ -27,20 +27,23 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+/**
+ * Tests for {@link AbstractValueField#setAutoDisplayText(boolean)}.
+ */
 @RunWith(PlatformTestRunner.class)
-public class AbstractValueFieldTest extends AbstractValueField<Integer> {
+public class ValueFieldAutoDisplayTextTest extends AbstractValueField<Integer> {
 
-  private static Locale ORIGINAL_LOCALE;
+  private static Locale s_original_locale;
 
   @BeforeClass
   public static void setupBeforeClass() {
-    ORIGINAL_LOCALE = NlsLocale.get(false);
+    s_original_locale = NlsLocale.get(false);
     NlsLocale.set(new Locale("de", "CH"));
   }
 
   @AfterClass
   public static void tearDownAfterClass() {
-    NlsLocale.set(ORIGINAL_LOCALE);
+    NlsLocale.set(s_original_locale);
   }
 
   @Override

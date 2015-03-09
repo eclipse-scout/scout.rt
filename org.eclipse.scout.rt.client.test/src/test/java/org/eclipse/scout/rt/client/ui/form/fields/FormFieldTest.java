@@ -30,12 +30,12 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.MultiStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestForm2.MainBox.SimpleGroupBox2;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestFormWithClassId.MainBox.TestFieldDuplicateClassId1;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestFormWithClassId.MainBox.TestFieldDuplicateClassId2;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestFormWithClassId.MainBox.TestFieldWithoutClassId;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestFormWithGroupBoxes.MainBox.GroupBox1;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestFormWithGroupBoxes.MainBox.GroupBox2;
+import org.eclipse.scout.rt.client.ui.form.fields.FormFieldTest.TestForm2.MainBox.SimpleGroupBox2;
+import org.eclipse.scout.rt.client.ui.form.fields.FormFieldTest.TestFormWithClassId.MainBox.TestFieldDuplicateClassId1;
+import org.eclipse.scout.rt.client.ui.form.fields.FormFieldTest.TestFormWithClassId.MainBox.TestFieldDuplicateClassId2;
+import org.eclipse.scout.rt.client.ui.form.fields.FormFieldTest.TestFormWithClassId.MainBox.TestFieldWithoutClassId;
+import org.eclipse.scout.rt.client.ui.form.fields.FormFieldTest.TestFormWithGroupBoxes.MainBox.GroupBox1;
+import org.eclipse.scout.rt.client.ui.form.fields.FormFieldTest.TestFormWithGroupBoxes.MainBox.GroupBox2;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTemplateUsingOtherTemplateGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTestGroupBox;
@@ -50,7 +50,7 @@ import org.junit.runner.RunWith;
  * @since 3.10.0
  */
 @RunWith(PlatformTestRunner.class)
-public class AbstractFormFieldTest {
+public class FormFieldTest {
   private static final String DUPLICATE_CLASS_ID = "DUPLICATE";
   private static final String TEST_CLASS_ID = "TEST_CLASS_ID1";
   private static final String TEST_FORM_ID = "TEST_FORM_CLASS_ID";

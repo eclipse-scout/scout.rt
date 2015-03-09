@@ -30,28 +30,28 @@ public class TypeCastUtilityClientTest {
 
   @Test
   public void testGetGenericsParameterClass() {
-    Class<?> T;
+    Class<?> t;
     //
-    T = TypeCastUtility.getGenericsParameterClass(ListBox.class, IHolder.class, 0);
-    assertEquals(Set.class, T);
+    t = TypeCastUtility.getGenericsParameterClass(ListBox.class, IHolder.class, 0);
+    assertEquals(Set.class, t);
     //
-    T = TypeCastUtility.getGenericsParameterClass(ListBox.class, IValueField.class, 0);
-    assertEquals(Set.class, T);
+    t = TypeCastUtility.getGenericsParameterClass(ListBox.class, IValueField.class, 0);
+    assertEquals(Set.class, t);
     //
-    T = TypeCastUtility.getGenericsParameterClass(ListBox.class, IListBox.class, 0);
-    assertEquals(Long.class, T);
+    t = TypeCastUtility.getGenericsParameterClass(ListBox.class, IListBox.class, 0);
+    assertEquals(Long.class, t);
     //
-    T = TypeCastUtility.getGenericsParameterClass(LongField.class, IHolder.class, 0);
-    assertEquals(Long.class, T);
+    t = TypeCastUtility.getGenericsParameterClass(LongField.class, IHolder.class, 0);
+    assertEquals(Long.class, t);
     //
-    T = TypeCastUtility.getGenericsParameterClass(LongArrayField.class, IHolder.class, 0);
-    assertEquals(Long[].class, T);
+    t = TypeCastUtility.getGenericsParameterClass(LongArrayField.class, IHolder.class, 0);
+    assertEquals(Long[].class, t);
     //
-    T = TypeCastUtility.getGenericsParameterClass(MapField.class, IHolder.class, 0);
-    assertEquals(Map.class, T);
+    t = TypeCastUtility.getGenericsParameterClass(MapField.class, IHolder.class, 0);
+    assertEquals(Map.class, t);
     //
-    T = TypeCastUtility.getGenericsParameterClass(MapArrayField.class, IHolder.class, 0);
-    assertEquals(Map[].class, T);
+    t = TypeCastUtility.getGenericsParameterClass(MapArrayField.class, IHolder.class, 0);
+    assertEquals(Map[].class, t);
   }
 
   static class ListBox extends AbstractListBox<Long> {

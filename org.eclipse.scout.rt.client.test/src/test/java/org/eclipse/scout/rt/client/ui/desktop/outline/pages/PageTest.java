@@ -41,7 +41,7 @@ import org.mockito.Mockito;
 public class PageTest {
   private static final String TEST_PAGE_CLASS_ID = "TEST_CLASS_ID";
   private List<IBean<?>> m_serviceRegs;
-  private final int TEST_SERVICE_RANKING = 10000;
+  private static final int TEST_SERVICE_RANKING = 10000;
 
   @After
   public void tearDown() {

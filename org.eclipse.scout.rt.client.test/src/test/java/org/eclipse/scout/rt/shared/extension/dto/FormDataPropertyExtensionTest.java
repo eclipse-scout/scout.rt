@@ -66,60 +66,60 @@ public class FormDataPropertyExtensionTest extends AbstractLocalExtensionTestCas
   }
 
   private void doExtensionOfContributionTest() throws Exception {
-    Long TEST_VAL_EXPORT = Long.valueOf(501);
-    Long TEST_VAL_IMPORT = Long.valueOf(601);
+    Long exportTestVal = Long.valueOf(501);
+    Long importTestVal = Long.valueOf(601);
 
     OrigForm f = new OrigForm();
     TreeBoxPropertyExtension propertyExtensionClient = f.getSecondUseOfTemplateBox().getContribution(TreeBoxToTemplateField.class).getExtension(TreeBoxPropertyExtension.class);
-    propertyExtensionClient.setLongValue(TEST_VAL_EXPORT);
+    propertyExtensionClient.setLongValue(exportTestVal);
 
     // test formData export
     OrigFormData data = new OrigFormData();
     f.exportFormData(data);
     TreeBoxPropertyExtensionData propertyContributionShared = data.getSecondUseOfTemplateBox().getContribution(TreeBoxToTemplateFieldData.class).getContribution(TreeBoxPropertyExtensionData.class);
-    Assert.assertEquals(TEST_VAL_EXPORT, propertyContributionShared.getLongValue());
+    Assert.assertEquals(exportTestVal, propertyContributionShared.getLongValue());
 
     // test formData import
-    propertyContributionShared.setLongValue(TEST_VAL_IMPORT);
+    propertyContributionShared.setLongValue(importTestVal);
     f.importFormData(data);
-    Assert.assertEquals(TEST_VAL_IMPORT, propertyExtensionClient.getLongValue());
+    Assert.assertEquals(importTestVal, propertyExtensionClient.getLongValue());
   }
 
   private void doFormTest() throws Exception {
-    Long TEST_VAL_EXPORT = Long.valueOf(201);
-    Long TEST_VAL_IMPORT = Long.valueOf(301);
+    Long exportTestVal = Long.valueOf(201);
+    Long importTestVal = Long.valueOf(301);
     OrigForm f = new OrigForm();
-    f.getExtension(FormPropertyExtension.class).setLongValue(TEST_VAL_EXPORT);
+    f.getExtension(FormPropertyExtension.class).setLongValue(exportTestVal);
 
     // test formData export
     OrigFormData data = new OrigFormData();
     f.exportFormData(data);
     PropertyExtensionData propertyExtension = data.getContribution(PropertyExtensionData.class);
     Assert.assertNotNull(propertyExtension);
-    Assert.assertEquals(TEST_VAL_EXPORT, propertyExtension.getLongValueProperty().getValue());
+    Assert.assertEquals(exportTestVal, propertyExtension.getLongValueProperty().getValue());
 
     // test formData import
-    propertyExtension.setLongValue(TEST_VAL_IMPORT);
+    propertyExtension.setLongValue(importTestVal);
     f.importFormData(data);
-    Assert.assertEquals(TEST_VAL_IMPORT, f.getExtension(FormPropertyExtension.class).getLongValue());
+    Assert.assertEquals(importTestVal, f.getExtension(FormPropertyExtension.class).getLongValue());
   }
 
   private void doFormFieldTest() throws Exception {
-    Long TEST_VAL_EXPORT = Long.valueOf(101);
-    Long TEST_VAL_IMPORT = Long.valueOf(401);
+    Long exportTestVal = Long.valueOf(101);
+    Long importTestVal = Long.valueOf(401);
     OrigForm f = new OrigForm();
-    f.getMainBox().getExtension(MainBoxPropertyExtension.class).setLongValue(TEST_VAL_EXPORT);
+    f.getMainBox().getExtension(MainBoxPropertyExtension.class).setLongValue(exportTestVal);
 
     // test formData export
     OrigFormData data = new OrigFormData();
     f.exportFormData(data);
     PropertyExtensionData propertyExtension = data.getContribution(PropertyExtensionData.class);
     Assert.assertNotNull(propertyExtension);
-    Assert.assertEquals(TEST_VAL_EXPORT, propertyExtension.getLongValueProperty().getValue());
+    Assert.assertEquals(exportTestVal, propertyExtension.getLongValueProperty().getValue());
 
     // test formData import
-    propertyExtension.setLongValue(TEST_VAL_IMPORT);
+    propertyExtension.setLongValue(importTestVal);
     f.importFormData(data);
-    Assert.assertEquals(TEST_VAL_IMPORT, f.getMainBox().getExtension(MainBoxPropertyExtension.class).getLongValue());
+    Assert.assertEquals(importTestVal, f.getMainBox().getExtension(MainBoxPropertyExtension.class).getLongValue());
   }
 }
