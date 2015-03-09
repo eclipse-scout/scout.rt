@@ -13,10 +13,15 @@ package org.eclipse.scout.rt.platform.cdi;
 import java.util.List;
 import java.util.SortedSet;
 
+import org.eclipse.scout.commons.annotations.Priority;
+
 /**
  * Used in {@link IBeanContext}
  * <p>
- * Knows how to create an object instance of a {@link IBean} wrapped with (multiple) interceptors
+ * Knows how to create an object instance of a {@link IBean} wrapped with (multiple) interceptors using all the known
+ * {@link BeanInvocationHint} annotations on the beans
+ * <p>
+ * The implementation with the highest {@link Priority} is used in the application.
  */
 public interface IBeanInstanceFactory {
   /**

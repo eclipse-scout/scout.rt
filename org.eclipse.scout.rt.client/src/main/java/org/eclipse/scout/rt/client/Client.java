@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.eclipse.scout.rt.platform.cdi.BeanInvocationHint;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 
 /**
@@ -13,6 +14,7 @@ import org.eclipse.scout.rt.platform.cdi.OBJ;
  * <p>
  * Only valid if the object is obtained using {@link OBJ#one(Class)} with an interface argument
  */
+@BeanInvocationHint
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface Client {
