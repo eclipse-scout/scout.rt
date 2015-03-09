@@ -13,11 +13,14 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(PlatformTestRunner.class)
 public class JsonFormFieldTest extends BaseFormFieldTest {
 
   AbstractGroupBox m_model = new AbstractGroupBox() {
@@ -32,7 +35,7 @@ public class JsonFormFieldTest extends BaseFormFieldTest {
     m_model.setEnabled(false);
     m_model.setVisible(false);
     m_model.setMandatory(true);
-    m_model.setErrorStatus("allesFalsch");
+    m_model.addErrorStatus("allesFalsch");
   }
 
   @Test
