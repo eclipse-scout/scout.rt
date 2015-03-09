@@ -11,6 +11,9 @@ scout.inherits(scout.DesktopTreeKeyStrokeAdapter, scout.TreeKeyStrokeAdapter);
 
 
 scout.DesktopTreeKeyStrokeAdapter.prototype.accept = function(event) {
+  if($('.glasspane').length>0){
+    return false;
+  }
   return true;
   //accept events if focus is on scout div
 //  var activeElement = document.activeElement;
