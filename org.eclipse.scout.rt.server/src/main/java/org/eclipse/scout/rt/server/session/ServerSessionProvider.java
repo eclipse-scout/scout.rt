@@ -50,7 +50,7 @@ public class ServerSessionProvider {
       public void run() throws Exception {
         serverSession.loadSession();
       }
-    }, input.copy().session(serverSession));
+    }, input.copy().name("server-session-initialization").session(serverSession));
 
     return serverSession;
   }

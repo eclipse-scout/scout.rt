@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.client.job.filter.BlockedJobFilter;
 import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
-import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

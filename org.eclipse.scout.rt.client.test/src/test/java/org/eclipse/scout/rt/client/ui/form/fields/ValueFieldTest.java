@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.ValueFieldTest.ValidateTestForm.MainBox.AField;
 import org.eclipse.scout.rt.client.ui.form.fields.ValueFieldTest.ValidateTestForm.MainBox.BField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

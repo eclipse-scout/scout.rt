@@ -17,28 +17,27 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.server.junit.rule.ServerJobRule;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
+import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
-@RunWith(PlatformTestRunner.class)
+@RunWith(ServerTestRunner.class)
+@RunWithServerSession(TestServerSession.class)
+@RunWithSubject("john")
 public class SessionInspectorTest {
 
   private static final Long CREATION_TIME = 23456789L;
   private static final Long LAST_ACCESS_TIME = 23459999L;
 
   private HttpServletRequest servletRequestBackup;
-
-  @Rule
-  public TestRule serverJobRule = new ServerJobRule();
 
   @Before
   public void setUp() throws Exception {

@@ -24,7 +24,7 @@ import org.osgi.framework.Bundle;
 public interface IServerSession extends ISession {
 
   /**
-   * Invoke this method to initialize the session.
+   * Invoke this method to initialize the session. The session is active just after this method returns.
    */
   void loadSession() throws ProcessingException;
 

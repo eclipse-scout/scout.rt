@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.To
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.TopBox.NameField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.SingleTemplateUsageForm;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
-import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 import org.junit.runner.RunWith;

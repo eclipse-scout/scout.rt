@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.testing.platform;
 
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.runner.Description;
 
 /**
@@ -22,13 +23,13 @@ import org.junit.runner.Description;
 public interface ITestExecutionListener {
 
   /**
-   * Method invoked before the first test commence execution.
+   * Method invoked after the platform was started.
    */
-  void init();
+  void platformStarted();
 
   /**
    * Method invoked before a JUnit test class commence execution.
-   * 
+   *
    * @param description
    *          describes the current test-context.
    */

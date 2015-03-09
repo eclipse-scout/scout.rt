@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
 import org.eclipse.scout.rt.shared.services.lookup.fixture.ILegacyCodeLookupCallVisitor;
 import org.eclipse.scout.rt.shared.services.lookup.fixture.LegacyCodeLookupCall;
-import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.common.code.TestingCodeService;
 import org.junit.AfterClass;

@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestForm
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTemplateUsingOtherTemplateGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTestGroupBox;
-import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

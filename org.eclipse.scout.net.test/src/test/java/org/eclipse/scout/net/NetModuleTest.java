@@ -5,7 +5,7 @@ import java.net.URL;
 
 import org.eclipse.scout.net.internal.NetModule;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
-import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

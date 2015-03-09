@@ -24,6 +24,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.app.IApplication;
@@ -288,6 +289,12 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     }
   }
 
+  @Override
+  public void startSession() {
+    startSession(Platform.getBundle(getClass().getPackage().getName()));
+  }
+
+  @SuppressWarnings("deprecation")
   @Override
   public final void startSession(Bundle bundle) {
     m_bundle = bundle;

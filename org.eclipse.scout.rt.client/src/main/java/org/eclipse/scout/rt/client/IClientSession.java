@@ -72,11 +72,18 @@ public interface IClientSession extends ISession {
   void initCustomParams(Map<String, String> customParams);
 
   /**
+   * Invoke this method to initialize the session. The session is active just after this method returns.
+   */
+  void startSession();
+
+  /**
    * Start model thread with job queue<br>
    * The model thread will first load the session and then start the event loop
    * <p>
    * The session is active just after this method returns.
    */
+  @Deprecated
+  // TODO [dwi]: remove
   void startSession(Bundle bundle);
 
   /**

@@ -80,9 +80,16 @@ public final class Platform implements IPlatform {
     m_state = State.Running;
   }
 
-  public synchronized void ensureStarted() {
+  /**
+   * @return <code>true</code> if the platform was started, <code>false</code> if already started.
+   */
+  public synchronized boolean ensureStarted() {
     if (getState() != State.Running) {
       start();
+      return true;
+    }
+    else {
+      return false;
     }
   }
 

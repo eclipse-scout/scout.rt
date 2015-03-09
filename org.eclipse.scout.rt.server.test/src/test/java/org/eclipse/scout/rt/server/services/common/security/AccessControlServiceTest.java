@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceUtil;
+import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNotificationQueueEvent;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -29,29 +30,26 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.AbstractClientNotification;
 import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
-import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.server.junit.rule.RunAs;
-import org.eclipse.scout.rt.testing.server.junit.rule.ServerJobRule;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
+import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
 /**
  * Test for {@link AbstractAccessControlService}
  */
-@RunWith(PlatformTestRunner.class)
+@RunWith(ServerTestRunner.class)
+@RunWithServerSession(TestServerSession.class)
+@RunWithSubject("john")
 public class AccessControlServiceTest {
   private AbstractAccessControlService m_accessControlService;
   private TestClientNotificationQueueListener m_listener;
   private List<IBean<?>> m_registerServices;
-
-  @Rule
-  public TestRule serverJobRule = new ServerJobRule();
 
   @Before
   public void setup() {
@@ -75,11 +73,11 @@ public class AccessControlServiceTest {
    * {@link AbstractAccessControlService#getPermissions()}
    */
   @Test
-  @RunAs("thisuser")
+  @RunWithSubject("anna")
   public void testClientNotificationSentForGetPermissions() {
     callGetPermissions();
 
-    verifyOneNotificationSent(AccessControlChangedNotification.class, SingleUserFilter.class, "thisuser");
+    verifyOneNotificationSent(AccessControlChangedNotification.class, SingleUserFilter.class, "anna");
   }
 
   /**

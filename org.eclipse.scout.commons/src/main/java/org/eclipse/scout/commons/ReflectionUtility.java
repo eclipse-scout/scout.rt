@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -67,6 +69,19 @@ public class ReflectionUtility {
     for (final Constructor<?> candidate : clazz.getConstructors()) {
       if (Arrays.equals(paramTypes, candidate.getParameterTypes())) {
         return candidate;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns the first element which has an annotation of the given type declared.
+   */
+  public static <ANNOTATION extends Annotation> ANNOTATION getAnnotation(final Class<ANNOTATION> annotationClass, final AnnotatedElement... elements) {
+    for (final AnnotatedElement element : elements) {
+      final ANNOTATION annotation = element.getAnnotation(annotationClass);
+      if (annotation != null) {
+        return annotation;
       }
     }
     return null;

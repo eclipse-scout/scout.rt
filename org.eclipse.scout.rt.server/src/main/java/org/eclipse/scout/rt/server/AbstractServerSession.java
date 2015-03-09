@@ -229,8 +229,10 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   public final void loadSession(Bundle bundle) throws ProcessingException {
     Assertions.assertFalse(isActive(), "Session already started");
 
-    m_bundle = Assertions.assertNotNull(bundle, "Bundle must not be null");
-    m_symbolicBundleName = bundle.getSymbolicName();
+    if (Platform.isRunning()) {
+      m_bundle = Assertions.assertNotNull(bundle, "Bundle must not be null");
+      m_symbolicBundleName = bundle.getSymbolicName();
+    }
     m_active = true;
     m_scoutTexts = new ScoutTexts();
     // explicitly set the just created instance to the ThreadLocal because it was not available yet, when the job was started.

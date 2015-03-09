@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.platform;
 
 import org.eclipse.scout.rt.platform.fixture.TestApplication;
-import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

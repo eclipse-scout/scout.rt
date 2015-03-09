@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.cdi;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
