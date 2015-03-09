@@ -6,7 +6,6 @@ scout.TreeKeyStrokeAdapter = function(field) {
   this.ctrl = false;
   this.alt = false;
   this.shift = false;
-  this.meta = false;
 
   this.keyStrokes.push({
     accept: function(event) {
@@ -86,7 +85,7 @@ scout.TreeKeyStrokeAdapter.prototype.drawKeyBox = function() {
       $upNode = $currentNode.prev('.tree-item');
     }
     if ($upNode) {
-      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '↑', $upNode, false, false, false);
+      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '↑', $upNode, this.ctrl, this.alt, this.shift);
     }
 
     if ($currentNode.length === 0) {
@@ -95,13 +94,13 @@ scout.TreeKeyStrokeAdapter.prototype.drawKeyBox = function() {
       $downNode = $currentNode.next('.tree-item');
     }
     if ($downNode) {
-      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '↓', $downNode, false, false, false);
+      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '↓', $downNode, this.ctrl, this.alt, this.shift);
     }
 
     if (currentNode.expanded) {
-      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '←', $currentNode, false, false, false);
+      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '←', $currentNode, this.ctrl, this.alt, this.shift);
     } else if (!currentNode.expanded && !currentNode.leaf) {
-      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '→', $currentNode, false, false, false);
+      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '→', $currentNode, this.ctrl, this.alt, this.shift);
     }
 
   }
