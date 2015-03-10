@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.runtime.BundleBrowser;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -36,7 +35,6 @@ import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
-import org.osgi.framework.Bundle;
 
 /**
  * Create a screenshot of one or more form into a destination folder. For every {@link ITabBox} a separate image is
@@ -78,28 +76,6 @@ public class PrintFormsAction extends AbstractAction {
 
   public void setFormTypes(List<Class<? extends IForm>> formTypes) {
     m_formTypes = CollectionUtility.arrayListWithoutNullElements(formTypes);
-  }
-
-  /**
-   * Convenience setter to choose all existing form types in a specific plugin
-   */
-  @SuppressWarnings("unchecked")
-  public void setFormTypesByBundle(Bundle bundle) {
-    BundleBrowser b = new BundleBrowser(bundle.getSymbolicName(),
-        bundle.getSymbolicName());
-    List<Class<? extends IForm>> list = new ArrayList<Class<? extends IForm>>();
-    for (String name : b.getClasses(false, true)) {
-      try {
-        Class<?> c = bundle.loadClass(name);
-        if (IForm.class.isAssignableFrom(c)) {
-          list.add((Class<? extends IForm>) c);
-        }
-      }
-      catch (ClassNotFoundException e) {
-        // nop
-      }
-    }
-    m_formTypes = list;
   }
 
   public String getContentType() {

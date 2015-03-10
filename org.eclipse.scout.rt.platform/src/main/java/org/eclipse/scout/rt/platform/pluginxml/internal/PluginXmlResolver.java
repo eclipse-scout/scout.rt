@@ -23,13 +23,9 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.Platform;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 /**
- * To resolve all plugin.xml and fragment.xml on the classpath. This class is responsible for the switch between pure
- * java and osgi implementation.
+ * To resolve all plugin.xml and fragment.xml on the classpath.
  */
 public final class PluginXmlResolver {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PluginXmlResolver.class);
@@ -41,12 +37,7 @@ public final class PluginXmlResolver {
    * @return all fragment.xml and plugin.xml files resolved on the classpath.
    */
   public static List<IPluginXml> resolvePluginXml() {
-    if (Platform.isOsgiRunning()) {
-      return resolvePluginXmlOsgi();
-    }
-    else {
-      return resolvePluginXmlPureJava();
-    }
+    return resolvePluginXmlPureJava();
   }
 
   /**
@@ -102,61 +93,4 @@ public final class PluginXmlResolver {
     }
     return pluginXmlUrls;
   }
-
-  /**
-   * @return
-   */
-  private static List<IPluginXml> resolvePluginXmlOsgi() {
-    List<IPluginXml> pluginXmls = new LinkedList<IPluginXml>();
-    for (Bundle bundle : FrameworkUtil.getBundle(PluginXmlResolver.class).getBundleContext().getBundles()) {
-      // plugin.xml
-      URL pluginUrl = bundle.getResource("plugin.xml");
-      if (pluginUrl != null) {
-        pluginXmls.add(new OsgiPluginXml(bundle, pluginUrl));
-      }
-      // fragments.xml
-      try {
-        Enumeration fragmentUrlEnumeration = bundle.getResources("fragment.xml");
-        while (fragmentUrlEnumeration != null && fragmentUrlEnumeration.hasMoreElements()) {
-          URL fragmentUrl = (URL) fragmentUrlEnumeration.nextElement();
-          if (fragmentUrl != null) {
-            pluginXmls.add(new OsgiPluginXml(bundle, fragmentUrl));
-          }
-        }
-      }
-      catch (IOException e) {
-        LOG.warn("exception while resolving fragments", e);
-      }
-    }
-    return pluginXmls;
-  }
-
-  public static class OsgiPluginXml extends PluginXml {
-
-    private Bundle m_bundle;
-
-    /**
-     * @param pluginXmlUrl
-     */
-    public OsgiPluginXml(Bundle bundle, URL pluginXmlUrl) {
-      super(pluginXmlUrl);
-      m_bundle = bundle;
-    }
-
-    public Bundle getBundle() {
-      return m_bundle;
-    }
-
-    @Override
-    public Class<?> loadClass(String fullyQuallifiedName) throws ClassNotFoundException {
-      return m_bundle.loadClass(fullyQuallifiedName);
-    }
-
-    @Override
-    public String toString() {
-      return String.format("%s in bundle '%s'", super.toString(), getBundle().getSymbolicName());
-    }
-
-  }
-
 }

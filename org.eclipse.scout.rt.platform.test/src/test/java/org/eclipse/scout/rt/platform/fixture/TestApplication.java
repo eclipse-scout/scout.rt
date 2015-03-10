@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.platform.IApplication;
 /**
  *
  */
-@ApplicationScoped
 public class TestApplication implements IApplication {
 
   private static TestApplication instance;
@@ -33,6 +32,16 @@ public class TestApplication implements IApplication {
 
   public static TestApplication getInstance() {
     return instance;
+  }
+
+  @Override
+  public String getName() {
+    return "test app";
+  }
+
+  @Override
+  public String getVersion() {
+    return "0.0.0";
   }
 
 }

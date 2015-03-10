@@ -10,89 +10,58 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.security;
 
-import java.lang.reflect.Modifier;
 import java.security.Permission;
 import java.util.HashSet;
+import java.util.Set;
 
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
-import org.eclipse.scout.commons.runtime.BundleBrowser;
+import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 import org.eclipse.scout.service.AbstractService;
-import org.osgi.framework.Bundle;
 
 /**
  * delegates to {@link PermissionStore}
  */
 @Priority(-1)
 public class PermissionService extends AbstractService implements IPermissionService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PermissionService.class);
 
-  private Object m_permissionClassesLock = new Object();
-  private BundleClassDescriptor[] m_permissionClasses;
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PermissionService.class);
+  private final Object m_permissionClassesLock = new Object();
+  private Set<Class<? extends Permission>> m_permissionClasses;
 
   @Override
-  public BundleClassDescriptor[] getAllPermissionClasses() {
+  public Set<Class<? extends Permission>> getAllPermissionClasses() {
     checkCache();
-    return m_permissionClasses;
+    return CollectionUtility.hashSet(m_permissionClasses);
   }
 
   private void checkCache() {
     synchronized (m_permissionClassesLock) {
       // null-check with lock (valid check)
       if (m_permissionClasses == null) {
-        HashSet<BundleClassDescriptor> discoveredPermissions = new HashSet<BundleClassDescriptor>();
-        for (Bundle bundle : Platform.getBundle("org.eclipse.scout.rt.server").getBundleContext().getBundles()) {
-          // Skip uninteresting bundles
-          if (!acceptBundle(bundle)) {
-            continue;
-          }
-          String[] classNames = null;
-          try {
-            BundleBrowser bundleBrowser = new BundleBrowser(bundle.getSymbolicName(), bundle.getSymbolicName());
-            classNames = bundleBrowser.getClasses(false, true);
-          }
-          catch (Exception e1) {
-            LOG.warn(null, e1);
-          }
-          if (classNames != null) {
-            // filter
-            for (String className : classNames) {
-              // fast pre-check
-              if (acceptClassName(bundle, className)) {
-                try {
-                  Class c = null;
-                  c = bundle.loadClass(className);
-                  if (acceptClass(bundle, c)) {
-                    discoveredPermissions.add(new BundleClassDescriptor(bundle.getSymbolicName(), c.getName()));
-                  }
-
-                }
-                catch (Throwable t) {
-                  // nop
-                }
+        Set<IClassInfo> allKnownPermissions = Platform.get().getClassInventory().getAllKnownSubClasses(Permission.class);
+        Set<Class<? extends Permission>> discoveredPermissions = new HashSet<>(allKnownPermissions.size());
+        for (IClassInfo permInfo : allKnownPermissions) {
+          if (acceptClassName(permInfo.name())) {
+            try {
+              if (acceptClass(permInfo)) {
+                @SuppressWarnings("unchecked")
+                Class<? extends Permission> permClass = (Class<? extends Permission>) permInfo.resolveClass();
+                discoveredPermissions.add(permClass);
               }
+            }
+            catch (ClassNotFoundException e) {
+              LOG.error("Unable to load permission.", e);
             }
           }
         }
-        m_permissionClasses = discoveredPermissions.toArray(new BundleClassDescriptor[discoveredPermissions.size()]);
+        m_permissionClasses = CollectionUtility.hashSet(discoveredPermissions);
       }
     }
-  }
-
-  /**
-   * Checks whether the given bundle should be scanned for permission classes. The default implementations accepts
-   * all bundles that are not fragments (because classes from fragments are automatically read when browsing the host
-   * bundle).
-   *
-   * @return Returns <code>true</code> if the given bundle meets the requirements to be scanned for permission classes.
-   *         <code>false</code> otherwise.
-   */
-  protected boolean acceptBundle(Bundle bundle) {
-    return !Platform.isFragment(bundle);
   }
 
   /**
@@ -100,14 +69,12 @@ public class PermissionService extends AbstractService implements IPermissionSer
    * requirements of this method are not considered further, i.e. the "expensive" class instantiation is skipped.
    * The default implementation checks whether the class name contains <code>"Permission"</code>.
    *
-   * @param bundle
-   *          The class's hosting bundle
    * @param className
    *          the class name to be checked
    * @return Returns <code>true</code> if the given class name meets the requirements to be considered as a permission
    *         class. <code>false</code> otherwise.
    */
-  protected boolean acceptClassName(Bundle bundle, String className) {
+  protected boolean acceptClassName(String className) {
     return className.indexOf("Permission") >= 0;
   }
 
@@ -121,21 +88,11 @@ public class PermissionService extends AbstractService implements IPermissionSer
    * <li>not <code>abstract</code>
    * </ul>
    *
-   * @param bundle
-   *          The class's hosting bundle
-   * @param c
+   * @param permInfo
    *          the class to be checked
    * @return Returns <code>true</code> if the class is a permission class. <code>false</code> otherwise.
    */
-  protected boolean acceptClass(Bundle bundle, Class<?> c) {
-    if (Permission.class.isAssignableFrom(c)) {
-      if (!c.isInterface()) {
-        int flags = c.getModifiers();
-        if (Modifier.isPublic(flags) && !Modifier.isAbstract(flags)) {
-          return true;
-        }
-      }
-    }
-    return false;
+  protected boolean acceptClass(IClassInfo permInfo) {
+    return permInfo.isInstanciable();
   }
 }

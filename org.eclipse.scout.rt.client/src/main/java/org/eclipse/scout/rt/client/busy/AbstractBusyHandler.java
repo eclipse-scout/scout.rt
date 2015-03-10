@@ -44,8 +44,8 @@ import org.eclipse.scout.rt.platform.job.Jobs;
  */
 public abstract class AbstractBusyHandler implements IBusyHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBusyHandler.class);
-  private static final QualifiedName TIMER_PROPERTY = new QualifiedName(AbstractBusyHandler.class.getName(), "timer");
-  private static final QualifiedName BUSY_OPERATION_PROPERTY = new QualifiedName(AbstractBusyHandler.class.getName(), "busy");
+  private static final String TIMER_PROPERTY = AbstractBusyHandler.class.getName() + ".timer";
+  private static final String BUSY_OPERATION_PROPERTY = AbstractBusyHandler.class.getName() + ".busy";
 
   private final Object m_stateLock = new Object();
   private final Set<IFuture<?>> m_list = Collections.synchronizedSet(new HashSet<IFuture<?>>());

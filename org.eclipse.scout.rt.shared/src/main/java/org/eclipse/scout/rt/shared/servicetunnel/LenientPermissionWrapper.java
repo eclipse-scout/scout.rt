@@ -5,14 +5,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
 import java.io.Serializable;
 import java.security.Permission;
 import java.security.Permissions;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.osgi.BundleObjectInputStream;
 
 /**
  * Wrapper for {@link Permissions} that is serialize safe.
@@ -69,12 +67,7 @@ public class LenientPermissionWrapper implements Serializable {
       m_className = (String) gfields.get("m_className", (String) null);
       byte[] data = (byte[]) gfields.get("m_permission", (byte[]) null);
 
-      ObjectInputStream localIn = new ObjectInputStream(new ByteArrayInputStream(data)) {
-        @Override
-        protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-          return (in instanceof BundleObjectInputStream) ? ((BundleObjectInputStream) in).resolveClass(desc) : Class.forName(desc.getName());
-        }
-      };
+      ObjectInputStream localIn = new ObjectInputStream(new ByteArrayInputStream(data));
       try {
         m_permission = (Permission) localIn.readObject();
       }

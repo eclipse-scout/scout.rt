@@ -97,4 +97,6 @@ public interface IPlatform {
    *
    */
   void stop() throws PlatformException;
+  
+  boolean inDevelopmentMode();
 }

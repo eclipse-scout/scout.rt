@@ -19,6 +19,7 @@ import java.net.URLConnection;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,7 +27,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.osgi.framework.Bundle;
 
 /**
@@ -40,7 +40,7 @@ import org.osgi.framework.Bundle;
  * Legacy parameters<br>
  * base-name: same as war-path
  */
-public class ResourceServlet extends HttpServletEx {
+public class ResourceServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1L;
   private static final String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$

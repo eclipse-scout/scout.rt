@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.menus;
 
 import java.util.Set;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
@@ -21,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
@@ -54,7 +54,7 @@ public class CopyWidthsOfColumnsMenu extends AbstractMenu {
   @Override
   protected void execInitAction() throws ProcessingException {
     // This menu is only visible in development mode and not in the web client
-    setVisible(Platform.inDevelopmentMode() && !UserAgentUtility.isWebClient());
+    setVisible(Platform.get().inDevelopmentMode() && !UserAgentUtility.isWebClient());
   }
 
   /**

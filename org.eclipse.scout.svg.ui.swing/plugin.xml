@@ -13,33 +13,6 @@
         </uiClass>
      </formField>
   </extension>
-
-   <extension
-         id="app"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="org.eclipse.scout.svg.ui.swing.internal.TestApplication">
-         </run>
-      </application>
-   </extension>
-
-   <extension
-         id="product"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="org.eclipse.scout.svg.ui.swing.app"
-            name="SVG Swing Test">
-         <property
-               name="appName"
-               value="SVG Swing Test">
-         </property>
-      </product>
-   </extension>
-
 </plugin>
 
 

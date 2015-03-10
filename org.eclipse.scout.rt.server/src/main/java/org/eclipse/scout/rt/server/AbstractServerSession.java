@@ -17,19 +17,16 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -43,30 +40,25 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.Bundle;
 
 public abstract class AbstractServerSession implements IServerSession, Serializable, IExtensibleObject {
 
   private static final long serialVersionUID = 1L;
 
-  private transient Bundle m_bundle;
   private boolean m_initialized;
   private boolean m_active;
-  private final HashMap<String, Object> m_attributes;
+  private final Map<String, Object> m_attributes;
   private transient Object m_attributesLock;
   private final SharedVariableMap m_sharedVariableMap;
   private transient ScoutTexts m_scoutTexts;
   private Subject m_subject;
   private String m_sessionId;
-  private String m_symbolicBundleName;
   private final ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>> m_objectExtensions;
 
   public AbstractServerSession(boolean autoInitConfig) {
     m_attributesLock = new Object();
-    m_attributes = new HashMap<String, Object>();
+    m_attributes = new HashMap<>();
     m_sharedVariableMap = new SharedVariableMap();
     m_objectExtensions = new ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>>(this);
     if (autoInitConfig) {
@@ -79,10 +71,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
    */
   private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
     ois.defaultReadObject();
-    if (m_bundle == null && m_symbolicBundleName != null) {
-      m_bundle = Platform.getBundle(m_symbolicBundleName);
-    }
-
     if (m_scoutTexts == null) {
       m_scoutTexts = new ScoutTexts();
       ScoutTexts.CURRENT.set(m_scoutTexts);
@@ -134,18 +122,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   private void setUserIdInternal(String newValue) {
     setSharedContextVariable("userId", String.class, newValue);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public Locale getLocale() {
-    return NlsLocale.get(); // This method will be removed in release 5.2.
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public UserAgent getUserAgent() {
-    return UserAgentUtility.getCurrentUserAgent();
   }
 
   /**
@@ -215,24 +191,8 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   @Override
-  public Bundle getBundle() {
-    return m_bundle;
-  }
-
-  @Override
-  public void loadSession() throws ProcessingException {
-    loadSession(Platform.getBundle(getClass().getPackage().getName()));
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public final void loadSession(Bundle bundle) throws ProcessingException {
+  public final void loadSession() throws ProcessingException {
     Assertions.assertFalse(isActive(), "Session already started");
-
-    if (Platform.isRunning()) {
-      m_bundle = Assertions.assertNotNull(bundle, "Bundle must not be null");
-      m_symbolicBundleName = bundle.getSymbolicName();
-    }
     m_active = true;
     m_scoutTexts = new ScoutTexts();
     // explicitly set the just created instance to the ThreadLocal because it was not available yet, when the job was started.

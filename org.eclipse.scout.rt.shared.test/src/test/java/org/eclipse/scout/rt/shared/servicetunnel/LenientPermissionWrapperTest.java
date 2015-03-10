@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.osgi.BundleObjectInputStream;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.junit.Test;
@@ -59,12 +58,9 @@ public class LenientPermissionWrapperTest {
 
   @Test
   public void read() throws Exception {
-    Logger logger1 = Logger.getLogger(BundleObjectInputStream.class.getName());
     Logger logger2 = Logger.getLogger(LenientPermissionWrapper.class.getName());
-    Level oldLevel1 = logger1.getLevel();
     Level oldLevel2 = logger2.getLevel();
     try {
-      logger1.setLevel(Level.OFF);
       logger2.setLevel(Level.OFF);
       //
       Permissions actual = getObjectSerializer().deserialize(new ByteArrayInputStream(Base64Utility.decode(data)), Permissions.class);
@@ -74,7 +70,6 @@ public class LenientPermissionWrapperTest {
       assertPermissionsEqual(expected, actual);
     }
     finally {
-      logger1.setLevel(oldLevel1);
       logger2.setLevel(oldLevel2);
     }
   }

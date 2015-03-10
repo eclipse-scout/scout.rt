@@ -29,7 +29,6 @@ import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -46,7 +45,6 @@ import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.ColorUIResource;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CSSPatch;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.HTMLUtility;
@@ -160,7 +158,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       System.setProperty("sun.java2d.noddraw", "true");
       System.getProperty("sun.java2d.noddraw", "true");// read to make it
       //only system properties are visible inside javax.swing
-      initLookAndFeel(System.getProperties());
+      initLookAndFeel();
       interceptUIDefaults(UIManager.getDefaults());
       CSSPatch.apply();
       m_rootFrame = createRootFrame();
@@ -177,8 +175,8 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
    * <p>
    * Properties: scout.laf, javax.swing.plaf.synth.style, swing.defaultlaf
    */
-  protected void initLookAndFeel(Properties initProperties) {
-    new InitLookAndFeelInjector().inject(initProperties);
+  protected void initLookAndFeel() {
+    new InitLookAndFeelInjector().inject();
   }
 
   @Override
@@ -560,11 +558,13 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
      */
     long hWnd = 0;
     Pattern pat = Pattern.compile("hWnd=([-]?[0-9]+)");
-    for (String s : Platform.getApplicationArgs()) {
-      Matcher m = pat.matcher(s.trim());
-      if (m.matches()) {
-        hWnd = Long.parseLong(m.group(1));
-        break;
+    for (Object s : System.getProperties().values()) {
+      if (s != null) {
+        Matcher m = pat.matcher(s.toString().trim());
+        if (m.matches()) {
+          hWnd = Long.parseLong(m.group(1));
+          break;
+        }
       }
     }
     if (hWnd != 0) {

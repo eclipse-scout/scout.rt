@@ -8,25 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform;
+package org.eclipse.scout.jaxws.internal;
 
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.jaxws.security.provider.ConfigIniAuthenticator;
+import org.eclipse.scout.rt.platform.cdi.IBeanContext;
+import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
+import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 
 /**
- * The application with the highest {@link Priority} will be launched in the {@link IPlatform.State#ApplicationStarting}
- * phase
+ * Bean Contributor for JAX-WS Scout RT.
  */
-@Bean
-public interface IApplication {
+public class JaxWs216BeanContributor implements IBeanContributor {
 
-  String CONFIG_KEY_VERSION = "scout.application.version";
-  String CONFIG_KEY_NAME = "scout.application.name";
-  
-  void start() throws PlatformException;
-
-  void stop() throws PlatformException;
-  
-  String getName();
-
-  String getVersion();
+  @Override
+  public void contributeBeans(IClassInventory classInventory, IBeanContext context) {
+    context.registerClass(ConfigIniAuthenticator.class);
+  }
 }

@@ -67,7 +67,6 @@ public class AbstractServerSessionTest {
   private void assertSessionsEquals(IServerSession expected, IServerSession actual) {
     assertEquals(expected.getId(), actual.getId());
     assertEquals(expected.getUserId(), actual.getUserId());
-    assertEquals(expected.getBundle(), actual.getBundle());
     ScoutAssert.assertListEquals(expected.getSharedVariableMap().entrySet(), actual.getSharedVariableMap().entrySet());
   }
 

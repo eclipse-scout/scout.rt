@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.ui.swing.ext.job;
 
 /**
- * Bean to hold properties of a {@link SwingProgressMonitor}
- * 
  * @author awe
  * @since 3.10.0-M3
  */

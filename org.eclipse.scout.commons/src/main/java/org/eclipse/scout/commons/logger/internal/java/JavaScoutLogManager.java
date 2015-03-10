@@ -15,17 +15,12 @@ import java.util.Enumeration;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import org.eclipse.core.runtime.ILogListener;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.EclipseLogUtility;
 import org.eclipse.scout.commons.logger.IScoutLogManager;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.JavaLogUtility;
@@ -50,12 +45,10 @@ public class JavaScoutLogManager implements IScoutLogManager {
 
   private Object m_recordingLock;
   private LogRecorderHandler m_logRecorderHandler;
-  private ILogListener m_eclipseLogListener;
   private boolean m_globalLogLevelSet;
 
   public JavaScoutLogManager() {
     m_recordingLock = new Object();
-    m_eclipseLogListener = new P_EclipseToJavaDelegateListener();
   }
 
   /**
@@ -69,14 +62,16 @@ public class JavaScoutLogManager implements IScoutLogManager {
    */
   @Override
   public void initialize() {
-    if (Platform.isRunning()) {
-      Platform.addLogListener(m_eclipseLogListener);
-    }
-
     Logger root = Logger.getLogger("");
     if (root.getLevel() == Level.INFO) {
       if (ConfigIniUtility.getProperty("java.util.logging.config.class") == null && ConfigIniUtility.getProperty("java.util.logging.config.file") == null) {
-        root.setLevel(Level.WARNING);
+        String level = ConfigIniUtility.getProperty("org.eclipse.scout.log.level");
+        if (level == null) {
+          root.setLevel(Level.WARNING);
+        }
+        else {
+          root.setLevel(JavaLogUtility.scoutToJavaLevel(JavaLogUtility.toScoutLevel(level)));
+        }
       }
     }
 
@@ -195,31 +190,6 @@ public class JavaScoutLogManager implements IScoutLogManager {
     }
     catch (Exception e) {
       throw new ProcessingException("could not create handler to record log messages", e);
-    }
-  }
-
-  /**
-   * To listen for Eclipse log events and send them to JUL
-   */
-  private final class P_EclipseToJavaDelegateListener implements ILogListener {
-
-    @Override
-    public void logging(IStatus status, String plugin) {
-      int scoutLogLevel = EclipseLogUtility.eclipseToScoutLevel(status.getSeverity());
-      Level javaLogLevel = JavaLogUtility.scoutToJavaLevel(scoutLogLevel);
-
-      String codeText = status.getCode() != 0 ? "[code " + status.getCode() + "] " : "";
-      LogRecord record = new LogRecord(javaLogLevel, codeText + status.getMessage());
-      record.setLoggerName(plugin);
-      if (status.getPlugin() != null && status.getPlugin().length() > 0) {
-        record.setSourceClassName(status.getPlugin());
-      }
-      else {
-        record.setSourceClassName(plugin);
-      }
-      record.setSourceMethodName(null);
-      record.setThrown(status.getException());
-      Logger.getLogger(record.getLoggerName()).log(record);
     }
   }
 }

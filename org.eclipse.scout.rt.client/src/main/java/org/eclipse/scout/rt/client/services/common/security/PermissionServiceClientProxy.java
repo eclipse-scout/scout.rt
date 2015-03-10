@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.security;
 
+import java.security.Permission;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
@@ -32,7 +34,7 @@ public class PermissionServiceClientProxy extends AbstractService implements IPe
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PermissionServiceClientProxy.class);
 
   private final Object m_stateLock = new Object();
-  private final HashMap<Object, ServiceState> m_stateMap = new HashMap<Object, ServiceState>();
+  private final Map<Object, ServiceState> m_stateMap = new HashMap<Object, ServiceState>();
 
   public PermissionServiceClientProxy() {
   }
@@ -55,7 +57,7 @@ public class PermissionServiceClientProxy extends AbstractService implements IPe
   }
 
   @Override
-  public BundleClassDescriptor[] getAllPermissionClasses() {
+  public Set<Class<? extends Permission>> getAllPermissionClasses() {
     ServiceState state = getServiceState();
     checkCache(state);
     return state.m_permissionClasses;
@@ -73,8 +75,8 @@ public class PermissionServiceClientProxy extends AbstractService implements IPe
     return ServiceTunnelUtility.createProxy(IPermissionService.class, ClientSessionProvider.currentSession().getServiceTunnel());
   }
 
-  private static class ServiceState {
-    final Object m_permissionClassesLock = new Object();
-    BundleClassDescriptor[] m_permissionClasses;
+  private static final class ServiceState {
+    private final Object m_permissionClassesLock = new Object();
+    private Set<Class<? extends Permission>> m_permissionClasses;
   }
 }

@@ -14,17 +14,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -32,8 +31,6 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeVisitor;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * Dynamic code service for testing purposes. Arbitrary code types can be registered dynamically. Consumers must
@@ -201,14 +198,9 @@ public class TestingCodeService extends AbstractService implements ICodeService 
   }
 
   @Override
-  public Set<BundleClassDescriptor> getAllCodeTypeClasses(String classPrefix) {
+  public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix) {
     synchronized (m_codeTypeMapLock) {
-      Set<BundleClassDescriptor> result = new HashSet<BundleClassDescriptor>();
-      for (Class<? extends ICodeType> type : m_codeTypes.keySet()) {
-        Bundle bundle = FrameworkUtil.getBundle(type);
-        result.add(new BundleClassDescriptor(bundle.getSymbolicName(), type.getName()));
-      }
-      return result;
+      return CollectionUtility.hashSet(m_codeTypes.keySet());
     }
   }
 

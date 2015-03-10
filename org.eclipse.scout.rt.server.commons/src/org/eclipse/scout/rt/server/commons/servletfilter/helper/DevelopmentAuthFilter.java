@@ -26,10 +26,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
 import org.eclipse.scout.rt.server.commons.servletfilter.security.SecureHttpServletRequestWrapper;
 
@@ -57,7 +57,7 @@ public class DevelopmentAuthFilter implements Filter {
 
   @Override
   public void doFilter(ServletRequest in, ServletResponse out, final FilterChain chain) throws IOException, ServletException {
-    if (isSubjectSet() || !Platform.inDevelopmentMode()) {
+    if (isSubjectSet() || !Platform.get().inDevelopmentMode()) {
       chain.doFilter(in, out);
       return;
     }

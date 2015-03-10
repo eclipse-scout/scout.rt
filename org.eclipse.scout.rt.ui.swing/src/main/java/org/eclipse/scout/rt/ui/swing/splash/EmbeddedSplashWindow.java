@@ -27,10 +27,10 @@ import javax.swing.JLabel;
 import javax.swing.RootPaneContainer;
 import javax.swing.UIManager;
 
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
-import org.osgi.framework.Version;
 
 public class EmbeddedSplashWindow implements ISplashWindow {
   private RootPaneContainer m_owner;
@@ -42,11 +42,13 @@ public class EmbeddedSplashWindow implements ISplashWindow {
 
   public EmbeddedSplashWindow(RootPaneContainer owner) {
     m_owner = owner;
-    Version v = Version.emptyVersion;
-    if (Platform.getProduct() != null) {
-      v = Version.parseVersion("" + Platform.getProduct().getDefiningBundle().getHeaders().get("Bundle-Version"));
+    IApplication app = OBJ.oneOrNull(IApplication.class);
+    if (app != null) {
+      m_versionText = app.getVersion();
     }
-    m_versionText = v.getMajor() + "." + v.getMinor() + "." + v.getMicro();
+    else {
+      m_versionText = "0.0.0";
+    }
   }
 
   @Override

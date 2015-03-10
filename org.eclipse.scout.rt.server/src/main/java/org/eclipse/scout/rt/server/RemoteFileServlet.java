@@ -17,6 +17,7 @@ import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,7 +25,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.service.SERVICES;
@@ -35,7 +35,7 @@ import org.eclipse.scout.service.SERVICES;
  * Init parameters:<br>
  * folder: folder inside external file location
  */
-public class RemoteFileServlet extends HttpServletEx {
+public class RemoteFileServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RemoteFileServlet.class);
@@ -98,7 +98,7 @@ public class RemoteFileServlet extends HttpServletEx {
           prefix + "default.htm", //$NON-NLS-1$
           prefix + "index.jsp", //$NON-NLS-1$
           prefix + "index.php" //$NON-NLS-1$
-      );
+          );
     }
     //
     try {

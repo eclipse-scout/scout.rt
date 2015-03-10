@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010,2013 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,21 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.svg.ui.swing.internal;
+package org.eclipse.scout.rt.client;
 
-import org.eclipse.equinox.app.IApplication;
-import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.platform.IModule;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 
-public class TestApplication implements IApplication {
+/**
+ *
+ */
+public class ClientModule implements IModule {
 
   @Override
-  public Object start(IApplicationContext context) throws InterruptedException {
-    SwingViewer.show();
-    Thread.sleep(Long.MAX_VALUE);
-    return EXIT_OK;
+  public void start() {
   }
 
   @Override
   public void stop() {
+    OBJ.one(IModelJobManager.class).shutdown();
   }
+
 }

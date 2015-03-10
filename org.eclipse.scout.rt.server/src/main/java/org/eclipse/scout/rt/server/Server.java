@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.platform.OBJ;
 
 /**
  * An object (typically a service implementation) with this annotation creates a server transaction whenever an
- * operationis called.
+ * operations called.
  * <p>
  * Only valid if the object is obtained using {@link OBJ#get(Class)} with an interface argument
  */

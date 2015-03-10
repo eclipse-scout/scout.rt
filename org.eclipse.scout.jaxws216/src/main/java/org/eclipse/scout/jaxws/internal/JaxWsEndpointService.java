@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.handler.Handler;
 
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.FileUtility;
@@ -32,9 +31,7 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.jaxws.internal.resources.BundleProxyClassLoader;
-import org.eclipse.scout.jaxws.internal.resources.BundleProxyResourceLoader;
-import org.eclipse.scout.jaxws.internal.resources.SunJaxWsXml;
+import org.eclipse.scout.jaxws.internal.resources.ProxyResourceLoader;
 import org.eclipse.scout.jaxws.internal.resources.SunJaxWsXmlFinder;
 import org.eclipse.scout.jaxws.internal.servlet.ServletAdapter;
 import org.eclipse.scout.jaxws.internal.servlet.ServletAdapterFactory;
@@ -47,7 +44,6 @@ import com.sun.xml.internal.ws.api.server.Container;
 import com.sun.xml.internal.ws.resources.WsservletMessages;
 import com.sun.xml.internal.ws.transport.http.DeploymentDescriptorParser;
 import com.sun.xml.internal.ws.transport.http.DeploymentDescriptorParser.AdapterFactory;
-import com.sun.xml.internal.ws.transport.http.ResourceLoader;
 
 @SuppressWarnings("restriction")
 public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpointService {
@@ -210,41 +206,39 @@ public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpo
 
   protected ServletAdapter[] createEndpointAdapters() {
     final List<ServletAdapter> servletAdapters = new ArrayList<ServletAdapter>();
-    for (SunJaxWsXml cfg : new SunJaxWsXmlFinder().findAll()) {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    if (contextClassLoader == null) {
+      contextClassLoader = getClass().getClassLoader();
+    }
+    for (URL sunJaxWsXml : new SunJaxWsXmlFinder().findAll()) {
       try {
-        final URL sunJaxWsXml = cfg.getResource();
-        final ClassLoader classLoader = new BundleProxyClassLoader(cfg.getBundle());
-        final ClassLoader oldContextCL = Thread.currentThread().getContextClassLoader();
         try {
-          Thread.currentThread().setContextClassLoader(classLoader);
-
-          final ResourceLoader resourceLoader = new BundleProxyResourceLoader(cfg.getBundle());
+          final ProxyResourceLoader resourceLoader = new ProxyResourceLoader();
           final Container container = createContainer(resourceLoader);
           final AdapterFactory adapterFactory = createServletAdapterFactory();
-          final DeploymentDescriptorParser<ServletAdapter> parser = createDeploymentDescriptorParser(classLoader, resourceLoader, container, adapterFactory);
+          final DeploymentDescriptorParser<ServletAdapter> parser = createDeploymentDescriptorParser(contextClassLoader, resourceLoader, container, adapterFactory);
           final List<ServletAdapter> adaptersInBundle = parser.parse(sunJaxWsXml.toExternalForm(), sunJaxWsXml.openStream());
           if (adaptersInBundle != null) {
             servletAdapters.addAll(adaptersInBundle);
           }
         }
         finally {
-          Thread.currentThread().setContextClassLoader(oldContextCL);
         }
       }
       catch (Exception e) {
-        LOG.error(WsservletMessages.LISTENER_PARSING_FAILED(e) + " for bundle '" + cfg.getBundle().getSymbolicName() + "'", e);
+        LOG.error(WsservletMessages.LISTENER_PARSING_FAILED(e), e);
       }
     }
     return servletAdapters.toArray(new ServletAdapter[servletAdapters.size()]);
   }
 
   @SuppressWarnings("unchecked")
-  protected DeploymentDescriptorParser<ServletAdapter> createDeploymentDescriptorParser(final ClassLoader classLoader, final ResourceLoader resourceLoader, final Container container, final AdapterFactory adapterFactory) throws MalformedURLException {
+  protected DeploymentDescriptorParser<ServletAdapter> createDeploymentDescriptorParser(final ClassLoader classLoader, final com.sun.xml.internal.ws.transport.http.ResourceLoader resourceLoader, final Container container, final AdapterFactory adapterFactory) throws MalformedURLException {
     return new DeploymentDescriptorParser(classLoader, resourceLoader, container, adapterFactory);
   }
 
-  protected Container createContainer(final ResourceLoader resourceLoader) {
-    return new ServletContainer((com.sun.xml.internal.ws.api.ResourceLoader) Platform.getAdapterManager().getAdapter(resourceLoader, com.sun.xml.internal.ws.api.ResourceLoader.class));
+  protected Container createContainer(com.sun.xml.internal.ws.api.ResourceLoader resourceLoader) {
+    return new ServletContainer(resourceLoader);
   }
 
   protected AdapterFactory<ServletAdapter> createServletAdapterFactory() {

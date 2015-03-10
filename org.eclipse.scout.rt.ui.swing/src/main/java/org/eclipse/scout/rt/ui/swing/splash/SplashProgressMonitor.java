@@ -14,10 +14,9 @@ import javax.swing.JFrame;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 
-public class SplashProgressMonitor extends NullProgressMonitor {
+public class SplashProgressMonitor {
   private final ISwingEnvironment m_env;
   private final boolean m_showPercentage;
   private int m_totalWork;
@@ -36,7 +35,6 @@ public class SplashProgressMonitor extends NullProgressMonitor {
     m_showPercentage = showPercentage;
   }
 
-  @Override
   public void beginTask(String name, int totalWork) {
     m_name1 = name;
     m_totalWork = totalWork;
@@ -44,19 +42,16 @@ public class SplashProgressMonitor extends NullProgressMonitor {
     setNameInternal();
   }
 
-  @Override
   public void worked(int work) {
     m_worked += work;
     setNameInternal();
   }
 
-  @Override
   public void subTask(String name) {
     m_name2 = name;
     setNameInternal();
   }
 
-  @Override
   public void setTaskName(String name) {
     m_name1 = name;
     m_name2 = null;
@@ -89,7 +84,6 @@ public class SplashProgressMonitor extends NullProgressMonitor {
         );
   }
 
-  @Override
   public void done() {
     hideSplash();
   }

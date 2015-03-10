@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.osgi.framework.Bundle;
 
 public interface IClientSession extends ISession {
 
@@ -77,16 +76,6 @@ public interface IClientSession extends ISession {
   void startSession();
 
   /**
-   * Start model thread with job queue<br>
-   * The model thread will first load the session and then start the event loop
-   * <p>
-   * The session is active just after this method returns.
-   */
-  @Deprecated
-  // TODO [dwi]: remove
-  void startSession(Bundle bundle);
-
-  /**
    * send a stop signal to the session event queue<br>
    * check {@link #isActive()} to wait until the queue has in fact closed
    */
@@ -114,7 +103,7 @@ public interface IClientSession extends ISession {
   /**
    * @return the desktop model assiciated with this client session
    *         <p>
-   *         Desktop is available only after {@link #startSession(Bundle)} and
+   *         Desktop is available only after {@link #startSession()} and
    *         <code>AbstractClientSession.execLoadSession()</code>
    */
   IDesktop getDesktop();

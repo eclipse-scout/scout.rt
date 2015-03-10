@@ -14,7 +14,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.net.URL;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,9 +29,6 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.InsetsUIResource;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -42,7 +39,6 @@ import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.splash.SplashWindow;
-import org.osgi.framework.Bundle;
 
 /**
  * Sets the default ui properties used in swing scout composites
@@ -155,7 +151,7 @@ public class UIDefaultsInjector {
   }
 
   /**
-   * only set value if the existing value inthe map is null or undefined
+   * only set value if the existing value in the map is null or undefined
    */
   protected void putIfUndefined(UIDefaults defaults, Object key, Object defaultValue) {
     if (defaults.get(key) == null) {
@@ -173,30 +169,17 @@ public class UIDefaultsInjector {
     }
   }
 
-  protected String[] m_splashExtensions = new String[]{"png", "jpg", "bmp"};
-
   protected IconUIResource getSplashUIResource() {
     IconUIResource iconresource = null;
-    String splashPathProp = ConfigIniUtility.getProperty("osgi.splashPath");
+    String splashPathProp = ConfigIniUtility.getProperty("scout.splashPath");
     try {
       if (!StringUtility.isNullOrEmpty(splashPathProp)) {
-        Path p = new Path(splashPathProp);
-        String bundleName = p.lastSegment();
-        Bundle splashBundle = Platform.getBundle(bundleName);
-        if (splashBundle != null) {
-          for (String ext : m_splashExtensions) {
-            String imageName = "splash." + ext;
-            URL[] entries = FileLocator.findEntries(splashBundle, new Path(imageName));
-            if (entries != null && entries.length > 0) {
-              URL splashUrl = entries[entries.length - 1];
-              if (splashUrl != null) {
-                Image img = Toolkit.getDefaultToolkit().createImage(IOUtility.getContent(splashUrl.openStream()));
-                if (img != null) {
-                  iconresource = new IconUIResource(new ImageIcon(img, imageName));
-                  break;
-                }
-              }
-            }
+        File f = new File(splashPathProp);
+        byte[] splashData = IOUtility.getContent(getClass().getClassLoader().getResourceAsStream(splashPathProp), true);
+        if (splashData != null && splashData.length > 0) {
+          Image img = Toolkit.getDefaultToolkit().createImage(splashData);
+          if (img != null) {
+            iconresource = new IconUIResource(new ImageIcon(img, f.getName()));
           }
         }
       }

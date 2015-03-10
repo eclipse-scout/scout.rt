@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.security;
 
+import java.security.Permission;
+import java.util.Set;
+
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.service.IService;
 
 /**
@@ -21,9 +23,9 @@ import org.eclipse.scout.service.IService;
 public interface IPermissionService extends IService {
 
   /**
-   * @return Returns all permissions of any loaded bundle. The actual strategy to find these permissions is up to the
+   * @return Returns all permissions on the classpath. The actual strategy to find these permissions is up to the
    *         implementation.
    */
-  BundleClassDescriptor[] getAllPermissionClasses();
+  Set<Class<? extends Permission>> getAllPermissionClasses();
 
 }

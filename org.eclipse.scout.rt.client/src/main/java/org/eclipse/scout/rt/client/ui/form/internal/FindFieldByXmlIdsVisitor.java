@@ -18,7 +18,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -26,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.platform.Platform;
 
 /**
  * @since 3.8.0
@@ -130,7 +130,7 @@ public class FindFieldByXmlIdsVisitor implements IFormFieldVisitor {
     }
     Entry<CompositeObject, IFormField> candidate = m_prioMap.lastEntry();
     if (m_ambiguousFieldKeys.contains(candidate.getKey())) {
-      if (Platform.inDevelopmentMode() && LOG.isWarnEnabled()) {
+      if (Platform.get().inDevelopmentMode() && LOG.isWarnEnabled()) {
         LOG.warn("ambiguous fieldId: " + Arrays.toString(m_xmlFieldIds) + " returning first candidate [" + candidate.getValue() + "]");
       }
     }

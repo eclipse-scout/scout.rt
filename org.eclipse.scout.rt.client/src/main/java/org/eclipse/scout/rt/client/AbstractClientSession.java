@@ -22,8 +22,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CollectorVisitor;
 import org.eclipse.scout.commons.ConfigIniUtility;
@@ -68,20 +66,17 @@ import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.Bundle;
 
 public abstract class AbstractClientSession implements IClientSession, IExtensibleObject {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractClientSession.class);
 
-  // context
-  private Bundle m_bundle;
   // state
   private final Object m_stateLock;
   private volatile boolean m_active;
   private volatile boolean m_isStopping;
   private Throwable m_loadError;
-  private int m_exitCode = IApplication.EXIT_OK;
+  private int m_exitCode = 0;
   // model
   private IDesktop m_desktop;
   private VirtualDesktop m_virtualDesktop;
@@ -202,11 +197,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   }
 
   @Override
-  public Bundle getBundle() {
-    return m_bundle;
-  }
-
-  @Override
   public boolean isActive() {
     return m_active;
   }
@@ -296,13 +286,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
 
   @Override
   public void startSession() {
-    startSession(Platform.getBundle(getClass().getPackage().getName()));
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public final void startSession(Bundle bundle) {
-    m_bundle = bundle;
     if (isActive()) {
       throw new IllegalStateException("session is active");
     }
@@ -414,7 +397,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
    */
   @Override
   public void stopSession() {
-    stopSession(IApplication.EXIT_OK);
+    stopSession(m_exitCode);
   }
 
   @Override

@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.NumberUtility;
@@ -32,7 +31,6 @@ import org.eclipse.scout.commons.holders.LongHolder;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.PreparedStatementCache;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.StatementProcessor;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.pool.SqlConnectionBuilder;
@@ -76,8 +74,8 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   private int m_maxFetchMemorySize = DEFAULT_MEMORY_PREFETCH_SIZE;
 
   //
-  private HashMap<String, List<BundleClassDescriptor>> m_permissionNameToDescriptor;
-  private HashMap<String, List<BundleClassDescriptor>> m_codeNameToDescriptor;
+  private HashMap<String, List<Class<?>>> m_permissionNameToDescriptor;
+  private HashMap<String, List<Class<?>>> m_codeNameToDescriptor;
 
   @Override
   protected void initializeService() {
@@ -85,40 +83,40 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     super.initializeService();
 
     // load code and permission names
-    m_permissionNameToDescriptor = new HashMap<String, List<BundleClassDescriptor>>();
+    m_permissionNameToDescriptor = new HashMap<String, List<Class<?>>>();
     IPermissionService psvc = SERVICES.getService(IPermissionService.class);
     if (psvc != null) {
-      for (BundleClassDescriptor d : psvc.getAllPermissionClasses()) {
-        List<BundleClassDescriptor> list = m_permissionNameToDescriptor.get(d.getSimpleClassName());
+      for (Class<? extends Permission> d : psvc.getAllPermissionClasses()) {
+        List<Class<?>> list = m_permissionNameToDescriptor.get(d.getSimpleName());
         if (list == null) {
-          list = new ArrayList<BundleClassDescriptor>();
-          m_permissionNameToDescriptor.put(d.getSimpleClassName(), list);
+          list = new ArrayList<Class<?>>();
+          m_permissionNameToDescriptor.put(d.getSimpleName(), list);
         }
         list.add(d);
         //
-        list = m_permissionNameToDescriptor.get(d.getClassName());
+        list = m_permissionNameToDescriptor.get(d.getName());
         if (list == null) {
-          list = new ArrayList<BundleClassDescriptor>();
-          m_permissionNameToDescriptor.put(d.getClassName(), list);
+          list = new ArrayList<Class<?>>();
+          m_permissionNameToDescriptor.put(d.getName(), list);
         }
         list.add(d);
       }
     }
-    m_codeNameToDescriptor = new HashMap<String, List<BundleClassDescriptor>>();
+    m_codeNameToDescriptor = new HashMap<String, List<Class<?>>>();
     ICodeService csvc = SERVICES.getService(ICodeService.class);
     if (csvc != null) {
-      for (BundleClassDescriptor d : csvc.getAllCodeTypeClasses("")) {
-        List<BundleClassDescriptor> list = m_codeNameToDescriptor.get(d.getSimpleClassName());
+      for (Class<?> d : csvc.getAllCodeTypeClasses("")) {
+        List<Class<?>> list = m_codeNameToDescriptor.get(d.getSimpleName());
         if (list == null) {
-          list = new ArrayList<BundleClassDescriptor>();
-          m_codeNameToDescriptor.put(d.getSimpleClassName(), list);
+          list = new ArrayList<Class<?>>();
+          m_codeNameToDescriptor.put(d.getSimpleName(), list);
         }
         list.add(d);
         //
-        list = m_codeNameToDescriptor.get(d.getClassName());
+        list = m_codeNameToDescriptor.get(d.getName());
         if (list == null) {
-          list = new ArrayList<BundleClassDescriptor>();
-          m_codeNameToDescriptor.put(d.getClassName(), list);
+          list = new ArrayList<Class<?>>();
+          m_codeNameToDescriptor.put(d.getName(), list);
         }
         list.add(d);
       }
@@ -802,17 +800,18 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
    *         Example: name "com.myapp.shared.core.security.ReadDataPermission" is loaded by the bundle with symbolic
    *         name "com.myapp.shared.core".
    */
-  private Class loadBundleClassLenient(Map<String, List<BundleClassDescriptor>> map, String name) {
+  private Class loadBundleClassLenient(Map<String, List<Class<?>>> map, String name) {
     String base = name;
     String suffix = "";
+    ClassLoader classLoader = getClass().getClassLoader();
     while (base.length() > 0) {
-      List<BundleClassDescriptor> list = map.get(base);
+      List<Class<?>> list = map.get(base);
       if (list != null) {
-        for (BundleClassDescriptor desc : list) {
+        for (Class<?> desc : list) {
           try {
-            Class c = Platform.getBundle(desc.getBundleSymbolicName()).loadClass(desc.getClassName());
+            Class c = classLoader.loadClass(desc.getName());
             if (suffix.length() > 0) {
-              c = Platform.getBundle(desc.getBundleSymbolicName()).loadClass(desc.getClassName() + suffix.replace('.', '$'));
+              c = classLoader.loadClass(desc.getName() + suffix.replace('.', '$'));
               return c;
             }
             else {
@@ -820,7 +819,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
             }
           }
           catch (Throwable t) {
-            LOG.warn("Could not load class with lenient name '" + name + "' in bundle " + desc.getBundleSymbolicName());
+            LOG.warn("Could not load class with lenient name '" + name + "'.");
           }
         }
       }

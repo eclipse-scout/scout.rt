@@ -8,8 +8,7 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.6.0,4.0.0)",
  org.eclipse.scout.rt.testing.shared;bundle-version="[5.1.0,5.2.0)";visibility:=reexport,
  org.eclipse.scout.rt.server;bundle-version="[5.1.0,5.2.0)",
  org.eclipse.scout.rt.testing.commons;bundle-version="[5.1.0,5.2.0)";visibility:=reexport
-Export-Package: org.eclipse.scout.rt.testing.server,
- org.eclipse.scout.rt.testing.server.runner,
+Export-Package: org.eclipse.scout.rt.testing.server.runner,
  org.eclipse.scout.rt.testing.server.runner.parameterized
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

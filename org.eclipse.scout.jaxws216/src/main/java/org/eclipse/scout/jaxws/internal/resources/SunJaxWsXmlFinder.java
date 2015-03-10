@@ -10,48 +10,38 @@
  ******************************************************************************/
 package org.eclipse.scout.jaxws.internal.resources;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.commons.osgi.BundleInspector;
-import org.osgi.framework.Bundle;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * Finds sun-jaxws.xml
  */
 public class SunJaxWsXmlFinder {
 
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SunJaxWsXmlFinder.class);
+
   /**
    * Searches all WEB-INF folders for sun-jaxws.xml
    */
-  public List<SunJaxWsXml> findAll() {
-    ArrayList<SunJaxWsXml> list = new ArrayList<SunJaxWsXml>();
-    for (Bundle bundle : Platform.getBundle("org.eclipse.scout.jaxws216").getBundleContext().getBundles()) {
-      // exclude fragments as their content is searched by their host bundles.
-      // Furthermore, fragments do not have a classloader and therefore cannot load classes.
-      if (!(BundleInspector.isFragment(bundle))) {
-        list.addAll(getConfigurations(bundle, "/WEB-INF"));
-      }
-    }
-
-    return list;
-  }
-
-  private List<SunJaxWsXml> getConfigurations(Bundle bundle, String path) {
-    List<SunJaxWsXml> configurations = new ArrayList<SunJaxWsXml>();
-
-    // do not use {@link Bundle#bundle.getEntryPaths(String)} as the bundle's classloader must be used in order to work for fragments.
-    Enumeration entries = bundle.findEntries(path, "sun-jaxws.xml", false);
-    if (entries != null && entries.hasMoreElements()) {
+  public List<URL> findAll() {
+    List<URL> configurations = new ArrayList<>();
+    try {
+      Enumeration<URL> entries = getClass().getClassLoader().getResources("/WEB-INF/sun-jaxws.xml");
       while (entries.hasMoreElements()) {
-        URL url = (URL) entries.nextElement();
+        URL url = entries.nextElement();
         if (url != null) {
-          configurations.add(new SunJaxWsXml(bundle, url));
+          configurations.add(url);
         }
       }
+    }
+    catch (IOException e) {
+      LOG.error("Unable to search for sun-jaxws.xml files.", e);
     }
     return configurations;
   }

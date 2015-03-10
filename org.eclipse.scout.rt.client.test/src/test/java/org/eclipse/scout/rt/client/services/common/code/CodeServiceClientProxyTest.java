@@ -21,11 +21,11 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.client.services.common.code.fixture.CompanyRatingCodeType;
 import org.eclipse.scout.rt.client.services.common.code.fixture.CompanyTypeCodeType;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -145,16 +145,11 @@ public class CodeServiceClientProxyTest {
     ICodeService remoteService = Mockito.mock(ICodeService.class);
 
     //getAllCodeTypeClasses:
-    when(remoteService.getAllCodeTypeClasses("")).thenReturn(
-        CollectionUtility.hashSet(
-            new BundleClassDescriptor("org.eclipse.scout.rt.client", CompanyRatingCodeType.class.getName()),
-            new BundleClassDescriptor("org.eclipse.scout.rt.client", CompanyTypeCodeType.class.getName())
-            ));
-    when(remoteService.getAllCodeTypeClasses("org.eclipse.scout.rt.client")).thenReturn(
-        CollectionUtility.hashSet(
-            new BundleClassDescriptor("org.eclipse.scout.rt.client", CompanyRatingCodeType.class.getName()),
-            new BundleClassDescriptor("org.eclipse.scout.rt.client", CompanyTypeCodeType.class.getName())
-            ));
+    Set<Class<? extends ICodeType<?, ?>>> hashSet = new HashSet<>();
+    hashSet.add(CompanyRatingCodeType.class);
+    hashSet.add(CompanyTypeCodeType.class);
+    when(remoteService.getAllCodeTypeClasses("")).thenReturn(hashSet);
+    when(remoteService.getAllCodeTypeClasses("org.eclipse.scout.rt.client")).thenReturn(hashSet);
 
     //getCodeType:
     when(remoteService.getCodeType(CompanyRatingCodeType.class)).thenReturn(new CompanyRatingCodeType());

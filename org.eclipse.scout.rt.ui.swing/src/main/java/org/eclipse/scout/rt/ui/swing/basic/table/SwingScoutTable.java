@@ -63,7 +63,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IRunnable;
@@ -71,6 +70,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;

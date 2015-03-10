@@ -14,11 +14,12 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Arrays;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
@@ -51,12 +52,16 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
   }
 
   private static String getVersion(String providedVersion) {
-    if (providedVersion == null && Platform.getProduct() != null) {
-      return (String) Platform.getProduct().getDefiningBundle().getHeaders().get("Bundle-Version");
+    if (providedVersion == null) {
+      IApplication app = OBJ.getOptional(IApplication.class);
+      if (app != null) {
+        String version = app.getVersion();
+        if (version != null) {
+          return version;
+        }
+      }
     }
-    else {
-      return providedVersion;
-    }
+    return providedVersion;
   }
 
   public String getVersion() {

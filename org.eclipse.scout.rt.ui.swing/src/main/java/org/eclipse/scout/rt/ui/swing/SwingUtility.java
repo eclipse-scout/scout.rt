@@ -63,7 +63,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicHTML;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -77,6 +76,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -785,7 +785,7 @@ public final class SwingUtility {
   }
 
   public static void installDevelopmentShortcuts(JComponent pane) {
-    if (Platform.inDevelopmentMode()) {
+    if (Platform.get().inDevelopmentMode()) {
       SwingScoutSimulator.getInstance().attach();
       //
       pane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control R"), "record");
@@ -1252,12 +1252,7 @@ public final class SwingUtility {
   }
 
   public static boolean hasScoutLookAndFeelFrameAndDialog() {
-    String useScoutLafFrameAndDialog = System.getProperty("scout.laf.useLafFrameAndDialog");
-    boolean useLafFrameAndDialog = true;
-    if (StringUtility.hasText(useScoutLafFrameAndDialog)) {
-      useLafFrameAndDialog = Boolean.parseBoolean(useScoutLafFrameAndDialog);
-    }
-    return useLafFrameAndDialog;
+    return ConfigIniUtility.getPropertyBoolean("scout.laf.useLafFrameAndDialog", true);
   }
 
   /**
@@ -1268,15 +1263,8 @@ public final class SwingUtility {
    */
   public static int getTopMarginForField() {
     if (topMarginForField == null) {
-      String topMarginForFieldProperty = System.getProperty("scout.laf.topMarginForField");
-      if (topMarginForFieldProperty != null) {
-        topMarginForField = Integer.parseInt(topMarginForFieldProperty);
-      }
-      else {
-        topMarginForField = Integer.valueOf(0);
-      }
+      topMarginForField = Integer.valueOf(ConfigIniUtility.getPropertyInt("scout.laf.topMarginForField", 4));
     }
-
     return topMarginForField;
   }
 

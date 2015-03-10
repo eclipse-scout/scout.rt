@@ -263,7 +263,7 @@ public final class CollectionUtility {
   }
 
   public static <T> ArrayList<T> arrayList(T value) {
-    ArrayList<T> list = new ArrayList<T>();
+    ArrayList<T> list = new ArrayList<T>(1);
     if (value != null) {
       list.add(value);
     }

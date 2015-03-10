@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.code;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,17 +17,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
-import org.eclipse.scout.commons.runtime.BundleBrowser;
+import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
-import org.osgi.framework.Bundle;
 
 /**
  * Common logic for the {@link ICodeService} implementations.
@@ -42,7 +39,7 @@ public class SharedCodeService extends AbstractService implements ICodeService {
 
   private final CodeTypeStore m_codeTypeStore;
   private final Object m_codeTypeClassDescriptorMapLock;
-  private final Map<String, Set<BundleClassDescriptor>> m_codeTypeClassDescriptorMap;
+  private final Map<String, Set<Class<? extends ICodeType<?, ?>>>> m_codeTypeClassDescriptorMap;
 
   public SharedCodeService() {
     m_codeTypeStore = new CodeTypeStore();
@@ -152,75 +149,41 @@ public class SharedCodeService extends AbstractService implements ICodeService {
   }
 
   @Override
-  public Set<BundleClassDescriptor> getAllCodeTypeClasses(String classPrefix) {
+  public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix) {
     if (classPrefix == null) {
       return CollectionUtility.hashSet();
     }
     synchronized (m_codeTypeClassDescriptorMapLock) {
-      Set<BundleClassDescriptor> a = m_codeTypeClassDescriptorMap.get(classPrefix);
+      Set<Class<? extends ICodeType<?, ?>>> a = m_codeTypeClassDescriptorMap.get(classPrefix);
       if (a != null) {
         return CollectionUtility.hashSet(a);
       }
-      //
-      Set<BundleClassDescriptor> discoveredCodeTypes = new HashSet<BundleClassDescriptor>();
-      for (Bundle bundle : Platform.getBundle("org.eclipse.scout.rt.shared").getBundleContext().getBundles()) {
-        if (bundle.getSymbolicName().startsWith(classPrefix)) {
-          // ok
-        }
-        else if (classPrefix.startsWith(bundle.getSymbolicName() + ".")) {
-          // ok
-        }
-        else {
-          continue;
-        }
-        // Skip uninteresting bundles
-        if (!acceptBundle(bundle, classPrefix)) {
-          continue;
-        }
-        String[] classNames;
-        try {
-          BundleBrowser bundleBrowser = new BundleBrowser(bundle.getSymbolicName(), bundle.getSymbolicName());
-          classNames = bundleBrowser.getClasses(false, true);
-        }
-        catch (Exception e1) {
-          LOG.warn(null, e1);
-          continue;
-        }
-        // filter
-        for (String className : classNames) {
-          // fast pre-check
-          if (acceptClassName(bundle, className)) {
-            try {
-              Class c = null;
-              c = bundle.loadClass(className);
-              if (acceptClass(bundle, c)) {
-                discoveredCodeTypes.add(new BundleClassDescriptor(bundle.getSymbolicName(), c.getName()));
-              }
+
+      Set<IClassInfo> allKnownCodeTypes = Platform.get().getClassInventory().getAllKnownSubClasses(ICodeType.class);
+      Set<Class<? extends ICodeType<?, ?>>> discoveredCodeTypes = new HashSet<>(allKnownCodeTypes.size());
+      for (IClassInfo codeTypeInfo : allKnownCodeTypes) {
+        if (acceptClassName(codeTypeInfo.name())) {
+          try {
+            if (acceptClass(codeTypeInfo)) {
+              @SuppressWarnings("unchecked")
+              Class<? extends ICodeType<?, ?>> codeTypeClass = (Class<? extends ICodeType<?, ?>>) codeTypeInfo.resolveClass();
+              discoveredCodeTypes.add(codeTypeClass);
             }
-            catch (Throwable t) {
-              // nop
-            }
+          }
+          catch (ClassNotFoundException e) {
+            LOG.error("Unable to load code type.", e);
           }
         }
       }
-      m_codeTypeClassDescriptorMap.put(classPrefix, discoveredCodeTypes);
+      m_codeTypeClassDescriptorMap.put(classPrefix, CollectionUtility.hashSet(discoveredCodeTypes));
       return CollectionUtility.hashSet(discoveredCodeTypes);
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public List<ICodeType<?, ?>> getAllCodeTypes(String classPrefix) {
-    List<Class<? extends ICodeType<?, ?>>> list = new ArrayList<Class<? extends ICodeType<?, ?>>>();
-    for (BundleClassDescriptor d : getAllCodeTypeClasses(classPrefix)) {
-      try {
-        list.add((Class<? extends ICodeType<?, ?>>) Platform.getBundle(d.getBundleSymbolicName()).loadClass(d.getClassName()));
-      }
-      catch (Throwable t) {
-        LOG.warn("Loading " + d.getClassName() + " of bundle " + d.getBundleSymbolicName(), t);
-        continue;
-      }
-    }
+    Set<Class<? extends ICodeType<?, ?>>> allCodeTypeClasses = getAllCodeTypeClasses(classPrefix);
+    List<Class<? extends ICodeType<?, ?>>> list = CollectionUtility.arrayList(allCodeTypeClasses);
     return getCodeTypes(list);
   }
 
@@ -239,18 +202,6 @@ public class SharedCodeService extends AbstractService implements ICodeService {
   }
 
   /**
-   * Checks whether the given bundle should be scanned for code type classes. The default implementations accepts
-   * all bundles that are not fragments (because classes from fragments are automatically read when browsing the host
-   * bundle).
-   *
-   * @return Returns <code>true</code> if the given bundle meets the requirements to be scanned for code type classes.
-   *         <code>false</code> otherwise.
-   */
-  protected boolean acceptBundle(Bundle bundle, String classPrefix) {
-    return !Platform.isFragment(bundle);
-  }
-
-  /**
    * Checks whether the given class name is a potential code type class. Class names that do not meet the
    * requirements of this method are not considered further, i.e. the "expensive" class instantiation is skipped.
    * The default implementation checks whether the class name contains <code>"CodeType"</code>.
@@ -262,37 +213,19 @@ public class SharedCodeService extends AbstractService implements ICodeService {
    * @return Returns <code>true</code> if the given class name meets the requirements to be considered as a code type
    *         class. <code>false</code> otherwise.
    */
-  protected boolean acceptClassName(Bundle bundle, String className) {
+  protected boolean acceptClassName(String className) {
     return (className.indexOf("CodeType") >= 0);
   }
 
   /**
-   * Checks whether the given class is a CodeType class that should be visible to this service. The default
-   * implementation checks if the class meets the following conditions:
-   * <ul>
-   * <li>subclass of {@link ICodeType}
-   * <li><code>public</code>
-   * <li>not an <code>interface</code>
-   * <li>not <code>abstract</code>
-   * <li>the class's simple name does not start with <code>"Abstract"</code> (convenience check)
-   * </ul>
+   * Checks whether the given class is a CodeType class that should be visible to this service.
    *
-   * @param bundle
-   *          The class's hosting bundle
    * @param c
    *          the class to be checked
-   * @return Returns <code>true</code> if the class is a code type class. <code>false</code> otherwise.
+   * @return Returns <code>true</code> if the class is an accepted code type class. <code>false</code> otherwise.
    */
-  protected boolean acceptClass(Bundle bundle, Class<?> c) {
-    if (ICodeType.class.isAssignableFrom(c)) {
-      if (!c.isInterface()) {
-        int flags = c.getModifiers();
-        if (Modifier.isPublic(flags) && (!Modifier.isAbstract(flags)) && (!c.getSimpleName().startsWith("Abstract"))) {
-          return true;
-        }
-      }
-    }
-    return false;
+  protected boolean acceptClass(IClassInfo c) {
+    return c.isInstanciable();
   }
 
   /**

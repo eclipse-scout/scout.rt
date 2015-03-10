@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.swing.form.fields.chartbox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -92,7 +91,7 @@ public class SwingScoutChartBox extends SwingScoutFieldComposite<IChartBox> impl
       try {
         String[] parts = qname.split("/");
         if (parts.length == 2) {
-          m_chartProvider = (ISwingChartProvider) Platform.getBundle(parts[0]).loadClass(parts[1]).newInstance();
+          m_chartProvider = (ISwingChartProvider) getClass().getClassLoader().loadClass(parts[1]).newInstance();
           m_chartComponent = m_chartProvider.createChart(this);
           chartPanel.add(m_chartComponent);
         }

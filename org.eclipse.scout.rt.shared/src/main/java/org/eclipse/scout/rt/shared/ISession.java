@@ -15,7 +15,6 @@ import java.util.Map;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.Bean;
-import org.osgi.framework.Bundle;
 
 /**
  * @since 3.8.0
@@ -27,9 +26,6 @@ public interface ISession {
    * The {@link ISession} which is currently associated with the current thread.
    */
   ThreadLocal<ISession> CURRENT = new ThreadLocal<>();
-
-  //TODO imo remove
-  Bundle getBundle();
 
   /**
    * Shared context variable containing the authenticated userId in lowercase

@@ -48,11 +48,11 @@ public class StoreAndLoadXml2FormTest {
   public static class InnerClass implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static final String VALUE = "Inner Level 1";
+    private final String m_value = "Inner Level 1";
 
     @Override
     public int hashCode() {
-      return VALUE.hashCode();
+      return m_value.hashCode();
     }
 
     @Override
@@ -60,17 +60,17 @@ public class StoreAndLoadXml2FormTest {
       if (obj == null || obj.getClass() != this.getClass()) {
         return false;
       }
-      return ((InnerClass) obj).VALUE.equals(this.VALUE);
+      return ((InnerClass) obj).m_value.equals(this.m_value);
     }
 
     public static class InnerInnerClass implements Serializable {
       private static final long serialVersionUID = 2L;
 
-      private static final String VALUE = "Inner Level 2";
+      private final String m_value = "Inner Level 2";
 
       @Override
       public int hashCode() {
-        return VALUE.hashCode();
+        return m_value.hashCode();
       }
 
       @Override
@@ -78,7 +78,7 @@ public class StoreAndLoadXml2FormTest {
         if (obj == null || obj.getClass() != this.getClass()) {
           return false;
         }
-        return ((InnerInnerClass) obj).VALUE.equals(this.VALUE);
+        return ((InnerInnerClass) obj).m_value.equals(this.m_value);
       }
     }
   }

@@ -19,6 +19,7 @@ import java.util.Locale;
 import javax.security.auth.Subject;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,7 +36,6 @@ import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
-import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
@@ -56,7 +56,7 @@ import org.osgi.framework.Version;
  * By default there is a JAAS convenience filter {@link HttpAuthJaasFilter} on /process and a {@link SoapWsseJaasFilter}
  * on /ajax with priority 1000.
  */
-public class ServiceTunnelServlet extends HttpServletEx {
+public class ServiceTunnelServlet extends HttpServlet {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.server.http.debug";
   private static final String ADMIN_SESSION_KEY = AdminSession.class.getName();
 

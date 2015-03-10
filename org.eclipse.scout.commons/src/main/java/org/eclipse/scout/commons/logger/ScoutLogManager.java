@@ -35,15 +35,6 @@ import org.eclipse.scout.commons.logger.internal.java.JavaScoutLogManager;
  * <td>All log events are passed to the java.util.log logger. This is the default strategy used.</td>
  * </tr>
  * <tr>
- * <td>eclipse</td>
- * <td>Eclipse Logger</td>
- * <td>All log events are passed to the Eclipse logger<br/>
- * The system (or config.ini) property <code>org.eclipse.scout.log.level</code> is only valid for eclipse log and
- * defines which log level is passed to Eclipse.<br>
- * The default is WARNING, since lower levels may produce substantial amount of log when using default eclipse log
- * settings. Valid values are ERROR, WARNING, INFO, DEBUG</td>
- * </tr>
- * <tr>
  * <td><i>EMPTY</td>
  * <td>Custom logger</i></td>
  * <td>By not setting the strategy property, the system looks for a class named
@@ -59,23 +50,11 @@ import org.eclipse.scout.commons.logger.internal.java.JavaScoutLogManager;
  * file.
  * </p>
  * <p>
- * Example settings in config.ini for eclipse log:
- * </p>
- * <p>
- *
- * <pre>
- * eclipse.consoleLog=true
- * org.eclipse.scout.log=eclipse
- * org.eclipse.scout.log.level=WARNING
- * </pre>
- *
- * </p>
- * <p>
  * Example settings in config.ini for java log:
  *
  * <pre>
- * eclipse.consoleLog=false
  * org.eclipse.scout.log=java
+ * org.eclipse.scout.log.level=WARNING
  * </pre>
  *
  * </p>

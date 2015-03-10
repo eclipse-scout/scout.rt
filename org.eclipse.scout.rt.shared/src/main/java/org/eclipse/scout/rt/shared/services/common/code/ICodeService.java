@@ -15,7 +15,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
@@ -56,14 +55,14 @@ public interface ICodeService extends IService {
 
   /**
    * reload code type
-   * 
+   *
    * @throws ProcessingException
    */
   <T extends ICodeType<?, ?>> T reloadCodeType(Class<T> type) throws ProcessingException;
 
   /**
    * reload code types
-   * 
+   *
    * @throws ProcessingException
    */
   List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException;
@@ -71,7 +70,7 @@ public interface ICodeService extends IService {
   /**
    * @return all codetype classes from bundles with classPrefix
    */
-  Set<BundleClassDescriptor> getAllCodeTypeClasses(String classPrefix);
+  Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix);
 
   @RemoteServiceAccessDenied
   List<ICodeType<?, ?>> getAllCodeTypes(String classPrefix);

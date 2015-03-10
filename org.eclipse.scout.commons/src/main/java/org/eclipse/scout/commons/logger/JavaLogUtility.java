@@ -49,6 +49,28 @@ public final class JavaLogUtility {
     return l;
   }
 
+  public static int toScoutLevel(String levelName) {
+    if (levelName == null) {
+      return IScoutLogger.LEVEL_WARN;
+    }
+
+    String nameClean = levelName.trim().toUpperCase();
+    switch (nameClean) {
+      case "DEBUG":
+        return IScoutLogger.LEVEL_DEBUG;
+      case "ERROR":
+        return IScoutLogger.LEVEL_ERROR;
+      case "INFO":
+        return IScoutLogger.LEVEL_INFO;
+      case "OFF":
+        return IScoutLogger.LEVEL_OFF;
+      case "TRACE":
+        return IScoutLogger.LEVEL_TRACE;
+      default:
+        return IScoutLogger.LEVEL_WARN;
+    }
+  }
+
   /**
    * convert between java log {@link Level} (object-based) and scout level (int-based)
    */

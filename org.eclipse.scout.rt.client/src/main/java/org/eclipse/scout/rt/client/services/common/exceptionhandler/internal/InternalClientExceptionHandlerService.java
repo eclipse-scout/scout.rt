@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.exceptionhandler.internal;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -22,6 +21,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.AbstractService;
 
@@ -55,7 +55,7 @@ public class InternalClientExceptionHandlerService extends AbstractService imple
     try {
       if (state.m_handlerLock.acquire()) {
         if (!pe.isConsumed()) {
-          if (Platform.inDevelopmentMode() || !(pe instanceof VetoException)) {
+          if (Platform.get().inDevelopmentMode() || !(pe instanceof VetoException)) {
             IProcessingStatus s = pe.getStatus();
             boolean logThrowable = !(pe instanceof VetoException);
             int logLevel = IScoutLogger.LEVEL_ERROR;
@@ -119,7 +119,7 @@ public class InternalClientExceptionHandlerService extends AbstractService imple
 
   /**
    * To visualize the exception in the UI
-   * 
+   *
    * @param pe
    *          the exception to be visualized
    */

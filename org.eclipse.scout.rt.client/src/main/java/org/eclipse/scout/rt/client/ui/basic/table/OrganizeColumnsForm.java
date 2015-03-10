@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -60,6 +59,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractLinkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -264,7 +264,7 @@ public class OrganizeColumnsForm extends AbstractForm {
                   row.setFont(FontSpec.parse("ITALIC"));
                 }
                 getTable().getTitleColumn().setValue(row, columnTitle);
-                if (Platform.inDevelopmentMode() && col.isSortActive()) {
+                if (Platform.get().inDevelopmentMode() && col.isSortActive()) {
                   getTable().getTitleColumn().setValue(row, columnTitle + " (" + col.getSortIndex() + ")");
                 }
 

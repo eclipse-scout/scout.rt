@@ -13,20 +13,15 @@ package org.eclipse.scout.rt.ui.swing;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
-import java.util.Hashtable;
 import java.util.Locale;
 
 import javax.security.auth.Subject;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.equinox.app.IApplication;
-import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.LocaleUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -35,13 +30,13 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.UserInterruptedException;
+import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.swing.ext.job.SwingProgressHandler;
 import org.eclipse.scout.rt.ui.swing.splash.SplashProgressMonitor;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * This abstract class is the base class for all Scout Swing (Eclipse) applications.
@@ -54,14 +49,11 @@ abstract class BaseSwingApplication implements IApplication {
 
   private SplashProgressMonitor m_monitor;
 
-  private ServiceRegistration m_monitorReg;
-
   void initialize() {
-    if (!Platform.inDevelopmentMode()) {
+    if (!Platform.get().inDevelopmentMode()) {
       try {
-        URL instArea = Platform.getInstanceLocation().getURL();
-        File sysoutRedirector = new File(instArea.getFile(), System.getProperty("user.name", "anonymous") + "-sysout.log");
-        File syserrRedirector = new File(instArea.getFile(), System.getProperty("user.name", "anonymous") + "-syserr.log");
+        File sysoutRedirector = File.createTempFile(System.getProperty("user.name", "anonymous") + "-sysout", ".log", new File("systemLogFiels"));
+        File syserrRedirector = File.createTempFile(System.getProperty("user.name", "anonymous") + "-syserr", ".log", new File("systemLogFiels"));
         sysoutRedirector.getParentFile().mkdirs();
         syserrRedirector.getParentFile().mkdirs();
         System.setOut(new PrintStream(new FileOutputStream(sysoutRedirector, true)));
@@ -73,8 +65,6 @@ abstract class BaseSwingApplication implements IApplication {
     }
     try {
       org.eclipse.scout.rt.platform.Platform.setDefault();
-      org.eclipse.scout.rt.platform.Platform.get().start();
-
       // The default @{link Locale} has to be set prior to SwingEnvironment is created, because UIDefaultsInjector resolves NLS texts.
       execInitLocale();
 
@@ -95,11 +85,7 @@ abstract class BaseSwingApplication implements IApplication {
       System.exit(0);
     }
     m_monitor = new SplashProgressMonitor(getSwingEnvironment(), showSplashScreenProgressInPercentage());
-    // register progress as osgi service
-    if (Platform.getProduct() != null && Platform.getProduct().getDefiningBundle() != null) {
-      BundleContext ctx = Platform.getProduct().getDefiningBundle().getBundleContext();
-      m_monitorReg = ctx.registerService(IProgressMonitor.class.getName(), m_monitor, new Hashtable<String, Object>());
-    }
+
     m_monitor.showSplash();
   }
 
@@ -123,47 +109,57 @@ abstract class BaseSwingApplication implements IApplication {
     return false;
   }
 
-  public final IProgressMonitor getProgressMonitor() {
+  public final SplashProgressMonitor getProgressMonitor() {
     return m_monitor;
+  }
+
+  @Override
+  public String getName() {
+    return ConfigIniUtility.getProperty(CONFIG_KEY_NAME);
+  }
+
+  @Override
+  public String getVersion() {
+    return ConfigIniUtility.getProperty(CONFIG_KEY_VERSION);
   }
 
   /**
    * This abstract template application creates a JAAS subject based on the system property "user.name"
    * <p>
-   * The start is then delegated to {@link #startInSubject(IApplicationContext)}
-   * <p>
    * Normally {@link #startInSubject(IApplicationContext)} is overridden
    */
   @Override
-  public Object start(final IApplicationContext context) throws Exception {
+  public void start() throws Exception {
     if (Subject.getSubject(AccessController.getContext()) != null) {
       // there is a subject context
-      return exit(startInSubject(context));
+      startInSubject();
+      exit();
     }
     else {
       Subject subject = new Subject();
       subject.getPrincipals().add(new SimplePrincipal(System.getProperty("user.name")));
-      return Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
+      Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
         @Override
         public Object run() throws Exception {
-          return exit(startInSubject(context));
+          startInSubject();
+          exit();
+          return null;
         }
       });
     }
   }
 
-  abstract Object startInSubject(IApplicationContext context) throws Exception;
+  abstract void startInSubject() throws Exception;
 
   /**
    * Exit delegate to handle os-specific exit behavior.
    * <p>
    * Mac OS X normally only closes the window, but we want to close the app (with Quit).
    */
-  protected Object exit(Object code) {
-    if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-      System.exit(0);
-    }
-    return code;
+  protected void exit() {
+//    if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+//      System.exit(0);
+//    }
   }
 
   protected void execInitLocale() {
@@ -192,9 +188,6 @@ abstract class BaseSwingApplication implements IApplication {
   }
 
   protected void stopSplashScreen() {
-    if (m_monitorReg != null) {
-      m_monitorReg.unregister();
-    }
     m_monitor.done();
     m_monitor = null;
   }

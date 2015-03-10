@@ -28,13 +28,13 @@ import javax.swing.JLabel;
 import javax.swing.JRootPane;
 import javax.swing.UIManager;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JFrameEx;
-import org.osgi.framework.Version;
 
 public class SplashWindow extends JFrameEx implements ISplashWindow {
   private static final long serialVersionUID = 1L;
@@ -46,16 +46,18 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
   public SplashWindow(Frame owner) {
     setUndecorated(true);
     getRootPane().setWindowDecorationStyle(JRootPane.NONE);
-    Version v = Version.emptyVersion;
-    if (Platform.getProduct() != null) {
-      m_title = Platform.getProduct().getName();
-      v = Version.parseVersion("" + Platform.getProduct().getDefiningBundle().getHeaders().get("Bundle-Version"));
+    IApplication app = OBJ.oneOrNull(IApplication.class);
+    String version = "0.0.0";
+    if (app != null) {
+      m_title = app.getName();
+      version = app.getVersion();
     }
+
     SwingUtility.setDefaultImageIcons(this);
     setTitle(m_title);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     setFont(new Font("Dialog", Font.PLAIN, 8));
-    m_versionText = "Version " + v.getMajor() + "." + v.getMinor() + "." + v.getMicro();
+    m_versionText = "Version " + version;
     // initial layout
     JComponent pane = (JComponent) getContentPane();
     pane.setLayout(new BorderLayout());

@@ -1673,7 +1673,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       if (LOG.isInfoEnabled()) {
         LOG.info("there are fields with errors");
       }
-      StringBuffer buf = new StringBuffer();
+      StringBuilder buf = new StringBuilder();
       if (mandatoryTexts.size() > 0) {
         buf.append(ScoutTexts.get("FormEmptyMandatoryFieldsMessage") + "\n\n");
         for (Iterator it = mandatoryTexts.iterator(); it.hasNext();) {

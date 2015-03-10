@@ -20,8 +20,9 @@ import org.eclipse.scout.commons.CollectionUtility;
  */
 public final class FormFieldExtensions {
 
-  public static final FormFieldExtensions INSTANCE = new FormFieldExtensions();
   private final List<IFormFieldExtension> m_extensions;
+
+  public final static FormFieldExtensions INSTANCE = new FormFieldExtensions();
 
   private FormFieldExtensions() {
     m_extensions = new ArrayList<>();

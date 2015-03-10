@@ -60,7 +60,7 @@ public class ConfigIniUtilityTest {
 
   @Before
   public void before() throws MalformedURLException {
-    URL url = new URL("configini", "localhost", 80, ConfigIniUtility.CONFIG_INI, getConfigIniContent());
+    URL url = new URL("configini", "localhost", 80, ConfigIniUtility.DEFAULT_CONFIG_FILE_NAME, getConfigIniContent());
     Set<String> externalConfigPaths = new HashSet<>();
     ConfigIniUtility.parseConfigIni(url, externalConfigPaths);
   }

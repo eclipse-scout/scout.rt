@@ -14,14 +14,11 @@ import java.security.Permission;
 import java.security.Permissions;
 import java.util.HashMap;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.Bundle;
 
 /**
  *
@@ -34,39 +31,38 @@ public final class AccessControlUtility {
 
   /**
    * Convenience to create permissions using a raw data matrix containing rows, columns
-   * 
+   *
    * @param matrix
    *          is expected to contain the columns PERMISSION_CLASS (String),
    *          PERMISSION_LEVEL (Integer)
    */
   public static Permissions createPermissions(Object[][] permissionData) {
-    HashMap<String, BundleClassDescriptor> permissionNameToBundleClassDesc;
-    permissionNameToBundleClassDesc = new HashMap<String, BundleClassDescriptor>();
+    HashMap<String, Class<? extends Permission>> permissionNameToBundleClassDesc = new HashMap<>();
     IPermissionService psvc = SERVICES.getService(IPermissionService.class);
     if (psvc != null) {
-      for (BundleClassDescriptor d : psvc.getAllPermissionClasses()) {
-        permissionNameToBundleClassDesc.put(d.getSimpleClassName(), d);
-        permissionNameToBundleClassDesc.put(d.getClassName(), d);
+      for (Class<? extends Permission> d : psvc.getAllPermissionClasses()) {
+        permissionNameToBundleClassDesc.put(d.getSimpleName(), d);
+        permissionNameToBundleClassDesc.put(d.getName(), d);
       }
     }
     //
     Permissions permSet = new Permissions();
+    ClassLoader classLoader = AccessControlUtility.class.getClassLoader();
     for (Object[] permissionRow : permissionData) {
       String name = "" + permissionRow[0];
       /*
-       * Legacy migration com.bsiag.scout.shared.security.X ->
-       * org.eclipse.scout.rt.shared.security.X
+       * Legacy migration com.bsiag.scout.shared.security.X -> org.eclipse.scout.rt.shared.security.X
        */
       name = name.replace("com.bsiag.scout.shared.security.", "org.eclipse.scout.rt.shared.security.");
+
       int level = TypeCastUtility.castValue(permissionRow[1], Integer.class);
       try {
-        BundleClassDescriptor desc = permissionNameToBundleClassDesc.get(name);
+        Class desc = permissionNameToBundleClassDesc.get(name);
         if (desc == null) {
           LOG.warn("Unknown permission with name: " + permissionRow[0]);
           continue;
         }
-        Bundle bundle = Platform.getBundle(desc.getBundleSymbolicName());
-        Class c = bundle.loadClass(desc.getClassName());
+        Class c = classLoader.loadClass(desc.getName());
         Permission p = (Permission) c.newInstance();
         if (p instanceof BasicHierarchyPermission) {
           ((BasicHierarchyPermission) p).setLevel(level);

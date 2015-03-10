@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -23,6 +22,7 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -441,7 +441,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
 
   // FIXME AWE: (smart-field) Quelle ContentAssistTreeForm > ResultTreeField
   // ----------------------------------------------------------------------------------------------
-
   @SuppressWarnings("unchecked")
   protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
     if (m_contentAssistField.isBrowseLoadIncremental()) {
@@ -457,11 +456,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       //hide loading status
       setStatusVisible(statusWasVisible);
     }
-    /*
-    else {
-    //nop, since complete tree is already loaded (via async job)
-    }
-     */
   }
 
   /**

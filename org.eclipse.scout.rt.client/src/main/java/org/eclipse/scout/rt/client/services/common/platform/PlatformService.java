@@ -11,14 +11,11 @@
 package org.eclipse.scout.rt.client.services.common.platform;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.service.AbstractService;
 
@@ -45,13 +42,7 @@ public class PlatformService extends AbstractService implements IPlatformService
     if (curPath == null) {
       curPath = FileChooser.getCurrentDirectory();
       if (curPath == null) {
-        try {
-          IClientSession session = ClientSessionProvider.currentSession();
-          curPath = Platform.getStateLocation(session.getBundle()).toFile().getCanonicalPath();
-        }
-        catch (IOException io) {
-          curPath = null;
-        }
+        curPath = ConfigIniUtility.getProperty("user.home");
       }
     }
     File f = null;

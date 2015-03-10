@@ -10,17 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.internal.PlatformImplementor;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  *
  */
 public final class Platform {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(Platform.class);
+
   /**
    * Singleton instance.
    */
@@ -56,11 +52,5 @@ public final class Platform {
    */
   public static void set(IPlatform p) {
     platform = p;
-  }
-
-  public static boolean isOsgiRunning() {
-//    return StringUtility.hasText(System.getProperty("org.osgi.framework.version"));
-    Bundle bundle = FrameworkUtil.getBundle(Platform.class);
-    return bundle != null;
   }
 }

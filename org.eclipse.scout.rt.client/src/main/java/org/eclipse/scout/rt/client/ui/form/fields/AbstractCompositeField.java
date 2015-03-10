@@ -35,7 +35,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
-import org.eclipse.scout.rt.client.ui.form.fields.snapbox.AbstractSnapBox;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.AbstractSplitBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
@@ -246,7 +245,6 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
           AbstractCompositeField.class,
           AbstractGroupBox.class,
           AbstractSequenceBox.class,
-          AbstractSnapBox.class,
           AbstractSplitBox.class,
           AbstractTabBox.class)) {
         return false;

@@ -19,11 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -43,7 +42,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.osgi.framework.Bundle;
 
 /**
  * Test for {@link ICodeService}
@@ -65,14 +63,14 @@ public class CodeServiceTest {
       ICodeService service = SERVICES.getService(ICodeService.class);
       assertSame(testService, service);
       //
-      Set<BundleClassDescriptor> result = service.getAllCodeTypeClasses("");
+      Set<Class<? extends ICodeType<?, ?>>> result = service.getAllCodeTypeClasses("");
       boolean testCodeType1Found = false;
       boolean testCodeType2Found = false;
-      for (BundleClassDescriptor b : result) {
-        if (CompareUtility.equals(b.getClassName(), TestCodeType1.class.getName())) {
+      for (Class<? extends ICodeType<?, ?>> b : result) {
+        if (CompareUtility.equals(b.getName(), TestCodeType1.class.getName())) {
           testCodeType1Found = true;
         }
-        if (CompareUtility.equals(b.getClassName(), TestCodeType2.class.getName())) {
+        if (CompareUtility.equals(b.getName(), TestCodeType2.class.getName())) {
           testCodeType2Found = true;
         }
       }
@@ -101,11 +99,6 @@ public class CodeServiceTest {
   }
 
   @Test
-  public void testIgnoreBundle() throws ProcessingException {
-    testImpl(new CodeService_IgnoreThisBundle_Mock(), false, false);
-  }
-
-  @Test
   public void testIgnoreClassName() throws ProcessingException {
     testImpl(new CodeService_IgnoreClassName1_Mock(), false, true);
   }
@@ -130,18 +123,6 @@ public class CodeServiceTest {
     }
   }
 
-  static class CodeService_IgnoreThisBundle_Mock extends AbstractCodeServiceMock {
-
-    public CodeService_IgnoreThisBundle_Mock() throws ProcessingException {
-      super();
-    }
-
-    @Override
-    protected boolean acceptBundle(Bundle bundle, String classPrefix) {
-      return super.acceptBundle(bundle, classPrefix) && (bundle != Platform.getBundle("org.eclipse.scout.rt.server"));
-    }
-  }
-
   static class CodeService_IgnoreClassName1_Mock extends AbstractCodeServiceMock {
 
     public CodeService_IgnoreClassName1_Mock() throws ProcessingException {
@@ -149,8 +130,8 @@ public class CodeServiceTest {
     }
 
     @Override
-    protected boolean acceptClassName(Bundle bundle, String className) {
-      return super.acceptClassName(bundle, className) && CompareUtility.notEquals(className, TestCodeType1.class.getName());
+    protected boolean acceptClassName(String name) {
+      return super.acceptClassName(name) && CompareUtility.notEquals(name, TestCodeType1.class.getName());
     }
   }
 
@@ -161,8 +142,8 @@ public class CodeServiceTest {
     }
 
     @Override
-    protected boolean acceptClass(Bundle bundle, Class<?> c) {
-      return super.acceptClass(bundle, c) && (c != TestCodeType2.class);
+    protected boolean acceptClass(IClassInfo ci) {
+      return super.acceptClass(ci) && (!ci.name().equals(TestCodeType2.class.getName()));
     }
   }
 

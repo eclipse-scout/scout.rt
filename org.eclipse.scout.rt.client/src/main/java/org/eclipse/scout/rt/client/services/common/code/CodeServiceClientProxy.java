@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.IRunnable;
@@ -28,7 +27,6 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -335,27 +333,28 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
   }
 
   @Override
-  public Set<BundleClassDescriptor> getAllCodeTypeClasses(String classPrefix) {
+  public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix) {
     if (classPrefix == null) {
       return CollectionUtility.hashSet();
     }
     ServiceState state = getServiceState();
     synchronized (state.m_codeTypeClassDescriptorMapLock) {
-      Set<BundleClassDescriptor> a = state.m_codeTypeClassDescriptorMap.get(classPrefix);
+      Set<Class<? extends ICodeType<?, ?>>> a = state.m_codeTypeClassDescriptorMap.get(classPrefix);
       if (a != null) {
         return CollectionUtility.hashSet(a);
       }
       // load code types from server-side
-      Set<BundleClassDescriptor> verifiedCodeTypes = new HashSet<BundleClassDescriptor>();
-      Set<BundleClassDescriptor> remoteCodeTypes = getRemoteService().getAllCodeTypeClasses(classPrefix);
-      for (BundleClassDescriptor d : remoteCodeTypes) {
+      Set<Class<? extends ICodeType<?, ?>>> verifiedCodeTypes = new HashSet<>();
+      Set<Class<? extends ICodeType<?, ?>>> remoteCodeTypes = getRemoteService().getAllCodeTypeClasses(classPrefix);
+      ClassLoader classLoader = getClass().getClassLoader();
+      for (Class<? extends ICodeType<?, ?>> d : remoteCodeTypes) {
         try {
           // check whether code type is available on client-side
-          Platform.getBundle(d.getBundleSymbolicName()).loadClass(d.getClassName());
+          classLoader.loadClass(d.getName());
           verifiedCodeTypes.add(d);
         }
         catch (Throwable t) {
-          LOG.error("Missing code-type in client: " + d.getClassName() + ", defined in server-side bundle " + d.getBundleSymbolicName());
+          LOG.error("Missing code-type in client: " + d.getName());
         }
       }
 
@@ -368,12 +367,13 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
   @Override
   public List<ICodeType<?, ?>> getAllCodeTypes(String classPrefix) {
     List<Class<? extends ICodeType<?, ?>>> list = new ArrayList<Class<? extends ICodeType<?, ?>>>();
-    for (BundleClassDescriptor d : getAllCodeTypeClasses(classPrefix)) {
+    ClassLoader classLoader = getClass().getClassLoader();
+    for (Class<? extends ICodeType<?, ?>> d : getAllCodeTypeClasses(classPrefix)) {
       try {
-        list.add((Class<? extends ICodeType<?, ?>>) Platform.getBundle(d.getBundleSymbolicName()).loadClass(d.getClassName()));
+        list.add((Class<? extends ICodeType<?, ?>>) classLoader.loadClass(d.getName()));
       }
       catch (Throwable t) {
-        LOG.warn("Loading " + d.getClassName() + " of bundle " + d.getBundleSymbolicName(), t);
+        LOG.warn("Loading " + d.getName(), t);
         continue;
       }
     }
@@ -401,6 +401,6 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
     final Map<Class<? extends ICodeType<?, ?>>, ICodeType<?, ?>> m_cache = new HashMap<Class<? extends ICodeType<?, ?>>, ICodeType<?, ?>>();
     //
     final Object m_codeTypeClassDescriptorMapLock = new Object();
-    final Map<String, Set<BundleClassDescriptor>> m_codeTypeClassDescriptorMap = new HashMap<String, Set<BundleClassDescriptor>>();
+    final Map<String, Set<Class<? extends ICodeType<?, ?>>>> m_codeTypeClassDescriptorMap = new HashMap<>();
   }
 }

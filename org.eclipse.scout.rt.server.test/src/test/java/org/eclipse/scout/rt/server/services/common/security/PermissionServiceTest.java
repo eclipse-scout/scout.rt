@@ -14,13 +14,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.security.Permission;
 import java.util.List;
+import java.util.Set;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission1;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission2;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
@@ -30,7 +31,6 @@ import org.eclipse.scout.service.SERVICES;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.osgi.framework.Bundle;
 
 /**
  * Test for {@link IPermissionService}
@@ -50,14 +50,14 @@ public class PermissionServiceTest {
       IPermissionService service = SERVICES.getService(IPermissionService.class);
       assertSame(testService, service);
       //
-      BundleClassDescriptor[] result = service.getAllPermissionClasses();
+      Set<Class<? extends Permission>> result = service.getAllPermissionClasses();
       boolean testPermission1Found = false;
       boolean testPermission2Found = false;
-      for (BundleClassDescriptor b : result) {
-        if (CompareUtility.equals(b.getClassName(), TestPermission1.class.getName())) {
+      for (Class<?> b : result) {
+        if (CompareUtility.equals(b.getName(), TestPermission1.class.getName())) {
           testPermission1Found = true;
         }
-        if (CompareUtility.equals(b.getClassName(), TestPermission2.class.getName())) {
+        if (CompareUtility.equals(b.getName(), TestPermission2.class.getName())) {
           testPermission2Found = true;
         }
       }
@@ -86,11 +86,6 @@ public class PermissionServiceTest {
   }
 
   @Test
-  public void testIgnoreBundle() throws ProcessingException {
-    testImpl(new PermissionService_IgnoreThisBundle_Mock(), false, false);
-  }
-
-  @Test
   public void testIgnoreClassName() throws ProcessingException {
     testImpl(new PermissionService_IgnoreClassName1_Mock(), false, true);
   }
@@ -115,18 +110,6 @@ public class PermissionServiceTest {
     }
   }
 
-  static class PermissionService_IgnoreThisBundle_Mock extends AbstractPermissionServiceMock {
-
-    public PermissionService_IgnoreThisBundle_Mock() throws ProcessingException {
-      super();
-    }
-
-    @Override
-    protected boolean acceptBundle(Bundle bundle) {
-      return super.acceptBundle(bundle) && (bundle != Platform.getBundle("org.eclipse.scout.rt.server"));
-    }
-  }
-
   static class PermissionService_IgnoreClassName1_Mock extends AbstractPermissionServiceMock {
 
     public PermissionService_IgnoreClassName1_Mock() throws ProcessingException {
@@ -134,8 +117,8 @@ public class PermissionServiceTest {
     }
 
     @Override
-    protected boolean acceptClassName(Bundle bundle, String className) {
-      return super.acceptClassName(bundle, className) && CompareUtility.notEquals(className, TestPermission1.class.getName());
+    protected boolean acceptClassName(String className) {
+      return super.acceptClassName(className) && CompareUtility.notEquals(className, TestPermission1.class.getName());
     }
   }
 
@@ -146,8 +129,8 @@ public class PermissionServiceTest {
     }
 
     @Override
-    protected boolean acceptClass(Bundle bundle, Class<?> c) {
-      return super.acceptClass(bundle, c) && (c != TestPermission2.class);
+    protected boolean acceptClass(IClassInfo ci) {
+      return super.acceptClass(ci) && (!ci.name().equals(TestPermission2.class.getName()));
     }
   }
 }
