@@ -23,7 +23,9 @@ import org.mockito.MockitoAnnotations;
 public class FutureFilterTest {
 
   @Mock
-  private IFuture<Object> m_future;
+  private IFuture<Object> m_future1;
+  @Mock
+  private IFuture<Object> m_future2;
 
   @Before
   public void before() {
@@ -32,16 +34,22 @@ public class FutureFilterTest {
 
   @Test
   public void test1() {
-    assertFalse(new FutureFilter(null).accept(mock(IFuture.class)));
+    assertFalse(new FutureFilter().accept(mock(IFuture.class)));
   }
 
   @Test
   public void test2() {
-    assertFalse(new FutureFilter(m_future).accept(mock(IFuture.class)));
+    assertFalse(new FutureFilter(m_future1).accept(mock(IFuture.class)));
   }
 
   @Test
   public void test3() {
-    assertTrue(new FutureFilter(m_future).accept(m_future));
+    assertTrue(new FutureFilter(m_future1).accept(m_future1));
+  }
+
+  @Test
+  public void test4() {
+    assertTrue(new FutureFilter(m_future1, m_future2).accept(m_future1));
+    assertTrue(new FutureFilter(m_future1, m_future2).accept(m_future2));
   }
 }

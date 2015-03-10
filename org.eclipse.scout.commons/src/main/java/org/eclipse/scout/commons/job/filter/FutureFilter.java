@@ -10,24 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job.filter;
 
+import java.util.Set;
+
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IFuture;
 
 /**
- * Filter which discards all Futures except the given one.
+ * Filter which discards all Futures except the given ones.
  *
  * @since 5.1
  */
 public class FutureFilter implements IFilter<IFuture<?>> {
 
-  private final IFuture<?> m_future;
+  private final Set<IFuture<?>> m_futures;
 
-  public FutureFilter(final IFuture<?> future) {
-    m_future = future;
+  public FutureFilter(final IFuture<?>... futures) {
+    m_futures = CollectionUtility.hashSet(futures);
   }
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return m_future == future;
+    return m_futures.contains(future);
   }
 }
