@@ -1,11 +1,14 @@
 scout.KeystrokeManager = function() {
+  this._adaptersToDraw = [];
   this._adapters = []; // FIXME BSH Keystroke | Check if we really need this
+  var that = this;
   //f1-help
   $(document).keydown(function(event) {
     if (event.which === scout.keys.F1) {
             drawKeyBox();
             event.preventDefault();
     }
+    that._adaptersToDraw = [];
   });
 
   $(document).keyup(function(event) {
@@ -13,13 +16,14 @@ scout.KeystrokeManager = function() {
       removeKeyBox();
       event.preventDefault();
     }
+    that._adaptersToDraw = [];
   });
 
   $(window).blur(function() {
     removeKeyBox();
+    that._adaptersToDraw = [];
   });
 
-  var that = this;
 
   function removeKeyBox() {
     var i, adapter;
@@ -33,8 +37,8 @@ scout.KeystrokeManager = function() {
 
   function drawKeyBox() {
     var i, adapter;
-    for (i = 0; i < that._adapters.length; i++) {
-      adapter = that._adapters[i];
+    for (i = 0; i < that._adaptersToDraw.length; i++) {
+      adapter = that._adaptersToDraw[i];
       if (adapter.drawKeyBox) {
         adapter.drawKeyBox();
       }
@@ -53,9 +57,14 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
     return;
   }
 
+  var that = this;
   var controller = function(event) {
     var i, keyStroke;
     var bubbleUp = true;
+
+    //Trace adapter if it is affected when key pressed.
+    that._adaptersToDraw.push(adapter);
+
     //if bubble up should be prevented then continue and prevent bubble up also if no key strokes are registered
     if ((!adapter.keyStrokes || !adapter.accept(event)) && !adapter.preventBubbleUp(event)) {
       return;
@@ -72,6 +81,7 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
     }
     if (!bubbleUp || adapter.preventBubbleUp(event)) {
       adapter.removeKeyBox();
+      that._adaptersToDraw = [];
       event.stopPropagation();
     }
   };
