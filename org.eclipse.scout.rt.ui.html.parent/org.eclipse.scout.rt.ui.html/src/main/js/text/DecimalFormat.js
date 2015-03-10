@@ -66,7 +66,7 @@ scout.DecimalFormat = function(locale, pattern) {
   if (posGroupingSeparator > 0) {
     this.groupLength = posDecimalSeparator - posGroupingSeparator - 1;
   }
-  pattern = pattern.replace(SYMBOLS.groupingSeparator, '');
+  pattern = pattern.replace(new RegExp('[' + SYMBOLS.groupingSeparator + ']', 'g'), '');
 
   // split on decimal point
   split = pattern.split(SYMBOLS.decimalSeparator);

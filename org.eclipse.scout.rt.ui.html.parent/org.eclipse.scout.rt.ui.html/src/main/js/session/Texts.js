@@ -10,17 +10,15 @@ scout.Texts.prototype.get = function(textKey) {
   if (!this.exists(textKey)) {
     return '[undefined text: ' + textKey + ']';
   }
-  var i, placeholder,
-    len = arguments.length,
+  var len = arguments.length,
     text = this._textMap[textKey];
 
   if (len === 1) {
     return text;
   }
 
-  for (i = 1; i < len; i++) {
-    placeholder = '{' + (i - 1) + '}';
-    text = text.replace(placeholder, arguments[i]);
+  for (var i = 1; i < len; i++) {
+    text = text.replace(new RegExp('\\{' + (i - 1) + '\\}', 'g'), arguments[i]);
   }
   return text;
 };

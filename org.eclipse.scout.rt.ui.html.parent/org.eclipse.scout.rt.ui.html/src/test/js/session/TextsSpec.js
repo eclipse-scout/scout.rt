@@ -5,6 +5,7 @@ describe("texts", function() {
       NoOptions: 'Keine Übereinstimmung',
       NumOptions: '{0} Optionen',
       Greeting: 'Hello {0}, my name is {2}, {1}.',
+      WrongInput: 'Wrong input: {0}. Try to replace {0} with {1}.',
       Empty: '',
       Null: null
     });
@@ -47,6 +48,10 @@ describe("texts", function() {
 
     it("optGet returns text if key found, with arguments", function() {
       expect(texts.optGet('NumOptions', '#Default', 7)).toBe('7 Optionen');
+    });
+
+    it("check if the same placeholder can be used multiple times", function() {
+      expect(texts.get('WrongInput', 'red', 'blue')).toBe('Wrong input: red. Try to replace red with blue.');
     });
 
   });

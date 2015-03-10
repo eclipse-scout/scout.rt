@@ -19,7 +19,10 @@ scout.NumberField.prototype._parse = function () {
   if (input) {
     // find simple format for value function
     var decimalFormat = this.session.locale.decimalFormat;
-    input = input.replace(decimalFormat.groupChar, '').replace(decimalFormat.pointChar, '.').replace(/\s/g, '');
+    input = input
+      .replace(new RegExp('[' + decimalFormat.groupingChar + ']', 'g'), '')
+      .replace(new RegExp('[' + decimalFormat.pointChar + ']', 'g'), '.')
+      .replace(/\s/g, '');
 
     // if only math symbols are in the input string...
     if (input.match(/^[\d\(\)\+\-\*\/\.]+$/)) {
@@ -30,7 +33,7 @@ scout.NumberField.prototype._parse = function () {
         input = decimalFormat.format(input);
         this.$field.val(input);
       } catch (err) {
-        // ignore errors, let the input handle by scout model
+        // ignore errors, let the input be handled by scout model
       }
     }
   }
