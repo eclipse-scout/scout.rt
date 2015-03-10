@@ -22,7 +22,7 @@ import org.eclipse.scout.testing.client.form.DynamicCancelButton;
 import org.eclipse.scout.testing.client.form.DynamicForm;
 import org.eclipse.scout.testing.client.form.DynamicGroupBox;
 import org.eclipse.scout.testing.client.form.FormHandler;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
  * Tests the import behavior of properties form a form data into its form. Untouched form data properties are not
  * expected to be imported into the form.
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class FormDataImportWithPropertiesTest {
 
   private static final boolean EXPECTED_BOOLEAN = true;

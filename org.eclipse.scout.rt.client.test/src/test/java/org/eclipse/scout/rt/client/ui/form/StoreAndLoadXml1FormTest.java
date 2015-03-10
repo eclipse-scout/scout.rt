@@ -21,14 +21,14 @@ import org.eclipse.scout.testing.client.form.DynamicCancelButton;
 import org.eclipse.scout.testing.client.form.DynamicForm;
 import org.eclipse.scout.testing.client.form.DynamicGroupBox;
 import org.eclipse.scout.testing.client.form.FormHandler;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * Tests exporting a from to an XML and vice versa.
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class StoreAndLoadXml1FormTest {
 
   private static final boolean EXPECTED_BOOLEAN = true;

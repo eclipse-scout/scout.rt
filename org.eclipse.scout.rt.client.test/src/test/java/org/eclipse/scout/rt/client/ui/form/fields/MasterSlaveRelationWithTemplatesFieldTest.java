@@ -22,11 +22,11 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.testing.client.form.FormHandler;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class MasterSlaveRelationWithTemplatesFieldTest {
 
   @Test

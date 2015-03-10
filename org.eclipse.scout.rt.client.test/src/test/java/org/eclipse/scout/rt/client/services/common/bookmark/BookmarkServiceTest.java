@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.service.SERVICES;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,7 +29,7 @@ import org.mockito.Mockito;
 /**
  * Test for {@link IBookmarkService}
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class BookmarkServiceTest {
 
   private IDesktop m_desktop;

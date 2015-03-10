@@ -24,13 +24,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.colorpicker.ColorFieldTest.Tes
 import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.AbstractColorField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.testing.client.form.FormHandler;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class ColorFieldTest {
 
   protected TestForm m_form;

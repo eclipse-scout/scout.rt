@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnVisibilityTest.TestTable.Test1Column;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ColumnVisibilityTest.TestTable.Test2Column;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 /**
  * JUnit test for {@link IColumn} visibility
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class ColumnVisibilityTest {
 
   private ClientUIPreferences m_uiPrefs;

@@ -12,13 +12,10 @@ package org.eclipse.scout.rt.testing.client.runner.parameterized;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.IScoutTestParameter;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedFrameworkMethod;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedTestRunnerExtension;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.testing.platform.RunWithSubject;
-import org.eclipse.scout.rt.testing.shared.RunWithSession;
 import org.junit.runner.Description;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -78,7 +75,7 @@ import org.junit.runners.model.Statement;
  * @see Parameterized
  * @see Parameters
  */
-public class ParameterizedScoutClientTestRunner extends ScoutClientTestRunner {
+public class ParameterizedScoutClientTestRunner extends ClientTestRunner {
 
   /** Parameters returned by the <code>@</code>{@link Parameters} annotated method in the test class. */
   private List<IScoutTestParameter> m_parameterList;

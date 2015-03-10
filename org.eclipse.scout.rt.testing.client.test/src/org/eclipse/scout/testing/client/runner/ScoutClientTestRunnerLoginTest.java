@@ -14,7 +14,7 @@ import java.util.Collections;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner.ClientTest;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner.ClientTest;
 import org.eclipse.scout.testing.client.runner.fixture.LoginTestSessionProvider;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 /**
  * JUnit test for {@link ScoutClientTestRunner} with login.
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 @ClientTest(runAs = "test", sessionProvider = LoginTestSessionProvider.class, forceNewSession = true)
 public class ScoutClientTestRunnerLoginTest {
 

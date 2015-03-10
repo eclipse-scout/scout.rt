@@ -30,14 +30,14 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.PageWithTableAndPage
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @since 3.10.0-M1
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class PageWithTableAndPageBeanTest {
 
   private static final String FIRST_COL_CONTENT = "first col";

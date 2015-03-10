@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +46,7 @@ import org.junit.runner.RunWith;
  * bug: When doing so the table selection disappears since {@link ITable#resetColumnConfiguration()} discards all rows
  * and selection from BookmarkUtility#activate
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest {
   private static boolean tableCustomizerSerialDataIsRandom;
 

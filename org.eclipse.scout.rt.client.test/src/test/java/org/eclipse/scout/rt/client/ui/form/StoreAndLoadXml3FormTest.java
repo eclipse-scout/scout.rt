@@ -23,13 +23,13 @@ import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTestGroupBox.InnerTes
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G1Box;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G2Box;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class StoreAndLoadXml3FormTest {
 
   @Test

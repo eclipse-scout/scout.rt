@@ -20,14 +20,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.StringFieldSetMultilineTextTest.MyForm.MainBox.GroupBox.CloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.StringFieldSetMultilineTextTest.MyForm.MainBox.GroupBox.Text1Field;
 import org.eclipse.scout.testing.client.form.FormHandler;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * Writing text with newlines into a single line text field must eliminate the newlines
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class StringFieldSetMultilineTextTest {
 
   @Test

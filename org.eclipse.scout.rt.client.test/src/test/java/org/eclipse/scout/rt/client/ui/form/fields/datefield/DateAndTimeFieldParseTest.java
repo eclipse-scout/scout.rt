@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.datefield.DateAndTimeFieldPars
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.DateAndTimeFieldParseTest.TestForm.MainBox.TestsGroupBox.TimeOnlyWithFormatField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.testing.client.form.FormHandler;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,7 +41,7 @@ import org.junit.runner.RunWith;
 /**
  * Tests for parsing in AbstractDateFields and AbstractTimeFields.
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class DateAndTimeFieldParseTest {
 
   public static class TestForm extends AbstractForm {

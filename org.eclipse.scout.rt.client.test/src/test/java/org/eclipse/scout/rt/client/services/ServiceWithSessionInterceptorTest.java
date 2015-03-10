@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 /**
  *
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class ServiceWithSessionInterceptorTest {
 
   private static IBean<TestService> m_bean01;

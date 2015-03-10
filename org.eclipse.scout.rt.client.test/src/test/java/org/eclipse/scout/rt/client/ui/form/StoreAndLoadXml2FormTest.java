@@ -24,14 +24,14 @@ import org.eclipse.scout.rt.client.ui.form.StoreAndLoadXml2FormTest.TestForm.Mai
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * Load and store of tables containing custom values and classes (classloading issues)
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class StoreAndLoadXml2FormTest {
 
   static final Object[][] TABLE_DATA = new Object[][]{

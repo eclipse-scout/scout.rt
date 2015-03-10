@@ -28,10 +28,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.testing.platform.RunWithSubject;
-import org.eclipse.scout.rt.testing.shared.RunWithSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,9 +40,9 @@ import org.junit.runner.RunWith;
 /**
  * Tests for {@link AbstractDesktop}
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
-@RunWithSession(TestEnvironmentClientSession.class)
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractDesktopTest {
   private static final Object TEST_DATA_TYPE_1 = new Object();
   private static final Object TEST_DATA_TYPE_2 = new Object();

@@ -25,14 +25,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.ReplaceFieldTest.TemplateUsage
 import org.eclipse.scout.rt.client.ui.form.fields.ReplaceFieldTest.TemplateUsageForm.MainBox.Template2Box;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @since 4.0.1
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class ReplaceFieldTest {
 
   @Test

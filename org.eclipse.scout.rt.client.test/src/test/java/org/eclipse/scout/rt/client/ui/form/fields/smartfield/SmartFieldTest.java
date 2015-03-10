@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.lookup.TestingLookupService;
 import org.eclipse.scout.testing.client.form.FormHandler;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,7 +48,7 @@ import org.junit.runner.RunWith;
  * Smartfield with rows having tooltip/color/icon. When some rows do not have tooltip/color/icon this info should be
  * taken from the initial values of tooltip/color/icon of the field.
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class SmartFieldTest {
   public static final String ICON_BOOKMARK = "bookmark";
   public static final String ICON_FILE = "file";

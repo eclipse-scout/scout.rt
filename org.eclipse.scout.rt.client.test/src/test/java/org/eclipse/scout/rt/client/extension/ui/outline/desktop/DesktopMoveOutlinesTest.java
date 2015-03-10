@@ -22,11 +22,11 @@ import org.eclipse.scout.rt.client.extension.ui.outline.desktop.fixture.SecondOu
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.service.SERVICES;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class DesktopMoveOutlinesTest extends AbstractLocalExtensionTestCase {
 
   @Test

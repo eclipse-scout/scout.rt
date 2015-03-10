@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.booleanfield;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class AbstractBooleanFieldTest extends AbstractBooleanField {
 
   @Test

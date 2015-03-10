@@ -23,14 +23,14 @@ import org.eclipse.scout.testing.client.form.DynamicGroupBox;
 import org.eclipse.scout.testing.client.form.DynamicOkButton;
 import org.eclipse.scout.testing.client.form.DynamicStringField;
 import org.eclipse.scout.testing.client.form.FormHandler;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * Bugzilla 352472 - Possible Deadlock at IForm#waitFor
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class FormWaitForTest {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormWaitForTest.class);
 

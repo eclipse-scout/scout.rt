@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.ext.JInternalFrameEx;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.DefaultColumnSplitStrategy;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.IMultiSplitStrategy;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +43,7 @@ import org.mockito.Mockito;
 /**
  * Tests for {@link SwingScoutDesktop}
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class SwingScoutDesktopUiTest {
 
   private SwingScoutDesktop m_desktop;

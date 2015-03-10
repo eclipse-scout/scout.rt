@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore.MethodImplementat
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ import org.mockito.Mockito;
  * A mocked {@link IExceptionHandlerService} simulates that a message box will be displayed for the
  * {@link VetoException}.
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class FormStoredWithVetoTest {
 
   private List<IBean<?>> m_registeredServices;

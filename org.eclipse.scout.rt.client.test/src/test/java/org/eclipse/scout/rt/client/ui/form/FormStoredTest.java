@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore;
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore.MethodImplementation;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
  * 
  * @since 4.1.0
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class FormStoredTest {
 
   @Test

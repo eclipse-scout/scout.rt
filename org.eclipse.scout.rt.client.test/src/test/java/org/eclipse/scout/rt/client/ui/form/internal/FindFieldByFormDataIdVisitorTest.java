@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
 import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +34,7 @@ import org.junit.runner.RunWith;
  * Bugzilla entry 399610: Form: exportFormData/importFormData incorrect for forms containing wrapped inner forms.
  * https://bugs.eclipse.org/bugs/show_bug.cgi?id=399610
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class FindFieldByFormDataIdVisitorTest {
 
   private static final String FIRST_FIELD_ID = "FirstField";

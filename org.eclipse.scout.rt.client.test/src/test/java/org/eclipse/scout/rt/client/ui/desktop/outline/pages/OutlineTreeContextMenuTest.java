@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.OutlineTreeContextMe
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.OutlineTreeContextMenuTest.PageWithTable.Table.PageWithTableEmptySpaceMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.OutlineTreeContextMenuTest.PageWithTable.Table.PageWithTableRowMenu;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -47,7 +47,7 @@ import org.junit.runner.RunWith;
  * Creates an outline consisting of a PageWithTable and PageWithNode as child. Tests if menus appear on parent
  * as well on client node correctly.
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class OutlineTreeContextMenuTest {
 
   @Test

@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.client.services.common.code.fixture.CompanyRatingCod
 import org.eclipse.scout.rt.client.services.common.code.fixture.CompanyTypeCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +43,7 @@ import org.mockito.stubbing.Answer;
  *
  * @since Scout 4.1-M2
  */
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
 public class CodeServiceClientProxyTest {
 
   private static final String CLIENT_CODE_TYPE_PREFIX = "org.eclipse.scout.rt.client";
