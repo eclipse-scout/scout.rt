@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.testing.platform.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
