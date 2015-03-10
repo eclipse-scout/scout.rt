@@ -141,7 +141,7 @@ button::-moz-focus-inner {
 }
 
 /* hidden DIV used to measure string length in UI */
-#StringMeasurement {
+#ScoutStringMeasurement {
   position: absolute;
   visibility: hidden;
   height: auto;

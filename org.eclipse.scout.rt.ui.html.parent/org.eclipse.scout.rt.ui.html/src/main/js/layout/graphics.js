@@ -10,9 +10,9 @@ scout.graphics = {
    */
   measureString: function(text, className) {
     text = text || '';
-    var $div = $('#StringMeasurement');
+    var $div = $('#ScoutStringMeasurement');
     if ($div.length === 0) { // create dynamically
-      $div = $('body').appendDiv('', '', 'StringMeasurement');
+      $div = $('body').appendDiv('', '', 'ScoutStringMeasurement');
     }
     $div.removeAttr('class');
     if (className) {
