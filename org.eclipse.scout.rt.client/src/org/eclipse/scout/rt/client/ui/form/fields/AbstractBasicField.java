@@ -162,7 +162,7 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
    * any further chain elements.
    */
   protected static class LocalBasicFieldExtension<VALUE_TYPE, OWNER_FIELD extends AbstractBasicField<VALUE_TYPE>> extends AbstractValueField.LocalValueFieldExtension<VALUE_TYPE, OWNER_FIELD>
-  implements IBasicFieldExtension<VALUE_TYPE, OWNER_FIELD> {
+      implements IBasicFieldExtension<VALUE_TYPE, OWNER_FIELD> {
 
     public LocalBasicFieldExtension(OWNER_FIELD owner) {
       super(owner);

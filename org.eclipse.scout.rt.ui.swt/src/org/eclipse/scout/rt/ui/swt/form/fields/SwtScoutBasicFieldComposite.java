@@ -175,7 +175,7 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
   protected boolean handleSwtInputVerifier() {
     final String text = getText();
     // only handle if text has changed
-    if (CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
+    if (!m_updateDisplayTextOnModify && CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
       return true;
     }
     // notify Scout

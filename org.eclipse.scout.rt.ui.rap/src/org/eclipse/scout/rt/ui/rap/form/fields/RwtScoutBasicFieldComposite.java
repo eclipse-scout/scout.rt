@@ -149,7 +149,7 @@ public abstract class RwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
     }
     final String text = getUiField().getText();
     // only handle if text has changed
-    if (CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
+    if (!m_updateDisplayTextOnModify && CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
       return;
     }
     final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, false);
