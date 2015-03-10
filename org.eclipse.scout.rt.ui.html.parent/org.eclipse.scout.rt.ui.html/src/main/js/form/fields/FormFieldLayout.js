@@ -14,7 +14,6 @@ scout.FormFieldLayout = function(formField) {
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 
-
 scout.FormFieldLayout.prototype.layout = function($container) {
   var containerSize, fieldSize, fieldBounds, htmlField, labelPositionLeft, labelHasFieldWidth,
     htmlContainer = scout.HtmlComponent.get($container),

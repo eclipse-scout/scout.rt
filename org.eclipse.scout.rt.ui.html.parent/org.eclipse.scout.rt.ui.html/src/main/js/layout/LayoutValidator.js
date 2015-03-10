@@ -9,7 +9,7 @@ scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
   var validateRoot,
     htmlCompParent = htmlComp;
 
-  //Mark every parent as invalid until validate root
+  // Mark every parent as invalid until validate root
   while (htmlCompParent) {
     htmlComp = htmlCompParent;
     htmlComp.invalidate();
@@ -32,6 +32,11 @@ scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
 
 scout.LayoutValidator.prototype.validate = function() {
   for (var i=0; i < this._invalidComponents.length; i++) {
+    if (this._invalidComponents[i].isRemoved()) {
+      // Don't layout components which don't exist anymore
+      continue;
+    }
+
     this._invalidComponents[i].layout();
   }
   this._invalidComponents = [];

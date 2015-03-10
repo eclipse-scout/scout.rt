@@ -184,6 +184,13 @@ scout.HtmlComponent.prototype.pack = function() {
   this.setSize(preferredSize);
 };
 
+/**
+ * Checks whether $comp has been removed from the dom
+ */
+scout.HtmlComponent.prototype.isRemoved = function() {
+  return !scout.HtmlComponent.optGet(this.$comp);
+};
+
 scout.HtmlComponent.prototype.debug = function() {
   return scout.graphics.debugOutput(this.$comp);
 };
@@ -201,10 +208,11 @@ scout.HtmlComponent.get = function($comp) {
   if (!htmlComp) {
     var details = '';
     if ($comp) {
-      details = 'Class: ' + $comp.attr('class');
-      details += '. Id: ' + $comp.attr('id');
+      details = '\nClass: ' + $comp.attr('class');
+      details += '\nId: ' + $comp.attr('id');
+      details += '\nAttached: ' + $comp.isAttached();
     }
-    throw new Error('data "htmlComponent" is undefined. Details: ' + details);
+    throw new Error('data "htmlComponent" is undefined.' + details);
   }
   return htmlComp;
 };
