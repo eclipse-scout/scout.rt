@@ -63,7 +63,7 @@ scout.FilterInputKeyStrokeAdapter.prototype.preventBubbleUp = function(event){
     //copy, paste, mark all, etc.
     return true;
   }
-  if(this.preventBubbleUpKeys.indexOf(event.which)>-1 ||(event.which>= scout.keys.A && event.which>= scout.keys.A)||(event.which>= scout.keys[0] && event.which>= scout.keys[9])){
+  if(this.preventBubbleUpKeys.indexOf(event.which)>-1 ||(event.which>= scout.keys.A && event.which<= scout.keys.Z)||(event.which>= scout.keys[0] && event.which<= scout.keys[9])){
     //all alphabetical chars, numbers, etc. which are captured by input.
     return true;
   }
