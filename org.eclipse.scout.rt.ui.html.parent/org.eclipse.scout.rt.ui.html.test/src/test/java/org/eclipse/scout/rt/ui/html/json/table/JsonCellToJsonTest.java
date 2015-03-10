@@ -22,7 +22,10 @@ import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithDateColumn;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithLongColumn;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithStringColumn;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -30,7 +33,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(ScoutClientTestRunner.class)
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonCellToJsonTest {
   private JsonSessionMock m_jsonSession;
 

@@ -199,13 +199,16 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         //FIXME CGU session must be started later, see JsonClientSession
         //return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
         Locale oldLocale = NlsLocale.get(false);
+        UserAgent oldUserAgent = UserAgent.CURRENT.get();
         try {
           NlsLocale.set(request.getLocale());
+          UserAgent.CURRENT.set(createUserAgent(jsonStartupRequest));
           //
           clientSession = createClientSession();
           initClientSession(clientSession, jsonStartupRequest);
         }
         finally {
+          UserAgent.CURRENT.set(oldUserAgent);
           NlsLocale.set(oldLocale);
         }
         httpSession.setAttribute(clientSessionAttributeName, clientSession);
@@ -248,9 +251,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
    * {@link IClientSession#startSession(org.osgi.framework.Bundle)} was not yet called
    */
   protected void initClientSession(IClientSession clientSession, JsonStartupRequest jsonStartupRequest) {
-    UserAgent userAgent = createUserAgent(jsonStartupRequest);
-    clientSession.setUserAgent(userAgent);
-    clientSession.setSubject(currentSubject());
     //custom props
     HashMap<String, String> customProps = new HashMap<String, String>();
     JSONObject obj = jsonStartupRequest.getCustomParams();
