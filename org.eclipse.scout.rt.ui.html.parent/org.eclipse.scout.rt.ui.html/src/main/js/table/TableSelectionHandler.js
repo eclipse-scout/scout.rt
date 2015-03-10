@@ -54,6 +54,10 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event, $row) {
       toIndex = this._$allRows.index($row);
       this._selectRange(fromIndex, toIndex, select);
     }.bind(this));
+
+    // This additionally window listener is necessary to track the clicks outside of a table row.
+    // If the mouse is released on a table row, onMouseUp gets called by the table's mouseUp listener.
+    $(window).one('mouseup.selectionHandler', this.onMouseUp.bind(this));
   }
 };
 
