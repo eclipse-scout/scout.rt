@@ -36,7 +36,6 @@ import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -114,10 +113,10 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     if (text != null && text.length() == 0) {
       text = null;
     }
-    IContentAssistFieldProposalForm<LOOKUP_KEY> smartForm = getProposalForm();
+    IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
     ILookupRow<LOOKUP_KEY> acceptedProposalRow = null;
-    if (smartForm != null && StringUtility.equalsIgnoreNewLines(smartForm.getSearchText(), text)) {
-      acceptedProposalRow = smartForm.getAcceptedProposal();
+    if (proposalChooser != null && StringUtility.equalsIgnoreNewLines(proposalChooser.getSearchText(), text)) {
+      acceptedProposalRow = proposalChooser.getAcceptedProposal();
     }
     //
     try {
@@ -149,21 +148,25 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
             return interceptConvertKeyToValue(acceptedProposalRow.getKey());
           }
           else {
+            // FIXME AWE: check if this code is still required (looks quite silly)
             // no match possible and proposal is inactive; reject change
-            if (smartForm == null) {
-              smartForm = createProposalForm();
-              smartForm.startForm();
-              smartForm.dataFetchedDelegate(fetchResult, getConfiguredBrowseMaxRowCount());
-            }
-            registerProposalFormInternal(smartForm);
-            smartForm = null;// prevent close in finally
+            // wenn man etwas eingetippt hat, das nicht im proposal ist
+            // --> proposal öffnen und fehlermeldung dort anzeigen, weiter-tabben
+            // nicht möglich
+//          if (smartForm == null) {
+//            smartForm = createProposalForm();
+//            smartForm.startForm();
+//            smartForm.dataFetchedDelegate(fetchResult, getConfiguredBrowseMaxRowCount());
+//          }
+//          registerProposalFormInternal(smartForm);
+//          smartForm = null;// prevent close in finally
             throw new VetoException(ScoutTexts.get("SmartFieldCannotComplete", text));
           }
         }
       }
     }
     finally {
-      unregisterProposalFormInternal(smartForm);
+      unregisterProposalChooserInternal();
     }
   }
 
@@ -233,7 +236,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
           }
           else {
             // enqueue LookupRow fetcher
-            // this will lateron call installLookupRowContext()
+            // this will later on call installLookupRowContext()
             ILookupCall<LOOKUP_KEY> call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractMixedSmartField.this));
             prepareKeyLookup(call, interceptConvertValueToKey(validKey));
             m_currentGetLookupRowByKeyJob = new P_GetLookupRowByKeyJob(call);
@@ -264,31 +267,26 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   }
 
   @Override
-  protected IContentAssistFieldProposalForm<LOOKUP_KEY> createProposalForm() throws ProcessingException {
-    return createProposalForm(false);
-  }
-
-  @Override
-  protected void handleProposalFormClosed(IContentAssistFieldProposalForm<LOOKUP_KEY> proposalForm) throws ProcessingException {
-    if (getProposalForm() == proposalForm) {
-      if (proposalForm.getCloseSystemType() == IButton.SYSTEM_TYPE_OK) {
-        ILookupRow<LOOKUP_KEY> row = proposalForm.getAcceptedProposal();
-        if (row != null) {
-          acceptProposal(row);
-        }
-      }
-      else {
-        revertValue();
-      }
-      registerProposalFormInternal(null);
+  protected void handleProposalChooserClosed() throws ProcessingException {
+    ILookupRow<LOOKUP_KEY> row = getProposalChooser().getAcceptedProposal();
+    if (row != null) {
+      acceptProposal(row);
+    }
+    else {
+      revertValue();
     }
   }
 
   @Override
+  protected IProposalChooser<?, LOOKUP_KEY> createProposalChooser() throws ProcessingException {
+    return createProposalChooser(false);
+  }
+
+  @Override
   protected void handleFetchResult(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
-    IContentAssistFieldProposalForm<LOOKUP_KEY> smartForm = getProposalForm();
-    if (smartForm != null && result != null) {
-      smartForm.dataFetchedDelegate(result, getBrowseMaxRowCount());
+    IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
+    if (proposalChooser != null && result != null) {
+      proposalChooser.dataFetchedDelegate(result, getBrowseMaxRowCount());
     }
   }
 
@@ -297,37 +295,35 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     @Override
     public boolean setTextFromUI(String text) {
       String currentValidText = (getCurrentLookupRow() != null ? getCurrentLookupRow().getText() : null);
-      IContentAssistFieldProposalForm smartForm = getProposalForm();
+      IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
       // accept proposal form if either input text matches search text or
       // existing display text is valid
       try {
-        if (smartForm != null && smartForm.getAcceptedProposal() != null) {
+        if (proposalChooser != null && proposalChooser.getAcceptedProposal() != null) {
           // a proposal was selected
           return acceptProposalFromUI();
         }
-        if (smartForm != null && (StringUtility.equalsIgnoreNewLines(text, smartForm.getSearchText()) || StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
+        if (proposalChooser != null && (StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) || StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
           /*
            * empty text means null
            */
           if (text == null || text.length() == 0) {
-            boolean b = parseValue(text);
-            return b;
+            return parseValue(text);
           }
           else {
             // no proposal was selected...
             if (!StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText))) {
               // ...and the current value is incomplete -> force proposal
               // selection
-              smartForm.forceProposalSelection();
+              proposalChooser.forceProposalSelection();
               return false;
             }
             else {
               // ... and current display is unchanged from model value -> nop
-              smartForm.doClose();
+              unregisterProposalChooserInternal();
               return true;
             }
           }
-
         }
         else {
           /*
@@ -354,16 +350,12 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
         newText = BROWSE_ALL_TEXT;
       }
       try {
-        IContentAssistFieldProposalForm<LOOKUP_KEY> smartForm = getProposalForm();
-        if (smartForm == null) {
+        IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
+        if (proposalChooser == null) {
           setActiveFilter(TriState.TRUE);
-          smartForm = createProposalForm();
-          smartForm.startForm();
-          smartForm.dataFetchedDelegate(getLookupRowFetcher().getResult(), getConfiguredBrowseMaxRowCount());
-          if (smartForm.isFormOpen()) {
-            doSearch(newText, selectCurrentValue, false);
-            registerProposalFormInternal(smartForm);
-          }
+          proposalChooser = registerProposalChooserInternal();
+          proposalChooser.dataFetchedDelegate(getLookupRowFetcher().getResult(), getConfiguredBrowseMaxRowCount());
+          doSearch(newText, selectCurrentValue, false);
         }
         else {
           if (!StringUtility.equalsIgnoreNewLines(getLookupRowFetcher().getLastSearchText(), newText)) {
@@ -377,12 +369,17 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     }
 
     @Override
+    public void closeProposalFromUI() {
+      unregisterProposalChooserInternal();
+    }
+
+    @Override
     public boolean acceptProposalFromUI() {
       try {
-        IContentAssistFieldProposalForm smartForm = getProposalForm();
-        if (smartForm != null) {
-          if (smartForm.getAcceptedProposal() != null) {
-            smartForm.doOk();
+        IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
+        if (proposalChooser != null) {
+          if (proposalChooser.getAcceptedProposal() != null) {
+            proposalChooser.doOk();
             return true;
           }
           else {
@@ -392,7 +389,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
             }
             else {
               // select first
-              smartForm.forceProposalSelection();
+              proposalChooser.forceProposalSelection();
               return false;
             }
           }
@@ -402,11 +399,6 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
       }
       return false;
-    }
-
-    @Override
-    public void unregisterProposalFormFromUI(IContentAssistFieldProposalForm form) {
-      unregisterProposalFormInternal(form);
     }
   }
 

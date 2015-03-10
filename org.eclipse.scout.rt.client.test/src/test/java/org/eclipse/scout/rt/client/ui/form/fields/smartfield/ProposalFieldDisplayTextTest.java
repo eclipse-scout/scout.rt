@@ -57,8 +57,8 @@ public class ProposalFieldDisplayTextTest {
     // single match
     field.getUIFacade().setTextFromUI("a");
     // select proposal
-    field.getProposalForm().forceProposalSelection();
-    field.getProposalForm().doOk();
+    field.getProposalChooser().forceProposalSelection();
+    field.getProposalChooser().doOk();
     assertEquals("aName", field.getValue());
     assertEquals("aName", field.getDisplayText());
     // lookup row available now

@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -79,52 +78,48 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     if (text != null && text.length() == 0) {
       text = null;
     }
-    IContentAssistFieldProposalForm<LOOKUP_KEY> smartForm = getProposalForm();
+    IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
     ILookupRow<LOOKUP_KEY> acceptedProposalRow = null;
-    if (smartForm != null && StringUtility.equalsIgnoreNewLines(smartForm.getSearchText(), text)) {
-      acceptedProposalRow = smartForm.getAcceptedProposal();
+    if (StringUtility.equalsIgnoreNewLines(proposalChooser.getSearchText(), text)) {
+      acceptedProposalRow = proposalChooser.getAcceptedProposal();
     }
-    try {
-      String oldText = getDisplayText();
-      boolean parsingError = getErrorStatus() != null && getErrorStatus().containsStatus(ParsingFailedStatus.class);
-      if (acceptedProposalRow == null && (!parsingError) && getCurrentLookupRow() != null && StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(oldText))) {
-        // no change
-        return getValue();
+//    try {
+    String oldText = getDisplayText();
+    boolean parsingError = getErrorStatus() != null && getErrorStatus().containsStatus(ParsingFailedStatus.class);
+    if (acceptedProposalRow == null && (!parsingError) && getCurrentLookupRow() != null && StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(oldText))) {
+      // no change
+      return getValue();
+    }
+    else {
+      // changed
+      if (acceptedProposalRow != null) {
+        setCurrentLookupRow(acceptedProposalRow);
+        return acceptedProposalRow.getText();
+      }
+      else if (text == null) {
+        setCurrentLookupRow(EMPTY_LOOKUP_ROW);
+        return null;
       }
       else {
-        // changed
+        setCurrentLookupRow(null);
+        doSearch(text, false, true);
+        proposalChooser = getProposalChooser();
+        acceptedProposalRow = proposalChooser.getAcceptedProposal();
         if (acceptedProposalRow != null) {
           setCurrentLookupRow(acceptedProposalRow);
           return acceptedProposalRow.getText();
         }
-        else if (text == null) {
-          setCurrentLookupRow(EMPTY_LOOKUP_ROW);
-          return null;
-        }
         else {
+          // no match possible and proposal is inactive; reject change
           setCurrentLookupRow(null);
-          doSearch(text, false, true);
-          smartForm = getProposalForm();
-          if (smartForm != null) {
-            acceptedProposalRow = smartForm.getAcceptedProposal();
-            if (acceptedProposalRow != null) {
-              setCurrentLookupRow(acceptedProposalRow);
-              return acceptedProposalRow.getText();
-            }
-            else {
-              // no match possible and proposal is inactive; reject change
-              registerProposalFormInternal(smartForm);
-              smartForm = null;// prevent close in finally
-              setCurrentLookupRow(null);
-            }
-          }
-          return text;
         }
+        return text;
       }
     }
-    finally {
-      unregisterProposalFormInternal(smartForm);
-    }
+//    }
+//    finally {
+//      unregisterProposalFormInternal(proposalChooser);
+//    }
 
   }
 
@@ -146,21 +141,18 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   }
 
   @Override
-  protected IContentAssistFieldProposalForm<LOOKUP_KEY> createProposalForm() throws ProcessingException {
-    return createProposalForm(true);
+  protected void handleProposalChooserClosed() throws ProcessingException {
+//    if (getProposalChooser() == proposalChooser) {
+    ILookupRow<LOOKUP_KEY> row = getProposalChooser().getAcceptedProposal();
+    if (row != null) {
+      acceptProposal(row);
+    }
+//    }
   }
 
   @Override
-  protected void handleProposalFormClosed(IContentAssistFieldProposalForm<LOOKUP_KEY> proposalForm) throws ProcessingException {
-    if (getProposalForm() == proposalForm) {
-      if (proposalForm.getCloseSystemType() == IButton.SYSTEM_TYPE_OK) {
-        ILookupRow<LOOKUP_KEY> row = proposalForm.getAcceptedProposal();
-        if (row != null) {
-          acceptProposal(row);
-        }
-      }
-      registerProposalFormInternal(null);
-    }
+  protected IProposalChooser<?, LOOKUP_KEY> createProposalChooser() throws ProcessingException {
+    return createProposalChooser(true);
   }
 
   @Override
@@ -177,27 +169,17 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
 
   @Override
   protected void handleFetchResult(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
-    IContentAssistFieldProposalForm<LOOKUP_KEY> smartForm = getProposalForm();
+    IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
     if (result == null) {
-      unregisterProposalFormInternal(smartForm);
+      unregisterProposalChooserInternal();
     }
     else {
       Collection<? extends ILookupRow<LOOKUP_KEY>> rows = result.getLookupRows();
       if (rows == null || rows.isEmpty()) {
-        unregisterProposalFormInternal(smartForm);
+        unregisterProposalChooserInternal();
       }
       else {
-        try {
-          if (smartForm == null) {
-            smartForm = createProposalForm();
-            smartForm.startForm();
-            registerProposalFormInternal(smartForm);
-          }
-          smartForm.dataFetchedDelegate(result, getBrowseMaxRowCount());
-        }
-        catch (ProcessingException e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-        }
+        proposalChooser.dataFetchedDelegate(result, getBrowseMaxRowCount());
       }
     }
   }
@@ -207,15 +189,15 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     @Override
     public boolean setTextFromUI(String text) {
       String currentValidText = getValue();
-      IContentAssistFieldProposalForm<LOOKUP_KEY> smartForm = getProposalForm();
+      IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
       // accept proposal form if either input text matches search text or
       // existing display text is valid
       try {
-        if (smartForm != null && smartForm.getAcceptedProposal() != null) {
+        if (proposalChooser.getAcceptedProposal() != null) {
           // a proposal was selected
           return acceptProposalFromUI();
         }
-        if (smartForm != null && (StringUtility.equalsIgnoreNewLines(text, smartForm.getSearchText()) || StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
+        if ((StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) || StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
           /*
            * empty text means null
            */
@@ -230,7 +212,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
             }
             else {
               // ... and current display is unchanged from model value -> nop
-              smartForm.doClose();
+              unregisterProposalChooserInternal();
               return true;
             }
           }
@@ -260,8 +242,8 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
       if (newText == null) {
         newText = BROWSE_ALL_TEXT;
       }
-      IContentAssistFieldProposalForm smartForm = getProposalForm();
-      if (smartForm == null) {
+      IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
+      if (proposalChooser == null) {
         setActiveFilter(TriState.TRUE);
         doSearch(newText, selectCurrentValue, false);
       }
@@ -275,22 +257,20 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     @Override
     public boolean acceptProposalFromUI() {
       try {
-        IContentAssistFieldProposalForm smartForm = getProposalForm();
-        if (smartForm != null) {
-          if (smartForm.getAcceptedProposal() != null) {
-            smartForm.doOk();
+        IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
+        if (proposalChooser.getAcceptedProposal() != null) {
+          proposalChooser.doOk();
+          return true;
+        }
+        else {
+          // allow with null text traverse
+          if (StringUtility.isNullOrEmpty(getDisplayText())) {
             return true;
           }
           else {
-            // allow with null text traverse
-            if (StringUtility.isNullOrEmpty(getDisplayText())) {
-              return true;
-            }
-            else {
-              // select first
-              smartForm.forceProposalSelection();
-              return false;
-            }
+            // select first
+            proposalChooser.forceProposalSelection();
+            return false;
           }
         }
       }
@@ -301,8 +281,8 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     }
 
     @Override
-    public void unregisterProposalFormFromUI(IContentAssistFieldProposalForm form) {
-      unregisterProposalFormInternal(form);
+    public void closeProposalFromUI() {
+      unregisterProposalChooserInternal();
     }
   }
 

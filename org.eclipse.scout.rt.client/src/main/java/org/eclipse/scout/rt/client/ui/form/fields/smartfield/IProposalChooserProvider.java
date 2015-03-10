@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,17 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-public interface IContentAssistFieldUIFacade {
+import org.eclipse.scout.commons.exception.ProcessingException;
 
-  boolean setTextFromUI(String newText);
+/**
+ * Responsible for creating {@link IProposalChooser}.
+ *
+ * @since 6.0.0
+ */
+public interface IProposalChooserProvider<LOOKUP_KEY> {
 
-  /**
-   * This may result in a property change {@link IContentAssistField#PROP_PROPOSAL_FORM} see
-   * {@link IContentAssistField#getProposalForm()}
-   */
-  void openProposalFromUI(String newText, boolean selectCurrentValue);
+  IProposalChooser<?, LOOKUP_KEY> createProposalChooser(IContentAssistField<?, LOOKUP_KEY> smartField, boolean allowCustomText) throws ProcessingException;
 
-  boolean acceptProposalFromUI();
-
-  void closeProposalFromUI();
 }

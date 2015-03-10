@@ -50,14 +50,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.form.FormEvent;
-import org.eclipse.scout.rt.client.ui.form.FormListener;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldProposalForm;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooser;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -65,6 +64,8 @@ import org.eclipse.scout.rt.ui.swing.action.menu.SwingScoutContextMenu;
 import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.basic.IconGroup;
 import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
+import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
+import org.eclipse.scout.rt.ui.swing.basic.tree.ISwingScoutTree;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTableEx;
@@ -75,6 +76,8 @@ import org.eclipse.scout.rt.ui.swing.ext.decoration.DropDownDecorationItem;
 import org.eclipse.scout.rt.ui.swing.ext.decoration.IDecorationGroup;
 import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
+import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
 import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutDropDownPopup;
 import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutPopup;
 
@@ -93,6 +96,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
   private SwingScoutContextMenu m_contextMenu;
   private DropDownDecorationItem m_dropdownIcon;
   private PropertyChangeListener m_contextMenuVisibilityListener;
+  private SwingScoutViewListener m_viewListener;
 
   @Override
   @SuppressWarnings("serial")
@@ -224,7 +228,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     super.attachScout();
     IContentAssistField f = getScoutObject();
     setIconIdFromScout(f.getIconId());
-    setProposalFormFromScout(f.getProposalForm());
+    setProposalChooserFromScout(f.getProposalChooser());
     installContextMenu();
   }
 
@@ -272,9 +276,9 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     m_dropdownIcon.setIconGroup(new IconGroup(getSwingEnvironment(), iconId));
   }
 
-  protected void setProposalFormFromScout(IContentAssistFieldProposalForm form) {
-    if (form != null) {
-      showProposalPopup(form);
+  protected void setProposalChooserFromScout(IProposalChooser proposalChooser) {
+    if (proposalChooser != null) {
+      showProposalPopup(proposalChooser);
     }
     else {
       hideProposalPopup();
@@ -371,7 +375,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     // end notify
   }
 
-  private void showProposalPopup(final IContentAssistFieldProposalForm form) {
+  private void showProposalPopup(final IProposalChooser proposalChooser) {
     setInputDirty(true);
 
     // check is needed, because for inline editing tables, the swing field might be already disposed
@@ -392,7 +396,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
            * Unregister proposal form from UI
            * If not, accessing the same smartfield will not open the proposal form again
            */
-          getScoutObject().getUIFacade().unregisterProposalFormFromUI(form);
+          getScoutObject().getUIFacade().closeProposalFromUI();
         }
       }, 0);
       return;
@@ -427,8 +431,27 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
       }
     });
     //
+
     m_proposalPopup = new SwingScoutDropDownPopup(getSwingEnvironment(), getSwingTextField(), getSwingTextField());
-    getSwingEnvironment().createForm(m_proposalPopup, form);
+    attachPopupListener();
+    Object proposalModel = proposalChooser.getModel();
+
+    if (proposalModel instanceof ITree) {
+      ISwingScoutTree tree = getSwingEnvironment().createTree((ITree) proposalModel);
+      tree.createField((ITree) proposalModel, getSwingEnvironment());
+      tree.connectToScout();
+      m_proposalPopup.getSwingContentPane().add(tree.getSwingContainer());
+    }
+    else if (proposalModel instanceof ITable) {
+      ISwingScoutTable table = getSwingEnvironment().createTable((ITable) proposalModel);
+      table.createField((ITable) proposalModel, getSwingEnvironment());
+      table.connectToScout();
+      m_proposalPopup.getSwingContentPane().add(table.getSwingContainer());
+    }
+    else {
+      throw new IllegalArgumentException();
+    }
+
     m_proposalPopup.makeNonFocusable();
     // adjust size of popup every time the table/tree changes in the model
     final JTableEx proposalTable = SwingUtility.findChildComponent(m_proposalPopup.getSwingContentPane(), JTableEx.class);
@@ -459,25 +482,21 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     m_proposalPopup.getSwingWindow().setSize(new Dimension(getSwingTextField().getWidth(), getScoutObject().getProposalFormHeight()));
     if (proposalTree != null || proposalTable != null) {
       //add a listener whenever the form changes
-      form.addFormListener(
-          new FormListener() {
-            @Override
-            public void formChanged(FormEvent e) throws ProcessingException {
-              switch (e.getType()) {
-                case FormEvent.TYPE_STRUCTURE_CHANGED: {
-                  Runnable t = new Runnable() {
-                    @Override
-                    public void run() {
-                      optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
-                    }
-                  };
-                  getSwingEnvironment().invokeSwingLater(t);
-                  break;
-                }
+      proposalChooser.addPropertyChangeListener(new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+          if (IProposalChooser.SWING_STRUCTURE_CHANGED.equals(evt.getPropertyName())) {
+            Runnable t = new Runnable() {
+              @Override
+              public void run() {
+                optimizePopupSize(m_proposalPopup, proposalTable, proposalTree);
               }
-            }
+            };
+            getSwingEnvironment().invokeSwingLater(t);
+
           }
-          );
+        }
+      });
       //enqueue a later swing job since there may be waiting swing tasks in the queue that change the table
       SwingUtilities.invokeLater(new Runnable() {
         @Override
@@ -491,6 +510,37 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
       }
     }
     m_proposalPopup.openView();
+  }
+
+  // Workaround to make Swing work without proposal form
+  private class P_SwingScoutViewListener implements SwingScoutViewListener {
+
+    @Override
+    public void viewChanged(SwingScoutViewEvent e) {
+      switch (e.getType()) {
+        case SwingScoutViewEvent.TYPE_CLOSED: {
+          // notify Scout
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              getScoutObject().getUIFacade().closeProposalFromUI();
+            }
+          };
+          getSwingEnvironment().invokeScoutLater(t, 0);
+          break;
+        }
+      }
+    }
+  }
+
+  private void attachPopupListener() {
+    m_viewListener = new P_SwingScoutViewListener();
+    m_proposalPopup.addSwingScoutViewListener(m_viewListener);
+  }
+
+  private void detachPopupListener() {
+    m_proposalPopup.removeSwingScoutViewListener(m_viewListener);
+    m_viewListener = null;
   }
 
   private void optimizePopupSize(SwingScoutPopup popup, JTableEx proposalTable, JTreeEx proposalTree) {
@@ -549,6 +599,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     getSwingTextField().getActionMap().remove("escape");
     if (m_proposalPopup != null) {
       m_proposalPopup.closeView();
+      detachPopupListener();
       m_proposalPopup = null;
     }
   }
@@ -649,8 +700,8 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     if (name.equals(IContentAssistField.PROP_ICON_ID)) {
       setIconIdFromScout((String) newValue);
     }
-    else if (name.equals(IContentAssistField.PROP_PROPOSAL_FORM)) {
-      setProposalFormFromScout((IContentAssistFieldProposalForm) newValue);
+    else if (name.equals(IContentAssistField.PROP_PROPOSAL_CHOOSER)) {
+      setProposalChooserFromScout((IProposalChooser) newValue);
     }
   }
 

@@ -32,10 +32,8 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  */
 public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALUE> {
 
-  /**
-   * {@link IContentAssistFieldProposalForm}
-   */
-  String PROP_PROPOSAL_FORM = "proposalForm";
+  String PROP_PROPOSAL_CHOOSER = "proposalChooser";
+
   /**
    * {@link String}
    */
@@ -51,16 +49,16 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
 
   void removeSmartFieldListener(ContentAssistFieldListener listener);
 
-  IContentAssistFieldProposalForm<LOOKUP_KEY> getProposalForm();
+  IProposalChooser<?, LOOKUP_KEY> getProposalChooser();
 
-  IContentAssistFieldProposalFormProvider<LOOKUP_KEY> getProposalFormProvider();
+  IProposalChooserProvider<LOOKUP_KEY> getProposalChooserProvider();
 
-  void setProposalFormProvider(IContentAssistFieldProposalFormProvider<LOOKUP_KEY> provider);
+  void setProposalChooserProvider(IProposalChooserProvider<LOOKUP_KEY> provider);
 
   /**
    * true: inactive rows are display and can be also be parsed using the UI
    * facade according to {@link #getActiveFilter()} false: inactive rows are
-   * only display when the smart field valud is set by the model. The UI facade
+   * only display when the smart field valid is set by the model. The UI facade
    * cannot choose such a value.
    */
   boolean isActiveFilterEnabled();
@@ -282,5 +280,7 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    * @return
    */
   Class<? extends IContentAssistFieldTable<VALUE>> getContentAssistFieldTableClass();
+
+  void acceptProposal() throws ProcessingException;
 
 }

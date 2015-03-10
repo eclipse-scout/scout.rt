@@ -49,8 +49,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IContentA
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.form.FormEvent;
-import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
@@ -73,6 +71,15 @@ import org.eclipse.scout.service.SERVICES;
  */
 @ScoutSdkIgnore
 public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends AbstractValueField<VALUE> implements IContentAssistField<VALUE, LOOKUP_KEY> {
+
+  // FIXME AWE: (content-assist) filter analog ListBox implementieren - Diskussion mit Hannes/Chris abwarten - danach überlegen ob wir
+  // die filterBox immer mitschicken wollen (= mehr daten bei jedem request) oder ob wir die filterBox nur mitschicken, wenn sie zu
+  // Beginn visible ist oder ob wir den filter neu hartkodiert im UI programmieren wollen (ohne model), dies würde den traffic wieder
+  // kleiner machen.
+
+  // FIXME AWE: (content-assist) ausprobieren - anstatt model für proposal zu erzeugen und wieder zu disposen, model einfach behalten
+  // danach werden nur noch delete/insertRows events gesendet
+
   public final ILookupRow<LOOKUP_KEY> EMPTY_LOOKUP_ROW = new LookupRow<LOOKUP_KEY>(null, "", null, null, null, null, null, true);
 
   private final EventListenerList m_listenerList = new EventListenerList();
@@ -81,9 +88,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   private ILookupCall<LOOKUP_KEY> m_lookupCall;
 
   // cached lookup row
-  private P_ProposalFormListener m_proposalFormListener;
-  private IContentAssistFieldProposalFormProvider<LOOKUP_KEY> m_proposalFormProvider;
   private IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> m_lookupRowFetcher;
+  private IProposalChooserProvider<LOOKUP_KEY> m_proposalChooserProvider;
   private int m_maxRowCount;
   private String m_browseNewText;
   private boolean m_installingRowContext = false;
@@ -127,7 +133,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    * Configures whether the field may display multiple lines of text.<br>
    * <p>
    * Subclasses can override this method. Default is false.
-   * 
+   *
    * @since 5.1
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -418,7 +424,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     setMultilineText(getConfiguredMultilineText());
     setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
     setBrowseNewText(getConfiguredBrowseNewText());
-    setProposalFormProvider(createProposalFormProvider());
+    setProposalChooserProvider(createProposalChooserProvider());
     setProposalFormHeight(getConfiguredProposalFormHeight());
     // content assist table
     Class<? extends IContentAssistFieldTable<VALUE>> contentAssistTableClazz = getConfiguredContentAssistTable();
@@ -668,68 +674,15 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public IContentAssistFieldProposalForm<LOOKUP_KEY> getProposalForm() {
-    return (IContentAssistFieldProposalForm<LOOKUP_KEY>) propertySupport.getProperty(PROP_PROPOSAL_FORM);
-  }
-
-  protected void registerProposalFormInternal(IContentAssistFieldProposalForm<LOOKUP_KEY> form) {
-    IContentAssistFieldProposalForm oldForm = getProposalForm();
-    if (oldForm == form) {
-      return;
-    }
-    // old form
-    if (oldForm != null) {
-      if (m_proposalFormListener != null) {
-        oldForm.removeFormListener(m_proposalFormListener);
-        m_proposalFormListener = null;
-      }
-      try {
-        oldForm.doClose();
-      }
-      catch (Throwable t) {
-        // nop
-      }
-    }
-    // new form
-    if (form != null) {
-      if (m_proposalFormListener == null) {
-        m_proposalFormListener = new P_ProposalFormListener();
-      }
-      form.addFormListener(m_proposalFormListener);
-    }
-    propertySupport.setProperty(PROP_PROPOSAL_FORM, form);
-  }
-
-  protected void unregisterProposalFormInternal(IContentAssistFieldProposalForm form) {
-    if (form != null) {
-      IContentAssistFieldProposalForm oldForm = getProposalForm();
-      if (oldForm == form) {
-        propertySupport.setProperty(PROP_PROPOSAL_FORM, null);
-      }
-      if (form.isFormOpen()) {
-        try {
-          form.doClose();
-        }
-        catch (ProcessingException e) {
-          // nop
-        }
-      }
-    }
+  public IProposalChooserProvider<LOOKUP_KEY> getProposalChooserProvider() {
+    return m_proposalChooserProvider;
   }
 
   @Override
-  public IContentAssistFieldProposalFormProvider<LOOKUP_KEY> getProposalFormProvider() {
-    return m_proposalFormProvider;
+  public void setProposalChooserProvider(IProposalChooserProvider<LOOKUP_KEY> provider) {
+    m_proposalChooserProvider = provider;
   }
-
-  @Override
-  public void setProposalFormProvider(IContentAssistFieldProposalFormProvider<LOOKUP_KEY> provider) {
-    m_proposalFormProvider = provider;
-  }
-
-  protected abstract IContentAssistFieldProposalForm<LOOKUP_KEY> createProposalForm() throws ProcessingException;
 
   public IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> getLookupRowFetcher() {
     return m_lookupRowFetcher;
@@ -737,28 +690,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   public void setLookupRowFetcher(IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> fetcher) {
     m_lookupRowFetcher = fetcher;
-  }
-
-  /**
-   * Returns the content assist field's proposal form with the use of a {@link IContentAssistFieldProposalFormProvider}.
-   * <p>
-   * To provide a custom proposal form create a custom proposal form provider and inject it with
-   * {@link #createProposalFormProvider()} or {@link #setProposalFormProvider()}.
-   * </p>
-   *
-   * @return {@link#ISmartFieldProposalForm}
-   * @throws ProcessingException
-   */
-  protected IContentAssistFieldProposalForm<LOOKUP_KEY> createProposalForm(boolean allowCustomText) throws ProcessingException {
-    IContentAssistFieldProposalFormProvider<LOOKUP_KEY> proposalFormProvider = getProposalFormProvider();
-    if (proposalFormProvider == null) {
-      return null;
-    }
-    return proposalFormProvider.createProposalForm(this, allowCustomText);
-  }
-
-  protected IContentAssistFieldProposalFormProvider<LOOKUP_KEY> createProposalFormProvider() {
-    return new DefaultContentAssistFieldProposalFormProvider<LOOKUP_KEY>();
   }
 
   /**
@@ -880,16 +811,46 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return super.getFont();
   }
 
+  protected abstract IProposalChooser<?, LOOKUP_KEY> createProposalChooser() throws ProcessingException;
+
+  /**
+   * Returns the content assist field's proposal chooser with the use of a {@link IProposalChooserProvider}.
+   * <p>
+   * To provide a custom proposal chooser create a custom proposal chooser provider and inject it with
+   * {@link #createProposalChooserProvider()} or {@link #setProposalChooserProvider()}.
+   * </p>
+   *
+   * @return {@link#IProposalChooser}
+   * @throws ProcessingException
+   */
+  protected IProposalChooser<?, LOOKUP_KEY> createProposalChooser(boolean allowCustomText) throws ProcessingException {
+    IProposalChooserProvider<LOOKUP_KEY> proposalChooserProvider = getProposalChooserProvider();
+    if (proposalChooserProvider == null) {
+      return null;
+    }
+    return proposalChooserProvider.createProposalChooser(this, allowCustomText);
+  }
+
+  protected IProposalChooserProvider<LOOKUP_KEY> createProposalChooserProvider() {
+    return new DefaultProposalChooserProvider<LOOKUP_KEY>();
+  }
+
   @Override
   public void doSearch(boolean selectCurrentValue, boolean synchronous) {
     doSearch(getLookupRowFetcher().getLastSearchText(), selectCurrentValue, synchronous);
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public IProposalChooser<?, LOOKUP_KEY> getProposalChooser() {
+    return (IProposalChooser<?, LOOKUP_KEY>) propertySupport.getProperty(PROP_PROPOSAL_CHOOSER);
+  }
+
   @Override
   public void doSearch(String searchText, boolean selectCurrentValue, boolean synchronous) {
-    IContentAssistFieldProposalForm<LOOKUP_KEY> proposalForm = getProposalForm();
-    if (proposalForm != null) {
-      proposalForm.setTablePopulateStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.WARNING));
+    IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
+    if (proposalChooser != null) {
+      proposalChooser.setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.WARNING));
     }
     getLookupRowFetcher().update(searchText, selectCurrentValue, synchronous);
   }
@@ -1232,7 +1193,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return rows;
   }
 
-  protected abstract void handleProposalFormClosed(IContentAssistFieldProposalForm<LOOKUP_KEY> proposalForm) throws ProcessingException;
+  protected abstract void handleProposalChooserClosed() throws ProcessingException;
 
   /**
    * @param newValue
@@ -1254,20 +1215,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   // end private class
 
-  private class P_ProposalFormListener implements FormListener {
-    @SuppressWarnings("unchecked")
-    @Override
-    public void formChanged(FormEvent e) throws ProcessingException {
-      switch (e.getType()) {
-        case FormEvent.TYPE_CLOSED: {
-          handleProposalFormClosed((IContentAssistFieldProposalForm<LOOKUP_KEY>) e.getForm());
-          break;
-        }
-      }
-    }
-
-  }// end private class
-
   private class P_LookupRowFetcherPropertyListener implements PropertyChangeListener {
     @SuppressWarnings("unchecked")
     @Override
@@ -1276,7 +1223,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
         handleFetchResult((IContentAssistFieldDataFetchResult<LOOKUP_KEY>) evt.getNewValue());
       }
     }
-
   }
 
   protected static class LocalContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> extends LocalValueFieldExtension<VALUE, OWNER> implements IContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER> {
@@ -1411,4 +1357,24 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     ContentAssistFieldPrepareKeyLookupChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldPrepareKeyLookupChain<VALUE, LOOKUP_KEY>(extensions);
     chain.execPrepareKeyLookup(call, key);
   }
+
+  protected IProposalChooser<?, LOOKUP_KEY> registerProposalChooserInternal() throws ProcessingException {
+    IProposalChooser<?, LOOKUP_KEY> proposalChooser = createProposalChooser();
+    propertySupport.setProperty(PROP_PROPOSAL_CHOOSER, proposalChooser);
+    return proposalChooser;
+  }
+
+  protected void unregisterProposalChooserInternal() {
+    if (getProposalChooser() != null) {
+      getProposalChooser().dispose();
+      propertySupport.setProperty(PROP_PROPOSAL_CHOOSER, null);
+    }
+  }
+
+  @Override
+  public void acceptProposal() throws ProcessingException {
+    handleProposalChooserClosed();
+    unregisterProposalChooserInternal();
+  }
+
 }
