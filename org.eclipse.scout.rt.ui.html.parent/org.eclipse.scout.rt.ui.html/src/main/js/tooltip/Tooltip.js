@@ -14,9 +14,8 @@ scout.Tooltip = function(options) {
 };
 
 scout.Tooltip.prototype.render = function($parent) {
-  if (!$parent) {
-    $parent = $('body');
-  }
+  // Auto-detect parent
+  $parent = $parent || (this.$origin && this.$origin.closest('.desktop,.glasspane')) || $('body');
 
   this.$container = $.makeDiv('tooltip')
     .hide()
@@ -104,10 +103,13 @@ scout.Tooltip.prototype.remove = function() {
 };
 
 scout.Tooltip.prototype._onTooltipClicked = function(event) {
-  //Only remove the tooltip if the click is outside of the container
-  if (!this.$container.children().is($(event.target))) {
-    this.remove();
+  // Only remove the tooltip if the click is outside of the container or the $origin (= status icon)
+  var $target = $(event.target);
+  if ($target[0] === this.$container[0] || this.$container.children().is($target) ||
+      $target[0] === this.$origin[0] || this.$origin.children().is($target)) {
+    return;
   }
+  this.remove();
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

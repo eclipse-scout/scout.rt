@@ -89,6 +89,7 @@ scout.FormField.prototype._renderProperties = function() {
 scout.FormField.prototype._remove = function() {
   scout.FormField.parent.prototype._remove.call(this);
   this.removeField();
+  this._hideStatusMessage();
 };
 
 scout.FormField.prototype._renderMandatory = function(mandatory) {
@@ -195,32 +196,36 @@ scout.FormField.prototype._renderGridData = function(gridData) {
 };
 
 scout.FormField.prototype._onStatusClick = function() {
-  this._showStatusMessage();
+  // Toggle tooltip
+  if (this.tooltip && this.tooltip.rendered) {
+    this._hideStatusMessage();
+  }
+  else {
+    var opts = {};
+    if (this.$container.hasClass('has-error')) {
+      opts.autoRemove = false;
+    }
+    this._showStatusMessage(opts);
+  }
 };
 
 scout.FormField.prototype._showStatusMessage = function(options) {
-  var opts, text, form, $formContainer;
   if (this.tooltip && this.tooltip.rendered) {
     return;
   }
 
+  var text = this.tooltipText;
   if (this.errorStatusUi) {
     text = this.errorStatusUi.message;
   } else if (this.errorStatus) {
     text = this.errorStatus.message;
-  } else {
-    text = this.tooltipText;
   }
 
-  form = this.getForm();
-  if (form) {
-    $formContainer = form.$container;
-  }
-
-  opts = {
+  var form = this.getForm();
+  var opts = {
     text: text,
     $origin: this.$status,
-    $context: $formContainer
+    $context: (form && form.$container)
   };
   $.extend(opts, options);
   this.tooltip = new scout.Tooltip(opts);
@@ -235,17 +240,10 @@ scout.FormField.prototype.getForm = function() {
   return parent;
 };
 
-scout.FormField.prototype._showStatusMessageOnError = function() {
-  if (this.$container.hasClass('has-error')) {
-    this._showStatusMessage({
-      autoRemove: false
-    });
-  }
-};
-
 scout.FormField.prototype._hideStatusMessage = function() {
   if (this.tooltip) {
     this.tooltip.remove();
+    this.tooltip = undefined;
   }
 };
 
