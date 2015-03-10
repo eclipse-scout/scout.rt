@@ -54,3 +54,7 @@ Try these to switch between fonts:
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.make-bold {
+  font-weight: bold;
+}
