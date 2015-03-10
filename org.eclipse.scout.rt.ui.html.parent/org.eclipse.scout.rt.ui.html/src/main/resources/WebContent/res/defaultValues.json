@@ -12,6 +12,7 @@
     "FormField": {
       "enabled": true,
       "visible": true,
+      "keyStrokes": [],
       "labelVisible": true,
       "labelPosition": 0,
       "mandatory": false,
@@ -92,6 +93,7 @@
       "headerVisible": true,
       "keyStroks": [],
       "keyboardNavigation": true,
+      "menus": [],
       "multiCheck": true,
       "multiSelect": true,
       "multilineText": false,
@@ -99,7 +101,8 @@
       "rows": [],
       "scrollToSelection": false,
       "selectedRowIds": [],
-      "tableStatusVisible": true
+      "tableControls": [],
+      "tableStatusVisible": false
     },
     "Desktop": {
       "dialogs": [],
@@ -115,6 +118,12 @@
       "modal": false
     },
     "Tree": {
+      "autoCheckChildren": false,
+      "checkable": false,
+      "enabled": true,
+      "menus": [],
+      "multiCheck": true,
+      "nodes": [],
       "selectedNodeIds": [],
       "filterEnabled": false
     },
@@ -123,6 +132,10 @@
     "Cell": {
       "horizontalAlignment": -1,
       "editable": false
+    },
+    "TableRow": {
+      "checked": false,
+      "enabled": true
     },
     "TableColumn": {
       "horizontalAlignment": -1,
@@ -135,6 +148,8 @@
       "fixedWidth": false
     },
     "TreeNode": {
+      "checked": false,
+      "enabled": true,
       "expanded": false,
       "leaf": false,
       "childNodes": []

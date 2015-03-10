@@ -443,6 +443,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     putProperty(jsonRow, "cells", jsonCells);
     putProperty(jsonRow, "checked", row.isChecked());
     putProperty(jsonRow, "enabled", row.isEnabled());
+    JsonObjectUtility.filterDefaultValues(jsonRow, "TableRow");
     return jsonRow;
   }
 

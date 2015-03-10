@@ -38,12 +38,15 @@ scout.Table.prototype.init = function(model, session) {
 
   this._initColumns();
   for (var i = 0; i < this.rows.length; i++) {
-    var row = this.rows[i];
-    // Unwrap data
-    this._unwrapCells(row.cells);
-    scout.defaultValues.applyTo(row.cells, 'Cell');
-    this.rowsMap[row.id] = row;
+    this._initRow(this.rows[i]);
   }
+};
+
+scout.Table.prototype._initRow = function(row) {
+  scout.defaultValues.applyTo(row, 'TableRow');
+  this._unwrapCells(row.cells);
+  scout.defaultValues.applyTo(row.cells, 'Cell');
+  this.rowsMap[row.id] = row;
 };
 
 scout.Table.prototype._initColumns = function() {
@@ -932,18 +935,15 @@ scout.Table.prototype._onRowsUpdated = function(rows) {
   // Update model
   for (var i = 0; i < rows.length; i++) {
     var updatedRow = rows[i];
-    // Unwrap data
-    this._unwrapCells(updatedRow.cells);
-    scout.defaultValues.applyTo(updatedRow.cells, 'Cell');
 
-    // Replace old row
     var oldRow = this.rowsMap[updatedRow.id];
     if (!oldRow) {
       throw new Error('Update event received for non existing row. RowId: ' + updatedRow.id);
     }
 
+    // Replace old row
+    this._initRow(updatedRow);
     scout.arrays.replace(this.rows, oldRow, updatedRow);
-    this.rowsMap[updatedRow.id] = updatedRow;
 
     // Replace old $row
     if (this.rendered && oldRow.$row) {
@@ -996,12 +996,9 @@ scout.Table.prototype._onRowsInserted = function(rows) {
   // Update model
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
-    // Unwrap data
-    this._unwrapCells(row.cells);
-    scout.defaultValues.applyTo(row.cells, 'Cell');
+    this._initRow(row);
     // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
     this.rows.push(row);
-    this.rowsMap[row.id] = row;
   }
 
   // Update HTML
