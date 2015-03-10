@@ -5,18 +5,12 @@ scout.AbstractSmartField = function() {
   this.options;
   this._selectedOption = -1;
   this._oldVal;
-  this._lookupStrategy;
   this._addAdapterProperties(['proposalChooser']);
 };
 scout.inherits(scout.AbstractSmartField, scout.ValueField);
 
 scout.AbstractSmartField.prototype.init = function(model, session) {
   scout.AbstractSmartField.parent.prototype.init.call(this, model, session);
-
-  // Install lookup strategy
-  this._lookupStrategy = (this.lookupStrategy === 'remote' ?
-    new scout.RemoteLookupStrategy(this) :
-    new scout.CachedLookupStrategy(this));
 };
 
 scout.AbstractSmartField.prototype._render = function($parent) {
@@ -40,19 +34,13 @@ scout.AbstractSmartField.prototype._renderProperties = function() {
 
 
 scout.AbstractSmartField.prototype._renderProposalChooser = function() {
-  $.log.info('_renderProposalChooser proposalChooser=' + this.proposalChooser);
-
   if (!this._$popup) {
     // We always expect the popup to be open at this point
     return;
   }
-
   // FIXME AWE: können wir besser auf diesen PC reagieren (spezifisches event?)
+  $.log.info('_renderProposalChooser proposalChooser=' + this.proposalChooser);
   if (this.proposalChooser) {
-
-    // FIXME AWE: die Table muss ein invalidateTree auf ihr layout machen, wenn rows
-    // geändert werden. Das muss dann dazu führen, das Popup resized wird. Dazu müsste
-    // es wohl auch selber ein layout haben.
     this.proposalChooser.render(this._$popup);
     this._resizePopup();
   }
@@ -64,19 +52,6 @@ scout.AbstractSmartField.prototype._renderProposalChooser = function() {
 scout.AbstractSmartField.prototype._removeProposalChooser = function() {
   $.log.info('_removeProposalChooser proposalChooser=' + this.proposalChooser);
   this._closePopup(false);
-};
-
-/**
- * @param visible [optional] when true, returns only visible options from the DOM, otherwise return all options regardless of their visible state.
- * Note: we cannot simply select all children, because the scrollbar DIV is also a child.
- */
-scout.AbstractSmartField.prototype._get$Options = function(visible) {
-  var filter = visible ? 'p:visible' : 'p';
-  return this._$optionsDiv.children(filter);
-};
-
-scout.AbstractSmartField.prototype._get$OptionsDiv = function() {
-  return this._$popup.children('.options');
 };
 
 scout.AbstractSmartField.prototype._updateScrollbar = function() {
@@ -103,16 +78,11 @@ scout.AbstractSmartField.prototype._onIconClick = function(event) {
   }
 };
 
-scout.AbstractSmartField.prototype._selectedOptionData = function() {
-  var option = this._get$Options(true).get(this._selectedOption);
-  return $(option).data('option');
-};
-
 // navigate in options
 scout.AbstractSmartField.prototype._onKeyDown = function(e) {
   if (e.which === scout.keys.TAB) {
     if (this._selectedOption > -1) {
-      var value = this._selectedOptionData();
+      // FIXME AWE: (smart-field) apply selected proposal on TAB
       this._applyOption(value);
       this._closePopup();
     }
@@ -168,7 +138,7 @@ scout.AbstractSmartField.prototype._onKeyUp = function(e) {
   // enter
   if (e.which === scout.keys.ENTER) {
     if (this._selectedOption > -1) {
-      var value = this._selectedOptionData();
+      // FIXME AWE: (smart-field) apply selected proposal on ENTER
       this._applyOption(value);
       this._closePopup();
     }
@@ -209,48 +179,13 @@ scout.AbstractSmartField.prototype._filterOptions = function() {
     return;
   }
   this._selectedOption = -1;
-//  this.session.send(this.id, 'displayTextChanged', {displayText: val});
-  this.session.send(this.id, 'requestProposal', {
+  this.session.send(this.id, 'openProposal', {
     searchText: this._searchText(),
-    browseAll: false});
-
+    selectCurrentValue: false});
 
   this._oldVal = val;
   $.log.debug('updated oldVal=' + this._oldVal);
-//  this._updateScrollbar();
 };
-
-scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
-  // TODO BSH Smartfield | Diese Logik mit derjenigen in LookupStrategy.js zusammenlegen?
-  // TODO BSH Smartfield | formRowHeight stimmt nicht (css hat keine Hoehe). Insbesondere nicht mit multiline Smartfields!
-  var fieldBounds = this._getInputBounds(),
-    optionHeight = scout.HtmlEnvironment.formRowHeight,
-    popupHeight = (numOptions + 1) * optionHeight,
-    popupBounds = new scout.Rectangle(fieldBounds.x, fieldBounds.y + fieldBounds.height, fieldBounds.width, popupHeight);
-
-  this._$popup = $.makeDiv('smart-field-popup')
-    .on('mousedown', this._onPopupMousedown.bind(this))
-    .append($.makeDiv('options'))
-    .append($.makeDiv('status'))
-    .appendTo($('body'));
-  scout.graphics.setBounds(this._$popup, popupBounds);
-
-  // layout options and status-div
-  this._$optionsDiv = this._get$OptionsDiv();
-  scout.scrollbars.install(this._$optionsDiv, {
-    invertColors: true
-  });
-  scout.graphics.setSize(this._$optionsDiv, fieldBounds.width, popupHeight - optionHeight);
-  this._setStatusText(vararg);
-  scout.scrollbars.attachScrollHandlers(this.$field, this._closePopup.bind(this));
-};
-
-//scout.AbstractSmartField.prototype._resizePopup = function(numOptions) {
-//  var optionHeight = scout.HtmlEnvironment.formRowHeight,
-//    popupHeight = (numOptions + 1) * optionHeight;
-//  this._$popup.cssHeight(popupHeight);
-//  this._updateScrollbar();
-//};
 
 scout.AbstractSmartField.prototype._onPopupMousedown = function(event) {
   // Make sure field blur won't be triggered -> pop-up must not be closed on mouse down
@@ -263,46 +198,6 @@ scout.AbstractSmartField.prototype._onPopupMousedown = function(event) {
  */
 scout.AbstractSmartField.prototype._getInputBounds = function() {
   return scout.graphics.offsetBounds(this.$field);
-};
-
-/**
- * Adds the given options to the DOM, tries to select the selected option by comparing to the value of the text-field.
- */
-scout.AbstractSmartField.prototype._renderOptions = function(options) {
-  var i, option, htmlOption, selectedPos,
-    val = this.$field.val();
-
-  for (i = 0; i < options.length; i++) {
-    option = options[i];
-    htmlOption = scout.strings.nl2br(option);
-    $('<p>')
-      .on('click', this._onOptionClick.bind(this))
-      .appendTo(this._$optionsDiv)
-      .data('option', option) // stores the original text as received from the server
-      .html(htmlOption);
-    if (option === val) {
-      selectedPos = i;
-    }
-  }
-  if (selectedPos !== undefined) {
-    this._selectOption(this._get$Options(true), selectedPos);
-  }
-  this._updateScrollbar();
-};
-
-/**
- * Empties the options DIV. Note: since we must not remove the scrollbar DIV, we must explicitly select P elements (=options).
- */
-scout.AbstractSmartField.prototype._emptyOptions = function() {
-  this._$optionsDiv.children('p').remove();
-  this._updateScrollbar();
-};
-
-scout.AbstractSmartField.prototype._onOptionClick = function(e) {
-  var selectedOption = $(e.target).data('option');
-  $.log.info('option selected ' + selectedOption);
-  this._applyOption(selectedOption);
-  this._closePopup();
 };
 
 scout.AbstractSmartField.prototype._onFieldBlur = function() {
@@ -342,7 +237,6 @@ scout.AbstractSmartField.prototype._setStatusText = function(vararg) {
   this._$popup.children('.status').text(text);
 };
 
-
 scout.AbstractSmartField.prototype._searchText = function() {
   var displayText = this.$field.val();
   return scout.strings.hasText(displayText) ? displayText : '*';
@@ -354,12 +248,11 @@ scout.AbstractSmartField.prototype._openPopup = function() {
   if (this._$popup) {
     return false;
   } else {
-
-    $.log.info("_openPopup");
-
-    this.session.send(this.id, 'requestProposal', {
-      searchText: this._searchText(),
-      browseAll: true});
+    // FIXME AWE: (smart-field) compare with Swing client when searchText is '*' and when it's == the
+    // display text. Asteriks means "browse all".
+    this.session.send(this.id, 'openProposal', {
+      searchText: '*', // this._searchText(),
+      selectCurrentValue: false});
 
     this._$popup = $.makeDiv('smart-field-popup')
       .on('mousedown', this._onPopupMousedown.bind(this))
@@ -376,18 +269,6 @@ scout.AbstractSmartField.prototype._openPopup = function() {
       150));
 
     return true;
-  }
-};
-
-scout.AbstractSmartField.prototype._onOptionsLoaded = function(options) {
-  this._lookupStrategy.onOptionsLoaded(options);
-};
-
-scout.AbstractSmartField.prototype.onModelAction = function(event) {
-  if (event.type === 'optionsLoaded') {
-    this._onOptionsLoaded(event.options);
-  } else {
-    scout.AbstractSmartField.parent.prototype.onModelAction.call(this, event);
   }
 };
 

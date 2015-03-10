@@ -137,7 +137,6 @@ __include("form/fields/radiobutton/RadioButtonLayout.js");
 __include("form/fields/richtextfield/RichTextField.js");
 __include("form/fields/sequencebox/SequenceBox.js");
 __include("form/fields/smartfield/AbstractSmartField.js");
-__include("form/fields/smartfield/LookupStrategy.js");
 __include("form/fields/smartfield/PopupLayout.js");
 __include("form/fields/smartfield/ProposalChooser.js");
 __include("form/fields/smartfield/ProposalChooserLayout.js");
