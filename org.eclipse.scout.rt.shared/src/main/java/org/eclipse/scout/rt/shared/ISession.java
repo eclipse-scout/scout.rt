@@ -51,12 +51,12 @@ public interface ISession {
   void setData(String key, Object value);
 
   /**
-   * The {@link IServiceTunnel} used by {@link IClientSession#getServiceTunnel()} checks for the Subject
-   * under which the session is running and creates a WSSE security element.
-   * <p>
    * Consumers can query for the {@link Subject} of a {@link IClientSession}
    * <p>
-   * Providers can set the {@link Subject} associated with a {@link IClientSession}
+   * The {@link IServiceTunnel} used by {@link IClientSession#getServiceTunnel()} checks for the Subject under which the
+   * session is running and creates a WSSE security element.
+   * <p>
+   * The subject is set when this object is created from {@link Subject#getSubject(java.security.AccessControlContext)}
    */
   Subject getSubject();
 

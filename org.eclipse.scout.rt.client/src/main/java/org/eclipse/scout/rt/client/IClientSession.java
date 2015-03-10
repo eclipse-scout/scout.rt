@@ -64,7 +64,7 @@ public interface IClientSession extends ISession {
   Throwable getLoadError();
 
   /**
-   * Called before {@link #startSession(Bundle)} in order to prepare the state used to start the session with some
+   * Called before {@link #startSession()} in order to prepare the state used to start the session with some
    * custom and runtime options
    *
    * @since 4.2

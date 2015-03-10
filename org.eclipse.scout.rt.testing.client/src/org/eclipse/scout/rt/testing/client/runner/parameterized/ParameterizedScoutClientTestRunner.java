@@ -16,6 +16,9 @@ import org.eclipse.scout.rt.testing.shared.runner.parameterized.IScoutTestParame
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedFrameworkMethod;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedTestRunnerExtension;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.testing.platform.RunWithSubject;
+import org.eclipse.scout.rt.testing.shared.RunWithSession;
 import org.junit.runner.Description;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;

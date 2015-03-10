@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client;
 
 import java.beans.PropertyChangeListener;
+import java.security.AccessController;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -100,6 +101,8 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     m_isStopping = false;
     m_sharedVariableMap = new SharedVariableMap();
     m_locale = NlsLocale.get();
+    m_userAgent = UserAgent.get();
+    m_subject = Subject.getSubject(AccessController.getContext());
     m_objectExtensions = new ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>>(this);
     if (autoInitConfig) {
       interceptInitConfig();
@@ -164,7 +167,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   @Override
   public final void setLocale(Locale locale) {
     NlsLocale.set(locale);
-
     Locale oldLocale = m_locale;
     m_locale = locale;
     if (!locale.equals(oldLocale)) {
