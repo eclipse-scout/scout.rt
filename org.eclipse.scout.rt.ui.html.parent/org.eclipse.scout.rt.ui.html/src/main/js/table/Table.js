@@ -546,7 +546,7 @@ scout.Table.prototype._installRows = function($rows) {
     }
 
     function showMenuPopup() {
-      var menuItems = that._filterMenus($selectedRows, '', true);
+      var menuItems = that._filterMenus('', true);
       if (menuItems.length > 0) {
         var popup = new scout.Popup();
         popup.$origin = this.$data;
@@ -592,26 +592,22 @@ scout.Table.prototype._findHyperLink = function(event) {
   return null;
 };
 
-scout.Table.prototype._filterMenus = function($selectedRows, allowedTypes, onlyVisible) {
+scout.Table.prototype._filterMenus = function(allowedTypes, onlyVisible) {
   allowedTypes = allowedTypes || [];
   if (!this.headerVisible) {
     //if no header is visible header menues should not be displayed
     delete allowedTypes[allowedTypes.indexOf('Table.Header')];
   }
-  if ($selectedRows && $selectedRows.length === 1) {
+  if (this.selectedRowIds.length === 1) {
     allowedTypes.push('Table.SingleSelection');
-  } else if ($selectedRows && $selectedRows.length > 1) {
+  } else if (this.selectedRowIds.length > 1) {
     allowedTypes.push('Table.MultiSelection');
   }
   return scout.menus.filter(this.menus, allowedTypes, onlyVisible);
 };
 
 scout.Table.prototype._renderMenus = function() {
-  this._renderRowMenus(this.$selectedRows());
-};
-
-scout.Table.prototype._renderRowMenus = function($selectedRows) {
-  var menuItems = this._filterMenus($selectedRows, ['Table.EmptySpace', 'Table.Header']);
+  var menuItems = this._filterMenus(['Table.EmptySpace', 'Table.Header']);
   menuItems = this.staticMenus.concat(menuItems);
   this.menuBar.updateItems(menuItems);
 };
@@ -620,7 +616,6 @@ scout.Table.prototype.onRowsSelected = function($selectedRows) {
   var rowIds = [];
 
   this.triggerRowsSelected($selectedRows);
-  this._renderRowMenus($selectedRows);
 
   if ($selectedRows) {
     $selectedRows.each(function() {
@@ -636,6 +631,7 @@ scout.Table.prototype.onRowsSelected = function($selectedRows) {
       });
     }
   }
+  this._renderMenus();
 };
 
 scout.Table.prototype.onResize = function() {

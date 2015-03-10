@@ -1,6 +1,5 @@
 describe("LayoutValidator", function() {
   var session;
-  var helper;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -32,7 +31,7 @@ describe("LayoutValidator", function() {
 
     it("and validate roots", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
-      var htmlComp = new scout.HtmlComponent($comp, session);
+      new scout.HtmlComponent($comp, session);
 
       var $compChild = $('<div>').appendTo($comp);
       var htmlCompChild = new scout.HtmlComponent($compChild, session);

@@ -25,8 +25,11 @@ scout.MenuBar.prototype.remove = function() {
 };
 
 scout.MenuBar.prototype.updateItems = function(menuItems) {
+  menuItems = scout.arrays.ensure(menuItems);
+
   // stop if menus are the same as before
-  if (scout.arrays.equals(this.menuItems, menuItems)) {
+  // remove separators before comparison, because orderFunc may add new separators (arrays.equals compares by reference (===))
+  if (scout.arrays.equals(this.menuItems.filter(notIsSeparator), menuItems.filter(notIsSeparator))) {
     return;
   }
 
@@ -57,6 +60,10 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
   //  }
 
   this._updateVisibility();
+
+  function notIsSeparator(menu) {
+    return !menu.separator;
+  }
 };
 
 scout.MenuBar.prototype._updateVisibility = function() {
