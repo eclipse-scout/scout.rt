@@ -245,18 +245,18 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     }
 
     @Override
-    public void openProposalFromUI(String newText, boolean selectCurrentValue) {
-      if (newText == null) {
-        newText = BROWSE_ALL_TEXT;
+    public void openProposalFromUI(String searchText, boolean selectCurrentValue) {
+      if (searchText == null) {
+        searchText = BROWSE_ALL_TEXT;
       }
       IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
       if (proposalChooser == null) {
         setActiveFilter(TriState.TRUE);
-        doSearch(newText, selectCurrentValue, false);
+        doSearch(searchText, selectCurrentValue, false);
       }
       else {
-        if (!StringUtility.equalsIgnoreNewLines(getLookupRowFetcher().getLastSearchText(), newText)) {
-          doSearch(newText, false, false);
+        if (!StringUtility.equalsIgnoreNewLines(getLookupRowFetcher().getLastSearchText(), searchText)) {
+          doSearch(searchText, false, false);
         }
       }
     }

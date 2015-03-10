@@ -18,7 +18,7 @@ public interface IContentAssistFieldUIFacade {
    * This may result in a property change {@link IContentAssistField#PROP_PROPOSAL_FORM} see
    * {@link IContentAssistField#getProposalForm()}
    */
-  void openProposalFromUI(String newText, boolean selectCurrentValue);
+  void openProposalFromUI(String searchText, boolean selectCurrentValue);
 
   boolean acceptProposalFromUI();
 

@@ -345,9 +345,9 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     }
 
     @Override
-    public void openProposalFromUI(String newText, boolean selectCurrentValue) {
-      if (newText == null) {
-        newText = BROWSE_ALL_TEXT;
+    public void openProposalFromUI(String searchText, boolean selectCurrentValue) {
+      if (searchText == null) {
+        searchText = BROWSE_ALL_TEXT;
       }
       try {
         IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
@@ -355,11 +355,11 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
           setActiveFilter(TriState.TRUE);
           proposalChooser = registerProposalChooserInternal();
           proposalChooser.dataFetchedDelegate(getLookupRowFetcher().getResult(), getConfiguredBrowseMaxRowCount());
-          doSearch(newText, selectCurrentValue, false);
+          doSearch(searchText, selectCurrentValue, false);
         }
         else {
-          if (!StringUtility.equalsIgnoreNewLines(getLookupRowFetcher().getLastSearchText(), newText)) {
-            doSearch(newText, false, false);
+          if (!StringUtility.equalsIgnoreNewLines(getLookupRowFetcher().getLastSearchText(), searchText)) {
+            doSearch(searchText, false, false);
           }
         }
       }
