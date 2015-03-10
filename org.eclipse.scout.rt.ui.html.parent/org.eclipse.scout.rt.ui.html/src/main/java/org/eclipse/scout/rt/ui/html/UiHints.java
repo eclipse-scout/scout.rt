@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.ui.html;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.Platform;
 
 /**
  * Helper to manage url param hints for the {@link AbstractUiServlet}.
@@ -86,19 +86,19 @@ public final class UiHints {
   }
 
   public static boolean isInspectorHint(HttpServletRequest req) {
-    return calculateHint(req, SESSION_ATTRIBUTE_INSPECTOR_HINT, Platform.inDevelopmentMode());
+    return calculateHint(req, SESSION_ATTRIBUTE_INSPECTOR_HINT, Platform.get().inDevelopmentMode());
   }
 
   public static boolean isCacheHint(HttpServletRequest req) {
-    return calculateHint(req, SESSION_ATTRIBUTE_CACHE_HINT, !Platform.inDevelopmentMode());
+    return calculateHint(req, SESSION_ATTRIBUTE_CACHE_HINT, !Platform.get().inDevelopmentMode());
   }
 
   public static boolean isCompressHint(HttpServletRequest req) {
-    return calculateHint(req, SESSION_ATTRIBUTE_COMPRESS_HINT, !Platform.inDevelopmentMode());
+    return calculateHint(req, SESSION_ATTRIBUTE_COMPRESS_HINT, !Platform.get().inDevelopmentMode());
   }
 
   public static boolean isMinifyHint(HttpServletRequest req) {
-    return calculateHint(req, SESSION_ATTRIBUTE_MINIFY_HINT, !Platform.inDevelopmentMode());
+    return calculateHint(req, SESSION_ATTRIBUTE_MINIFY_HINT, !Platform.get().inDevelopmentMode());
   }
 
   private static boolean calculateHint(HttpServletRequest req, String sessionAttr, boolean defaultValue) {

@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
@@ -75,7 +75,7 @@ public class DefaultValuesFilterService extends AbstractService implements IDefa
 
   protected void ensureLoaded() throws ProcessingException {
     DefaultValuesFilter filter = m_filter;
-    if (filter != null && Platform.inDevelopmentMode()) {
+    if (filter != null && Platform.get().inDevelopmentMode()) {
       long time = System.currentTimeMillis();
       if (time - m_lastCheckForFileUpdate > FILE_UPDATE_CHECK_INTERVAL) {
         m_lastCheckForFileUpdate = time;

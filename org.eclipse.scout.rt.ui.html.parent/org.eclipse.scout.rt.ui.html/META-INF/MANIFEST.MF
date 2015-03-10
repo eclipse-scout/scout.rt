@@ -5,7 +5,6 @@ Bundle-SymbolicName: org.eclipse.scout.rt.ui.html;singleton:=true
 Bundle-Version: 5.1.0.qualifier
 Bundle-Vendor: BSI Business Systems Integration AG
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-ActivationPolicy: lazy
 Import-Package: javax.servlet;version="[2.5.0,3.0.0)",
  javax.servlet.http;version="[2.5.0,3.0.0)",
  org.json
@@ -37,4 +36,3 @@ Export-Package: org.eclipse.scout.rt.ui.html,
  org.eclipse.scout.rt.ui.html.json.tree,
  org.eclipse.scout.rt.ui.html.res,
  org.eclipse.scout.rt.ui.html.script
-Bundle-Activator: org.eclipse.scout.rt.ui.html.Activator

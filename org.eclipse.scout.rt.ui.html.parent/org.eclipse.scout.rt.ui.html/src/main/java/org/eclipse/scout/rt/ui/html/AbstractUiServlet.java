@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,8 +24,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
-import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.ui.html.cache.DefaultHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -43,7 +43,7 @@ import org.eclipse.scout.service.SERVICES;
  * <p>
  * Ajax requests are processed as "/json" using HTTP POST, see {@link JsonMessageRequestInterceptor}
  */
-public abstract class AbstractUiServlet extends HttpServletEx {
+public abstract class AbstractUiServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractUiServlet.class);
@@ -56,6 +56,27 @@ public abstract class AbstractUiServlet extends HttpServletEx {
     m_httpCacheControl = createHttpCacheControl();
     m_requestHandlerGet = createRequestHandlerGet();
     m_requestHandlerPost = createRequestHandlerPost();
+  }
+
+  @Override
+  public void init() throws ServletException {
+    try {
+      Platform.get().start();
+    }
+    catch (Exception e) {
+      throw new ServletException(e);
+    }
+  }
+
+  @Override
+  public void destroy() {
+    try {
+      Platform.get().stop();
+    }
+    catch (Exception e) {
+      LOG.warn("Unable to stop platform.", e);
+    }
+    super.destroy();
   }
 
   protected IHttpCacheControl createHttpCacheControl() {
