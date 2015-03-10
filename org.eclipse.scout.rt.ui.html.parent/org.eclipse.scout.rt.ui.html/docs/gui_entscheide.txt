@@ -136,3 +136,13 @@ BSH 2015-01-21
 - Neuladen muss auf TablePage und NodePages möglich sein. NodePages brauchen darum auch den TableStatus.
 - Vorschlag CGU: Auch Detail-Forms / 360°-Sichten können neu geladen werden. Hier wäre der Button
   allerdings oben. Ist das schlimm?
+
+Ideen:
+-Tabelle
+  NBU 2015-03-10
+  - Filter-Feld: über das Filter Feld sollte es möglich sein gewisse Werte über Formeln zu Filtern.
+             Bsp. Wenn Werte grösser als 100 gesucht werden sollen dann kann >100 eingegeben werden
+             und der Filter sucht sich dann alle Zellen die Zahlen grösser 100 drin haben.
+             Weiter sollte es möglich sein diese Formeln direkt auf eine Spalte anzuwenden.
+             Bsp. Es gibt eine Spalte Preis, in welcher man alle Werte zwischen 150'000 und 200'000
+             filtern möchte die Eingabe würde ins Filter-Feld könnte dann etwa so aussehen-> [Preis =>150000]&&[Preis<=200000]
