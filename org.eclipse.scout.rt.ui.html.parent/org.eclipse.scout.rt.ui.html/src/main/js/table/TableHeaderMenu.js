@@ -19,8 +19,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   this.$header = $header;
 
   // every user action will close menu
-  $('body').on('mousedown.remove', onMouseDown);
-  $('body').on('keydown.remove', removeMenu);
+  $(window).on('mousedown.tableheadermenu', onMouseDown);
+  $(window).on('keydown.tableheadermenu', removeMenu);
 
   // create buttons in command for order
   if (table.header.columns.length > 1) {
@@ -392,8 +392,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 scout.TableHeaderMenu.prototype.remove = function() {
   this.$headerMenu.remove();
   this.$header.removeClass('menu-open');
-  $('body').off('mousedown.remove');
-  $('body').off('keydown.remove');
+  $(window).off('mousedown.tableheadermenu');
+  $(window).off('keydown.tableheadermenu');
 };
 
 scout.TableHeaderMenu.prototype.isOpenFor = function($header) {

@@ -63,9 +63,10 @@ scout.TableHeader = function(table, session) {
       $header = $(this).prev(),
       headerWidth = parseFloat($header.css('min-width'));
 
-    $('body').addClass('col-resize')
-      .on('mousemove', '', resizeMove)
-      .one('mouseup', '', resizeEnd);
+    $(window)
+      .on('mousemove.tableheader', resizeMove)
+      .one('mouseup', resizeEnd);
+    $('body').addClass('col-resize');
 
     function resizeMove(event) {
       var diff = event.pageX - startX,
@@ -77,8 +78,8 @@ scout.TableHeader = function(table, session) {
     }
 
     function resizeEnd(event) {
-      $('body').off('mousemove')
-        .removeClass('col-resize');
+      $(window).off('mousemove.tableheader');
+      $('body').removeClass('col-resize');
 
       var width = parseFloat($header.css('min-width'));
       that.table.resizingColumnFinished($header.data('column'), width);
@@ -97,7 +98,8 @@ scout.TableHeader = function(table, session) {
     that.dragging = false;
 
     // start drag & drop events
-    $('body').on('mousemove', '', dragMove)
+    $(window)
+      .on('mousemove.tableheader', '', dragMove)
       .one('mouseup', '', dragEnd);
 
     function dragMove(event) {
@@ -155,7 +157,7 @@ scout.TableHeader = function(table, session) {
     }
 
     function dragEnd(event) {
-      $('body').off('mousemove');
+      $(window).off('mousemove.tableheader');
 
       // in case of no movement: return
       if (!that.dragging) {

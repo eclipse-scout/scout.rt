@@ -268,9 +268,10 @@ scout.TableFooter.prototype._addResize = function($parent) {
     .on('mousedown', '', resize);
 
   function resize(event) {
-    $('body').addClass('row-resize')
-      .on('mousemove', '', resizeMove)
-      .one('mouseup', '', resizeEnd);
+    $(window)
+      .on('mousemove.tablefooter', resizeMove)
+      .one('mouseup', resizeEnd);
+    $('body').addClass('row-resize');
 
     function resizeMove(event) {
       var newHeight = that._table.$container.height() - event.pageY;
@@ -285,8 +286,8 @@ scout.TableFooter.prototype._addResize = function($parent) {
         that.selectedControl.setSelected(false);
       }
 
-      $('body').off('mousemove')
-        .removeClass('row-resize');
+      $(window).off('mousemove.tablefooter');
+      $('body').removeClass('row-resize');
     }
 
     return false;

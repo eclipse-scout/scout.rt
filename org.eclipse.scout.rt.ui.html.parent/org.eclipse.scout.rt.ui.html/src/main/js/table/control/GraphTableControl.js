@@ -220,7 +220,8 @@ scout.GraphTableControl.prototype.moveNode = function(event) {
     }
   }
 
-  $('body').on('mousemove', '', nodeMove)
+  $(window)
+    .on('mousemove.graphtablecontrol', '', nodeMove)
     .one('mouseup', '', nodeEnd);
   return false;
 
@@ -232,7 +233,7 @@ scout.GraphTableControl.prototype.moveNode = function(event) {
   }
 
   function nodeEnd() {
-    $('body').off('mousemove');
+    $(window).off('mousemove.graphtablecontrol');
     that.kelvin = 200;
     that.doPhysics.call(that);
   }

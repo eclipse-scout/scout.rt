@@ -17,11 +17,12 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   var viewDateDiff = 0;
   var origin = scout.graphics.offsetBounds(this._dateField.$field);
   if (!this.$popup) {
+    var $parent = $('body'); // TODO BSH Try this: this._dateField.$field.closest('.desktop .glasspane') || $('body');
     this.$popup = $.makeDiv('date-box')
       .cssLeft(origin.x)
       .cssTop(origin.y + origin.height)
-      .mousedown(this._onMouseDown.bind(this));
-    $('body').append(this.$popup);
+      .mousedown(this._onMouseDown.bind(this))
+      .appendTo($parent);
 
     scout.scrollbars.attachScrollHandlers(this._dateField.$field, this.close.bind(this));
 
