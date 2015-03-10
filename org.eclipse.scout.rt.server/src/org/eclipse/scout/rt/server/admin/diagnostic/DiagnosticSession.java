@@ -31,6 +31,10 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.shared.OfficialVersion;
+import org.eclipse.scout.rt.shared.security.ReadDiagnosticServletPermission;
+import org.eclipse.scout.rt.shared.security.UpdateDiagnosticServletPermission;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Version;
 
 public class DiagnosticSession {
@@ -43,7 +47,10 @@ public class DiagnosticSession {
         Object value = next.getValue();
         IDiagnostic diagnosticProvider = DiagnosticFactory.getDiagnosticProvider(action);
         if (diagnosticProvider != null && value instanceof Object[]) {
-          diagnosticProvider.call(action, (Object[]) value);
+          boolean hasUpdateDiagnosticsServletPermission = SERVICES.getService(IAccessControlService.class).checkPermission(new UpdateDiagnosticServletPermission());
+          if (hasUpdateDiagnosticsServletPermission) {
+            diagnosticProvider.call(action, (Object[]) value);
+          }
         }
       }
     }
@@ -70,6 +77,9 @@ public class DiagnosticSession {
   }
 
   private void doHtmlResponse(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    boolean hasReadDiagnosticsServletPermission = SERVICES.getService(IAccessControlService.class).checkPermission(new ReadDiagnosticServletPermission());
+    boolean hasUpdateDiagnosticsServletPermission = SERVICES.getService(IAccessControlService.class).checkPermission(new UpdateDiagnosticServletPermission());
+
     String errorMsg = "";
 
     /* run garbage collection for better estimation of current memory usage */
@@ -77,6 +87,9 @@ public class DiagnosticSession {
     if (StringUtility.hasText(doGc)) {
       System.gc();
       errorMsg = "<font color='blue'> System.gc() triggered.</font>";
+    }
+    if (!hasUpdateDiagnosticsServletPermission && !req.getParameterMap().isEmpty()) {
+      errorMsg = "<font color='red'>" + UpdateDiagnosticServletPermission.class.getSimpleName() + " required to update values.</font>";
     }
 
     List<List<String>> result = getDiagnosticItems();
@@ -124,10 +137,15 @@ public class DiagnosticSession {
     out.println("</head>");
     out.println("<body>");
     out.println("<h3>" + title + " " + version + "</h3>");
-    out.println("<form method='POST' action='" + StringUtility.join("?", req.getRequestURL().toString(), req.getQueryString()) + "'>");
-    out.print(diagnosticHTML);
-    out.println("<p><input type='submit' value='submit'/></p>");
-    out.println("</form>");
+    if (hasReadDiagnosticsServletPermission) {
+      out.println("<form method='POST' action='" + StringUtility.join("?", req.getRequestURL().toString(), req.getQueryString()) + "'>");
+      out.print(diagnosticHTML);
+      out.println("<p><input type='submit' value='submit'/></p>");
+      out.println("</form>");
+    }
+    else {
+      out.println("<font color='red'>" + ReadDiagnosticServletPermission.class.getSimpleName() + " required to access diagnostic data.</font>");
+    }
     out.print(errorMsg);
     out.println("<p class=\"copyright\">&copy; " + OfficialVersion.COPYRIGHT + "</p>");
     out.println("</body>");
@@ -269,7 +287,7 @@ public class DiagnosticSession {
    * - number of available (logical) processors
    * - client host address
    * - client host name
-   * 
+   *
    * @return ArrayList<String>
    */
   public static ArrayList<String> getSystemInformation() {
