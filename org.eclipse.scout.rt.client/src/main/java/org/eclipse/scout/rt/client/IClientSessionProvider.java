@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client;
 /**
  * Objects of this type can provide you with a {@link IClientSession}.
  */
+//TODO dwi remove
 public interface IClientSessionProvider {
 
   /**

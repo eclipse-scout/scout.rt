@@ -10,25 +10,32 @@
  ******************************************************************************/
 package org.eclipse.scout.testing.client.runner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+
 import java.util.Collections;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner.ClientTest;
-import org.eclipse.scout.testing.client.runner.fixture.LoginTestSessionProvider;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.testing.client.runner.fixture.LoginTestClientSessionProvider;
+import org.eclipse.scout.testing.client.runner.fixture.LoginTestClientSessionProvider.LoginTestClientSession;
 import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * JUnit test for {@link ScoutClientTestRunner} with login.
+ * JUnit test for {@link ClientTestRunner} with login.
  */
 @RunWith(ClientTestRunner.class)
-@ClientTest(runAs = "test", sessionProvider = LoginTestSessionProvider.class, forceNewSession = true)
+@RunWithClientSession(value = LoginTestClientSession.class, provider = LoginTestClientSessionProvider.class)
+@RunWithSubject("default")
 public class ScoutClientTestRunnerLoginTest {
 
   private static IClientSession s_beforeClassClientSession;
@@ -86,29 +93,29 @@ public class ScoutClientTestRunnerLoginTest {
   private static void checkBeforeClass() {
     assertNotNull(TestEnvironmentClientSession.get());
     if (s_beforeClassClientSession == null) {
-      assertSame(LoginTestSessionProvider.getCurrentSession(), TestEnvironmentClientSession.get());
-      assertEquals(Collections.singletonList("test"), LoginTestSessionProvider.getBeforeStartRunAs());
-      assertEquals(Collections.singletonList("test"), LoginTestSessionProvider.getAfterStartRunAs());
+      assertSame(LoginTestClientSessionProvider.getCurrentSession(), TestEnvironmentClientSession.get());
+      assertEquals(Collections.singletonList("test"), LoginTestClientSessionProvider.getBeforeStartRunAs());
+      assertEquals(Collections.singletonList("test"), LoginTestClientSessionProvider.getAfterStartRunAs());
       s_beforeClassClientSession = TestEnvironmentClientSession.get();
-      LoginTestSessionProvider.clearProtocol();
+      LoginTestClientSessionProvider.clearProtocol();
     }
     else {
-      assertEquals(Collections.emptyList(), LoginTestSessionProvider.getBeforeStartRunAs());
-      assertEquals(Collections.emptyList(), LoginTestSessionProvider.getAfterStartRunAs());
+      assertEquals(Collections.emptyList(), LoginTestClientSessionProvider.getBeforeStartRunAs());
+      assertEquals(Collections.emptyList(), LoginTestClientSessionProvider.getAfterStartRunAs());
       assertSame(s_beforeClassClientSession, TestEnvironmentClientSession.get());
     }
   }
 
   private static void checkAfterClass() {
     assertSame(s_beforeClassClientSession, TestEnvironmentClientSession.get());
-    assertEquals(Collections.emptyList(), LoginTestSessionProvider.getBeforeStartRunAs());
-    assertEquals(Collections.emptyList(), LoginTestSessionProvider.getAfterStartRunAs());
+    assertEquals(Collections.emptyList(), LoginTestClientSessionProvider.getBeforeStartRunAs());
+    assertEquals(Collections.emptyList(), LoginTestClientSessionProvider.getAfterStartRunAs());
   }
 
   private void checkBeforeAfterAndTest() {
     assertNotNull(TestEnvironmentClientSession.get());
     assertSame(s_beforeClassClientSession, TestEnvironmentClientSession.get());
-    assertEquals(Collections.emptyList(), LoginTestSessionProvider.getBeforeStartRunAs());
-    assertEquals(Collections.emptyList(), LoginTestSessionProvider.getAfterStartRunAs());
+    assertEquals(Collections.emptyList(), LoginTestClientSessionProvider.getBeforeStartRunAs());
+    assertEquals(Collections.emptyList(), LoginTestClientSessionProvider.getAfterStartRunAs());
   }
 }

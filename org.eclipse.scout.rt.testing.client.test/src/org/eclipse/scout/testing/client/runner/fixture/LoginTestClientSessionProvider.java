@@ -10,37 +10,33 @@
  ******************************************************************************/
 package org.eclipse.scout.testing.client.runner.fixture;
 
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.testing.client.DefaultTestClientSessionProvider;
+import javax.security.auth.Subject;
 
-public class LoginTestSessionProvider extends DefaultTestClientSessionProvider {
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+
+public class LoginTestClientSessionProvider extends ClientSessionProvider {
 
   private static IClientSession s_currentSession;
   private static List<String> s_beforeStartRunAs;
   private static List<String> s_afterStartRunAs;
 
-  public LoginTestSessionProvider() {
+  public LoginTestClientSessionProvider() {
     clearProtocol();
   }
 
   @Override
-  public <T extends IClientSession> T getOrCreateClientSession(Class<T> clazz, String runAs, boolean createNew) {
-    T clientSession = super.getOrCreateClientSession(clazz, runAs, createNew);
+  public <T extends IClientSession> T provide(ClientJobInput input) throws ProcessingException {
+    T clientSession = super.provide(input);
     s_currentSession = clientSession;
     return clientSession;
-  }
-
-  @Override
-  protected void beforeStartSession(IClientSession clientSession, String runAs) {
-    s_beforeStartRunAs.add(runAs);
-  }
-
-  @Override
-  protected void afterStartSession(IClientSession clientSession, String runAs) {
-    s_afterStartRunAs.add(runAs);
   }
 
   public static void clearProtocol() {
@@ -59,5 +55,18 @@ public class LoginTestSessionProvider extends DefaultTestClientSessionProvider {
 
   public static List<String> getAfterStartRunAs() {
     return s_afterStartRunAs;
+  }
+
+  public static class LoginTestClientSession extends TestEnvironmentClientSession {
+    private static List<String> s_beforeStartRunAs;
+    private static List<String> s_afterStartRunAs;
+
+    @Override
+    public void startSession() {
+      String runAs = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next().getName();
+      s_beforeStartRunAs.add(runAs);
+      super.startSession();
+      s_afterStartRunAs.add(runAs);
+    }
   }
 }
