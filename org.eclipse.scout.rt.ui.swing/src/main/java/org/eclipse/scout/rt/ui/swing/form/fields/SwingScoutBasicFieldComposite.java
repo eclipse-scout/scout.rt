@@ -122,7 +122,7 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
   protected boolean handleSwingInputVerifier() {
     final String text = getSwingField().getText();
     // only handle if text has changed
-    if (CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
+    if (!m_udateDisplayTextOnModify && CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
       return true;
     }
     // notify Scout
