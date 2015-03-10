@@ -80,47 +80,48 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     }
     IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
     ILookupRow<LOOKUP_KEY> acceptedProposalRow = null;
-    if (StringUtility.equalsIgnoreNewLines(proposalChooser.getSearchText(), text)) {
+    if (proposalChooser != null && StringUtility.equalsIgnoreNewLines(proposalChooser.getSearchText(), text)) {
       acceptedProposalRow = proposalChooser.getAcceptedProposal();
     }
-//    try {
-    String oldText = getDisplayText();
-    boolean parsingError = getErrorStatus() != null && getErrorStatus().containsStatus(ParsingFailedStatus.class);
-    if (acceptedProposalRow == null && (!parsingError) && getCurrentLookupRow() != null && StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(oldText))) {
-      // no change
-      return getValue();
-    }
-    else {
-      // changed
-      if (acceptedProposalRow != null) {
-        setCurrentLookupRow(acceptedProposalRow);
-        return acceptedProposalRow.getText();
-      }
-      else if (text == null) {
-        setCurrentLookupRow(EMPTY_LOOKUP_ROW);
-        return null;
+    try {
+      String oldText = getDisplayText();
+      boolean parsingError = getErrorStatus() != null && getErrorStatus().containsStatus(ParsingFailedStatus.class);
+      if (acceptedProposalRow == null && (!parsingError) && getCurrentLookupRow() != null && StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(oldText))) {
+        // no change
+        return getValue();
       }
       else {
-        setCurrentLookupRow(null);
-        doSearch(text, false, true);
-        proposalChooser = getProposalChooser();
-        acceptedProposalRow = proposalChooser.getAcceptedProposal();
+        // changed
         if (acceptedProposalRow != null) {
           setCurrentLookupRow(acceptedProposalRow);
           return acceptedProposalRow.getText();
         }
-        else {
-          // no match possible and proposal is inactive; reject change
-          setCurrentLookupRow(null);
+        else if (text == null) {
+          setCurrentLookupRow(EMPTY_LOOKUP_ROW);
+          return null;
         }
-        return text;
+        else {
+          setCurrentLookupRow(null);
+          doSearch(text, false, true);
+          proposalChooser = getProposalChooser();
+          if (proposalChooser != null) {
+            acceptedProposalRow = proposalChooser.getAcceptedProposal();
+            if (acceptedProposalRow != null) {
+              setCurrentLookupRow(acceptedProposalRow);
+              return acceptedProposalRow.getText();
+            }
+            else {
+              // no match possible and proposal is inactive; reject change
+              setCurrentLookupRow(null);
+            }
+          }
+          return text;
+        }
       }
     }
-//    }
-//    finally {
-//      unregisterProposalFormInternal(proposalChooser);
-//    }
-
+    finally {
+      unregisterProposalChooserInternal();
+    }
   }
 
   @Override
@@ -142,12 +143,10 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
 
   @Override
   protected void handleProposalChooserClosed() throws ProcessingException {
-//    if (getProposalChooser() == proposalChooser) {
     ILookupRow<LOOKUP_KEY> row = getProposalChooser().getAcceptedProposal();
     if (row != null) {
       acceptProposal(row);
     }
-//    }
   }
 
   @Override
@@ -179,7 +178,15 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
         unregisterProposalChooserInternal();
       }
       else {
-        proposalChooser.dataFetchedDelegate(result, getBrowseMaxRowCount());
+        try {
+          if (proposalChooser == null) {
+        	proposalChooser = registerProposalChooserInternal();
+          }
+          proposalChooser.dataFetchedDelegate(result, getBrowseMaxRowCount());
+        }
+        catch (ProcessingException e) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        }
       }
     }
   }
@@ -193,11 +200,11 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
       // accept proposal form if either input text matches search text or
       // existing display text is valid
       try {
-        if (proposalChooser.getAcceptedProposal() != null) {
+        if (proposalChooser != null && proposalChooser.getAcceptedProposal() != null) {
           // a proposal was selected
           return acceptProposalFromUI();
         }
-        if ((StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) || StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
+        if (proposalChooser != null && (StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) || StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
           /*
            * empty text means null
            */
@@ -258,19 +265,21 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     public boolean acceptProposalFromUI() {
       try {
         IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
-        if (proposalChooser.getAcceptedProposal() != null) {
-          proposalChooser.doOk();
-          return true;
-        }
-        else {
-          // allow with null text traverse
-          if (StringUtility.isNullOrEmpty(getDisplayText())) {
+        if (proposalChooser != null) {
+          if (proposalChooser.getAcceptedProposal() != null) {
+            proposalChooser.doOk();
             return true;
           }
           else {
-            // select first
-            proposalChooser.forceProposalSelection();
-            return false;
+            // allow with null text traverse
+            if (StringUtility.isNullOrEmpty(getDisplayText())) {
+              return true;
+            }
+            else {
+              // select first
+              proposalChooser.forceProposalSelection();
+              return false;
+            }
           }
         }
       }
