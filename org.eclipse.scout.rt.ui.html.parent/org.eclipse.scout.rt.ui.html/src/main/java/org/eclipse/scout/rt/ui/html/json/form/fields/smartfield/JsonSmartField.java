@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -29,6 +28,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -71,6 +71,12 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
+    putJsonProperty(new JsonAdapterProperty<IContentAssistField<K, V>>(IContentAssistField.PROP_PROPOSAL_CHOOSER, model, getJsonSession()) {
+      @Override
+      protected Object modelValue() {
+        return getModel().getProposalChooser();
+      }
+    });
     putJsonProperty(new JsonProperty<IContentAssistField<K, V>>(PROP_MULTI_LINE, model) {
       @Override
       protected Boolean modelValue() {
@@ -155,46 +161,33 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if ("loadOptions".equals(event.getType())) {
-      handleLoadOptions(event);
+    if ("requestProposal".equals(event.getType())) {
+      handleUiRequestProposal(event);
+    }
+    else if ("closeProposal".equals(event.getType())) {
+      handleUiCloseProposal();
     }
     else {
       super.handleUiEvent(event, res);
     }
   }
 
-  protected void handleLoadOptions(JsonEvent event) {
-    String query = event.getData().optString("query");
-    LOG.debug("load options for query=" + query);
-    JSONArray options = optionsToJson(loadOptions(query));
-    addActionEvent("optionsLoaded", putProperty(new JSONObject(), PROP_OPTIONS, options));
+  private void handleUiCloseProposal() {
+    LOG.debug("close proposal");
+    getModel().getUIFacade().closeProposalFromUI();
+  }
+
+  private void handleUiRequestProposal(JsonEvent event) {
+    String searchText = event.getData().optString("searchText");
+    boolean browseAll = event.getData().optBoolean("browseAll", false);
+    LOG.debug("handle request proposal -> openProposalFromUI. searchText=" + searchText + " browseAll=" + browseAll);
+    getModel().getUIFacade().openProposalFromUI(searchText, browseAll);
   }
 
   @Override
   protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
-    if (StringUtility.isNullOrEmpty(displayText)) {
-      getModel().setValue(null);
-    }
-    else {
-      updateValue(displayText);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  protected void updateValue(String displayText) {
-    if (m_proposal) {
-      // proposal field: key/value is _always_ string
-      getModel().setValue((K) displayText);
-    }
-    else {
-      // smart-field: lookup key by display-text
-      for (ILookupRow<V> lookupRow : m_options) {
-        if (displayText.equals(lookupRow.getText())) {
-          getModel().setValue((K) lookupRow.getKey());
-          return;
-        }
-      }
-    }
+    LOG.debug("handle displayText changed -> setTextFromUI. displayText=" + displayText + " whileTyping=" + whileTyping);
+    getModel().getUIFacade().setTextFromUI(displayText);
   }
 
   @Override

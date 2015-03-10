@@ -9,6 +9,7 @@ scout.CachedLookupStrategy = function(smartField) {
 scout.CachedLookupStrategy.prototype = {
 
   filterOptions: function(query) {
+    $.log.info('filterOptions query=' + query);
     var match, numVisibleOptions = 0,
       showAll = (!query || '*' === query),
       regexp = new RegExp(query, 'im'), // i = ignore case, m = multiline
@@ -42,10 +43,12 @@ scout.CachedLookupStrategy.prototype = {
   },
 
   openPopup: function() {
-    var sf = this._smartField,
-      numOptions = sf.options.length;
-    sf._showPopup(Math.min(10, numOptions), numOptions);
-    sf._renderOptions(sf.options);
+//    var sf = this._smartField,
+//      numOptions = sf.options.length;
+//    sf._showPopup(Math.min(10, numOptions), numOptions);
+//    sf._renderOptions(sf.options);
+    var sf = this._smartField;
+    sf._showPopup2("*", true);
   }
 
 };
@@ -70,37 +73,35 @@ scout.RemoteLookupStrategy.prototype = {
 
   onOptionsLoaded: function(options) {
     $.log.debug('options loaded: ' + options.length);
-
-    var sf = this._smartField;
-    if (!sf._$popup) {
-      // Popup might have been closed in the meantime -> ignore result
-      return;
-    }
-    sf._emptyOptions();
-    // adjust size of popup to loaded options (cannot know in advance)
-    var oldBounds = scout.graphics.getBounds(sf._$popup),
-      optionHeight = scout.HtmlEnvironment.formRowHeight,
-      popupHeight = (Math.min(10, options.length) + 1) * optionHeight,
-      newBounds = new scout.Rectangle(oldBounds.x, oldBounds.y, oldBounds.width, popupHeight);
-    scout.graphics.setBounds(sf._$popup, newBounds);
-    scout.graphics.setSize(sf._get$OptionsDiv(), newBounds.width, popupHeight - optionHeight);
-    sf._updateScrollbar();
-    sf._renderOptions(options);
-    sf._setStatusText(options.length);
+//    sf._emptyOptions();
+//
+//    // adjust size of popup to loaded options (cannot know in advance)
+//    var oldBounds = scout.graphics.getBounds(sf._$popup),
+//      optionHeight = scout.HtmlEnvironment.formRowHeight,
+//      popupHeight = (Math.min(10, options.length) + 1) * optionHeight,
+//      newBounds = new scout.Rectangle(oldBounds.x, oldBounds.y, oldBounds.width, popupHeight);
+//    scout.graphics.setBounds(sf._$popup, newBounds);
+//    scout.graphics.setSize(sf._get$OptionsDiv(), newBounds.width, popupHeight - optionHeight);
+//    sf._updateScrollbar();
+//    sf._renderOptions(options);
+//    sf._setStatusText(options.length);
   },
 
   openPopup: function() {
-    var sf = this._smartField;
-    sf._showPopup(1, sf.session.text('LoadOptions_'));
-    this._loadOptions('*');
-  },
-
-  _loadOptions: function(query) {
-    var sf = this._smartField;
-    $.log.debug('load options from server. query=' + query);
-    sf.session.send(sf.id, 'loadOptions', {
-      query: query
-    });
+    var sf = this._smartField,
+      displayText = this.$field.val(),
+      searchText = scout.strings.hasText(displayText) ? displayText : '*';
+    sf._showPopup2(searchText, true);
+//    sf._showPopup(1, sf.session.text('LoadOptions_'));
+//    this._loadOptions('*');
   }
+
+//  _loadOptions: function(query) {
+//    var sf = this._smartField;
+//    $.log.debug('load options from server. query=' + query);
+//    sf.session.send(sf.id, 'displayTextChanged', {
+//      query: query
+//    });
+//  }
 
 };

@@ -16,7 +16,13 @@ scout.graphics = {
     }
     $div.removeAttr('class');
     if (className) {
-      $div.addClass(className);
+      if (Array.isArray(className)) {
+        className.forEach(function(cn) {
+          $div.addClass(cn);
+        });
+      } else {
+        $div.addClass(className);
+      }
     }
     $div.html(text.replace(/\s/g, "&nbsp;"));
     var dimension = new scout.Dimension($div.width(), $div.height());
@@ -114,6 +120,20 @@ scout.graphics = {
       .cssTop(bounds.y)
       .cssWidth(bounds.width)
       .cssHeight(bounds.height);
+  },
+
+  /**
+   * Sets the location (CSS properties left, top) of the component.
+   * @param vararg integer value for X position OR instance of scout.Point
+   * @param y (optional) integer value for Y position
+   * @returns
+   */
+  setLocation: function($comp, vararg, y) {
+    var point = vararg instanceof scout.Point ?
+        vararg : new scout.Point(vararg, y);
+    $comp
+      .cssLeft(point.x)
+      .cssTop(point.y);
   },
 
   offsetBounds: function($elem, includeMargins) {

@@ -101,3 +101,18 @@
   }
 }
 
+.measurement {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 999;
+}
+
+.proposal-chooser {
+  & > .active-filter {
+    background-color: @panel-background-color;
+    width: 100%;
+    height: @logical-grid-height;
+    padding-top: 4px;
+  }
+}

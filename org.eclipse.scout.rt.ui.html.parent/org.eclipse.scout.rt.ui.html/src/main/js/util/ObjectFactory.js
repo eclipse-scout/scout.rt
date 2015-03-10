@@ -306,7 +306,12 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.KeyStroke();
   }
-}, { //FIXME CGU: only needed temporarily, remove when switched to FormToolButton2
+}, {
+  objectType: 'ProposalChooser',
+  create: function() {
+    return new scout.ProposalChooser();
+  }
+}, { // FIXME CGU: only needed temporarily, remove when switched to FormToolButton2
   objectType: 'Null',
   create: function() {
     return new scout.NullAdapter();

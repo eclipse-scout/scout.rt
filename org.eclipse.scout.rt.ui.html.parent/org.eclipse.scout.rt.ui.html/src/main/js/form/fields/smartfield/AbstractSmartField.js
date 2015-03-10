@@ -6,6 +6,7 @@ scout.AbstractSmartField = function() {
   this._selectedOption = -1;
   this._oldVal;
   this._lookupStrategy;
+  this._addAdapterProperties(['proposalChooser']);
 };
 scout.inherits(scout.AbstractSmartField, scout.ValueField);
 
@@ -30,6 +31,39 @@ scout.AbstractSmartField.prototype._render = function($parent) {
   this.addMandatoryIndicator();
   this.addIcon();
   this.addStatus();
+};
+
+scout.AbstractSmartField.prototype._renderProperties = function() {
+  scout.AbstractSmartField.parent.prototype._renderProperties.call(this);
+  this._renderProposalChooser();
+};
+
+
+scout.AbstractSmartField.prototype._renderProposalChooser = function() {
+  $.log.info('_renderProposalChooser proposalChooser=' + this.proposalChooser);
+
+  if (!this._$popup) {
+    // We always expect the popup to be open at this point
+    return;
+  }
+
+  // FIXME AWE: können wir besser auf diesen PC reagieren (spezifisches event?)
+  if (this.proposalChooser) {
+
+    // FIXME AWE: die Table muss ein invalidateTree auf ihr layout machen, wenn rows
+    // geändert werden. Das muss dann dazu führen, das Popup resized wird. Dazu müsste
+    // es wohl auch selber ein layout haben.
+    this.proposalChooser.render(this._$popup);
+    this._resizePopup();
+  }
+  else {
+    this._closePopup(false);
+  }
+};
+
+scout.AbstractSmartField.prototype._removeProposalChooser = function() {
+  $.log.info('_removeProposalChooser proposalChooser=' + this.proposalChooser);
+  this._closePopup(false);
 };
 
 /**
@@ -169,22 +203,23 @@ scout.AbstractSmartField.prototype._applyOption = function(option) {
 };
 
 scout.AbstractSmartField.prototype._filterOptions = function() {
-  var val = this.$field.val();
+  var val = this._searchText();
   if (this._oldVal === val) {
     $.log.debug('value of field has not changed - do not filter (oldVal=' + this._oldVal + ')');
     return;
   }
   this._selectedOption = -1;
-  this._lookupStrategy.filterOptions(val);
+//  this.session.send(this.id, 'displayTextChanged', {displayText: val});
+  this.session.send(this.id, 'requestProposal', {
+    searchText: this._searchText(),
+    browseAll: false});
+
+
   this._oldVal = val;
   $.log.debug('updated oldVal=' + this._oldVal);
-  this._updateScrollbar();
+//  this._updateScrollbar();
 };
 
-/**
- * @param numOptions the height of the popup is 'numOptions * height per option in px'
- * @param vararg same as in #_setStatusText(vararg)
- */
 scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
   // TODO BSH Smartfield | Diese Logik mit derjenigen in LookupStrategy.js zusammenlegen?
   // TODO BSH Smartfield | formRowHeight stimmt nicht (css hat keine Hoehe). Insbesondere nicht mit multiline Smartfields!
@@ -199,6 +234,7 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
     .append($.makeDiv('status'))
     .appendTo($('body'));
   scout.graphics.setBounds(this._$popup, popupBounds);
+
   // layout options and status-div
   this._$optionsDiv = this._get$OptionsDiv();
   scout.scrollbars.install(this._$optionsDiv, {
@@ -209,12 +245,12 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
   scout.scrollbars.attachScrollHandlers(this.$field, this._closePopup.bind(this));
 };
 
-scout.AbstractSmartField.prototype._resizePopup = function(numOptions) {
-  var optionHeight = scout.HtmlEnvironment.formRowHeight,
-    popupHeight = (numOptions + 1) * optionHeight;
-  this._$popup.cssHeight(popupHeight);
-  this._updateScrollbar();
-};
+//scout.AbstractSmartField.prototype._resizePopup = function(numOptions) {
+//  var optionHeight = scout.HtmlEnvironment.formRowHeight,
+//    popupHeight = (numOptions + 1) * optionHeight;
+//  this._$popup.cssHeight(popupHeight);
+//  this._updateScrollbar();
+//};
 
 scout.AbstractSmartField.prototype._onPopupMousedown = function(event) {
   // Make sure field blur won't be triggered -> pop-up must not be closed on mouse down
@@ -275,13 +311,15 @@ scout.AbstractSmartField.prototype._onFieldBlur = function() {
   this._closePopup();
 };
 
-scout.AbstractSmartField.prototype._closePopup = function() {
+scout.AbstractSmartField.prototype._closePopup = function(notifyServer) {
   if (this._$popup) {
-    this._selectedOption = -1;
+    notifyServer = notifyServer === undefined ? true : notifyServer;
+    if (notifyServer) {
+      this.session.send(this.id, 'closeProposal');
+    }
     this._$popup.remove();
     this._$popup = null;
   }
-  scout.scrollbars.detachScrollHandlers(this.$field);
 };
 
 /**
@@ -304,11 +342,39 @@ scout.AbstractSmartField.prototype._setStatusText = function(vararg) {
   this._$popup.children('.status').text(text);
 };
 
+
+scout.AbstractSmartField.prototype._searchText = function() {
+  var displayText = this.$field.val();
+  return scout.strings.hasText(displayText) ? displayText : '*';
+};
+
+// FIXME AWE: an dieser stelle müssten wir auch die screen-boundaries berücksichtigen
+// und entscheiden, ob das popup gegen unten oder gegen oben geöffnet werden soll.
 scout.AbstractSmartField.prototype._openPopup = function() {
   if (this._$popup) {
     return false;
   } else {
-    this._lookupStrategy.openPopup();
+
+    $.log.info("_openPopup");
+
+    this.session.send(this.id, 'requestProposal', {
+      searchText: this._searchText(),
+      browseAll: true});
+
+    this._$popup = $.makeDiv('smart-field-popup')
+      .on('mousedown', this._onPopupMousedown.bind(this))
+      .appendTo($('body'));
+
+    var htmlPopup = new scout.HtmlComponent(this._$popup, this.session),
+      fieldBounds = this._getInputBounds();
+    htmlPopup.validateRoot = true;
+    htmlPopup.setLayout(new scout.PopupLayout(htmlPopup, this._resizePopup.bind(this)));
+    htmlPopup.setBounds(new scout.Rectangle(
+      fieldBounds.x,
+      fieldBounds.y + fieldBounds.height,
+      fieldBounds.width,
+      150));
+
     return true;
   }
 };
@@ -323,4 +389,18 @@ scout.AbstractSmartField.prototype.onModelAction = function(event) {
   } else {
     scout.AbstractSmartField.parent.prototype.onModelAction.call(this, event);
   }
+};
+
+/**
+ * This method is called when the PopupLayout is invalidated which happens typically
+ * when the proposal table adds or removes rows.
+ */
+scout.AbstractSmartField.prototype._resizePopup = function() {
+  var htmlPopup = scout.HtmlComponent.get(this._$popup),
+    prefSize = htmlPopup.getPreferredSize(),
+    inputBounds = this._getInputBounds();
+  prefSize.width = Math.max(inputBounds.width, prefSize.width);
+  prefSize.height = Math.min(400, prefSize.height);
+  $.log.info('_resizePopup prefSize=' + prefSize);
+  htmlPopup.setSize(prefSize);
 };

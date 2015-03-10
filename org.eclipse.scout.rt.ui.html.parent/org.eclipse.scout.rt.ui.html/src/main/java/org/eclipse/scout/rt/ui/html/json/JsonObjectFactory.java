@@ -50,6 +50,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonG
 import org.eclipse.scout.rt.client.ui.form.fields.richtextfield.IRichTextField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -85,6 +86,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButton
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButtonGroup;
 import org.eclipse.scout.rt.ui.html.json.form.fields.richtextfield.JsonRichTextField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox.JsonSequenceBox;
+import org.eclipse.scout.rt.ui.html.json.form.fields.smartfield.JsonProposalChooser;
 import org.eclipse.scout.rt.ui.html.json.form.fields.smartfield.JsonSmartField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.splitbox.JsonSplitBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.stringfield.JsonStringField;
@@ -181,6 +183,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (model instanceof IContentAssistField<?, ?>) {
       return new JsonSmartField((IContentAssistField<?, ?>) model, session, id, parent);
+    }
+    if (model instanceof IProposalChooser) {
+      return new JsonProposalChooser((IProposalChooser) model, session, id, parent);
     }
     if (model instanceof IDateField) {
       return new JsonDateField((IDateField) model, session, id, parent);

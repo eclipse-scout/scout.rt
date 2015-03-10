@@ -1017,6 +1017,7 @@ scout.Table.prototype._onRowsInserted = function(rows) {
     }
 
     this.drawData();
+    this.htmlComp.invalidateTree();
   }
 };
 
@@ -1035,6 +1036,7 @@ scout.Table.prototype._onRowsDeleted = function(rowIds) {
   // Update HTML
   if (this.rendered) {
     this.updateScrollbar();
+    this.htmlComp.invalidateTree();
   }
 };
 
@@ -1046,6 +1048,7 @@ scout.Table.prototype._onAllRowsDeleted = function() {
   // Update HTML
   if (this.rendered) {
     this.drawData();
+    this.htmlComp.invalidateTree();
   }
 };
 
