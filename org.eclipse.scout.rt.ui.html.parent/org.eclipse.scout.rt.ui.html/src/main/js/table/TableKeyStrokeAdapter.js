@@ -197,9 +197,13 @@ scout.TableKeyStrokeAdapter.prototype.drawKeyBox = function() {
   }
 
   // keys for header
-  var $tableHeader = $('.table-header', this._field.$container);
-  if ($tableHeader.length) {
-    $tableHeader.prependDiv('key-box char', 'a - z');
+
+  var $filterinput = $('.control-filter', this._field.$container);
+  if ($filterinput.length) {
+    var filterInputPosition =  $filterinput.position();
+    var top = $filterinput.css('margin-top').replace("px", "");
+    var left =  filterInputPosition.left + parseInt($filterinput.css('margin-left').replace("px", ""),0) + 4;
+    $filterinput.beforeDiv('key-box char', 'a - z').css('left', left +'px').css('top', top +'px');
   }
   this.keyBoxDrawn = true;
 };
