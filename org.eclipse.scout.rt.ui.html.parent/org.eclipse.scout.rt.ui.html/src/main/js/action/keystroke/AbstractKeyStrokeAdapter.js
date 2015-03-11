@@ -8,7 +8,6 @@ scout.AbstractKeyStrokeAdapter = function(field) {
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function() {
-  var additionalKeyBox, altKeybox, shiftKeyBox, keyBox, metaKeyBox;
   if (this.keyBoxDrawn) {
     return;
   }
@@ -22,14 +21,6 @@ scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function() {
 
     scout.KeyStrokeUtil.drawSingleKeyBoxItem(offsetLeft, '0', this._field.$container, this.ctrl, this.alt, this.shift);
   }
-};
-
-scout.AbstractKeyStrokeAdapter.prototype._calcKeyboxSeparator = function(offset) {
-  return this.marginLeft * offset + this.additionalMarginLeft;
-};
-
-scout.AbstractKeyStrokeAdapter.prototype._calcKeybox = function(offset) {
-  return this.marginLeft * offset;
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.removeKeyBox = function() {

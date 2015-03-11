@@ -32,7 +32,7 @@ scout.RadioButton.prototype._renderProperties = function() {
  */
 scout.RadioButton.prototype._renderLabel = function(label) {
   if (this.$label) {
-    this.$label.html(label);
+    this.$label.html(label ? scout.strings.removeAmpersand(label) : '');
   }
 };
 

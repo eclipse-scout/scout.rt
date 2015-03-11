@@ -145,7 +145,7 @@ scout.FormField.prototype._renderLabel = function(label) {
     }
   } else if (this.$label) {
     this._removePlaceholder();
-    this.$label.html(label);
+    this.$label.html(this.label ? scout.strings.removeAmpersand(this.label) : '');
   }
 };
 
@@ -263,7 +263,7 @@ scout.FormField.prototype._goOnline = function() {
 scout.FormField.prototype.addLabel = function() {
   this.$label = $('<label>')
     .appendTo(this.$container)
-    .attr('title', this.label)
+    .attr('title', this.label ? scout.strings.removeAmpersand(this.label) : '')
     .attr('for', this.refFieldId);
 };
 
