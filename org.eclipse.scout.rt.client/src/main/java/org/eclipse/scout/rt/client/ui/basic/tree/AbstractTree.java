@@ -2243,10 +2243,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     e.setNewSelectedNodes(newSelectedNodes);
-    // update node menus
-    updateNodeMenus(newSelection);
     //single observer
     try {
+      nodesSelectedInternal(deselectedNodes, newSelectedNodes);
       interceptNodesSelected(e);
     }
     catch (ProcessingException ex) {
@@ -2257,6 +2256,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
     //end single observer
     fireTreeEventInternal(e);
+  }
+
+  protected void nodesSelectedInternal(Set<ITreeNode> oldSelection, Set<ITreeNode> newSelection) {
+    updateNodeMenus(m_selectedNodes);
   }
 
   /**
@@ -2512,18 +2515,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if (m_treeEventBuffer.size() > 0) {
       List<TreeEvent> list = m_treeEventBuffer;
       m_treeEventBuffer = new ArrayList<TreeEvent>();
-      // coalesce selection events
-      boolean foundSelectionEvent = false;
-      for (ListIterator<TreeEvent> it = list.listIterator(list.size()); it.hasPrevious();) {
-        if (it.previous().getType() == TreeEvent.TYPE_NODES_SELECTED) {
-          if (!foundSelectionEvent) {
-            foundSelectionEvent = true;
-          }
-          else {
-            it.remove();
-          }
-        }
-      }
+      coalesceEvents(list);
       // fire the batch and set tree to changing, otherwise a listener might trigger another events that then are processed before all other listeners received that batch
       try {
         setTreeChanging(true);
@@ -2532,6 +2524,21 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       finally {
         setTreeChanging(false);
+      }
+    }
+  }
+
+  protected void coalesceEvents(List<TreeEvent> list) {
+    // coalesce selection events
+    boolean foundSelectionEvent = false;
+    for (ListIterator<TreeEvent> it = list.listIterator(list.size()); it.hasPrevious();) {
+      if (it.previous().getType() == TreeEvent.TYPE_NODES_SELECTED) {
+        if (!foundSelectionEvent) {
+          foundSelectionEvent = true;
+        }
+        else {
+          it.remove();
+        }
       }
     }
   }

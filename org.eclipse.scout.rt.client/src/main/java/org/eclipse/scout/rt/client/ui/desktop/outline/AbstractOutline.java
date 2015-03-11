@@ -14,6 +14,8 @@ import java.security.Permission;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
@@ -578,6 +580,21 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
   }
 
+  @Override
+  protected void nodesSelectedInternal(Set<ITreeNode> oldSelection, Set<ITreeNode> newSelection) {
+    super.nodesSelectedInternal(oldSelection, newSelection);
+
+    IPage deselectedPage = null;
+    if (CollectionUtility.hasElements(oldSelection)) {
+      deselectedPage = (IPage) CollectionUtility.firstElement(oldSelection);
+    }
+    IPage newSelectedPage = null;
+    if (CollectionUtility.hasElements(newSelection)) {
+      newSelectedPage = (IPage) CollectionUtility.firstElement(newSelection);
+    }
+    handleActivePageChanged(deselectedPage, newSelectedPage);
+  }
+
   private void handleActivePageChanged(IPage<?> deselectedPage, IPage<?> selectedPage) {
     if (m_pageChangeStrategy == null) {
       return;
@@ -678,16 +695,27 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return m_pageChangeStrategy;
   }
 
+  @Override
+  protected void coalesceEvents(List<TreeEvent> list) {
+    super.coalesceEvents(list);
+
+    // coalesce page changed events
+    boolean foundEvent = false;
+    for (ListIterator<TreeEvent> it = list.listIterator(list.size()); it.hasPrevious();) {
+      if (it.previous().getType() == OutlineEvent.TYPE_PAGE_CHANGED) {
+        if (!foundEvent) {
+          foundEvent = true;
+        }
+        else {
+          it.remove();
+        }
+      }
+    }
+  }
+
   private class P_OutlineListener extends TreeAdapter {
     @Override
     public void treeChanged(TreeEvent e) {
-      switch (e.getType()) {
-        case TreeEvent.TYPE_NODES_SELECTED: {
-          handleActivePageChanged((IPage) e.getDeselectedNode(), (IPage) e.getNewSelectedNode());
-          break;
-        }
-      }
-
       ITreeNode commonParentNode = e.getCommonParentNode();
       if (commonParentNode instanceof IPageWithNodes) {
         handlePageWithNodesTreeEvent(e, (IPageWithNodes) commonParentNode);
