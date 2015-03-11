@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.inventory.internal;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
@@ -21,9 +22,6 @@ import org.eclipse.scout.rt.platform.cdi.internal.PlatformBeanContributor;
 import org.eclipse.scout.rt.platform.cdi.internal.scan.fixture.TestingBean;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 public class BeanScannerTest {
 
@@ -53,14 +51,46 @@ public class BeanScannerTest {
     JandexClassInventory classInventory = new JandexClassInventory(finder.getIndex());
 
     final Set<Class> actual = new HashSet<>();
-    IBeanContext context = Mockito.mock(IBeanContext.class);
-    Mockito.when(context.registerClass(Mockito.<Class<?>> any())).thenAnswer(new Answer<IBean<?>>() {
+    IBeanContext context = new IBeanContext() {
       @Override
-      public IBean<?> answer(InvocationOnMock invocation) throws Throwable {
-        actual.add((Class) invocation.getArguments()[0]);
+      public void unregisterBean(IBean bean) {
+      }
+
+      @Override
+      public <T> IBean<T> registerClass(Class<T> clazz) {
+        actual.add(clazz);
         return null;
       }
-    });
+
+      @Override
+      public void registerBean(IBean bean, Object instance) {
+      }
+
+      @Override
+      public <T> List<T> getInstances(Class<T> beanClazz) {
+        return null;
+      }
+
+      @Override
+      public <T> T getInstanceOrNull(Class<T> beanClazz) {
+        return null;
+      }
+
+      @Override
+      public <T> T getInstance(Class<T> beanClazz) {
+        return null;
+      }
+
+      @Override
+      public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
+        return null;
+      }
+
+      @Override
+      public Set<IBean<?>> getAllRegisteredBeans() {
+        return null;
+      }
+    };
 
     PlatformBeanContributor contrib = new PlatformBeanContributor();
     contrib.contributeBeans(classInventory, context);
@@ -69,7 +99,6 @@ public class BeanScannerTest {
     expected.add(org.eclipse.scout.rt.platform.cdi.internal.scan.fixture.TestingBean.class);
     expected.add(org.eclipse.scout.rt.platform.cdi.internal.scan.fixture.TestingBean.S1.class);
     expected.add(Class.forName(TestingBean.class.getName() + "$S2"));
-    expected.add(org.eclipse.scout.rt.platform.cdi.internal.scan.fixture.TestingBean.I1.class);
 
     Assert.assertEquals(expected, actual);
   }

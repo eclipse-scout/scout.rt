@@ -70,6 +70,7 @@ public class JandexClassInfo implements IClassInfo {
     }
     catch (ClassNotFoundException ex) {
       LOG.warn("Error loading class '" + name() + "' with flags 0x" + Integer.toHexString(flags()), ex);
+      return false;
     }
     return true;
   }

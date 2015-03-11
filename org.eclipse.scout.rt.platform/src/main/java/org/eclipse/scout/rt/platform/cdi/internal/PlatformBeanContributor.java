@@ -85,10 +85,11 @@ public class PlatformBeanContributor implements IBeanContributor {
   }
 
   private void collect(IClassInfo ci, Set<Class<?>> collector) {
+    if (!ci.isInstanciable()) {
+      LOG.debug("Skipping bean candidate '{0}' because it is not instanciable.", ci.name());
+      return;
+    }
     try {
-      if (!ci.isInstanciable()) {
-        LOG.debug("Skipping bean candidate '{0}' because it is not instanciable.", ci.name());
-      }
       collector.add(ci.resolveClass());
     }
     catch (ClassNotFoundException ex) {
