@@ -62,7 +62,7 @@ public class ServerJobFutureTest {
   }
 
   @Test
-  public void testCancelSuccess() {
+  public void testCancelHard() {
     ServerJobFuture future = new ServerJobFuture<>(m_jobFuture);
 
     future.register(m_tx1);
@@ -85,6 +85,25 @@ public class ServerJobFutureTest {
     verifyNoMoreInteractions(m_tx3);
 
     inOrder.verify(m_delegate, times(1)).cancel(eq(true));
+  }
+
+  @Test
+  public void testCancelSoft() {
+    ServerJobFuture future = new ServerJobFuture<>(m_jobFuture);
+
+    future.register(m_tx1);
+    future.register(m_tx2);
+    future.register(m_tx3);
+
+    // Run the test
+    assertTrue(future.cancel(false));
+
+    // Verify
+    verifyZeroInteractions(m_tx1);
+    verifyZeroInteractions(m_tx2);
+    verifyZeroInteractions(m_tx3);
+
+    verify(m_delegate, times(1)).cancel(eq(false));
   }
 
   @Test

@@ -65,10 +65,13 @@ public class ServerJobFuture<RESULT> extends JobFuture<RESULT> {
       return false;
     }
 
-    // 1. Cancel all associated transactions (must be done before canceling the job to not exit transaction boundary).
     final Set<Boolean> success = new HashSet<>();
-    for (final ITransaction transaction : m_transactions) {
-      success.add(cancelTransactionSafe(transaction));
+
+    // 1. Cancel all associated transactions (must be done before canceling the job to not exit transaction boundary).
+    if (interruptIfRunning) { // cancel transactions only if interrupting hard.
+      for (final ITransaction transaction : m_transactions) {
+        success.add(cancelTransactionSafe(transaction));
+      }
     }
 
     // 2. Cancel the job.
