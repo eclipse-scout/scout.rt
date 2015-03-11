@@ -29,7 +29,7 @@ scout.SplitBox.prototype._render = function($parent) {
     if (this.secondField) {
       this._$splitter = $.makeDiv('splitter')
         .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
-        .on('mousedown', resizeSplitter)
+        .on('mousedown', resizeSplitter.bind(this))
         .appendTo(this._$splitArea);
 
       this.secondField.render(this._$splitArea);
@@ -43,37 +43,36 @@ scout.SplitBox.prototype._render = function($parent) {
 
   // --- Helper functions ---
 
-  var that = this;
   function resizeSplitter() {
     // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
     $(window)
-      .on('mousemove.splitbox', resizeMove)
-      .one('mouseup', resizeEnd);
+      .on('mousemove.splitbox', resizeMove.bind(this))
+      .one('mouseup', resizeEnd.bind(this));
     // Ensure the correct cursor is always shown while moving
-    $('body').addClass(that.splitHorizontal ? 'col-resize' : 'row-resize');
+    $('body').addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
 
     // Get initial area and splitter bounds
-    var splitAreaPosition = that._$splitArea.offset();
-    var splitAreaSize = scout.graphics.getSize(that._$splitArea, true);
-    var splitterPosition = that._$splitter.offset();
-    var splitterSize = scout.graphics.getSize(that._$splitter, true);
+    var splitAreaPosition = this._$splitArea.offset();
+    var splitAreaSize = scout.graphics.getSize(this._$splitArea, true);
+    var splitterPosition = this._$splitter.offset();
+    var splitterSize = scout.graphics.getSize(this._$splitter, true);
 
     // Create temporary splitter
     var $tempSplitter = $.makeDiv('temp-splitter')
-      .addClass(that.splitHorizontal ? 'x-axis' : 'y-axis')
-      .appendTo(that._$splitArea);
-    if (that.splitHorizontal) { // "|"
+      .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
+      .appendTo(this._$splitArea);
+    if (this.splitHorizontal) { // "|"
       $tempSplitter.cssLeft(splitterPosition.left - splitAreaPosition.left);
     } else { // "--"
       $tempSplitter.cssTop(splitterPosition.top - splitAreaPosition.top);
     }
-    that._$splitter.addClass('dragging');
+    this._$splitter.addClass('dragging');
 
-    var newSplitterPosition = that.splitterPosition;
+    var newSplitterPosition = this.splitterPosition;
     var SNAP_SIZE = 25;
 
     function resizeMove(event) {
-      if (that.splitHorizontal) { // "|"
+      if (this.splitHorizontal) { // "|"
         // Calculate target splitter position (in area)
         var targetSplitterPositionLeft = event.pageX - splitAreaPosition.left;
 
@@ -117,14 +116,15 @@ scout.SplitBox.prototype._render = function($parent) {
     function resizeEnd(event) {
       // Remove listeners and reset cursor
       $(window).off('mousemove.splitbox');
-      $('body').removeClass((that.splitHorizontal ? 'col-resize' : 'row-resize'));
+      $('body').removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
 
       // Remove temporary splitter
       $tempSplitter.remove();
-      that._$splitter.removeClass('dragging');
+      this._$splitter.removeClass('dragging');
 
       // Update split box
-      that.newSplitterPosition(newSplitterPosition);
+      this.newSplitterPosition(newSplitterPosition);
+      scout.HtmlComponent.get(this._$splitArea).revalidate();
     }
 
     return false;
@@ -143,12 +143,8 @@ scout.SplitBox.prototype._renderSplitterPosition = function() {
 scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition) {
   // Ensure range 0..1
   newSplitterPosition = Math.max(0, Math.min(1, newSplitterPosition));
-
   // Update model TODO BSH Scout-model? How to cache position?
   this.splitterPosition = newSplitterPosition;
-
-  // Update layout
-  scout.HtmlComponent.get(this._$splitArea).revalidate();
 };
 
 /**
