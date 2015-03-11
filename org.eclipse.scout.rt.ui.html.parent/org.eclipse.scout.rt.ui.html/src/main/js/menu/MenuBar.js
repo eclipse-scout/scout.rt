@@ -5,7 +5,7 @@ scout.MenuBar = function($parent, position, orderFunc) {
   this.$parent = $parent;
 
   // Create a menubar container and add it to the parent, but don't show it yet. It will
-  // be shown automatically when items are added to the menubar, see _updateVisibility().
+  // be shown automatically when items are added to the menubar, see updateVisibility().
   this.$container = $.makeDiv('menubar').hide();
   if (this.position === 'top') {
     this.$parent.prepend(this.$container);
@@ -59,18 +59,23 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
   //    this.lastItem.$container.addClass('last');
   //  }
 
-  this._updateVisibility();
+  this.updateVisibility();
 
   function notIsSeparator(menu) {
     return !menu.separator;
   }
 };
 
-scout.MenuBar.prototype._updateVisibility = function() {
-  this.$container.setVisible(this.menuItems.length > 0);
-  var htmlComp = scout.HtmlComponent.optGet(this.$parent);
-  if (htmlComp) {
-    htmlComp.invalidateTree();
+scout.MenuBar.prototype.updateVisibility = function() {
+  var wasVisible = this.$container.isVisible(),
+    visible = !this.hiddenByUi && this.menuItems.length > 0;
+
+  this.$container.setVisible(visible);
+  if (this.$container.isVisible() !== wasVisible) {
+    var htmlComp = scout.HtmlComponent.optGet(this.$parent);
+    if (htmlComp) {
+      htmlComp.invalidateTree();
+    }
   }
 };
 

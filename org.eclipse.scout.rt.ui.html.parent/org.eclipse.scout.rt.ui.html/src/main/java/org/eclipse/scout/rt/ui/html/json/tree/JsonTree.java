@@ -117,7 +117,9 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachContextMenu();
+    if (getModel().getContextMenu().isVisibleGranted()) {
+      attachAdapter(getModel().getContextMenu());
+    }
     attachNodes(getTopLevelNodes(true), true);
   }
 
@@ -132,10 +134,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     if (!m_treeNodeIds.isEmpty() || !m_treeNodes.isEmpty()) {
       throw new IllegalStateException("Not all nodes have been disposed! TreeNodeIds: " + m_treeNodeIds + " TreeNodes: " + m_treeNodes);
     }
-  }
-
-  protected void attachContextMenu() {
-    attachAdapter(getModel().getContextMenu());
   }
 
   @Override

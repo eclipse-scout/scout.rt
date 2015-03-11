@@ -46,7 +46,37 @@ scout.MobileOutline.prototype._updateOutlineTab = function(node) {
     node.detailForm.$container.width(node.$node.width());
     node.detailForm.htmlComp.layout();
     this._currentDetailForm = node.detailForm;
+  } else {
+    // Temporary set menubar to invisible and await response to recompute visibility again
+    // This is necessary because when moving the menubar to the selected node, the menubar probably has shows the wrong menus.
+    // On client side we do not know which menus belong to which page.
+    // The other solution would be to never show outline menus, instead show the menus of the table resp. show the table itself.
+    this.menuBar.hiddenByUi = true;
+    this.menuBar.updateVisibility();
+    waitForServer(this.session, function() {
+      this.menuBar.hiddenByUi = false;
+      this.menuBar.updateVisibility();
+    }.bind(this));
   }
+
+  // Move menubar to the selected node
+  this.menuBar.$container.appendTo(node.$node);
+
+  function waitForServer(session, func) {
+    if (session.areRequestsPending() || session.areEventsQueued()) {
+      session.listen().done(func);
+    } else {
+      func();
+    }
+  }
+};
+
+scout.MobileOutline.prototype._filterMenus = function(allowedTypes) {
+  if (this._currentDetailForm) {
+    // Don't display menus of the tree if a detail form is shown, because the detail form has its own menubar
+    return [];
+  }
+  return scout.MobileOutline.parent.prototype._filterMenus.call(this, allowedTypes);
 };
 
 scout.MobileOutline.prototype.onResize = function() {

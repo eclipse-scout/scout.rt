@@ -128,7 +128,7 @@ scout.Tree.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
-  if(this.enabled){
+  if (this.enabled) {
     this.installKeyStrokeAdapter();
   }
 
@@ -144,14 +144,14 @@ scout.Tree.prototype._render = function($parent) {
   this._updateItemPath();
 };
 
-scout.Tree.prototype.installKeyStrokeAdapter = function(){
+scout.Tree.prototype.installKeyStrokeAdapter = function() {
   this.$container.attr('tabIndex', 0);
   if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
     scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
   }
 };
 
-scout.Tree.prototype.uninstallKeyStrokeAdapter = function(){
+scout.Tree.prototype.uninstallKeyStrokeAdapter = function() {
   this.$container.attr('tabIndex', -1);
   if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
     scout.keyStrokeManager.uninstallAdapter(this.$container, this.keyStrokeAdapter);
@@ -304,8 +304,8 @@ scout.Tree.prototype.setNodesSelected = function(nodes) {
     });
     // FIXME BSH Keystroke | "scroll into view"
     this._renderSelection();
-    this._triggerNodesSelected(nodeIds);
     this._renderMenus();
+    this._triggerNodesSelected(nodeIds);
   }
 };
 
@@ -315,9 +315,6 @@ scout.Tree.prototype._triggerNodesSelected = function(nodeIds) {
   });
 };
 
-/**
- * @param $nodes if undefined the nodes will be resolved using this.selectedNodeIds
- */
 scout.Tree.prototype._renderSelection = function() {
   var i, node, $node,
     $nodes = [];
@@ -492,7 +489,7 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
 scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
   var updateNodeMap, parentNode, nodes;
 
-  //Update model and nodemap
+  // Update model and nodemap
   updateNodeMap = function(parentNode, node) {
     this._updateMarkChildrenChecked(node, false, false);
     delete this.nodesMap[node.id];
@@ -516,7 +513,7 @@ scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
   }
   this._visitNodes(nodes, updateNodeMap);
 
-  //remove node from html document
+  // remove node from html document
   if (this.rendered) {
     this._removeNodes(nodes, parentNodeId);
   }
@@ -524,9 +521,9 @@ scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
 
 scout.Tree.prototype._onNodesSelected = function(nodeIds) {
   this.selectedNodeIds = nodeIds;
-  this._renderMenus();
   if (this.rendered) {
     this._renderSelection();
+    this._renderMenus();
   }
   this._triggerNodesSelected(nodeIds);
 };
@@ -649,7 +646,6 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
 
 scout.Tree.prototype._addNodes = function(nodes, $parent) {
   if (!nodes || nodes.length === 0) {
-    this._renderMenus();
     return;
   }
 
@@ -672,7 +668,6 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
       $predecessor = $node;
     }
   }
-  this._renderMenus();
   this.updateScrollbar();
 
   //return the last created node
@@ -708,8 +703,8 @@ scout.Tree.prototype._decorateNode = function(node) {
     return;
   }
 
-  $node.toggleClass('leaf', !!node.leaf);
-  $node.toggleClass('expanded', ( !!node.expanded && node.childNodes.length > 0));
+  $node.toggleClass('leaf', !! node.leaf);
+  $node.toggleClass('expanded', ( !! node.expanded && node.childNodes.length > 0));
 
   // Replace only the text node in the DOM, but leave inner DIVs untouched (e.g. tree item control)
   var textDomNodes = $node.contents().filter(function() {
@@ -1010,15 +1005,15 @@ scout.Tree.prototype._renderProperties = function() {
 };
 
 scout.Tree.prototype._renderMenus = function() {
-  var menuItems = this._filterMenus(this.selectedNodeIds, ['Tree.EmptySpace', 'Tree.Header']);
+  var menuItems = this._filterMenus(['Tree.EmptySpace']);
   this.menuBar.updateItems(menuItems);
 };
 
-scout.Tree.prototype._filterMenus = function(selectedNodeIds, allowedTypes) {
+scout.Tree.prototype._filterMenus = function(allowedTypes) {
   allowedTypes = allowedTypes || [];
-  if (selectedNodeIds && selectedNodeIds.length === 1) {
+  if (this.selectedNodeIds.length === 1) {
     allowedTypes.push('Tree.SingleSelection');
-  } else if (selectedNodeIds && selectedNodeIds.length > 1) {
+  } else if (this.selectedNodeIds.length > 1) {
     allowedTypes.push('Tree.MultiSelection');
   }
   return scout.menus.filter(this.menus, allowedTypes);
@@ -1043,9 +1038,9 @@ scout.Tree.prototype._renderEnabled = function() {
       node = $node.data('node');
     $node.find('input').setEnabled(enabled && node.enabled);
   });
-  if(enabled){
+  if (enabled) {
     this.installKeyStrokeAdapter();
-  } else{
+  } else {
     this.uninstallKeyStrokeAdapter();
   }
 };

@@ -65,7 +65,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapter(getModel().getRootGroupBox());
-    if (getModel() instanceof IForm5) {
+    if (getModel() instanceof IForm5 && ((IForm5) getModel()).getContextMenu().isVisibleGranted()) {
       attachAdapter(((IForm5) getModel()).getContextMenu());
     }
   }

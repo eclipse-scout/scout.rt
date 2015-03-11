@@ -190,7 +190,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachAdapter(getModel().getContextMenu());
+    if (getModel().getContextMenu().isVisibleGranted()) {
+      attachAdapter(getModel().getContextMenu());
+    }
     attachColumns();
   }
 
