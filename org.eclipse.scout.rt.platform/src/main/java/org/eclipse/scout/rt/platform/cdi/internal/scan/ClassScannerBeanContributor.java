@@ -47,10 +47,6 @@ public class ClassScannerBeanContributor implements IBeanContributor {
         if (LOG.isDebugEnabled()) {
           LOG.debug("detected @Bean " + c);
         }
-
-        //TODO imo
-        System.out.println("detected @Bean " + c);
-
         context.registerClass(c);
       }
     }
