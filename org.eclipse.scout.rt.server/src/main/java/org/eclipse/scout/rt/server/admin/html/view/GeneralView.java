@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
@@ -79,7 +79,7 @@ public class GeneralView extends DefaultView {
       p.print("There is no HTTP-Session needed ");
     }
     p.br();
-    IServerSession serverSession = (IServerSession) ISession.CURRENT.get();
+    IServerSession serverSession = ServerSessionProvider.currentSession();
     if (serverSession != null) {
       p.print("Session ID (ThreadContext): " + serverSession.getId());
     }

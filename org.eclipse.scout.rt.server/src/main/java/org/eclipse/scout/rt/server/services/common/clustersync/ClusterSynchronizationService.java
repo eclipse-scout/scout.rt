@@ -37,10 +37,10 @@ import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
@@ -233,7 +233,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   }
 
   protected IClusterNotificationMessageProperties getNotificationProperties() {
-    return new ClusterNotificationMessageProperties(getNodeId(), ISession.CURRENT.get().getUserId());
+    return new ClusterNotificationMessageProperties(getNodeId(), ServerSessionProvider.currentSession().getUserId());
   }
 
   protected void notifyListeners(IClusterNotificationMessage message) {

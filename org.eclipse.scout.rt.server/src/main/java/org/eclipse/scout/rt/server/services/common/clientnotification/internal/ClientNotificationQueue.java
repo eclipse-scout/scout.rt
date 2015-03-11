@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNoti
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationQueueElement;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationQueueListener;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 
 /**
@@ -74,7 +74,7 @@ public class ClientNotificationQueue {
     synchronized (m_queueLock) {
       while (true) {
         if (!m_queue.isEmpty()) {
-          IServerSession serverSession = (IServerSession) ISession.CURRENT.get();
+          IServerSession serverSession = ServerSessionProvider.currentSession();
           for (Iterator<ConsumableClientNotificationQueueElement> it = m_queue.iterator(); it.hasNext();) {
             ConsumableClientNotificationQueueElement e = it.next();
             if (!e.isActive()) {
@@ -122,7 +122,7 @@ public class ClientNotificationQueue {
   public void ackNotifications(Set<String> consumedNotificationIds) {
     synchronized (m_queueLock) {
       if (!m_queue.isEmpty()) {
-        IServerSession serverSession = (IServerSession) ISession.CURRENT.get();
+        IServerSession serverSession = ServerSessionProvider.currentSession();
         for (Iterator<ConsumableClientNotificationQueueElement> it = m_queue.iterator(); it.hasNext();) {
           ConsumableClientNotificationQueueElement e = it.next();
           if (e.isConsumable(serverSession)

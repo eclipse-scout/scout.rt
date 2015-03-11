@@ -60,9 +60,9 @@ import org.eclipse.scout.rt.server.services.common.jdbc.IStatementProcessorMonit
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
-import org.eclipse.scout.rt.shared.ISession;
 
 public class StatementProcessor implements IStatementProcessor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(StatementProcessor.class);
@@ -117,7 +117,7 @@ public class StatementProcessor implements IStatementProcessor {
         }
       }
       // add server session as default
-      IServerSession session = (IServerSession) ISession.CURRENT.get();
+      IServerSession session = ServerSessionProvider.currentSession();
       if (session != null) {
         bases.add(session);
       }

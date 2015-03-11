@@ -16,9 +16,9 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.filter.JobFilter;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.filter.ServerSessionFilter;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.service.AbstractService;
 
@@ -28,7 +28,7 @@ public class ServerProcessingCancelService extends AbstractService implements IS
   @Override
   public boolean cancel(final long requestSequence) {
     final IFilter<IFuture<?>> filterJobId = new JobFilter(String.valueOf(requestSequence));
-    final IFilter<IFuture<?>> filterCurrentSession = new ServerSessionFilter((IServerSession) IServerSession.CURRENT.get());
+    final IFilter<IFuture<?>> filterCurrentSession = new ServerSessionFilter(ServerSessionProvider.currentSession());
 
     // Cancel the job and its associated transaction.
     return OBJ.one(IServerJobManager.class).cancel(new AndFilter<>(filterJobId, filterCurrentSession), true);

@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobInput;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
@@ -225,7 +225,7 @@ public class ClientJobInput extends JobInput {
   public static ClientJobInput defaults() {
     final ClientJobInput defaults = new ClientJobInput(JobInput.defaults());
     defaults.userAgent(UserAgent.CURRENT.get(), false); // set as not-preferred UserAgent.
-    defaults.session((IClientSession) ISession.CURRENT.get()); // must be set after setting the Locale and the UserAgent because session-bound values have precedence.
+    defaults.session(ClientSessionProvider.currentSession()); // must be set after setting the Locale and the UserAgent because session-bound values have precedence.
     defaults.sessionRequired(true);
     return defaults;
   }

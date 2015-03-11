@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
@@ -183,7 +183,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
   }
 
   private ServiceTunnelResponse invokeService(IServiceTunnelRequest serviceReq) throws ProcessingException {
-    IServerSession serverSession = (IServerSession) ISession.CURRENT.get();
+    IServerSession serverSession = ServerSessionProvider.currentSession();
     Class<?> serviceInterfaceClass = resolveClass(serverSession.getBundle(), serviceReq.getServiceInterfaceClassName());
     Object service = Assertions.assertNotNull(SERVICES.getService(serviceInterfaceClass), "service not found in service registry: %s", serviceReq.getServiceInterfaceClassName());
     Method serviceOp = ServiceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());

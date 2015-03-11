@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.services.common.clientnotification;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 
 /**
  * Filter to send a notification to a specific user
@@ -44,7 +44,7 @@ public class SingleUserFilter implements IClientNotificationFilter {
 
   @Override
   public boolean accept() {
-    return m_userId != null && m_userId.equalsIgnoreCase(ISession.CURRENT.get().getUserId());
+    return m_userId != null && m_userId.equalsIgnoreCase(ServerSessionProvider.currentSession().getUserId());
   }
 
   @Override

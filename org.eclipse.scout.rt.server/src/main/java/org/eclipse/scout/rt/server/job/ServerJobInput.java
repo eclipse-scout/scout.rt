@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobInput;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
@@ -279,7 +279,7 @@ public class ServerJobInput extends JobInput {
     defaults.userAgent(UserAgent.CURRENT.get(), false); // set as not-preferred UserAgent.
     defaults.servletRequest(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
     defaults.servletResponse(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
-    defaults.session((IServerSession) ISession.CURRENT.get()); // must be set after setting the Locale and the UserAgent because session-bound values have precedence.
+    defaults.session(ServerSessionProvider.currentSession()); // must be set after setting the Locale and the UserAgent because session-bound values have precedence.
     defaults.sessionRequired(true);
     defaults.transactional(true);
     return defaults;

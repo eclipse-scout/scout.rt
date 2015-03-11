@@ -82,6 +82,7 @@ import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
@@ -112,7 +113,6 @@ import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -814,7 +814,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     IDesktop desktop = getDesktop();
     if (desktop == null) {
-      desktop = ((IClientSession) IClientSession.CURRENT.get()).getVirtualDesktop();
+      desktop = ClientSessionProvider.currentSession().getVirtualDesktop();
     }
     desktop.addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
@@ -962,7 +962,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void waitFor() throws ProcessingException {
     // check if the desktop is observing this process
-    IDesktop desktop = ((IClientSession) IClientSession.CURRENT.get()).getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     if (desktop == null || !desktop.isOpened()) {
       throw new ProcessingException("Cannot wait for " + getClass().getName() + ". There is no desktop or the desktop has not yet been opened in the ui", null, WAIT_FOR_ERROR_CODE);
     }
@@ -1331,7 +1331,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * Convenience for ClientJob.getCurrentSession().getDesktop()
    */
   public IDesktop getDesktop() {
-    return ((IClientSession) IClientSession.CURRENT.get()).getDesktop();
+    return ClientSessionProvider.currentSession().getDesktop();
   }
 
   @Override
@@ -2937,7 +2937,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       setName("IForm.P_CloseTimer");
       setDaemon(true);
       m_seconds = seconds;
-      m_session = (IClientSession) ISession.CURRENT.get();
+      m_session = ClientSessionProvider.currentSession();
     }
 
     @Override

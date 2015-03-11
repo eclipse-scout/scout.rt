@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.UpdateUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
@@ -73,7 +73,7 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
 
   @Override
   protected Object getCurrentUserId() {
-    return ISession.CURRENT.get().getUserId();
+    return ServerSessionProvider.currentSession().getUserId();
   }
 
   @Override

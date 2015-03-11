@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 
 /**
  * Filter to send a notification to a specific session
@@ -42,7 +42,7 @@ public class SessionFilter implements IClientNotificationFilter {
 
   @Override
   public boolean accept() {
-    return m_sessionRef != null && ISession.CURRENT.get() == m_sessionRef.get();
+    return m_sessionRef != null && ServerSessionProvider.currentSession() == m_sessionRef.get();
   }
 
   @Override
