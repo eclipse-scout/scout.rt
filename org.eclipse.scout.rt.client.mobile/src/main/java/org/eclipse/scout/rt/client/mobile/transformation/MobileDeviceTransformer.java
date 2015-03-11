@@ -58,7 +58,7 @@ import org.eclipse.scout.service.SERVICES;
 public class MobileDeviceTransformer implements IDeviceTransformer {
   private final Map<IForm, WeakReference<IForm>> m_modifiedForms = new WeakHashMap<IForm, WeakReference<IForm>>();
   private IDesktop m_desktop;
-  private P_PageChangedListener m_outlineListener;
+  private P_OutlineListener m_outlineListener;
   private List<IOutline> m_outlines;
   private ToolFormHandler m_toolFormHandler;
   private boolean m_gridDataDirty;
@@ -154,7 +154,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   @Override
   public void adaptDesktopOutlines(OrderedCollection<IOutline> outlines) {
     m_outlines = outlines.getOrderedList();
-    m_outlineListener = new P_PageChangedListener();
+    m_outlineListener = new P_OutlineListener();
     for (IOutline outline : m_outlines) {
       outline.addTreeListener(m_outlineListener);
     }
@@ -213,18 +213,25 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     }
 
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.DISPLAY_OUTLINE_ROOT_NODE)) {
-      //Necessary to enable drilldown from top of the outline
+      // Necessary to enable drilldown from top of the outline
       outline.setRootNodeVisible(true);
     }
+    outline.getContextMenu().setVisibleGranted(true);
   }
 
   @Override
   public void transformPageDetailTable(ITable table) {
     if (table == null) {
       if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.DISPLAY_PAGE_TABLE)) {
-        //Do not allow closing the outline table because it breaks the navigation
+        // Do not allow closing the outline table because it breaks the navigation
         makeSurePageDetailTableIsVisible();
       }
+    }
+  }
+
+  public void transformPageDetailForm(IPage page) throws ProcessingException {
+    if (page.isDetailFormVisible() && page.getDetailForm() != null) {
+      transformForm(page.getDetailForm());
     }
   }
 
@@ -461,7 +468,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   }
 
-  private class P_PageChangedListener extends TreeAdapter {
+  private class P_OutlineListener extends TreeAdapter {
 
     @Override
     public void treeChanged(TreeEvent e) {
@@ -473,9 +480,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     protected void onPageChanged(OutlineEvent e) {
       IPage page = (IPage) e.getChildNode();
       try {
-        if (page.isDetailFormVisible() && page.getDetailForm() != null) {
-          transformForm(page.getDetailForm());
-        }
+        transformPageDetailForm(page);
       }
       catch (ProcessingException e1) {
         throw new RuntimeException(e1);
