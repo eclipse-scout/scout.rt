@@ -11,11 +11,6 @@ scout.SplitBox = function() {
 };
 scout.inherits(scout.SplitBox, scout.CompositeField);
 
-scout.SplitBox.prototype._renderProperties = function() {
-  scout.SplitBox.parent.prototype._renderProperties.call(this);
-  this._renderSplitterPosition(this.splitterPosition);
-};
-
 scout.SplitBox.prototype._render = function($parent) {
   this.addContainer($parent, 'split-box');
   // This widget does not support label, mandatoryIndicator and status
@@ -136,6 +131,11 @@ scout.SplitBox.prototype._render = function($parent) {
   }
 };
 
+scout.SplitBox.prototype._renderProperties = function() {
+  scout.SplitBox.parent.prototype._renderProperties.call(this);
+  this._renderSplitterPosition(this.splitterPosition);
+};
+
 scout.SplitBox.prototype._renderSplitterPosition = function() {
   this.newSplitterPosition(this.splitterPosition);
 };
@@ -155,5 +155,12 @@ scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition) {
  * @override CompositeField.js
  */
 scout.SplitBox.prototype.getFields = function() {
-  return [ this.firstField, this.secondField ];
+  var fields = [];
+  if (this.firstField) {
+    fields.push(this.firstField);
+  }
+  if (this.secondField) {
+    fields.push(this.secondField);
+  }
+  return fields;
 };

@@ -26,6 +26,11 @@ public class JsonListBox<V, T extends IListBox<V>> extends JsonFormField<T> {
   }
 
   @Override
+  public String getObjectType() {
+    return "ListBox";
+  }
+
+  @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonAdapterProperty<IListBox<V>>("table", model, getJsonSession()) {
@@ -44,10 +49,4 @@ public class JsonListBox<V, T extends IListBox<V>> extends JsonFormField<T> {
       });
     }
   }
-
-  @Override
-  public String getObjectType() {
-    return "ListBox";
-  }
-
 }

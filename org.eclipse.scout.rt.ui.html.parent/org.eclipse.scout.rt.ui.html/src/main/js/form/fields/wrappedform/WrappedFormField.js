@@ -2,7 +2,7 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.WrappedFormField = function() {
-  scout.CalendarField.parent.call(this);
+  scout.WrappedFormField.parent.call(this);
   this._addAdapterProperties(['innerForm']);
 };
 scout.inherits(scout.WrappedFormField, scout.FormField);
