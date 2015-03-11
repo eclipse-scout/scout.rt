@@ -169,6 +169,7 @@ scout.Tree.prototype.onResize = function() {
 
 scout.Tree.prototype.updateScrollbar = function() {
   scout.scrollbars.update(this.$data);
+  this.htmlComp.invalidateTree();
 };
 
 scout.Tree.prototype.setBreadcrumbEnabled = function(enabled) {

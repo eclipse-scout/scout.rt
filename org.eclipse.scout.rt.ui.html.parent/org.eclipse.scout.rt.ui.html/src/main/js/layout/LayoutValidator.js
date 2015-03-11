@@ -30,14 +30,14 @@ scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
   }
 };
 
+/**
+ * Layouts all invalid components (as long as they haven't been removed).
+ */
 scout.LayoutValidator.prototype.validate = function() {
-  for (var i=0; i < this._invalidComponents.length; i++) {
-    if (this._invalidComponents[i].isRemoved()) {
-      // Don't layout components which don't exist anymore
-      continue;
+  this._invalidComponents.forEach(function(comp){
+    if (!comp.isRemoved()) { // don't layout components which don't exist anymore
+      comp.layout();
     }
-
-    this._invalidComponents[i].layout();
-  }
+  });
   this._invalidComponents = [];
 };

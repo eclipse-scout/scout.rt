@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonGridData;
-import org.eclipse.scout.rt.ui.html.json.JsonProcessingStatus;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.json.JSONObject;
 
 // TODO AWE: [P2] make JsonFormField abstract (later), direktes instanzieren soll nicht mehr möglich sein
@@ -79,7 +79,6 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
         return getModel().isStatusVisible();
       }
     });
-
     putJsonProperty(new JsonProperty<T>(IFormField.PROP_ERROR_STATUS, model) {
       @Override
       protected IStatus modelValue() {
@@ -88,12 +87,7 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        if (value == null) {
-          return "";
-        }
-        else {
-          return new JsonProcessingStatus((IStatus) value).toJson();
-        }
+        return JsonStatus.toJson((IStatus) value);
       }
     });
     putJsonProperty(new JsonProperty<T>("gridData", model) {

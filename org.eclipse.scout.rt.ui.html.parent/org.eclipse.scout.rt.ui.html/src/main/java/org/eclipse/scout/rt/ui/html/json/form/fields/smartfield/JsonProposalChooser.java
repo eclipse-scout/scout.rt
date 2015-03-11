@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.json.JSONObject;
 
@@ -49,6 +50,11 @@ public class JsonProposalChooser extends AbstractJsonPropertyObserver<IProposalC
       @Override
       protected IStatus modelValue() {
         return getModel().getStatus();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return JsonStatus.toJson((IStatus) value);
       }
     });
     putJsonProperty(new JsonProperty<IProposalChooser>(IProposalChooser.PROP_STATUS_VISIBLE, model) {

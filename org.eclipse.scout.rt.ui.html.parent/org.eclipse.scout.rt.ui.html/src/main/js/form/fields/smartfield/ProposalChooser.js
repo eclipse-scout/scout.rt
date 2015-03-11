@@ -2,24 +2,50 @@ scout.ProposalChooser = function() {
   scout.ProposalChooser.parent.call(this);
   this._addAdapterProperties(['model']);
   this.$container;
+  this._$status;
   this.htmlComp;
 };
 scout.inherits(scout.ProposalChooser, scout.ModelAdapter);
 
-scout.ProposalChooser.prototype.render = function($parent) {
+scout.ProposalChooser.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('proposal-chooser');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ProposalChooserLayout(this));
   this.model.render(this.$container);
 
+  this._$status = this.$container.appendDiv('status');
+
   // support for activeFilter
-  this.activeFilter = 'TRUE'; // FIXME AWE: remove hardcoded
+  this.activeFilter = 'TRUE'; // FIXME AWE: (smart-field) remove hardcoded filter
   if (this.activeFilter) {
     var $activeFilter = $.makeDiv('active-filter')
       .appendTo(this.$container);
     this._appendOption($activeFilter, 'UNDEFINED', 'Alle');
     this._appendOption($activeFilter, 'TRUE', 'Aktive');
     this._appendOption($activeFilter, 'FALSE', 'Inaktive');
+  }
+};
+
+scout.ProposalChooser.prototype._renderProperties = function() {
+  scout.ProposalChooser.parent.prototype._renderProperties.call(this);
+  this._updateStatus();
+};
+
+scout.ProposalChooser.prototype._renderStatus = function() {
+  this._updateStatus();
+};
+
+scout.ProposalChooser.prototype._renderStatusVisible = function() {
+  this._updateStatus();
+};
+
+scout.ProposalChooser.prototype._updateStatus = function() {
+  $.log.debug('_updateStatus status=' + this.status + ' statusVisible=' + this.statusVisible);
+  this._$status.setVisible(this.statusVisible && this.status);
+  if (this.status) {
+    this._$status.text(this.status.message);
+  } else {
+    this._$status.text('');
   }
 };
 

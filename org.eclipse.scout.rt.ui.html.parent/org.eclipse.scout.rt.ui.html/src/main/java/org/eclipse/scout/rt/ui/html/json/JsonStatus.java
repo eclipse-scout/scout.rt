@@ -15,25 +15,23 @@ import org.eclipse.scout.rt.client.IFieldStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
 import org.json.JSONObject;
 
-/**
- * @author awe
- */
-public class JsonProcessingStatus implements IJsonObject {
+public class JsonStatus implements IJsonObject {
 
   private final IStatus m_status;
 
-  public JsonProcessingStatus(IStatus processingStatus) {
-    this.m_status = processingStatus;
+  public JsonStatus(IStatus status) {
+    this.m_status = status;
   }
 
-  public IStatus getProcessingStatus() {
+  public IStatus getStatus() {
     return m_status;
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
-    JsonObjectUtility.putProperty(json, "message", getMessage());
+    JsonObjectUtility.putProperty(json, "message", m_status.getMessage());
+    JsonObjectUtility.putProperty(json, "severity", m_status.getSeverity());
     JsonObjectUtility.putProperty(json, "iconName", getIconUrl());
     return json;
   }
@@ -47,8 +45,8 @@ public class JsonProcessingStatus implements IJsonObject {
     }
   }
 
-  private String getMessage() {
-    return m_status.getMessage();
+  public static Object toJson(IStatus status) {
+    return status == null ? "" : new JsonStatus(status).toJson();
   }
 
 }

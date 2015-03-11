@@ -244,6 +244,11 @@ scout.AbstractSmartField.prototype._searchText = function() {
 
 // FIXME AWE: an dieser stelle müssten wir auch die screen-boundaries berücksichtigen
 // und entscheiden, ob das popup gegen unten oder gegen oben geöffnet werden soll.
+/**
+ * This method opens a popup before we contact the server to load proposals. This means
+ * at this point we cannot know what size the popup should have. We have to set a fixed
+ * size and resize the popup later when proposals are available.
+ */
 scout.AbstractSmartField.prototype._openPopup = function() {
   if (this._$popup) {
     return false;
@@ -259,14 +264,24 @@ scout.AbstractSmartField.prototype._openPopup = function() {
       .appendTo($('body'));
 
     var htmlPopup = new scout.HtmlComponent(this._$popup, this.session),
+      popupLayout = new scout.PopupLayout(htmlPopup),
       fieldBounds = this._getInputBounds();
+
+    popupLayout.autoSize = false;
+    popupLayout.adjustAutoSize = function(prefSize) {
+      return new scout.Dimension(
+          Math.max(fieldBounds.width, prefSize.width),
+          Math.min(350, prefSize.height));
+    };
+
     htmlPopup.validateRoot = true;
-    htmlPopup.setLayout(new scout.PopupLayout(htmlPopup, this._resizePopup.bind(this)));
+    htmlPopup.setLayout(popupLayout);
     htmlPopup.setBounds(new scout.Rectangle(
       fieldBounds.x,
       fieldBounds.y + fieldBounds.height,
       fieldBounds.width,
-      150));
+      scout.HtmlEnvironment.formRowHeight * 2));
+    popupLayout.autoSize = true;
 
     return true;
   }

@@ -34,12 +34,26 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
     },
 
     TREE: {
+      _$tree: null,
+      _$treeData: null,
       cssSelector: '.tree',
       modifyDom: function($container) {
-
+        $.log.info('modify DOM');
+        this._$tree = $container.find('.tree')
+          .css('display', 'inline-block')
+          .css('width', 'auto')
+          .css('height', 'auto');
+        this._$treeData = this._$tree.children('.tree-data')
+          .css('display', 'inline-block');
       },
       restoreDom: function($container) {
-
+        $.log.info('restore DOM');
+        this._$tree
+          .css('display', 'block')
+          .css('width', '100%')
+          .css('height', '100%');
+        this._$treeData
+          .css('display', 'block');
       }
     }
 };
@@ -56,12 +70,24 @@ scout.ProposalChooserLayout.prototype._createTypeHandler = function(proposalChoo
 scout.ProposalChooserLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
     htmlModel = scout.HtmlComponent.get($container.children(this._typeHandler.cssSelector)),
-    size = htmlContainer.getSize().subtract(htmlContainer.getInsets());
+    size = htmlContainer.getSize().subtract(htmlContainer.getInsets()),
+    $status = $container.children('.status:visible'),
+    $activeFilter = $container.children('.active-filter:visible');
 
-  if (this._hasFilter()) {
-    size.height -= scout.HtmlEnvironment.formRowHeight;
+  if ($status.length) {
+    size.height -= scout.graphics.getSize($status).height;
+  }
+  if ($activeFilter.length) {
+    size.height -= scout.graphics.getSize($activeFilter).height;
+  }
+
+  // when status or active-filter is available we must explicitly set the
+  // height of the model (table or tree) in pixel. Otherwise we'd rely on
+  // the CSS height which is set to 100%.
+  if ($status.length || $activeFilter.length) {
     htmlModel.pixelBasedSizing = true;
   }
+
   htmlModel.setSize(size);
 };
 
@@ -96,9 +122,5 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
 
   $.log.info('proposal-chooser prefSize=' + prefSize);
   return prefSize;
-};
-
-scout.ProposalChooserLayout.prototype._hasFilter = function() {
-  return this._proposalChooser.activeFilter !== undefined;
 };
 
