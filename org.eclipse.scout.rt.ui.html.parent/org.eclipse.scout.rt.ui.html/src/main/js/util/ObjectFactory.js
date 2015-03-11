@@ -302,6 +302,11 @@ scout.defaultObjectFactories = [{
     return new scout.PlaceholderField();
   }
 }, {
+  objectType: 'WizardProgressField',
+  create: function() {
+    return new scout.WizardProgressField();
+  }
+}, {
   objectType: 'KeyStroke',
   create: function() {
     return new scout.KeyStroke();

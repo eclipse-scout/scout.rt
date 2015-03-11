@@ -1,0 +1,116 @@
+@wizard-progress-height: 40px;
+@wizard-progress-border-width: 3px;
+@wizard-progress-step-background-color: @palette-gray-8;
+@wizard-progress-step-foreground-color: @text-color;
+@wizard-progress-active-step-background-color: @palette-gray-7;
+@wizard-progress-active-step-foreground-color: @active-color;
+@wizard-progress-disabled-step-background-color: @body-background-color;
+@wizard-progress-disabled-step-foreground-color: @text-disabled-color;
+@wizard-progress-separator-color: @palette-gray-6;
+@wizard-progress-separator-width: 2px;
+
+.wizard-steps {
+  height: @wizard-progress-height;
+  margin-left: @mandatory-indicator-width;
+  margin-right: 0;
+
+  overflow: hidden;
+  border-top: @wizard-progress-border-width solid @desktop-border-color;
+  border-bottom: @wizard-progress-border-width solid @desktop-border-color;
+  /* If wizard progress field is in the root-group-box and there is a menubar, */
+  /* disable the top-border (because the menubar already has a border) */
+  .menubar ~ .root-group-box > .group-box-body > .wizard-progress-field > & {
+    border-top-color: transparent;
+    margin-top: -@wizard-progress-border-width;
+  }
+
+  /* This creates a new stacking context: */
+  position: relative;
+  z-index: 0;
+}
+
+.wizard-step {
+  display: inline-block;
+  height: @wizard-progress-height - (2 * @wizard-progress-border-width);
+  line-height: @wizard-progress-height - (2 * @wizard-progress-border-width);
+  position: relative;
+
+  /* Spacing */
+  padding-left: 20px;
+  padding-right: 10px;
+  &:first-child {
+    padding-left: 15px;
+  }
+  &:last-child {
+  }
+
+  /* Step types */
+  color: @wizard-progress-step-foreground-color;
+  background-color: @wizard-progress-step-background-color;
+  &.disabled {
+    color: @wizard-progress-disabled-step-foreground-color;
+    background-color: @wizard-progress-disabled-step-background-color;
+  }
+  &.active {
+    color: @wizard-progress-active-step-foreground-color;
+    background-color: @wizard-progress-active-step-background-color;
+  }
+  &.before-active {
+  }
+  &.after-active {
+    background-color: @wizard-progress-disabled-step-background-color;
+  }
+
+  /* Step content */
+  & > div {
+    display: inline-block;
+    max-width: 100px;
+    .overflow-ellipsis-nowrap;
+  }
+
+  /* Hover state */
+  &:not(.disabled):not(.active):hover {
+    cursor: pointer;
+
+    & > div {
+      text-decoration: underline;
+    }
+  }
+
+  /* Arrow separators (::after is behind ::before) */
+  &::after,
+  &::before {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: (@wizard-progress-height / 2) - @wizard-progress-border-width;
+    left: 100%;
+    height: 0;
+    width: 0;
+    margin-top: -((@wizard-progress-height / 2) + 4);
+
+    border-top: ((@wizard-progress-height / 2) + 4) solid transparent;
+    border-bottom: ((@wizard-progress-height / 2) + 4) solid transparent;
+    border-left: (@wizard-progress-height / 4) solid transparent;
+    z-index: 1; /* draw over next .wizard-step */
+  }
+  /* Note: border-left-color must match background color of .wizard-step */
+  &::after {
+    border-left-color: @wizard-progress-step-background-color;
+  }
+  &.disabled::after {
+    border-left-color: @wizard-progress-disabled-step-background-color;
+  }
+  &.active::after {
+    border-left-color: @wizard-progress-active-step-background-color;
+  }
+  &.after-active::after {
+    border-left-color: @wizard-progress-disabled-step-background-color;
+  }
+  &.after-active::after {
+  }
+  &::before {
+    margin-left: @wizard-progress-separator-width;
+    border-left-color: @wizard-progress-separator-color;
+  }
+}

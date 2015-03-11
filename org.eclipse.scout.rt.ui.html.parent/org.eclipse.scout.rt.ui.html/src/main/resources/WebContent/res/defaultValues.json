@@ -169,8 +169,12 @@
         "TabItem": null
       },
       "ImageField": null,
+      "ListBox": null,
       "OfficeOnlineField": null,
+      "PlaceholderField": null,
+      "PlannerField": null,
       "SequenceBox": null,
+      "SplitBox": null,
       "TabBox": null,
       "TableField": null,
       "TagCloudField": null,
@@ -178,6 +182,7 @@
       "TreeBox": null,
       "ValueField": {
         "CheckBoxField": null,
+        "CalendarField": null,
         "DateField": null,
         "LabelField": null,
         "NumberField": null,
@@ -187,7 +192,9 @@
         },
         "StringField": null,
         "RadioButtonGroup": null
-      }
+      },
+      "WizardProgressField": null,
+      "WrappedFormField": null
     },
     "Action": {
       "ToolButton": null,
