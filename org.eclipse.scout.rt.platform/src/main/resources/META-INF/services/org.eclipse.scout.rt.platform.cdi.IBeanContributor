@@ -1,1 +1,1 @@
-org.eclipse.scout.rt.platform.cdi.internal.scan.ClassScannerBeanContributor
+org.eclipse.scout.rt.platform.cdi.internal.PlatformBeanContributor
