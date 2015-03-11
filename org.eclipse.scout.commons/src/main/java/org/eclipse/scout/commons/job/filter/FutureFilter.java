@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job.filter;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -26,6 +27,10 @@ public class FutureFilter implements IFilter<IFuture<?>> {
   private final Set<IFuture<?>> m_futures;
 
   public FutureFilter(final IFuture<?>... futures) {
+    m_futures = CollectionUtility.hashSet(futures);
+  }
+
+  public FutureFilter(final Collection<IFuture<?>> futures) {
     m_futures = CollectionUtility.hashSet(futures);
   }
 
