@@ -245,7 +245,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       throw new ServletException("Expected init-param \"session\"");
     }
 
-    m_contentHandler = createContentHandler(m_serverSessionClass);
+    m_contentHandler = createContentHandler();
   }
 
   /**
@@ -279,7 +279,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
    * <p>
    * This method is part of the protected api and can be overridden.
    */
-  protected IServiceTunnelContentHandler createContentHandler(Class<? extends IServerSession> sessionClass) {
+  protected IServiceTunnelContentHandler createContentHandler() {
     DefaultServiceTunnelContentHandler e = new DefaultServiceTunnelContentHandler();
     e.initialize();
     return e;
