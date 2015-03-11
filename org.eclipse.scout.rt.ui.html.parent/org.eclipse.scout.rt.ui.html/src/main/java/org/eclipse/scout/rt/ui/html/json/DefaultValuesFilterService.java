@@ -27,9 +27,20 @@ import org.json.JSONObject;
 public class DefaultValuesFilterService extends AbstractService implements IDefaultValuesFilterService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultValuesFilterService.class);
 
-  protected DefaultValuesFilter m_filter;
+  private static final long FILE_UPDATE_CHECK_INTERVAL = 1234; // in milliseconds (only used in dev mode)
+
+  private DefaultValuesFilter m_filter;
+  private long m_lastCheckForFileUpdate; // timestamp in milliseconds (only used in dev mode)
 
   public DefaultValuesFilterService() {
+  }
+
+  protected DefaultValuesFilter getFilter() {
+    return m_filter;
+  }
+
+  protected void setFilter(DefaultValuesFilter filter) {
+    m_filter = filter;
   }
 
   @Override
@@ -65,17 +76,21 @@ public class DefaultValuesFilterService extends AbstractService implements IDefa
   protected void ensureLoaded() throws ProcessingException {
     DefaultValuesFilter filter = m_filter;
     if (filter != null && Platform.inDevelopmentMode()) {
-      URL url = getDefaultValuesJsonUrl();
-      try {
-        URLConnection conn = url.openConnection();
-        long lastModified = conn.getLastModified();
-        if (lastModified != filter.lastModified()) {
-          LOG.info("Detected modification in " + url);
-          loadFilter();
+      long time = System.currentTimeMillis();
+      if (time - m_lastCheckForFileUpdate > FILE_UPDATE_CHECK_INTERVAL) {
+        m_lastCheckForFileUpdate = time;
+        URL url = getDefaultValuesJsonUrl();
+        try {
+          URLConnection conn = url.openConnection();
+          long lastModified = conn.getLastModified();
+          if (lastModified != filter.lastModified()) {
+            LOG.info("Detected modification in " + url);
+            loadFilter();
+          }
         }
-      }
-      catch (Exception e) {
-        LOG.warn("Error while checking for file modification of " + url, e);
+        catch (Exception e) {
+          LOG.warn("Error while checking for file modification of " + url, e);
+        }
       }
     }
 
