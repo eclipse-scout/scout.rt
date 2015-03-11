@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.inventory.internal;
 
 import java.lang.reflect.Modifier;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.jboss.jandex.ClassInfo;
 
@@ -23,6 +24,7 @@ public class JandexClassInfo implements IClassInfo {
   private final ClassInfo m_classInfo;
 
   public JandexClassInfo(ClassInfo classInfo) {
+    Assertions.assertNotNull(classInfo);
     m_classInfo = classInfo;
   }
 
@@ -79,5 +81,38 @@ public class JandexClassInfo implements IClassInfo {
   @Override
   public boolean isEnum() {
     return (flags() & ACC_ENUM) != 0;
+  }
+
+  @Override
+  public String toString() {
+    return m_classInfo.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return m_classInfo.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof JandexClassInfo)) {
+      return false;
+    }
+    JandexClassInfo other = (JandexClassInfo) obj;
+    if (m_classInfo == null) {
+      if (other.m_classInfo != null) {
+        return false;
+      }
+    }
+    else if (!m_classInfo.equals(other.m_classInfo)) {
+      return false;
+    }
+    return true;
   }
 }

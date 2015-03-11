@@ -30,14 +30,16 @@ public class PlatformBeanContributor implements IBeanContributor {
 
   @Override
   public void contributeBeans(IClassInventory classInventory, IBeanContext context) {
+    Set<Class<?>> allBeans = new HashSet<>();
+
     // 1. collect all annotations annotated with @Bean and register all classes that are directly annotated with @Bean
     Set<IClassInfo> beanAnnotations = new HashSet<>();
     for (IClassInfo ci : classInventory.getKnownAnnotatedTypes(Bean.class)) {
-      if ((ci.flags() & IClassInfo.ACC_ANNOTATION) != 0) {
+      if (ci.isAnnotation()) {
         beanAnnotations.add(ci);
       }
       else {
-        register(context, ci);
+        collectWithSubClasses(classInventory, ci, allBeans);
       }
     }
 
@@ -45,32 +47,67 @@ public class PlatformBeanContributor implements IBeanContributor {
     for (IClassInfo annotation : beanAnnotations) {
       try {
         for (IClassInfo ci : classInventory.getKnownAnnotatedTypes(annotation.resolveClass())) {
-          register(context, ci);
+          collectWithSubClasses(classInventory, ci, allBeans);
         }
       }
       catch (ClassNotFoundException e) {
-        LOG.warn("Error loading class", e);
+        LOG.warn("Error loading class '" + annotation.name() + "' with flags 0x" + Integer.toHexString(annotation.flags()), e);
       }
+    }
+
+    // 3. add all classes to the context
+    for (Class<?> bean : allBeans) {
+      context.registerClass(bean);
     }
   }
 
   /**
    * @param ci
    */
-  private void register(IBeanContext context, IClassInfo ci) {
+  private void collectWithSubClasses(IClassInventory classInventory, IClassInfo ci, Set<Class<?>> collector) {
     if (ci.isEnum() || ci.isAnnotation() || ci.isSynthetic() || !ci.isPublic()) {
+      LOG.debug("Skipping bean candidate '{0}' because it is no supported class type (enum, annotation, anonymous class) or is not public.", ci.name());
       return;
     }
+
+    collect(ci, collector);
+
+    if (!ci.isFinal()) {
+      try {
+        Set<IClassInfo> allKnownSubClasses = classInventory.getAllKnownSubClasses(ci.resolveClass());
+        for (IClassInfo subClass : allKnownSubClasses) {
+          collect(subClass, collector);
+        }
+      }
+      catch (ClassNotFoundException e) {
+        LOG.warn("Error loading class '" + ci.name() + "' with flags 0x" + Integer.toHexString(ci.flags()), e);
+      }
+    }
+  }
+
+  private void collect(IClassInfo ci, Set<Class<?>> collector) {
     try {
+      if (ci.isAbstract() || ci.isInterface()) {
+        LOG.debug("Skipping bean candidate '{0}' because it is abstract or an interface.", ci.name());
+        return;
+      }
+
+      if (!ci.hasNoArgsConstructor()) {
+        LOG.debug("Skipping bean candidate '{0}' because no default constructor could be found.", ci.name());
+        return;
+      }
+
       Class<?> clazz = ci.resolveClass();
       // top level or static inner
       if (clazz.isMemberClass() && !Modifier.isStatic(clazz.getModifiers())) {
+        LOG.debug("Skipping bean candidate '{0}' because it is a non static inner class.", ci.name());
         return;
       }
-      context.registerClass(clazz);
+
+      collector.add(clazz);
     }
     catch (ClassNotFoundException ex) {
-      LOG.warn("class " + ci.name() + " with flags 0x" + Integer.toHexString(ci.flags()), ex);
+      LOG.warn("Error loading class '" + ci.name() + "' with flags 0x" + Integer.toHexString(ci.flags()), ex);
     }
   }
 }
