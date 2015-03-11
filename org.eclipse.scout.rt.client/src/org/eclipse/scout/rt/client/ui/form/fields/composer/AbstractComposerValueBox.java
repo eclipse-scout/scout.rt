@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -364,6 +363,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List<?> values0) {
       setFilterActiveNodesValue(TriState.TRUE);
       setFilterActiveNodes(attribute.isActiveFilterEnabled());
@@ -380,9 +380,12 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
         }
       }
       try {
-        if (CollectionUtility.hasElements(values0)) {
-          Set<Object> values = new HashSet<Object>(values0);
-          setValue(values);
+        Object firstElement = CollectionUtility.firstElement(values0);
+        if (firstElement instanceof Collection) {
+          setValue(CollectionUtility.hashSet((Collection) firstElement));
+        }
+        else if (firstElement instanceof Object[]) {
+          setValue(CollectionUtility.hashSet((Object[]) firstElement));
         }
         else {
           setValue(null);
@@ -405,7 +408,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       if (value == null) {
         return null;
       }
-      return CollectionUtility.arrayList(value);
+      return CollectionUtility.arrayList((Object) value);
     }
 
     @Override
