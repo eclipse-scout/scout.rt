@@ -31,9 +31,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.application.AbstractEntryPoint;
@@ -504,32 +502,25 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
 
       @Override
       public void valueUnbound(final HttpSessionBindingEvent event) {
-        // Use SafeRunner to never propagate an exception which might crash the application server.
-        SafeRunner.run(new ISafeRunnable() {
+        try {
+          destroyApplication(event, clientSession);
+        }
+        catch (Exception e) {
+          String msg = new StringBuilder()
+          .append(" [thread=").append(Thread.currentThread())
+          .append(", httpSession=").append(event.getSession().getId())
+          .append(", clientSession=").append(clientSession)
+          .append(", environment=").append(AbstractRwtEnvironment.this)
+          .append(", userAgent=").append(clientSession.getUserAgent())
+          .append("]").toString();
 
-          @Override
-          public void run() throws Exception {
-            destroyApplication(event, clientSession);
+          if (Platform.isRunning()) {
+            LOG.error("Failed to stop application." + msg, e);
           }
-
-          @Override
-          public void handleException(Throwable e) {
-            String msg = new StringBuffer()
-                .append(" [thread=").append(Thread.currentThread())
-                .append(", httpSession=").append(event.getSession().getId())
-                .append(", clientSession=").append(clientSession)
-                .append(", environment=").append(AbstractRwtEnvironment.this)
-                .append(", userAgent=").append(clientSession.getUserAgent())
-                .append("]").toString();
-
-            if (Platform.isRunning()) {
-              LOG.error("Failed to stop application." + msg, e);
-            }
-            else {
-              LOG.warn("Failed to stop application because platform was already terminated." + msg, e);
-            }
+          else {
+            LOG.warn("Failed to stop application because platform was already terminated." + msg, e);
           }
-        });
+        }
       }
     });
     return clientSession;
