@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.splitbox.internal.SplitBoxGrid
 
 /**
  * <h3>AbstractSplitBox</h3> ...
- * 
+ *
  * @since 3.1.12 16.07.2008
  */
 @ClassId("2b156923-e659-4993-8d5d-559f140ec59d")
@@ -43,6 +43,11 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   @Override
   protected boolean getConfiguredGridUseUiHeight() {
     return true;
+  }
+
+  @Override
+  protected int getConfiguredGridW() {
+    return FULL_WIDTH;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
