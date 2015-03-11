@@ -30,6 +30,7 @@ abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPropertyOb
     propertySupport.setProperty(PROP_ACTIVE_STATE_FILTER_ENABLED, m_contentAssistField.isActiveFilterEnabled());
     propertySupport.setProperty(PROP_ACTIVE_STATE_FILTER, m_contentAssistField.getActiveFilter());
     m_model = createModel();
+    setStatusVisible(true);
   }
 
   abstract protected T createModel() throws ProcessingException;
