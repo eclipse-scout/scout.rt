@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.platform.inventory.internal;
 import java.lang.reflect.Modifier;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.jboss.jandex.ClassInfo;
 
@@ -21,6 +23,7 @@ import org.jboss.jandex.ClassInfo;
  */
 public class JandexClassInfo implements IClassInfo {
 
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JandexClassInfo.class);
   private final ClassInfo m_classInfo;
 
   public JandexClassInfo(ClassInfo classInfo) {
@@ -46,6 +49,29 @@ public class JandexClassInfo implements IClassInfo {
   @Override
   public Class<?> resolveClass() throws ClassNotFoundException {
     return Class.forName(name());
+  }
+
+  @Override
+  public boolean isInstanciable() {
+    if (isAbstract() || isInterface()) {
+      return false;
+    }
+
+    if (!hasNoArgsConstructor()) {
+      return false;
+    }
+
+    try {
+      Class<?> clazz = resolveClass();
+      // top level or static inner
+      if (clazz.isMemberClass() && !Modifier.isStatic(clazz.getModifiers())) {
+        return false;
+      }
+    }
+    catch (ClassNotFoundException ex) {
+      LOG.warn("Error loading class '" + name() + "' with flags 0x" + Integer.toHexString(flags()), ex);
+    }
+    return true;
   }
 
   @Override

@@ -40,6 +40,8 @@ public interface IClassInfo {
 
   Class<?> resolveClass() throws ClassNotFoundException;
 
+  boolean isInstanciable();
+
   boolean isPublic();
 
   boolean isFinal();

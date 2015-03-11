@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.cdi.internal;
 
-import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -87,24 +86,10 @@ public class PlatformBeanContributor implements IBeanContributor {
 
   private void collect(IClassInfo ci, Set<Class<?>> collector) {
     try {
-      if (ci.isAbstract() || ci.isInterface()) {
-        LOG.debug("Skipping bean candidate '{0}' because it is abstract or an interface.", ci.name());
-        return;
+      if (!ci.isInstanciable()) {
+        LOG.debug("Skipping bean candidate '{0}' because it is not instanciable.", ci.name());
       }
-
-      if (!ci.hasNoArgsConstructor()) {
-        LOG.debug("Skipping bean candidate '{0}' because no default constructor could be found.", ci.name());
-        return;
-      }
-
-      Class<?> clazz = ci.resolveClass();
-      // top level or static inner
-      if (clazz.isMemberClass() && !Modifier.isStatic(clazz.getModifiers())) {
-        LOG.debug("Skipping bean candidate '{0}' because it is a non static inner class.", ci.name());
-        return;
-      }
-
-      collector.add(clazz);
+      collector.add(ci.resolveClass());
     }
     catch (ClassNotFoundException ex) {
       LOG.warn("Error loading class '" + ci.name() + "' with flags 0x" + Integer.toHexString(ci.flags()), ex);
