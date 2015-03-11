@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.cdi.internal.scan;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -42,8 +43,14 @@ public class ClassScannerBeanContributor implements IBeanContributor {
       scanner = new BeanFinderWithReflection();
     }
     try {
+      long t0 = System.nanoTime();
       scanner.scanAllModules();
-      for (Class<?> c : scanner.finish()) {
+      Collection<Class> classes = scanner.finish();
+      long millis = (System.nanoTime() - t0) / 1000000L;
+
+      LOG.info("detected " + classes.size() + " @Bean annotated classes in " + millis + "ms");
+
+      for (Class<?> c : classes) {
         if (LOG.isDebugEnabled()) {
           LOG.debug("detected @Bean " + c);
         }
