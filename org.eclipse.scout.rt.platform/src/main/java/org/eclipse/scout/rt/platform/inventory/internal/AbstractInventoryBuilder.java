@@ -1,9 +1,8 @@
-package org.eclipse.scout.rt.platform.cdi.internal.scan;
+package org.eclipse.scout.rt.platform.inventory.internal;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -17,11 +16,11 @@ import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
 /**
  * scan classpath for {@link Bean}
  */
-public abstract class AbstractBeanFinder {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBeanFinder.class);
+public abstract class AbstractInventoryBuilder {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractInventoryBuilder.class);
   public static final String CLASS_EXT = ".class";
 
-  public AbstractBeanFinder() {
+  public AbstractInventoryBuilder() {
   }
 
   public void scanAllModules() throws IOException {
@@ -109,6 +108,6 @@ public abstract class AbstractBeanFinder {
 
   protected abstract void handleClass(String classname, URL url);
 
-  public abstract Collection<Class> finish();
+  public abstract void finish();
 
 }

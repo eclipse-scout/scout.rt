@@ -19,12 +19,13 @@ import org.eclipse.scout.rt.client.session.ClientSessionProviderWithCache;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopExtensionPluginXmlVisitor;
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
+import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.platform.pluginxml.internal.PluginXmlParser;
 
 public class ClientBeanContributor implements IBeanContributor {
 
   @Override
-  public void contributeBeans(IBeanContext context) {
+  public void contributeBeans(IClassInventory classInventory, IBeanContext context) {
     PluginXmlParser.get().visit(new DesktopExtensionPluginXmlVisitor(context));
     context.registerClass(IconLocator.class);
     context.registerClass(ClientJobManager.class);

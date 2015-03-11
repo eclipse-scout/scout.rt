@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.cdi;
 
+import org.eclipse.scout.rt.platform.inventory.IClassInventory;
+
 /**
  * see {@link Bean}
  */
 public interface IBeanContributor {
 
-  void contributeBeans(IBeanContext context);
+  void contributeBeans(IClassInventory classInventory, IBeanContext context);
 }

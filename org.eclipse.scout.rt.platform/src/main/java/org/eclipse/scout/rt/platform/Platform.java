@@ -20,6 +20,10 @@ import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
 import org.eclipse.scout.rt.platform.internal.ScoutServiceLoader;
+import org.eclipse.scout.rt.platform.inventory.IClassInventory;
+import org.eclipse.scout.rt.platform.inventory.internal.JandexInventoryBuilder;
+import org.eclipse.scout.rt.platform.inventory.internal.JandexClassInventory;
+import org.jboss.jandex.Index;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
@@ -38,6 +42,7 @@ public final class Platform implements IPlatform {
   private BeanContext m_beanContext;
   private List<IModule> m_startedModules;
   private IApplication m_application;
+  private IClassInventory m_classInventory;
 
   private Platform() {
   }
@@ -66,6 +71,7 @@ public final class Platform implements IPlatform {
     }
     m_state = State.Starting;
     notifyListeners(new PlatformEvent(this, PlatformEvent.ABOUT_TO_START));
+    m_classInventory = buildClassInventory();
     startBeanContext();
     m_beanContext.initBeanInstanceFactory();
     startModules();
@@ -93,11 +99,29 @@ public final class Platform implements IPlatform {
     }
   }
 
+  protected IClassInventory buildClassInventory() {
+    try {
+      long t0 = System.nanoTime();
+
+      JandexInventoryBuilder beanFinder = new JandexInventoryBuilder();
+      beanFinder.scanAllModules();
+      beanFinder.finish();
+      long millis = (System.nanoTime() - t0) / 1000000L;
+      Index index = beanFinder.getIndex();
+      LOG.info("created class inventory  in {0} ms", millis);
+
+      return new JandexClassInventory(index);
+    }
+    catch (Exception e) {
+      throw new RuntimeException("Error while building class inventory", e);
+    }
+  }
+
   protected void startBeanContext() {
     BeanContext context = new BeanContext();
     //register beans
     for (IBeanContributor contributor : ScoutServiceLoader.loadServices(IBeanContributor.class)) {
-      contributor.contributeBeans(context);
+      contributor.contributeBeans(getClassInventory(), context);
     }
     m_beanContext = context;
   }
@@ -196,5 +220,10 @@ public final class Platform implements IPlatform {
 //    return StringUtility.hasText(System.getProperty("org.osgi.framework.version"));
     Bundle bundle = FrameworkUtil.getBundle(Platform.class);
     return bundle != null;
+  }
+
+  @Override
+  public IClassInventory getClassInventory() {
+    return m_classInventory;
   }
 }

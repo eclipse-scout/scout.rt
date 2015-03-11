@@ -14,6 +14,8 @@ Export-Package:
  org.eclipse.scout.rt.platform.cdi.interceptor.internal,
  org.eclipse.scout.rt.platform.cdi.internal,
  org.eclipse.scout.rt.platform.internal,
+ org.eclipse.scout.rt.platform.inventory,
+ org.eclipse.scout.rt.platform.inventory.internal,
  org.eclipse.scout.rt.platform.pluginxml,
  org.eclipse.scout.rt.platform.pluginxml.internal
 Bundle-ActivationPolicy: lazy

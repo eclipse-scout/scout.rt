@@ -8,30 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.cdi.internal.scan;
+package org.eclipse.scout.rt.platform.inventory.internal;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.platform.cdi.Bean;
+import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.cdi.IBeanContext;
+import org.eclipse.scout.rt.platform.cdi.internal.PlatformBeanContributor;
 import org.eclipse.scout.rt.platform.cdi.internal.scan.fixture.TestingBean;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public class BeanScannerTest {
 
   @Test
-  public void testReflection() throws Exception {
-    testFinderImpl(new BeanFinderWithReflection());
-  }
-
-  @Test
   public void testJandex() throws Exception {
-    testFinderImpl(new BeanFinderWithJandex());
-  }
+    JandexInventoryBuilder finder = new JandexInventoryBuilder();
 
-  private void testFinderImpl(AbstractBeanFinder finder) throws Exception {
     String basePath = TestingBean.class.getName().replace('.', '/');
     for (String path : new String[]{
         Bean.class.getName().replace('.', '/'),
@@ -50,7 +49,21 @@ public class BeanScannerTest {
     }) {
       finder.handleClass(path.replace('/', '.'), TestingBean.class.getClassLoader().getResource(path + ".class"));
     }
-    Collection<Class> actual = finder.finish();
+    finder.finish();
+    JandexClassInventory classInventory = new JandexClassInventory(finder.getIndex());
+
+    final Set<Class> actual = new HashSet<>();
+    IBeanContext context = Mockito.mock(IBeanContext.class);
+    Mockito.when(context.registerClass(Mockito.<Class<?>> any())).thenAnswer(new Answer<IBean<?>>() {
+      @Override
+      public IBean<?> answer(InvocationOnMock invocation) throws Throwable {
+        actual.add((Class) invocation.getArguments()[0]);
+        return null;
+      }
+    });
+
+    PlatformBeanContributor contrib = new PlatformBeanContributor();
+    contrib.contributeBeans(classInventory, context);
 
     HashSet<Class> expected = new HashSet<Class>();
     expected.add(org.eclipse.scout.rt.platform.cdi.internal.scan.fixture.TestingBean.class);

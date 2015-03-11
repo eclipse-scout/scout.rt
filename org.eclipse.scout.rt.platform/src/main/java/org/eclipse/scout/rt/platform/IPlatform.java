@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform;
 
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
+import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 
 /**
  *
@@ -60,4 +61,5 @@ public interface IPlatform {
    */
   void removePlatformListener(IPlatformListener listener);
 
+  IClassInventory getClassInventory();
 }
