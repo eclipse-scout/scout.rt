@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
-import org.eclipse.scout.rt.platform.cdi.Bean;
+import org.eclipse.scout.rt.platform.cdi.BeanImplementor;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 
@@ -67,7 +67,7 @@ public final class TestingUtility {
     }
     List<IBean<?>> registeredBeans = new ArrayList<>();
     for (Object service : services) {
-      Bean<Object> bean = new Bean<>(service.getClass());
+      BeanImplementor<Object> bean = new BeanImplementor<>(service.getClass());
       bean.addAnnotation(AnnotationFactory.createApplicationScoped());
       bean.addAnnotation(AnnotationFactory.createPriority(priority));
       OBJ.registerBean(bean, service);

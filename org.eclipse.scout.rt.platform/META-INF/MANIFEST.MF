@@ -17,3 +17,5 @@ Export-Package:
  org.eclipse.scout.rt.platform.pluginxml,
  org.eclipse.scout.rt.platform.pluginxml.internal
 Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: jandex-1.2.2.Final.jar,
+ .

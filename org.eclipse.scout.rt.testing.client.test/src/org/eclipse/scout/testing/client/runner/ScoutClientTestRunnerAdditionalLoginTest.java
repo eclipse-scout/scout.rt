@@ -98,8 +98,8 @@ public class ScoutClientTestRunnerAdditionalLoginTest {
     assertNotNull(TestEnvironmentClientSession.get());
     if (s_beforeClassClientSession == null) {
       assertSame(LoginTestClientSessionProvider.getCurrentSession(), TestEnvironmentClientSession.get());
-      assertEquals(Collections.singletonList("test"), LoginTestClientSessionProvider.getBeforeStartRunAs());
-      assertEquals(Collections.singletonList("test"), LoginTestClientSessionProvider.getAfterStartRunAs());
+      assertEquals(Collections.singletonList("default"), LoginTestClientSessionProvider.getBeforeStartRunAs());
+      assertEquals(Collections.singletonList("default"), LoginTestClientSessionProvider.getAfterStartRunAs());
       s_beforeClassClientSession = TestEnvironmentClientSession.get();
       LoginTestClientSessionProvider.clearProtocol();
     }

@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.internal;
 
-import org.eclipse.scout.rt.platform.cdi.Bean;
+import org.eclipse.scout.rt.platform.cdi.BeanImplementor;
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
 import org.eclipse.scout.rt.platform.pluginxml.internal.PluginXmlParser;
@@ -25,7 +25,7 @@ public class SwingBeanContributor implements IBeanContributor {
   @Override
   public void contributeBeans(IBeanContext context) {
     FormFieldExtensions formFieldExtensions = new FormFieldExtensions();
-    Bean<FormFieldExtensions> bean = new Bean<FormFieldExtensions>(FormFieldExtensions.class);
+    BeanImplementor<FormFieldExtensions> bean = new BeanImplementor<FormFieldExtensions>(FormFieldExtensions.class);
     context.registerBean(bean, formFieldExtensions);
 
     context.registerClass(SwingModule.class);

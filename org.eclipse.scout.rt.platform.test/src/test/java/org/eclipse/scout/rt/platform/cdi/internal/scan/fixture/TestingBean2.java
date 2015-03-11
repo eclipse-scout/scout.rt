@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.cdi;
+package org.eclipse.scout.rt.platform.cdi.internal.scan.fixture;
 
-/**
- * see {@link Bean}
- */
-public interface IBeanContributor {
+import org.eclipse.scout.rt.platform.cdi.Bean;
 
-  void contributeBeans(IBeanContext context);
+@Bean
+class TestingBean2 {
 }

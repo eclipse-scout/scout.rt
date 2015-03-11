@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.exception.InitializationException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-import org.eclipse.scout.rt.platform.cdi.Bean;
+import org.eclipse.scout.rt.platform.cdi.BeanImplementor;
 import org.eclipse.scout.rt.platform.cdi.CreateImmediately;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
@@ -104,7 +104,7 @@ public class BeanContext implements IBeanContext {
     if (regs.size() == 1) {
       return (IBean<T>) regs.first().getBean();
     }
-    Bean<T> bean = new Bean<T>(beanClazz);
+    BeanImplementor<T> bean = new BeanImplementor<T>(beanClazz);
     registerBean(bean, null);
     return bean;
   }

@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
 public class BeanRegisterUnregisterTest {
 
   @Test
-  public void test() {
+  public void testOneBean() {
     BeanContext context = new BeanContext();
     context.initBeanInstanceFactory();
 

@@ -45,9 +45,9 @@ public class BeanContextTest {
     context.registerClass(Bean02.class);
 
     Assert.assertEquals(2, context.getAllRegisteredBeans().size());
-    context.unregisterBean(new Bean<Bean01>(Bean01.class));
+    context.unregisterBean(new BeanImplementor<Bean01>(Bean01.class));
     Assert.assertEquals(1, context.getAllRegisteredBeans().size());
-    context.unregisterBean(new Bean<Bean02>(Bean02.class));
+    context.unregisterBean(new BeanImplementor<Bean02>(Bean02.class));
     Assert.assertEquals(0, context.getAllRegisteredBeans().size());
   }
 

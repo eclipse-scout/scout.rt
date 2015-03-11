@@ -16,17 +16,21 @@ import java.util.List;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.session.ClientSessionProviderWithCache;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.platform.cdi.Bean;
 
-public class LoginTestClientSessionProvider extends ClientSessionProvider {
+@Bean
+@Priority(10)
+public class LoginTestClientSessionProvider extends ClientSessionProviderWithCache {
 
   private static IClientSession s_currentSession;
-  private static List<String> s_beforeStartRunAs;
-  private static List<String> s_afterStartRunAs;
+  private static final List<String> s_beforeStartRunAs = new ArrayList<String>();
+  private static final List<String> s_afterStartRunAs = new ArrayList<String>();
 
   public LoginTestClientSessionProvider() {
     clearProtocol();
@@ -40,8 +44,8 @@ public class LoginTestClientSessionProvider extends ClientSessionProvider {
   }
 
   public static void clearProtocol() {
-    s_beforeStartRunAs = new ArrayList<String>();
-    s_afterStartRunAs = new ArrayList<String>();
+    s_beforeStartRunAs.clear();
+    s_afterStartRunAs.clear();
     s_currentSession = null;
   }
 
@@ -57,9 +61,9 @@ public class LoginTestClientSessionProvider extends ClientSessionProvider {
     return s_afterStartRunAs;
   }
 
+  @Bean
+  @Priority(10)
   public static class LoginTestClientSession extends TestEnvironmentClientSession {
-    private static List<String> s_beforeStartRunAs;
-    private static List<String> s_afterStartRunAs;
 
     @Override
     public void startSession() {

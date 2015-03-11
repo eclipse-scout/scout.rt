@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.testing.platform.runner.statement;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
-import org.eclipse.scout.rt.platform.cdi.Bean;
+import org.eclipse.scout.rt.platform.cdi.BeanImplementor;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.junit.runners.model.Statement;
 
@@ -45,7 +45,7 @@ public class RegisterBeanStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
-    final Bean<?> bean = new Bean<>(m_beanClass);
+    final BeanImplementor<?> bean = new BeanImplementor<>(m_beanClass);
     bean.addAnnotation(AnnotationFactory.createPriority(m_priority));
 
     OBJ.registerBean(bean, null);
