@@ -130,5 +130,5 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
  * another size (which is required when the field-content is scrollable).
  */
 scout.FormFieldLayout.prototype.naturalSize = function(formField) {
-  return new scout.Dimension(formField.$fieldContainer.width(), formField.$fieldContainer.height());
+  return new scout.Dimension(formField.$fieldContainer.outerWidth(true), formField.$fieldContainer.outerHeight(true));
 };
