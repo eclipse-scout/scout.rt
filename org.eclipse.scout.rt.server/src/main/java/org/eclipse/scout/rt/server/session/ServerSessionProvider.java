@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.shared.ISession;
 
 /**
  * Provider for server sessions.
@@ -40,7 +41,7 @@ public class ServerSessionProvider {
    */
   public <T extends IServerSession> T provide(final ServerJobInput input) throws ProcessingException {
     // Create an empty session instance.
-    final T serverSession = cast(OBJ.one(IServerSession.class));
+    final T serverSession = ServerSessionProvider.cast(OBJ.one(IServerSession.class));
     serverSession.setIdInternal(String.format("%s-%s", serverSession.getClass().getName(), UUID.randomUUID()));
 
     // Initialize the session.
@@ -55,11 +56,37 @@ public class ServerSessionProvider {
     return serverSession;
   }
 
+  /**
+   * @return The {@link IServerSession} which is associated with the current thread, or <code>null</code> if not found.
+   */
+  public static final IServerSession currentSession() {
+    final ISession session = ISession.CURRENT.get();
+    return (IServerSession) (session instanceof IServerSession ? session : null);
+  }
+
+  /**
+   * @return The {@link IServerSession} which is associated with the current thread, or <code>null</code> if not found
+   *         or not of the expected type.
+   */
+  public static final <SESSION extends IServerSession> SESSION currentSession(final Class<SESSION> type) {
+    final IServerSession serverSession = currentSession();
+    if (serverSession == null) {
+      return null;
+    }
+
+    try {
+      return ServerSessionProvider.cast(serverSession);
+    }
+    catch (final ProcessingException e) {
+      return null; // NOOP
+    }
+  }
+
   @Internal
   @SuppressWarnings("unchecked")
-  protected <T extends IServerSession> T cast(final IServerSession serverSession) throws ProcessingException {
+  protected static <SESSION extends IServerSession> SESSION cast(final IServerSession serverSession) throws ProcessingException {
     try {
-      return (T) serverSession;
+      return (SESSION) serverSession;
     }
     catch (final ClassCastException e) {
       throw new ProcessingException(String.format("Wrong session class [actual=%s]", serverSession.getClass().getName()), e);

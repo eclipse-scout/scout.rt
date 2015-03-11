@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.shared.ISession;
 
 /**
  * Provider for client sessions.
@@ -38,7 +39,7 @@ public class ClientSessionProvider {
    */
   public <T extends IClientSession> T provide(final ClientJobInput input) throws ProcessingException {
     // Create an empty session instance.
-    final T clientSession = cast(OBJ.one(IClientSession.class));
+    final T clientSession = ClientSessionProvider.cast(OBJ.one(IClientSession.class));
 
     // Initialize the session.
     OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
@@ -52,11 +53,37 @@ public class ClientSessionProvider {
     return clientSession;
   }
 
+  /**
+   * @return The {@link IClientSession} which is associated with the current thread, or <code>null</code> if not found.
+   */
+  public static final IClientSession currentSession() {
+    final ISession session = ISession.CURRENT.get();
+    return (IClientSession) (session instanceof IClientSession ? session : null);
+  }
+
+  /**
+   * @return The {@link IClientSession} which is associated with the current thread, or <code>null</code> if not found
+   *         or not of the expected type.
+   */
+  public static final <SESSION extends IClientSession> SESSION currentSession(final Class<SESSION> type) {
+    final IClientSession clientSession = currentSession();
+    if (clientSession == null) {
+      return null;
+    }
+
+    try {
+      return ClientSessionProvider.cast(clientSession);
+    }
+    catch (final ProcessingException e) {
+      return null; // NOOP
+    }
+  }
+
   @Internal
   @SuppressWarnings("unchecked")
-  protected <T extends IClientSession> T cast(final IClientSession clientSession) throws ProcessingException {
+  protected static <SESSION extends IClientSession> SESSION cast(final IClientSession clientSession) throws ProcessingException {
     try {
-      return (T) clientSession;
+      return (SESSION) clientSession;
     }
     catch (final ClassCastException e) {
       throw new ProcessingException(String.format("Wrong session class [actual=%s]", clientSession.getClass().getName()), e);

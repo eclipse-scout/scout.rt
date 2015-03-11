@@ -74,7 +74,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
     for (final Principal principal : principals) {
       final IClientSession clientSession = m_cache.get(newCacheKey(clientSessionClass, principal));
       if (clientSession != null) {
-        return cast(clientSession);
+        return ClientSessionProvider.cast(clientSession);
       }
     }
     return null;

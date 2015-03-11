@@ -73,7 +73,7 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
     for (final Principal principal : principals) {
       final IServerSession serverSession = m_cache.get(newCacheKey(serverSessionClass, principal));
       if (serverSession != null) {
-        return cast(serverSession);
+        return ServerSessionProvider.cast(serverSession);
       }
     }
     return null;
