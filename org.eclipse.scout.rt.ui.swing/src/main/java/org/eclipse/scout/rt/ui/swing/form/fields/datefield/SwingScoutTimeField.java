@@ -289,7 +289,7 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
   protected boolean handleSwingInputVerifier() {
     final String text = getSwingTimeField().getText();
     // only handle if text has changed
-    if (CompareUtility.equals(text, m_displayTextToVerify) && (isDateTimeCompositeMember() || getScoutObject().getErrorStatus() == null)) {
+    if (!m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown && CompareUtility.equals(text, m_displayTextToVerify) && (isDateTimeCompositeMember() || getScoutObject().getErrorStatus() == null)) {
       return true;
     }
     m_displayTextToVerify = text;
@@ -311,6 +311,9 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
     }
     // end notify
     getSwingEnvironment().dispatchImmediateSwingJobs();
+    if (m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown && !m_updateDisplayTextOnModify) {
+      m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown = false;
+    }
     return true;// continue always
   }
 
