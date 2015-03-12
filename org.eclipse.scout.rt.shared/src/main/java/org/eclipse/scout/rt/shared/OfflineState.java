@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,8 +18,9 @@ import org.eclipse.scout.service.IService;
  * see {@link IService} for description of this indicator class
  */
 public final class OfflineState {
+  public static final ThreadLocal<Boolean> CURRENT = new ThreadLocal<>();
+
   private static boolean defaultValue = false;
-  private static final ThreadLocal<Boolean> THREAD_LOCAL = new ThreadLocal<Boolean>();
 
   private OfflineState() {
   }
@@ -40,7 +41,7 @@ public final class OfflineState {
   }
 
   public static boolean isOfflineInCurrentThread() {
-    Boolean var = THREAD_LOCAL.get();
+    Boolean var = CURRENT.get();
     if (var != null) {
       return var.booleanValue();
     }
@@ -59,6 +60,6 @@ public final class OfflineState {
    *          the default of {@link #isOfflineDefault()}
    */
   public static void setOfflineInCurrentThread(Boolean b) {
-    THREAD_LOCAL.set(b);
+    CURRENT.set(b);
   }
 }

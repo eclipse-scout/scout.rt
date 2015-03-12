@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
@@ -49,17 +49,11 @@ import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Version;
 
 /**
- * Use this servlet to dispatch scout gui service requests using {@link IServiceTunnelRequest},
+ * Use this Servlet to dispatch scout UI service requests using {@link IServiceTunnelRequest},
  * {@link IServiceTunnelResponse} and any {@link IServiceTunnelContentHandler} implementation.
- * <p>
- * Override the methods
- * {@link DefaultTransactionDelegate#validateInput(org.eclipse.scout.rt.shared.validate.IValidationStrategy, Object, java.lang.reflect.Method, Object[])
- * DefaultTransactionDelegate#validateInput} and
- * {@link DefaultTransactionDelegate#validateOutput(org.eclipse.scout.rt.shared.validate.IValidationStrategy, Object, java.lang.reflect.Method, Object, Object[])
- * DefaultTransactionDelegate#validateOutput} to do central input/output validation.
- * <p>
- * By default there is a jaas convenience filter {@link HttpAuthJaasFilter} on /process and a {@link SoapWsseJaasFilter}
- * on /ajax with priority 1000
+ * <p/>
+ * By default there is a JAAS convenience filter {@link HttpAuthJaasFilter} on /process and a {@link SoapWsseJaasFilter}
+ * on /ajax with priority 1000.
  */
 public class ServiceTunnelServlet extends HttpServletEx {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.server.http.debug";
@@ -68,7 +62,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelServlet.class);
 
   private transient IServiceTunnelContentHandler m_contentHandler;
-  private Class<? extends IServerSession> m_serverSessionClass;
   private Version m_requestMinVersion;
   private final boolean m_debug;
 
@@ -101,7 +94,9 @@ public class ServiceTunnelServlet extends HttpServletEx {
       input.servletResponse(res);
       input.locale(Locale.getDefault());
       input.userAgent(UserAgent.createDefault());
-      input.session(lookupScoutServerSessionOnHttpSession(input.copy()));
+      input.session(lookupServerSessionOnHttpSession(input.copy()));
+
+      input = interceptServerJobInput(input);
 
       invokeAdminServiceInServerJob(input);
     }
@@ -134,7 +129,9 @@ public class ServiceTunnelServlet extends HttpServletEx {
       input.servletResponse(res);
       input.locale(serviceRequest.getLocale());
       input.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
-      input.session(lookupScoutServerSessionOnHttpSession(input.copy()));
+      input.session(lookupServerSessionOnHttpSession(input.copy()));
+
+      input = interceptServerJobInput(input);
 
       IServiceTunnelResponse serviceResponse = invokeServiceInServerJob(input, serviceRequest);
 
@@ -237,14 +234,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
    */
   @Internal
   protected void lazyInit(HttpServletRequest req, HttpServletResponse res) throws ServletException {
-    // TODO [dwi]: Session class should be resolved by OBJ.one(IServerSession.class); remove once there is only one session class.
-    if (m_serverSessionClass == null) {
-      m_serverSessionClass = loadSessionClassByParam();
-    }
-    if (m_serverSessionClass == null) {
-      throw new ServletException("Expected init-param \"session\"");
-    }
-
     m_contentHandler = createContentHandler();
   }
 
@@ -275,7 +264,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   /**
-   * create the (reusable) content handler (soap, xml, binary) for marshalling scout/osgi remote service calls
+   * Create the (reusable) content handler (soap, xml, binary) for marshalling scout/osgi remote service calls
    * <p>
    * This method is part of the protected api and can be overridden.
    */
@@ -285,30 +274,18 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return e;
   }
 
-  // === SESSION CLASS, SESSION LOOKUP, SESSION CREATION ===
-
   /**
-   * Load the IServerSession class by servlet config parameter
-   *
-   * @throws ServletException
+   * Override this method to intercept the {@link ServerJobInput} used to run server jobs. The default implementation
+   * simply returns the given input.
    */
-  @SuppressWarnings("unchecked")
-  private Class<? extends IServerSession> loadSessionClassByParam() throws ServletException {
-    String qname = getServletConfig().getInitParameter("session");
-    if (qname != null) {
-      int i = qname.lastIndexOf('.');
-      try {
-        return (Class<? extends IServerSession>) Platform.getBundle(qname.substring(0, i)).loadClass(qname);
-      }
-      catch (ClassNotFoundException e) {
-        throw new ServletException("Loading class " + qname, e);
-      }
-    }
-    return null;
+  protected ServerJobInput interceptServerJobInput(final ServerJobInput input) {
+    return input;
   }
 
+  // === SESSION LOOKUP ===
+
   @Internal
-  protected IServerSession lookupScoutServerSessionOnHttpSession(ServerJobInput jobInput) throws ProcessingException, ServletException {
+  protected IServerSession lookupServerSessionOnHttpSession(ServerJobInput jobInput) throws ProcessingException, ServletException {
     HttpServletRequest req = jobInput.getServletRequest();
     HttpServletResponse res = jobInput.getServletResponse();
 
@@ -319,7 +296,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       synchronized (req.getSession()) {
         serverSession = (IServerSession) cacheService.get(IServerSession.class.getName(), req, res); // double checking
         if (serverSession == null) {
-          serverSession = createAndLoadServerSession(m_serverSessionClass, jobInput);
+          serverSession = provideServerSession(jobInput);
           cacheService.put(IServerSession.class.getName(), serverSession, req, res);
         }
       }
@@ -327,12 +304,16 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return serverSession;
   }
 
-  @Internal
-  protected IServerSession createAndLoadServerSession(final Class<? extends IServerSession> clazz, ServerJobInput input) throws ProcessingException {
-    IServerSessionRegistryService sessionService = SERVICES.getService(IServerSessionRegistryService.class);
-    final IServerSession serverSession = sessionService.newServerSession(clazz, input);
+  /**
+   * Method invoked to provide a new {@link IServerSession} for the current HTTP-request.
+   *
+   * @param input
+   *          context information about the ongoing HTTP-request.
+   * @return {@link IServerSession}; must not be <code>null</code>.
+   */
+  protected IServerSession provideServerSession(final ServerJobInput input) throws ProcessingException {
+    final IServerSession serverSession = OBJ.one(ServerSessionProvider.class).provide(input);
     serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(input.getServletRequest(), input.getServletResponse()));
-
     return serverSession;
   }
 

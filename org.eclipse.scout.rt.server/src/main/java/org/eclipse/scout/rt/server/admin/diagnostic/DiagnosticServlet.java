@@ -55,7 +55,9 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
       input.servletResponse(res);
       input.locale(Locale.getDefault());
       input.userAgent(UserAgent.createDefault());
-      input.session(lookupScoutServerSessionOnHttpSession(input.copy()));
+      input.session(lookupServerSessionOnHttpSession(input.copy()));
+
+      input = interceptServerJobInput(input);
 
       invokeDiagnosticServiceInServerJob(input);
 

@@ -18,11 +18,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.cdi.BeanImplementor;
 import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.mockito.Mockito;
 
 /**
  *
@@ -53,27 +56,36 @@ public final class TestingUtility {
   }
 
   /**
-   * Registers a service on behalf of the given bundle context and returns a map with the created service registration
-   * objects.
-   *
-   * @param bundleContext
-   * @param priority
-   * @param services
-   * @return
+   * Registers the given services in the current {@link IBeanContext} and returns their registrations.<br/>
+   * If registering Mockito mocks, use {@link #registerService(float, Object, Class)} instead.
    */
   public static List<IBean<?>> registerServices(float priority, Object... services) {
     if (services == null) {
       return CollectionUtility.emptyArrayList();
     }
     List<IBean<?>> registeredBeans = new ArrayList<>();
+
     for (Object service : services) {
-      BeanImplementor<Object> bean = new BeanImplementor<>(service.getClass());
-      bean.addAnnotation(AnnotationFactory.createApplicationScoped());
-      bean.addAnnotation(AnnotationFactory.createPriority(priority));
-      OBJ.registerBean(bean, service);
-      registeredBeans.add(bean);
+      Assertions.assertFalse(Mockito.mockingDetails(service).isMock(), "Cannot register mocked bean. Use 'registerService' and provide the concrete type. [mock=%s]", service);
+// TODO [dwi][mvi]: enable concrete class resolution for mocks once running without OSGI.
+//      if (Mockito.mockingDetails(service).isMock()) {
+//        Class clazz = new MockUtil().getMockHandler(service).getMockSettings().getTypeToMock();
+//      }
+
+      registeredBeans.add(registerService(priority, service, service.getClass()));
     }
     return registeredBeans;
+  }
+
+  /**
+   * Registers the given service under the given type in the current {@link IBeanContext} and returns its registration.
+   */
+  public static <SERVICE> IBean<SERVICE> registerService(float priority, SERVICE object, Class<? extends SERVICE> clazz) {
+    BeanImplementor<SERVICE> bean = new BeanImplementor<>(clazz);
+    bean.addAnnotation(AnnotationFactory.createApplicationScoped());
+    bean.addAnnotation(AnnotationFactory.createPriority(priority));
+    OBJ.registerBean(bean, object);
+    return bean;
   }
 
   /**

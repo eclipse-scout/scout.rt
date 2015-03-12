@@ -29,9 +29,5 @@ import org.eclipse.scout.service.IService;
 @InputValidation(IValidationStrategy.PROCESS.class)
 public interface IOfflineDispatcherService extends IService {
 
-  String getServerSessionClass();
-
-  void setServerSessionClass(String className);
-
   IServiceTunnelResponse dispatch(final IServiceTunnelRequest request, final IProgressMonitor monitor);
 }

@@ -12,222 +12,120 @@ package org.eclipse.scout.rt.server.services.common.offline;
 
 import java.lang.reflect.Method;
 import java.security.AccessController;
-import java.util.LinkedList;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.ICallable;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
-import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
-import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
-import org.osgi.framework.Bundle;
 
 public class OfflineDispatcherService extends AbstractService implements IOfflineDispatcherService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(OfflineDispatcherService.class);
-
-  private Class<? extends IServerSession> m_serverSessionClass;
-  private IServerSession m_serverSession;
-  private Subject m_subject;
-  private final Thread m_dispatcherThread;
-  // queue
-  private final Object m_queueLock;
-  private final LinkedList<Runnable> m_queue;
-
-  public OfflineDispatcherService() {
-    m_queue = new LinkedList<Runnable>();
-    m_queueLock = new Object();
-    m_dispatcherThread = new Thread("Dispatcher for " + getClass().getName()) {
-      @Override
-      public void run() {
-        // offline dispatcher thread is always in offline mode
-        OfflineState.setOfflineInCurrentThread(true);
-        while (true) {
-          try {
-            dispatchNextJob();
-          }
-          catch (Throwable t) {
-            LOG.error("Error while executing job in offline dispatcher thread.", t);
-          }
-        }
-      }
-    };
-    m_dispatcherThread.setDaemon(true);
-    m_dispatcherThread.start();
-  }
 
   @Override
-  public String getServerSessionClass() {
-    return (m_serverSessionClass != null ? m_serverSessionClass.getName() : null);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public void setServerSessionClass(String className) {
-    int i = className.lastIndexOf('.');
+  public IServiceTunnelResponse dispatch(final IServiceTunnelRequest request, final IProgressMonitor monitor) {
     try {
-      m_serverSessionClass = (Class<? extends IServerSession>) Platform.getBundle(className.substring(0, i)).loadClass(className);
-    }
-    catch (ClassNotFoundException e) {
-      throw new IllegalArgumentException("Loading class " + className, e);
-    }
-  }
+      // Create the job-input on behalf of which the server-job is run.
+      ServerJobInput input = ServerJobInput.empty();
+      input.name("OfflineServiceCall");
+      input.id(String.valueOf(request.getRequestSequence())); // to cancel server jobs and associated transactions.
+      input.subject(Subject.getSubject(AccessController.getContext()));
+      input.locale(request.getLocale());
+      input.userAgent(UserAgent.createByIdentifier(request.getUserAgent()));
+      input.session(provideServerSession(input.copy()));
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public ServiceTunnelResponse dispatch(final IServiceTunnelRequest request, final IProgressMonitor monitor) {
-    final Subject subject = Subject.getSubject(AccessController.getContext());
-    if (m_serverSessionClass == null) {
-      String className = Platform.getProduct().getDefiningBundle().getSymbolicName();
-      className = className.replaceAll("\\.ui\\..*$", ".server.core") + ".ServerSession";
-      int i = className.lastIndexOf('.');
-      try {
-        LOG.warn("missing config.ini property: " + getClass().getName() + "#serverSessionClass=your.app.server.ServerSession. Trying to find default class " + className);
-        m_serverSessionClass = (Class<? extends IServerSession>) Platform.getBundle(className.substring(0, i)).loadClass(className);
+      input = interceptServerJobInput(input);
+
+      final IServiceTunnelResponse response = invokeServiceInServerJob(input, request);
+      if (response != null) {
+        return response;
       }
-      catch (ClassNotFoundException e) {
-        // nop
-      }
-      if (m_serverSessionClass == null) {
-        return new ServiceTunnelResponse(null, null, new ProcessingException("missing config.ini property: " + getClass().getName() + "#serverSessionClass=your.app.server.ServerSession"));
+      else {
+        return new ServiceTunnelResponse(null, null, new InterruptedException("Result from handler was null"));
       }
     }
-
-    Thread currentThread = Thread.currentThread();
-    if (currentThread == m_dispatcherThread) {
-      // when already in dispatcher thread, call service directly
-      ServiceTunnelResponse res;
-      try {
-        res = invokeService(request);
-      }
-      catch (Throwable e) {
-        return new ServiceTunnelResponse(null, null, e);
-      }
-      return res;
-
-    }
-    // create a job and run inside the server dispatcher thread
-    final Object waitLock = new Object();
-    final Holder<ServiceTunnelResponse> responseHolder = new Holder<ServiceTunnelResponse>(ServiceTunnelResponse.class);
-    if ((!currentThread.isInterrupted()) && (monitor == null || !monitor.isCanceled())) {
-      Runnable job = new Runnable() {
-        @Override
-        public void run() {
-          try {
-            ServiceTunnelResponse res = invokeInServerJob(request, subject);
-            responseHolder.setValue(res);
-          }
-          finally {
-            synchronized (waitLock) {
-              waitLock.notifyAll();
-            }
-          }
-        }
-      };
-      enqueueJob(job);
-      // wait until done
-      synchronized (waitLock) {
-        while (responseHolder.getValue() == null && (!currentThread.isInterrupted()) && (!(monitor != null && monitor.isCanceled()))) {
-          try {
-            waitLock.wait(2000);
-          }
-          catch (InterruptedException e) {
-            responseHolder.setValue(new ServiceTunnelResponse(null, null, e));
-          }
-        }
-      }
-    }
-
-    if (responseHolder.getValue() != null) {
-      return responseHolder.getValue();
-    }
-    else {
-      return new ServiceTunnelResponse(null, null, new InterruptedException("Result from handler was null"));
-    }
-  }
-
-  private ServiceTunnelResponse invokeInServerJob(final IServiceTunnelRequest request, final Subject subject) {
-    try {
-      IServerSession session = getOrCreateSession(subject, request.getUserAgent());
-
-      return OBJ.one(IServerJobManager.class).runNow(new ICallable<ServiceTunnelResponse>() {
-
-        @Override
-        public ServiceTunnelResponse call() throws Exception {
-          return invokeService(request);
-        }
-      }, ServerJobInput.defaults().name("Offline invocation").session(session).subject(subject));
-    }
-    catch (ProcessingException e) {
+    catch (final Exception e) {
       return new ServiceTunnelResponse(null, null, e);
     }
   }
 
-  private ServiceTunnelResponse invokeService(IServiceTunnelRequest serviceReq) throws ProcessingException {
-    IServerSession serverSession = ServerSessionProvider.currentSession();
-    Class<?> serviceInterfaceClass = resolveClass(serverSession.getBundle(), serviceReq.getServiceInterfaceClassName());
-    Object service = Assertions.assertNotNull(SERVICES.getService(serviceInterfaceClass), "service not found in service registry: %s", serviceReq.getServiceInterfaceClassName());
-    Method serviceOp = ServiceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
-    Object data = ServiceUtility.invoke(serviceOp, service, serviceReq.getArgs());
-    Object[] outParameters = ServiceUtility.extractHolderArguments(serviceReq.getArgs());
-    ServiceTunnelResponse serviceRes = new ServiceTunnelResponse(data, outParameters, null);
+  /**
+   * Override this method to intercept the {@link ServerJobInput} used to run server jobs. The default implementation
+   * simply returns the given input.
+   */
+  protected ServerJobInput interceptServerJobInput(final ServerJobInput input) {
+    return input;
+  }
+
+  /**
+   * Method invoked to provide a new or cached {@link IServerSession} for the current request.
+   *
+   * @param input
+   *          context information about the ongoing request.
+   * @return {@link IServerSession}; must not be <code>null</code>.
+   */
+  protected IServerSession provideServerSession(final ServerJobInput input) throws ProcessingException {
+    final IServerSession serverSession = OBJ.one(ServerSessionProviderWithCache.class).provide(input);
+    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(input.getServletRequest(), input.getServletResponse()));
+    return serverSession;
+  }
+
+  /**
+   * Method invoked to delegate the request to the 'process service' on behalf of a server job.
+   *
+   * @param input
+   *          input to be used to run the server job with current context information set.
+   * @param serviceTunnelRequest
+   *          describes the service to be invoked.
+   * @return {@link IServiceTunnelResponse} response sent back to the caller.
+   */
+  protected IServiceTunnelResponse invokeServiceInServerJob(final ServerJobInput input, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
+    return OBJ.one(IServerJobManager.class).schedule(new ICallable<IServiceTunnelResponse>() {
+
+      @Override
+      public IServiceTunnelResponse call() throws Exception {
+        return invokeService(serviceTunnelRequest);
+      }
+    }, input).get(); // schedule the service-request to enable cancellation by 'ServerProcessingCancelService.cancel(requestSequence)'
+  }
+
+  /**
+   * Method invoked to delegate the request to the 'process service'.
+   */
+  @Internal
+  protected IServiceTunnelResponse invokeService(final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException, ClassNotFoundException {
+    OfflineState.setOfflineInCurrentThread(true);
+
+    final Class<?> serviceClass = SerializationUtility.getClassLoader().loadClass(serviceTunnelRequest.getServiceInterfaceClassName());
+    final Object service = Assertions.assertNotNull(SERVICES.getService(serviceClass), "service not found in service registry: %s", serviceClass);
+    final Method serviceOperation = ServiceUtility.getServiceOperation(serviceClass, serviceTunnelRequest.getOperation(), serviceTunnelRequest.getParameterTypes());
+
+    final Object[] serviceArgs = serviceTunnelRequest.getArgs();
+    final Object result = ServiceUtility.invoke(serviceOperation, service, serviceArgs);
+    final Object[] outParams = ServiceUtility.extractHolderArguments(serviceArgs);
+
+    final ServiceTunnelResponse serviceResponse = new ServiceTunnelResponse(result, outParams, null);
+
     // add accumulated client notifications as side-payload
-    serviceRes.setClientNotifications(SERVICES.getService(IClientNotificationService.class).getNextNotifications(0));
-    return serviceRes;
-  }
-
-  private void enqueueJob(Runnable r) {
-    synchronized (m_queueLock) {
-      m_queue.add(r);
-      m_queueLock.notifyAll();
-    }
-  }
-
-  private void dispatchNextJob() throws InterruptedException {
-    synchronized (m_queueLock) {
-      if (m_queue.isEmpty()) {
-        m_queueLock.wait();
-      }
-      if (!m_queue.isEmpty()) {
-        Runnable r = m_queue.remove(0);
-        r.run();
-      }
-    }
-  }
-
-  protected IServerSession getOrCreateSession(Subject subject, String userAgent) throws ProcessingException {
-    if (m_serverSession == null || CompareUtility.notEquals(subject, m_subject)) {
-      m_subject = subject;
-      m_serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(m_serverSessionClass, subject, UserAgent.createByIdentifier(userAgent));
-    }
-    return m_serverSession;
-  }
-
-  protected Class<?> resolveClass(Bundle bundle, String name) {
-    try {
-      return bundle.loadClass(name);
-    }
-    catch (ClassNotFoundException e) {
-      throw new IllegalArgumentException("Failed to load class: " + name, e);
-    }
+    serviceResponse.setClientNotifications(SERVICES.getService(IClientNotificationService.class).getNextNotifications(0));
+    return serviceResponse;
   }
 }

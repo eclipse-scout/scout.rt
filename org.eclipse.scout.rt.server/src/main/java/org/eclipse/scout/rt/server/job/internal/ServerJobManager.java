@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.server.job.internal.callable.TwoPhaseTransactionBoun
 import org.eclipse.scout.rt.server.transaction.BasicTransaction;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
@@ -49,13 +50,14 @@ public class ServerJobManager extends JobManager<ServerJobInput> implements ISer
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final ServerJobInput input) {
     final ITransaction tx = Assertions.assertNotNull(createTransaction());
 
-    final Callable<RESULT> c8 = new TwoPhaseTransactionBoundaryCallable<>(next, tx, input);
-    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ITransaction.CURRENT, tx);
-    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ScoutTexts.CURRENT, (input.getSession() != null ? input.getSession().getTexts() : ScoutTexts.CURRENT.get()));
-    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, UserAgent.CURRENT, input.getUserAgent());
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, ISession.CURRENT, input.getSession());
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, input.getServletResponse());
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, input.getServletRequest());
+    final Callable<RESULT> c9 = new TwoPhaseTransactionBoundaryCallable<>(next, tx, input);
+    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(c9, ITransaction.CURRENT, tx);
+    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ScoutTexts.CURRENT, (input.getSession() != null ? input.getSession().getTexts() : ScoutTexts.CURRENT.get()));
+    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, UserAgent.CURRENT, input.getUserAgent());
+    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ISession.CURRENT, input.getSession());
+    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, input.getServletResponse());
+    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, input.getServletRequest());
+    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, OfflineState.CURRENT, OfflineState.CURRENT.get());
     final Callable<RESULT> c1 = super.interceptCallable(c2, input);
 
     return c1;

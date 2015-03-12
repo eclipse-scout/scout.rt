@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server;
 
 import java.io.IOException;
+import java.security.AccessController;
 
 import javax.security.auth.Subject;
 import javax.servlet.Filter;
@@ -22,22 +23,24 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * Expected init-param example: session=com.bsiag.myapp.server.ServerSession
+ * Filter to run the ongoing HTTP-request in a server job. Requests targeted to '/process' are not run in a server job
+ * because done in {@link ServiceTunnelServlet}.
  */
 public class ServerJobServletFilter implements Filter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerJobServletFilter.class);
@@ -55,65 +58,88 @@ public class ServerJobServletFilter implements Filter {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public void doFilter(ServletRequest sreq, ServletResponse sres, FilterChain chain) throws IOException, ServletException {
-    FilterConfigInjection.FilterConfig config = m_injection.getConfig(sreq);
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    FilterConfigInjection.FilterConfig config = m_injection.getConfig(request);
     if (!config.isActive()) {
-      chain.doFilter(sreq, sres);
+      chain.doFilter(request, response);
       return;
     }
-    //
-    HttpServletRequest httpRequest = (HttpServletRequest) sreq;
-    HttpServletResponse httpResponse = (HttpServletResponse) sres;
+
+    HttpServletRequest httpRequest = (HttpServletRequest) request;
+    HttpServletResponse httpResponse = (HttpServletResponse) response;
+
     if ("/process".equals(httpRequest.getServletPath())) {
-      chain.doFilter(sreq, sres);
+      chain.doFilter(request, response);
       return;
     }
-    IServerSession serverSession;
-    // create new session
-    synchronized (httpRequest.getSession()) {
-      serverSession = (IServerSession) SERVICES.getService(IHttpSessionCacheService.class).getAndTouch(IServerSession.class.getName(), httpRequest, httpResponse);
-      if (serverSession == null) {
-        String qname = config.getInitParameter("session");
-        Class<? extends IServerSession> serverSessionClass;
-        if (qname == null) {
-          throw new ServletException("Expected init-param \"session\"");
-        }
-        int i = qname.lastIndexOf('.');
-        try {
-          serverSessionClass = (Class<? extends IServerSession>) Platform.getBundle(qname.substring(0, i)).loadClass(qname);
-        }
-        catch (ClassNotFoundException e) {
-          throw new ServletException("Loading class " + qname, e);
-        }
-        try {
-          serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(serverSessionClass, (Subject) null);
-          // store new session
-          SERVICES.getService(IHttpSessionCacheService.class).put(IServerSession.class.getName(), serverSession, httpRequest, httpResponse);
-        }
-        catch (Throwable t) {
-          LOG.error(String.format("Failed to create and start session '%s'", serverSessionClass), t);
-          httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
-          return;
+
+    try {
+      // Create the job input on behalf of which the server job is run.
+      ServerJobInput input = ServerJobInput.empty();
+      input.name(ServerJobServletFilter.class.getSimpleName());
+      input.subject(Subject.getSubject(AccessController.getContext()));
+      input.servletRequest(httpRequest);
+      input.servletResponse(httpResponse);
+      input.session(lookupServerSessionOnHttpSession(input.copy()));
+
+      input = interceptServerJobInput(input);
+
+      try {
+        continueChainInServerJob(chain, input);
+      }
+      catch (ProcessingException e) {
+        handleException(e, httpRequest);
+      }
+      catch (RuntimeException e) {
+        handleException(new ProcessingException("Unexpected error while processing HTTP request", e), httpRequest);
+      }
+    }
+    catch (ProcessingException e) {
+      throw new ServletException("Failed to process request", e);
+    }
+  }
+
+  // === SESSION LOOKUP ===
+
+  /**
+   * Override this method to intercept the {@link ServerJobInput} used to run server jobs. The default implementation
+   * simply returns the given input.
+   */
+  protected ServerJobInput interceptServerJobInput(final ServerJobInput input) {
+    return input;
+  }
+
+  @Internal
+  protected IServerSession lookupServerSessionOnHttpSession(ServerJobInput jobInput) throws ProcessingException, ServletException {
+    HttpServletRequest req = jobInput.getServletRequest();
+    HttpServletResponse res = jobInput.getServletResponse();
+
+    //external request: apply locking, this is the session initialization phase
+    IHttpSessionCacheService cacheService = SERVICES.getService(IHttpSessionCacheService.class);
+    IServerSession serverSession = (IServerSession) cacheService.getAndTouch(IServerSession.class.getName(), req, res);
+    if (serverSession == null) {
+      synchronized (req.getSession()) {
+        serverSession = (IServerSession) cacheService.get(IServerSession.class.getName(), req, res); // double checking
+        if (serverSession == null) {
+          serverSession = provideServerSession(jobInput);
+          cacheService.put(IServerSession.class.getName(), serverSession, req, res);
         }
       }
     }
+    return serverSession;
+  }
 
-    // Create the job-input on behalf of which the server-job is run.
-    ServerJobInput input = ServerJobInput.empty();
-    input.name(ServerJobServletFilter.class.getSimpleName());
-    input.servletRequest(httpRequest);
-    input.servletResponse(httpResponse);
-    input.session(serverSession);
-    try {
-      continueChainInServerJob(chain, input);
-    }
-    catch (ProcessingException e) {
-      handleException(e, httpRequest);
-    }
-    catch (RuntimeException e) {
-      handleException(new ProcessingException("Unexpected error while processing HTTP request", e), httpRequest);
-    }
+  /**
+   * Method invoked to provide a new {@link IServerSession} for the current HTTP-request.
+   *
+   * @param input
+   *          context information about the ongoing HTTP-request.
+   * @return {@link IServerSession}; must not be <code>null</code>.
+   */
+  protected IServerSession provideServerSession(final ServerJobInput input) throws ProcessingException {
+    final IServerSession serverSession = OBJ.one(ServerSessionProvider.class).provide(input);
+    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(input.getServletRequest(), input.getServletResponse()));
+    return serverSession;
   }
 
   /**
