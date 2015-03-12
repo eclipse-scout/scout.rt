@@ -24,10 +24,6 @@
     top: 5px;
   }
 
-  & label:hover::before {
-    border: 2px solid @hover-color;
-  }
-
   & input[type=radio] {
     /* no visiblity and display change to be focusable */
     position: absolute;
@@ -39,10 +35,6 @@
     border: 0;
     outline: 0;
     opacity: 0;
-  }
-
-  & input[type=radio]:disabled + label:hover::before {
-    border: 2px solid @border-color;
   }
 
   & input[type=radio]:checked + label::before {
