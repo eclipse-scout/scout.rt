@@ -1,6 +1,5 @@
 scout.DesktopTableKeyStrokeAdapter = function(field) {
   scout.DesktopTableKeyStrokeAdapter.parent.call(this, field);
-  this.alt = true;
 };
 scout.inherits(scout.DesktopTableKeyStrokeAdapter, scout.TableKeyStrokeAdapter);
 

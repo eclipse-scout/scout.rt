@@ -37,13 +37,13 @@ scout.DesktopKeyStrokeAdapter = function(desktop) {
 
 scout.inherits(scout.DesktopKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
-scout.DesktopKeyStrokeAdapter.prototype.drawKeyBox = function() {
+scout.DesktopKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeystrokes) {
   if (this.keyBoxDrawn) {
     return;
   }
 
   this.keyBoxDrawn = true;
-  this._viewTabAutoKeyStroke.drawKeyBox();
+  this._viewTabAutoKeyStroke.checkAndDrawKeyBox(null, drawedKeystrokes);
   if (this._taskbar) {
     $('.taskbar-item', this._taskbar.$container).each(function(i, e) {
       $(e).appendDiv('key-box', $(e).attr('data-shortcut'));

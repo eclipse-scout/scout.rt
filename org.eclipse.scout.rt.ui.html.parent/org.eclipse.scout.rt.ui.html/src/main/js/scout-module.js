@@ -86,10 +86,13 @@ __include("table/FilterInputKeyStrokeAdapter.js");
 __include("table/TableLayout.js");
 __include("table/TableOrganizeMenu.js");
 __include("table/TableSelectionHandler.js");
+__include("table/TableControlKeyStrokes.js");
+__include("table/TableFilterControlKeyStrokes.js");
 // Desktop
 __include("tree/Tree.js");
 __include("tree/TreeCompact.js");
 __include("tree/TreeLayout.js");
+__include("tree/TreeControlKeyStrokes.js");
 __include("tree/TreeKeyStrokeAdapter.js");
 __include("desktop/BaseDesktop.js");
 __include("desktop/Desktop.js");

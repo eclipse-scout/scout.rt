@@ -36,11 +36,11 @@ scout.KeystrokeManager = function() {
   }
 
   function drawKeyBox() {
-    var i, adapter;
+    var i, adapter, drawedKeys={};
     for (i = 0; i < that._adaptersToDraw.length; i++) {
       adapter = that._adaptersToDraw[i];
       if (adapter.drawKeyBox) {
-        adapter.drawKeyBox();
+        adapter.drawKeyBox(drawedKeys);
       }
     }
   }

@@ -32,18 +32,34 @@ scout.ViewTabAutoKeyStroke.prototype.handle = function(event) {
  */
 scout.ViewTabAutoKeyStroke.prototype.accept = function(event) {
   if (this._enabled && event && event.which >= 48 && event.which <= 57 && // 0-9
-    event.ctrlKey === this.ctrl && event.altKey === this.alt && event.metaKey === this.meta && event.shiftKey === this.shift) {
+    event.ctrlKey === this.ctrl && event.altKey === this.alt && event.shiftKey === this.shift) {
     return true;
   }
   return false;
 };
-
-scout.ViewTabAutoKeyStroke.prototype.drawKeyBox = function() {
+/**
+ * @Override scout.KeyStroke
+ */
+scout.ViewTabAutoKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys){
+  if(scout.KeyStrokeUtil.keyStrokeRangeDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9])){
+    return;
+  }
+  if(this.drawHint){
+    this._drawKeyBox($container);
+    drawedKeys[this.keyStrokeName()]=true;
+    scout.KeyStrokeUtil.keyStrokeRangeDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9]);
+  }
+};
+/**
+ * @Override scout.KeyStroke
+ */
+scout.ViewTabAutoKeyStroke.prototype._drawKeyBox = function($container) {
   if (this.keyBoxDrawed) {
     return;
   }
   if (this._enabled && this._tabs) {
     for (var i = 0; i < this._tabs.length; i++) {
+      //TODO nbu fix bug->table is not first tab but displayed as first.
       var offsetLeft = 4,
         firstField = true;
       if (i === 0) {
@@ -62,7 +78,9 @@ scout.ViewTabAutoKeyStroke.prototype.drawKeyBox = function() {
     this.keyBoxDrawed = true;
   }
 };
-
+/**
+ * @Override scout.KeyStroke
+ */
 scout.ViewTabAutoKeyStroke.prototype.removeKeyBox = function() {
   if (!this.keyBoxDrawed) {
     return;

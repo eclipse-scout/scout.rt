@@ -5,7 +5,6 @@ scout.KeyStroke = function() {
   this.ctrl = false;
   this.alt = false;
   this.shift = false;
-  this.meta = false;
   this.bubbleUp=false;
 };
 scout.inherits(scout.KeyStroke, scout.Action);
@@ -19,10 +18,6 @@ scout.KeyStroke.prototype._remove = function() {
   scout.KeyStroke.parent.prototype._remove.call(this);
 };
 
-/**
- * If processing should continue return true otherwise return false.
- * Default: do not bubble up-> false
- */
 scout.KeyStroke.prototype.handle = function(event) {
   this.sendDoAction();
 };
@@ -31,7 +26,7 @@ scout.KeyStroke.prototype.accept = function(event) {
   if (this.ignore(event)) {
     return false;
   }
-  if (event && event.ctrlKey === this.ctrl && event.altKey === this.alt && event.metaKey === this.meta && event.shiftKey === this.shift && event.which === this.keyStrokeKeyPart) {
+  if (event && event.ctrlKey === this.ctrl && event.altKey === this.alt && event.shiftKey === this.shift && event.which === this.keyStrokeKeyPart) {
     return true;
   }
   return false;
@@ -60,12 +55,41 @@ scout.KeyStroke.prototype.initKeyStrokeParts = function() {
       this.alt = true;
     } else if (part === 'control') {
       this.ctrl = true;
-    } else if (part === 'meta') {
-      this.meta = true;
     } else if (part === 'shift') {
       this.shift = true;
     } else {
       this.keyStrokeKeyPart = scout.keys[part.toUpperCase()];
     }
   }
+};
+
+scout.KeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys){
+  if(drawedKeys[this.keyStrokeName()]){
+    return;
+  }
+  if(this.drawHint){
+    this._drawKeyBox($container);
+    drawedKeys[this.keyStrokeName()]=true;
+  }
+};
+
+scout.KeyStroke.prototype._drawKeyBox = function($container){
+  if (!this.drawHint) {
+    return;
+  }
+  var keyBoxText = scout.codesToKeys[this.keystrokeKeyPart];
+  var keyName = scout.KeyStrokeUtil.keyStrokeName(this.ctrl, this.alt, this.shift, scout.keys.HOME);
+  scout.KeyStrokeUtil.drawSingleKeyBoxItem(4, keyBoxText, $container, this.ctrl, this.alt, this.shift);
+};
+
+scout.KeyStroke.prototype.removeKeyBox = function($container){
+  $('.key-box', $container).remove();
+  $('.key-box-additional', $container).remove();
+};
+
+scout.KeyStroke.prototype.keyStrokeName = function(){
+  var name = this.ctrl ? 'ctrl+':'';
+  name += this.alt ? 'alt+':'' ;
+  name += this.shift ? 'shift+':'';
+  return name + this.keyStrokeKeyPart;
 };

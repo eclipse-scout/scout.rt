@@ -7,26 +7,22 @@ scout.AbstractKeyStrokeAdapter = function(field) {
   this.keyBoxDrawn = false;
 };
 
-scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function() {
+scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
   if (this.keyBoxDrawn) {
     return;
   }
   this.keyBoxDrawn = true;
-  var offsetLeft = 4;
   for (var i = 0; i < this.keyStrokes.length; i++) {
-    if (!this.keyStrokes[i].drawHint) {
-      continue;
-    }
-    var keyBoxText = scout.codesToKeys[this.keyStrokes[i].keystrokeKeyPart];
-
-    scout.KeyStrokeUtil.drawSingleKeyBoxItem(offsetLeft, '0', this._field.$container, this.ctrl, this.alt, this.shift);
+    this.keyStrokes[i].checkAndDrawKeyBox(this._field.$container, drawedKeys);
   }
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.removeKeyBox = function() {
   this.keyBoxDrawn = false;
-  $('.key-box', this._field.$container).remove();
-  $('.key-box-additional', this._field.$container).remove();
+  for (var i = 0; i < this.keyStrokes.length; i++) {
+    this.keyStrokes[i].removeKeyBox(this._field.$container);
+  }
+
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
