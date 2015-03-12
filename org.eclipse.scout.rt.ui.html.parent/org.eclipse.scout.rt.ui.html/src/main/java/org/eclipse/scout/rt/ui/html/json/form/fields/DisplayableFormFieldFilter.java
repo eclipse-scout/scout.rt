@@ -11,15 +11,13 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
-public abstract class JsonGlobalAdapterProperty<T> extends JsonAdapterProperty<T> {
+public class DisplayableFormFieldFilter<T extends IFormField> implements IFilter<T> {
 
-  public JsonGlobalAdapterProperty(String propertyName, T model, IJsonSession session) {
-    super(propertyName, model, session, true, null);
+  @Override
+  public boolean accept(T element) {
+    return element.isVisibleGranted();
   }
 
-  public JsonGlobalAdapterProperty(String propertyName, T model, IJsonSession session, IFilter<Object> filter) {
-    super(propertyName, model, session, true, filter);
-  }
 }

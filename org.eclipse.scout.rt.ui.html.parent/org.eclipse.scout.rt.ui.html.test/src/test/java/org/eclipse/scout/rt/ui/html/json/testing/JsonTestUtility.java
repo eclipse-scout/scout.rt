@@ -19,8 +19,12 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -144,6 +148,40 @@ public final class JsonTestUtility {
 
   public static JSONObject getPropertyChange(JSONObject json, int index) throws JSONException {
     return getEvent(json, index).getJSONObject("properties");
+  }
+
+  public static void initField(ICompositeField compositeField) {
+    InitFieldVisitor visitor = new InitFieldVisitor();
+    compositeField.visitFields(visitor, 0);
+  }
+
+  // copy from FormUtility
+  private static class InitFieldVisitor implements IFormFieldVisitor {
+    private ProcessingException m_firstEx;
+
+    @Override
+    public boolean visitField(IFormField field, int level, int fieldIndex) {
+      try {
+        field.initField();
+      }
+      catch (ProcessingException e) {
+        if (m_firstEx == null) {
+          m_firstEx = e;
+        }
+      }
+      catch (Throwable t) {
+        if (m_firstEx == null) {
+          m_firstEx = new ProcessingException("Unexpected", t);
+        }
+      }
+      return true;
+    }
+
+    public void handleResult() throws ProcessingException {
+      if (m_firstEx != null) {
+        throw m_firstEx;
+      }
+    }
   }
 
 }

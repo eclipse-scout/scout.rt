@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.menu;
 
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
@@ -20,6 +21,9 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
+import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 // FIXME AWE: (menu) diese klasse soll kein JsonAdapter mehr sein. Parent der menus ist dann die Table
@@ -27,7 +31,7 @@ import org.json.JSONObject;
 public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropertyObserver<T> {
 
   private ContextMenuListener m_contextMenuListener;
-  private List<IMenu> m_menus;
+  private Set<IJsonAdapter<?>> m_jsonMenuAdapters = new HashSet<IJsonAdapter<?>>();
 
   public JsonContextMenu(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -59,11 +63,14 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
     return null;
   }
 
+  public JSONArray childActionsToJson() {
+    return JsonAdapterUtility.getAdapterIdsForModel(getJsonSession(), getModel().getChildActions(), this, new DisplayableActionFilter<IMenu>());
+  }
+
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    m_menus = getModel().getChildActions();
-    attachAdapters(m_menus);
+    m_jsonMenuAdapters.addAll(attachAdapters(getModel().getChildActions(), new DisplayableActionFilter<IMenu>()));
   }
 
   @Override
@@ -78,19 +85,20 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
   }
 
   public void handleModelContextMenuStructureChanged(ContextMenuEvent event) {
-    disposeAdapters(m_menus, getModel().getChildActions());
-    m_menus = getModel().getChildActions();
-    List<IJsonAdapter<?>> menuAdapters = attachAdapters(m_menus);
-
+    Set<IJsonAdapter> jsonMenuAdapters = new HashSet<IJsonAdapter>(m_jsonMenuAdapters);
+    for (IJsonAdapter<?> adapter : jsonMenuAdapters) {
+      // Dispose adapter only if's model is not part of the new models
+      if (!getModel().getChildActions().contains((adapter.getModel()))) {
+        adapter.dispose();
+        m_jsonMenuAdapters.remove(adapter);
+      }
+    }
+    List<IJsonAdapter<?>> menuAdapters = attachAdapters(getModel().getChildActions(), new DisplayableActionFilter<IMenu>());
+    m_jsonMenuAdapters.addAll(menuAdapters);
     IJsonAdapter<?> owner = getAdapter(event.getSource().getOwner());
     if (owner instanceof IContextMenuOwner) {
       ((IContextMenuOwner) owner).handleModelContextMenuChanged(menuAdapters);
     }
-  }
-
-  public Collection<IJsonAdapter<?>> getJsonChildActions() {
-    Collection<IJsonAdapter<?>> adapters = getAdapters(getModel().getChildActions());
-    return adapters;
   }
 
   protected class P_ContextMenuListener implements ContextMenuListener {

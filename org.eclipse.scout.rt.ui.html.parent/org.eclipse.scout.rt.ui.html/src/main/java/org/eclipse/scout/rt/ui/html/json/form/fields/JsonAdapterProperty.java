@@ -11,7 +11,10 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
@@ -20,15 +23,18 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
   private IJsonSession m_jsonSession;
   private boolean m_global;
+  private IFilter<Object> m_filter;
+  private Set<IJsonAdapter> m_ownedAdapters = new HashSet<IJsonAdapter>();
 
   public JsonAdapterProperty(String propertyName, T model, IJsonSession session) {
-    this(propertyName, model, session, false);
+    this(propertyName, model, session, false, null);
   }
 
-  public JsonAdapterProperty(String propertyName, T model, IJsonSession session, boolean global) {
+  public JsonAdapterProperty(String propertyName, T model, IJsonSession session, boolean global, IFilter<Object> filter) {
     super(propertyName, model);
     m_jsonSession = session;
     m_global = global;
+    m_filter = filter;
   }
 
   public IJsonSession getJsonSession() {
@@ -37,22 +43,23 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
 
   @Override
   public Object valueToJsonOnPropertyChange(Object oldValue, Object newValue) {
-    if (!m_global && oldValue != null) {
-      disposeAdapters(oldValue, newValue);
+    if (!m_global) {
+      disposeAdapters(newValue);
     }
     createAdapters(newValue);
     return super.valueToJsonOnPropertyChange(oldValue, newValue);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public Object prepareValueForToJson(Object value) {
     if (value == null) {
       return null;
     }
     if (value instanceof Collection) {
-      return JsonAdapterUtility.getAdapterIdsForModel(getJsonSession(), (Collection) value, getParentJsonAdapter());
+      return JsonAdapterUtility.getAdapterIdsForModel(getJsonSession(), (Collection<Object>) value, getParentJsonAdapter(), m_filter);
     }
-    return JsonAdapterUtility.getAdapterIdForModel(getJsonSession(), value, getParentJsonAdapter());
+    return JsonAdapterUtility.getAdapterIdForModel(getJsonSession(), value, getParentJsonAdapter(), m_filter);
   }
 
   public void createAdapters() {
@@ -75,10 +82,15 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
 
   protected void createAdapter(Object model) {
     if (m_global) {
-      m_jsonSession.getRootJsonAdapter().attachAdapter(model);
+      m_jsonSession.getRootJsonAdapter().attachAdapter(model, m_filter);
     }
     else {
-      getParentJsonAdapter().attachAdapter(model);
+      IJsonAdapter<?> adapter = getParentJsonAdapter().attachAdapter(model, m_filter);
+
+      // Only track owned adapters, only those may be disposed
+      if (getParentJsonAdapter() == adapter.getParent()) {
+        m_ownedAdapters.add(adapter);
+      }
     }
   }
 
@@ -86,29 +98,20 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
    * If the property is a collection: Disposes every old model if the new list does not contain it.
    * If the property is not a collection: Dispose the old model.
    */
-  protected void disposeAdapters(Object oldModels, Object newModels) {
-    if (oldModels == null) {
-      return;
-    }
-    if (oldModels instanceof Collection) {
-      for (Object oldModel : (Collection) oldModels) {
-        if (newModels == null || !((Collection) newModels).contains(oldModel)) {
-          disposeAdapter(oldModel);
+  protected void disposeAdapters(Object newModels) {
+    Set<IJsonAdapter> attachedAdapters = new HashSet<IJsonAdapter>(m_ownedAdapters);
+    for (IJsonAdapter<?> adapter : attachedAdapters) {
+      if (newModels instanceof Collection) {
+        // Dispose adapter only if's model is not part of the new models
+        if (!((Collection) newModels).contains(adapter.getModel())) {
+          adapter.dispose();
+          m_ownedAdapters.remove(adapter);
         }
       }
-    }
-    else {
-      disposeAdapter(oldModels);
-    }
-  }
-
-  /**
-   * Disposes the model, but only if it's not a global adapter.
-   */
-  protected void disposeAdapter(Object model) {
-    IJsonAdapter<Object> jsonAdapter = m_jsonSession.getJsonAdapter(model, getParentJsonAdapter(), false);
-    if (jsonAdapter != null) {
-      jsonAdapter.dispose();
+      else {
+        adapter.dispose();
+        m_ownedAdapters.remove(adapter);
+      }
     }
   }
 

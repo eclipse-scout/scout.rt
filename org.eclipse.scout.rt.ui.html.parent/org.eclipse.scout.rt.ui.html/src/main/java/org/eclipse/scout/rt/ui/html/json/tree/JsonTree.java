@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.MouseButton;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
@@ -117,9 +119,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    if (getModel().getContextMenu().isVisibleGranted()) {
-      attachAdapter(getModel().getContextMenu());
-    }
+    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
     attachNodes(getTopLevelNodes(true), true);
   }
 
@@ -196,7 +196,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void putContextMenu(JSONObject json) {
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
-      JsonObjectUtility.putProperty(json, PROP_MENUS, JsonObjectUtility.adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
+      JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
   }
 

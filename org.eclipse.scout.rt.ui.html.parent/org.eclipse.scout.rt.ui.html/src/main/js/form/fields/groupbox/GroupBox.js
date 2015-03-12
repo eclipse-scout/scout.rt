@@ -3,8 +3,8 @@
 
 scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
-  this.formFields = [];
-  this._addAdapterProperties('formFields');
+  this.fields = [];
+  this._addAdapterProperties('fields');
   this.$body;
   this._$groupBoxTitle;
 
@@ -61,9 +61,9 @@ scout.GroupBox.prototype._prepareFields = function() {
   this.processButtons = [];
 
   var i, field, res;
-  for (i = 0; i < this.formFields.length; i++) {
+  for (i = 0; i < this.fields.length; i++) {
     res = undefined;
-    field = this.formFields[i];
+    field = this.fields[i];
     if (field.label !== scout.strings.removeAmpersand(field.label)) {
       //Add mnemonic keyStrokevar
       var mnemonic = field.label.match(/(^|[^&]|&&)&($|[^&]|&&)/g)[0].replace('&', '');

@@ -10,17 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.groupbox;
 
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.json.JSONObject;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 
 /**
  * This class creates JSON output for an <code>IGroupBox</code>.
  */
-public class JsonGroupBox<T extends IGroupBox> extends JsonFormField<T> {
+public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFormField> {
 
   public static final String PROP_MAIN_BOX = "mainBox";
   public static final String PROP_SCROLLABLE = "scrollable";
@@ -62,17 +62,6 @@ public class JsonGroupBox<T extends IGroupBox> extends JsonFormField<T> {
         return getModel().isScrollable();
       }
     });
-  }
-
-  @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    attachAdapters(getModel().getFields());
-  }
-
-  @Override
-  public JSONObject toJson() {
-    return putAdapterIdsProperty(super.toJson(), "formFields", getModel().getFields());
   }
 
 }

@@ -20,10 +20,9 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.json.JSONObject;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 
-public class JsonTabBox<T extends ITabBox> extends JsonFormField<T> {
+public class JsonTabBox<T extends ITabBox> extends JsonCompositeField<T, IGroupBox> {
 
   public JsonTabBox(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -54,14 +53,13 @@ public class JsonTabBox<T extends ITabBox> extends JsonFormField<T> {
   }
 
   @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    attachAdapters(getModel().getGroupBoxes());
+  protected List<IGroupBox> getModelFields() {
+    return getModel().getGroupBoxes();
   }
 
   @Override
-  public JSONObject toJson() {
-    return putAdapterIdsProperty(super.toJson(), "tabItems", getModel().getGroupBoxes());
+  protected String getModelFieldsName() {
+    return "tabItems";
   }
 
   @Override

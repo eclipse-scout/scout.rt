@@ -24,23 +24,33 @@ import java.util.Locale;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
+import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableControl;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWith3Cols;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithNotDisplayableMenu;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithNotDisplayableMenu.DisplayableMenu;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithNotDisplayableMenu.NotDisplayableMenu;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithoutMenus;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
-import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -291,6 +301,112 @@ public class JsonTableTest {
     responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_jsonSession.currentJsonResponse(), JsonTable.EVENT_COLUMN_HEADERS_UPDATED);
     assertTrue(responseEvents.size() == 1);
+  }
+
+  /**
+   * Tests whether non displayable menus are sent.
+   * <p>
+   * This limits response size and also leverages security because the menus are never visible to the user, not even
+   * with the dev tools of the browser
+   */
+  @Test
+  public void testDontSendNotDisplayableMenus() throws Exception {
+    TableWithNotDisplayableMenu table = new TableWithNotDisplayableMenu();
+    table.initTable();
+
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
+    JsonContextMenu<IContextMenu> jsonContextMenu = jsonTable.getAdapter(table.getContextMenu());
+    JsonMenu<IMenu> jsonDisplayableMenu = jsonContextMenu.getAdapter(table.getMenu(TableWithNotDisplayableMenu.DisplayableMenu.class));
+    JsonMenu<IMenu> jsonNotDisplayableMenu = jsonContextMenu.getAdapter(table.getMenu(TableWithNotDisplayableMenu.NotDisplayableMenu.class));
+
+    // Adapter for NotDisplayableMenu must not exist
+    assertNull(jsonNotDisplayableMenu);
+
+    // Json response must not contain NotDisplayableMenu
+    JSONObject json = jsonTable.toJson();
+    JSONArray jsonMenus = json.getJSONArray("menus");
+    assertEquals(1, jsonMenus.length());
+    assertEquals(jsonDisplayableMenu.getId(), jsonMenus.get(0));
+  }
+
+  @Test
+  public void testMenuDisposalOnPropertyChange() throws ProcessingException, JSONException {
+    ITable table = new TableWithoutMenus();
+
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
+    JsonContextMenu<IContextMenu> jsonContextMenu = jsonTable.getAdapter(table.getContextMenu());
+
+    Menu menu1 = new Menu();
+    table.getContextMenu().addChildAction(menu1);
+    assertNotNull(jsonContextMenu.getAdapter(menu1));
+    assertTrue(jsonContextMenu.getAdapter(menu1).isAttached());
+
+    table.getContextMenu().removeChildAction(menu1);
+    m_jsonSession.flush();
+    assertNull(jsonContextMenu.getAdapter(menu1));
+  }
+
+  /**
+   * Tests whether it is possible to dispose (or replace) menus if at least one menu is not displayable.<br>
+   */
+  @Test
+  public void testMenuDisposalOnPropertyChangeWithNotDisplayableMenu() throws ProcessingException, JSONException {
+    ITable table = new TableWithNotDisplayableMenu();
+    table.initTable();
+
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
+    JsonContextMenu<IContextMenu> jsonContextMenu = jsonTable.getAdapter(table.getContextMenu());
+
+    DisplayableMenu displayableMenu = table.getMenu(TableWithNotDisplayableMenu.DisplayableMenu.class);
+    NotDisplayableMenu notDisplayableMenu = table.getMenu(TableWithNotDisplayableMenu.NotDisplayableMenu.class);
+    assertNull(jsonContextMenu.getAdapter(notDisplayableMenu));
+    assertNotNull(jsonContextMenu.getAdapter(displayableMenu));
+    assertTrue(jsonContextMenu.getAdapter(displayableMenu).isAttached());
+
+    table.getContextMenu().removeChildAction(notDisplayableMenu);
+    table.getContextMenu().removeChildAction(displayableMenu);
+    m_jsonSession.flush();
+
+    assertNull(jsonContextMenu.getAdapter(notDisplayableMenu));
+    assertNull(jsonContextMenu.getAdapter(displayableMenu));
+  }
+
+  @Test
+  public void testTableControlDisposalOnPropertyChange() throws ProcessingException, JSONException {
+    ITable table = new TableWithoutMenus();
+    table.initTable();
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
+
+    TableControl control = new TableControl();
+    table.addTableControl(control);
+    assertNotNull(jsonTable.getAdapter(control));
+    assertTrue(jsonTable.getAdapter(control).isAttached());
+
+    table.removeTableControl(control);
+    m_jsonSession.flush();
+    assertNull(jsonTable.getAdapter(control));
+  }
+
+  @Test
+  public void testMultipleTableControlDisposallOnPropertyChange() throws ProcessingException, JSONException {
+    ITable table = new TableWithoutMenus();
+    table.initTable();
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
+
+    TableControl tableControl1 = new TableControl();
+    TableControl tableControl2 = new TableControl();
+    table.addTableControl(tableControl1);
+    table.addTableControl(tableControl2);
+    assertNotNull(jsonTable.getAdapter(tableControl1));
+    assertTrue(jsonTable.getAdapter(tableControl1).isAttached());
+    assertNotNull(jsonTable.getAdapter(tableControl2));
+    assertTrue(jsonTable.getAdapter(tableControl2).isAttached());
+
+    table.removeTableControl(tableControl1);
+    m_jsonSession.flush();
+    assertNull(jsonTable.getAdapter(tableControl1));
+    assertNotNull(jsonTable.getAdapter(tableControl2));
+    assertTrue(jsonTable.getAdapter(tableControl2).isAttached());
   }
 
   /**

@@ -8,18 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.form.fields;
+package org.eclipse.scout.rt.ui.html.json.action;
 
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 
-public abstract class JsonGlobalAdapterProperty<T> extends JsonAdapterProperty<T> {
+public class DisplayableActionFilter<T extends IAction> implements IFilter<T> {
 
-  public JsonGlobalAdapterProperty(String propertyName, T model, IJsonSession session) {
-    super(propertyName, model, session, true, null);
+  @Override
+  public boolean accept(T element) {
+    return element.isVisibleGranted();
   }
 
-  public JsonGlobalAdapterProperty(String propertyName, T model, IJsonSession session, IFilter<Object> filter) {
-    super(propertyName, model, session, true, filter);
-  }
 }

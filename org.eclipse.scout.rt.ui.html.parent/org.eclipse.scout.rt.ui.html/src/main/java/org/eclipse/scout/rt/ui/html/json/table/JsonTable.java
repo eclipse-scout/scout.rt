@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -42,6 +43,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.ICellValueReader;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
@@ -77,7 +79,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String PROP_COLUMN_ID = "columnId";
   public static final String PROP_COLUMN_IDS = "columnIds";
   public static final String PROP_COLUMNS = "columns";
-  public static final String PROP_CONTROLS = "controls";
   public static final String PROP_SELECTED_ROW_IDS = "selectedRowIds";
 
   private TableListener m_tableListener;
@@ -190,9 +191,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    if (getModel().getContextMenu().isVisibleGranted()) {
-      attachAdapter(getModel().getContextMenu());
-    }
+    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
     attachColumns();
   }
 
@@ -258,9 +257,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     putProperty(json, PROP_ROWS, jsonRows);
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
-      JsonObjectUtility.putProperty(json, PROP_MENUS, JsonObjectUtility.adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
+      JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
-//    putAdapterIdsProperty(json, "controls", getModel().getTableControls()); // FIXME AWE: rename to "tableControls" in JS/Java
     putProperty(json, PROP_SELECTED_ROW_IDS, rowIdsToJson(getModel().getSelectedRows()));
     return json;
   }

@@ -9,7 +9,7 @@ FormSpecHelper.prototype.createFormWithOneField = function(session, parentId) {
 
   form.rootGroupBox = rootGroupBox.id;
   form.parent = parentId || session.rootAdapter.id;
-  rootGroupBox.formFields = [field.id];
+  rootGroupBox.fields = [field.id];
 
   return createAdapter(form, session, [rootGroupBox, field]);
 };

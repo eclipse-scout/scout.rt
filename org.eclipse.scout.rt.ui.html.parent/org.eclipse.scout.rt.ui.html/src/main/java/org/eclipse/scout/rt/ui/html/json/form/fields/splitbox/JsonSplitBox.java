@@ -42,8 +42,8 @@ public class JsonSplitBox<T extends ISplitBox> extends JsonFormField<T> {
         }
       }
     }
-    m_firstField = firstField;
-    m_secondField = secondField;
+    m_firstField = (firstField != null && firstField.isVisibleGranted()) ? firstField : null;
+    m_secondField = (secondField != null && secondField.isVisibleGranted()) ? secondField : null;
   }
 
   @Override

@@ -10,18 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox;
 
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.json.JSONObject;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 
-/**
- * This class creates JSON output for an <code>ISequenceBox</code>.
- */
-public class JsonSequenceBox<T extends ISequenceBox> extends JsonFormField<T> {
-
-  public static final String PROP_FIELDS = "fields";
+public class JsonSequenceBox<T extends ISequenceBox> extends JsonCompositeField<T, IFormField> {
 
   public JsonSequenceBox(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -30,17 +25,6 @@ public class JsonSequenceBox<T extends ISequenceBox> extends JsonFormField<T> {
   @Override
   public String getObjectType() {
     return "SequenceBox";
-  }
-
-  @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    attachAdapters(getModel().getFields());
-  }
-
-  @Override
-  public JSONObject toJson() {
-    return putAdapterIdsProperty(super.toJson(), PROP_FIELDS, getModel().getFields());
   }
 
 }

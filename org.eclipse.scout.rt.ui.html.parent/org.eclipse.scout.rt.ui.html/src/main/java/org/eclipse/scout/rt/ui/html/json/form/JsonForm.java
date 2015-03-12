@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
@@ -29,6 +30,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONObject;
@@ -65,8 +67,8 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapter(getModel().getRootGroupBox());
-    if (getModel() instanceof IForm5 && ((IForm5) getModel()).getContextMenu().isVisibleGranted()) {
-      attachAdapter(((IForm5) getModel()).getContextMenu());
+    if (getModel() instanceof IForm5) {
+      attachAdapter(((IForm5) getModel()).getContextMenu(), new DisplayableActionFilter<IMenu>());
     }
   }
 
@@ -109,7 +111,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
     if (getModel() instanceof IForm5) {
       JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(((IForm5) getModel()).getContextMenu());
       if (jsonContextMenu != null) {
-        JsonObjectUtility.putProperty(json, PROP_MENUS, JsonObjectUtility.adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
+        JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
       }
     }
     return json;

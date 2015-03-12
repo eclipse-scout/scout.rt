@@ -25,13 +25,13 @@ describe("Form", function() {
 
       expect(form.rootGroupBox).toBeTruthy();
       expect(session.getModelAdapter(form.rootGroupBox.id)).toBe(form.rootGroupBox);
-      expect(form.rootGroupBox.formFields[0]).toBeTruthy();
-      expect(session.getModelAdapter(form.rootGroupBox.formFields[0].id)).toBe(form.rootGroupBox.formFields[0]);
+      expect(form.rootGroupBox.fields[0]).toBeTruthy();
+      expect(session.getModelAdapter(form.rootGroupBox.fields[0].id)).toBe(form.rootGroupBox.fields[0]);
 
       form.destroy();
 
       expect(session.getModelAdapter(form.rootGroupBox.id)).toBeFalsy();
-      expect(session.getModelAdapter(form.rootGroupBox.formFields[0].id)).toBeFalsy();
+      expect(session.getModelAdapter(form.rootGroupBox.fields[0].id)).toBeFalsy();
     });
 
   });

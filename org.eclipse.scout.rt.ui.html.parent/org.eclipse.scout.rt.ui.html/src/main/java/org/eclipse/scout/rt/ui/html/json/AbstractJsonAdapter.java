@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
@@ -150,35 +151,38 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     throw new IllegalStateException("Event not handled. " + event);
   }
 
-  @Override
-  public final <A extends IJsonAdapter<?>> A attachAdapter(Object model) {
-    if (model == null) {
-      return null;
-    }
+  public final <A extends IJsonAdapter<?>, M> A attachAdapter(M model) {
     return attachAdapter(model, null);
   }
 
-  protected final <A extends IJsonAdapter<?>> A attachAdapter(Object model, IJsonObjectFactory objectFactory) {
+  @Override
+  public final <A extends IJsonAdapter<?>, M> A attachAdapter(M model, IFilter<M> filter) {
+    return attachAdapter(model, null, filter);
+  }
+
+  protected final <A extends IJsonAdapter<?>, M> A attachAdapter(M model, IJsonObjectFactory objectFactory, IFilter<M> filter) {
+    if (model == null) {
+      return null;
+    }
+    if (filter != null && !filter.accept(model)) {
+      return null;
+    }
     return m_jsonSession.getOrCreateJsonAdapter(model, this, objectFactory);
   }
 
-  protected final List<IJsonAdapter<?>> attachAdapters(Collection<?> models) {
-    List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
-    for (Object model : models) {
-      adapters.add(attachAdapter(model));
-    }
-    return adapters;
+  protected final <M> List<IJsonAdapter<?>> attachAdapters(Collection<M> models) {
+    return attachAdapters(models, null);
   }
 
-  /**
-   * Disposes adapters for the existing models but only if they are not part of the newModels.
-   */
-  protected void disposeAdapters(List<?> existingModels, List<?> newModels) {
-    existingModels.removeAll(newModels);
-    for (Object model : existingModels) {
-      IJsonAdapter<Object> jsonAdapter = getJsonSession().getJsonAdapter(model, this, false);
-      jsonAdapter.dispose();
+  protected final <M> List<IJsonAdapter<?>> attachAdapters(Collection<M> models, IFilter<M> filter) {
+    List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
+    for (M model : models) {
+      IJsonAdapter<?> adapter = attachAdapter(model, filter);
+      if (adapter != null) {
+        adapters.add(adapter);
+      }
     }
+    return adapters;
   }
 
   /**
@@ -237,8 +241,12 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return JsonObjectUtility.putProperty(json, key, JsonAdapterUtility.getAdapterIdForModel(getJsonSession(), model, this));
   }
 
-  protected final JSONObject putAdapterIdsProperty(JSONObject json, String key, Collection<?> models) {
-    return JsonObjectUtility.putProperty(json, key, JsonAdapterUtility.getAdapterIdsForModel(getJsonSession(), models, this));
+  protected final <M> JSONObject putAdapterIdsProperty(JSONObject json, String key, Collection<M> models) {
+    return putAdapterIdsProperty(json, key, models, null);
+  }
+
+  protected final <M> JSONObject putAdapterIdsProperty(JSONObject json, String key, Collection<M> models, IFilter<M> filter) {
+    return JsonObjectUtility.putProperty(json, key, JsonAdapterUtility.getAdapterIdsForModel(getJsonSession(), models, this, filter));
   }
 
   protected final JSONObject putProperty(JSONObject json, String key, Object value) {
