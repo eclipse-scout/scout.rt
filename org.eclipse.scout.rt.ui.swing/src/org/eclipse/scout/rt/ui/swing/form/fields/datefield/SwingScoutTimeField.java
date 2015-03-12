@@ -272,20 +272,30 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
 
   @Override
   protected void setDisplayTextFromScout(String s) {
+    JTextComponent swingField = getSwingField();
+    String oldText = swingField.getText();
+    if (s == null) {
+      s = "";
+    }
+    if (oldText == null) {
+      oldText = "";
+    }
+    if (oldText.equals(s)) {
+      return;
+    }
     m_displayTextToVerify = s;
     IDateField f = getScoutObject();
     Date value = f.getValue();
     JTextComponent textField = getSwingTimeField();
     if (value == null) {
-      textField.setText(m_displayTextToVerify);
-      textField.setCaretPosition(0);
-      return;
+      updateTextKeepCurserPosition(m_displayTextToVerify, this);
     }
-    DateFormat format = f.getIsolatedTimeFormat();
-    if (format != null) {
-      m_displayTextToVerify = format.format(value);
-      textField.setText(m_displayTextToVerify);
-      textField.setCaretPosition(0);
+    else {
+      DateFormat format = f.getIsolatedTimeFormat();
+      if (format != null) {
+        m_displayTextToVerify = format.format(value);
+        updateTextKeepCurserPosition(m_displayTextToVerify, this);
+      }
     }
   }
 

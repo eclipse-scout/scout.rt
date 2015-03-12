@@ -63,7 +63,7 @@ public class SwingScoutBasicFieldCompositeTest {
     Mockito.when(caret.getDot()).thenReturn(oldEndIndex);
 
     JTextComponent mock = Mockito.mock(JTextComponent.class);
-    Mockito.when(mock.getText()).thenReturn(oldText, newText);
+    Mockito.when(mock.getText()).thenReturn(oldText, oldText, newText);
     Mockito.when(mock.getCaret()).thenReturn(caret);
     field.setSwingFieldMock(mock);
 

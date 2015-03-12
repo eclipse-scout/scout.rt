@@ -216,6 +216,15 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     setAutoDate(getConfiguredAutoDate());
   }
 
+  /**
+   * UpdateDisplayTextOnModify is not supported for DateTimeField.
+   */
+  @Override
+  public final void setUpdateDisplayTextOnModify(boolean b) {
+    super.setUpdateDisplayTextOnModify(b);
+    preventUpdateDisplaytextOnModifiyOnDateTimeField();
+  }
+
   @Override
   public void setFormat(String s) {
     m_format = s;
@@ -239,8 +248,16 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   @Override
   public void setHasTime(boolean b) {
     propertySupport.setPropertyBool(PROP_HAS_TIME, b);
+    preventUpdateDisplaytextOnModifiyOnDateTimeField();
     if (isInitialized()) {
       setValue(getValue());
+    }
+  }
+
+  private void preventUpdateDisplaytextOnModifiyOnDateTimeField() {
+    if (isUpdateDisplayTextOnModify() && isHasDate() && isHasTime()) {
+      LOG.error("UpdateDisplayTextOnModify is not supported for combined Date Time Field.");
+      setUpdateDisplayTextOnModify(false);
     }
   }
 
@@ -252,6 +269,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   @Override
   public void setHasDate(boolean b) {
     propertySupport.setPropertyBool(PROP_HAS_DATE, b);
+    preventUpdateDisplaytextOnModifiyOnDateTimeField();
     if (isInitialized()) {
       setValue(getValue());
     }
