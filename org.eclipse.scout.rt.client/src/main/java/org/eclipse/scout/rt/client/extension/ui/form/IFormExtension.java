@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
@@ -65,7 +65,7 @@ public interface IFormExtension<OWNER_FORM extends AbstractForm> extends IExtens
 
   boolean execValidate(FormValidateChain chain) throws ProcessingException;
 
-  void execOnCloseRequest(FormOnCloseRequestChain chain, boolean kill, HashSet<Integer> enabledButtonSystemTypes) throws ProcessingException;
+  void execOnCloseRequest(FormOnCloseRequestChain chain, boolean kill, Set<Integer> enabledButtonSystemTypes) throws ProcessingException;
 
   void execDataChanged(FormDataChangedChain chain, Object... dataTypes) throws ProcessingException;
 

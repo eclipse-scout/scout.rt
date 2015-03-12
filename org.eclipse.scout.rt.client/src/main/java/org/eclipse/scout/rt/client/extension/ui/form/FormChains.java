@@ -1,7 +1,7 @@
 package org.eclipse.scout.rt.client.extension.ui.form;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
@@ -297,7 +297,7 @@ public final class FormChains {
       super(extensions);
     }
 
-    public void execOnCloseRequest(final boolean kill, final HashSet<Integer> enabledButtonSystemTypes) throws ProcessingException {
+    public void execOnCloseRequest(final boolean kill, final Set<Integer> enabledButtonSystemTypes) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IFormExtension<? extends AbstractForm> next) throws ProcessingException {

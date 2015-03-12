@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
@@ -106,7 +106,7 @@ public abstract class AbstractFormExtension<FORM extends AbstractForm> extends A
   }
 
   @Override
-  public void execOnCloseRequest(FormOnCloseRequestChain chain, boolean kill, HashSet<Integer> enabledButtonSystemTypes) throws ProcessingException {
+  public void execOnCloseRequest(FormOnCloseRequestChain chain, boolean kill, Set<Integer> enabledButtonSystemTypes) throws ProcessingException {
     chain.execOnCloseRequest(kill, enabledButtonSystemTypes);
   }
 

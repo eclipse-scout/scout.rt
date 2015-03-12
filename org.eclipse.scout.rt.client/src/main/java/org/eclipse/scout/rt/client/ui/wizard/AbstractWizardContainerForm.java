@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.wizard;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.wizard.IWizardContainerFormExtension;
@@ -77,7 +77,7 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
   }
 
   @Override
-  protected void execOnCloseRequest(boolean kill, HashSet<Integer> enabledButtonSystemTypes) throws ProcessingException {
+  protected void execOnCloseRequest(boolean kill, Set<Integer> enabledButtonSystemTypes) throws ProcessingException {
     handleEscapeKey(kill);
   }
 

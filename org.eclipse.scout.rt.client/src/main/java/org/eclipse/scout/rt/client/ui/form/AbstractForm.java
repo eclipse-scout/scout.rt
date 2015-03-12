@@ -490,11 +490,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    *          pressed or ESC was pressed
    * @param enabledButtonSystemTypes
    *          set of all {@link IButton#SYSTEM_TYPE_*} of all enabled and
-   *          visible buttons of this form
+   *          visible buttons of this form (never <code>null</code>)
    */
   @ConfigOperation
   @Order(18)
-  protected void execOnCloseRequest(boolean kill, final HashSet<Integer> enabledButtonSystemTypes) throws ProcessingException {
+  protected void execOnCloseRequest(boolean kill, Set<Integer> enabledButtonSystemTypes) throws ProcessingException {
     if (enabledButtonSystemTypes.contains(IButton.SYSTEM_TYPE_CLOSE)) {
       doClose();
     }
@@ -2012,8 +2012,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (isFormOpen()) {
       try {
         // check if there is an active close, cancel or finish button
-        final HashSet<Integer> enabledSystemTypes = new HashSet<Integer>();
-        final HashSet<IButton> enabledSystemButtons = new HashSet<IButton>();
+        final Set<Integer> enabledSystemTypes = new HashSet<Integer>();
+        final Set<IButton> enabledSystemButtons = new HashSet<IButton>();
         IFormFieldVisitor v = new IFormFieldVisitor() {
           @Override
           public boolean visitField(IFormField field, int level, int fieldIndex) {
@@ -3105,7 +3105,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
 
     @Override
-    public void execOnCloseRequest(FormOnCloseRequestChain chain, boolean kill, HashSet<Integer> enabledButtonSystemTypes) throws ProcessingException {
+    public void execOnCloseRequest(FormOnCloseRequestChain chain, boolean kill, Set<Integer> enabledButtonSystemTypes) throws ProcessingException {
       getOwner().execOnCloseRequest(kill, enabledButtonSystemTypes);
     }
 
@@ -3113,7 +3113,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     public void execDataChanged(FormDataChangedChain chain, Object... dataTypes) throws ProcessingException {
       getOwner().execDataChanged(dataTypes);
     }
-
   }
 
   protected final void interceptCloseTimer() throws ProcessingException {
@@ -3194,7 +3193,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return chain.execValidate();
   }
 
-  protected final void interceptOnCloseRequest(boolean kill, HashSet<Integer> enabledButtonSystemTypes) throws ProcessingException {
+  protected final void interceptOnCloseRequest(boolean kill, Set<Integer> enabledButtonSystemTypes) throws ProcessingException {
     List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
     FormOnCloseRequestChain chain = new FormOnCloseRequestChain(extensions);
     chain.execOnCloseRequest(kill, enabledButtonSystemTypes);
