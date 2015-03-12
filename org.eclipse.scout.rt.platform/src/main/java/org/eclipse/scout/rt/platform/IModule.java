@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
+import org.eclipse.scout.rt.platform.cdi.Bean;
 import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
 
 /**
  * A {@link IModule} can be used to take part at the scout platform's lifecycle.
  * To register a module add add it to the CDI context using {@link IBeanContributor}.
  */
+@Bean
 public interface IModule {
 
   /**

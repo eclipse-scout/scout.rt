@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.testing.server.runner.parameterized;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.IScoutTestParameter;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedFrameworkMethod;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedTestRunnerExtension;
@@ -75,8 +75,8 @@ import org.junit.runners.model.Statement;
  * @see Parameterized
  * @see Parameters
  */
-// TODO [dwi/abr] do we need this class?
-public class ParameterizedScoutServerTestRunner extends PlatformTestRunner {
+// TODO [dwi/abr] do we need this class? -> imo says yes, in bsi crm, please rename and remove "scout" prefix
+public class ParameterizedScoutServerTestRunner extends ServerTestRunner {
 
   /** Parameters returned by the <code>@</code>{@link Parameters} annotated method in the test class. */
   private List<IScoutTestParameter> m_parameterList;
