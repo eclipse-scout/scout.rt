@@ -74,21 +74,21 @@ scout.TreeControlKeyStrokes.prototype._drawKeyBox = function($container, drawedK
     } else {
       $upNode = $currentNode.prev('.tree-item');
     }
-    if ($upNode && !scout.KeyStrokeUtil.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.UP)) {
-      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '↑', $upNode, this.ctrl, this.alt, this.shift);
+    if ($upNode && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.UP)) {
+      scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '↑', $upNode, this.ctrl, this.alt, this.shift);
     }
     if ($currentNode.length === 0) {
       $downNode = this._field.$nodes().first();
     } else {
       $downNode = $currentNode.next('.tree-item');
     }
-    if ($downNode && !scout.KeyStrokeUtil.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.DOWN)) {
-      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '↓', $downNode, this.ctrl, this.alt, this.shift);
+    if ($downNode && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.DOWN)) {
+      scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '↓', $downNode, this.ctrl, this.alt, this.shift);
     }
-    if (currentNode.expanded && !scout.KeyStrokeUtil.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.LEFT)) {
-      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '←', $currentNode, this.ctrl, this.alt, this.shift);
-    } else if (!currentNode.expanded && !scout.KeyStrokeUtil.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.RIGHT)) {
-      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '→', $currentNode, this.ctrl, this.alt, this.shift);
+    if (currentNode.expanded && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.LEFT)) {
+      scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '←', $currentNode, this.ctrl, this.alt, this.shift);
+    } else if (!currentNode.expanded && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.RIGHT)) {
+      scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '→', $currentNode, this.ctrl, this.alt, this.shift);
     }
   }
 };

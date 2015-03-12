@@ -21,17 +21,19 @@ scout.TableFilterControlKeyStrokes.prototype.handle = function(event) {
  * @Override scout.KeyStroke
  */
 scout.TableFilterControlKeyStrokes.prototype._drawKeyBox = function($container, drawedKeys) {
-//TODO nbu only draw if control-filter is active
+  var activeElement = document.activeElement;
+  var elementType = activeElement.tagName.toLowerCase();
   var $filterinput = $('.control-filter', this._field.$container);
-  if ($filterinput.length &&
-      !scout.KeyStrokeUtil.keyStrokesAlreadyDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.A, scout.keys.Z) &&
-      !scout.KeyStrokeUtil.keyStrokesAlreadyDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9])) {
-    var filterInputPosition =  $filterinput.position();
+  if ((elementType === 'textarea' || elementType === 'input') && $filterinput[0] !== activeElement) {
+    return;
+  }
+  if ($filterinput.length && !scout.keyStrokeBox.keyStrokesAlreadyDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.A, scout.keys.Z) && !scout.keyStrokeBox.keyStrokesAlreadyDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9])) {
+    var filterInputPosition = $filterinput.position();
     var top = $filterinput.css('margin-top').replace("px", "");
-    var left =  filterInputPosition.left + parseInt($filterinput.css('margin-left').replace("px", ""),0) + 4;
-    $filterinput.beforeDiv('key-box char', 'a - z').css('left', left +'px').css('top', top +'px');
-    scout.KeyStrokeUtil.keyStrokeRangeDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9]);
-    scout.KeyStrokeUtil.keyStrokeRangeDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.A, scout.keys.Z);
+    var left = filterInputPosition.left + parseInt($filterinput.css('margin-left').replace("px", ""), 0) + 4;
+    $filterinput.beforeDiv('key-box char', 'a - z').css('left', left + 'px').css('top', top + 'px');
+    scout.keyStrokeBox.keyStrokeRangeDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9]);
+    scout.keyStrokeBox.keyStrokeRangeDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.A, scout.keys.Z);
   }
 };
 
@@ -46,6 +48,5 @@ scout.TableFilterControlKeyStrokes.prototype.checkAndDrawKeyBox = function($cont
  */
 scout.TableFilterControlKeyStrokes.prototype.accept = function(event) {
   return event && ((event.which >= 65 && event.which <= 90) || (event.which >= 48 && event.which <= 57)) && // a-z
-  event.ctrlKey===this.ctrl && event.altKey===this.alt && event.shiftKey===this.shift ;
+  event.ctrlKey === this.ctrl && event.altKey === this.alt && event.shiftKey === this.shift;
 };
-

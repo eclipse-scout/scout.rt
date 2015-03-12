@@ -24,7 +24,6 @@ __include("util/ObjectFactory.js");
 __include("util/objects.js");
 __include("util/strings.js");
 __include("util/URL.js");
-__include("util/KeyStrokeUtil.js");
 // Session related
 __include("session/Event.js");
 __include("session/Locale.js");

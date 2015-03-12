@@ -78,8 +78,8 @@ scout.KeyStroke.prototype._drawKeyBox = function($container){
     return;
   }
   var keyBoxText = scout.codesToKeys[this.keystrokeKeyPart];
-  var keyName = scout.KeyStrokeUtil.keyStrokeName(this.ctrl, this.alt, this.shift, scout.keys.HOME);
-  scout.KeyStrokeUtil.drawSingleKeyBoxItem(4, keyBoxText, $container, this.ctrl, this.alt, this.shift);
+  var keyName = scout.keyStrokeBox.keyStrokeName(this.ctrl, this.alt, this.shift, scout.keys.HOME);
+  scout.keyStrokeBox.drawSingleKeyBoxItem(4, keyBoxText, $container, this.ctrl, this.alt, this.shift);
 };
 
 scout.KeyStroke.prototype.removeKeyBox = function($container){

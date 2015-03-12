@@ -112,8 +112,8 @@ scout.TableControlKeyStrokes.prototype._drawKeyBox = function($container, drawed
     var $allRows = this._field.$rows();
     var $firstRow = $allRows.first();
     var $lastRow = $allRows.last();
-    if (!scout.KeyStrokeUtil.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.HOME)) {
-      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, 'Home', $firstRow, false, false, false);
+    if (!scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.HOME)) {
+      scout.keyStrokeBox.drawSingleKeyBoxItem(offset, 'Home', $firstRow, false, false, false);
     }
 
     var $rowsSelected = this._field.$selectedRows();
@@ -130,22 +130,22 @@ scout.TableControlKeyStrokes.prototype._drawKeyBox = function($container, drawed
       $pageUpRow = $allRows.last();
     }
 
-    if (scout.KeyStrokeUtil.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.PAGE_UP)) {
-      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, 'PgUp', $firstRow, false, false, false);
+    if (scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.PAGE_UP)) {
+      scout.keyStrokeBox.drawSingleKeyBoxItem(offset, 'PgUp', $firstRow, false, false, false);
     }
 
     var $upRow, $downRow;
     if ($allRows.length > $rowsSelected.length) {
-      if ($rowsSelected.first()[0] !== $firstRow[0] && !scout.KeyStrokeUtil.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.UP)) {
+      if ($rowsSelected.first()[0] !== $firstRow[0] && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.UP)) {
         //take pageUpOffset when upRow is the same as PgUp otherwise take firstRowOffset if up row is equal first row when not take 4.
         if ($rowsSelected.length > 0) {
           $upRow = this._field.$prevFilteredRows($rowsSelected.first()).first();
         } else {
           $upRow = $allRows.first();
         }
-        scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '↑', $upRow, false, false, false);
+        scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '↑', $upRow, false, false, false);
       }
-      if ($rowsSelected.last()[0] !== $lastRow[0] && !scout.KeyStrokeUtil.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.DOWN)) {
+      if ($rowsSelected.last()[0] !== $lastRow[0] && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.DOWN)) {
         //take upRowOffset when $downRow = $upRow if not take pageUpOffset when upRow is the same as PgUp otherwise take
         //firstRowOffset if up row is equal first row when not take 4.
         if ($rowsSelected.length > 0) {
@@ -153,7 +153,7 @@ scout.TableControlKeyStrokes.prototype._drawKeyBox = function($container, drawed
         } else {
           $downRow = $allRows.first();
         }
-        scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, '↓', $downRow, false, false, false);
+        scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '↓', $downRow, false, false, false);
       }
     }
     // pgdn: jump down
@@ -168,12 +168,12 @@ scout.TableControlKeyStrokes.prototype._drawKeyBox = function($container, drawed
     } else {
       $pgDownRow = $allRows.first();
     }
-    if (!scout.KeyStrokeUtil.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.PAGE_DOWN)) {
-      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, 'PgDn', $pgDownRow, false, false, false);
+    if (!scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.PAGE_DOWN)) {
+      scout.keyStrokeBox.drawSingleKeyBoxItem(offset, 'PgDn', $pgDownRow, false, false, false);
     }
 
-    if (!scout.KeyStrokeUtil.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.END)) {
-      scout.KeyStrokeUtil.drawSingleKeyBoxItem(offset, 'End', $lastRow, false, false, false);
+    if (!scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.END)) {
+      scout.keyStrokeBox.drawSingleKeyBoxItem(offset, 'End', $lastRow, false, false, false);
     }
   }
 

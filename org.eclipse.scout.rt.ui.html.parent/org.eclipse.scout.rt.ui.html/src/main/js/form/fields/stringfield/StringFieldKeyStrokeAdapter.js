@@ -15,7 +15,7 @@ scout.StringFieldEnterKeyStroke = function() {
   this.drawHint = false;
 };
 scout.inherits(scout.StringFieldEnterKeyStroke, scout.KeyStroke);
-//TODO nbu draw-> when in textarea swallow enter event.
+
 scout.StringFieldEnterKeyStroke.prototype.handle = function(event) {};
 
 scout.StringFieldEnterKeyStroke.prototype.accept = function(event) {
