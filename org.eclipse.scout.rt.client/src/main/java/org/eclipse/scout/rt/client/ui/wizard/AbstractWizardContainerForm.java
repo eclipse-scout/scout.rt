@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,17 +22,24 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 /**
  * <h3>AbstractWizardContainerForm</h3> The form to extends to provide a
  * customized wizard container form.
- * 
+ *
  * @since 24.11.2009
  */
 public abstract class AbstractWizardContainerForm extends AbstractForm implements IWizardContainerForm {
+
   private IWizard m_wizard;
   private P_WizardPropertyListener m_propertyChangeListener;
 
-  public AbstractWizardContainerForm(IWizard w) throws ProcessingException {
+  public AbstractWizardContainerForm(IWizard wizard) throws ProcessingException {
+    this(wizard, true);
+  }
+
+  public AbstractWizardContainerForm(IWizard wizard, boolean callInitializer) throws ProcessingException {
     super(false);
-    m_wizard = w;
-    callInitializer();
+    m_wizard = wizard;
+    if (callInitializer) {
+      callInitializer();
+    }
   }
 
   @Override
@@ -110,16 +117,8 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
 
   protected void updateTitleFromWizard() {
     if (getWizard() != null) {
-      String title = getWizard().getTitle();
-      String subTitle = getWizard().getSubTitle();
-      String s = "";
-      if (title != null) {
-        s += title;
-      }
-      if (subTitle != null) {
-        s += " - " + subTitle;
-      }
-      setTitle(s);
+      setTitle(getWizard().getTitle());
+      setSubTitle(getWizard().getSubTitle());
     }
   }
 
@@ -143,6 +142,7 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
   }
 
   private class P_WizardPropertyListener implements PropertyChangeListener {
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
       handleWizardPropertyChanged(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
@@ -160,5 +160,4 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
   protected IWizardContainerFormExtension<? extends AbstractWizardContainerForm> createLocalExtension() {
     return new LocalWizardContainerFormExtension<AbstractWizardContainerForm>(this);
   }
-
 }
