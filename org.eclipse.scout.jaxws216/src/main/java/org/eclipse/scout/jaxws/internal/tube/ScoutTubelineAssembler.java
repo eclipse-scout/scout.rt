@@ -190,8 +190,8 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
    */
   @Internal
   protected IAuthenticator createAuthenticator(final Class<? extends IAuthenticator> authenticatorClass) {
-    if (authenticatorClass == null || authenticatorClass == IAuthenticator.AcceptAny.class) {
-      return IAuthenticator.AcceptAny.INSTANCE;
+    if (authenticatorClass == null || authenticatorClass == IAuthenticator.AcceptAnyAuthenticator.class) {
+      return IAuthenticator.AcceptAnyAuthenticator.INSTANCE;
     }
     else {
       return OBJ.one(authenticatorClass);

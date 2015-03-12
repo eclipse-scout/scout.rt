@@ -31,11 +31,11 @@ public interface IAuthenticator {
   /**
    * Authenticator that always evaluates to <code>true</code>.
    */
-  static final class AcceptAny implements IAuthenticator {
+  static final class AcceptAnyAuthenticator implements IAuthenticator {
 
-    public static final IAuthenticator INSTANCE = new AcceptAny();
+    public static final IAuthenticator INSTANCE = new AcceptAnyAuthenticator();
 
-    private AcceptAny() {
+    private AcceptAnyAuthenticator() {
     }
 
     @Override
