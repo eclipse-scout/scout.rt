@@ -11,7 +11,9 @@ scout.WrappedFormField.prototype._render = function($parent) {
   this.addContainer($parent, 'wrapped-form-field');
   this.addLabel();
   this.addStatus();
+};
 
+scout.WrappedFormField.prototype._renderProperties = function() {
   this._renderInnerForm();
 };
 
