@@ -107,7 +107,7 @@ scout.TableControlKeyStrokes.prototype.handle = function(event) {
  * @Override scout.KeyStroke
  */
 scout.TableControlKeyStrokes.prototype._drawKeyBox = function($container, drawedKeys) {
-  if (this._field.$rows.length >> 0) {
+  if (this._field.$rows.length > 0) {
     var offset = 4;
     var $allRows = this._field.$rows();
     var $firstRow = $allRows.first();
