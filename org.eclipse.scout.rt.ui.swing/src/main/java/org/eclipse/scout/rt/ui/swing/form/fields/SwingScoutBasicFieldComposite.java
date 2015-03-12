@@ -80,8 +80,14 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
     if (oldText.equals(newText)) {
       return;
     }
+    updateTextKeepCurserPosition(newText, this);
+  }
+
+  protected static void updateTextKeepCurserPosition(String newText, SwingScoutBasicFieldComposite composite) {
     try {
-      getUpdateSwingFromScoutLock().acquire();
+      composite.getUpdateSwingFromScoutLock().acquire();
+      JTextComponent swingField = composite.getSwingField();
+      String oldText = swingField.getText();
       //
       int startIndex = -1;
       int endIndex = -1;
@@ -114,7 +120,7 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
       }
     }
     finally {
-      getUpdateSwingFromScoutLock().release();
+      composite.getUpdateSwingFromScoutLock().release();
     }
   }
 

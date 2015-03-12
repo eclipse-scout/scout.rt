@@ -257,20 +257,28 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
 
   @Override
   protected void setDisplayTextFromScout(String s) {
+    JTextComponent swingField = getSwingField();
+    String oldText = swingField.getText();
+    if (s == null) {
+      s = "";
+    }
+    if (oldText == null) {
+      oldText = "";
+    }
+    if (oldText.equals(s)) {
+      return;
+    }
     m_displayTextToVerify = s;
     IDateField f = getScoutObject();
     Date value = f.getValue();
-    JTextComponent dateField = getSwingDateField();
-    if (value == null || !f.isHasTime()) {
-      //only date field
-      dateField.setText(m_displayTextToVerify);
-      dateField.setCaretPosition(0);
-      return;
+    if (f.isHasTime() && value != null) {
+      // If the the field has a time part (2nd field in swing, hooked to the same model field.)
+      // the model's displaytext is ignored, instead the model's value is formatted.
+      DateFormat format = f.getIsolatedDateFormat();
+      m_displayTextToVerify = format.format(value);
     }
-    DateFormat format = f.getIsolatedDateFormat();
-    m_displayTextToVerify = format.format(value);
-    dateField.setText(m_displayTextToVerify);
-    dateField.setCaretPosition(0);
+    //The model's displaytext is set if the model's value is null or the field has no time part.
+    updateTextKeepCurserPosition(m_displayTextToVerify, this);
   }
 
   @Override
