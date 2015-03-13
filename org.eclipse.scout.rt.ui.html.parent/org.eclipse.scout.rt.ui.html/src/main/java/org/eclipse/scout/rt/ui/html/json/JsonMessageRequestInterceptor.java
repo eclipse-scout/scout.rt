@@ -76,11 +76,11 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     catch (Exception e) {
       if (jsonSession == null) {
         LOG.error("Error while initializing json session", e);
-        writeErrorResponse(resp, createStartupFailedJsonResponse());
+        writeResponse(resp, createStartupFailedJsonResponse());
       }
       else {
         LOG.error("Unexpected error while processing JSON request", e);
-        writeErrorResponse(resp, createUnrecoverableFailureJsonResponse());
+        writeResponse(resp, createUnrecoverableFailureJsonResponse());
       }
     }
     return true;
@@ -114,7 +114,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       if (jsonSession == null) {
         if (!jsonReq.isStartupRequest()) {
           LOG.info("Request cannot be processed due to JSON session timeout [id=" + jsonReq.getJsonSessionId() + "]");
-          writeErrorResponse(resp, createSessionTimeoutJsonResponse());
+          writeResponse(resp, createSessionTimeoutJsonResponse());
           return null;
         }
         LOG.info("Creating new JSON session with ID " + jsonReq.getJsonSessionId() + "...");
@@ -130,42 +130,38 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
   }
 
   protected JsonResponse createSessionTimeoutJsonResponse() {
-    JsonResponse jsonResp = new JsonResponse();
-    jsonResp.setErrorCode(JsonResponse.ERR_SESSION_TIMEOUT);
-    jsonResp.setErrorMessage("The session has expired, please reload the page."); // will be translated in client, see Session.js/_processErrorResponse()
-    return jsonResp;
+    JsonResponse response = new JsonResponse();
+    response.markAsError(JsonResponse.ERR_SESSION_TIMEOUT, "The session has expired, please reload the page.");
+    return response;
   }
 
   protected JsonResponse createUnrecoverableFailureJsonResponse() {
-    JsonResponse jsonResp = new JsonResponse();
-    jsonResp.setErrorCode(JsonResponse.ERR_UI_PROCESSING);
-    jsonResp.setErrorMessage("UI processing error"); // will be translated in client, see Session.js/_processErrorResponse()
-    return jsonResp;
+    JsonResponse response = new JsonResponse();
+    response.markAsError(JsonResponse.ERR_UI_PROCESSING, "UI processing error");
+    return response;
   }
 
   protected JsonResponse createStartupFailedJsonResponse() {
-    JsonResponse jsonResp = new JsonResponse();
-    jsonResp.setErrorCode(JsonResponse.ERR_STARTUP_FAILED);
-    jsonResp.setErrorMessage("Initialization failed");
-    return jsonResp;
+    JsonResponse response = new JsonResponse();
+    response.markAsError(JsonResponse.ERR_STARTUP_FAILED, "Initialization failed");
+    return response;
   }
 
   protected JsonResponse createPingJsonResponse() {
     return new JsonResponse();
   }
 
-  protected void writeErrorResponse(HttpServletResponse resp, JsonResponse jsonErrorResp) throws IOException {
-    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    writeResponse(resp, jsonErrorResp.toJson());
+  protected void writeResponse(HttpServletResponse res, JsonResponse response) throws IOException {
+    writeResponse(res, response.toJson());
   }
 
-  protected void writeResponse(HttpServletResponse resp, JSONObject json) throws IOException {
+  protected void writeResponse(HttpServletResponse res, JSONObject json) throws IOException {
     String jsonText = json.toString();
     byte[] data = jsonText.getBytes("UTF-8");
-    resp.setContentLength(data.length);
-    resp.setContentType("application/json");
-    resp.setCharacterEncoding("UTF-8");
-    resp.getOutputStream().write(data);
+    res.setContentLength(data.length);
+    res.setContentType("application/json");
+    res.setCharacterEncoding("UTF-8");
+    res.getOutputStream().write(data);
     if (LOG.isTraceEnabled()) {
       LOG.trace("Returned: " + jsonText);
     }

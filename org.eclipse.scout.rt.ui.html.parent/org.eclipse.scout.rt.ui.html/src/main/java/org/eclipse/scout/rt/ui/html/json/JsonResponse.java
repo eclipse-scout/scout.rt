@@ -34,14 +34,17 @@ public class JsonResponse {
 
   public static final String PROP_EVENTS = "events";
   public static final String PROP_ADAPTER_DATA = "adapterData";
+  public static final String PROP_ERROR = "error";
   public static final String PROP_ERROR_CODE = "errorCode";
   public static final String PROP_ERROR_MESSAGE = "errorMessage";
 
   private final List<JsonEvent> m_eventList;
   private final Map<String/*id*/, JsonEvent> m_idToPropertyChangeEventMap;
   private final Map<String, IJsonAdapter<?>> m_adapterMap;
-  private Integer m_errorCode;
+  private boolean m_error;
+  private int m_errorCode;
   private String m_errorMessage;
+
   private boolean m_toJsonInProgress;
 
   public JsonResponse() {
@@ -119,6 +122,22 @@ public class JsonResponse {
     addActionEvent(id, eventName, eventData);
   }
 
+  /**
+   * Marks this JSON response as "error" (default is "success").
+   *
+   * @param errorCode
+   *          An arbitrary number indicating the type of error.
+   * @param errorMessage
+   *          A message describing the error. This message is mostly useful for debugging purposes. Usually, it is
+   *          not shown to the user, because it is not language-dependent. If possible, the displayed message is
+   *          translated by the client using the <code>errorCode</code> parameter (see Session.js).
+   */
+  public void markAsError(int errorCode, String errorMessage) {
+    m_error = true;
+    m_errorCode = errorCode;
+    m_errorMessage = errorMessage;
+  }
+
   // FIXME CGU potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
 
   /**
@@ -174,8 +193,12 @@ public class JsonResponse {
 
       JsonObjectUtility.putProperty(json, PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
       JsonObjectUtility.putProperty(json, PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
-      JsonObjectUtility.putProperty(json, PROP_ERROR_CODE, m_errorCode);
-      JsonObjectUtility.putProperty(json, PROP_ERROR_MESSAGE, m_errorMessage);
+      if (m_error) {
+        JSONObject jsonError = JsonObjectUtility.newOrderedJSONObject();
+        JsonObjectUtility.putProperty(jsonError, PROP_ERROR_CODE, m_errorCode);
+        JsonObjectUtility.putProperty(jsonError, PROP_ERROR_MESSAGE, m_errorMessage);
+        JsonObjectUtility.putProperty(json, PROP_ERROR, jsonError);
+      }
     }
     finally {
       m_toJsonInProgress = false;
@@ -227,11 +250,15 @@ public class JsonResponse {
     return m_adapterMap;
   }
 
-  public void setErrorCode(Integer errorCode) {
-    m_errorCode = errorCode;
+  protected boolean error() {
+    return m_error;
   }
 
-  public void setErrorMessage(String errorMessage) {
-    m_errorMessage = errorMessage;
+  protected Integer errorCode() {
+    return m_errorCode;
+  }
+
+  protected String errorMessage() {
+    return m_errorMessage;
   }
 }

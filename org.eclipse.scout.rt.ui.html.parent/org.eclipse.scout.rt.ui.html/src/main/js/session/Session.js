@@ -193,12 +193,11 @@ scout.Session.prototype.getOrCreateModelAdapters = function(ids, parent) {
 scout.Session.prototype.send = function(target, type, data) {
   this._asyncEvents.push(new scout.Event(target, type, data));
   if (!this._asyncRequestQueued) {
-    var that = this;
     setTimeout(function() {
-      that._sendNow(that._asyncEvents);
-      that._asyncRequestQueued = false;
-      that._asyncEvents = [];
-    }, 0);
+      this._sendNow(this._asyncEvents);
+      this._asyncRequestQueued = false;
+      this._asyncEvents = [];
+    }.bind(this), 0);
     this._asyncRequestQueued = true;
   }
 };
@@ -266,14 +265,18 @@ scout.Session.prototype._sendRequest = function(request) {
     context: request
   };
 
-  var that = this;
   var success = false;
   var jsError;
 
   function onAjaxDone(data) {
     try {
-      that._processSuccessResponse(data);
-      success = true;
+      if (data.error) {
+        this._processErrorJsonResponse(data.error);
+      }
+      else {
+        this._processSuccessResponse(data);
+        success = true;
+      }
     } catch (err) {
       jsError = jsError || err;
     }
@@ -282,19 +285,19 @@ scout.Session.prototype._sendRequest = function(request) {
   function onAjaxFail(jqXHR, textStatus, errorThrown) {
     try {
       var request = this;
-      that._processErrorResponse(request, jqXHR, textStatus, errorThrown);
+      this._processErrorResponse(request, jqXHR, textStatus, errorThrown);
     } catch (err) {
       jsError = jsError || err;
     }
   }
 
   function onAjaxAlways(data, textStatus, errorThrown) {
-    that._requestsPendingCounter--;
-    if (!that.areRequestsPending() && !request.unload) {
-      that.setBusy(false);
+    this._requestsPendingCounter--;
+    if (!this.areRequestsPending() && !request.unload) {
+      this.setBusy(false);
     }
     if (success) {
-      that._fireRequestFinished(data);
+      this._fireRequestFinished(data);
     }
     // Throw previously catched error
     if (jsError) {
@@ -302,7 +305,7 @@ scout.Session.prototype._sendRequest = function(request) {
     }
   }
 
-  $.ajax(ajaxOptions).done(onAjaxDone).fail(onAjaxFail).always(onAjaxAlways);
+  $.ajax(ajaxOptions).done(onAjaxDone.bind(this)).fail(onAjaxFail.bind(this)).always(onAjaxAlways.bind(this));
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {
@@ -373,12 +376,6 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
     return;
   }
 
-  var jsonResponse = jqXHR.responseJSON;
-  if (jsonResponse && jsonResponse.errorCode) {
-    this._processErrorJsonResponse(jsonResponse);
-    return;
-  }
-
   throw new Error('Error while processing request: ' + errorThrown);
 };
 
@@ -434,7 +431,6 @@ scout.Session.prototype._fireRequestFinished = function(message) {
 
 scout.Session.prototype.showFatalMessage = function(options) {
   options = options || {};
-  var that = this;
   var model = {
     title: options.title,
     iconId: options.iconId,
@@ -453,13 +449,13 @@ scout.Session.prototype.showFatalMessage = function(options) {
     ui.remove();
     // Custom actions
     if (option === 'yes' && options.yesButtonAction) {
-      options.yesButtonAction.apply(that);
+      options.yesButtonAction.apply(this);
     } else if (option === 'no' && options.noButtonAction) {
-      options.noButtonAction.apply(that);
+      options.noButtonAction.apply(this);
     } else if (option === 'cancel' && options.cancelButtonAction) {
-      options.cancelButtonAction.apply(that);
+      options.cancelButtonAction.apply(this);
     }
-  };
+  }.bind(this);
 
   ui.render(this.$entryPoint);
 };
@@ -524,50 +520,46 @@ scout.Session.prototype.setBusy = function(busy) {
 };
 
 scout.Session.prototype._renderBusyGlasspane = function() {
-  var that = this;
-
   // Don't show the busy glasspane immediately. Set a short timer instead (which may be
   // cancelled again if the busy state returns to false in the meantime).
   this._busyGlasspaneTimer = setTimeout(function() {
     // Create busy glasspane
-    that._$busyGlasspane = scout.fields.new$Glasspane()
+    this._$busyGlasspane = scout.fields.new$Glasspane()
       .addClass('busy')
-      .appendTo(that.$entryPoint);
+      .appendTo(this.$entryPoint);
     $('.taskbar-logo').addClass('animated');
 
     // Workround for Chrome: Trigger cursor change (Otherwise, the cursor is not correctly
     // updated without moving the mouse, see https://code.google.com/p/chromium/issues/detail?id=26723)
-    that._$busyGlasspane.css('cursor', 'default');
+    this._$busyGlasspane.css('cursor', 'default');
     setTimeout(function() {
-      that._$busyGlasspane.css('cursor', 'wait');
-    }, 0);
+      this._$busyGlasspane.css('cursor', 'wait');
+    }.bind(this), 0);
     // (End workaround)
 
-    if (that.desktop) {
-      that._darkBusyGlasspaneTimer = setTimeout(function() {
-        that._$busyGlasspane.addClass('dark');
-      }, 2500);
+    if (this.desktop) {
+      this._darkBusyGlasspaneTimer = setTimeout(function() {
+        this._$busyGlasspane.addClass('dark');
+      }.bind(this), 2500);
     }
-  }, 500);
+  }.bind(this), 500);
 };
 
 scout.Session.prototype._removeBusyGlasspane = function() {
-  var that = this;
-
   // Clear any pending timers
-  clearTimeout(that._busyGlasspaneTimer);
-  clearTimeout(that._darkBusyGlasspaneTimer);
+  clearTimeout(this._busyGlasspaneTimer);
+  clearTimeout(this._darkBusyGlasspaneTimer);
 
   // If the timer action was executed and the glasspane is showing, we have to remove it
-  if (that._$busyGlasspane) {
+  if (this._$busyGlasspane) {
     // Workround for Chrome: Before removing the glasspane, reset the cursor. Therefore,
     // the actual remove has to be inside setTimeout()
-    that._$busyGlasspane.css('cursor', 'default');
+    this._$busyGlasspane.css('cursor', 'default');
     setTimeout(function() {
       // (End workaround)
-      that._$busyGlasspane.stop().fadeOut(150, $.removeThis);
+      this._$busyGlasspane.stop().fadeOut(150, $.removeThis);
       $('.taskbar-logo').removeClass('animated');
-    }, 0);
+    }.bind(this), 0);
   }
 };
 
