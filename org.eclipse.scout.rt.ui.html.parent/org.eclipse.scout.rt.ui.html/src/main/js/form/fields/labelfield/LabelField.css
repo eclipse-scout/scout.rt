@@ -3,4 +3,5 @@
   padding-bottom: @borderless-field-padding-y;
   margin-left: @mandatory-indicator-width;
   .user-select(text);
+  .overflow-ellipsis;
 }
