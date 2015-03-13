@@ -102,8 +102,8 @@ scout.GroupBox.prototype.getFields = function() {
 };
 
 scout.GroupBox.prototype._renderBorderVisible = function(borderVisible) {
-  if (borderVisible && this.borderDecoration === 'auto') {
-    borderVisible = this._computeBorderVisible();
+  if (this.borderDecoration === 'auto') {
+    borderVisible = this._computeBorderVisible(borderVisible);
   }
 
   if (!borderVisible) {
@@ -120,15 +120,22 @@ scout.GroupBox.prototype._renderBorderDecoration = function() {
  *
  * @returns false if it is the mainbox. Or if the groupbox contains exactly one tablefield which has an invisible label
  */
-scout.GroupBox.prototype._computeBorderVisible = function() {
+scout.GroupBox.prototype._computeBorderVisible = function(borderVisible) {
   var fields = this.getFields();
   if (this.mainBox) {
-    return false;
+    borderVisible = false;
   } else if (fields.length === 1 && fields[0].objectType === 'TableField' && !fields[0].labelVisible) {
     fields[0].$container.addClass('single');
-    return false;
+    borderVisible = false;
+  } else if (this.parent instanceof scout.GroupBox &&
+      this.parent.parent instanceof scout.Form &&
+      this.parent.parent.parent instanceof scout.WrappedFormField &&
+      this.parent.parent.parent.parent instanceof scout.SplitBox &&
+      this.parent.getFields().length === 1) {
+    // Special case for wizard: wrapped form in split box with a single group box
+    borderVisible = false;
   }
-  return true;
+  return borderVisible;
 };
 
 /**
