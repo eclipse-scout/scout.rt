@@ -55,12 +55,13 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       //disable cache
       servlet.getHttpCacheControl().disableCacheHeaders(req, resp);
 
-      JsonRequest jsonReq = new JsonRequest(decodeJSONRequest(req));
-      if (jsonReq.isPingRequest()) {
+      JSONObject jsonReqObj = decodeJSONRequest(req);
+      if (isPingRequest(jsonReqObj)) {
         writeResponse(resp, createPingJsonResponse().toJson());
         return true;
       }
 
+      JsonRequest jsonReq = new JsonRequest(jsonReqObj);
       jsonSession = getOrCreateJsonSession(servlet, req, resp, jsonReq);
       if (jsonSession == null) {
         return true;
@@ -85,11 +86,18 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     return true;
   }
 
+  /**
+   * Check if request is a simple ping. We don't use JsonRequest here because a ping request has no jsonSessionId.
+   */
+  private boolean isPingRequest(JSONObject json) {
+    return json.has("ping");
+  }
+
   protected IJsonSession getOrCreateJsonSession(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
     String jsonSessionAttributeName = IJsonSession.HTTP_SESSION_ATTRIBUTE_PREFIX + jsonReq.getJsonSessionId();
     HttpSession httpSession = req.getSession();
 
-    //FIXME cgu really synchronize on this? blocks every call, maybe introduce a lock object saved on httpSession or even better use java.util.concurrent.locks.ReadWriteLock
+    // FIXME cgu really synchronize on this? blocks every call, maybe introduce a lock object saved on httpSession or even better use java.util.concurrent.locks.ReadWriteLock
     synchronized (httpSession) {
       IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(jsonSessionAttributeName);
 

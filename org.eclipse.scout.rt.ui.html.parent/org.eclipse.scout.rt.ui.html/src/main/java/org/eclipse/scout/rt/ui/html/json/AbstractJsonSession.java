@@ -11,12 +11,14 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +28,9 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
@@ -60,9 +65,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private long m_jsonAdapterSeq = ROOT_ID;
   private JsonResponse m_currentJsonResponse;
   private JsonRequest m_currentJsonRequest;
-  private HttpServletRequest m_currentHttpRequest;
+  private AtomicReference<HttpServletRequest> m_currentHttpRequest = new AtomicReference<>();
   private JsonEventProcessor m_jsonEventProcessor;
   private boolean m_disposing;
+  private AtomicReference<List<Job>> m_asyncStartedJobs = new AtomicReference<>();
 
   public AbstractJsonSession() {
     m_currentJsonResponse = createJsonResponse();
@@ -70,6 +76,42 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
     m_rootJsonAdapter = new P_RootAdapter(this);
     m_customHtmlRenderer = createCustomHtmlRenderer();
+
+    m_asyncStartedJobs.set(new ArrayList<Job>());
+
+    // FIXME AWE: remove when disposed, thread safety
+    Job.getJobManager().addJobChangeListener(new JobChangeAdapter() {
+
+      private Job isJobElegible(IJobChangeEvent event) {
+        if (isProcessingClientRequest()) {
+          Job job = event.getJob();
+          if (ClientJobUtility.isAsyncJobFromClientSession(job, getClientSession())) {
+            return job;
+          }
+        }
+        return null;
+      }
+
+      @Override
+      public void scheduled(IJobChangeEvent event) {
+        Job job = isJobElegible(event);
+        if (job != null) {
+          List<Job> list = m_asyncStartedJobs.get();
+          list.add(job);
+          LOG.debug("Async Job " + job + " was scheduled while no request was processing --> Add to list, size=" + list.size());
+        }
+      }
+
+      @Override
+      public void done(IJobChangeEvent event) {
+        List<Job> list = m_asyncStartedJobs.get();
+        Job job = event.getJob();
+        if (list.contains(job)) {
+          list.remove(job);
+          LOG.debug("Async Job " + job + " has terminated --> Remove from list, size=" + list.size());
+        }
+      }
+    });
   }
 
   protected JsonResponse createJsonResponse() {
@@ -172,7 +214,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   @SuppressWarnings("unchecked")
   @Override
   public void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
-    m_currentHttpRequest = request;
+    m_currentHttpRequest.set(request);
     m_currentJsonRequest = jsonStartupRequest;
     m_jsonSessionId = jsonStartupRequest.getJsonSessionId();
     if (currentSubject() == null) {
@@ -181,7 +223,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
     IClientSession clientSession;
     synchronized (this) {
-      HttpSession httpSession = m_currentHttpRequest.getSession();
+      HttpSession httpSession = m_currentHttpRequest.get().getSession();
       // Lookup the requested client session
       String clientSessionId = jsonStartupRequest.getClientSessionId();
       if (clientSessionId == null) {
@@ -296,7 +338,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   protected UserAgent createUserAgent(JsonStartupRequest jsonStartupRequest) {
     IUiLayer uiLayer = UiLayer.HTML;
     IUiDeviceType uiDeviceType = UiDeviceType.DESKTOP;
-    String browserId = m_currentHttpRequest.getHeader("User-Agent");
+    String browserId = m_currentHttpRequest.get().getHeader("User-Agent");
     JSONObject userAgent = jsonStartupRequest.getUserAgent();
     if (userAgent != null) {
       // FIXME CGU: it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
@@ -318,7 +360,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public void dispose() {
-    if (m_currentHttpRequest != null) {
+    if (isProcessingClientRequest()) {
       // If there is a request in progress just mark the session as being disposed.
       // The actual disposing happens before returning to the client, see processRequest.
       m_disposing = true;
@@ -498,7 +540,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public HttpServletRequest currentHttpRequest() {
-    return m_currentHttpRequest;
+    return m_currentHttpRequest.get();
   }
 
   public JsonEventProcessor getJsonEventProcessor() {
@@ -510,9 +552,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     if (LOG.isDebugEnabled()) {
       LOG.debug("Adapter count before request: " + m_jsonAdapterRegistry.getJsonAdapterCount());
     }
-
     try {
-      m_currentHttpRequest = httpRequest;
+      m_currentHttpRequest.set(httpRequest);
       m_currentJsonRequest = jsonRequest;
       if (jsonRequest.isStartupRequest()) {
         getJsonClientSession().processRequestLocale(httpRequest.getLocale());
@@ -525,7 +566,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       // reset event map (aka jsonResponse) when response has been sent to client
       flush();
       m_currentJsonResponse = createJsonResponse();
-      m_currentHttpRequest = null;
+      m_currentHttpRequest.set(null);
 
       if (m_disposing) {
         dispose();
@@ -537,6 +578,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
+  private boolean isProcessingClientRequest() {
+    return m_currentHttpRequest.get() != null;
+  }
+
   protected JSONObject jsonResponseToJson() {
     final IHolder<JSONObject> resultHolder = new Holder<JSONObject>(JSONObject.class);
     ClientSyncJob job = new ClientSyncJob("processEvents", getClientSession()) {
@@ -545,7 +590,16 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         ClientJobUtility.runAsSubject(new Runnable() {
           @Override
           public void run() {
+            // Note: must be called within ClientJob because adapters could call a Service in their toJson() method
+            // FIXME AWE: (jobs) Nicht an jeder Ecke einen neuen Job starten, besser einen einzigen Job für alles
+            // starten, siehe auch AbstractJsonSession#init, Local-Handling, etc
             JSONObject result = currentJsonResponse().toJson();
+
+            if (!m_asyncStartedJobs.get().isEmpty()) {
+              LOG.debug("FOUND async started jobs, add checkAsync property to response");
+              JsonObjectUtility.putProperty(result, "checkAsync", "true");
+            }
+
             resultHolder.setValue(result);
           }
         });

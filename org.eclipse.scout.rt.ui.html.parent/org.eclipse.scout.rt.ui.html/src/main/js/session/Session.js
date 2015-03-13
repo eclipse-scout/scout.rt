@@ -56,6 +56,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper();
   this.partId = jsonSessionId.substring(0, jsonSessionId.indexOf(':'));
+  this._asyncChecker;
 
   // TODO BSH Detach | Check if there is another way
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
@@ -308,6 +309,18 @@ scout.Session.prototype._processSuccessResponse = function(message) {
     cacheSize = scout.objects.countProperties(this.modelAdapterRegistry);
     $.log.debug('size of modelAdapterRegistry after response has been processed: ' + cacheSize);
   }
+
+  if (message.checkAsync) {
+    this._asyncChecker = setTimeout(this._pullAsyncResults.bind(this), 250);
+    $.log.debug('message.checkAsync = true. Pull async results in 250 [ms]...');
+  }
+};
+
+scout.Session.prototype._pullAsyncResults = function() {
+  $.log.info('Check for async results...');
+  this._sendRequest({
+    pullAsyncResults: true,
+    jsonSessionId: this.jsonSessionId});
 };
 
 scout.Session.prototype._copyAdapterData = function(adapterData) {
@@ -329,8 +342,8 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
 scout.Session.prototype._processErrorResponse = function(request, jqXHR, textStatus, errorThrown) {
   $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
 
-  //Status code = 0 -> no connection
-  //Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
+  // Status code = 0 -> no connection
+  // Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
   if (!jqXHR.status || jqXHR.status >= 12000) {
     this.goOffline();
     if (!this._queuedRequest) {

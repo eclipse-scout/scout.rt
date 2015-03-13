@@ -33,7 +33,7 @@ public final class ClientJobUtility {
       int numSync = 0;
       for (Job job : Job.getJobManager().find(ClientJob.class)) {
         ClientJob clientJob = (ClientJob) job;
-        if (isSyncJobFromCurrentSession(clientJob, currentClientSession)) {
+        if (isSyncJobFromClientSession(clientJob, currentClientSession)) {
           numSync++;
           if (clientJob.isWaitFor()) {
             numWaitFor++;
@@ -56,8 +56,21 @@ public final class ClientJobUtility {
     }
   }
 
-  protected static boolean isSyncJobFromCurrentSession(ClientJob job, IClientSession currentClientSession) {
-    return (job.isSync() && job.getClientSession() == currentClientSession);
+  public static boolean isSyncJobFromClientSession(ClientJob job, IClientSession clientSession) {
+    return (job.isSync() && job.getClientSession() == clientSession);
+  }
+
+  public static boolean isAsyncJobFromClientSession(Job job, IClientSession clientSession) {
+    if (job instanceof ClientJob) {
+      return isAsyncJobFromClientSession((ClientJob) job, clientSession);
+    }
+    else {
+      return false;
+    }
+  }
+
+  public static boolean isAsyncJobFromClientSession(ClientJob job, IClientSession clientSession) {
+    return (!job.isSync() && job.getClientSession() == clientSession);
   }
 
   public static void waitForSyncJob(ClientJob syncJob) {

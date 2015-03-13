@@ -24,13 +24,22 @@ public class JsonRequest {
 
   public static final String PROP_STARTUP = "startup";
   public static final String PROP_UNLOAD = "unload";
-  public static final String PROP_PING = "ping";
   public static final String PROP_JSON_SESSION_ID = "jsonSessionId";
   public static final String PROP_EVENTS = "events";
 
   private final JSONObject m_request;
 
+  /**
+   * Creates a new JsonRequest instance.
+   *
+   * @param request
+   * @throws IllegalArgumentException
+   *           when mandatory property jsonSessionId is not set
+   */
   public JsonRequest(JSONObject request) {
+    if (!request.has(PROP_JSON_SESSION_ID)) {
+      throw new IllegalArgumentException("Missing property '" + PROP_JSON_SESSION_ID + "' in request " + request);
+    }
     m_request = request;
   }
 
@@ -61,10 +70,6 @@ public class JsonRequest {
 
   public boolean isUnloadRequest() {
     return m_request.optBoolean(PROP_UNLOAD);
-  }
-
-  public boolean isPingRequest() {
-    return m_request.optBoolean(PROP_PING);
   }
 
   @Override
