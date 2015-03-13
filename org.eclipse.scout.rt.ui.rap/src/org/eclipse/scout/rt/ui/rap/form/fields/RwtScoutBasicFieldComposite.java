@@ -28,7 +28,8 @@ public abstract class RwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
   private boolean m_validateOnAnyKey;
   private P_RwtValidateOnAnyKeyModifyListener m_validateOnAnyKeyModifyListener;
   private P_RwtUpdateDisplayTextOnModifyModifyListener m_updateDisplayTextOnModifyListener = new P_RwtUpdateDisplayTextOnModifyModifyListener();
-  private boolean m_updateDisplayTextOnModify;
+  protected boolean m_updateDisplayTextOnModify;
+  protected boolean m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown;
 
   @Override
   protected void attachScout() {
@@ -56,8 +57,14 @@ public abstract class RwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
     if (oldText.equals(newText)) {
       return;
     }
+    updateTextKeepCurserPosition(newText);
+  }
+
+  protected void updateTextKeepCurserPosition(String newText) {
     try {
       getUpdateUiFromScoutLock().acquire();
+      Text field = getUiField();
+      String oldText = field.getText();
       int startIndex = field.getSelection().x;
       int endIndex = field.getSelection().y;
       if (startIndex == endIndex && newText.length() != oldText.length()) {
@@ -99,6 +106,7 @@ public abstract class RwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
   protected void setUpdateDisplayTextOnModifyFromScout(boolean b) {
     m_updateDisplayTextOnModify = b;
     if (b) {
+      m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown = true;
       addUpdateDisplayTextOnModifyListener();
     }
     else {
@@ -149,7 +157,7 @@ public abstract class RwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
     }
     final String text = getUiField().getText();
     // only handle if text has changed
-    if (!m_updateDisplayTextOnModify && CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
+    if (!m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown && CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
       return;
     }
     final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, false);
@@ -170,6 +178,9 @@ public abstract class RwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
     }
     doit = result.getValue();
     getUiEnvironment().dispatchImmediateUiJobs();
+    if (m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown && !m_updateDisplayTextOnModify) {
+      m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown = false;
+    }
   }
 
   @Override

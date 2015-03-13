@@ -22,7 +22,8 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
   private Point m_backupSelection = null;
   private TextFieldEditableSupport m_editableSupport;
   private boolean m_validateOnAnyKey;
-  private boolean m_updateDisplayTextOnModify;
+  protected boolean m_updateDisplayTextOnModify;
+  protected boolean m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown;
 
   protected void addModifyListenerForBasicField(Widget inputField) {
     TypedListener typedListener = new TypedListener(new P_SwtTextModifyListener());
@@ -49,9 +50,13 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
     if (oldText.equals(newText)) {
       return;
     }
-    //
+    updateTextKeepCurserPosition(newText);
+  }
+
+  protected void updateTextKeepCurserPosition(String newText) {
     try {
       getUpdateSwtFromScoutLock().acquire();
+      String oldText = getText();
       int startIndex = getSelection().x;
       int endIndex = getSelection().y;
       int caretPosition = getCaretOffset();
@@ -175,7 +180,7 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
   protected boolean handleSwtInputVerifier() {
     final String text = getText();
     // only handle if text has changed
-    if (!m_updateDisplayTextOnModify && CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
+    if (!m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown && CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
       return true;
     }
     // notify Scout
@@ -194,6 +199,9 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
     }
     getEnvironment().dispatchImmediateSwtJobs();
     // end notify
+    if (m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown && !m_updateDisplayTextOnModify) {
+      m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown = false;
+    }
     return true; // continue always
   }
 
@@ -217,6 +225,9 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
 
   protected void setUpdateDisplayTextOnModifyFromScout(boolean b) {
     m_updateDisplayTextOnModify = b;
+    if (b) {
+      m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown = true;
+    }
   }
 
   protected class P_SwtTextModifyListener implements ModifyListener {

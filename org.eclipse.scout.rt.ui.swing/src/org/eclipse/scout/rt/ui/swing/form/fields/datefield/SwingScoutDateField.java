@@ -282,7 +282,7 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
       m_displayTextToVerify = format.format(value);
     }
     //The model's displaytext is set if the model's value is null or the field has no time part.
-    updateTextKeepCurserPosition(m_displayTextToVerify, this);
+    updateTextKeepCurserPosition(m_displayTextToVerify);
   }
 
   @Override

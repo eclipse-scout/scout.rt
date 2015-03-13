@@ -292,12 +292,12 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
       DateFormat format = f.getIsolatedTimeFormat();
       if (format != null) {
         m_displayTextToVerify = format.format(value);
-        updateTextKeepCurserPosition(m_displayTextToVerify, this);
+        updateTextKeepCurserPosition(m_displayTextToVerify);
       }
     }
     else {
       //The model's displaytext is set if the model's value is null or the field has no time part.
-      updateTextKeepCurserPosition(m_displayTextToVerify, this);
+      updateTextKeepCurserPosition(m_displayTextToVerify);
     }
   }
 

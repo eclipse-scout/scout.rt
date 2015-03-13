@@ -55,6 +55,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Text;
 
 public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> implements IRwtScoutDateField, IPopupSupport {
 
@@ -314,20 +315,28 @@ public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> i
 
   @Override
   protected void setDisplayTextFromScout(String s) {
-    IDateField scoutField = getScoutObject();
+    Text field = getUiField();
+    String oldText = field.getText();
     if (s == null) {
       s = "";
     }
-    m_displayTextToVerify = s;
-    Date value = scoutField.getValue();
-    if (value != null) {
-      DateFormat format = scoutField.getIsolatedDateFormat();
-      if (format != null) {
-        m_displayTextToVerify = format.format(value);
-      }
+    if (oldText == null) {
+      oldText = "";
     }
-    getUiField().setText(m_displayTextToVerify);
-    getUiField().setCaretOffset(0);
+    if (oldText.equals(s)) {
+      return;
+    }
+    m_displayTextToVerify = s;
+    IDateField f = getScoutObject();
+    Date value = f.getValue();
+    if (f.isHasTime() && value != null) {
+      // If the the field has a time part (2nd field in swing, hooked to the same model field.)
+      // the model's displaytext is ignored, instead the model's value is formatted.
+      DateFormat format = f.getIsolatedDateFormat();
+      m_displayTextToVerify = format.format(value);
+    }
+    //The model's displaytext is set if the model's value is null or the field has no time part.
+    updateTextKeepCurserPosition(m_displayTextToVerify);
   }
 
   @Override
@@ -363,7 +372,7 @@ public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> i
     }
     final String text = getUiField().getText();
     // only handle if text has changed
-    if (CompareUtility.equals(text, m_displayTextToVerify) && (isDateTimeCompositeMember() || getScoutObject().getErrorStatus() == null)) {
+    if (!m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown && CompareUtility.equals(text, m_displayTextToVerify) && (isDateTimeCompositeMember() || getScoutObject().getErrorStatus() == null)) {
       return;
     }
     m_displayTextToVerify = text;
@@ -384,6 +393,9 @@ public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> i
       //nop
     }
     getUiEnvironment().dispatchImmediateUiJobs();
+    if (m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown && !m_updateDisplayTextOnModify) {
+      m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown = false;
+    }
   }
 
   @Override

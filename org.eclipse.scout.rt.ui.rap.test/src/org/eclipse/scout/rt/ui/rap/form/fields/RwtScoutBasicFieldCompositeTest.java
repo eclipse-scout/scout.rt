@@ -58,7 +58,7 @@ public class RwtScoutBasicFieldCompositeTest {
     P_RwtScoutBasicFieldComposite field = new P_RwtScoutBasicFieldComposite();
 
     Text mock = Mockito.mock(Text.class);
-    Mockito.when(mock.getText()).thenReturn(oldText, newText);
+    Mockito.when(mock.getText()).thenReturn(oldText, oldText, newText);
     Mockito.when(mock.getSelection()).thenReturn(new Point(oldStartIndex, oldEndIndex));
     field.setUiFieldMock(mock);
 

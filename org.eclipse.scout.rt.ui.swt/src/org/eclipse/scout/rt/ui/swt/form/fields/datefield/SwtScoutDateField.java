@@ -193,14 +193,6 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
   }
 
   @Override
-  protected void setDisplayTextFromScout(String s) {
-    if (s == null) {
-      s = "";
-    }
-    getSwtField().setText(s);
-  }
-
-  @Override
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
     m_dateChooserButton.setEnabled(b);
@@ -246,7 +238,7 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
   protected boolean handleSwtInputVerifier() {
     final String text = getSwtField().getText();
     // only handle if text has changed
-    if (CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
+    if (!m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown && CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
       return true;
     }
     final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, false);
@@ -267,6 +259,9 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
     }
     getEnvironment().dispatchImmediateSwtJobs();
     // end notify
+    if (m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown && !m_updateDisplayTextOnModify) {
+      m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown = false;
+    }
     return true;// continue always
   }
 
