@@ -30,7 +30,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> extends SwingScoutValueFieldComposite<T> {
 
   private boolean m_validateOnAnyKey;
-  private boolean m_udateDisplayTextOnModify;
+  protected boolean m_updateDisplayTextOnModify;
+  protected boolean m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown;
 
   /**
    * attach Scout Model: set scout properties
@@ -60,7 +61,10 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
   }
 
   protected void setUpdateDisplayTextOnModifyFromScout(boolean b) {
-    m_udateDisplayTextOnModify = b;
+    m_updateDisplayTextOnModify = b;
+    if (b) {
+      m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown = true;
+    }
   }
 
   @Override
@@ -128,7 +132,7 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
   protected boolean handleSwingInputVerifier() {
     final String text = getSwingField().getText();
     // only handle if text has changed
-    if (!m_udateDisplayTextOnModify && CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
+    if (!m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown && CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
       return true;
     }
     // notify Scout
@@ -150,6 +154,9 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
     //if not validate any key, also update selections
     if (!m_validateOnAnyKey) {
       setSelectionFromSwing();
+    }
+    if (m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown && !m_updateDisplayTextOnModify) {
+      m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown = false;
     }
     return true; // continue always
   }
@@ -224,7 +231,7 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
     }
 
     private void setDisplayTextInScout() {
-      if (m_udateDisplayTextOnModify && getUpdateSwingFromScoutLock().isReleased()) {
+      if (m_updateDisplayTextOnModify && getUpdateSwingFromScoutLock().isReleased()) {
         final String text = getSwingField().getText();
         // notify Scout
         Runnable t = new Runnable() {
