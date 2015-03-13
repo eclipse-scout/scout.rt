@@ -79,7 +79,7 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
   }
 
   public void handleModelContextMenuChanged(ContextMenuEvent event) {
-    if (ContextMenuEvent.TYPE_STRUCTURE_CHANGED == event.getEventType()) {
+    if (ContextMenuEvent.TYPE_STRUCTURE_CHANGED == event.getType()) {
       handleModelContextMenuStructureChanged(event);
     }
   }
