@@ -21,11 +21,14 @@ import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm.MainBox.TabBox.TemplateExGroupBox;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestForm.MainBox.TabBox.TemplateGroupBox;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture.TestFormData;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(ClientTestRunner.class)
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class TabFormTestTest {
 
   @Test

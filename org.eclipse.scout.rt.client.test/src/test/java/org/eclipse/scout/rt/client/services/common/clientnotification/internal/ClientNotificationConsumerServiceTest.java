@@ -24,9 +24,12 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.AbstractClientNotification;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +39,8 @@ import org.junit.runner.RunWith;
  * Test for {@link ClientNotificationConsumerService}
  */
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class ClientNotificationConsumerServiceTest {
   /** Service under test */
   private ClientNotificationConsumerService m_clientNotificationService;
@@ -141,7 +146,7 @@ public class ClientNotificationConsumerServiceTest {
 
   /**
    * Tests that client notifications consumed for another session is still consumed.
-   * 
+   *
    * @throws InterruptedException
    */
   @Test

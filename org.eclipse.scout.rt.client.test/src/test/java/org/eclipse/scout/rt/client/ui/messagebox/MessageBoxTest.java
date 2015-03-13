@@ -20,6 +20,8 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,10 +31,12 @@ import org.mockito.Mockito;
 
 /**
  * Tests for {@link MessageBox}.
- * 
+ *
  * @since Scout 4.0.1
  */
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class MessageBoxTest {
 
   private IDesktop m_desktopSpy;
@@ -52,7 +56,7 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a single object.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -64,7 +68,7 @@ public class MessageBoxTest {
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a single object in a list.
    * Bug 440433.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -75,7 +79,7 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a null parameter.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -86,7 +90,7 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a null object as parameter.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -98,7 +102,7 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an empty array.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -110,7 +114,7 @@ public class MessageBoxTest {
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an empty list.
    * Bug 440433.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -121,7 +125,7 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an empty array.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -133,7 +137,7 @@ public class MessageBoxTest {
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an empty list.
    * Bug 440433.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -144,7 +148,7 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an simple array.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -156,7 +160,7 @@ public class MessageBoxTest {
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an simple list.
    * Bug 440433.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -168,7 +172,7 @@ public class MessageBoxTest {
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an simple list.
    * Bug 440433.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -180,7 +184,7 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with an array containing a null.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -192,7 +196,7 @@ public class MessageBoxTest {
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a list containing a null.
    * Bug 440433.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -203,7 +207,7 @@ public class MessageBoxTest {
 
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a big array.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -215,7 +219,7 @@ public class MessageBoxTest {
   /**
    * Test method for {@link MessageBox#showDeleteConfirmationMessage} with a big list.
    * Bug 440433.
-   * 
+   *
    * @throws Exception
    */
   @Test
