@@ -4,7 +4,7 @@
 scout.Calendar = function() {
   scout.Calendar.parent.call(this);
 
-  // main elements (reduce?)
+  // main elements
   this.$container;
   this.$header;
   this.$range;
@@ -21,7 +21,6 @@ scout.Calendar = function() {
 
   // dates
   this.selected = new Date();
-  this.show = new Date();
   this.start = new Date();
   this.end = new Date();
 
@@ -31,7 +30,8 @@ scout.Calendar = function() {
 };
 scout.inherits(scout.Calendar, scout.ModelAdapter);
 
-/* -- basics -------------------------------------------- */
+
+/* -- basics, create divs ------------------------------------------------ */
 scout.Calendar.prototype.init = function(model, session) {
   scout.Calendar.parent.prototype.init.call(this, model, session);
 };
@@ -47,7 +47,7 @@ scout.Calendar.prototype._render = function($parent) {
 
   // main elements
   this.$header = this.$container.appendDiv('calendar-header');
-  this.$year = this.$container.appendDiv('calendar-year');
+  this.$year = this.$container.appendDiv('calendar-year-container').appendDiv('calendar-year');
   this.$grid = this.$container.appendDiv('calendar-grid');
   this.$list = this.$container.appendDiv('calendar-list');
 
@@ -55,7 +55,7 @@ scout.Calendar.prototype._render = function($parent) {
   this.$range = this.$header.appendDiv('calendar-range');
   this.$range.appendDiv('calendar-minus').click(this._onClickMinus.bind(this));
   this.$range.appendDiv('calendar-plus').click(this._onClickPlus.bind(this));
-  this.$range.appendDiv('calendar-select', 'Januar 2015');
+  this.$range.appendDiv('calendar-select');
 
   // ... and modes
   this.$commands = this.$header.appendDiv('calendar-commands');
@@ -69,7 +69,7 @@ scout.Calendar.prototype._render = function($parent) {
   this.$commands.appendDiv('calendar-toggle-year').click(this._onClickYear.bind(this));
   this.$commands.appendDiv('calendar-toggle-list').click(this._onClickList.bind(this));
 
-  // render the dates
+  // append the main grid
   for (var w = 0; w < 7; w++) {
     var $w = this.$grid.appendDiv();
 
@@ -96,110 +96,189 @@ scout.Calendar.prototype._render = function($parent) {
     }
   }
 
-  // show grid
-  this._renderDisplayMode();
+  // should be done by server?
+  this.displayMode = this.MONTH;
+  this._updateModel();
+  this._updateScreen();
 };
 
-scout.Calendar.prototype._onClickMinus = function(event) {};
+/* -- basics, events -------------------------------------------- */
 
-scout.Calendar.prototype._onClickPlus = function(event) {};
+scout.Calendar.prototype._onClickMinus = function(event) {
+  var year = this.selected.getFullYear(),
+    month = this.selected.getMonth(),
+    date = this.selected.getDate(),
+    day = this.selected.getDay();
+
+  // find new selected date
+  if (this.displayMode === this.DAY) {
+    this.selected = new Date(year, month, date - 1);
+  } else if (this.displayMode === this.WEEK || this.displayMode === this.WORK) {
+    this.selected = new Date(year, month, date - 7);
+  } else if (this.displayMode === this.MONTH) {
+    this.selected = new Date(year, month - 1, date);
+  }
+
+  // update calendar
+  this._updateModel();
+  this._updateScreen();
+};
+
+scout.Calendar.prototype._onClickPlus = function(event) {
+  var year = this.selected.getFullYear(),
+    month = this.selected.getMonth(),
+    date = this.selected.getDate(),
+    day = this.selected.getDay();
+
+  // find new selected date
+  if (this.displayMode === this.DAY) {
+    this.selected = new Date(year, month, date + 1);
+  } else if (this.displayMode === this.WEEK || this.displayMode === this.WORK) {
+    this.selected = new Date(year, month, date + 7);
+  } else if (this.displayMode === this.MONTH) {
+    this.selected = new Date(year, month + 1, date);
+  }
+
+  // update calendar
+  this._updateModel();
+  this._updateScreen();
+};
 
 scout.Calendar.prototype._onClickToday = function(event) {
+  // new selected date
+  this.selected = new Date();
+
+  // update calendar
+  this._updateModel();
+  this._updateScreen();
 };
 
 scout.Calendar.prototype._onClickMode = function(event) {
-  this._setDisplayMode($(event.target).data('mode'), scout.dates.parseJsonDate(this.selectedDate));
+  // set new mode
+  this.displayMode = $(event.target).data('mode');
+
+  // update calendar
+  this._updateModel();
+  this._updateScreen();
 };
 
 scout.Calendar.prototype._onClickYear = function(event) {
+  // set flag
   this.showYear = !this.showYear;
-  this._renderDisplayMode();
+
+  // update screen
+  this._updateScreen();
 };
 scout.Calendar.prototype._onClickList = function(event) {
+  // set flag
   this.showList = !this.showList;
-  this._renderDisplayMode();
+
+  // update screen
+  this._updateScreen();
 };
 
 scout.Calendar.prototype._onClickDay = function(event) {
+  // select clicked day
   $('.selected', this.$grid).select(false);
   $(event.target).select(true);
   this.selected = $(event.target).data('date');
+
+  // change selected day in year picker
+  this.colorYear();
 };
 
 
-/* --  set and render grid -------------------------------------------- */
+/* --  set display mode and range ------------------------------------- */
 
-scout.Calendar.prototype._setDisplayMode = function(mode) {
-  var year = this.show.getFullYear(),
-    month = this.show.getMonth(),
-    date = this.show.getDate(),
-    day = this.show.getDay();
+scout.Calendar.prototype._updateModel = function() {
+  // find base values for later calbulation
+  var year = this.selected.getFullYear(),
+    month = this.selected.getMonth(),
+    date = this.selected.getDate(),
+    day = (this.selected.getDay() + 6) % 7;
 
-  // find start and end of displayed components based on showDate
-  if (mode === this.DAY) {
+  // find start and end of displayed components based on selected date
+  if (this.displayMode === this.DAY) {
     this.start = new Date(year, month, date);
     this.end = new Date(year, month, date + 1);
-  } else if (mode === this.WEEK) {
-    this.start = new Date(year, month, date - day + 1);
-    this.end = new Date(year, month, date - day + 7);
-  } else if (mode === this.MONTH) {
+  } else if (this.displayMode === this.WEEK) {
+    this.start = new Date(year, month, date - day);
+    this.end = new Date(year, month, date - day + 6);
+  } else if (this.displayMode === this.MONTH) {
     this.start = new Date(year, month, 1);
     this.end = new Date(year, month + 1, 0);
-  } else if (mode === this.WORK) {
-    this.start = new Date(year, month, date - day + 1);
-    this.end = new Date(year, month, date - day + 5);
+  } else if (this.displayMode === this.WORK) {
+    this.start = new Date(year, month, date - day);
+    this.end = new Date(year, month, date - day + 4);
+  }
+
+  // change selected day if workweek and selected day on weekend
+  if (this.displayMode === this.WORK && day > 4) {
+    this.selected = new Date(year, month, date - day + 4);
   }
 
   // set range...
   this.session.send(this.id, 'setVisibleRange', {
     dateRange: {
-      // TODO Calendar | Get initial dates from date selector
       from: scout.dates.toJsonDate(this.start),
       to: scout.dates.toJsonDate(this.end)
     }
   });
 
-  // ... and mode
+  // ... and mode on server
   this.session.send(this.id, 'setDisplayMode', {
-    displayMode: mode
+    displayMode: this.displayMode
   });
 };
 
-scout.Calendar.prototype._renderDisplayMode = function() {
+scout.Calendar.prototype._updateScreen = function() {
   // select mode
   $('.calendar-mode', this.$commands).select(false);
   $("[data-mode='" + this.displayMode +"']", this.$modes).select(true);
 
-  // layout
-  this.layoutSize();
+  // remove selected day
+  $('.selected', this.$grid).select(false);
+
+  // layout grid
   this.layoutLabel();
+  this.layoutSize();
   this.layoutComponents();
+  this.layoutAxis();
+
+  // if year shown and changed, redraw year
+  if (this.selected.getFullYear() !== $('.year-title', this.$year).text() && this.showYear) {
+    this.$year.empty();
+    this.drawYear();
+  }
+
+  // color year
+  this.colorYear();
 };
 
 scout.Calendar.prototype.layoutSize = function() {
   // reset animation sizes
   $('div', this.$container).removeData(['new-width', 'new-height']);
 
-  // layout grid
+  // init vars
   var $selected = $('.selected', this.$grid),
     headerH = $('.calendar-week-header', this.$grid).height(),
     gridH = this.$grid.height(),
     gridW = this.$container.width();
 
-  // select and draw year
+  // show or hide year
   $(".calendar-toggle-year", this.$modes).select(this.showYear);
   if (this.showYear) {
-    this.$year.data('new-width', 200);
-    gridW -= 200;
+    this.$year.parent().data('new-width', 270);
+    gridW -= 270;
   } else {
-    this.$year.data('new-width', 0);
+    this.$year.parent().data('new-width', 0);
   }
 
-  // select and draw list
+  // show or hide work list
   $(".calendar-toggle-list", this.$modes).select(this.showList);
   if (this.showList) {
-    this.$list.data('new-width', 200);
-    gridW -= 200;
+    this.$list.data('new-width', 270);
+    gridW -= 270;
   } else {
     this.$list.data('new-width', 0);
   }
@@ -270,6 +349,7 @@ scout.Calendar.prototype.layoutLabel = function() {
   $('.calendar-select', this.$range).text(text);
 
   // set dayname (based on width of shown column)
+  // TODO: new-width not correct (will be calculated later)
   var $days = $('.calendar-day-name', this.$grid),
     weekdays;
 
@@ -283,10 +363,11 @@ scout.Calendar.prototype.layoutLabel = function() {
     $(this).text(weekdays[index]);
   });
 
-  // set day date and mark selected one
+  // prepare to set all day date and mark selected one
   var $dates = $('.calendar-day', this.$grid),
     firstDate = new Date(this.start.valueOf());
 
+  // find first visible date
   for (var offset = 0; offset < 42; offset++){
     firstDate.setDate(firstDate.getDate() - 1);
     if ((firstDate.getDay() === 0) && firstDate.getMonth() !== this.start.getMonth()){
@@ -294,6 +375,7 @@ scout.Calendar.prototype.layoutLabel = function() {
     }
   }
 
+  // loop all days and set value and class
   for (var w = 0; w < 6; w++) {
     for (var d = 0; d < 7; d++) {
       var cl = '';
@@ -316,15 +398,21 @@ scout.Calendar.prototype.layoutLabel = function() {
 
       text = this._dateFormat(firstDate, 'dd');
       $dates.eq(w * 7 + d)
+        .removeClass('weekend-out weekend out selected now')
         .addClass(cl)
         .attr('data-day-name', text)
         .data('date', new Date(firstDate.valueOf()));
     }
   }
+};
 
-  // set weekname or day schedule
+scout.Calendar.prototype.layoutAxis = function() {
+  var $selected = $('.selected', this.$grid);
+
+  // remove old axis
   $('.calendar-week-axis, .calendar-week-task', this.$grid).remove();
 
+  // set weekname or day schedule
   if (this.displayMode === this.MONTH ) {
     $('.calendar-week-name').each(function (index) {
       if (index > 0) {
@@ -334,14 +422,150 @@ scout.Calendar.prototype.layoutLabel = function() {
     });
   } else {
     $('.calendar-week-name').text('');
-    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '08:00').css('top', this._dayPosition(8));
-    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '12:00').css('top', this._dayPosition(12));
-    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '13:00').css('top', this._dayPosition(13));
-    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '17:00').css('top', this._dayPosition(17));
-    $selected.parent().appendDiv('calendar-week-task').attr('data-axis-name', 'Tasks').css('top', this._dayPosition(-1));
+    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '08:00').css('top', this._dayPosition(8) + '%');
+    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '12:00').css('top', this._dayPosition(12) + '%');
+    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '13:00').css('top', this._dayPosition(13) + '%');
+    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '17:00').css('top', this._dayPosition(17) + '%');
+    $selected.parent().appendDiv('calendar-week-task').attr('data-axis-name', 'Tasks').css('top', this._dayPosition(-1) + '%');
+  }
+};
+
+/* -- year, draw and color ---------------------------------------- */
+
+scout.Calendar.prototype.drawYear = function() {
+  // init vars
+  var year = this.start.getFullYear(),
+    first, $month, day, $day;
+
+  // set title
+  this.$year.appendDiv('year-title', year);
+
+  // add months and days
+  for (var month = 0; month < 12; month++) {
+    first = new Date(year, month, 1);
+    $month = this.$year.appendDiv('year-month').attr('data-title', this._dateFormat(first, 'MMMM'));
+    for (var d = 1; d <= 31; d++) {
+      day = new Date(year, month, d);
+
+      // stop if day is already out of range
+      if (day.getMonth() != month) {
+        break;
+      }
+
+      // add div per day
+      $day = $month.appendDiv('year-day', d).data('date', day);
+
+      // first day has margin depending on weekday
+      if (d == 1) {
+        $day.css('margin-left', ((day.getDay() + 6) % 7) * $day.outerWidth());
+      }
+    }
   }
 
+  // bind events for days divs
+  $('.year-day', this.$year)
+   .click(this._onYearClick.bind(this))
+   .hover(this._onYearHoverIn.bind(this), this._onYearHoverOut.bind(this));
 };
+
+scout.Calendar.prototype.colorYear = function() {
+  // color is only needed if visible
+  if (!this.showYear) {
+    return;
+  }
+
+  // remove color information
+  $('.year-day.year-range, .year-day.year-range-day', this.$year).removeClass('year-range year-range-day');
+
+  // loop all days and colorize based on range and selected
+  var that = this,
+    $day, date;
+
+  $('.year-day', this.$year).each( function (){
+    $day = $(this);
+    date = $day.data('date');
+
+    if (that.displayMode !== that.DAY && date >= that.start && date <= that.end) {
+      $day.addClass('year-range');
+    }
+
+    if (scout.dates.isSameDay(date, that.selected)) {
+      $day.addClass('year-range-day');
+    }
+  });
+};
+
+/* -- year, events ---------------------------------------- */
+
+scout.Calendar.prototype._onYearClick = function(event) {
+  // new selected day
+  this.selected = $('.year-hover-day', this.$year).data('date');
+
+  // update calendar
+  this._updateModel();
+  this._updateScreen();
+};
+
+
+scout.Calendar.prototype._onYearHoverIn = function(event) {
+  // init vars
+  var $day = $(event.target),
+    date1 = $day.data('date'),
+    year = date1.getFullYear(),
+    month = date1.getMonth(),
+    date = date1.getDate(),
+    day = (date1.getDay() + 6) % 7,
+    that = this,
+    startHover,
+    endHover,
+    $day2, date2;
+
+  // find hover based on mode
+  if (this.displayMode === this.DAY) {
+    startHover = new Date(year, month, date);
+    endHover = new Date(year, month, date);
+  } else if (this.displayMode === this.WEEK) {
+    startHover = new Date(year, month, date - day);
+    endHover = new Date(year, month, date - day + 6);
+  } else if (this.displayMode === this.MONTH) {
+    startHover = new Date(year, month, 1);
+    endHover = new Date(year, month + 1, 0);
+  } else if (this.displayMode === this.WORK) {
+    startHover = new Date(year, month, date - day);
+    endHover = new Date(year, month, date - day + 4);
+
+    // in case of work week: selected date has to be opart of range
+    if (date1 > endHover) {
+      date1 = endHover;
+    }
+  }
+
+  // loop days and colorize based on hover star and hover end
+  $('.year-day', this.$year).each( function (){
+    $day2 = $(this);
+    date2 = $day2.data('date');
+
+    if (date2 >= startHover && date2 <= endHover) {
+      $day2.addClass('year-hover');
+    } else {
+      $day2.removeClass('year-hover');
+    }
+
+    if (scout.dates.isSameDay(date1, date2)) {
+      $day2.addClass('year-hover-day');
+    }
+
+  });
+};
+
+scout.Calendar.prototype._onYearHoverOut = function(event) {
+  // remove all hover effects
+  $('.year-day.year-hover, .year-day.year-hover-day', this.$year).removeClass('year-hover year-hover-day');
+};
+
+
+/* -- components ----------------------------------------------- */
+// TODO
 
 scout.Calendar.prototype.layoutComponents = function() {
   $('.calendar-component', this.$grid).remove();
@@ -356,43 +580,73 @@ scout.Calendar.prototype.layoutComponents = function() {
       toDate;
 
     if (typeof c === 'object') {
-      $.l(c, c.fromDate, c.toDate, c.fullDay, c.cell.text, c.cell.tooltipText);
-
       fromDate = scout.dates.parseJsonDate(c.fromDate);
       toDate = scout.dates.parseJsonDate(c.toDate);
 
       for (var j = 0; j < c.coveredDays.length; j++) {
-        // var d = scout.dates.parseJsonDate(c.coveredDays[j]);
+        var d = scout.dates.parseJsonDate(c.coveredDays[j]);
 
-        $day = this._findDay(fromDate);
+        $day = this._findDay(d);
+
+        if ($day === undefined) {
+          continue;
+        }
+
         $component = $day.appendDiv('calendar-component', c.cell.text)
           .hover(this._onMouseenter.bind(this), this._onMouseleave.bind(this));
 
         if (this.displayMode !== this.MONTH) {
           $component.addClass('component-day');
+          $component.html('<b>' + $component.html() + '</b><br>' + c.cell.tooltipText);
+
+          var fromHours = fromDate.getHours(),
+            fromMinutes = fromDate.getMinutes(),
+            toHours = toDate.getHours(),
+            toMinutes = toDate.getMinutes();
 
           if (c.fullDay) {
-            $component.css('position', 'absolute');
-            $component.css('top', 'calc(' + this._dayPosition(-1)  + ')' + countTask + 'px)');
-            countTask += 5;
+            $component.css('top', 'calc(' + this._dayPosition(-1)  + '% + ' + countTask + 'px)');
+            countTask += 25;
+          } else if (c.coveredDays.length === 1) {
+            $component.css('top',  this._dayPosition(fromHours + fromMinutes / 60) + '%')
+              .css('height', this._dayPosition(toHours + toMinutes / 60) - this._dayPosition(fromHours + fromMinutes / 60) + '%')
+              .attr('data-from', this._dateFormat(fromDate, 'HH:mm'))
+              .attr('data-to', this._dateFormat(toDate, 'HH:mm'));
+          } else if (scout.dates.isSameDay(d, fromDate)) {
+            $component.css('top',  this._dayPosition(fromHours + fromMinutes / 60) + '%')
+              .css('height', this._dayPosition(24) - this._dayPosition(fromHours + fromMinutes / 60) + '%')
+              .addClass('component-open-bottom');
 
+          } else if (scout.dates.isSameDay(d, toDate)) {
+            $component.css('top',  this._dayPosition(0) + '%')
+              .css('height', this._dayPosition(fromHours + fromMinutes / 60) - this._dayPosition(0) + '%')
+              .addClass('component-open-top')
+              .html('');
           } else {
-            // scout.dates.isSameDay(
+            $component.css('top',  this._dayPosition(1) + '%')
+              .css('height', this._dayPosition(12) - this._dayPosition(1) + '%')
+              .addClass('component-open-top')
+              .html('');
 
-            $component.css('position', 'absolute');
-            $component.css('top', '20%');
-            $component.css('height', '40%');
+            $component.afterDiv('calendar-component component-day')
+              .css('top',  this._dayPosition(12) + '%')
+              .css('height', this._dayPosition(24) - this._dayPosition(12) + '%')
+              .addClass('component-open-bottom')
+              .hover(this._onMouseenter.bind(this), this._onMouseleave.bind(this));
 
-           // for mouse over!
-            $component.attr('data-from', '08:45');
-            $component.attr('data-to', '16:00');
           }
+
         }
       }
     }
   }
 };
 
+// to do!
+// zeiten oben anzeigen, von bis, nur beim ertsen der zugeöhrigen Termine
+// alle zugehörigen termine anzeigen
+// alle anderen TEmrine etwas heller machen?
+/// wenn zu klein: temrin irgendwei öffnen und anzeigen.
 scout.Calendar.prototype._onMouseenter = function (date) {
   var $e = $(event.target),
     $w = $e.parent().parent();
@@ -410,8 +664,9 @@ scout.Calendar.prototype._onMouseleave = function (date) {
 /* -- helper -------------------------------------------- */
 
 scout.Calendar.prototype._dateFormat = function(date, pattern) {
-  var d = new Date(date.valueOf());
-  var dateFormat = new scout.DateFormat(this.session.locale, pattern);
+  var d = new Date(date.valueOf()),
+  dateFormat = new scout.DateFormat(this.session.locale, pattern);
+
   return dateFormat.format(d);
 };
 
@@ -419,19 +674,20 @@ scout.Calendar.prototype._dayPosition = function(hour) {
   if (hour < 0) {
     return '85%';
   } else if (hour < 8) {
-    return parseInt(hour / 8 * 10 + 5, 10) + '%';
+    return parseInt(hour / 8 * 10 + 5, 10);
   } else if (hour < 12) {
-    return parseInt((hour - 8) / 4 * 25 + 15, 10) + '%';
+    return parseInt((hour - 8) / 4 * 25 + 15, 10);
   } else if (hour < 13) {
-    return parseInt((hour - 12) / 1 * 5 + 40, 10) + '%';
+    return parseInt((hour - 12) / 1 * 5 + 40, 10);
   } else if (hour < 17) {
-    return parseInt((hour - 13 ) / 4 * 25 + 45, 10) + '%';
-  } else if (hour < 24) {
-    return parseInt((hour - 17) / 7 * 10 + 70, 10) + '%';
+    return parseInt((hour - 13 ) / 4 * 25 + 45, 10);
+  } else if (hour <= 24) {
+    return parseInt((hour - 17) / 7 * 10 + 70, 10);
   }
 };
 
 scout.Calendar.prototype._findDay = function (date) {
+  // TODO: tuning
   var $day;
 
   $('.calendar-day', this.grid)
@@ -447,30 +703,26 @@ scout.Calendar.prototype._findDay = function (date) {
 
 
 
-/* -----------  Scout Stuff ---------------------*/
+/* -----------  Scout  -------------------------------*/
 
 scout.Calendar.prototype._renderComponents = function() {
-  //this.layoutComponents();
+  this.layoutComponents();
 };
 
 scout.Calendar.prototype._renderLoadInProgress = function() {
 };
 
-
 scout.Calendar.prototype._renderViewRange = function() {
-};
-
-
-/*
-scout.Calendar.prototype._renderViewRange = function() {
-};
-
-
-scout.Calendar.prototype._renderSelectedComponent = function() {
 };
 
 scout.Calendar.prototype._renderDisplayMode = function() {
 };
+
+/*
+
+scout.Calendar.prototype._renderSelectedComponent = function() {
+};
+
 
 scout.Calendar.prototype._renderDisplayCondensed = function() {
 };
@@ -511,10 +763,8 @@ scout.Calendar.prototype.onModelAction = function(event) {
 };
 
 scout.Calendar.prototype._onCalendarChanged = function(calendarEvent) {
-  // TODO Calendar | Implement --> see JsonCalendarEvent
 };
 
 scout.Calendar.prototype._onCalendarChangedBatch = function(calendarEventBatch) {
-  // TODO Calendar | Implement --> see JsonCalendarEvent (calendarEventBatch is an array of CalendarEvent)
 };
 */

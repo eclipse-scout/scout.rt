@@ -10,7 +10,8 @@ scout.CalendarLayout.prototype.layout = function($container) {
 
   height += $container.cssMarginTop() + $container.cssMarginBottom();
   $container.css('height', 'calc(100% - '+ height + 'px)');
-  this.calendar._renderDisplayMode();
+
+  this.calendar.layoutSize();
 };
 
 scout.CalendarLayout.prototype.preferredLayoutSize = function($comp) {
@@ -19,6 +20,4 @@ scout.CalendarLayout.prototype.preferredLayoutSize = function($comp) {
 
 scout.CalendarLayout.prototype.invalidate = function($comp) {
   this.calendar.layoutSize();
-  this.calendar.layoutLabel();
-  this.calendar.layoutComponents();
 };
