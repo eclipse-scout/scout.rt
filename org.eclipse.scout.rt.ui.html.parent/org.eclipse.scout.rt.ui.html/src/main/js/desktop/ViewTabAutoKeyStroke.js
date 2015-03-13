@@ -5,6 +5,7 @@ scout.ViewTabAutoKeyStroke = function(enabled, tabs, keyStroke) {
   this.keyStroke = keyStroke;
   this.initKeyStrokeParts();
   this.keyBoxDrawed = false;
+  this.drawHint=true;
 };
 scout.inherits(scout.ViewTabAutoKeyStroke, scout.KeyStroke);
 
@@ -41,7 +42,7 @@ scout.ViewTabAutoKeyStroke.prototype.accept = function(event) {
  * @Override scout.KeyStroke
  */
 scout.ViewTabAutoKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys){
-  if(scout.keyStrokeBox.keyStrokeRangeDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9])){
+  if(scout.keyStrokeBox.keyStrokesAlreadyDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9])){
     return;
   }
   if(this.drawHint){

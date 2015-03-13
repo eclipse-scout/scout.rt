@@ -6,6 +6,7 @@ scout.KeyStroke = function() {
   this.alt = false;
   this.shift = false;
   this.bubbleUp=false;
+  this.drawHint=false;
 };
 scout.inherits(scout.KeyStroke, scout.Action);
 
