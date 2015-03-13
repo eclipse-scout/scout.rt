@@ -327,7 +327,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       JSONObject json = new JSONObject();
       putProperty(json, "id", id);
       putProperty(json, "checked", node.isChecked());
-      JsonObjectUtility.filterDefaultValues(json, "TreeNode");
       jsonNodes.put(json);
     }
     putProperty(jsonEvent, PROP_NODES, (jsonNodes));
