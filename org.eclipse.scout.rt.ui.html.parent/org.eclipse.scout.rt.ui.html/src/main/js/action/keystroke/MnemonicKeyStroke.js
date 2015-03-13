@@ -21,7 +21,7 @@ scout.MnemonicKeyStroke.prototype._drawKeyBox = function($container) {
   var offset = this._findMnemonicPosition();
   if(offset){
     var keyText = this._$containerForKeyBox().html().match(new RegExp('(' + scout.codesToKeys[this.keyStrokeKeyPart] + ')', 'i'))[0];
-    this._$containerForKeyBox().prependDiv('key-box ', keyText).css('left', '' + offset.left + 'px').css('top', ''+offset.top+'px').css('position', 'fixed').css('z-index', '100');
+    this._$containerForKeyBox().prependDiv('key-box key-box-mnemonics', keyText).css('left', '' + offset.left + 'px').css('top', ''+offset.top+'px').css('position', 'fixed').css('z-index', '100');
   }
 };
 

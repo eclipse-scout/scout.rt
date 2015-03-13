@@ -14,3 +14,8 @@
   font-weight: bold;
   .drop-shadow();
 }
+
+
+.key-box.key-box-mnemonics {
+  font-size: inherit;
+}
