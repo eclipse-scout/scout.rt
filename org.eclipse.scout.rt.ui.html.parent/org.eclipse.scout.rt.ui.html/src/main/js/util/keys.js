@@ -194,7 +194,6 @@ scout.keyStrokeBox = {
     additionalMarginLeft: 22,
     marginLeft: 28,
     drawSingleKeyBoxItem: function(offset, keyBoxText, $container, ctrl, alt, shift) {
-      var additionalKeyBox;
       var $existingKeyBoxes = $('.key-box', $container);
       var boxGroup = 0;
       if ($existingKeyBoxes.length>0) {

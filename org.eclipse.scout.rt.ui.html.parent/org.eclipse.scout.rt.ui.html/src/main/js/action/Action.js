@@ -1,6 +1,15 @@
 scout.Action = function() {
   this._hoverBound = false;
   scout.Action.parent.call(this);
+
+  //keyStroke
+  this.keyStroke;
+  this.keyStrokeKeyPart;
+  this.ctrl = false;
+  this.alt = false;
+  this.shift = false;
+  this.bubbleUp=false;
+  this.drawHint=true;
 };
 scout.inherits(scout.Action, scout.ModelAdapter);
 
@@ -14,6 +23,11 @@ scout.Action.prototype._renderProperties = function() {
   this._renderEnabled(this.enabled);
   this._renderSelected(this.selected);
   this._renderVisible(this.visible);
+};
+
+scout.Action.prototype.init = function(model, session) {
+  scout.Action.parent.prototype.init.call(this, model, session);
+  this.initKeyStrokeParts();
 };
 
 scout.Action.prototype._remove = function() {
@@ -107,4 +121,81 @@ scout.Action.prototype.sendSelected = function(selected) {
   this.session.send(this.id, 'selected', {
     selected: selected
   });
+};
+
+//KeyStrokes
+
+scout.Action.prototype.ignore = function(event) {
+  return false;
+};
+
+scout.Action._syncKeyStroke = function(keyStroke) {
+  // When model's 'keystroke' property changes, also update keystroke parts
+  this.keyStroke = keyStroke;
+  this.initKeyStrokeParts();
+};
+
+scout.Action.prototype.initKeyStrokeParts = function() {
+  this.keyStrokeKeyPart = undefined;
+  if (!this.keyStroke) {
+    return;
+  }
+  var keyStrokeParts = this.keyStroke.split('-');
+  for (var i = 0; i < keyStrokeParts.length; i++) {
+    var part = keyStrokeParts[i];
+    // see org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer
+    if (part === 'alternate') {
+      this.alt = true;
+    } else if (part === 'control') {
+      this.ctrl = true;
+    } else if (part === 'shift') {
+      this.shift = true;
+    } else {
+      this.keyStrokeKeyPart = scout.keys[part.toUpperCase()];
+    }
+  }
+};
+
+scout.Action.prototype.accept = function(event) {
+  if (this.ignore(event)) {
+    return false;
+  }
+  if (event && event.ctrlKey === this.ctrl && event.altKey === this.alt && event.shiftKey === this.shift && event.which === this.keyStrokeKeyPart) {
+    return true;
+  }
+  return false;
+};
+
+scout.Action.prototype.handle = function(event) {
+  this.sendDoAction();
+};
+
+scout.Action.prototype.checkAndDrawKeyBox = function($container, drawedKeys){
+  if(drawedKeys[this.keyStrokeName()]){
+    return;
+  }
+  if(this.drawHint){
+    this._drawKeyBox($container);
+    drawedKeys[this.keyStrokeName()]=true;
+  }
+};
+
+scout.Action.prototype._drawKeyBox = function($container){
+  if (!this.drawHint||!this.keyStroke) {
+    return;
+  }
+  var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
+  scout.keyStrokeBox.drawSingleKeyBoxItem(4, keyBoxText, $container, this.ctrl, this.alt, this.shift);
+};
+
+scout.Action.prototype.removeKeyBox = function($container){
+  $('.key-box', $container).remove();
+  $('.key-box-additional', $container).remove();
+};
+
+scout.Action.prototype.keyStrokeName = function(){
+  var name = this.ctrl ? 'ctrl+':'';
+  name += this.alt ? 'alt+':'' ;
+  name += this.shift ? 'shift+':'';
+  return name + this.keyStrokeKeyPart;
 };

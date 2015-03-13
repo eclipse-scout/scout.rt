@@ -173,3 +173,11 @@ scout.TableControl.prototype.onResize = function() {
     this.form.onResize();
   }
 };
+
+scout.TableControl.prototype._drawKeyBox = function($container){
+  scout.TableControl.parent.prototype._drawKeyBox.call(this, this.$container);
+};
+
+scout.TableControl.prototype.handle = function(event){
+  this.toggle();
+};
