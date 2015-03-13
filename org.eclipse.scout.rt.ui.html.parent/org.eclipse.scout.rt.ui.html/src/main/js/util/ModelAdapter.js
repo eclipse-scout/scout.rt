@@ -1,7 +1,13 @@
 scout.ModelAdapter = function() {
   this.session = undefined;
+
+  // Adapter structure
+  this.owner = undefined;
+  this.ownedAdapters = [];
+  // Model structure
   this.parent = undefined;
   this.children = [];
+
   this._adapterProperties = [];
   this.rendered = false;
   this.destroyed = false;
@@ -28,17 +34,17 @@ scout.ModelAdapter.prototype.init = function(model, session) {
 };
 
 scout.ModelAdapter.prototype.render = function($parent) {
+  $.log.trace('render model adapter: ' + this);
   if (this.rendered || this.ui) {
-    throw new Error('Already rendered');
+    throw new Error('Already rendered: ' + this);
   }
   if (this.destroyed) {
-    throw new Error('Object is destroyed');
+    throw new Error('Object is destroyed: ' + this);
   }
   this.ui = this._createUi();
   if (this.ui) {
     this.ui.render($parent);
-  }
-  else {
+  } else {
     this._render($parent);
     this._renderProperties();
   }
@@ -93,11 +99,10 @@ scout.ModelAdapter.prototype._renderProperties = function() {
 };
 
 scout.ModelAdapter.prototype.remove = function() {
-  var i, child;
-
+  $.log.trace('remove model adapter: ' + this);
   if (this.rendered) {
-    for (i = 0; i < this.children.length; i++) {
-      child = this.children[i];
+    for (var i = 0; i < this.children.length; i++) {
+      var child = this.children[i];
       child.remove();
     }
 
@@ -114,6 +119,7 @@ scout.ModelAdapter.prototype._remove = function() {
   }
   if (this.ui) {
     this.ui.remove();
+    this.ui = undefined;
   }
 };
 
@@ -122,30 +128,40 @@ scout.ModelAdapter.prototype.dispose = function() {
 };
 
 scout.ModelAdapter.prototype.destroy = function() {
-  var i, child,
-    children = this.children.slice();
-
-  for (i = 0; i < children.length; i++) {
-    child = children[i];
-    child.destroy();
+  var ownedAdapters = this.ownedAdapters.slice();
+  for (var i = 0; i < ownedAdapters.length; i++) {
+    var ownedAdapter = ownedAdapters[i];
+    ownedAdapter.destroy();
   }
 
   this.remove();
   this.session.unregisterModelAdapter(this);
 
-  // Disconnect from parent
-  if (this.parent) {
-    this.parent.removeChild(this);
-    this.parent = null;
+  // Disconnect from owner
+  if (this.owner) {
+    this.owner.removeOwnedAdapter(this);
+    this.owner = null;
   }
   this.destroyed = true;
 };
 
+scout.ModelAdapter.prototype.addOwnedAdapter = function(ownedAdapter) {
+  $.log.trace('addOwnedAdapter(' + ownedAdapter + ') to ' + this);
+  this.ownedAdapters.push(ownedAdapter);
+};
+
+scout.ModelAdapter.prototype.removeOwnedAdapter = function(ownedAdapter) {
+  $.log.trace('removeOwnedAdapter(' + ownedAdapter + ') from ' + this);
+  scout.arrays.remove(this.ownedAdapters, ownedAdapter);
+};
+
 scout.ModelAdapter.prototype.addChild = function(childAdapter) {
+  $.log.trace('addChild(' + childAdapter + ') to ' + this);
   this.children.push(childAdapter);
 };
 
 scout.ModelAdapter.prototype.removeChild = function(childAdapter) {
+  $.log.trace('removeChild(' + childAdapter + ') from ' + this);
   scout.arrays.remove(this.children, childAdapter);
 };
 
@@ -188,7 +204,7 @@ scout.ModelAdapter.prototype._createAdapters = function(propertyName, adapterIds
 scout.ModelAdapter.prototype._destroyAdapters = function(propertyName, oldAdapters, newAdapterIds) {
   return this._processAdapters(oldAdapters, function(oldAdapter) {
     // Only destroy it if its linked to this adapter (-> don't destroy global adapters)
-    if (oldAdapter.parent !== this) {
+    if (oldAdapter.owner !== this) {
       return;
     }
 
@@ -344,6 +360,7 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldVa
  * Maybe overridden to influence creation. Default is emtpy.
  */
 scout.ModelAdapter.prototype.onChildAdapterCreated = function(propertyName) {
+  // NOP may be implemented by subclasses
 };
 
 scout.ModelAdapter.prototype.goOffline = function() {
@@ -389,6 +406,10 @@ scout.ModelAdapter.prototype._generateId = function(cssClass) {
     idParts[i] = idParts[i].charAt(0).toUpperCase() + idParts[i].substring(1);
   }
   return idParts.join('') + '-' + this.id;
+};
+
+scout.ModelAdapter.prototype.toString = function() {
+  return this.objectType + '[' + this.id + ']';
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

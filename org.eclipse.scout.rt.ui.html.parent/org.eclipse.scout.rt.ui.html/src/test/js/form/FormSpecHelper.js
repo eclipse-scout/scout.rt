@@ -8,7 +8,7 @@ FormSpecHelper.prototype.createFormWithOneField = function(session, parentId) {
   var field = this.createFieldModel();
 
   form.rootGroupBox = rootGroupBox.id;
-  form.parent = parentId || session.rootAdapter.id;
+  form.owner = parentId || session.rootAdapter.id;
   rootGroupBox.fields = [field.id];
 
   return createAdapter(form, session, [rootGroupBox, field]);

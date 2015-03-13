@@ -268,7 +268,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       }
     }
 
-    m_jsonClientSession = (JsonClientSession) createJsonAdapter(clientSession, m_rootJsonAdapter, null);
+    m_jsonClientSession = (JsonClientSession) createJsonAdapter(clientSession, m_rootJsonAdapter);
     m_jsonEventProcessor = createJsonEventProcessor();
     startUpClientSession(clientSession);
 
@@ -724,8 +724,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
     @Override
     public String getObjectType() {
-      return null;
+      return "GlobalAdapter";
     }
-
   }
 }

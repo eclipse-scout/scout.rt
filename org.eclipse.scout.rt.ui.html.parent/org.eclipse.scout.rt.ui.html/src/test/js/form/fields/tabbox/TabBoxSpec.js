@@ -17,7 +17,7 @@ describe("TabBox", function() {
       model.tabItems.push(tabItems[i].id);
     }
     model.selectedTab = 0;
-    model.parent = session.rootAdapter.id;
+    model.owner = session.rootAdapter.id;
 
     return createAdapter(model, session, tabItems);
   }

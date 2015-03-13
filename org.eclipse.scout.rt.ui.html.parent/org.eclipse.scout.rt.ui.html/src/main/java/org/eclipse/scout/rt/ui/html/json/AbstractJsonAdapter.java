@@ -132,8 +132,10 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     }
 
     // Only send parent if its a global adapter. In the other cases the client may use its creator as parent.
+    // Note: The parent adapter is called "owner" in the UI, whereas "parent" refers to the "outer field".
+    // FIXME BSH/CGU What if owner is different from creator but not the root adapter? How to check???
     if (getParent() == getJsonSession().getRootJsonAdapter()) {
-      putProperty(json, "parent", getParent().getId());
+      putProperty(json, "owner", getParent().getId());
     }
     return json;
   }

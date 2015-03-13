@@ -75,7 +75,8 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this.modelAdapterRegistry[jsonSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
-    id: '1'
+    id: '1',
+    objectType: 'GlobalAdapter'
   }, this);
 
   this._initCustomParams();
@@ -120,6 +121,7 @@ scout.Session.prototype.getModelAdapter = function(id) {
 };
 
 scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
+  $.log.trace('getOrCreate(' + id + (parent ? ', ' + parent : '') + ')');
   if (!id) {
     return;
   }
@@ -129,6 +131,18 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
 
   var adapter = this.modelAdapterRegistry[id];
   if (adapter) {
+    $.log.trace('model adapter already exists: ' + adapter + ' --> owner = ' + adapter.owner + ', parent = ' + adapter.parent + ', new parent = ' + parent);
+    if (!adapter.rendered) {
+      // Re-link
+      $.log.trace('unlink ' + adapter + ' from ' + adapter.parent + ' and link to new parent ' + parent);
+      if (adapter.parent) {
+        adapter.parent.removeChild(adapter);
+      }
+      adapter.parent = parent;
+      parent.addChild(adapter);
+    } else {
+      $.log.trace('adapter ' + adapter + ' is already rendered. keeping link to parent ' + adapter.parent);
+    }
     return adapter;
   }
 
@@ -137,17 +151,23 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
     throw new Error('no adapterData found for id=' + id);
   }
 
-  if (!parent && adapterData.parent === undefined) {
-    this._adapterDataCache[adapterData.id] = adapterData;
-    throw new Error('parent must be defined');
-  }
-  // Prefer the parent sent by the server
-  if (adapterData.parent !== undefined) {
-    parent = this.getModelAdapter(adapterData.parent);
+  var owner;
+  if (adapterData.owner !== undefined) {
+    // Prefer the owner sent by the server
+    owner = this.getModelAdapter(adapterData.owner);
+    parent = parent || owner; // convenience when 'parent' was not set, e.g. in tests
+  } else {
+    if (!parent) {
+      throw new Error('parent must be defined');
+    }
+    owner = parent;
   }
 
   adapter = this.objectFactory.create(adapterData);
+  $.log.trace('created new adapter ' + adapter + ': owner = ' + owner + ', parent = ' + parent + ', adapterData.owner = ' + adapterData.owner);
+  adapter.owner = owner;
   adapter.parent = parent;
+  owner.addOwnedAdapter(adapter);
   parent.addChild(adapter);
 
   return adapter;
@@ -557,7 +577,9 @@ scout.Session.prototype._processEvents = function(events) {
     event = events[i];
 
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
-    adapter = this.getOrCreateModelAdapter(event.target, scout.rootAdapter);
+    // FIXME BSH/CGU: Check if this should only be getModelAdapter()
+    // See commit by CGU 2014-08-15 18:20:43 ("HtmlUi: Fixed 'No adapter' bug")
+    adapter = this.getOrCreateModelAdapter(event.target, this.rootAdapter);
     if (!adapter) {
       throw new Error('No adapter registered for ID ' + event.target);
     }

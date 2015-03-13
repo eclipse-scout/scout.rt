@@ -33,7 +33,7 @@ describe("TableField", function() {
     if (tableModel) {
       tableFieldModel.table = tableModel.id;
     }
-    tableFieldModel.parent = session.rootAdapter.id;
+    tableFieldModel.owner = session.rootAdapter.id;
     return createAdapter(tableFieldModel, session, tableModel);
   }
 
@@ -76,7 +76,7 @@ describe("TableField", function() {
 
     it("if table is global, only removes the table but does not destroy it if value is changed to ''", function() {
       var tableModel = tableHelper.createModelFixture(2, 2);
-      tableModel.parent = session.rootAdapter.id;
+      tableModel.owner = session.rootAdapter.id;
       var tableField = createTableField(tableModel);
       var table = tableField.table;
       tableField.render(session.$entryPoint);

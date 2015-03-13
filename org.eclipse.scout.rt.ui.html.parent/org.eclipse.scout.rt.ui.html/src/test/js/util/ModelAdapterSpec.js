@@ -185,7 +185,7 @@ describe("ModelAdapter", function() {
     it("does not destroy children, which are globally used", function() {
       var adapter = createModelAdapter(createGenericModel(), 'childAdapter');
       var model = createGenericModel();
-      model.parent = session.rootAdapter.id;
+      model.owner = session.rootAdapter.id;
 
       var message = {
         adapterData : createAdapterData(model),
