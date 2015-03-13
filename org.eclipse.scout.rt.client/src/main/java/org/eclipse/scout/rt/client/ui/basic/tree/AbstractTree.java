@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -50,6 +49,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeAc
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeClickChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesSelectedChain;
+import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -95,7 +95,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private boolean m_autoDiscardOnDelete;
   private boolean m_autoTitle;
   private final HashMap<Object, ITreeNode> m_deletedNodes;
-  private List<TreeEvent> m_treeEventBuffer = new ArrayList<TreeEvent>();
+  private AbstractEventBuffer<TreeEvent> m_eventBuffer;
+
   private Set<ITreeNode> m_nodeDecorationBuffer = new HashSet<ITreeNode>();
   private Set<ITreeNode> m_selectedNodes = new HashSet<ITreeNode>();
   private final List<ITreeNodeFilter> m_nodeFilters;
@@ -477,6 +478,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
     setRootNode(new AbstractTreeNode() {
     });
+    setEventBuffer(new TreeEventBuffer());
     // add Convenience observer for drag & drop callbacks and event history
     addTreeListener(new TreeAdapter() {
 
@@ -747,6 +749,14 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     for (ITreeNode child : inode.getChildNodes()) {
       applyNodeFiltersRecInternal(child, inode.isFilterAccepted(), level + 1);
     }
+  }
+
+  protected AbstractEventBuffer<TreeEvent> getEventBuffer() {
+    return m_eventBuffer;
+  }
+
+  protected void setEventBuffer(AbstractEventBuffer<TreeEvent> eventBuffer) {
+    m_eventBuffer = eventBuffer;
   }
 
   @Override
@@ -2403,18 +2413,16 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   protected void fireTreeEventInternal(TreeEvent e) {
     if (isTreeChanging()) {
       // buffer the event for later batch firing
-      m_treeEventBuffer.add(e);
+      getEventBuffer().add(e);
     }
     else {
       EventListener[] listeners = m_listenerList.getListeners(TreeListener.class);
-      if (listeners != null && listeners.length > 0) {
-        for (int i = 0; i < listeners.length; i++) {
-          try {
-            ((TreeListener) listeners[i]).treeChanged(e);
-          }
-          catch (Throwable t) {
-            LOG.error("fire " + e, t);
-          }
+      for (EventListener l : listeners) {
+        try {
+          ((TreeListener) l).treeChanged(e);
+        }
+        catch (Exception t) {
+          LOG.error("fire " + e, t);
         }
       }
     }
@@ -2424,10 +2432,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private void fireTreeEventBatchInternal(List<? extends TreeEvent> batch) {
     if (CollectionUtility.hasElements(batch)) {
       EventListener[] listeners = m_listenerList.getListeners(TreeListener.class);
-      if (listeners != null && listeners.length > 0) {
-        for (int i = 0; i < listeners.length; i++) {
-          ((TreeListener) listeners[i]).treeChangedBatch(batch);
-        }
+      for (EventListener l : listeners) {
+        ((TreeListener) l).treeChangedBatch(batch);
       }
     }
   }
@@ -2512,11 +2518,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * and call lookups
    */
   private void processEventBuffer() {
-    if (m_treeEventBuffer.size() > 0) {
-      List<TreeEvent> list = m_treeEventBuffer;
-      m_treeEventBuffer = new ArrayList<TreeEvent>();
-      coalesceEvents(list);
-      // fire the batch and set tree to changing, otherwise a listener might trigger another events that then are processed before all other listeners received that batch
+    if (!getEventBuffer().isEmpty()) {
+      final List<TreeEvent> list = getEventBuffer().removeEvents();
+      // fire the batch and set tree to changing, otherwise a listener might trigger another events that then are processed
+      // before all other listeners received that batch
       try {
         setTreeChanging(true);
         //
@@ -2524,21 +2529,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       finally {
         setTreeChanging(false);
-      }
-    }
-  }
-
-  protected void coalesceEvents(List<TreeEvent> list) {
-    // coalesce selection events
-    boolean foundSelectionEvent = false;
-    for (ListIterator<TreeEvent> it = list.listIterator(list.size()); it.hasPrevious();) {
-      if (it.previous().getType() == TreeEvent.TYPE_NODES_SELECTED) {
-        if (!foundSelectionEvent) {
-          foundSelectionEvent = true;
-        }
-        else {
-          it.remove();
-        }
       }
     }
   }

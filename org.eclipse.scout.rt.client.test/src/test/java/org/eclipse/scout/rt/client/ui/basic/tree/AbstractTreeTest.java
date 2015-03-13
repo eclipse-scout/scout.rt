@@ -18,13 +18,16 @@ import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link AbstractTree}
  */
+@RunWith(PlatformTestRunner.class)
 public class AbstractTreeTest {
 
   private AbstractTreeNode m_node;
@@ -105,7 +108,6 @@ public class AbstractTreeTest {
       m_node.getTree().setTreeChanging(false);
     }
     assertNotifications(1, 5);
-
   }
 
   private void assertNotifications(int expectedNotifications, int expectedEvents) {

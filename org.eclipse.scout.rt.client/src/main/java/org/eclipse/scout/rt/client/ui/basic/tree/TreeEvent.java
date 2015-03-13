@@ -20,10 +20,14 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
-public class TreeEvent extends EventObject {
+public class TreeEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
+  private static IScoutLogger LOG = ScoutLogManager.getLogger(TreeEvent.class);
 
   /**
    * valid attributes are parentNode,childNodes
@@ -174,6 +178,7 @@ public class TreeEvent extends EventObject {
     return (ITree) getSource();
   }
 
+  @Override
   public int getType() {
     return m_type;
   }
@@ -311,8 +316,10 @@ public class TreeEvent extends EventObject {
   public String toString() {
     StringBuffer buf = new StringBuffer();
     buf.append("TreeEvent[");
+    buf.append(getTypeName());
     // nodes
     if (CollectionUtility.hasElements(m_nodes) && getTree() != null) {
+      buf.append(" ");
       if (m_nodes.size() == 1) {
         buf.append("\"" + CollectionUtility.firstElement(m_nodes) + "\"");
       }
@@ -326,27 +333,28 @@ public class TreeEvent extends EventObject {
         buf.append("}");
       }
     }
-    else {
-      buf.append("{}");
-    }
-    buf.append(" ");
     // decode type
+    buf.append("]");
+    return buf.toString();
+  }
+
+  /**
+   * decode type
+   */
+  private String getTypeName() {
     try {
       Field[] f = getClass().getDeclaredFields();
       for (int i = 0; i < f.length; i++) {
-        if (Modifier.isPublic(f[i].getModifiers()) && Modifier.isStatic(f[i].getModifiers()) && f[i].getName().startsWith("TYPE_")) {
-          if (((Number) f[i].get(null)).intValue() == m_type) {
-            buf.append(f[i].getName());
-            break;
-          }
+        if (Modifier.isPublic(f[i].getModifiers()) && Modifier.isStatic(f[i].getModifiers()) && f[i].getName().startsWith("TYPE_")
+            && ((Number) f[i].get(null)).intValue() == m_type) {
+          return (f[i].getName());
         }
       }
     }
-    catch (Throwable t) {
-      buf.append("#" + m_type);
+    catch (IllegalAccessException e) {
+      LOG.error("Error Reading fields", e);
     }
-    buf.append("]");
-    return buf.toString();
+    return "#" + m_type;
   }
 
 }

@@ -19,11 +19,15 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
-@SuppressWarnings("serial")
-public class TableEvent extends java.util.EventObject {
+public class TableEvent extends java.util.EventObject implements IModelEvent {
+  private static final long serialVersionUID = 1L;
+  private static IScoutLogger LOG = ScoutLogManager.getLogger(TableEvent.class);
   /**
    * Column visibility and/or order and/or width changed
    */
@@ -136,7 +140,6 @@ public class TableEvent extends java.util.EventObject {
    * Advise to scroll to selection
    */
   public static final int TYPE_SCROLL_TO_SELECTION = 830;
-  //next 840, check method AbstractTable.processEventBuffer
 
   private final int m_type;
   private List<? extends ITableRow> m_rows;
@@ -162,6 +165,7 @@ public class TableEvent extends java.util.EventObject {
     return (ITable) getSource();
   }
 
+  @Override
   public int getType() {
     return m_type;
   }
@@ -301,24 +305,10 @@ public class TableEvent extends java.util.EventObject {
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append(getClass().getSimpleName() + "[");
-    // decode type
-    try {
-      Field[] f = getClass().getDeclaredFields();
-      for (int i = 0; i < f.length; i++) {
-        if (Modifier.isPublic(f[i].getModifiers()) && Modifier.isStatic(f[i].getModifiers()) && f[i].getName().startsWith("TYPE_")) {
-          if (((Number) f[i].get(null)).intValue() == m_type) {
-            buf.append(f[i].getName());
-            break;
-          }
-        }
-      }
-    }
-    catch (Throwable t) {
-      buf.append("#" + m_type);
-    }
-    buf.append(" ");
+    buf.append(getTypeName());
     // rows
     if (CollectionUtility.hasElements(m_rows) && getTable() != null) {
+      buf.append(" ");
       if (m_rows.size() == 1) {
         buf.append("row ").append(m_rows.get(0));
       }
@@ -333,10 +323,26 @@ public class TableEvent extends java.util.EventObject {
         buf.append("}");
       }
     }
-    else {
-      buf.append("{}");
-    }
     buf.append("]");
     return buf.toString();
+  }
+
+  /**
+   * decode type
+   */
+  private String getTypeName() {
+    try {
+      Field[] f = getClass().getDeclaredFields();
+      for (int i = 0; i < f.length; i++) {
+        if (Modifier.isPublic(f[i].getModifiers()) && Modifier.isStatic(f[i].getModifiers()) && f[i].getName().startsWith("TYPE_")
+            && ((Number) f[i].get(null)).intValue() == m_type) {
+          return (f[i].getName());
+        }
+      }
+    }
+    catch (IllegalAccessException e) {
+      LOG.error("Error Reading fields", e);
+    }
+    return "#" + m_type;
   }
 }

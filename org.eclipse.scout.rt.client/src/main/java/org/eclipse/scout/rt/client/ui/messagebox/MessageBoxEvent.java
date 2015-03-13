@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,7 +14,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.EventObject;
 
-public class MessageBoxEvent extends EventObject {
+import org.eclipse.scout.rt.client.ui.IModelEvent;
+
+public class MessageBoxEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
   // state
   public static final int TYPE_CLOSED = 900;
@@ -30,6 +32,7 @@ public class MessageBoxEvent extends EventObject {
     return (IMessageBox) getSource();
   }
 
+  @Override
   public int getType() {
     return m_type;
   }

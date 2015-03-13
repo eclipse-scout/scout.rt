@@ -15,9 +15,10 @@ import java.util.EventObject;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
-public class ButtonEvent extends EventObject {
+public class ButtonEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
   /**
    * event when button was clicked
@@ -45,6 +46,7 @@ public class ButtonEvent extends EventObject {
     return (IButton) super.getSource();
   }
 
+  @Override
   public int getType() {
     return m_type;
   }

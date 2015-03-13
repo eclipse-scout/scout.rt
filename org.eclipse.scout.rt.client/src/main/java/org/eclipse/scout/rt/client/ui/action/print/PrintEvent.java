@@ -12,10 +12,12 @@ package org.eclipse.scout.rt.client.ui.action.print;
 
 import java.util.EventObject;
 
+import org.eclipse.scout.rt.client.ui.IModelEvent;
+
 /**
  *
  */
-public class PrintEvent extends EventObject {
+public class PrintEvent extends EventObject implements IModelEvent {
 
   private static final long serialVersionUID = 1L;
 
@@ -29,6 +31,7 @@ public class PrintEvent extends EventObject {
     m_type = type;
   }
 
+  @Override
   public int getType() {
     return m_type;
   }

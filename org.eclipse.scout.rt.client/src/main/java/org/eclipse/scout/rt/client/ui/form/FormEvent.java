@@ -17,6 +17,7 @@ import java.util.EventObject;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.pagefield.IPageField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
@@ -25,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
  * Form lifecycle for observing form "open" event attach to IDesktop and listen
  * for FORM_ADDED
  */
-public class FormEvent extends EventObject {
+public class FormEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
   // state
   public static final int TYPE_ACTIVATED = 510;
@@ -107,6 +108,7 @@ public class FormEvent extends EventObject {
     return (IForm) getSource();
   }
 
+  @Override
   public int getType() {
     return m_type;
   }

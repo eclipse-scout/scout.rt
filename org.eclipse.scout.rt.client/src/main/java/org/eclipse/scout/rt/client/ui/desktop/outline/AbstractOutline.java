@@ -14,7 +14,6 @@ import java.security.Permission;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -195,6 +194,8 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     addTreeListener(new P_OutlineListener());
     addNodeFilter(new P_TableFilterBasedTreeNodeFilter());
     super.initConfig();
+
+    setEventBuffer(new OutlineEventBuffer());
     setRootNodeVisible(false);
     IPage<?> rootPage = new InvisibleRootPage();
     setRootNode(rootPage);
@@ -695,24 +696,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   public IPageChangeStrategy getPageChangeStrategy() {
     return m_pageChangeStrategy;
-  }
-
-  @Override
-  protected void coalesceEvents(List<TreeEvent> list) {
-    super.coalesceEvents(list);
-
-    // coalesce page changed events
-    boolean foundEvent = false;
-    for (ListIterator<TreeEvent> it = list.listIterator(list.size()); it.hasPrevious();) {
-      if (it.previous().getType() == OutlineEvent.TYPE_PAGE_CHANGED) {
-        if (!foundEvent) {
-          foundEvent = true;
-        }
-        else {
-          it.remove();
-        }
-      }
-    }
   }
 
   private class P_OutlineListener extends TreeAdapter {

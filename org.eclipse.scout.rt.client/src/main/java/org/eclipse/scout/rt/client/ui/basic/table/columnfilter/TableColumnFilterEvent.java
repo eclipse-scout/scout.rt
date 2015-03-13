@@ -14,13 +14,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.EventObject;
 
+import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
 /**
  * @since 3.8.0
  */
-public class TableColumnFilterEvent extends EventObject {
+public class TableColumnFilterEvent extends EventObject implements IModelEvent {
 
   private static final long serialVersionUID = 1L;
 
@@ -56,6 +57,7 @@ public class TableColumnFilterEvent extends EventObject {
     return getTable().getColumnFilterManager();
   }
 
+  @Override
   public int getType() {
     return m_type;
   }

@@ -16,10 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 @SuppressWarnings("serial")
-public class CalendarEvent extends java.util.EventObject {
+public class CalendarEvent extends java.util.EventObject implements IModelEvent {
 
   /**
    * valid properties: component
@@ -57,6 +58,7 @@ public class CalendarEvent extends java.util.EventObject {
     return (ICalendar) getSource();
   }
 
+  @Override
   public int getType() {
     return m_type;
   }

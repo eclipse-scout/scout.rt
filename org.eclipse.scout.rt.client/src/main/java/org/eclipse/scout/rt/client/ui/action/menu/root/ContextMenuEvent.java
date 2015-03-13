@@ -12,13 +12,15 @@ package org.eclipse.scout.rt.client.ui.action.menu.root;
 
 import java.util.EventObject;
 
+import org.eclipse.scout.rt.client.ui.IModelEvent;
+
 /**
  *
  */
-public class ContextMenuEvent extends EventObject {
+public class ContextMenuEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
 
-  public static int TYPE_STRUCTURE_CHANGED = 1;
+  public final static int TYPE_STRUCTURE_CHANGED = 1;
 
   private final int m_eventType;
 
@@ -32,7 +34,16 @@ public class ContextMenuEvent extends EventObject {
     return (IContextMenu) super.getSource();
   }
 
+  /**
+   * @deprecated use #getType()
+   */
+  @Deprecated
   public int getEventType() {
     return m_eventType;
+  }
+
+  @Override
+  public int getType() {
+    return getEventType();
   }
 }

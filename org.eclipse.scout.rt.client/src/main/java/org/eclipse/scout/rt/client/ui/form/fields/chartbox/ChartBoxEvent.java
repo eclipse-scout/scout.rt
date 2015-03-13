@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.client.ui.form.fields.chartbox;
 
 import java.util.EventObject;
 
-public class ChartBoxEvent extends EventObject {
+import org.eclipse.scout.rt.client.ui.IModelEvent;
+
+public class ChartBoxEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
   public static final int TYPE_DATA_CHANGED = 100;
 
@@ -27,6 +29,7 @@ public class ChartBoxEvent extends EventObject {
     return (IChartBox) getSource();
   }
 
+  @Override
   public int getType() {
     return m_type;
   }

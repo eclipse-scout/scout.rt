@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-public class ContentAssistFieldEvent extends java.util.EventObject {
+import org.eclipse.scout.rt.client.ui.IModelEvent;
+
+public class ContentAssistFieldEvent extends java.util.EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
 
   private final int m_type;
@@ -24,6 +26,7 @@ public class ContentAssistFieldEvent extends java.util.EventObject {
     return (IContentAssistField) getSource();
   }
 
+  @Override
   public int getType() {
     return m_type;
   }

@@ -17,10 +17,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
-@SuppressWarnings("serial")
-public class ActivityMapEvent extends java.util.EventObject {
+public class ActivityMapEvent extends java.util.EventObject implements IModelEvent {
+  private static final long serialVersionUID = 1L;
   /**
    * Some activities have been added valid properties: activities,
    * firstActivity, lastActivity
@@ -92,6 +93,7 @@ public class ActivityMapEvent extends java.util.EventObject {
     return (IActivityMap) getSource();
   }
 
+  @Override
   public int getType() {
     return m_type;
   }

@@ -15,8 +15,9 @@ import java.util.EventObject;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.IModelEvent;
 
-public class DocumentFieldEvent extends EventObject {
+public class DocumentFieldEvent extends EventObject implements IModelEvent {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DocumentFieldEvent.class);
 
   private static final long serialVersionUID = 1L;
@@ -45,6 +46,7 @@ public class DocumentFieldEvent extends EventObject {
     return (IDocumentField) getSource();
   }
 
+  @Override
   public int getType() {
     return m_type;
   }

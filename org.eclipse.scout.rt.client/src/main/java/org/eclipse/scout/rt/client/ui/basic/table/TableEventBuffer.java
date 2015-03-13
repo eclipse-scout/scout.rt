@@ -13,13 +13,10 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
 /**
@@ -32,47 +29,13 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
  * </p>
  * Not thread safe, to be accessed in client model job.
  */
-public class TableEventBuffer {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableEventBuffer.class);
-
-  private List<TableEvent> m_buffer = new LinkedList<>();
-
-  /**
-   * @return <code>true</code>, if empty, false otherwise.
-   */
-  public boolean isEmpty() {
-    return m_buffer.isEmpty();
-  }
-
-  /**
-   * Add a new event to the buffer
-   */
-  public void add(TableEvent e) {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(String.format("Adding '%1$s'", e));
-    }
-    m_buffer.add(e);
-  }
-
-  /**
-   * Remove all current events from the buffer.
-   *
-   * @return the coalesced list of events.
-   */
-  public List<TableEvent> removeEvents() {
-    List<TableEvent> list = m_buffer;
-    m_buffer = new LinkedList<TableEvent>();
-    List<TableEvent> res = new ArrayList<TableEvent>(coalesce(list));
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(String.format("Removing Events from buffer '%1$s'", res));
-    }
-    return res;
-  }
+public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
 
   /**
    * Removes unnecessary events or combines events in the list.
    */
-  private List<? extends TableEvent> coalesce(List<TableEvent> list) {
+  @Override
+  protected List<? extends TableEvent> coalesce(List<TableEvent> list) {
     //traverse the list in reversed order
     //previous events may be deleted from the list
     for (int j = 0; j < list.size() - 1; j++) {
@@ -144,10 +107,6 @@ public class TableEventBuffer {
   /**
    * Merge list of rows, such that, if a row of the same index is in both lists, only the one of the second list (later
    * event) is kept.
-   *
-   * @param first
-   * @param second
-   * @return
    */
   private List<ITableRow> mergeRows(List<ITableRow> first, List<ITableRow> second) {
     List<ITableRow> rows = new ArrayList<>();
@@ -173,10 +132,6 @@ public class TableEventBuffer {
    * Merge list of cols, such that, if a column of the same index is in both lists, only the one of the second list
    * (later
    * event) is kept.
-   *
-   * @param first
-   * @param second
-   * @return
    */
   private Collection<IColumn<?>> mergeColumns(Collection<IColumn<?>> first, Collection<IColumn<?>> second) {
     List<IColumn<?>> cols = new ArrayList<>();
@@ -225,7 +180,6 @@ public class TableEventBuffer {
   private boolean isIgnorePrevious(int type) {
     switch (type) {
       case TableEvent.TYPE_ROWS_SELECTED:
-      case TableEvent.TYPE_ROWS_CHECKED:
       case TableEvent.TYPE_SCROLL_TO_SELECTION:
       case TableEvent.TYPE_ROWS_DRAG_REQUEST:
       case TableEvent.TYPE_ROW_ORDER_CHANGED:
@@ -248,6 +202,7 @@ public class TableEventBuffer {
       case TableEvent.TYPE_ROWS_UPDATED:
       case TableEvent.TYPE_ROWS_INSERTED:
       case TableEvent.TYPE_ROWS_DELETED:
+      case TableEvent.TYPE_ROWS_CHECKED:
       case TableEvent.TYPE_COLUMN_HEADERS_UPDATED: {
         return true;
       }
@@ -256,33 +211,6 @@ public class TableEventBuffer {
       }
     }
 
-  }
-
-  /**
-   * Removes all events of the same type from the list.
-   *
-   * @param type
-   * @param list
-   */
-  private void remove(int type, List<TableEvent> list) {
-    final ArrayList<Integer> types = new ArrayList<>();
-    types.add(type);
-    remove(types, list);
-  }
-
-  /**
-   * Removes all events of the same type from the list.
-   *
-   * @param type
-   * @param list
-   */
-  private void remove(List<Integer> types, List<TableEvent> list) {
-    final Iterator<TableEvent> iter = list.iterator();
-    while (iter.hasNext()) {
-      if (types.contains(iter.next().getType())) {
-        iter.remove();
-      }
-    }
   }
 
 }

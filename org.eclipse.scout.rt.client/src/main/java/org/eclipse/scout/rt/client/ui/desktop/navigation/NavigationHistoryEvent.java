@@ -12,13 +12,14 @@ package org.eclipse.scout.rt.client.ui.desktop.navigation;
 
 import java.util.EventObject;
 
+import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.internal.UserNavigationHistory;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 /**
  * An event describing a change in the navigation history.
  */
-public class NavigationHistoryEvent extends EventObject {
+public class NavigationHistoryEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
   private final int m_type;
   private final Bookmark m_bookmark;
@@ -38,7 +39,7 @@ public class NavigationHistoryEvent extends EventObject {
 
   /**
    * Creates a new NavigationHistoryEvent object.
-   * 
+   *
    * @param service
    *          The source navigation history on which the Event initially occurred.
    * @param type
@@ -50,7 +51,7 @@ public class NavigationHistoryEvent extends EventObject {
 
   /**
    * Creates a new NavigationHistoryEvent object.
-   * 
+   *
    * @param service
    *          The source navigation history on which the Event initially occurred.
    * @param type
@@ -74,6 +75,7 @@ public class NavigationHistoryEvent extends EventObject {
   /**
    * @return the event type: one of {@link #TYPE_CHANGED}, {@link #TYPE_BOOKMARK_ADDED},{@link #TYPE_BOOKMARK_REMOVDED}
    */
+  @Override
   public int getType() {
     return m_type;
   }

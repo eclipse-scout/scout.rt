@@ -159,7 +159,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private boolean m_sortValid;
   private boolean m_initialMultiLineText;
   private int m_tableChanging;
-  private final TableEventBuffer m_tableEventBuffer = new TableEventBuffer();
+  private TableEventBuffer m_eventBuffer = new TableEventBuffer();
+
   private final HashSet<P_CellLookup> m_cellLookupBuffer = new HashSet<P_CellLookup>();
   private HashSet<ITableRow> m_rowDecorationBuffer = new HashSet<ITableRow>();
   // key stroke buffer for select-as-you-type
@@ -867,6 +868,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     setDropType(getConfiguredDropType());
     setScrollToSelection(getConfiguredScrollToSelection());
     setTableStatusVisible(getConfiguredTableStatusVisible());
+    setEventBuffer(new TableEventBuffer());
     if (getTableCustomizer() == null) {
       setTableCustomizer(createTableCustomizer());
     }
@@ -1012,6 +1014,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     });
     //
+  }
+
+  protected TableEventBuffer getEventBuffer() {
+    return m_eventBuffer;
+  }
+
+  protected void setEventBuffer(TableEventBuffer eventBuffer) {
+    m_eventBuffer = eventBuffer;
   }
 
   private void initColumnsInternal() {
@@ -3570,8 +3580,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         return;
       }
       //
-      if (!m_tableEventBuffer.isEmpty()) {
-        List<TableEvent> coalescedEvents = m_tableEventBuffer.removeEvents();
+      if (!getEventBuffer().isEmpty()) {
+        List<TableEvent> coalescedEvents = getEventBuffer().removeEvents();
         // fire the batch and set tree to changing, otherwise a listener might trigger another events that
         // then are processed before all other listeners received that batch
         try {
@@ -3682,7 +3692,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void tablePopulated() {
-    if (m_tableEventBuffer.isEmpty()) {
+    if (getEventBuffer().isEmpty()) {
       synchronized (m_cachedFilteredRowsLock) {
         m_cachedFilteredRows = null;
       }
@@ -4011,21 +4021,19 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected void fireTableEventInternal(TableEvent e) {
     if (isTableChanging()) {
       // buffer the event for later batch firing
-      m_tableEventBuffer.add(e);
+      getEventBuffer().add(e);
     }
     else {
       //Ensure all editor values have been applied.
 //      getUIFacade().completeCellEditFromUI();
 
       EventListener[] listeners = m_listenerList.getListeners(TableListener.class);
-      if (listeners != null && listeners.length > 0) {
-        for (int i = 0; i < listeners.length; i++) {
-          try {
-            ((TableListener) listeners[i]).tableChanged(e);
-          }
-          catch (Throwable t) {
-            LOG.error("fire " + e, t);
-          }
+      for (EventListener l : listeners) {
+        try {
+          ((TableListener) l).tableChanged(e);
+        }
+        catch (Exception t) {
+          LOG.error("fire " + e, t);
         }
       }
     }
@@ -4035,10 +4043,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private void fireTableEventBatchInternal(List<? extends TableEvent> batch) {
     if (CollectionUtility.hasElements(batch)) {
       EventListener[] listeners = m_listenerList.getListeners(TableListener.class);
-      if (listeners != null && listeners.length > 0) {
-        for (int i = 0; i < listeners.length; i++) {
-          ((TableListener) listeners[i]).tableChangedBatch(batch);
-        }
+      for (EventListener l : listeners) {
+        ((TableListener) l).tableChangedBatch(batch);
       }
     }
   }

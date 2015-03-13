@@ -12,10 +12,12 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.util.EventObject;
 
+import org.eclipse.scout.rt.client.ui.IModelEvent;
+
 /**
  *
  */
-public class ValueFieldEvent<T> extends EventObject {
+public class ValueFieldEvent<T> extends EventObject implements IModelEvent {
 
   public static final int TYPE_CUT = 100;
   public static final int TYPE_COPY = 200;
@@ -36,6 +38,7 @@ public class ValueFieldEvent<T> extends EventObject {
     return (IValueField<T>) super.getSource();
   }
 
+  @Override
   public int getType() {
     return m_type;
   }

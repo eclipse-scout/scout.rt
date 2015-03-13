@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,20 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.tree;
-
-import java.util.EventListener;
-import java.util.List;
+package org.eclipse.scout.rt.client.ui;
 
 /**
- * @see TreeAdapter
+ * Marker for Events in Scout Model
  */
-public interface TreeListener extends EventListener {
+public interface IModelEvent {
 
-  void treeChanged(TreeEvent e);
+  int getType();
 
-  /**
-   * batch event for fast processing of batch changes
-   */
-  void treeChangedBatch(List<? extends TreeEvent> batch);
 }
