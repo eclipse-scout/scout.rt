@@ -6,13 +6,12 @@ scout.inherits(scout.RadioButton, scout.Button);
 scout.RadioButton.prototype._render = function($parent) {
   this.addContainer($parent, 'radio-button', new scout.RadioButtonLayout(this));
 
-  var forRefId = 'RefId-' + this.id;
   this.addField($('<input>')
-    .attr('id', forRefId)
+    .attr('id', this.refFieldId)
     .attr('type', 'radio')
     .attr('value', this.radioValue).on('click', this._onClick.bind(this)));
   this.addLabel();
-  this.$label.attr('for', forRefId);
+  this.$label.attr('for', this.refFieldId);
   this.addStatus();
 };
 
