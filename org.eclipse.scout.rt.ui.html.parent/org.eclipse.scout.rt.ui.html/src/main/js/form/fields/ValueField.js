@@ -43,12 +43,10 @@ scout.ValueField.prototype._onFieldBlur = function() {
 };
 
 scout.ValueField.prototype._updateDisplayText = function(displayText, whileTyping) {
-  if (displayText === this.displayText) {
+  displayText = scout.strings.nvl(displayText, '');
+  var oldDisplayText = scout.strings.nvl(this.displayText, '');
+  if (displayText === oldDisplayText) {
     return;
-  }
-
-  if (!displayText) {
-    displayText = '';
   }
 
   var data = {

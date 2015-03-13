@@ -35,6 +35,9 @@
         "heightInPixel": 0
       }
     },
+    "ValueField": {
+      "displayText": ""
+    },
     "Action": {
       "enabled": true,
       "visible": true,
