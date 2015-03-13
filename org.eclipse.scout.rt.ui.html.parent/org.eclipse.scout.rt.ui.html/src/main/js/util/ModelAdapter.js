@@ -42,6 +42,9 @@ scout.ModelAdapter.prototype.render = function($parent) {
     this._render($parent);
     this._renderProperties();
   }
+  if (this.$container && this.modelClass) {
+    this.$container.attr('data-modelClass', this.modelClass);
+  }
   this.rendered = true;
   if (this.session.offline) {
     this.goOffline();

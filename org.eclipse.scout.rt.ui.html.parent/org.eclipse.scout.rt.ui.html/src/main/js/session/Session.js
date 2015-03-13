@@ -318,6 +318,7 @@ scout.Session.prototype._processSuccessResponse = function(message) {
 
 scout.Session.prototype._pullAsyncResults = function() {
   $.log.info('Check for async results...');
+  // FIXME AWE: hier nicht über sendRequest gehen, sonst sehen wir einen busy cursor
   this._sendRequest({
     pullAsyncResults: true,
     jsonSessionId: this.jsonSessionId});

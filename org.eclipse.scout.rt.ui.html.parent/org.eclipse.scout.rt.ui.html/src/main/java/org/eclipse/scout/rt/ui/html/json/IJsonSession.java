@@ -85,4 +85,6 @@ public interface IJsonSession {
   void registerJsonAdapter(IJsonAdapter<?> adapter);
 
   void unregisterJsonAdapter(String id);
+
+  boolean isInspectorHint();
 }

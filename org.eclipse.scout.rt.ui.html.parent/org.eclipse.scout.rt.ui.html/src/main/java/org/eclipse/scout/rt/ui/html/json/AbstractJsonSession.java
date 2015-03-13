@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.html.ClientJobUtility;
+import org.eclipse.scout.rt.ui.html.UiHints;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -558,6 +559,9 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       if (jsonRequest.isStartupRequest()) {
         getJsonClientSession().processRequestLocale(httpRequest.getLocale());
       }
+      else if (jsonRequest.isPullAsyncRequest()) {
+        waitForAsyncJobs();
+      }
       getJsonEventProcessor().processEvents(m_currentJsonRequest, currentJsonResponse());
       return jsonResponseToJson();
     }
@@ -578,6 +582,14 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
+  private void waitForAsyncJobs() {
+    // - wartet und blockiert den pullAsync request, solange bis alle async jobs terminiert haben
+    // 1. was ist, wenn ein Async job ewig läuft im hintergrund?
+    // 2. was ist, wenn waitForAsyncJobs fertig wird, während gerade ein normaler request verarbeitet wird?
+    //    - dann könnten wir die ergebnisse huckepack in die response hängen
+
+  }
+
   private boolean isProcessingClientRequest() {
     return m_currentHttpRequest.get() != null;
   }
@@ -595,6 +607,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
             // starten, siehe auch AbstractJsonSession#init, Local-Handling, etc
             JSONObject result = currentJsonResponse().toJson();
 
+            // FIXME AWE: den pullAsync Request so umbauen, dass er den haupt-thread nicht blockiert
+            // aber blockiert bis ein ergebnis vorliegt (long-polling))
             if (!m_asyncStartedJobs.get().isEmpty()) {
               LOG.debug("FOUND async started jobs, add checkAsync property to response");
               JsonObjectUtility.putProperty(result, "checkAsync", "true");
@@ -624,7 +638,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   @Override
   public void logout() {
     LOG.info("Logging out...");
-    //when timeout occurs, logout is called without a http context
+    // when timeout occurs, logout is called without a http context
     if (currentHttpRequest() != null) {
       currentHttpRequest().getSession(false).invalidate();
       currentJsonResponse().addActionEvent(getJsonSessionId(), "logout", new JSONObject());
@@ -695,6 +709,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
       LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
     }
+  }
+
+  @Override
+  public boolean isInspectorHint() {
+    return UiHints.isInspectorHint(m_currentHttpRequest.get());
   }
 
   private static class P_RootAdapter extends AbstractJsonAdapter<Object> {

@@ -72,6 +72,10 @@ public class JsonRequest {
     return m_request.optBoolean(PROP_UNLOAD);
   }
 
+  public boolean isPullAsyncRequest() {
+    return m_request.has("pullAsyncResults");
+  }
+
   @Override
   public String toString() {
     if (m_request == null) {

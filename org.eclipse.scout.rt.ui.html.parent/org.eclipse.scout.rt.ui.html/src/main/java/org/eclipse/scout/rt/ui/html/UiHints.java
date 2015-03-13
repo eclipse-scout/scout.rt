@@ -32,14 +32,20 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 public final class UiHints {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiHints.class);
 
-  private static final String URL_PARAM_DEBUG = "debug";//enables/disbles cache, compress, minify
+  /**
+   * Enables/disables cache, compress, minify. Also decides if scoutClass attribute is added to the DOM for
+   * form-fields.
+   */
+  private static final String URL_PARAM_DEBUG = "debug";
   private static final String URL_PARAM_CACHE_HINT = "cache";
   private static final String URL_PARAM_COMPRESS_HINT = "compress";
   private static final String URL_PARAM_MINIFY_HINT = "minify";
+  private static final String URL_PARAM_INSPECTOR_HINT = "inspector";
 
   private static final String SESSION_ATTRIBUTE_CACHE_HINT = UiHints.class.getName() + "#cache";
   private static final String SESSION_ATTRIBUTE_COMPRESS_HINT = UiHints.class.getName() + "#compress";
   private static final String SESSION_ATTRIBUTE_MINIFY_HINT = UiHints.class.getName() + "#minify";
+  private static final String SESSION_ATTRIBUTE_INSPECTOR_HINT = UiHints.class.getName() + "#inspector";
 
   private UiHints() {
     // static access only
@@ -48,8 +54,13 @@ public final class UiHints {
   public static void updateHints(HttpServletRequest req) {
     Boolean debug = getRequestParameterBoolean(req, URL_PARAM_DEBUG);
     if (debug != null) {
-      updateHint(req, !debug.booleanValue(), SESSION_ATTRIBUTE_CACHE_HINT, SESSION_ATTRIBUTE_COMPRESS_HINT, SESSION_ATTRIBUTE_MINIFY_HINT);
+      updateHint(req, !debug.booleanValue(),
+          SESSION_ATTRIBUTE_CACHE_HINT,
+          SESSION_ATTRIBUTE_COMPRESS_HINT,
+          SESSION_ATTRIBUTE_MINIFY_HINT);
+      updateHint(req, debug.booleanValue(), SESSION_ATTRIBUTE_INSPECTOR_HINT);
     }
+    updateHint(req, getRequestParameterBoolean(req, URL_PARAM_INSPECTOR_HINT), SESSION_ATTRIBUTE_INSPECTOR_HINT);
     updateHint(req, getRequestParameterBoolean(req, URL_PARAM_CACHE_HINT), SESSION_ATTRIBUTE_CACHE_HINT);
     updateHint(req, getRequestParameterBoolean(req, URL_PARAM_COMPRESS_HINT), SESSION_ATTRIBUTE_COMPRESS_HINT);
     updateHint(req, getRequestParameterBoolean(req, URL_PARAM_MINIFY_HINT), SESSION_ATTRIBUTE_MINIFY_HINT);
@@ -72,6 +83,10 @@ public final class UiHints {
   private static Boolean getRequestParameterBoolean(HttpServletRequest req, String name) {
     String s = req.getParameter(name);
     return s != null ? ("true".equals(s)) : null;
+  }
+
+  public static boolean isInspectorHint(HttpServletRequest req) {
+    return calculateHint(req, SESSION_ATTRIBUTE_INSPECTOR_HINT, Platform.inDevelopmentMode());
   }
 
   public static boolean isCacheHint(HttpServletRequest req) {
