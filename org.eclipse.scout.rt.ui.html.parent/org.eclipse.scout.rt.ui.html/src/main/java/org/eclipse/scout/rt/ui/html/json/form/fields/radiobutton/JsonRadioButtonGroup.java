@@ -17,19 +17,10 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONObject;
 
-/**
- *
- */
 public class JsonRadioButtonGroup<T extends IRadioButtonGroup> extends JsonValueField<T> {
 
   private static final String FORM_FIELDS = "formFields";
 
-  /**
-   * @param model
-   * @param jsonSession
-   * @param id
-   * @param parent
-   */
   public JsonRadioButtonGroup(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
   }

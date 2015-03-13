@@ -31,6 +31,11 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> {
   }
 
   @Override
+  public String getObjectType() {
+    return "Button";
+  }
+
+  @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IButton>(PROP_SYSTEM_TYPE, model) {
@@ -63,11 +68,6 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> {
         return BinaryResourceUrlUtility.createIconUrl(JsonButton.this, getModel().getIconId());
       }
     });
-  }
-
-  @Override
-  public String getObjectType() {
-    return "Button";
   }
 
   @Override

@@ -24,6 +24,11 @@ public class JsonTreeField<T extends ITreeField> extends JsonFormField<T> {
   }
 
   @Override
+  public String getObjectType() {
+    return "TreeField";
+  }
+
+  @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
@@ -33,10 +38,5 @@ public class JsonTreeField<T extends ITreeField> extends JsonFormField<T> {
         return getModel().getTree();
       }
     });
-  }
-
-  @Override
-  public String getObjectType() {
-    return "TreeField";
   }
 }

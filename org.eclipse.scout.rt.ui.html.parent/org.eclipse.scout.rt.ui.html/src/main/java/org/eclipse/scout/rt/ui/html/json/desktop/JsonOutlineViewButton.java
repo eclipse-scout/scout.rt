@@ -18,6 +18,11 @@ public class JsonOutlineViewButton<T extends IOutlineViewButton> extends JsonAct
   }
 
   @Override
+  public String getObjectType() {
+    return "OutlineViewButton";
+  }
+
+  @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonGlobalAdapterProperty<T>("outline", model, getJsonSession()) {
@@ -32,11 +37,6 @@ public class JsonOutlineViewButton<T extends IOutlineViewButton> extends JsonAct
       }
     });
     getJsonProperty(IAction.PROP_SELECTED).addSlaveProperty(getJsonProperty("outline"));
-  }
-
-  @Override
-  public String getObjectType() {
-    return "OutlineViewButton";
   }
 
   @Override

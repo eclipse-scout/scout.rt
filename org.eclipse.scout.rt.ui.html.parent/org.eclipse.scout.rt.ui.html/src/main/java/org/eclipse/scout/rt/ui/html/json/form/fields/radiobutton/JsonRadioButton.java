@@ -18,19 +18,10 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 
-/**
- *
- */
 public class JsonRadioButton<T extends IRadioButton> extends JsonButton<T> {
 
   private static final String SELECTED = "selected";
 
-  /**
-   * @param model
-   * @param jsonSession
-   * @param id
-   * @param parent
-   */
   public JsonRadioButton(T model, IJsonSession jsonSession, String id, IJsonAdapter parent) {
     super(model, jsonSession, id, parent);
   }
@@ -62,5 +53,4 @@ public class JsonRadioButton<T extends IRadioButton> extends JsonButton<T> {
       super.handleUiEvent(event, res);
     }
   }
-
 }

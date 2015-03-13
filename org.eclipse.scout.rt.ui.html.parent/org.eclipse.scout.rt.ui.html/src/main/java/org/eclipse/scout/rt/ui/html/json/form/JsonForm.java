@@ -38,10 +38,6 @@ import org.json.JSONObject;
 public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonForm.class);
 
-  public JsonForm(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
-  }
-
   public static final String EVENT_FORM_CLOSING = "formClosing";
   public static final String PROP_FORM_ID = "formId";
   public static final String PROP_TITLE = IForm.PROP_TITLE;
@@ -57,6 +53,10 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
   public static final String PROP_CLOSABLE = "closable";
 
   private FormListener m_formListener;
+
+  public JsonForm(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
+  }
 
   @Override
   public String getObjectType() {

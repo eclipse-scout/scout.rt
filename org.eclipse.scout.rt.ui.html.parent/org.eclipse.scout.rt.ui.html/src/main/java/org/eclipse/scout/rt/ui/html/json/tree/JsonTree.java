@@ -66,6 +66,11 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   @Override
+  public String getObjectType() {
+    return "Tree";
+  }
+
+  @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<T>(ITree.PROP_TITLE, model) {
@@ -109,11 +114,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
         return getModel().isAutoCheckChildNodes();
       }
     });
-  }
-
-  @Override
-  public String getObjectType() {
-    return "Tree";
   }
 
   @Override

@@ -33,6 +33,11 @@ public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormF
   }
 
   @Override
+  public String getObjectType() {
+    return "ValueField";
+  }
+
+  @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<T>(IValueField.PROP_DISPLAY_TEXT, model) {
@@ -41,11 +46,6 @@ public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormF
         return getModel().getDisplayText();
       }
     });
-  }
-
-  @Override
-  public String getObjectType() {
-    return "ValueField";
   }
 
   @Override

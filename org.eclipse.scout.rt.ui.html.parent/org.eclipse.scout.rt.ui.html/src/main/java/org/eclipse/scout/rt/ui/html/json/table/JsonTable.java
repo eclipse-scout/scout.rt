@@ -96,6 +96,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   @Override
+  public String getObjectType() {
+    return "Table";
+  }
+
+  @Override
   protected void initJsonProperties(T model) {
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ENABLED, model) {
       @Override
@@ -181,11 +186,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().getTableControls();
       }
     });
-  }
-
-  @Override
-  public String getObjectType() {
-    return "Table";
   }
 
   @Override

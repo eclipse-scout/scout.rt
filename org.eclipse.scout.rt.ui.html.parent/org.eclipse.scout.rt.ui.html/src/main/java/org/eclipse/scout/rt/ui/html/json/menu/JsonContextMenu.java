@@ -38,6 +38,11 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
   }
 
   @Override
+  public String getObjectType() {
+    return "ContextMenu";
+  }
+
+  @Override
   protected void attachModel() {
     super.attachModel();
     if (m_contextMenuListener != null) {
@@ -71,11 +76,6 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     m_jsonMenuAdapters.addAll(attachAdapters(getModel().getChildActions(), new DisplayableActionFilter<IMenu>()));
-  }
-
-  @Override
-  public String getObjectType() {
-    return "ContextMenu";
   }
 
   public void handleModelContextMenuChanged(ContextMenuEvent event) {

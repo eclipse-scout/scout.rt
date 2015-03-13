@@ -24,6 +24,11 @@ public class JsonFormToolButton<T extends IFormToolButton<IForm>> extends JsonAc
   }
 
   @Override
+  public String getObjectType() {
+    return "ToolButton";
+  }
+
+  @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
@@ -33,12 +38,5 @@ public class JsonFormToolButton<T extends IFormToolButton<IForm>> extends JsonAc
         return getModel().getForm();
       }
     });
-
   }
-
-  @Override
-  public String getObjectType() {
-    return "ToolButton";
-  }
-
 }

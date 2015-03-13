@@ -33,6 +33,11 @@ public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyO
   }
 
   @Override
+  public String getObjectType() {
+    return "MessageBox";
+  }
+
+  @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
@@ -91,11 +96,6 @@ public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyO
 //  }
 //});
 
-  }
-
-  @Override
-  public String getObjectType() {
-    return "MessageBox";
   }
 
   @Override
