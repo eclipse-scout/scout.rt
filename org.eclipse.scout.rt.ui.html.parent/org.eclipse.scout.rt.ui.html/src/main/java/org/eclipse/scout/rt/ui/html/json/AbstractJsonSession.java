@@ -224,7 +224,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
     IClientSession clientSession;
     synchronized (this) {
-      HttpSession httpSession = m_currentHttpRequest.get().getSession();
+      HttpSession httpSession = currentHttpRequest().getSession();
       // Lookup the requested client session
       String clientSessionId = jsonStartupRequest.getClientSessionId();
       if (clientSessionId == null) {
@@ -339,7 +339,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   protected UserAgent createUserAgent(JsonStartupRequest jsonStartupRequest) {
     IUiLayer uiLayer = UiLayer.HTML;
     IUiDeviceType uiDeviceType = UiDeviceType.DESKTOP;
-    String browserId = m_currentHttpRequest.get().getHeader("User-Agent");
+    String browserId = currentHttpRequest().getHeader("User-Agent");
     JSONObject userAgent = jsonStartupRequest.getUserAgent();
     if (userAgent != null) {
       // FIXME CGU: it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
@@ -582,16 +582,15 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
-  private void waitForAsyncJobs() {
+  protected void waitForAsyncJobs() {
     // - wartet und blockiert den pullAsync request, solange bis alle async jobs terminiert haben
     // 1. was ist, wenn ein Async job ewig läuft im hintergrund?
     // 2. was ist, wenn waitForAsyncJobs fertig wird, während gerade ein normaler request verarbeitet wird?
     //    - dann könnten wir die ergebnisse huckepack in die response hängen
-
   }
 
-  private boolean isProcessingClientRequest() {
-    return m_currentHttpRequest.get() != null;
+  protected boolean isProcessingClientRequest() {
+    return currentHttpRequest() != null;
   }
 
   protected JSONObject jsonResponseToJson() {
@@ -713,7 +712,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public boolean isInspectorHint() {
-    return UiHints.isInspectorHint(m_currentHttpRequest.get());
+    return UiHints.isInspectorHint(currentHttpRequest());
   }
 
   private static class P_RootAdapter extends AbstractJsonAdapter<Object> {
