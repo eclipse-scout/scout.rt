@@ -66,7 +66,6 @@ scout.Button.prototype._onClick = function() {
  */
 scout.Button.prototype._renderProperties = function() {
   scout.Button.parent.prototype._renderProperties.call(this);
-  this._renderLabel();
   this._renderIconId();
   this._renderSelected();
 };
@@ -77,8 +76,11 @@ scout.Button.prototype._renderSelected = function() {
   }
 };
 
-scout.Button.prototype._renderLabel = function() {
-  this.$field.text(this.label ? scout.strings.removeAmpersand(this.label) : '');
+/**
+ * @override
+ */
+scout.Button.prototype._renderLabel = function(label) {
+  this.$field.text(label ? scout.strings.removeAmpersand(label) : '');
 };
 
 /**
