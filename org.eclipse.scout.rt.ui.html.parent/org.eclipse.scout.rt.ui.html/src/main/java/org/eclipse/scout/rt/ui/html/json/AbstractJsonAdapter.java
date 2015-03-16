@@ -128,7 +128,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     putProperty(json, "id", getId());
     putProperty(json, "objectType", getObjectTypeVariant());
     if (getJsonSession().isInspectorHint()) {
-      putProperty(json, "modelClass", getModel().getClass().getSimpleName());
+      putProperty(json, "modelClass", getModel().getClass().getName());
     }
 
     // Only send parent if its a global adapter. In the other cases the client may use its creator as parent.
