@@ -37,21 +37,21 @@
       background-color: @body-background-color;
       border: 0;
     }
-  }
 
-  & > .tree-item-control {
-    /* adjust control position */
-    margin-left: -@outline-item-control-size - 5px;
-    margin-top: -3px;
+    & > .tree-item-control {
+      /* adjust control position */
+      margin-left: -@outline-item-control-size - 5px;
+      margin-top: -3px;
 
-    width: @outline-item-control-size;
-    height: @outline-item-control-size;
-    line-height: @outline-item-control-size;
+      width: @outline-item-control-size;
+      height: @outline-item-control-size;
+      line-height: @outline-item-control-size;
 
-    &::before {
-      font-size: @outline-item-control-size;
-      /* always use same color as the tree-item label */
-      color: inherit;
+      &::before {
+        font-size: @outline-item-control-size;
+        /* always use same color as the tree-item label */
+        color: inherit;
+      }
     }
   }
 
