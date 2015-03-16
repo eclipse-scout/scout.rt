@@ -34,7 +34,7 @@ public class BeanFilter {
       }
     }
 
-    // 2. register all classes that are indirectly annotated with @Bean
+    // 2. register all classes that are somehow annotated with @Bean
     for (IClassInfo annotation : beanAnnotations) {
       try {
         for (IClassInfo ci : classInventory.getKnownAnnotatedTypes(annotation.resolveClass())) {
