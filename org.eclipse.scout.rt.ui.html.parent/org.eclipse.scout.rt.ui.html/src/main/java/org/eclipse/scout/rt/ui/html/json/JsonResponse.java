@@ -138,6 +138,10 @@ public class JsonResponse {
     m_errorMessage = errorMessage;
   }
 
+  public boolean isMarkedAsError() {
+    return m_error;
+  }
+
   // FIXME CGU potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
 
   /**

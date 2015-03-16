@@ -61,10 +61,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private long m_jsonAdapterSeq = ROOT_ID;
   private JsonResponse m_currentJsonResponse;
   private JsonRequest m_currentJsonRequest;
-  private AtomicReference<HttpServletRequest> m_currentHttpRequest = new AtomicReference<>();
+  // Note: This variable is referenced by reflection (!) in JsonTestUtility.endRequest()
+  private final AtomicReference<HttpServletRequest> m_currentHttpRequest = new AtomicReference<>();
   private JsonEventProcessor m_jsonEventProcessor;
   private boolean m_disposing;
-  private AtomicReference<List<Job>> m_asyncStartedJobs = new AtomicReference<>();
+  // Note: This variable is referenced by reflection (!) in JsonTestUtility.endRequest()
+  private final AtomicReference<List<Job>> m_asyncStartedJobs = new AtomicReference<>();
 
   public AbstractJsonSession() {
     m_currentJsonResponse = createJsonResponse();
@@ -646,7 +648,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public boolean isInspectorHint() {
-    return UiHints.isInspectorHint(currentHttpRequest());
+    HttpServletRequest req = currentHttpRequest();
+    return (req != null && UiHints.isInspectorHint(req));
   }
 
   private static class P_RootAdapter extends AbstractJsonAdapter<Object> {

@@ -15,6 +15,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -78,7 +79,9 @@ public final class JsonTestUtility {
 
     field = AbstractJsonSession.class.getDeclaredField("m_currentHttpRequest");
     field.setAccessible(true);
-    field.set(jsonSession, null);
+    @SuppressWarnings("unchecked")
+    AtomicReference<HttpServletRequest> ref = (AtomicReference<HttpServletRequest>) field.get(jsonSession);
+    ref.set(null);
 
     jsonSession.flush();
   }
