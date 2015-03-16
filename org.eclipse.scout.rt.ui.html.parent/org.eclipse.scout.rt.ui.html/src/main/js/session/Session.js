@@ -284,7 +284,6 @@ scout.Session.prototype._sendRequest = function(request) {
 
   function onAjaxFail(jqXHR, textStatus, errorThrown) {
     try {
-      var request = this;
       this._processErrorResponse(request, jqXHR, textStatus, errorThrown);
     } catch (err) {
       jsError = jsError || err;
