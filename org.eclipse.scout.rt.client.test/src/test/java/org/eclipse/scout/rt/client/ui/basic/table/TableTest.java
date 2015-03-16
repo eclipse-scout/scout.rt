@@ -17,9 +17,12 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -27,6 +30,8 @@ import org.junit.runner.RunWith;
  * Tests for {@link AbstractTable}
  */
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class TableTest {
 
   /**
@@ -308,6 +313,15 @@ public class TableTest {
     assertRowEquals(1, "A Total", 2, table, rows, i++);
   }
 
+  @Test
+  public void testReplaceRows() throws ProcessingException {
+    P_Table table = new P_Table();
+    table.initTable();
+  }
+
+  /**
+   * Creates a table with 2 rows. with given status.
+   */
   private P_Table createTable(int status) throws ProcessingException {
     P_Table table = new P_Table();
     table.initTable();

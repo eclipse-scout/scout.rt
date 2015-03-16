@@ -12,19 +12,24 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore;
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore.MethodImplementation;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * Unit test for {@link AbstractForm} with different implementation of {@link AbstractFormHandler#execStore()} and/or of
  * {@link AbstractForm#execStored()}.
- * 
+ *
  * @since 4.1.0
  */
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class FormStoredTest {
 
   @Test

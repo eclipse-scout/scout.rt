@@ -19,14 +19,19 @@ import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.extension.ui.outline.desktop.fixture.ExtensionTestDesktop;
 import org.eclipse.scout.rt.client.extension.ui.outline.desktop.fixture.FirstOutline;
 import org.eclipse.scout.rt.client.extension.ui.outline.desktop.fixture.SecondOutline;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class DesktopMoveOutlinesTest extends AbstractLocalExtensionTestCase {
 
   @Test

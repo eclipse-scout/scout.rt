@@ -21,13 +21,16 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.P_TestGroupBox.InnerG
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.P_TestGroupBox.InnerGroupBox.TestStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link AbstractGroupBox}
  *
  * @since 4.1.0
  */
+@RunWith(PlatformTestRunner.class)
 public class AbstractGroupBoxTest {
 
   @Test

@@ -16,6 +16,7 @@ import java.io.Serializable;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractObjectColumn;
@@ -25,6 +26,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -32,12 +35,14 @@ import org.junit.runner.RunWith;
  * Load and store of tables containing custom values and classes (classloading issues)
  */
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class StoreAndLoadXml2FormTest {
 
   static final Object[][] TABLE_DATA = new Object[][]{
-      new Object[]{1L, "One", new java.util.Date()},
-      new Object[]{2L, "Two", new StoreAndLoadXml2FormTest.InnerClass()},
-      new Object[]{3L, "Three", new StoreAndLoadXml2FormTest.InnerClass.InnerInnerClass()}
+    new Object[]{1L, "One", new java.util.Date()},
+    new Object[]{2L, "Two", new StoreAndLoadXml2FormTest.InnerClass()},
+    new Object[]{3L, "Three", new StoreAndLoadXml2FormTest.InnerClass.InnerInnerClass()}
   };
 
   public static class InnerClass implements Serializable {
