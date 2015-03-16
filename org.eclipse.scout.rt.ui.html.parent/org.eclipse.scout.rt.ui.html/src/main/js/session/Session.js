@@ -338,12 +338,33 @@ scout.Session.prototype._processSuccessResponse = function(message) {
   }
 };
 
+/**
+ * Pulls the results of running async jobs. Note: we cannot use the _sendRequest method here
+ * since we don't want the busy handling in this case (async jobs should run in the _background_).
+ */
 scout.Session.prototype._pullAsyncResults = function() {
   $.log.info('Check for async results...');
-  // FIXME AWE: hier nicht über sendRequest gehen, sonst sehen wir einen busy cursor
-  this._sendRequest({
-    pullAsyncResults: true,
-    jsonSessionId: this.jsonSessionId});
+  var request = {
+      pullAsyncResults: true,
+      jsonSessionId: this.jsonSessionId
+    }, ajaxOptions = {
+      async: true,
+      type: 'POST',
+      dataType: 'json',
+      contentType: 'application/json; charset=UTF-8',
+      cache: false,
+      url: this.url,
+      data: JSON.stringify(request),
+      context: request
+    };
+
+    $.ajax(ajaxOptions)
+      .done(function(data) {
+        this._processSuccessResponse(data);
+      }.bind(this))
+      .fail(function(jqXHR, textStatus, errorThrown) {
+        this._processErrorResponse(request, jqXHR, textStatus, errorThrown);
+      }.bind(this));
 };
 
 scout.Session.prototype._copyAdapterData = function(adapterData) {

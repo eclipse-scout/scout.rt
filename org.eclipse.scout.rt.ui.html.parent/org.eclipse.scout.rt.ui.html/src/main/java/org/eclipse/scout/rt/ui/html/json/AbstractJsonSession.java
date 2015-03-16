@@ -26,15 +26,22 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.commons.job.IJobChangeEvent;
+import org.eclipse.scout.commons.job.IJobChangeEventFilter;
+import org.eclipse.scout.commons.job.IJobChangeListener;
 import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.internal.JobChangeEvent;
+import org.eclipse.scout.commons.job.internal.JobChangeListeners;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.shared.ui.IUiLayer;
@@ -61,20 +68,35 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private long m_jsonAdapterSeq = ROOT_ID;
   private JsonResponse m_currentJsonResponse;
   private JsonRequest m_currentJsonRequest;
-  // Note: This variable is referenced by reflection (!) in JsonTestUtility.endRequest()
+  /**
+   * Note: This variable is referenced by reflection (!) in JsonTestUtility.endRequest()
+   * The variable is accessed by different threads, thus it is an atomic reference.
+   */
   private final AtomicReference<HttpServletRequest> m_currentHttpRequest = new AtomicReference<>();
   private JsonEventProcessor m_jsonEventProcessor;
   private boolean m_disposing;
-  // Note: This variable is referenced by reflection (!) in JsonTestUtility.endRequest()
-  private final AtomicReference<List<Job>> m_asyncStartedJobs = new AtomicReference<>();
+  private final List<IFuture<?>> m_asyncStartedJobFutures;
+  private IJobChangeListener m_jobChangeListener;
 
+  // FIXME AWE: (jobs) thread safety, review
+  // FIXME AWE: (jobs) make test form for async stuff
   public AbstractJsonSession() {
     m_currentJsonResponse = createJsonResponse();
     m_jsonObjectFactory = createJsonObjectFactory();
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
     m_rootJsonAdapter = new P_RootAdapter(this);
     m_customHtmlRenderer = createCustomHtmlRenderer();
-    m_asyncStartedJobs.set(new ArrayList<Job>());
+    m_asyncStartedJobFutures = new ArrayList<>();
+
+    // FIXME DWI/MVI/AWE: (Jobs) das hier auf neue, schöne Job API umstellen.
+    m_jobChangeListener = new P_JobChangeAdapter();
+    JobChangeListeners.DEFAULT.add(new P_JobChangeAdapter(), new IJobChangeEventFilter() {
+      @Override
+      public boolean accept(IJobChangeEvent event) {
+        return JobChangeEvent.EVENT_TYPE_SCHEDULED == event.getType() ||
+            JobChangeEvent.EVENT_TYPE_DONE == event.getType();
+      }
+    });
   }
 
   protected JsonResponse createJsonResponse() {
@@ -201,8 +223,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       else {
         // No client session for the requested ID was found, so create one and store it in the map
         LOG.info("Creating new client session [clientSessionId=" + clientSessionId + "]");
-        //FIXME CGU session must be started later, see JsonClientSession
-        //return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
+        // FIXME CGU session must be started later, see JsonClientSession
+        // return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
         Locale oldLocale = NlsLocale.get(false);
         UserAgent oldUserAgent = UserAgent.CURRENT.get();
         try {
@@ -325,6 +347,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       return;
     }
 
+    JobChangeListeners.DEFAULT.remove(m_jobChangeListener);
     m_jsonAdapterRegistry.disposeAllJsonAdapters();
     m_currentJsonResponse = null;
     flush();
@@ -517,7 +540,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         getJsonClientSession().processRequestLocale(httpRequest.getLocale());
       }
       else if (jsonRequest.isPullAsyncRequest()) {
-        waitForAsyncJobs();
+        waitForAsyncJob();
       }
       getJsonEventProcessor().processEvents(m_currentJsonRequest, currentJsonResponse());
       return jsonResponseToJson();
@@ -539,11 +562,37 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
-  protected void waitForAsyncJobs() {
-    // - wartet und blockiert den pullAsync request, solange bis alle async jobs terminiert haben
-    // 1. was ist, wenn ein Async job ewig läuft im hintergrund?
-    // 2. was ist, wenn waitForAsyncJobs fertig wird, während gerade ein normaler request verarbeitet wird?
-    //    - dann könnten wir die ergebnisse huckepack in die response hängen
+  // FIXME AWE: (Jobs) reviewen ob die logik hier stimmt
+  // - wartet und blockiert den pullAsync request, solange bis _irgend_ einer aus der liste der ASSJs terminiert
+  //   sobald das geschieht, verarbeiten wir den request weiter.
+
+  // 1. was ist, wenn ein Async job ewig läuft im hintergrund?
+  // 2. was ist, wenn waitForAsyncJobs fertig wird, während gerade ein normaler request verarbeitet wird?
+  //    - dann könnten wir die ergebnisse huckepack in die response hängen
+  private void waitForAsyncJob() {
+
+    synchronized (m_asyncStartedJobFutures) {
+      if (m_asyncStartedJobFutures.isEmpty()) {
+        // Probably the async job has finished in the meantime...
+        LOG.debug("Wait for async jobs, but no async jobs are running right now, return immediately");
+        return;
+      }
+
+      LOG.trace("Wait until async job has terminated...");
+      try {
+
+        m_asyncStartedJobFutures.wait(); // Braucht es hier eine max-wait-time oder wollen wir 4-ever warten?
+        // Spurious wake-up? Das problem ist, dass wir nicht auf einen bestimmten Job warten, sondern einfach
+        // weitermachen, wenn irgend ein Job zu ende ist. Vermutlich ist es kein Problem, auch wenn der wake-up
+        // unberechtigt war, führt das nur dazu, dass der request beendet wird und der client gleich wieder einen
+        // neuen pullAsyncRequest startet. Sofern noch Async jobs vorhanden sind
+        LOG.trace("Async job terminated. Continue request processing...");
+      }
+      catch (InterruptedException e) {
+        LOG.warn("Interrupted while waiting for m_asyncStartedJobFutures", e);
+      }
+    }
+
   }
 
   protected boolean isProcessingClientRequest() {
@@ -560,6 +609,16 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
           @Override
           public void run() {
             JSONObject result = currentJsonResponse().toJson();
+
+            // FIXME AWE: (Jobs) den pullAsync Request so umbauen, dass er den haupt-thread nicht blockiert
+            // aber blockiert bis ein ergebnis vorliegt (long-polling))
+            synchronized (m_asyncStartedJobFutures) {
+              if (m_asyncStartedJobFutures.size() > 0) {
+                LOG.debug("FOUND async started jobs, add checkAsync property to response");
+                JsonObjectUtility.putProperty(result, "checkAsync", "true");
+              }
+            }
+
             resultHolder.setValue(result);
           }
         });
@@ -663,4 +722,50 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       return "GlobalAdapter";
     }
   }
+
+  private class P_JobChangeAdapter implements IJobChangeListener {
+
+    @Override
+    public void jobChanged(IJobChangeEvent event) {
+      if (JobChangeEvent.EVENT_TYPE_SCHEDULED == event.getType()) {
+        scheduled(event);
+      }
+      else if (JobChangeEvent.EVENT_TYPE_DONE == event.getType()) {
+        done(event);
+      }
+      else {
+        throw new IllegalArgumentException();
+      }
+    }
+
+    private boolean isAsyncJobFromClientSession(IJobChangeEvent event, IClientSession clientSession) {
+      IClientSession jobClientSession = ((ClientJobInput) event.getFuture().getJobInput()).getSession(); // == Session from job
+      return jobClientSession == clientSession &&
+          event.getSourceManager() instanceof IClientJobManager;// == ASYNC Jobs
+    }
+
+    private void scheduled(IJobChangeEvent event) {
+      if (isProcessingClientRequest() && isAsyncJobFromClientSession(event, getClientSession())) {
+        int newSize;
+        synchronized (m_asyncStartedJobFutures) {
+          m_asyncStartedJobFutures.add(event.getFuture());
+          newSize = m_asyncStartedJobFutures.size();
+        }
+        LOG.debug("Async Job " + event + " was scheduled while no request was processing. Add to list. New size=" + newSize);
+      }
+    }
+
+    private void done(IJobChangeEvent event) {
+      synchronized (m_asyncStartedJobFutures) {
+        IFuture<?> future = event.getFuture();
+        if (m_asyncStartedJobFutures.contains(future)) {
+          m_asyncStartedJobFutures.remove(future);
+          int newSize = m_asyncStartedJobFutures.size();
+          LOG.debug("Async Job " + event + " has terminated. Remove from list. New size=" + newSize);
+          m_asyncStartedJobFutures.notify();
+        }
+      }
+    }
+  }
+
 }
