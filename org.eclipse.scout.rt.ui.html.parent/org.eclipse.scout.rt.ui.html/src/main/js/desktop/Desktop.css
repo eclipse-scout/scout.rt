@@ -164,15 +164,34 @@
 
 /* table / form */
 
+@desktop-table-header-padding-y: @table-header-padding-y + 6;
+@desktop-table-row-padding-y: @table-row-padding-y + 6;
+
 .desktop-bench > .table {
+
+  & > .table-header > .header-item {
+    padding-top: @desktop-table-header-padding-y;
+    padding-bottom: @desktop-table-header-padding-y;
+  }
+
   & > .table-header,
   & > .table-data {
     margin-left: @bench-margin-x;
     margin-right: @bench-margin-x;
   }
 
+  & > .table-data > .table-row > .table-cell {
+    padding-top: @desktop-table-row-padding-y;
+    padding-bottom: @desktop-table-row-padding-y;
+
+    &.checkable {
+      padding-top: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment;
+      padding-bottom: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment;
+    }
+  }
+
   /* Desktop table has a 2px border. For this we create a div which spans the full row and has */
-  /* border-top/bottom set to 1px. Middle rows dont have 2px border so no need to do it for those. */
+  /* border-top/bottom set to 1px. Middle rows don't have 2px border so no need to do it for those. */
   & .table-row,
   & .table-row-sum {
     border-left-width: 2px;

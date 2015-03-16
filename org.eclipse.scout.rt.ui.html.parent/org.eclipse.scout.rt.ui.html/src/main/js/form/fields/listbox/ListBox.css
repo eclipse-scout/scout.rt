@@ -11,25 +11,9 @@
   }
 }
 
-.list-box.single > .field > .table {
-  border: 0;
-  border-bottom: 0;
-  border-radius: 0;
-  background-color: transparent;
-}
-
-.list-box > .field >  .table > .table-header,
-.list-box > .field > .table > .table-header > .header-resize  {
-  height: @logical-grid-height;
-}
-
-.list-box .table-header > .header-item {
-  line-height: @logical-grid-height;
-}
-
 .list-box .menubar {
-  height:39px;
-  border-bottom:none;
+  height: 39px;
+  border-bottom: none;
   margin-left: @table-row-padding-left;
   margin-right: @table-row-padding-left;
   padding: 0;
@@ -47,9 +31,3 @@
     height: @logical-grid-height - 10px;
   }
 }
-
-.list-box > .field > .table > .table-data .table-row > .table-cell {
-  padding-top: @table-row-padding-y - 6;
-  padding-bottom: @table-row-padding-y - 6;
-}
-

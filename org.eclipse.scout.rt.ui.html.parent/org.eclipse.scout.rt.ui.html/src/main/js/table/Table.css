@@ -1,9 +1,7 @@
-@table-cell-inset: 5px;
-@table-selection-border-width: 2px;
-@table-header-height: 40px;
-@table-footer-height: 52px;
-@table-row-padding-y: 12px;
+@table-row-padding-y: 6px;
 @table-row-padding-left: 8px;
+/* Adjustment to shift the checkbox a little upwards to align it with the text (resp. first line of the text in case of multiline cells) */
+@checkable-cell-padding-adjustment: 2px;
 
 .table {
   height: 100%;
@@ -31,8 +29,6 @@
   padding-top: 1px;
 }
 
-/* table rows */
-
 .table-row,
 .table-row-sum {
   position:relative;
@@ -41,9 +37,6 @@
   border-right: 1px solid transparent;
   border-bottom: 1px solid @desktop-border-color;
 
-  /* Selected rows */
-  /* Hint: The definition of the 2px selection border is written in desktop.css because it is */
-  /* not possible to prevent the creation of the additional selection div in tablefield.css*/
   &.selected {
     background-color: @selection-row-background-color;
     border-color: @selection-row-border-color;
@@ -85,14 +78,15 @@
   padding: @table-row-padding-y 4px @table-row-padding-y @table-row-padding-left;
   .overflow-ellipsis-nowrap;
   mix-blend-mode: multiply; /* experimental support, currently only in FF */
-  vertical-align: middle;
+  vertical-align: top; /* for multiline text */
 
   .table-row-sum & {
     font-weight: bold;
   }
 
-  &.checkable-col {
-    padding: @table-row-padding-y 4px @table-row-padding-y 4px;
+  &.checkable {
+    padding-top: @table-row-padding-y - @checkable-cell-padding-adjustment;
+    padding-bottom: @table-row-padding-y - @checkable-cell-padding-adjustment;
   }
 
   & label {

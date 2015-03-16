@@ -15,7 +15,7 @@ scout.CheckBoxColumn.prototype.init = function(model, session) {
 };
 
 scout.CheckBoxColumn.prototype.buildCell = function(row) {
-  var cell = '<div class="table-cell checkable-col"  style="min-width:' + scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE +
+  var cell = '<div class="table-cell checkable"  style="min-width:' + scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE +
     'px; max-width:' + scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE + 'px;"' + scout.device.unselectableAttribute +
     '><input type="checkbox" id="' + row.id + '-checkable" ';
   if (row.checked) {
@@ -39,7 +39,7 @@ scout.CheckBoxColumn.prototype.buildHeaderCell = function(header) {
 scout.CheckBoxColumn.prototype.onMouseUp = function(event, $row) {
   var row = $row.data('row');
   var $target = $(event.target);
-  if ($target.is('label') && $target.parent().hasClass('checkable-col')) {
+  if ($target.is('label') && $target.parent().hasClass('checkable')) {
     this.table.checkRow(row, !row.checked);
   }
 };

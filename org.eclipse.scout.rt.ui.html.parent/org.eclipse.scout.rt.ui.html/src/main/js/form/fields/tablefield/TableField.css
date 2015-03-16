@@ -18,15 +18,6 @@
   background-color: transparent;
 }
 
-.table-field > .table > .table-header,
-.table-field > .table > .table-header > .header-resize  {
-  height: @logical-grid-height;
-}
-
-.table-field .table-header > .header-item {
-  line-height: @logical-grid-height;
-}
-
 .table-field .menubar {
   height:39px;
   border-bottom:none;
@@ -46,9 +37,4 @@
   & > .menu-separator {
     height: @logical-grid-height - 10px;
   }
-}
-
-.table-field > .table > .table-data .table-row > .table-cell {
-  padding-top: @table-row-padding-y - 6;
-  padding-bottom: @table-row-padding-y - 6;
 }

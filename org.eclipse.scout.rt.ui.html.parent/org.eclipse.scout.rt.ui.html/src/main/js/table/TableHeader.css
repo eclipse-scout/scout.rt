@@ -1,5 +1,7 @@
+@table-header-padding-y: 6px;
+@table-header-padding-left: @table-row-padding-left;
+
 .table-header {
-  height: @table-header-height;
   position: relative;
   background-color: @panel-background-color;
   border-top: 1px solid @desktop-border-color;
@@ -10,11 +12,9 @@
 
 .sort-icon(@icon) {
   position: absolute;
-  top: -2px;
+  margin-top: -2px;
   right: 6px;
   content: @icon;
-  height: 100%;
-  vertical-align: middle;
   color: @palette-gray-4;
 }
 
@@ -22,10 +22,13 @@
   position: relative;
   display: inline-block;
   .font-text-normal(@bold);
-  padding: 0px 6px 0px @table-row-padding-left;
+  padding: @table-header-padding-y 6px @table-header-padding-y @table-header-padding-left;
   .overflow-ellipsis-nowrap;
-  line-height: @table-header-height;
-  cursor:pointer;
+  /* Vertical align is necessary for 2 things:
+    1. Alignment in case of multiline headers.
+    2. A correct header height, see http://stackoverflow.com/questions/20566710/overflowhidden-displayinline-block-moves-text-upwards */
+  vertical-align: bottom;
+  cursor: pointer;
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
 
@@ -65,7 +68,7 @@
   position: absolute;
   display: inline-block;
   top: 0px;
-  height: @table-header-height;
+  height: 100%;
   width: 17px;
   padding: 8px;
   margin-left: -8px;
