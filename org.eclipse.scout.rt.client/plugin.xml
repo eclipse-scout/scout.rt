@@ -5,7 +5,6 @@
     <service class="org.eclipse.scout.rt.client.services.common.platform.PlatformService" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>
     <service class="org.eclipse.scout.rt.client.services.common.exceptionhandler.internal.InternalClientExceptionHandlerService" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>
     <service class="org.eclipse.scout.rt.client.services.common.file.FileService" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>
-    <service class="org.eclipse.scout.rt.client.services.common.session.internal.ClientSessionRegistryService"/>
     <service class="org.eclipse.scout.rt.client.services.common.prefs.FileSystemUserPreferencesStorageService"/>
     <service class="org.eclipse.scout.rt.client.services.common.clientnotification.internal.ClientNotificationConsumerService"/>
     <service class="org.eclipse.scout.rt.client.services.common.perf.internal.PerformanceAnalyzerService"/>

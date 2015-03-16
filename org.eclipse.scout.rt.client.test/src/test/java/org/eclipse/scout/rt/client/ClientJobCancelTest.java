@@ -12,11 +12,10 @@ package org.eclipse.scout.rt.client;
 
 import static org.junit.Assert.assertEquals;
 
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.client.fixture.MockServerProcessingCancelService;
@@ -24,24 +23,23 @@ import org.eclipse.scout.rt.client.fixture.MockServiceTunnel;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -49,9 +47,9 @@ import org.junit.runner.RunWith;
  * Tests what happens when the user cancels a long running job (system=false) that is caused by a backend service call
  * through the client proxy.
  */
-@RunWith(PlatformTestRunner.class)
-@Ignore
-// TODO [dwi] Migrate to new Job API
+@RunWith(ClientTestRunner.class)
+@RunWithClientSession(TestEnvironmentClientSession.class)
+@RunWithSubject("anna")
 public class ClientJobCancelTest {
   private static long pingServiceDelay;
 
@@ -61,7 +59,7 @@ public class ClientJobCancelTest {
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
-    TestEnvironmentClientSession clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(TestEnvironmentClientSession.class, null, UserAgent.createDefault());
+    IClientSession clientSession = ClientSessionProvider.currentSession();
     if (clientSession != null) {
       oldServiceTunnel = clientSession.getServiceTunnel();
     }
@@ -69,13 +67,13 @@ public class ClientJobCancelTest {
 
   @AfterClass
   public static void tearDownAfterClass() throws Exception {
-    TestEnvironmentClientSession clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(TestEnvironmentClientSession.class, null, UserAgent.createDefault());
+    TestEnvironmentClientSession clientSession = (TestEnvironmentClientSession) ClientSessionProvider.currentSession();
     clientSession.setServiceTunnel(oldServiceTunnel);
   }
 
   @Before
   public void setUp() throws Exception {
-    m_session = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(TestEnvironmentClientSession.class, null, UserAgent.createDefault());
+    m_session = ClientSessionProvider.currentSession(TestEnvironmentClientSession.class);
     MockServiceTunnel tunnel = new MockServiceTunnel(m_session);
     m_session.setServiceTunnel(tunnel);
     m_serviceReg = TestingUtility.registerServices(0, new MockPingService(), new MockServerProcessingCancelService(tunnel));
@@ -89,35 +87,27 @@ public class ClientJobCancelTest {
 
   @Test
   public void testPingWithoutDelayAndInterrupt() throws Exception {
-    String s = (String) testInternal(10L, false);
+    String s = testInternal(10L, false);
     assertEquals("pong", s);
   }
 
   @Test
   public void testPingWithDelayAndInterruptClientJob() throws Exception {
-    UndeclaredThrowableException u = (UndeclaredThrowableException) testInternal(1000000L, true);
-    Throwable t = u.getCause().getCause();
-    assertEquals(InterruptedException.class, t.getClass());
-    assertEquals(ScoutTexts.get("UserInterrupted"), t.getMessage());
+    String s = testInternal(1000000L, true);
+    Assert.assertNull(s); // we don't expect an answer
   }
 
   /**
    * run a client job, let the service call be delayed and optionally interrupt after one second
    */
-  protected Object testInternal(long delay, boolean interrupt) throws Exception {
+  protected String testInternal(long delay, boolean interrupt) throws Exception {
     pingServiceDelay = delay;
     //
-    final AtomicReference<Object> resultRef = new AtomicReference<Object>();
-    IFuture<Void> future = OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+    IFuture<String> future = OBJ.one(IModelJobManager.class).schedule(new ICallable<String>() {
       @Override
-      public void run() throws Exception {
+      public String call() throws Exception {
         IPingService serviceProxy = ServiceTunnelUtility.createProxy(IPingService.class, m_session.getServiceTunnel());
-        try {
-          resultRef.set(serviceProxy.ping("ABC"));
-        }
-        catch (Throwable t) {
-          resultRef.set(t);
-        }
+        return serviceProxy.ping("ABC");
       }
     }, ClientJobInput.defaults().session(m_session).name("Client"));
 
@@ -126,8 +116,7 @@ public class ClientJobCancelTest {
       OBJ.one(IClientJobManager.class).schedule(new JobThatInterrupts(future), 1, TimeUnit.SECONDS, ClientJobInput.defaults().session(m_session).name("Interrupter"));
     }
     //wait for user job
-    future.get();
-    return resultRef.get();
+    return future.get();
   }
 
   private static class JobThatInterrupts implements IRunnable {
@@ -155,5 +144,4 @@ public class ClientJobCancelTest {
       return "pong";
     }
   }
-
 }
