@@ -10,15 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.cdi.internal;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
+import org.eclipse.scout.rt.platform.cdi.BeanCreationException;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.IBeanRegistration;
 
 public class BeanRegistration<T> implements IBeanRegistration<T> {
+  private static final ThreadLocal<Deque<String>> INSTANTIATION_STACK = new ThreadLocal<>();
   private final IBean<T> m_bean;
   private final boolean m_isInstanceBasedBean;
   private final Semaphore m_instanceLock = new Semaphore(1, true);
@@ -41,12 +46,19 @@ public class BeanRegistration<T> implements IBeanRegistration<T> {
     if (m_bean.getBeanClazz().isInterface()) {
       return null;
     }
+
+    Deque<String> stack = INSTANTIATION_STACK.get();
+    String beanName = m_bean.getBeanClazz().getName();
+    if (stack != null && stack.contains(beanName)) {
+      String message = String.format("The requested bean is currently being created. Creation path: [%s]", CollectionUtility.format(stack, ", "));
+      throw new BeanCreationException(beanName, message);
+    }
+
     if (BeanContext.isApplicationScoped(m_bean)) {
-      //TODO: loop detection? when an OBJ.one() is used inside a constructor
       m_instanceLock.acquireUninterruptibly();
       try {
         if (m_instance == null) {
-          m_instance = BeanInstanceUtil.create(m_bean.getBeanClazz());
+          m_instance = createNewInstance();
         }
         return m_instance;
       }
@@ -54,7 +66,34 @@ public class BeanRegistration<T> implements IBeanRegistration<T> {
         m_instanceLock.release();
       }
     }
-    return BeanInstanceUtil.create(m_bean.getBeanClazz());
+    return createNewInstance();
+  }
+
+  /**
+   * @returns Returns a new instance of the bean managed by this registration.
+   */
+  protected T createNewInstance() {
+    Class<? extends T> beanClass = m_bean.getBeanClazz();
+    Deque<String> stack = INSTANTIATION_STACK.get();
+    boolean removeStack = false;
+    if (stack == null) {
+      stack = new LinkedList<>();
+      INSTANTIATION_STACK.set(stack);
+      removeStack = true;
+    }
+
+    try {
+      stack.addLast(beanClass.getName());
+      return BeanInstanceUtil.create(beanClass);
+    }
+    finally {
+      if (removeStack) {
+        INSTANTIATION_STACK.remove();
+      }
+      else {
+        stack.removeLast();
+      }
+    }
   }
 
   @Override

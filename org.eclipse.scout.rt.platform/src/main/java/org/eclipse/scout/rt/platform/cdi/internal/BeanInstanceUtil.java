@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.cdi.internal;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
@@ -20,6 +21,7 @@ import javax.annotation.PostConstruct;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.cdi.BeanCreationException;
 
 public final class BeanInstanceUtil {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BeanInstanceUtil.class);
@@ -34,16 +36,32 @@ public final class BeanInstanceUtil {
       instance = Assertions.assertNotNull(newInstance(beanClazz));
       instance = initializeInstance(instance);
     }
-    catch (Exception e) {
-      LOG.error(String.format("Could not instantiate '%s'.", beanClazz), e);
+    catch (Throwable t) {
+      if (LOG.isInfoEnabled()) {
+        LOG.info(String.format("Cannot create new instance of '%s'.", beanClazz), t);
+      }
+      if (t instanceof Error) {
+        throw (Error) t;
+      }
+      else if (t instanceof RuntimeException) {
+        throw (RuntimeException) t;
+      }
+      else {
+        throw new BeanCreationException(beanClazz == null ? null : beanClazz.getName(), t);
+      }
     }
     return instance;
   }
 
-  public static <T> T newInstance(Class<T> clazz) throws Exception {
-    Constructor<T> cons = clazz.getDeclaredConstructor();
-    cons.setAccessible(true);
-    return cons.newInstance();
+  public static <T> T newInstance(Class<T> clazz) throws Throwable {
+    try {
+      Constructor<T> cons = clazz.getDeclaredConstructor();
+      cons.setAccessible(true);
+      return cons.newInstance();
+    }
+    catch (InvocationTargetException e) {
+      throw e.getCause();
+    }
   }
 
   public static <T> T initializeInstance(T instance) {
