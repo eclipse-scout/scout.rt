@@ -77,6 +77,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private boolean m_disposing;
   private final List<IFuture<?>> m_asyncStartedJobFutures;
   private IJobChangeListener m_jobChangeListener;
+  private IJobChangeEventFilter m_jobChangeEventFilter;
 
   // FIXME AWE: (jobs) thread safety, review
   // FIXME AWE: (jobs) make test form for async stuff
@@ -90,13 +91,14 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
     // FIXME DWI/MVI/AWE: (Jobs) das hier auf neue, schöne Job API umstellen.
     m_jobChangeListener = new P_JobChangeAdapter();
-    JobChangeListeners.DEFAULT.add(new P_JobChangeAdapter(), new IJobChangeEventFilter() {
+    m_jobChangeEventFilter = new IJobChangeEventFilter() {
       @Override
       public boolean accept(IJobChangeEvent event) {
         return JobChangeEvent.EVENT_TYPE_SCHEDULED == event.getType() ||
             JobChangeEvent.EVENT_TYPE_DONE == event.getType();
       }
-    });
+    };
+    JobChangeListeners.DEFAULT.add(m_jobChangeListener, m_jobChangeEventFilter);
   }
 
   protected JsonResponse createJsonResponse() {
@@ -347,7 +349,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       return;
     }
 
-    JobChangeListeners.DEFAULT.remove(m_jobChangeListener);
+    JobChangeListeners.DEFAULT.remove(m_jobChangeListener, m_jobChangeEventFilter);
     m_jsonAdapterRegistry.disposeAllJsonAdapters();
     m_currentJsonResponse = null;
     flush();

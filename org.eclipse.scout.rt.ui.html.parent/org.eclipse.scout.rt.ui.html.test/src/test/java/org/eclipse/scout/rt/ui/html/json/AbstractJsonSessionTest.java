@@ -14,15 +14,15 @@ import javax.servlet.http.HttpSessionBindingEvent;
 
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession.P_ClientSessionCleanupHandler;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.rt.ui.html.json.testing.TestEnvironmentJsonSession;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
-import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -54,18 +54,17 @@ public class AbstractJsonSessionTest {
   }
 
   @Test
-  public void testSessionInvalidation() throws InterruptedException {
+  public void testSessionInvalidation() throws Exception {
     AbstractJsonSession jsonSession = (AbstractJsonSession) JsonTestUtility.createAndInitializeJsonSession();
     IClientSession clientSession = jsonSession.getClientSession();
 
-    //Don't waste time waiting for client jobs to finish. Test job itself runs inside a client job so we always have to wait until max time
+    // Don't waste time waiting for client jobs to finish. Test job itself runs inside a client job so we always have to wait until max time
     ((AbstractClientSession) clientSession).setMaxShutdownWaitTime(0);
-
     WeakReference<IJsonSession> ref = new WeakReference<IJsonSession>(jsonSession);
-
     HttpSessionBindingEvent mockEvent = Mockito.mock(HttpSessionBindingEvent.class);
     P_ClientSessionCleanupHandler dummyCleanupHandler = new AbstractJsonSession.P_ClientSessionCleanupHandler("1", clientSession);
 
+    JsonTestUtility.endRequest(jsonSession);
     jsonSession.valueUnbound(mockEvent);
     dummyCleanupHandler.valueUnbound(mockEvent);
     assertFalse(clientSession.isActive());
