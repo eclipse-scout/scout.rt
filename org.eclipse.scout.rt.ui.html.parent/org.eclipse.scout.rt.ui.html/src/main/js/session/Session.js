@@ -295,6 +295,7 @@ scout.Session.prototype._sendRequest = function(request) {
     if (!this.areRequestsPending() && !request.unload) {
       this.setBusy(false);
     }
+    this.layoutValidator.validate();
     if (success) {
       this._fireRequestFinished(data);
     }
@@ -319,7 +320,6 @@ scout.Session.prototype._processSuccessResponse = function(message) {
     this.processingEvents = true;
     try {
       this._processEvents(message.events);
-      this.layoutValidator.validate();
     } finally {
       this.processingEvents = false;
     }
