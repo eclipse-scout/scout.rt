@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.wizard;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.wizard.IWizardProgressFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -153,7 +154,7 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
     }
   }
 
-  private class P_WizardListener implements WizardListener {
+  private class P_WizardListener implements WizardListener, WeakEventListener {
 
     @Override
     public void wizardChanged(WizardEvent e) {

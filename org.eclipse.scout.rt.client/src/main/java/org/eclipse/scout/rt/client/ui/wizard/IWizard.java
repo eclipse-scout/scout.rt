@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 public interface IWizard extends IPropertyObserver, ITypeWithClassId {
@@ -69,32 +70,6 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId {
    */
   String PROP_CLOSE_TYPE = "closeType";
 
-  /**
-   * Standalone window Swing: modal -> JDialog, nonmodal -> JFrame
-   */
-  int DISPLAY_HINT_DIALOG = 0;
-  /**
-   * Inline view Swing: JInternalFrame
-   */
-  int DISPLAY_HINT_VIEW = 20;
-
-  String VIEW_ID_N = "N";
-  String VIEW_ID_NE = "NE";
-  String VIEW_ID_E = "E";
-  String VIEW_ID_SE = "SE";
-  String VIEW_ID_S = "S";
-  String VIEW_ID_SW = "SW";
-  String VIEW_ID_W = "W";
-  String VIEW_ID_NW = "NW";
-  String VIEW_ID_CENTER = "C";
-  String VIEW_ID_OUTLINE = "OUTLINE";
-  String VIEW_ID_OUTLINE_SELECTOR = "OUTLINE_SELECTOR";
-  String VIEW_ID_PAGE_DETAIL = "PAGE_DETAIL";
-  String VIEW_ID_PAGE_SEARCH = "PAGE_SEARCH";
-  String VIEW_ID_PAGE_TABLE = "PAGE_TABLE";
-
-  String EDITOR_ID = "EDITOR";
-
   void addWizardListener(WizardListener listener);
 
   void removeWizardListener(WizardListener listener);
@@ -111,43 +86,70 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId {
   boolean isChanging();
 
   /**
-   * use one of the VIEW_ID_ constants or a custom text
+   * Hint for wizard container form
    */
   int getDisplayHint();
 
-  void setDisplayHint(int i);
+  /**
+   * Hint for wizard container form
+   */
+  void setDisplayHint(int displayHint);
 
+  /**
+   * Hint for wizard container form
+   */
   String getDisplayViewId();
 
+  /**
+   * Hint for wizard container form
+   */
   void setDisplayViewId(String viewId);
 
+  /**
+   * Hint for wizard container form
+   */
   boolean isModal();
 
-  void setModal(boolean b);
+  /**
+   * Hint for wizard container form
+   */
+  void setModal(boolean modal);
 
+  /**
+   * Hint for wizard container form
+   */
   String getTitle();
 
-  void setTitle(String s);
+  /**
+   * Hint for wizard container form
+   */
+  void setTitle(String title);
 
+  /**
+   * Hint for wizard container form
+   */
   String getSubTitle();
 
-  void setSubTitle(String s);
+  /**
+   * Hint for wizard container form
+   */
+  void setSubTitle(String subTitle);
 
   String getTitleHtml();
 
-  void setTitleHtml(String s);
+  void setTitleHtml(String subTitleHtml);
 
   String getTooltipText();
 
-  void setTooltipText(String s);
+  void setTooltipText(String tooltipText);
 
   String getIconId();
 
-  void setIconId(String s);
+  void setIconId(String iconId);
 
   String getWizardNo();
 
-  void setWizardNo(String s);
+  void setWizardNo(String wizardNo);
 
   /**
    * No more operations are possible on a closed wizard.
@@ -163,6 +165,11 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId {
    * start the wizard
    */
   void start() throws ProcessingException;
+
+  /**
+   * Convenience method to get the current desktop.
+   */
+  IDesktop getDesktop() throws ProcessingException;
 
   /**
    * @return current wizard form or <code>null</code> if there is no current

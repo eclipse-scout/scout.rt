@@ -62,23 +62,19 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
   String PROP_PERSPECTIVE_ID = "perspectiveId";
 
   /**
-   * Standalone window<br>
-   * Swing: modal -> JDialog, nonmodal -> JFrame<br>
+   * Standalone window
    */
   int DISPLAY_HINT_DIALOG = 0;
   /**
-   * Popup view is a popup window that is automatically closed when mouse clicks outside of popup<br>
-   * Swing: JPopup
+   * Popup view is a popup window that is automatically closed when mouse clicks outside of popup
    */
   int DISPLAY_HINT_POPUP_WINDOW = 10;
   /**
    * Popup dialog is a normal dialog, but placement is at the focus owner location instead of default dialog position
-   * Swing: JPopup
    */
   int DISPLAY_HINT_POPUP_DIALOG = 12;
   /**
-   * Inline view<br>
-   * Swing: JInternalFrame
+   * Inline view
    */
   int DISPLAY_HINT_VIEW = 20;
 
@@ -99,8 +95,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
   String VIEW_ID_PAGE_DETAIL = "PAGE_DETAIL";
   String VIEW_ID_PAGE_SEARCH = "PAGE_SEARCH";
   String VIEW_ID_PAGE_TABLE = "PAGE_TABLE";
-
-  String EDITOR_ID = "EDITOR";
 
   /**
    * Initialize the form and all of its fields.

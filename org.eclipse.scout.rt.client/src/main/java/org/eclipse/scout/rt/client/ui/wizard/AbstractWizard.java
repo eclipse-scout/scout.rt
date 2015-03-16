@@ -72,13 +72,11 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   private List<IWizardStep<? extends IForm>> m_availableStepList;
   private List<IWizardStep<? extends IForm>> m_stepList;
   private IWizardStep<? extends IForm> m_activeStep;
-  // event accumulation (coalescation)
   private final OptimisticLock m_changingLock;
-  private List<WizardEvent> m_accumulatedEvents;
+  private List<WizardEvent> m_accumulatedEvents; // event accumulation (coalescation)
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractWizard, IWizardExtension<? extends AbstractWizard>> m_objectExtensions;
   //
-  private boolean m_displayHintLocked;
   private boolean m_modal;
   private String m_displayViewId;
   private int m_displayHint;
@@ -130,24 +128,36 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * Configuration
    */
 
+  /**
+   * @return hint for wizard container form
+   */
   @ConfigProperty(ConfigProperty.FORM_DISPLAY_HINT)
   @Order(100)
   protected int getConfiguredDisplayHint() {
-    return DISPLAY_HINT_DIALOG;
+    return IForm.DISPLAY_HINT_DIALOG;
   }
 
+  /**
+   * @return hint for wizard container form
+   */
   @ConfigProperty(ConfigProperty.FORM_VIEW_ID)
   @Order(105)
   protected String getConfiguredDisplayViewId() {
     return null;
   }
 
+  /**
+   * @return hint for wizard container form
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(106)
   protected boolean getConfiguredModal() {
     return false;
   }
 
+  /**
+   * @return hint for wizard container form
+   */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
   protected String getConfiguredTitle() {
@@ -194,18 +204,21 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * create and eventually open a form containing the wizard.<br>
    * this method may be overwritten to provide an own wizard representation
    * form.
-   *
-   * @return
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(5)
   protected IWizardContainerForm execCreateContainerForm() throws ProcessingException {
     DefaultWizardContainerForm containerForm = new DefaultWizardContainerForm(this);
+    decorateWizardContainerForm(containerForm);
+    return containerForm;
+  }
+
+  protected void decorateWizardContainerForm(IWizardContainerForm containerForm) {
     containerForm.setDisplayHint(getDisplayHint());
     containerForm.setDisplayViewId(getDisplayViewId());
     containerForm.setModal(isModal());
-    return containerForm;
+    containerForm.setTitle(getTitle());
+    containerForm.setSubTitle(getSubTitle());
   }
 
   /**
@@ -213,8 +226,6 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * used for example to decorate the step
    * labels and description depending on the current state or to decorate the
    * current wizard form in {@link #getWizardForm()}
-   *
-   * @throws ProcessingException
    */
   @ConfigOperation
   @Order(6)
@@ -520,23 +531,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void setDisplayHint(int i) {
-    if (m_displayHintLocked) {
-      throw new IllegalArgumentException("displayHint cannot be changed once the form handling has started");
-    }
-    switch (i) {
-      case DISPLAY_HINT_DIALOG: {
-        m_displayHint = i;
-        break;
-      }
-      case DISPLAY_HINT_VIEW: {
-        m_displayHint = i;
-        break;
-      }
-      default: {
-        throw new IllegalArgumentException("invalid displayHint " + i);
-      }
-    }
+  public void setDisplayHint(int displayHint) {
+    m_displayHint = displayHint;
   }
 
   @Override
@@ -555,8 +551,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void setModal(boolean b) {
-    m_modal = b;
+  public void setModal(boolean modal) {
+    m_modal = modal;
   }
 
   @Override
@@ -565,8 +561,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void setTitle(String s) {
-    propertySupport.setPropertyString(PROP_TITLE, s);
+  public void setTitle(String title) {
+    propertySupport.setPropertyString(PROP_TITLE, title);
   }
 
   @Override
@@ -575,8 +571,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void setTitleHtml(String s) {
-    propertySupport.setPropertyString(PROP_TITLE_HTML, s);
+  public void setTitleHtml(String titleHtml) {
+    propertySupport.setPropertyString(PROP_TITLE_HTML, titleHtml);
   }
 
   @Override
@@ -585,8 +581,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void setTooltipText(String s) {
-    propertySupport.setPropertyString(PROP_TOOLTIP_TEXT, s);
+  public void setTooltipText(String tooltipText) {
+    propertySupport.setPropertyString(PROP_TOOLTIP_TEXT, tooltipText);
   }
 
   @Override
@@ -595,8 +591,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void setIconId(String s) {
-    propertySupport.setPropertyString(PROP_ICON_ID, s);
+  public void setIconId(String iconId) {
+    propertySupport.setPropertyString(PROP_ICON_ID, iconId);
   }
 
   @Override
@@ -605,22 +601,26 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public void setSubTitle(String s) {
-    propertySupport.setPropertyString(PROP_SUB_TITLE, s);
+  public void setSubTitle(String subTitle) {
+    propertySupport.setPropertyString(PROP_SUB_TITLE, subTitle);
   }
 
   @Override
   public String getWizardNo() {
-    return propertySupport.getPropertyString(PROP_SUB_TITLE);
+    return propertySupport.getPropertyString(PROP_WIZARD_NO);
   }
 
   @Override
-  public void setWizardNo(String s) {
-    propertySupport.setPropertyString(PROP_SUB_TITLE, s);
+  public void setWizardNo(String wizardNo) {
+    propertySupport.setPropertyString(PROP_WIZARD_NO, wizardNo);
   }
 
+  @Override
   public IDesktop getDesktop() {
-    return ClientSessionProvider.currentSession().getDesktop();
+    if (ClientSessionProvider.currentSession() != null) {
+      return ClientSessionProvider.currentSession().getDesktop();
+    }
+    return null;
   }
 
   @Override
@@ -1051,7 +1051,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void waitFor() throws ProcessingException {
     // check if the desktop is observing this process
-    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
+    IDesktop desktop = getDesktop();
     if (desktop == null || !desktop.isOpened()) {
       throw new ProcessingException("Cannot wait for " + getClass().getName() + ". There is no desktop or the desktop has not yet been opened in the ui", null, WAIT_FOR_ERROR_CODE);
     }
