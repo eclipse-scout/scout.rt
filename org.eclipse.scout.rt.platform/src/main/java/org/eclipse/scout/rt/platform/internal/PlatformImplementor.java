@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.IApplication;
@@ -94,13 +95,15 @@ public class PlatformImplementor implements IPlatform {
       changeState(State.BeanContextValid);
       startCreateImmediatelyBeans();
 
-      changeState(State.ApplicationStarting);
-      startApplication();
-      changeState(State.ApplicationStarted);
     }
     finally {
       m_stateLock.writeLock().unlock();
     }
+
+    // start of application not part of the lock to allow the application to use the bean context and the inventory
+    changeState(State.ApplicationStarting);
+    startApplication();
+    changeState(State.ApplicationStarted);
   }
 
   protected IClassInventory createClassInventory() {
@@ -171,12 +174,12 @@ public class PlatformImplementor implements IPlatform {
       changeState(State.ApplicationStopping);
       stopApplication();
       changeState(State.ApplicationStopped);
-      destroyBeanContext();
-      destroyClassInventory();
       if (Platform.get() == this) {
         Platform.set(null);
       }
       changeState(State.PlatformStopped);
+      destroyBeanContext();
+      destroyClassInventory();
     }
     finally {
       m_stateLock.writeLock().unlock();
@@ -259,5 +262,10 @@ public class PlatformImplementor implements IPlatform {
         LOG.warn(IPlatformListener.class.getSimpleName() + " " + reg.getBean().getBeanClazz(), t);
       }
     }
+  }
+
+  @Override
+  public boolean inDevelopmentMode() {
+    return ConfigIniUtility.getPropertyBoolean(ConfigIniUtility.KEY_PLATFORM_DEV_MODE, false);
   }
 }

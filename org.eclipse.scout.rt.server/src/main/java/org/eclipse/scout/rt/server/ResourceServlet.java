@@ -23,11 +23,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.osgi.framework.Bundle;
 
 /**
  * Init parameters for WAR resources<br>
@@ -49,8 +46,6 @@ public class ResourceServlet extends HttpServlet {
   private static final String ETAG = "ETag"; //$NON-NLS-1$
 
   private String m_warPath;
-  private String m_bundleName;
-  private String m_bundlePath;
 
   public ResourceServlet() {
   }
@@ -71,37 +66,21 @@ public class ResourceServlet extends HttpServlet {
     if (m_warPath != null && m_warPath.endsWith("/")) {
       m_warPath = m_warPath.substring(0, m_warPath.length() - 1);
     }
-    //
-    m_bundleName = config.getInitParameter("bundle-name"); //$NON-NLS-1$
-    if (!StringUtility.hasText(m_bundleName)) {
-      m_bundleName = null;
-    }
-    //
-    m_bundlePath = config.getInitParameter("bundle-path"); //$NON-NLS-1$
-    if (!StringUtility.hasText(m_bundlePath)) {
-      m_bundlePath = null;
-    }
-    if (m_bundlePath != null && m_bundlePath.endsWith("/")) {
-      m_bundlePath = m_bundlePath.substring(0, m_bundlePath.length() - 1);
-    }
-    //
     // check config
-    if (m_warPath != null) {
-      // ok
-    }
-    else if (m_bundleName != null && m_bundlePath != null) {
-      // ok
-    }
-    else {
-      throw new ServletException("Missing init parameters. Set either 'war-path' or 'bundle-name','bundle-path'");
+    if (m_warPath == null) {
+      throw new ServletException("Missing init parameters. Set 'war-path' parameter.");
     }
   }
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-    Path p = new Path(req.getRequestURI());
-    String lastSegment = p.lastSegment();
-    if ((lastSegment != null && lastSegment.contains(".")) || req.getRequestURI().endsWith("/")) {
+    String uri = req.getRequestURI();
+    int lastSlashPos = uri.lastIndexOf('/');
+    String lastSegment = null;
+    if (lastSlashPos >= 0 && uri.length() > lastSlashPos) {
+      lastSegment = uri.substring(lastSlashPos + 1);
+    }
+    if ((lastSegment != null && lastSegment.contains(".")) || uri.endsWith("/")) {
       if (!writeStaticResource(req, res)) {
         res.setStatus(HttpServletResponse.SC_NOT_FOUND);
       }
@@ -130,13 +109,6 @@ public class ResourceServlet extends HttpServlet {
       String resourcePath = m_warPath + pathInfo;
       url = servletContext.getResource(resourcePath);
       contentType = servletContext.getMimeType(resourcePath);
-    }
-    else if (m_bundleName != null && m_bundlePath != null) {
-      String resourcePath = m_bundlePath + pathInfo;
-      Bundle bundle = Platform.getBundle(m_bundleName);
-      if (bundle != null) {
-        url = bundle.getResource(resourcePath);
-      }
     }
     //
     if (url == null) {

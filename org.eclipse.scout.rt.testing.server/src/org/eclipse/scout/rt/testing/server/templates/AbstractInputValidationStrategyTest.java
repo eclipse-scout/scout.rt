@@ -14,9 +14,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,11 +26,8 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * Test to find all service methods, where an input validation strategy annotation is missing. <br/>
@@ -46,26 +41,9 @@ import org.osgi.framework.FrameworkUtil;
 // TODO [dwi]: ask jgu whether to remove
 public abstract class AbstractInputValidationStrategyTest {
 
-  private Set<String> m_sharedBundles;
-  private Set<String> m_serverBundles;
-
   protected abstract String[] getConfiguredSharedBundles();
 
   protected abstract String[] getConfiguredServerBundles();
-
-  @Before
-  public void init() {
-    m_sharedBundles = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(getConfiguredSharedBundles())));
-    m_serverBundles = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(getConfiguredServerBundles())));
-  }
-
-  protected Set<String> getSharedBundles() {
-    return m_sharedBundles;
-  }
-
-  protected Set<String> getServerBundles() {
-    return m_serverBundles;
-  }
 
   @Test
   public void validateServices() throws Exception {
@@ -78,9 +56,6 @@ public abstract class AbstractInputValidationStrategyTest {
       if (Proxy.isProxyClass(serviceClass)) {
         continue;
       }
-      if (!fromBundles(serviceClass, getServerBundles())) {
-        continue;
-      }
       checkServiceClass(serviceClass, collector);
     }
     report(collector);
@@ -89,9 +64,7 @@ public abstract class AbstractInputValidationStrategyTest {
   protected void checkServiceClass(Class<?> serviceClass, Set<Method> collector) throws Exception {
     Collection<Class<?>> interfacesHierarchy = new ArrayList<Class<?>>();
     for (Class<?> ci : ServiceUtility.getInterfacesHierarchy(serviceClass, Object.class)) {
-      if (fromBundles(ci, getSharedBundles())) {
-        interfacesHierarchy.add(ci);
-      }
+      interfacesHierarchy.add(ci);
     }
 
     for (Method m : serviceClass.getDeclaredMethods()) {
@@ -147,11 +120,6 @@ public abstract class AbstractInputValidationStrategyTest {
         }
       }
     }
-  }
-
-  protected boolean fromBundles(Class<?> c, Set<String> bundles) {
-    Bundle interfaceBundle = FrameworkUtil.getBundle(c);
-    return interfaceBundle != null && bundles.contains(interfaceBundle.getSymbolicName());
   }
 
   protected void report(Set<Method> collector) throws Exception {

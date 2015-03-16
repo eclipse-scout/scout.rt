@@ -48,7 +48,6 @@ import org.eclipse.scout.rt.shared.validate.OutputValidation;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
-import org.osgi.framework.Version;
 
 /**
  * Delegate for scout dynamic business op invocation
@@ -73,10 +72,10 @@ public class DefaultTransactionDelegate {
   public static final Pattern DEFAULT_QUERY_NAMES_PATTERN = Pattern.compile("(get|is|has|load|read|find|select)([A-Z].*)?");
   public static final Pattern DEFAULT_PROCESS_NAMES_PATTERN = Pattern.compile("(set|put|add|remove|store|write|create|insert|update|delete)([A-Z].*)?");
 
-  private final Version m_requestMinVersion;
+  private final String m_requestMinVersion;
   private final boolean m_debug;
 
-  public DefaultTransactionDelegate(Version requestMinVersion, boolean debug) {
+  public DefaultTransactionDelegate(String requestMinVersion, boolean debug) {
     m_requestMinVersion = requestMinVersion;
     m_debug = debug;
   }
@@ -143,13 +142,12 @@ public class DefaultTransactionDelegate {
     }
     // version check of request
     if (m_requestMinVersion != null) {
-      String v = serviceReq.getVersion();
-      if (v == null) {
-        v = "0.0.0";
+      String requestVersion = serviceReq.getVersion();
+      if (requestVersion == null) {
+        requestVersion = "0.0.0";
       }
-      Version requestVersion = Version.parseVersion(v);
       if (requestVersion.compareTo(m_requestMinVersion) < 0) {
-        return new ServiceTunnelResponse(null, null, new VersionMismatchException(requestVersion.toString(), m_requestMinVersion.toString()));
+        return new ServiceTunnelResponse(null, null, new VersionMismatchException(requestVersion, m_requestMinVersion.toString()));
       }
     }
     Set<String> consumedNotifications = serviceReq.getConsumedNotifications();

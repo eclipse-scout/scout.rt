@@ -3,11 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Scout Server
 Bundle-SymbolicName: org.eclipse.scout.rt.server;singleton:=true
 Bundle-Version: 5.1.0.qualifier
-Bundle-Activator: org.eclipse.scout.rt.server.internal.Activator
 Bundle-Vendor: Eclipse Scout Project
-Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)",
- org.eclipse.equinox.http.registry;bundle-version="[1.0.100,2.0.0)";visibility:=reexport,
- org.eclipse.scout.service;bundle-version="[5.1.0,5.2.0)";visibility:=reexport,
+Require-Bundle: org.eclipse.scout.service;bundle-version="[5.1.0,5.2.0)";visibility:=reexport,
  org.eclipse.scout.commons;bundle-version="[5.1.0,5.2.0)";visibility:=reexport,
  org.eclipse.scout.rt.shared;bundle-version="[5.1.0,5.2.0)";visibility:=reexport,
  org.eclipse.scout.rt.server.commons;bundle-version="[5.1.0,5.2.0)"
@@ -23,7 +20,6 @@ Export-Package: org.eclipse.scout.rt.server,
  org.eclipse.scout.rt.server.cdi,
  org.eclipse.scout.rt.server.context,
  org.eclipse.scout.rt.server.extension,
- org.eclipse.scout.rt.server.internal;x-internal:=true,
  org.eclipse.scout.rt.server.job,
  org.eclipse.scout.rt.server.scheduler,
  org.eclipse.scout.rt.server.scheduler.internal,
@@ -63,4 +59,3 @@ Export-Package: org.eclipse.scout.rt.server,
  org.eclipse.scout.rt.server.transaction.internal;x-internal:=true
 Eclipse-BuddyPolicy: registered
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-ActivationPolicy: lazy

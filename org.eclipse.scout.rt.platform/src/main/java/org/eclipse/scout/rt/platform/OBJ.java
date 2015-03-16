@@ -23,22 +23,6 @@ public final class OBJ {
   }
 
   /**
-   * @deprecated use {@link #get(Class)}
-   */
-  @Deprecated
-  public static <T> T one(Class<T> beanClazz) {
-    return get(beanClazz);
-  }
-
-  /**
-   * @deprecated use {@link #getOptional(Class)}
-   */
-  @Deprecated
-  public static <T> T oneOrNull(Class<T> beanClazz) {
-    return getOptional(beanClazz);
-  }
-
-  /**
    * @return the first instance of this type.
    */
   public static <T> T get(Class<T> beanClazz) {

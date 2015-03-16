@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
@@ -31,7 +30,9 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
@@ -47,7 +48,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.Version;
 
 /**
  * Use this Servlet to dispatch scout UI service requests using {@link IServiceTunnelRequest},
@@ -64,7 +64,7 @@ public class ServiceTunnelServlet extends HttpServlet {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelServlet.class);
 
   private transient IServiceTunnelContentHandler m_contentHandler;
-  private Version m_requestMinVersion;
+  private String m_requestMinVersion;
   private final boolean m_debug;
 
   public ServiceTunnelServlet() {
@@ -212,7 +212,25 @@ public class ServiceTunnelServlet extends HttpServlet {
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
+    try {
+      Platform.setDefault();
+      Platform.get().start();
+    }
+    catch (Exception e) {
+      throw new ServletException(e);
+    }
     m_requestMinVersion = initRequestMinVersion(config);
+  }
+
+  @Override
+  public void destroy() {
+    try {
+      Platform.get().stop();
+    }
+    catch (Exception e) {
+      LOG.warn("Unable to stop platform.", e);
+    }
+    super.destroy();
   }
 
   /**
@@ -228,25 +246,19 @@ public class ServiceTunnelServlet extends HttpServlet {
    * Reads the minimum version a request must have.
    * <p/>
    * The version has to be defined as init parameter in the servlet configuration. <br/>
-   * This can be done by adding a new init-param at the {@link DefaultHttpProxyHandlerServlet} on the extension point
-   * org.eclipse.equinox.http.registry.servlets and setting its name to min-version and its value to the desired version
-   * (like 1.2.3). <br/>
-   * If there is no min-version defined it uses the Bundle-Version of the bundle which contains the running product.
+   * This can be done by adding a new init-param at the {@link DefaultHttpProxyHandlerServlet} in the web.xml and
+   * setting its name to 'min-version' and its value to the desired version (like 1.2.3). <br/>
+   * If there is no min-version defined it uses the version of the {@link IApplication} if there is one.
    */
   @Internal
-  protected Version initRequestMinVersion(ServletConfig config) {
-    Version version = null;
-    String v = config.getInitParameter("min-version");
-    if (v != null) {
-      Version tmp = Version.parseVersion(v);
-      version = new Version(tmp.getMajor(), tmp.getMinor(), tmp.getMicro());
+  protected String initRequestMinVersion(ServletConfig config) {
+    String version = config.getInitParameter("min-version");
+    if (version == null) {
+      IApplication app = OBJ.getOptional(IApplication.class);
+      if (app != null) {
+        version = app.getVersion();
+      }
     }
-    else if (Platform.getProduct() != null) {
-      v = (String) Platform.getProduct().getDefiningBundle().getHeaders().get("Bundle-Version");
-      Version tmp = Version.parseVersion(v);
-      version = new Version(tmp.getMajor(), tmp.getMinor(), tmp.getMicro());
-    }
-
     return version;
   }
 
@@ -304,7 +316,7 @@ public class ServiceTunnelServlet extends HttpServlet {
   /**
    * @return minimal version a service request must have.
    */
-  protected Version getRequestMinVersion() {
+  protected String getRequestMinVersion() {
     return m_requestMinVersion;
   }
 

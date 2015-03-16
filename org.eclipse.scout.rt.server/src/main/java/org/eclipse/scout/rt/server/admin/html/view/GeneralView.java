@@ -18,10 +18,11 @@ import java.util.Iterator;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -56,8 +57,9 @@ public class GeneralView extends DefaultView {
     String loggingStatusMessage = createLoggingQuickLink(p);
 
     // infos
-    if (Platform.getProduct() != null) {
-      p.print("Product: id=" + Platform.getProduct().getId() + ", name=" + Platform.getProduct().getName() + ", app=" + Platform.getProduct().getApplication() + ", bundle=" + Platform.getProduct().getDefiningBundle());
+    IApplication app = OBJ.getOptional(IApplication.class);
+    if (app != null) {
+      p.print("Product: name=" + app.getName() + ", app=" + app.getClass().getName() + ", version=" + app.getVersion());
       p.br();
     }
     else {

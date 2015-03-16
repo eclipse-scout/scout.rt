@@ -11,9 +11,6 @@ import java.util.zip.ZipFile;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.Platform;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * scan classpath for {@link Bean}
@@ -26,28 +23,14 @@ public abstract class AbstractInventoryBuilder {
   }
 
   public void scanAllModules() throws IOException {
-    if (Platform.isOsgiRunning()) {
-      String path = "META-INF/scout.xml";
-      for (Bundle b : FrameworkUtil.getBundle(getClass()).getBundleContext().getBundles()) {
-        if (b.getResource("/" + path) == null) {
-          continue;
-        }
-        for (Enumeration en = b.findEntries("/", "*.class", true); en.hasMoreElements();) {
-          URL url = ((URL) en.nextElement());
-          handleClass(url);
-        }
+    String path = "META-INF/scout.xml";
+    for (Enumeration<URL> en = getClass().getClassLoader().getResources(path); en.hasMoreElements();) {
+      String url = en.nextElement().toExternalForm();
+      if (url.startsWith("jar:file:")) {
+        scanModule(new File(url.substring(9, url.lastIndexOf("!"))));
       }
-    }
-    else {
-      String path = "META-INF/scout.xml";
-      for (Enumeration<URL> en = getClass().getClassLoader().getResources(path); en.hasMoreElements();) {
-        String url = en.nextElement().toExternalForm();
-        if (url.startsWith("jar:file:")) {
-          scanModule(new File(url.substring(9, url.lastIndexOf("!"))));
-        }
-        else if (url.startsWith("file:")) {
-          scanModule(new File(url.substring(5)).getParentFile().getParentFile().getParentFile());
-        }
+      else if (url.startsWith("file:")) {
+        scanModule(new File(url.substring(5)).getParentFile().getParentFile().getParentFile());
       }
     }
   }

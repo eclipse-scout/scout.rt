@@ -120,6 +120,7 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
     }
   }
 
+  @SuppressWarnings("deprecation")
   protected boolean isSection() {
     return m_containerBorderVisible && IGroupBox.BORDER_DECORATION_SECTION.equals(m_containerBorderDecoration);
   }
@@ -197,6 +198,7 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
   /**
    * set the values {@link #m_containerBorderVisible} and {@link #m_containerBorderDecoration}
    */
+  @SuppressWarnings("deprecation")
   protected void interceptBorderStyle(IGroupBox box) {
     m_containerBorderVisible = box.isBorderVisible();
     m_containerBorderDecoration = IGroupBox.BORDER_DECORATION_EMPTY;
@@ -274,6 +276,7 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
     }
   }
 
+  @SuppressWarnings("deprecation")
   protected void installSwingContainerBorder() {
     m_containerBorderInstalled = true;
     if (m_containerBorderVisible) {

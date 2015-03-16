@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.jaxws.internal;
 
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.handler.Handler;
 
-import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.FileUtility;
@@ -113,7 +113,7 @@ public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpo
     }
 
     byte[] content = new byte[0];
-    if (new Path(pathInfo).lastSegment().equals(HTML_STATUS_PAGE_TEMPLATE)) {
+    if (pathInfo.endsWith(HTML_STATUS_PAGE_TEMPLATE)) {
       // status page
       String html = createHtmlStatusPage(request.getContextPath(), servletAdapters);
       if (html != null) {
@@ -132,7 +132,11 @@ public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpo
       }
     }
 
-    String contentType = FileUtility.getContentTypeForExtension(new Path(pathInfo).getFileExtension());
+    String extension = IOUtility.getFileExtension(pathInfo);
+    String contentType = null;
+    if (extension != null) {
+      contentType = FileUtility.getContentTypeForExtension(extension);
+    }
     if (contentType == null) {
       contentType = "application/unknown";
     }
@@ -247,7 +251,8 @@ public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpo
 
   protected URL resolveResourceURL(String pathInfo) {
     if (m_propResourcePath != null) {
-      URL url = getClass().getResource(new Path(m_propResourcePath).append(pathInfo).toPortableString());
+      File f = new File(m_propResourcePath, pathInfo);
+      URL url = getClass().getResource(f.getAbsolutePath());
       if (url != null) {
         return url;
       }
@@ -266,6 +271,7 @@ public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpo
   }
 
   private URL resolveDefaultResourceURL(String pathInfo) {
-    return getClass().getResource(new Path("/org/eclipse/scout/jaxws216/html/").append(pathInfo).toPortableString());
+    File f = new File("/org/eclipse/scout/jaxws216/html/", pathInfo);
+    return getClass().getResource(f.getAbsolutePath());
   }
 }

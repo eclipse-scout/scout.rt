@@ -10,22 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.platform.IModule;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.PlatformException;
+import org.eclipse.scout.rt.platform.job.IJobManager;
 
 /**
  *
  */
-public class ClientModule implements IModule {
+public class ClientModule implements IPlatformListener {
 
   @Override
-  public void start() {
+  public void stateChanged(PlatformEvent event) throws PlatformException {
+    if (event.getState() == IPlatform.State.ApplicationStopped) {
+      for (IJobManager mgr : OBJ.all(IJobManager.class)) {
+        mgr.shutdown();
+      }
+    }
   }
-
-  @Override
-  public void stop() {
-    OBJ.one(IModelJobManager.class).shutdown();
-  }
-
 }

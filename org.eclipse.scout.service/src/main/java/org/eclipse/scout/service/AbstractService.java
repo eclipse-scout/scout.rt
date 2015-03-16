@@ -13,8 +13,6 @@ package org.eclipse.scout.service;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.service.IServiceInitializer.ServiceInitializerResult;
 
@@ -24,8 +22,6 @@ import org.eclipse.scout.service.IServiceInitializer.ServiceInitializerResult;
  */
 //@ApplicationScoped // FIXME abr uncomment after switching from plugin.xml to scout.xml
 public abstract class AbstractService implements IService {
-  @SuppressWarnings("unused")
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractService.class);
 
   /**
    * This default implementation calls the default initializer {@link DefaultServiceInitializer} which calls

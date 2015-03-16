@@ -23,29 +23,4 @@
            factory="org.eclipse.scout.service.DefaultServiceFactory">
      </service>
    </extension>
-  <extension id="app" name="Server Application" point="org.eclipse.core.runtime.applications">
-    <application>
-      <run class="org.eclipse.scout.rt.server.ServerApplication"/>
-    </application>
-  </extension>
-  <extension point="org.eclipse.scout.rt.server.commons.filters">
-    <filter aliases="/process /diagnostics" class="org.eclipse.scout.rt.server.commons.servletfilter.helper.DevelopmentAuthFilter" ranking="1000000">
-       <init-param
-             name="active"
-             value="true">
-       </init-param>
-    </filter>
-    <filter aliases="/process /diagnostics" class="org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter" ranking="1000010">
-       <init-param
-             name="active"
-             value="true">
-       </init-param>
-    </filter>
-    <filter aliases="/ajax" class="org.eclipse.scout.rt.server.SoapWsseJaasFilter" ranking="1000010">
-       <init-param
-             name="active"
-             value="true">
-       </init-param>
-    </filter>
-  </extension>
 </plugin>

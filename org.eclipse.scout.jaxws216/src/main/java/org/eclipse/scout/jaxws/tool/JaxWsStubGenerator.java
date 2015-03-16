@@ -40,7 +40,6 @@ import java.util.regex.Pattern;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
@@ -142,21 +141,21 @@ public class JaxWsStubGenerator {
       wsdlLocation = wsdlLocation.substring(1);
     }
 
-    String outDir = null;
+    File outDir = null;
     String jarFileName = null;
 
     // prepare output directory
-    Path outPath = new Path(args[ARG_OUT_DIR]);
+    File outPath = new File(args[ARG_OUT_DIR]);
     File tempOutDir = null;
-    String suffix = outPath.getFileExtension();
-    if (suffix != null && suffix.equalsIgnoreCase("jar")) {
-      jarFileName = outPath.lastSegment();
-      outDir = outPath.removeLastSegments(1).toPortableString();
+    String suffix = IOUtility.getFileExtension(outPath.getName());
+    if ("jar".equalsIgnoreCase(suffix)) {
+      jarFileName = outPath.getName();
+      outDir = outPath.getParentFile();
     }
     else {
-      outDir = outPath.toPortableString();
+      outDir = outPath.getAbsoluteFile();
     }
-    new File(outDir).mkdirs();
+    outDir.mkdirs();
 
     // instrument with output directory
     List<String> properties = new LinkedList<String>();
@@ -210,7 +209,7 @@ public class JaxWsStubGenerator {
     }
     else {
       properties.add("-d");
-      properties.add(outDir);
+      properties.add(outDir.getAbsolutePath());
     }
 
     // instrument to not compile the source files as source code fixes have to be applied first
@@ -230,7 +229,7 @@ public class JaxWsStubGenerator {
         stubOutDir = tempOutDir;
       }
       else {
-        stubOutDir = new File(outDir);
+        stubOutDir = outDir;
       }
 
       // check that stub files were generated
@@ -284,17 +283,14 @@ public class JaxWsStubGenerator {
     }
   }
 
-  private static void createJarArchive(File tempOutDir, String outDirPath, String jarFileName) {
+  private static void createJarArchive(File tempOutDir, File outDirPath, String jarFileName) {
     if (jarFileName == null) {
       return;
     }
 
     try {
       // create archive from created files
-      if (!outDirPath.endsWith(FILE_PATH_SEPARATOR)) {
-        outDirPath = outDirPath + FILE_PATH_SEPARATOR;
-      }
-      File jarFile = IOUtility.toFile(outDirPath + jarFileName);
+      File jarFile = new File(outDirPath, jarFileName);
       if (jarFile.exists()) {
         jarFile.delete();
       }
@@ -385,7 +381,7 @@ public class JaxWsStubGenerator {
 
   /**
    * Print information about WSDL
-   * 
+   *
    * @param properties
    * @param logger
    */

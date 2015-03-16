@@ -27,5 +27,4 @@ public class PlatformListener implements IPlatformListener {
       PluginXmlParser.get().visit(new FormFieldsPluginXmlVisitor(context));
     }
   }
-
 }

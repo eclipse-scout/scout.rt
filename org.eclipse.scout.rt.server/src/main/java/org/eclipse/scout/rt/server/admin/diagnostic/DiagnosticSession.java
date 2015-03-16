@@ -24,18 +24,17 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.core.runtime.IProduct;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.security.ReadDiagnosticServletPermission;
 import org.eclipse.scout.rt.shared.security.UpdateDiagnosticServletPermission;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.Version;
 
 public class DiagnosticSession {
 
@@ -104,12 +103,12 @@ public class DiagnosticSession {
 
     String diagnosticHTML = getDiagnosticItemsHTML(result);
 
+    IApplication app = OBJ.getOptional(IApplication.class);
     String title = "unknown";
-    Version version = Version.emptyVersion;
-    IProduct product = Platform.getProduct();
-    if (product != null) {
-      title = product.getName();
-      version = Version.parseVersion("" + product.getDefiningBundle().getHeaders().get("Bundle-Version"));
+    String version = "0.0.0";
+    if (app != null) {
+      title = app.getName();
+      version = app.getVersion();
     }
 
     resp.setContentType("text/html");
@@ -208,24 +207,20 @@ public class DiagnosticSession {
     DiagnosticFactory.addDiagnosticItemToList(result, "Environment variables", envList, DiagnosticFactory.STATUS_INFO);
 
     DiagnosticFactory.addDiagnosticItemToList(result, "Version", "", DiagnosticFactory.STATUS_TITLE);
-    Version v = Version.emptyVersion;
-    IProduct product = Platform.getProduct();
-    String productId = "n/a";
-    String productName = "n/a";
-    String application = "n/a";
-    String definingBundle = "n/a";
-    if (product != null) {
-      productId = product.getId();
-      productName = product.getName();
-      application = product.getApplication();
-      definingBundle = product.getDefiningBundle().getSymbolicName();
-      v = Version.parseVersion("" + product.getDefiningBundle().getHeaders().get("Bundle-Version"));
+
+    IApplication app = OBJ.getOptional(IApplication.class);
+    String productName = "unknown";
+    String application = "unknown";
+    String version = "0.0.0";
+    if (app != null) {
+      productName = app.getName();
+      version = app.getVersion();
+      application = app.getClass().getName();
     }
-    DiagnosticFactory.addDiagnosticItemToList(result, "Product ID", productId, DiagnosticFactory.STATUS_INFO);
+
     DiagnosticFactory.addDiagnosticItemToList(result, "Product Name", productName, DiagnosticFactory.STATUS_INFO);
     DiagnosticFactory.addDiagnosticItemToList(result, "Application", application, DiagnosticFactory.STATUS_INFO);
-    DiagnosticFactory.addDiagnosticItemToList(result, "Defining Bundle", definingBundle, DiagnosticFactory.STATUS_INFO);
-    DiagnosticFactory.addDiagnosticItemToList(result, "Defining Bundle Version", v.toString(), DiagnosticFactory.STATUS_INFO);
+    DiagnosticFactory.addDiagnosticItemToList(result, "Defining Bundle Version", version, DiagnosticFactory.STATUS_INFO);
 
     DiagnosticFactory.addDiagnosticItemToList(result, "Change values", "", DiagnosticFactory.STATUS_TITLE);
     return result;

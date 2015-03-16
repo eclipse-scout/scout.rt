@@ -5,7 +5,8 @@ Bundle-SymbolicName: org.eclipse.scout.rt.shared;singleton:=true
 Bundle-Version: 5.1.0.qualifier
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.scout.service;bundle-version="[5.1.0,5.2.0)";visibility:=reexport,
- org.eclipse.scout.commons;bundle-version="[5.1.0,5.2.0)";visibility:=reexport
+ org.eclipse.scout.commons;bundle-version="[5.1.0,5.2.0)";visibility:=reexport,
+ org.eclipse.scout.rt.platform;bundle-version="[5.1.0,5.2.0)";visibility:=reexport
 Export-Package: org.eclipse.scout.rt.shared,
  org.eclipse.scout.rt.shared.data.basic,
  org.eclipse.scout.rt.shared.data.basic.table,

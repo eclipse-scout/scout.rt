@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.UserInterruptedException;
 import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.PlatformException;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -64,7 +65,6 @@ abstract class BaseSwingApplication implements IApplication {
       }
     }
     try {
-      org.eclipse.scout.rt.platform.Platform.setDefault();
       // The default @{link Locale} has to be set prior to SwingEnvironment is created, because UIDefaultsInjector resolves NLS texts.
       execInitLocale();
 
@@ -129,23 +129,28 @@ abstract class BaseSwingApplication implements IApplication {
    * Normally {@link #startInSubject(IApplicationContext)} is overridden
    */
   @Override
-  public void start() throws Exception {
-    if (Subject.getSubject(AccessController.getContext()) != null) {
-      // there is a subject context
-      startInSubject();
-      exit();
+  public void start() throws PlatformException {
+    try {
+      if (Subject.getSubject(AccessController.getContext()) != null) {
+        // there is a subject context
+        startInSubject();
+        exit();
+      }
+      else {
+        Subject subject = new Subject();
+        subject.getPrincipals().add(new SimplePrincipal(System.getProperty("user.name")));
+        Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
+          @Override
+          public Object run() throws Exception {
+            startInSubject();
+            exit();
+            return null;
+          }
+        });
+      }
     }
-    else {
-      Subject subject = new Subject();
-      subject.getPrincipals().add(new SimplePrincipal(System.getProperty("user.name")));
-      Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
-        @Override
-        public Object run() throws Exception {
-          startInSubject();
-          exit();
-          return null;
-        }
-      });
+    catch (Exception e) {
+      throw new PlatformException("Unable to start application.", e);
     }
   }
 

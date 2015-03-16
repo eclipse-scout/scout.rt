@@ -27,7 +27,6 @@ import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.osgi.framework.Version;
 
 // TODO NoOsgi
 @Ignore
@@ -37,7 +36,6 @@ public class RemoteServiceAccessTest {
   public void testAnnotations() throws Exception {
     DefaultTransactionDelegateMock bo = new DefaultTransactionDelegateMock();
     //
-    assertNonAccessible(bo, IMockProcessService.class, IService.class.getMethod("initializeService", org.osgi.framework.ServiceRegistration.class), IMockProcessService.class);
     assertNonAccessible(bo, IMockProcessService.class, Object.class.getMethod("hashCode"), IMockProcessService.class);
     //
     assertAccessible(bo, IMockProcessService.class, IMockProcessService.class.getMethod("hello"), IMockProcessService.class);
@@ -88,7 +86,7 @@ public class RemoteServiceAccessTest {
     private final Permissions m_permissionCollection;
 
     public DefaultTransactionDelegateMock() {
-      super(Version.emptyVersion, false);
+      super("0.0.0", false);
       m_permissionCollection = new Permissions();
       m_permissionCollection.add(new RemoteServiceAccessPermission("*.shared.*", "*"));
       m_permissionCollection.add(new RemoteServiceAccessPermission("*.IMockProcessService", "*"));
