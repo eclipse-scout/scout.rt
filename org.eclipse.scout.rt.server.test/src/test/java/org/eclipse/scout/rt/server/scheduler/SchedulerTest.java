@@ -21,9 +21,12 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
+import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +34,9 @@ import org.junit.runner.RunWith;
 /**
  * Tests for IScheduler
  */
-@RunWith(PlatformTestRunner.class)
+@RunWith(ServerTestRunner.class)
+@RunWithServerSession(TestServerSession.class)
+@RunWithSubject("john")
 public class SchedulerTest {
 
   private ServerJobInput m_input;
@@ -48,6 +53,7 @@ public class SchedulerTest {
     m_input.session(OBJ.one(ServerSessionProvider.class).provide(m_input.copy()));
 
     m_ticker = new Ticker(Calendar.SECOND);
+
   }
 
   @Test

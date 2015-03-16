@@ -37,16 +37,16 @@ public class SessionInspectorTest {
   private static final Long CREATION_TIME = 23456789L;
   private static final Long LAST_ACCESS_TIME = 23459999L;
 
-  private HttpServletRequest servletRequestBackup;
+  private HttpServletRequest m_servletRequestBackup;
 
   @Before
-  public void setUp() throws Exception {
-    servletRequestBackup = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+  public void setUp() {
+    m_servletRequestBackup = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
   }
 
   @After
-  public void tearDown() throws Exception {
-    IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.set(servletRequestBackup);
+  public void tearDown() {
+    IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.set(m_servletRequestBackup);
   }
 
   @Test

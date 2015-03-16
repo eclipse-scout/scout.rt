@@ -35,7 +35,6 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.cache.TestHttpSession;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.eclipse.scout.service.IService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,7 +91,7 @@ public class BasicSecurityFilterTest {
   @Test
   public void testFilterNotAuthenticated() throws IOException, ServletException {
     IHttpSessionCacheService cacheService = mock(IHttpSessionCacheService.class);
-    registerTestService(cacheService);
+    registerTestService(cacheService, IHttpSessionCacheService.class);
 
     BasicSecurityFilter f = new BasicSecurityFilter();
     f.init(m_testFilterConfig);
@@ -105,7 +104,7 @@ public class BasicSecurityFilterTest {
   @Test
   public void testFilterAuthenticated() throws IOException, ServletException {
     IHttpSessionCacheService cacheService = mock(IHttpSessionCacheService.class);
-    registerTestService(cacheService);
+    registerTestService(cacheService, IHttpSessionCacheService.class);
 
     BasicSecurityFilter f = new BasicSecurityFilter();
     f.init(m_testFilterConfig);
@@ -115,8 +114,8 @@ public class BasicSecurityFilterTest {
     verify(cacheService).put(subjectProperty(), anyObject(), any(HttpServletRequest.class), any(HttpServletResponse.class));
   }
 
-  private void registerTestService(IService service) {
-    m_registeredServices.addAll(TestingUtility.registerServices(1000, service));
+  private <SERVICE> void registerTestService(SERVICE service, Class<? extends SERVICE> clazz) {
+    m_registeredServices.add(TestingUtility.registerService(1000, service, clazz));
   }
 
   private String subjectProperty() {

@@ -47,7 +47,9 @@ import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
+import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
@@ -59,7 +61,9 @@ import org.mockito.stubbing.Answer;
 /**
  * Test for {@link ServiceTunnelServlet}
  */
-@RunWith(PlatformTestRunner.class)
+@RunWith(ServerTestRunner.class)
+@RunWithServerSession(TestServerSession.class)
+@RunWithSubject("default")
 public class ServiceTunnelServletTest {
 
   private static final int TEST_SERVICE_RANKING = 1000;
@@ -114,7 +118,7 @@ public class ServiceTunnelServletTest {
     assertEquals(testSession, session);
   }
 
-/**
+  /**
    * Calls {@link ServiceTunnelServlet#lookupServerSessionOnHttpSession(ServerJobInput) in 4 different threads within
    * the same HTTP session. Test ensures that the same server session is returned in all threads and that
    *
