@@ -69,6 +69,11 @@ public class PlatformBeanContributor implements IBeanContributor {
       return;
     }
 
+    //TODO nOSGi: currently services are contributed from the pluginXml visitor. therefore they must be skipped here to ensure the are not registered twice. can be removed as soon as the plugin.xml has been deleted.
+    if ("org.eclipse.scout.service.AbstractService".equals(ci.name())) {
+      return;
+    }
+
     collect(ci, collector);
 
     if (!ci.isFinal()) {

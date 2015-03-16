@@ -39,7 +39,14 @@ public class ClientSessionProvider {
    */
   public <T extends IClientSession> T provide(final ClientJobInput input) throws ProcessingException {
     // Create an empty session instance.
+    ClientJobInput in = input.copy();
     final T clientSession = ClientSessionProvider.cast(OBJ.one(IClientSession.class));
+    if (in.getUserAgent() != null) {
+      clientSession.setUserAgent(in.getUserAgent());
+    }
+    if (in.getLocale() != null) {
+      clientSession.setLocale(in.getLocale());
+    }
 
     // Initialize the session.
     OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
@@ -48,7 +55,7 @@ public class ClientSessionProvider {
       public void run() throws Exception {
         clientSession.startSession();
       }
-    }, input.copy().name("client-session-initialization").session(clientSession)).get();
+    }, in.name("client-session-initialization").session(clientSession)).get();
 
     return clientSession;
   }
