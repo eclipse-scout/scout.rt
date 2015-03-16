@@ -23,6 +23,7 @@
   margin-left: @mandatory-indicator-width;
   border-bottom: 3px solid @desktop-border-color;
   padding-bottom: 6px;
+  .overflow-ellipsis;
 
   & span {
    .font-text-normal(@bold);
