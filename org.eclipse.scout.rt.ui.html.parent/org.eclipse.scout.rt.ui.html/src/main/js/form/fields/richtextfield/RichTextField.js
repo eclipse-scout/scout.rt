@@ -161,7 +161,7 @@ scout.RichTextField.prototype._onChange = function(event) {
         c.parentElement.removeChild(c);
       }
 
-      /*if (c.nodeType === 1 && c.nodeName === 'SPAN' && c != markerStart && c != markerEnd) {
+      /*if (c.nodeType === 1 && c.nodeName === 'SPAN' && c !== markerStart && c !== markerEnd) {
         t = document.createTextNode(c.innerText);
         c.parentNode.replaceChild(t, c);
       }*/

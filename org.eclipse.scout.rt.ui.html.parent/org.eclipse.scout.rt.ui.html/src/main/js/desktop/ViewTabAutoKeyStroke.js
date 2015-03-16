@@ -13,7 +13,7 @@ scout.inherits(scout.ViewTabAutoKeyStroke, scout.KeyStroke);
  * @Override scout.KeyStroke
  */
 scout.ViewTabAutoKeyStroke.prototype.handle = function(event) {
-  if (this._tabs.length === 0 || (event.which != 57 && event.which != 48 && event.which - 48 > this._tabs.length)) {
+  if (this._tabs.length === 0 || (event.which !== 57 && event.which !== 48 && event.which - 48 > this._tabs.length)) {
     return;
   }
   if (event.which === 57) {

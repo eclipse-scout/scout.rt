@@ -100,8 +100,8 @@ function stripCommentsFromJson(input) {
       continue;
     }
     // Handle end of line
-    if (currentCharacter == '\r') {
-      if (nextCharacter == '\n') {
+    if (currentCharacter === '\r') {
+      if (nextCharacter === '\n') {
         // Handle \r\n as \n
         continue;
       }

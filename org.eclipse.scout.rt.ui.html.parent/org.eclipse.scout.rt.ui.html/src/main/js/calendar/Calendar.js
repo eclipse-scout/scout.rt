@@ -448,7 +448,7 @@ scout.Calendar.prototype.drawYear = function() {
       day = new Date(year, month, d);
 
       // stop if day is already out of range
-      if (day.getMonth() != month) {
+      if (day.getMonth() !== month) {
         break;
       }
 
@@ -456,7 +456,7 @@ scout.Calendar.prototype.drawYear = function() {
       $day = $month.appendDiv('year-day', d).data('date', day);
 
       // first day has margin depending on weekday
-      if (d == 1) {
+      if (d === 1) {
         $day.css('margin-left', ((day.getDay() + 6) % 7) * $day.outerWidth());
       }
     }

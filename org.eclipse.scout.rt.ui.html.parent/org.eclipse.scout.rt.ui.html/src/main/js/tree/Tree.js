@@ -709,7 +709,7 @@ scout.Tree.prototype._decorateNode = function(node) {
 
   // Replace only the text node in the DOM, but leave inner DIVs untouched (e.g. tree item control)
   var textDomNodes = $node.contents().filter(function() {
-    return (this.nodeType == 3 && this.textContent.trim() !== '');
+    return (this.nodeType === 3 && this.textContent.trim() !== '');
   });
   if (textDomNodes.length > 0) {
     textDomNodes[0].textContent = node.text;
