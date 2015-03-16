@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -43,13 +44,13 @@ import org.mockito.Mockito;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class FormStoredWithVetoTest {
 
-  private List<IBean<?>> m_registeredServices;
+  private List<IBean<?>> m_registeredServices = new ArrayList<>();
   private IExceptionHandlerService m_exceptionHandlerService;
 
   @Before
   public void setup() {
     m_exceptionHandlerService = Mockito.mock(IExceptionHandlerService.class);
-    m_registeredServices = TestingUtility.registerServices(9000, m_exceptionHandlerService);
+    m_registeredServices.add(TestingUtility.registerService(9000, m_exceptionHandlerService, IExceptionHandlerService.class));
   }
 
   @After

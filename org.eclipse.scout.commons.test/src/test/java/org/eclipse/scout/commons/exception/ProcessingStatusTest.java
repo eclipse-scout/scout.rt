@@ -25,7 +25,6 @@ public class ProcessingStatusTest {
   private IProcessingStatus m_infoStatus;
   private IProcessingStatus m_warningStatus;
   private IProcessingStatus m_errorStatus;
-  private IProcessingStatus m_cancelStatus;
   private IProcessingStatus m_fatalStatus;
   private IProcessingStatus m_okStatus;
 
@@ -49,7 +48,6 @@ public class ProcessingStatusTest {
     assertTrue(m_infoStatus.getSeverity() < m_warningStatus.getSeverity());
     assertTrue(m_warningStatus.getSeverity() < m_errorStatus.getSeverity());
     assertTrue(m_infoStatus.getSeverity() < m_errorStatus.getSeverity());
-    assertTrue(m_cancelStatus.getSeverity() < m_warningStatus.getSeverity());
     assertTrue(m_errorStatus.getSeverity() < m_fatalStatus.getSeverity());
     assertTrue(m_okStatus.getSeverity() < m_infoStatus.getSeverity());
   }

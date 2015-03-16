@@ -34,7 +34,7 @@ import org.mockito.stubbing.Answer;
  */
 @RunWith(PlatformTestRunner.class)
 public class BatchNormalizerTest {
-  private List<? extends IBean<?>> m_reg;
+  private List<IBean<?>> m_reg = new ArrayList<>();
   private IFruitLookupService m_lookupService;
 
   @Before
@@ -57,7 +57,7 @@ public class BatchNormalizerTest {
     Mockito.doAnswer(answer).when(m_lookupService).getDataByText(Mockito.<ILookupCall<Object>> any());
     Mockito.doAnswer(answer).when(m_lookupService).getDataByRec(Mockito.<ILookupCall<Object>> any());
 
-    m_reg = TestingUtility.registerServices(0, m_lookupService);
+    m_reg.add(TestingUtility.registerService(0, m_lookupService, IFruitLookupService.class));
   }
 
   @After

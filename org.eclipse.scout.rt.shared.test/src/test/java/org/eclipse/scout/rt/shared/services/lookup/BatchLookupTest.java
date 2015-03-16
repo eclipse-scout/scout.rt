@@ -34,7 +34,7 @@ import org.mockito.stubbing.Answer;
  */
 @RunWith(PlatformTestRunner.class)
 public class BatchLookupTest {
-  private List<IBean<?>> m_reg;
+  private List<IBean<?>> m_reg = new ArrayList<>();
   private IFlowerLookupService m_lookupService;
   private static long m_localInvocations;
 
@@ -58,7 +58,7 @@ public class BatchLookupTest {
     Mockito.doAnswer(answer).when(m_lookupService).getDataByText(Mockito.<ILookupCall<Object>> any());
     Mockito.doAnswer(answer).when(m_lookupService).getDataByRec(Mockito.<ILookupCall<Object>> any());
 
-    m_reg = TestingUtility.registerServices(0, m_lookupService);
+    m_reg.add(TestingUtility.registerService(0, m_lookupService, IFlowerLookupService.class));
   }
 
   @After

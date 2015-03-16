@@ -41,7 +41,9 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
   @Override
   protected void execLoadSession() throws ProcessingException {
     //do not enable client notifications, do not add service tunnel
-    setDesktop(new TestEnvironmentDesktop());
+    final TestEnvironmentDesktop d = new TestEnvironmentDesktop();
+    setDesktop(d);
+    simulateDesktopOpened(d);
   }
 
   @Override
@@ -77,5 +79,13 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
    */
   public void replaceDesktop(IDesktop desktop) {
     m_testDesktop = desktop;
+  }
+
+  /**
+   * Simulates that the desktop has been opened.
+   */
+  protected void simulateDesktopOpened(IDesktop desktop) {
+    desktop.getUIFacade().fireGuiAttached();
+    desktop.getUIFacade().fireDesktopOpenedFromUI();
   }
 }
