@@ -61,6 +61,7 @@ public abstract class AbstractUiServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
     try {
+      Platform.setDefault();
       Platform.get().start();
     }
     catch (Exception e) {
