@@ -25,10 +25,60 @@
   padding-bottom: 6px;
   .overflow-ellipsis;
 
-  & span {
-   .font-text-normal(@bold);
-   color: @title-color;
- }
+  & > .group-box-control {
+    display: inline-block;
+    transition: transform 0.3s;
+    cursor: pointer;
+    /* adjust control position (use absolute positioning, otherwise the layout would be disturbed, */
+    /* because the control div is higher than the title span */
+    position: absolute;
+    top: @group-margin-top - 3px;
+    left: @mandatory-indicator-width;
+
+    /* for good animation, ensure that the control is a square and the icon is centered */
+    width: @group-box-control-size;
+    height: @group-box-control-size;
+    line-height: @group-box-control-size;
+    text-align: center;
+
+    &::before {
+      .font-icon;
+      font-size: @group-box-control-size;
+      content: @icon-angle-down;
+
+      .disabled & {
+        color: @text-disabled-color;
+      }
+    }
+    &:hover::before {
+      color: @highlight-color;
+
+     .disabled & {
+        color: @text-disabled-color;
+      }
+    }
+
+    .group-box.collapsed > & {
+      /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
+      /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
+      .transform(rotate(-89.99deg));
+    }
+  }
+
+  & > span {
+    .font-text-normal(@bold);
+    color: @title-color;
+  }
+
+  &.expandable {
+    /* Expansion can also be performed on the title itself */
+    cursor: pointer;
+  }
+
+  /* Move title span to right when control is rendered */
+  & > .group-box-control ~ span {
+    padding-left: @group-box-control-size + 5px;
+  }
 }
 
 .group-box-body {
@@ -39,5 +89,9 @@
   &.y-padding-invisible {
     padding-top: 0;
     padding-bottom: 0;
+  }
+
+  .collapsed > & {
+    display: none;
   }
 }

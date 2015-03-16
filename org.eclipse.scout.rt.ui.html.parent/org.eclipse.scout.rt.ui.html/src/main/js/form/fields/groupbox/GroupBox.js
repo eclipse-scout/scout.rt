@@ -19,6 +19,8 @@ scout.GroupBox.prototype._renderProperties = function() {
   scout.GroupBox.parent.prototype._renderProperties.call(this);
 
   this._renderBorderVisible(this.borderVisible);
+  this._renderExpandable(this.expandable);
+  this._renderExpanded(this.expanded);
 };
 
 scout.GroupBox.prototype._render = function($parent) {
@@ -138,6 +140,36 @@ scout.GroupBox.prototype._computeBorderVisible = function(borderVisible) {
   return borderVisible;
 };
 
+scout.GroupBox.prototype._renderExpandable = function(expandable) {
+  expandable = expandable && (this.borderDecoration === 'auto' || this.borderDecoration === 'section');
+  var $control = this._$groupBoxTitle.children('.group-box-control');
+
+  if (expandable) {
+    if ($control.length === 0) {
+      // Create control if necessary
+      $control = $.makeDiv('group-box-control')
+        .on('click', this._onGroupBoxControlClick.bind(this))
+        .prependTo(this._$groupBoxTitle);
+    }
+    this._$groupBoxTitle
+      .addClass('expandable')
+      .on('click.group-box-control', this._onGroupBoxControlClick.bind(this));
+  }
+  else {
+    $control.remove();
+    this._$groupBoxTitle
+      .removeClass('expandable')
+      .off('.group-box-control');
+  }
+};
+
+scout.GroupBox.prototype._renderExpanded = function(expanded) {
+  this.$container.toggleClass('collapsed', !expanded);
+  if (this.rendered) {
+    scout.HtmlComponent.get(this.$container).invalidateTree();
+  }
+};
+
 /**
  * @override FormField.js
  */
@@ -152,4 +184,23 @@ scout.GroupBox.prototype._renderLabelVisible = function(visible) {
  */
 scout.GroupBox.prototype._registerKeyStrokeAdapter = function() {
   this.keyStrokeAdapter = new scout.GroupBoxKeyStrokeAdapter(this);
+};
+
+scout.GroupBox.prototype._onGroupBoxControlClick = function(event) {
+  if (this.expandable) {
+    this.setGroupBoxExpanded(!this.expanded);
+  }
+  $.suppressEvent(event); // otherwise, the event would be triggered twice sometimes (by group-box-control and group-box-title)
+};
+
+scout.GroupBox.prototype.setGroupBoxExpanded = function(expanded) {
+  if (this.expanded !== expanded) {
+    this.expanded = expanded;
+    this.session.send(this.id, 'expanded', {
+      expanded: expanded
+    });
+  }
+  if (this.rendered) {
+    this._renderExpanded(expanded);
+  }
 };

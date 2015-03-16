@@ -14,13 +14,18 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 
 /**
  * This class creates JSON output for an <code>IGroupBox</code>.
  */
 public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFormField> {
+
+  // from UI
+  public static final String EVENT_EXPANDED = "expanded";
 
   public static final String PROP_MAIN_BOX = "mainBox";
   public static final String PROP_SCROLLABLE = "scrollable";
@@ -62,6 +67,33 @@ public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFo
         return getModel().isScrollable();
       }
     });
+    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_EXPANDABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isExpandable();
+      }
+    });
+    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_EXPANDED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isExpanded();
+      }
+    });
   }
 
+  @Override
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+    if (EVENT_EXPANDED.equals(event.getType())) {
+      handleUiExpanded(event);
+    }
+    else {
+      super.handleUiEvent(event, res);
+    }
+  }
+
+  protected void handleUiExpanded(JsonEvent event) {
+    boolean expanded = event.getData().optBoolean("expanded");
+    addPropertyEventFilterCondition(IGroupBox.PROP_EXPANDED, expanded);
+    getModel().getUIFacade().setExpandedFromUI(expanded);
+  }
 }

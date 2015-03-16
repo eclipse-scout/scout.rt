@@ -28,9 +28,14 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
     htmlGbBody = this._htmlGbBody(),
     prefSize;
 
-  prefSize = htmlGbBody.getPreferredSize()
-    .add(htmlContainer.getInsets())
-    .add(htmlGbBody.getMargins());
+  if (htmlGbBody.$comp.isVisible()) {
+    prefSize = htmlGbBody.getPreferredSize()
+      .add(htmlGbBody.getMargins());
+  }
+  else {
+    prefSize = new scout.Dimension(0, 0);
+  }
+  prefSize = prefSize.add(htmlContainer.getInsets());
   prefSize.height += this._titleHeight($container);
 
   return prefSize;
