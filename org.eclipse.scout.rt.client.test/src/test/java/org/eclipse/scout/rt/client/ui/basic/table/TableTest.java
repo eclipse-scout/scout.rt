@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
@@ -35,16 +36,19 @@ import org.junit.runner.RunWith;
 public class TableTest {
 
   /**
-   * Test that deleted tableRows can be discarded:
-   * New inserted rows are automatically discarded.
+   * Test that new inserted rows are automatically discarded.
    */
   @Test
-  public void testDeleteAllNew() throws Exception {
+  public void testDeleteAllNew() throws ProcessingException {
     //Bug 361985
     P_Table table = createTable(ITableRow.STATUS_INSERTED);
 
+    final CapturingTableAdapter ta = new CapturingTableAdapter();
+    table.addTableListener(ta);
     table.deleteAllRows();
     assertRowCount(0, 0, table);
+    assertEquals(1, ta.getEvents().size());
+    assertEquals(TableEvent.TYPE_ALL_ROWS_DELETED, ta.getEvents().get(0).getType());
   }
 
   /**
@@ -53,9 +57,11 @@ public class TableTest {
    * discard these rows.
    */
   @Test
-  public void testDeleteAllAndDiscardFirst() throws Exception {
+  public void testDeleteAllAndDiscardFirst() throws ProcessingException {
     //Bug 361985
     P_Table table = createTable(ITableRow.STATUS_NON_CHANGED);
+    final CapturingTableAdapter ta = new CapturingTableAdapter();
+    table.addTableListener(ta);
 
     table.deleteAllRows();
     assertRowCount(0, 2, table);
@@ -69,6 +75,8 @@ public class TableTest {
     assertRowCount(0, 1, table);
     asssertNoTable(deletedRows.get(0));
     asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(1));
+    assertEquals(1, ta.getEvents().size());
+    assertEquals(TableEvent.TYPE_ALL_ROWS_DELETED, ta.getEvents().get(0).getType());
   }
 
   /**
@@ -80,6 +88,8 @@ public class TableTest {
   public void testDeleteAndDiscard() throws Exception {
     //Bug 361985
     P_Table table = createTable(ITableRow.STATUS_NON_CHANGED);
+    final CapturingTableAdapter ta = new CapturingTableAdapter();
+    table.addTableListener(ta);
 
     ITableRow row1 = table.getRow(0);
     ITableRow row2 = table.getRow(1);
@@ -198,8 +208,10 @@ public class TableTest {
 
   /**
    * Test of {@link AbstractTable#sort()}. Sorted by:
-   * - 1. ThridColumn (defined with AlwaysIncludeSortAtBegin in the column)
-   * - 2. FirstColumn descending.
+   * <ol>
+   * <li>ThridColumn (defined with AlwaysIncludeSortAtBegin in the column)
+   * <li>FirstColumn descending.
+   * </ol>
    */
   @Test
   public void testSortFirstColumn() throws Exception {
@@ -434,6 +446,19 @@ public class TableTest {
       protected boolean getConfiguredAlwaysIncludeSortAtBegin() {
         return true;
       }
+    }
+  }
+
+  class CapturingTableAdapter extends TableAdapter {
+    private List<TableEvent> m_events = new ArrayList<>();
+
+    protected List<TableEvent> getEvents() {
+      return m_events;
+    }
+
+    @Override
+    public void tableChanged(TableEvent e) {
+      m_events.add(e);
     }
   }
 }

@@ -65,6 +65,7 @@ public class CheckRowsInTableTest {
     assertTrue(row.isChecked());
   }
 
+  @Test
   public void testSetUncheckedById() throws Exception {
     P_Table table = createTable(true);
     ITableRow row = table.getRow(0);
@@ -153,7 +154,7 @@ public class CheckRowsInTableTest {
       return getColumnSet().getColumnByClass(SecondColumn.class);
     }
 
-    public ThirdColumn getThridColumn() {
+    public ThirdColumn getThirdColumn() {
       return getColumnSet().getColumnByClass(ThirdColumn.class);
     }
 

@@ -124,13 +124,13 @@ public class TableEventBufferTest {
   @Test
   public void testCombineMultipleUpdates() {
     List<ITableRow> rows1 = new ArrayList<>();
-    final ITableRow r1 = mockTableRow(0);
-    final ITableRow r2 = mockTableRow(1);
+    final ITableRow r1 = mockRow(0);
+    final ITableRow r2 = mockRow(1);
     rows1.add(r1);
     rows1.add(r2);
     final TableEvent e1 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, rows1);
     List<ITableRow> rows2 = new ArrayList<>();
-    final ITableRow r3 = mockTableRow(2);
+    final ITableRow r3 = mockRow(2);
     rows2.add(r3);
     final TableEvent e2 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, rows2);
     m_testBuffer.add(e1);
@@ -147,6 +147,24 @@ public class TableEventBufferTest {
     expected.add(r2);
     expected.add(r3);
     assertTrue(CollectionUtility.equalsCollection(expected, resultRows));
+  }
+
+  /**
+   * Multiple insert events on the same row should be merged into a single event with the rows combined in the correct
+   * order.
+   */
+  @Test
+  public void testCombineMultipleInsertsSameRows() {
+    final TableEvent e1 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(0, 1, 2));
+    final TableEvent e2 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(1, 3));
+    m_testBuffer.add(e1);
+    m_testBuffer.add(e2);
+
+    final List<TableEvent> events = m_testBuffer.removeEvents();
+
+    assertEquals(1, events.size());
+    final List<ITableRow> resultRows = events.get(0).getRows();
+    assertEquals(4, resultRows.size());
   }
 
   /**
@@ -184,30 +202,6 @@ public class TableEventBufferTest {
   }
 
   /**
-   * If, a row is inserted and immediately after that updated, only an insert event with the updated value needs to be
-   * kept.
-   */
-  @Test
-  public void testInsertedFollowedByUpdated() {
-    List<ITableRow> rows = new ArrayList<>();
-    final ITableRow newRow = mockTableRow(0);
-    rows.add(newRow);
-
-    List<ITableRow> updatedRows = new ArrayList<>();
-    final ITableRow updatedRow = mockTableRow(0);
-    when(updatedRow.getCell(0)).thenReturn(mock(ICell.class));
-    updatedRows.add(updatedRow);
-
-    final TableEvent insert = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, rows);
-    final TableEvent update = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, updatedRows);
-    m_testBuffer.add(insert);
-    m_testBuffer.add(update);
-    final List<TableEvent> events = m_testBuffer.removeEvents();
-    assertEquals(1, events.size());
-    assertNotNull(events.get(0).getFirstRow().getCell(0));
-  }
-
-  /**
    * Updates that are not consecutive are not combined.
    */
   @Test
@@ -222,30 +216,105 @@ public class TableEventBufferTest {
     assertEquals(2, events.get(0).getRows().size());
   }
 
+  ////// REPLACE
+
   /**
-   * If an insert is followed by an update, the update can be merged with the insert.
+   * If a row is inserted and later updated, only an insert event with the updated value needs to be kept.
    */
   @Test
-  public void testInsertFollowedByUpdatesOnSameRow() {
-    List<ITableRow> rows = new ArrayList<>();
-    final ITableRow newRow = mockTableRow(0);
-    final ICell cell1 = mock(ICell.class);
-    when(newRow.getCell(0)).thenReturn(cell1);
-    rows.add(newRow);
+  public void testInsertedFollowedByUpdated() {
+    final TableEvent insert = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(0));
 
-    List<ITableRow> updatedRows = new ArrayList<>();
-    final ITableRow updatedRow = mock(ITableRow.class);
-    when(updatedRow.getRowIndex()).thenReturn(1);
-    when(updatedRow.getCell(0)).thenReturn(cell1);
-    updatedRows.add(updatedRow);
-    final TableEvent insert = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, rows);
+    final List<ITableRow> updatedRows = mockRows(0);
+    when(updatedRows.get(0).getCell(0)).thenReturn(mock(ICell.class));
     final TableEvent update = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, updatedRows);
 
     m_testBuffer.add(insert);
     m_testBuffer.add(update);
     final List<TableEvent> events = m_testBuffer.removeEvents();
+    assertEquals(1, events.size());
+    assertNotNull(events.get(0).getFirstRow().getCell(0));
+  }
+
+  /**
+   * If multiple rows are inserted later a row is updated, it should be merged and the event removed.
+   */
+  @Test
+  public void testInsertedFollowedUpdatedMultipleRows() {
+    final TableEvent insert = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(0, 1));
+    final List<ITableRow> updatedRows = mockRows(0);
+    when(updatedRows.get(0).getCell(0)).thenReturn(mock(ICell.class));
+    final TableEvent otherUpdate = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(3, 4));
+    final TableEvent update = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, updatedRows);
+    m_testBuffer.add(insert);
+    m_testBuffer.add(otherUpdate);
+    m_testBuffer.add(update);
+    final List<TableEvent> events = m_testBuffer.removeEvents();
     assertEquals(2, events.size());
-    assertEquals(cell1, events.get(0).getFirstRow().getCell(0));
+    assertEquals(2, events.get(0).getRowCount());
+    assertNotNull(events.get(0).getFirstRow().getCell(0));
+  }
+
+  /**
+   * If a row is inserted and another row is updated, the events are not merged
+   */
+  @Test
+  public void testInsertedFollowedUpdatedNoMatch() {
+    final TableEvent insert = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(1, 2, 3));
+    final TableEvent update = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0));
+    m_testBuffer.add(insert);
+    m_testBuffer.add(update);
+    final List<TableEvent> events = m_testBuffer.removeEvents();
+    assertEquals(2, events.size());
+  }
+
+  /**
+   * If a row is inserted and later updated, but there is a TableEvent, there should be no merge.
+   */
+  @Test
+  public void testInsertedFollowedUpdatedIndexChanging() {
+    final TableEvent insert = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(1, 2, 3));
+    final TableEvent orderChanged = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROW_ORDER_CHANGED);
+    final TableEvent update = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0));
+    m_testBuffer.add(insert);
+    m_testBuffer.add(orderChanged);
+    m_testBuffer.add(update);
+    final List<TableEvent> events = m_testBuffer.removeEvents();
+    assertEquals(3, events.size());
+  }
+
+  @Test
+  public void testUpdateFollowedByDeleteRemoved() {
+    final TableEvent update = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0));
+    final TableEvent delete = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_DELETED, mockRows(0));
+    m_testBuffer.add(update);
+    m_testBuffer.add(delete);
+    final List<TableEvent> events = m_testBuffer.removeEvents();
+    assertEquals(1, events.size());
+    assertEquals(TableEvent.TYPE_ROWS_DELETED, events.get(0).getType());
+  }
+
+  @Test
+  public void testPopulatedFollowedByDeleteNotRemoved() {
+    final TableEvent update = new TableEvent(mock(ITable.class), TableEvent.TYPE_TABLE_POPULATED, mockRows(0));
+    final TableEvent delete = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_DELETED, mockRows(0));
+    m_testBuffer.add(update);
+    m_testBuffer.add(delete);
+    final List<TableEvent> events = m_testBuffer.removeEvents();
+    assertEquals(2, events.size());
+    assertEquals(TableEvent.TYPE_TABLE_POPULATED, events.get(0).getType());
+    assertEquals(TableEvent.TYPE_ROWS_DELETED, events.get(1).getType());
+  }
+
+  @Test
+  public void testUpdateFollowedByDeleteNoMatch() {
+    final TableEvent update = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0));
+    final TableEvent delete = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_DELETED, mockRows(1));
+    m_testBuffer.add(update);
+    m_testBuffer.add(delete);
+    final List<TableEvent> events = m_testBuffer.removeEvents();
+    assertEquals(2, events.size());
+    assertEquals(TableEvent.TYPE_ROWS_DELETED, events.get(1).getType());
   }
 
   private TableEvent createTestUpdateEvent() {
@@ -259,7 +328,15 @@ public class TableEventBufferTest {
     return new TableEvent(mock(ITable.class), type);
   }
 
-  private ITableRow mockTableRow(int rowIndex) {
+  private List<ITableRow> mockRows(int... indexes) {
+    List<ITableRow> rows = new ArrayList<>();
+    for (int i : indexes) {
+      rows.add(mockRow(i));
+    }
+    return rows;
+  }
+
+  private ITableRow mockRow(int rowIndex) {
     final ITableRow r = mock(ITableRow.class);
     when(r.getRowIndex()).thenReturn(rowIndex);
     return r;

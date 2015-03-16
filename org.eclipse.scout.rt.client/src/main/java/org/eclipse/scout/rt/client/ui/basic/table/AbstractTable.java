@@ -1222,7 +1222,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (col != null) {
           setContextColumn(col);
         }
-        interceptHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals(LOCAL_URL_HOST));
+        interceptHyperlinkAction(url, url.getPath(), LOCAL_URL_HOST.equals(url.getHost()));
       }
       finally {
         m_actionRunning = false;
@@ -3272,7 +3272,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         // without CTRL-key held. In contrast to explicit multiple column sort, the first clicked column
         // is the least significant sort column.
         List<IColumn<?>> sortCols = getColumnSet().getSortColumns();
-        if (sortCols.size() > 0) {
+        if (!sortCols.isEmpty() && !getRows().isEmpty()) {
           // first make sure decorations and lookups are up-to-date
           processDecorationBuffer();
           List<ITableRow> a = new ArrayList<ITableRow>(getRows());

@@ -27,7 +27,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * </ul>
  * </p>
  * Not thread safe, to be accessed in client model job.
- * 
+ *
  * @param T
  *          event type
  */

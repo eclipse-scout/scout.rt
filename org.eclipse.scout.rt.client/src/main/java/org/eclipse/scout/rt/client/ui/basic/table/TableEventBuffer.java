@@ -11,10 +11,12 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -36,13 +38,21 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    */
   @Override
   protected List<? extends TableEvent> coalesce(List<TableEvent> list) {
+    removeObsolete(list);
+    replacePrevious(list, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED);
+    coalesceSameType(list);
+    return list;
+  }
+
+  /**
+   * Remove previous events that are now obsolete.
+   */
+  private void removeObsolete(List<TableEvent> list) {
     //traverse the list in reversed order
     //previous events may be deleted from the list
     for (int j = 0; j < list.size() - 1; j++) {
       int i = list.size() - 1 - j;
-
       TableEvent cur = list.get(i);
-      TableEvent next = list.get(i - 1);
 
       final int type = cur.getType();
 
@@ -54,27 +64,143 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       else if (isIgnorePrevious(type)) {
         remove(type, list.subList(0, i));
       }
-      //merge current update event with previous insert event of the same row
-      else if (isReplaceUpdateWithInsert(cur, next)) {
-        next.setRows(cur.getRows());
-        list.remove(i);
-        //ignore current event
+      else if (type == TableEvent.TYPE_ROWS_DELETED) {
+        removeRows(cur.getRows(), list.subList(0, i),
+            TableEvent.TYPE_ROWS_UPDATED,
+            TableEvent.TYPE_ROWS_SELECTED,
+            TableEvent.TYPE_ROWS_CHECKED);
       }
-      //merge previous events of the same type (rows and columns) into the current and delete the previous events
-      else if (isCoalesceConsecutivePrevious(type)) {
+    }
+  }
+
+  /**
+   * Traverses the list backwards and removes rows of a given type from a list. If the row list becomes empty the whole
+   * event is removed. This process is stopped, when a event that may change row indexes is encountered.
+   */
+  private void removeRows(List<ITableRow> rows, List<TableEvent> list, Integer... types) {
+    final List<Integer> typeList = Arrays.asList(types);
+    final ListIterator<TableEvent> iter = list.listIterator(list.size());
+    while (iter.hasPrevious()) {
+      final TableEvent e = iter.previous();
+      if (typeList.contains(e.getType())) {
+        removeRows(rows, e);
+        if (e.getRowCount() == 0) {
+          iter.remove();
+        }
+      }
+      if (!isRowOrderUnchanged(e.getType())) {
+        break;
+      }
+
+    }
+
+  }
+
+  private void removeRows(List<ITableRow> rows, TableEvent e) {
+    final Map<Integer, ITableRow> rowIndexes = getRowIndexMap(rows);
+    final List<ITableRow> newRows = new ArrayList<>();
+
+    for (ITableRow r : e.getRows()) {
+      if (!rowIndexes.containsKey(r.getRowIndex())) {
+        newRows.add(r);
+      }
+    }
+    e.setRows(newRows);
+  }
+
+  /**
+   * Update a previous event of given type and removes a newer one of another type.
+   */
+  private void replacePrevious(List<TableEvent> list, int oldType, int newType) {
+    for (int j = 0; j < list.size() - 1; j++) {
+      int i = list.size() - 1 - j;
+      TableEvent cur = list.get(i);
+      final int type = cur.getType();
+      //merge current update event with previous insert event of the same row
+      if (type == newType && cur.getRowCount() == 1) {
+        final boolean updated = updatePreviousRow(cur, list.subList(0, i), oldType);
+        if (updated) {
+          list.remove(i);
+        }
+      }
+    }
+  }
+
+  /**
+   * Merge previous events of the same type (rows and columns) into the current and delete the previous events
+   */
+  private void coalesceSameType(List<TableEvent> list) {
+    for (int j = 0; j < list.size() - 1; j++) {
+      int i = list.size() - 1 - j;
+      TableEvent cur = list.get(i);
+
+      final int type = cur.getType();
+      if (isCoalesceConsecutivePrevious(type)) {
         coalesce(cur, list.subList(0, i));
       }
     }
-
-    return list;
   }
 
-  private boolean isReplaceUpdateWithInsert(TableEvent first, TableEvent next) {
-    return first.getType() == TableEvent.TYPE_ROWS_UPDATED
-        && first.getRowCount() == 1
-        && next.getType() == TableEvent.TYPE_ROWS_INSERTED
-        && next.getRowCount() == 1
-        && first.getFirstRow().getRowIndex() == next.getFirstRow().getRowIndex();
+  /**
+   * Updates previous rows in the list, if it is of the given type. Breaks, if events are encountered, that may change
+   * the row order.
+   */
+  private boolean updatePreviousRow(TableEvent cur, List<TableEvent> list, int type) {
+    final ListIterator<TableEvent> iter = list.listIterator(list.size());
+    while (iter.hasPrevious()) {
+      final TableEvent previous = iter.previous();
+      if (previous.getType() == type) {
+        final boolean replaced = tryReplaceRow(previous, cur.getFirstRow());
+        if (replaced) {
+          return true;
+        }
+      }
+      if (!isRowOrderUnchanged(previous.getType())) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @return <code>true</code>, if the event does not influence the row order.
+   */
+  private boolean isRowOrderUnchanged(int type) {
+    switch (type) {
+      case TableEvent.TYPE_ROWS_SELECTED:
+      case TableEvent.TYPE_ROW_ACTION:
+      case TableEvent.TYPE_ROW_CLICK:
+      case TableEvent.TYPE_ROWS_UPDATED:
+      case TableEvent.TYPE_ROWS_CHECKED:
+      case TableEvent.TYPE_SCROLL_TO_SELECTION:
+      case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
+      case TableEvent.TYPE_COLUMN_ORDER_CHANGED:
+      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Replaces the row in the event, if it is contained.
+   *
+   * @return <code>true</code>, if successful.
+   */
+  private boolean tryReplaceRow(TableEvent e, ITableRow newRow) {
+    final List<ITableRow> rows = new ArrayList<>();
+    boolean replaced = false;
+    for (ITableRow r : e.getRows()) {
+      if (r.getRowIndex() == newRow.getRowIndex()) {
+        rows.add(newRow);
+        replaced = true;
+      }
+      else {
+        rows.add(r);
+      }
+    }
+    e.setRows(rows);
+    return replaced;
   }
 
   /**
@@ -110,11 +236,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    */
   private List<ITableRow> mergeRows(List<ITableRow> first, List<ITableRow> second) {
     List<ITableRow> rows = new ArrayList<>();
-    HashMap<Integer, ITableRow> rowIndexes = new HashMap<>();
-
-    for (ITableRow r : second) {
-      rowIndexes.put(r.getRowIndex(), r);
-    }
+    Map<Integer, ITableRow> rowIndexes = getRowIndexMap(second);
 
     for (ITableRow r : first) {
       if (!rowIndexes.containsKey(r.getRowIndex())) {
@@ -126,6 +248,14 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       rows.add(r);
     }
     return rows;
+  }
+
+  private Map<Integer, ITableRow> getRowIndexMap(List<ITableRow> rows) {
+    Map<Integer, ITableRow> rowIndexes = new HashMap<>();
+    for (ITableRow r : rows) {
+      rowIndexes.put(r.getRowIndex(), r);
+    }
+    return rowIndexes;
   }
 
   /**
