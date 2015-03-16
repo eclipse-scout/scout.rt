@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.eclipse.scout.net.internal.NetModule;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -17,19 +14,6 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class NetModuleTest {
   private static final String TEST_URL = "http://www.eclipse.org";
-
-  private NetModule m_netModule;
-
-  @Before
-  public void before() {
-    m_netModule = OBJ.one(NetModule.class);
-    m_netModule.start();
-  }
-
-  @After
-  public void after() {
-    m_netModule.stop();
-  }
 
   /**
    * Test connecting to an url using {@link NetModule}

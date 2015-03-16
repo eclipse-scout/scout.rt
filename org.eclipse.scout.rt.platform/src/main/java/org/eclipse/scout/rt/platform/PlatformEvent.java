@@ -12,23 +12,19 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.EventObject;
 
+import org.eclipse.scout.rt.platform.IPlatform.State;
+
 /**
- *
+ * @since 5.2
  */
 public class PlatformEvent extends EventObject {
   private static final long serialVersionUID = 1L;
 
-  public static final int ABOUT_TO_START = 1;
-  public static final int MODULES_STARTED = 2;
-  public static final int STARTED = 3;
-  public static final int ABOUT_TO_STOP = 4;
-  public static final int STOPPED = 5;
+  private final IPlatform.State m_state;
 
-  private int m_eventType;
-
-  PlatformEvent(IPlatform platform, int eventType) {
+  PlatformEvent(IPlatform platform, State state) {
     super(platform);
-    m_eventType = eventType;
+    m_state = state;
   }
 
   @Override
@@ -36,33 +32,12 @@ public class PlatformEvent extends EventObject {
     return (IPlatform) super.getSource();
   }
 
-  public int getEventType() {
-    return m_eventType;
+  public IPlatform.State getState() {
+    return m_state;
   }
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder("Platform Event: ");
-    switch (getEventType()) {
-      case ABOUT_TO_START:
-        builder.append("ABOUT_TO_START");
-        break;
-      case MODULES_STARTED:
-        builder.append("MODULES_STARTED");
-        break;
-      case STARTED:
-        builder.append("STARTED");
-        break;
-      case ABOUT_TO_STOP:
-        builder.append("ABOUT_TO_STOP");
-        break;
-      case STOPPED:
-        builder.append("STOPPED");
-        break;
-      default:
-        builder.append("undefined");
-        break;
-    }
-    return builder.toString();
+    return getClass().getSimpleName() + "[" + getState().name() + "]";
   }
 }

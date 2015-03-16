@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.service;
 
+
 /**
  * Convenience service interface for services that are interested in beeing
  * notified when they are lazily created.

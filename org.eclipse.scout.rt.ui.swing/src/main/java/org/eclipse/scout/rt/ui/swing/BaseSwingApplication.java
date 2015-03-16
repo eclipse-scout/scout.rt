@@ -72,6 +72,7 @@ abstract class BaseSwingApplication implements IApplication {
       }
     }
     try {
+      org.eclipse.scout.rt.platform.Platform.setDefault();
       org.eclipse.scout.rt.platform.Platform.get().start();
 
       // The default @{link Locale} has to be set prior to SwingEnvironment is created, because UIDefaultsInjector resolves NLS texts.

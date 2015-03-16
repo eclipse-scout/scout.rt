@@ -11,29 +11,30 @@
 package org.eclipse.scout.jaxws;
 
 import org.eclipse.scout.commons.ConfigIniUtility;
-import org.eclipse.scout.rt.platform.IModule;
+import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.PlatformException;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 
 import com.sun.xml.internal.ws.fault.SOAPFaultBuilder;
 
 @SuppressWarnings("restriction")
 @ApplicationScoped
-public class JaxWs216Module implements IModule {
-
+public class JaxWs216Module implements IPlatformListener {
   public static final String PROP_STACKTRACE = "org.eclipse.scout.jaxws.stacktrace";
   public static final String PROP_DEFAULT_PRINCIPAL = "org.eclipse.scout.jaxws.txhandler.sessionfactory.principal";
   public static final String PROP_PUBLISH_STATUS_PAGE = "org.eclipse.scout.jaxws.publish_status_page";
 
   @Override
-  public void start() {
-    // apply properties
-    boolean stacktraceEnabled = ConfigIniUtility.getPropertyBoolean(PROP_STACKTRACE, false);
-    if (!stacktraceEnabled) {
-      System.setProperty(SOAPFaultBuilder.class.getName() + ".disableCaptureStackTrace", "false");
+  public void stateChanged(PlatformEvent event) throws PlatformException {
+    if (event.getState() == IPlatform.State.PlatformInit) {
+      // apply properties
+      boolean stacktraceEnabled = ConfigIniUtility.getPropertyBoolean(PROP_STACKTRACE, false);
+      if (!stacktraceEnabled) {
+        System.setProperty(SOAPFaultBuilder.class.getName() + ".disableCaptureStackTrace", "false");
+      }
     }
   }
 
-  @Override
-  public void stop() {
-  }
 }

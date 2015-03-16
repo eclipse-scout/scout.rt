@@ -8,19 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform;
+package org.eclipse.scout.rt.platform.inventory.internal.fixture;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.platform.cdi.Bean;
 
-/**
- * The application with the highest {@link Priority} will be launched in the {@link IPlatform.State#ApplicationStarting}
- * phase
- */
 @Bean
-public interface IApplication {
-
-  void start() throws PlatformException;
-
-  void stop() throws PlatformException;
+class TestingBean2 {
 }

@@ -14,11 +14,13 @@ import java.util.Map;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.platform.cdi.Bean;
 import org.osgi.framework.Bundle;
 
 /**
  * @since 3.8.0
  */
+@Bean
 public interface ISession {
 
   /**

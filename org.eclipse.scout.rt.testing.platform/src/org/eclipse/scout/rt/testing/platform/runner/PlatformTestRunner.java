@@ -52,7 +52,9 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
   @Override
   protected Statement classBlock(final RunNotifier notifier) {
     // Ensure the platform to be started.
-    if (((Platform) Platform.get()).ensureStarted()) {
+    if (Platform.get() == null) {
+      Platform.setDefault();
+      Platform.get().start();
       final ITestExecutionListener listener = OBJ.oneOrNull(ITestExecutionListener.class);
       if (listener != null) {
         listener.platformStarted();

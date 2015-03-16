@@ -10,8 +10,10 @@ import java.util.zip.ZipFile;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.cdi.Bean;
-import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * scan classpath for {@link Bean}
@@ -24,14 +26,28 @@ public abstract class AbstractInventoryBuilder {
   }
 
   public void scanAllModules() throws IOException {
-    String path = "META-INF/services/" + IBeanContributor.class.getName();
-    for (Enumeration<URL> en = getClass().getClassLoader().getResources(path); en.hasMoreElements();) {
-      String url = en.nextElement().toExternalForm();
-      if (url.startsWith("jar:file:")) {
-        scanModule(new File(url.substring(9, url.lastIndexOf("!"))));
+    if (Platform.isOsgiRunning()) {
+      String path = "META-INF/scout.xml";
+      for (Bundle b : FrameworkUtil.getBundle(getClass()).getBundleContext().getBundles()) {
+        if (b.getResource("/" + path) == null) {
+          continue;
+        }
+        for (Enumeration en = b.findEntries("/", "*.class", true); en.hasMoreElements();) {
+          URL url = ((URL) en.nextElement());
+          handleClass(url);
+        }
       }
-      else if (url.startsWith("file:")) {
-        scanModule(new File(url.substring(5)).getParentFile().getParentFile().getParentFile());
+    }
+    else {
+      String path = "META-INF/scout.xml";
+      for (Enumeration<URL> en = getClass().getClassLoader().getResources(path); en.hasMoreElements();) {
+        String url = en.nextElement().toExternalForm();
+        if (url.startsWith("jar:file:")) {
+          scanModule(new File(url.substring(9, url.lastIndexOf("!"))));
+        }
+        else if (url.startsWith("file:")) {
+          scanModule(new File(url.substring(5)).getParentFile().getParentFile().getParentFile());
+        }
       }
     }
   }
@@ -76,8 +92,7 @@ public abstract class AbstractInventoryBuilder {
 
   protected void scanFile(File file, String path) throws IOException {
     if (isClass(path)) {
-      String classname = filenameToClassname(path);
-      handleClass(classname, file.toURI().toURL());
+      handleClass(file.toURI().toURL());
     }
   }
 
@@ -88,8 +103,7 @@ public abstract class AbstractInventoryBuilder {
       while (entries.hasMoreElements()) {
         String path = entries.nextElement().getName();
         if (isClass(path)) {
-          String classname = filenameToClassname(path);
-          handleClass(classname, new URL(archiveUrl + path));
+          handleClass(new URL(archiveUrl + path));
         }
       }
     }
@@ -102,11 +116,7 @@ public abstract class AbstractInventoryBuilder {
     return name.endsWith(CLASS_EXT);
   }
 
-  protected String filenameToClassname(String filename) {
-    return filename.substring(0, filename.lastIndexOf(CLASS_EXT)).replace('/', '.').replace('\\', '.');
-  }
-
-  protected abstract void handleClass(String classname, URL url);
+  protected abstract void handleClass(URL url);
 
   public abstract void finish();
 

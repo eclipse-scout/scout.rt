@@ -14,52 +14,84 @@ import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 
 /**
- *
+ * All instances of IPlatformListener receive event notifications from the platform
  */
 public interface IPlatform {
 
   static enum State {
     /**
-     * The state is active during initializing the system. Initializing is used to read system configurations and
-     * register
-     * static dependencies like services. During initialization registries are not available for use.
+     * This event signals that {@link IPlatform#start()} was called.
+     * <p>
+     * No state is valid so far
+     * <p>
+     * Next phase is creating the class inventory
      */
-    Initializing,
+    PlatformInit,
     /**
-     * This state is active
+     * This event signals that {@link IPlatform#getClassInventory()} is now valid.
+     * <p>
+     * Next phase is building the bean-context
      */
-    Starting,
-    Running,
-    Stopping,
-    Stopped
+    ClassInventoryValid,
+    /**
+     * This event signals that {@link IPlatform#getBeanContext()} was prepared with the beans found in the
+     * {@link IPlatform#getClassInventory()} and may manipulated using
+     * {@link IBeanContext#registerBean(org.eclipse.scout.rt.platform.cdi.IBean, Object)} etc.
+     * <p>
+     * Next phase is bean context valid
+     */
+    BeanContextPrepared,
+    /**
+     * This event signals that {@link IPlatform#getBeanContext()} is now valid and should not be manipulated anymore
+     * <p>
+     * Next phase is starting the application
+     */
+    BeanContextValid,
+    /**
+     * This event signals that the platform is about to start the application, special init code that requires the valid
+     * platform may be run now (former Activator.start logic)
+     * <p>
+     * Next phase is platform started
+     */
+    ApplicationStarting,
+    /**
+     * This event signals that the platform has completed starting the application {@link IApplication#start()}
+     */
+    ApplicationStarted,
+
+    /**
+     * This event signals that {@link IPlatform#stop()} was called.
+     * <p>
+     * Special dispose code may be run now (former Activator.stop logic)
+     * <p>
+     * Next phase is application stopped
+     */
+    ApplicationStopping,
+    /**
+     * application was stopped using {@link IApplication#stop()}
+     * <p>
+     * Next phase is platform stopped
+     */
+    ApplicationStopped,
+    /**
+     * platform is now stopped and all resources and caches are released and disposed
+     */
+    PlatformStopped
   }
-
-  /**
-   *
-   */
-  void start();
-
-  /**
-   *
-   */
-  void stop();
 
   /**
    * @return
    */
   State getState();
 
+  IClassInventory getClassInventory();
+
   IBeanContext getBeanContext();
 
-  /**
-   * @param listener
-   */
-  void addPlatformListener(IPlatformListener listener);
+  void start() throws PlatformException;
 
   /**
-   * @param listener
+   *
    */
-  void removePlatformListener(IPlatformListener listener);
-
-  IClassInventory getClassInventory();
+  void stop() throws PlatformException;
 }

@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
@@ -32,6 +33,8 @@ import org.eclipse.scout.rt.platform.cdi.OBJ;
  * Provider for client sessions. A client session is only created if not contained in the session cache.
  * TODO [dwi/imo]: move into test-package?
  */
+//TODO dwi, imo prio?
+@Priority(-10)
 @ApplicationScoped
 public class ClientSessionProviderWithCache extends ClientSessionProvider {
 

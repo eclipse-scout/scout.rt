@@ -15,6 +15,8 @@ import java.lang.reflect.Modifier;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.jboss.jandex.ClassInfo;
 
@@ -22,7 +24,6 @@ import org.jboss.jandex.ClassInfo;
  *
  */
 public class JandexClassInfo implements IClassInfo {
-
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JandexClassInfo.class);
   private final ClassInfo m_classInfo;
 
@@ -48,6 +49,9 @@ public class JandexClassInfo implements IClassInfo {
 
   @Override
   public Class<?> resolveClass() throws ClassNotFoundException {
+    if (Platform.isOsgiRunning()) {
+      return Class.forName(name(), true, SerializationUtility.getClassLoader());
+    }
     return Class.forName(name());
   }
 

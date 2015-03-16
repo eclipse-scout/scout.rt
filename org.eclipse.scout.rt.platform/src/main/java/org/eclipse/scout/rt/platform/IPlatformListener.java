@@ -12,10 +12,14 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.EventListener;
 
+import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
+
 /**
- *
+ * @since 5.2
  */
+@ApplicationScoped
 public interface IPlatformListener extends EventListener {
 
-  void platformChanged(PlatformEvent event);
+  void stateChanged(PlatformEvent event) throws PlatformException;
+
 }

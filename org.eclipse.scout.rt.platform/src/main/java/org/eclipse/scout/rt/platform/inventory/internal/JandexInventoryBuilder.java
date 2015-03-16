@@ -16,12 +16,12 @@ public class JandexInventoryBuilder extends AbstractInventoryBuilder {
   private Index m_index;
 
   @Override
-  protected void handleClass(String classname, URL url) {
+  protected void handleClass(URL url) {
     try (InputStream in = url.openStream()) {
       indexer.index(in);
     }
     catch (IOException ex) {
-      LOG.error("class " + classname + " at " + url, ex);
+      LOG.error("class at " + url, ex);
     }
   }
 

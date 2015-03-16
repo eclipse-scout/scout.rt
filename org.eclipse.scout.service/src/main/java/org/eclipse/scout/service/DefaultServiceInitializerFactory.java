@@ -12,9 +12,10 @@ package org.eclipse.scout.service;
 
 /**
  * Default implementation for service initialization.
- * 
+ *
  * @see DefaultServiceInitializer
  */
+//TODO dwi this class, DefaultServiceInitializer, and IServiceInitializer, and AbstractService.init... sind das nicht ein paar dinge im kreis rum? (imo)
 public class DefaultServiceInitializerFactory implements IServiceInitializerFactory {
 
   @Override

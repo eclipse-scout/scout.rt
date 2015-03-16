@@ -14,7 +14,6 @@ import java.net.URL;
 
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.scout.net.internal.NetModule;
 
 public class TestApplication implements IApplication {
 
@@ -22,7 +21,7 @@ public class TestApplication implements IApplication {
   public Object start(IApplicationContext context) throws Exception {
     System.out.println("Hello RCP World!");
 
-    new NetModule().start();
+//    new NetModule().start();
 
     URL url = new URL("http://www.google.ch");
     for (int i = 0; i < 10; i++) {

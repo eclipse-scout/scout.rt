@@ -19,7 +19,10 @@ import java.net.ProxySelector;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.net.EclipseAuthenticator;
 import org.eclipse.scout.net.EclipseProxySelector;
-import org.eclipse.scout.rt.platform.IModule;
+import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.PlatformException;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 
 /**
@@ -42,7 +45,8 @@ import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
  * Use org.eclipse.scout.net.proxy.autodetect=false to disable proxy detection
  */
 @ApplicationScoped
-public final class NetModule implements IModule {
+public final class NetModule implements IPlatformListener {
+
   public static boolean DEBUG;
   public static boolean PROXY_AUTODETECTION;
 
@@ -51,38 +55,38 @@ public final class NetModule implements IModule {
   private ProxySelector m_oldProxySelector;
   private ProxySelector m_newProxySelector;
 
+  @Override
   @SuppressWarnings("deprecation")
-  @Override
-  public void start() {
-    String debugText = ConfigIniUtility.getProperty("org.eclipse.scout.net" + ".debug");
-    DEBUG = (debugText != null && debugText.equalsIgnoreCase("true"));
+  public void stateChanged(PlatformEvent event) throws PlatformException {
+    if (event.getState() == IPlatform.State.PlatformInit) {
+      String debugText = ConfigIniUtility.getProperty("org.eclipse.scout.net" + ".debug");
+      DEBUG = (debugText != null && debugText.equalsIgnoreCase("true"));
 
-    String proxyDetectionText = ConfigIniUtility.getProperty("org.eclipse.scout.net" + ".proxy.autodetect");
-    PROXY_AUTODETECTION = (proxyDetectionText == null || proxyDetectionText.equalsIgnoreCase("true"));
+      String proxyDetectionText = ConfigIniUtility.getProperty("org.eclipse.scout.net" + ".proxy.autodetect");
+      PROXY_AUTODETECTION = (proxyDetectionText == null || proxyDetectionText.equalsIgnoreCase("true"));
 
-    // setup java.net
-    m_oldProxySelector = ProxySelector.getDefault();
-    m_oldCookieHandler = CookieHandler.getDefault();
-    if (PROXY_AUTODETECTION) {
-      ProxySelector.setDefault(m_newProxySelector = new EclipseProxySelector());
+      // setup java.net
+      m_oldProxySelector = ProxySelector.getDefault();
+      m_oldCookieHandler = CookieHandler.getDefault();
+      if (PROXY_AUTODETECTION) {
+        ProxySelector.setDefault(m_newProxySelector = new EclipseProxySelector());
+      }
+      CookieManager.setDefault(m_newCookieHandler = new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+      Authenticator.setDefault(new EclipseAuthenticator());
     }
-    CookieManager.setDefault(m_newCookieHandler = new CookieManager(null, CookiePolicy.ACCEPT_ALL));
-    Authenticator.setDefault(new EclipseAuthenticator());
-  }
-
-  @Override
-  public void stop() {
-    Authenticator.setDefault(null);
-    if (ProxySelector.getDefault() == m_newProxySelector) {
-      ProxySelector.setDefault(m_oldProxySelector);
+    else if (event.getState() == IPlatform.State.PlatformStopped) {
+      Authenticator.setDefault(null);
+      if (ProxySelector.getDefault() == m_newProxySelector) {
+        ProxySelector.setDefault(m_oldProxySelector);
+      }
+      if (CookieHandler.getDefault() == m_newCookieHandler) {
+        CookieHandler.setDefault(m_oldCookieHandler);
+      }
+      m_oldProxySelector = null;
+      m_newProxySelector = null;
+      m_oldCookieHandler = null;
+      m_newCookieHandler = null;
     }
-    if (CookieHandler.getDefault() == m_newCookieHandler) {
-      CookieHandler.setDefault(m_oldCookieHandler);
-    }
-    m_oldProxySelector = null;
-    m_newProxySelector = null;
-    m_oldCookieHandler = null;
-    m_newCookieHandler = null;
   }
 
 }

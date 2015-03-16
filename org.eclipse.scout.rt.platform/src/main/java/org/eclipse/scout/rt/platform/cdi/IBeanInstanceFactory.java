@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.annotations.Priority;
  * <p>
  * The implementation with the highest {@link Priority} is used in the application.
  */
+@Bean
 public interface IBeanInstanceFactory {
   /**
    * @return an object instance for the bean or null if none was created

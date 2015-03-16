@@ -14,15 +14,13 @@ import java.util.EventListener;
 
 import javax.xml.xpath.XPath;
 
-import org.eclipse.scout.rt.platform.IModule;
 import org.eclipse.scout.rt.platform.pluginxml.internal.IPluginXml;
 import org.eclipse.scout.rt.platform.pluginxml.internal.PluginXmlParser;
 import org.w3c.dom.Document;
 
 /**
  * A {@link IPluginXmlVisitor} can be added to the {@link PluginXmlParser}.
- * The visitor must be added during module startup. To get there register an {@link IModule} in the manifest file and
- * add your visitor to the parser.
+ * The visitor must be added during module startup.
  */
 public interface IPluginXmlVisitor extends EventListener {
 

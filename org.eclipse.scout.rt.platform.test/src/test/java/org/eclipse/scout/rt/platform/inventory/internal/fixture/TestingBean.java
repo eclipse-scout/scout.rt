@@ -8,19 +8,50 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform;
+package org.eclipse.scout.rt.platform.inventory.internal.fixture;
 
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.platform.cdi.Bean;
 
-/**
- * The application with the highest {@link Priority} will be launched in the {@link IPlatform.State#ApplicationStarting}
- * phase
- */
 @Bean
-public interface IApplication {
+public class TestingBean {
+  @Bean
+  public static class S1 {
+  }
 
-  void start() throws PlatformException;
+  @ApplicationScoped
+  protected static class S2 {
+  }
 
-  void stop() throws PlatformException;
+  @Bean
+  private static class S3 {
+  }
+
+  @Bean
+  static class S4 {
+  }
+
+  //must inherit @Bean
+  public static class S1Sub1 extends S1 {
+  }
+
+  @Bean
+  public class M1 {
+  }
+
+  @Bean
+  public interface I1 {
+  }
+
+  @Bean
+  interface I2 {
+  }
+
+  @Bean
+  public enum E1 {
+  }
+
+  @Bean
+  public @interface A1 {
+  }
 }

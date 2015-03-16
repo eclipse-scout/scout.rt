@@ -10,18 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.service;
 
-import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.service.internal.ITestService;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(PlatformTestRunner.class)
 public class ServiceTest {
-
-  @BeforeClass
-  public static void setup() {
-    ((Platform) Platform.get()).ensureStarted();
-  }
 
   @Test
   public void testFragmentRegisteredService() throws Exception {

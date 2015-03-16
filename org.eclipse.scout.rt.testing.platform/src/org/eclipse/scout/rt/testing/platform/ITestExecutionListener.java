@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform;
 
+import org.eclipse.scout.rt.platform.cdi.Bean;
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.runner.Description;
@@ -20,6 +21,7 @@ import org.junit.runner.Description;
  *
  * @see PlatformTestRunner
  */
+@Bean
 public interface ITestExecutionListener {
 
   /**

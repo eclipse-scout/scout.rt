@@ -11,15 +11,12 @@
 package org.eclipse.scout.rt.platform.inventory.internal;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.BeanFilter;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.platform.cdi.Bean;
-import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.platform.cdi.IBeanContext;
-import org.eclipse.scout.rt.platform.cdi.internal.PlatformBeanContributor;
-import org.eclipse.scout.rt.platform.cdi.internal.scan.fixture.TestingBean;
+import org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,65 +36,23 @@ public class BeanScannerTest {
         basePath + "$S2",
         basePath + "$S3",
         basePath + "$S4",
+        basePath + "$S1Sub1",
         basePath + "$M1",
         basePath + "$I1",
         basePath + "$I2",
         basePath + "$E1",
         basePath + "$A1",
     }) {
-      finder.handleClass(path.replace('/', '.'), TestingBean.class.getClassLoader().getResource(path + ".class"));
+      finder.handleClass(TestingBean.class.getClassLoader().getResource(path + ".class"));
     }
     finder.finish();
     JandexClassInventory classInventory = new JandexClassInventory(finder.getIndex());
-
-    final Set<Class> actual = new HashSet<>();
-    IBeanContext context = new IBeanContext() {
-      @Override
-      public void unregisterBean(IBean bean) {
-      }
-
-      @Override
-      public <T> IBean<T> registerClass(Class<T> clazz) {
-        actual.add(clazz);
-        return null;
-      }
-
-      @Override
-      public void registerBean(IBean bean, Object instance) {
-      }
-
-      @Override
-      public <T> List<T> getInstances(Class<T> beanClazz) {
-        return null;
-      }
-
-      @Override
-      public <T> T getInstanceOrNull(Class<T> beanClazz) {
-        return null;
-      }
-
-      @Override
-      public <T> T getInstance(Class<T> beanClazz) {
-        return null;
-      }
-
-      @Override
-      public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
-        return null;
-      }
-
-      @Override
-      public Set<IBean<?>> getAllRegisteredBeans() {
-        return null;
-      }
-    };
-
-    PlatformBeanContributor contrib = new PlatformBeanContributor();
-    contrib.contributeBeans(classInventory, context);
+    final Set<Class> actual = new BeanFilter().collect(classInventory);
 
     HashSet<Class> expected = new HashSet<Class>();
-    expected.add(org.eclipse.scout.rt.platform.cdi.internal.scan.fixture.TestingBean.class);
-    expected.add(org.eclipse.scout.rt.platform.cdi.internal.scan.fixture.TestingBean.S1.class);
+    expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.class);
+    expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S1.class);
+    expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S1Sub1.class);
     expected.add(Class.forName(TestingBean.class.getName() + "$S2"));
 
     Assert.assertEquals(expected, actual);
