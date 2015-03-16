@@ -31,9 +31,21 @@ abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPropertyOb
     propertySupport.setProperty(PROP_ACTIVE_STATE_FILTER, m_contentAssistField.getActiveFilter());
     m_model = createModel();
     setStatusVisible(true);
+    init();
   }
 
+  /**
+   * Used to create the 'model' of the proposal chooser. In this method you shouldn't call methods that access the
+   * m_model variable since it isn't set until this method has completed. Use the {@link #init()} method instead.
+   */
   abstract protected T createModel() throws ProcessingException;
+
+  /**
+   * Init method called by the CTOR of the class, after createModel() has been called and m_model variable is set.
+   * The default implementation does nothing.
+   */
+  protected void init() throws ProcessingException {
+  }
 
   @Override
   public ILookupRow<LOOKUP_KEY> getAcceptedProposal() throws ProcessingException {

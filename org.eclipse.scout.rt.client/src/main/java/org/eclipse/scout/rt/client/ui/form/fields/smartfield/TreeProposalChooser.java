@@ -68,6 +68,9 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
 
   @Override
   protected ITree createModel() throws ProcessingException {
+    m_activeNodesFilter = new P_ActiveNodesFilter();
+    m_matchingNodesFilter = new P_MatchingNodesFilter();
+
     ITree tree = new P_Tree();
     tree.setIconId(m_contentAssistField.getBrowseIconId());
     tree.addTreeListener(new TreeAdapter() {
@@ -83,10 +86,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
         }
       }
     });
-
-    m_activeNodesFilter = new P_ActiveNodesFilter();
-    m_matchingNodesFilter = new P_MatchingNodesFilter();
-    startPopulateInitialTree();
     return tree;
   }
 
@@ -160,12 +159,13 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
    *
    * @throws ProcessingException
    */
+  @Override
   @SuppressWarnings("deprecation")
-  private void startPopulateInitialTree() throws ProcessingException {
+  protected void init() throws ProcessingException {
     if (m_contentAssistField.isBrowseLoadIncremental()) {
-      //do sync
+      // do sync
       loadRootNode();
-      commitPopulateInitialTree(m_model);
+      commitPopulateInitialTree();
       fireStructureChanged();
     }
     else {
@@ -187,7 +187,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
                 if (m_contentAssistField.isBrowseAutoExpandAll()) {
                   m_model.expandAll(m_model.getRootNode());
                 }
-                commitPopulateInitialTree(m_model);
+                commitPopulateInitialTree();
               }
               finally {
                 m_model.setTreeChanging(false);
@@ -214,10 +214,10 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
    *
    * @throws ProcessingException
    */
-  private void commitPopulateInitialTree(ITree tree) throws ProcessingException {
+  private void commitPopulateInitialTree() throws ProcessingException {
     updateActiveFilter();
     if (m_selectCurrentValueRequested) {
-      if (tree.getSelectedNodeCount() == 0) {
+      if (m_model.getSelectedNodeCount() == 0) {
         selectCurrentValueInternal();
       }
     }
