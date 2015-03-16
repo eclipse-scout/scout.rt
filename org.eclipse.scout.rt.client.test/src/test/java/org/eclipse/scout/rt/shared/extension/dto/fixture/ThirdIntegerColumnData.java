@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.scout.commons.annotations.Extends;
 public class ThirdIntegerColumnData implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  public static final String THIRD_INTEGER = "thirdInteger";
+  public static final String thirdInteger = "thirdInteger";
   private Integer m_thirdInteger;
 
   public ThirdIntegerColumnData() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,11 @@
 package org.eclipse.scout.rt.shared.data.form.fixture;
 
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -44,7 +46,7 @@ public abstract class AbstractTestGroupBoxData extends AbstractFormFieldData {
     return getFieldByClass(Text2.class);
   }
 
-  public static class TestListBox extends AbstractValueFieldData<String[]> {
+  public static class TestListBox extends AbstractValueFieldData<Set<String>> {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,6 +54,7 @@ public abstract class AbstractTestGroupBoxData extends AbstractFormFieldData {
     }
   }
 
+  @ClassId("1b67f4c4-1579-4875-a2c9-d62c7cd63508-formdata")
   public static class Text1 extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
