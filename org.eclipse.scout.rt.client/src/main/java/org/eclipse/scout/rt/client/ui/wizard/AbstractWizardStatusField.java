@@ -74,6 +74,11 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
   }
 
   @Override
+  protected boolean getConfiguredStatusVisible() {
+    return false;
+  }
+
+  @Override
   protected void execInitField() throws ProcessingException {
     //automatically set wizard if the field is placed inside a wizard container form
     IForm f = getForm();
