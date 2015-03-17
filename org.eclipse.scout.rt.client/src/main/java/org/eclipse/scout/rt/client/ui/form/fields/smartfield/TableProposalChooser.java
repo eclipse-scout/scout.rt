@@ -43,6 +43,7 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
   @Override
   protected IContentAssistFieldTable createModel() {
     IContentAssistFieldTable<LOOKUP_KEY> table = new P_Table<LOOKUP_KEY>();
+    table.setMultilineText(m_contentAssistField.isMultilineText());
     table.addTableListener(new TableListener() {
 
       @Override
