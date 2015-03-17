@@ -34,7 +34,7 @@ public class JsonEventProcessor {
 
   public void processEvents(final JsonRequest request, final JsonResponse response) {
     IClientSession clientSession = m_jsonSession.getClientSession();
-    OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+    OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         ModelJobUtility.runAsSubject(new Runnable() {

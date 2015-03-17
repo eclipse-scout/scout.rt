@@ -337,13 +337,13 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   private static void waitForAllOtherJobs() {
     final IClientSession session = ClientSessionProvider.currentSession();
-    final IBlockingCondition waitForClientJobsToComplete = OBJ.one(IModelJobManager.class).createBlockingCondition("Wait for ClientJobs to complete", true);
+    final IBlockingCondition waitForClientJobsToComplete = OBJ.get(IModelJobManager.class).createBlockingCondition("Wait for ClientJobs to complete", true);
     try {
-      OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
+      OBJ.get(IClientJobManager.class).schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           try {
-            OBJ.one(IClientJobManager.class).waitUntilDone(new AndFilter<>(new ClientSessionFilter(session), new NotFilter<>(new FutureFilter(IFuture.CURRENT.get()))), 1, TimeUnit.MINUTES);
+            OBJ.get(IClientJobManager.class).waitUntilDone(new AndFilter<>(new ClientSessionFilter(session), new NotFilter<>(new FutureFilter(IFuture.CURRENT.get()))), 1, TimeUnit.MINUTES);
           }
           finally {
             waitForClientJobsToComplete.setBlocking(false);

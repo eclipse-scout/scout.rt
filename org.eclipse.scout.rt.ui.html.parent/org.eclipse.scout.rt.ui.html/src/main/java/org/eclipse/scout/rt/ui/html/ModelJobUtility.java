@@ -34,7 +34,7 @@ public final class ModelJobUtility {
    * Wait until all sync jobs have been finished or only waitFor sync jobs are left.
    */
   public static void waitUntilJobsHaveFinished(IClientSession currentClientSession) {
-    final IModelJobManager modelJobManager = OBJ.one(IModelJobManager.class);
+    final IModelJobManager modelJobManager = OBJ.get(IModelJobManager.class);
     if (modelJobManager.isModelThread()) {
       throw new IllegalStateException("Cannot wait for another sync job, because current job is also sync!");
     }
@@ -47,7 +47,7 @@ public final class ModelJobUtility {
   }
 
   public static void runInModelThreadAndWait(IClientSession clientSession, IExecutable<?> executable) throws ProcessingException {
-    IModelJobManager modelJobManager = OBJ.one(IModelJobManager.class);
+    IModelJobManager modelJobManager = OBJ.get(IModelJobManager.class);
     if (modelJobManager.isModelThread()) {
       modelJobManager.runNow(executable, ClientJobInput.defaults().session(clientSession));
     }
