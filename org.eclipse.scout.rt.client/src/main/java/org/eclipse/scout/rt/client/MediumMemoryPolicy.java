@@ -189,9 +189,9 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
       }
       desktop.releaseUnusedPages();
       System.gc();
-      OBJ.one(IClientJobManager.class).cancel(new AndFilter<IFuture<?>>(new ClientSessionFilter(session), new JobFilter(getClass().getName())), true);
+      OBJ.get(IClientJobManager.class).cancel(new AndFilter<IFuture<?>>(new ClientSessionFilter(session), new JobFilter(getClass().getName())), true);
       try {
-        OBJ.one(IClientJobManager.class).schedule(new ForceGCJob(), ClientJobInput.defaults().session(session).name("release memory").id(getClass().getName()));
+        OBJ.get(IClientJobManager.class).schedule(new ForceGCJob(), ClientJobInput.defaults().session(session).name("release memory").id(getClass().getName()));
       }
       catch (JobExecutionException e) {
         LOG.error("", e);

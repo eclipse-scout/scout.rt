@@ -160,7 +160,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     final HttpServletRequest request = input.getServletRequest();
     final HttpServletResponse response = input.getServletResponse();
 
-    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
+    OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -186,7 +186,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
    * @return {@link IServiceTunnelResponse} response sent back to the client.
    */
   protected IServiceTunnelResponse invokeServiceInServerJob(final ServerJobInput input, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
-    return OBJ.one(IServerJobManager.class).runNow(new ICallable<IServiceTunnelResponse>() {
+    return OBJ.get(IServerJobManager.class).runNow(new ICallable<IServiceTunnelResponse>() {
 
       @Override
       public IServiceTunnelResponse call() throws Exception {
@@ -312,7 +312,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
    * @return {@link IServerSession}; must not be <code>null</code>.
    */
   protected IServerSession provideServerSession(final ServerJobInput input) throws ProcessingException {
-    final IServerSession serverSession = OBJ.one(ServerSessionProvider.class).provide(input);
+    final IServerSession serverSession = OBJ.get(ServerSessionProvider.class).provide(input);
     serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(input.getServletRequest(), input.getServletResponse()));
     return serverSession;
   }

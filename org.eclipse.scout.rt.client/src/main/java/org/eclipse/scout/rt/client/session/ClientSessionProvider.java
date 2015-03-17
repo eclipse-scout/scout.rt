@@ -40,7 +40,7 @@ public class ClientSessionProvider {
   public <T extends IClientSession> T provide(final ClientJobInput input) throws ProcessingException {
     // Create an empty session instance.
     ClientJobInput in = input.copy();
-    final T clientSession = ClientSessionProvider.cast(OBJ.one(IClientSession.class));
+    final T clientSession = ClientSessionProvider.cast(OBJ.get(IClientSession.class));
     if (in.getUserAgent() != null) {
       clientSession.setUserAgent(in.getUserAgent());
     }
@@ -49,7 +49,7 @@ public class ClientSessionProvider {
     }
 
     // Initialize the session.
-    OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+    OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {

@@ -116,7 +116,7 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
     long memUsed = (memTotal - Runtime.getRuntime().freeMemory());
     long memMax = Runtime.getRuntime().maxMemory();
     if (memUsed > memMax * 80L / 100L) {
-      OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+      OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           desktop.releaseUnusedPages();

@@ -41,7 +41,7 @@ public class SwingScoutSynchronizer {
    * A timeout value &lt;= 0 means no timeout.
    */
   public IFuture<Void> invokeScoutLater(final Runnable j, long cancelTimeout) {
-    if (OBJ.one(IModelJobManager.class).isModelThread()) {
+    if (OBJ.get(IModelJobManager.class).isModelThread()) {
       LOG.warn("trying to queue scout runnable but already in scout thread: " + j);
     }
     else if (!SwingUtilities.isEventDispatchThread()) {
@@ -57,7 +57,7 @@ public class SwingScoutSynchronizer {
 
     // schedule job
     final long deadLine = cancelTimeout > 0 ? System.currentTimeMillis() + cancelTimeout : -1;
-    IFuture<Void> future = OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+    IFuture<Void> future = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         if (deadLine < 0 || deadLine > System.currentTimeMillis()) {
@@ -75,7 +75,7 @@ public class SwingScoutSynchronizer {
     if (SwingUtilities.isEventDispatchThread()) {
       LOG.warn("trying to queue swing runnable but already in swing thread: " + j);
     }
-    if (!OBJ.one(IModelJobManager.class).isModelThread()) {
+    if (!OBJ.get(IModelJobManager.class).isModelThread()) {
       throw new IllegalStateException("queueing swing runnable from outside scout thread: " + j);
     }
     SwingUtilities.invokeLater(j);

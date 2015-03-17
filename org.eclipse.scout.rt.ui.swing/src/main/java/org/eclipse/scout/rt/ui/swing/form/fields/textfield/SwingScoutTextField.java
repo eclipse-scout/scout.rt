@@ -99,7 +99,7 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
   protected void attachScout() {
     super.attachScout();
     // spell checking
-    ISwingSpellCheckerService spellCheckerService = OBJ.oneOrNull(ISwingSpellCheckerService.class);
+    ISwingSpellCheckerService spellCheckerService = OBJ.getOptional(ISwingSpellCheckerService.class);
     if (spellCheckerService != null && spellCheckerService.isInstalled()) {
       m_spellingMonitor = spellCheckerService.createSpellingMonitor(new SwingFieldHolder(this, this.getSwingTextField()));
     }

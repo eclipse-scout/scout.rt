@@ -55,7 +55,7 @@ public abstract class AbstractAccessControlService extends AbstractSharedAccessC
 
     //notify clusters:
     try {
-      IClusterSynchronizationService s = OBJ.oneOrNull(IClusterSynchronizationService.class);
+      IClusterSynchronizationService s = OBJ.getOptional(IClusterSynchronizationService.class);
       if (s != null) {
         s.publishNotification(new AccessControlCacheChangedClusterNotification());
       }
@@ -71,7 +71,7 @@ public abstract class AbstractAccessControlService extends AbstractSharedAccessC
 
     //notify clusters:
     try {
-      IClusterSynchronizationService s = OBJ.oneOrNull(IClusterSynchronizationService.class);
+      IClusterSynchronizationService s = OBJ.getOptional(IClusterSynchronizationService.class);
       if (s != null) {
         s.publishNotification(new AccessControlCacheChangedClusterNotification(userIds));
       }

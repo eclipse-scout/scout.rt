@@ -261,7 +261,7 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
 
   protected void clearSelectionDelayed() {
     IClientSession clientSession = ClientSessionProvider.currentSession();
-    OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+    OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         clearSelection();

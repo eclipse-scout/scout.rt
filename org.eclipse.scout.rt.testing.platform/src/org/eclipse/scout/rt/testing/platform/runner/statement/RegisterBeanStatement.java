@@ -12,13 +12,13 @@ package org.eclipse.scout.rt.testing.platform.runner.statement;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.cdi.BeanImplementor;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.junit.runners.model.Statement;
 
 /**
  * Statement to register a bean-class during the time of executing a statement.
- * 
+ *
  * @since5.1
  */
 public class RegisterBeanStatement extends Statement {
@@ -48,12 +48,12 @@ public class RegisterBeanStatement extends Statement {
     final BeanImplementor<?> bean = new BeanImplementor<>(m_beanClass);
     bean.addAnnotation(AnnotationFactory.createPriority(m_priority));
 
-    OBJ.registerBean(bean, null);
+    Platform.get().getBeanContext().registerBean(bean, null);
     try {
       m_next.evaluate();
     }
     finally {
-      OBJ.unregisterBean(bean);
+      Platform.get().getBeanContext().unregisterBean(bean);
     }
   }
 }

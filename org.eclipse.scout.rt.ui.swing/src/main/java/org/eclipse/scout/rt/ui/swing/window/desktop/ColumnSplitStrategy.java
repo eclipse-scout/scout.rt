@@ -171,7 +171,7 @@ public class ColumnSplitStrategy implements IMultiSplitStrategy {
       }
     };
     try {
-      m_storageJob = OBJ.one(IClientJobManager.class).schedule(t, 400, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(m_prefs.getSession()));
+      m_storageJob = OBJ.get(IClientJobManager.class).schedule(t, 400, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(m_prefs.getSession()));
     }
     catch (JobExecutionException e) {
     }

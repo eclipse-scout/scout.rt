@@ -37,11 +37,11 @@ public class DefaultShellService extends AbstractService implements IShellServic
     if (UserAgentUtility.isWebClient()) {
       // Bug 454897: Need to be in model thread for call
       final IClientSession clientSession = ClientSessionProvider.currentSession();
-      if (OBJ.one(IModelJobManager.class).isModelThread()) {
+      if (OBJ.get(IModelJobManager.class).isModelThread()) {
         clientSession.getDesktop().openUrlInBrowser(path);
       }
       else {
-        OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+        OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
           @Override
           public void run() throws Exception {
             clientSession.getDesktop().openUrlInBrowser(path);

@@ -107,7 +107,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
             }
           }
           else {
-            OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+            OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
               @Override
               public void run() throws Exception {
                 reloadCodeTypes(notification.getCodeTypes());

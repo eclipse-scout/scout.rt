@@ -294,7 +294,7 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
   }
 
   protected boolean fireBeforeLocationChangedFromSwt(final String location) {
-    IModelJobManager modelJobManager = OBJ.one(IModelJobManager.class);
+    IModelJobManager modelJobManager = OBJ.get(IModelJobManager.class);
     IFuture<Boolean> future = modelJobManager.schedule(new ICallable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
@@ -313,7 +313,7 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
   }
 
   protected void fireAfterLocationChangedFromSwt(final String location) {
-    IModelJobManager modelJobManager = OBJ.one(IModelJobManager.class);
+    IModelJobManager modelJobManager = OBJ.get(IModelJobManager.class);
     modelJobManager.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {

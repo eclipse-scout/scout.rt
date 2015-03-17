@@ -499,7 +499,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
         }
         case DesktopEvent.TYPE_DESKTOP_CLOSED: {
           try {
-            IFuture<Void> run = OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
+            IFuture<Void> run = OBJ.get(IClientJobManager.class).schedule(new IRunnable() {
               @Override
               public void run() throws Exception {
                 SwingUtilities.invokeAndWait(new Runnable() {

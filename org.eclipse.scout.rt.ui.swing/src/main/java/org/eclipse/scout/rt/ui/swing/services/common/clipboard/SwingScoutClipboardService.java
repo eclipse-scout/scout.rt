@@ -60,7 +60,7 @@ public class SwingScoutClipboardService extends AbstractService implements IClip
           try {
             Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
             final TransferObject[] transferObjects = createScoutTransferables(contents, requests);
-            OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+            OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
               @Override
               public void run() throws Exception {
                 clipboardConsumer.consume(transferObjects);

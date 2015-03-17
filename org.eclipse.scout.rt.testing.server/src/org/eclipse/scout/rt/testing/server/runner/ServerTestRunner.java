@@ -89,7 +89,7 @@ public class ServerTestRunner extends PlatformTestRunner {
     if (annotation == null) {
       return next;
     }
-    final Statement s3 = new RunNowStatement(next, OBJ.one(IServerJobManager.class));
+    final Statement s3 = new RunNowStatement(next, OBJ.get(IServerJobManager.class));
     final Statement s2 = new ProvideServerSessionStatement(s3, annotation.provider());
     final Statement s1 = new RegisterBeanStatement(s2, annotation.value(), priority);
 

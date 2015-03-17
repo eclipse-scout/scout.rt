@@ -38,7 +38,7 @@ public final class SERVICES {
    * @return the service with the highest ranking or <code>null</code>, if the service is not found.
    */
   public static <T extends Object> T getService(Class<T> serviceClass) {
-    return OBJ.one(serviceClass);
+    return OBJ.get(serviceClass);
   }
 
   /**

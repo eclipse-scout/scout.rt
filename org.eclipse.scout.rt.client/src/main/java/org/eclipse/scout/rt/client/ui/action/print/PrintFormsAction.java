@@ -194,7 +194,7 @@ public class PrintFormsAction extends AbstractAction {
     }
 
     private void schedulePrintJob(final IForm f) {
-      OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+      OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           printForm(f, null);

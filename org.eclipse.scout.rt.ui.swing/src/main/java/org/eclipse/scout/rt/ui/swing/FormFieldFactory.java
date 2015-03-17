@@ -41,7 +41,7 @@ public class FormFieldFactory implements IFormFieldFactory {
 
   public FormFieldFactory() {
     TreeMap<CompositeObject, P_FormFieldExtension> sortedMap = new TreeMap<CompositeObject, P_FormFieldExtension>();
-    for (IFormFieldExtension extension : OBJ.one(FormFieldExtensions.class).getFormFieldExtensions()) {
+    for (IFormFieldExtension extension : OBJ.get(FormFieldExtensions.class).getFormFieldExtensions()) {
       if (extension.isActive()) {
         final Class<?> modelClazz = extension.getModelClass();
         final Class<? extends ISwingScoutFormField> uiClazz = extension.getUiClass();

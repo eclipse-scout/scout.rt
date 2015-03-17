@@ -90,7 +90,7 @@ public class ClientTestRunner extends PlatformTestRunner {
     if (annotation == null) {
       return next;
     }
-    final Statement s3 = new RunNowStatement(next, OBJ.one(IClientJobManager.class));
+    final Statement s3 = new RunNowStatement(next, OBJ.get(IClientJobManager.class));
     final Statement s2 = new ProvideClientSessionStatement(s3, annotation.provider());
     final Statement s1 = new RegisterBeanStatement(s2, annotation.value(), priority);
 

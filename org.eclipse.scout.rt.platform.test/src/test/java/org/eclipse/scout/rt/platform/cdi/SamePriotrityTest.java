@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.cdi;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -31,16 +32,17 @@ public class SamePriotrityTest {
 
   @BeforeClass
   public static void registerBeans() {
-    m_bean01 = OBJ.registerClass(ABean.class);
-    m_bean02 = OBJ.registerClass(BBean.class);
+    m_bean01 = Platform.get().getBeanContext().registerClass(ABean.class);
+    m_bean02 = Platform.get().getBeanContext().registerClass(BBean.class);
   }
 
   /**
-   * Tests if two beans with the same priority registered to the bean context are ordered on behaviour of their class name.
+   * Tests if two beans with the same priority registered to the bean context are ordered on behaviour of their class
+   * name.
    */
   @Test
   public void testPriority() {
-    Assert.assertEquals(ABean.class, OBJ.one(ITestBean.class).getClass());
+    Assert.assertEquals(ABean.class, OBJ.get(ITestBean.class).getClass());
     List<ITestBean> all = OBJ.all(ITestBean.class);
     Assert.assertEquals(2, all.size());
     Assert.assertEquals(ABean.class, all.get(0).getClass());
@@ -49,8 +51,8 @@ public class SamePriotrityTest {
 
   @AfterClass
   public static void removeBeans() {
-    OBJ.unregisterBean(m_bean01);
-    OBJ.unregisterBean(m_bean02);
+    Platform.get().getBeanContext().unregisterBean(m_bean01);
+    Platform.get().getBeanContext().unregisterBean(m_bean02);
   }
 
   private static interface ITestBean {

@@ -50,7 +50,7 @@ public class SchedulerTest {
 
     m_input = ServerJobInput.empty();
     m_input.subject(subject);
-    m_input.session(OBJ.one(ServerSessionProvider.class).provide(m_input.copy()));
+    m_input.session(OBJ.get(ServerSessionProvider.class).provide(m_input.copy()));
 
     m_ticker = new Ticker(Calendar.SECOND);
 

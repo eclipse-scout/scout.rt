@@ -226,7 +226,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
     m_cancelButtonText = cancelButtonText;
     m_iconId = iconId;
     m_autoCloseMillis = -1;
-    m_blockingCondition = OBJ.one(IModelJobManager.class).createBlockingCondition("block", false);
+    m_blockingCondition = OBJ.get(IModelJobManager.class).createBlockingCondition("block", false);
     if (m_title == null) {
       IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
       if (desktop != null) {
@@ -466,7 +466,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
           if (getAutoCloseMillis() > 0) {
             final long dt = getAutoCloseMillis();
             try {
-              m_autoCloseJob = OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
+              m_autoCloseJob = OBJ.get(IClientJobManager.class).schedule(new IRunnable() {
                 @Override
                 public void run() throws Exception {
                   if (IFuture.CURRENT.get() == m_autoCloseJob) {

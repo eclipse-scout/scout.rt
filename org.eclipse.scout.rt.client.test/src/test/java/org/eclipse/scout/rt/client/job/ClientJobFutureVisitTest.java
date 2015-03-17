@@ -49,7 +49,7 @@ public class ClientJobFutureVisitTest {
 
   @Before
   public void before() throws InterruptedException, JobExecutionException {
-    m_jobManager = OBJ.one(IClientJobManager.class);
+    m_jobManager = OBJ.get(IClientJobManager.class);
     m_jobManager.cancel(new AlwaysFilter<IFuture<?>>(), true);
     assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS)); // TODO DWI: own job manager for this test.
 

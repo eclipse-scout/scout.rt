@@ -126,7 +126,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
   private void markDirty() {
     m_dirty = true;
     IClientSession clientSession = ClientSessionProvider.currentSession();
-    OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+    OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         if (m_dirty) {

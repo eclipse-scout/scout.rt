@@ -152,7 +152,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   @ConfigOperation
   @Order(40)
   protected void execLoadItemsInBackground(final IClientSession session, final Date minDate, final Date maxDate, final Set<ICalendarItem> result) throws ProcessingException {
-    IFuture<Void> future = OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+    IFuture<Void> future = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         interceptLoadItems(minDate, maxDate, result);
@@ -361,7 +361,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   private void setLoadInProgressInSyncJob(final boolean b) {
-    OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+    OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         setLoadInProgress(b);
@@ -430,11 +430,11 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         ClientJobInput input = ClientJobInput.defaults().session(session).name(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " reload");
         if (refreshInterval > 0) {
           // interval load
-          m_reloadJob = OBJ.one(IClientJobManager.class).scheduleWithFixedDelay(runnable, startDelayMillis, refreshInterval, TimeUnit.MILLISECONDS, input);
+          m_reloadJob = OBJ.get(IClientJobManager.class).scheduleWithFixedDelay(runnable, startDelayMillis, refreshInterval, TimeUnit.MILLISECONDS, input);
         }
         else {
           // single load
-          m_reloadJob = OBJ.one(IClientJobManager.class).schedule(runnable, startDelayMillis, TimeUnit.MILLISECONDS, input);
+          m_reloadJob = OBJ.get(IClientJobManager.class).schedule(runnable, startDelayMillis, TimeUnit.MILLISECONDS, input);
         }
       }
       catch (JobExecutionException e) {
@@ -476,7 +476,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
           }
         }
 
-        IFuture<Void> future = OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+        IFuture<Void> future = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
           @Override
           public void run() throws Exception {
             synchronized (AbstractCalendarItemProvider.this) {

@@ -51,7 +51,7 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
     final Set<Principal> principals = subject.getPrincipals();
     Assertions.assertFalse(principals.isEmpty(), "Subject contains no principals");
 
-    SESSION serverSession = getFromCache(principals, OBJ.one(IServerSession.class).getClass());
+    SESSION serverSession = getFromCache(principals, OBJ.get(IServerSession.class).getClass());
     if (serverSession != null) {
       return serverSession;
     }

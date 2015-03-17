@@ -247,7 +247,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
             // this will later on call installLookupRowContext()
             ILookupCall<LOOKUP_KEY> call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractMixedSmartField.this));
             prepareKeyLookup(call, interceptConvertValueToKey(validKey));
-            m_currentGetLookupRowByKeyJob = OBJ.one(IClientJobManager.class).schedule(new P_GetLookupRowByKeyJob(call), ClientJobInput.defaults().name("Fetch smartfield data for " + getLabel()));
+            m_currentGetLookupRowByKeyJob = OBJ.get(IClientJobManager.class).schedule(new P_GetLookupRowByKeyJob(call), ClientJobInput.defaults().name("Fetch smartfield data for " + getLabel()));
           }
         }
         catch (ProcessingException e) {
@@ -414,7 +414,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
 
     private P_GetLookupRowByKeyJob(final ILookupCall<LOOKUP_KEY> call) throws JobExecutionException {
       // immediately start a thread that fetches data async
-      m_backgroundJob = OBJ.one(IClientJobManager.class).schedule(new ICallable<List<ILookupRow<LOOKUP_KEY>>>() {
+      m_backgroundJob = OBJ.get(IClientJobManager.class).schedule(new ICallable<List<ILookupRow<LOOKUP_KEY>>>() {
         @Override
         public List<ILookupRow<LOOKUP_KEY>> call() throws Exception {
           List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(call.getDataByKey());

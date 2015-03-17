@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.cdi;
 
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -25,8 +26,8 @@ public class ApplicationsScopedTest {
 
   @BeforeClass
   public static void registerBeans() {
-    m_bean01 = OBJ.registerClass(TestObject.class);
-    m_bean02 = OBJ.registerClass(Bean02.class);
+    m_bean01 = Platform.get().getBeanContext().registerClass(TestObject.class);
+    m_bean02 = Platform.get().getBeanContext().registerClass(Bean02.class);
   }
 
   /**
@@ -34,9 +35,9 @@ public class ApplicationsScopedTest {
    */
   @Test
   public void testApplicaitonScopded() {
-    TestObject i1 = OBJ.one(TestObject.class);
+    TestObject i1 = OBJ.get(TestObject.class);
     Assert.assertNotNull(i1);
-    ITestObject i2 = OBJ.one(TestObject.class);
+    ITestObject i2 = OBJ.get(TestObject.class);
     Assert.assertNotNull(i2);
     Assert.assertEquals(i1, i2);
   }
@@ -46,17 +47,17 @@ public class ApplicationsScopedTest {
    */
   @Test
   public void testInheritedApplicaitonScopded() {
-    Bean02 i1 = OBJ.one(Bean02.class);
+    Bean02 i1 = OBJ.get(Bean02.class);
     Assert.assertNotNull(i1);
-    Bean02 i2 = OBJ.one(Bean02.class);
+    Bean02 i2 = OBJ.get(Bean02.class);
     Assert.assertNotNull(i2);
     Assert.assertEquals(i1, i2);
   }
 
   @AfterClass
   public static void unregisterBeans() {
-    OBJ.unregisterBean(m_bean01);
-    OBJ.unregisterBean(m_bean02);
+    Platform.get().getBeanContext().unregisterBean(m_bean01);
+    Platform.get().getBeanContext().unregisterBean(m_bean02);
 
   }
 

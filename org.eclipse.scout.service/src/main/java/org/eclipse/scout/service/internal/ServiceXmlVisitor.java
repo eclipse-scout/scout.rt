@@ -82,6 +82,7 @@ public class ServiceXmlVisitor implements IPluginXmlVisitor {
   private void registerService(IServiceReference ref, IPluginXml xmlFile) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
     BeanImplementor<?> bean = new BeanImplementor<Object>(ref.getService());
     fillServiceAnnotations(bean, xmlFile, ref);
+    //TODO imo check to enhance the exiting bean (IService may receive a @Bean anno...) instead of re-registering it
     m_context.registerBean(bean, null);
   }
 

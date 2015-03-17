@@ -69,7 +69,7 @@ public class SwingScoutTextArea extends SwingScoutTextFieldComposite<IStringFiel
     super.attachScout();
     setTextWrapFromScout(getScoutObject().isWrapText());
     // spell checking
-    ISwingSpellCheckerService spellCheckerService = OBJ.oneOrNull(ISwingSpellCheckerService.class);
+    ISwingSpellCheckerService spellCheckerService = OBJ.getOptional(ISwingSpellCheckerService.class);
     if (spellCheckerService != null && spellCheckerService.isInstalled()) {
       m_spellingMonitor = spellCheckerService.createSpellingMonitor(new SwingFieldHolder(this, this.getSwingTextArea()));
     }

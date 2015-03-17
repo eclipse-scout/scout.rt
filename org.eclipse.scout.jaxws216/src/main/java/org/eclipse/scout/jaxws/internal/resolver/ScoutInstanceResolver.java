@@ -102,7 +102,7 @@ public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
      * Method invoked to invoke the port-type method on behalf of a server job.
      */
     protected Object invokeInServerJob(ServerJobInput input, final T portType, final Method method, final Object... args) throws ProcessingException {
-      return OBJ.one(IServerJobManager.class).runNow(new ICallable<Object>() {
+      return OBJ.get(IServerJobManager.class).runNow(new ICallable<Object>() {
 
         @Override
         public Object call() throws Exception {

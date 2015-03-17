@@ -201,7 +201,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_enabledGranted = true;
     m_visibleGranted = true;
     m_formLoading = true;
-    m_blockingCondition = OBJ.one(IModelJobManager.class).createBlockingCondition("block", false);
+    m_blockingCondition = OBJ.get(IModelJobManager.class).createBlockingCondition("block", false);
     m_objectExtensions = new ObjectExtensions<AbstractForm, IFormExtension<? extends AbstractForm>>(this);
     if (callInitializer) {
       callInitializer();
@@ -2900,9 +2900,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * Starts the timer that periodically invokes {@link AbstractForm#interceptTimer(String).
    */
   protected IFuture<Void> startTimer(long intervalSeconds, final String timerId) throws JobExecutionException {
-    final IModelJobManager modelJobManager = OBJ.one(IModelJobManager.class);
+    final IModelJobManager modelJobManager = OBJ.get(IModelJobManager.class);
 
-    return OBJ.one(IClientJobManager.class).scheduleAtFixedRate(new IRunnable() {
+    return OBJ.get(IClientJobManager.class).scheduleAtFixedRate(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -2942,7 +2942,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
     @Override
     public void run() {
-      IModelJobManager modelJobManager = OBJ.one(IModelJobManager.class);
+      IModelJobManager modelJobManager = OBJ.get(IModelJobManager.class);
 
       while (this == m_scoutCloseTimer && m_seconds > 0 && isCloseTimerArmed()) {
         modelJobManager.schedule(new IRunnable() {

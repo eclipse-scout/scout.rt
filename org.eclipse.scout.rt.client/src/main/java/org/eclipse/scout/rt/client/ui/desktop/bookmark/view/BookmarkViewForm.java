@@ -325,7 +325,7 @@ public class BookmarkViewForm extends AbstractForm {
       public void handleEvent(ClientNotificationConsumerEvent e, boolean sync) {
         if (e.getClientNotification() instanceof BookmarkChangedClientNotification) {
           IClientSession clientSession = ClientSessionProvider.currentSession();
-          OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+          OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
             @Override
             public void run() throws Exception {
               SERVICES.getService(IBookmarkService.class).loadBookmarks();

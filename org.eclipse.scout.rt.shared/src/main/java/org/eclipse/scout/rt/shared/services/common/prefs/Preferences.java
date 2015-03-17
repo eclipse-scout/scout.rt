@@ -84,7 +84,7 @@ public class Preferences implements IPreferences {
    *           if the session or nodeId is <code>null</code>.
    */
   public static IPreferences get(ISession userScope, String nodeId) throws ProcessingException {
-    IUserPreferencesService service = OBJ.one(IUserPreferencesService.class);
+    IUserPreferencesService service = OBJ.get(IUserPreferencesService.class);
     if (service == null) {
       LOG.warn("No preferences service could be found!");
       return null;

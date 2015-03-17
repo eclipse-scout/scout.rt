@@ -39,7 +39,7 @@ public abstract class AbstractGuiMock implements IGuiMock {
     final AtomicReference<Throwable> throwables = new AtomicReference<Throwable>(null);
 
     IClientSession clientSession = getClientSession();
-    IFuture<Void> future = OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+    IFuture<Void> future = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         if (deadLine < 0 || deadLine > System.nanoTime()) {

@@ -259,9 +259,9 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     ServerJobInput jobInput = ServerJobInput.empty();
     jobInput.name("cluster-sync-receive");
     jobInput.subject(m_subject);
-    jobInput.session(OBJ.one(ServerSessionProviderWithCache.class).provide(jobInput.copy()));
+    jobInput.session(OBJ.get(ServerSessionProviderWithCache.class).provide(jobInput.copy()));
 
-    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
+    OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {

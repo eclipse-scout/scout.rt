@@ -31,6 +31,6 @@ public class BlockedJobFilter implements IFilter<IFuture<?>> {
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return OBJ.one(IModelJobManager.class).isBlocked(future);
+    return OBJ.get(IModelJobManager.class).isBlocked(future);
   }
 }

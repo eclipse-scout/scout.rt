@@ -110,7 +110,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
   protected synchronized void startMessageConsumer() throws ProcessingException {
     stopMessageConsumer();
-    m_messageConsumerFuture = OBJ.one(IServerJobManager.class).schedule(createMessageConsumerRunnable(), ServerJobInput.empty().sessionRequired(false).transactional(false));
+    m_messageConsumerFuture = OBJ.get(IServerJobManager.class).schedule(createMessageConsumerRunnable(), ServerJobInput.empty().sessionRequired(false).transactional(false));
   }
 
   protected synchronized void stopMessageConsumer() throws ProcessingException {
@@ -119,7 +119,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
       // Wait for the consumer to be stopped.
       try {
-        OBJ.one(IServerJobManager.class).waitUntilDone(new FutureFilter(m_messageConsumerFuture), m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
+        OBJ.get(IServerJobManager.class).waitUntilDone(new FutureFilter(m_messageConsumerFuture), m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
       }
       catch (InterruptedException e) {
         // NOOP

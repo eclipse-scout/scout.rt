@@ -272,7 +272,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
               }
             }
             else {
-              OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+              OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
                 @Override
                 public void run() throws Exception {
                   updateSharedVariableMap(notification.getSharedVariableMap());
@@ -467,7 +467,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   protected void scheduleSessionInactivation() {
     try {
       final Set<IFuture<?>> runningFutures = findRunningFutures();
-      OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
+      OBJ.get(IClientJobManager.class).schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           long timeout = getMaxShutdownWaitTime();
@@ -512,8 +512,8 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     };
 
     ClientSessionFilter filter = new ClientSessionFilter(this);
-    OBJ.one(IModelJobManager.class).visit(filter, visitor);
-    OBJ.one(IClientJobManager.class).visit(filter, visitor);
+    OBJ.get(IModelJobManager.class).visit(filter, visitor);
+    OBJ.get(IClientJobManager.class).visit(filter, visitor);
 
     return futures;
   }

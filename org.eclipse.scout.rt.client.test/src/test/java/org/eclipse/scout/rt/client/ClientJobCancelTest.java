@@ -103,7 +103,7 @@ public class ClientJobCancelTest {
   protected String testInternal(long delay, boolean interrupt) throws Exception {
     pingServiceDelay = delay;
     //
-    IFuture<String> future = OBJ.one(IModelJobManager.class).schedule(new ICallable<String>() {
+    IFuture<String> future = OBJ.get(IModelJobManager.class).schedule(new ICallable<String>() {
       @Override
       public String call() throws Exception {
         IPingService serviceProxy = ServiceTunnelUtility.createProxy(IPingService.class, m_session.getServiceTunnel());
@@ -113,7 +113,7 @@ public class ClientJobCancelTest {
 
     //make user interrupt the job in 1 sec
     if (interrupt) {
-      OBJ.one(IClientJobManager.class).schedule(new JobThatInterrupts(future), 1, TimeUnit.SECONDS, ClientJobInput.defaults().session(m_session).name("Interrupter"));
+      OBJ.get(IClientJobManager.class).schedule(new JobThatInterrupts(future), 1, TimeUnit.SECONDS, ClientJobInput.defaults().session(m_session).name("Interrupter"));
     }
     //wait for user job
     return future.get();

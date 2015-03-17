@@ -476,7 +476,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
         showMessageBox(getRootFrame(), mb);
       }
       // notify desktop that it is loaded
-      OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+      OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           desktop.getUIFacade().fireDesktopOpenedFromUI();

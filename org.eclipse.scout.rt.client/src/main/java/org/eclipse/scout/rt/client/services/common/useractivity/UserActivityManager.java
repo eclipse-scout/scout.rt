@@ -140,7 +140,7 @@ public class UserActivityManager {
       m_currentState = newStatus;
 
       try {
-        OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
+        OBJ.get(IClientJobManager.class).schedule(new IRunnable() {
           @Override
           public void run() throws Exception {
             for (IUserActivityStateService s : SERVICES.getServices(IUserActivityStateService.class)) {

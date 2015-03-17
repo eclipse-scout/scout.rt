@@ -358,7 +358,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
       }
       P_PendingProposalRunnable job = new P_PendingProposalRunnable(text, selectCurrentValue);
       try {
-        m_pendingProposalFuture = OBJ.one(IClientJobManager.class).schedule(job, initialDelay, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
+        m_pendingProposalFuture = OBJ.get(IClientJobManager.class).schedule(job, initialDelay, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
       }
       catch (JobExecutionException e) {
         LOG.error("Unable to request proposal support for smartfield.", e);

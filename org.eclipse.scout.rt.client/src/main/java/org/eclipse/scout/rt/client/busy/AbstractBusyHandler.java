@@ -66,7 +66,7 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
 
   @Override
   public boolean acceptFuture(IFuture<?> future, IJobManager<?> mgr) {
-    if (OBJ.one(IModelJobManager.class) == mgr) {
+    if (OBJ.get(IModelJobManager.class) == mgr) {
       // only model jobs
       return true;
     }
@@ -211,7 +211,7 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
     try {
       P_TimerJob runnable = new P_TimerJob(future);
       future.getJobInput().getContext().set(TIMER_PROPERTY, runnable);
-      OBJ.one(IClientJobManager.class).schedule(runnable, getShortOperationMillis(), TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
+      OBJ.get(IClientJobManager.class).schedule(runnable, getShortOperationMillis(), TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
     }
     catch (JobExecutionException e) {
       LOG.warn("Unable to schedule busy timer.", e);
@@ -259,7 +259,7 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
     if (future.isCancelled() || future.isDone()) {
       return false;
     }
-    boolean isBlocked = OBJ.one(IModelJobManager.class).isBlocked(future);
+    boolean isBlocked = OBJ.get(IModelJobManager.class).isBlocked(future);
     if (isBlocked) {
       return false;
     }

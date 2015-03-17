@@ -50,7 +50,7 @@ public class FileChooser implements IFileChooser {
     m_directory = directory;
     m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(fileExtensions);
     m_load = load;
-    m_blockingCondition = OBJ.one(IModelJobManager.class).createBlockingCondition("block", false);
+    m_blockingCondition = OBJ.get(IModelJobManager.class).createBlockingCondition("block", false);
   }
 
   @Override

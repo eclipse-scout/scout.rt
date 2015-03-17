@@ -1022,11 +1022,11 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
         ClientJobInput input = ClientJobInput.defaults().session(session).name("Smartfield text lookup");
         if (background) {
-          OBJ.one(IModelJobManager.class).schedule(scoutSyncJob, input);
+          OBJ.get(IModelJobManager.class).schedule(scoutSyncJob, input);
         }
         else {
           try {
-            OBJ.one(IModelJobManager.class).runNow(scoutSyncJob, input);
+            OBJ.get(IModelJobManager.class).runNow(scoutSyncJob, input);
           }
           catch (ProcessingException e) {
             fetcher.dataFetched(null, e);
@@ -1130,11 +1130,11 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
         ClientJobInput input = ClientJobInput.defaults().session(session).name("ContentAssistField browse lookup");
         if (background) {
-          OBJ.one(IModelJobManager.class).schedule(scoutSyncJob, input);
+          OBJ.get(IModelJobManager.class).schedule(scoutSyncJob, input);
         }
         else {
           try {
-            OBJ.one(IModelJobManager.class).runNow(scoutSyncJob, input);
+            OBJ.get(IModelJobManager.class).runNow(scoutSyncJob, input);
           }
           catch (ProcessingException e) {
             fetcher.dataFetched(null, e);

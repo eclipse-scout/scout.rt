@@ -26,10 +26,10 @@ import org.eclipse.scout.rt.server.IServerSession;
 public class ProcessInspector {
 
   /**
-   * Convenience for {@link OBJ#one(Class)}
+   * Convenience for {@link OBJ#get(Class)}
    */
   public static ProcessInspector instance() {
-    return OBJ.one(ProcessInspector.class);
+    return OBJ.get(ProcessInspector.class);
   }
 
   /**

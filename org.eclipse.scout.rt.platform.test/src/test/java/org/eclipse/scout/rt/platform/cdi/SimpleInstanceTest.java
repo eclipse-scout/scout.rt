@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.cdi;
 
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
@@ -42,7 +43,7 @@ public class SimpleInstanceTest {
 
   @AfterClass
   public static void unregisterBeans() {
-    OBJ.registerClass(TestObject.class);
+    Platform.get().getBeanContext().registerClass(TestObject.class);
   }
 
   private static interface ITestObject {

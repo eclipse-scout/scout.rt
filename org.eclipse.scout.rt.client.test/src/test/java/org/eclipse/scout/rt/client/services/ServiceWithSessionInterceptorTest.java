@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services;
 
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
@@ -31,17 +32,17 @@ public class ServiceWithSessionInterceptorTest {
 
   @BeforeClass
   public static void setUp() {
-    m_bean01 = OBJ.registerClass(TestService.class);
+    m_bean01 = Platform.get().getBeanContext().registerClass(TestService.class);
   }
 
   @AfterClass
   public static void tearDown() {
-    OBJ.unregisterBean(m_bean01);
+    Platform.get().getBeanContext().unregisterBean(m_bean01);
   }
 
   @Test
   public void testService() throws Exception {
-    OBJ.one(ITestService.class).doit();
+    OBJ.get(ITestService.class).doit();
   }
 
   private static interface ITestService extends IService {

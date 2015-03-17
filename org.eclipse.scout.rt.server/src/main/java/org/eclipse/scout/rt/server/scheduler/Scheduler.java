@@ -16,6 +16,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -50,7 +51,7 @@ public class Scheduler extends AbstractScheduler implements IScheduler {
 
   @Override
   public void handleJobExecution(final ISchedulerJob job, final TickSignal signal) throws ProcessingException {
-    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
+    OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -69,15 +70,15 @@ public class Scheduler extends AbstractScheduler implements IScheduler {
   // TODO [dwi] [session]: remove temporary workaround until session class is registered in platform.
   @Deprecated
   private static IServerSession loadServerSession(Class<? extends IServerSession> serverSessionType, Subject subject) throws ProcessingException {
-    IServerSession currentServerSession = OBJ.oneOrNull(IServerSession.class);
+    IServerSession currentServerSession = OBJ.getOptional(IServerSession.class);
     if (currentServerSession != null) {
-      IBean<?> oldServerSessionBean = OBJ.registerClass(currentServerSession.getClass());
-      OBJ.unregisterBean(oldServerSessionBean);
+      IBean<?> oldServerSessionBean = Platform.get().getBeanContext().registerClass(currentServerSession.getClass());
+      Platform.get().getBeanContext().unregisterBean(oldServerSessionBean);
       try {
         return loadServerSessionInternal(serverSessionType, subject);
       }
       finally {
-        OBJ.registerBean(oldServerSessionBean, null);
+        Platform.get().getBeanContext().registerBean(oldServerSessionBean, null);
       }
     }
     else {
@@ -88,12 +89,12 @@ public class Scheduler extends AbstractScheduler implements IScheduler {
   // TODO [dwi] [session]: remove temporary workaround until session class is registered in platform.
   @Deprecated
   private static IServerSession loadServerSessionInternal(Class<? extends IServerSession> serverSessionType, Subject subject) throws ProcessingException {
-    IBean<?> newServerSessionBean = OBJ.registerClass(serverSessionType);
+    IBean<?> newServerSessionBean = Platform.get().getBeanContext().registerClass(serverSessionType);
     try {
-      return OBJ.one(ServerSessionProviderWithCache.class).provide(ServerJobInput.empty().subject(subject));
+      return OBJ.get(ServerSessionProviderWithCache.class).provide(ServerJobInput.empty().subject(subject));
     }
     finally {
-      OBJ.unregisterBean(newServerSessionBean);
+      Platform.get().getBeanContext().unregisterBean(newServerSessionBean);
     }
   }
 }

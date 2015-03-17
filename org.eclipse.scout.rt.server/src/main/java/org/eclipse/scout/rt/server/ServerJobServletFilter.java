@@ -137,7 +137,7 @@ public class ServerJobServletFilter implements Filter {
    * @return {@link IServerSession}; must not be <code>null</code>.
    */
   protected IServerSession provideServerSession(final ServerJobInput input) throws ProcessingException {
-    final IServerSession serverSession = OBJ.one(ServerSessionProvider.class).provide(input);
+    final IServerSession serverSession = OBJ.get(ServerSessionProvider.class).provide(input);
     serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(input.getServletRequest(), input.getServletResponse()));
     return serverSession;
   }
@@ -162,7 +162,7 @@ public class ServerJobServletFilter implements Filter {
    *          input to be used to run the server job with current context information set.
    */
   protected void continueChainInServerJob(final FilterChain chain, final ServerJobInput input) throws ProcessingException {
-    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
+    OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {

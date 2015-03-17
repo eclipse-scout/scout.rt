@@ -101,7 +101,7 @@ public class PlatformImplementor implements IPlatform {
   }
 
   protected void startApplication() {
-    m_application = OBJ.oneOrNull(IApplication.class);
+    m_application = OBJ.getOptional(IApplication.class);
     if (m_application != null) {
       try {
         m_application.start();

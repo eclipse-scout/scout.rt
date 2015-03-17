@@ -127,7 +127,7 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
       input.subject(authSubject);
       input.session(lookupServerSession(authSubject));
 
-      return OBJ.one(IServerJobManager.class).runNow(new ICallable<Boolean>() {
+      return OBJ.get(IServerJobManager.class).runNow(new ICallable<Boolean>() {
 
         @Override
         public Boolean call() throws Exception {
@@ -147,7 +147,7 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
   @Internal
   protected IServerSession lookupServerSession(final Subject subject) throws ProcessingException {
     final ServerJobInput input = ServerJobInput.defaults().name("JAX-WS Session").subject(subject);
-    return OBJ.one(ServerSessionProviderWithCache.class).provide(input);
+    return OBJ.get(ServerSessionProviderWithCache.class).provide(input);
   }
 
   /**

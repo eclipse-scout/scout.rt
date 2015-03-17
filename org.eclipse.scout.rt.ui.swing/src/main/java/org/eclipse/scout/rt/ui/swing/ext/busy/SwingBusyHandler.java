@@ -44,7 +44,7 @@ public class SwingBusyHandler extends AbstractBusyHandler {
   protected void runBusy(IFuture<?> future) {
     try {
       IRunnable runnable = new SwingBusyJob(this);
-      OBJ.one(IClientJobManager.class).schedule(runnable, ClientJobInput.defaults().sessionRequired(false).name(TEXTS.get("BusyJob")));
+      OBJ.get(IClientJobManager.class).schedule(runnable, ClientJobInput.defaults().sessionRequired(false).name(TEXTS.get("BusyJob")));
     }
     catch (JobExecutionException e) {
       LOG.error("", e);

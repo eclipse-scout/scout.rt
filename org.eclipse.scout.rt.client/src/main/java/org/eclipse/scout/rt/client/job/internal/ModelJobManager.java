@@ -160,7 +160,7 @@ public class ModelJobManager implements IModelJobManager {
     IJobChangeListeners.DEFAULT.fireEvent(new JobChangeEvent(JobChangeEvent.EVENT_TYPE_SCHEDULED, JobChangeEvent.EVENT_MODE_ASYNC, this, task.getFuture()));
 
     try {
-      OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
+      OBJ.get(IClientJobManager.class).schedule(new IRunnable() {
 
         @Override
         public void run() throws Exception {

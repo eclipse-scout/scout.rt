@@ -50,9 +50,9 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
     }
     desktop.releaseUnusedPages();
     System.gc();
-    OBJ.one(IClientJobManager.class).cancel(new AndFilter<IFuture<?>>(new JobFilter(getClass().getName()), new ClientSessionFilter(session)), true);
+    OBJ.get(IClientJobManager.class).cancel(new AndFilter<IFuture<?>>(new JobFilter(getClass().getName()), new ClientSessionFilter(session)), true);
     try {
-      OBJ.one(IClientJobManager.class).schedule(new ForceGCJob(), ClientJobInput.defaults().session(session).name("release memory").id(getClass().getName()));
+      OBJ.get(IClientJobManager.class).schedule(new ForceGCJob(), ClientJobInput.defaults().session(session).name("release memory").id(getClass().getName()));
     }
     catch (JobExecutionException e) {
       LOG.error("", e);

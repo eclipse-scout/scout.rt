@@ -82,7 +82,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
    * @return {@link IServerSession}; must not be <code>null</code>.
    */
   protected IServerSession provideServerSession(final ServerJobInput input) throws ProcessingException {
-    final IServerSession serverSession = OBJ.one(ServerSessionProviderWithCache.class).provide(input);
+    final IServerSession serverSession = OBJ.get(ServerSessionProviderWithCache.class).provide(input);
     serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(input.getServletRequest(), input.getServletResponse()));
     return serverSession;
   }
@@ -97,7 +97,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
    * @return {@link IServiceTunnelResponse} response sent back to the caller.
    */
   protected IServiceTunnelResponse invokeServiceInServerJob(final ServerJobInput input, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
-    return OBJ.one(IServerJobManager.class).schedule(new ICallable<IServiceTunnelResponse>() {
+    return OBJ.get(IServerJobManager.class).schedule(new ICallable<IServiceTunnelResponse>() {
 
       @Override
       public IServiceTunnelResponse call() throws Exception {

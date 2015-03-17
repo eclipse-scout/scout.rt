@@ -41,7 +41,7 @@ public class NotifyTestListenerStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
-    final ITestExecutionListener listener = OBJ.oneOrNull(ITestExecutionListener.class);
+    final ITestExecutionListener listener = OBJ.getOptional(ITestExecutionListener.class);
     if (listener != null) {
       listener.beforeTestClass(m_description);
       try {

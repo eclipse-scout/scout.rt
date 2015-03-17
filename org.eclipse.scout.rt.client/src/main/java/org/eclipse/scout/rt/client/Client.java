@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.cdi.OBJ;
  * An object (typically a service implementation) with this annotation creates a client transaction whenever an
  * operationis called.
  * <p>
- * Only valid if the object is obtained using {@link OBJ#one(Class)} with an interface argument
+ * Only valid if the object is obtained using {@link OBJ#get(Class)} with an interface argument
  */
 @Bean
 @BeanInvocationHint

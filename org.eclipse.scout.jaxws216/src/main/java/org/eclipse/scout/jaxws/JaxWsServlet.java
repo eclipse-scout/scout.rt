@@ -55,7 +55,7 @@ public class JaxWsServlet extends EndpointServlet {
       input.sessionRequired(false);
       input.transactional(false);
 
-      OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
+      OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
 
         @Override
         public void run() throws Exception {

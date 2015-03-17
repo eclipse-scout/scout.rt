@@ -53,8 +53,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBo
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -87,12 +87,12 @@ public class SwingScoutModelFinderUiTest {
 
   @Before
   public void before() {
-    m_iconLocatorReg = OBJ.registerClass(P_NullIconLocator.class);
+    m_iconLocatorReg = Platform.get().getBeanContext().registerClass(P_NullIconLocator.class);
   }
 
   @After
   public void after() {
-    OBJ.unregisterBean(m_iconLocatorReg);
+    Platform.get().getBeanContext().unregisterBean(m_iconLocatorReg);
   }
 
   @Test

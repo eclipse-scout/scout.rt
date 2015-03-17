@@ -582,7 +582,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     }
 
     // TODO [dwi]: delayed model job
-    m_storeColumnWidthsJob = OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+    m_storeColumnWidthsJob = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         if (getScoutObject() != null) {
@@ -773,7 +773,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       m_swingAutoOptimizeColumnWidthsJob.cancel(true);
     }
     try {
-      m_swingAutoOptimizeColumnWidthsJob = OBJ.one(IClientJobManager.class).schedule(new P_SwingAutoOptimizeColumnWidthsJob(), 200, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
+      m_swingAutoOptimizeColumnWidthsJob = OBJ.get(IClientJobManager.class).schedule(new P_SwingAutoOptimizeColumnWidthsJob(), 200, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
     }
     catch (JobExecutionException e) {
     }

@@ -43,7 +43,7 @@ public class ScoutClientJobWrapperStatement extends Statement {
       doEvaluate();
     }
     else {
-      IFuture<Void> future = OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+      IFuture<Void> future = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           try {

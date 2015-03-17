@@ -218,7 +218,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
     super.attachScout();
 
     //add listener and init values
-    OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+    OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         if (m_scoutNavListener == null) {
@@ -239,7 +239,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
   protected void detachScout() {
     super.detachScout();
     //add listener and init values
-    OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+    OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         if (m_scoutNavListener != null) {

@@ -26,7 +26,7 @@ public class ModelJobFilter implements IJobChangeEventFilter {
 
   @Override
   public boolean accept(IJobChangeEvent event) {
-    return OBJ.one(IModelJobManager.class) == event.getSourceManager();
+    return OBJ.get(IModelJobManager.class) == event.getSourceManager();
   }
 
 }

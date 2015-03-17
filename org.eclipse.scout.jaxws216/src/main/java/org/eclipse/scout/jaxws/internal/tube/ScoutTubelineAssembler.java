@@ -194,7 +194,7 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
       return IAuthenticator.AcceptAnyAuthenticator.INSTANCE;
     }
     else {
-      return OBJ.one(authenticatorClass);
+      return OBJ.get(authenticatorClass);
     }
   }
 
@@ -204,7 +204,7 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
   @Internal
   protected Object invokeInServerJob(final ServerJobInput input, final Object object, final Method method, final Object[] args) throws Throwable {
     try {
-      return OBJ.one(IServerJobManager.class).runNow(new ICallable<Object>() {
+      return OBJ.get(IServerJobManager.class).runNow(new ICallable<Object>() {
 
         @Override
         public Object call() throws Exception {

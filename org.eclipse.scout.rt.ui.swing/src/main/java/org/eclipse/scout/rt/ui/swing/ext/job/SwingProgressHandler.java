@@ -176,8 +176,8 @@ public class SwingProgressHandler {
 
     @Override
     public void actionPerformed(ActionEvent a) {
-      OBJ.one(IClientJobManager.class).cancel(new AlwaysFilter<IFuture<?>>(), true);
-      OBJ.one(IModelJobManager.class).cancel(new AlwaysFilter<IFuture<?>>(), true);
+      OBJ.get(IClientJobManager.class).cancel(new AlwaysFilter<IFuture<?>>(), true);
+      OBJ.get(IModelJobManager.class).cancel(new AlwaysFilter<IFuture<?>>(), true);
     }
   }// end class
 

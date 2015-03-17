@@ -444,7 +444,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   private boolean isModelThread() {
-    return OBJ.one(IModelJobManager.class).isModelThread();
+    return OBJ.get(IModelJobManager.class).isModelThread();
   }
 
   @Override

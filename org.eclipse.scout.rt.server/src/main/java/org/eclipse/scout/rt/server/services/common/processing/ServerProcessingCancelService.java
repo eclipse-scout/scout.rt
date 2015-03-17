@@ -31,6 +31,6 @@ public class ServerProcessingCancelService extends AbstractService implements IS
     final IFilter<IFuture<?>> filterCurrentSession = new ServerSessionFilter(ServerSessionProvider.currentSession());
 
     // Cancel the job and its associated transaction.
-    return OBJ.one(IServerJobManager.class).cancel(new AndFilter<>(filterJobId, filterCurrentSession), true);
+    return OBJ.get(IServerJobManager.class).cancel(new AndFilter<>(filterJobId, filterCurrentSession), true);
   }
 }

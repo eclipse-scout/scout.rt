@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -33,9 +34,9 @@ public class PostConstructTest {
 
   @BeforeClass
   public static void registerBeans() {
-    m_bean01 = OBJ.registerClass(Bean01.class);
-    m_bean02 = OBJ.registerClass(Bean02.class);
-    m_bean04 = OBJ.registerClass(Bean04.class);
+    m_bean01 = Platform.get().getBeanContext().registerClass(Bean01.class);
+    m_bean02 = Platform.get().getBeanContext().registerClass(Bean02.class);
+    m_bean04 = Platform.get().getBeanContext().registerClass(Bean04.class);
 
   }
 
@@ -47,19 +48,19 @@ public class PostConstructTest {
   @Test
   public void testInitialize() {
     Assert.assertEquals(0, Bean01.m_initializedCounter.get());
-    OBJ.one(Bean01.class);
+    OBJ.get(Bean01.class);
     Assert.assertEquals(1, Bean01.m_initializedCounter.get());
 
-    OBJ.one(Bean01.class);
+    OBJ.get(Bean01.class);
     Assert.assertEquals(1, Bean01.m_initializedCounter.get());
   }
 
   @Test
   public void testInitialzeInHierarchy() {
-    Bean02 new1 = OBJ.one(Bean02.class);
+    Bean02 new1 = OBJ.get(Bean02.class);
     Assert.assertEquals(1, new1.getSuperInitCount());
     Assert.assertEquals(1, new1.getInitCount());
-    new1 = OBJ.one(Bean02.class);
+    new1 = OBJ.get(Bean02.class);
     Assert.assertEquals(1, new1.getSuperInitCount());
     Assert.assertEquals(1, new1.getInitCount());
 
@@ -67,10 +68,10 @@ public class PostConstructTest {
 
   @Test
   public void testInitializeInHierarchyWithSameMethodNames() {
-    Bean04 new1 = OBJ.one(Bean04.class);
+    Bean04 new1 = OBJ.get(Bean04.class);
     Assert.assertEquals(1, new1.getBean04InitCount());
     Assert.assertEquals(1, new1.getAbstractBean03InitCount());
-    new1 = OBJ.one(Bean04.class);
+    new1 = OBJ.get(Bean04.class);
     Assert.assertEquals(1, new1.getBean04InitCount());
     Assert.assertEquals(1, new1.getAbstractBean03InitCount());
 
@@ -78,9 +79,9 @@ public class PostConstructTest {
 
   @AfterClass
   public static void removeBeans() {
-    OBJ.unregisterBean(m_bean01);
-    OBJ.unregisterBean(m_bean02);
-    OBJ.unregisterBean(m_bean04);
+    Platform.get().getBeanContext().unregisterBean(m_bean01);
+    Platform.get().getBeanContext().unregisterBean(m_bean02);
+    Platform.get().getBeanContext().unregisterBean(m_bean04);
   }
 
   @ApplicationScoped

@@ -64,7 +64,7 @@ public class UserActivityProvider extends AbstractPropertyObserver implements IU
     }
     if (m_userInactiveJob == null) {
       try {
-        m_userInactiveJob = OBJ.one(IClientJobManager.class).schedule(new UserInactiveRunnable(), m_idleTrigger + 1000L, TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
+        m_userInactiveJob = OBJ.get(IClientJobManager.class).schedule(new UserInactiveRunnable(), m_idleTrigger + 1000L, TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
       }
       catch (JobExecutionException e) {
       }
@@ -81,7 +81,7 @@ public class UserActivityProvider extends AbstractPropertyObserver implements IU
       }
       else {
         try {
-          m_userInactiveJob = OBJ.one(IClientJobManager.class).schedule(new UserInactiveRunnable(), delta, TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
+          m_userInactiveJob = OBJ.get(IClientJobManager.class).schedule(new UserInactiveRunnable(), delta, TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
         }
         catch (JobExecutionException e) {
         }

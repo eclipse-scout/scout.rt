@@ -150,7 +150,7 @@ public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> impl
       try {
         final URL url = new URI(uri).toURL();
         //notify scout later
-        OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+        OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
           @Override
           public void run() throws Exception {
             getScoutObject().getUIFacade().fireHyperlinkFromUI(url);

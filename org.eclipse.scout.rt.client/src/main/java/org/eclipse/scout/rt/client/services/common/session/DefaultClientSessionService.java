@@ -34,32 +34,32 @@ public class DefaultClientSessionService extends AbstractService implements ISes
 
   @Override
   public <RESULT> RESULT runNow(IExecutable<RESULT> executable) throws ProcessingException {
-    return OBJ.one(IClientJobManager.class).runNow(executable);
+    return OBJ.get(IClientJobManager.class).runNow(executable);
   }
 
   @Override
   public <RESULT> RESULT runNow(IExecutable<RESULT> executable, IJobInput input) throws ProcessingException {
-    return OBJ.one(IClientJobManager.class).runNow(executable, (ClientJobInput) input);
+    return OBJ.get(IClientJobManager.class).runNow(executable, (ClientJobInput) input);
   }
 
   @Override
   public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable) throws JobExecutionException {
-    return OBJ.one(IClientJobManager.class).schedule(executable);
+    return OBJ.get(IClientJobManager.class).schedule(executable);
   }
 
   @Override
   public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, IJobInput input) throws JobExecutionException {
-    return OBJ.one(IClientJobManager.class).schedule(executable, (ClientJobInput) input);
+    return OBJ.get(IClientJobManager.class).schedule(executable, (ClientJobInput) input);
   }
 
   @Override
   public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit) throws JobExecutionException {
-    return OBJ.one(IClientJobManager.class).schedule(executable, delay, delayUnit);
+    return OBJ.get(IClientJobManager.class).schedule(executable, delay, delayUnit);
   }
 
   @Override
   public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, IJobInput input) throws JobExecutionException {
-    return OBJ.one(IClientJobManager.class).schedule(executable, delay, delayUnit, (ClientJobInput) input);
+    return OBJ.get(IClientJobManager.class).schedule(executable, delay, delayUnit, (ClientJobInput) input);
   }
 
   @Override

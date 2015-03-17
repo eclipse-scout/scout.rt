@@ -75,7 +75,7 @@ public class ClientNotificationConsumerService extends AbstractService implement
     else {
       // async
       try {
-        OBJ.one(IClientJobManager.class).schedule(new IRunnable() {
+        OBJ.get(IClientJobManager.class).schedule(new IRunnable() {
           @Override
           public void run() throws Exception {
             fireEvent(session, notifications, false);

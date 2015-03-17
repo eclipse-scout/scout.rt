@@ -31,8 +31,8 @@ import org.eclipse.scout.rt.client.job.filter.BlockedJobFilter;
 import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
 import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.cdi.BeanImplementor;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
@@ -63,7 +63,7 @@ public class ModelJobFutureVisitTest {
     m_bean = new BeanImplementor<IModelJobManager>(IModelJobManager.class);
     m_bean.addAnnotation(AnnotationFactory.createPriority(100));
     m_bean.addAnnotation(AnnotationFactory.createApplicationScoped());
-    OBJ.registerBean(m_bean, m_jobManager);
+    Platform.get().getBeanContext().registerBean(m_bean, m_jobManager);
 
     m_session1 = mock(IClientSession.class);
     m_session2 = mock(IClientSession.class);
@@ -161,7 +161,7 @@ public class ModelJobFutureVisitTest {
 
   @After
   public void after() {
-    OBJ.unregisterBean(m_bean);
+    Platform.get().getBeanContext().unregisterBean(m_bean);
   }
 
   @Test

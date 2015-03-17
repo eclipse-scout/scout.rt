@@ -38,7 +38,7 @@ public class JobChangeBlockedListenersTest {
 
   @Test
   public void testBlocking() throws Exception {
-    final IModelJobManager jobMgr = OBJ.one(IModelJobManager.class);
+    final IModelJobManager jobMgr = OBJ.get(IModelJobManager.class);
     final IBlockingCondition condition = jobMgr.createBlockingCondition("test condition", true);
     P_JobChangeListener listener = new P_JobChangeListener();
 

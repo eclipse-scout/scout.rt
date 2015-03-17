@@ -16,7 +16,7 @@ import java.util.Set;
 import org.eclipse.scout.commons.Assertions.AssertionException;
 
 /**
- *
+ * @since 5.2
  */
 public interface IBeanContext {
 

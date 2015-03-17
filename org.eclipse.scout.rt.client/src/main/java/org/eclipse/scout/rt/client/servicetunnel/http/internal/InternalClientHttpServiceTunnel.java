@@ -137,7 +137,7 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
       }
       try {
         ClientJobInput input = ClientJobInput.defaults().session(getSession()).name("Client notification fetcher");
-        m_pollingJob = OBJ.one(IClientJobManager.class).scheduleWithFixedDelay(new ClientNotificationPollingJob(), p, p, TimeUnit.MILLISECONDS, input);
+        m_pollingJob = OBJ.get(IClientJobManager.class).scheduleWithFixedDelay(new ClientNotificationPollingJob(), p, p, TimeUnit.MILLISECONDS, input);
       }
       catch (JobExecutionException e) {
         LOG.error("Unable to schedule client notification polling job.", e);
@@ -191,6 +191,6 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
 
   @Override
   protected IFuture<?> schedule(IRunnable runnable, IServiceTunnelRequest req) throws JobExecutionException {
-    return OBJ.one(IClientJobManager.class).schedule(runnable, ClientJobInput.defaults().session(getSession()));
+    return OBJ.get(IClientJobManager.class).schedule(runnable, ClientJobInput.defaults().session(getSession()));
   }
 }

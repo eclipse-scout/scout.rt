@@ -55,7 +55,7 @@ public abstract class AbstractKeyboardNavigationSupport {
           m_navigationJob.cancel(true);
         }
         try {
-          m_navigationJob = OBJ.one(IClientJobManager.class).schedule(new P_NavigationJob(), 250, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(m_session));
+          m_navigationJob = OBJ.get(IClientJobManager.class).schedule(new P_NavigationJob(), 250, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(m_session));
         }
         catch (JobExecutionException e) {
         }

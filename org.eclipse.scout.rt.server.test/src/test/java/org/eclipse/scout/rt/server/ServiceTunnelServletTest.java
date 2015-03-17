@@ -79,7 +79,7 @@ public class ServiceTunnelServletTest {
 
   @Before
   public void before() throws ServletException, InstantiationException, IllegalAccessException {
-    m_serverSessionProviderSpy = spy(OBJ.one(ServerSessionProvider.class));
+    m_serverSessionProviderSpy = spy(OBJ.get(ServerSessionProvider.class));
 
     m_beans = TestingUtility.registerServices(TEST_SERVICE_RANKING, new StickySessionCacheService(), new AbstractAccessControlService() {
     });
@@ -197,7 +197,7 @@ public class ServiceTunnelServletTest {
     List<IFuture<?>> futures = new ArrayList<>();
 
     for (IExecutable<?> job : jobs) {
-      futures.add(OBJ.one(IServerJobManager.class).schedule(job, ServerJobInput.empty().sessionRequired(false).transactional(false)));
+      futures.add(OBJ.get(IServerJobManager.class).schedule(job, ServerJobInput.empty().sessionRequired(false).transactional(false)));
     }
 
     for (IFuture<?> future : futures) {

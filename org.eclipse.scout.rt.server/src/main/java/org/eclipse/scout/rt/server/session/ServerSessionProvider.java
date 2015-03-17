@@ -41,11 +41,11 @@ public class ServerSessionProvider {
    */
   public <T extends IServerSession> T provide(final ServerJobInput input) throws ProcessingException {
     // Create an empty session instance.
-    final T serverSession = ServerSessionProvider.cast(OBJ.one(IServerSession.class));
+    final T serverSession = ServerSessionProvider.cast(OBJ.get(IServerSession.class));
     serverSession.setIdInternal(String.format("%s-%s", serverSession.getClass().getName(), UUID.randomUUID()));
 
     // Initialize the session.
-    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
+    OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {

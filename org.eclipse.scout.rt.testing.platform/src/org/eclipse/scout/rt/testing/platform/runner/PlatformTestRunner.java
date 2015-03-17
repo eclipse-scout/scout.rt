@@ -55,7 +55,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
     if (Platform.get() == null) {
       Platform.setDefault();
       Platform.get().start();
-      final ITestExecutionListener listener = OBJ.oneOrNull(ITestExecutionListener.class);
+      final ITestExecutionListener listener = OBJ.getOptional(ITestExecutionListener.class);
       if (listener != null) {
         listener.platformStarted();
       }

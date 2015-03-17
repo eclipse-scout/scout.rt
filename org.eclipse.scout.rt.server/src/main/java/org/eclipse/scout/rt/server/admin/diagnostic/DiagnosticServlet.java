@@ -74,7 +74,7 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
    *          input to be used to run the server job with current context information set.
    */
   protected void invokeDiagnosticServiceInServerJob(final ServerJobInput input) throws ProcessingException {
-    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
+    OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {

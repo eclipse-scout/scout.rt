@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.services;
 
 import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.TestServerSession;
@@ -32,7 +33,7 @@ public class ServiceWithSessionInterceptorTest {
   @BeforeClass
   public static void setUp() {
     serverSession = new TestServerSession();
-    OBJ.registerClass(TestService.class);
+    Platform.get().getBeanContext().registerClass(TestService.class);
   }
 
   @AfterClass
@@ -42,7 +43,7 @@ public class ServiceWithSessionInterceptorTest {
 
   @Test
   public void testService() throws Exception {
-    OBJ.one(IServerJobManager.class).runNow(new IRunnable() {
+    OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -52,7 +53,7 @@ public class ServiceWithSessionInterceptorTest {
   }
 
   protected void runInServerJob() {
-    OBJ.one(ITestService.class).doit();
+    OBJ.get(ITestService.class).doit();
 
   }
 

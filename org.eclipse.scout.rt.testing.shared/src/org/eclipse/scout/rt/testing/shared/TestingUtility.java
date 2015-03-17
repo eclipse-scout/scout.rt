@@ -21,10 +21,10 @@ import java.util.Map;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.cdi.BeanImplementor;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.mockito.Mockito;
 
 /**
@@ -84,7 +84,7 @@ public final class TestingUtility {
     BeanImplementor<SERVICE> bean = new BeanImplementor<>(clazz);
     bean.addAnnotation(AnnotationFactory.createApplicationScoped());
     bean.addAnnotation(AnnotationFactory.createPriority(priority));
-    OBJ.registerBean(bean, object);
+    Platform.get().getBeanContext().registerBean(bean, object);
     return bean;
   }
 
@@ -98,7 +98,7 @@ public final class TestingUtility {
       return;
     }
     for (IBean<?> bean : beans) {
-      OBJ.unregisterBean(bean);
+      Platform.get().getBeanContext().unregisterBean(bean);
     }
   }
 

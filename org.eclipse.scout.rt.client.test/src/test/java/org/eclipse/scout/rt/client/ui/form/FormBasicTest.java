@@ -63,7 +63,7 @@ public class FormBasicTest {
     testSequence.add(0);
     testSequence.add(1);
     //emulate that gui clicks on ok button
-    IFuture<Void> future = OBJ.one(IModelJobManager.class).schedule(new IRunnable() {
+    IFuture<Void> future = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         testSequence.add(2);

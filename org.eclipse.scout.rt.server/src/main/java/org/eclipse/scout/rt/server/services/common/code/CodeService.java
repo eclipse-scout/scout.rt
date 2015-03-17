@@ -49,7 +49,7 @@ public class CodeService extends SharedCodeService implements IClusterNotificati
     SERVICES.getService(IClientNotificationService.class).putNotification(new CodeTypeChangedNotification(codetypeList), new AllUserFilter(AllUserFilter.DEFAULT_TIMEOUT));
 
     // notify clusters:
-    IClusterSynchronizationService s = OBJ.oneOrNull(IClusterSynchronizationService.class);
+    IClusterSynchronizationService s = OBJ.getOptional(IClusterSynchronizationService.class);
     if (s != null) {
       s.publishNotification(new UnloadCodeTypeCacheClusterNotification(codetypeList));
     }
