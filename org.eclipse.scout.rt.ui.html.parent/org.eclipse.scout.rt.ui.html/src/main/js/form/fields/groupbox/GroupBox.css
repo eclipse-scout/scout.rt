@@ -25,7 +25,7 @@
   padding-bottom: 6px;
   .overflow-ellipsis;
 
-  .group-box.collapsed > & {
+  .group-box.collapsed:not(.with-line) > & {
     border-bottom-color: transparent;
   }
 

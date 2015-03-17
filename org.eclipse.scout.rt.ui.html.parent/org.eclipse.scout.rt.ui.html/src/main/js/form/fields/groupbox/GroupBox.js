@@ -164,6 +164,9 @@ scout.GroupBox.prototype._renderExpandable = function(expandable) {
 
 scout.GroupBox.prototype._renderExpanded = function(expanded) {
   this.$container.toggleClass('collapsed', !expanded);
+  if (this.borderDecoration === 'line') {
+    this.$container.toggleClass('with-line', !expanded);
+  }
   if (this.rendered) {
     scout.HtmlComponent.get(this.$container).invalidateTree();
   }
