@@ -189,13 +189,13 @@ public class MobileSmartTreeForm<LOOKUP_TYPE> extends ContentAssistTreeForm<LOOK
         }
 
         @Override
-        protected boolean getConfiguredValidateOnAnyKey() {
+        protected boolean getConfiguredUpdateDisplayTextOnModify() {
           return true;
         }
 
         @Override
-        protected void execChangedValue() throws ProcessingException {
-          getContentAssistField().doSearch(getValue(), false, false);
+        protected void execChangedDisplayText() {
+          getContentAssistField().doSearch(getDisplayText(), false, false);
         }
 
       }

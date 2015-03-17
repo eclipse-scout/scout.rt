@@ -148,13 +148,13 @@ public class BookmarkViewForm extends AbstractForm {
           }
 
           @Override
-          protected boolean getConfiguredValidateOnAnyKey() {
+          protected boolean getConfiguredUpdateDisplayTextOnModify() {
             return true;
           }
 
           @Override
-          protected void execChangedValue() throws ProcessingException {
-            String s = StringUtility.emptyIfNull(getValue()).trim();
+          protected void execChangedDisplayText() {
+            String s = StringUtility.emptyIfNull(getDisplayText()).trim();
             if (s.length() > 0) {
               if (!s.endsWith("*")) {
                 s = s + "*";

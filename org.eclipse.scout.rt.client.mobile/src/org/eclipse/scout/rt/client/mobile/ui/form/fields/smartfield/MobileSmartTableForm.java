@@ -194,13 +194,13 @@ public class MobileSmartTableForm<LOOKUP_TYPE> extends ContentAssistTableForm<LO
         }
 
         @Override
-        protected boolean getConfiguredValidateOnAnyKey() {
+        protected boolean getConfiguredUpdateDisplayTextOnModify() {
           return true;
         }
 
         @Override
-        protected void execChangedValue() throws ProcessingException {
-          getContentAssistField().doSearch(getValue(), false, false);
+        protected void execChangedDisplayText() {
+          getContentAssistField().doSearch(getDisplayText(), false, false);
         }
 
       }
