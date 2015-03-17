@@ -1,0 +1,39 @@
+.html-field > .field {
+  padding-top: @borderless-field-padding-y;
+  padding-bottom: @borderless-field-padding-y;
+  margin-left: @mandatory-indicator-width;
+  .user-select(text);
+  .overflow-ellipsis;
+
+  /* Set styles for allowed HTML tags inside HTML field: */
+
+  & table {
+    border: 0;
+    border-spacing: 0;
+    border-collapse: collapse;
+    margin: 0;
+    padding: 0;
+  }
+  & tr, & td, & th {
+    padding-left: 0;
+  }
+
+  & h1 {
+    font-size: 17px;
+  }
+  & h2 {
+    font-size: 16px;
+  }
+  & h3 {
+    font-size: 15px;
+  }
+  & h4 {
+    font-size: 14px;
+  }
+  & h5 {
+    font-size: 13px;
+  }
+  & small {
+    font-size: 10px;
+  }
+}

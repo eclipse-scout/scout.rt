@@ -124,6 +124,12 @@
       "selectedNodeIds": [],
       "filterEnabled": false
     },
+    "ImageField": {
+      "scrollBarEnabled": false
+    },
+    "HtmlField": {
+      "scrollBarsEnabled": false
+    },
 
     // Other objects
     "Cell": {
@@ -150,9 +156,6 @@
       "expanded": false,
       "leaf": false,
       "childNodes": []
-    },
-    "ImageField": {
-      "scrollBarEnabled": false
     }
   },
 
@@ -181,6 +184,7 @@
         "CheckBoxField": null,
         "CalendarField": null,
         "DateField": null,
+        "HtmlField": null,
         "LabelField": null,
         "NumberField": null,
         "RichTextField": null,

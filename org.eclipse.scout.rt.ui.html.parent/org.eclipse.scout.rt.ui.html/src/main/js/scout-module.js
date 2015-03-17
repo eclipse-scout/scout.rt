@@ -125,6 +125,7 @@ __include("form/fields/datefield/DatePicker.js");
 __include("form/fields/groupbox/GroupBox.js");
 __include("form/fields/groupbox/GroupBoxKeyStrokeAdapter.js");
 __include("form/fields/groupbox/GroupBoxLayout.js");
+__include("form/fields/htmlfield/HtmlField.js");
 __include("form/fields/imagefield/ImageField.js");
 __include("form/fields/imagefield/ImageFieldLayout.js");
 __include("form/fields/labelfield/LabelField.js");

@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
@@ -77,6 +78,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.calendar.JsonCalendarField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
+import org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield.JsonHtmlField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.imagefield.JsonImageField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.labelfield.JsonLabelField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.listbox.JsonListBox;
@@ -209,6 +211,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (model instanceof IWizardProgressField) {
       return new JsonWizardProgressField((IWizardProgressField) model, session, id, parent);
+    }
+    if (model instanceof IHtmlField) {
+      return new JsonHtmlField((IHtmlField) model, session, id, parent);
     }
 
     // Fallback for all other form fields (will generate a 'not implemented' placeholder). Note: insert more form fields _before_ this line!
