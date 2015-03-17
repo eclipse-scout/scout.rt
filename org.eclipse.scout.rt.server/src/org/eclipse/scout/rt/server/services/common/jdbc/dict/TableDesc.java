@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,6 +18,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.zip.CRC32;
 
+/**
+ * @deprecated will be removed in the Neptune release.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class TableDesc implements java.io.Serializable {
   private static final long serialVersionUID = -8904163472086670246L;
   private String m_name, m_owner;

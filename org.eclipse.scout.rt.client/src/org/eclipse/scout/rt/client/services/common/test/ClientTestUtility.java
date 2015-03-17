@@ -42,6 +42,10 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.osgi.framework.Bundle;
 
+/**
+ * @deprecated will be removed in the Neptune release.
+ */
+@Deprecated
 public final class ClientTestUtility {
 
   private ClientTestUtility() {

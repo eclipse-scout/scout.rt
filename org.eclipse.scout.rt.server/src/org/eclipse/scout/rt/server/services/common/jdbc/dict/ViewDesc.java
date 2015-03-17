@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,10 +14,16 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+/**
+ * @deprecated will be removed in the Neptune release.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class ViewDesc implements java.io.Serializable {
   private static final long serialVersionUID = 5293982375734275306L;
   private String m_name, m_owner;
   private String m_statement;
+
   private Collection<TableGrantDesc> m_grants;
 
   // for IScoutSerializable

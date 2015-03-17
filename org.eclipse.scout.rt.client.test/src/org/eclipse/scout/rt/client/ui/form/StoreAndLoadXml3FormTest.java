@@ -27,6 +27,7 @@ import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@SuppressWarnings("deprecation")
 @RunWith(ScoutClientTestRunner.class)
 public class StoreAndLoadXml3FormTest {
 

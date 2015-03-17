@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,6 +16,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 
+/**
+ * @deprecated will be removed in the Neptune release.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class OracleDataDictionaryBuilder {
   public static final int SOURCE_TYPE_ORACLE_SERVER = 100;
   public static final int SOURCE_TYPE_ORACLE_CLIENT_LITE = 101;

@@ -126,6 +126,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
 
+@SuppressWarnings("deprecation")
 @FormData(value = AbstractFormData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractForm extends AbstractPropertyObserver implements IForm, IExtensibleObject, IContributionOwner {
 
@@ -2590,7 +2591,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * @deprecated will be removed with the N-Release. See Bug 456408.
    *             With the N-Release you should use {@link #getTitle()} instead.
    */
-  @SuppressWarnings("deprecation")
   @Deprecated
   @Override
   public String getBasicTitle() {
@@ -2601,7 +2601,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * @deprecated will be removed with the N-Release. See Bug 456408.
    *             With the N-Release you should use {@link #getTitle()} instead.
    */
-  @SuppressWarnings("deprecation")
   @Deprecated
   @Override
   public void setBasicTitle(String basicTitle) {

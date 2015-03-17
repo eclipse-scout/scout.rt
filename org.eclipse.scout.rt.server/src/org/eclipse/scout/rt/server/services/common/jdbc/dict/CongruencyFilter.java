@@ -18,6 +18,11 @@ import java.util.Iterator;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
+/**
+ * @deprecated will be removed in the Neptune release.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class CongruencyFilter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(CongruencyFilter.class);
   private ArrayList<String> m_forceTriggerChangeTableNames = new ArrayList<String>();
