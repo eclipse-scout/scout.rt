@@ -56,7 +56,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper();
   this.partId = jsonSessionId.substring(0, jsonSessionId.indexOf(':'));
-  this._asyncChecker;
+  this._requestedBackgroundJob = false;
 
   // TODO BSH Detach | Check if there is another way
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
@@ -347,22 +347,25 @@ scout.Session.prototype._processSuccessResponse = function(message) {
     cacheSize = scout.objects.countProperties(this.modelAdapterRegistry);
     $.log.debug('size of modelAdapterRegistry after response has been processed: ' + cacheSize);
   }
-
-  if (message.checkAsync) {
-    this._asyncChecker = setTimeout(this._pullAsyncResults.bind(this), 250);
-    $.log.debug('message.checkAsync = true. Pull async results in 250 [ms]...');
-  }
 };
 
 /**
- * Pulls the results of running async jobs. Note: we cannot use the _sendRequest method here
- * since we don't want the busy handling in this case (async jobs should run in the _background_).
+ * Pulls the results of jobs running in the background. Note: we cannot use the _sendRequest method here
+ * since we don't want any busy handling in case of background jobs. The request may take a while, since
+ * the server doesn't return until either a time-out occurs or there's something in the response when
+ * a model job is done and no request initiated by a user is running.
  */
-scout.Session.prototype._pullAsyncResults = function() {
-  $.log.info('Check for async results...');
+scout.Session.prototype._requestBackgroundJobs = function() {
+  if (this._requestedBackgroundJob) {
+    $.log.info('A background job request was already started. Don\'t start a new one...');
+    return;
+  }
+
+  $.log.info('Start a new background jobs request...');
+  this._requestedBackgroundJob = true;
   var request = {
-      pullAsyncResults: true,
-      jsonSessionId: this.jsonSessionId
+      jsonSessionId: this.jsonSessionId,
+      waitForBackgroundJobs: true
     }, ajaxOptions = {
       async: true,
       type: 'POST',
@@ -380,6 +383,11 @@ scout.Session.prototype._pullAsyncResults = function() {
       }.bind(this))
       .fail(function(jqXHR, textStatus, errorThrown) {
         this._processErrorResponse(request, jqXHR, textStatus, errorThrown);
+      }.bind(this))
+      .always(function() {
+        this._requestedBackgroundJob = false;
+        setTimeout(this._requestBackgroundJobs.bind(this));
+        $.log.info('background job request done');
       }.bind(this));
 };
 
@@ -659,12 +667,12 @@ scout.Session.prototype._onInitialized = function(event) {
   this.locale = new scout.Locale(clientSessionData.locale);
   this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
   this.desktop.render(this.$entryPoint);
+  this._requestBackgroundJobs();
 };
 
 scout.Session.prototype._onLogout = function(event) {
   // Make sure the unload handler does not get triggered since the server initiated the logout and already disposed the session
   $(window).off('unload.' + this.id);
-
   if (event.redirectUrl) {
     window.location.href = event.redirectUrl;
   } else {

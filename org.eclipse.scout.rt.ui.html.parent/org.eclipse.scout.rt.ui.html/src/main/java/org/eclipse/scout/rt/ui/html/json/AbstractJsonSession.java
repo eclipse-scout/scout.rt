@@ -11,13 +11,13 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.security.AccessController;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.security.auth.Subject;
@@ -35,12 +35,13 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.shared.ui.IUiLayer;
@@ -74,31 +75,43 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private final AtomicReference<HttpServletRequest> m_currentHttpRequest = new AtomicReference<>();
   private JsonEventProcessor m_jsonEventProcessor;
   private boolean m_disposing;
-  private final List<IFuture<?>> m_asyncStartedJobFutures;
   private IJobListener m_jobChangeListener;
 
   // FIXME AWE: (jobs) thread safety, review
-  // FIXME AWE: (jobs) make test form for async stuff
+  private Object m_backgroundJobLock = new Object();
+
   public AbstractJsonSession() {
     m_currentJsonResponse = createJsonResponse();
     m_jsonObjectFactory = createJsonObjectFactory();
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
     m_rootJsonAdapter = new P_RootAdapter(this);
     m_customHtmlRenderer = createCustomHtmlRenderer();
-    m_asyncStartedJobFutures = new ArrayList<>();
 
-    // FIXME DWI/MVI/AWE: (Jobs) das hier auf neue, schöne Job API umstellen.
-    m_jobChangeListener = new P_JobChangeAdapter();
+    m_jobChangeListener = new P_JobChangeListener();
     Jobs.getJobManager().addListener(m_jobChangeListener, new IFilter<JobEvent>() {
-
       @Override
       public boolean accept(JobEvent event) {
-        switch (event.getType()) {
-          case SCHEDULED:
-          case DONE:
-            return true;
-          default:
-            return false;
+        IFuture<?> future = event.getFuture();
+
+        System.out.println(
+            "type == done " + (JobEventType.DONE == event.getType()) +
+                "\nmodelJob=" + ModelJobs.isModelJob(future) +
+                "\nclientSession=" + matchesClientSession(future) +
+                "\n!processing=" + !isProcessingClientRequest());
+
+        return JobEventType.DONE == event.getType() &&
+            ModelJobs.isModelJob(future) &&
+            matchesClientSession(future) &&
+            !isProcessingClientRequest();
+      }
+
+      private boolean matchesClientSession(IFuture<?> future) {
+        if (future.getJobInput() instanceof ModelJobInput) {
+          IClientSession jobClientSession = ((ModelJobInput) future.getJobInput()).getSession();
+          return jobClientSession == getClientSession();
+        }
+        else {
+          return false; // FIXME AWE remove
         }
       }
     });
@@ -402,7 +415,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public String createUniqueIdFor(IJsonAdapter jsonAdapter) {
-    //FIXME CGU create id based on scout object for automatic gui testing, use @classId? or CustomWidgetIdGenerator from scout.ui.rwt bundle?
+    // FIXME CGU create id based on scout object for automatic gui testing, use @classId? or CustomWidgetIdGenerator from scout.ui.rwt bundle?
     return "" + (++m_jsonAdapterSeq);
   }
 
@@ -544,9 +557,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       if (jsonRequest.isStartupRequest()) {
         getJsonClientSession().processRequestLocale(httpRequest.getLocale());
       }
-      else if (jsonRequest.isPullAsyncRequest()) {
-        waitForAsyncJob();
-      }
       getJsonEventProcessor().processEvents(m_currentJsonRequest, currentJsonResponse());
       return jsonResponseToJson();
     }
@@ -567,37 +577,21 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
-  // FIXME AWE: (Jobs) reviewen ob die logik hier stimmt
-  // - wartet und blockiert den pullAsync request, solange bis _irgend_ einer aus der liste der ASSJs terminiert
-  //   sobald das geschieht, verarbeiten wir den request weiter.
-
-  // 1. was ist, wenn ein Async job ewig läuft im hintergrund?
-  // 2. was ist, wenn waitForAsyncJobs fertig wird, während gerade ein normaler request verarbeitet wird?
-  //    - dann könnten wir die ergebnisse huckepack in die response hängen
-  private void waitForAsyncJob() {
-
-    synchronized (m_asyncStartedJobFutures) {
-      if (m_asyncStartedJobFutures.isEmpty()) {
-        // Probably the async job has finished in the meantime...
-        LOG.debug("Wait for async jobs, but no async jobs are running right now, return immediately");
-        return;
-      }
-
-      LOG.trace("Wait until async job has terminated...");
+  // FIXME AWE: (Jobs) make configurable
+  @Override
+  public void waitForBackgroundJobs() {
+    LOG.trace("Wait until background job terminates...");
+    synchronized (m_backgroundJobLock) {
       try {
-
-        m_asyncStartedJobFutures.wait(); // Braucht es hier eine max-wait-time oder wollen wir 4-ever warten?
-        // Spurious wake-up? Das problem ist, dass wir nicht auf einen bestimmten Job warten, sondern einfach
-        // weitermachen, wenn irgend ein Job zu ende ist. Vermutlich ist es kein Problem, auch wenn der wake-up
-        // unberechtigt war, führt das nur dazu, dass der request beendet wird und der client gleich wieder einen
-        // neuen pullAsyncRequest startet. Sofern noch Async jobs vorhanden sind
-        LOG.trace("Async job terminated. Continue request processing...");
+        m_backgroundJobLock.wait(TimeUnit.MINUTES.toMillis(1)); // Wait max. one minute, then return
       }
       catch (InterruptedException e) {
-        LOG.warn("Interrupted while waiting for m_asyncStartedJobFutures", e);
+        LOG.warn("Interrupted while waiting for this", e);
+      }
+      finally {
+        LOG.trace("Background job terminated. Continue request processing...");
       }
     }
-
   }
 
   protected boolean isProcessingClientRequest() {
@@ -606,32 +600,18 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   protected JSONObject jsonResponseToJson() {
     final IHolder<JSONObject> resultHolder = new Holder<JSONObject>(JSONObject.class);
-
-    IRunnable runnable = new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        ModelJobUtility.runAsSubject(new Runnable() {
-          @Override
-          public void run() {
-            JSONObject result = currentJsonResponse().toJson();
-
-            // FIXME AWE: (Jobs) den pullAsync Request so umbauen, dass er den haupt-thread nicht blockiert
-            // aber blockiert bis ein ergebnis vorliegt (long-polling))
-            synchronized (m_asyncStartedJobFutures) {
-              if (m_asyncStartedJobFutures.size() > 0) {
-                LOG.debug("FOUND async started jobs, add checkAsync property to response");
-                JsonObjectUtility.putProperty(result, "checkAsync", "true");
-              }
-            }
-
-            resultHolder.setValue(result);
-          }
-        });
-      }
-    };
-
     try {
-      ModelJobUtility.runInModelThreadAndWait(getClientSession(), runnable);
+      ModelJobUtility.runInModelThreadAndWait(getClientSession(), new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          ModelJobUtility.runAsSubject(new Runnable() {
+            @Override
+            public void run() {
+              resultHolder.setValue(currentJsonResponse().toJson());
+            }
+          });
+        }
+      });
     }
     catch (ProcessingException e) {
       throw new JsonException(e); // TODO BSH Exception | Try to eliminate this pattern (5 others in html bundle)
@@ -728,47 +708,13 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
-  private class P_JobChangeAdapter implements IJobListener {
+  private class P_JobChangeListener implements IJobListener {
 
     @Override
     public void changed(JobEvent event) {
-      switch (event.getType()) {
-        case SCHEDULED:
-          scheduled(event);
-          break;
-        case DONE:
-          done(event);
-          break;
-        default:
-          throw new IllegalArgumentException();
-      }
-    }
-
-    private boolean isAsyncJobFromClientSession(JobEvent event, IClientSession clientSession) {
-      IClientSession jobClientSession = ((ClientJobInput) event.getFuture().getJobInput()).getSession(); // == Session from job
-      return jobClientSession == clientSession && ClientJobs.isClientJob(event.getFuture()); // == ASYNC Jobs
-    }
-
-    private void scheduled(JobEvent event) {
-      if (isProcessingClientRequest() && isAsyncJobFromClientSession(event, getClientSession())) {
-        int newSize;
-        synchronized (m_asyncStartedJobFutures) {
-          m_asyncStartedJobFutures.add(event.getFuture());
-          newSize = m_asyncStartedJobFutures.size();
-        }
-        LOG.debug("Async Job " + event + " was scheduled while no request was processing. Add to list. New size=" + newSize);
-      }
-    }
-
-    private void done(JobEvent event) {
-      synchronized (m_asyncStartedJobFutures) {
-        IFuture<?> future = event.getFuture();
-        if (m_asyncStartedJobFutures.contains(future)) {
-          m_asyncStartedJobFutures.remove(future);
-          int newSize = m_asyncStartedJobFutures.size();
-          LOG.debug("Async Job " + event + " has terminated. Remove from list. New size=" + newSize);
-          m_asyncStartedJobFutures.notify();
-        }
+      synchronized (m_backgroundJobLock) {
+        LOG.trace("Job done. Name=" + event.getFuture().getJobInput().getName() + ". Notify waiting requests...");
+        m_backgroundJobLock.notifyAll();
       }
     }
   }

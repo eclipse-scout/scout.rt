@@ -42,45 +42,52 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
   }
 
   @Override
-  public boolean interceptPost(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptPost(AbstractUiServlet servlet, HttpServletRequest httpReq, HttpServletResponse httpResp) throws ServletException, IOException {
     //serve only /json
-    String pathInfo = req.getPathInfo();
+    String pathInfo = httpReq.getPathInfo();
     IJsonSession jsonSession = null;
     if (CompareUtility.notEquals(pathInfo, "/json")) {
       LOG.info("404_NOT_FOUND_POST: " + pathInfo);
-      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+      httpResp.sendError(HttpServletResponse.SC_NOT_FOUND);
       return true;
     }
     try {
       //disable cache
-      servlet.getHttpCacheControl().disableCacheHeaders(req, resp);
+      servlet.getHttpCacheControl().disableCacheHeaders(httpReq, httpResp);
 
-      JSONObject jsonReqObj = decodeJSONRequest(req);
+      JSONObject jsonReqObj = decodeJSONRequest(httpReq);
       if (isPingRequest(jsonReqObj)) {
-        writeResponse(resp, createPingJsonResponse().toJson());
+        writeResponse(httpResp, createPingJsonResponse().toJson());
         return true;
       }
 
       JsonRequest jsonReq = new JsonRequest(jsonReqObj);
-      jsonSession = getOrCreateJsonSession(servlet, req, resp, jsonReq);
+      jsonSession = getOrCreateJsonSession(servlet, httpReq, httpResp, jsonReq);
       if (jsonSession == null) {
         return true;
       }
 
+      if (jsonReq.isWaitForBackgroundJobsRequest()) {
+        // Blocks the current thread until:
+        // - a model job terminates and the response has data
+        // - the max. wait time has exceeded
+        jsonSession.waitForBackgroundJobs();
+      }
+
       // GUI requests for the same session must be processed consecutively
       synchronized (jsonSession) {
-        JSONObject json = jsonSession.processRequest(req, jsonReq);
-        writeResponse(resp, json);
+        JSONObject jsonResp = jsonSession.processRequest(httpReq, jsonReq);
+        writeResponse(httpResp, jsonResp);
       }
     }
     catch (Exception e) {
       if (jsonSession == null) {
         LOG.error("Error while initializing json session", e);
-        writeResponse(resp, createStartupFailedJsonResponse());
+        writeResponse(httpResp, createStartupFailedJsonResponse());
       }
       else {
         LOG.error("Unexpected error while processing JSON request", e);
-        writeResponse(resp, createUnrecoverableFailureJsonResponse());
+        writeResponse(httpResp, createUnrecoverableFailureJsonResponse());
       }
     }
     return true;
@@ -155,13 +162,13 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     writeResponse(res, response.toJson());
   }
 
-  protected void writeResponse(HttpServletResponse res, JSONObject json) throws IOException {
-    String jsonText = json.toString();
+  protected void writeResponse(HttpServletResponse httpResp, JSONObject jsonResp) throws IOException {
+    String jsonText = jsonResp.toString();
     byte[] data = jsonText.getBytes("UTF-8");
-    res.setContentLength(data.length);
-    res.setContentType("application/json");
-    res.setCharacterEncoding("UTF-8");
-    res.getOutputStream().write(data);
+    httpResp.setContentLength(data.length);
+    httpResp.setContentType("application/json");
+    httpResp.setCharacterEncoding("UTF-8");
+    httpResp.getOutputStream().write(data);
     if (LOG.isTraceEnabled()) {
       LOG.trace("Returned: " + jsonText);
     }

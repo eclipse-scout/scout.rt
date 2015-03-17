@@ -87,4 +87,7 @@ public interface IJsonSession {
   void unregisterJsonAdapter(String id);
 
   boolean isInspectorHint();
+
+  void waitForBackgroundJobs();
+
 }
