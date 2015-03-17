@@ -28,7 +28,6 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonSmartField.class);
   private static final String PROP_LOOKUP_STRATEGY = "lookupStrategy";
-  private static final String PROP_MULTI_LINE = "multiline";
   private static final String PROP_PROPOSAL = "proposal";
 
   private boolean m_proposal;
@@ -53,12 +52,6 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
       @Override
       protected Object modelValue() {
         return getModel().getProposalChooser();
-      }
-    });
-    putJsonProperty(new JsonProperty<IContentAssistField<K, V>>(PROP_MULTI_LINE, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isMultilineText();
       }
     });
     putJsonProperty(new JsonProperty<IContentAssistField<K, V>>(PROP_LOOKUP_STRATEGY, model) {

@@ -34,7 +34,7 @@ scout.TableLayout.prototype.layout = function($container) {
  * Resizes the columns to make them use all the available space.
  */
 scout.TableLayout.prototype._layoutColumns = function() {
-  var i, column, newWidth, weight,
+  var newWidth, weight,
     relevantColumns = [],
     columns = this.table.columns,
     currentWidth = 0,

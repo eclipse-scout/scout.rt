@@ -1531,7 +1531,11 @@ scout.Table.prototype._renderEnabled = function() {
   this.$data.setEnabled(this.enabled);
 };
 
-scout.Table.prototype._renderMultiSelect = function(multiSelect) {
+scout.Table.prototype._renderMultiSelect = function() {
+  // nop
+};
+
+scout.Table.prototype._renderMultilineText = function() {
   // nop
 };
 

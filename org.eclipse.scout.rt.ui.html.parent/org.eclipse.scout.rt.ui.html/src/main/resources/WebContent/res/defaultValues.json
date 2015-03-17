@@ -73,16 +73,10 @@
       "fields": []
     },
     "SmartField": {
-      "multiline": false,
-      "validateOnAnyKey": false,
-      "options": [],
-      "lookupStrategy": "remote"
+      "lookupStrategy": "remote",
+      "proposal": false
     },
     "SmartFieldMultiline": {
-      "multilineText": false,
-      "validateOnAnyKey": false,
-      "options": [],
-      "lookupStrategy": "remote"
     },
     "StringField": {
       "inputMasked": false,
