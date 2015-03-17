@@ -13,23 +13,28 @@ package org.eclipse.scout.rt.client.ui.wizard;
 import java.net.URL;
 
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.AbstractSplitBox;
+import org.eclipse.scout.rt.client.ui.form.fields.wizard.AbstractWizardProgressField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.SplitBox;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.SplitBox.ContentBox;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.SplitBox.ContentBox.WrappedWizardForm;
-import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.SplitBox.StatusField;
+import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.SplitBox.StatusBox;
+import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.SplitBox.StatusBox.StatusField;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardCancelButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardFinishButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardNextStepButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardPreviousStepButton;
+import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardProgressField;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardResetButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardSuspendButton;
 import org.eclipse.scout.rt.shared.AbstractIcons;
@@ -43,12 +48,23 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  */
 public class DefaultWizardContainerForm extends AbstractWizardContainerForm implements IWizardContainerForm {
 
-  public DefaultWizardContainerForm(IWizard w) throws ProcessingException {
-    super(w);
+  public DefaultWizardContainerForm(IWizard wizard) throws ProcessingException {
+    this(wizard, true);
+  }
+
+  public DefaultWizardContainerForm(IWizard wizard, boolean callInitializer) throws ProcessingException {
+    super(wizard, false);
+    if (callInitializer) {
+      callInitializer();
+    }
   }
 
   public MainBox getMainBox() {
     return getFieldByClass(MainBox.class);
+  }
+
+  public WizardProgressField getWizardProgressField() {
+    return getFieldByClass(WizardProgressField.class);
   }
 
   public SplitBox getSplitBox() {
@@ -57,6 +73,10 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
 
   public ContentBox getContentBox() {
     return getFieldByClass(ContentBox.class);
+  }
+
+  public StatusBox getStatusBox() {
+    return getFieldByClass(StatusBox.class);
   }
 
   public WrappedWizardForm getWrappedWizardForm() {
@@ -109,6 +129,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
 
   @Order(10.0f)
   public class MainBox extends AbstractGroupBox {
+
     @Override
     protected int getConfiguredGridW() {
       return 3;
@@ -129,13 +150,12 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       return 2;
     }
 
-    @Order(10.0f)
-    public class SplitBox extends AbstractSplitBox {
+    @Order(10.0)
+    public class WizardProgressField extends AbstractWizardProgressField {
+    }
 
-      @Override
-      protected int getConfiguredGridH() {
-        return 2;
-      }
+    @Order(20.0)
+    public class SplitBox extends AbstractSplitBox {
 
       @Override
       protected double getConfiguredSplitterPosition() {
@@ -147,16 +167,30 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
         return false;
       }
 
-      @Order(10.0f)
+      @Order(10.0)
       public class ContentBox extends AbstractGroupBox {
-        @Override
-        protected int getConfiguredGridW() {
-          return 2;
-        }
 
         @Override
-        protected int getConfiguredGridH() {
-          return 6;
+        protected boolean getConfiguredBorderVisible() {
+          return false;
+        }
+
+        @Order(10.0)
+        public class WrappedWizardForm extends AbstractWrappedFormField<IForm> {
+
+          @Override
+          protected int getConfiguredGridW() {
+            return 2;
+          }
+        }
+      }
+
+      @Order(20.0)
+      public class StatusBox extends AbstractGroupBox {
+
+        @Override
+        protected int getConfiguredGridW() {
+          return 1;
         }
 
         @Override
@@ -164,8 +198,15 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
           return false;
         }
 
-        @Order(10.0f)
-        public class WrappedWizardForm extends AbstractWrappedFormField<IForm> {
+        @Override
+        protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
+          super.injectFieldsInternal(fields);
+          // TODO BSH Inject info boxes and groups here
+        }
+
+        @Order(20.0)
+        public class StatusField extends AbstractWizardStatusField {
+
           @Override
           protected int getConfiguredGridW() {
             return 2;
@@ -173,37 +214,23 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
 
           @Override
           protected int getConfiguredGridH() {
-            return 8;
+            return 2;
           }
-        }
 
-      }
-
-      @Order(20)
-      public class StatusField extends AbstractWizardStatusField {
-        @Override
-        protected int getConfiguredGridW() {
-          return 2;
-        }
-
-        @Override
-        protected int getConfiguredGridH() {
-          return 2;
-        }
-
-        @Override
-        protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
-          if (DefaultWizardContainerForm.this.getWizard() != null) {
-            DefaultWizardContainerForm.this.getWizard().doHyperlinkAction(url, path, local);
-          }
-          else {
-            super.execHyperlinkAction(url, path, local);
+          @Override
+          protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+            if (DefaultWizardContainerForm.this.getWizard() != null) {
+              DefaultWizardContainerForm.this.getWizard().doHyperlinkAction(url, path, local);
+            }
+            else {
+              super.execHyperlinkAction(url, path, local);
+            }
           }
         }
       }
     }
 
-    @Order(10)
+    @Order(10.0)
     public class WizardCancelButton extends AbstractButton implements IButton {
 
       @Override
@@ -232,7 +259,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       }
     }
 
-    @Order(20)
+    @Order(20.0)
     public class WizardSuspendButton extends AbstractButton {
 
       @Override
@@ -261,7 +288,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       }
     }
 
-    @Order(25)
+    @Order(25.0)
     public class WizardResetButton extends AbstractButton implements IButton {
 
       @Override
@@ -290,7 +317,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       }
     }
 
-    @Order(30)
+    @Order(30.0)
     public class WizardPreviousStepButton extends AbstractButton {
 
       @Override
@@ -319,7 +346,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       }
     }
 
-    @Order(40)
+    @Order(40.0)
     public class WizardNextStepButton extends AbstractButton {
 
       @Override
@@ -348,7 +375,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       }
     }
 
-    @Order(50)
+    @Order(50.0)
     public class WizardFinishButton extends AbstractButton {
 
       @Override
@@ -403,6 +430,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
   }
 
   public class WizardHandler extends AbstractFormHandler {
+
     @Override
     protected void execLoad() throws ProcessingException {
       if (getWizard() != null) {
