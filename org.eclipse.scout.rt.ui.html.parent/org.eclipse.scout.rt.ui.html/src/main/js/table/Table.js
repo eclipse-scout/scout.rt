@@ -1330,7 +1330,7 @@ scout.Table.prototype.hideRow = function($row, useAnimation) {
 /**
  * @param resizingInProgress set this to true when calling this function several times in a row. If resizing is finished you have to call resizingColumnFinished.
  */
-scout.Table.prototype.resizeColumn = function(column, width, resizingInProgress) {
+scout.Table.prototype.resizeColumn = function(column, width) {
   if (column.fixedWidth) {
     return;
   }
@@ -1348,20 +1348,27 @@ scout.Table.prototype.resizeColumn = function(column, width, resizingInProgress)
     this.header.onColumnResized(column, width);
   }
 
-  if (!resizingInProgress) {
-    this.resizingColumnFinished(column, width);
-  }
+  this._sendColumnResized(column);
 };
 
-scout.Table.prototype.resizingColumnFinished = function(column, width) {
-  if (column.fixedWidth && !this.autoResizeColumns) {
+scout.Table.prototype._sendColumnResized = function(column) {
+  var data, event;
+  if (column.fixedWidth || this.autoResizeColumns) {
     return;
   }
-  var data = {
+
+  event = new scout.Event(this.id, 'columnResized', {
     columnId: column.id,
-    width: width
+    width: column.width
+  });
+
+  // Only send the latest resize event for a column
+  event.coalesce = function(previous) {
+    return this.id == previous.id && this.type === previous.type && this.columnId == previous.columnId;
   };
-  this.session.send(this.id, 'columnResized', data);
+
+  // send delayed to avoid a lot of requests while resizing
+  this.session.sendEvent(event, 750);
 };
 
 scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {

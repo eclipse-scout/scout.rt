@@ -184,28 +184,32 @@ scout.Session.prototype.getOrCreateModelAdapters = function(ids, parent) {
   return adapters;
 };
 
+scout.Session.prototype.send = function(target, type, data, delay) {
+  this.sendEvent(new scout.Event(target, type, data), delay);
+};
+
 /**
  * Sends the request asynchronously and processes the response later.<br>
  * Furthermore, the request is sent delayed. If send is called multiple times
  * during the same user interaction, the events are collected and sent in one
  * request at the end of the user interaction
  */
-scout.Session.prototype.send = function(target, type, data) {
-  this._asyncEvents.push(new scout.Event(target, type, data));
-  if (!this._asyncRequestQueued) {
-    setTimeout(function() {
-      this._sendNow(this._asyncEvents);
-      this._asyncRequestQueued = false;
-      this._asyncEvents = [];
-    }.bind(this), 0);
-    this._asyncRequestQueued = true;
-  }
+scout.Session.prototype.sendEvent = function(event, delay) {
+  delay = delay || 0;
+
+  this._asyncEvents = this._coalesceEvents(this._asyncEvents, event);
+  this._asyncEvents.push(event);
+
+  clearTimeout(this._sendTimeoutId);
+  this._sendTimeoutId = setTimeout(function() {
+    this._sendNow();
+  }.bind(this), delay);
 };
 
-scout.Session.prototype._sendNow = function(events, deferred) {
+scout.Session.prototype._sendNow = function() {
   var request = {
     jsonSessionId: this.jsonSessionId,
-    events: events
+    events: this._asyncEvents
   };
 
   if (this._startup) {
@@ -227,10 +231,23 @@ scout.Session.prototype._sendNow = function(events, deferred) {
   }
 
   this._sendRequest(request);
+  this._asyncEvents = [];
+};
+
+scout.Session.prototype._coalesceEvents = function(previousEvents, event) {
+  if (!event.coalesce) {
+    return previousEvents;
+  }
+  var filter = $.negate(event.coalesce).bind(event);
+  return previousEvents.filter(filter);
 };
 
 scout.Session.prototype._sendRequest = function(request) {
+  var coalescedEvents = [];
   if (this.offline) {
+    request.events.forEach(function(event) {
+      this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
+    }.bind(this));
     this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
     return;
   }

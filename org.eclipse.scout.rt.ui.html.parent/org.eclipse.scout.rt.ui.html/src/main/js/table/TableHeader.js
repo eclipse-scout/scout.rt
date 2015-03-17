@@ -73,16 +73,13 @@ scout.TableHeader = function(table, session) {
         wHeader = headerWidth + diff;
 
       if (wHeader > 80 || diff > 0) {
-        that.table.resizeColumn($header.data('column'), wHeader, true);
+        that.table.resizeColumn($header.data('column'), wHeader);
       }
     }
 
     function resizeEnd(event) {
       $(window).off('mousemove.tableheader');
       $('body').removeClass('col-resize');
-
-      var width = parseFloat($header.css('min-width'));
-      that.table.resizingColumnFinished($header.data('column'), width);
     }
   }
 

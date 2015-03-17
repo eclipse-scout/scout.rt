@@ -27,8 +27,9 @@ function createSimpleModel(objectType, id) {
  * Sends the queued requests and simulates a response as well.
  * @param response if not set an empty success response will be generated
  */
-function sendQueuedAjaxCalls(response) {
-  jasmine.clock().tick(0);
+function sendQueuedAjaxCalls(response, time) {
+  time = time || 0;
+  jasmine.clock().tick(time);
 
   if (!response) {
     response = {

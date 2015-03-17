@@ -352,7 +352,7 @@ describe("Table", function() {
       table.resizeColumn(table.columns[0], 100);
       expect(table.columns[0].width).toBe(100);
 
-      sendQueuedAjaxCalls();
+      sendQueuedAjaxCalls('', 1000);
       var event = new scout.Event(table.id, 'columnResized', {
         columnId: table.columns[0].id,
         width: 100
@@ -365,8 +365,8 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      table.resizeColumn(table.columns[0], 50, true);
-      table.resizeColumn(table.columns[0], 100, true);
+      table.resizeColumn(table.columns[0], 50);
+      table.resizeColumn(table.columns[0], 100);
 
       sendQueuedAjaxCalls();
 
@@ -378,11 +378,11 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      table.resizeColumn(table.columns[0], 50, true);
-      table.resizeColumn(table.columns[0], 100, true);
+      table.resizeColumn(table.columns[0], 50);
+      table.resizeColumn(table.columns[0], 100);
       table.resizeColumn(table.columns[0], 150);
 
-      sendQueuedAjaxCalls();
+      sendQueuedAjaxCalls('', 1000);
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);

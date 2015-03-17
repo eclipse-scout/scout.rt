@@ -60,7 +60,7 @@ scout.TableLayout.prototype._layoutColumns = function() {
     weight = column.initialWidth / totalInitialWidth;
     newWidth = weight * availableWidth;
     if (newWidth !== column.width) {
-      this.table.resizeColumn(column, newWidth, true);
+      this.table.resizeColumn(column, newWidth);
     }
   }.bind(this));
 };

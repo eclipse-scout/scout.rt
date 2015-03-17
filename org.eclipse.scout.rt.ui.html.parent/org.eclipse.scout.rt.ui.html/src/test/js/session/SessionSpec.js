@@ -39,6 +39,108 @@ describe("Session", function() {
       expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected', 'nodeExpanded']);
     });
 
+    it("sends multiple async events in one call over multiple user interactions if sending was delayed", function() {
+      var session = createSession();
+
+      // send first event delayed (in 500 ms)
+      session.send(1, 'nodeClicked', '', 500);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      // tick 100 ms
+      sendQueuedAjaxCalls('', 100);
+
+      // since 500 ms are not passed yet, the request has not been sent and following events should be added
+      session.send(1, 'nodeSelected');
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      session.send(1, 'nodeExpanded');
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      sendQueuedAjaxCalls('', 1000);
+
+      // after executing setTimeout there must be exactly one ajax request
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      // check that content is complete and in correct order
+      var requestData = mostRecentJsonRequest();
+      expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected', 'nodeExpanded']);
+    });
+
+    it("does not await the full delay if a susequent send call has a smaller delay", function() {
+      var session = createSession();
+
+      // send first event delayed (in 500 ms)
+      session.send(1, 'nodeClicked', '', 500);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      // tick 100 ms
+      sendQueuedAjaxCalls('', 100);
+
+      // since 500 ms are not passed yet, the request has not been sent and following events should be added
+      session.send(1, 'nodeSelected');
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      session.send(1, 'nodeExpanded');
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      sendQueuedAjaxCalls('', 0);
+
+      // after executing setTimeout there must be exactly one ajax request
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      // check that content is complete and in correct order
+      var requestData = mostRecentJsonRequest();
+      expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected', 'nodeExpanded']);
+    });
+
+    it("coalesces events if event provides a coalesce function", function() {
+      var session = createSession();
+
+      var coalesce = function(previous) {
+        return this.target === previous.target && this.type === previous.type && this.column == previous.column;
+      };
+
+      var event0 = new scout.Event(1, 'columnResized', {column: 'a'});
+      event0.coalesce = coalesce;
+      session.sendEvent(event0);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      var event1 = new scout.Event(1, 'rowSelected');
+      event1.coalesce = coalesce;
+      session.sendEvent(event1);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      var event2 = new scout.Event(1, 'columnResized', {column: 'a'});
+      event2.coalesce = coalesce;
+      session.sendEvent(event2);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      var event3 = new scout.Event(1, 'columnResized', {column: 'z'});
+      event3.coalesce = coalesce;
+      session.sendEvent(event3);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      // event for another target
+      var event4 = new scout.Event(2, 'columnResized', {column: 'a'});
+      event4.coalesce = coalesce;
+      session.sendEvent(event4);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      var event5 = new scout.Event(1, 'columnResized', {column: 'a'});
+      event5.coalesce = coalesce;
+      session.sendEvent(event5);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      sendQueuedAjaxCalls();
+
+      // after executing setTimeout there must be exactly one ajax request
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      // check whether the first and second resize events were correctly removed
+      var requestData = mostRecentJsonRequest();
+      expect(requestData).toContainEvents([event1, event3, event4, event5]);
+    });
+
   });
 
   describe("init", function() {

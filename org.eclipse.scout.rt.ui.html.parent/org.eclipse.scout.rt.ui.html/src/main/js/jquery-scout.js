@@ -95,6 +95,15 @@
   };
 
   /**
+   * Returns a function which negates the return value of the given function when called.
+   */
+  $.negate = function(fx) {
+    return function() {
+      return !fx.apply(this, arguments);
+    };
+  };
+
+  /**
    * from http://api.jquery.com/jquery.getscript/
    */
   $.getCachedScript = function(url, options) {
