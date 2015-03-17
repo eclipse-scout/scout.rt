@@ -49,17 +49,23 @@ public interface IGroupBox extends ICompositeField {
 
   String BORDER_DECORATION_EMPTY = "empty";
   String BORDER_DECORATION_LINE = "line";
-  String BORDER_DECORATION_SECTION = "section";
   /**
    * automatic border decoration
    * <ul>
-   * <li>expandable=true uses section border</li>
    * <li>MainBox (IGroupBox#isMainBox()) has no border</li>
    * <li>groupbox inside tab box (IGroupBox#isMainBox()) has no border</li>
    * <li>all others use line border</li>
    * </ul>
    */
   String BORDER_DECORATION_AUTO = "auto";
+  /**
+   * @deprecated This decoration type is obsolete, do not use it anymore. This constant will be removed in the O
+   *             release. To apply the "section style" to a group box, set its "expandable" property to
+   *             <code>true</code>. In most cases, you can just remove your <code>getConfiguredBorderDecoration()</code>
+   *             declaration, thus falling back to the default {@link #BORDER_DECORATION_AUTO}.
+   */
+  @Deprecated
+  String BORDER_DECORATION_SECTION = BORDER_DECORATION_AUTO;
 
   /*
    * Runtime
@@ -104,7 +110,6 @@ public interface IGroupBox extends ICompositeField {
   /**
    * When borderEnabled=true: borderDecoration="line" shows a line decoration around box, borderDecoration="none" or
    * null shows just insets.<br>
-   * borderDecoration="section" shows a section header<br>
    * Other custom borderDecorations are possible and must be handled in the appropriate GUI factory.
    * <p>
    * Note that this is just the style of the border. To define a section group with expand/collapse, use

@@ -116,8 +116,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   /**
    * Configures whether this group box should be expandable or not.<br>
    * This property depends on the border decoration which can be configured by {@link #getConfiguredBorderDecoration()}.
-   * It typically only has an effect if the border decoration is set to {@link IGroupBox#BORDER_DECORATION_SECTION} or
-   * {@link IGroupBox#BORDER_DECORATION_AUTO}.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
    *
