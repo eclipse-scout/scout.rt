@@ -35,7 +35,7 @@ public interface IPlatform {
     /**
      * This event signals that {@link IPlatform#getBeanContext()} was prepared with the beans found in the
      * {@link IPlatform#getClassInventory()} and may manipulated using
-     * {@link IBeanContext#registerBean(org.eclipse.scout.rt.platform.cdi.IBean, Object)} etc.
+     * {@link IBeanContext#registerBean(org.eclipse.scout.rt.platform.IBean, Object)} etc.
      * <p>
      * However, {@link IBeanContext#getInstance(Class)} is not available yet
      * <p>

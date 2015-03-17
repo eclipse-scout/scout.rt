@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.annotations.Priority;
  * In more details...
  * <p>
  * The existence of the file
- * <code>src/main/resources/META-INF/services/org.eclipse.scout.rt.platform.cdi.IBeanContributor</code> will make scout
+ * <code>src/main/resources/META-INF/services/org.eclipse.scout.rt.platform.IBeanContributor</code> will make scout
  * add all relevant beans in this maven module with {@link IBeanContext#registerClass(Class)}. <br/>
  * These includes classes that satisfy all of the following rules:
  * <ol>
@@ -30,7 +30,7 @@ import org.eclipse.scout.commons.annotations.Priority;
  * that have a {@link Bean} annotation
  * <p>
  * All implemented classes of this interface are listed in a file
- * <code>src/main/resources/META-INF/services/org.eclipse.scout.rt.platform.cdi.IBeanContributor</code> and may manually
+ * <code>src/main/resources/META-INF/services/org.eclipse.scout.rt.platform.IBeanContributor</code> and may manually
  * register custom beans.
  */
 @Retention(RetentionPolicy.RUNTIME)
