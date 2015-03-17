@@ -376,9 +376,26 @@
     position: relative;
     width: calc(~"100%" - 20px);
     height: 45px;
+  }
+
+  & .year-title-item {
+    display: inline-block;
+    padding-right: 15px;
     line-height: 45px;
     font-size: 17px;
+    color: @palette-gray-6;
+    cursor: pointer;
+
+    &.selected {
+      color: @palette-gray-4;
+      cursor: default;
+    }
+
+    &:hover {
+      color: @palette-gray-4;
+    }
   }
+
 
    & .year-title:after{
     position: absolute;

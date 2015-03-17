@@ -246,7 +246,7 @@ scout.Calendar.prototype._updateScreen = function() {
   this.layoutAxis();
 
   // if year shown and changed, redraw year
-  if (this.selected.getFullYear() !== $('.year-title', this.$year).text() && this.showYear) {
+  if (this.selected.getFullYear() !== $('.year-title', this.$year).data('year') && this.showYear) {
     this.$year.empty();
     this.drawYear();
   }
@@ -438,7 +438,18 @@ scout.Calendar.prototype.drawYear = function() {
     first, $month, day, $day;
 
   // set title
-  this.$year.appendDiv('year-title', year);
+  var $title = this.$year.appendDiv('year-title').data('year', year);
+
+  // append 3 years
+  $title.appendDiv('year-title-item', year - 1)
+    .data('year-diff', -1)
+    .click(this._onYearClick.bind(this));
+
+  $title.appendDiv('year-title-item selected', year);
+
+  $title.appendDiv('year-title-item', year + 1)
+    .data('year-diff', +1)
+    .click(this._onYearClick.bind(this));
 
   // add months and days
   for (var month = 0; month < 12; month++) {
@@ -464,7 +475,7 @@ scout.Calendar.prototype.drawYear = function() {
 
   // bind events for days divs
   $('.year-day', this.$year)
-   .click(this._onYearClick.bind(this))
+   .click(this._onYearDayClick.bind(this))
    .hover(this._onYearHoverIn.bind(this), this._onYearHoverOut.bind(this));
 };
 
@@ -498,6 +509,22 @@ scout.Calendar.prototype.colorYear = function() {
 /* -- year, events ---------------------------------------- */
 
 scout.Calendar.prototype._onYearClick = function(event) {
+  // prepare calculation
+  var diff = $(event.target).data('year-diff'),
+    year = this.selected.getFullYear(),
+    month = this.selected.getMonth(),
+    date = this.selected.getDate();
+
+  // find new selected date
+  this.selected = new Date(year + diff, month, date);
+
+  // update calendar
+  this._updateModel();
+  this._updateScreen();
+};
+
+
+scout.Calendar.prototype._onYearDayClick = function(event) {
   // new selected day
   this.selected = $('.year-hover-day', this.$year).data('date');
 
