@@ -25,6 +25,10 @@
   padding-bottom: 6px;
   .overflow-ellipsis;
 
+  .group-box.collapsed > & {
+    border-bottom-color: transparent;
+  }
+
   & > .group-box-control {
     display: inline-block;
     transition: transform 0.3s;
