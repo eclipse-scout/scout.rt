@@ -15,14 +15,6 @@ scout.GroupBox = function() {
 };
 scout.inherits(scout.GroupBox, scout.CompositeField);
 
-scout.GroupBox.prototype._renderProperties = function() {
-  scout.GroupBox.parent.prototype._renderProperties.call(this);
-
-  this._renderBorderVisible(this.borderVisible);
-  this._renderExpandable(this.expandable);
-  this._renderExpanded(this.expanded);
-};
-
 scout.GroupBox.prototype._render = function($parent) {
   var env = scout.HtmlEnvironment,
     htmlComp = this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', new scout.GroupBoxLayout(this)),
@@ -48,6 +40,14 @@ scout.GroupBox.prototype._render = function($parent) {
   for (var i = 0; i < this.controls.length; i++) {
     this.controls[i].render(this.$body);
   }
+};
+
+scout.GroupBox.prototype._renderProperties = function() {
+  scout.GroupBox.parent.prototype._renderProperties.call(this);
+
+  this._renderBorderVisible(this.borderVisible);
+  this._renderExpandable(this.expandable);
+  this._renderExpanded(this.expanded);
 };
 
 scout.GroupBox.prototype._remove = function() {
@@ -141,7 +141,6 @@ scout.GroupBox.prototype._computeBorderVisible = function(borderVisible) {
 };
 
 scout.GroupBox.prototype._renderExpandable = function(expandable) {
-  expandable = expandable && (this.borderDecoration === 'auto' || this.borderDecoration === 'section');
   var $control = this._$groupBoxTitle.children('.group-box-control');
 
   if (expandable) {
