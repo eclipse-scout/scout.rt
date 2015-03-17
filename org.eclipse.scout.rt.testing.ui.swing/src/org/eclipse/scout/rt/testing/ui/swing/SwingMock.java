@@ -55,7 +55,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;

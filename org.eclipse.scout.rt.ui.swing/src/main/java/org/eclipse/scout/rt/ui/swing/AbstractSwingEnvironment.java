@@ -78,7 +78,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;

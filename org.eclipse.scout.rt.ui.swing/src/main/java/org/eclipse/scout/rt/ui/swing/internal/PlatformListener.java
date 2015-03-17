@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.internal;
 
+import org.eclipse.scout.rt.platform.IBeanContext;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformException;
-import org.eclipse.scout.rt.platform.cdi.IBeanContext;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.platform.pluginxml.internal.PluginXmlParser;
 import org.eclipse.scout.rt.ui.swing.extension.FormFieldExtensions;
 import org.eclipse.scout.rt.ui.swing.extension.FormFieldsPluginXmlVisitor;

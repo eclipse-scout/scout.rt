@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.internal.servlet.EndpointServlet;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
 

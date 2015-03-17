@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.busy.AbstractBusyHandler;
 import org.eclipse.scout.rt.client.busy.IBusyHandler;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 /**

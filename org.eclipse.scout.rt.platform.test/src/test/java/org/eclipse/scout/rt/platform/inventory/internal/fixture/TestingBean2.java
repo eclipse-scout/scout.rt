@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.inventory.internal.fixture;
 
-import org.eclipse.scout.rt.platform.cdi.Bean;
+import org.eclipse.scout.rt.platform.Bean;
 
 @Bean
 class TestingBean2 {

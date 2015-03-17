@@ -16,7 +16,7 @@ import org.eclipse.scout.commons.job.internal.JobManager;
 import org.eclipse.scout.commons.job.internal.callable.InitThreadLocalCallable;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;

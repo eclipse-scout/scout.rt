@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;

@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 
 @ClassId("6936b8b8-6612-4efa-bf29-80a26f80b9da")
 public abstract class AbstractWizardStatusField extends AbstractHtmlField {

@@ -1,11 +1,11 @@
-package org.eclipse.scout.rt.platform;
+package org.eclipse.scout.rt.platform.internal;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.cdi.Bean;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 

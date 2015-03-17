@@ -21,10 +21,10 @@ import java.util.Map;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanContext;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.cdi.BeanImplementor;
-import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.platform.cdi.IBeanContext;
+import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.mockito.Mockito;
 
 /**

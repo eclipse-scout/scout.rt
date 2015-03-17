@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.cdi.internal;
+package org.eclipse.scout.rt.platform.internal;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -17,10 +17,9 @@ import java.util.concurrent.Semaphore;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-import org.eclipse.scout.rt.platform.cdi.BeanCreationException;
-import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.platform.cdi.IBeanRegistration;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BeanCreationException;
+import org.eclipse.scout.rt.platform.IBean;
 
 public class BeanRegistration<T> implements IBeanRegistration<T> {
   private static final ThreadLocal<Deque<String>> INSTANTIATION_STACK = new ThreadLocal<>();
@@ -54,7 +53,7 @@ public class BeanRegistration<T> implements IBeanRegistration<T> {
       throw new BeanCreationException(beanName, message);
     }
 
-    if (BeanContext.isApplicationScoped(m_bean)) {
+    if (BeanContextImplementor.isApplicationScoped(m_bean)) {
       m_instanceLock.acquireUninterruptibly();
       try {
         if (m_instance == null) {

@@ -28,7 +28,7 @@ import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.job.filter.JobFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;

@@ -26,8 +26,8 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.OBJ;
 
 /**
  * Provider for client sessions. A client session is only created if not contained in the session cache.

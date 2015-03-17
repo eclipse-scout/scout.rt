@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.cdi;
 
-import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.SimpleBeanInstanceFactory;
+import org.eclipse.scout.rt.platform.internal.BeanContextImplementor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,8 +23,7 @@ public class BeanDoubleRegistrationTest {
 
   @Test
   public void testDoubleRegistration() {
-    BeanContext context = new BeanContext();
-    context.initBeanInstanceFactory();
+    BeanContextImplementor context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
 
     IBean<?> reg1 = context.registerClass(Bean01.class);
     IBean<?> reg2 = context.registerClass(Bean01.class);

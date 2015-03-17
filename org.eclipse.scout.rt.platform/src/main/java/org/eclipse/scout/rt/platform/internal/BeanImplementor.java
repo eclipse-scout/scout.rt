@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.cdi;
+package org.eclipse.scout.rt.platform.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Inherited;
@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.IBean;
 
 public class BeanImplementor<T> implements IBean<T> {
   private final Class<? extends T> m_beanClazz;

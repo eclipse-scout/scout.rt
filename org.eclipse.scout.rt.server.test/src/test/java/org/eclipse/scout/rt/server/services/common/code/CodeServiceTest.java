@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
-import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;

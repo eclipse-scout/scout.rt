@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;

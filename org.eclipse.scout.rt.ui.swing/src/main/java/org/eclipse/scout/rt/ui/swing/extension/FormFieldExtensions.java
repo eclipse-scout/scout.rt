@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
  *

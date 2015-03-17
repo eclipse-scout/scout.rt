@@ -17,8 +17,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eclipse.scout.rt.platform.cdi.Bean;
-import org.eclipse.scout.rt.platform.cdi.BeanInvocationHint;
+import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.BeanInvocationHint;
 
 /**
  * Marks an interface (typically a service) that is capable of being called as client proxy to the back-end server if

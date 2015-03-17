@@ -15,6 +15,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;

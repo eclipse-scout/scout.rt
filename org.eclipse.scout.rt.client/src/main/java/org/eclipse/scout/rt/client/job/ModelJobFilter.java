@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.job;
 
 import org.eclipse.scout.commons.job.IJobChangeEvent;
 import org.eclipse.scout.commons.job.IJobChangeEventFilter;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 
 /**
  *

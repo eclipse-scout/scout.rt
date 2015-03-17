@@ -18,7 +18,7 @@ import javax.xml.xpath.XPathFactory;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.cdi.IBeanContext;
+import org.eclipse.scout.rt.platform.IBeanContext;
 import org.eclipse.scout.rt.platform.pluginxml.IPluginXmlVisitor;
 import org.eclipse.scout.rt.platform.pluginxml.internal.IPluginXml;
 import org.w3c.dom.Document;

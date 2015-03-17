@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueue;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueueElement;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ConsumableClientNotificationQueueElement;

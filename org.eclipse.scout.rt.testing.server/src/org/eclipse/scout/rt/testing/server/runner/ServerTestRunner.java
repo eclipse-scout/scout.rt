@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

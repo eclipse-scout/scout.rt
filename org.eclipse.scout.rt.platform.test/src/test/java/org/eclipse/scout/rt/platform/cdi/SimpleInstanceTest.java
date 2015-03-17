@@ -11,7 +11,8 @@
 package org.eclipse.scout.rt.platform.cdi;
 
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
+import org.eclipse.scout.rt.platform.SimpleBeanInstanceFactory;
+import org.eclipse.scout.rt.platform.internal.BeanContextImplementor;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -22,13 +23,11 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class SimpleInstanceTest {
 
-  private static BeanContext context;
+  private static BeanContextImplementor context;
 
   @BeforeClass
   public static void registerBeans() {
-    context = new BeanContext();
-    context.initBeanInstanceFactory();
-
+    context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
     context.registerClass(TestObject.class);
   }
 

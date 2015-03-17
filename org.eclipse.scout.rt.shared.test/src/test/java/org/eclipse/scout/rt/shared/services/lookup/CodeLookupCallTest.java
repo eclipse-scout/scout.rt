@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.CodeRow;

@@ -15,8 +15,8 @@ import javax.annotation.PreDestroy;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.service.IServiceInitializer.ServiceInitializerResult;
 
 /**

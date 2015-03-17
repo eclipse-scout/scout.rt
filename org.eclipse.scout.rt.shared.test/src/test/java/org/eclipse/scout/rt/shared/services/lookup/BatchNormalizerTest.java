@@ -16,7 +16,7 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;

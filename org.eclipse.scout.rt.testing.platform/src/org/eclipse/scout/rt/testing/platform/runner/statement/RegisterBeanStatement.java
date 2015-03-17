@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.testing.platform.runner.statement;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.cdi.BeanImplementor;
+import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.junit.runners.model.Statement;
 
 /**

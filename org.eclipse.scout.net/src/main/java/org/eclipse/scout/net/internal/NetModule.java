@@ -19,11 +19,11 @@ import java.net.ProxySelector;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.net.EclipseAuthenticator;
 import org.eclipse.scout.net.EclipseProxySelector;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformException;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 
 /**
  * Extension to the org.eclipse.core.net to support JAAS based net

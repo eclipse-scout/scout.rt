@@ -17,8 +17,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceUtil;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNotificationQueueEvent;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;

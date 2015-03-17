@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 
 /**
@@ -38,11 +37,15 @@ public interface IPlatform {
      * {@link IPlatform#getClassInventory()} and may manipulated using
      * {@link IBeanContext#registerBean(org.eclipse.scout.rt.platform.cdi.IBean, Object)} etc.
      * <p>
+     * However, {@link IBeanContext#getInstance(Class)} is not available yet
+     * <p>
      * Next phase is bean context valid
      */
     BeanContextPrepared,
     /**
      * This event signals that {@link IPlatform#getBeanContext()} is now valid and should not be manipulated anymore
+     * <p>
+     * {@link IBeanContext#getInstance(Class)} is valid now.
      * <p>
      * Next phase is starting the application
      */

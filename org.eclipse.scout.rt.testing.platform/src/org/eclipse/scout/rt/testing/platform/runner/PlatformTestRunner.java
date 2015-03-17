@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.testing.platform.runner;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.ReflectionUtility;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.testing.platform.ITestExecutionListener;
 import org.eclipse.scout.rt.testing.platform.runner.statement.NotifyTestListenerStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;

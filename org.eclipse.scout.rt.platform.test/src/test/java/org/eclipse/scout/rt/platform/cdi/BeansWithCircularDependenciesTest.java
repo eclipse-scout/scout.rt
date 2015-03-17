@@ -13,6 +13,11 @@ package org.eclipse.scout.rt.platform.cdi;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.BeanCreationException;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;

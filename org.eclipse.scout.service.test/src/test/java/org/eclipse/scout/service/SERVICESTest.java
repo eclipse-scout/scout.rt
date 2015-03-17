@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.cdi.BeanImplementor;
-import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;

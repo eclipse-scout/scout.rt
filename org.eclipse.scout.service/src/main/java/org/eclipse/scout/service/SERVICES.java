@@ -12,7 +12,7 @@ package org.eclipse.scout.service;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 
 /**
  * Utility class for querying registered OSGi services

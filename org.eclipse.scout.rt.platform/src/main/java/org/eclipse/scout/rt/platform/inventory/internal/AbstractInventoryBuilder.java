@@ -10,8 +10,8 @@ import java.util.zip.ZipFile;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.cdi.Bean;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 

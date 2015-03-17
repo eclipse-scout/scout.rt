@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.rt.client.job.IBlockingCondition;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 
 /**
  * Filter which accepts Futures which are waiting for a blocking condition to fall.

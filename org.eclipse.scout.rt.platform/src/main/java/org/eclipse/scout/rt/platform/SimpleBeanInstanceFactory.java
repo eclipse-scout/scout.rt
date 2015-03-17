@@ -1,11 +1,11 @@
-package org.eclipse.scout.rt.platform.cdi;
+package org.eclipse.scout.rt.platform;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.internal.IBeanRegistration;
 
 /**
  * Default simple {@link IBeanInstanceFactory} used in {@link IPlatform#getBeanContext()}

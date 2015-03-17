@@ -7,9 +7,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eclipse.scout.rt.platform.cdi.Bean;
-import org.eclipse.scout.rt.platform.cdi.BeanInvocationHint;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.BeanInvocationHint;
+import org.eclipse.scout.rt.platform.OBJ;
 
 /**
  * An object (typically a service implementation) with this annotation creates a server transaction whenever an

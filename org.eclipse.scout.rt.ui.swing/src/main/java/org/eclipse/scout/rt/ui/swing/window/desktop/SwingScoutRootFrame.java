@@ -56,7 +56,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;

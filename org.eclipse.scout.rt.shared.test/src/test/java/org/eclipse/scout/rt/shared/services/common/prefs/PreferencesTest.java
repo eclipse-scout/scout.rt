@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.AbstractService;

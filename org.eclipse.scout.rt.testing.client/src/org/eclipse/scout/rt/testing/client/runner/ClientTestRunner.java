@@ -16,7 +16,7 @@ import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.testing.client.runner.statement.ProvideClientSessionStatement;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;

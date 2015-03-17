@@ -3,8 +3,6 @@ package org.eclipse.scout.rt.platform;
 import java.lang.annotation.Annotation;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-import org.eclipse.scout.rt.platform.cdi.CreateImmediately;
 
 public final class AnnotationFactory {
   private AnnotationFactory() {

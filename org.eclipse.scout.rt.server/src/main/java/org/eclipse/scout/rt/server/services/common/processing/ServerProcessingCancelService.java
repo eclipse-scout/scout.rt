@@ -15,7 +15,7 @@ import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.filter.JobFilter;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.filter.ServerSessionFilter;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;

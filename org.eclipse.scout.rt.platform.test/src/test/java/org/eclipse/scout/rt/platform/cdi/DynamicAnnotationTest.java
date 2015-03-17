@@ -2,6 +2,8 @@ package org.eclipse.scout.rt.platform.cdi;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.junit.Assert;
 import org.junit.Test;
 

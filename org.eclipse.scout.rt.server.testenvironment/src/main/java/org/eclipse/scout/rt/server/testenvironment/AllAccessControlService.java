@@ -21,7 +21,7 @@ import java.util.List;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.platform.cdi.Bean;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.AbstractService;

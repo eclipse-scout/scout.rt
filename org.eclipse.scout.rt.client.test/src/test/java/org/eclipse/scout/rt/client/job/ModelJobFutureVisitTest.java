@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
 import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.cdi.BeanImplementor;
+import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;

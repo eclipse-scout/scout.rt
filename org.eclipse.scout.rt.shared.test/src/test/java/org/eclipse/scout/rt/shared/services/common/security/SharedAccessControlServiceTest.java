@@ -20,8 +20,8 @@ import java.security.Permissions;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceUtil;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;

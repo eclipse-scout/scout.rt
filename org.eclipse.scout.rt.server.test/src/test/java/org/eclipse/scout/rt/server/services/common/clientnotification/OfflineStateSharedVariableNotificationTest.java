@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;

@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceUtil;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;

@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.server.services;
 
 import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;

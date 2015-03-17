@@ -30,7 +30,7 @@ import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.filter.FutureFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;

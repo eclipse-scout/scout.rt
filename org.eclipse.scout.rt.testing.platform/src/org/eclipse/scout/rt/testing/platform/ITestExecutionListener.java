@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform;
 
-import org.eclipse.scout.rt.platform.cdi.Bean;
-import org.eclipse.scout.rt.platform.cdi.IBeanContext;
+import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.IBeanContext;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.runner.Description;
 

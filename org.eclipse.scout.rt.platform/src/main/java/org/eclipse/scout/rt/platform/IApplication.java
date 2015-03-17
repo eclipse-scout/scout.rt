@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.platform.cdi.Bean;
 
 /**
  * The application with the highest {@link Priority} will be launched in the {@link IPlatform.State#ApplicationStarting}

@@ -8,20 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.cdi;
+package org.eclipse.scout.rt.platform;
 
 import java.util.List;
 import java.util.SortedSet;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.platform.internal.IBeanRegistration;
 
 /**
  * Used in {@link IBeanContext}
  * <p>
- * Knows how to create an object instance of a {@link IBean} wrapped with (multiple) interceptors using all the known
- * {@link BeanInvocationHint} annotations on the beans
+ * Knows how to create an object instance of a {@link IBean} wrapped with a runtime contex (multiple interceptors) using
+ * all the known {@link BeanInvocationHint} annotations on the beans
  * <p>
- * The implementation with the highest {@link Priority} is used in the application.
+ * The {@link IBeanInstanceFactory} implementation with the highest {@link Priority} is used inside {@link IBeanContext}.
  */
 @Bean
 public interface IBeanInstanceFactory {

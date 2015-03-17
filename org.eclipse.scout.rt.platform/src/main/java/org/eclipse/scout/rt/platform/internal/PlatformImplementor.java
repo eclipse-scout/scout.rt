@@ -8,15 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform;
+package org.eclipse.scout.rt.platform.internal;
 
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.cdi.IBeanContext;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
-import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
+import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.IBeanContext;
+import org.eclipse.scout.rt.platform.IBeanInstanceFactory;
+import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.PlatformException;
+import org.eclipse.scout.rt.platform.SimpleBeanInstanceFactory;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexClassInventory;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexInventoryBuilder;
@@ -28,12 +37,15 @@ import org.jboss.jandex.Index;
 public class PlatformImplementor implements IPlatform {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PlatformImplementor.class);
 
-  private State m_state = State.PlatformStopped;
+  private final ReentrantReadWriteLock m_stateLock;
+  private State m_state;
   private IClassInventory m_classInventory;
-  private IBeanContext m_beanContext;
+  private BeanContextImplementor m_beanContext;
   private IApplication m_application;
 
   public PlatformImplementor() {
+    m_stateLock = new ReentrantReadWriteLock(true);
+    m_state = State.PlatformStopped;
   }
 
   @Override
@@ -53,19 +65,28 @@ public class PlatformImplementor implements IPlatform {
 
   @Override
   public synchronized void start() {
-    m_classInventory = createClassInventory();
-    m_beanContext = createBeanContext();
-    //now all IPlatformListener are registered and can receive platform events
+    m_stateLock.writeLock().lock();
+    try {
+      changeState(State.PlatformStopped);
+      m_classInventory = createClassInventory();
+      m_beanContext = createBeanContext();
+      //now all IPlatformListener are registered and can receive platform events
 
-    changeState(State.PlatformInit);
-    changeState(State.ClassInventoryValid);
-    changeState(State.BeanContextPrepared);
-    changeState(State.BeanContextValid);
-    startCreateImmediatelyBeans();
+      changeState(State.PlatformInit);
+      changeState(State.ClassInventoryValid);
+      changeState(State.BeanContextPrepared);
 
-    changeState(State.ApplicationStarting);
-    startApplication();
-    changeState(State.ApplicationStarted);
+      initBeanInstanceFactory();
+      changeState(State.BeanContextValid);
+      startCreateImmediatelyBeans();
+
+      changeState(State.ApplicationStarting);
+      startApplication();
+      changeState(State.ApplicationStarted);
+    }
+    finally {
+      m_stateLock.writeLock().unlock();
+    }
   }
 
   protected IClassInventory createClassInventory() {
@@ -86,18 +107,32 @@ public class PlatformImplementor implements IPlatform {
     }
   }
 
-  protected IBeanContext createBeanContext() {
-    BeanContext context = new BeanContext();
+  protected BeanContextImplementor createBeanContext() {
+    BeanContextImplementor context = new BeanContextImplementor();
     Set<Class> allBeans = new BeanFilter().collect(getClassInventory());
     for (Class<?> bean : allBeans) {
       context.registerClass(bean);
     }
-    context.initBeanInstanceFactory();
     return context;
   }
 
+  protected void initBeanInstanceFactory() {
+    if (m_beanContext.getBeanInstanceFactory() != null) {
+      return;
+    }
+    TreeSet<IBeanRegistration> regs = m_beanContext.getRegistrationsInternal(IBeanInstanceFactory.class);
+    if (regs.size() > 0) {
+      m_beanContext.setBeanInstanceFactory((IBeanInstanceFactory) regs.first().getInstance());
+    }
+    if (m_beanContext.getBeanInstanceFactory() != null) {
+      return;
+    }
+    LOG.warn("Using " + SimpleBeanInstanceFactory.class.getName() + ". Please verify that this application really has no client or server side " + IBeanInstanceFactory.class.getSimpleName());
+    m_beanContext.setBeanInstanceFactory(new SimpleBeanInstanceFactory());
+  }
+
   protected void startCreateImmediatelyBeans() {
-    ((BeanContext) m_beanContext).startCreateImmediatelyBeans();
+    ((BeanContextImplementor) m_beanContext).startCreateImmediatelyBeans();
   }
 
   protected void startApplication() {
@@ -117,15 +152,21 @@ public class PlatformImplementor implements IPlatform {
 
   @Override
   public synchronized void stop() {
-    changeState(State.ApplicationStopping);
-    stopApplication();
-    changeState(State.ApplicationStopped);
-    destroyBeanContext();
-    destroyClassInventory();
-    if (Platform.get() == this) {
-      Platform.set(null);
+    m_stateLock.writeLock().lock();
+    try {
+      changeState(State.ApplicationStopping);
+      stopApplication();
+      changeState(State.ApplicationStopped);
+      destroyBeanContext();
+      destroyClassInventory();
+      if (Platform.get() == this) {
+        Platform.set(null);
+      }
+      changeState(State.PlatformStopped);
     }
-    changeState(State.PlatformStopped);
+    finally {
+      m_stateLock.writeLock().unlock();
+    }
   }
 
   protected void stopApplication() {
@@ -152,12 +193,18 @@ public class PlatformImplementor implements IPlatform {
 
   protected void changeState(State newState) {
     verifyStateChange(m_state, newState);
+    if (m_state == newState) {
+      return;
+    }
     m_state = newState;
     fireStateEvent(newState);
   }
 
   protected void verifyStateChange(State oldState, State newState) {
-    if (oldState == State.PlatformInit && newState == State.ClassInventoryValid) {
+    if (oldState == newState) {
+      return;
+    }
+    else if (oldState == State.PlatformInit && newState == State.ClassInventoryValid) {
       return;
     }
     else if (oldState == State.ClassInventoryValid && newState == State.BeanContextPrepared) {
@@ -189,12 +236,13 @@ public class PlatformImplementor implements IPlatform {
 
   protected void fireStateEvent(State newState) {
     PlatformEvent e = new PlatformEvent(this, newState);
-    for (IPlatformListener l : m_beanContext.getInstances(IPlatformListener.class)) {
+    for (IBeanRegistration reg : m_beanContext.getRegistrationsInternal(IPlatformListener.class)) {
       try {
-        l.stateChanged(e);
+        IPlatformListener listener = (IPlatformListener) reg.getInstance();
+        listener.stateChanged(e);
       }
       catch (Throwable t) {
-        LOG.warn(IPlatformListener.class.getSimpleName() + " " + l.getClass(), t);
+        LOG.warn(IPlatformListener.class.getSimpleName() + " " + reg.getBean().getBeanClazz(), t);
       }
     }
   }

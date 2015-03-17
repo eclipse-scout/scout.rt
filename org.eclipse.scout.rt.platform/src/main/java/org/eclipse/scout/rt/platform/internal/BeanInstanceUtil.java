@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.cdi.internal;
+package org.eclipse.scout.rt.platform.internal;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -21,7 +21,7 @@ import javax.annotation.PostConstruct;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.cdi.BeanCreationException;
+import org.eclipse.scout.rt.platform.BeanCreationException;
 
 public final class BeanInstanceUtil {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BeanInstanceUtil.class);

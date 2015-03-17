@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.EventListener;
 
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-
 /**
  * @since 5.2
  */

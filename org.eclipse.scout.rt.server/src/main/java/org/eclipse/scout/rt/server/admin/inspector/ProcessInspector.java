@@ -15,8 +15,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.commons.TTLCache;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 
 /**

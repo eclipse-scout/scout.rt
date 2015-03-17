@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.shell.IShellService;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;

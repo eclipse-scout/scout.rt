@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.platform.cdi;
+package org.eclipse.scout.rt.platform;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

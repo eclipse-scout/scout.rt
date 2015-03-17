@@ -8,15 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.cdi;
+package org.eclipse.scout.rt.platform;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
+import org.eclipse.scout.rt.platform.internal.BeanContextImplementor;
 
 /**
- * The static accessor to the {@link BeanContext}
+ * The static accessor to the {@link BeanContextImplementor}
  */
 public final class OBJ {
 

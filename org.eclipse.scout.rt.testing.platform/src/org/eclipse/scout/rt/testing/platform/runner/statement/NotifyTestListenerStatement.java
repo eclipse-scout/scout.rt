@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.testing.platform.ITestExecutionListener;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;

@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.platform.cdi.IBeanContext;
+import org.eclipse.scout.rt.platform.IBeanContext;
 import org.eclipse.scout.rt.platform.pluginxml.IPluginXmlVisitor;
 import org.eclipse.scout.rt.platform.pluginxml.internal.IPluginXml;
 import org.eclipse.scout.rt.ui.swing.extension.internal.FormFieldExtension;

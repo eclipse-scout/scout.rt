@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableUIFacade;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 
 /**
  * @since 3.9.0

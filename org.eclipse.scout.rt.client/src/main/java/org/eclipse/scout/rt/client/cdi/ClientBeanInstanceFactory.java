@@ -6,9 +6,9 @@ import java.util.SortedSet;
 
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.services.ClientServiceTunnelInvocationHandler;
+import org.eclipse.scout.rt.platform.IBeanInstanceFactory;
 import org.eclipse.scout.rt.platform.IPlatform;
-import org.eclipse.scout.rt.platform.cdi.IBeanInstanceFactory;
-import org.eclipse.scout.rt.platform.cdi.IBeanRegistration;
+import org.eclipse.scout.rt.platform.internal.IBeanRegistration;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 

@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.services.common.useractivity.IUserActivityProvider;
 import org.eclipse.scout.rt.shared.services.common.useractivity.IUserActivityStateService;
 import org.eclipse.scout.rt.shared.services.common.useractivity.UserActivityClientNotification;

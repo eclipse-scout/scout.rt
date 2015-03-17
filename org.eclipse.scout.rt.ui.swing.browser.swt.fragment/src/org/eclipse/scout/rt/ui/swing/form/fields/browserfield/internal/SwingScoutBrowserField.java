@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;

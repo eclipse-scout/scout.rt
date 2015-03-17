@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardConsumer;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.service.AbstractService;
 

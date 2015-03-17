@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.cdi;
 
-import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.SimpleBeanInstanceFactory;
+import org.eclipse.scout.rt.platform.internal.BeanContextImplementor;
+import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,8 +24,7 @@ public class BeanContextTest {
 
   @Test
   public void testRegistration() {
-    BeanContext context = new BeanContext();
-    context.initBeanInstanceFactory();
+    BeanContextImplementor context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
 
     context.registerClass(Bean01.class);
     Assert.assertEquals(1, context.getInstances(ITestBean.class).size());
@@ -38,8 +40,7 @@ public class BeanContextTest {
 
   @Test
   public void testUnregisterByBean() {
-    BeanContext context = new BeanContext();
-    context.initBeanInstanceFactory();
+    BeanContextImplementor context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
 
     context.registerClass(Bean01.class);
     context.registerClass(Bean02.class);

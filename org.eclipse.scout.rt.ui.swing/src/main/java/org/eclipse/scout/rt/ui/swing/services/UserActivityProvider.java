@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.services.common.useractivity.IUserActivityProvider;
 
 public class UserActivityProvider extends AbstractPropertyObserver implements IUserActivityProvider {

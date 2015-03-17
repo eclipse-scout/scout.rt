@@ -15,7 +15,7 @@ import java.security.AccessController;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;

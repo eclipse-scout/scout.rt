@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.session.ClientSessionProviderWithCache;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.platform.cdi.Bean;
+import org.eclipse.scout.rt.platform.Bean;
 
 @Bean
 @Priority(10)

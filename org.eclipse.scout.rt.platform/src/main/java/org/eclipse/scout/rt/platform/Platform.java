@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.internal.PlatformImplementor;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 

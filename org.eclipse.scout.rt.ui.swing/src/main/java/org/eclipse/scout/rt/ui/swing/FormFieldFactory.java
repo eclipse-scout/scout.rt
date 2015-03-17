@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.ui.swing.extension.FormFieldExtensions;
 import org.eclipse.scout.rt.ui.swing.extension.IFormFieldExtension;
 import org.eclipse.scout.rt.ui.swing.extension.IFormFieldFactory;

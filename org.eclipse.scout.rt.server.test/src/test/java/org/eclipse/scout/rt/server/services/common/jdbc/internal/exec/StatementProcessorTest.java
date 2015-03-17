@@ -17,7 +17,7 @@ import java.util.Date;
 import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.commons.holders.LongHolder;
 import org.eclipse.scout.commons.holders.NVPair;
-import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceUtil;
+import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;

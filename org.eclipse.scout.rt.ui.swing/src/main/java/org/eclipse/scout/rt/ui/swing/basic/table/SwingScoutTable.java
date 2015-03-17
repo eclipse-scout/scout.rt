@@ -91,7 +91,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;

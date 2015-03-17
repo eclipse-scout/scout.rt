@@ -11,11 +11,11 @@
 package org.eclipse.scout.jaxws;
 
 import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformException;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 
 import com.sun.xml.internal.ws.fault.SOAPFaultBuilder;
 

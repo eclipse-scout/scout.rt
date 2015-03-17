@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.client.services.common.icon;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.service.SERVICES;
 

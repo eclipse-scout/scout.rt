@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.cdi;
+package org.eclipse.scout.rt.platform;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 
@@ -19,6 +20,8 @@ import org.eclipse.scout.commons.Assertions.AssertionException;
  * @since 5.2
  */
 public interface IBeanContext {
+
+  ReentrantReadWriteLock getReadWriteLock();
 
   /**
    * @param beanClazz

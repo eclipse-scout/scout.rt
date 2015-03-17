@@ -31,7 +31,7 @@ import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;

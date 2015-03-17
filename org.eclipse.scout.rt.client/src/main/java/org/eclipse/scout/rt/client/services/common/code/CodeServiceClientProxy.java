@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNoti
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;

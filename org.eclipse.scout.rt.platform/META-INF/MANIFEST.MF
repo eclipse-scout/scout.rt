@@ -12,7 +12,6 @@ Export-Package:
  org.eclipse.scout.rt.platform.cdi,
  org.eclipse.scout.rt.platform.cdi.interceptor,
  org.eclipse.scout.rt.platform.cdi.interceptor.internal,
- org.eclipse.scout.rt.platform.cdi.internal,
  org.eclipse.scout.rt.platform.internal,
  org.eclipse.scout.rt.platform.inventory,
  org.eclipse.scout.rt.platform.inventory.internal,

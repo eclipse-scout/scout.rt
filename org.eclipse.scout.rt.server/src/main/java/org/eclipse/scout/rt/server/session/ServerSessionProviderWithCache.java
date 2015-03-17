@@ -24,8 +24,8 @@ import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
 

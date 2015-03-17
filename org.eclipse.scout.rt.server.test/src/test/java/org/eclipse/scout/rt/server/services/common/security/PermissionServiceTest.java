@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
-import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission1;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission2;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;

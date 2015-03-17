@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;

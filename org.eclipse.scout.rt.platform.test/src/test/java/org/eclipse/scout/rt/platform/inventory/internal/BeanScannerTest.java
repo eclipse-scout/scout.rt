@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.platform.inventory.internal;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.BeanFilter;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-import org.eclipse.scout.rt.platform.cdi.Bean;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.internal.BeanFilter;
 import org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean;
 import org.junit.Assert;
 import org.junit.Test;

@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 
 /**
  * <p>

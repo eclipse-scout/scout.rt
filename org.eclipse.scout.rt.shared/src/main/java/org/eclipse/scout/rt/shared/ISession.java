@@ -14,7 +14,7 @@ import java.util.Map;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.platform.cdi.Bean;
+import org.eclipse.scout.rt.platform.Bean;
 import org.osgi.framework.Bundle;
 
 /**

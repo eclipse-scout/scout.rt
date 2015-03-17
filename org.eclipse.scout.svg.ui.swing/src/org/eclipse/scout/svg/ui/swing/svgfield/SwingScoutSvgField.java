@@ -24,7 +24,7 @@ import org.apache.batik.swing.svg.SVGUserAgent;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;

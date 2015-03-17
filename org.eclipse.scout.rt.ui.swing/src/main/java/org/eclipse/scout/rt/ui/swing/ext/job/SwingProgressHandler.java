@@ -27,7 +27,7 @@ import org.eclipse.scout.commons.job.internal.JobChangeListeners;
 import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.job.ModelJobFilter;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 
 /**
  * handler dealing with SwingProgressProvider events.

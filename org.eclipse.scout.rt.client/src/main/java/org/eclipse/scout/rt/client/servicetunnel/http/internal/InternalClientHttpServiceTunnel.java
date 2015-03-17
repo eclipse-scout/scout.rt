@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.servicetunnel.http.internal.AbstractInternalHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;

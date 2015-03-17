@@ -11,7 +11,7 @@
 package org.eclipse.scout.service;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
  * By default, properties in config.ini bean properties are injected when a service is initialized.

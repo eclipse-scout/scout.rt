@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.ui.swing.internal;
 import java.util.Hashtable;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformException;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.ui.swing.login.internal.InternalNetAuthenticator;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;

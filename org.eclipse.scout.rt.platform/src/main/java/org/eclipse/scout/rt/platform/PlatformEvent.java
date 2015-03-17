@@ -22,7 +22,7 @@ public class PlatformEvent extends EventObject {
 
   private final IPlatform.State m_state;
 
-  PlatformEvent(IPlatform platform, State state) {
+  public PlatformEvent(IPlatform platform, State state) {
     super(platform);
     m_state = state;
   }

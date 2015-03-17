@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.inventory.internal.fixture;
 
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
-import org.eclipse.scout.rt.platform.cdi.Bean;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.Bean;
 
 @Bean
 public class TestingBean {

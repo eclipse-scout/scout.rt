@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
  * Authenticator to validate a user's credential against configured users in config.ini file.

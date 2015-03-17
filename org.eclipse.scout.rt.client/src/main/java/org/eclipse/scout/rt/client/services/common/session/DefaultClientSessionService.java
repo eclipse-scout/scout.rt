@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.job.IJobInput;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
 import org.eclipse.scout.service.AbstractService;
 

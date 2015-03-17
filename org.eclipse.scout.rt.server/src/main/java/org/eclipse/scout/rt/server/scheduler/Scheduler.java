@@ -16,9 +16,9 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;

@@ -12,7 +12,7 @@ package org.eclipse.scout.extension;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.extension.ExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
