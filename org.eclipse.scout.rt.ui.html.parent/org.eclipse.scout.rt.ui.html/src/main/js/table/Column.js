@@ -9,6 +9,11 @@ scout.Column.prototype.init = function(model, session) {
 
   // Fill in the missing default values
   scout.defaultValues.applyTo(this);
+
+  // InitialWidth is only sent if it differs from width
+  if (this.initialWidth === undefined) {
+    this.initialWidth = this.width;
+  }
 };
 
 scout.Column.prototype.buildCell = function(row) {

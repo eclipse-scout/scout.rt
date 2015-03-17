@@ -390,14 +390,14 @@ scout.Table.prototype._buildRowDiv = function(row) {
   return rowDiv;
 };
 
-scout.Table.prototype._getTableRowBorderWidth = function() {
-  if (this._tableRowBorderWidth !== undefined) {
-    return this._tableRowBorderWidth;
+scout.Table.prototype.tableRowBorderWidth = function() {
+  if (this._tableRowBorderWidthCached !== undefined) {
+    return this._tableRowBorderWidthCached;
   }
   var $tableRowDummy = this.$data.appendDiv('table-row');
-  this._tableRowBorderWidth = $tableRowDummy.cssBorderLeftWidth() + $tableRowDummy.cssBorderRightWidth();
+  this._tableRowBorderWidthCached = $tableRowDummy.cssBorderLeftWidth() + $tableRowDummy.cssBorderRightWidth();
   $tableRowDummy.remove();
-  return this._tableRowBorderWidth;
+  return this._tableRowBorderWidthCached;
 };
 
 scout.Table.prototype._updateRowWidth = function() {
@@ -405,7 +405,7 @@ scout.Table.prototype._updateRowWidth = function() {
   for (var i = 0; i < this.columns.length; i++) {
     this._rowWidth += this.columns[i].width;
   }
-  this._rowWidth += this._getTableRowBorderWidth();
+  this._rowWidth += this.tableRowBorderWidth();
 };
 
 scout.Table.prototype._drawData = function(startRow) {
@@ -637,13 +637,15 @@ scout.Table.prototype.onRowsSelected = function($selectedRows) {
   this._renderMenus();
 };
 
+// Only necessary if the table is a root html comp (outline table)
+//FIXME CGU what if a table on a form contains a footer?
+//also, if tree gets resized while a tablecontrol and a form is open, the content of the table control is not resized, because desktop does table.setSize after attaching
 scout.Table.prototype.onResize = function() {
   if (this.footer) {
     // Delegate window resize events to footer (actually only width changes are relevant)
     this.footer.onResize();
   }
-  // Only necessary for outline table. If the table is on a form, the update is triggered by the table layout
-  scout.scrollbars.update(this.$data);
+  this.htmlComp.revalidate();
 };
 
 scout.Table.prototype.sendRowClicked = function($row, columnId) {
@@ -1032,7 +1034,6 @@ scout.Table.prototype._onRowsDeleted = function(rowIds) {
   }
   // Update HTML
   if (this.rendered) {
-    this.updateScrollbar();
     this.htmlComp.invalidateTree();
   }
 };
@@ -1353,7 +1354,7 @@ scout.Table.prototype.resizeColumn = function(column, width, resizingInProgress)
 };
 
 scout.Table.prototype.resizingColumnFinished = function(column, width) {
-  if (column.fixedWidth) {
+  if (column.fixedWidth && !this.autoResizeColumns) {
     return;
   }
   var data = {
@@ -1532,6 +1533,12 @@ scout.Table.prototype._renderEnabled = function() {
 
 scout.Table.prototype._renderMultiSelect = function(multiSelect) {
   // nop
+};
+
+scout.Table.prototype._renderAutoResizeColumns = function() {
+  if (this.autoResizeColumns && this.rendered) {
+    this.htmlComp.invalidateTree();
+  }
 };
 
 scout.Table.prototype._onRowOrderChanged = function(rowIds) {

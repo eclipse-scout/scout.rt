@@ -47,6 +47,9 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     JsonObjectUtility.putProperty(json, "text", getJsonSession().getCustomHtmlRenderer().convert(getColumn().getHeaderCell().getText(), true));
     JsonObjectUtility.putProperty(json, "type", computeColumnType(getColumn()));
     JsonObjectUtility.putProperty(json, IColumn.PROP_WIDTH, getColumn().getWidth());
+    if (getColumn().getInitialWidth() != getColumn().getWidth()) {
+      JsonObjectUtility.putProperty(json, "initialWidth", getColumn().getInitialWidth());
+    }
     JsonObjectUtility.putProperty(json, "summary", getColumn().isSummary());
     JsonObjectUtility.putProperty(json, IColumn.PROP_HORIZONTAL_ALIGNMENT, getColumn().getHorizontalAlignment());
     if (getColumn().isSortActive() && getColumn().isSortExplicit()) {

@@ -98,17 +98,15 @@ scout.Form.prototype._isClosable = function() {
 
 scout.Form.prototype.onResize = function() {
   $.log.trace('(Form#onResize) window was resized -> layout Form container');
-  var htmlCont = scout.HtmlComponent.get(this.$container);
+  var htmlComp = scout.HtmlComponent.get(this.$container);
   var $parent = this.$container.parent();
   var parentSize = new scout.Dimension($parent.width(), $parent.height());
-  htmlCont.setSize(parentSize);
+  htmlComp.setSize(parentSize);
 };
 
 scout.Form.prototype.appendTo = function($parent) {
   this.$container.appendTo($parent);
 };
-
-scout.Form.prototype.onModelCreate = function() {};
 
 scout.Form.prototype._remove = function() {
   scout.Form.parent.prototype._remove.call(this);

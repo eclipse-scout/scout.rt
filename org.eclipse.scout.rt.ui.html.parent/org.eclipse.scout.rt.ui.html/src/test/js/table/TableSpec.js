@@ -396,6 +396,54 @@ describe("Table", function() {
 
   });
 
+  describe("autoResizeColumns", function() {
+
+    it("distributes the table columns using initialWidth as weight", function() {
+      var model = helper.createModelFixture(2);
+      model.columns[0].initialWidth = 100;
+      model.columns[1].initialWidth = 200;
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+      table.$data.width(450);
+
+      var event = createPropertyChangeEvent(table, {
+        "autoResizeColumns": true
+      });
+      table.onModelPropertyChange(event);
+
+      // Triggers TableLayout._layoutColumns()
+      session.layoutValidator.validate();
+
+      expect(table.columns[0].width).toBe(150);
+      expect(table.columns[1].width).toBe(300);
+    });
+
+    it("excludes columns with fixed width", function() {
+      var model = helper.createModelFixture(2);
+      model.columns[0].initialWidth = 100;
+      model.columns[0].width = model.columns[0].initialWidth;
+      model.columns[0].fixedWidth = true;
+      model.columns[1].initialWidth = 200;
+      model.columns[1].width = model.columns[1].initialWidth;
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+      table.$data.width(450);
+
+      var event = createPropertyChangeEvent(table, {
+        "autoResizeColumns": true
+      });
+      table.onModelPropertyChange(event);
+
+      // Triggers TableLayout._layoutColumns()
+      session.layoutValidator.validate();
+
+      expect(table.columns[0].width).toBe(100);
+      expect(table.columns[1].width).toBe(350);
+    });
+
+
+  });
+
   describe("sort", function() {
     var model, table, column0, column1, column2;
     var $colHeaders, $header0, $header1, $header2;

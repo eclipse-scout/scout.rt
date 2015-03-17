@@ -24,7 +24,45 @@ scout.TableLayout.prototype.layout = function($container) {
   height += $data.cssMarginTop() + $data.cssMarginBottom();
   $data.css('height', 'calc(100% - '+ height + 'px)');
 
+  if (this.table.autoResizeColumns) {
+    this._layoutColumns();
+  }
   scout.scrollbars.update(this.table.$data);
+};
+
+/**
+ * Resizes the columns to make them use all the available space.
+ */
+scout.TableLayout.prototype._layoutColumns = function() {
+  var i, column, newWidth, weight,
+    relevantColumns = [],
+    columns = this.table.columns,
+    currentWidth = 0,
+    totalInitialWidth = 0,
+    availableWidth = this.table.$data.outerWidth() - this.table.tableRowBorderWidth();
+
+  columns.forEach(function(column) {
+    if (column.fixedWidth) {
+      availableWidth -= column.width;
+    } else {
+      relevantColumns.push(column);
+      currentWidth += column.width;
+      totalInitialWidth += column.initialWidth;
+    }
+  }.bind(this));
+
+  if (availableWidth === currentWidth) {
+    // Columns already use the available space, no need to resize
+    return;
+  }
+
+  relevantColumns.forEach(function(column) {
+    weight = column.initialWidth / totalInitialWidth;
+    newWidth = weight * availableWidth;
+    if (newWidth !== column.width) {
+      this.table.resizeColumn(column, newWidth, true);
+    }
+  }.bind(this));
 };
 
 scout.TableLayout.prototype.preferredLayoutSize = function($comp) {
