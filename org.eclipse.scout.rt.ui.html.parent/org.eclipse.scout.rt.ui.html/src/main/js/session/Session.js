@@ -589,9 +589,13 @@ scout.Session.prototype._processEvents = function(events) {
     event = events[i];
 
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
-    // FIXME BSH/CGU: Check if this should only be getModelAdapter()
-    // See commit by CGU 2014-08-15 18:20:43 ("HtmlUi: Fixed 'No adapter' bug")
-    adapter = this.getOrCreateModelAdapter(event.target, this.rootAdapter);
+    adapter = this.getModelAdapter(event.target);
+    if (!adapter) {
+      // FIXME BSH/CGU: Check if this should only be getModelAdapter()
+      // See commit by CGU 2014-08-15 18:20:43 ("HtmlUi: Fixed 'No adapter' bug")
+      // --> This re-links the parent adapter to the root adapter!!!
+      adapter = this.getOrCreateModelAdapter(event.target, this.rootAdapter);
+    }
     if (!adapter) {
       throw new Error('No adapter registered for ID ' + event.target);
     }
