@@ -29,20 +29,27 @@ public interface IClusterSynchronizationService extends IService {
   String getNodeId();
 
   /**
-   * @return ClusterNodeStatusInfo
+   * @return info about sent and received messages
+   * @deprecated use {@link #getStatusInfo()}. Will be removed in the N Release.
    */
+  @Deprecated
   ClusterNodeStatusInfo getClusterNodeStatusInfo();
 
   /**
+   * @return info about sent and received messages
+   */
+  IClusterNodeStatusInfo getStatusInfo();
+
+  /**
    * Starts listening to notifications
-   * 
+   *
    * @return <code>true</code>, if successful
    */
   boolean enable();
 
   /**
    * Stops listening to notifications
-   * 
+   *
    * @return <code>true</code>, if successful
    */
   boolean disable();
