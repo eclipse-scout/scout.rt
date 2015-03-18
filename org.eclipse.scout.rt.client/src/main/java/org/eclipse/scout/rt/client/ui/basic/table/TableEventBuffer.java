@@ -67,7 +67,6 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       else if (type == TableEvent.TYPE_ROWS_DELETED) {
         removeRows(cur.getRows(), list.subList(0, i),
             TableEvent.TYPE_ROWS_UPDATED,
-            TableEvent.TYPE_ROWS_SELECTED,
             TableEvent.TYPE_ROWS_CHECKED);
       }
     }
