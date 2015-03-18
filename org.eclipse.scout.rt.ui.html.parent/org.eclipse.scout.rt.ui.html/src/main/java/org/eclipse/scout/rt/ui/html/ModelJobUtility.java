@@ -14,9 +14,9 @@ import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientSessionFutureFilter;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.client.job.SessionFutureFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.BlockedFutureFilter;
@@ -33,17 +33,18 @@ public final class ModelJobUtility {
   }
 
   /**
+   * TODO [awe][dwi] Sync oder Async?
    * Wait until all sync jobs have been finished or only waitFor sync jobs are left.
    */
-  public static void waitUntilJobsHaveFinished(IClientSession currentClientSession) {
+  public static void waitUntilJobsHaveFinished(IClientSession clientSession) {
     if (ModelJobs.isModelThread()) {
       throw new IllegalStateException("Cannot wait for another sync job, because current job is also sync!");
     }
     try {
-      final IFilter<IFuture<?>> currentSessionFilter = new ClientSessionFutureFilter(currentClientSession);
+      final IFilter<IFuture<?>> sessionFilter = new SessionFutureFilter(clientSession);
       final IFilter<IFuture<?>> notBlockedFilter = new NotFilter<>(BlockedFutureFilter.INSTANCE);
       final IFilter<IFuture<?>> nonPeriodicFilter = new PeriodicFutureFilter(false);
-      Jobs.getJobManager().awaitDone(new AndFilter<>(currentSessionFilter, notBlockedFilter, nonPeriodicFilter), 1, TimeUnit.HOURS);
+      Jobs.getJobManager().awaitDone(new AndFilter<>(sessionFilter, notBlockedFilter, nonPeriodicFilter), 1, TimeUnit.HOURS);
     }
     catch (InterruptedException e) {
       LOG.warn("Interrupted while waiting for all jobs to complete.", e);

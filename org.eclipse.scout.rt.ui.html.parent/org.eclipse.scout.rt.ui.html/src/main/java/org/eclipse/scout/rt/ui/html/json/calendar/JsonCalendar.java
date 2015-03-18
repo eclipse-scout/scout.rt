@@ -24,10 +24,8 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.ClientSessionFutureFilter;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.job.CurrentSessionFutureFilter;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarAdapter;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
@@ -37,7 +35,7 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.filter.FutureFilter;
+import org.eclipse.scout.rt.platform.job.filter.CurrentFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.PeriodicFutureFilter;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -337,15 +335,14 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   }
 
   private static void waitForAllOtherJobs() {
-    final IClientSession session = ClientSessionProvider.currentSession();
     final IBlockingCondition waitForClientJobsToComplete = Jobs.getJobManager().createBlockingCondition("Wait for ClientJobs to complete", true);
     try {
       ClientJobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           try {
-            final IFilter<IFuture<?>> currentSessionFilter = new ClientSessionFutureFilter(session);
-            final IFilter<IFuture<?>> notCurrentFutureFilter = new NotFilter<>(new FutureFilter(IFuture.CURRENT.get()));
+            final IFilter<IFuture<?>> currentSessionFilter = CurrentSessionFutureFilter.INSTANCE;
+            final IFilter<IFuture<?>> notCurrentFutureFilter = new NotFilter<>(CurrentFutureFilter.INSTANCE);
             final IFilter<IFuture<?>> nonPeriodicFilter = new PeriodicFutureFilter(false);
 
             Jobs.getJobManager().awaitDone(new AndFilter<>(currentSessionFilter, notCurrentFutureFilter, nonPeriodicFilter), 1, TimeUnit.MINUTES);
