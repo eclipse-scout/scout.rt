@@ -40,7 +40,7 @@ public class ClientSessionProvider {
    *           is thrown if the {@link IClientSession} could not be created or initialized.
    */
   public <SESSION extends IClientSession> SESSION provide(final ModelJobInput input) throws ProcessingException {
-    return input.getContext().setSessionRequired(false).invoke(new ICallable<SESSION>() {
+    return input.getContext().invoke(new ICallable<SESSION>() {
 
       @Override
       public SESSION call() throws Exception {

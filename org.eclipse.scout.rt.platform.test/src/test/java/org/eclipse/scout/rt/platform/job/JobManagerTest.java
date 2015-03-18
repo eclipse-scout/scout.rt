@@ -158,14 +158,14 @@ public class JobManagerTest {
 
   @Test(expected = AssertionException.class)
   public void testValidateInput() {
-    new _JobManager().interceptInput(null);
+    new _JobManager().validate(null);
   }
 
   private class _JobManager extends JobManager {
 
     @Override
-    protected JobInput interceptInput(JobInput input) {
-      return super.interceptInput(input);
+    protected void validate(JobInput input) {
+      super.validate(input);
     }
 
     @Override

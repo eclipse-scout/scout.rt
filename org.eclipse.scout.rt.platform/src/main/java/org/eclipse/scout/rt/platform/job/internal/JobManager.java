@@ -20,6 +20,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
@@ -31,6 +32,7 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.context.Context;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -185,8 +187,7 @@ public class JobManager implements IJobManager {
    */
   @Internal
   protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final IExecutable<RESULT> executable, JobInput input) {
-    input = Assertions.assertNotNull(input, "job-input must not be null");
-    input = interceptInput(input.copy());
+    validate(input);
 
     // Ensure a job name to be set.
     if (input.getName() == null) {
@@ -380,11 +381,16 @@ public class JobManager implements IJobManager {
   }
 
   /**
-   * Overwrite this method to intercept the input provided. The default implementation validates the input to not to be
-   * <code>null</code>.
+   * Method invoked to validate the given input. The default implementation ensures the input not to be
+   * <code>null</code> and calls {@link Context#validate}.
+   *
+   * @throws AssertionException
+   *           thrown if the input is not valid.
    */
-  protected JobInput interceptInput(final JobInput input) {
-    return Assertions.assertNotNull(input, "job-input must not be null");
+  protected void validate(final JobInput input) {
+    Assertions.assertNotNull(input, "job-input must not be null");
+    Assertions.assertNotNull(input.getContext(), "context must not be null");
+    input.getContext().validate();
   }
 
   @Override

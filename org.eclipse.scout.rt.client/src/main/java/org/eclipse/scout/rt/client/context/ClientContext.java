@@ -80,8 +80,8 @@ public class ClientContext extends Context {
   }
 
   @Override
-  protected void beforeInvoke() {
-    super.beforeInvoke();
+  public void validate() {
+    super.validate();
     if (isSessionRequired()) {
       Assertions.assertNotNull(m_session, "ClientSession must not be null");
     }

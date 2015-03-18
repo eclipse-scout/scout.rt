@@ -65,15 +65,13 @@ public class Context {
   }
 
   public <RESULT> RESULT invoke(final Callable<RESULT> callable) {
-    beforeInvoke();
+    validate();
+
     try {
       return interceptCallable(callable).call();
     }
     catch (final Exception e) {
       throw new ContextInvocationException(e);
-    }
-    finally {
-      afterInvoke();
     }
   }
 
@@ -117,15 +115,9 @@ public class Context {
   }
 
   /**
-   * Method invoked before the context is constructed and the callable invoked.
+   * Validates this context.
    */
-  protected void beforeInvoke() {
-  }
-
-  /**
-   * Method invoked after the callable was invoked and the context destroyed.
-   */
-  protected void afterInvoke() {
+  public void validate() {
   }
 
   public Subject getSubject() {

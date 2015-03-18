@@ -86,8 +86,8 @@ public class ServerContext extends Context {
   }
 
   @Override
-  protected void beforeInvoke() {
-    super.beforeInvoke();
+  public void validate() {
+    super.validate();
     if (isSessionRequired()) {
       Assertions.assertNotNull(m_session, "ServerSession must not be null");
     }
