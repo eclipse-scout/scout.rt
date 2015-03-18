@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.server.context.ServerContext;
 /**
  * Factory and utility methods for {@link IJobManager} to schedule and interact with server jobs.
  * <p/>
- * Use this class to schedule jobs that do require a server context for execution. By default, client jobs require a
+ * Use this class to schedule jobs that do require a server context for execution. By default, server jobs require a
  * {@link IServerSession} to be set.
  *
  * @since 5.1
