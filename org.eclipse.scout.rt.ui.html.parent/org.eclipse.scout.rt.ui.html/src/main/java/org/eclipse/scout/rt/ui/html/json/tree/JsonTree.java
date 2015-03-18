@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -54,15 +55,17 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   public static final String PROP_SELECTED_NODE_IDS = "selectedNodeIds";
 
   private TreeListener m_treeListener;
-  private Map<String, ITreeNode> m_treeNodes;
-  private Map<ITreeNode, String> m_treeNodeIds;
-  private TreeEventFilter m_treeEventFilter;
+  private final Map<String, ITreeNode> m_treeNodes;
+  private final Map<ITreeNode, String> m_treeNodeIds;
+  private final TreeEventFilter m_treeEventFilter;
+  private final AbstractEventBuffer<TreeEvent> m_eventBuffer;
 
   public JsonTree(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
     m_treeEventFilter = new TreeEventFilter(getModel());
+    m_eventBuffer = model.createEventBuffer();
   }
 
   @Override
@@ -205,6 +208,23 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     if (event == null) {
       return;
     }
+    // Add event to buffer instead of handling it immediately. (This allows coalescing the events at JSON response level.)
+    m_eventBuffer.add(event);
+    registerAsBufferedEventsAdapter();
+  }
+
+  @Override
+  public void processBufferedEvents() {
+    if (m_eventBuffer.isEmpty()) {
+      return;
+    }
+    List<TreeEvent> coalescedEvents = m_eventBuffer.removeEvents();
+    for (TreeEvent event : coalescedEvents) {
+      processBufferedEvent(event);
+    }
+  }
+
+  protected void processBufferedEvent(TreeEvent event) {
     switch (event.getType()) {
       case TreeEvent.TYPE_NODES_INSERTED:
         handleModelNodesInserted(event);
@@ -532,6 +552,10 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     int eventType = expanded ? TreeEvent.TYPE_NODE_EXPANDED : TreeEvent.TYPE_NODE_COLLAPSED;
     addTreeEventFilterCondition(eventType, CollectionUtility.arrayList(node));
     getModel().getUIFacade().setNodeExpandedFromUI(node, expanded);
+  }
+
+  protected AbstractEventBuffer<TreeEvent> eventBuffer() {
+    return m_eventBuffer;
   }
 
   protected final TreeEventFilter getTreeEventFilter() {

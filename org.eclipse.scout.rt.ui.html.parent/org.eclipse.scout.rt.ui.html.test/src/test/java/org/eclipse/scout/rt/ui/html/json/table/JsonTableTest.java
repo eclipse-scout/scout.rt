@@ -486,7 +486,105 @@ public class JsonTableTest {
       }
     });
 
+    // After flushing the event buffers and applying the model changes
+    // to the JsonTable, the row should not exist anymore on the JsonTable
+    JsonTestUtility.processBufferedEvents(m_jsonSession);
     assertNull(jsonTable.getTableRowForRowId(row0Id));
+  }
+
+  /**
+   * Tests that multiple model events are coalseced in JSON layer
+   */
+  @Test
+  public void testTableEventCoalesceInUi_TwoRowsAdded() throws Exception {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetDisplayableColumns();
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
+
+    // Response should contain no events
+    assertEquals(0, m_jsonSession.currentJsonResponse().getEventList().size());
+
+    // Add two rows sequentially --> this should trigger two TableEvents
+    table.addRowsByMatrix(new Object[]{new Object[]{"NewCell_0", "NewCell_1", "NewCell_2"}});
+    table.addRowsByMatrix(new Object[]{new Object[]{"AnotherNewCell_0", "AnotherNewCell_1", "AnotherNewCell_2"}});
+
+    // Events should not yet be in the response
+    assertEquals(0, m_jsonSession.currentJsonResponse().getEventList().size());
+    // But they should be in the event buffer
+    assertEquals(2, jsonTable.eventBuffer().size());
+    // When converting to JSON, the event buffer should be cleared and the events should
+    // be coalesced and written to the response. -->  Only one insert event (with two rows)
+    JSONObject response = m_jsonSession.currentJsonResponse().toJson();
+    assertEquals(0, jsonTable.eventBuffer().size());
+    JSONArray events = response.getJSONArray("events");
+    assertEquals(1, events.length());
+    assertEquals(2, events.getJSONObject(0).getJSONArray("rows").length());
+  }
+
+  /**
+   * Tests that multiple model events are coalseced in JSON layer
+   */
+  @Test
+  public void testTableEventCoalesceInUi_RowInsertedAndUpdated() throws Exception {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetDisplayableColumns();
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
+
+    // Response should contain no events
+    assertEquals(0, m_jsonSession.currentJsonResponse().getEventList().size());
+
+    // Add one row, then update it --> this should trigger two TableEvents
+    List<ITableRow> newRows = table.addRowsByMatrix(new Object[]{new Object[]{"NewCell_0", "NewCell_1", "NewCell_2"}});
+    newRows.get(0).getCellForUpdate(0).setValue("UPDATED");
+
+    // Events should not yet be in the response
+    assertEquals(0, m_jsonSession.currentJsonResponse().getEventList().size());
+    // But they should be in the event buffer
+    assertEquals(2, jsonTable.eventBuffer().size());
+    // When converting to JSON, the event buffer should be cleared and the events should
+    // be coalesced and written to the response. --> Update should be merged with inserted
+    JSONObject response = m_jsonSession.currentJsonResponse().toJson();
+    assertEquals(0, jsonTable.eventBuffer().size());
+    JSONArray events = response.getJSONArray("events");
+    assertEquals(1, events.length());
+    assertEquals(1, events.getJSONObject(0).getJSONArray("rows").length());
+    assertEquals("UPDATED", events.getJSONObject(0).getJSONArray("rows").getJSONObject(0).getJSONArray("cells").getString(0));
+  }
+
+  /**
+   * Tests that multiple model events are coalseced in JSON layer
+   */
+  @Test
+  public void testTableEventCoalesceInUi_RowInsertedAndDeleted() throws Exception {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetDisplayableColumns();
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
+
+    // Response should contain no events
+    assertEquals(0, m_jsonSession.currentJsonResponse().getEventList().size());
+
+    // Add one row, then delete it --> this should trigger two TableEvents
+    List<ITableRow> newRows = table.addRowsByMatrix(new Object[]{new Object[]{"NewCell_0", "NewCell_1", "NewCell_2"}});
+    table.discardRows(newRows);
+
+    // Events should not yet be in the response
+    assertEquals(0, m_jsonSession.currentJsonResponse().getEventList().size());
+    // But they should be in the event buffer
+    assertEquals(2, jsonTable.eventBuffer().size());
+    // When converting to JSON, the event buffer should be cleared and the events should
+    // be coalesced and written to the response. --> Both events should cancel each other
+    JSONObject response = m_jsonSession.currentJsonResponse().toJson();
+    assertEquals(0, jsonTable.eventBuffer().size());
+    JSONArray events = response.getJSONArray("events");
+
+    // FIXME BSH Actually, we would expect 0. But coalesce does not do this yet. Change this later.
+    assertEquals(2, events.length());
   }
 
   public static Table createTableFixture(int numRows) throws ProcessingException {

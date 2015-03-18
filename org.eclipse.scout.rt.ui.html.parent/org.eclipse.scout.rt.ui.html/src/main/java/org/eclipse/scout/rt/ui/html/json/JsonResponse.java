@@ -12,11 +12,13 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
@@ -41,16 +43,19 @@ public class JsonResponse {
   private final List<JsonEvent> m_eventList;
   private final Map<String/*id*/, JsonEvent> m_idToPropertyChangeEventMap;
   private final Map<String, IJsonAdapter<?>> m_adapterMap;
+  private final Set<IJsonAdapter<?>> m_bufferedEventsAdapters;
   private boolean m_error;
   private int m_errorCode;
   private String m_errorMessage;
 
   private boolean m_toJsonInProgress;
+  private boolean m_processingBufferedEvents;
 
   public JsonResponse() {
     m_eventList = new ArrayList<>();
     m_adapterMap = new HashMap<>();
     m_idToPropertyChangeEventMap = new HashMap<>();
+    m_bufferedEventsAdapters = new HashSet<>();
   }
 
   /**
@@ -123,6 +128,29 @@ public class JsonResponse {
   }
 
   /**
+   * Registers the given adapter as a holder of buffered events. Before executing {@link #toJson()} those buffers are
+   * consumed automatically. (Additionally, all registered buffers can be consumed manually with
+   * {@link #fireProcessBufferedEvents()}.)
+   */
+  public void registerBufferedEventsAdapter(IJsonAdapter<?> adapter) {
+    if (m_processingBufferedEvents) {
+      throw new IllegalStateException("Cannot register an adapter as buffered events provider while processing buffered events [" + adapter + "]");
+    }
+    if (adapter != null) {
+      m_bufferedEventsAdapters.add(adapter);
+    }
+  }
+
+  public void unregisterBufferedEventsAdapter(IJsonAdapter<?> adapter) {
+    if (m_processingBufferedEvents) {
+      throw new IllegalStateException("Cannot unregister an adapter as buffered events provider while processing buffered events [" + adapter + "]");
+    }
+    if (adapter != null) {
+      m_bufferedEventsAdapters.remove(adapter);
+    }
+  }
+
+  /**
    * Marks this JSON response as "error" (default is "success").
    *
    * @param errorCode
@@ -162,6 +190,9 @@ public class JsonResponse {
    * we should conceptually separate object creation from JSON output creation.
    */
   public JSONObject toJson() {
+    // Ensure all buffered events are handled. This might cause the addition of more events and adapters to this response.
+    fireProcessBufferedEvents();
+
     JSONObject json = new JSONObject();
     JSONObject adapterData = new JSONObject();
     m_toJsonInProgress = true;
@@ -208,6 +239,22 @@ public class JsonResponse {
       m_toJsonInProgress = false;
     }
     return json;
+  }
+
+  /**
+   * Causes all registered {@link IBufferedEventsProvider}s to process their buffered events. This may add some events
+   * and adapters to this response. This method is called automatically during {@link #toJson()}.
+   */
+  public void fireProcessBufferedEvents() {
+    m_processingBufferedEvents = true;
+    try {
+      for (IJsonAdapter<?> adapter : m_bufferedEventsAdapters) {
+        adapter.processBufferedEvents();
+      }
+    }
+    finally {
+      m_processingBufferedEvents = false;
+    }
   }
 
   /**

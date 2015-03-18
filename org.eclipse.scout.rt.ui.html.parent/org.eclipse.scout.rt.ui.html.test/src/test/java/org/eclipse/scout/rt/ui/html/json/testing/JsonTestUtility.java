@@ -87,12 +87,20 @@ public final class JsonTestUtility {
   }
 
   /**
+   * Ensures that all buffered events are applied to the JSON-Adapters.
+   */
+  public static void processBufferedEvents(IJsonSession jsonSession) {
+    jsonSession.currentJsonResponse().fireProcessBufferedEvents();
+  }
+
+  /**
    * @param eventType
    *          Optional. If set only events with the given type will be returned.
    * @param adapterId
    *          Optional. If set only events for the given id will be returned.
    */
   public static List<JsonEvent> extractEventsFromResponse(JsonResponse response, String eventType, String adapterId) throws JSONException {
+    response.fireProcessBufferedEvents();
     List<JsonEvent> list = new ArrayList<>();
     for (JsonEvent event : response.getEventList()) {
       if ((eventType == null || event.getType().equals(eventType))

@@ -21,11 +21,15 @@ import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NodePage;
@@ -37,10 +41,6 @@ import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTreeTest;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
-import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -113,6 +113,7 @@ public class JsonOutlineTest {
     }
 
     outline.removeNode(nodePage);
+    JsonTestUtility.processBufferedEvents(m_jsonSession);
 
     // Verify nodes get unregistered
     for (ITreeNode node : allNodes) {
@@ -144,6 +145,7 @@ public class JsonOutlineTest {
     Assert.assertNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
 
     nodePage.setTableVisible(true);
+    JsonTestUtility.processBufferedEvents(m_jsonSession);
     jsonNode = jsonOutline.toJson().getJSONArray("nodes").getJSONObject(0);
     Assert.assertNotNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
   }

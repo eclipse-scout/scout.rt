@@ -22,6 +22,7 @@ import java.util.Map;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -29,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
@@ -86,6 +88,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   private final Map<ITableRow, String> m_tableRowIds;
   private final TableEventFilter m_tableEventFilter;
   private final Map<IColumn, JsonColumn> m_jsonColumns;
+  private final AbstractEventBuffer<TableEvent> m_eventBuffer;
 
   public JsonTable(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -93,6 +96,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     m_tableRowIds = new HashMap<>();
     m_tableEventFilter = new TableEventFilter(this);
     m_jsonColumns = new HashMap<IColumn, JsonColumn>();
+    m_eventBuffer = model.createEventBuffer();
   }
 
   @Override
@@ -546,12 +550,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     return row;
   }
 
-  protected void handleModelTableEventBatch(List<? extends TableEvent> events) {
-    for (TableEvent event : events) {
-      handleModelTableEvent(event);
-    }
-  }
-
   protected void handleModelTableEvent(TableEvent event) {
     /* FIXME CGU we need to coalesce the events during the same request (something like AbstractTable.processEventBuffer). I don't think the developer should be responsible for this (using setTableChanging(true))
      * Example: The developer calls addRow several times for the same table -> must generate only one json event -> reduces data and improves redrawing performance on client
@@ -572,6 +570,23 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (event == null) {
       return;
     }
+    // Add event to buffer instead of handling it immediately. (This allows coalescing the events at JSON response level.)
+    m_eventBuffer.add(event);
+    registerAsBufferedEventsAdapter();
+  }
+
+  @Override
+  public void processBufferedEvents() {
+    if (m_eventBuffer.isEmpty()) {
+      return;
+    }
+    List<TableEvent> coalescedEvents = m_eventBuffer.removeEvents();
+    for (TableEvent event : coalescedEvents) {
+      processBufferedEvent(event);
+    }
+  }
+
+  protected void processBufferedEvent(TableEvent event) {
     switch (event.getType()) {
       case TableEvent.TYPE_ROWS_INSERTED:
         handleModelRowsInserted(event.getRows());
@@ -667,18 +682,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     addActionEvent(EVENT_ROWS_DELETED, jsonEvent);
   }
 
-  private void disposeRows(Collection<ITableRow> modelRows) {
-    for (ITableRow row : modelRows) {
-      disposeRow(row);
-    }
-  }
-
-  private void disposeRow(ITableRow row) {
-    String rowId = m_tableRowIds.get(row);
-    m_tableRowIds.remove(row);
-    m_tableRows.remove(rowId);
-  }
-
   protected void handleModelAllRowsDeleted(Collection<ITableRow> modelRows) {
     if (modelRows.isEmpty()) {
       return;
@@ -756,6 +759,18 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
+  protected void disposeRows(Collection<ITableRow> modelRows) {
+    for (ITableRow row : modelRows) {
+      disposeRow(row);
+    }
+  }
+
+  protected void disposeRow(ITableRow row) {
+    String rowId = m_tableRowIds.get(row);
+    m_tableRowIds.remove(row);
+    m_tableRows.remove(rowId);
+  }
+
   protected Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {
     List<IColumn<?>> visibleColumns = new LinkedList<IColumn<?>>();
     for (IColumn<?> column : columns) {
@@ -769,6 +784,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   @Override
   public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
     addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
+  }
+
+  protected AbstractEventBuffer<TableEvent> eventBuffer() {
+    return m_eventBuffer;
   }
 
   protected final TableEventFilter getTableEventFilter() {
@@ -822,16 +841,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  private class P_TableListener implements TableListener {
+  private class P_TableListener extends TableAdapter {
+
     @Override
     public void tableChanged(final TableEvent e) {
       handleModelTableEvent(e);
     }
-
-    @Override
-    public void tableChangedBatch(List<? extends TableEvent> events) {
-      handleModelTableEventBatch(events);
-    }
   }
-
 }

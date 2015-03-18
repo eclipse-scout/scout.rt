@@ -262,6 +262,14 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     getJsonSession().currentJsonResponse().addActionEvent(getId(), eventName, eventData);
   }
 
+  protected final void registerAsBufferedEventsAdapter() {
+    getJsonSession().currentJsonResponse().registerBufferedEventsAdapter(this);
+  }
+
+  protected final void unregisterAsBufferedEventsAdapter() {
+    getJsonSession().currentJsonResponse().unregisterBufferedEventsAdapter(this);
+  }
+
   /**
    * Like {@link #addActionEvent(String, JSONObject)} but if there are already action events for the same
    * event in the current response, all existing events are removed before adding the new event.
@@ -279,5 +287,9 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   @Override
   public void cleanUpEventFilters() {
+  }
+
+  @Override
+  public void processBufferedEvents() {
   }
 }

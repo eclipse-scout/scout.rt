@@ -50,4 +50,9 @@ public interface IJsonAdapter<T extends Object> extends IJsonObject {
   Collection<IJsonAdapter<?>> getAdapters(Collection<?> models);
 
   IJsonAdapter<?> getParent();
+
+  /**
+   * Consumes all buffered model events, if there are any. The buffer will be empty afterwards.
+   */
+  void processBufferedEvents();
 }

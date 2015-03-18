@@ -21,10 +21,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
@@ -35,10 +39,6 @@ import org.eclipse.scout.rt.ui.html.json.tree.fixtures.Tree;
 import org.eclipse.scout.rt.ui.html.json.tree.fixtures.TreeNode;
 import org.eclipse.scout.rt.ui.html.json.tree.fixtures.TreeWith3Levels;
 import org.eclipse.scout.rt.ui.html.json.tree.fixtures.TreeWithOneNode;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
-import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -263,6 +263,7 @@ public class JsonTreeTest {
 
     tree.removeNode(nodes.get(0));
 
+    JsonTestUtility.processBufferedEvents(m_jsonSession);
     assertNull(jsonTree.getNodeId(nodes.get(0)));
     assertNull(jsonTree.getNode(node0Id));
   }
@@ -291,6 +292,7 @@ public class JsonTreeTest {
       }
     });
 
+    JsonTestUtility.processBufferedEvents(m_jsonSession);
     assertNull(jsonTree.getNodeId(nodes.get(0)));
     assertNull(jsonTree.getNode(node0Id));
   }
@@ -318,6 +320,7 @@ public class JsonTreeTest {
 
     tree.removeNode(allNodes.get(0));
 
+    JsonTestUtility.processBufferedEvents(m_jsonSession);
     for (ITreeNode node : allNodes) {
       assertNull(jsonTree.getNodeId(node));
     }
