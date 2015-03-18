@@ -43,7 +43,7 @@ public class OutlineEventBufferTest {
     final OutlineEvent e2 = new OutlineEvent(mock(IOutline.class), OutlineEvent.TYPE_PAGE_CHANGED);
     m_testBuffer.add(e1);
     m_testBuffer.add(e2);
-    final List<TreeEvent> coalesced = m_testBuffer.removeEvents();
+    final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(1, coalesced.size());
     assertSame(e2, coalesced.get(0));
   }

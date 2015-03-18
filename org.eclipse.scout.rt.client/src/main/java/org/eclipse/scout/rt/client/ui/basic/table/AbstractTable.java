@@ -3582,7 +3582,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       //
       if (!getEventBuffer().isEmpty()) {
-        List<TableEvent> coalescedEvents = getEventBuffer().removeEvents();
+        List<TableEvent> coalescedEvents = getEventBuffer().consumeAndCoalesceEvents();
         // fire the batch and set tree to changing, otherwise a listener might trigger another events that
         // then are processed before all other listeners received that batch
         try {

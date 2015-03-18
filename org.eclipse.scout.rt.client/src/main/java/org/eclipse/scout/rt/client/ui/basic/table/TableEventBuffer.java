@@ -37,7 +37,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    * Removes unnecessary events or combines events in the list.
    */
   @Override
-  protected List<? extends TableEvent> coalesce(List<TableEvent> events) {
+  protected List<TableEvent> coalesce(List<TableEvent> events) {
     removeObsolete(events);
     replacePrevious(events, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED);
     coalesceSameType(events);

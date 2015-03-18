@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -70,12 +69,12 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
    *
    * @return the coalesced list of events.
    */
-  public List<T> removeEvents() {
-    List<T> res = new ArrayList<T>(coalesce(consume()));
+  public List<T> consumeAndCoalesceEvents() {
+    List<T> result = coalesce(consume());
     if (LOG.isDebugEnabled()) {
-      LOG.debug(String.format("Removing Events from buffer '%1$s'", res));
+      LOG.debug(String.format("Consumed events from buffer '%1$s'", result));
     }
-    return res;
+    return result;
   }
 
   /**
@@ -87,7 +86,7 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
     return list;
   }
 
-  protected abstract List<? extends T> coalesce(List<T> events);
+  protected abstract List<T> coalesce(List<T> events);
 
   /**
    * Removes all events of the same type from the list.

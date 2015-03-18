@@ -42,7 +42,7 @@ public class TreeEventBufferTest {
     m_testBuffer.add(e1);
     m_testBuffer.add(e2);
     m_testBuffer.add(e3);
-    final List<TreeEvent> coalesced = m_testBuffer.removeEvents();
+    final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(3, coalesced.size());
     assertSame(e1, coalesced.get(0));
     assertSame(e2, coalesced.get(1));
@@ -62,7 +62,7 @@ public class TreeEventBufferTest {
     m_testBuffer.add(e2);
     m_testBuffer.add(e3);
     m_testBuffer.add(e4);
-    final List<TreeEvent> coalesced = m_testBuffer.removeEvents();
+    final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(2, coalesced.size());
     assertSame(e2, coalesced.get(0));
     assertSame(e4, coalesced.get(1));

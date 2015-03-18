@@ -2520,7 +2520,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   private void processEventBuffer() {
     if (!getEventBuffer().isEmpty()) {
-      final List<TreeEvent> list = getEventBuffer().removeEvents();
+      final List<TreeEvent> list = getEventBuffer().consumeAndCoalesceEvents();
       // fire the batch and set tree to changing, otherwise a listener might trigger another events that then are processed
       // before all other listeners received that batch
       try {

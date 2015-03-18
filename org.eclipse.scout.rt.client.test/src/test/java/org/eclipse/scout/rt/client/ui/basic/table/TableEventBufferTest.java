@@ -44,7 +44,7 @@ public class TableEventBufferTest {
   @Test
   public void testEmpty() {
     assertTrue(m_testBuffer.isEmpty());
-    assertTrue(m_testBuffer.removeEvents().isEmpty());
+    assertTrue(m_testBuffer.consumeAndCoalesceEvents().isEmpty());
   }
 
   /**
@@ -54,7 +54,7 @@ public class TableEventBufferTest {
   public void testSingleEvent() {
     final TableEvent se = mockEvent(TableEvent.TYPE_ROWS_SELECTED);
     m_testBuffer.add(se);
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(se, events.iterator().next());
     assertTrue(m_testBuffer.isEmpty());
   }
@@ -72,7 +72,7 @@ public class TableEventBufferTest {
     m_testBuffer.add(e1);
     m_testBuffer.add(e2);
     m_testBuffer.add(e3);
-    final List<TableEvent> coalesced = m_testBuffer.removeEvents();
+    final List<TableEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(3, coalesced.size());
     assertSame(e1, coalesced.get(0));
     assertSame(e2, coalesced.get(1));
@@ -90,7 +90,7 @@ public class TableEventBufferTest {
     m_testBuffer.add(se1);
     m_testBuffer.add(se2);
     m_testBuffer.add(se3);
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(2, events.size());
     assertSame(se2, events.get(0));
     assertSame(se3, events.get(1));
@@ -112,7 +112,7 @@ public class TableEventBufferTest {
     m_testBuffer.add(mockEvent(TableEvent.TYPE_ROWS_DELETED));
     final TableEvent alldeleted = mockEvent(TableEvent.TYPE_ALL_ROWS_DELETED);
     m_testBuffer.add(alldeleted);
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(2, events.size());
     assertSame(columnEvent, events.get(0));
     assertSame(alldeleted, events.get(1));
@@ -136,7 +136,7 @@ public class TableEventBufferTest {
     m_testBuffer.add(e1);
     m_testBuffer.add(e2);
 
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
 
     assertEquals(1, events.size());
     final List<ITableRow> resultRows = events.get(0).getRows();
@@ -160,7 +160,7 @@ public class TableEventBufferTest {
     m_testBuffer.add(e1);
     m_testBuffer.add(e2);
 
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
 
     assertEquals(1, events.size());
     final List<ITableRow> resultRows = events.get(0).getRows();
@@ -189,7 +189,7 @@ public class TableEventBufferTest {
     e2.setColumns(cols2);
     m_testBuffer.add(e2);
 
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
 
     assertEquals(1, events.size());
     final Collection<IColumn<?>> resultRows = events.get(0).getColumns();
@@ -211,7 +211,7 @@ public class TableEventBufferTest {
     m_testBuffer.add(mockEvent(TableEvent.TYPE_ROWS_INSERTED));
     final TableEvent e2 = createTestUpdateEvent();
     m_testBuffer.add(e2);
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(3, events.size());
     assertEquals(2, events.get(0).getRows().size());
   }
@@ -231,7 +231,7 @@ public class TableEventBufferTest {
 
     m_testBuffer.add(insert);
     m_testBuffer.add(update);
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(1, events.size());
     assertNotNull(events.get(0).getFirstRow().getCell(0));
   }
@@ -249,7 +249,7 @@ public class TableEventBufferTest {
     m_testBuffer.add(insert);
     m_testBuffer.add(otherUpdate);
     m_testBuffer.add(update);
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(2, events.size());
     assertEquals(2, events.get(0).getRowCount());
     assertNotNull(events.get(0).getFirstRow().getCell(0));
@@ -264,7 +264,7 @@ public class TableEventBufferTest {
     final TableEvent update = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0));
     m_testBuffer.add(insert);
     m_testBuffer.add(update);
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(2, events.size());
   }
 
@@ -279,7 +279,7 @@ public class TableEventBufferTest {
     m_testBuffer.add(insert);
     m_testBuffer.add(orderChanged);
     m_testBuffer.add(update);
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(3, events.size());
   }
 
@@ -289,7 +289,7 @@ public class TableEventBufferTest {
     final TableEvent delete = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_DELETED, mockRows(0));
     m_testBuffer.add(update);
     m_testBuffer.add(delete);
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(1, events.size());
     assertEquals(TableEvent.TYPE_ROWS_DELETED, events.get(0).getType());
   }
@@ -300,7 +300,7 @@ public class TableEventBufferTest {
     final TableEvent delete = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_DELETED, mockRows(0));
     m_testBuffer.add(update);
     m_testBuffer.add(delete);
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(2, events.size());
     assertEquals(TableEvent.TYPE_TABLE_POPULATED, events.get(0).getType());
     assertEquals(TableEvent.TYPE_ROWS_DELETED, events.get(1).getType());
@@ -312,7 +312,7 @@ public class TableEventBufferTest {
     final TableEvent delete = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_DELETED, mockRows(1));
     m_testBuffer.add(update);
     m_testBuffer.add(delete);
-    final List<TableEvent> events = m_testBuffer.removeEvents();
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(2, events.size());
     assertEquals(TableEvent.TYPE_ROWS_DELETED, events.get(1).getType());
   }
