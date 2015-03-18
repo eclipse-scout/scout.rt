@@ -32,6 +32,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateChildPagesChain;
+import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
@@ -194,8 +195,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     addTreeListener(new P_OutlineListener());
     addNodeFilter(new P_TableFilterBasedTreeNodeFilter());
     super.initConfig();
-
-    setEventBuffer(new OutlineEventBuffer());
     setRootNodeVisible(false);
     IPage<?> rootPage = new InvisibleRootPage();
     setRootNode(rootPage);
@@ -211,6 +210,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
+  }
+
+  @Override
+  public AbstractEventBuffer<TreeEvent> createEventBuffer() {
+    return new OutlineEventBuffer();
   }
 
   /*

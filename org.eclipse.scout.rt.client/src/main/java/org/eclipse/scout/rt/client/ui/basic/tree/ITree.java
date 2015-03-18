@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -68,6 +69,11 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
   void initTree() throws ProcessingException;
 
   void disposeTree();
+
+  /**
+   * @since 5.1.0
+   */
+  AbstractEventBuffer<TreeEvent> createEventBuffer();
 
   /**
    * sets the node as selected node and processes the url.

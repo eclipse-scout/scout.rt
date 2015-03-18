@@ -458,6 +458,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   protected void initConfig() {
     m_enabledGranted = true;
     m_eventHistory = createEventHistory();
+    m_eventBuffer = createEventBuffer();
     m_uiFacade = createUIFacade();
     m_contributionHolder = new ContributionComposite(this);
     setTitle(getConfiguredTitle());
@@ -478,7 +479,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
     setRootNode(new AbstractTreeNode() {
     });
-    setEventBuffer(new TreeEventBuffer());
     // add Convenience observer for drag & drop callbacks and event history
     addTreeListener(new TreeAdapter() {
 
@@ -751,12 +751,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
-  protected AbstractEventBuffer<TreeEvent> getEventBuffer() {
-    return m_eventBuffer;
+  @Override
+  public AbstractEventBuffer<TreeEvent> createEventBuffer() {
+    return new TreeEventBuffer();
   }
 
-  protected void setEventBuffer(AbstractEventBuffer<TreeEvent> eventBuffer) {
-    m_eventBuffer = eventBuffer;
+  protected AbstractEventBuffer<TreeEvent> getEventBuffer() {
+    return m_eventBuffer;
   }
 
   @Override

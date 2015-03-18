@@ -67,6 +67,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRow
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsSelectedChain;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
+import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -159,7 +160,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private boolean m_sortValid;
   private boolean m_initialMultiLineText;
   private int m_tableChanging;
-  private TableEventBuffer m_eventBuffer = new TableEventBuffer();
+  private AbstractEventBuffer<TableEvent> m_eventBuffer;
+  private int m_eventBufferLoopDetection;
 
   private final HashSet<P_CellLookup> m_cellLookupBuffer = new HashSet<P_CellLookup>();
   private HashSet<ITableRow> m_rowDecorationBuffer = new HashSet<ITableRow>();
@@ -181,8 +183,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private boolean m_actionRunning;
   private List<ITableControl> m_tableControls;
   private IReloadHandler m_reloadHandler;
-
-  private int m_eventBufferLoopDetection;
 
   public AbstractTable() {
     this(true);
@@ -849,6 +849,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   protected void initConfig() {
     m_eventHistory = createEventHistory();
+    m_eventBuffer = createEventBuffer();
     m_uiFacade = createUIFacade();
     m_contributionHolder = new ContributionComposite(this);
     setTitle(getConfiguredTitle());
@@ -868,7 +869,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     setDropType(getConfiguredDropType());
     setScrollToSelection(getConfiguredScrollToSelection());
     setTableStatusVisible(getConfiguredTableStatusVisible());
-    setEventBuffer(new TableEventBuffer());
     if (getTableCustomizer() == null) {
       setTableCustomizer(createTableCustomizer());
     }
@@ -1016,12 +1016,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     //
   }
 
-  protected TableEventBuffer getEventBuffer() {
-    return m_eventBuffer;
+  @Override
+  public AbstractEventBuffer<TableEvent> createEventBuffer() {
+    return new TableEventBuffer();
   }
 
-  protected void setEventBuffer(TableEventBuffer eventBuffer) {
-    m_eventBuffer = eventBuffer;
+  protected AbstractEventBuffer<TableEvent> getEventBuffer() {
+    return m_eventBuffer;
   }
 
   private void initColumnsInternal() {

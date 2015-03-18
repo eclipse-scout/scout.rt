@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -162,6 +163,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void initTable() throws ProcessingException;
 
   void disposeTable();
+
+  /**
+   * @since 5.1.0
+   */
+  AbstractEventBuffer<TableEvent> createEventBuffer();
 
   /**
    * set the context column and processes the url.
