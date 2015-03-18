@@ -46,16 +46,16 @@ import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
 
 public class ClusterSynchronizationService extends AbstractService implements IClusterSynchronizationService, IPublishSubscribeMessageListener {
-  private static final String TRANSACTION_MEMBER_ID = ClusterSynchronizationService.class.getName();
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClusterSynchronizationService.class);
+
+  private static final String TRANSACTION_MEMBER_ID = ClusterSynchronizationService.class.getName();
   private static final String PROP_USER_CLUSTER_SYNC = String.format("%s#user", ClusterSynchronizationService.class.getName());
   private static final String CLUSTER_NODE_ID_PARAM = "org.eclipse.scout.rt.server.clusterNodeId";
 
   private final EventListenerList m_listenerList = new EventListenerList();
   private final ClusterNodeStatusInfo m_statusInfo = new ClusterNodeStatusInfo();
 
-  // variables must not be synchronized as they are only set at initialization
-  private String m_nodeId;
+  private volatile String m_nodeId;
   private final Subject m_subject;
 
   private volatile boolean m_enabled;
@@ -127,8 +127,22 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     return getListenerList().getListeners(IClusterNotificationListener.class);
   }
 
+  /**
+   * @deprecated use {@link #getStatusInfo()}
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public ClusterNodeStatusInfo getClusterNodeStatusInfo() {
+    return m_statusInfo;
+  }
+
+  @Override
+  public IClusterNodeStatusInfo getStatusInfo() {
+    return m_statusInfo.getStatus();
+  }
+
+  protected ClusterNodeStatusInfo getStatusInfoInternal() {
     return m_statusInfo;
   }
 
@@ -254,7 +268,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
       return;
     }
 
-    getClusterNodeStatusInfo().updateReceiveStatus(message);
+    getStatusInfoInternal().updateReceiveStatus(message);
 
     ServerJobInput jobInput = ServerJobInput.empty();
     jobInput.setName("cluster-sync-receive");
@@ -280,7 +294,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     ITransaction tx = Assertions.assertNotNull(ITransaction.CURRENT.get(), "Transaction required");
     ClusterSynchronizationTransaction m = (ClusterSynchronizationTransaction) tx.getMember(TRANSACTION_MEMBER_ID);
     if (m == null) {
-      m = new ClusterSynchronizationTransaction(TRANSACTION_MEMBER_ID, getMessageService());
+      m = new ClusterSynchronizationTransaction(TRANSACTION_MEMBER_ID, getMessageService(), m_statusInfo);
       tx.registerMember(m);
     }
     return m;
@@ -293,11 +307,17 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   protected static class ClusterSynchronizationTransaction extends AbstractTransactionMember {
     private final List<IClusterNotificationMessage> m_messageQueue;
     private final IPublishSubscribeMessageService m_messageService;
+    private final ClusterNodeStatusInfo m_statusInfo;
 
-    public ClusterSynchronizationTransaction(String transactionId, IPublishSubscribeMessageService messageService) throws ProcessingException {
+    public ClusterSynchronizationTransaction(String transactionId, IPublishSubscribeMessageService messageService, ClusterNodeStatusInfo statusInfo) throws ProcessingException {
       super(transactionId);
       m_messageQueue = new LinkedList<IClusterNotificationMessage>();
       m_messageService = messageService;
+      m_statusInfo = statusInfo;
+    }
+
+    protected ClusterNodeStatusInfo getStatusInfoInternal() {
+      return m_statusInfo;
     }
 
     public synchronized void addMessage(IClusterNotificationMessage m) {
@@ -319,6 +339,9 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     @Override
     public synchronized void commitPhase2() {
       m_messageService.publishNotifications(new ArrayList<IClusterNotificationMessage>(m_messageQueue));
+      for (IClusterNotificationMessage m : m_messageQueue) {
+        getStatusInfoInternal().updateSentStatus(m);
+      }
     }
 
     @Override
@@ -335,4 +358,5 @@ public class ClusterSynchronizationService extends AbstractService implements IC
       m_messageQueue.clear();
     }
   }
+
 }
