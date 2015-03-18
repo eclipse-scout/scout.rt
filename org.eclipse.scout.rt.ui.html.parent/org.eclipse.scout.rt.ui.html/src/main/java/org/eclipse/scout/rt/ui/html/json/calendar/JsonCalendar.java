@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.filter.AndFilter;
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -37,6 +38,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.FutureFilter;
+import org.eclipse.scout.rt.platform.job.filter.PeriodicFutureFilter;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -342,7 +344,11 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
         @Override
         public void run() throws Exception {
           try {
-            Jobs.getJobManager().awaitDone(new AndFilter<>(new ClientSessionFutureFilter(session), new NotFilter<>(new FutureFilter(IFuture.CURRENT.get()))), 1, TimeUnit.MINUTES);
+            final IFilter<IFuture<?>> currentSessionFilter = new ClientSessionFutureFilter(session);
+            final IFilter<IFuture<?>> notCurrentFutureFilter = new NotFilter<>(new FutureFilter(IFuture.CURRENT.get()));
+            final IFilter<IFuture<?>> nonPeriodicFilter = new PeriodicFutureFilter(false);
+
+            Jobs.getJobManager().awaitDone(new AndFilter<>(currentSessionFilter, notCurrentFutureFilter, nonPeriodicFilter), 1, TimeUnit.MINUTES);
           }
           finally {
             waitForClientJobsToComplete.setBlocking(false);
