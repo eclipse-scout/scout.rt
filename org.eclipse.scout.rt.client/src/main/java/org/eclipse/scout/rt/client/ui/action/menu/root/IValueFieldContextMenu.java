@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.client.ui.action.menu.root;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
-/**
- *
- */
 public interface IValueFieldContextMenu extends IFormFieldContextMenu {
 
   @Override
