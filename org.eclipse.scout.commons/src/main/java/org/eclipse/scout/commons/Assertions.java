@@ -22,6 +22,39 @@ public final class Assertions {
   }
 
   /**
+   * Asserts the given value to be <code>null</code>.
+   *
+   * @param value
+   *          the value to be tested.
+   * @return the given value if <code>null</code>.
+   * @throws AssertionException
+   *           if the given value is not <code>null</code>.
+   */
+  public static <T> T assertNull(final T value) {
+    return assertNull(value, "expected 'null' object but was 'non-null'");
+  }
+
+  /**
+   * Asserts the given value to be <code>null</code>.
+   *
+   * @param value
+   *          the value to be tested.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return the given value if <code>null</code>.
+   * @throws AssertionException
+   *           if the given value is not <code>null</code>.
+   */
+  public static <T> T assertNull(final T value, final String msg, final Object... msgArgs) {
+    if (value != null) {
+      fail(msg, msgArgs);
+    }
+    return value;
+  }
+
+  /**
    * Asserts the given value not to be <code>null</code>.
    *
    * @param value
@@ -157,6 +190,339 @@ public final class Assertions {
       fail(msg, msgArgs);
     }
     return value;
+  }
+
+  /**
+   * Asserts <code>value1</code> to be equals with <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @return <code>value1</code> if equals with <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not equals with <code>value2</code>.
+   */
+  public static <T> T assertEquals(final T value1, Object value2) {
+    return assertEquals(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
+  }
+
+  /**
+   * Asserts <code>value1</code> to be equals with <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return <code>value1</code> if equals with <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not equals with <code>value2</code>.
+   */
+  public static <T> T assertEquals(final T value1, Object value2, final String msg, final Object... msgArgs) {
+    if (!CompareUtility.equals(value1, value2)) {
+      fail(msg, msgArgs);
+    }
+    return value1;
+  }
+
+  /**
+   * Asserts <code>value1</code> not to be equals with <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @return <code>value1</code> if not equals with <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is equals with <code>value2</code>.
+   */
+  public static <T> T assertNotEquals(final T value1, Object value2) {
+    return assertNotEquals(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
+  }
+
+  /**
+   * Asserts <code>value1</code> not to be equals with <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return <code>value1</code> if not equals with <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is equals with <code>value2</code>.
+   */
+  public static <T> T assertNotEquals(final T value1, Object value2, final String msg, final Object... msgArgs) {
+    if (CompareUtility.equals(value1, value2)) {
+      fail(msg, msgArgs);
+    }
+    return value1;
+  }
+
+  /**
+   * Asserts <code>value1</code> to be same as <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @return <code>value1</code> if same as <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not same as <code>value2</code>.
+   */
+  public static <T> T assertSame(final T value1, Object value2) {
+    return assertSame(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
+  }
+
+  /**
+   * Asserts <code>value1</code> to be same as <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return <code>value1</code> if same as <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not same as <code>value2</code>.
+   */
+  public static <T> T assertSame(final T value1, Object value2, final String msg, final Object... msgArgs) {
+    if (value1 != value2) {
+      fail(msg, msgArgs);
+    }
+    return value1;
+  }
+
+  /**
+   * Asserts <code>value1</code> not to be same as <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @return <code>value1</code> if not same as <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is same as <code>value2</code>.
+   */
+  public static <T> T assertNotSame(final T value1, Object value2) {
+    return assertNotSame(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
+  }
+
+  /**
+   * Asserts <code>value1</code> not to be same as <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return <code>value1</code> if not same as <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is same as <code>value2</code>.
+   */
+  public static <T> T assertNotSame(final T value1, Object value2, final String msg, final Object... msgArgs) {
+    if (value1 == value2) {
+      fail(msg, msgArgs);
+    }
+    return value1;
+  }
+
+  /**
+   * Asserts <code>value1</code> to be equal <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @return <code>value1</code> if equal <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not equal <code>value2</code>.
+   */
+  public static <T extends Comparable<T>> T assertEqual(final T value1, T value2) {
+    return assertEqual(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
+  }
+
+  /**
+   * Asserts <code>value1</code> to be equal <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return <code>value1</code> if equal <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not equal <code>value2</code>.
+   */
+  public static <T extends Comparable<T>> T assertEqual(final T value1, T value2, final String msg, final Object... msgArgs) {
+    if (value1.compareTo(value2) != 0) {
+      fail(msg, msgArgs);
+    }
+    return value1;
+  }
+
+  /**
+   * Asserts <code>value1</code> to be greater <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @return <code>value1</code> if greater <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not greater <code>value2</code>.
+   */
+  public static <T extends Comparable<T>> T assertGreater(final T value1, T value2) {
+    return assertGreater(value1, value2, "expected value1 to be '>' value2 [value1=%s, value2=%s]", value1, value2);
+  }
+
+  /**
+   * Asserts <code>value1</code> to be greater <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return <code>value1</code> if greater <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not greater <code>value2</code>.
+   */
+  public static <T extends Comparable<T>> T assertGreater(final T value1, T value2, final String msg, final Object... msgArgs) {
+    if (value1.compareTo(value2) <= 0) {
+      fail(msg, msgArgs);
+    }
+    return value1;
+  }
+
+  /**
+   * Asserts <code>value1</code> to be greater or equals <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @return <code>value1</code> if greater or equal <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not greater or equals <code>value2</code>.
+   */
+  public static <T extends Comparable<T>> T assertGreaterOrEqual(final T value1, T value2) {
+    return assertGreaterOrEqual(value1, value2, "expected value1 to be '>=' value2 [value1=%s, value2=%s]", value1, value2);
+  }
+
+  /**
+   * Asserts <code>value1</code> to be greater or equal <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return <code>value1</code> if greater or equal <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not greater or equal <code>value2</code>.
+   */
+  public static <T extends Comparable<T>> T assertGreaterOrEqual(final T value1, T value2, final String msg, final Object... msgArgs) {
+    if (value1.compareTo(value2) < 0) {
+      fail(msg, msgArgs);
+    }
+    return value1;
+  }
+
+  /**
+   * Asserts <code>value1</code> to be less <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @return <code>value1</code> if less <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not less <code>value2</code>.
+   */
+  public static <T extends Comparable<T>> T assertLess(final T value1, T value2) {
+    return assertLess(value1, value2, "expected value1 to be '<' value2 [value1=%s, value2=%s]", value1, value2);
+  }
+
+  /**
+   * Asserts <code>value1</code> to be less <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return <code>value1</code> if less <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not less <code>value2</code>.
+   */
+  public static <T extends Comparable<T>> T assertLess(final T value1, T value2, final String msg, final Object... msgArgs) {
+    if (value1.compareTo(value2) >= 0) {
+      fail(msg, msgArgs);
+    }
+    return value1;
+  }
+
+  /**
+   * Asserts <code>value1</code> to be less or equal <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @return <code>value1</code> if less or equal <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not less or equal <code>value2</code>.
+   */
+  public static <T extends Comparable<T>> T assertLessOrEqual(final T value1, T value2) {
+    return assertLessOrEqual(value1, value2, "expected value1 to be '<=' value2 [value1=%s, value2=%s]", value1, value2);
+  }
+
+  /**
+   * Asserts <code>value1</code> to be less or equal <code>value2</code>.
+   *
+   * @param value1
+   *          the value to be tested.
+   * @param value2
+   *          the value to be tested against.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return <code>value1</code> if less or equal <code>value2</code>.
+   * @throws AssertionException
+   *           if <code>value1</code> is not less or equal <code>value2</code>.
+   */
+  public static <T extends Comparable<T>> T assertLessOrEqual(final T value1, T value2, final String msg, final Object... msgArgs) {
+    if (value1.compareTo(value2) > 0) {
+      fail(msg, msgArgs);
+    }
+    return value1;
   }
 
   /**

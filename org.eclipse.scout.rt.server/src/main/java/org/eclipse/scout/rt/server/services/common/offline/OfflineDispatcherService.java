@@ -16,15 +16,15 @@ import java.security.AccessController;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
-import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.rt.shared.OfflineState;
@@ -44,12 +44,12 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     try {
       // Create the job-input on behalf of which the server-job is run.
       ServerJobInput input = ServerJobInput.empty();
-      input.name("OfflineServiceCall");
-      input.id(String.valueOf(request.getRequestSequence())); // to cancel server jobs and associated transactions.
-      input.subject(Subject.getSubject(AccessController.getContext()));
-      input.locale(request.getLocale());
-      input.userAgent(UserAgent.createByIdentifier(request.getUserAgent()));
-      input.session(provideServerSession(input.copy()));
+      input.setName("OfflineServiceCall");
+      input.setId(String.valueOf(request.getRequestSequence())); // to cancel server jobs and associated transactions.
+      input.setSubject(Subject.getSubject(AccessController.getContext()));
+      input.setLocale(request.getLocale());
+      input.setUserAgent(UserAgent.createByIdentifier(request.getUserAgent()));
+      input.setSession(provideServerSession(input.copy()));
 
       input = interceptServerJobInput(input);
 
@@ -97,13 +97,13 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
    * @return {@link IServiceTunnelResponse} response sent back to the caller.
    */
   protected IServiceTunnelResponse invokeServiceInServerJob(final ServerJobInput input, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
-    return OBJ.get(IServerJobManager.class).schedule(new ICallable<IServiceTunnelResponse>() {
+    return ServerJobs.schedule(new ICallable<IServiceTunnelResponse>() {
 
       @Override
       public IServiceTunnelResponse call() throws Exception {
         return invokeService(serviceTunnelRequest);
       }
-    }, input).get(); // schedule the service-request to enable cancellation by 'ServerProcessingCancelService.cancel(requestSequence)'
+    }, input).awaitDone(); // schedule the service-request to enable cancellation by 'ServerProcessingCancelService.cancel(requestSequence)'
   }
 
   /**

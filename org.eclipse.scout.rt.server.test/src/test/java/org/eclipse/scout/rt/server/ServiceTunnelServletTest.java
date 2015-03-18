@@ -35,16 +35,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.ICallable;
+import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.ICallable;
-import org.eclipse.scout.commons.job.IExecutable;
-import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.server.commons.cache.ICacheEntry;
 import org.eclipse.scout.rt.server.commons.cache.StickySessionCacheService;
-import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -118,7 +118,7 @@ public class ServiceTunnelServletTest {
     assertEquals(testSession, session);
   }
 
-  /**
+/**
    * Calls {@link ServiceTunnelServlet#lookupServerSessionOnHttpSession(ServerJobInput) in 4 different threads within
    * the same HTTP session. Test ensures that the same server session is returned in all threads and that
    *
@@ -151,7 +151,7 @@ public class ServiceTunnelServletTest {
 
     Set<IServerSession> serverSessions = new HashSet<IServerSession>();
     for (IFuture<?> future : futures) {
-      serverSessions.add((IServerSession) future.get());
+      serverSessions.add((IServerSession) future.awaitDone());
     }
 
     assertEquals(CollectionUtility.hashSet(testServerSession), serverSessions);
@@ -197,11 +197,11 @@ public class ServiceTunnelServletTest {
     List<IFuture<?>> futures = new ArrayList<>();
 
     for (IExecutable<?> job : jobs) {
-      futures.add(OBJ.get(IServerJobManager.class).schedule(job, ServerJobInput.empty().sessionRequired(false).transactional(false)));
+      futures.add(ServerJobs.schedule(job, ServerJobInput.empty().sessionRequired(false).transactional(false)));
     }
 
     for (IFuture<?> future : futures) {
-      future.get();
+      future.awaitDone();
     }
 
     return futures;

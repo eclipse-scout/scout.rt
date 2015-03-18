@@ -16,41 +16,45 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
-import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobExecutionException;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(PlatformTestRunner.class)
 public class MultipleSessionTest {
-
-  private IModelJobManager m_jobManager;
 
   private IClientSession m_clientSession1;
   private IClientSession m_clientSession2;
 
+  private List<IBean<?>> m_beans;
+
   @Before
   public void before() {
-    m_jobManager = new ModelJobManager();
+    m_beans = TestingUtility.registerServices(1000, new JobManager());
     m_clientSession1 = mock(IClientSession.class);
     m_clientSession2 = mock(IClientSession.class);
   }
 
   @After
   public void after() {
-    m_jobManager.shutdown();
-    ISession.CURRENT.remove();
+    TestingUtility.unregisterServices(m_beans);
   }
 
   @Test
@@ -60,41 +64,41 @@ public class MultipleSessionTest {
     final BlockingCountDownLatch latch1 = new BlockingCountDownLatch(2);
     final BlockingCountDownLatch latch2 = new BlockingCountDownLatch(2);
 
-    m_jobManager.schedule(new IRunnable() {
+    ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add("job1-S1");
         latch1.countDownAndBlock();
       }
-    }, ClientJobInput.empty().name("job-1-S1").session(m_clientSession1));
+    }, ModelJobInput.empty().setName("job-1-S1").setSession(m_clientSession1));
 
-    m_jobManager.schedule(new IRunnable() {
+    ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add("job2-S1");
         latch2.countDownAndBlock();
       }
-    }, ClientJobInput.empty().name("job-2-S1").session(m_clientSession1));
+    }, ModelJobInput.empty().setName("job-2-S1").setSession(m_clientSession1));
 
-    m_jobManager.schedule(new IRunnable() {
+    ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add("job1-S2");
         latch1.countDownAndBlock();
       }
-    }, ClientJobInput.empty().name("job-1-S2").session(m_clientSession2));
+    }, ModelJobInput.empty().setName("job-1-S2").setSession(m_clientSession2));
 
-    m_jobManager.schedule(new IRunnable() {
+    ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add("job2-S2");
         latch2.countDownAndBlock();
       }
-    }, ClientJobInput.empty().name("job-2-S2").session(m_clientSession2));
+    }, ModelJobInput.empty().setName("job-2-S2").setSession(m_clientSession2));
 
     assertTrue(latch1.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2"), protocol);
@@ -104,7 +108,7 @@ public class MultipleSessionTest {
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2", "job2-S1", "job2-S2"), protocol);
     latch2.unblock();
 
-    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
   }
 
   @Test
@@ -115,7 +119,7 @@ public class MultipleSessionTest {
     final BlockingCountDownLatch latch2 = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch interruptedLatch = new BlockingCountDownLatch(1);
 
-    m_jobManager.schedule(new IRunnable() {
+    ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -130,9 +134,9 @@ public class MultipleSessionTest {
           interruptedLatch.countDown();
         }
       }
-    }, ClientJobInput.empty().name("job-1-S1").session(m_clientSession1));
+    }, ModelJobInput.empty().setName("job-1-S1").setSession(m_clientSession1));
 
-    m_jobManager.schedule(new IRunnable() {
+    ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -144,9 +148,9 @@ public class MultipleSessionTest {
           protocol.add("job2-S1-interrupted");
         }
       }
-    }, ClientJobInput.empty().name("job-2-S1").session(m_clientSession1));
+    }, ModelJobInput.empty().setName("job-2-S1").setSession(m_clientSession1));
 
-    m_jobManager.schedule(new IRunnable() {
+    ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -158,9 +162,9 @@ public class MultipleSessionTest {
           protocol.add("job1-S2-interrupted");
         }
       }
-    }, ClientJobInput.empty().name("job-1-S2").session(m_clientSession2));
+    }, ModelJobInput.empty().setName("job-1-S2").setSession(m_clientSession2));
 
-    m_jobManager.schedule(new IRunnable() {
+    ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -172,12 +176,12 @@ public class MultipleSessionTest {
           protocol.add("job2-S2-interrupted");
         }
       }
-    }, ClientJobInput.empty().name("job-2-S2").session(m_clientSession2));
+    }, ModelJobInput.empty().setName("job-2-S2").setSession(m_clientSession2));
 
     assertTrue(latch1.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2"), protocol);
 
-    m_jobManager.cancel(new ClientSessionFilter(m_clientSession1), true); // cancel all jobs of session1
+    Jobs.getJobManager().cancel(new ClientSessionFutureFilter(m_clientSession1), true); // cancel all jobs of session1
 
     assertTrue(interruptedLatch.await());
 
@@ -187,6 +191,6 @@ public class MultipleSessionTest {
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S1-interrupted", "job1-S2", "job2-S2"), protocol);
     latch2.unblock();
 
-    assertTrue(m_jobManager.waitUntilDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
+    assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
   }
 }

@@ -24,6 +24,7 @@ import javax.swing.SwingUtilities;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
@@ -32,16 +33,14 @@ import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.dnd.TransferObjectRequest;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardConsumer;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.service.AbstractService;
 
@@ -60,12 +59,12 @@ public class SwingScoutClipboardService extends AbstractService implements IClip
           try {
             Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
             final TransferObject[] transferObjects = createScoutTransferables(contents, requests);
-            OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+            ModelJobs.schedule(new IRunnable() {
               @Override
               public void run() throws Exception {
                 clipboardConsumer.consume(transferObjects);
               }
-            }, ClientJobInput.defaults().session(clientSession));
+            }, ModelJobInput.defaults().setSession(clientSession));
           }
           catch (Throwable t) {
             LOG.debug("Cannot get system clipboard's contents", t);

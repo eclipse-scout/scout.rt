@@ -16,20 +16,17 @@ import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IProgressMonitor;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IProgressMonitor;
+import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.servicetunnel.http.internal.AbstractInternalHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -46,8 +43,6 @@ import org.eclipse.scout.service.SERVICES;
  * @author awe
  */
 public class InternalClientHttpServiceTunnel extends AbstractInternalHttpServiceTunnel<IClientSession> implements IClientServiceTunnel {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationPollingJob.class);
 
   private IFuture<Void> m_pollingJob;
   private long m_pollInterval = -1L;
@@ -135,13 +130,8 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
         // cancel the old
         m_pollingJob.cancel(true);
       }
-      try {
-        ClientJobInput input = ClientJobInput.defaults().session(getSession()).name("Client notification fetcher");
-        m_pollingJob = OBJ.get(IClientJobManager.class).scheduleWithFixedDelay(new ClientNotificationPollingJob(), p, p, TimeUnit.MILLISECONDS, input);
-      }
-      catch (JobExecutionException e) {
-        LOG.error("Unable to schedule client notification polling job.", e);
-      }
+      ClientJobInput input = ClientJobInput.defaults().setSession(getSession()).setName("Client notification fetcher");
+      m_pollingJob = ClientJobs.scheduleWithFixedDelay(new ClientNotificationPollingJob(), p, p, TimeUnit.MILLISECONDS, input);
     }
     else {
       if (m_pollingJob != null) {
@@ -191,6 +181,6 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
 
   @Override
   protected IFuture<?> schedule(IRunnable runnable, IServiceTunnelRequest req) throws JobExecutionException {
-    return OBJ.get(IClientJobManager.class).schedule(runnable, ClientJobInput.defaults().session(getSession()));
+    return ClientJobs.schedule(runnable, ClientJobInput.defaults().setSession(getSession()));
   }
 }

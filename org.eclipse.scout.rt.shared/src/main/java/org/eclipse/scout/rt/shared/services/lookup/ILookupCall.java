@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
  *

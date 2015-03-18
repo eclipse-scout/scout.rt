@@ -87,7 +87,7 @@ public class SwingScoutTray extends SwingScoutComposite<IDesktop> implements ISw
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 5678).get(5678, TimeUnit.MILLISECONDS);
+        getSwingEnvironment().invokeScoutLater(t, 5678).awaitDone(5678, TimeUnit.MILLISECONDS);
       }
       catch (ProcessingException e) {
         //nop

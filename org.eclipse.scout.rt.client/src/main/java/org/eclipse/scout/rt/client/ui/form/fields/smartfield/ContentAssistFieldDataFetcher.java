@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 

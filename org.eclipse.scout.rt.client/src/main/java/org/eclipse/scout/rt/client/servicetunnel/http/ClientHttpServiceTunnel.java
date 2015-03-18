@@ -16,9 +16,9 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.http.internal.InternalClientHttpServiceTunnel;
+import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;

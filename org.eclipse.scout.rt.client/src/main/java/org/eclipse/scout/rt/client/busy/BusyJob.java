@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.busy;
 
-import org.eclipse.scout.commons.job.IProgressMonitor;
-import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 
 /**
  * This is the default busy job that runs the process of showing busy marker, blocking and canceling.

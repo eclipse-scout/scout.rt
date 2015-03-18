@@ -47,22 +47,18 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooser;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -93,7 +89,6 @@ import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutPopup;
  * in the proposal popup
  */
 public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContentAssistField<?, ?>> implements ISwingScoutSmartField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutSmartField.class);
 
   // proposal support
   private SwingScoutDropDownPopup m_proposalPopup;
@@ -357,12 +352,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
         m_pendingProposalFuture.cancel(true);
       }
       P_PendingProposalRunnable job = new P_PendingProposalRunnable(text, selectCurrentValue);
-      try {
-        m_pendingProposalFuture = OBJ.get(IClientJobManager.class).schedule(job, initialDelay, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
-      }
-      catch (JobExecutionException e) {
-        LOG.error("Unable to request proposal support for smartfield.", e);
-      }
+      m_pendingProposalFuture = ClientJobs.schedule(job, initialDelay, TimeUnit.MILLISECONDS, ClientJobInput.defaults().setSession(getSwingEnvironment().getScoutSession()));
     }
   }
 
@@ -636,10 +626,11 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     boolean hasFinished = false;
     IFuture<Void> job = getSwingEnvironment().invokeScoutLater(t, 0);
     try {
-      job.get(2345, TimeUnit.MILLISECONDS);
+      job.awaitDone(2345, TimeUnit.MILLISECONDS);
       hasFinished = true;
     }
     catch (ProcessingException e) {
+      // NOOP
     }
 
     // end notify

@@ -23,17 +23,17 @@ import javax.jms.Session;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IProgressMonitor;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.filter.FutureFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IProgressMonitor;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.filter.FutureFilter;
 import org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService;
-import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 
 /**
@@ -110,7 +110,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
   protected synchronized void startMessageConsumer() throws ProcessingException {
     stopMessageConsumer();
-    m_messageConsumerFuture = OBJ.get(IServerJobManager.class).schedule(createMessageConsumerRunnable(), ServerJobInput.empty().sessionRequired(false).transactional(false));
+    m_messageConsumerFuture = ServerJobs.schedule(createMessageConsumerRunnable(), ServerJobInput.empty().setSessionRequired(false).setTransactional(false));
   }
 
   protected synchronized void stopMessageConsumer() throws ProcessingException {
@@ -119,7 +119,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
       // Wait for the consumer to be stopped.
       try {
-        OBJ.get(IServerJobManager.class).waitUntilDone(new FutureFilter(m_messageConsumerFuture), m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
+        Jobs.getJobManager().awaitDone(new FutureFilter(m_messageConsumerFuture), m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
       }
       catch (InterruptedException e) {
         // NOOP

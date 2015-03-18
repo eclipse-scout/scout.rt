@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.annotations.Data;
-import org.eclipse.scout.commons.job.ICallable;
 import org.junit.Test;
 
 public class ReflectionUtilityTest {

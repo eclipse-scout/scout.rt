@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageActivatedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDataLoadedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDeactivatedChain;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
@@ -49,7 +49,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -443,14 +442,11 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     return (IPage) getParentNode();
   }
 
-  private boolean isModelThread() {
-    return OBJ.get(IModelJobManager.class).isModelThread();
-  }
-
   @Override
   public IPage<?> getChildPage(final int childIndex) {
     ///make it model thread safe
-    if (isModelThread()) {
+    // TOOD [mvi] why not always in model thread?
+    if (ModelJobs.isModelThread()) {
       try {
         return (IPage) getTree().resolveVirtualNode(getChildNode(childIndex));
       }
@@ -463,7 +459,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public List<IPage<?>> getChildPages() {
-    if (isModelThread()) {
+    // TOOD [mvi] why not always in model thread?
+    if (ModelJobs.isModelThread()) {
       try {
         getTree().resolveVirtualNodes(getChildNodes());
       }

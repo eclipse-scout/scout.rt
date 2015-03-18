@@ -9,12 +9,18 @@ Require-Bundle: org.eclipse.scout.commons;bundle-version="[5.1.0,5.2.0)",
  org.eclipse.osgi
 Export-Package: 
  org.eclipse.scout.rt.platform,
- org.eclipse.scout.rt.platform.cdi,
  org.eclipse.scout.rt.platform.cdi.interceptor,
  org.eclipse.scout.rt.platform.cdi.interceptor.internal,
+ org.eclipse.scout.rt.platform.context,
  org.eclipse.scout.rt.platform.internal,
  org.eclipse.scout.rt.platform.inventory,
  org.eclipse.scout.rt.platform.inventory.internal,
+ org.eclipse.scout.rt.platform.job,
+ org.eclipse.scout.rt.platform.job.filter,
+ org.eclipse.scout.rt.platform.job.internal,
+ org.eclipse.scout.rt.platform.job.internal.callable,
+ org.eclipse.scout.rt.platform.job.internal.future,
+ org.eclipse.scout.rt.platform.job.listener,
  org.eclipse.scout.rt.platform.pluginxml,
  org.eclipse.scout.rt.platform.pluginxml.internal
 Bundle-ActivationPolicy: lazy

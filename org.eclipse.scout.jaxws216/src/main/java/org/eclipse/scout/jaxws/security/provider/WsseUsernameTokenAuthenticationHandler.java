@@ -24,17 +24,17 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.ICallable;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.jaxws.annotation.ScoutTransaction;
 import org.eclipse.scout.jaxws.internal.JaxWsConstants;
 import org.eclipse.scout.jaxws.internal.JaxWsHelper;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.service.ServiceUtility;
 
@@ -124,11 +124,11 @@ public class WsseUsernameTokenAuthenticationHandler implements IAuthenticationHa
       final Subject authSubject = createAuthenticatorSubject();
 
       final ServerJobInput input = ServerJobInput.defaults();
-      input.name("JAX-WS authentication");
-      input.subject(authSubject);
-      input.session(lookupServerSession(authSubject));
+      input.setName("JAX-WS authentication");
+      input.setSubject(authSubject);
+      input.setSession(lookupServerSession(authSubject));
 
-      return OBJ.get(IServerJobManager.class).runNow(new ICallable<Boolean>() {
+      return ServerJobs.runNow(new ICallable<Boolean>() {
 
         @Override
         public Boolean call() throws Exception {
@@ -147,7 +147,7 @@ public class WsseUsernameTokenAuthenticationHandler implements IAuthenticationHa
    */
   @Internal
   protected IServerSession lookupServerSession(final Subject subject) throws ProcessingException {
-    final ServerJobInput input = ServerJobInput.defaults().name("JAX-WS Session").subject(subject);
+    final ServerJobInput input = ServerJobInput.defaults().setName("JAX-WS Session").setSubject(subject);
     return OBJ.get(ServerSessionProviderWithCache.class).provide(input);
   }
 

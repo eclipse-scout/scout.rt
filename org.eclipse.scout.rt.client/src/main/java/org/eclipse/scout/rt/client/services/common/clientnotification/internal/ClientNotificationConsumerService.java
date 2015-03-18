@@ -17,19 +17,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.service.AbstractService;
 
@@ -74,17 +72,12 @@ public class ClientNotificationConsumerService extends AbstractService implement
     }
     else {
       // async
-      try {
-        OBJ.get(IClientJobManager.class).schedule(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            fireEvent(session, notifications, false);
-          }
-        }, ClientJobInput.defaults().session(session).name("Dispatch client notifications"));
-      }
-      catch (JobExecutionException e) {
-        LOG.error("Unable to fire client notifications.", e);
-      }
+      ClientJobs.schedule(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          fireEvent(session, notifications, false);
+        }
+      }, ClientJobInput.defaults().setSession(session).setName("Dispatch client notifications"));
     }
   }
 

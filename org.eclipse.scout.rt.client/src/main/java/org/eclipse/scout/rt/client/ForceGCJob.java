@@ -10,12 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
-import org.eclipse.scout.commons.job.IProgressMonitor;
-import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 
-/**
- *
- */
 public class ForceGCJob implements IRunnable {
   @Override
   public void run() throws Exception {

@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.OBJ;
 
@@ -47,7 +47,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
   }
 
   @Override
-  public <SESSION extends IClientSession> SESSION provide(final ClientJobInput input) throws ProcessingException {
+  public <SESSION extends IClientSession> SESSION provide(final ModelJobInput input) throws ProcessingException {
     final Subject subject = Assertions.assertNotNull(input.getSubject(), "Subject must not be null");
     final Set<Principal> principals = subject.getPrincipals();
     Assertions.assertFalse(principals.isEmpty(), "Subject contains no principals");

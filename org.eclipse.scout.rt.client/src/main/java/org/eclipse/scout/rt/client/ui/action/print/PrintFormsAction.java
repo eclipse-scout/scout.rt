@@ -18,14 +18,14 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
@@ -37,7 +37,6 @@ import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
-import org.eclipse.scout.rt.platform.OBJ;
 import org.osgi.framework.Bundle;
 
 /**
@@ -194,7 +193,7 @@ public class PrintFormsAction extends AbstractAction {
     }
 
     private void schedulePrintJob(final IForm f) {
-      OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+      ModelJobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           printForm(f, null);
@@ -243,7 +242,7 @@ public class PrintFormsAction extends AbstractAction {
             }
           });
         }
-      }, ClientJobInput.defaults().name("print " + f.getClass().getSimpleName()));
+      }, ModelJobInput.defaults().setName("print " + f.getClass().getSimpleName()));
     }
   }
 

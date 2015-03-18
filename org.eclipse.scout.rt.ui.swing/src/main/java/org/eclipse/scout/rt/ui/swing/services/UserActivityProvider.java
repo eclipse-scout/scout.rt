@@ -17,13 +17,11 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.SwingUtilities;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.services.common.useractivity.IUserActivityProvider;
 
 public class UserActivityProvider extends AbstractPropertyObserver implements IUserActivityProvider {
@@ -63,11 +61,7 @@ public class UserActivityProvider extends AbstractPropertyObserver implements IU
       setActiveInternal(true);
     }
     if (m_userInactiveJob == null) {
-      try {
-        m_userInactiveJob = OBJ.get(IClientJobManager.class).schedule(new UserInactiveRunnable(), m_idleTrigger + 1000L, TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
-      }
-      catch (JobExecutionException e) {
-      }
+      m_userInactiveJob = ClientJobs.schedule(new UserInactiveRunnable(), m_idleTrigger + 1000L, TimeUnit.MILLISECONDS, ClientJobInput.defaults().setSessionRequired(false));
     }
     m_postponed = System.currentTimeMillis() + m_idleTrigger;
   }
@@ -80,11 +74,7 @@ public class UserActivityProvider extends AbstractPropertyObserver implements IU
         m_userInactiveJob = null;
       }
       else {
-        try {
-          m_userInactiveJob = OBJ.get(IClientJobManager.class).schedule(new UserInactiveRunnable(), delta, TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
-        }
-        catch (JobExecutionException e) {
-        }
+        m_userInactiveJob = ClientJobs.schedule(new UserInactiveRunnable(), delta, TimeUnit.MILLISECONDS, ClientJobInput.defaults().setSessionRequired(false));
       }
     }
   }

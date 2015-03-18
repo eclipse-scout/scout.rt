@@ -15,6 +15,8 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.ICallable;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -22,10 +24,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.commons.job.ICallable;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -33,12 +31,13 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IMixedSma
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.MixedSmartFieldChains.MixedSmartFieldConvertKeyToValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.MixedSmartFieldChains.MixedSmartFieldConvertValueToKeyChain;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -185,7 +184,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     IFuture<?> future = m_currentGetLookupRowByKeyJob;
     if (future != null) {
       try {
-        future.get();
+        future.awaitDone();
       }
       catch (ProcessingException e) {
         LOG.error("Unable to load smartfield data.", e);
@@ -247,7 +246,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
             // this will later on call installLookupRowContext()
             ILookupCall<LOOKUP_KEY> call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractMixedSmartField.this));
             prepareKeyLookup(call, interceptConvertValueToKey(validKey));
-            m_currentGetLookupRowByKeyJob = OBJ.get(IClientJobManager.class).schedule(new P_GetLookupRowByKeyJob(call), ClientJobInput.defaults().name("Fetch smartfield data for " + getLabel()));
+            m_currentGetLookupRowByKeyJob = ClientJobs.schedule(new P_GetLookupRowByKeyJob(call), ClientJobInput.defaults().setName("Fetch smartfield data for " + getLabel()));
           }
         }
         catch (ProcessingException e) {
@@ -414,14 +413,14 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
 
     private P_GetLookupRowByKeyJob(final ILookupCall<LOOKUP_KEY> call) throws JobExecutionException {
       // immediately start a thread that fetches data async
-      m_backgroundJob = OBJ.get(IClientJobManager.class).schedule(new ICallable<List<ILookupRow<LOOKUP_KEY>>>() {
+      m_backgroundJob = ClientJobs.schedule(new ICallable<List<ILookupRow<LOOKUP_KEY>>>() {
         @Override
         public List<ILookupRow<LOOKUP_KEY>> call() throws Exception {
           List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(call.getDataByKey());
           filterKeyLookup(call, result);
           return cleanupResultList(result);
         }
-      }, ClientJobInput.defaults().name("Fetch smartfield data"));
+      }, ClientJobInput.defaults().setName("Fetch smartfield data"));
     }
 
     @Override
@@ -431,7 +430,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
       if (IFuture.CURRENT.get() == m_currentGetLookupRowByKeyJob) {
         m_currentGetLookupRowByKeyJob = null;
         try {
-          List<ILookupRow<LOOKUP_KEY>> rows = m_backgroundJob.get();
+          List<ILookupRow<LOOKUP_KEY>> rows = m_backgroundJob.awaitDone();
           if (CollectionUtility.hasElements(rows)) {
             installLookupRowContext(rows.get(0));
           }

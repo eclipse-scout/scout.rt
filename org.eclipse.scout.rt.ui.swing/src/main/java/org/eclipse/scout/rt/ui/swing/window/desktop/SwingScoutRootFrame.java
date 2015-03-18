@@ -41,22 +41,21 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -499,7 +498,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
         }
         case DesktopEvent.TYPE_DESKTOP_CLOSED: {
           try {
-            IFuture<Void> run = OBJ.get(IClientJobManager.class).schedule(new IRunnable() {
+            IFuture<Void> future = ClientJobs.schedule(new IRunnable() {
               @Override
               public void run() throws Exception {
                 SwingUtilities.invokeAndWait(new Runnable() {
@@ -509,8 +508,8 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
                   }
                 });
               }
-            }, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
-            run.get(1, TimeUnit.MINUTES); // wait no longer than one minute
+            }, ClientJobInput.defaults().setSession(getSwingEnvironment().getScoutSession()));
+            future.awaitDone(1, TimeUnit.MINUTES); // wait no longer than one minute
           }
           catch (ProcessingException ex) {
             LOG.error("Error invoking desktop closed hook.", ex);

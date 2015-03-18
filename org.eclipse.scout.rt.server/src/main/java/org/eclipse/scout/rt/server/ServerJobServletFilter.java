@@ -23,17 +23,17 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
-import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -76,11 +76,11 @@ public class ServerJobServletFilter implements Filter {
     try {
       // Create the job input on behalf of which the server job is run.
       ServerJobInput input = ServerJobInput.empty();
-      input.name(ServerJobServletFilter.class.getSimpleName());
-      input.subject(Subject.getSubject(AccessController.getContext()));
-      input.servletRequest(httpRequest);
-      input.servletResponse(httpResponse);
-      input.session(lookupServerSessionOnHttpSession(input.copy()));
+      input.setName(ServerJobServletFilter.class.getSimpleName());
+      input.setSubject(Subject.getSubject(AccessController.getContext()));
+      input.setServletRequest(httpRequest);
+      input.setServletResponse(httpResponse);
+      input.setSession(lookupServerSessionOnHttpSession(input.copy()));
 
       input = interceptServerJobInput(input);
 
@@ -162,7 +162,7 @@ public class ServerJobServletFilter implements Filter {
    *          input to be used to run the server job with current context information set.
    */
   protected void continueChainInServerJob(final FilterChain chain, final ServerJobInput input) throws ProcessingException {
-    OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
+    ServerJobs.runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {

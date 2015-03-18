@@ -14,14 +14,14 @@ import java.util.UUID;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
@@ -39,19 +39,18 @@ public class ServerSessionProvider {
    * @throws ProcessingException
    *           is thrown if the {@link IServerSession} could not be created or initialized.
    */
-  public <T extends IServerSession> T provide(final ServerJobInput input) throws ProcessingException {
+  public <SESSION extends IServerSession> SESSION provide(final ServerJobInput input) throws ProcessingException {
     // Create an empty session instance.
-    final T serverSession = ServerSessionProvider.cast(OBJ.get(IServerSession.class));
+    final SESSION serverSession = ServerSessionProvider.cast(OBJ.get(IServerSession.class));
     serverSession.setIdInternal(String.format("%s-%s", serverSession.getClass().getName(), UUID.randomUUID()));
 
     // Initialize the session.
-    OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
-
+    ServerJobs.runNow(new IRunnable() {
       @Override
       public void run() throws Exception {
         serverSession.loadSession();
       }
-    }, input.copy().name("server-session-initialization").session(serverSession));
+    }, input.copy().setName("server-session-initialization").setSession(serverSession));
 
     return serverSession;
   }

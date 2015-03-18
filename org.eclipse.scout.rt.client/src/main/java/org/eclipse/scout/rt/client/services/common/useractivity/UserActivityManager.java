@@ -14,17 +14,15 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
-import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.services.common.useractivity.IUserActivityProvider;
 import org.eclipse.scout.rt.shared.services.common.useractivity.IUserActivityStateService;
 import org.eclipse.scout.rt.shared.services.common.useractivity.UserActivityClientNotification;
@@ -139,24 +137,19 @@ public class UserActivityManager {
     if (newStatus != m_currentState) {
       m_currentState = newStatus;
 
-      try {
-        OBJ.get(IClientJobManager.class).schedule(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            for (IUserActivityStateService s : SERVICES.getServices(IUserActivityStateService.class)) {
-              try {
-                s.setStatus(newStatus);
-              }
-              catch (Exception t) {
-                LOG.error("service " + s.getClass().getName(), t);
-              }
+      ClientJobs.schedule(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          for (IUserActivityStateService s : SERVICES.getServices(IUserActivityStateService.class)) {
+            try {
+              s.setStatus(newStatus);
+            }
+            catch (Exception t) {
+              LOG.error("service " + s.getClass().getName(), t);
             }
           }
-        }, ClientJobInput.defaults().session(m_clientSession).name("user activity " + newStatus));
-      }
-      catch (JobExecutionException e) {
-        LOG.error("Unable to set new status to user activity state services.", e);
-      }
+        }
+      }, ClientJobInput.defaults().setSession(m_clientSession).setName("user activity " + newStatus));
     }
   }
 

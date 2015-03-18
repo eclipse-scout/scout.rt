@@ -53,10 +53,11 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.client.job.ClientSessionFutureFilter;
+import org.eclipse.scout.rt.platform.job.Jobs;
+//bugs.eclipse.org/bugs/show_bug.cgi?id=458143
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
+//dwiehl@git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
@@ -138,7 +139,7 @@ public class SwingMock extends AbstractGuiMock {
       //wait until model queue is empty
       try {
         IClientSession clientSession = getClientSession();
-        OBJ.get(IModelJobManager.class).waitUntilDone(new ClientSessionFilter(clientSession), 1, TimeUnit.HOURS);
+        Jobs.getJobManager().awaitDone(new ClientSessionFutureFilter(clientSession), 1, TimeUnit.HOURS);
       }
       catch (InterruptedException e) {
         throw new IllegalStateException("Interrupted", e);

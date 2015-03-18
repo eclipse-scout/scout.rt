@@ -20,15 +20,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.Binding;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.internal.servlet.EndpointServlet;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
-import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.ServerJobs;
 
 /**
  * Runs the webservice request in a server-job to propagate the current request-context and to run on behalf of a
@@ -47,15 +46,15 @@ public class JaxWsServlet extends EndpointServlet {
     try {
       // Create the job-input on behalf of which the server-job is run.
       final ServerJobInput input = ServerJobInput.empty();
-      input.name("JAX-WS Request");
-      input.subject(getOrCreateSubject());
-      input.servletRequest(request);
-      input.servletResponse(response);
-      input.locale(Locale.getDefault());
-      input.sessionRequired(false);
-      input.transactional(false);
+      input.setName("JAX-WS Request");
+      input.setSubject(getOrCreateSubject());
+      input.setServletRequest(request);
+      input.setServletResponse(response);
+      input.setLocale(Locale.getDefault());
+      input.setSessionRequired(false);
+      input.setTransactional(false);
 
-      OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
+      ServerJobs.runNow(new IRunnable() {
 
         @Override
         public void run() throws Exception {

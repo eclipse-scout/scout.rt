@@ -29,14 +29,13 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -45,9 +44,10 @@ import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLo
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.client.job.ClientSessionFutureFilter;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
@@ -57,7 +57,8 @@ import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -272,12 +273,12 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
               }
             }
             else {
-              OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+              ModelJobs.schedule(new IRunnable() {
                 @Override
                 public void run() throws Exception {
                   updateSharedVariableMap(notification.getSharedVariableMap());
                 }
-              }, ClientJobInput.defaults().session(AbstractClientSession.this).name("Update shared context"));
+              }, ModelJobInput.defaults().setName("Update shared context"));
             }
           }
         }
@@ -465,29 +466,24 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
    * finished. This method does not block the caller.
    */
   protected void scheduleSessionInactivation() {
-    try {
-      final Set<IFuture<?>> runningFutures = findRunningFutures();
-      OBJ.get(IClientJobManager.class).schedule(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          long timeout = getMaxShutdownWaitTime();
+    final Set<IFuture<?>> runningFutures = findRunningFutures();
+    ClientJobs.schedule(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        long timeout = getMaxShutdownWaitTime();
 
-          try {
-            // Wait for the client jobs to finish for a maximal period of time.
-            for (IFuture<?> clientJob : runningFutures) {
-              clientJob.get(timeout, TimeUnit.MILLISECONDS);
-            }
-          }
-          finally {
-            // Inactivate the client session.
-            inactivateSession();
+        try {
+          // Wait for the client jobs to finish for a maximal period of time.
+          for (IFuture<?> runningFuture : runningFutures) {
+            runningFuture.awaitDone(timeout, TimeUnit.MILLISECONDS);
           }
         }
-      }, ClientJobInput.defaults().session(this).name("Wait for client jobs to finish before inactivating the session"));
-    }
-    catch (ProcessingException e1) {
-      LOG.warn("unable to wait for jobs to finish.", e1);
-    }
+        finally {
+          // Inactivate the client session.
+          inactivateSession();
+        }
+      }
+    }, ClientJobInput.defaults().setSession(this).setName("Wait for client jobs to finish before inactivating the session"));
   }
 
   /**
@@ -511,9 +507,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
       }
     };
 
-    ClientSessionFilter filter = new ClientSessionFilter(this);
-    OBJ.get(IModelJobManager.class).visit(filter, visitor);
-    OBJ.get(IClientJobManager.class).visit(filter, visitor);
+    Jobs.getJobManager().visit(new ClientSessionFutureFilter(this), visitor);
 
     return futures;
   }

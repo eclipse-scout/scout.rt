@@ -19,16 +19,13 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.DateUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IProgressMonitor;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -40,12 +37,14 @@ import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.Calendar
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderLoadItemsInBackgroundChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.ICalendarItemProviderExtension;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -152,13 +151,13 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   @ConfigOperation
   @Order(40)
   protected void execLoadItemsInBackground(final IClientSession session, final Date minDate, final Date maxDate, final Set<ICalendarItem> result) throws ProcessingException {
-    IFuture<Void> future = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+    IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         interceptLoadItems(minDate, maxDate, result);
       }
-    }, ClientJobInput.defaults().session(session).name(getClass().getSimpleName() + " load items"));
-    future.get();
+    }, ModelJobInput.defaults().setSession(session).setName(getClass().getSimpleName() + " load items"));
+    future.awaitDone();
   }
 
   @ConfigOperation
@@ -361,12 +360,12 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   private void setLoadInProgressInSyncJob(final boolean b) {
-    OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+    ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         setLoadInProgress(b);
       }
-    }, ClientJobInput.defaults().name(getClass().getSimpleName() + " prepare"));
+    }, ModelJobInput.defaults().setName(getClass().getSimpleName() + " prepare"));
   }
 
   @Override
@@ -424,21 +423,16 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       m_reloadJob = null;
     }
     if (minDate != null && maxDate != null) {
-      try {
-        long refreshInterval = getRefreshIntervalMillis();
-        P_ReloadJob runnable = new P_ReloadJob(minDate, maxDate);
-        ClientJobInput input = ClientJobInput.defaults().session(session).name(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " reload");
-        if (refreshInterval > 0) {
-          // interval load
-          m_reloadJob = OBJ.get(IClientJobManager.class).scheduleWithFixedDelay(runnable, startDelayMillis, refreshInterval, TimeUnit.MILLISECONDS, input);
-        }
-        else {
-          // single load
-          m_reloadJob = OBJ.get(IClientJobManager.class).schedule(runnable, startDelayMillis, TimeUnit.MILLISECONDS, input);
-        }
+      long refreshInterval = getRefreshIntervalMillis();
+      P_ReloadJob runnable = new P_ReloadJob(minDate, maxDate);
+      ClientJobInput input = ClientJobInput.defaults().setSession(session).setName(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " reload");
+      if (refreshInterval > 0) {
+        // interval load
+        m_reloadJob = ClientJobs.scheduleWithFixedDelay(runnable, startDelayMillis, refreshInterval, TimeUnit.MILLISECONDS, input);
       }
-      catch (JobExecutionException e) {
-        LOG.error("Unable to schedule calendar item load job.", e);
+      else {
+        // single load
+        m_reloadJob = ClientJobs.schedule(runnable, startDelayMillis, TimeUnit.MILLISECONDS, input);
       }
     }
   }
@@ -476,7 +470,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
           }
         }
 
-        IFuture<Void> future = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+        IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
           @Override
           public void run() throws Exception {
             synchronized (AbstractCalendarItemProvider.this) {
@@ -485,8 +479,8 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
               }
             }
           }
-        }, ClientJobInput.defaults().name(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " setItems"));
-        future.get();
+        }, ModelJobInput.defaults().setName(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " setItems"));
+        future.awaitDone();
       }
       finally {
         setLoadInProgressInSyncJob(false);

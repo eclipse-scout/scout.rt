@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.servicetunnel.http.internal;
 
-import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 
 /**

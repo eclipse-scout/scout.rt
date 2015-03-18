@@ -44,15 +44,14 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardRefres
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardResetChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardStartChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardSuspendChain;
-import org.eclipse.scout.rt.client.job.IBlockingCondition;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -95,7 +94,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     m_accumulatedEvents = new ArrayList<WizardEvent>(3);
     m_availableStepList = new ArrayList<IWizardStep<? extends IForm>>(0);
     m_stepList = new ArrayList<IWizardStep<? extends IForm>>(0);
-    m_blockingCondition = OBJ.get(IModelJobManager.class).createBlockingCondition("WizardBlock", false);
+    m_blockingCondition = Jobs.getJobManager().createBlockingCondition("WizardBlock", false);
     m_objectExtensions = new ObjectExtensions<AbstractWizard, IWizardExtension<? extends AbstractWizard>>(this);
     if (callInitializer) {
       callInitializer();

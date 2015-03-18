@@ -15,17 +15,17 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IProgressMonitor;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IProgressMonitor;
+import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
 import org.eclipse.scout.rt.shared.validate.annotations.MaxLength;
 import org.eclipse.scout.service.SERVICES;
@@ -527,7 +527,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       return null;
     }
     try {
-      return service.schedule(runnable, service.defaults().name(name));
+      return service.schedule(runnable, service.defaults().setName(name));
     }
     catch (JobExecutionException e) {
       LOG.error("Unable to schedule lookup call job.", e);

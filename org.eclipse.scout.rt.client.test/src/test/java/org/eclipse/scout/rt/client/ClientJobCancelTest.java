@@ -15,19 +15,19 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.job.ICallable;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.ICallable;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.fixture.MockServerProcessingCancelService;
 import org.eclipse.scout.rt.client.fixture.MockServiceTunnel;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -103,20 +103,20 @@ public class ClientJobCancelTest {
   protected String testInternal(long delay, boolean interrupt) throws Exception {
     pingServiceDelay = delay;
     //
-    IFuture<String> future = OBJ.get(IModelJobManager.class).schedule(new ICallable<String>() {
+    IFuture<String> future = ModelJobs.schedule(new ICallable<String>() {
       @Override
       public String call() throws Exception {
         IPingService serviceProxy = ServiceTunnelUtility.createProxy(IPingService.class, m_session.getServiceTunnel());
         return serviceProxy.ping("ABC");
       }
-    }, ClientJobInput.defaults().session(m_session).name("Client"));
+    }, ModelJobInput.defaults().setSession(m_session).setName("Client"));
 
     //make user interrupt the job in 1 sec
     if (interrupt) {
-      OBJ.get(IClientJobManager.class).schedule(new JobThatInterrupts(future), 1, TimeUnit.SECONDS, ClientJobInput.defaults().session(m_session).name("Interrupter"));
+      ClientJobs.schedule(new JobThatInterrupts(future), 1, TimeUnit.SECONDS, ClientJobInput.defaults().setSession(m_session).setName("Interrupter"));
     }
     //wait for user job
-    return future.get();
+    return future.awaitDone();
   }
 
   private static class JobThatInterrupts implements IRunnable {

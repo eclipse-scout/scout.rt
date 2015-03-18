@@ -18,6 +18,7 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -26,8 +27,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -44,15 +43,15 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAs
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldPrepareRecLookupChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldPrepareTextLookupChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IContentAssistFieldExtension;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -1020,13 +1019,13 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           }
         };
 
-        ClientJobInput input = ClientJobInput.defaults().session(session).name("Smartfield text lookup");
+        ModelJobInput input = ModelJobInput.defaults().setSession(session).setName("Smartfield text lookup");
         if (background) {
-          OBJ.get(IModelJobManager.class).schedule(scoutSyncJob, input);
+          ModelJobs.schedule(scoutSyncJob, input);
         }
         else {
           try {
-            OBJ.get(IModelJobManager.class).runNow(scoutSyncJob, input);
+            ModelJobs.runNow(scoutSyncJob, input);
           }
           catch (ProcessingException e) {
             fetcher.dataFetched(null, e);
@@ -1128,13 +1127,13 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           }
         };
 
-        ClientJobInput input = ClientJobInput.defaults().session(session).name("ContentAssistField browse lookup");
+        ModelJobInput input = ModelJobInput.defaults().setSession(session).setName("ContentAssistField browse lookup");
         if (background) {
-          OBJ.get(IModelJobManager.class).schedule(scoutSyncJob, input);
+          ModelJobs.schedule(scoutSyncJob, input);
         }
         else {
           try {
-            OBJ.get(IModelJobManager.class).runNow(scoutSyncJob, input);
+            ModelJobs.runNow(scoutSyncJob, input);
           }
           catch (ProcessingException e) {
             fetcher.dataFetched(null, e);

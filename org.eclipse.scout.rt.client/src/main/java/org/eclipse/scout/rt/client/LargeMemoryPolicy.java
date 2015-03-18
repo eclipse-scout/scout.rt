@@ -13,17 +13,16 @@ package org.eclipse.scout.rt.client;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
@@ -116,13 +115,13 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
     long memUsed = (memTotal - Runtime.getRuntime().freeMemory());
     long memMax = Runtime.getRuntime().maxMemory();
     if (memUsed > memMax * 80L / 100L) {
-      OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+      ModelJobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           desktop.releaseUnusedPages();
           System.gc();
         }
-      }, ClientJobInput.defaults().name("Check memory"));
+      }, ModelJobInput.defaults().setName("Check memory"));
     }
   }
 

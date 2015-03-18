@@ -66,16 +66,15 @@ import javax.swing.table.TableColumnModel;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -91,7 +90,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
@@ -581,8 +580,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       m_storeColumnWidthsJob.cancel(true);
     }
 
-    // TODO [dwi]: delayed model job
-    m_storeColumnWidthsJob = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+    m_storeColumnWidthsJob = ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         if (getScoutObject() != null) {
@@ -593,7 +591,8 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           }
         }
       }
-    }, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
+    }, 400, TimeUnit.MILLISECONDS, ModelJobInput.defaults().setSession(getSwingEnvironment().getScoutSession()));
+
   }
 
   /**
@@ -772,11 +771,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     if (m_swingAutoOptimizeColumnWidthsJob != null) {
       m_swingAutoOptimizeColumnWidthsJob.cancel(true);
     }
-    try {
-      m_swingAutoOptimizeColumnWidthsJob = OBJ.get(IClientJobManager.class).schedule(new P_SwingAutoOptimizeColumnWidthsJob(), 200, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
-    }
-    catch (JobExecutionException e) {
-    }
+    m_swingAutoOptimizeColumnWidthsJob = ClientJobs.schedule(new P_SwingAutoOptimizeColumnWidthsJob(), 200, TimeUnit.MILLISECONDS, ClientJobInput.defaults().setSession(getSwingEnvironment().getScoutSession()));
   }
 
   protected void handleSwingEmptySpaceSelection(final MouseEvent e) {
@@ -1006,7 +1001,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 20000).get(20000, TimeUnit.MILLISECONDS);
+        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDone(20000, TimeUnit.MILLISECONDS);
       }
       catch (ProcessingException e) {
         //nop
@@ -1036,7 +1031,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 20000).get(20000, TimeUnit.MILLISECONDS);
+        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDone(20000, TimeUnit.MILLISECONDS);
       }
       catch (ProcessingException e) {
         //nop

@@ -12,14 +12,13 @@ package org.eclipse.scout.testing.client.runner;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.WrappingProcessingRuntimeExceptionHandlerService;
 import org.junit.runners.model.Statement;
@@ -43,7 +42,7 @@ public class ScoutClientJobWrapperStatement extends Statement {
       doEvaluate();
     }
     else {
-      IFuture<Void> future = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+      IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           try {
@@ -53,8 +52,8 @@ public class ScoutClientJobWrapperStatement extends Statement {
             throw new Exception(e);
           }
         }
-      }, ClientJobInput.defaults().session(m_clientSession).name("JUnit Client Job Runner"));
-      future.get();
+      }, ModelJobInput.defaults().setSession(m_clientSession).setName("JUnit Client Job Runner"));
+      future.awaitDone();
     }
   }
 

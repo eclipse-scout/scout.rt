@@ -10,16 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.ext.busy;
 
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.busy.AbstractBusyHandler;
 import org.eclipse.scout.rt.client.busy.IBusyHandler;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
@@ -34,21 +30,13 @@ import org.eclipse.scout.rt.shared.TEXTS;
  */
 public class SwingBusyHandler extends AbstractBusyHandler {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingBusyJob.class);
-
   public SwingBusyHandler() {
     super();
   }
 
   @Override
   protected void runBusy(IFuture<?> future) {
-    try {
-      IRunnable runnable = new SwingBusyJob(this);
-      OBJ.get(IClientJobManager.class).schedule(runnable, ClientJobInput.defaults().sessionRequired(false).name(TEXTS.get("BusyJob")));
-    }
-    catch (JobExecutionException e) {
-      LOG.error("", e);
-    }
+    IRunnable runnable = new SwingBusyJob(this);
+    ClientJobs.schedule(runnable, ClientJobInput.defaults().setSessionRequired(false).setName(TEXTS.get("BusyJob")));
   }
-
 }

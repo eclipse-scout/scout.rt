@@ -14,16 +14,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.job.FutureJobChangeEventFilter;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IJobChangeEvent;
-import org.eclipse.scout.commons.job.IJobChangeEventFilter;
-import org.eclipse.scout.commons.job.IJobChangeListener;
-import org.eclipse.scout.commons.job.IJobInput;
-import org.eclipse.scout.commons.job.internal.JobChangeEvent;
-import org.eclipse.scout.commons.job.internal.JobChangeListeners;
+import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.listener.IJobListener;
+import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventFutureFilter;
 import org.eclipse.scout.service.AbstractService;
 
 /**
@@ -38,24 +37,22 @@ import org.eclipse.scout.service.AbstractService;
 public class BusyManagerService extends AbstractService implements IBusyManagerService {
   private static final String HANDLER_CLIENT_SESSION_KEY = IBusyHandler.class.getName();
 
-  private final IJobChangeListener m_jobChangeListener;
-  private final IJobChangeListener m_jobChangeListenerEx;
+  private final IJobListener m_jobChangeListener;
 
   public BusyManagerService() {
     m_jobChangeListener = new P_JobChangeListener();
-    m_jobChangeListenerEx = new P_JobChangeListenerEx();
   }
 
   @Override
   public void initializeService() {
     super.initializeService();
-    JobChangeListeners.DEFAULT.add(m_jobChangeListener);
+    Jobs.getJobManager().addListener(m_jobChangeListener, new AlwaysFilter<JobEvent>());
   }
 
   @Override
   public void disposeServices() {
     try {
-      JobChangeListeners.DEFAULT.remove(m_jobChangeListener);
+      Jobs.getJobManager().removeListener(m_jobChangeListener);
     }
     finally {
       super.disposeServices();
@@ -67,11 +64,9 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
       return null;
     }
 
-    IJobInput input = future.getJobInput();
+    JobInput input = future.getJobInput();
     if (input instanceof ClientJobInput) {
-      ClientJobInput cji = (ClientJobInput) input;
-      IClientSession session = cji.getSession();
-      return getHandler(session);
+      return getHandler(((ClientJobInput) input).getSession());
     }
     return null;
   }
@@ -105,54 +100,56 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
     session.setData(HANDLER_CLIENT_SESSION_KEY, null);
   }
 
-  private class P_JobChangeListener implements IJobChangeListener {
+  private class P_JobChangeListener implements IJobListener {
 
-    private final Map<IFuture<?>, IJobChangeEventFilter> m_filters = new HashMap<>();
+    private Map<IFuture, IJobListener> m_listeners = new HashMap<>();
 
-    private void running(IJobChangeEvent event) {
+    private void running(JobEvent event) {
       IFuture<?> future = event.getFuture();
       IBusyHandler handler = getHandlerInternal(future);
       if (handler == null) {
         return;
       }
-      if (!handler.acceptFuture(future, event.getSourceManager())) {
+      if (!handler.acceptFuture(future)) {
         return;
       }
-      FutureJobChangeEventFilter eventFilter = new FutureJobChangeEventFilter(future);
-      m_filters.put(future, eventFilter);
-      JobChangeListeners.DEFAULT.add(m_jobChangeListenerEx, eventFilter);
+
+      IJobListener listener = new P_JobChangeListenerEx();
+      m_listeners.put(future, listener);
+      Jobs.getJobManager().addListener(listener, new JobEventFutureFilter(future));
+
       handler.onJobBegin(future);
     }
 
-    private void done(IJobChangeEvent event) {
+    private void done(JobEvent event) {
       IFuture<?> future = event.getFuture();
       IBusyHandler handler = getHandlerInternal(future);
       if (handler == null) {
         return;
       }
-      if (!handler.acceptFuture(future, event.getSourceManager())) {
+      if (!handler.acceptFuture(future)) {
         return;
       }
-      IJobChangeEventFilter eventFilter = m_filters.get(future);
-      JobChangeListeners.DEFAULT.remove(m_jobChangeListenerEx, eventFilter);
+
+      Jobs.getJobManager().removeListener(m_listeners.remove(future));
       handler.onJobEnd(future);
     }
 
     @Override
-    public void jobChanged(IJobChangeEvent event) {
-      if (event.getMode() == JobChangeEvent.EVENT_MODE_ASYNC) {
-        if (event.getType() == JobChangeEvent.EVENT_TYPE_DONE) {
-          done(event);
-        }
-        else if (event.getType() == JobChangeEvent.EVENT_TYPE_ABOUT_TO_RUN) {
+    public void changed(JobEvent event) {
+      switch (event.getType()) {
+        case ABOUT_TO_RUN:
           running(event);
-        }
+          break;
+        case DONE:
+          done(event);
+          break;
       }
     }
   }
 
-  private class P_JobChangeListenerEx implements IJobChangeListener {
-    private void blockingConditionStart(IJobChangeEvent event) {
+  private class P_JobChangeListenerEx implements IJobListener {
+    private void blockingConditionStart(JobEvent event) {
       IFuture<?> future = event.getFuture();
       IBusyHandler handler = getHandlerInternal(future);
       if (handler == null) {
@@ -161,7 +158,7 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
       handler.onJobEnd(future);
     }
 
-    private void blockingConditionEnd(IJobChangeEvent event) {
+    private void blockingConditionEnd(JobEvent event) {
       IFuture<?> future = event.getFuture();
       IBusyHandler handler = getHandlerInternal(future);
       if (handler == null) {
@@ -171,12 +168,14 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
     }
 
     @Override
-    public void jobChanged(IJobChangeEvent event) {
-      if (event.getType() == JobChangeEvent.EVENT_TYPE_BLOCKED) {
-        blockingConditionStart(event);
-      }
-      else if (event.getType() == JobChangeEvent.EVENT_TYPE_UN_BLOCKED) {
-        blockingConditionEnd(event);
+    public void changed(JobEvent event) {
+      switch (event.getType()) {
+        case BLOCKED:
+          blockingConditionStart(event);
+          break;
+        case UNBLOCKED:
+          blockingConditionEnd(event);
+          break;
       }
     }
   }

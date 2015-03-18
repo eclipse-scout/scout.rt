@@ -20,12 +20,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
-import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 public class DiagnosticServlet extends ServiceTunnelServlet {
@@ -49,13 +48,13 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
     try {
       // Create the job-input on behalf of which the server-job is run.
       ServerJobInput input = ServerJobInput.empty();
-      input.name("DiagnosticServiceCall");
-      input.subject(subject);
-      input.servletRequest(req);
-      input.servletResponse(res);
-      input.locale(Locale.getDefault());
-      input.userAgent(UserAgent.createDefault());
-      input.session(lookupServerSessionOnHttpSession(input.copy()));
+      input.setName("DiagnosticServiceCall");
+      input.setSubject(subject);
+      input.setServletRequest(req);
+      input.setServletResponse(res);
+      input.setLocale(Locale.getDefault());
+      input.setUserAgent(UserAgent.createDefault());
+      input.setSession(lookupServerSessionOnHttpSession(input.copy()));
 
       input = interceptServerJobInput(input);
 
@@ -74,7 +73,7 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
    *          input to be used to run the server job with current context information set.
    */
   protected void invokeDiagnosticServiceInServerJob(final ServerJobInput input) throws ProcessingException {
-    OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
+    ServerJobs.runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {

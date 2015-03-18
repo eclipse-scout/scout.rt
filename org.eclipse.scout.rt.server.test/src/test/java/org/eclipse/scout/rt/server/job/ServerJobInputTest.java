@@ -12,13 +12,11 @@ package org.eclipse.scout.rt.server.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import java.security.PrivilegedAction;
@@ -29,9 +27,8 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
-import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.ISession;
@@ -64,13 +61,7 @@ public class ServerJobInputTest {
     assertNull(input.getName());
     assertNull(input.getId());
     assertNull(input.getSubject());
-    try {
-      assertNull(input.getSession());
-      fail();
-    }
-    catch (AssertionException e) {
-      // expected assertion exception
-    }
+    assertNull(input.getSession());
     assertTrue(input.isSessionRequired());
     assertNull(input.getUserAgent());
     assertNull(input.getLocale());
@@ -79,7 +70,7 @@ public class ServerJobInputTest {
   @Test
   public void testCopy() {
     ServerJobInput input = ServerJobInput.empty();
-    input.getContext().set("A", "B");
+    input.getPropertyMap().put("A", "B");
     input.name("name");
     input.id("123");
     input.subject(new Subject());
@@ -90,7 +81,7 @@ public class ServerJobInputTest {
     ServerJobInput copy = input.copy();
 
     assertNotSame(input.getContext(), copy.getContext());
-    assertEquals(toSet(input.getContext().iterator()), toSet(copy.getContext().iterator()));
+    assertEquals(toSet(input.getPropertyMap().iterator()), toSet(copy.getPropertyMap().iterator()));
     assertEquals(input.getName(), copy.getName());
     assertEquals(input.getId(), copy.getId());
     assertSame(input.getSubject(), copy.getSubject());
@@ -146,11 +137,6 @@ public class ServerJobInputTest {
   public void testSessionRequiredCopy() {
     assertTrue(ServerJobInput.empty().sessionRequired(true).copy().isSessionRequired());
     assertFalse(ServerJobInput.empty().sessionRequired(false).copy().isSessionRequired());
-  }
-
-  @Test(expected = AssertionException.class)
-  public void testSessionRequiredAssertionException() {
-    ServerJobInput.defaults().sessionRequired(true).session(mock(IServerSession.class)).session(null).getSession();
   }
 
   @Test
@@ -361,30 +347,18 @@ public class ServerJobInputTest {
   }
 
   @Test
-  public void testDefaultJobContext() {
-    JobContext threadLocalContext = new JobContext();
-    threadLocalContext.set("prop", "value");
+  public void testDefaultPropertyMap() {
+    PropertyMap threadLocalContext = new PropertyMap();
+    threadLocalContext.put("prop", "value");
 
     // No context on ThreadLocal
-    JobContext.CURRENT.remove();
+    PropertyMap.CURRENT.remove();
     assertNotNull(ServerJobInput.defaults().getContext());
 
     // Context on ThreadLocal
-    JobContext.CURRENT.set(threadLocalContext);
+    PropertyMap.CURRENT.set(threadLocalContext);
     assertNotSame(threadLocalContext, ServerJobInput.defaults().getContext());
-    assertEquals(toSet(threadLocalContext.iterator()), toSet(ServerJobInput.defaults().getContext().iterator()));
-
-    // Session on ThreadLocal, but set explicitly
-    JobContext.CURRENT.set(threadLocalContext);
-    JobContext explicitContext = new JobContext();
-    assertSame(explicitContext, ServerJobInput.defaults().context(explicitContext).getContext());
-    assertTrue(toSet(ServerJobInput.defaults().context(explicitContext).getContext().iterator()).isEmpty());
-
-    // Context on ThreadLocal, but set explicity to null
-    JobContext.CURRENT.set(threadLocalContext);
-    assertNotNull(ServerJobInput.defaults().context(null).getContext());
-    assertNotEquals(threadLocalContext, ServerJobInput.defaults().context(null).getContext());
-    assertTrue(toSet(ServerJobInput.defaults().context(null).getContext().iterator()).isEmpty());
+    assertEquals(toSet(threadLocalContext.iterator()), toSet(ServerJobInput.defaults().getPropertyMap().iterator()));
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

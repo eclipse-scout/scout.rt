@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.busy;
 
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IJobManager;
-import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
+import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
  * Shows blocking progress on a long operation for a {@link ModelJobManager} with respect to
@@ -29,10 +27,10 @@ public interface IBusyHandler {
   /**
    * Decides whether to block the ui based on that running job.
    */
-  boolean acceptFuture(IFuture<?> future, IJobManager<?> mgr);
+  boolean acceptFuture(IFuture<?> future);
 
   /**
-   * callback when a job accepted by {@link #acceptFuture(IFuture, IJobManager)} begun running
+   * callback when a job accepted by {@link #acceptFuture(IFuture)} begun running
    */
   void onJobBegin(IFuture<?> future);
 

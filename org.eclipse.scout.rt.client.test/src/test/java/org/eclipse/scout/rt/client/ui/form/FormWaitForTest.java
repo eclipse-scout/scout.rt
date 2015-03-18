@@ -12,14 +12,13 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
@@ -66,7 +65,7 @@ public class FormWaitForTest {
 
     testSequence.add(0);
 
-    IFuture<Void> future = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+    IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         testSequence.add(3);
@@ -75,7 +74,7 @@ public class FormWaitForTest {
 
         LOG.debug("ClientSyncWaitForTest.testStartAndWaitImpl(...).new ClientSyncJob() {...}.runVoid() finished");
       }
-    }, ClientJobInput.defaults().name("Close"));
+    }, ModelJobInput.defaults().setName("Close"));
 
     LOG.debug("ClientSessionProvider.currentSession()");
     LOG.debug("ClientSessionProvider.currentSession().getDesktop()");
@@ -90,7 +89,7 @@ public class FormWaitForTest {
     LOG.debug("ClientSyncWaitForTest.testStartAndWaitImpl() after waitFor");
     testSequence.add(5);
 
-    future.get();
+    future.awaitDone();
     ScoutAssert.assertOrder(new Integer[]{0, 1, 2, 3, 4, 5}, testSequence.toArray());
   }
 }

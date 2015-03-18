@@ -12,15 +12,14 @@ package org.eclipse.scout.rt.client.services.common.session;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IExecutable;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IJobInput;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobExecutionException;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
 import org.eclipse.scout.service.AbstractService;
 
@@ -34,36 +33,36 @@ public class DefaultClientSessionService extends AbstractService implements ISes
 
   @Override
   public <RESULT> RESULT runNow(IExecutable<RESULT> executable) throws ProcessingException {
-    return OBJ.get(IClientJobManager.class).runNow(executable);
+    return ClientJobs.runNow(executable);
   }
 
   @Override
-  public <RESULT> RESULT runNow(IExecutable<RESULT> executable, IJobInput input) throws ProcessingException {
-    return OBJ.get(IClientJobManager.class).runNow(executable, (ClientJobInput) input);
+  public <RESULT> RESULT runNow(IExecutable<RESULT> executable, JobInput input) throws ProcessingException {
+    return ClientJobs.runNow(executable, (ClientJobInput) input);
   }
 
   @Override
   public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable) throws JobExecutionException {
-    return OBJ.get(IClientJobManager.class).schedule(executable);
+    return ClientJobs.schedule(executable);
   }
 
   @Override
-  public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, IJobInput input) throws JobExecutionException {
-    return OBJ.get(IClientJobManager.class).schedule(executable, (ClientJobInput) input);
+  public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, JobInput input) throws JobExecutionException {
+    return ClientJobs.schedule(executable, (ClientJobInput) input);
   }
 
   @Override
   public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit) throws JobExecutionException {
-    return OBJ.get(IClientJobManager.class).schedule(executable, delay, delayUnit);
+    return ClientJobs.schedule(executable, delay, delayUnit);
   }
 
   @Override
-  public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, IJobInput input) throws JobExecutionException {
-    return OBJ.get(IClientJobManager.class).schedule(executable, delay, delayUnit, (ClientJobInput) input);
+  public <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, JobInput input) throws JobExecutionException {
+    return ClientJobs.schedule(executable, delay, delayUnit, (ClientJobInput) input);
   }
 
   @Override
-  public IJobInput defaults() {
+  public JobInput defaults() {
     return ClientJobInput.defaults();
   }
 }

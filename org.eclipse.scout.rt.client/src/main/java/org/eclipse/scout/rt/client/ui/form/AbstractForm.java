@@ -37,6 +37,7 @@ import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StoppableThread;
 import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -53,9 +54,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
@@ -78,9 +76,9 @@ import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormValidateChai
 import org.eclipse.scout.rt.client.extension.ui.form.IFormExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.MoveFormFieldsHandler;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IBlockingCondition;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
@@ -112,7 +110,10 @@ import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobExecutionException;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -201,7 +202,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_enabledGranted = true;
     m_visibleGranted = true;
     m_formLoading = true;
-    m_blockingCondition = OBJ.get(IModelJobManager.class).createBlockingCondition("block", false);
+    m_blockingCondition = Jobs.getJobManager().createBlockingCondition("block", false);
     m_objectExtensions = new ObjectExtensions<AbstractForm, IFormExtension<? extends AbstractForm>>(this);
     if (callInitializer) {
       callInitializer();
@@ -2900,13 +2901,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * Starts the timer that periodically invokes {@link AbstractForm#interceptTimer(String).
    */
   protected IFuture<Void> startTimer(long intervalSeconds, final String timerId) throws JobExecutionException {
-    final IModelJobManager modelJobManager = OBJ.get(IModelJobManager.class);
-
-    return OBJ.get(IClientJobManager.class).scheduleAtFixedRate(new IRunnable() {
+    return ClientJobs.scheduleAtFixedRate(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        modelJobManager.schedule(new IRunnable() {
+        ModelJobs.schedule(new IRunnable() {
 
           @Override
           public void run() throws Exception {
@@ -2921,7 +2920,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
             }
           }
-        }, ClientJobInput.defaults().name("Form timer")).get(); // Wait for the job to complete.
+        }, ModelJobInput.defaults().setName("Form timer")).awaitDone();
       }
     }, intervalSeconds, intervalSeconds, TimeUnit.SECONDS, ClientJobInput.defaults());
   }
@@ -2942,16 +2941,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
     @Override
     public void run() {
-      IModelJobManager modelJobManager = OBJ.get(IModelJobManager.class);
-
       while (this == m_scoutCloseTimer && m_seconds > 0 && isCloseTimerArmed()) {
-        modelJobManager.schedule(new IRunnable() {
+        ModelJobs.schedule(new IRunnable() {
 
           @Override
           public void run() throws Exception {
             setSubTitle("" + m_seconds);
           }
-        }, ClientJobInput.defaults().name("Form close countdown").session(m_session));
+        }, ModelJobInput.defaults().setName("Form close countdown").setSession(m_session));
 
         try {
           sleep(TimeUnit.SECONDS.toMillis(1));
@@ -2961,7 +2958,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         m_seconds--;
       }
       if (this == m_scoutCloseTimer) {
-        modelJobManager.schedule(new IRunnable() {
+        ModelJobs.schedule(new IRunnable() {
 
           @Override
           public void run() throws Exception {
@@ -2978,7 +2975,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               SERVICES.getService(IExceptionHandlerService.class).handleException(se);
             }
           }
-        }, ClientJobInput.defaults().name("Form close timer").session(m_session));
+        }, ModelJobInput.defaults().setName("Form close timer").setSession(m_session));
       }
     }
   }// end private class

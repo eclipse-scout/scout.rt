@@ -16,17 +16,13 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IJobManager;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
  * <p>
@@ -65,12 +61,8 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
   }
 
   @Override
-  public boolean acceptFuture(IFuture<?> future, IJobManager<?> mgr) {
-    if (OBJ.get(IModelJobManager.class) == mgr) {
-      // only model jobs
-      return true;
-    }
-    return false;
+  public boolean acceptFuture(IFuture<?> future) {
+    return ModelJobs.isModelJob(future);
   }
 
   @Override
@@ -208,31 +200,26 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
   }
 
   private void addTimer(IFuture<?> future) {
-    try {
-      P_TimerJob runnable = new P_TimerJob(future);
-      future.getJobInput().getContext().set(TIMER_PROPERTY, runnable);
-      OBJ.get(IClientJobManager.class).schedule(runnable, getShortOperationMillis(), TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
-    }
-    catch (JobExecutionException e) {
-      LOG.warn("Unable to schedule busy timer.", e);
-    }
+    P_TimerJob runnable = new P_TimerJob(future);
+    future.getJobInput().getPropertyMap().put(TIMER_PROPERTY, runnable);
+    ClientJobs.schedule(runnable, getShortOperationMillis(), TimeUnit.MILLISECONDS, ClientJobInput.defaults().setSessionRequired(false));
   }
 
   private void removeTimer(IFuture<?> future) {
-    P_TimerJob t = (P_TimerJob) future.getJobInput().getContext().get(TIMER_PROPERTY);
+    P_TimerJob t = (P_TimerJob) future.getJobInput().getPropertyMap().get(TIMER_PROPERTY);
     if (t != null) {
-      future.getJobInput().getContext().set(TIMER_PROPERTY, null);
+      future.getJobInput().getPropertyMap().put(TIMER_PROPERTY, null);
     }
   }
 
   private P_TimerJob getTimer(IFuture<?> future) {
-    return (P_TimerJob) future.getJobInput().getContext().get(TIMER_PROPERTY);
+    return (P_TimerJob) future.getJobInput().getPropertyMap().get(TIMER_PROPERTY);
   }
 
   private void addBusyOperation(IFuture<?> future) {
     int oldSize, newSize;
     synchronized (getStateLock()) {
-      future.getJobInput().getContext().set(BUSY_OPERATION_PROPERTY, "true");
+      future.getJobInput().getPropertyMap().put(BUSY_OPERATION_PROPERTY, "true");
       oldSize = m_list.size();
       m_list.add(future);
       newSize = m_list.size();
@@ -245,22 +232,21 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
 
   private void removeBusyOperation(IFuture<?> future) {
     synchronized (getStateLock()) {
-      future.getJobInput().getContext().set(BUSY_OPERATION_PROPERTY, null);
+      future.getJobInput().getPropertyMap().put(BUSY_OPERATION_PROPERTY, null);
       m_list.remove(future);
       getStateLock().notifyAll();
     }
   }
 
   private boolean isBusyOperationNoLock(IFuture<?> future) {
-    return "true".equals(future.getJobInput().getContext().get(BUSY_OPERATION_PROPERTY));
+    return "true".equals(future.getJobInput().getPropertyMap().get(BUSY_OPERATION_PROPERTY));
   }
 
   private static boolean isJobActive(IFuture<?> future) {
     if (future.isCancelled() || future.isDone()) {
       return false;
     }
-    boolean isBlocked = OBJ.get(IModelJobManager.class).isBlocked(future);
-    if (isBlocked) {
+    if (future.isBlocked()) {
       return false;
     }
     return true;

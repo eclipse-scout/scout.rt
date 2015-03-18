@@ -24,7 +24,6 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.UIDefaults;
 
-import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
@@ -37,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.basic.table.SwingTableColumn;

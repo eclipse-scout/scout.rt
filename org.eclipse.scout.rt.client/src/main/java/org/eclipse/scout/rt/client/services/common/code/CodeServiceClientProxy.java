@@ -21,22 +21,21 @@ import java.util.Set;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
@@ -107,12 +106,12 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
             }
           }
           else {
-            OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+            ModelJobs.schedule(new IRunnable() {
               @Override
               public void run() throws Exception {
                 reloadCodeTypes(notification.getCodeTypes());
               }
-            }, ClientJobInput.defaults().name("Reload code types"));
+            }, ModelJobInput.defaults().setName("Reload code types"));
           }
         }
       }

@@ -17,12 +17,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -187,7 +187,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
       IHttpBackgroundExecutable executor = createHttpBackgroundExecutor(cancelCall, new Object());
       IFuture<?> future = schedule(executor, cancelCall);
       try {
-        future.get(10, TimeUnit.SECONDS);
+        future.awaitDone(10, TimeUnit.SECONDS);
         IServiceTunnelResponse cancelResult = executor.getResponse();
         if (cancelResult == null) {
           return false;

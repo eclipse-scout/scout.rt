@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services;
 
-import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.server.TestServerSession;
-import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
@@ -43,7 +43,7 @@ public class ServiceWithSessionInterceptorTest {
 
   @Test
   public void testService() throws Exception {
-    OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
+    ServerJobs.runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {

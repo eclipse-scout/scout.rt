@@ -18,21 +18,19 @@ import java.util.EventListener;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IBlockingCondition;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -226,7 +224,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
     m_cancelButtonText = cancelButtonText;
     m_iconId = iconId;
     m_autoCloseMillis = -1;
-    m_blockingCondition = OBJ.get(IModelJobManager.class).createBlockingCondition("block", false);
+    m_blockingCondition = Jobs.getJobManager().createBlockingCondition("block", false);
     if (m_title == null) {
       IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
       if (desktop != null) {
@@ -465,19 +463,14 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
           // attach auto-cancel timer
           if (getAutoCloseMillis() > 0) {
             final long dt = getAutoCloseMillis();
-            try {
-              m_autoCloseJob = OBJ.get(IClientJobManager.class).schedule(new IRunnable() {
-                @Override
-                public void run() throws Exception {
-                  if (IFuture.CURRENT.get() == m_autoCloseJob) {
-                    closeMessageBox();
-                  }
+            m_autoCloseJob = ClientJobs.schedule(new IRunnable() {
+              @Override
+              public void run() throws Exception {
+                if (IFuture.CURRENT.get() == m_autoCloseJob) {
+                  closeMessageBox();
                 }
-              }, dt, TimeUnit.MILLISECONDS, ClientJobInput.defaults().name("Auto-close " + getTitle()));
-            }
-            catch (JobExecutionException e) {
-              LOG.error("Unable to schedule auto-close job.", e);
-            }
+              }
+            }, dt, TimeUnit.MILLISECONDS, ClientJobInput.defaults().setName("Auto-close " + getTitle()));
           }
           // start sub event dispatch thread
           waitFor();

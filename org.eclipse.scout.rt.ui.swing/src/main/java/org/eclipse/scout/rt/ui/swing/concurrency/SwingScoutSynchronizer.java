@@ -12,13 +12,12 @@ package org.eclipse.scout.rt.ui.swing.concurrency;
 
 import javax.swing.SwingUtilities;
 
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 
 public class SwingScoutSynchronizer {
@@ -41,7 +40,7 @@ public class SwingScoutSynchronizer {
    * A timeout value &lt;= 0 means no timeout.
    */
   public IFuture<Void> invokeScoutLater(final Runnable j, long cancelTimeout) {
-    if (OBJ.get(IModelJobManager.class).isModelThread()) {
+    if (ModelJobs.isModelThread()) {
       LOG.warn("trying to queue scout runnable but already in scout thread: " + j);
     }
     else if (!SwingUtilities.isEventDispatchThread()) {
@@ -57,14 +56,14 @@ public class SwingScoutSynchronizer {
 
     // schedule job
     final long deadLine = cancelTimeout > 0 ? System.currentTimeMillis() + cancelTimeout : -1;
-    IFuture<Void> future = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+    IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         if (deadLine < 0 || deadLine > System.currentTimeMillis()) {
           j.run();
         }
       }
-    }, ClientJobInput.defaults().session(m_env.getScoutSession()).name("Swing post::" + j));
+    }, ModelJobInput.defaults().setSession(m_env.getScoutSession()).setName("Swing post::" + j));
     return future;
   }
 
@@ -75,7 +74,7 @@ public class SwingScoutSynchronizer {
     if (SwingUtilities.isEventDispatchThread()) {
       LOG.warn("trying to queue swing runnable but already in swing thread: " + j);
     }
-    if (!OBJ.get(IModelJobManager.class).isModelThread()) {
+    if (!ModelJobs.isModelThread()) {
       throw new IllegalStateException("queueing swing runnable from outside scout thread: " + j);
     }
     SwingUtilities.invokeLater(j);

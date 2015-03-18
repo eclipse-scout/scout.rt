@@ -13,12 +13,11 @@ package org.eclipse.scout.rt.client.ui.form;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
@@ -63,7 +62,7 @@ public class FormBasicTest {
     testSequence.add(0);
     testSequence.add(1);
     //emulate that gui clicks on ok button
-    IFuture<Void> future = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+    IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         testSequence.add(2);
@@ -71,13 +70,13 @@ public class FormBasicTest {
         Thread.sleep(200L);
         testSequence.add(3);
       }
-    }, 200, TimeUnit.MILLISECONDS, ClientJobInput.defaults().name("Close"));
+    }, 200, TimeUnit.MILLISECONDS, ModelJobInput.defaults().setName("Close"));
 
     try {
       f.start(new FormHandler());
       f.waitFor();
       testSequence.add(4);
-      future.get();
+      future.awaitDone();
       ScoutAssert.assertOrder(new Integer[]{0, 1, 2, 3, 4}, testSequence.toArray());
     }
     finally {

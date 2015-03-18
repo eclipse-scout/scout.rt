@@ -13,12 +13,11 @@ package org.eclipse.scout.testing.client;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
 
 /**
@@ -39,7 +38,7 @@ public abstract class AbstractGuiMock implements IGuiMock {
     final AtomicReference<Throwable> throwables = new AtomicReference<Throwable>(null);
 
     IClientSession clientSession = getClientSession();
-    IFuture<Void> future = OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+    IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         if (deadLine < 0 || deadLine > System.nanoTime()) {
@@ -51,9 +50,9 @@ public abstract class AbstractGuiMock implements IGuiMock {
           }
         }
       }
-    }, ClientJobInput.defaults().session(clientSession).name(r.toString()));
+    }, ModelJobInput.defaults().setSession(clientSession).setName(r.toString()));
 
-    future.get(runTimeout, TimeUnit.MILLISECONDS);
+    future.awaitDone(runTimeout, TimeUnit.MILLISECONDS);
     Throwable t = throwables.get();
     if (t != null) {
       throw t;

@@ -51,17 +51,16 @@ import org.eclipse.scout.commons.CSSPatch;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.IBusyManagerService;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
@@ -78,7 +77,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
@@ -476,13 +475,13 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
         showMessageBox(getRootFrame(), mb);
       }
       // notify desktop that it is loaded
-      OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+      ModelJobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           desktop.getUIFacade().fireDesktopOpenedFromUI();
           desktop.getUIFacade().fireGuiAttached();
         }
-      }, ClientJobInput.defaults().session(session));
+      }, ModelJobInput.defaults().setSession(session));
     }
     attachBusyHandler();
   }

@@ -25,10 +25,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ICallable;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.ICallable;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.OBJ;
@@ -37,8 +37,8 @@ import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter;
-import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -88,13 +88,13 @@ public class ServiceTunnelServlet extends HttpServletEx {
     try {
       // Create the job-input on behalf of which the server-job is run.
       ServerJobInput input = ServerJobInput.empty();
-      input.name("AdminServiceCall");
-      input.subject(subject);
-      input.servletRequest(req);
-      input.servletResponse(res);
-      input.locale(Locale.getDefault());
-      input.userAgent(UserAgent.createDefault());
-      input.session(lookupServerSessionOnHttpSession(input.copy()));
+      input.setName("AdminServiceCall");
+      input.setSubject(subject);
+      input.setServletRequest(req);
+      input.setServletResponse(res);
+      input.setLocale(Locale.getDefault());
+      input.setUserAgent(UserAgent.createDefault());
+      input.setSession(lookupServerSessionOnHttpSession(input.copy()));
 
       input = interceptServerJobInput(input);
 
@@ -122,14 +122,14 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
       // Create the job-input on behalf of which the server-job is run.
       ServerJobInput input = ServerJobInput.empty();
-      input.name("RemoteServiceCall");
-      input.id(String.valueOf(serviceRequest.getRequestSequence())); // to cancel server jobs and associated transactions.
-      input.subject(subject);
-      input.servletRequest(req);
-      input.servletResponse(res);
-      input.locale(serviceRequest.getLocale());
-      input.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
-      input.session(lookupServerSessionOnHttpSession(input.copy()));
+      input.setName("RemoteServiceCall");
+      input.setId(String.valueOf(serviceRequest.getRequestSequence())); // to cancel server jobs and associated transactions.
+      input.setSubject(subject);
+      input.setServletRequest(req);
+      input.setServletResponse(res);
+      input.setLocale(serviceRequest.getLocale());
+      input.setUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
+      input.setSession(lookupServerSessionOnHttpSession(input.copy()));
 
       input = interceptServerJobInput(input);
 
@@ -160,7 +160,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     final HttpServletRequest request = input.getServletRequest();
     final HttpServletResponse response = input.getServletResponse();
 
-    OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
+    ServerJobs.runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -186,7 +186,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
    * @return {@link IServiceTunnelResponse} response sent back to the client.
    */
   protected IServiceTunnelResponse invokeServiceInServerJob(final ServerJobInput input, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
-    return OBJ.get(IServerJobManager.class).runNow(new ICallable<IServiceTunnelResponse>() {
+    return ServerJobs.runNow(new ICallable<IServiceTunnelResponse>() {
 
       @Override
       public IServiceTunnelResponse call() throws Exception {

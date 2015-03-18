@@ -13,14 +13,14 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark.view;
 import java.security.Permission;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
@@ -46,7 +46,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractLinkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
-import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.CreateUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.DeleteUserBookmarkPermission;
@@ -325,12 +324,12 @@ public class BookmarkViewForm extends AbstractForm {
       public void handleEvent(ClientNotificationConsumerEvent e, boolean sync) {
         if (e.getClientNotification() instanceof BookmarkChangedClientNotification) {
           IClientSession clientSession = ClientSessionProvider.currentSession();
-          OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+          ModelJobs.schedule(new IRunnable() {
             @Override
             public void run() throws Exception {
               SERVICES.getService(IBookmarkService.class).loadBookmarks();
             }
-          }, ClientJobInput.defaults().session(clientSession).name("Bookmarks changed"));
+          }, ModelJobInput.defaults().setSession(clientSession).setName("Bookmarks changed"));
         }
       }
     };

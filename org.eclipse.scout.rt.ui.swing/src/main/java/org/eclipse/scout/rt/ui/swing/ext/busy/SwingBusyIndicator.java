@@ -29,7 +29,7 @@ import javax.swing.JRootPane;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 
-import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 
 /**

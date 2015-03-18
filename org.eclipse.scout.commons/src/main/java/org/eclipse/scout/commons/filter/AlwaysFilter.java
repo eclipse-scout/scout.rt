@@ -17,13 +17,6 @@ package org.eclipse.scout.commons.filter;
  */
 public class AlwaysFilter<ELEMENT> implements IFilter<ELEMENT> {
 
-  /**
-   * Returns an {@link AlwaysFilter} if the given filter is <code>null</code>.
-   */
-  public static <ELEMENT> IFilter<ELEMENT> ifNull(final IFilter<ELEMENT> filter) {
-    return (filter != null ? filter : new AlwaysFilter<ELEMENT>());
-  }
-
   @Override
   public boolean accept(final ELEMENT element) {
     return true;

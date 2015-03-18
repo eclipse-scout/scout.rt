@@ -12,12 +12,14 @@ package org.eclipse.scout.rt.client.session;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.ICallable;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.ISession;
@@ -37,27 +39,26 @@ public class ClientSessionProvider {
    * @throws ProcessingException
    *           is thrown if the {@link IClientSession} could not be created or initialized.
    */
-  public <T extends IClientSession> T provide(final ClientJobInput input) throws ProcessingException {
-    // Create an empty session instance.
-    ClientJobInput in = input.copy();
-    final T clientSession = ClientSessionProvider.cast(OBJ.get(IClientSession.class));
-    if (in.getUserAgent() != null) {
-      clientSession.setUserAgent(in.getUserAgent());
-    }
-    if (in.getLocale() != null) {
-      clientSession.setLocale(in.getLocale());
-    }
-
-    // Initialize the session.
-    OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+  public <SESSION extends IClientSession> SESSION provide(final ModelJobInput input) throws ProcessingException {
+    return input.getContext().setSessionRequired(false).invoke(new ICallable<SESSION>() {
 
       @Override
-      public void run() throws Exception {
-        clientSession.startSession();
-      }
-    }, in.name("client-session-initialization").session(clientSession)).get();
+      public SESSION call() throws Exception {
+        // 1. Create an empty session instance.
+        final SESSION clientSession = ClientSessionProvider.cast(OBJ.get(IClientSession.class));
 
-    return clientSession;
+        // 2. Load the session.
+        ModelJobs.schedule(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            clientSession.startSession();
+          }
+        }, input.copy().setName("client-session-initialization").setSession(clientSession)).awaitDone();
+
+        return clientSession;
+      }
+    });
   }
 
   /**

@@ -26,15 +26,15 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.server.job.IServerJobManager;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -257,11 +257,11 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     getClusterNodeStatusInfo().updateReceiveStatus(message);
 
     ServerJobInput jobInput = ServerJobInput.empty();
-    jobInput.name("cluster-sync-receive");
-    jobInput.subject(m_subject);
-    jobInput.session(OBJ.get(ServerSessionProviderWithCache.class).provide(jobInput.copy()));
+    jobInput.setName("cluster-sync-receive");
+    jobInput.setSubject(m_subject);
+    jobInput.setSession(OBJ.get(ServerSessionProviderWithCache.class).provide(jobInput.copy()));
 
-    OBJ.get(IServerJobManager.class).runNow(new IRunnable() {
+    ServerJobs.runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {

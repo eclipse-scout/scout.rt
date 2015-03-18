@@ -12,13 +12,13 @@ package org.eclipse.scout.rt.shared.services.common.session;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IExecutable;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IJobInput;
-import org.eclipse.scout.commons.job.IJobManager;
-import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.job.JobExecutionException;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.service.IService;
 
 /**
@@ -35,7 +35,7 @@ public interface ISessionService extends IService {
   /**
    * see {@link IJobManager#runNow(IExecutable, IJobInput)}
    */
-  <RESULT> RESULT runNow(IExecutable<RESULT> executable, IJobInput input) throws ProcessingException;
+  <RESULT> RESULT runNow(IExecutable<RESULT> executable, JobInput input) throws ProcessingException;
 
   /**
    * see {@link IJobManager#schedule(IExecutable)}
@@ -45,7 +45,7 @@ public interface ISessionService extends IService {
   /**
    * see {@link IJobManager#schedule(IExecutable, IJobInput)}
    */
-  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, IJobInput input) throws JobExecutionException;
+  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, JobInput input) throws JobExecutionException;
 
   /**
    * see {@link IJobManager#schedule(IExecutable, long, TimeUnit)}
@@ -55,10 +55,10 @@ public interface ISessionService extends IService {
   /**
    * see {@link IJobManager#schedule(IExecutable, long, TimeUnit, IJobInput)}
    */
-  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, IJobInput input) throws JobExecutionException;
+  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, JobInput input) throws JobExecutionException;
 
   /**
    * @return The default job input
    */
-  IJobInput defaults();
+  JobInput defaults();
 }

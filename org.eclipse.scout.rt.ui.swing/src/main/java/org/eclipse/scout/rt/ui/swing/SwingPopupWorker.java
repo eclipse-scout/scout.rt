@@ -33,7 +33,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -43,6 +42,7 @@ import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
  * a swing runnable that can be enqueued into the awt event queue when run it
@@ -173,7 +173,7 @@ public class SwingPopupWorker implements Runnable {
     };
     IFuture<Void> prepareJob = m_environment.invokeScoutLater(t, 0);
     try {
-      prepareJob.get(1200, TimeUnit.MILLISECONDS);
+      prepareJob.awaitDone(1200, TimeUnit.MILLISECONDS);
     }
     catch (ProcessingException e) {
       LOG.error("error during prepare menus.", e);

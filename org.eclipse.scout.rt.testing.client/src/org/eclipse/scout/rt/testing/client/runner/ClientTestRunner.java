@@ -14,9 +14,8 @@ import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.testing.client.runner.statement.ProvideClientSessionStatement;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -90,7 +89,7 @@ public class ClientTestRunner extends PlatformTestRunner {
     if (annotation == null) {
       return next;
     }
-    final Statement s3 = new RunNowStatement(next, OBJ.get(IClientJobManager.class));
+    final Statement s3 = new RunNowStatement(next, ClientJobInput.defaults());
     final Statement s2 = new ProvideClientSessionStatement(s3, annotation.provider());
     final Statement s1 = new RegisterBeanStatement(s2, annotation.value(), priority);
 

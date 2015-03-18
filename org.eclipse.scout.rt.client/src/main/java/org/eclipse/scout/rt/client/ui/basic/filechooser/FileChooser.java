@@ -18,12 +18,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.IBlockingCondition;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 
@@ -50,7 +49,7 @@ public class FileChooser implements IFileChooser {
     m_directory = directory;
     m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(fileExtensions);
     m_load = load;
-    m_blockingCondition = OBJ.get(IModelJobManager.class).createBlockingCondition("block", false);
+    m_blockingCondition = Jobs.getJobManager().createBlockingCondition("block", false);
   }
 
   @Override

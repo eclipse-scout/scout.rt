@@ -12,15 +12,13 @@ package org.eclipse.scout.rt.ui.swing.basic.table;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IProgressMonitor;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 
 /**
  *
@@ -54,11 +52,7 @@ public abstract class AbstractKeyboardNavigationSupport {
         if (m_navigationJob != null) {
           m_navigationJob.cancel(true);
         }
-        try {
-          m_navigationJob = OBJ.get(IClientJobManager.class).schedule(new P_NavigationJob(), 250, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(m_session));
-        }
-        catch (JobExecutionException e) {
-        }
+        m_navigationJob = ClientJobs.schedule(new P_NavigationJob(), 250, TimeUnit.MILLISECONDS, ClientJobInput.defaults().setSession(m_session));
         m_timeoutTimestamp = System.currentTimeMillis() + m_delay;
       }
     }

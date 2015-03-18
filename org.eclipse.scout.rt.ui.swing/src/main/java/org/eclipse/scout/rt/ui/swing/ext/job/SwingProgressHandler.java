@@ -19,15 +19,11 @@ import javax.swing.SwingUtilities;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IJobChangeEvent;
-import org.eclipse.scout.commons.job.IJobChangeListener;
-import org.eclipse.scout.commons.job.internal.JobChangeEvent;
-import org.eclipse.scout.commons.job.internal.JobChangeListeners;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.client.job.ModelJobFilter;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.client.job.ModelJobEventFilter;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.listener.IJobListener;
+import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 
 /**
  * handler dealing with SwingProgressProvider events.
@@ -54,40 +50,43 @@ public class SwingProgressHandler {
   }
 
   private final EventListenerList m_listenerList = new EventListenerList();
-  private final IJobChangeListener m_modelJobsListener;
+  private final IJobListener m_modelJobListener;
   private volatile boolean m_jobRunning;
   private MonitorProperties m_monitorProps;
 
   protected SwingProgressHandler() {
-    m_modelJobsListener = new IJobChangeListener() {
+    m_modelJobListener = new IJobListener() {
+
       @Override
-      public void jobChanged(final IJobChangeEvent event) {
-        if (event.getMode() == JobChangeEvent.EVENT_MODE_ASYNC) {
-          if (event.getType() == JobChangeEvent.EVENT_TYPE_ABOUT_TO_RUN) {
+      public void changed(final JobEvent event) {
+        switch (event.getType()) {
+          case ABOUT_TO_RUN: {
             SwingUtilities.invokeLater(new Runnable() {
               @Override
               public void run() {
                 propertyChangeInSwing(event.getFuture());
               }
             });
+            break;
           }
-          else if (event.getType() == JobChangeEvent.EVENT_TYPE_DONE) {
+          case DONE: {
             SwingUtilities.invokeLater(new Runnable() {
               @Override
               public void run() {
                 propertyChangeInSwing(null);
               }
             });
+            break;
           }
         }
       }
     };
 
-    JobChangeListeners.DEFAULT.add(m_modelJobsListener, ModelJobFilter.INSTANCE);
+    Jobs.getJobManager().addListener(m_modelJobListener, ModelJobEventFilter.INSTANCE);
   }
 
   private void dispose() {
-    JobChangeListeners.DEFAULT.remove(m_modelJobsListener, ModelJobFilter.INSTANCE);
+    Jobs.getJobManager().removeListener(m_modelJobListener);
   }
 
   private void propertyChangeInSwing(IFuture<?> future) {
@@ -176,8 +175,7 @@ public class SwingProgressHandler {
 
     @Override
     public void actionPerformed(ActionEvent a) {
-      OBJ.get(IClientJobManager.class).cancel(new AlwaysFilter<IFuture<?>>(), true);
-      OBJ.get(IModelJobManager.class).cancel(new AlwaysFilter<IFuture<?>>(), true);
+      Jobs.getJobManager().cancel(new AlwaysFilter<IFuture<?>>(), true);
     }
   }// end class
 
