@@ -14,17 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
  *
  */
-@ApplicationScoped
 public final class FormFieldExtensions {
 
+  public static final FormFieldExtensions INSTANCE = new FormFieldExtensions();
   private final List<IFormFieldExtension> m_extensions;
 
-  public FormFieldExtensions() {
+  private FormFieldExtensions() {
     m_extensions = new ArrayList<>();
   }
 

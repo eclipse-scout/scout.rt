@@ -47,19 +47,13 @@ public class FormFieldsPluginXmlVisitor implements IPluginXmlVisitor {
   public static final String ATTR_FACTORY_CLASS = "class";
 
   private final IBeanContext m_context;
-  private final FormFieldExtensions m_formFieldExtensions;
 
-  public FormFieldsPluginXmlVisitor(IBeanContext context, FormFieldExtensions formFieldExtensions) {
+  public FormFieldsPluginXmlVisitor(IBeanContext context) {
     m_context = context;
-    m_formFieldExtensions = formFieldExtensions;
   }
 
   protected IBeanContext getContext() {
     return m_context;
-  }
-
-  protected FormFieldExtensions getFormFieldExtensions() {
-    return m_formFieldExtensions;
   }
 
   @Override
@@ -106,7 +100,7 @@ public class FormFieldsPluginXmlVisitor implements IPluginXmlVisitor {
       formFieldExt.setModelClass((Class<? extends IFormField>) loadClass);
       formFieldExt.setFactoryClass(getClassName(element, ELEM_FACTORY, ATTR_FACTORY_CLASS, IFormFieldFactory.class, xmlFile));
       formFieldExt.setUiClass(getClassName(element, ELEM_UICLASS, ATTR_UICLASS_CLASS, ISwingScoutFormField.class, xmlFile));
-      getFormFieldExtensions().add(formFieldExt);
+      FormFieldExtensions.INSTANCE.add(formFieldExt);
     }
     catch (ClassNotFoundException e) {
       //TODO

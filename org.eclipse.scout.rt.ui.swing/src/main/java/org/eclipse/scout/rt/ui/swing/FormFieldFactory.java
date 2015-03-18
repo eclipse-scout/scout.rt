@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.ui.swing.extension.FormFieldExtensions;
 import org.eclipse.scout.rt.ui.swing.extension.IFormFieldExtension;
 import org.eclipse.scout.rt.ui.swing.extension.IFormFieldFactory;
@@ -41,7 +40,7 @@ public class FormFieldFactory implements IFormFieldFactory {
 
   public FormFieldFactory() {
     TreeMap<CompositeObject, P_FormFieldExtension> sortedMap = new TreeMap<CompositeObject, P_FormFieldExtension>();
-    for (IFormFieldExtension extension : OBJ.get(FormFieldExtensions.class).getFormFieldExtensions()) {
+    for (IFormFieldExtension extension : FormFieldExtensions.INSTANCE.getFormFieldExtensions()) {
       if (extension.isActive()) {
         final Class<?> modelClazz = extension.getModelClass();
         final Class<? extends ISwingScoutFormField> uiClazz = extension.getUiClass();
