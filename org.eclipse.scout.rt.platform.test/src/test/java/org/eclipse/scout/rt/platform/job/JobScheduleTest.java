@@ -269,9 +269,9 @@ public class JobScheduleTest {
           public void run() throws Exception {
             actualThreadName2.setValue(Thread.currentThread().getName());
           }
-        }, JobInput.defaults().name("XYZ")).awaitDone();
+        }, JobInput.defaults().setName("XYZ")).awaitDone();
       }
-    }, JobInput.defaults().name("ABC")).awaitDone();
+    }, JobInput.defaults().setName("ABC")).awaitDone();
 
     assertTrue(actualThreadName1.getValue().matches("scout-thread-(\\d)+;ABC"));
     assertTrue(actualThreadName2.getValue().matches("scout-thread-(\\d)+;XYZ"));
@@ -377,7 +377,7 @@ public class JobScheduleTest {
       public void run() throws Exception {
         executed.set(true);
       }
-    }, 1, TimeUnit.SECONDS, JobInput.empty().expirationTime(500, TimeUnit.MILLISECONDS));
+    }, 1, TimeUnit.SECONDS, JobInput.empty().setExpirationTime(500, TimeUnit.MILLISECONDS));
 
     try {
       assertNull(future.awaitDone());
@@ -399,7 +399,7 @@ public class JobScheduleTest {
       public void run() throws Exception {
         executed.set(true);
       }
-    }, 1, TimeUnit.SECONDS, JobInput.empty().expirationTime(JobInput.INFINITE_EXPIRATION, TimeUnit.MILLISECONDS));
+    }, 1, TimeUnit.SECONDS, JobInput.empty().setExpirationTime(JobInput.INFINITE_EXPIRATION, TimeUnit.MILLISECONDS));
 
     future.awaitDone();
     assertTrue(executed.get());
@@ -435,7 +435,7 @@ public class JobScheduleTest {
         Thread.sleep(2000);
         return "job-1";
       }
-    }, JobInput.empty().mutex(mutex));
+    }, JobInput.empty().setMutex(mutex));
 
     IFuture<String> future2 = m_jobManager.schedule(new ICallable<String>() {
 
@@ -443,7 +443,7 @@ public class JobScheduleTest {
       public String call() throws Exception {
         return "job-2";
       }
-    }, 500, TimeUnit.MILLISECONDS, JobInput.empty().mutex(mutex));
+    }, 500, TimeUnit.MILLISECONDS, JobInput.empty().setMutex(mutex));
 
     assertEquals("job-2", future2.awaitDone(10, TimeUnit.SECONDS));
     assertEquals("job-1", future1.awaitDone());
@@ -462,7 +462,7 @@ public class JobScheduleTest {
         latch.countDownAndBlock();
         return "job-1";
       }
-    }, JobInput.empty().mutex(mutex));
+    }, JobInput.empty().setMutex(mutex));
 
     IFuture<String> future2 = m_jobManager.schedule(new ICallable<String>() {
 
@@ -470,7 +470,7 @@ public class JobScheduleTest {
       public String call() throws Exception {
         return "job-2";
       }
-    }, JobInput.empty().mutex(mutex));
+    }, JobInput.empty().setMutex(mutex));
 
     try {
       assertEquals("job-2", future2.awaitDone(2, TimeUnit.SECONDS));

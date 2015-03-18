@@ -175,10 +175,16 @@ public class ServerJobInput extends JobInput<ServerContext> {
   }
 
   public static ServerJobInput defaults() {
-    return new ServerJobInput(JobInput.defaults()).setContext(ServerContext.defaults());
+    final ServerJobInput defaults = new ServerJobInput(JobInput.defaults());
+    defaults.setContext(ServerContext.defaults());
+    defaults.setSessionRequired(true);
+    return defaults;
   }
 
   public static ServerJobInput empty() {
-    return new ServerJobInput(JobInput.empty()).setContext(ServerContext.empty());
+    final ServerJobInput empty = new ServerJobInput(JobInput.empty());
+    empty.setContext(ServerContext.empty());
+    empty.setSessionRequired(true);
+    return empty;
   }
 }

@@ -102,7 +102,7 @@ public class ServiceTunnelServletTest {
 
   @Test
   public void testNewSessionCreatedOnLookupHttpSession() throws ProcessingException, ServletException {
-    IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerJobInput.empty().servletRequest(m_requestMock).servletResponse(m_responseMock));
+    IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerJobInput.empty().setServletRequest(m_requestMock).setServletResponse(m_responseMock));
     assertNotNull(session);
   }
 
@@ -114,7 +114,7 @@ public class ServiceTunnelServletTest {
     when(cacheMock.isActive()).thenReturn(true);
 
     when(m_testHttpSession.getAttribute(IServerSession.class.getName())).thenReturn(cacheMock);
-    IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerJobInput.empty().servletRequest(m_requestMock).servletResponse(m_responseMock));
+    IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerJobInput.empty().setServletRequest(m_requestMock).setServletResponse(m_responseMock));
     assertEquals(testSession, session);
   }
 
@@ -197,7 +197,7 @@ public class ServiceTunnelServletTest {
     List<IFuture<?>> futures = new ArrayList<>();
 
     for (IExecutable<?> job : jobs) {
-      futures.add(ServerJobs.schedule(job, ServerJobInput.empty().sessionRequired(false).transactional(false)));
+      futures.add(ServerJobs.schedule(job, ServerJobInput.empty().setSessionRequired(false).setTransactional(false)));
     }
 
     for (IFuture<?> future : futures) {
@@ -221,7 +221,7 @@ public class ServiceTunnelServletTest {
 
     @Override
     public IServerSession call() throws Exception {
-      return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(ServerJobInput.empty().servletRequest(m_request).servletResponse(m_response));
+      return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(ServerJobInput.empty().setServletRequest(m_request).setServletResponse(m_response));
     }
   }
 }

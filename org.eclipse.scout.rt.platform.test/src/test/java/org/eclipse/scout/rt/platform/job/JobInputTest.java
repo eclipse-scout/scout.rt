@@ -54,11 +54,11 @@ public class JobInputTest {
   public void testCopy() {
     JobInput input = JobInput.empty();
     input.getPropertyMap().put("A", "B");
-    input.name("name");
-    input.id("123");
-    input.subject(new Subject());
-    input.locale(Locale.CANADA_FRENCH);
-    input.expirationTime(10, TimeUnit.MINUTES);
+    input.setName("name");
+    input.setId("123");
+    input.setSubject(new Subject());
+    input.setLocale(Locale.CANADA_FRENCH);
+    input.setExpirationTime(10, TimeUnit.MINUTES);
 
     JobInput copy = input.copy();
 
@@ -74,13 +74,13 @@ public class JobInputTest {
   @Test
   public void testDefaultName() {
     assertNull(JobInput.defaults().getName());
-    assertEquals("ABC", JobInput.defaults().name("ABC").getName());
+    assertEquals("ABC", JobInput.defaults().setName("ABC").getName());
   }
 
   @Test
   public void testDefaultId() {
     assertNull(JobInput.defaults().getId());
-    assertEquals("123", JobInput.defaults().id("123").getId());
+    assertEquals("123", JobInput.defaults().setId("123").getId());
   }
 
   @Test
@@ -105,7 +105,7 @@ public class JobInputTest {
         return JobInput.defaults();
       }
     });
-    input.subject(null);
+    input.setSubject(null);
     assertNull(input.getSubject());
   }
 
@@ -133,7 +133,7 @@ public class JobInputTest {
     assertEquals(Locale.CANADA_FRENCH, JobInput.defaults().getLocale());
 
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.KOREAN, JobInput.defaults().locale(Locale.KOREAN).getLocale());
+    assertEquals(Locale.KOREAN, JobInput.defaults().setLocale(Locale.KOREAN).getLocale());
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

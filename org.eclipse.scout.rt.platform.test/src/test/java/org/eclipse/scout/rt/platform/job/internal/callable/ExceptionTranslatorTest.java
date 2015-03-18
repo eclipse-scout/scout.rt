@@ -144,8 +144,8 @@ public class ExceptionTranslatorTest {
 
   @Test
   public void testCallableContextMessage1() throws Exception {
-    m_input.id("7");
-    m_input.name("job");
+    m_input.setId("7");
+    m_input.setName("job");
 
     Callable<?> next = mock(Callable.class);
     doThrow(new RuntimeException()).when(next).call();
@@ -163,8 +163,8 @@ public class ExceptionTranslatorTest {
 
   @Test
   public void testCallableContextMessage2() throws Exception {
-    m_input.id("7");
-    m_input.name("job");
+    m_input.setId("7");
+    m_input.setName("job");
 
     Subject s = new Subject();
     s.getPrincipals().add(new SimplePrincipal("jack"));
@@ -201,8 +201,8 @@ public class ExceptionTranslatorTest {
 
   @Test
   public void testCallableException() throws Exception {
-    m_input.id("7");
-    m_input.name("job");
+    m_input.setId("7");
+    m_input.setName("job");
 
     Callable<?> next = mock(Callable.class);
 

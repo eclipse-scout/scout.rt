@@ -160,7 +160,7 @@ public class ClientContext extends Context {
     final ClientContext defaults = OBJ.get(ClientContext.class);
     defaults.apply(Context.defaults());
     defaults.m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
-    defaults.m_sessionRequired = true;
+    defaults.setSessionRequired(false);
     defaults.setSession(ClientSessionProvider.currentSession());
     return defaults;
   }
@@ -172,7 +172,7 @@ public class ClientContext extends Context {
     final ClientContext empty = OBJ.get(ClientContext.class);
     empty.apply(Context.empty());
     empty.m_userAgent = new PreferredValue<>(null, true);
-    empty.m_sessionRequired = true;
+    empty.setSessionRequired(false);
     empty.setSession(null);
     return empty;
   }

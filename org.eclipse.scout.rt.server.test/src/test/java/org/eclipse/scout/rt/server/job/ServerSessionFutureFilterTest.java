@@ -41,7 +41,7 @@ public class ServerSessionFutureFilterTest {
 
   @Test
   public void test1() {
-    ServerJobInput input = ServerJobInput.empty().sessionRequired(false).session(null);
+    ServerJobInput input = ServerJobInput.empty().setSessionRequired(false).setSession(null);
     when(m_future.getJobInput()).thenReturn(input);
 
     assertTrue(new ServerSessionFutureFilter(null).accept(m_future));
@@ -49,7 +49,7 @@ public class ServerSessionFutureFilterTest {
 
   @Test
   public void test2() {
-    ServerJobInput input = ServerJobInput.empty().sessionRequired(false).session(null);
+    ServerJobInput input = ServerJobInput.empty().setSessionRequired(false).setSession(null);
     when(m_future.getJobInput()).thenReturn(input);
 
     assertFalse(new ServerSessionFutureFilter(m_session1).accept(m_future));
@@ -57,7 +57,7 @@ public class ServerSessionFutureFilterTest {
 
   @Test
   public void test3() {
-    ServerJobInput input = ServerJobInput.empty().session(m_session1);
+    ServerJobInput input = ServerJobInput.empty().setSession(m_session1);
     when(m_future.getJobInput()).thenReturn(input);
 
     assertFalse(new ServerSessionFutureFilter(m_session2).accept(m_future));
@@ -65,7 +65,7 @@ public class ServerSessionFutureFilterTest {
 
   @Test
   public void test4() {
-    ServerJobInput input = ServerJobInput.empty().session(m_session1);
+    ServerJobInput input = ServerJobInput.empty().setSession(m_session1);
     when(m_future.getJobInput()).thenReturn(input);
 
     assertTrue(new ServerSessionFutureFilter(m_session1).accept(m_future));

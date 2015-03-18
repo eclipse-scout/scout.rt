@@ -123,10 +123,16 @@ public class ClientJobInput extends JobInput<ClientContext> {
   }
 
   public static ClientJobInput defaults() {
-    return new ClientJobInput(JobInput.defaults()).setContext(ClientContext.defaults());
+    final ClientJobInput defaults = new ClientJobInput(JobInput.defaults());
+    defaults.setContext(ClientContext.defaults());
+    defaults.setSessionRequired(true);
+    return defaults;
   }
 
   public static ClientJobInput empty() {
-    return new ClientJobInput(JobInput.empty()).setContext(ClientContext.empty());
+    final ClientJobInput empty = new ClientJobInput(JobInput.empty());
+    empty.setContext(ClientContext.empty());
+    empty.setSessionRequired(true);
+    return empty;
   }
 }

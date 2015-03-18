@@ -49,7 +49,7 @@ public class ServiceWithSessionInterceptorTest {
       public void run() throws Exception {
         runInServerJob();
       }
-    }, ServerJobInput.empty().name("test-job").session(serverSession));
+    }, ServerJobInput.empty().setName("test-job").setSession(serverSession));
   }
 
   protected void runInServerJob() {

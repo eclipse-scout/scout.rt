@@ -38,7 +38,7 @@ public class ThreadNameDecoratorTest {
 
     Thread.currentThread().setName("scout-thread-5 (idle)");
 
-    JobInput input = JobInput.empty().id("123").name("job1");
+    JobInput input = JobInput.empty().setId("123").setName("job1");
 
     new ThreadNameDecorator<Void>(next, "scout-client-thread", input.getIdentifier()).call();
     assertEquals("scout-client-thread-5;123:job1", threadName.getValue());

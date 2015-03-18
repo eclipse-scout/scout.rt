@@ -197,7 +197,7 @@ public class JobInput<CONTEXT extends Context> {
    */
   public static JobInput defaults() {
     final JobInput<Context> defaults = new JobInput<>();
-    defaults.m_expirationTime = INFINITE_EXPIRATION;
+    defaults.setExpirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
     defaults.setContext(Context.defaults());
     return defaults;
   }
@@ -207,7 +207,7 @@ public class JobInput<CONTEXT extends Context> {
    */
   public static JobInput empty() {
     final JobInput<Context> empty = new JobInput<>();
-    empty.m_expirationTime = INFINITE_EXPIRATION;
+    empty.setExpirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
     empty.setContext(Context.empty());
     return empty;
   }

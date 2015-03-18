@@ -49,8 +49,8 @@ public class SchedulerTest {
     subject.setReadOnly();
 
     m_input = ServerJobInput.empty();
-    m_input.subject(subject);
-    m_input.session(OBJ.get(ServerSessionProvider.class).provide(m_input.copy()));
+    m_input.setSubject(subject);
+    m_input.setSession(OBJ.get(ServerSessionProvider.class).provide(m_input.copy()));
 
     m_ticker = new Ticker(Calendar.SECOND);
 

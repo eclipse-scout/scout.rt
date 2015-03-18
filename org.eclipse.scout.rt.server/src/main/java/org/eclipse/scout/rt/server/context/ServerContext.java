@@ -219,11 +219,11 @@ public class ServerContext extends Context {
     final ServerContext defaults = OBJ.get(ServerContext.class);
     defaults.apply(Context.defaults());
     defaults.m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
-    defaults.m_servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-    defaults.m_servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
-    defaults.m_transactionId = ITransaction.TX_ZERO_ID;
-    defaults.m_transactional = true;
-    defaults.m_sessionRequired = true;
+    defaults.setServletRequest(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
+    defaults.setServletResponse(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
+    defaults.setTransactionId(ITransaction.TX_ZERO_ID);
+    defaults.setTransactional(true);
+    defaults.setSessionRequired(false);
     defaults.setSession(ServerSessionProvider.currentSession());
     return defaults;
   }
@@ -235,11 +235,11 @@ public class ServerContext extends Context {
     final ServerContext empty = OBJ.get(ServerContext.class);
     empty.apply(Context.empty());
     empty.m_userAgent = new PreferredValue<>(null, true);
-    empty.m_servletRequest = null;
-    empty.m_servletResponse = null;
-    empty.m_transactionId = ITransaction.TX_ZERO_ID;
-    empty.m_transactional = true;
-    empty.m_sessionRequired = true;
+    empty.setServletRequest(null);
+    empty.setServletResponse(null);
+    empty.setTransactionId(ITransaction.TX_ZERO_ID);
+    empty.setTransactional(true);
+    empty.setSessionRequired(false);
     empty.setSession(null);
     return empty;
   }
