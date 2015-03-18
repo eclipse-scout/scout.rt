@@ -218,7 +218,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     if (m_eventBuffer.isEmpty()) {
       return;
     }
-    List<TreeEvent> coalescedEvents = m_eventBuffer.removeEvents();
+    List<TreeEvent> coalescedEvents = m_eventBuffer.consumeAndCoalesceEvents();
     for (TreeEvent event : coalescedEvents) {
       processBufferedEvent(event);
     }

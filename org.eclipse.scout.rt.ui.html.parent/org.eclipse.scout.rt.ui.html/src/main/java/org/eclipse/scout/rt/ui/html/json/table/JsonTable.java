@@ -580,7 +580,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (m_eventBuffer.isEmpty()) {
       return;
     }
-    List<TableEvent> coalescedEvents = m_eventBuffer.removeEvents();
+    List<TableEvent> coalescedEvents = m_eventBuffer.consumeAndCoalesceEvents();
     for (TableEvent event : coalescedEvents) {
       processBufferedEvent(event);
     }
