@@ -1352,19 +1352,18 @@ scout.Table.prototype.resizeColumn = function(column, width) {
 };
 
 scout.Table.prototype._sendColumnResized = function(column) {
-  var data, event;
   if (column.fixedWidth || this.autoResizeColumns) {
     return;
   }
 
-  event = new scout.Event(this.id, 'columnResized', {
+  var event = new scout.Event(this.id, 'columnResized', {
     columnId: column.id,
     width: column.width
   });
 
   // Only send the latest resize event for a column
   event.coalesce = function(previous) {
-    return this.id == previous.id && this.type === previous.type && this.columnId == previous.columnId;
+    return this.id === previous.id && this.type === previous.type && this.columnId === previous.columnId;
   };
 
   // send delayed to avoid a lot of requests while resizing
@@ -1372,8 +1371,7 @@ scout.Table.prototype._sendColumnResized = function(column) {
 };
 
 scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
-  var data,
-    index = newPos,
+  var index = newPos,
     column0 = this.columns[0];
 
   // If column 0 is the gui only checkbox column, don't allow moving a column before this one.
@@ -1388,7 +1386,7 @@ scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
   scout.arrays.remove(this.columns, column);
   scout.arrays.insert(this.columns, column, newPos);
 
-  data = {
+  var data = {
     columnId: column.id,
     index: index
   };

@@ -243,7 +243,6 @@ scout.Session.prototype._coalesceEvents = function(previousEvents, event) {
 };
 
 scout.Session.prototype._sendRequest = function(request) {
-  var coalescedEvents = [];
   if (this.offline) {
     request.events.forEach(function(event) {
       this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);

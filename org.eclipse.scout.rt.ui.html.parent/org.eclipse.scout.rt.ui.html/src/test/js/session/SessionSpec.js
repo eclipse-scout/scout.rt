@@ -97,7 +97,7 @@ describe("Session", function() {
       var session = createSession();
 
       var coalesce = function(previous) {
-        return this.target === previous.target && this.type === previous.type && this.column == previous.column;
+        return this.target === previous.target && this.type === previous.type && this.column === previous.column;
       };
 
       var event0 = new scout.Event(1, 'columnResized', {column: 'a'});
