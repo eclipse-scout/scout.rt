@@ -12,7 +12,7 @@ scout.FormLayout.prototype.layout = function($container) {
   rootGbSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets())
     .subtract(htmlRootGb.getMargins());
-  rootGbSize.height -= this._menuBarHeight($container);
+
   if (this._form.isDialog()) {
     rootGbSize.height -= this._titleHeight($container);
   }
@@ -29,7 +29,6 @@ scout.FormLayout.prototype.preferredLayoutSize = function($container) {
   prefSize = htmlRootGb.getPreferredSize()
     .add(htmlContainer.getInsets())
     .add(htmlRootGb.getMargins());
-  prefSize.height += this._menuBarHeight($container);
   prefSize.height += this._titleHeight($container);
 
   return prefSize;
@@ -37,10 +36,6 @@ scout.FormLayout.prototype.preferredLayoutSize = function($container) {
 
 scout.FormLayout.prototype._htmlRootGroupBox = function($container) {
   return scout.HtmlComponent.get($container.children('.root-group-box'));
-};
-
-scout.FormLayout.prototype._menuBarHeight = function($container) {
-  return scout.graphics.getVisibleSize($container.children('.menubar'), true).height;
 };
 
 scout.FormLayout.prototype._titleHeight = function($container) {

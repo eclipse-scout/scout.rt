@@ -14,6 +14,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     .subtract(htmlContainer.getInsets())
     .subtract(htmlGbBody.getMargins());
   gbBodySize.height -= this._titleHeight($container);
+  gbBodySize.height -= this._menuBarHeight($container);
 
   $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
   htmlGbBody.setSize(gbBodySize);
@@ -37,12 +38,17 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
   }
   prefSize = prefSize.add(htmlContainer.getInsets());
   prefSize.height += this._titleHeight($container);
+  prefSize.height += this._menuBarHeight($container);
 
   return prefSize;
 };
 
 scout.GroupBoxLayout.prototype._titleHeight = function($container) {
   return scout.graphics.getVisibleSize($container.children('.group-box-title'), true).height;
+};
+
+scout.GroupBoxLayout.prototype._menuBarHeight = function($container) {
+  return scout.graphics.getVisibleSize($container.children('.menubar'), true).height;
 };
 
 scout.GroupBoxLayout.prototype._htmlGbBody = function() {

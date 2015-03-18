@@ -10,19 +10,28 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.groupbox;
 
+import java.util.List;
+
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
+import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
+import org.json.JSONObject;
 
 /**
  * This class creates JSON output for an <code>IGroupBox</code>.
  */
-public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFormField> {
+public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFormField> implements IContextMenuOwner {
 
   // from UI
   public static final String EVENT_EXPANDED = "expanded";
@@ -37,6 +46,12 @@ public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFo
   @Override
   public String getObjectType() {
     return "GroupBox";
+  }
+
+  @Override
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
+    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
   }
 
   @Override
@@ -79,6 +94,21 @@ public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFo
         return getModel().isExpanded();
       }
     });
+  }
+
+  @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
+    if (jsonContextMenu != null) {
+      JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
+    }
+    return json;
+  }
+
+  @Override
+  public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
+    addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
   }
 
   @Override

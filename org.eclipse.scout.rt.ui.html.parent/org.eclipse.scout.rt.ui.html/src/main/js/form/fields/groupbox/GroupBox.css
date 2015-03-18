@@ -13,8 +13,12 @@
   padding-right: @bench-margin-x;
 }
 
-.group-box {
-  width: 100%;
+.root-group-box > .main-menubar {
+  border-bottom: 3px solid @desktop-border-color;
+}
+
+.group-box > .menubar {
+  margin-left: @mandatory-indicator-width;
 }
 
 .group-box-title {

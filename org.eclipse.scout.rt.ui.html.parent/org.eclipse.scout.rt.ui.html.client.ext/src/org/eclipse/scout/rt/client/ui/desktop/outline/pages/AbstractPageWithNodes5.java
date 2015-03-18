@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
-import org.eclipse.scout.rt.client.ui.form.IForm5;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.ui.menu.MenuWrapper;
 
 public abstract class AbstractPageWithNodes5 extends AbstractPageWithNodes {
@@ -45,12 +45,12 @@ public abstract class AbstractPageWithNodes5 extends AbstractPageWithNodes {
       return;
     }
     super.ensureDetailFormCreated();
-    if (getDetailForm() instanceof IForm5) {
-      IForm5 form = (IForm5) getDetailForm();
-      List<IMenu> menus = form.getContextMenu().getChildActions();
+    IForm form = getDetailForm();
+    if (form != null) {
+      List<IMenu> menus = form.getRootGroupBox().getContextMenu().getChildActions();
       adaptDetailFormMenus(menus);
-      if (!CollectionUtility.equalsCollection(menus, form.getContextMenu().getChildActions())) {
-        form.getContextMenu().setChildActions(menus);
+      if (!CollectionUtility.equalsCollection(menus, form.getRootGroupBox().getContextMenu().getChildActions())) {
+        form.getRootGroupBox().getContextMenu().setChildActions(menus);
       }
     }
   }

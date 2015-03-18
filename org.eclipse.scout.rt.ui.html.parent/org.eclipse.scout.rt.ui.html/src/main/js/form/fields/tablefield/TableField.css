@@ -17,24 +17,3 @@
   border-radius: 0;
   background-color: transparent;
 }
-
-.table-field .menubar {
-  height:39px;
-  border-bottom:none;
-  margin-left: @table-row-padding-left;
-  margin-right: @table-row-padding-left;
-  padding: 0;
-
-  & > .menu-item {
-    padding-top:0;
-
-    &[data-icon]::before {
-      font-size: 18px;
-      line-height: @logical-grid-height;
-    }
-  }
-
-  & > .menu-separator {
-    height: @logical-grid-height - 10px;
-  }
-}

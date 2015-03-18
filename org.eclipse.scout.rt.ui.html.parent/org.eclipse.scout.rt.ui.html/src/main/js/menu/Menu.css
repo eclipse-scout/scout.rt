@@ -5,8 +5,7 @@
 .menu-icon(@icon) {
   .font-icon;
   display: inline-block;
-  font-size: 22px;
-  line-height: 29px;
+  font-size: 18px;
   content: @icon;
   color: @icon-color;
   vertical-align: -3px;
@@ -30,24 +29,6 @@
 }
 
 /* Styles */
-
-.menubar {
-  position: relative;
-  height: 55px;
-  margin: 0 @menu-margin-x;
-  padding: 6px 0 10px 0;
-
-  & div {
-    position: relative; /* reset a possible different value (e.g. set by .form-field) which might cause 'display: inline-block' to be ignored for the computed style */
-    display: inline-block;
-    vertical-align: middle;
-  }
-
-  & button {
-    min-width: 110px;
-    margin: 6px 0 3px 0;
-  }
-}
 
 .menu-separator {
   width: 1px;
@@ -117,7 +98,7 @@
 }
 
 .menu-textandicon[data-icon]::before {
-  padding-right: 11px;
+  padding-right: 5px;
 }
 
 .popup {

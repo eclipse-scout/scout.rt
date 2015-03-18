@@ -5,19 +5,6 @@
   background-color: @body-background-color;
 }
 
-.form > .menubar, .dialog > .menubar  {
-  border-bottom: 3px solid @desktop-border-color;
-
-  &.bottom {
-    position: absolute;
-    bottom: 0;
-    width: calc(~"100% - " @menu-margin-x*2);
-
-    border-top: 1px solid @desktop-border-color;
-    border-bottom: 0;
-  }
-}
-
 .detach-menu {
   &::before {
     .menu-icon(@icon-detach);
@@ -41,22 +28,22 @@
     .animation-duration(0.15s);
   }
 
-  & .title-box {
+  & > .title-box {
     margin-top: 10px;
     margin-left: 20px;
   }
 
-  & .title {
+  & > .title {
     .font-text-large;
     color: @active-color;
   }
 
-  & .sub-title {
+  & > .sub-title {
     .font-text-normal;
     color: @active-color;
   }
 
-  & .closable {
+  & > .closable {
     position: absolute;
     right: 5px;
     margin: 8px;

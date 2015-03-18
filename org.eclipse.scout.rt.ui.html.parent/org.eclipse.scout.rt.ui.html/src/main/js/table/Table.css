@@ -16,6 +16,15 @@
   &:focus {
     outline: none;
   }
+
+  & > .menubar {
+    border-bottom: none;
+
+    &:not(.main-menubar) {
+      margin-left: @table-row-padding-left;
+      margin-right: @table-row-padding-left;
+    }
+  }
 }
 
 .table-data {
@@ -124,5 +133,7 @@
   top: 2px;
 }
 
-.table .key-box.char { bottom: 2px; }
+.table .key-box.char {
+  bottom: 2px;
+}
 

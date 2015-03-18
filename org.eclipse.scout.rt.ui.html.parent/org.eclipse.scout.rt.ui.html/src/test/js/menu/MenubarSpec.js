@@ -12,7 +12,7 @@ describe("Menubar", function() {
 
     it("prefers menu type for the left location if menu types for multiple locations are specified", function() {
       var menus, menu1;
-      var menubar = new scout.MenuBar(session.$entryPoint, 'top', scout.FormMenuItemsOrder.order);
+      var menubar = new scout.MenuBar(session.$entryPoint, 'top', scout.GroupBoxMenuItemsOrder.order);
 
       menu1 = helper.createMenu(helper.createModel(1));
       menu1.menuTypes = ['Table.EmptySpace', 'Table.SingleSelection'];

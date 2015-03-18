@@ -51,7 +51,12 @@ scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, nod
   if (!this._hasButton(menus, scout.NavigateDownButton)) {
     menus.push(new scout.NavigateDownButton(this, node));
   }
-  formOrTable.staticMenus = menus;
+
+  if (formOrTable instanceof scout.Form) {
+    formOrTable.rootGroupBox.staticMenus = menus;
+  } else {
+    formOrTable.staticMenus = menus;
+  }
 };
 
 scout.Outline.prototype._hasButton = function(menus, buttonClass) {

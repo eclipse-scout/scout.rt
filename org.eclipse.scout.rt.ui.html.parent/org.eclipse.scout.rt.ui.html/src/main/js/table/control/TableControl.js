@@ -23,7 +23,7 @@ scout.TableControl.prototype.remove = function() {
 };
 
 scout.TableControl.prototype._renderContent = function($parent) {
-  this.form.menuBarPosition = 'bottom';
+  this.form.rootGroupBox.menuBarPosition = 'bottom';
   this.form.render($parent);
   this.form.$container.height($parent.height());
   this.form.$container.width($parent.width());

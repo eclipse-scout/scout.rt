@@ -319,7 +319,8 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   this._outlineTab._update(content, title, subTitle);
   this._updateTab(this._outlineTab);
   this._selectTab(this._outlineTab);
-  if (content.objectType === 'Table') {
+  //FIXME CGU create DesktopTable or OutlineTable
+  if (content instanceof scout.Table) {
     if (!scout.keyStrokeManager.isAdapterInstalled(content.keyStrokeAdapter)) {
       if (content.keyStrokeAdapter.objectType !== 'TableKeyStrokeAdapter') {
         content.injectKeyStrokeAdapter(new scout.DesktopTableKeyStrokeAdapter(content), this.$parent);
@@ -333,6 +334,10 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
     // FIXME CGU: maybe include in render?
     content.htmlComp.layout();
     content.htmlComp.validateRoot = true;
+
+    if (content instanceof scout.Table) {
+      content.menuBar.$container.addClass('main-menubar');
+    }
   }
 };
 

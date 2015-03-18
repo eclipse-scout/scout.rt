@@ -2,7 +2,7 @@
 // left2: menus (left aligned)
 // right2: menus (right aligned)
 // right1: buttons (right aligned)
-scout.FormMenuItemsOrder = {
+scout.GroupBoxMenuItemsOrder = {
   order: function(items) {
     var i, item,
       left1Items = [],

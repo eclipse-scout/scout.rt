@@ -1,0 +1,45 @@
+.menubar {
+  position: relative;
+  height: 40px;
+  border-bottom: 1px solid @desktop-border-color;
+
+  & div {
+    position: relative; /* reset a possible different value (e.g. set by .form-field) which might cause 'display: inline-block' to be ignored for the computed style */
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  & button {
+    min-width: 110px;
+    margin: 6px 0 3px 0;
+  }
+
+  &.bottom {
+    border-top: 1px solid @desktop-border-color;
+    border-bottom: 0;
+  }
+
+  & > .menu-item {
+    &[data-icon]::before {
+      font-size: 18px;
+      line-height: @logical-grid-height;
+    }
+  }
+
+  & > .menu-separator {
+    height: @logical-grid-height - 10px;
+  }
+}
+
+.main-menubar {
+  margin-left: @bench-margin-x;
+  margin-right: @bench-margin-x;
+  height: 55px;
+  padding: 6px 0 10px 0;
+
+  & > .menu-item {
+    &[data-icon]::before {
+      font-size: 22px;
+    }
+  }
+}

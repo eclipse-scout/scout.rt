@@ -25,7 +25,8 @@ describe("FormToolButton", function() {
     render: function() {},
     htmlComp: {
       pack: function() {}
-    }
+    },
+    rootGroupBox: {}
   };
 
   function createAction(model) {

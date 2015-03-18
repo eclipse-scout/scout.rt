@@ -1,20 +1,15 @@
 scout.Form = function() {
   scout.Form.parent.call(this);
   this.rootGroupBox;
-  this.menus = [];
-  this.staticMenus = [];
-  this._addAdapterProperties(['rootGroupBox', 'menus']);
+  this._addAdapterProperties(['rootGroupBox']);
   this._locked;
-  this.menuBarPosition = 'top';
   this._$glassPane;
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
 scout.Form.prototype._render = function($parent) {
-  var menuItems = [];
-
   if (this.isDialog()) {
-    this.menuBarPosition = 'bottom';
+    this.rootGroupBox.menuBarPosition = 'bottom';
     // FIXME BSH Try to consolidate management of glasspanes in desktop (but: Session.showFatalMessage())
     this._$glassPane = scout.fields.new$Glasspane().appendTo($parent);
     $parent = this._$glassPane;
@@ -54,12 +49,6 @@ scout.Form.prototype._render = function($parent) {
   this.htmlComp.setLayout(new scout.FormLayout(this));
   this.htmlComp.pixelBasedSizing = false;
   this.rootGroupBox.render(this.$container);
-
-  menuItems = this.staticMenus
-    .concat(this.menus)
-    .concat(this.rootGroupBox.processButtons);
-  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.FormMenuItemsOrder.order);
-  this.menuBar.updateItems(menuItems);
 
   if (this._locked) {
     this.disable();
@@ -110,9 +99,6 @@ scout.Form.prototype.appendTo = function($parent) {
 
 scout.Form.prototype._remove = function() {
   scout.Form.parent.prototype._remove.call(this);
-  if (this.menuBar) {
-    this.menuBar.remove();
-  }
   if (this._$glassPane) {
     this._$glassPane.fadeOutAndRemove();
   }
