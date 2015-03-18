@@ -77,7 +77,8 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   }
 
   private IServerJobFactory createJobFactory() {
-    return SERVICES.getService(IServerJobService.class).createJobFactory(getBackendSession(), getBackendSession().getSubject());
+    IServerJobService service = SERVICES.getService(IServerJobService.class);
+    return service.createJobFactory(getBackendSession(), getBackendSession().getSubject());
   }
 
   protected String createNodeId() {
@@ -154,8 +155,22 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     return getListenerList().getListeners(IClusterNotificationListener.class);
   }
 
+  /**
+   * @deprecated use {@link #getStatusInfo()}
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public ClusterNodeStatusInfo getClusterNodeStatusInfo() {
+    return m_statusInfo;
+  }
+
+  @Override
+  public IClusterNodeStatusInfo getStatusInfo() {
+    return m_statusInfo.getStatus();
+  }
+
+  protected ClusterNodeStatusInfo getStatusInfoInternal() {
     return m_statusInfo;
   }
 
@@ -317,7 +332,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     }
     ClusterSynchronizationTransaction m = (ClusterSynchronizationTransaction) t.getMember(TRANSACTION_MEMBER_ID);
     if (m == null) {
-      m = new ClusterSynchronizationTransaction(TRANSACTION_MEMBER_ID, getMessageService());
+      m = new ClusterSynchronizationTransaction(TRANSACTION_MEMBER_ID, getMessageService(), m_statusInfo);
       t.registerMember(m);
     }
     return m;
@@ -330,11 +345,17 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   protected static class ClusterSynchronizationTransaction extends AbstractTransactionMember {
     private final List<IClusterNotificationMessage> m_messageQueue;
     private final IPublishSubscribeMessageService m_messageService;
+    private final ClusterNodeStatusInfo m_statusInfo;
 
-    public ClusterSynchronizationTransaction(String transactionId, IPublishSubscribeMessageService messageService) throws ProcessingException {
+    public ClusterSynchronizationTransaction(String transactionId, IPublishSubscribeMessageService messageService, ClusterNodeStatusInfo statusInfo) throws ProcessingException {
       super(transactionId);
       m_messageQueue = new LinkedList<IClusterNotificationMessage>();
       m_messageService = messageService;
+      m_statusInfo = statusInfo;
+    }
+
+    protected ClusterNodeStatusInfo getStatusInfoInternal() {
+      return m_statusInfo;
     }
 
     public synchronized void addMessage(IClusterNotificationMessage m) {
@@ -356,6 +377,9 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     @Override
     public synchronized void commitPhase2() {
       m_messageService.publishNotifications(new ArrayList<IClusterNotificationMessage>(m_messageQueue));
+      for (IClusterNotificationMessage m : m_messageQueue) {
+        getStatusInfoInternal().updateSentStatus(m);
+      }
     }
 
     @Override
