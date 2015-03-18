@@ -17,6 +17,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientContext;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -134,5 +135,14 @@ public class ClientJobInput extends JobInput<ClientContext> {
     empty.setContext(ClientContext.empty());
     empty.setSessionRequired(true);
     return empty;
+  }
+
+  @Override
+  public String toString() {
+    final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("id", getId());
+    builder.attr("name", getName());
+    builder.ref("session", getSession());
+    return builder.toString();
   }
 }

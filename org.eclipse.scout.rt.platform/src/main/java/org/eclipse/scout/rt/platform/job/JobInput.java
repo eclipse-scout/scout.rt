@@ -17,6 +17,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.context.Context;
 
 /**
@@ -160,20 +161,8 @@ public class JobInput<CONTEXT extends Context> {
    * @return the job's identifier consisting of the job's 'id' and 'name', or {@link JobInput#N_A} if not set.
    */
   public String getIdentifier() {
-    final int maxLenght = 20;
-
     final String identifier = StringUtility.join(":", m_id, m_name);
-    if (identifier == null) {
-      return JobInput.N_A;
-    }
-    else {
-      if (identifier.length() > maxLenght) {
-        return identifier.substring(0, maxLenght - 3) + "...";
-      }
-      else {
-        return identifier;
-      }
-    }
+    return StringUtility.nvl(identifier, JobInput.N_A);
   }
 
   /**
@@ -210,5 +199,13 @@ public class JobInput<CONTEXT extends Context> {
     empty.setExpirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
     empty.setContext(Context.empty());
     return empty;
+  }
+
+  @Override
+  public String toString() {
+    final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("id", getId());
+    builder.attr("name", getName());
+    return builder.toString();
   }
 }

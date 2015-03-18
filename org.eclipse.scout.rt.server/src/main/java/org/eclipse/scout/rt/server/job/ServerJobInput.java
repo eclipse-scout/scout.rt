@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerContext;
@@ -186,5 +187,14 @@ public class ServerJobInput extends JobInput<ServerContext> {
     empty.setContext(ServerContext.empty());
     empty.setSessionRequired(true);
     return empty;
+  }
+
+  @Override
+  public String toString() {
+    final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("id", getId());
+    builder.attr("name", getName());
+    builder.ref("session", getSession());
+    return builder.toString();
   }
 }

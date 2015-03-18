@@ -91,10 +91,14 @@ public class ToStringBuilder {
   /**
    * Creates the identifier for the given {@link Object} consisting of classname and hashcode.
    */
-  private static String createIdentifier(final Object instance) {
-    final Class<?> clazz = resolveClass(instance);
-
-    return String.format("%s@%s", clazz.getSimpleName(), Integer.toHexString(instance.hashCode()));
+  private static String createIdentifier(final Object object) {
+    if (object == null) {
+      return "null";
+    }
+    else {
+      final Class<?> clazz = resolveClass(object);
+      return String.format("%s@%s", clazz.getSimpleName(), Integer.toHexString(object.hashCode()));
+    }
   }
 
   /**
