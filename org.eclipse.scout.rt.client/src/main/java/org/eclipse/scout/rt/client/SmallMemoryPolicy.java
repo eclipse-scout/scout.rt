@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.ClientSessionFutureFilter;
+import org.eclipse.scout.rt.client.job.CurrentSessionFutureFilter;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -35,8 +35,7 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
   @Override
   public void beforeTablePageLoadData(IPageWithTable<?> page) {
     //make sure inactive outlines have no selection that "keeps" the pages
-    IClientSession session = ClientSessionProvider.currentSession();
-    IDesktop desktop = session.getDesktop();
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     for (IOutline o : desktop.getAvailableOutlines()) {
       if (o != desktop.getOutline()) {
         o.selectNode(null);
@@ -44,8 +43,8 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
     }
     desktop.releaseUnusedPages();
     System.gc();
-    Jobs.getJobManager().cancel(new AndFilter<>(new JobFutureFilter(getClass().getName()), new ClientSessionFutureFilter(session)), true);
-    ClientJobs.schedule(new ForceGCJob(), ClientJobInput.defaults().setSession(session).setName("release memory").setId(getClass().getName()));
+    Jobs.getJobManager().cancel(new AndFilter<>(new JobFutureFilter(getClass().getName()), CurrentSessionFutureFilter.INSTANCE), true);
+    ClientJobs.schedule(new ForceGCJob(), ClientJobInput.defaults().setName("release memory").setId(getClass().getName()));
     if (page.getTable() != null) {
       page.getTable().discardAllRows();
     }

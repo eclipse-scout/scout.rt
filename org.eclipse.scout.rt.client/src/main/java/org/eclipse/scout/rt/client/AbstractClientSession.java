@@ -45,7 +45,7 @@ import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionSt
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.ClientSessionFutureFilter;
+import org.eclipse.scout.rt.client.job.SessionFutureFilter;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
@@ -507,7 +507,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
       }
     };
 
-    Jobs.getJobManager().visit(new ClientSessionFutureFilter(this), visitor);
+    Jobs.getJobManager().visit(new SessionFutureFilter(this), visitor);
 
     return futures;
   }

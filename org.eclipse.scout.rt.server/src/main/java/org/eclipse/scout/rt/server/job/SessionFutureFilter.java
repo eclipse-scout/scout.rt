@@ -8,31 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.job;
+package org.eclipse.scout.rt.server.job;
 
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.server.IServerSession;
 
 /**
- * Filter which accepts Futures only if belonging to the given session.
+ * Filter which accepts Futures only if belonging to the given server session.
  *
  * @since 5.1
  */
-public class ClientSessionFutureFilter implements IFilter<IFuture<?>> {
+public class SessionFutureFilter implements IFilter<IFuture<?>> {
 
-  private final IClientSession m_session;
+  private final IServerSession m_session;
 
-  public ClientSessionFutureFilter(final IClientSession session) {
+  public SessionFutureFilter(final IServerSession session) {
     m_session = session;
   }
 
   @Override
   public boolean accept(final IFuture<?> future) {
     final JobInput jobInput = future.getJobInput();
-    if (jobInput instanceof ClientJobInput) {
-      return (m_session == ((ClientJobInput) jobInput).getSession());
+    if (jobInput instanceof ServerJobInput) {
+      return m_session == ((ServerJobInput) jobInput).getSession();
     }
     else {
       return false;

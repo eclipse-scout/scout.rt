@@ -25,7 +25,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(PlatformTestRunner.class)
-public class ClientSessionFutureFilterTest {
+public class SessionFutureFilterTest {
 
   @Mock
   private IFuture<Object> m_future;
@@ -44,7 +44,7 @@ public class ClientSessionFutureFilterTest {
     ClientJobInput input = ClientJobInput.empty().setSessionRequired(false).setSession(null);
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertTrue(new ClientSessionFutureFilter(null).accept(m_future));
+    assertTrue(new SessionFutureFilter(null).accept(m_future));
   }
 
   @Test
@@ -52,7 +52,7 @@ public class ClientSessionFutureFilterTest {
     ClientJobInput input = ClientJobInput.empty().setSessionRequired(false).setSession(null);
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertFalse(new ClientSessionFutureFilter(m_session1).accept(m_future));
+    assertFalse(new SessionFutureFilter(m_session1).accept(m_future));
   }
 
   @Test
@@ -60,7 +60,7 @@ public class ClientSessionFutureFilterTest {
     ClientJobInput input = ClientJobInput.empty().setSession(m_session1);
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertFalse(new ClientSessionFutureFilter(m_session2).accept(m_future));
+    assertFalse(new SessionFutureFilter(m_session2).accept(m_future));
   }
 
   @Test
@@ -68,7 +68,7 @@ public class ClientSessionFutureFilterTest {
     ClientJobInput input = ClientJobInput.empty().setSession(m_session1);
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertTrue(new ClientSessionFutureFilter(m_session1).accept(m_future));
+    assertTrue(new SessionFutureFilter(m_session1).accept(m_future));
   }
 
   @Test
@@ -76,6 +76,6 @@ public class ClientSessionFutureFilterTest {
     JobInput input = JobInput.empty();
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertFalse(new ClientSessionFutureFilter(m_session1).accept(m_future));
+    assertFalse(new SessionFutureFilter(m_session1).accept(m_future));
   }
 }

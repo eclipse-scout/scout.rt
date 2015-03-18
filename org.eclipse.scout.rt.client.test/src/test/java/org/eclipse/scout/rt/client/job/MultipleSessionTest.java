@@ -181,7 +181,7 @@ public class MultipleSessionTest {
     assertTrue(latch1.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2"), protocol);
 
-    Jobs.getJobManager().cancel(new ClientSessionFutureFilter(m_clientSession1), true); // cancel all jobs of session1
+    Jobs.getJobManager().cancel(new SessionFutureFilter(m_clientSession1), true); // cancel all jobs of session1
 
     assertTrue(interruptedLatch.await());
 
