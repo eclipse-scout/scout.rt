@@ -287,4 +287,14 @@ public class ClusterNodeStatusInfo {
     }
   }
 
+  /**
+   * @deprecated use {@link #updateLastChanged(IClusterNotificationMessage)} Will be removed in the N Release.
+   */
+  @Deprecated
+  public void setLastChangedOriginNodeId(String originNode) {
+    synchronized (m_lock) {
+      m_info.setLastChangedOriginNodeId(originNode);
+    }
+  }
+
 }
