@@ -69,6 +69,11 @@ public interface IFuture<RESULT> {
   boolean isBlocked();
 
   /**
+   * @return <code>true</code> if this is a periodic job, or <code>false</code> if executed only once.
+   */
+  boolean isPeriodic();
+
+  /**
    * Blocks the calling thread until the job gets cancelled or completed to return its execution result. This call
    * returns immediately if the job is not running anymore or was cancelled.
    *

@@ -86,7 +86,7 @@ public class JobManager implements IJobManager {
 
   @Override
   public final <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final JobInput input) {
-    final JobFutureTask<RESULT> futureTask = createJobFutureTask(executable, input);
+    final JobFutureTask<RESULT> futureTask = createJobFutureTask(executable, input, false);
 
     if (!futureTask.isMutexTask() || m_mutexSemaphores.tryAcquireElseOfferTail(futureTask)) {
       m_executor.submit(Job.callable(futureTask.getJob()));
@@ -96,8 +96,8 @@ public class JobManager implements IJobManager {
   }
 
   @Override
-  public <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit, final JobInput input) {
-    final JobFutureTask<RESULT> futureTask = createJobFutureTask(executable, input);
+  public final <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit, final JobInput input) {
+    final JobFutureTask<RESULT> futureTask = createJobFutureTask(executable, input, false);
 
     if (futureTask.isMutexTask()) {
       m_executor.schedule(new Runnable() {
@@ -119,7 +119,7 @@ public class JobManager implements IJobManager {
 
   @Override
   public final IFuture<Void> scheduleAtFixedRate(final IRunnable runnable, final long initialDelay, final long period, final TimeUnit unit, final JobInput input) {
-    final JobFutureTask<Void> futureTask = createJobFutureTask(runnable, input);
+    final JobFutureTask<Void> futureTask = createJobFutureTask(runnable, input, true);
     Assertions.assertFalse(futureTask.isMutexTask(), "Mutual exclusion is not supported for periodic jobs");
 
     m_executor.scheduleAtFixedRate(Job.runnable(futureTask.getJob()), initialDelay, period, unit);
@@ -129,7 +129,7 @@ public class JobManager implements IJobManager {
 
   @Override
   public final IFuture<Void> scheduleWithFixedDelay(final IRunnable runnable, final long initialDelay, final long delay, final TimeUnit unit, final JobInput input) {
-    final JobFutureTask<Void> futureTask = createJobFutureTask(runnable, input);
+    final JobFutureTask<Void> futureTask = createJobFutureTask(runnable, input, true);
     Assertions.assertFalse(futureTask.isMutexTask(), "Mutual exclusion is not supported for periodic jobs");
 
     m_executor.scheduleWithFixedDelay(Job.runnable(futureTask.getJob()), initialDelay, delay, unit);
@@ -183,10 +183,11 @@ public class JobManager implements IJobManager {
    *          executable to be given to the executor for execution.
    * @param input
    *          input that describes the job to be executed.
-   * @return
+   * @param periodic
+   *          <code>true</code> if this is a periodic action, <code>false</code> if executed only once.
    */
   @Internal
-  protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final IExecutable<RESULT> executable, JobInput input) {
+  protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final IExecutable<RESULT> executable, JobInput input, final boolean periodic) {
     validate(input);
 
     // Ensure a job name to be set.
@@ -198,7 +199,7 @@ public class JobManager implements IJobManager {
     final Callable<RESULT> callable = interceptCallable(Executables.callable(executable), input);
 
     // Create the Future to be returned to the caller.
-    final JobFutureTask<RESULT> futureTask = new JobFutureTask<RESULT>(input, m_mutexSemaphores, callable) {
+    final JobFutureTask<RESULT> futureTask = new JobFutureTask<RESULT>(input, periodic, m_mutexSemaphores, callable) {
 
       @Override
       protected void postConstruct() {

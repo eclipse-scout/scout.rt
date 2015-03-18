@@ -51,11 +51,13 @@ public class JobFutureTask<RESULT> extends ScheduledFutureDelegate<RESULT> imple
   protected final Long m_expirationDate;
   private volatile boolean m_blocked;
   private final IProgressMonitor m_progressMonitor;
+  private final boolean m_periodic;
 
   private final MutexSemaphores m_mutexSemaphores;
 
-  public JobFutureTask(final JobInput input, final MutexSemaphores mutexSemaphores, final Callable<RESULT> callable) {
+  public JobFutureTask(final JobInput input, final boolean periodic, final MutexSemaphores mutexSemaphores, final Callable<RESULT> callable) {
     m_input = input;
+    m_periodic = periodic;
     m_mutexSemaphores = mutexSemaphores;
     m_job = new Job<>(this, callable);
     m_progressMonitor = OBJ.get(ProgressMonitorProvider.class).provide(this);
@@ -86,6 +88,11 @@ public class JobFutureTask<RESULT> extends ScheduledFutureDelegate<RESULT> imple
   @Override
   public void setBlocked(final boolean blocked) {
     m_blocked = blocked;
+  }
+
+  @Override
+  public boolean isPeriodic() {
+    return m_periodic;
   }
 
   @Override
@@ -212,8 +219,8 @@ public class JobFutureTask<RESULT> extends ScheduledFutureDelegate<RESULT> imple
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("job", m_input.getIdentifier());
-    builder.attr("input", m_input);
+    builder.attr("job", m_input);
+    builder.attr("periodic", m_periodic);
     builder.attr("blocked", m_blocked);
     builder.attr("expirationDate", m_expirationDate);
     builder.ref("progressMonitor", m_progressMonitor);
