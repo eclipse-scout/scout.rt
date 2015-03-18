@@ -22,5 +22,4 @@ public class OutlineEventBuffer extends TreeEventBuffer {
   protected boolean isIgnorePrevious(int type) {
     return super.isIgnorePrevious(type) || type == OutlineEvent.TYPE_PAGE_CHANGED;
   }
-
 }

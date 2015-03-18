@@ -30,25 +30,27 @@ import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
 
   @Override
-  protected List<TreeEvent> coalesce(List<TreeEvent> list) {
+  protected List<TreeEvent> coalesce(List<TreeEvent> events) {
     //traverse the list in reversed order
     //previous events may be deleted from the list
-    for (int j = 0; j < list.size() - 1; j++) {
-      int i = list.size() - 1 - j;
+    for (int j = 0; j < events.size() - 1; j++) {
+      int i = events.size() - 1 - j;
 
-      final int type = list.get(i).getType();
+      TreeEvent event = events.get(i);
+      int type = event.getType();
 
       //remove all previous events of the same type
       if (isIgnorePrevious(type)) {
-        remove(type, list.subList(0, i));
+        remove(type, events.subList(0, i));
       }
     }
-    return list;
+    return events;
   }
 
   /**
    * @param type
-   * @return true, if previous events of the same type can be ignored. false otherwise
+   *          {@link TreeEvent} type
+   * @return <code>true</code>, if previous events of the same type can be ignored. <code>false</code> otherwise
    */
   protected boolean isIgnorePrevious(int type) {
     switch (type) {
@@ -62,5 +64,4 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       }
     }
   }
-
 }

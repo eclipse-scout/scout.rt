@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,13 +35,24 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 public abstract class AbstractEventBuffer<T extends IModelEvent> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractEventBuffer.class);
 
-  protected List<T> m_buffer = new LinkedList<>();
+  private List<T> m_buffer = new LinkedList<>();
+
+  protected List<T> getBuffer() {
+    return m_buffer;
+  }
 
   /**
-   * @return <code>true</code>, if empty, false otherwise.
+   * @return <code>true</code>, if empty, <code>false</code> otherwise.
    */
   public boolean isEmpty() {
     return m_buffer.isEmpty();
+  }
+
+  /**
+   * The current number of events in the buffer (pre-coalesced).
+   */
+  public int size() {
+    return m_buffer.size();
   }
 
   /**
@@ -75,33 +87,34 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
     return list;
   }
 
-  protected abstract List<? extends T> coalesce(List<T> list);
+  protected abstract List<? extends T> coalesce(List<T> events);
 
   /**
    * Removes all events of the same type from the list.
    *
    * @param type
-   * @param list
+   *          Event type to remove from the list.
+   * @param events
+   *          List to filter. Must not be <code>null</code>.
    */
-  protected void remove(int type, List<T> list) {
-    final ArrayList<Integer> types = new ArrayList<>();
-    types.add(type);
-    remove(types, list);
+  protected void remove(int type, List<T> events) {
+    remove(Collections.singletonList(type), events);
   }
 
   /**
    * Removes all events of the same type from the list.
    *
-   * @param type
-   * @param list
+   * @param types
+   *          List of event types to remove from the list. Must not be <code>null</code>.
+   * @param events
+   *          List to filter. Must not be <code>null</code>.
    */
-  protected void remove(List<Integer> types, List<T> list) {
-    final Iterator<T> iter = list.iterator();
-    while (iter.hasNext()) {
-      if (types.contains(iter.next().getType())) {
-        iter.remove();
+  protected void remove(List<Integer> types, List<T> events) {
+    for (Iterator<T> it = events.iterator(); it.hasNext();) {
+      T event = it.next();
+      if (types.contains(event.getType())) {
+        it.remove();
       }
     }
   }
-
 }
