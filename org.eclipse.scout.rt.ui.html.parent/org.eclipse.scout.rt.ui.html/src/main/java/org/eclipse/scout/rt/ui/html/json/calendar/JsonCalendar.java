@@ -17,27 +17,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.JobExecutionException;
-import org.eclipse.scout.commons.job.filter.FutureFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.IBlockingCondition;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.client.job.ClientSessionFutureFilter;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarAdapter;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarListener;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobExecutionException;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.filter.FutureFilter;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -337,13 +336,13 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   private static void waitForAllOtherJobs() {
     final IClientSession session = ClientSessionProvider.currentSession();
-    final IBlockingCondition waitForClientJobsToComplete = OBJ.get(IModelJobManager.class).createBlockingCondition("Wait for ClientJobs to complete", true);
+    final IBlockingCondition waitForClientJobsToComplete = Jobs.getJobManager().createBlockingCondition("Wait for ClientJobs to complete", true);
     try {
-      OBJ.get(IClientJobManager.class).schedule(new IRunnable() {
+      ClientJobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           try {
-            OBJ.get(IClientJobManager.class).waitUntilDone(new AndFilter<>(new ClientSessionFilter(session), new NotFilter<>(new FutureFilter(IFuture.CURRENT.get()))), 1, TimeUnit.MINUTES);
+            Jobs.getJobManager().awaitDone(new AndFilter<>(new ClientSessionFutureFilter(session), new NotFilter<>(new FutureFilter(IFuture.CURRENT.get()))), 1, TimeUnit.MINUTES);
           }
           finally {
             waitForClientJobsToComplete.setBlocking(false);

@@ -26,22 +26,21 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IJobChangeEvent;
-import org.eclipse.scout.commons.job.IJobChangeEventFilter;
-import org.eclipse.scout.commons.job.IJobChangeListener;
-import org.eclipse.scout.commons.job.IRunnable;
-import org.eclipse.scout.commons.job.internal.JobChangeEvent;
-import org.eclipse.scout.commons.job.internal.JobChangeListeners;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IClientJobManager;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.listener.IJobListener;
+import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.shared.ui.IUiLayer;
@@ -76,8 +75,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private JsonEventProcessor m_jsonEventProcessor;
   private boolean m_disposing;
   private final List<IFuture<?>> m_asyncStartedJobFutures;
-  private IJobChangeListener m_jobChangeListener;
-  private IJobChangeEventFilter m_jobChangeEventFilter;
+  private IJobListener m_jobChangeListener;
 
   // FIXME AWE: (jobs) thread safety, review
   // FIXME AWE: (jobs) make test form for async stuff
@@ -91,14 +89,19 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
     // FIXME DWI/MVI/AWE: (Jobs) das hier auf neue, schöne Job API umstellen.
     m_jobChangeListener = new P_JobChangeAdapter();
-    m_jobChangeEventFilter = new IJobChangeEventFilter() {
+    Jobs.getJobManager().addListener(m_jobChangeListener, new IFilter<JobEvent>() {
+
       @Override
-      public boolean accept(IJobChangeEvent event) {
-        return JobChangeEvent.EVENT_TYPE_SCHEDULED == event.getType() ||
-            JobChangeEvent.EVENT_TYPE_DONE == event.getType();
+      public boolean accept(JobEvent event) {
+        switch (event.getType()) {
+          case SCHEDULED:
+          case DONE:
+            return true;
+          default:
+            return false;
+        }
       }
-    };
-    JobChangeListeners.DEFAULT.add(m_jobChangeListener, m_jobChangeEventFilter);
+    });
   }
 
   protected JsonResponse createJsonResponse() {
@@ -349,7 +352,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       return;
     }
 
-    JobChangeListeners.DEFAULT.remove(m_jobChangeListener, m_jobChangeEventFilter);
+    Jobs.getJobManager().removeListener(m_jobChangeListener);
     m_jsonAdapterRegistry.disposeAllJsonAdapters();
     m_currentJsonResponse = null;
     flush();
@@ -725,28 +728,28 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
-  private class P_JobChangeAdapter implements IJobChangeListener {
+  private class P_JobChangeAdapter implements IJobListener {
 
     @Override
-    public void jobChanged(IJobChangeEvent event) {
-      if (JobChangeEvent.EVENT_TYPE_SCHEDULED == event.getType()) {
-        scheduled(event);
-      }
-      else if (JobChangeEvent.EVENT_TYPE_DONE == event.getType()) {
-        done(event);
-      }
-      else {
-        throw new IllegalArgumentException();
+    public void changed(JobEvent event) {
+      switch (event.getType()) {
+        case SCHEDULED:
+          scheduled(event);
+          break;
+        case DONE:
+          done(event);
+          break;
+        default:
+          throw new IllegalArgumentException();
       }
     }
 
-    private boolean isAsyncJobFromClientSession(IJobChangeEvent event, IClientSession clientSession) {
+    private boolean isAsyncJobFromClientSession(JobEvent event, IClientSession clientSession) {
       IClientSession jobClientSession = ((ClientJobInput) event.getFuture().getJobInput()).getSession(); // == Session from job
-      return jobClientSession == clientSession &&
-          event.getSourceManager() instanceof IClientJobManager;// == ASYNC Jobs
+      return jobClientSession == clientSession && ClientJobs.isClientJob(event.getFuture()); // == ASYNC Jobs
     }
 
-    private void scheduled(IJobChangeEvent event) {
+    private void scheduled(JobEvent event) {
       if (isProcessingClientRequest() && isAsyncJobFromClientSession(event, getClientSession())) {
         int newSize;
         synchronized (m_asyncStartedJobFutures) {
@@ -757,7 +760,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       }
     }
 
-    private void done(IJobChangeEvent event) {
+    private void done(JobEvent event) {
       synchronized (m_asyncStartedJobFutures) {
         IFuture<?> future = event.getFuture();
         if (m_asyncStartedJobFutures.contains(future)) {

@@ -10,13 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.ui.html.ModelJobUtility;
 
 /**
@@ -34,7 +33,7 @@ public class JsonEventProcessor {
 
   public void processEvents(final JsonRequest request, final JsonResponse response) {
     IClientSession clientSession = m_jsonSession.getClientSession();
-    OBJ.get(IModelJobManager.class).schedule(new IRunnable() {
+    ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         ModelJobUtility.runAsSubject(new Runnable() {
@@ -46,7 +45,7 @@ public class JsonEventProcessor {
           }
         });
       }
-    }, ClientJobInput.defaults().session(clientSession).name("processEvents"));
+    }, ModelJobInput.defaults().setSession(clientSession).setName("processEvents"));
     ModelJobUtility.waitUntilJobsHaveFinished(clientSession);
   }
 

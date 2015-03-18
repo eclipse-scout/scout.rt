@@ -6,20 +6,20 @@ import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
-import org.eclipse.scout.commons.job.IExecutable;
-import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.filter.FutureFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.client.job.filter.BlockedJobFilter;
-import org.eclipse.scout.rt.client.job.filter.ClientSessionFilter;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.client.job.ClientSessionFutureFilter;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.filter.BlockedFutureFilter;
+import org.eclipse.scout.rt.platform.job.filter.FutureFilter;
 import org.eclipse.scout.rt.shared.ISession;
 
 public final class ModelJobUtility {
@@ -34,12 +34,11 @@ public final class ModelJobUtility {
    * Wait until all sync jobs have been finished or only waitFor sync jobs are left.
    */
   public static void waitUntilJobsHaveFinished(IClientSession currentClientSession) {
-    final IModelJobManager modelJobManager = OBJ.get(IModelJobManager.class);
-    if (modelJobManager.isModelThread()) {
+    if (ModelJobs.isModelThread()) {
       throw new IllegalStateException("Cannot wait for another sync job, because current job is also sync!");
     }
     try {
-      modelJobManager.waitUntilDone(new AndFilter<>(new ClientSessionFilter(currentClientSession), new NotFilter<>(BlockedJobFilter.INSTANCE)), 1, TimeUnit.HOURS);
+      Jobs.getJobManager().awaitDone(new AndFilter<>(new ClientSessionFutureFilter(currentClientSession), new NotFilter<>(BlockedFutureFilter.INSTANCE)), 1, TimeUnit.HOURS);
     }
     catch (InterruptedException e) {
       LOG.warn("Interrupted while waiting for all jobs to be finished.", e);
@@ -47,14 +46,13 @@ public final class ModelJobUtility {
   }
 
   public static void runInModelThreadAndWait(IClientSession clientSession, IExecutable<?> executable) throws ProcessingException {
-    IModelJobManager modelJobManager = OBJ.get(IModelJobManager.class);
-    if (modelJobManager.isModelThread()) {
-      modelJobManager.runNow(executable, ClientJobInput.defaults().session(clientSession));
+    if (ModelJobs.isModelThread()) {
+      ModelJobs.runNow(executable, ModelJobInput.defaults().setSession(clientSession));
     }
     else {
-      IFuture<?> future = modelJobManager.schedule(executable, ClientJobInput.defaults().session(clientSession));
+      IFuture<?> future = ModelJobs.schedule(executable, ModelJobInput.defaults().setSession(clientSession));
       try {
-        modelJobManager.waitUntilDone(new AndFilter<IFuture<?>>(new FutureFilter(future), new NotFilter<>(BlockedJobFilter.INSTANCE)), 1, TimeUnit.HOURS);
+        Jobs.getJobManager().awaitDone(new AndFilter<IFuture<?>>(new FutureFilter(future), new NotFilter<>(BlockedFutureFilter.INSTANCE)), 1, TimeUnit.HOURS);
       }
       catch (InterruptedException e) {
         LOG.warn("Interrupted while waiting for executable '" + executable.getClass().getName() + "'.", e);
