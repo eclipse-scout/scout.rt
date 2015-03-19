@@ -38,9 +38,8 @@ scout.Form.prototype._render = function($parent) {
     }.bind(this)});
     this._setDialogTitle();
 
-    this.$container.hide();
     setTimeout(function() {
-      this.$container.addClass('shown').show();
+      this.$container.addClass('shown');
       this._$glassPane.installFocusContext('auto');
     }.bind(this));
   }

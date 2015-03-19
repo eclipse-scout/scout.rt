@@ -21,7 +21,7 @@ scout.MessageBox.prototype.render = function($parent) {
   }
 
   this._$glassPane = scout.fields.new$Glasspane().appendTo($parent);
-  this.$container = this._$glassPane.appendDiv('messagebox').hide();
+  this.$container = this._$glassPane.appendDiv('messagebox');
 
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.makeDraggable($handle);
@@ -56,7 +56,7 @@ scout.MessageBox.prototype.render = function($parent) {
   this.previouslyFocusedElement = document.activeElement;
   setTimeout(function() {
     // Class 'shown' is used for css animation
-    this.$container.addClass('shown').show();
+    this.$container.addClass('shown');
     this._$glassPane.installFocusContext('auto');
     // Prevent resizing when message-box is dragged off the viewport
     this.$container.css('min-width', this.$container.width());

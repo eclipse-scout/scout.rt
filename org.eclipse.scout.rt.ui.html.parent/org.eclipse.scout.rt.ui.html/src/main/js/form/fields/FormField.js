@@ -146,6 +146,11 @@ scout.FormField.prototype._renderLabel = function(label) {
   } else if (this.$label) {
     this._removePlaceholder();
     this.$label.html(this.label ? scout.strings.removeAmpersand(this.label) : '');
+
+    // Invalidate layout if label width depends on its content
+    if (this.labelUseUiWidth && this.rendered) {
+      scout.HtmlComponent.get(this.$container).invalidateTree();
+    }
   }
 };
 

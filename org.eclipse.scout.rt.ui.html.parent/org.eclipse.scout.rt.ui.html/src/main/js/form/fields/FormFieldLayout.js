@@ -18,6 +18,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   var containerSize, fieldSize, fieldBounds, htmlField, labelPositionLeft, labelHasFieldWidth,
     htmlContainer = scout.HtmlComponent.get($container),
     formField = this.formField,
+    labelWidth = this.labelWidth,
     left = 0,
     right = 0,
     top = 0;
@@ -26,11 +27,15 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     subtract(htmlContainer.getInsets());
 
   if (formField.$label && formField.labelVisible) {
+    // currently a gui only flag, necessary for sequencebox
+    if (formField.labelUseUiWidth) {
+      labelWidth = scout.graphics.prefSize(formField.$label, true).width;
+    }
     labelPositionLeft = formField.labelPosition === scout.FormField.LABEL_POSITION_DEFAULT ||
       formField.labelPosition === scout.FormField.LABEL_POSITION_LEFT;
     if (labelPositionLeft) {
-      scout.graphics.setBounds(formField.$label, 0, 0, this.labelWidth, this.rowHeight);
-      left += formField.$label.outerWidth(true);
+      scout.graphics.setBounds(formField.$label, 0, 0, labelWidth, this.rowHeight);
+      left += labelWidth;
     } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
       top += formField.$label.outerHeight(true);
       labelHasFieldWidth = true;
@@ -87,13 +92,17 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     width = 0,
     htmlContainer = scout.HtmlComponent.get($container),
     height = scout.HtmlEnvironment.formRowHeight,
+    labelWidth = this.labelWidth,
     formField = this.formField;
 
   if (formField.$label && formField.labelVisible) {
+    if (formField.labelUseUiWidth) {
+      labelWidth = scout.graphics.prefSize(formField.$label, true).width;
+    }
     labelPositionLeft = formField.labelPosition === scout.FormField.LABEL_POSITION_DEFAULT ||
       formField.labelPosition === scout.FormField.LABEL_POSITION_LEFT;
     if (labelPositionLeft) {
-      width += this.labelWidth;
+      width += labelWidth;
     } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
       height += formField.$label.outerHeight(true);
     }

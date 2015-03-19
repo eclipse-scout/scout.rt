@@ -30,6 +30,30 @@ scout.graphics = {
     return dimension;
   },
 
+  /**
+   * Returns the preferred size of $elem.
+   * Precondition: $elem and it's parents must not be hidden (display: none. Visibility: hidden would be ok
+   * because in this case the browser reserves the space the element would be using).
+   */
+  prefSize: function($elem, includeMargins) {
+    var prefSize,
+      props = $elem.css(['width', 'height', 'white-space']);
+
+    // modify properties which prevent reading the preferred size
+    $elem.css({
+      'width': 'auto',
+      'height': 'auto',
+      'white-space': 'no-wrap'
+    });
+    
+    // measure
+    prefSize = scout.graphics.getSize($elem, includeMargins);
+
+    // reset the modified properties
+    $elem.css(props);
+    return prefSize;
+  },
+
   /* These functions are designed to be used with box-sizing:box-model. The only reliable
    * way to set the size of a component when working with box model is to use css('width/height'...)
    * in favor of width/height() functions.
@@ -348,5 +372,5 @@ scout.HtmlEnvironment = {
   formColumnGap: 40,
   fieldLabelWidth: 140,
   fieldMandatoryIndicatorWidth: 6,
-  fieldStatusWidth: 30
+  fieldStatusWidth: 20
 };

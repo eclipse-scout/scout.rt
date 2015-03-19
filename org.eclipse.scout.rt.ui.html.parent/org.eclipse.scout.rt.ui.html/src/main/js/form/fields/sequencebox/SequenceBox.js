@@ -14,6 +14,7 @@ scout.SequenceBox.prototype._render = function($parent) {
   htmlComp.setLayout(new scout.LogicalGridLayout(8, 0));
   for (i = 0; i < this.fields.length; i++) {
     field = this.fields[i];
+    field.labelUseUiWidth = true;
     field.render(this.$field);
     this._modifyLabel(field);
   }
