@@ -88,13 +88,13 @@ public class ServiceTunnelServlet extends HttpServletEx {
     try {
       // Create the job-input on behalf of which the server-job is run.
       ServerJobInput input = ServerJobInput.empty();
-      input.setName("AdminServiceCall");
-      input.setSubject(subject);
-      input.setServletRequest(req);
-      input.setServletResponse(res);
-      input.setLocale(Locale.getDefault());
-      input.setUserAgent(UserAgent.createDefault());
-      input.setSession(lookupServerSessionOnHttpSession(input.copy()));
+      input.name("AdminServiceCall");
+      input.subject(subject);
+      input.servletRequest(req);
+      input.servletResponse(res);
+      input.locale(Locale.getDefault());
+      input.userAgent(UserAgent.createDefault());
+      input.session(lookupServerSessionOnHttpSession(input.copy()));
 
       input = interceptServerJobInput(input);
 
@@ -122,14 +122,14 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
       // Create the job-input on behalf of which the server-job is run.
       ServerJobInput input = ServerJobInput.empty();
-      input.setName("RemoteServiceCall");
-      input.setId(String.valueOf(serviceRequest.getRequestSequence())); // to cancel server jobs and associated transactions.
-      input.setSubject(subject);
-      input.setServletRequest(req);
-      input.setServletResponse(res);
-      input.setLocale(serviceRequest.getLocale());
-      input.setUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
-      input.setSession(lookupServerSessionOnHttpSession(input.copy()));
+      input.name("RemoteServiceCall");
+      input.id(String.valueOf(serviceRequest.getRequestSequence())); // to cancel server jobs and associated transactions.
+      input.subject(subject);
+      input.servletRequest(req);
+      input.servletResponse(res);
+      input.locale(serviceRequest.getLocale());
+      input.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
+      input.session(lookupServerSessionOnHttpSession(input.copy()));
 
       input = interceptServerJobInput(input);
 

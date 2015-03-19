@@ -42,7 +42,7 @@ public class ServerJobFutureFilterTest {
   public void before() {
     MockitoAnnotations.initMocks(this);
 
-    ServerJobInput serverJobInput = ServerJobInput.empty().setSession(m_serverSession1);
+    ServerJobInput serverJobInput = ServerJobInput.empty().session(m_serverSession1);
     when(m_serverJobFuture.getJobInput()).thenReturn(serverJobInput);
 
     JobInput jobInput = JobInput.empty();

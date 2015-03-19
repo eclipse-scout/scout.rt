@@ -265,7 +265,7 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
       public void run() throws Exception {
         clearSelection();
       }
-    }, ModelJobInput.defaults().setSession(clientSession).setName("Clearing selection"));
+    }, ModelJobInput.defaults().session(clientSession).name("Clearing selection"));
   }
 
   protected void clearSelection() {

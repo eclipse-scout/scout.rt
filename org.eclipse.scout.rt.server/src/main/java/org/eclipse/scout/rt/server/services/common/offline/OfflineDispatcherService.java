@@ -44,12 +44,12 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     try {
       // Create the job-input on behalf of which the server-job is run.
       ServerJobInput input = ServerJobInput.empty();
-      input.setName("OfflineServiceCall");
-      input.setId(String.valueOf(request.getRequestSequence())); // to cancel server jobs and associated transactions.
-      input.setSubject(Subject.getSubject(AccessController.getContext()));
-      input.setLocale(request.getLocale());
-      input.setUserAgent(UserAgent.createByIdentifier(request.getUserAgent()));
-      input.setSession(provideServerSession(input.copy()));
+      input.name("OfflineServiceCall");
+      input.id(String.valueOf(request.getRequestSequence())); // to cancel server jobs and associated transactions.
+      input.subject(Subject.getSubject(AccessController.getContext()));
+      input.locale(request.getLocale());
+      input.userAgent(UserAgent.createByIdentifier(request.getUserAgent()));
+      input.session(provideServerSession(input.copy()));
 
       input = interceptServerJobInput(input);
 

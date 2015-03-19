@@ -48,13 +48,13 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
     try {
       // Create the job-input on behalf of which the server-job is run.
       ServerJobInput input = ServerJobInput.empty();
-      input.setName("DiagnosticServiceCall");
-      input.setSubject(subject);
-      input.setServletRequest(req);
-      input.setServletResponse(res);
-      input.setLocale(Locale.getDefault());
-      input.setUserAgent(UserAgent.createDefault());
-      input.setSession(lookupServerSessionOnHttpSession(input.copy()));
+      input.name("DiagnosticServiceCall");
+      input.subject(subject);
+      input.servletRequest(req);
+      input.servletResponse(res);
+      input.locale(Locale.getDefault());
+      input.userAgent(UserAgent.createDefault());
+      input.session(lookupServerSessionOnHttpSession(input.copy()));
 
       input = interceptServerJobInput(input);
 

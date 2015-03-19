@@ -168,6 +168,6 @@ public class ColumnSplitStrategy implements IMultiSplitStrategy {
         m_prefs.setDesktopColumnSplits(m_definedLocation);
       }
     };
-    m_storageJob = ClientJobs.schedule(t, 400, TimeUnit.MILLISECONDS, ClientJobInput.defaults().setSession(m_prefs.getSession()));
+    m_storageJob = ClientJobs.schedule(t, 400, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(m_prefs.getSession()));
   }
 }

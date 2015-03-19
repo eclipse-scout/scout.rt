@@ -29,7 +29,7 @@ public class Scheduler extends AbstractScheduler implements IScheduler {
   private ServerJobInput m_jobInput;
 
   public Scheduler() throws ProcessingException {
-    this(new Ticker(Calendar.MINUTE), ServerJobInput.defaults().setSessionRequired(false).setTransactional(false));
+    this(new Ticker(Calendar.MINUTE), ServerJobInput.defaults().sessionRequired(false).transactional(false));
   }
 
   @Deprecated
@@ -41,7 +41,7 @@ public class Scheduler extends AbstractScheduler implements IScheduler {
   @Deprecated
   // TODO [dwi] [session]: remove me until session class is registered in platform.
   public Scheduler(Subject subject, Class<? extends IServerSession> serverSessionType, Ticker ticker) throws ProcessingException {
-    this(ticker, ServerJobInput.empty().setSubject(subject).setSession(loadServerSession(serverSessionType, subject)));
+    this(ticker, ServerJobInput.empty().subject(subject).session(loadServerSession(serverSessionType, subject)));
   }
 
   public Scheduler(Ticker ticker, ServerJobInput jobInput) throws ProcessingException {
@@ -57,7 +57,7 @@ public class Scheduler extends AbstractScheduler implements IScheduler {
       public void run() throws Exception {
         job.run(Scheduler.this, signal);
       }
-    }, m_jobInput.copy().setName(getJobName(job)));
+    }, m_jobInput.copy().name(getJobName(job)));
   }
 
   /**
@@ -91,7 +91,7 @@ public class Scheduler extends AbstractScheduler implements IScheduler {
   private static IServerSession loadServerSessionInternal(Class<? extends IServerSession> serverSessionType, Subject subject) throws ProcessingException {
     IBean<?> newServerSessionBean = Platform.get().getBeanContext().registerClass(serverSessionType);
     try {
-      return OBJ.get(ServerSessionProviderWithCache.class).provide(ServerJobInput.empty().setSubject(subject));
+      return OBJ.get(ServerSessionProviderWithCache.class).provide(ServerJobInput.empty().subject(subject));
     }
     finally {
       Platform.get().getBeanContext().unregisterBean(newServerSessionBean);

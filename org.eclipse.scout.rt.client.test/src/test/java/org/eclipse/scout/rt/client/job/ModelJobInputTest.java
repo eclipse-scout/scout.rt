@@ -55,11 +55,11 @@ public class ModelJobInputTest {
     IClientSession session1 = mock(IClientSession.class);
     IClientSession session2 = mock(IClientSession.class);
     ISession.CURRENT.set(session1);
-    assertSame(session2, ModelJobInput.defaults().setSession(session2).getMutex());
+    assertSame(session2, ModelJobInput.defaults().session(session2).getMutex());
   }
 
   @Test(expected = UnsupportedOperationException.class)
   public void testMutex4() {
-    ModelJobInput.defaults().setMutex(new Object());
+    ModelJobInput.defaults().mutex(new Object());
   }
 }

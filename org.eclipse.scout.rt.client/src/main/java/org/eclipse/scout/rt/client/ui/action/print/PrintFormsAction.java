@@ -242,7 +242,7 @@ public class PrintFormsAction extends AbstractAction {
             }
           });
         }
-      }, ModelJobInput.defaults().setName("print " + f.getClass().getSimpleName()));
+      }, ModelJobInput.defaults().name("print " + f.getClass().getSimpleName()));
     }
   }
 

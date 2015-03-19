@@ -527,7 +527,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       return null;
     }
     try {
-      return service.schedule(runnable, service.defaults().setName(name));
+      return service.schedule(runnable, service.defaults().name(name));
     }
     catch (JobExecutionException e) {
       LOG.error("Unable to schedule lookup call job.", e);

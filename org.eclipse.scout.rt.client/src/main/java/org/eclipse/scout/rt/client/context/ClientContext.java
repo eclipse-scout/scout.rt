@@ -94,7 +94,7 @@ public class ClientContext extends Context {
   /**
    * Set the session and its Locale and UserAgent as derived values.
    */
-  public ClientContext setSession(final IClientSession session) {
+  public ClientContext session(final IClientSession session) {
     m_session = session;
     if (session != null) {
       m_locale.set(session.getLocale(), false);
@@ -110,7 +110,7 @@ public class ClientContext extends Context {
   /**
    * Set to <code>false</code> if the context does not require a session. By default, a session is required.
    */
-  public ClientContext setSessionRequired(final boolean sessionRequired) {
+  public ClientContext sessionRequired(final boolean sessionRequired) {
     m_sessionRequired = sessionRequired;
     return this;
   }
@@ -119,19 +119,19 @@ public class ClientContext extends Context {
     return m_userAgent.get();
   }
 
-  public ClientContext setUserAgent(final UserAgent userAgent) {
+  public ClientContext userAgent(final UserAgent userAgent) {
     m_userAgent.set(userAgent, true);
     return this;
   }
 
   @Override
-  public ClientContext setSubject(final Subject subject) {
-    return (ClientContext) super.setSubject(subject);
+  public ClientContext subject(final Subject subject) {
+    return (ClientContext) super.subject(subject);
   }
 
   @Override
-  public ClientContext setLocale(final Locale locale) {
-    return (ClientContext) super.setLocale(locale);
+  public ClientContext locale(final Locale locale) {
+    return (ClientContext) super.locale(locale);
   }
 
   // === construction methods ===
@@ -160,8 +160,8 @@ public class ClientContext extends Context {
     final ClientContext defaults = OBJ.get(ClientContext.class);
     defaults.apply(Context.defaults());
     defaults.m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
-    defaults.setSessionRequired(false);
-    defaults.setSession(ClientSessionProvider.currentSession());
+    defaults.sessionRequired(false);
+    defaults.session(ClientSessionProvider.currentSession());
     return defaults;
   }
 
@@ -172,8 +172,8 @@ public class ClientContext extends Context {
     final ClientContext empty = OBJ.get(ClientContext.class);
     empty.apply(Context.empty());
     empty.m_userAgent = new PreferredValue<>(null, true);
-    empty.setSessionRequired(false);
-    empty.setSession(null);
+    empty.sessionRequired(false);
+    empty.session(null);
     return empty;
   }
 

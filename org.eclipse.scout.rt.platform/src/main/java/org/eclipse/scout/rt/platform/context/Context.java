@@ -127,7 +127,7 @@ public class Context {
   /**
    * Sets the Subject to invoke the Callable under a particular user.
    */
-  public Context setSubject(final Subject subject) {
+  public Context subject(final Subject subject) {
     m_subject = subject;
     return this;
   }
@@ -139,7 +139,7 @@ public class Context {
   /**
    * Sets the Locale to be set for the time of execution.
    */
-  public Context setLocale(final Locale locale) {
+  public Context locale(final Locale locale) {
     m_locale.set(locale, true);
     return this;
   }

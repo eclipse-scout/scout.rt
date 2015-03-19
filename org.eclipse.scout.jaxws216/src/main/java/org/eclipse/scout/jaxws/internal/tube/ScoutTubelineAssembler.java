@@ -139,7 +139,7 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
           final MessageContext messageContext = Assertions.assertNotNull((MessageContext) args[0], "message context must not be null");
           final IServerSession serverSession = Assertions.assertNotNull(JaxWsHelper.getContextSession(messageContext), "Missig server-session on message context [messageContext=%s]", messageContext);
 
-          return ScoutTubelineAssembler.this.invokeInServerJob(ServerJobInput.defaults().setName("JAX-WS TX-Handler").setSession(serverSession), handler, method, args);
+          return ScoutTubelineAssembler.this.invokeInServerJob(ServerJobInput.defaults().name("JAX-WS TX-Handler").session(serverSession), handler, method, args);
         }
         else {
           return method.invoke(handler, args);

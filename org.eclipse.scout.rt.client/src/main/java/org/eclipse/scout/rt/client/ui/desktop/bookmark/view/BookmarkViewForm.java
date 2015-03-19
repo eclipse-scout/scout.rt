@@ -329,7 +329,7 @@ public class BookmarkViewForm extends AbstractForm {
             public void run() throws Exception {
               SERVICES.getService(IBookmarkService.class).loadBookmarks();
             }
-          }, ModelJobInput.defaults().setSession(clientSession).setName("Bookmarks changed"));
+          }, ModelJobInput.defaults().session(clientSession).name("Bookmarks changed"));
         }
       }
     };

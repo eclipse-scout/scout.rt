@@ -74,7 +74,7 @@ public class FormWaitForTest {
 
         LOG.debug("ClientSyncWaitForTest.testStartAndWaitImpl(...).new ClientSyncJob() {...}.runVoid() finished");
       }
-    }, ModelJobInput.defaults().setName("Close"));
+    }, ModelJobInput.defaults().name("Close"));
 
     LOG.debug("ClientSessionProvider.currentSession()");
     LOG.debug("ClientSessionProvider.currentSession().getDesktop()");

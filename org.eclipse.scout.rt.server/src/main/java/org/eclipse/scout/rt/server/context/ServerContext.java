@@ -117,7 +117,7 @@ public class ServerContext extends Context {
   /**
    * Sets the session. There are no other values derived from the given session.
    */
-  public ServerContext setSession(final IServerSession session) {
+  public ServerContext session(final IServerSession session) {
     m_session = session;
     return this;
   }
@@ -129,7 +129,7 @@ public class ServerContext extends Context {
   /**
    * Set to <code>false</code> if the context does not require a session. By default, a session is required.
    */
-  public ServerContext setSessionRequired(final boolean sessionRequired) {
+  public ServerContext sessionRequired(final boolean sessionRequired) {
     m_sessionRequired = sessionRequired;
     return this;
   }
@@ -138,7 +138,7 @@ public class ServerContext extends Context {
     return m_servletRequest;
   }
 
-  public ServerContext setServletRequest(final HttpServletRequest servletRequest) {
+  public ServerContext servletRequest(final HttpServletRequest servletRequest) {
     m_servletRequest = servletRequest;
     return this;
   }
@@ -147,7 +147,7 @@ public class ServerContext extends Context {
     return m_servletResponse;
   }
 
-  public ServerContext setServletResponse(final HttpServletResponse servletResponse) {
+  public ServerContext servletResponse(final HttpServletResponse servletResponse) {
     m_servletResponse = servletResponse;
     return this;
   }
@@ -156,7 +156,7 @@ public class ServerContext extends Context {
     return m_userAgent.get();
   }
 
-  public ServerContext setUserAgent(final UserAgent userAgent) {
+  public ServerContext userAgent(final UserAgent userAgent) {
     m_userAgent.set(userAgent, true);
     return this;
   }
@@ -165,7 +165,7 @@ public class ServerContext extends Context {
     return m_transactionId;
   }
 
-  public ServerContext setTransactionId(final long transactionId) {
+  public ServerContext transactionId(final long transactionId) {
     m_transactionId = transactionId;
     return this;
   }
@@ -174,19 +174,19 @@ public class ServerContext extends Context {
     return m_transactional;
   }
 
-  public ServerContext setTransactional(final boolean transactional) {
+  public ServerContext transactional(final boolean transactional) {
     m_transactional = transactional;
     return this;
   }
 
   @Override
-  public ServerContext setSubject(final Subject subject) {
-    return (ServerContext) super.setSubject(subject);
+  public ServerContext subject(final Subject subject) {
+    return (ServerContext) super.subject(subject);
   }
 
   @Override
-  public ServerContext setLocale(final Locale locale) {
-    return (ServerContext) super.setLocale(locale);
+  public ServerContext locale(final Locale locale) {
+    return (ServerContext) super.locale(locale);
   }
 
   // === construction methods ===
@@ -219,12 +219,12 @@ public class ServerContext extends Context {
     final ServerContext defaults = OBJ.get(ServerContext.class);
     defaults.apply(Context.defaults());
     defaults.m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
-    defaults.setServletRequest(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
-    defaults.setServletResponse(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
-    defaults.setTransactionId(ITransaction.TX_ZERO_ID);
-    defaults.setTransactional(true);
-    defaults.setSessionRequired(false);
-    defaults.setSession(ServerSessionProvider.currentSession());
+    defaults.servletRequest(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
+    defaults.servletResponse(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
+    defaults.transactionId(ITransaction.TX_ZERO_ID);
+    defaults.transactional(true);
+    defaults.sessionRequired(false);
+    defaults.session(ServerSessionProvider.currentSession());
     return defaults;
   }
 
@@ -235,12 +235,12 @@ public class ServerContext extends Context {
     final ServerContext empty = OBJ.get(ServerContext.class);
     empty.apply(Context.empty());
     empty.m_userAgent = new PreferredValue<>(null, true);
-    empty.setServletRequest(null);
-    empty.setServletResponse(null);
-    empty.setTransactionId(ITransaction.TX_ZERO_ID);
-    empty.setTransactional(true);
-    empty.setSessionRequired(false);
-    empty.setSession(null);
+    empty.servletRequest(null);
+    empty.servletResponse(null);
+    empty.transactionId(ITransaction.TX_ZERO_ID);
+    empty.transactional(true);
+    empty.sessionRequired(false);
+    empty.session(null);
     return empty;
   }
 

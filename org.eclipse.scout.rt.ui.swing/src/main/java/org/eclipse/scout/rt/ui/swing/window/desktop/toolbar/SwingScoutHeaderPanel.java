@@ -231,7 +231,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
           handleNavigationChangedFromScout();
         }
       }
-    }, ModelJobInput.defaults().setSession(getSwingEnvironment().getScoutSession()));
+    }, ModelJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
   }
 
   @Override
@@ -249,7 +249,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
           m_scoutNavListener = null;
         }
       }
-    }, ModelJobInput.defaults().setSession(getSwingEnvironment().getScoutSession()));
+    }, ModelJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
   }
 
   @Override

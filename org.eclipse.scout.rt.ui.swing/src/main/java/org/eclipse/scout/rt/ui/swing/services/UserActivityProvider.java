@@ -61,7 +61,7 @@ public class UserActivityProvider extends AbstractPropertyObserver implements IU
       setActiveInternal(true);
     }
     if (m_userInactiveJob == null) {
-      m_userInactiveJob = ClientJobs.schedule(new UserInactiveRunnable(), m_idleTrigger + 1000L, TimeUnit.MILLISECONDS, ClientJobInput.defaults().setSessionRequired(false));
+      m_userInactiveJob = ClientJobs.schedule(new UserInactiveRunnable(), m_idleTrigger + 1000L, TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
     }
     m_postponed = System.currentTimeMillis() + m_idleTrigger;
   }
@@ -74,7 +74,7 @@ public class UserActivityProvider extends AbstractPropertyObserver implements IU
         m_userInactiveJob = null;
       }
       else {
-        m_userInactiveJob = ClientJobs.schedule(new UserInactiveRunnable(), delta, TimeUnit.MILLISECONDS, ClientJobInput.defaults().setSessionRequired(false));
+        m_userInactiveJob = ClientJobs.schedule(new UserInactiveRunnable(), delta, TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
       }
     }
   }

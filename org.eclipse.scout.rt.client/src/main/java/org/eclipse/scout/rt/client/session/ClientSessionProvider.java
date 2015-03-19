@@ -54,7 +54,7 @@ public class ClientSessionProvider {
           public void run() throws Exception {
             clientSession.startSession();
           }
-        }, input.copy().setName("client-session-initialization").setSession(clientSession)).awaitDoneAndGet();
+        }, input.copy().name("client-session-initialization").session(clientSession)).awaitDoneAndGet();
 
         return clientSession;
       }

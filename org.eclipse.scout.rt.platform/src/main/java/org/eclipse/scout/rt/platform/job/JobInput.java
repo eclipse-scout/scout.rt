@@ -66,7 +66,7 @@ public class JobInput<CONTEXT extends Context> {
    * Sets the <code>id</code> of a job; must not be set; must not be unique; is primarily used for logging purpose, to
    * decorate the worker thread's name and to identify the job's Future.
    */
-  public JobInput setId(final String id) {
+  public JobInput id(final String id) {
     m_id = id;
     return this;
   }
@@ -78,7 +78,7 @@ public class JobInput<CONTEXT extends Context> {
   /**
    * Sets the name of a job; is used to decorate the worker thread's name and for logging purpose; must not be set.
    */
-  public JobInput setName(final String name) {
+  public JobInput name(final String name) {
     m_name = name;
     return this;
   }
@@ -91,7 +91,7 @@ public class JobInput<CONTEXT extends Context> {
    * Sets the mutex object (mutual exclusion) for the job. This is used to run the job in sequence among other jobs with
    * the same mutex object, so that no two such jobs are run in parallel at the same time.
    */
-  public JobInput setMutex(final Object mutexObject) {
+  public JobInput mutex(final Object mutexObject) {
     m_mutexObject = mutexObject;
     return this;
   }
@@ -111,7 +111,7 @@ public class JobInput<CONTEXT extends Context> {
    *          the time unit of the <code>time</code> argument.
    * @return this in order to support for method chaining
    */
-  public JobInput setExpirationTime(final long time, final TimeUnit timeUnit) {
+  public JobInput expirationTime(final long time, final TimeUnit timeUnit) {
     m_expirationTime = timeUnit.toMillis(time);
     return this;
   }
@@ -123,7 +123,7 @@ public class JobInput<CONTEXT extends Context> {
   /**
    * Sets the {@link Context} to be set for the time of execution.
    */
-  public JobInput setContext(final CONTEXT context) {
+  public JobInput context(final CONTEXT context) {
     m_context = Assertions.assertNotNull(context, "Context must not be null");
     return this;
   }
@@ -135,8 +135,8 @@ public class JobInput<CONTEXT extends Context> {
   /**
    * Sets the Subject to execute the job under a particular user.
    */
-  public JobInput setSubject(final Subject subject) {
-    m_context.setSubject(subject);
+  public JobInput subject(final Subject subject) {
+    m_context.subject(subject);
     return this;
   }
 
@@ -147,8 +147,8 @@ public class JobInput<CONTEXT extends Context> {
   /**
    * Sets the Locale to be set for the time of execution.
    */
-  public JobInput setLocale(final Locale locale) {
-    m_context.setLocale(locale);
+  public JobInput locale(final Locale locale) {
+    m_context.locale(locale);
     return this;
   }
 
@@ -177,7 +177,7 @@ public class JobInput<CONTEXT extends Context> {
    * Creates a shallow copy of the job-input represented by <code>this</code> context.
    */
   public JobInput copy() {
-    return new JobInput<>(this).setContext(getContext().copy());
+    return new JobInput<>(this).context(getContext().copy());
   }
 
   /**
@@ -185,8 +185,8 @@ public class JobInput<CONTEXT extends Context> {
    */
   public static JobInput defaults() {
     final JobInput<Context> defaults = new JobInput<>();
-    defaults.setExpirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
-    defaults.setContext(Context.defaults());
+    defaults.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
+    defaults.context(Context.defaults());
     return defaults;
   }
 
@@ -195,8 +195,8 @@ public class JobInput<CONTEXT extends Context> {
    */
   public static JobInput empty() {
     final JobInput<Context> empty = new JobInput<>();
-    empty.setExpirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
-    empty.setContext(Context.empty());
+    empty.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
+    empty.context(Context.empty());
     return empty;
   }
 

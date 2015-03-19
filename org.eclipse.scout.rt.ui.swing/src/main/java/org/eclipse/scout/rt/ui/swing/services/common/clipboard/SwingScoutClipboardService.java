@@ -64,7 +64,7 @@ public class SwingScoutClipboardService extends AbstractService implements IClip
               public void run() throws Exception {
                 clipboardConsumer.consume(transferObjects);
               }
-            }, ModelJobInput.defaults().setSession(clientSession));
+            }, ModelJobInput.defaults().session(clientSession));
           }
           catch (Throwable t) {
             LOG.debug("Cannot get system clipboard's contents", t);

@@ -70,7 +70,7 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
         bc1.waitFor();
       }
-    }, JobInput.empty().setId("session1").setName("mutex1_job1").setMutex(m_mutexObject1));
+    }, JobInput.empty().id("session1").name("mutex1_job1").mutex(m_mutexObject1));
 
     // SESSION 1 (JOB-2)
     m_jobManager.schedule(new IRunnable() {
@@ -80,7 +80,7 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
         latch.countDownAndBlock();
       }
-    }, JobInput.empty().setId("session1").setName("mutex1_job2").setMutex(m_mutexObject1));
+    }, JobInput.empty().id("session1").name("mutex1_job2").mutex(m_mutexObject1));
 
     // SESSION 1 (JOB-3)
     m_jobManager.schedule(new IRunnable() {
@@ -89,7 +89,7 @@ public class JobFutureVisitTest {
       public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
       }
-    }, JobInput.empty().setId("session1").setName("mutex1_job3").setMutex(m_mutexObject1));
+    }, JobInput.empty().id("session1").name("mutex1_job3").mutex(m_mutexObject1));
 
     // =========
     // SESSION 2 (JOB-1)
@@ -99,7 +99,7 @@ public class JobFutureVisitTest {
       public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
       }
-    }, JobInput.empty().setId("session2").setName("mutex2_job1").setMutex(m_mutexObject2));
+    }, JobInput.empty().id("session2").name("mutex2_job1").mutex(m_mutexObject2));
 
     // SESSION 2 (JOB-2)
     m_jobManager.schedule(new IRunnable() {
@@ -109,7 +109,7 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
         bc2.waitFor();
       }
-    }, JobInput.empty().setId("session2").setName("mutex2_job2").setMutex(m_mutexObject2));
+    }, JobInput.empty().id("session2").name("mutex2_job2").mutex(m_mutexObject2));
 
     // SESSION 2  (JOB-3)
     m_jobManager.schedule(new IRunnable() {
@@ -123,7 +123,7 @@ public class JobFutureVisitTest {
 
         latch.countDownAndBlock();
       }
-    }, JobInput.empty().setId("session2").setName("mutex2_job3").setMutex(m_mutexObject2));
+    }, JobInput.empty().id("session2").name("mutex2_job3").mutex(m_mutexObject2));
 
     // SESSION 2  (JOB-4)
     m_jobManager.schedule(new IRunnable() {
@@ -132,7 +132,7 @@ public class JobFutureVisitTest {
       public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
       }
-    }, JobInput.empty().setId("session2").setName("mutex2_job4").setMutex(m_mutexObject2));
+    }, JobInput.empty().id("session2").name("mutex2_job4").mutex(m_mutexObject2));
 
     // =========
     // SESSION 3 (JOB-1)
@@ -143,7 +143,7 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
         latch.countDownAndBlock();
       }
-    }, JobInput.empty().setId("session3").setName("mutex3_job1").setMutex(m_mutexObject3));
+    }, JobInput.empty().id("session3").name("mutex3_job1").mutex(m_mutexObject3));
 
     assertTrue(latch.await());
   }

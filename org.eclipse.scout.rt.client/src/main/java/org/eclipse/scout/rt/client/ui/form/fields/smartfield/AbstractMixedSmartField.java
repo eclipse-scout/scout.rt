@@ -246,7 +246,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
             // this will later on call installLookupRowContext()
             ILookupCall<LOOKUP_KEY> call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractMixedSmartField.this));
             prepareKeyLookup(call, interceptConvertValueToKey(validKey));
-            m_currentGetLookupRowByKeyJob = ClientJobs.schedule(new P_GetLookupRowByKeyJob(call), ClientJobInput.defaults().setName("Fetch smartfield data for " + getLabel()));
+            m_currentGetLookupRowByKeyJob = ClientJobs.schedule(new P_GetLookupRowByKeyJob(call), ClientJobInput.defaults().name("Fetch smartfield data for " + getLabel()));
           }
         }
         catch (ProcessingException e) {
@@ -420,7 +420,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
           filterKeyLookup(call, result);
           return cleanupResultList(result);
         }
-      }, ClientJobInput.defaults().setName("Fetch smartfield data"));
+      }, ClientJobInput.defaults().name("Fetch smartfield data"));
     }
 
     @Override

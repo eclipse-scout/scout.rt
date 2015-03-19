@@ -340,7 +340,7 @@ public class JobCancelTest {
             }
             verifyLatch.countDown();
           }
-        }, JobInput.defaults().setName("job-2"));
+        }, JobInput.defaults().name("job-2"));
 
         try {
           setupLatch.countDownAndBlock();
@@ -357,7 +357,7 @@ public class JobCancelTest {
         job1DoneLatch.countDown();
         verifyLatch.countDown();
       }
-    }, JobInput.defaults().setName("job-1"));
+    }, JobInput.defaults().name("job-1"));
 
     assertTrue(setupLatch.await());
     future1.cancel(true);
@@ -393,7 +393,7 @@ public class JobCancelTest {
         }
         verifyLatch.countDown();
       }
-    }, JobInput.defaults().setId(commonJobId));
+    }, JobInput.defaults().id(commonJobId));
 
     // Job-2 (common-id)
     m_jobManager.schedule(new IRunnable() {
@@ -408,7 +408,7 @@ public class JobCancelTest {
         }
         verifyLatch.countDown();
       }
-    }, JobInput.defaults().setId(commonJobId));
+    }, JobInput.defaults().id(commonJobId));
 
     // Job-3 (common-id)
     m_jobManager.schedule(new IRunnable() {
@@ -427,7 +427,7 @@ public class JobCancelTest {
               protocol.add("job-3b-interrupted");
             }
           }
-        }, JobInput.defaults().setId("123"));
+        }, JobInput.defaults().id("123"));
 
         try {
           setupLatch.countDownAndBlock();
@@ -437,7 +437,7 @@ public class JobCancelTest {
         }
         verifyLatch.countDown();
       }
-    }, JobInput.defaults().setId(commonJobId));
+    }, JobInput.defaults().id(commonJobId));
 
     // Job-4 (common-id, but not-null mutex)
     m_jobManager.schedule(new IRunnable() {
@@ -451,7 +451,7 @@ public class JobCancelTest {
           protocol.add("job-4-interrupted");
         }
       }
-    }, JobInput.defaults().setId(commonJobId).setMutex(new Object()));
+    }, JobInput.defaults().id(commonJobId).mutex(new Object()));
 
     assertTrue(setupLatch.await());
     m_jobManager.cancel(newJobIdAndMutexFilter(commonJobId, null), true);

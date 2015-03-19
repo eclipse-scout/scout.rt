@@ -149,7 +149,7 @@ public class UserActivityManager {
             }
           }
         }
-      }, ClientJobInput.defaults().setSession(m_clientSession).setName("user activity " + newStatus));
+      }, ClientJobInput.defaults().session(m_clientSession).name("user activity " + newStatus));
     }
   }
 

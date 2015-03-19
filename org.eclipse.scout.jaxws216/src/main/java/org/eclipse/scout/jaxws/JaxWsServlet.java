@@ -46,13 +46,13 @@ public class JaxWsServlet extends EndpointServlet {
     try {
       // Create the job-input on behalf of which the server-job is run.
       final ServerJobInput input = ServerJobInput.empty();
-      input.setName("JAX-WS Request");
-      input.setSubject(getOrCreateSubject());
-      input.setServletRequest(request);
-      input.setServletResponse(response);
-      input.setLocale(Locale.getDefault());
-      input.setSessionRequired(false);
-      input.setTransactional(false);
+      input.name("JAX-WS Request");
+      input.subject(getOrCreateSubject());
+      input.servletRequest(request);
+      input.servletResponse(response);
+      input.locale(Locale.getDefault());
+      input.sessionRequired(false);
+      input.transactional(false);
 
       ServerJobs.runNow(new IRunnable() {
 

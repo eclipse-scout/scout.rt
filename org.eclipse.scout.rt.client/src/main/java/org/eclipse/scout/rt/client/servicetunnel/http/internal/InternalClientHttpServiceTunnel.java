@@ -130,7 +130,7 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
         // cancel the old
         m_pollingJob.cancel(true);
       }
-      ClientJobInput input = ClientJobInput.defaults().setSession(getSession()).setName("Client notification fetcher");
+      ClientJobInput input = ClientJobInput.defaults().session(getSession()).name("Client notification fetcher");
       m_pollingJob = ClientJobs.scheduleWithFixedDelay(new ClientNotificationPollingJob(), p, p, TimeUnit.MILLISECONDS, input);
     }
     else {
@@ -181,6 +181,6 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
 
   @Override
   protected IFuture<?> schedule(IRunnable runnable, IServiceTunnelRequest req) throws JobExecutionException {
-    return ClientJobs.schedule(runnable, ClientJobInput.defaults().setSession(getSession()));
+    return ClientJobs.schedule(runnable, ClientJobInput.defaults().session(getSession()));
   }
 }

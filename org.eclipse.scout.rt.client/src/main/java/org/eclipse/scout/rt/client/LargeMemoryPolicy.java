@@ -121,7 +121,7 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
           desktop.releaseUnusedPages();
           System.gc();
         }
-      }, ModelJobInput.defaults().setName("Check memory"));
+      }, ModelJobInput.defaults().name("Check memory"));
     }
   }
 

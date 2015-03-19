@@ -192,7 +192,7 @@ public class JobManager implements IJobManager {
 
     // Ensure a job name to be set.
     if (input.getName() == null) {
-      input = input.copy().setName(executable.getClass().getName());
+      input = input.copy().name(executable.getClass().getName());
     }
 
     // Create the Callable to be given to the executor.

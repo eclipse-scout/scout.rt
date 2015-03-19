@@ -2920,7 +2920,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
             }
           }
-        }, ModelJobInput.defaults().setName("Form timer")).awaitDoneAndGet();
+        }, ModelJobInput.defaults().name("Form timer")).awaitDoneAndGet();
       }
     }, intervalSeconds, intervalSeconds, TimeUnit.SECONDS, ClientJobInput.defaults());
   }
@@ -2948,7 +2948,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           public void run() throws Exception {
             setSubTitle("" + m_seconds);
           }
-        }, ModelJobInput.defaults().setName("Form close countdown").setSession(m_session));
+        }, ModelJobInput.defaults().name("Form close countdown").session(m_session));
 
         try {
           sleep(TimeUnit.SECONDS.toMillis(1));
@@ -2975,7 +2975,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               SERVICES.getService(IExceptionHandlerService.class).handleException(se);
             }
           }
-        }, ModelJobInput.defaults().setName("Form close timer").setSession(m_session));
+        }, ModelJobInput.defaults().name("Form close timer").session(m_session));
       }
     }
   }// end private class

@@ -42,39 +42,39 @@ public class ClientJobInput extends JobInput<ClientContext> {
   }
 
   @Override
-  public ClientJobInput setId(final String id) {
-    return (ClientJobInput) super.setId(id);
+  public ClientJobInput id(final String id) {
+    return (ClientJobInput) super.id(id);
   }
 
   @Override
-  public ClientJobInput setName(final String name) {
-    return (ClientJobInput) super.setName(name);
+  public ClientJobInput name(final String name) {
+    return (ClientJobInput) super.name(name);
   }
 
   @Override
-  public ClientJobInput setMutex(final Object mutexObject) {
+  public ClientJobInput mutex(final Object mutexObject) {
     Assertions.assertFalse(mutexObject instanceof ISession, "The session cannot be used as mutex object to not interfere with model jobs");
-    return (ClientJobInput) super.setMutex(mutexObject);
+    return (ClientJobInput) super.mutex(mutexObject);
   }
 
   @Override
-  public ClientJobInput setExpirationTime(final long time, final TimeUnit timeUnit) {
-    return (ClientJobInput) super.setExpirationTime(time, timeUnit);
+  public ClientJobInput expirationTime(final long time, final TimeUnit timeUnit) {
+    return (ClientJobInput) super.expirationTime(time, timeUnit);
   }
 
   @Override
-  public ClientJobInput setContext(final ClientContext context) {
-    return (ClientJobInput) super.setContext(context);
+  public ClientJobInput context(final ClientContext context) {
+    return (ClientJobInput) super.context(context);
   }
 
   @Override
-  public ClientJobInput setSubject(final Subject subject) {
-    return (ClientJobInput) super.setSubject(subject);
+  public ClientJobInput subject(final Subject subject) {
+    return (ClientJobInput) super.subject(subject);
   }
 
   @Override
-  public ClientJobInput setLocale(final Locale locale) {
-    return (ClientJobInput) super.setLocale(locale);
+  public ClientJobInput locale(final Locale locale) {
+    return (ClientJobInput) super.locale(locale);
   }
 
   public IClientSession getSession() {
@@ -84,8 +84,8 @@ public class ClientJobInput extends JobInput<ClientContext> {
   /**
    * Set the session and its Locale and UserAgent as derived values.
    */
-  public ClientJobInput setSession(final IClientSession session) {
-    getContext().setSession(session);
+  public ClientJobInput session(final IClientSession session) {
+    getContext().session(session);
     return this;
   }
 
@@ -96,8 +96,8 @@ public class ClientJobInput extends JobInput<ClientContext> {
   /**
    * Set to <code>false</code> if the context does not require a session. By default, a session is required.
    */
-  public ClientJobInput setSessionRequired(final boolean sessionRequired) {
-    getContext().setSessionRequired(sessionRequired);
+  public ClientJobInput sessionRequired(final boolean sessionRequired) {
+    getContext().sessionRequired(sessionRequired);
     return this;
   }
 
@@ -105,8 +105,8 @@ public class ClientJobInput extends JobInput<ClientContext> {
     return getContext().getUserAgent();
   }
 
-  public ClientJobInput setUserAgent(final UserAgent userAgent) {
-    getContext().setUserAgent(userAgent);
+  public ClientJobInput userAgent(final UserAgent userAgent) {
+    getContext().userAgent(userAgent);
     return this;
   }
 
@@ -119,20 +119,20 @@ public class ClientJobInput extends JobInput<ClientContext> {
 
   @Override
   public ClientJobInput copy() {
-    return new ClientJobInput(this).setContext(getContext().copy());
+    return new ClientJobInput(this).context(getContext().copy());
   }
 
   public static ClientJobInput defaults() {
     final ClientJobInput defaults = new ClientJobInput(JobInput.defaults());
-    defaults.setContext(ClientContext.defaults());
-    defaults.setSessionRequired(true);
+    defaults.context(ClientContext.defaults());
+    defaults.sessionRequired(true);
     return defaults;
   }
 
   public static ClientJobInput empty() {
     final ClientJobInput empty = new ClientJobInput(JobInput.empty());
-    empty.setContext(ClientContext.empty());
-    empty.setSessionRequired(true);
+    empty.context(ClientContext.empty());
+    empty.sessionRequired(true);
     return empty;
   }
 

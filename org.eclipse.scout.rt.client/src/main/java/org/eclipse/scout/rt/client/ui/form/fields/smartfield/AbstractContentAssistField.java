@@ -1019,7 +1019,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           }
         };
 
-        ModelJobInput input = ModelJobInput.defaults().setSession(session).setName("Smartfield text lookup");
+        ModelJobInput input = ModelJobInput.defaults().session(session).name("Smartfield text lookup");
         if (background) {
           ModelJobs.schedule(scoutSyncJob, input);
         }
@@ -1127,7 +1127,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           }
         };
 
-        ModelJobInput input = ModelJobInput.defaults().setSession(session).setName("ContentAssistField browse lookup");
+        ModelJobInput input = ModelJobInput.defaults().session(session).name("ContentAssistField browse lookup");
         if (background) {
           ModelJobs.schedule(scoutSyncJob, input);
         }

@@ -61,7 +61,7 @@ public class ServerJobTest {
       @Override
       public void run() throws Exception {
       }
-    }, ServerJobInput.defaults().setSessionRequired(false)).awaitDoneAndGet();
+    }, ServerJobInput.defaults().sessionRequired(false)).awaitDoneAndGet();
   }
 
   @Test
@@ -88,9 +88,9 @@ public class ServerJobTest {
             actualThreadName2.setValue(Thread.currentThread().getName());
             setupLatch.countDown();
           }
-        }, ServerJobInput.defaults().setId("200").setName("XYZ"));
+        }, ServerJobInput.defaults().id("200").name("XYZ"));
       }
-    }, ServerJobInput.defaults().setId("100").setName("ABC"));
+    }, ServerJobInput.defaults().id("100").name("ABC"));
 
     assertTrue(setupLatch.await());
 

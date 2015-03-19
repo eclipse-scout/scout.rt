@@ -64,7 +64,7 @@ public class ClientJobTest {
       @Override
       public void run() throws Exception {
       }
-    }, ClientJobInput.defaults().setSessionRequired(false)).awaitDoneAndGet();
+    }, ClientJobInput.defaults().sessionRequired(false)).awaitDoneAndGet();
   }
 
   @Test
@@ -79,7 +79,7 @@ public class ClientJobTest {
       public void run() throws Exception {
         modelThread.set(ModelJobs.isModelThread());
       }
-    }, ClientJobInput.empty().setSession(m_clientSession1)).awaitDoneAndGet();
+    }, ClientJobInput.empty().session(m_clientSession1)).awaitDoneAndGet();
 
     assertFalse(ModelJobs.isModelThread());
     assertFalse(modelThread.get());
@@ -109,9 +109,9 @@ public class ClientJobTest {
             actualThreadName2.setValue(Thread.currentThread().getName());
             setupLatch.countDown();
           }
-        }, ClientJobInput.defaults().setId("200").setName("XYZ"));
+        }, ClientJobInput.defaults().id("200").name("XYZ"));
       }
-    }, ClientJobInput.defaults().setId("100").setName("ABC"));
+    }, ClientJobInput.defaults().id("100").name("ABC"));
 
     assertTrue(setupLatch.await());
 

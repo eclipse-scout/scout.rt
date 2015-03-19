@@ -39,13 +39,13 @@ public class ModelJobInput extends ClientJobInput {
   }
 
   @Override
-  public ModelJobInput setId(final String id) {
-    return (ModelJobInput) super.setId(id);
+  public ModelJobInput id(final String id) {
+    return (ModelJobInput) super.id(id);
   }
 
   @Override
-  public ModelJobInput setName(final String name) {
-    return (ModelJobInput) super.setName(name);
+  public ModelJobInput name(final String name) {
+    return (ModelJobInput) super.name(name);
   }
 
   @Override
@@ -54,43 +54,43 @@ public class ModelJobInput extends ClientJobInput {
   }
 
   @Override
-  public ModelJobInput setMutex(final Object mutexObject) {
+  public ModelJobInput mutex(final Object mutexObject) {
     throw new UnsupportedOperationException("For model jobs, the mutex object cannot be set. Implicitly, the session is used as mutex object so that no two jobs of the same session run in parallel at any time.");
   }
 
   @Override
-  public ModelJobInput setExpirationTime(final long time, final TimeUnit timeUnit) {
-    return (ModelJobInput) super.setExpirationTime(time, timeUnit);
+  public ModelJobInput expirationTime(final long time, final TimeUnit timeUnit) {
+    return (ModelJobInput) super.expirationTime(time, timeUnit);
   }
 
   @Override
-  public ModelJobInput setContext(final ClientContext context) {
-    return (ModelJobInput) super.setContext(context);
+  public ModelJobInput context(final ClientContext context) {
+    return (ModelJobInput) super.context(context);
   }
 
   @Override
-  public ModelJobInput setSubject(final Subject subject) {
-    return (ModelJobInput) super.setSubject(subject);
+  public ModelJobInput subject(final Subject subject) {
+    return (ModelJobInput) super.subject(subject);
   }
 
   @Override
-  public ModelJobInput setLocale(final Locale locale) {
-    return (ModelJobInput) super.setLocale(locale);
+  public ModelJobInput locale(final Locale locale) {
+    return (ModelJobInput) super.locale(locale);
   }
 
   @Override
-  public ModelJobInput setSession(final IClientSession session) {
-    return (ModelJobInput) super.setSession(session);
+  public ModelJobInput session(final IClientSession session) {
+    return (ModelJobInput) super.session(session);
   }
 
   @Override
-  public ModelJobInput setSessionRequired(final boolean sessionRequired) {
-    return (ModelJobInput) super.setSessionRequired(true);
+  public ModelJobInput sessionRequired(final boolean sessionRequired) {
+    return (ModelJobInput) super.sessionRequired(true);
   }
 
   @Override
-  public ModelJobInput setUserAgent(final UserAgent userAgent) {
-    return (ModelJobInput) super.setUserAgent(userAgent);
+  public ModelJobInput userAgent(final UserAgent userAgent) {
+    return (ModelJobInput) super.userAgent(userAgent);
   }
 
   @Override
@@ -102,14 +102,14 @@ public class ModelJobInput extends ClientJobInput {
 
   @Override
   public ModelJobInput copy() {
-    return new ModelJobInput(this).setContext(getContext().copy());
+    return new ModelJobInput(this).context(getContext().copy());
   }
 
   public static ModelJobInput defaults() {
-    return new ModelJobInput(ClientJobInput.defaults()).setContext(ClientContext.defaults());
+    return new ModelJobInput(ClientJobInput.defaults()).context(ClientContext.defaults());
   }
 
   public static ModelJobInput empty() {
-    return new ModelJobInput(ClientJobInput.empty()).setContext(ClientContext.empty());
+    return new ModelJobInput(ClientJobInput.empty()).context(ClientContext.empty());
   }
 }

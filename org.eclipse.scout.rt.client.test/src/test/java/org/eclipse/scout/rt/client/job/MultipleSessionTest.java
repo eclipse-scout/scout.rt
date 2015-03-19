@@ -71,7 +71,7 @@ public class MultipleSessionTest {
         protocol.add("job1-S1");
         latch1.countDownAndBlock();
       }
-    }, ModelJobInput.empty().setName("job-1-S1").setSession(m_clientSession1));
+    }, ModelJobInput.empty().name("job-1-S1").session(m_clientSession1));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -80,7 +80,7 @@ public class MultipleSessionTest {
         protocol.add("job2-S1");
         latch2.countDownAndBlock();
       }
-    }, ModelJobInput.empty().setName("job-2-S1").setSession(m_clientSession1));
+    }, ModelJobInput.empty().name("job-2-S1").session(m_clientSession1));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -89,7 +89,7 @@ public class MultipleSessionTest {
         protocol.add("job1-S2");
         latch1.countDownAndBlock();
       }
-    }, ModelJobInput.empty().setName("job-1-S2").setSession(m_clientSession2));
+    }, ModelJobInput.empty().name("job-1-S2").session(m_clientSession2));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -98,7 +98,7 @@ public class MultipleSessionTest {
         protocol.add("job2-S2");
         latch2.countDownAndBlock();
       }
-    }, ModelJobInput.empty().setName("job-2-S2").setSession(m_clientSession2));
+    }, ModelJobInput.empty().name("job-2-S2").session(m_clientSession2));
 
     assertTrue(latch1.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2"), protocol);
@@ -134,7 +134,7 @@ public class MultipleSessionTest {
           interruptedLatch.countDown();
         }
       }
-    }, ModelJobInput.empty().setName("job-1-S1").setSession(m_clientSession1));
+    }, ModelJobInput.empty().name("job-1-S1").session(m_clientSession1));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -148,7 +148,7 @@ public class MultipleSessionTest {
           protocol.add("job2-S1-interrupted");
         }
       }
-    }, ModelJobInput.empty().setName("job-2-S1").setSession(m_clientSession1));
+    }, ModelJobInput.empty().name("job-2-S1").session(m_clientSession1));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -162,7 +162,7 @@ public class MultipleSessionTest {
           protocol.add("job1-S2-interrupted");
         }
       }
-    }, ModelJobInput.empty().setName("job-1-S2").setSession(m_clientSession2));
+    }, ModelJobInput.empty().name("job-1-S2").session(m_clientSession2));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -176,7 +176,7 @@ public class MultipleSessionTest {
           protocol.add("job2-S2-interrupted");
         }
       }
-    }, ModelJobInput.empty().setName("job-2-S2").setSession(m_clientSession2));
+    }, ModelJobInput.empty().name("job-2-S2").session(m_clientSession2));
 
     assertTrue(latch1.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2"), protocol);

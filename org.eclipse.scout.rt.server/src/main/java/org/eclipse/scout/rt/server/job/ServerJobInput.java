@@ -42,38 +42,38 @@ public class ServerJobInput extends JobInput<ServerContext> {
   }
 
   @Override
-  public ServerJobInput setId(final String id) {
-    return (ServerJobInput) super.setId(id);
+  public ServerJobInput id(final String id) {
+    return (ServerJobInput) super.id(id);
   }
 
   @Override
-  public ServerJobInput setName(final String name) {
-    return (ServerJobInput) super.setName(name);
+  public ServerJobInput name(final String name) {
+    return (ServerJobInput) super.name(name);
   }
 
   @Override
-  public ServerJobInput setMutex(final Object mutexObject) {
-    return (ServerJobInput) super.setMutex(mutexObject);
+  public ServerJobInput mutex(final Object mutexObject) {
+    return (ServerJobInput) super.mutex(mutexObject);
   }
 
   @Override
-  public ServerJobInput setExpirationTime(final long time, final TimeUnit timeUnit) {
-    return (ServerJobInput) super.setExpirationTime(time, timeUnit);
+  public ServerJobInput expirationTime(final long time, final TimeUnit timeUnit) {
+    return (ServerJobInput) super.expirationTime(time, timeUnit);
   }
 
   @Override
-  public ServerJobInput setContext(final ServerContext context) {
-    return (ServerJobInput) super.setContext(context);
+  public ServerJobInput context(final ServerContext context) {
+    return (ServerJobInput) super.context(context);
   }
 
   @Override
-  public ServerJobInput setSubject(final Subject subject) {
-    return (ServerJobInput) super.setSubject(subject);
+  public ServerJobInput subject(final Subject subject) {
+    return (ServerJobInput) super.subject(subject);
   }
 
   @Override
-  public ServerJobInput setLocale(final Locale locale) {
-    return (ServerJobInput) super.setLocale(locale);
+  public ServerJobInput locale(final Locale locale) {
+    return (ServerJobInput) super.locale(locale);
   }
 
   public IServerSession getSession() {
@@ -83,8 +83,8 @@ public class ServerJobInput extends JobInput<ServerContext> {
   /**
    * Sets the session. There are no other values derived from the given session.
    */
-  public ServerJobInput setSession(final IServerSession session) {
-    getContext().setSession(session);
+  public ServerJobInput session(final IServerSession session) {
+    getContext().session(session);
     return this;
   }
 
@@ -97,8 +97,8 @@ public class ServerJobInput extends JobInput<ServerContext> {
    *          <code>false</code> if the context does not require a session. By default, a session is required.
    * @return <code>this</code> in order to support for method chaining
    */
-  public ServerJobInput setSessionRequired(final boolean sessionRequired) {
-    getContext().setSessionRequired(sessionRequired);
+  public ServerJobInput sessionRequired(final boolean sessionRequired) {
+    getContext().sessionRequired(sessionRequired);
     return this;
   }
 
@@ -109,8 +109,8 @@ public class ServerJobInput extends JobInput<ServerContext> {
   /**
    * Sets the HTTP ServletRequest to be set for the time of execution.
    */
-  public ServerJobInput setServletRequest(final HttpServletRequest servletRequest) {
-    getContext().setServletRequest(servletRequest);
+  public ServerJobInput servletRequest(final HttpServletRequest servletRequest) {
+    getContext().servletRequest(servletRequest);
     return this;
   }
 
@@ -121,8 +121,8 @@ public class ServerJobInput extends JobInput<ServerContext> {
   /**
    * Sets the HTTP ServletResponse to be set for the time of execution.
    */
-  public ServerJobInput setServletResponse(final HttpServletResponse servletResponse) {
-    getContext().setServletResponse(servletResponse);
+  public ServerJobInput servletResponse(final HttpServletResponse servletResponse) {
+    getContext().servletResponse(servletResponse);
     return this;
   }
 
@@ -133,8 +133,8 @@ public class ServerJobInput extends JobInput<ServerContext> {
   /**
    * Sets the UserAgent to be set for the time of execution.
    */
-  public ServerJobInput setUserAgent(final UserAgent userAgent) {
-    getContext().setUserAgent(userAgent);
+  public ServerJobInput userAgent(final UserAgent userAgent) {
+    getContext().userAgent(userAgent);
     return this;
   }
 
@@ -145,8 +145,8 @@ public class ServerJobInput extends JobInput<ServerContext> {
   /**
    * Sets the transaction-ID to be set for the time of execution.
    */
-  public ServerJobInput setTransactionId(final long transactionId) {
-    getContext().setTransactionId(transactionId);
+  public ServerJobInput transactionId(final long transactionId) {
+    getContext().transactionId(transactionId);
     return this;
   }
 
@@ -157,8 +157,8 @@ public class ServerJobInput extends JobInput<ServerContext> {
   /**
    * Sets whether this job should run in a separate transaction.
    */
-  public ServerJobInput setTransactional(final boolean transactional) {
-    getContext().setTransactional(transactional);
+  public ServerJobInput transactional(final boolean transactional) {
+    getContext().transactional(transactional);
     return this;
   }
 
@@ -171,20 +171,20 @@ public class ServerJobInput extends JobInput<ServerContext> {
 
   @Override
   public ServerJobInput copy() {
-    return new ServerJobInput(this).setContext(getContext().copy());
+    return new ServerJobInput(this).context(getContext().copy());
   }
 
   public static ServerJobInput defaults() {
     final ServerJobInput defaults = new ServerJobInput(JobInput.defaults());
-    defaults.setContext(ServerContext.defaults());
-    defaults.setSessionRequired(true);
+    defaults.context(ServerContext.defaults());
+    defaults.sessionRequired(true);
     return defaults;
   }
 
   public static ServerJobInput empty() {
     final ServerJobInput empty = new ServerJobInput(JobInput.empty());
-    empty.setContext(ServerContext.empty());
-    empty.setSessionRequired(true);
+    empty.context(ServerContext.empty());
+    empty.sessionRequired(true);
     return empty;
   }
 

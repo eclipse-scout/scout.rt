@@ -137,7 +137,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
           }
         }
       }
-    }, ModelJobInput.defaults().setSession(clientSession).setName("Wizard status - mark dirty"));
+    }, ModelJobInput.defaults().session(clientSession).name("Wizard status - mark dirty"));
   }
 
   public void refreshStatus() throws ProcessingException {
