@@ -20,7 +20,6 @@ import javax.annotation.PostConstruct;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -249,9 +248,6 @@ public class SmartFieldTest {
     Assert.assertEquals("T&estMenu2", smartfieldMenus.get(1).getTextWithMnemonic());
     Assert.assertEquals("control-alternate-f11", smartfieldMenus.get(1).getKeyStroke());
 
-    List<IKeyStroke> smartfieldKeyStrokes = m_form.getStyleField().getContributedKeyStrokes();
-    Assert.assertNotNull("KeyStrokes of Smartfield should not be null", smartfieldKeyStrokes);
-    Assert.assertEquals("Smartfield should have 2 keyStrokes registered", 2, smartfieldKeyStrokes.size());
   }
 
   private static void assertFieldStyle(StyleField f, String icon, String tt, String bg, String fg, String font) {

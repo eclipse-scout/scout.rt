@@ -1883,21 +1883,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         }
       }
     }
-    //
-    c = getContributedKeyStrokes();
-    if (c != null) {
-      for (IKeyStroke ks : c) {
-        if (ks != null) {
-          ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
-        }
-      }
-    }
     propertySupport.setPropertyList(PROP_KEY_STROKES, CollectionUtility.arrayListWithoutNullElements(ksMap.values()));
-  }
-
-  @Override
-  public List<IKeyStroke> getContributedKeyStrokes() {
-    return null;
   }
 
   @Override

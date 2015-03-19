@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table.control;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
@@ -43,5 +44,10 @@ public class SearchFormTableControl extends AbstractTableControl {
         }
       });
     }
+  }
+
+  @Override
+  protected String getConfiguredKeyStroke() {
+    return IKeyStroke.CONTROL + "-" + IKeyStroke.F2;
   }
 }

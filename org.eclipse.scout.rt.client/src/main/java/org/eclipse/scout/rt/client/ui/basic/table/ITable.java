@@ -106,7 +106,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * {@link List<IKeyStroke>}
    */
-  String PROP_KEY_STROKES = "keyStroks";
+  String PROP_KEY_STROKES = "keyStrokes";
   /**
    * Boolean
    */

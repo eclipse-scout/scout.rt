@@ -31,9 +31,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldC
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDropRequestChain;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -162,11 +160,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
     return ConfigurationUtility.removeReplacedClasses(filtered);
-  }
-
-  @Override
-  public List<IKeyStroke> getContributedKeyStrokes() {
-    return MenuUtility.getKeyStrokesFromMenus(getMenus());
   }
 
   @Override

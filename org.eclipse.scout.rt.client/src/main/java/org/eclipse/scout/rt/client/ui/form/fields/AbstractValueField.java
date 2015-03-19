@@ -45,9 +45,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.Val
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldParseValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.ValueFieldContextMenu;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -177,11 +175,6 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
     return ConfigurationUtility.removeReplacedClasses(filtered);
-  }
-
-  @Override
-  public List<IKeyStroke> getContributedKeyStrokes() {
-    return MenuUtility.getKeyStrokesFromMenus(getMenus());
   }
 
   /*
@@ -661,7 +654,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * any further chain elements.
    */
   protected static class LocalValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends AbstractFormField.LocalFormFieldExtension<OWNER>
-  implements IValueFieldExtension<VALUE, OWNER> {
+      implements IValueFieldExtension<VALUE, OWNER> {
 
     public LocalValueFieldExtension(OWNER owner) {
       super(owner);

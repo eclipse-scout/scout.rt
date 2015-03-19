@@ -25,9 +25,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.IGroupBoxExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
-import org.eclipse.scout.rt.client.ui.action.keystroke.DefaultFormEnterKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.keystroke.DefaultFormEscapeKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
@@ -377,46 +374,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
     return ConfigurationUtility.removeReplacedClasses(filtered);
-  }
-
-  @Override
-  public List<IKeyStroke> getContributedKeyStrokes() {
-    List<IKeyStroke> list = new ArrayList<IKeyStroke>(2);
-    if (isMainBox() && (getForm() != null && getForm().getOuterForm() == null)) {
-      // add default escape and enter key stroke only if no similar key stroke
-      // is defined on the mainbox
-      boolean hasEnter = false;
-      boolean hasEscape = false;
-      for (IKeyStroke ks : getLocalKeyStrokes()) {
-        if ("enter".equalsIgnoreCase(ks.getKeyStroke())) {
-          hasEnter = true;
-        }
-        if ("escape".equalsIgnoreCase(ks.getKeyStroke())) {
-          hasEscape = true;
-        }
-      }
-      if (!hasEnter) {
-        try {
-          DefaultFormEnterKeyStroke enterKeyStroke = new DefaultFormEnterKeyStroke(getForm());
-          enterKeyStroke.initAction();
-          list.add(enterKeyStroke);
-        }
-        catch (ProcessingException e) {
-          LOG.error("could not initialize enter key stroke.", e);
-        }
-      }
-      if (!hasEscape) {
-        try {
-          DefaultFormEscapeKeyStroke escKeyStroke = new DefaultFormEscapeKeyStroke(getForm());
-          escKeyStroke.initAction();
-          list.add(escKeyStroke);
-        }
-        catch (ProcessingException e) {
-          LOG.error("could not initialize esc key stroke.", e);
-        }
-      }
-    }
-    return list;
   }
 
   @Override

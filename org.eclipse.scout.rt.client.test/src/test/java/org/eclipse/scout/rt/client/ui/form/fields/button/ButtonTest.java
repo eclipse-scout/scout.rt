@@ -15,7 +15,6 @@ import java.util.List;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -34,7 +33,7 @@ import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link AbstractButton}
- * 
+ *
  * @since 3.10.0-M4
  */
 @RunWith(ClientTestRunner.class)
@@ -133,9 +132,6 @@ public class ButtonTest {
     Assert.assertEquals("T&estMenu2", pushButton1Menus.get(1).getTextWithMnemonic());
     Assert.assertEquals("control-alternate-f11", pushButton1Menus.get(1).getKeyStroke());
 
-    List<IKeyStroke> pushButton1KeyStrokes = m_form.getPushButton1().getContributedKeyStrokes();
-    Assert.assertNotNull("KeyStrokes of PushButton1 should not be null", pushButton1KeyStrokes);
-    Assert.assertEquals("PushButton1 should have 2 keyStrokes registered", 2, pushButton1KeyStrokes.size());
   }
 
   @After

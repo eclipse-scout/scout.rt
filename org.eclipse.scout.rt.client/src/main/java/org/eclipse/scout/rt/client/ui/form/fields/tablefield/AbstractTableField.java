@@ -43,8 +43,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFiel
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveInsertedRowChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveUpdatedRowChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldUpdateTableStatusChain;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -684,14 +682,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   @Override
   public void reloadTableData() throws ProcessingException {
     interceptReloadTableData();
-  }
-
-  @Override
-  public List<IKeyStroke> getContributedKeyStrokes() {
-    if (getTable() != null) {
-      return MenuUtility.getKeyStrokesFromMenus(getTable().getMenus());
-    }
-    return CollectionUtility.emptyArrayList();
   }
 
   private class P_ManagedTableListener extends TableAdapter {

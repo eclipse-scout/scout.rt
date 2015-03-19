@@ -34,6 +34,7 @@ public interface IButton extends IFormField {
   String PROP_IMAGE = "image";
   String PROP_SELECTED = "selected";
   String PROP_CONTEXT_MENU = "contextMenu";
+  String PROP_KEY_STOKE = "keyStroke";
 
   /*
    * System Types
@@ -74,6 +75,10 @@ public interface IButton extends IFormField {
   Object getImage();
 
   void setImage(Object nativeImg);
+
+  String getKeyStroke();
+
+  void setKeyStroke(String keyStroke);
 
   /**
    * display style<br>

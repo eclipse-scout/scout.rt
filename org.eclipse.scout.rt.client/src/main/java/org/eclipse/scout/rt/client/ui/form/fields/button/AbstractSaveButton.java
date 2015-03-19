@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @ClassId("74551d0d-a923-49e9-aaeb-a212d77e460d")
@@ -45,5 +46,10 @@ public abstract class AbstractSaveButton extends AbstractButton {
   @Override
   protected int getConfiguredHorizontalAlignment() {
     return -1;
+  }
+
+  @Override
+  protected String getConfiguredKeyStroke() {
+    return IKeyStroke.ENTER;
   }
 }

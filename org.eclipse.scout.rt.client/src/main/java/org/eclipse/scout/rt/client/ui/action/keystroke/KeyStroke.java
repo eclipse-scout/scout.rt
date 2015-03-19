@@ -10,27 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.keystroke;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.action.IAction;
 
 public class KeyStroke extends AbstractKeyStroke {
-  private IAction m_delegate;
   private String m_id;
 
   public KeyStroke(String keyStroke) {
-    this(keyStroke, null);
-  }
-
-  public KeyStroke(String keyStroke, IAction delegate) {
-    super(false);
-    m_delegate = delegate;
-    // create special id with key as part of name
-    if (delegate != null) {
-      m_id = delegate.getActionId() + ".keyStroke";
-    }
-    else {
-      m_id = keyStroke;
-    }
+    m_id = keyStroke;
     callInitializer();
     setKeyStroke(keyStroke);
   }
@@ -41,20 +26,6 @@ public class KeyStroke extends AbstractKeyStroke {
   @Override
   public String getActionId() {
     return m_id;
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  protected void execAction() throws ProcessingException {
-    if (m_delegate != null) {
-      m_delegate.prepareAction();
-      if (m_delegate.isThisAndParentsVisible() && m_delegate.isThisAndParentsEnabled()) {
-        m_delegate.doAction();
-      }
-    }
-    else {
-      super.execAction();
-    }
   }
 
 }

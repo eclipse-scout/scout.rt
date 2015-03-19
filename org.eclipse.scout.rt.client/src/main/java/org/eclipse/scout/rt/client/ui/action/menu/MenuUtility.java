@@ -10,19 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
@@ -31,42 +23,12 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 
 /**
  * Utility class for menus
- * 
+ *
  * @since 3.10.0-M4
  */
 public final class MenuUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MenuUtility.class);
 
   private MenuUtility() {
-  }
-
-  /**
-   * Collects all keyStrokes from an array of menus
-   * 
-   * @since 3.10.0-M4
-   */
-  public static List<IKeyStroke> getKeyStrokesFromMenus(List<? extends IMenu> menu) {
-    Set<String> keys = new HashSet<String>();
-    if (menu != null) {
-      List<IKeyStroke> keyStrokes = new ArrayList<IKeyStroke>(menu.size());
-      for (IMenu m : menu) {
-        String s = m.getKeyStroke();
-        if (StringUtility.hasText(s)) {
-          try {
-            KeyStroke ks = new KeyStroke(s, m);
-            ks.initAction();
-            if (keys.add(ks.getKeyStroke())) {
-              keyStrokes.add(ks);
-            }
-          }
-          catch (ProcessingException e) {
-            LOG.error("could not initialize enter key stroke.", e);
-          }
-        }
-      }
-      return keyStrokes;
-    }
-    return CollectionUtility.emptyArrayList();
   }
 
   /**

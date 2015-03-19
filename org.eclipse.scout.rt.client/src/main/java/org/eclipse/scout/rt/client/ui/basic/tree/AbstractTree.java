@@ -55,9 +55,6 @@ import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.action.IActionFilter;
-import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -936,41 +933,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private void rebuildKeyStrokesInternal() {
-
-    final List<IMenu> menus = new ArrayList<IMenu>();
-    final IActionFilter activeFilter = ActionUtility.createMenuFilterMenuTypes(getContextMenu().getCurrentMenuTypes(), true);
-    getContextMenu().acceptVisitor(new IActionVisitor() {
-      @Override
-      public int visit(IAction action) {
-        if (action instanceof IMenu) {
-          IMenu menu = (IMenu) action;
-          if (menu.isEnabled() && !menu.isSeparator() && !menu.hasChildActions()) {
-            if (activeFilter.accept(menu)) {
-              menus.add(menu);
-            }
-          }
-        }
-        return CONTINUE;
-      }
-    });
-
-    //Compute the Keystrokes: base + keyStroke for the current Menus.
-    List<IKeyStroke> ksList = new ArrayList<IKeyStroke>(m_baseKeyStrokes);
-    for (IMenu menu : menus) {
-      if (menu.getKeyStroke() != null) {
-        try {
-          IKeyStroke ks = new KeyStroke(menu.getKeyStroke(), menu);
-          ks.initAction();
-          ksList.add(ks);
-        }
-        catch (ProcessingException e) {
-          LOG.error("could not initialize key stroke '" + menu.getKeyStroke() + "'", e);
-        }
-      }
-    }
-
-    //Set KeyStrokes:
-    setKeyStrokesInternal(ksList);
+    setKeyStrokesInternal(m_baseKeyStrokes);
   }
 
   @Override

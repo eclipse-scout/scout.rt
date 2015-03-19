@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @ClassId("d5b9a643-bdf2-483c-8adf-e8728021611e")
@@ -45,5 +46,10 @@ public abstract class AbstractCancelButton extends AbstractButton {
   @Override
   protected int getConfiguredHorizontalAlignment() {
     return 1;
+  }
+
+  @Override
+  protected String getConfiguredKeyStroke() {
+    return IKeyStroke.ESCAPE;
   }
 }

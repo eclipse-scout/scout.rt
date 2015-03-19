@@ -6,7 +6,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -149,9 +148,6 @@ public class FileChooserFieldTest {
     Assert.assertEquals("Menu&2", fileChooserFieldMenus.get(1).getTextWithMnemonic());
     Assert.assertEquals("alternate-2", fileChooserFieldMenus.get(1).getKeyStroke());
 
-    List<IKeyStroke> fileChooserFieldKeyStrokes = m_form.getFileChooserField().getContributedKeyStrokes();
-    Assert.assertNotNull("KeyStrokes of fileChooserField should not be null", fileChooserFieldKeyStrokes);
-    Assert.assertEquals("fileChooserField should have 2 keyStrokes registered", 2, fileChooserFieldKeyStrokes.size());
   }
 
   @After

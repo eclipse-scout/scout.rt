@@ -5,7 +5,6 @@ import java.util.List;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -92,9 +91,6 @@ public class ImageFieldTest {
     Assert.assertEquals("&ImageFieldMenu", imageFieldMenus.get(0).getTextWithMnemonic());
     Assert.assertEquals("control-a", imageFieldMenus.get(0).getKeyStroke());
 
-    List<IKeyStroke> imageFieldKeyStrokes = m_form.getImageField().getContributedKeyStrokes();
-    Assert.assertNotNull("KeyStrokes of ImageField should not be null", imageFieldKeyStrokes);
-    Assert.assertEquals("ImageField should have 1 keyStrokes registered", 1, imageFieldKeyStrokes.size());
   }
 
   @After

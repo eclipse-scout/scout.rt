@@ -31,9 +31,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.button.ButtonChains.
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.IButtonExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -95,6 +93,15 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   @Order(220)
   protected boolean getConfiguredProcessButton() {
     return true;
+  }
+
+  /**
+   * Use IKeyStroke constants to define a key stroke for Button execution.
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(230)
+  protected String getConfiguredKeyStroke() {
+    return null;
   }
 
   /**
@@ -196,17 +203,14 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   @Override
-  public List<IKeyStroke> getContributedKeyStrokes() {
-    return MenuUtility.getKeyStrokesFromMenus(getMenus());
-  }
-
-  @Override
   protected void initConfig() {
     super.initConfig();
     setSystemType(getConfiguredSystemType());
     setDisplayStyleInternal(getConfiguredDisplayStyle());
     setProcessButton(getConfiguredProcessButton());
     setIconId(getConfiguredIconId());
+    setKeyStroke(getConfiguredKeyStroke());
+
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
@@ -270,6 +274,16 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   @Override
   public Object getImage() {
     return propertySupport.getProperty(PROP_IMAGE);
+  }
+
+  @Override
+  public String getKeyStroke() {
+    return propertySupport.getPropertyString(PROP_KEY_STOKE);
+  }
+
+  @Override
+  public void setKeyStroke(String keyStroke) {
+    propertySupport.setPropertyString(PROP_KEY_STOKE, keyStroke);
   }
 
   @Override

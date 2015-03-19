@@ -63,7 +63,6 @@ import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
@@ -264,19 +263,18 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * If isAutoTabKeyStrokesEnabled is true this modifier is used in combination with a number to select tab.
    * possible values:
    * <ul>
-   * <li>control</li>
-   * <li>alternate</li>
-   * <li>meta</li>
-   * <li>shift</li>
+   * <li>IKeyStroke.CONTROL</li>
+   * <li>IKeyStroke.SHIFT</li>
+   * <li>IKeyStroke.ALT</li>
    * </ul>
-   * default
+   * default IKeyStroke.CONTROL
    *
    * @return
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(40)
   protected String getConfiguredAutoTabKeyStrokeModifier() {
-    return "control";
+    return IKeyStroke.CONTROL;
   }
 
   private List<Class<? extends IAction>> getConfiguredActions() {
@@ -541,19 +539,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     List<IAction> contributedActions = m_contributionHolder.getContributionsByClass(IAction.class);
     actionList.addAll(contributedActions);
-    //extract keystroke hints from menus
-    for (IMenu menu : new ActionFinder().findActions(actionList, IMenu.class, true)) {
-      if (menu.getKeyStroke() != null) {
-        try {
-          IKeyStroke ks = new KeyStroke(menu.getKeyStroke(), menu);
-          ks.initAction();
-          actionList.add(ks);
-        }
-        catch (Throwable t) {
-          LOG.error(null, t);
-        }
-      }
-    }
     //build completed menu, viewButton, toolButton lists
     // only top level menus
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
