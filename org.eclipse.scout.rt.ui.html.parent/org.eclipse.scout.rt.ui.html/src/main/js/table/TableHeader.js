@@ -68,6 +68,8 @@ scout.TableHeader = function(table, session) {
       .one('mouseup', resizeEnd);
     $('body').addClass('col-resize');
 
+    return false;
+
     function resizeMove(event) {
       var diff = event.pageX - startX,
         wHeader = headerWidth + diff;

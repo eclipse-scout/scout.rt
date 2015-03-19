@@ -39,7 +39,7 @@ scout.TableLayout.prototype._layoutColumns = function() {
     columns = this.table.columns,
     currentWidth = 0,
     totalInitialWidth = 0,
-    availableWidth = this.table.$data.outerWidth() - this.table.tableRowBorderWidth();
+    availableWidth = this.table.$data.outerWidth();
 
   columns.forEach(function(column) {
     if (column.fixedWidth) {

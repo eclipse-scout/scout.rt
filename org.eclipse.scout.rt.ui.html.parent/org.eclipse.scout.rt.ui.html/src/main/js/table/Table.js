@@ -390,22 +390,11 @@ scout.Table.prototype._buildRowDiv = function(row) {
   return rowDiv;
 };
 
-scout.Table.prototype.tableRowBorderWidth = function() {
-  if (this._tableRowBorderWidthCached !== undefined) {
-    return this._tableRowBorderWidthCached;
-  }
-  var $tableRowDummy = this.$data.appendDiv('table-row');
-  this._tableRowBorderWidthCached = $tableRowDummy.cssBorderLeftWidth() + $tableRowDummy.cssBorderRightWidth();
-  $tableRowDummy.remove();
-  return this._tableRowBorderWidthCached;
-};
-
 scout.Table.prototype._updateRowWidth = function() {
   this._rowWidth = 0;
   for (var i = 0; i < this.columns.length; i++) {
     this._rowWidth += this.columns[i].width;
   }
-  this._rowWidth += this.tableRowBorderWidth();
 };
 
 scout.Table.prototype._drawData = function(startRow) {
