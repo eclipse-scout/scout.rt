@@ -47,7 +47,7 @@ scout.FormField.prototype.dispose = function() {
   this._uninstallKeyStrokeAdapter();
 };
 
-scout.FormField.prototype._registerKeyStrokeAdapter = function(){
+scout.FormField.prototype._registerKeyStrokeAdapter = function() {
   this.keyStrokeAdapter = new scout.FormFieldKeyStrokeAdapter(this);
 };
 
@@ -204,8 +204,7 @@ scout.FormField.prototype._onStatusClick = function() {
   // Toggle tooltip
   if (this.tooltip && this.tooltip.rendered) {
     this._hideStatusMessage();
-  }
-  else {
+  } else {
     var opts = {};
     if (this.$container.hasClass('has-error')) {
       opts.autoRemove = false;
@@ -361,4 +360,3 @@ scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
   htmlComp.setLayout(layout || new scout.FormFieldLayout(this));
   return htmlComp;
 };
-

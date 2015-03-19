@@ -23,8 +23,8 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     right = 0,
     top = 0;
 
-  containerSize = htmlContainer.getAvailableSize().
-    subtract(htmlContainer.getInsets());
+  containerSize = htmlContainer.getAvailableSize()
+    .subtract(htmlContainer.getInsets());
 
   if (formField.$label && formField.labelVisible) {
     // currently a gui only flag, necessary for sequencebox
@@ -123,8 +123,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     } else {
       prefSize = this.naturalSize(formField);
     }
-  }
-  else {
+  } else {
     prefSize = new scout.Dimension(0, 0);
   }
   width += prefSize.width;

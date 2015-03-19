@@ -45,7 +45,7 @@ scout.graphics = {
       'height': 'auto',
       'white-space': 'no-wrap'
     });
-    
+
     // measure
     prefSize = scout.graphics.getSize($elem, includeMargins);
 
@@ -154,7 +154,7 @@ scout.graphics = {
    */
   setLocation: function($comp, vararg, y) {
     var point = vararg instanceof scout.Point ?
-        vararg : new scout.Point(vararg, y);
+      vararg : new scout.Point(vararg, y);
     $comp
       .cssLeft(point.x)
       .cssTop(point.y);

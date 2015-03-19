@@ -1682,12 +1682,12 @@ scout.Table.linkRowToDiv = function(row, $row) {
 };
 
 scout.Table.prototype.injectKeyStrokeAdapter = function(adapter, target) {
-  if(adapter === this.keyStrokeAdapter){
-   return;
+  if (adapter === this.keyStrokeAdapter) {
+    return;
   }
-  if(scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)){
+  if (scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
     scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
   }
-    this.keyStrokeAdapter = adapter;
-    scout.keyStrokeManager.installAdapter(target, this.keyStrokeAdapter);
+  this.keyStrokeAdapter = adapter;
+  scout.keyStrokeManager.installAdapter(target, this.keyStrokeAdapter);
 };
