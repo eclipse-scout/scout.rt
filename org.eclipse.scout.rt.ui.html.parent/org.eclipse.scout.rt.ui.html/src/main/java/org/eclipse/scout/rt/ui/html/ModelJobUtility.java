@@ -8,20 +8,15 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.filter.AndFilter;
-import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobFutureFilters;
+import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.Filter;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.client.job.SessionFutureFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.filter.BlockedFutureFilter;
-import org.eclipse.scout.rt.platform.job.filter.FutureFilter;
-import org.eclipse.scout.rt.platform.job.filter.PeriodicFutureFilter;
 import org.eclipse.scout.rt.shared.ISession;
 
 public final class ModelJobUtility {
@@ -41,10 +36,8 @@ public final class ModelJobUtility {
       throw new IllegalStateException("Cannot wait for another sync job, because current job is also sync!");
     }
     try {
-      final IFilter<IFuture<?>> sessionFilter = new SessionFutureFilter(clientSession);
-      final IFilter<IFuture<?>> notBlockedFilter = new NotFilter<>(BlockedFutureFilter.INSTANCE);
-      final IFilter<IFuture<?>> nonPeriodicFilter = new PeriodicFutureFilter(false);
-      Jobs.getJobManager().awaitDone(new AndFilter<>(sessionFilter, notBlockedFilter, nonPeriodicFilter), 1, TimeUnit.HOURS);
+      Filter filter = ClientJobFutureFilters.newFilter().modelJobsOnly().session(clientSession).notBlocked().notPeriodic();
+      Jobs.getJobManager().awaitDone(filter, 1, TimeUnit.HOURS);
     }
     catch (InterruptedException e) {
       LOG.warn("Interrupted while waiting for all jobs to complete.", e);
@@ -58,7 +51,7 @@ public final class ModelJobUtility {
     else {
       IFuture<?> future = ModelJobs.schedule(executable, ModelJobInput.defaults().setSession(clientSession));
       try {
-        Jobs.getJobManager().awaitDone(new AndFilter<>(new FutureFilter(future), new NotFilter<>(BlockedFutureFilter.INSTANCE)), 1, TimeUnit.HOURS);
+        Jobs.getJobManager().awaitDone(ClientJobFutureFilters.newFilter().futures(future).notBlocked(), 1, TimeUnit.HOURS);
       }
       catch (InterruptedException e) {
         LOG.warn("Interrupted while waiting for executable '" + executable.getClass().getName() + "'.", e);

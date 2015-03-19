@@ -15,28 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.Range;
-import org.eclipse.scout.commons.filter.AndFilter;
-import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.filter.NotFilter;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.CurrentSessionFutureFilter;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarAdapter;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarListener;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
-import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobExecutionException;
-import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.filter.CurrentFutureFilter;
-import org.eclipse.scout.rt.platform.job.filter.PeriodicFutureFilter;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -49,7 +34,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObserver<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonCalendar.class);
 
   // from model
   public static final String EVENT_CALENDAR_CHANGED = "calendarChanged";
@@ -335,28 +319,26 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   }
 
   private static void waitForAllOtherJobs() {
-    final IBlockingCondition waitForClientJobsToComplete = Jobs.getJobManager().createBlockingCondition("Wait for ClientJobs to complete", true);
-    try {
-      ClientJobs.schedule(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          try {
-            final IFilter<IFuture<?>> currentSessionFilter = CurrentSessionFutureFilter.INSTANCE;
-            final IFilter<IFuture<?>> notCurrentFutureFilter = new NotFilter<>(CurrentFutureFilter.INSTANCE);
-            final IFilter<IFuture<?>> nonPeriodicFilter = new PeriodicFutureFilter(false);
-
-            Jobs.getJobManager().awaitDone(new AndFilter<>(currentSessionFilter, notCurrentFutureFilter, nonPeriodicFilter), 1, TimeUnit.MINUTES);
-          }
-          finally {
-            waitForClientJobsToComplete.setBlocking(false);
-          }
-        }
-      });
-
-      waitForClientJobsToComplete.waitFor();
-    }
-    catch (JobExecutionException e) {
-      LOG.error("Could not schedule waiting job.", e);
-    }
+    // TODO [bsh][dw]: verify
+//    final IBlockingCondition waitForClientJobsToComplete = Jobs.getJobManager().createBlockingCondition("Wait for ClientJobs to complete", true);
+//    try {
+//      ClientJobs.schedule(new IRunnable() {
+//        @Override
+//        public void run() throws Exception {
+//          try {
+//            Filter filter = ClientJobFutureFilters.newFilter().currentSession().notCurrentFuture().notPeriodic();
+//            Jobs.getJobManager().awaitDone(filter, 1, TimeUnit.MINUTES);
+//          }
+//          finally {
+//            waitForClientJobsToComplete.setBlocking(false);
+//          }
+//        }
+//      });
+//
+//      waitForClientJobsToComplete.waitFor();
+//    }
+//    catch (JobExecutionException e) {
+//      LOG.error("Could not schedule waiting job.", e);
+//    }
   }
 }
