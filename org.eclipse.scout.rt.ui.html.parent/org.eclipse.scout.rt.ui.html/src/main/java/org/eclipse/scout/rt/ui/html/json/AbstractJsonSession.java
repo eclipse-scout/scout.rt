@@ -358,12 +358,20 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
 
     Jobs.getJobManager().removeListener(m_jobChangeListener);
+    // Notify waiting requests - should not delay web-container shutdown
+    notifyPollingBackgroundJobRequests();
     m_jsonAdapterRegistry.disposeAllJsonAdapters();
     m_currentJsonResponse = null;
     flush();
     // "Leak detection". After disposing all adapters and flushing the session, no adapters should be remaining.
     if (!m_jsonAdapterRegistry.isEmpty() && !m_unregisterAdapterSet.isEmpty()) {
       throw new IllegalStateException("JsonAdapterRegistry should be empty, but is not!");
+    }
+  }
+
+  private void notifyPollingBackgroundJobRequests() {
+    synchronized (m_backgroundJobLock) {
+      m_backgroundJobLock.notifyAll();
     }
   }
 
@@ -569,7 +577,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
-  // FIXME AWE: (Jobs) make configurable
   @Override
   public void waitForBackgroundJobs() {
     LOG.trace("Wait until background job terminates...");
@@ -704,10 +711,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
     @Override
     public void changed(JobEvent event) {
-      synchronized (m_backgroundJobLock) {
-        LOG.trace("Job done. Name=" + event.getFuture().getJobInput().getName() + ". Notify waiting requests...");
-        m_backgroundJobLock.notifyAll();
-      }
+      LOG.trace("Job done. Name=" + event.getFuture().getJobInput().getName() + ". Notify waiting requests...");
+      notifyPollingBackgroundJobRequests();
     }
   }
 

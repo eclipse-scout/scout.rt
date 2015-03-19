@@ -56,6 +56,8 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper();
   this.partId = jsonSessionId.substring(0, jsonSessionId.indexOf(':'));
+  this._backgroundJobPollingEnabled = false;
+  this._backgroundJobPollingSuccess = false;
 
   // TODO BSH Detach | Check if there is another way
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
@@ -100,7 +102,6 @@ scout.Session.prototype._initObjectFactory = function(options) {
       options.objectFactories = scout.defaultObjectFactories;
     }
   }
-
   this.objectFactory.register(options.objectFactories);
 };
 
@@ -242,10 +243,9 @@ scout.Session.prototype._coalesceEvents = function(previousEvents, event) {
 };
 
 scout.Session.prototype._sendRequest = function(request) {
-  var polling = !!request.pollForBackgroundJobs,
-    unload = !!request.unload;
+  var unload = !!request.unload;
 
-  if (this.offline && !polling) {
+  if (this.offline) {
     request.events.forEach(function(event) {
       this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
     }.bind(this));
@@ -269,30 +269,16 @@ scout.Session.prototype._sendRequest = function(request) {
 
   var jsError,
     success = false,
-    ajaxOptions = {
-      async: !unload,
-      type: 'POST',
-      dataType: 'json',
-      contentType: 'application/json; charset=UTF-8',
-      cache: false,
-      url: this.url,
-      data: JSON.stringify(request),
-      context: request
-    },
     busyHandling =
       !unload &&
-      !polling &&
       !this.areRequestsPending();
 
   if (busyHandling) {
     this.setBusy(true);
   }
-  // Don't increase pending counter for polling requests
-  if (!polling) {
-    this._requestsPendingCounter++;
-  }
+  this._requestsPendingCounter++;
 
-  $.ajax(ajaxOptions)
+  $.ajax(this._ajaxOptions(request, !unload))
     .done(onAjaxDone.bind(this))
     .fail(onAjaxFail.bind(this))
     .always(onAjaxAlways.bind(this));
@@ -320,18 +306,13 @@ scout.Session.prototype._sendRequest = function(request) {
   }
 
   function onAjaxAlways(data, textStatus, errorThrown) {
-    if (polling) {
-      // Immediately start a new poll background jobs request, when a polling request is done
-      setTimeout(this._pollForBackgroundJobs.bind(this));
-    } else {
-      // Don't decrease pending counter for polling requests
-      this._requestsPendingCounter--;
-    }
+    this._requestsPendingCounter--;
     if (busyHandling) {
       this.setBusy(false);
     }
     this.layoutValidator.validate();
     if (success) {
+      this._resumeBackgroundJobPolling();
       this._fireRequestFinished(data);
     }
     // Throw previously catched error
@@ -339,6 +320,59 @@ scout.Session.prototype._sendRequest = function(request) {
       throw jsError;
     }
   }
+};
+
+scout.Session.prototype._ajaxOptions = function(request, async) {
+  return {
+    async: async,
+    type: 'POST',
+    dataType: 'json',
+    contentType: 'application/json; charset=UTF-8',
+    cache: false,
+    url: this.url,
+    data: JSON.stringify(request),
+    context: request
+  };
+};
+
+scout.Session.prototype._resumeBackgroundJobPolling = function() {
+  if (this._backgroundJobPollingEnabled && !this._backgroundJobPollingSuccess) {
+    $.log.info('Resume background jobs polling request');
+    this._pollForBackgroundJobs();
+  }
+};
+
+/**
+ * Polls the results of jobs running in the background. Note: we cannot use the _sendRequest method here
+ * since we don't want any busy handling in case of background jobs. The request may take a while, since
+ * the server doesn't return until either a time-out occurs or there's something in the response when
+ * a model job is done and no request initiated by a user is running.
+ */
+scout.Session.prototype._pollForBackgroundJobs = function() {
+  var request = {
+      jsonSessionId: this.jsonSessionId,
+      pollForBackgroundJobs: true
+    };
+  $.ajax(this._ajaxOptions(request))
+    .done(function(data){
+      if (data.error) {
+        // Don't schedule a new polling request, when an error occurs
+        // when the next user-initiated request succeeds, we re-enable polling
+        // otherwise the polling would ping the server to death in case of an error
+        $.log.warn('Polling request failed. Interrupt polling until the next user-initiated request succeeds');
+        this._backgroundJobPollingSuccess = false;
+        this._processErrorJsonResponse(data.error);
+      } else {
+        this._processSuccessResponse(data);
+        this.layoutValidator.validate();
+        this._backgroundJobPollingSuccess = true;
+        setTimeout(this._pollForBackgroundJobs.bind(this));
+      }
+    }.bind(this))
+    .fail(function(jqXHR, textStatus, errorThrown){
+      this._backgroundJobPollingSuccess = false;
+      this._processErrorResponse(request, jqXHR, textStatus, errorThrown);
+    }.bind(this));
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {
@@ -364,19 +398,6 @@ scout.Session.prototype._processSuccessResponse = function(message) {
     cacheSize = scout.objects.countProperties(this.modelAdapterRegistry);
     $.log.debug('size of modelAdapterRegistry after response has been processed: ' + cacheSize);
   }
-};
-
-/**
- * Polls the results of jobs running in the background. Note: we cannot use the _sendRequest method here
- * since we don't want any busy handling in case of background jobs. The request may take a while, since
- * the server doesn't return until either a time-out occurs or there's something in the response when
- * a model job is done and no request initiated by a user is running.
- */
-scout.Session.prototype._pollForBackgroundJobs = function() {
-  this._sendRequest({
-    jsonSessionId: this.jsonSessionId,
-    pollForBackgroundJobs: true
-  });
 };
 
 scout.Session.prototype._copyAdapterData = function(adapterData) {
@@ -655,9 +676,7 @@ scout.Session.prototype._onInitialized = function(event) {
   this.locale = new scout.Locale(clientSessionData.locale);
   this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
   this.desktop.render(this.$entryPoint);
-  if (event.backgroundJobPollingEnabled) {
-    this._pollForBackgroundJobs();
-  }
+  this._backgroundJobPollingEnabled = event.backgroundJobPollingEnabled;
 };
 
 scout.Session.prototype._onLogout = function(event) {
