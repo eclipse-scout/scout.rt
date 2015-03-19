@@ -11,11 +11,13 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.ui.html.ModelJobUtility;
 
 /**
@@ -33,7 +35,7 @@ public class JsonEventProcessor {
 
   public void processEvents(final JsonRequest request, final JsonResponse response) {
     IClientSession clientSession = m_jsonSession.getClientSession();
-    ModelJobs.schedule(new IRunnable() {
+    IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         ModelJobUtility.runAsSubject(new Runnable() {
@@ -46,7 +48,16 @@ public class JsonEventProcessor {
         });
       }
     }, ModelJobInput.defaults().session(clientSession).name("processEvents"));
-    ModelJobUtility.waitUntilJobsHaveFinished(clientSession);
+    ModelJobUtility.waitUntilAllModelJobsJobsHaveFinished(clientSession);
+    try {
+      // If model job has finished (= not waitFor), check if there was an exception
+      if (future.isDone()) {
+        future.awaitDoneAndGet();
+      }
+    }
+    catch (ProcessingException e) {
+      throw new JsonException("Error while processing events", e);
+    }
   }
 
   protected void processEvent(JsonEvent event, JsonResponse response) {

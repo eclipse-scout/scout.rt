@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -31,10 +32,8 @@ public final class ModelJobUtility {
    * TODO [awe][dwi] Sync oder Async?
    * Wait until all sync jobs have been finished or only waitFor sync jobs are left.
    */
-  public static void waitUntilJobsHaveFinished(IClientSession clientSession) {
-    if (ModelJobs.isModelThread()) {
-      throw new IllegalStateException("Cannot wait for another sync job, because current job is also sync!");
-    }
+  public static void waitUntilAllModelJobsJobsHaveFinished(IClientSession clientSession) {
+    Assertions.assertFalse(ModelJobs.isModelThread(), "Cannot wait for another model job, because the current job is a model job itself");
     try {
       Filter filter = ClientJobFutureFilters.allFilter().modelJobsOnly().session(clientSession).notBlocked().notPeriodic();
       Jobs.getJobManager().awaitDone(filter, 1, TimeUnit.HOURS);
@@ -55,6 +54,11 @@ public final class ModelJobUtility {
       }
       catch (InterruptedException e) {
         LOG.warn("Interrupted while waiting for executable '" + executable.getClass().getName() + "'.", e);
+      }
+      // If the executable has finished, call awaitDone() to throw a possible exception from the job.
+      // We must _not_ do that if the job is blocked ("waitFor")!
+      if (future.isDone()) {
+        future.awaitDoneAndGet();
       }
     }
   }
