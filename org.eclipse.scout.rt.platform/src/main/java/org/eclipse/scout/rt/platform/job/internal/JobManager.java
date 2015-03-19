@@ -61,7 +61,7 @@ public class JobManager implements IJobManager {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobManager.class);
 
   protected static final String PROP_CORE_POOL_SIZE = "org.eclipse.scout.job.corePoolSize";
-  protected static final int DEFAULT_CORE_POOL_SIZE = 5; // The number of threads to keep in the pool, even if they are idle;
+  protected static final int DEFAULT_CORE_POOL_SIZE = 10; // The number of threads to keep in the pool, even if they are idle;
 
   protected static final String PROP_KEEP_ALIVE_TIME = "org.eclipse.scout.job.keepAliveTime"; // The time limit for which threads may remain idle before being terminated; use 0 to keep them alive forever.
   protected static final long DEFAULT_KEEP_ALIVE_TIME = 30; // minutes

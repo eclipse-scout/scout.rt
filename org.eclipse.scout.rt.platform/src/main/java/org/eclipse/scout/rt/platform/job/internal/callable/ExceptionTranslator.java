@@ -28,7 +28,9 @@ import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.context.Context.ContextInvocationException;
+import org.eclipse.scout.rt.platform.job.JobExceptionHandler;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.platform.job.JobInput;
 
@@ -68,11 +70,28 @@ public class ExceptionTranslator<RESULT> implements Callable<RESULT>, Chainable<
       return m_next.call();
     }
     catch (final Throwable t) {
+      handleException(t);
+
       final ProcessingException pe = ExceptionTranslator.translate(t);
       pe.addContextMessage(String.format("identity=%s", getIdentity()));
       pe.addContextMessage(String.format("job=%s", m_input.getIdentifier()));
 
       throw pe;
+    }
+  }
+
+  /**
+   * Method invoked to handle a job execution exception. By default,
+   * {@link JobExceptionHandler#handleException(JobInput, Throwable)} is invoked.
+   */
+  protected void handleException(final Throwable t) {
+    if (m_input.isLogOnError()) {
+      try {
+        OBJ.get(JobExceptionHandler.class).handleException(m_input, t);
+      }
+      catch (final RuntimeException e) {
+        // NOOP
+      }
     }
   }
 

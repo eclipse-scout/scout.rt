@@ -20,6 +20,8 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.JobExceptionHandler;
 
 /**
  * Thread factory for named threads and to handle uncaught exceptions.
@@ -49,18 +51,16 @@ public class NamedThreadFactory implements ThreadFactory {
     thread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 
       @Override
-      public void uncaughtException(final Thread t, final Throwable throwable) {
-        handleUncaughtException(t, throwable);
+      public void uncaughtException(final Thread t, final Throwable cause) {
+        try {
+          OBJ.get(JobExceptionHandler.class).handleUncaughtException(thread, cause);
+        }
+        catch (final RuntimeException e) {
+          LOG.error(String.format("Failed to handle uncaught exception [thread=%s, cause=%s]", t.getName(), cause), e);
+        }
       }
     });
     return thread;
-  }
-
-  /**
-   * Method invoked when an uncaught exception is thrown.
-   */
-  protected void handleUncaughtException(final Thread thread, final Throwable throwable) {
-    LOG.error(String.format("Worker thread abruptly terminated due to an uncaught exception [thread=%s]", thread.getName()), throwable);
   }
 
   /**

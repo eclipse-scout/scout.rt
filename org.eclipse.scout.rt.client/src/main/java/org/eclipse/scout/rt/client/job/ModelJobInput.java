@@ -79,6 +79,11 @@ public class ModelJobInput extends ClientJobInput {
   }
 
   @Override
+  public ModelJobInput logOnError(final boolean logOnError) {
+    return (ModelJobInput) super.logOnError(logOnError);
+  }
+
+  @Override
   public ModelJobInput session(final IClientSession session) {
     return (ModelJobInput) super.session(session);
   }

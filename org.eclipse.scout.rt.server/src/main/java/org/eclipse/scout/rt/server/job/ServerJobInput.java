@@ -76,6 +76,11 @@ public class ServerJobInput extends JobInput<ServerContext> {
     return (ServerJobInput) super.locale(locale);
   }
 
+  @Override
+  public ServerJobInput logOnError(final boolean logOnError) {
+    return (ServerJobInput) super.logOnError(logOnError);
+  }
+
   public IServerSession getSession() {
     return getContext().getSession();
   }

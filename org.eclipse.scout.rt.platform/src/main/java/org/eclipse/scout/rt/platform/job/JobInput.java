@@ -44,6 +44,7 @@ public class JobInput<CONTEXT extends Context> {
   protected String m_name;
   protected Object m_mutexObject;
   protected long m_expirationTime;
+  protected boolean m_logOnError;
   protected CONTEXT m_context;
 
   protected JobInput() {
@@ -54,9 +55,8 @@ public class JobInput<CONTEXT extends Context> {
     m_name = origin.m_name;
     m_mutexObject = origin.m_mutexObject;
     m_expirationTime = origin.m_expirationTime;
+    m_logOnError = origin.m_logOnError;
   }
-
-  // === setter methods ===
 
   public String getId() {
     return m_id;
@@ -152,6 +152,18 @@ public class JobInput<CONTEXT extends Context> {
     return this;
   }
 
+  public boolean isLogOnError() {
+    return m_logOnError;
+  }
+
+  /**
+   * Instrument the job manager to log execution exceptions caused by this job; is <code>true</code> by default.
+   */
+  public JobInput logOnError(final boolean logOnError) {
+    m_logOnError = logOnError;
+    return this;
+  }
+
   public PropertyMap getPropertyMap() {
     return m_context.getPropertyMap();
   }
@@ -186,6 +198,7 @@ public class JobInput<CONTEXT extends Context> {
   public static JobInput defaults() {
     final JobInput<Context> defaults = new JobInput<>();
     defaults.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
+    defaults.logOnError(true);
     defaults.context(Context.defaults());
     return defaults;
   }
@@ -196,6 +209,7 @@ public class JobInput<CONTEXT extends Context> {
   public static JobInput empty() {
     final JobInput<Context> empty = new JobInput<>();
     empty.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
+    empty.logOnError(true);
     empty.context(Context.empty());
     return empty;
   }
