@@ -15,7 +15,6 @@ import javax.annotation.PreDestroy;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.service.IServiceInitializer.ServiceInitializerResult;
 
@@ -23,7 +22,7 @@ import org.eclipse.scout.service.IServiceInitializer.ServiceInitializerResult;
  * Convenience {@link IService} implementation with support for config.ini
  * variable injection. see {@link ServiceUtility#injectConfigProperties(IService)}
  */
-@ApplicationScoped
+//@ApplicationScoped // FIXME abr uncomment after switching from plugin.xml to scout.xml
 public abstract class AbstractService implements IService {
   @SuppressWarnings("unused")
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractService.class);
