@@ -98,11 +98,6 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     return false;
   }
 
-  @Override
-  protected boolean getConfiguredGridUseUiHeight() {
-    return true;
-  }
-
   /**
    * Default implementation ensures that all fields in the range box have
    * ascending values.<br>
