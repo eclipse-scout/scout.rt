@@ -16,13 +16,13 @@ import java.util.Map;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobEventFilters;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
-import org.eclipse.scout.rt.platform.job.listener.JobEventFutureFilter;
 import org.eclipse.scout.service.AbstractService;
 
 /**
@@ -116,7 +116,7 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
 
       IJobListener listener = new P_JobChangeListenerEx();
       m_listeners.put(future, listener);
-      Jobs.getJobManager().addListener(listener, new JobEventFutureFilter(future));
+      Jobs.getJobManager().addListener(listener, ClientJobEventFilters.allFilter().futures(future));
 
       handler.onJobBegin(future);
     }

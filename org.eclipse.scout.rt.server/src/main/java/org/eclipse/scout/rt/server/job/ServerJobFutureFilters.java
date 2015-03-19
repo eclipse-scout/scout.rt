@@ -30,16 +30,16 @@ public final class ServerJobFutureFilters {
   }
 
   /**
-   * Creates a filter to accept only server jobs with some specific characteristics. The filter is designed to support
-   * method chaining.
+   * Creates a filter to accept Futures of all server jobs that comply with some specific characteristics. By default,
+   * the filter returned accepts all server job Futures. The filter is designed to support method
+   * chaining.
    */
-  public static Filter newFilter() {
+  public static Filter allFilter() {
     return new Filter();
   }
 
   /**
-   * Filter to accept only server jobs with the given characteristics.
-   * <p/>
+   * Filter to accept Futures of all server jobs that comply with the given characteristics.<br/>
    * The 'setter-methods' returns <code>this</code> in order to support for method chaining.
    *
    * @since 5.1
@@ -48,12 +48,17 @@ public final class ServerJobFutureFilters {
 
     @Override
     protected void postConstruct() {
-      m_filters.add(ServerJobFilter.INSTANCE);
+      andFilter(ServerJobFilter.INSTANCE);
     }
 
     @Override
-    public Filter id(final String id) {
-      return (Filter) super.id(id);
+    public Filter andFilter(final IFilter<IFuture<?>> filter) {
+      return (Filter) super.andFilter(filter);
+    }
+
+    @Override
+    public Filter ids(final String... ids) {
+      return (Filter) super.ids(ids);
     }
 
     @Override
@@ -96,11 +101,16 @@ public final class ServerJobFutureFilters {
       return (Filter) super.notPeriodic();
     }
 
+    @Override
+    public Filter mutex(final Object mutexObject) {
+      return (Filter) super.mutex(mutexObject);
+    }
+
     /**
      * To accept only jobs which are run on behalf of the given server session.
      */
     public Filter session(final IServerSession session) {
-      m_filters.add(new SessionFilter(session));
+      andFilter(new SessionFilter(session));
       return this;
     }
 
@@ -110,7 +120,7 @@ public final class ServerJobFutureFilters {
      * @see ISession#CURRENT
      */
     public Filter currentSession() {
-      m_filters.add(new SessionFilter(ISession.CURRENT.get()));
+      andFilter(new SessionFilter(ISession.CURRENT.get()));
       return this;
     }
 
@@ -120,7 +130,7 @@ public final class ServerJobFutureFilters {
      * @see ISession#CURRENT
      */
     public Filter notCurrentSession() {
-      m_filters.add(new NotFilter<>(new SessionFilter(ISession.CURRENT.get())));
+      andFilter(new NotFilter<>(new SessionFilter(ISession.CURRENT.get())));
       return this;
     }
   }

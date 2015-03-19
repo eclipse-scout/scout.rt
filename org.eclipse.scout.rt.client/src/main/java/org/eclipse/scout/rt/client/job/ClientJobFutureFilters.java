@@ -31,16 +31,16 @@ public final class ClientJobFutureFilters {
   }
 
   /**
-   * Creates a filter to accept only client- or model jobs with some specific characteristics. The filter is designed to
-   * support method chaining.
+   * Creates a filter to accept Futures of all client- or model jobs that comply with some specific characteristics. By
+   * default, the filter returned accepts all client/model-job Futures. The filter is designed to support method
+   * chaining.
    */
-  public static Filter newFilter() {
+  public static Filter allFilter() {
     return new Filter();
   }
 
   /**
-   * Filter to accept only client- or model jobs with the given characteristics.
-   * <p/>
+   * Filter to accept Futures of all client- and model jobs that comply with the given characteristics.<br/>
    * The 'setter-methods' returns <code>this</code> in order to support for method chaining.
    *
    * @since 5.1
@@ -49,12 +49,17 @@ public final class ClientJobFutureFilters {
 
     @Override
     protected void postConstruct() {
-      m_filters.add(new OrFilter<>(ClientJobFilter.INSTANCE, ModelJobFilter.INSTANCE));
+      andFilter(new OrFilter<>(ClientJobFilter.INSTANCE, ModelJobFilter.INSTANCE));
     }
 
     @Override
-    public Filter id(String id) {
-      return (Filter) super.id(id);
+    public Filter andFilter(final IFilter<IFuture<?>> filter) {
+      return (Filter) super.andFilter(filter);
+    }
+
+    @Override
+    public Filter ids(final String... ids) {
+      return (Filter) super.ids(ids);
     }
 
     @Override
@@ -97,11 +102,16 @@ public final class ClientJobFutureFilters {
       return (Filter) super.notPeriodic();
     }
 
+    @Override
+    public Filter mutex(final Object mutexObject) {
+      return (Filter) super.mutex(mutexObject);
+    }
+
     /**
      * To accept only jobs which are run on behalf of the given client session.
      */
     public Filter session(final IClientSession session) {
-      m_filters.add(new SessionFilter(session));
+      andFilter(new SessionFilter(session));
       return this;
     }
 
@@ -111,7 +121,7 @@ public final class ClientJobFutureFilters {
      * @see ISession#CURRENT
      */
     public Filter currentSession() {
-      m_filters.add(new SessionFilter(ISession.CURRENT.get()));
+      andFilter(new SessionFilter(ISession.CURRENT.get()));
       return this;
     }
 
@@ -121,7 +131,7 @@ public final class ClientJobFutureFilters {
      * @see ISession#CURRENT
      */
     public Filter notCurrentSession() {
-      m_filters.add(new NotFilter<>(new SessionFilter(ISession.CURRENT.get())));
+      andFilter(new NotFilter<>(new SessionFilter(ISession.CURRENT.get())));
       return this;
     }
 
@@ -129,7 +139,7 @@ public final class ClientJobFutureFilters {
      * To accept only model jobs, and not client jobs.
      */
     public Filter modelJobsOnly() {
-      m_filters.add(ModelJobFilter.INSTANCE);
+      andFilter(ModelJobFilter.INSTANCE);
       return this;
     }
 
@@ -137,7 +147,7 @@ public final class ClientJobFutureFilters {
      * To accept only client jobs, and not model jobs.
      */
     public Filter clientJobsOnly() {
-      m_filters.add(ClientJobFilter.INSTANCE);
+      andFilter(ClientJobFilter.INSTANCE);
       return this;
     }
   }

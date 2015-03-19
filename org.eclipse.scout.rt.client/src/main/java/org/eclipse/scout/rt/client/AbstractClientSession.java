@@ -507,7 +507,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
       }
     };
 
-    Jobs.getJobManager().visit(ClientJobFutureFilters.newFilter().session(this), visitor);
+    Jobs.getJobManager().visit(ClientJobFutureFilters.allFilter().session(this), visitor);
 
     return futures;
   }

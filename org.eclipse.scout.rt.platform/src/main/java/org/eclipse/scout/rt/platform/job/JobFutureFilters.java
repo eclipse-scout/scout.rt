@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
@@ -31,25 +32,22 @@ public final class JobFutureFilters {
   }
 
   /**
-   * Creates a filter to accept only 'basic jobs' with some specific characteristics. 'Basic jobs' are jobs with a
-   * concrete {@link JobInput} as their input and do not include client-, model- nor server jobs. The filter is designed
-   * to support method chaining.
+   * Creates a filter to accept Futures of all jobs that comply with some specific characteristics. By default, the
+   * filter returned accepts all Futures. The filter is designed to support method chaining.
    */
-  public static Filter newFilter() {
+  public static Filter allFilter() {
     return new Filter();
   }
 
   /**
-   * Filter to accept only 'basic jobs' with the given characteristics. 'Basic jobs' are jobs with a concrete
-   * {@link JobInput} as their input and do not include client-, model- nor server jobs.
-   * <p/>
+   * Filter to accept Futures of all jobs that comply with the given characteristics.<br/>
    * The 'setter-methods' returns <code>this</code> in order to support for method chaining.
    *
    * @since 5.1
    */
   public static class Filter implements IFilter<IFuture<?>> {
 
-    protected final List<IFilter<IFuture<?>>> m_filters = new ArrayList<>();
+    private final List<IFilter<IFuture<?>>> m_filters = new ArrayList<>();
 
     public Filter() {
       postConstruct();
@@ -57,21 +55,28 @@ public final class JobFutureFilters {
 
     @Override
     public boolean accept(final IFuture<?> future) {
-      return new AndFilter<>(m_filters).accept(future);
+      return (m_filters.isEmpty() ? true : new AndFilter<>(m_filters).accept(future));
     }
 
     /**
-     * Method invoked after construction. The default implementation adds a filter to accept only 'basic jobs'.
+     * Method invoked after construction.
      */
     protected void postConstruct() {
-      m_filters.add(JobFilter.INSTANCE);
     }
 
     /**
-     * To accept only jobs of the given job-id.
+     * Registers the given filter to further constrain the Futures to be accepted.
      */
-    public Filter id(final String id) {
-      m_filters.add(new IdFilter(id));
+    public Filter andFilter(final IFilter<IFuture<?>> filter) {
+      m_filters.add(filter);
+      return this;
+    }
+
+    /**
+     * To accept only jobs of the given job id's.
+     */
+    public Filter ids(final String... ids) {
+      andFilter(new JobIdFilter(ids));
       return this;
     }
 
@@ -79,7 +84,7 @@ public final class JobFutureFilters {
      * To accept only jobs which belong to the given Futures.
      */
     public Filter futures(final IFuture<?>... futures) {
-      m_filters.add(new FutureFilter(futures));
+      andFilter(new FutureFilter(futures));
       return this;
     }
 
@@ -87,7 +92,7 @@ public final class JobFutureFilters {
      * To accept only jobs which belong to the given Futures.
      */
     public Filter futures(final Collection<IFuture<?>> futures) {
-      m_filters.add(new FutureFilter(futures));
+      andFilter(new FutureFilter(futures));
       return this;
     }
 
@@ -97,7 +102,7 @@ public final class JobFutureFilters {
      * @see IFuture#CURRENT
      */
     public Filter currentFuture() {
-      m_filters.add(new FutureFilter(IFuture.CURRENT.get()));
+      andFilter(new FutureFilter(IFuture.CURRENT.get()));
       return this;
     }
 
@@ -107,7 +112,7 @@ public final class JobFutureFilters {
      * @see IFuture#CURRENT
      */
     public Filter notCurrentFuture() {
-      m_filters.add(new NotFilter<>(new FutureFilter(IFuture.CURRENT.get())));
+      andFilter(new NotFilter<>(new FutureFilter(IFuture.CURRENT.get())));
       return this;
     }
 
@@ -117,7 +122,7 @@ public final class JobFutureFilters {
      * @see IBlockingCondition
      */
     public Filter blocked() {
-      m_filters.add(new BlockedFilter(true));
+      andFilter(BlockedFilter.TRUE_INSTANCE);
       return this;
     }
 
@@ -127,7 +132,7 @@ public final class JobFutureFilters {
      * @see IBlockingCondition
      */
     public Filter notBlocked() {
-      m_filters.add(new BlockedFilter(false));
+      andFilter(BlockedFilter.FALSE_INSTANCE);
       return this;
     }
 
@@ -138,7 +143,7 @@ public final class JobFutureFilters {
      * @see IJobManager#scheduleAtFixedRate()
      */
     public Filter periodic() {
-      m_filters.add(new PeriodicFilter(true));
+      andFilter(PeriodicFilter.TRUE_INSTANCE);
       return this;
     }
 
@@ -148,7 +153,15 @@ public final class JobFutureFilters {
      * @see IJobManager#schedule()
      */
     public Filter notPeriodic() {
-      m_filters.add(new PeriodicFilter(false));
+      andFilter(PeriodicFilter.FALSE_INSTANCE);
+      return this;
+    }
+
+    /**
+     * To accept only jobs which belong to the given mutex object.
+     */
+    public Filter mutex(final Object mutexObject) {
+      andFilter(new MutexFilter(mutexObject));
       return this;
     }
   }
@@ -184,9 +197,12 @@ public final class JobFutureFilters {
    */
   public static class BlockedFilter implements IFilter<IFuture<?>> {
 
+    public static final IFilter<IFuture<?>> TRUE_INSTANCE = new BlockedFilter(true);
+    public static final IFilter<IFuture<?>> FALSE_INSTANCE = new BlockedFilter(false);
+
     private final boolean m_blocked;
 
-    public BlockedFilter(final boolean blocked) {
+    private BlockedFilter(final boolean blocked) {
       m_blocked = blocked;
     }
 
@@ -203,9 +219,12 @@ public final class JobFutureFilters {
    */
   public static class PeriodicFilter implements IFilter<IFuture<?>> {
 
+    public static final IFilter<IFuture<?>> TRUE_INSTANCE = new PeriodicFilter(true);
+    public static final IFilter<IFuture<?>> FALSE_INSTANCE = new PeriodicFilter(false);
+
     private final boolean m_periodic;
 
-    public PeriodicFilter(final boolean periodic) {
+    private PeriodicFilter(final boolean periodic) {
       m_periodic = periodic;
     }
 
@@ -216,15 +235,15 @@ public final class JobFutureFilters {
   }
 
   /**
-   * Filter which discards all Futures which do not belong to the given <code>job-id</code>.
+   * Filter which discards all Futures which do not belong to the given job id's.
    *
    * @since 5.1
    */
-  public static class IdFilter implements IFilter<IFuture<?>> {
+  public static class JobIdFilter implements IFilter<IFuture<?>> {
 
     private final Set<String> m_ids;
 
-    public IdFilter(final String... id) {
+    public JobIdFilter(final String... id) {
       m_ids = CollectionUtility.hashSet(id);
     }
 
@@ -235,21 +254,21 @@ public final class JobFutureFilters {
   }
 
   /**
-   * Filter which accepts only Futures from 'basic jobs'. 'Basic jobs' are jobs with a
-   * concrete {@link JobInput} as their input and do not include client-, model- nor server jobs.
+   * Filter which accepts all Futures that belong to the given mutex object.
    *
    * @since 5.1
    */
-  public static class JobFilter implements IFilter<IFuture<?>> {
+  public static class MutexFilter implements IFilter<IFuture<?>> {
 
-    public static final IFilter<IFuture<?>> INSTANCE = new JobFilter();
+    private final Object m_mutexObject;
 
-    private JobFilter() {
+    public MutexFilter(final Object mutexObject) {
+      m_mutexObject = mutexObject;
     }
 
     @Override
     public boolean accept(final IFuture<?> future) {
-      return JobInput.class.equals(future.getJobInput().getClass());
+      return CompareUtility.equals(m_mutexObject, future.getJobInput().getMutex());
     }
   }
 }

@@ -139,7 +139,7 @@ public class SwingMock extends AbstractGuiMock {
       //wait until model queue is empty
       try {
         IClientSession clientSession = getClientSession();
-        Jobs.getJobManager().awaitDone(ClientJobFutureFilters.newFilter().modelJobsOnly().session(clientSession).notPeriodic(), 1, TimeUnit.HOURS);
+        Jobs.getJobManager().awaitDone(ClientJobFutureFilters.allFilter().modelJobsOnly().session(clientSession).notPeriodic(), 1, TimeUnit.HOURS);
       }
       catch (InterruptedException e) {
         throw new IllegalStateException("Interrupted", e);

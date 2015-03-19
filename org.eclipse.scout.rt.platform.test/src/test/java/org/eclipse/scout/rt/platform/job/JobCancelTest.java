@@ -462,7 +462,7 @@ public class JobCancelTest {
   }
 
   private static AndFilter<IFuture<?>> newJobIdAndMutexFilter(final String jobId, final Object mutex) {
-    final IFilter<IFuture<?>> jobFilter = new JobFutureFilters.IdFilter(jobId);
+    final IFilter<IFuture<?>> jobFilter = JobFutureFilters.allFilter().ids(jobId);
     final IFilter<IFuture<?>> mutexFilter = new IFilter<IFuture<?>>() {
 
       @Override

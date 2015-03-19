@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
+import org.eclipse.scout.rt.platform.job.JobEventFilters;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.internal.callable.ApplyContextCallable;
@@ -48,7 +49,6 @@ import org.eclipse.scout.rt.platform.job.internal.future.JobFutureTask;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
-import org.eclipse.scout.rt.platform.job.listener.JobEventTypeFilter;
 
 /**
  * Default implementation of {@link IJobManager}.
@@ -81,7 +81,7 @@ public class JobManager implements IJobManager {
     m_mutexSemaphores = Assertions.assertNotNull(createMutexSemaphores(m_executor));
     m_listeners = new JobListeners();
 
-    addListener(m_futures, new JobEventTypeFilter(JobEventType.SCHEDULED, JobEventType.DONE, JobEventType.BLOCKED, JobEventType.UNBLOCKED));
+    addListener(m_futures, JobEventFilters.allFilter().eventTypes(JobEventType.SCHEDULED, JobEventType.DONE, JobEventType.BLOCKED, JobEventType.UNBLOCKED));
   }
 
   @Override

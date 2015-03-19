@@ -188,7 +188,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
       String jobId = getClass().getName();
 
       // Cancel pending job
-      Jobs.getJobManager().cancel(ClientJobFutureFilters.newFilter().currentSession().id(jobId), true);
+      Jobs.getJobManager().cancel(ClientJobFutureFilters.allFilter().currentSession().ids(jobId), true);
 
       ClientJobs.schedule(new ForceGCJob(), ClientJobInput.defaults().name("release memory").id(getClass().getName()));
 

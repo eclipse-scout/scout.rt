@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -50,7 +49,7 @@ public class JobListenerTest {
   @Test
   public void testEvents() throws Exception {
     P_JobChangeListener listener = new P_JobChangeListener();
-    m_jobManager.addListener(listener, new AlwaysFilter<JobEvent>());
+    m_jobManager.addListener(listener, JobEventFilters.allFilter());
 
     IFuture<Void> future = null;
     JobInput input = JobInput.empty();
@@ -59,7 +58,7 @@ public class JobListenerTest {
       public void run() throws Exception {
       }
     }, input);
-    m_jobManager.awaitDone(JobFutureFilters.newFilter().futures(future), 1, TimeUnit.MINUTES);
+    m_jobManager.awaitDone(JobFutureFilters.allFilter().futures(future), 1, TimeUnit.MINUTES);
     m_jobManager.shutdown();
     m_jobManager.removeListener(listener);
 
@@ -82,7 +81,7 @@ public class JobListenerTest {
   @Test
   public void testCancel() throws Exception {
     P_JobChangeListener listener = new P_JobChangeListener();
-    m_jobManager.addListener(listener, new AlwaysFilter<JobEvent>());
+    m_jobManager.addListener(listener, JobEventFilters.allFilter());
     final BooleanHolder hasStarted = new BooleanHolder(Boolean.FALSE);
     IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
       @Override
@@ -91,7 +90,7 @@ public class JobListenerTest {
       }
     }, 200, TimeUnit.MILLISECONDS, JobInput.empty());
     future.cancel(true);
-    m_jobManager.awaitDone(JobFutureFilters.newFilter().futures(future), 1, TimeUnit.MINUTES);
+    m_jobManager.awaitDone(JobFutureFilters.allFilter().futures(future), 1, TimeUnit.MINUTES);
     m_jobManager.removeListener(listener);
     m_jobManager.shutdown();
 

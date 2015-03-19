@@ -76,10 +76,10 @@ public class AwaitDoneTest {
       }
     }, JobInput.defaults());
 
-    assertTrue(m_jobManager.awaitDone(JobFutureFilters.newFilter().futures(future1), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(JobFutureFilters.allFilter().futures(future1), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
     assertTrue(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
-    assertTrue(m_jobManager.isDone(JobFutureFilters.newFilter().futures(future1)));
+    assertTrue(m_jobManager.isDone(JobFutureFilters.allFilter().futures(future1)));
   }
 
   @Test
@@ -106,8 +106,8 @@ public class AwaitDoneTest {
       }
     }, JobInput.defaults());
 
-    assertTrue(m_jobManager.awaitDone(JobFutureFilters.newFilter().futures(future1), 30, TimeUnit.SECONDS));
-    assertTrue(m_jobManager.isDone(JobFutureFilters.newFilter().futures(future1)));
+    assertTrue(m_jobManager.awaitDone(JobFutureFilters.allFilter().futures(future1), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.isDone(JobFutureFilters.allFilter().futures(future1)));
     assertFalse(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
     assertFalse(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 500, TimeUnit.MILLISECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
@@ -135,6 +135,6 @@ public class AwaitDoneTest {
       }
     }, JobInput.defaults());
 
-    assertTrue(m_jobManager.awaitDone(JobFutureFilters.newFilter().notBlocked(), 10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(JobFutureFilters.allFilter().notBlocked(), 10, TimeUnit.SECONDS));
   }
 }
