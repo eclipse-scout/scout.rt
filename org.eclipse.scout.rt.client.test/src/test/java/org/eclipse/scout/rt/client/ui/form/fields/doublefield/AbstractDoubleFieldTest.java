@@ -23,7 +23,6 @@ import java.text.NumberFormat;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
@@ -47,7 +46,7 @@ public class AbstractDoubleFieldTest extends AbstractDoubleField {
   }
 
   @Test
-  public void testParseValueInternalInRange() throws ProcessingException {
+  public void testParseValue() throws ProcessingException {
     setFractionDigits(50);
     assertEquals("parsing failed", Double.valueOf(42), parseValueInternal("42"));
     assertEquals("parsing failed", Double.valueOf(-42), parseValueInternal("-42"));
@@ -79,23 +78,6 @@ public class AbstractDoubleFieldTest extends AbstractDoubleField {
     setMinValue(null);
     assertEquals("expected maxValue=Double.MAX_VALUE after calling setter with null-param", Double.valueOf(Double.MAX_VALUE), getMaxValue());
     assertEquals("expected minValue=-Double.MAX_VALUE after calling setter with null-param", Double.valueOf(-Double.MAX_VALUE), getMinValue());
-  }
-
-  @Test
-  public void testParseValueInternalMaxMin() throws ProcessingException {
-    // expect default for maxValue=Double.MAX_VALUE and minValue=-Double.MAX_VALUE
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, BigDecimal.valueOf(Double.MAX_VALUE).toPlainString() + "0");
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, BigDecimal.valueOf(-Double.MAX_VALUE).toPlainString() + "0");
-    assertEquals("parsing failed", Double.valueOf(Double.MAX_VALUE), parseValueInternal(BigDecimal.valueOf(Double.MAX_VALUE).toPlainString()));
-    assertEquals("parsing failed", Double.valueOf(-Double.MAX_VALUE), parseValueInternal(BigDecimal.valueOf(-Double.MAX_VALUE).toPlainString()));
-
-    setMaxValue(99d);
-    setMinValue(-99d);
-    setFractionDigits(2);
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, formatWithFractionDigits(99.04, 2));
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, formatWithFractionDigits(-99.9, 1));
-    assertEquals("parsing failed", Double.valueOf(99), parseValueInternal("99"));
-    assertEquals("parsing failed", Double.valueOf(-99), parseValueInternal("-99"));
   }
 
   @Test

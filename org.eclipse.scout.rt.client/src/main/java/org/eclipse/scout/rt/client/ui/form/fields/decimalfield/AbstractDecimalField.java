@@ -249,7 +249,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
   }
 
   /**
-   * Rounds the parsed value according {@link #getRoundingMode()} and {@link #getParsingFractionDigits()}. (The maximum
+   * Rounds the parsed value according {@link #getRoundingMode()} and {@link #getFractionDigits()}. (The maximum
    * fraction digits used for parsing is adapted to {@link #getMultiplier()} if needed.)
    *
    * @throws ArithmeticException

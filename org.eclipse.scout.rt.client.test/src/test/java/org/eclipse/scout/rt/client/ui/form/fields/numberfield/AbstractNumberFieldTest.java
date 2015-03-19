@@ -88,6 +88,17 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     assertTrue(msg, exceptionOccured);
   }
 
+  public static <T extends Number> void assertValidateValueInternalThrowsProcessingException(String msg, AbstractNumberField<T> field, T rawValue) {
+    boolean exceptionOccured = false;
+    try {
+      field.validateValueInternal(rawValue);
+    }
+    catch (ProcessingException e) {
+      exceptionOccured = true;
+    }
+    assertTrue(msg, exceptionOccured);
+  }
+
   @Test
   public void testParseValueSuffix() throws ProcessingException {
     for (Locale locale : DecimalFormat.getAvailableLocales()) {
@@ -356,8 +367,38 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
     }
   }
 
+  @Test
+  public void testValidateValueInternalMaxMin() throws ProcessingException {
+    // expect default for maxValue=getMaxPossibleValue() and minValue=getMinPossibleValue()
+    assertEquals("expected to pass validation", getMaxPossibleValue(), validateValueInternal(getMaxPossibleValue()));
+    assertEquals("expected to pass validation", getMinPossibleValue(), validateValueInternal(getMinPossibleValue()));
+
+    setMaxValue(BigDecimal.valueOf(99));
+    setMinValue(BigDecimal.valueOf(-99));
+    AbstractNumberFieldTest.assertValidateValueInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, BigDecimal.valueOf(100));
+    AbstractNumberFieldTest.assertValidateValueInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, BigDecimal.valueOf(-100));
+    assertEquals("expected to pass validation", BigDecimal.valueOf(99), validateValueInternal(BigDecimal.valueOf(99)));
+    assertEquals("expected to pass validation", BigDecimal.valueOf(-99), validateValueInternal(BigDecimal.valueOf(-99)));
+  }
+
   private String format(String s, char decimalSeparator) {
     return s.replace('.', decimalSeparator);
+  }
+
+  @Test
+  public void testSetMaxAndMinValueNull() {
+    assertEquals("expect default for maxValue=getMaxPossibleValue()", getMaxPossibleValue(), getMaxValue());
+    assertEquals("expect default for minValue=getMinPossibleValue()", getMinPossibleValue(), getMinValue());
+
+    setMaxValue(BigDecimal.valueOf(99));
+    setMinValue(BigDecimal.valueOf(-99));
+    assertEquals("maxValue not as set above", BigDecimal.valueOf(99), getMaxValue());
+    assertEquals("minValue not as set above", BigDecimal.valueOf(-99), getMinValue());
+
+    setMaxValue(null);
+    setMinValue(null);
+    assertEquals("expect default for maxValue=getMaxPossibleValue() after calling setter with null-param", getMaxPossibleValue(), getMaxValue());
+    assertEquals("expect default for minValue=getMinPossibleValue() after calling setter with null-param", getMinPossibleValue(), getMinValue());
   }
 
 }

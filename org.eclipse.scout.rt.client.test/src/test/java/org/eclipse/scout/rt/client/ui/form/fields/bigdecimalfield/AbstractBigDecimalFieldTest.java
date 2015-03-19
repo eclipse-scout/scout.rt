@@ -52,7 +52,7 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
   }
 
   @Test
-  public void testParseValueInternalInRange() throws ProcessingException {
+  public void testParseValue() throws ProcessingException {
     setFractionDigits(5);
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(42), parseValueInternal("42"));
     ScoutAssert.assertComparableEquals(BigDecimal.valueOf(-42), parseValueInternal("-42"));
@@ -65,30 +65,12 @@ public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
   }
 
   @Test
-  public void testParseValueInternalMaxMin() throws ProcessingException {
-    setFractionDigits(80);
-    // expect default for maxValue=999999999999999999999999999999999999999999999999999999999999 and minValue=-999999999999999999999999999999999999999999999999999999999999
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, "98765432109876543210987654321098765432109876543210987654321098765432109876543210");
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, "-98765432109876543210987654321098765432109876543210987654321098765432109876543210");
+  public void testParseValueInternalAroundPossibleMinMaxValue() throws ProcessingException {
 
-    setMaxValue(new BigDecimal("99999999999999999999999999999999999999999999999999999999999999999999999999999999"));
-    setMinValue(new BigDecimal("-99999999999999999999999999999999999999999999999999999999999999999999999999999999"));
-    ScoutAssert.assertComparableEquals(new BigDecimal("98765432109876543210987654321098765432109876543210987654321098765432109876543210"),
-        parseValueInternal("98765432109876543210987654321098765432109876543210987654321098765432109876543210"));
-    ScoutAssert.assertComparableEquals(new BigDecimal("-98765432109876543210987654321098765432109876543210987654321098765432109876543210"),
-        parseValueInternal("-98765432109876543210987654321098765432109876543210987654321098765432109876543210"));
-
-    ScoutAssert.assertComparableEquals(new BigDecimal("98765432109876543210987654321098765432109876543210987654321098765432109876543210.98765432109876543210987654321098765432109876543210987654321098765432109876543210"),
-        parseValueInternal("98765432109876543210987654321098765432109876543210987654321098765432109876543210" + m_decimalSeparator + "98765432109876543210987654321098765432109876543210987654321098765432109876543210"));
-    ScoutAssert.assertComparableEquals(new BigDecimal("-98765432109876543210987654321098765432109876543210987654321098765432109876543210.98765432109876543210987654321098765432109876543210987654321098765432109876543210"),
-        parseValueInternal("-98765432109876543210987654321098765432109876543210987654321098765432109876543210" + m_decimalSeparator + "98765432109876543210987654321098765432109876543210987654321098765432109876543210"));
-
-    setMaxValue(new BigDecimal("99"));
-    setMinValue(new BigDecimal("-99"));
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, "100");
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, "-100");
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(99), parseValueInternal("99"));
-    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(-99), parseValueInternal("-99"));
+    assertEquals("parsing failed", getMaxPossibleValue(), parseValueInternal(getMaxPossibleValue().toPlainString()));
+    assertEquals("parsing failed", getMinPossibleValue(), parseValueInternal(getMinPossibleValue().toPlainString()));
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, getMaxPossibleValue().add(BigDecimal.ONE).toPlainString());
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, getMinPossibleValue().subtract(BigDecimal.ONE).toPlainString());
   }
 
   @Test

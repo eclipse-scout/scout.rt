@@ -42,6 +42,16 @@ public class NumberUtilityTest {
     assertNull(NumberUtility.numberToBigDecimal(Float.valueOf(Float.NEGATIVE_INFINITY)));
     assertNull(NumberUtility.numberToBigDecimal(Float.valueOf(Float.POSITIVE_INFINITY)));
     assertNull(NumberUtility.numberToBigDecimal(Float.valueOf(Float.NaN)));
+
+    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(Integer.MAX_VALUE), NumberUtility.numberToBigDecimal(Integer.MAX_VALUE));
+    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(Integer.MIN_VALUE), NumberUtility.numberToBigDecimal(Integer.MIN_VALUE));
+    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(Long.MAX_VALUE), NumberUtility.numberToBigDecimal(Long.MAX_VALUE));
+    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(Long.MIN_VALUE), NumberUtility.numberToBigDecimal(Long.MIN_VALUE));
+    ScoutAssert.assertComparableEquals(new BigDecimal("999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"),
+        NumberUtility.numberToBigDecimal(new BigInteger("999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999")));
+    ScoutAssert.assertComparableEquals(new BigDecimal("999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"),
+        NumberUtility.numberToBigDecimal(new BigInteger("999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999")));
+    ScoutAssert.assertComparableEquals(BigDecimal.valueOf(Double.MAX_VALUE), NumberUtility.numberToBigDecimal(BigDecimal.valueOf(Double.MAX_VALUE)));
   }
 
   @Test
@@ -81,8 +91,7 @@ public class NumberUtilityTest {
     d = NumberUtility.median(10.0, 20.0, 30.0, 40.0);
     assertEquals(30.0, d, EPSILON);
   }
-  
-  
+
   @Test
   public void testParseEmptyString() {
     assertEquals(0d, NumberUtility.parseDouble(""), 0.00001d);

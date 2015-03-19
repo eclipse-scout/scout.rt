@@ -65,46 +65,24 @@ public class AbstractIntegerFieldTest extends AbstractIntegerField {
   }
 
   @Test
-  public void testParseValueInternalInRange() throws ProcessingException {
+  public void testParseValue() throws ProcessingException {
+    // maxValue and minValue must not have an influence for parsing
+    setMaxValue(99);
+    setMinValue(-99);
+
+    assertEquals("parsing failed", Integer.valueOf(0), parseValueInternal("0"));
     assertEquals("parsing failed", Integer.valueOf(42), parseValueInternal("42"));
     assertEquals("parsing failed", Integer.valueOf(-42), parseValueInternal("-42"));
-    assertEquals("parsing failed", Integer.valueOf(0), parseValueInternal("0"));
-
-    assertEquals("parsing failed", Integer.valueOf(Integer.MAX_VALUE), parseValueInternal(Integer.toString(Integer.MAX_VALUE)));
-    assertEquals("parsing failed", Integer.valueOf(Integer.MIN_VALUE), parseValueInternal(Integer.toString(Integer.MIN_VALUE)));
-
+    assertEquals("parsing failed", Integer.valueOf(101), parseValueInternal("101"));
+    assertEquals("parsing failed", Integer.valueOf(-101), parseValueInternal("-101"));
   }
 
   @Test
-  public void testSetMaxAndMinValueNull() {
-    assertEquals("expect default for maxValue=Integer.MAX_VALUE", Integer.valueOf(Integer.MAX_VALUE), getMaxValue());
-    assertEquals("expect default for minValue=Integer.MIN_VALUE", Integer.valueOf(Integer.MIN_VALUE), getMinValue());
-
-    setMaxValue(99);
-    setMinValue(-99);
-    assertEquals("maxValue not as set above", Integer.valueOf(99), getMaxValue());
-    assertEquals("minValue not as set above", Integer.valueOf(-99), getMinValue());
-
-    setMaxValue(null);
-    setMinValue(null);
-    assertEquals("expected maxValue=Integer.MAX_VALUE after calling setter with null-param", Integer.valueOf(Integer.MAX_VALUE), getMaxValue());
-    assertEquals("expected minValue=Integer.MIN_VALUE after calling setter with null-param", Integer.valueOf(Integer.MIN_VALUE), getMinValue());
-  }
-
-  @Test
-  public void testParseValueInternalMaxMin() throws ProcessingException {
-    // expect default for maxValue=Integer.MAX_VALUE and minValue=Integer.MIN_VALUE
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, BigDecimal.valueOf(Integer.MAX_VALUE).add(BigDecimal.ONE).toPlainString());
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, BigDecimal.valueOf(Integer.MIN_VALUE).subtract(BigDecimal.ONE).toPlainString());
+  public void testParseValueInternalAroundIntegerMinMaxValue() throws ProcessingException {
     assertEquals("parsing failed", Integer.valueOf(Integer.MAX_VALUE), parseValueInternal(BigDecimal.valueOf(Integer.MAX_VALUE).toPlainString()));
     assertEquals("parsing failed", Integer.valueOf(Integer.MIN_VALUE), parseValueInternal(BigDecimal.valueOf(Integer.MIN_VALUE).toPlainString()));
-
-    setMaxValue(99);
-    setMinValue(-99);
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, "100");
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, "-100");
-    assertEquals("parsing failed", Integer.valueOf(99), parseValueInternal("99"));
-    assertEquals("parsing failed", Integer.valueOf(-99), parseValueInternal("-99"));
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, BigDecimal.valueOf(Integer.MAX_VALUE).add(BigDecimal.ONE).toPlainString());
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, BigDecimal.valueOf(Integer.MIN_VALUE).subtract(BigDecimal.ONE).toPlainString());
   }
 
   @Test

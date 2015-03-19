@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -47,29 +48,25 @@ public class AbstractBigIntegerFieldTest extends AbstractBigIntegerField {
   }
 
   @Test
-  public void testParseValueInternalInRange() throws ProcessingException {
+  public void testParseValue() throws ProcessingException {
+    // maxValue and minValue must not have an influence for parsing
+    setMaxValue(BigInteger.valueOf(99));
+    setMinValue(BigInteger.valueOf(-99));
+
+    assertEquals("parsing failed", BigInteger.valueOf(0), parseValueInternal("0"));
     assertEquals("parsing failed", BigInteger.valueOf(42), parseValueInternal("42"));
     assertEquals("parsing failed", BigInteger.valueOf(-42), parseValueInternal("-42"));
-    assertEquals("parsing failed", BigInteger.valueOf(0), parseValueInternal("0"));
+    assertEquals("parsing failed", BigInteger.valueOf(101), parseValueInternal("101"));
+    assertEquals("parsing failed", BigInteger.valueOf(-101), parseValueInternal("-101"));
   }
 
   @Test
-  public void testParseValueInternalMaxMin() throws ProcessingException {
-    // expect default for maxValue=999999999999999999999999999999999999999999999999999999999999 and minValue=-999999999999999999999999999999999999999999999999999999999999
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, "98765432109876543210987654321098765432109876543210987654321098765432109876543210");
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, "-98765432109876543210987654321098765432109876543210987654321098765432109876543210");
+  public void testParseValueInternalAroundPossibleMinMaxValue() throws ProcessingException {
 
-    setMaxValue(new BigInteger("99999999999999999999999999999999999999999999999999999999999999999999999999999999"));
-    setMinValue(new BigInteger("-99999999999999999999999999999999999999999999999999999999999999999999999999999999"));
-    assertEquals("parsing failed", new BigInteger("98765432109876543210987654321098765432109876543210987654321098765432109876543210"), parseValueInternal("98765432109876543210987654321098765432109876543210987654321098765432109876543210"));
-    assertEquals("parsing failed", new BigInteger("-98765432109876543210987654321098765432109876543210987654321098765432109876543210"), parseValueInternal("-98765432109876543210987654321098765432109876543210987654321098765432109876543210"));
-
-    setMaxValue(new BigInteger("99"));
-    setMinValue(new BigInteger("-99"));
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, "100");
-    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, "-100");
-    assertEquals("parsing failed", BigInteger.valueOf(99), parseValueInternal("99"));
-    assertEquals("parsing failed", BigInteger.valueOf(-99), parseValueInternal("-99"));
+    assertEquals("parsing failed", getMaxPossibleValue(), parseValueInternal(new BigDecimal(getMaxPossibleValue()).toPlainString()));
+    assertEquals("parsing failed", getMinPossibleValue(), parseValueInternal(new BigDecimal(getMinPossibleValue()).toPlainString()));
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too big number.", this, new BigDecimal(getMaxPossibleValue().add(BigInteger.ONE)).toPlainString());
+    AbstractNumberFieldTest.assertParseToBigDecimalInternalThrowsProcessingException("Expected an exception when parsing a string representing a too small number.", this, new BigDecimal(getMinPossibleValue().subtract(BigInteger.ONE)).toPlainString());
   }
 
   @Test
@@ -88,14 +85,12 @@ public class AbstractBigIntegerFieldTest extends AbstractBigIntegerField {
     Assert.assertEquals("parsing failed", BigInteger.valueOf(12), parseValueInternal(formatWithFractionDigits(12.1, 1)));
     Assert.assertEquals("parsing failed", BigInteger.valueOf(13), parseValueInternal(formatWithFractionDigits(12.5, 1)));
 
-    setMaxValue(new BigInteger("99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"));
-    setMinValue(new BigInteger("-99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"));
-    Assert.assertEquals("parsing failed", new BigInteger("92233720368547758079223372036854775807922337203685477580792233720368547758079223372036854775807"),
-        parseValueInternal("92233720368547758079223372036854775807922337203685477580792233720368547758079223372036854775807" + m_decimalSeparator + "40007"));
-    Assert.assertEquals("parsing failed", new BigInteger("92233720368547758079223372036854775807922337203685477580792233720368547758079223372036854775808"),
-        parseValueInternal("92233720368547758079223372036854775807922337203685477580792233720368547758079223372036854775807" + m_decimalSeparator + "5"));
-    Assert.assertEquals("parsing failed", new BigInteger("92233720368547758079223372036854775807922337203685477580792233720368547758079223372036854775808"),
-        parseValueInternal("92233720368547758079223372036854775807922337203685477580792233720368547758079223372036854775807" + m_decimalSeparator + "92233720368547758079223372036854775807922337203685477580792233720368547758079223372036854775808"));
+    Assert.assertEquals("parsing failed", new BigInteger("99999999999999999999999999999999999999999999999999999999999"),
+        parseValueInternal("99999999999999999999999999999999999999999999999999999999999" + m_decimalSeparator + "40007"));
+    Assert.assertEquals("parsing failed", new BigInteger("99999999999999999999999999999999999999999999999999999999999"),
+        parseValueInternal("99999999999999999999999999999999999999999999999999999999998" + m_decimalSeparator + "5"));
+    Assert.assertEquals("parsing failed", new BigInteger("99999999999999999999999999999999999999999999999999999999999"),
+        parseValueInternal("99999999999999999999999999999999999999999999999999999999998" + m_decimalSeparator + "999999999999999999999999999999999999999999999999999999999999"));
 
     setRoundingMode(RoundingMode.HALF_EVEN);
     Assert.assertEquals("parsing failed", BigInteger.valueOf(12), parseValueInternal(formatWithFractionDigits(12.5, 1)));

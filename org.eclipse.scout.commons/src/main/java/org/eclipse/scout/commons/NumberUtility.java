@@ -85,6 +85,9 @@ public final class NumberUtility {
    * @param number
    */
   public static BigDecimal numberToBigDecimal(Number number) {
+    if (number instanceof BigDecimal) {
+      return (BigDecimal) number;
+    }
     if (number == null) {
       return null;
     }

@@ -386,10 +386,10 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
         throw new ProcessingException(ScoutTexts.get("InvalidNumberMessageX", text));
       }
       // check for bad range
-      if (getMinValue() != null && retVal.compareTo(NumberUtility.numberToBigDecimal(getMinValue())) < 0) {
+      if (getMinPossibleValue() != null && retVal.compareTo(NumberUtility.numberToBigDecimal(getMinPossibleValue())) < 0) {
         throwNumberTooSmall();
       }
-      if (getMaxValue() != null && retVal.compareTo(NumberUtility.numberToBigDecimal(getMaxValue())) > 0) {
+      if (getMaxPossibleValue() != null && retVal.compareTo(NumberUtility.numberToBigDecimal(getMaxPossibleValue())) > 0) {
         throwNumberTooLarge();
       }
     }
