@@ -20,6 +20,9 @@ import org.eclipse.scout.rt.testing.client.runner.statement.ProvideClientSession
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
+import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.ProcessingRuntimeExceptionUnwrappingStatement;
+import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.ProcessingRuntimeExceptionWrappingStatement;
+import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
@@ -80,6 +83,12 @@ public class ClientTestRunner extends PlatformTestRunner {
     return s1;
   }
 
+  @Override
+  @SuppressWarnings("deprecation")
+  protected Statement possiblyExpectingExceptions(FrameworkMethod method, Object test, Statement next) {
+    return super.possiblyExpectingExceptions(method, test, new ProcessingRuntimeExceptionUnwrappingStatement(next));
+  }
+
   /**
    * Method invoked to create the session context.
    */
@@ -88,7 +97,8 @@ public class ClientTestRunner extends PlatformTestRunner {
     if (annotation == null) {
       return next;
     }
-    final Statement s3 = new ModelRunNowStatement(next);
+    final Statement s4 = new ProcessingRuntimeExceptionWrappingStatement(next);
+    final Statement s3 = new ModelRunNowStatement(s4);
     final Statement s2 = new ProvideClientSessionStatement(s3, annotation.provider());
     final Statement s1 = new RegisterBeanStatement(s2, annotation.value(), priority);
 
