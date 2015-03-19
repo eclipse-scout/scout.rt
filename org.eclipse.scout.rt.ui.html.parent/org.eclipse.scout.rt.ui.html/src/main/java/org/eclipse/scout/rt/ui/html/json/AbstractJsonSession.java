@@ -35,9 +35,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
-import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.client.job.ClientJobEventFilters;
+import org.eclipse.scout.rt.client.job.ClientJobEventFilters.Filter;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -85,22 +84,16 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_rootJsonAdapter = new P_RootAdapter(this);
     m_customHtmlRenderer = createCustomHtmlRenderer();
 
-    m_jobChangeListener = new P_JobChangeListener();
-    Jobs.getJobManager().addListener(m_jobChangeListener, new IFilter<JobEvent>() {
-      @Override
-      public boolean accept(JobEvent event) {
-        IFuture<?> future = event.getFuture();
-        return JobEventType.DONE == event.getType() &&
-            ModelJobs.isModelJob(future) &&
-            matchesClientSession(future) &&
-            !isProcessingClientRequest();
-      }
+    m_jobChangeListener = new P_JobListener();
+    Filter filter = ClientJobEventFilters.allFilter().modelJobsOnly().session(getClientSession()).eventTypes(JobEventType.DONE).andFilter(new IFilter<JobEvent>() {
 
-      private boolean matchesClientSession(IFuture<?> future) {
-        IClientSession jobClientSession = ((ModelJobInput) future.getJobInput()).getSession();
-        return jobClientSession == getClientSession();
+      @Override
+      public boolean accept(JobEvent element) {
+        return !isProcessingClientRequest();
       }
     });
+
+    Jobs.getJobManager().addListener(m_jobChangeListener, filter);
   }
 
   protected JsonResponse createJsonResponse() {
@@ -707,7 +700,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
-  private class P_JobChangeListener implements IJobListener {
+  private class P_JobListener implements IJobListener {
 
     @Override
     public void changed(JobEvent event) {

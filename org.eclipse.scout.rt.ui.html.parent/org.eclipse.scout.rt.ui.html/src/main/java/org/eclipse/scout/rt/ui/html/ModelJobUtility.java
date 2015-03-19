@@ -36,7 +36,7 @@ public final class ModelJobUtility {
       throw new IllegalStateException("Cannot wait for another sync job, because current job is also sync!");
     }
     try {
-      Filter filter = ClientJobFutureFilters.newFilter().modelJobsOnly().session(clientSession).notBlocked().notPeriodic();
+      Filter filter = ClientJobFutureFilters.allFilter().modelJobsOnly().session(clientSession).notBlocked().notPeriodic();
       Jobs.getJobManager().awaitDone(filter, 1, TimeUnit.HOURS);
     }
     catch (InterruptedException e) {
@@ -51,7 +51,7 @@ public final class ModelJobUtility {
     else {
       IFuture<?> future = ModelJobs.schedule(executable, ModelJobInput.defaults().session(clientSession));
       try {
-        Jobs.getJobManager().awaitDone(ClientJobFutureFilters.newFilter().futures(future).notBlocked(), 1, TimeUnit.HOURS);
+        Jobs.getJobManager().awaitDone(ClientJobFutureFilters.allFilter().futures(future).notBlocked(), 1, TimeUnit.HOURS);
       }
       catch (InterruptedException e) {
         LOG.warn("Interrupted while waiting for executable '" + executable.getClass().getName() + "'.", e);
