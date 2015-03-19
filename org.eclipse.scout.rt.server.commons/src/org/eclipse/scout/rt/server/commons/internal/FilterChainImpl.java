@@ -38,8 +38,8 @@ public class FilterChainImpl implements FilterChain {
   public void doFilter(ServletRequest req, ServletResponse res) throws IOException, ServletException {
     if (m_filters.size() > 0) {
       Filter nextFilter = m_filters.remove(0);
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("ServletFilterChain: doFilter " + nextFilter.getClass().getSimpleName());
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("ServletFilterChain: doFilter " + nextFilter.getClass().getSimpleName());
       }
       nextFilter.doFilter(req, res, this);
     }
