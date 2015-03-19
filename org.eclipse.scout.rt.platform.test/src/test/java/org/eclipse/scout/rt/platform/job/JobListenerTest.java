@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.holders.BooleanHolder;
-import org.eclipse.scout.rt.platform.job.filter.FutureFilter;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -60,10 +59,11 @@ public class JobListenerTest {
       public void run() throws Exception {
       }
     }, input);
-    m_jobManager.awaitDone(new FutureFilter(future), 1, TimeUnit.MINUTES);
+    m_jobManager.awaitDone(JobFutureFilters.newFilter().futures(future), 1, TimeUnit.MINUTES);
     m_jobManager.shutdown();
     m_jobManager.removeListener(listener);
 
+    // TODO [dwi] fix this test.
     List<JobEventType> expectedStati = new ArrayList<>();
     expectedStati.add(JobEventType.SCHEDULED);
     expectedStati.add(JobEventType.ABOUT_TO_RUN);
@@ -91,7 +91,7 @@ public class JobListenerTest {
       }
     }, 200, TimeUnit.MILLISECONDS, JobInput.empty());
     future.cancel(true);
-    m_jobManager.awaitDone(new FutureFilter(future), 1, TimeUnit.MINUTES);
+    m_jobManager.awaitDone(JobFutureFilters.newFilter().futures(future), 1, TimeUnit.MINUTES);
     m_jobManager.removeListener(listener);
     m_jobManager.shutdown();
 

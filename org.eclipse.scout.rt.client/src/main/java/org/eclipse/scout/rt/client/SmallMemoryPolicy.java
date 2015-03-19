@@ -11,17 +11,15 @@
 package org.eclipse.scout.rt.client;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.filter.AndFilter;
+import org.eclipse.scout.rt.client.job.ClientJobFutureFilters;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.CurrentSessionFutureFilter;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.filter.JobFutureFilter;
 
 /**
  * dont cache table page search form contents, releaseUnusedPages before every page reload and force gc to free
@@ -43,8 +41,12 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
     }
     desktop.releaseUnusedPages();
     System.gc();
-    Jobs.getJobManager().cancel(new AndFilter<>(new JobFutureFilter(getClass().getName()), CurrentSessionFutureFilter.INSTANCE), true);
-    ClientJobs.schedule(new ForceGCJob(), ClientJobInput.defaults().setName("release memory").setId(getClass().getName()));
+
+    String jobId = getClass().getName();
+
+    Jobs.getJobManager().cancel(ClientJobFutureFilters.newFilter().id(jobId).currentSession(), true);
+    ClientJobs.schedule(new ForceGCJob(), ClientJobInput.defaults().setName("release memory").setId(jobId));
+
     if (page.getTable() != null) {
       page.getTable().discardAllRows();
     }

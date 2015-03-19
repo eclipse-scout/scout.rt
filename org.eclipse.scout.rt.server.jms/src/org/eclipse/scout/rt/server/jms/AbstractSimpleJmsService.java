@@ -30,8 +30,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.filter.FutureFilter;
 import org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService;
+import org.eclipse.scout.rt.server.job.ServerJobFutureFilters;
 import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
@@ -119,7 +119,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
       // Wait for the consumer to be stopped.
       try {
-        Jobs.getJobManager().awaitDone(new FutureFilter(m_messageConsumerFuture), m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
+        Jobs.getJobManager().awaitDone(ServerJobFutureFilters.newFilter().futures(m_messageConsumerFuture), m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
       }
       catch (InterruptedException e) {
         // NOOP

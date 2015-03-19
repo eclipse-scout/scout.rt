@@ -24,8 +24,6 @@ import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
-import org.eclipse.scout.rt.platform.job.filter.BlockedFutureFilter;
-import org.eclipse.scout.rt.platform.job.filter.JobFutureFilter;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -219,7 +217,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitBlockedFilter() throws JobExecutionException, InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(BlockedFutureFilter.INSTANCE, new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(JobFutureFilters.newFilter().blocked(), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -242,7 +240,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitNotBlockedFilter() throws JobExecutionException, InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(new NotFilter<>(BlockedFutureFilter.INSTANCE), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(new NotFilter<>(JobFutureFilters.newFilter().blocked()), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -265,7 +263,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitSession1Filter() throws JobExecutionException, InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(new JobFutureFilter("session1"), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(JobFutureFilters.newFilter().id("session1"), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -288,7 +286,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitSession2Filter() throws JobExecutionException, InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(new JobFutureFilter("session2"), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(JobFutureFilters.newFilter().id("session2"), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -311,7 +309,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitSessionFilterAndBlocked() throws JobExecutionException, InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(new AndFilter<IFuture<?>>(new JobFutureFilter("session1"), BlockedFutureFilter.INSTANCE), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(new AndFilter<IFuture<?>>(JobFutureFilters.newFilter().id("session1").blocked()), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {

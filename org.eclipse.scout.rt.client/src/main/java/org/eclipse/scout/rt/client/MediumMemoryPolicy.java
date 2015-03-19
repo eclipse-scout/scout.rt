@@ -17,12 +17,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.job.ClientJobFutureFilters;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.CurrentSessionFutureFilter;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
@@ -36,7 +35,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.filter.JobFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
@@ -186,8 +184,14 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
       }
       desktop.releaseUnusedPages();
       System.gc();
-      Jobs.getJobManager().cancel(new AndFilter<>(CurrentSessionFutureFilter.INSTANCE, new JobFutureFilter(getClass().getName())), true);
+
+      String jobId = getClass().getName();
+
+      // Cancel pending job
+      Jobs.getJobManager().cancel(ClientJobFutureFilters.newFilter().currentSession().id(jobId), true);
+
       ClientJobs.schedule(new ForceGCJob(), ClientJobInput.defaults().setName("release memory").setId(getClass().getName()));
+
       m_release = false;
     }
     if (page.getTable() != null && page.getTable().getRowCount() > 1000) {

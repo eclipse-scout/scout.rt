@@ -50,13 +50,11 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
-import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.SessionFutureFilter;
+import org.eclipse.scout.rt.client.job.ClientJobFutureFilters;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.filter.PeriodicFutureFilter;
 //bugs.eclipse.org/bugs/show_bug.cgi?id=458143
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 //dwiehl@git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git
@@ -141,7 +139,7 @@ public class SwingMock extends AbstractGuiMock {
       //wait until model queue is empty
       try {
         IClientSession clientSession = getClientSession();
-        Jobs.getJobManager().awaitDone(new AndFilter<>(new SessionFutureFilter(clientSession), new PeriodicFutureFilter(false)), 1, TimeUnit.HOURS);
+        Jobs.getJobManager().awaitDone(ClientJobFutureFilters.newFilter().modelJobsOnly().session(clientSession).notPeriodic(), 1, TimeUnit.HOURS);
       }
       catch (InterruptedException e) {
         throw new IllegalStateException("Interrupted", e);

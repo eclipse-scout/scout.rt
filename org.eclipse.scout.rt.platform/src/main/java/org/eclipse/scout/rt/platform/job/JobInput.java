@@ -24,8 +24,7 @@ import org.eclipse.scout.rt.platform.context.Context;
  * Describes a job with context information to be applied onto the executing worker thread during the time of the job's
  * execution.
  * <p/>
- * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
- * characteristics:
+ * The 'setter-methods' returns <code>this</code> in order to support for method chaining.
  *
  * @see Context
  * @see IJobManager

@@ -22,9 +22,6 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
-import org.eclipse.scout.commons.filter.NotFilter;
-import org.eclipse.scout.rt.platform.job.filter.BlockedFutureFilter;
-import org.eclipse.scout.rt.platform.job.filter.FutureFilter;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -79,10 +76,10 @@ public class AwaitDoneTest {
       }
     }, JobInput.defaults());
 
-    assertTrue(m_jobManager.awaitDone(new FutureFilter(future1), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(JobFutureFilters.newFilter().futures(future1), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
     assertTrue(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
-    assertTrue(m_jobManager.isDone(new FutureFilter(future1)));
+    assertTrue(m_jobManager.isDone(JobFutureFilters.newFilter().futures(future1)));
   }
 
   @Test
@@ -109,8 +106,8 @@ public class AwaitDoneTest {
       }
     }, JobInput.defaults());
 
-    assertTrue(m_jobManager.awaitDone(new FutureFilter(future1), 30, TimeUnit.SECONDS));
-    assertTrue(m_jobManager.isDone(new FutureFilter(future1)));
+    assertTrue(m_jobManager.awaitDone(JobFutureFilters.newFilter().futures(future1), 30, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.isDone(JobFutureFilters.newFilter().futures(future1)));
     assertFalse(m_jobManager.isDone(new AlwaysFilter<IFuture<?>>()));
     assertFalse(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 500, TimeUnit.MILLISECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
@@ -138,6 +135,6 @@ public class AwaitDoneTest {
       }
     }, JobInput.defaults());
 
-    assertTrue(m_jobManager.awaitDone(new NotFilter<>(BlockedFutureFilter.INSTANCE), 10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.awaitDone(JobFutureFilters.newFilter().notBlocked(), 10, TimeUnit.SECONDS));
   }
 }

@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.filter.FutureFilter;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -65,7 +64,7 @@ public class JobListenerBlockedFutureTest {
       public void run() throws Exception {
       }
     }, input);
-    assertTrue(m_jobManager.awaitDone(new FutureFilter(future), 1, TimeUnit.MINUTES));
+    assertTrue(m_jobManager.awaitDone(ClientJobFutureFilters.newFilter().futures(future), 1, TimeUnit.MINUTES));
     m_jobManager.shutdown();
     m_jobManager.removeListener(listener);
 
@@ -117,7 +116,7 @@ public class JobListenerBlockedFutureTest {
           condition.waitFor();
         }
       }, input);
-      assertTrue(m_jobManager.awaitDone(new FutureFilter(outerFuture), 1, TimeUnit.MINUTES));
+      assertTrue(m_jobManager.awaitDone(ClientJobFutureFilters.newFilter().futures(outerFuture), 1, TimeUnit.MINUTES));
       m_jobManager.shutdown();
     }
     finally {

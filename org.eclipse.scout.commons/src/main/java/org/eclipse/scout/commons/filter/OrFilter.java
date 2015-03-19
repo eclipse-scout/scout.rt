@@ -10,21 +10,30 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.filter;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.CollectionUtility;
 
 /**
- * Filter which returns the logical 'OR' of two other filters.
+ * Filter which returns the logical 'OR' of the given Filters.
  *
  * @since 5.1
  */
 public class OrFilter<ELEMENT> implements IFilter<ELEMENT> {
 
-  private final IFilter<ELEMENT>[] m_filters;
+  private final List<IFilter<ELEMENT>> m_filters;
 
   @SafeVarargs
   public OrFilter(final IFilter<ELEMENT>... filters) {
     Assertions.assertTrue(filters.length > 0, "Must have one filter at minimum");
-    m_filters = filters;
+    m_filters = CollectionUtility.arrayList(filters);
+  }
+
+  public OrFilter(final Collection<IFilter<ELEMENT>> filters) {
+    Assertions.assertTrue(filters.size() > 0, "Must have one filter at minimum");
+    m_filters = CollectionUtility.arrayList(filters);
   }
 
   @Override

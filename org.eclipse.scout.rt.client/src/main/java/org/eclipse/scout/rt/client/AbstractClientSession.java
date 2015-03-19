@@ -43,9 +43,9 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
+import org.eclipse.scout.rt.client.job.ClientJobFutureFilters;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.SessionFutureFilter;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
@@ -507,7 +507,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
       }
     };
 
-    Jobs.getJobManager().visit(new SessionFutureFilter(this), visitor);
+    Jobs.getJobManager().visit(ClientJobFutureFilters.newFilter().session(this), visitor);
 
     return futures;
   }

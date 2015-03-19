@@ -25,8 +25,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * Describes a model job with context information to be applied onto the executing worker thread during the time
  * of the job's execution.
  * <p/>
- * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
- * characteristics:
+ * The 'setter-methods' returns <code>this</code> in order to support for method chaining.
  *
  * @see ClientContext
  * @see ModelJobs

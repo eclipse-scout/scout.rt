@@ -31,7 +31,6 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.rt.platform.job.filter.JobFutureFilter;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -455,15 +454,15 @@ public class JobCancelTest {
     }, JobInput.defaults().setId(commonJobId).setMutex(new Object()));
 
     assertTrue(setupLatch.await());
-    m_jobManager.cancel(newAndFilter(commonJobId, null), true);
+    m_jobManager.cancel(newJobIdAndMutexFilter(commonJobId, null), true);
 
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.hashSet("job-1-interrupted", "job-2-interrupted", "job-3a-interrupted"), protocol);
   }
 
-  private static AndFilter<IFuture<?>> newAndFilter(final String id, final Object mutex) {
-    final IFilter<IFuture<?>> jobFilter = new JobFutureFilter(id);
+  private static AndFilter<IFuture<?>> newJobIdAndMutexFilter(final String jobId, final Object mutex) {
+    final IFilter<IFuture<?>> jobFilter = new JobFutureFilters.IdFilter(jobId);
     final IFilter<IFuture<?>> mutexFilter = new IFilter<IFuture<?>>() {
 
       @Override
