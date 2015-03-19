@@ -87,7 +87,7 @@ public class ServerTestRunnerDifferentSubjectTest {
     m_transactions.add(transaction);
 
     assertEquals(2, m_serverSessions.size());
-    assertEquals(3, m_transactions.size()); // (beforeClass/afterClass), (before,test1,after), (before,test2,after),
+    assertEquals(4, m_transactions.size()); // (beforeClass), (before,test1,after), (before,test2,after), (afterClass)
   }
 
   public static class JUnitServerSession extends AbstractServerSession {

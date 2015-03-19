@@ -99,8 +99,8 @@ public class ServerTestRunnerDifferentSessionTest {
     assertNotNull(transaction);
     m_transactions.add(transaction);
 
-    assertEquals(4, m_serverSessions.size());
-    assertEquals(4, m_transactions.size()); // (beforeClass/afterClass), (before,test1,after), (before,test2,after),
+    assertEquals(5, m_serverSessions.size());
+    assertEquals(5, m_transactions.size()); // (beforeClass), (before,test1,after), (before,test2,after), (before,test3,after), (afterClass)
   }
 
   public static class JUnitServerSession1 extends AbstractServerSession {

@@ -78,7 +78,7 @@ public class ClientTestRunnerDifferentSessionTest {
     assertEquals("anna", getCurrentUser());
     m_clientSessions.add(clientSession);
 
-    assertEquals(4, m_clientSessions.size());
+    assertEquals(5, m_clientSessions.size());
   }
 
   public static class JUnitClientSession1 extends AbstractClientSession {

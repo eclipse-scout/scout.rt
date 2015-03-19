@@ -35,9 +35,10 @@ import org.junit.runner.RunWith;
  */
 @RunWith(ClientTestRunner.class)
 @RunWithClientSession(value = LoginTestClientSession.class, provider = LoginTestClientSessionProvider.class)
-@RunWithSubject("default")
+@RunWithSubject(ScoutClientTestRunnerLoginTest.TEST_SUBJECT)
 public class ScoutClientTestRunnerLoginTest {
 
+  static final String TEST_SUBJECT = "ScoutClientTestRunnerLoginTest";
   private static IClientSession s_beforeClassClientSession;
 
   @BeforeClass
@@ -94,8 +95,8 @@ public class ScoutClientTestRunnerLoginTest {
     assertNotNull(TestEnvironmentClientSession.get());
     if (s_beforeClassClientSession == null) {
       assertSame(LoginTestClientSessionProvider.getCurrentSession(), TestEnvironmentClientSession.get());
-      assertEquals(Collections.singletonList("default"), LoginTestClientSessionProvider.getBeforeStartRunAs());
-      assertEquals(Collections.singletonList("default"), LoginTestClientSessionProvider.getAfterStartRunAs());
+      assertEquals(Collections.singletonList(TEST_SUBJECT), LoginTestClientSessionProvider.getBeforeStartRunAs());
+      assertEquals(Collections.singletonList(TEST_SUBJECT), LoginTestClientSessionProvider.getAfterStartRunAs());
       s_beforeClassClientSession = TestEnvironmentClientSession.get();
       LoginTestClientSessionProvider.clearProtocol();
     }

@@ -11,17 +11,21 @@
 package org.eclipse.scout.rt.testing.platform.runner;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.ITestExecutionListener;
-import org.eclipse.scout.rt.testing.platform.runner.statement.NotifyTestListenerStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 /**
@@ -51,6 +55,11 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement classBlock(final RunNotifier notifier) {
+    ensurePlatformStarted();
+    return super.classBlock(notifier);
+  }
+
+  protected void ensurePlatformStarted() {
     // Ensure the platform to be started.
     if (Platform.get() == null) {
       Platform.setDefault();
@@ -60,10 +69,77 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
         listener.platformStarted();
       }
     }
+  }
 
-    final Statement superStatement = PlatformTestRunner.super.classBlock(notifier);
+  @Override
+  protected Statement withBeforeClasses(final Statement statement) {
+    final List<FrameworkMethod> befores = getTestClass().getAnnotatedMethods(BeforeClass.class);
+    if (befores.isEmpty()) {
+      return statement;
+    }
 
-    return interceptClassLevelStatement(superStatement, getTestClass().getJavaClass());
+    Statement beforeClassStatement = new Statement() {
+      @Override
+      public void evaluate() throws Throwable {
+        for (FrameworkMethod each : befores) {
+          each.invokeExplosively(null);
+        }
+      }
+    };
+
+    final Statement interceptedBeforeClassStatement = interceptBeforeClassStatement(beforeClassStatement, getTestClass().getJavaClass());
+    return new Statement() {
+      @Override
+      public void evaluate() throws Throwable {
+        interceptedBeforeClassStatement.evaluate();
+        statement.evaluate();
+      }
+    };
+  }
+
+  @Override
+  protected Statement withAfterClasses(final Statement statement) {
+    final List<FrameworkMethod> afters = getTestClass().getAnnotatedMethods(AfterClass.class);
+    if (afters.isEmpty()) {
+      return statement;
+    }
+
+    final List<Throwable> errors = new ArrayList<Throwable>();
+    Statement afterClassStatement = new Statement() {
+      @Override
+      public void evaluate() throws Throwable {
+        for (FrameworkMethod each : afters) {
+          try {
+            each.invokeExplosively(null);
+          }
+          catch (Throwable e) {
+            errors.add(e);
+          }
+        }
+      }
+    };
+
+    final Statement interceptedAfterClassStatement = interceptAfterClassStatement(afterClassStatement, getTestClass().getJavaClass());
+    return new Statement() {
+      @Override
+      public void evaluate() throws Throwable {
+        try {
+          statement.evaluate();
+        }
+        catch (Throwable e) {
+          errors.add(e);
+        }
+        finally {
+          try {
+            interceptedAfterClassStatement.evaluate();
+          }
+          catch (Throwable e) {
+            errors.add(e);
+          }
+        }
+        MultipleFailureException.assertEmpty(errors);
+      }
+    };
   }
 
   @Override
@@ -105,10 +181,15 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    * @return the head of the chain to be invoked first.
    */
   protected Statement interceptClassLevelStatement(final Statement next, final Class<?> testClass) {
-    Statement s2 = new SubjectStatement(next, testClass.getAnnotation(RunWithSubject.class));
-    Statement s1 = new NotifyTestListenerStatement(s2, getDescription());
+    return new SubjectStatement(next, testClass.getAnnotation(RunWithSubject.class));
+  }
 
-    return s1;
+  protected Statement interceptBeforeClassStatement(Statement beforeClassStatement, Class<?> javaClass) {
+    return interceptClassLevelStatement(beforeClassStatement, javaClass);
+  }
+
+  protected Statement interceptAfterClassStatement(Statement beforeClassStatement, Class<?> javaClass) {
+    return interceptClassLevelStatement(beforeClassStatement, javaClass);
   }
 
   /**

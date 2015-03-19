@@ -1,20 +1,10 @@
-/*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
-package org.eclipse.scout.rt.testing.platform.runner.statement;
+package org.eclipse.scout.rt.testing.client.runner.statement;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.junit.runners.model.Statement;
 
 /**
@@ -22,10 +12,9 @@ import org.junit.runners.model.Statement;
  *
  * @since5.1
  */
-public class RunNowStatement extends Statement {
+public class ModelRunNowStatement extends Statement {
 
   protected final Statement m_next;
-  private final JobInput<?> m_jobInput;
 
   /**
    * Creates a statement to run the following statements within a job.
@@ -35,17 +24,16 @@ public class RunNowStatement extends Statement {
    * @param jobInput
    *          {@link JobInput} to be given to the 'runNow' call.
    */
-  public RunNowStatement(final Statement next, final JobInput<?> jobInput) {
+  public ModelRunNowStatement(final Statement next) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
-    m_jobInput = Assertions.assertNotNull(jobInput, "job input must not be null");
   }
 
   @Override
   public void evaluate() throws Throwable {
+    Assertions.assertFalse(ModelJobs.isModelJob(), "already running within a model context");
     final Holder<Throwable> throwable = new Holder<>();
 
-    Jobs.runNow(new IRunnable() {
-
+    IRunnable runnable = new IRunnable() {
       @Override
       public void run() throws Exception {
         try {
@@ -55,7 +43,8 @@ public class RunNowStatement extends Statement {
           throwable.setValue(t);
         }
       }
-    }, m_jobInput);
+    };
+    ModelJobs.schedule(runnable).awaitDone();
 
     if (throwable.getValue() != null) {
       throw throwable.getValue();
