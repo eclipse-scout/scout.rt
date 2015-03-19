@@ -38,7 +38,7 @@ public class PlatformImplementor implements IPlatform {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PlatformImplementor.class);
 
   private final ReentrantReadWriteLock m_stateLock;
-  private State m_state;
+  private volatile State m_state; // may be read at any time by any thread
   private IClassInventory m_classInventory;
   private BeanContextImplementor m_beanContext;
   private IApplication m_application;
@@ -55,12 +55,26 @@ public class PlatformImplementor implements IPlatform {
 
   @Override
   public IClassInventory getClassInventory() {
-    return m_classInventory;
+    // use lock to ensure the caller waits until the platform has been started completely
+    m_stateLock.readLock().lock();
+    try {
+      return m_classInventory;
+    }
+    finally {
+      m_stateLock.readLock().unlock();
+    }
   }
 
   @Override
   public IBeanContext getBeanContext() {
-    return m_beanContext;
+    // use lock to ensure the caller waits until the platform has been started completely
+    m_stateLock.readLock().lock();
+    try {
+      return m_beanContext;
+    }
+    finally {
+      m_stateLock.readLock().unlock();
+    }
   }
 
   @Override
