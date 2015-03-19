@@ -305,7 +305,7 @@ public class SwingScoutImageField extends SwingScoutFieldComposite<IImageField> 
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 5678).awaitDone(5678, TimeUnit.MILLISECONDS);
+        getSwingEnvironment().invokeScoutLater(t, 5678).awaitDoneAndGet(5678, TimeUnit.MILLISECONDS);
       }
       catch (ProcessingException e) {
         //nop

@@ -184,7 +184,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     IFuture<?> future = m_currentGetLookupRowByKeyJob;
     if (future != null) {
       try {
-        future.awaitDone();
+        future.awaitDoneAndGet();
       }
       catch (ProcessingException e) {
         LOG.error("Unable to load smartfield data.", e);
@@ -430,7 +430,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
       if (IFuture.CURRENT.get() == m_currentGetLookupRowByKeyJob) {
         m_currentGetLookupRowByKeyJob = null;
         try {
-          List<ILookupRow<LOOKUP_KEY>> rows = m_backgroundJob.awaitDone();
+          List<ILookupRow<LOOKUP_KEY>> rows = m_backgroundJob.awaitDoneAndGet();
           if (CollectionUtility.hasElements(rows)) {
             installLookupRowContext(rows.get(0));
           }

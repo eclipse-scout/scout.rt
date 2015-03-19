@@ -76,7 +76,7 @@ public class FormBasicTest {
       f.start(new FormHandler());
       f.waitFor();
       testSequence.add(4);
-      future.awaitDone();
+      future.awaitDoneAndGet();
       ScoutAssert.assertOrder(new Integer[]{0, 1, 2, 3, 4}, testSequence.toArray());
     }
     finally {

@@ -108,7 +108,7 @@ public class JobCancelTest {
     assertTrue(future.isCancelled());
 
     try {
-      assertNull(future.awaitDone(1, TimeUnit.SECONDS));
+      assertNull(future.awaitDoneAndGet(1, TimeUnit.SECONDS));
       assertTrue(future.isCancelled());
     }
     catch (JobExecutionException e) {
@@ -157,7 +157,7 @@ public class JobCancelTest {
     assertEquals(Arrays.asList("interrupted", "cancelled-after"), protocol);
 
     try {
-      assertNull(future.awaitDone(5, TimeUnit.SECONDS));
+      assertNull(future.awaitDoneAndGet(5, TimeUnit.SECONDS));
       assertTrue(future.isCancelled());
     }
     catch (JobExecutionException e) {
@@ -186,7 +186,7 @@ public class JobCancelTest {
     assertTrue(protocol.isEmpty());
 
     try {
-      assertNull(future.awaitDone(10, TimeUnit.SECONDS));
+      assertNull(future.awaitDoneAndGet(10, TimeUnit.SECONDS));
       assertTrue(future.isCancelled());
     }
     catch (JobExecutionException e) {
@@ -224,7 +224,7 @@ public class JobCancelTest {
     assertEquals(3, count.get());
 
     try {
-      assertNull(future.awaitDone(10, TimeUnit.SECONDS));
+      assertNull(future.awaitDoneAndGet(10, TimeUnit.SECONDS));
       assertTrue(future.isCancelled());
     }
     catch (JobExecutionException e) {
@@ -299,7 +299,7 @@ public class JobCancelTest {
     assertTrue(future3.isCancelled());
 
     try {
-      assertNull(future2.awaitDone(1, TimeUnit.SECONDS));
+      assertNull(future2.awaitDoneAndGet(1, TimeUnit.SECONDS));
       assertTrue(future2.isCancelled());
     }
     catch (JobExecutionException e) {

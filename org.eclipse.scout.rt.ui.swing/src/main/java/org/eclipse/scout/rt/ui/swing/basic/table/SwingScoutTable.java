@@ -1001,7 +1001,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDone(20000, TimeUnit.MILLISECONDS);
+        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDoneAndGet(20000, TimeUnit.MILLISECONDS);
       }
       catch (ProcessingException e) {
         //nop
@@ -1031,7 +1031,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDone(20000, TimeUnit.MILLISECONDS);
+        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDoneAndGet(20000, TimeUnit.MILLISECONDS);
       }
       catch (ProcessingException e) {
         //nop

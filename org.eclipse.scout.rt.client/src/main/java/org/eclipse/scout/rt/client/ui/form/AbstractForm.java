@@ -2920,7 +2920,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
             }
           }
-        }, ModelJobInput.defaults().setName("Form timer")).awaitDone();
+        }, ModelJobInput.defaults().setName("Form timer")).awaitDoneAndGet();
       }
     }, intervalSeconds, intervalSeconds, TimeUnit.SECONDS, ClientJobInput.defaults());
   }

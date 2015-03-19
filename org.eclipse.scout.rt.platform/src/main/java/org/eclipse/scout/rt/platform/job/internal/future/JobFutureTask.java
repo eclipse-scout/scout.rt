@@ -176,7 +176,7 @@ public class JobFutureTask<RESULT> extends ScheduledFutureDelegate<RESULT> imple
   }
 
   @Override
-  public RESULT awaitDone() throws ProcessingException {
+  public RESULT awaitDoneAndGet() throws ProcessingException {
     try {
       return get();
     }
@@ -195,7 +195,7 @@ public class JobFutureTask<RESULT> extends ScheduledFutureDelegate<RESULT> imple
   }
 
   @Override
-  public RESULT awaitDone(final long timeout, final TimeUnit unit) throws ProcessingException {
+  public RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit) throws ProcessingException {
     try {
       return get(timeout, unit);
     }

@@ -53,7 +53,7 @@ public class ClientJobTest {
       @Override
       public void run() throws Exception {
       }
-    }).awaitDone();
+    }).awaitDoneAndGet();
   }
 
   @Test
@@ -64,7 +64,7 @@ public class ClientJobTest {
       @Override
       public void run() throws Exception {
       }
-    }, ClientJobInput.defaults().setSessionRequired(false)).awaitDone();
+    }, ClientJobInput.defaults().setSessionRequired(false)).awaitDoneAndGet();
   }
 
   @Test
@@ -79,7 +79,7 @@ public class ClientJobTest {
       public void run() throws Exception {
         modelThread.set(ModelJobs.isModelThread());
       }
-    }, ClientJobInput.empty().setSession(m_clientSession1)).awaitDone();
+    }, ClientJobInput.empty().setSession(m_clientSession1)).awaitDoneAndGet();
 
     assertFalse(ModelJobs.isModelThread());
     assertFalse(modelThread.get());
@@ -132,7 +132,7 @@ public class ClientJobTest {
       public void run() throws Exception {
         jobInput.setValue(IFuture.CURRENT.get().getJobInput());
       }
-    }).awaitDone();
+    }).awaitDoneAndGet();
 
     assertTrue(jobInput.getValue() instanceof ClientJobInput);
   }

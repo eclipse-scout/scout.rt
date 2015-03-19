@@ -151,7 +151,7 @@ public class ServiceTunnelServletTest {
 
     Set<IServerSession> serverSessions = new HashSet<IServerSession>();
     for (IFuture<?> future : futures) {
-      serverSessions.add((IServerSession) future.awaitDone());
+      serverSessions.add((IServerSession) future.awaitDoneAndGet());
     }
 
     assertEquals(CollectionUtility.hashSet(testServerSession), serverSessions);
@@ -201,7 +201,7 @@ public class ServiceTunnelServletTest {
     }
 
     for (IFuture<?> future : futures) {
-      future.awaitDone();
+      future.awaitDoneAndGet();
     }
 
     return futures;

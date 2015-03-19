@@ -116,7 +116,7 @@ public class ClientJobCancelTest {
       ClientJobs.schedule(new JobThatInterrupts(future), 1, TimeUnit.SECONDS, ClientJobInput.defaults().setSession(m_session).setName("Interrupter"));
     }
     //wait for user job
-    return future.awaitDone();
+    return future.awaitDoneAndGet();
   }
 
   private static class JobThatInterrupts implements IRunnable {

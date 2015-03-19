@@ -157,7 +157,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         interceptLoadItems(minDate, maxDate, result);
       }
     }, ModelJobInput.defaults().setSession(session).setName(getClass().getSimpleName() + " load items"));
-    future.awaitDone();
+    future.awaitDoneAndGet();
   }
 
   @ConfigOperation
@@ -480,7 +480,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
             }
           }
         }, ModelJobInput.defaults().setName(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " setItems"));
-        future.awaitDone();
+        future.awaitDoneAndGet();
       }
       finally {
         setLoadInProgressInSyncJob(false);

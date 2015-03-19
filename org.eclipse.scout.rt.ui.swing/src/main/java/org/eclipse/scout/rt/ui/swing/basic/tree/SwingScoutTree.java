@@ -544,7 +544,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     };
 
     try {
-      getSwingEnvironment().invokeScoutLater(t, 1234).awaitDone(1234, TimeUnit.MILLISECONDS);
+      getSwingEnvironment().invokeScoutLater(t, 1234).awaitDoneAndGet(1234, TimeUnit.MILLISECONDS);
     }
     catch (ProcessingException e) {
       LOG.debug("exception occured while joining on model thread: " + e);
@@ -765,7 +765,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDone(20000, TimeUnit.MILLISECONDS);
+        getSwingEnvironment().invokeScoutLater(t, 20000).awaitDoneAndGet(20000, TimeUnit.MILLISECONDS);
       }
       catch (ProcessingException e) {
         //nop

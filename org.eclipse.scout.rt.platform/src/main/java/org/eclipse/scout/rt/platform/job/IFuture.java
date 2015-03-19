@@ -84,7 +84,7 @@ public interface IFuture<RESULT> {
    *           is thrown if this thread was interrupted while waiting for the job to complete; see
    *           {@link JobExecutionException#isInterruption()};</li>
    */
-  RESULT awaitDone() throws ProcessingException;
+  RESULT awaitDoneAndGet() throws ProcessingException;
 
   /**
    * Blocks the calling thread until the job gets cancelled or completed to return its execution result. This call
@@ -106,5 +106,5 @@ public interface IFuture<RESULT> {
    *           see {@link JobExecutionException#isTimeout()};</li>
    *           </ul>
    */
-  RESULT awaitDone(long timeout, TimeUnit unit) throws ProcessingException;
+  RESULT awaitDoneAndGet(long timeout, TimeUnit unit) throws ProcessingException;
 }

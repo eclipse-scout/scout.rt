@@ -89,7 +89,7 @@ public class FormWaitForTest {
     LOG.debug("ClientSyncWaitForTest.testStartAndWaitImpl() after waitFor");
     testSequence.add(5);
 
-    future.awaitDone();
+    future.awaitDoneAndGet();
     ScoutAssert.assertOrder(new Integer[]{0, 1, 2, 3, 4, 5}, testSequence.toArray());
   }
 }

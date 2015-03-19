@@ -50,7 +50,7 @@ public class ServerJobTest {
       @Override
       public void run() throws Exception {
       }
-    }).awaitDone();
+    }).awaitDoneAndGet();
   }
 
   @Test
@@ -61,7 +61,7 @@ public class ServerJobTest {
       @Override
       public void run() throws Exception {
       }
-    }, ServerJobInput.defaults().setSessionRequired(false)).awaitDone();
+    }, ServerJobInput.defaults().setSessionRequired(false)).awaitDoneAndGet();
   }
 
   @Test
@@ -111,7 +111,7 @@ public class ServerJobTest {
       public void run() throws Exception {
         jobInput.setValue(IFuture.CURRENT.get().getJobInput());
       }
-    }).awaitDone();
+    }).awaitDoneAndGet();
 
     assertTrue(jobInput.getValue() instanceof ServerJobInput);
   }

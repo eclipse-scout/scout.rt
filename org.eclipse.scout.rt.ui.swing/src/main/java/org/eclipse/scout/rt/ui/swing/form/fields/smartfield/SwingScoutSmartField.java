@@ -626,7 +626,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     boolean hasFinished = false;
     IFuture<Void> job = getSwingEnvironment().invokeScoutLater(t, 0);
     try {
-      job.awaitDone(2345, TimeUnit.MILLISECONDS);
+      job.awaitDoneAndGet(2345, TimeUnit.MILLISECONDS);
       hasFinished = true;
     }
     catch (ProcessingException e) {

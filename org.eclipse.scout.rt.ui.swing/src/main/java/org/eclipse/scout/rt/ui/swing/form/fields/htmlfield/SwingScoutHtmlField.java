@@ -333,7 +333,7 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     };
     IFuture<Void> job = getSwingEnvironment().invokeScoutLater(t, 0);
     try {
-      job.awaitDone(2345, TimeUnit.MILLISECONDS);
+      job.awaitDoneAndGet(2345, TimeUnit.MILLISECONDS);
     }
     catch (ProcessingException e) {
       //nop

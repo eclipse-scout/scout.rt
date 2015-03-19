@@ -68,7 +68,7 @@ public class ModelJobTest {
       public void run() throws Exception {
         modelThread.set(ModelJobs.isModelThread());
       }
-    }, ModelJobInput.empty().setSession(m_clientSession1)).awaitDone();
+    }, ModelJobInput.empty().setSession(m_clientSession1)).awaitDoneAndGet();
 
     assertFalse(ModelJobs.isModelThread());
     assertTrue(modelThread.get());
@@ -121,7 +121,7 @@ public class ModelJobTest {
       public void run() throws Exception {
         jobInput.setValue(IFuture.CURRENT.get().getJobInput());
       }
-    }).awaitDone();
+    }).awaitDoneAndGet();
 
     assertTrue(jobInput.getValue() instanceof ModelJobInput);
   }

@@ -301,7 +301,7 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
     }, ModelJobInput.defaults().setSession(getSwingEnvironment().getScoutSession()).setName("fireBeforeLocationChangedFromSwt"));
 
     try {
-      return future.awaitDone(10, TimeUnit.SECONDS);
+      return future.awaitDoneAndGet(10, TimeUnit.SECONDS);
     }
     catch (ProcessingException e) {
       LOG.warn("Failed to wait for the Scout model to accept a location change.", e);

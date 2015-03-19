@@ -349,7 +349,7 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
         }
       };
       try {
-        getSwingEnvironment().invokeScoutLater(t, 5678).awaitDone(5678, TimeUnit.MILLISECONDS);
+        getSwingEnvironment().invokeScoutLater(t, 5678).awaitDoneAndGet(5678, TimeUnit.MILLISECONDS);
       }
       catch (ProcessingException e) {
         //nop

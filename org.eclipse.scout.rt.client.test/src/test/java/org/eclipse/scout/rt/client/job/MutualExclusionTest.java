@@ -183,7 +183,7 @@ public class MutualExclusionTest {
             });
 
             try {
-              future.awaitDone(1, TimeUnit.SECONDS);
+              future.awaitDoneAndGet(1, TimeUnit.SECONDS);
             }
             catch (JobExecutionException e) {
               if (e.isTimeout()) {
@@ -246,7 +246,7 @@ public class MutualExclusionTest {
         });
 
         try {
-          future.awaitDone(1, TimeUnit.SECONDS);
+          future.awaitDoneAndGet(1, TimeUnit.SECONDS);
         }
         catch (JobExecutionException e) {
           protocol.add(2);
@@ -336,7 +336,7 @@ public class MutualExclusionTest {
     }, ModelJobInput.defaults().setName("job-2"));
 
     // Wait until job1 completed.
-    future1.awaitDone(30, TimeUnit.SECONDS);
+    future1.awaitDoneAndGet(30, TimeUnit.SECONDS);
 
     assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
 
@@ -529,7 +529,7 @@ public class MutualExclusionTest {
 
     assertTrue(future1.isCancelled());
     try {
-      assertNull(future1.awaitDone(0, TimeUnit.MILLISECONDS));
+      assertNull(future1.awaitDoneAndGet(0, TimeUnit.MILLISECONDS));
       assertTrue(future1.isCancelled());
     }
     catch (JobExecutionException e) {
@@ -538,7 +538,7 @@ public class MutualExclusionTest {
 
     assertFalse(future2.isCancelled());
     try {
-      future2.awaitDone(0, TimeUnit.MILLISECONDS);
+      future2.awaitDoneAndGet(0, TimeUnit.MILLISECONDS);
       fail();
     }
     catch (JobExecutionException e) {
@@ -547,7 +547,7 @@ public class MutualExclusionTest {
 
     assertFalse(future3.isCancelled());
     try {
-      future3.awaitDone(0, TimeUnit.MILLISECONDS);
+      future3.awaitDoneAndGet(0, TimeUnit.MILLISECONDS);
       fail();
     }
     catch (JobExecutionException e) {
@@ -562,14 +562,14 @@ public class MutualExclusionTest {
     expectedProtocol.add("done-3");
     assertEquals(expectedProtocol, protocol);
     try {
-      assertNull(future2.awaitDone(0, TimeUnit.MILLISECONDS));
+      assertNull(future2.awaitDoneAndGet(0, TimeUnit.MILLISECONDS));
     }
     catch (JobExecutionException e) {
       fail();
     }
 
     try {
-      assertNull(future3.awaitDone(0, TimeUnit.MILLISECONDS));
+      assertNull(future3.awaitDoneAndGet(0, TimeUnit.MILLISECONDS));
     }
     catch (JobExecutionException e) {
       fail();
@@ -1160,7 +1160,7 @@ public class MutualExclusionTest {
         BC.waitFor();
         protocol.add("5: afterWaitFor");
       }
-    }).awaitDone();
+    }).awaitDoneAndGet();
 
     assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 10, TimeUnit.SECONDS));
 
@@ -1205,7 +1205,7 @@ public class MutualExclusionTest {
 
     // Expect the job to continue running.
     try {
-      future.awaitDone();
+      future.awaitDoneAndGet();
 
       List<String> expected = new ArrayList<>();
       expected.add("1: running");

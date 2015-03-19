@@ -173,7 +173,7 @@ public class SwingPopupWorker implements Runnable {
     };
     IFuture<Void> prepareJob = m_environment.invokeScoutLater(t, 0);
     try {
-      prepareJob.awaitDone(1200, TimeUnit.MILLISECONDS);
+      prepareJob.awaitDoneAndGet(1200, TimeUnit.MILLISECONDS);
     }
     catch (ProcessingException e) {
       LOG.error("error during prepare menus.", e);

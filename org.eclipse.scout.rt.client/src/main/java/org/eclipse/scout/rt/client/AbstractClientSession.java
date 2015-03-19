@@ -475,7 +475,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
         try {
           // Wait for the client jobs to finish for a maximal period of time.
           for (IFuture<?> runningFuture : runningFutures) {
-            runningFuture.awaitDone(timeout, TimeUnit.MILLISECONDS);
+            runningFuture.awaitDoneAndGet(timeout, TimeUnit.MILLISECONDS);
           }
         }
         finally {

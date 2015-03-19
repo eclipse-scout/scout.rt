@@ -103,7 +103,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
       public IServiceTunnelResponse call() throws Exception {
         return invokeService(serviceTunnelRequest);
       }
-    }, input).awaitDone(); // schedule the service-request to enable cancellation by 'ServerProcessingCancelService.cancel(requestSequence)'
+    }, input).awaitDoneAndGet(); // schedule the service-request to enable cancellation by 'ServerProcessingCancelService.cancel(requestSequence)'
   }
 
   /**

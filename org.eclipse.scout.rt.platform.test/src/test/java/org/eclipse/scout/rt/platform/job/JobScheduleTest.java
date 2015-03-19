@@ -69,7 +69,7 @@ public class JobScheduleTest {
     }, JobInput.defaults());
 
     // VERIFY
-    assertEquals("running", future.awaitDone());
+    assertEquals("running", future.awaitDoneAndGet());
     assertTrue(future.isDone());
   }
 
@@ -85,7 +85,7 @@ public class JobScheduleTest {
     }, JobInput.defaults());
 
     // VERIFY
-    assertNull(future.awaitDone());
+    assertNull(future.awaitDoneAndGet());
     assertEquals(CollectionUtility.hashSet("running"), protocol);
     assertTrue(future.isDone());
   }
@@ -103,7 +103,7 @@ public class JobScheduleTest {
     }, JobInput.defaults());
 
     try {
-      future.awaitDone();
+      future.awaitDoneAndGet();
       fail("Exception expected");
     }
     catch (Exception e) {
@@ -125,7 +125,7 @@ public class JobScheduleTest {
     }, JobInput.defaults());
 
     try {
-      future.awaitDone();
+      future.awaitDoneAndGet();
       fail("Exception expected");
     }
     catch (Exception e) {
@@ -147,7 +147,7 @@ public class JobScheduleTest {
     }, JobInput.defaults());
 
     try {
-      future.awaitDone();
+      future.awaitDoneAndGet();
       fail("Exception expected");
     }
     catch (Exception e) {
@@ -170,7 +170,7 @@ public class JobScheduleTest {
     }, JobInput.defaults());
 
     try {
-      future.awaitDone();
+      future.awaitDoneAndGet();
       fail("Exception expected");
     }
     catch (Exception e) {
@@ -193,7 +193,7 @@ public class JobScheduleTest {
     }, JobInput.defaults());
 
     try {
-      future.awaitDone();
+      future.awaitDoneAndGet();
       fail("Exception expected");
     }
     catch (Exception e) {
@@ -216,7 +216,7 @@ public class JobScheduleTest {
     }, JobInput.defaults());
 
     try {
-      future.awaitDone();
+      future.awaitDoneAndGet();
       fail("Exception expected");
     }
     catch (Exception e) {
@@ -242,9 +242,9 @@ public class JobScheduleTest {
           public void run() throws Exception {
             protocol.add(Thread.currentThread());
           }
-        }, JobInput.defaults()).awaitDone();
+        }, JobInput.defaults()).awaitDoneAndGet();
       }
-    }, JobInput.defaults()).awaitDone();
+    }, JobInput.defaults()).awaitDoneAndGet();
 
     assertEquals(2, protocol.size());
     assertFalse(protocol.contains(Thread.currentThread()));
@@ -269,9 +269,9 @@ public class JobScheduleTest {
           public void run() throws Exception {
             actualThreadName2.setValue(Thread.currentThread().getName());
           }
-        }, JobInput.defaults().setName("XYZ")).awaitDone();
+        }, JobInput.defaults().setName("XYZ")).awaitDoneAndGet();
       }
-    }, JobInput.defaults().setName("ABC")).awaitDone();
+    }, JobInput.defaults().setName("ABC")).awaitDoneAndGet();
 
     assertTrue(actualThreadName1.getValue().matches("scout-thread-(\\d)+;ABC"));
     assertTrue(actualThreadName2.getValue().matches("scout-thread-(\\d)+;XYZ"));
@@ -302,11 +302,11 @@ public class JobScheduleTest {
           }
         }, JobInput.defaults()));
 
-        expectedFuture2.getValue().awaitDone(); // wait for the job to complete
+        expectedFuture2.getValue().awaitDoneAndGet(); // wait for the job to complete
       }
     }, JobInput.defaults()));
 
-    expectedFuture1.getValue().awaitDone(); // wait for the job to complete
+    expectedFuture1.getValue().awaitDoneAndGet(); // wait for the job to complete
 
     assertNotNull(expectedFuture1.getValue());
     assertNotNull(expectedFuture2.getValue());
@@ -329,7 +329,7 @@ public class JobScheduleTest {
         protocol.add(1);
       }
     }, JobInput.defaults());
-    future.awaitDone();
+    future.awaitDoneAndGet();
     protocol.add(2);
 
     assertEquals(Arrays.asList(1, 2), protocol);
@@ -380,7 +380,7 @@ public class JobScheduleTest {
     }, 1, TimeUnit.SECONDS, JobInput.empty().setExpirationTime(500, TimeUnit.MILLISECONDS));
 
     try {
-      assertNull(future.awaitDone());
+      assertNull(future.awaitDoneAndGet());
       assertTrue(future.isCancelled());
       assertFalse(executed.get());
     }
@@ -401,7 +401,7 @@ public class JobScheduleTest {
       }
     }, 1, TimeUnit.SECONDS, JobInput.empty().setExpirationTime(JobInput.INFINITE_EXPIRATION, TimeUnit.MILLISECONDS));
 
-    future.awaitDone();
+    future.awaitDoneAndGet();
     assertTrue(executed.get());
   }
 
@@ -417,7 +417,7 @@ public class JobScheduleTest {
         tRunning.set(System.nanoTime());
         return "executed";
       }
-    }, 2, TimeUnit.SECONDS, JobInput.empty()).awaitDone(5, TimeUnit.SECONDS);
+    }, 2, TimeUnit.SECONDS, JobInput.empty()).awaitDoneAndGet(5, TimeUnit.SECONDS);
 
     assertEquals("executed", result);
     long delta = tRunning.get() - tScheduled;
@@ -445,8 +445,8 @@ public class JobScheduleTest {
       }
     }, 500, TimeUnit.MILLISECONDS, JobInput.empty().setMutex(mutex));
 
-    assertEquals("job-2", future2.awaitDone(10, TimeUnit.SECONDS));
-    assertEquals("job-1", future1.awaitDone());
+    assertEquals("job-2", future2.awaitDoneAndGet(10, TimeUnit.SECONDS));
+    assertEquals("job-1", future1.awaitDoneAndGet());
   }
 
   @Test
@@ -473,7 +473,7 @@ public class JobScheduleTest {
     }, JobInput.empty().setMutex(mutex));
 
     try {
-      assertEquals("job-2", future2.awaitDone(2, TimeUnit.SECONDS));
+      assertEquals("job-2", future2.awaitDoneAndGet(2, TimeUnit.SECONDS));
       fail();
     }
     catch (JobExecutionException e) {

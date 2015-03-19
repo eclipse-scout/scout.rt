@@ -44,7 +44,7 @@ public class ModelRunNowStatement extends Statement {
         }
       }
     };
-    ModelJobs.schedule(runnable).awaitDone();
+    ModelJobs.schedule(runnable).awaitDoneAndGet();
 
     if (throwable.getValue() != null) {
       throw throwable.getValue();

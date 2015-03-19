@@ -187,7 +187,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
       IHttpBackgroundExecutable executor = createHttpBackgroundExecutor(cancelCall, new Object());
       IFuture<?> future = schedule(executor, cancelCall);
       try {
-        future.awaitDone(10, TimeUnit.SECONDS);
+        future.awaitDoneAndGet(10, TimeUnit.SECONDS);
         IServiceTunnelResponse cancelResult = executor.getResponse();
         if (cancelResult == null) {
           return false;

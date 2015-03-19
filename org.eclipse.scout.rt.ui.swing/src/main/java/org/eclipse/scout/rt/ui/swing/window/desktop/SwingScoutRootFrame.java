@@ -509,7 +509,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
                 });
               }
             }, ClientJobInput.defaults().setSession(getSwingEnvironment().getScoutSession()));
-            future.awaitDone(1, TimeUnit.MINUTES); // wait no longer than one minute
+            future.awaitDoneAndGet(1, TimeUnit.MINUTES); // wait no longer than one minute
           }
           catch (ProcessingException ex) {
             LOG.error("Error invoking desktop closed hook.", ex);
