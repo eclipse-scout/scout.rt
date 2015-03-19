@@ -511,6 +511,8 @@ scout.Session.prototype.showFatalMessage = function(options) {
   }.bind(this);
 
   ui.render(this.$entryPoint);
+  // In case error occurs during application loading, remove the animation
+  this.$entryPoint.children('.application-loading').remove();
 };
 
 scout.Session.prototype.goOffline = function() {
@@ -641,6 +643,14 @@ scout.Session.prototype._processEvents = function(events) {
 };
 
 scout.Session.prototype.init = function() {
+  // After a short time, display a loading animation (will be removed again in _onInitialized)
+  setTimeout(function() {
+    if (!this.desktop) {
+      this.$entryPoint.appendDiv('application-loading').fadeIn();
+    }
+  }.bind(this), 500);
+
+  // Send startup request
   this._startup = true;
   this._sendNow();
 
@@ -676,6 +686,7 @@ scout.Session.prototype._onInitialized = function(event) {
   this.locale = new scout.Locale(clientSessionData.locale);
   this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
   this.desktop.render(this.$entryPoint);
+  this.$entryPoint.children('.application-loading').remove();
   this._backgroundJobPollingEnabled = event.backgroundJobPollingEnabled;
 };
 

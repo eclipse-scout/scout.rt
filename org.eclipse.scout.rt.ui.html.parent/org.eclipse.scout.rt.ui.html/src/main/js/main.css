@@ -164,3 +164,20 @@ button::-moz-focus-inner {
   margin: 10px;
   .user-select(text)
 }
+
+.application-loading {
+  display: block;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  margin-left: -50px;
+  margin-top: -50px;
+
+  background-image: url('logo.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+
+  .animation(rotate-x 5s infinite linear);
+}

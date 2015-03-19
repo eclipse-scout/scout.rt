@@ -129,9 +129,15 @@
 /*** Pulse Opacity ***/
 
 .keyframes-pulse-opacity () {
-  0%   { opacity: 1.0; }
-  50%  { opacity: 0.05; }
-  100% { opacity: 1.0; }
+  0% {
+    opacity: 1.0;
+  }
+  50% {
+    opacity: 0.05;
+  }
+  100% {
+    opacity: 1.0;
+  }
 }
 
 @-webkit-keyframes pulse-opacity { .keyframes-pulse-opacity; }
@@ -141,17 +147,32 @@
 
 .keyframes-pulsate () {
   0% {
-    transform:scale(0.1);
+    .transform(scale(0.1));
     opacity: 0.0;
   }
   50% {
     opacity: 1.0;
   }
   100% {
-    transform:scale(1.2);
+    .transform(scale(1.2));
     opacity: 0.0;
   }
 }
 
 @-webkit-keyframes pulsate { .keyframes-pulsate; }
 @keyframes pulsate { .keyframes-pulsate; }
+
+/*** Rotate-X ***/
+
+.keyframes-rotate-x () {
+  0% {
+    .transform(perspective(120px) rotateY(0deg));
+  } 50% {
+    .transform(perspective(120px) rotateY(-180.0deg));
+  } 100% {
+    .transform(perspective(120px) rotateY(-360deg));
+  }
+}
+
+@-webkit-keyframes rotate-x { .keyframes-rotate-x; }
+@keyframes rotate-x { .keyframes-rotate-x; }
