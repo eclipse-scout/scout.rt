@@ -331,13 +331,12 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   }
   if (!content.rendered) {
     content.render(this.$bench);
-    // FIXME CGU: maybe include in render?
-    content.htmlComp.layout();
-    content.htmlComp.validateRoot = true;
-
     if (content instanceof scout.Table) {
       content.menuBar.$container.addClass('main-menubar');
     }
+    // FIXME CGU: maybe include in render?
+    content.htmlComp.layout();
+    content.htmlComp.validateRoot = true;
   }
 };
 
