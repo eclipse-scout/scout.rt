@@ -76,8 +76,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private JsonEventProcessor m_jsonEventProcessor;
   private boolean m_disposing;
   private IJobListener m_jobChangeListener;
-
-  // FIXME AWE: (jobs) thread safety, review
   private Object m_backgroundJobLock = new Object();
 
   public AbstractJsonSession() {
@@ -92,13 +90,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       @Override
       public boolean accept(JobEvent event) {
         IFuture<?> future = event.getFuture();
-
-        System.out.println(
-            "type == done " + (JobEventType.DONE == event.getType()) +
-                "\nmodelJob=" + ModelJobs.isModelJob(future) +
-                "\nclientSession=" + matchesClientSession(future) +
-                "\n!processing=" + !isProcessingClientRequest());
-
         return JobEventType.DONE == event.getType() &&
             ModelJobs.isModelJob(future) &&
             matchesClientSession(future) &&
@@ -106,13 +97,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       }
 
       private boolean matchesClientSession(IFuture<?> future) {
-        if (future.getJobInput() instanceof ModelJobInput) {
-          IClientSession jobClientSession = ((ModelJobInput) future.getJobInput()).getSession();
-          return jobClientSession == getClientSession();
-        }
-        else {
-          return false; // FIXME AWE remove
-        }
+        IClientSession jobClientSession = ((ModelJobInput) future.getJobInput()).getSession();
+        return jobClientSession == getClientSession();
       }
     });
   }
@@ -277,8 +263,14 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     JSONObject jsonEvent = new JSONObject();
     JsonObjectUtility.putProperty(jsonEvent, "clientSession", m_jsonClientSession.getId());
     JsonObjectUtility.putProperty(jsonEvent, "textMap", getTextMap(request.getLocale()));
+    JsonObjectUtility.putProperty(jsonEvent, "backgroundJobPollingEnabled", isBackgroundJobPollingEnabled());
     m_currentJsonResponse.addActionEvent(m_jsonSessionId, "initialized", jsonEvent);
     LOG.info("JsonSession with ID " + m_jsonSessionId + " initialized");
+  }
+
+  @Override
+  public boolean isBackgroundJobPollingEnabled() {
+    return true;
   }
 
   /**

@@ -72,8 +72,8 @@ public class JsonRequest {
     return m_request.optBoolean(PROP_UNLOAD);
   }
 
-  public boolean isWaitForBackgroundJobsRequest() {
-    return m_request.has("waitForBackgroundJobs");
+  public boolean isPollForBackgroundJobsRequest() {
+    return m_request.has("pollForBackgroundJobs");
   }
 
   @Override

@@ -67,9 +67,9 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
         return true;
       }
 
-      if (jsonReq.isWaitForBackgroundJobsRequest()) {
+      if (jsonReq.isPollForBackgroundJobsRequest()) {
         // Blocks the current thread until:
-        // - a model job terminates and the response has data
+        // - a model job terminates
         // - the max. wait time has exceeded
         jsonSession.waitForBackgroundJobs();
       }

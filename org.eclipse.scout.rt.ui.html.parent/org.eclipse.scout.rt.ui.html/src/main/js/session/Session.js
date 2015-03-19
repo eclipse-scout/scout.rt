@@ -56,7 +56,6 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper();
   this.partId = jsonSessionId.substring(0, jsonSessionId.indexOf(':'));
-  this._requestedBackgroundJob = false;
 
   // TODO BSH Detach | Check if there is another way
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
@@ -243,7 +242,10 @@ scout.Session.prototype._coalesceEvents = function(previousEvents, event) {
 };
 
 scout.Session.prototype._sendRequest = function(request) {
-  if (this.offline) {
+  var polling = !!request.pollForBackgroundJobs,
+    unload = !!request.unload;
+
+  if (this.offline && !polling) {
     request.events.forEach(function(event) {
       this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
     }.bind(this));
@@ -251,7 +253,7 @@ scout.Session.prototype._sendRequest = function(request) {
     return;
   }
 
-  if (request.unload && navigator.sendBeacon) {
+  if (unload && navigator.sendBeacon) {
     // The unload request must _not_ be sent asynchronously, because the browser would cancel
     // it when the page unload is completed. Because the support for synchronous AJAX request
     // will apparently be dropped eventually, we use the "sendBeacon" method to send the unload
@@ -265,24 +267,35 @@ scout.Session.prototype._sendRequest = function(request) {
     return;
   }
 
-  if (!this.areRequestsPending() && !request.unload) {
+  var jsError,
+    success = false,
+    ajaxOptions = {
+      async: !unload,
+      type: 'POST',
+      dataType: 'json',
+      contentType: 'application/json; charset=UTF-8',
+      cache: false,
+      url: this.url,
+      data: JSON.stringify(request),
+      context: request
+    },
+    busyHandling =
+      !unload &&
+      !polling &&
+      !this.areRequestsPending();
+
+  if (busyHandling) {
     this.setBusy(true);
   }
-  this._requestsPendingCounter++;
+  // Don't increase pending counter for polling requests
+  if (!polling) {
+    this._requestsPendingCounter++;
+  }
 
-  var ajaxOptions = {
-    async: !request.unload,
-    type: 'POST',
-    dataType: 'json',
-    contentType: 'application/json; charset=UTF-8',
-    cache: false,
-    url: this.url,
-    data: JSON.stringify(request),
-    context: request
-  };
-
-  var success = false;
-  var jsError;
+  $.ajax(ajaxOptions)
+    .done(onAjaxDone.bind(this))
+    .fail(onAjaxFail.bind(this))
+    .always(onAjaxAlways.bind(this));
 
   function onAjaxDone(data) {
     try {
@@ -307,8 +320,14 @@ scout.Session.prototype._sendRequest = function(request) {
   }
 
   function onAjaxAlways(data, textStatus, errorThrown) {
-    this._requestsPendingCounter--;
-    if (!this.areRequestsPending() && !request.unload) {
+    if (polling) {
+      // Immediately start a new poll background jobs request, when a polling request is done
+      setTimeout(this._pollForBackgroundJobs.bind(this));
+    } else {
+      // Don't decrease pending counter for polling requests
+      this._requestsPendingCounter--;
+    }
+    if (busyHandling) {
       this.setBusy(false);
     }
     this.layoutValidator.validate();
@@ -320,8 +339,6 @@ scout.Session.prototype._sendRequest = function(request) {
       throw jsError;
     }
   }
-
-  $.ajax(ajaxOptions).done(onAjaxDone.bind(this)).fail(onAjaxFail.bind(this)).always(onAjaxAlways.bind(this));
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {
@@ -350,45 +367,16 @@ scout.Session.prototype._processSuccessResponse = function(message) {
 };
 
 /**
- * Pulls the results of jobs running in the background. Note: we cannot use the _sendRequest method here
+ * Polls the results of jobs running in the background. Note: we cannot use the _sendRequest method here
  * since we don't want any busy handling in case of background jobs. The request may take a while, since
  * the server doesn't return until either a time-out occurs or there's something in the response when
  * a model job is done and no request initiated by a user is running.
  */
-scout.Session.prototype._requestBackgroundJobs = function() {
-  if (this._requestedBackgroundJob) {
-    $.log.info('A background job request was already started. Don\'t start a new one...');
-    return;
-  }
-
-  $.log.info('Start a new background jobs request...');
-  this._requestedBackgroundJob = true;
-  var request = {
-      jsonSessionId: this.jsonSessionId,
-      waitForBackgroundJobs: true
-    }, ajaxOptions = {
-      async: true,
-      type: 'POST',
-      dataType: 'json',
-      contentType: 'application/json; charset=UTF-8',
-      cache: false,
-      url: this.url,
-      data: JSON.stringify(request),
-      context: request
-    };
-
-    $.ajax(ajaxOptions)
-      .done(function(data) {
-        this._processSuccessResponse(data);
-      }.bind(this))
-      .fail(function(jqXHR, textStatus, errorThrown) {
-        this._processErrorResponse(request, jqXHR, textStatus, errorThrown);
-      }.bind(this))
-      .always(function() {
-        this._requestedBackgroundJob = false;
-        setTimeout(this._requestBackgroundJobs.bind(this));
-        $.log.info('background job request done');
-      }.bind(this));
+scout.Session.prototype._pollForBackgroundJobs = function() {
+  this._sendRequest({
+    jsonSessionId: this.jsonSessionId,
+    pollForBackgroundJobs: true
+  });
 };
 
 scout.Session.prototype._copyAdapterData = function(adapterData) {
@@ -667,7 +655,9 @@ scout.Session.prototype._onInitialized = function(event) {
   this.locale = new scout.Locale(clientSessionData.locale);
   this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
   this.desktop.render(this.$entryPoint);
-  this._requestBackgroundJobs();
+  if (event.backgroundJobPollingEnabled) {
+    this._pollForBackgroundJobs();
+  }
 };
 
 scout.Session.prototype._onLogout = function(event) {
