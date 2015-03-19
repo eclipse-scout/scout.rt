@@ -46,10 +46,10 @@ public final class ModelJobUtility {
 
   public static void runInModelThreadAndWait(IClientSession clientSession, IExecutable<?> executable) throws ProcessingException {
     if (ModelJobs.isModelThread()) {
-      ModelJobs.runNow(executable, ModelJobInput.defaults().setSession(clientSession));
+      ModelJobs.runNow(executable, ModelJobInput.defaults().session(clientSession));
     }
     else {
-      IFuture<?> future = ModelJobs.schedule(executable, ModelJobInput.defaults().setSession(clientSession));
+      IFuture<?> future = ModelJobs.schedule(executable, ModelJobInput.defaults().session(clientSession));
       try {
         Jobs.getJobManager().awaitDone(ClientJobFutureFilters.newFilter().futures(future).notBlocked(), 1, TimeUnit.HOURS);
       }

@@ -45,7 +45,7 @@ public class JsonEventProcessor {
           }
         });
       }
-    }, ModelJobInput.defaults().setSession(clientSession).setName("processEvents"));
+    }, ModelJobInput.defaults().session(clientSession).name("processEvents"));
     ModelJobUtility.waitUntilJobsHaveFinished(clientSession);
   }
 
