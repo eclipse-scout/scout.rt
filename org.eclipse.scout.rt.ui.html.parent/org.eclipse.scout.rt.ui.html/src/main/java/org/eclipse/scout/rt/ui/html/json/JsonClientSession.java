@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.html.ModelJobUtility;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.json.JSONObject;
-import org.osgi.framework.FrameworkUtil;
 
 public class JsonClientSession<T extends IClientSession> extends AbstractJsonAdapter<T> {
 
@@ -63,7 +62,7 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
     }
     if (!getModel().isActive()) {
       // FIXME CGU: copied from session service. Moved here to be able to attach locale listener first
-      getModel().startSession(FrameworkUtil.getBundle(getClass()));
+      getModel().startSession();
     }
 
     if (getModel().getLoadError() != null) {
@@ -127,7 +126,6 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
         });
       }
     };
-
     try {
       ModelJobUtility.runInModelThreadAndWait(getJsonSession().getClientSession(), runnable);
     }
@@ -198,5 +196,4 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
       }
     }
   }
-
 }
