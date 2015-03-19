@@ -25,7 +25,7 @@ public class TableOrganizeMenu extends OrganizeColumnsMenu {
 
   @Override
   protected String getConfiguredIconId() {
-    return "\uE031";
+    return "font:\uE031";
   }
 
   @Override
