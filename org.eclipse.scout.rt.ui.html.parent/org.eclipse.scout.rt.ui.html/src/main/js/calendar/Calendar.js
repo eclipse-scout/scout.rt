@@ -310,6 +310,33 @@ scout.Calendar.prototype.layoutSize = function() {
       .data('new-width', parseInt((gridW - headerH) / 7, 10));
   }
 
+  // set dayname (based on width of shown column)
+  var width = this.$container.width(),
+    weekdays;
+
+  $.l(width);
+
+  if (this.displayMode === this.DAY) {
+    width /= 1;
+  } else if (this.displayMode ===  this.WORK) {
+    width /= 5;
+  } else if  (this.displayMode ===  this.WEEK) {
+    width /= 7;
+  } else if (this.displayMode === this.MONTH) {
+    width /= 7;
+  }
+
+  if (width > 100) {
+      weekdays = this.session.locale.dateFormat.symbols.weekdaysOrdered;
+  } else {
+      weekdays = this.session.locale.dateFormat.symbols.weekdaysShortOrdered;
+  }
+
+  $('.calendar-day-name', this.$grid).each(function (index) {
+    $(this).text(weekdays[index]);
+  });
+
+
   // animate old to new sizes
   $('div', this.$container).each(function() {
     var $e = $(this),
@@ -347,21 +374,6 @@ scout.Calendar.prototype.layoutLabel = function() {
   }
 
   $('.calendar-select', this.$range).text(text);
-
-  // set dayname (based on width of shown column)
-  // TODO: new-width not correct (will be calculated later)
-  var $days = $('.calendar-day-name', this.$grid),
-    weekdays;
-
-  if ($days.eq($selected.index() - 1).data('new-width') > 100) {
-      weekdays = this.session.locale.dateFormat.symbols.weekdaysOrdered;
-  } else {
-      weekdays = this.session.locale.dateFormat.symbols.weekdaysShortOrdered;
-  }
-
-  $days.each(function (index) {
-    $(this).text(weekdays[index]);
-  });
 
   // prepare to set all day date and mark selected one
   var $dates = $('.calendar-day', this.$grid),
@@ -662,7 +674,7 @@ scout.Calendar.prototype.layoutComponents = function() {
               .hover(this._onMouseenter.bind(this), this._onMouseleave.bind(this));
 
           }
-
+target
         }
       }
     }
