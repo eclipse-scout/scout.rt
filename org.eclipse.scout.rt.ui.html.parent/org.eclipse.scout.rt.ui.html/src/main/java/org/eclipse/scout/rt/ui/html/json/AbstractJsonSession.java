@@ -37,6 +37,8 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobEventFilters;
 import org.eclipse.scout.rt.client.job.ClientJobEventFilters.Filter;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -85,11 +87,16 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_customHtmlRenderer = createCustomHtmlRenderer();
 
     m_jobChangeListener = new P_JobListener();
-    Filter filter = ClientJobEventFilters.allFilter().modelJobsOnly().session(getClientSession()).eventTypes(JobEventType.DONE).andFilter(new IFilter<JobEvent>() {
+    Filter filter = ClientJobEventFilters.allFilter().modelJobsOnly().eventTypes(JobEventType.DONE).andFilter(new IFilter<JobEvent>() {
 
       @Override
       public boolean accept(JobEvent element) {
-        return !isProcessingClientRequest();
+        return matchesClientSession(element.getFuture()) && !isProcessingClientRequest();
+      }
+
+      private boolean matchesClientSession(IFuture<?> future) {
+        IClientSession jobClientSession = ((ModelJobInput) future.getJobInput()).getSession();
+        return jobClientSession == getClientSession();
       }
     });
 
