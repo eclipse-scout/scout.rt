@@ -28,18 +28,18 @@ import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
  * <h2>Example:</h2>
  * <p>
  * Instead of writing in Oracle syntax a condition like
- * 
+ *
  * <pre>
  * String condition = &quot;AND NVL(start_date, SYSDATE) &gt; :date&quot;;
  * </pre>
- * 
+ *
  * the code
- * 
+ *
  * <pre>
  * {@link ISqlStyle} style = service.getSqlStyle();
  * String condition = &quot;AND &quot; + style.nvl(&quot;start_date&quot;, &quot;end_date&quot;) + &quot;(start_date, end_date) &gt; :date&quot;;
  * </pre>
- * 
+ *
  * is used. On Oracle it will be translated to <code>NVL(start_date, end_date)</code>, but when running MSSQL you would
  * get <code>ISNULL(start_date, end_date)</code>
  * </p>
@@ -71,11 +71,11 @@ public interface ISqlStyle extends Serializable {
   /**
    * Can be used to escape plain text that must not be prefixed by <code>:</code><br />
    * E.g.
-   * 
+   *
    * <pre>
    * createNotLike(&quot;P.NAME&quot;, PLAIN_BIND_MARKER_PREFIX + &quot;'%test'&quot;)
    * </pre>
-   * 
+   *
    * to generate <code>P.NAME not like '%test'</code> instead of <code>P.NAME not like :'%test'</code>
    */
   String PLAIN_BIND_MARKER_PREFIX = "&";
@@ -99,7 +99,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * bind factory see {@link #isBlobEnabled()}, {@link #isClobEnabled()} and {@link #isLargeString(String)}
-   * 
+   *
    * @param o
    *          the value to be bound. If the value is a {@link IHolder} then its content value is used
    * @param nullType
@@ -194,7 +194,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute BETWEEN :firstBind AND :secondBind
    * </pre>
@@ -208,7 +208,7 @@ public interface ISqlStyle extends Serializable {
    * In an Oracle implementation this could be represented as
    * </p>
    * </p>
-   * 
+   *
    * <pre>
    * attribute BETWEEN TRUNC( :firstBind ) AND (TRUNC( :secondBind ) + (86399/86400))
    * </pre>
@@ -221,7 +221,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute BETWEEN TRUNC( :firstBind , 'MI' ) AND (TRUNC( :secondBind , 'MI') + (59/1440))
    * </pre>
@@ -234,7 +234,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * UPPER( attribute ) LIKE UPPER( :firstBind || '%')
    * </pre>
@@ -247,7 +247,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * UPPER( attribute ) NOT LIKE UPPER( :firstBind || '%')
    * </pre>
@@ -260,7 +260,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * UPPER( attribute ) LIKE UPPER( '%' || :firstBind )
    * </pre>
@@ -273,7 +273,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * UPPER( attribute ) NOT LIKE UPPER( '%' || :firstBind )
    * </pre>
@@ -286,7 +286,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * UPPER( attribute ) LIKE UPPER('%'|| :firstBind ||'%')
    * </pre>
@@ -301,7 +301,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * UPPER( attribute ) NOT LIKE UPPER('%'|| :firstBind ||'%')
    * </pre>
@@ -314,7 +314,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * UPPER( attribute ) LIKE UPPER( :firstBind )
    * </pre>
@@ -327,7 +327,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * UPPER( attribute ) NOT LIKE UPPER( :firstBind )
    * </pre>
@@ -339,7 +339,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute IS NULL</code>
    * </p>
@@ -352,7 +352,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute IS NOT NULL
    * </pre>
@@ -366,7 +366,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * NVL(attribute, 0) = 0
    * </pre>
@@ -380,7 +380,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * NVL( attribute, 0) <> 0
    * </pre>
@@ -394,7 +394,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * NVL(attribute, '0') = '0'
    * </pre>
@@ -408,7 +408,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * NVL( attribute, '0') <> '0'
    * </pre>
@@ -421,7 +421,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute IN ( :{firstBind} )
    * </pre>
@@ -434,7 +434,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * NOT( attribute IN ( :{firstBind} ))
    * </pre>
@@ -454,8 +454,20 @@ public interface ISqlStyle extends Serializable {
   String createNotInList(String attribute, Object array);
 
   /**
+   * <code>P.NAME in (o1,o2,...)</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   */
+  String createInList(String attribute, boolean plain, Object array);
+
+  /**
+   * <code>P.NAME not in (o1,o2,...)</code><br />
+   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   */
+  String createNotInList(String attribute, boolean plain, Object array);
+
+  /**
    * Style can handle arrays as bind or as literal replacement.
-   * 
+   *
    * @return true if calls to {@link ISqlStyle.createInList(String attribute, Object array)} or {@link
    *         ISqlStyle.createNotInList(String attribute, Object array)} produce SQL binds.
    */
@@ -466,7 +478,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= TRUNC(SYSDATE) AND attribute < TRUNC(SYSDATE+1)
    * </pre>
@@ -479,7 +491,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= TRUNC(SYSDATE-( :firstBind ))
    * AND
@@ -494,7 +506,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute &gt;= TRUNC(SYSDATE)
    * AND
@@ -509,7 +521,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= TRUNC(SYSDATE+ :firstBind )
    * AND
@@ -524,7 +536,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= TRUNC(SYSDATE+ (( :firstBind ) *7) )
    * AND
@@ -539,7 +551,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= TRUNC(ADD_MONTHS(SYSDATE,(-1)*( :firstBind )))
    * AND
@@ -554,7 +566,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= TRUNC(SYSDATE)
    * AND
@@ -569,7 +581,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= TRUNC(ADD_MONTHS(SYSDATE, :firstBind ))
    * AND
@@ -584,7 +596,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute < TRUNC(SYSDATE  + :firstBind +1)
    * </pre>
@@ -597,7 +609,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute < TRUNC(SYSDATE+(( :firstBind )*7)+1)
    * </pre>
@@ -610,7 +622,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute < TRUNC(ADD_MONTHS(SYSDATE, :firstBind )+1)
    * </pre>
@@ -623,7 +635,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= TRUNC(SYSDATE  + :firstBind )
    * </pre>
@@ -636,7 +648,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= TRUNC(SYSDATE+(( :firstBind )*7))
    * </pre>
@@ -649,7 +661,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >=TRUNC(ADD_MONTHS(SYSDATE, :firstBind ))
    * </pre>
@@ -671,7 +683,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * ( attribute >= TRUNC(SYSDATE, 'MI') AND attribute < (TRUNC(SYSDATE, 'MI')+(1/24/60)))
    * </pre>
@@ -684,7 +696,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute < (TRUNC(SYSDATE, 'MI')+(( :firstBind +1)/24/60))
    * </pre>
@@ -697,7 +709,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute <(TRUNC(SYSDATE, 'MI')+((1/24/60)+( :firstBind /24)))
    * </pre>
@@ -710,7 +722,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >=(TRUNC(SYSDATE, 'MI')+( :firstBind /24/60))
    * </pre>
@@ -723,7 +735,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= (TRUNC(SYSDATE, 'MI')+( :firstBind /24))
    * </pre>
@@ -735,7 +747,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * ( attribute <TRUNC(SYSDATE, 'MI') OR  attribute >=(TRUNC(SYSDATE, 'MI')+(1/24/60)))
    * </pre>
@@ -747,7 +759,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= ((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI'))/24/60</code><br />
    * AND
@@ -761,7 +773,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute < ((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI'))/24/60</code><br />
    * OR
@@ -776,7 +788,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+( :firstBind /24/60))/24/60
    * AND
@@ -791,7 +803,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+( :firstBind /24))/24/60
    * AND
@@ -806,7 +818,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute <((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+(( :firstBind +1)/24/60))/24/60
    * </pre>
@@ -819,7 +831,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute <((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+( :firstBind /24)+(1/24/60))/24/60
    * </pre>
@@ -832,7 +844,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+( :firstBind /24/60))/24/60
    * </pre>
@@ -845,7 +857,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+( :firstBind /24))/24/60
    * </pre>
@@ -861,7 +873,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute = :firstBind
    * </pre>
@@ -874,7 +886,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute = TRUNC( :firstBind )
    * </pre>
@@ -887,7 +899,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute = TRUNC( :firstBind ,'MI')
    * </pre>
@@ -903,7 +915,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute <> :firstBind
    * </pre>
@@ -916,7 +928,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute <> TRUNC( :firstBind )
    * </pre>
@@ -929,7 +941,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute <> TRUNC( :firstBind ,'MI')
    * </pre>
@@ -945,7 +957,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute < :firstBind
    * </pre>
@@ -958,7 +970,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute < TRUNC( :firstBind )
    * </pre>
@@ -971,7 +983,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute < TRUNC( :firstBind ,'MI')
    * </pre>
@@ -987,7 +999,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute <= :firstBind
    * </pre>
@@ -1000,7 +1012,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute <= (TRUNC( :firstBind )+(86399/86400))
    * </pre>
@@ -1013,7 +1025,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute <= (TRUNC( :firstBind ,'MI')+(59/1440))
    * </pre>
@@ -1029,7 +1041,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute > :firstBind
    * </pre>
@@ -1042,7 +1054,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute > TRUNC( :firstBind )
    * </pre>
@@ -1055,7 +1067,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute > TRUNC( :firstBind ,'MI')
    * </pre>
@@ -1071,7 +1083,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= :firstBind
    * </pre>
@@ -1084,7 +1096,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= TRUNC( :firstBind )
    * </pre>
@@ -1097,7 +1109,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * 
+   *
    * <pre>
    * attribute >= TRUNC( :firstBind ,'MI')
    * </pre>
