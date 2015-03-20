@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.exception.InitializationException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -425,7 +424,9 @@ public final class ConfigIniUtility {
   protected static void parseLocalConfigIniFile(Set<String> externalConfigPaths) {
     URL url = getConfigIniUrl();
     if (url == null) {
-      throw new InitializationException("No configuration area found.");
+      // don't log here because the logger needs this class (cyclic dependencies)
+      System.err.println("No configuration area found. Running with empty configuration.");
+      return;
     }
     parseConfigIni(url, externalConfigPaths);
   }
