@@ -1421,10 +1421,10 @@ public class StatementProcessor implements IStatementProcessor {
       if (Collection.class.isAssignableFrom(cls)) {
         Collection value = (Collection) ((IHolder) o).getValue();
         if (value == null) {
-          return new ArrayInput(null, bindToken);
+          return new ArrayInput(m_callerService.getSqlStyle(), null, bindToken);
         }
         else {
-          return new ArrayInput(value.toArray(), bindToken);
+          return new ArrayInput(m_callerService.getSqlStyle(), value.toArray(), bindToken);
         }
       }
       else if (cls.isArray()) {
