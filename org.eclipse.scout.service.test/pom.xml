@@ -18,5 +18,18 @@
   </parent>
 
   <artifactId>org.eclipse.scout.service.test</artifactId>
-  <packaging>eclipse-test-plugin</packaging>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <artifactId>org.eclipse.scout.rt.testing.platform</artifactId>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <version>5.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <artifactId>org.eclipse.scout.service</artifactId>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <version>5.1.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -16,17 +16,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.easymock.EasyMock;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * Tests for {@link StatementProcessor#createSqlDump(boolean, boolean)}
- * 
+ *
  * @see https://bugs.eclipse.org/bugs/show_bug.cgi?id=371963
  */
 public class StatementProcessorCreateSqlDumpTest {
@@ -116,23 +116,14 @@ public class StatementProcessorCreateSqlDumpTest {
   }
 
   private void runDump(String expected, StatementType type, String statement) throws ProcessingException {
-    ISqlService callerService = EasyMock.createNiceMock(ISqlService.class);
+    ISqlStyle style = Mockito.mock(ISqlStyle.class);
+    Mockito.when(style.buildBindFor(23, null)).thenReturn(new SqlBind(4, 23));
+    Mockito.when(style.toPlainText(23)).thenReturn("23");
+    Mockito.when(style.buildBindFor("lorem", null)).thenReturn(new SqlBind(1, "lorem"));
+    Mockito.when(style.toPlainText("lorem")).thenReturn("'lorem'");
 
-    ISqlStyle style = EasyMock.createNiceMock(ISqlStyle.class);
-    style.buildBindFor(23, null);
-    EasyMock.expectLastCall().andReturn(new SqlBind(4, 23));
-    style.toPlainText(23);
-    EasyMock.expectLastCall().andReturn("23");
-
-    style.buildBindFor("lorem", null);
-    EasyMock.expectLastCall().andReturn(new SqlBind(1, "lorem"));
-    style.toPlainText("lorem");
-    EasyMock.expectLastCall().andReturn("'lorem'");
-
-    callerService.getSqlStyle();
-    EasyMock.expectLastCall().andReturn(style).anyTimes();
-
-    EasyMock.replay(callerService, style);
+    ISqlService callerService = Mockito.mock(ISqlService.class);
+    Mockito.when(callerService.getSqlStyle()).thenReturn(style);
 
     Object[] bindBases = new Object[]{new NVPair("myKey", 23), new NVPair("myText", "lorem")};
     P_StatementProcessor_UnderTest statementProcessor = new P_StatementProcessor_UnderTest(callerService, statement, bindBases);

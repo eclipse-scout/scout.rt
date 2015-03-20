@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.form.fields.buttons;
 
-import org.easymock.EasyMock;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
@@ -26,6 +25,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 /**
  * Tests for {@link ButtonFactory}
@@ -41,7 +41,7 @@ public class ButtonFactoryTest {
   @Before
   public void setup() {
     m_factory = new ButtonFactory();
-    m_swingEnvironment = EasyMock.createNiceMock(ISwingEnvironment.class);
+    m_swingEnvironment = Mockito.mock(ISwingEnvironment.class);
   }
 
   @Test

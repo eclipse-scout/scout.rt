@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import org.easymock.EasyMock;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -28,8 +27,12 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFiel
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
+@RunWith(PlatformTestRunner.class)
 public class AbstractDecimalColumnTest extends AbstractDecimalColumn<BigDecimal> {
 
   @Override
@@ -113,7 +116,7 @@ public class AbstractDecimalColumnTest extends AbstractDecimalColumn<BigDecimal>
     setMultiplier(100);
     setFractionDigits(3);
 
-    ITableRow row = EasyMock.createMock(ITableRow.class);
+    ITableRow row = Mockito.mock(ITableRow.class);
     AbstractBigDecimalField field = (AbstractBigDecimalField) prepareEditInternal(row);
     assertFalse("expected groupingUsed-property to be propagated to field", field.isGroupingUsed());
     assertEquals("expected minFractionDigits-property to be propagated to field", 5, field.getMinFractionDigits());

@@ -15,17 +15,20 @@ import static org.junit.Assert.assertEquals;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
-import org.easymock.EasyMock;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
+@RunWith(PlatformTestRunner.class)
 public class AbstractIntegerColumnTest extends AbstractIntegerColumn {
 
   @Test
   public void testFormattingInDecorateCellInternal() throws ProcessingException {
-    ITableRow row = EasyMock.createMock(ITableRow.class);
+    ITableRow row = Mockito.mock(ITableRow.class);
     Cell cell = new Cell();
     Integer testValue = Integer.valueOf(-123456789);
     cell.setValue(testValue);

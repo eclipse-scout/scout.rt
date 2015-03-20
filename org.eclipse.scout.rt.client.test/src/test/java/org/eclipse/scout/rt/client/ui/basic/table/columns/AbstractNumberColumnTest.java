@@ -20,7 +20,6 @@ import java.beans.PropertyChangeListener;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-import org.easymock.EasyMock;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
@@ -28,8 +27,12 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFiel
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
+@RunWith(PlatformTestRunner.class)
 public class AbstractNumberColumnTest extends AbstractNumberColumn<Integer> {
 
   @Override
@@ -61,7 +64,7 @@ public class AbstractNumberColumnTest extends AbstractNumberColumn<Integer> {
     setMinValue(minValue);
     Integer maxValue = Integer.valueOf(42);
     setMaxValue(maxValue);
-    ITableRow row = EasyMock.createMock(ITableRow.class);
+    ITableRow row = Mockito.mock(ITableRow.class);
     AbstractIntegerField field = (AbstractIntegerField) prepareEditInternal(row);
     assertFalse("expected groupingUsed property to be propagated to field", field.isGroupingUsed());
 

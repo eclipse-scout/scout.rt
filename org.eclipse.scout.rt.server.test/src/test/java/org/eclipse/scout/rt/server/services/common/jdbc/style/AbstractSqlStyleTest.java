@@ -24,13 +24,13 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.easymock.EasyMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * JUnit tests for {@link AbstractSqlStyle}
- * 
+ *
  * @since 3.9.0
  * @author awe, msc, kle
  */
@@ -69,84 +69,74 @@ public class AbstractSqlStyleTest {
 
   /**
    * Test for {@link AbstractSqlStyle#writeBind} for {@link BigDecimal}
-   * 
+   *
    * @throws SQLException
    */
   @Test
   public void testWriteBind() throws SQLException {
     BigDecimal bd = new BigDecimal("9.123");
     SqlBind bind = new SqlBind(Types.DECIMAL, bd);
-    PreparedStatement ps = EasyMock.createMock(PreparedStatement.class);
-    ps.setObject(1, bd, Types.DECIMAL, 3);
-    EasyMock.expectLastCall();
-    EasyMock.replay(ps);
+    PreparedStatement ps = Mockito.mock(PreparedStatement.class);
     sql.writeBind(ps, 1, bind);
+    Mockito.verify(ps).setObject(1, bd, Types.DECIMAL, 3);
   }
 
   /**
    * Test for {@link AbstractSqlStyle#writeBind} for {@link BigDecimal}
-   * 
+   *
    * @throws SQLException
    */
   @Test
   public void testWriteBindNoScale() throws SQLException {
     BigDecimal bd = new BigDecimal("9");
     SqlBind bind = new SqlBind(Types.NUMERIC, bd);
-    PreparedStatement ps = EasyMock.createMock(PreparedStatement.class);
-    ps.setObject(1, bd, Types.NUMERIC, 0);
-    EasyMock.expectLastCall();
-    EasyMock.replay(ps);
+    PreparedStatement ps = Mockito.mock(PreparedStatement.class);
     sql.writeBind(ps, 1, bind);
+    Mockito.verify(ps).setObject(1, bd, Types.NUMERIC, 0);
   }
 
   /**
    * Test for {@link AbstractSqlStyle#writeBind} for null values with nulltype {@link Clob}
-   * 
+   *
    * @throws SQLException
    */
   @Test
   public void testWriteBindForNullClob() throws SQLException {
-    PreparedStatement ps = EasyMock.createMock(PreparedStatement.class);
+    PreparedStatement ps = Mockito.mock(PreparedStatement.class);
     SqlBind bind = new SqlBind(Types.CLOB, null);
-    ps.setClob(1, (Clob) null);
-    EasyMock.expectLastCall();
-    EasyMock.replay(ps);
     sql.writeBind(ps, 1, bind);
+    Mockito.verify(ps).setClob(1, (Clob) null);
   }
 
   /**
    * Test for {@link AbstractSqlStyle#writeBind} for null values with nulltype {@link Blob}
-   * 
+   *
    * @throws SQLException
    */
   @Test
   public void testWriteBindForNullBlob() throws SQLException {
-    PreparedStatement ps = EasyMock.createMock(PreparedStatement.class);
+    PreparedStatement ps = Mockito.mock(PreparedStatement.class);
     SqlBind bind = new SqlBind(Types.BLOB, null);
-    ps.setBlob(1, (Blob) null);
-    EasyMock.expectLastCall();
-    EasyMock.replay(ps);
     sql.writeBind(ps, 1, bind);
+    Mockito.verify(ps).setBlob(1, (Blob) null);
   }
 
   /**
    * Test for {@link AbstractSqlStyle#writeBind} for null values with nulltype {@link Types.LONGVARBINARY}
-   * 
+   *
    * @throws SQLException
    */
   @Test
   public void testWriteBindForLongVarBinary() throws SQLException {
-    PreparedStatement ps = EasyMock.createMock(PreparedStatement.class);
+    PreparedStatement ps = Mockito.mock(PreparedStatement.class);
     SqlBind bind = new SqlBind(Types.LONGVARBINARY, null);
-    ps.setBytes(1, (byte[]) null);
-    EasyMock.expectLastCall();
-    EasyMock.replay(ps);
     sql.writeBind(ps, 1, bind);
+    Mockito.verify(ps).setBytes(1, (byte[]) null);
   }
 
   /**
    * Test for {@link AbstractSqlStyle#writeBind} for null values with nulltype {@link LONGVARCHAR}
-   * 
+   *
    * @throws SQLException
    */
   @Test
@@ -156,7 +146,7 @@ public class AbstractSqlStyleTest {
 
   /**
    * Test for {@link AbstractSqlStyle#writeBind} for null values with nulltype {@link LONGVARCHAR}
-   * 
+   *
    * @throws SQLException
    */
   @Test
@@ -167,18 +157,16 @@ public class AbstractSqlStyleTest {
   /**
    * Verifies that {@link PreparedStatement#setNull(int, int)} is called when invoking
    * {@link AbstractSqlStyle#writeBind(PreparedStatement, int, SqlBind)}
-   * 
+   *
    * @param nullType
    *          {@link Types} null type for preparedStatement
    * @throws SQLException
    */
   private void verifySetNullCalledOnPS(int nullType) throws SQLException {
-    PreparedStatement ps = EasyMock.createMock(PreparedStatement.class);
+    PreparedStatement ps = Mockito.mock(PreparedStatement.class);
     SqlBind bind = new SqlBind(nullType, null);
-    ps.setNull(1, nullType);
-    EasyMock.expectLastCall();
-    EasyMock.replay(ps);
     sql.writeBind(ps, 1, bind);
+    Mockito.verify(ps).setNull(1, nullType);
   }
 
   /**
@@ -226,15 +214,14 @@ public class AbstractSqlStyleTest {
 
   @Test
   public void testNoDecimalConversion() throws Exception {
-    ResultSet rs = EasyMock.createMock(ResultSet.class);
-    ResultSetMetaData meta = EasyMock.createMock(ResultSetMetaData.class);
+    ResultSet rs = Mockito.mock(ResultSet.class);
+    ResultSetMetaData meta = Mockito.mock(ResultSetMetaData.class);
     int jdbcBindIndex = 0;
     SqlStyleDecimalConversionNone sqlDecimalConversion = new SqlStyleDecimalConversionNone();
 
-    EasyMock.expect(rs.getBigDecimal(jdbcBindIndex)).andReturn(BigDecimal.valueOf(123.456789d)).anyTimes();
-    EasyMock.expect(rs.getBigDecimal(jdbcBindIndex + 1)).andReturn(BigDecimal.valueOf(987654L)).anyTimes();
-    EasyMock.expect(rs.wasNull()).andReturn(false).anyTimes();
-    EasyMock.replay(rs, meta);
+    Mockito.when(rs.getBigDecimal(jdbcBindIndex)).thenReturn(BigDecimal.valueOf(123.456789d));
+    Mockito.when(rs.getBigDecimal(jdbcBindIndex + 1)).thenReturn(BigDecimal.valueOf(987654L));
+    Mockito.when(rs.wasNull()).thenReturn(false);
 
     Object o1 = sqlDecimalConversion.readBind(rs, meta, Types.DECIMAL, jdbcBindIndex);
     Object o2 = sqlDecimalConversion.readBind(rs, meta, Types.DECIMAL, jdbcBindIndex + 1);
@@ -249,15 +236,14 @@ public class AbstractSqlStyleTest {
 
   @Test
   public void testLegacyDecimalConversion() throws Exception {
-    ResultSet rs = EasyMock.createMock(ResultSet.class);
-    ResultSetMetaData meta = EasyMock.createMock(ResultSetMetaData.class);
+    ResultSet rs = Mockito.mock(ResultSet.class);
+    ResultSetMetaData meta = Mockito.mock(ResultSetMetaData.class);
     final int jdbcBindIndex = 0;
     SqlStyleDecimalConversionLegacy sqlDecimalConversion = new SqlStyleDecimalConversionLegacy();
 
-    EasyMock.expect(rs.getBigDecimal(jdbcBindIndex)).andReturn(BigDecimal.valueOf(123.456789d)).anyTimes();
-    EasyMock.expect(rs.getBigDecimal(jdbcBindIndex + 1)).andReturn(BigDecimal.valueOf(987654L)).anyTimes();
-    EasyMock.expect(rs.wasNull()).andReturn(false).anyTimes();
-    EasyMock.replay(rs, meta);
+    Mockito.when(rs.getBigDecimal(jdbcBindIndex)).thenReturn(BigDecimal.valueOf(123.456789d));
+    Mockito.when(rs.getBigDecimal(jdbcBindIndex + 1)).thenReturn(BigDecimal.valueOf(987654L));
+    Mockito.when(rs.wasNull()).thenReturn(false);
 
     Object o1 = sqlDecimalConversion.readBind(rs, meta, Types.DECIMAL, jdbcBindIndex);
     Object o2 = sqlDecimalConversion.readBind(rs, meta, Types.DECIMAL, jdbcBindIndex + 1);

@@ -20,5 +20,18 @@
   </parent>
 
   <artifactId>org.eclipse.scout.rt.client.mobile.test</artifactId>
-  <packaging>eclipse-test-plugin</packaging>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <artifactId>org.eclipse.scout.rt.client.testenvironment</artifactId>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <version>5.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <artifactId>org.eclipse.scout.rt.client.mobile</artifactId>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <version>5.1.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 </project>

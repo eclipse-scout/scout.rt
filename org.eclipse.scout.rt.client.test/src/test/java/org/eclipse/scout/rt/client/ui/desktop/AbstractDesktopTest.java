@@ -16,11 +16,11 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collections;
 import java.util.List;
 
-import org.easymock.EasyMock;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class AbstractDesktopTest {
 
@@ -30,13 +30,12 @@ public class AbstractDesktopTest {
 
   @Before
   public void setUp() {
-    ITreeNode node = EasyMock.createNiceMock(ITreeNode.class);
-    EasyMock.expect(node.getChildNodes()).andReturn(Collections.<ITreeNode> emptyList());
+    ITreeNode node = Mockito.mock(ITreeNode.class);
+    Mockito.when(node.getChildNodes()).thenReturn(Collections.<ITreeNode> emptyList());
 
-    m_outline = EasyMock.createNiceMock(IOutline.class);
-    EasyMock.expect(m_outline.getActivePage()).andReturn(null);
-    EasyMock.expect(m_outline.getRootNode()).andReturn(node).anyTimes();
-    EasyMock.replay(node, m_outline);
+    m_outline = Mockito.mock(IOutline.class);
+    Mockito.when(m_outline.getActivePage()).thenReturn(null);
+    Mockito.when(m_outline.getRootNode()).thenReturn(node);
 
     m_desktop = new AbstractDesktop(false) {
       @Override

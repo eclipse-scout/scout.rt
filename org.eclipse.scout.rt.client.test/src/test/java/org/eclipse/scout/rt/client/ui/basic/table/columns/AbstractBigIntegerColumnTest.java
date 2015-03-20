@@ -17,18 +17,21 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import org.easymock.EasyMock;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.AbstractBigIntegerField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 /**
  * JUnit tests for {@link AbstractBigIntegerColumn}
- * 
+ *
  * @since 4.0.0
  */
+@RunWith(PlatformTestRunner.class)
 public class AbstractBigIntegerColumnTest extends AbstractBigIntegerColumn {
 
   private static final BigInteger MIN_VALUE = new BigInteger("-999999999994");
@@ -46,7 +49,7 @@ public class AbstractBigIntegerColumnTest extends AbstractBigIntegerColumn {
 
   @Test
   public void testEditorFieldMinAndMaxValue() throws ProcessingException {
-    ITableRow row = EasyMock.createMock(ITableRow.class);
+    ITableRow row = Mockito.mock(ITableRow.class);
     AbstractBigIntegerField field = (AbstractBigIntegerField) prepareEditInternal(row);
 
     assertEquals("minValue not mapped to editor field", MIN_VALUE, field.getMinValue());
@@ -55,7 +58,7 @@ public class AbstractBigIntegerColumnTest extends AbstractBigIntegerColumn {
 
   @Test
   public void testFormattingInDecorateCellInternal() throws ProcessingException {
-    ITableRow row = EasyMock.createMock(ITableRow.class);
+    ITableRow row = Mockito.mock(ITableRow.class);
     Cell cell = new Cell();
     BigInteger testValue = BigInteger.valueOf(-123456789);
     cell.setValue(testValue);

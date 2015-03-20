@@ -4,21 +4,3 @@ Bundle-Name: Scout Shared Testing
 Bundle-SymbolicName: org.eclipse.scout.rt.testing.shared;singleton:=true
 Bundle-Version: 5.1.0.qualifier
 Bundle-Vendor: Eclipse Scout Project
-Require-Bundle: org.eclipse.scout.rt.shared;bundle-version="[5.1.0,5.2.0)",
- org.eclipse.scout.rt.testing.commons;bundle-version="[5.1.0,5.2.0)";visibility:=reexport,
- org.eclipse.scout.rt.testing.platform;bundle-version="[5.1.0,5.2.0)";visibility:=reexport
-Export-Package: org.eclipse.scout.extension,
- org.eclipse.scout.rt.testing.shared,
- org.eclipse.scout.rt.testing.shared.runner,
- org.eclipse.scout.rt.testing.shared.runner.parameterized,
- org.eclipse.scout.rt.testing.shared.services.common.code,
- org.eclipse.scout.rt.testing.shared.services.lookup
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-ActivationPolicy: lazy
-Import-Package: junit.framework;version="[4.9.0,5.0.0)",
- org.apache.tools.ant.taskdefs.optional.junit;version="[0.0.0,2.0.0)",
- org.junit;version="[4.9.0,5.0.0)",
- org.junit.runner;version="[4.9.0,5.0.0)",
- org.junit.runners;version="[4.9.0,5.0.0)",
- org.junit.runners.model;version="[4.9.0,5.0.0)",
- org.mockito;version="1.9.5"

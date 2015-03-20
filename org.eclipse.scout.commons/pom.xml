@@ -22,5 +22,5 @@
   </parent>
 
   <artifactId>org.eclipse.scout.commons</artifactId>
-  <packaging>eclipse-plugin</packaging>
+  <packaging>jar</packaging>
 </project>

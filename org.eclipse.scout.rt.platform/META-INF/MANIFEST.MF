@@ -3,21 +3,4 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Scout Platform
 Bundle-SymbolicName: org.eclipse.scout.rt.platform
 Bundle-Version: 5.1.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Eclipse Scout Project
-Require-Bundle: org.eclipse.scout.commons;bundle-version="[5.1.0,5.2.0)"
-Export-Package: 
- org.eclipse.scout.rt.platform,
- org.eclipse.scout.rt.platform.context,
- org.eclipse.scout.rt.platform.internal,
- org.eclipse.scout.rt.platform.inventory,
- org.eclipse.scout.rt.platform.inventory.internal,
- org.eclipse.scout.rt.platform.job,
- org.eclipse.scout.rt.platform.job.internal,
- org.eclipse.scout.rt.platform.job.internal.callable,
- org.eclipse.scout.rt.platform.job.internal.future,
- org.eclipse.scout.rt.platform.job.listener,
- org.eclipse.scout.rt.platform.pluginxml,
- org.eclipse.scout.rt.platform.pluginxml.internal
-Bundle-ClassPath: jandex-1.2.2.Final.jar,
- .
