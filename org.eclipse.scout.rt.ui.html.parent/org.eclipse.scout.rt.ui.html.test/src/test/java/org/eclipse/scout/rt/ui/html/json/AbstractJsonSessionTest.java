@@ -21,8 +21,8 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession.P_ClientSessionCleanupHandler;
+import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
-import org.eclipse.scout.rt.ui.html.json.testing.TestEnvironmentJsonSession;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -75,7 +75,7 @@ public class AbstractJsonSessionTest {
 
   @Test
   public void testCreateDisposeInSameRequest() throws Exception {
-    AbstractJsonSession session = new TestEnvironmentJsonSession();
+    AbstractJsonSession session = new JsonSessionMock();
     IStringField model = new AbstractStringField() {
     };
     IJsonAdapter<?> adapter = session.getOrCreateJsonAdapter(model, null);

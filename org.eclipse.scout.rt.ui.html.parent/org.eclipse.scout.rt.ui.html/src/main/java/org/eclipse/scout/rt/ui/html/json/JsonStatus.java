@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.json;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.IFieldStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
-import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonStatus implements IJsonObject {
@@ -33,7 +32,6 @@ public class JsonStatus implements IJsonObject {
     JSONObject json = new JSONObject();
     JsonObjectUtility.putProperty(json, "message", m_status.getMessage());
     JsonObjectUtility.putProperty(json, "severity", m_status.getSeverity());
-    JsonObjectUtility.putProperty(json, "iconName", BinaryResourceUrlUtility.createIconUrl(getIconId()));
     return json;
   }
 

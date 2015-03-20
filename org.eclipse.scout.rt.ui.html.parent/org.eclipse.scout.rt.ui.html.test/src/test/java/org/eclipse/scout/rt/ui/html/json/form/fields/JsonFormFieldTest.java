@@ -46,7 +46,6 @@ public class JsonFormFieldTest extends BaseFormFieldTest {
     assertEquals(Boolean.FALSE, json.get("visible"));
     JSONObject errorStatus = (JSONObject) json.get("errorStatus");
     assertEquals("allesFalsch", errorStatus.get("message"));
-    assertEquals("status_error", errorStatus.get("iconName"));
   }
 
 }

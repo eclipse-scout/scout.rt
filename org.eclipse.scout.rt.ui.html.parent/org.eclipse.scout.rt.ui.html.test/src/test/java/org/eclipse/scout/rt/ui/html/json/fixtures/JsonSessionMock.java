@@ -14,16 +14,16 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEventProcessor;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.mockito.Mockito;
 
 public class JsonSessionMock extends AbstractJsonSession {
   private JsonClientSession m_jsonClientSession;
-  private JsonDesktopMock m_jsonDesktopMock;
+  private JsonDesktop m_jsonDesktopMock;
   private JsonEventProcessor m_jsonEventProcessor;
 
   public JsonSessionMock() {
@@ -33,7 +33,7 @@ public class JsonSessionMock extends AbstractJsonSession {
   @Override
   public void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
     m_jsonClientSession = Mockito.mock(JsonClientSession.class);
-    m_jsonDesktopMock = new JsonDesktopMock(Mockito.mock(IDesktop.class), this, createUniqueIdFor(null), m_jsonClientSession);
+    m_jsonDesktopMock = Mockito.mock(JsonDesktop.class);//new JsonDesktopMock(Mockito.mock(IDesktop.class), this, createUniqueIdFor(null), m_jsonClientSession);
     Mockito.when(m_jsonClientSession.getJsonDesktop()).thenReturn(m_jsonDesktopMock);
     m_jsonEventProcessor = new JsonEventProcessor(this);
 

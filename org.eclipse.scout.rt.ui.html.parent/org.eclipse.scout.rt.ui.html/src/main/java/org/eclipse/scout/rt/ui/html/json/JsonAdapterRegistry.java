@@ -142,5 +142,10 @@ public class JsonAdapterRegistry {
     protected Object getModel() {
       return m_model;
     }
+
+    @Override
+    public String toString() {
+      return "JsonAdapter: " + m_jsonAdapter;
+    }
   }
 }
