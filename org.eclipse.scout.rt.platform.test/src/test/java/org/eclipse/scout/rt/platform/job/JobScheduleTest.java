@@ -272,9 +272,8 @@ public class JobScheduleTest {
         }, JobInput.defaults().name("XYZ")).awaitDoneAndGet();
       }
     }, JobInput.defaults().name("ABC")).awaitDoneAndGet();
-
-    assertTrue(actualThreadName1.getValue().matches("scout-thread-(\\d)+;ABC"));
-    assertTrue(actualThreadName2.getValue().matches("scout-thread-(\\d)+;XYZ"));
+    assertTrue(actualThreadName1.getValue(), actualThreadName1.getValue().matches("scout-thread-(\\d)+ \\[Running\\] ABC"));
+    assertTrue(actualThreadName2.getValue(), actualThreadName2.getValue().matches("scout-thread-(\\d)+ \\[Running\\] XYZ"));
     assertEquals("main", Thread.currentThread().getName());
   }
 

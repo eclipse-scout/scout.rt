@@ -14,6 +14,7 @@ import java.util.EventObject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 
@@ -28,11 +29,17 @@ public class JobEvent extends EventObject {
 
   private final JobEventType m_eventType;
   private final IFuture<?> m_future;
+  private final IBlockingCondition m_blockingCondition;
 
   public JobEvent(final IJobManager jobManager, final JobEventType type, final IFuture<?> future) {
+    this(jobManager, type, future, null);
+  }
+
+  public JobEvent(final IJobManager jobManager, final JobEventType type, final IFuture<?> future, final IBlockingCondition blockingCondition) {
     super(jobManager);
     m_eventType = Assertions.assertNotNull(type);
     m_future = future;
+    m_blockingCondition = blockingCondition;
   }
 
   @Override
@@ -45,6 +52,15 @@ public class JobEvent extends EventObject {
    */
   public JobEventType getType() {
     return m_eventType;
+  }
+
+  /**
+   * @return blocking condition which a 'blocking event' is associated with; is <code>null</code> for other events.
+   * @see JobEventType#BLOCKED
+   * @see JobEventType#UNBLOCKED
+   */
+  public IBlockingCondition getBlockingCondition() {
+    return m_blockingCondition;
   }
 
   /**

@@ -177,6 +177,37 @@ public class ClientJobEventFilterTest {
   }
 
   @Test
+  public void testCurrentFuture() {
+    JobEvent clientEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_clientJobFuture);
+
+    IFuture.CURRENT.remove();
+    assertFalse(ClientJobEventFilters.allFilter().currentFuture().accept(clientEvent));
+
+    IFuture.CURRENT.set(m_clientJobFuture);
+    assertTrue(ClientJobEventFilters.allFilter().currentFuture().accept(clientEvent));
+    IFuture.CURRENT.remove();
+  }
+
+  @Test
+  public void testNotCurrentFuture() {
+    JobEvent clientEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_clientJobFuture);
+    JobEvent modelEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_modelJobFuture);
+
+    IFuture.CURRENT.set(m_clientJobFuture);
+    assertFalse(ClientJobEventFilters.allFilter().notCurrentFuture().accept(clientEvent));
+    assertTrue(ClientJobEventFilters.allFilter().notCurrentFuture().accept(modelEvent));
+    IFuture.CURRENT.remove();
+
+    IFuture.CURRENT.set(m_modelJobFuture);
+    assertTrue(ClientJobEventFilters.allFilter().notCurrentFuture().accept(clientEvent));
+    assertFalse(ClientJobEventFilters.allFilter().notCurrentFuture().accept(modelEvent));
+    IFuture.CURRENT.remove();
+
+    assertTrue(ClientJobEventFilters.allFilter().notCurrentFuture().accept(clientEvent));
+    assertTrue(ClientJobEventFilters.allFilter().notCurrentFuture().accept(modelEvent));
+  }
+
+  @Test
   public void testMutex() {
     Object mutexObject1 = new Object();
     Object mutexObject2 = new Object();

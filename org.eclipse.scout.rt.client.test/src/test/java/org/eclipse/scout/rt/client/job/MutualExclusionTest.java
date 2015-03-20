@@ -50,6 +50,7 @@ import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
+import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory;
 import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
 import org.eclipse.scout.rt.platform.job.internal.future.Job;
 import org.eclipse.scout.rt.shared.ISession;
@@ -1225,7 +1226,13 @@ public class MutualExclusionTest {
 
       @Override
       public Void answer(InvocationOnMock invocation) throws Throwable {
-        task.run();
+        NamedThreadFactory.CURRENT_THREAD_INFO.set(new NamedThreadFactory.ThreadInfo("mock-thread", 0));
+        try {
+          task.run();
+        }
+        finally {
+          NamedThreadFactory.CURRENT_THREAD_INFO.remove();
+        }
         return null;
       }
     }).when(javaFuture).run();

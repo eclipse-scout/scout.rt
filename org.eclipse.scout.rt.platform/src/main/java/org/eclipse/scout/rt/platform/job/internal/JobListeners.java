@@ -54,12 +54,14 @@ class JobListeners {
    *          listener to be registered.
    * @param filter
    *          filter to only get notified about events of interest - that is for events accepted by the filter.
+   * @return the given listener.
    */
-  void add(final IJobListener listener, final IFilter<JobEvent> filter) {
+  IJobListener add(final IJobListener listener, final IFilter<JobEvent> filter) {
     Assertions.assertNotNull(listener, "Listener must not be null");
     m_writeLock.lock();
     try {
       m_listenerMap.put(listener, Filters.alwaysFilterIfNull(filter));
+      return listener;
     }
     finally {
       m_writeLock.unlock();

@@ -94,8 +94,8 @@ public class ServerJobTest {
 
     assertTrue(setupLatch.await());
 
-    assertTrue(actualThreadName1.getValue().matches("scout-server-thread-(\\d)+;100:ABC"));
-    assertTrue(actualThreadName2.getValue().matches("scout-server-thread-(\\d)+;200:XYZ"));
+    assertTrue(actualThreadName1.getValue().matches("scout-server-thread-(\\d)+ \\[Running\\] 100:ABC"));
+    assertTrue(actualThreadName2.getValue().matches("scout-server-thread-(\\d)+ \\[Running\\] 200:XYZ"));
     assertEquals("main", Thread.currentThread().getName());
   }
 

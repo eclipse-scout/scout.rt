@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.filter.Filters;
 import org.eclipse.scout.commons.filter.IFilter;
@@ -167,8 +168,8 @@ public class JobManager implements IJobManager {
   }
 
   @Override
-  public void addListener(final IJobListener listener, final IFilter<JobEvent> filter) {
-    m_listeners.add(listener, Filters.alwaysFilterIfNull(filter));
+  public IJobListener addListener(final IJobListener listener, final IFilter<JobEvent> filter) {
+    return m_listeners.add(listener, Filters.alwaysFilterIfNull(filter));
   }
 
   @Override
@@ -414,6 +415,11 @@ public class JobManager implements IJobManager {
     }
 
     @Override
+    public String getName() {
+      return m_name;
+    }
+
+    @Override
     public boolean isBlocking() {
       return m_blocking;
     }
@@ -445,7 +451,7 @@ public class JobManager implements IJobManager {
         try {
           if (currentTask != null) {
             currentTask.setBlocked(true);
-            m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.BLOCKED, currentTask));
+            m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.BLOCKED, currentTask, this));
 
             // Pass the mutex to next task if being a mutex task.
             if (currentTask.isMutexTask()) {
@@ -468,7 +474,7 @@ public class JobManager implements IJobManager {
         finally {
           if (currentTask != null) {
             currentTask.setBlocked(false);
-            m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.UNBLOCKED, currentTask));
+            m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.UNBLOCKED, currentTask, this));
           }
         }
       }
@@ -477,6 +483,14 @@ public class JobManager implements IJobManager {
       if (currentTask != null && currentTask.isMutexTask()) {
         m_mutexSemaphores.acquire(currentTask); // Wait until acquired the mutex anew.
       }
+    }
+
+    @Override
+    public String toString() {
+      final ToStringBuilder builder = new ToStringBuilder(this);
+      builder.attr("name", m_name);
+      builder.attr("blocking", m_blocking);
+      return builder.toString();
     }
   }
 }

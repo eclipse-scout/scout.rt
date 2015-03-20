@@ -13,8 +13,15 @@ package org.eclipse.scout.rt.platform.job.internal.callable;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.rt.platform.job.JobEventFilters;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory;
+import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
+import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
+import org.eclipse.scout.rt.platform.job.listener.IJobListener;
+import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
 /**
  * Processor to decorate the thread-name of the worker-thread during the time of execution with the job name.
@@ -49,15 +56,32 @@ public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, Chainable<
 
   @Override
   public RESULT call() throws Exception {
-    final Thread thread = Thread.currentThread();
-    final String oldThreadName = thread.getName();
+    final ThreadInfo currentThreadInfo = NamedThreadFactory.CURRENT_THREAD_INFO.get();
 
-    NamedThreadFactory.decorateThreadName(m_threadName, m_jobName);
+    // Install job listener to decorate the thread's name once being blocked.
+    final IJobListener listener = Jobs.getJobManager().addListener(new IJobListener() {
+
+      @Override
+      public void changed(final JobEvent event) {
+        switch (event.getType()) {
+          case BLOCKED:
+            currentThreadInfo.updateState(JobState.Blocked, event.getBlockingCondition().getName());
+            break;
+          case UNBLOCKED:
+            currentThreadInfo.updateState(JobState.Running, null);
+            break;
+        }
+      }
+    }, JobEventFilters.allFilter().currentFuture().eventTypes(JobEventType.BLOCKED, JobEventType.UNBLOCKED));
+
+    // Update the name of the thread.
+    currentThreadInfo.updateNameAndState(m_threadName, m_jobName, JobState.Running);
     try {
       return m_next.call();
     }
     finally {
-      thread.setName(oldThreadName);
+      Jobs.getJobManager().removeListener(listener);
+      currentThreadInfo.updateNameAndState(null, null, JobState.Idle);
     }
   }
 

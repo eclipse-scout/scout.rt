@@ -18,6 +18,7 @@ import java.util.Set;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
@@ -104,6 +105,26 @@ public final class JobEventFilters {
      */
     public Filter futures(final Collection<IFuture<?>> futures) {
       andFilter(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(futures)));
+      return this;
+    }
+
+    /**
+     * To accept only events which belong to the current executing job.
+     *
+     * @see IFuture#CURRENT
+     */
+    public Filter currentFuture() {
+      andFilter(new FutureEventFilterDelegate(new JobFutureFilters.FutureFilter(IFuture.CURRENT.get())));
+      return this;
+    }
+
+    /**
+     * To accept events of all all jobs except the current executing job.
+     *
+     * @see IFuture#CURRENT
+     */
+    public Filter notCurrentFuture() {
+      andFilter(new FutureEventFilterDelegate(new NotFilter<>(new JobFutureFilters.FutureFilter(IFuture.CURRENT.get()))));
       return this;
     }
 

@@ -220,17 +220,18 @@ public interface IJobManager {
    * <p/>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}. Also see {@link JobFutureFilters} for simplified usage:<br/>
-   * <code>JobFutureFilters.allFilter().notCurrentFuture().session(...);</code>
-   * 
+   * <code>JobEventFilters.allFilter().notCurrentFuture().session(...);</code>
+   *
    * @param listener
    *          listener to be registered.
    * @param filter
    *          filter to only get notified about events of interest - that is for events accepted by the filter.
+   * @return the given listener.
    * @see JobEventFilters
    * @see ServerJobEventFilters
    * @see ClientJobEventFilters
    */
-  void addListener(IJobListener listener, IFilter<JobEvent> filter);
+  IJobListener addListener(IJobListener listener, IFilter<JobEvent> filter);
 
   /**
    * Removes the given listener from the list.

@@ -85,6 +85,16 @@ public final class ClientJobEventFilters {
     }
 
     @Override
+    public Filter currentFuture() {
+      return (Filter) super.currentFuture();
+    }
+
+    @Override
+    public Filter notCurrentFuture() {
+      return (Filter) super.notCurrentFuture();
+    }
+
+    @Override
     public Filter periodic() {
       return (Filter) super.periodic();
     }

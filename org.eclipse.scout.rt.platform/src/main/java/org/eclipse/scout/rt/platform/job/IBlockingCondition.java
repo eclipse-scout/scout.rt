@@ -43,4 +43,9 @@ public interface IBlockingCondition {
    *           with the mutex anymore and should terminate its work.
    */
   void waitFor() throws JobExecutionException;
+
+  /**
+   * @return the name of this blocking condition.
+   */
+  String getName();
 }
