@@ -58,6 +58,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this.partId = jsonSessionId.substring(0, jsonSessionId.indexOf(':'));
   this._backgroundJobPollingEnabled = false;
   this._backgroundJobPollingSuccess = false;
+  this._backgroundJobPollingInProgress = false;
 
   // TODO BSH Detach | Check if there is another way
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
@@ -267,12 +268,7 @@ scout.Session.prototype._sendRequest = function(request) {
     return;
   }
 
-  var jsError,
-    success = false,
-    busyHandling =
-      !unload &&
-      !this.areRequestsPending();
-
+  var busyHandling = (!unload && !this.areRequestsPending());
   if (busyHandling) {
     this.setBusy(true);
   }
@@ -282,6 +278,11 @@ scout.Session.prototype._sendRequest = function(request) {
     .done(onAjaxDone.bind(this))
     .fail(onAjaxFail.bind(this))
     .always(onAjaxAlways.bind(this));
+
+  // --- Helper methods ---
+
+  var jsError,
+    success = false;
 
   function onAjaxDone(data) {
     try {
@@ -349,30 +350,48 @@ scout.Session.prototype._resumeBackgroundJobPolling = function() {
  * a model job is done and no request initiated by a user is running.
  */
 scout.Session.prototype._pollForBackgroundJobs = function() {
+  // Ensure only one polling background job is running
+  if (this._backgroundJobPollingInProgress) {
+    return;
+  }
+  this._backgroundJobPollingInProgress = true;
+
   var request = {
       jsonSessionId: this.jsonSessionId,
       pollForBackgroundJobs: true
     };
+
   $.ajax(this._ajaxOptions(request))
-    .done(function(data){
-      if (data.error) {
-        // Don't schedule a new polling request, when an error occurs
-        // when the next user-initiated request succeeds, we re-enable polling
-        // otherwise the polling would ping the server to death in case of an error
-        $.log.warn('Polling request failed. Interrupt polling until the next user-initiated request succeeds');
-        this._backgroundJobPollingSuccess = false;
-        this._processErrorJsonResponse(data.error);
-      } else {
-        this._processSuccessResponse(data);
-        this.layoutValidator.validate();
-        this._backgroundJobPollingSuccess = true;
-        setTimeout(this._pollForBackgroundJobs.bind(this));
-      }
-    }.bind(this))
-    .fail(function(jqXHR, textStatus, errorThrown){
+    .done(onAjaxDone.bind(this))
+    .fail(onAjaxFail.bind(this))
+    .always(onAjaxAlways.bind(this));
+
+  // --- Helper methods ---
+
+  function onAjaxDone(data) {
+    if (data.error) {
+      // Don't schedule a new polling request, when an error occurs
+      // when the next user-initiated request succeeds, we re-enable polling
+      // otherwise the polling would ping the server to death in case of an error
+      $.log.warn('Polling request failed. Interrupt polling until the next user-initiated request succeeds');
       this._backgroundJobPollingSuccess = false;
-      this._processErrorResponse(request, jqXHR, textStatus, errorThrown);
-    }.bind(this));
+      this._processErrorJsonResponse(data.error);
+    } else {
+      this._processSuccessResponse(data);
+      this.layoutValidator.validate();
+      this._backgroundJobPollingSuccess = true;
+      setTimeout(this._pollForBackgroundJobs.bind(this));
+    }
+  }
+
+  function onAjaxFail(jqXHR, textStatus, errorThrown) {
+    this._backgroundJobPollingSuccess = false;
+    this._processErrorResponse(request, jqXHR, textStatus, errorThrown);
+  }
+
+  function onAjaxAlways(data, textStatus, errorThrown) {
+    this._backgroundJobPollingInProgress = false;
+  }
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {
