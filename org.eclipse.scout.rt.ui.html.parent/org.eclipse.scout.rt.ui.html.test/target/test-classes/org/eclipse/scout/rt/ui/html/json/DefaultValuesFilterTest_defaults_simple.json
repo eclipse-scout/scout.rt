@@ -1,0 +1,36 @@
+{
+  "defaults": {
+    "FormField": {
+      "enabled": true,
+      "gridData": {
+        "x": -1,
+        "y": -1
+      }
+    },
+    "GroupBox": {
+      "borderDecoration": "auto"
+    },
+    "SmartField": {
+      "multiline": false,
+      "options": [],
+      "lookupStrategy": "remote"
+    },
+    "Table": {
+      "enabled": true,
+      "rowHeightHint": -1,
+      "rows": []
+    },
+    "Cell": {
+      "horizontalAlignment": -1,
+      "editable": false
+    }
+  },
+  "objectTypeHierarchy": {
+    "FormField": {
+      "TableField": null,
+      "ValueField": {
+        "SmartField": null
+      }
+    }
+  }
+}

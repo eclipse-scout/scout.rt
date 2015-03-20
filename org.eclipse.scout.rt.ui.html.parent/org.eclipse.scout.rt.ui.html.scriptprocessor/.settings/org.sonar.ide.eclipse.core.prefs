@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+extraProperties=sonar.exclusions\=file\:**/org/eclipse/scout/rt/shared/win32/x86/com/**,\n\t\t\tfile\:**/jakarta-jmeter/**,\n\t\t\tfile\:**/resources/WebContent/**\r\nsonar.coverage.exclusions\=file\:**/org/eclipse/scout/rt/shared/win32/x86/com/**,\n\t\t\tfile\:**/jakarta-jmeter/**,\n\t\t\tfile\:**/resources/WebContent/**\r\nsonar.skippedModules\=org.eclipse.swt.win32.extension
+projectKey=org.eclipse.scout.rt.ui.html.parent\:org.eclipse.scout.rt.ui.html.scriptprocessor\:develop
+serverUrl=
+version=2
