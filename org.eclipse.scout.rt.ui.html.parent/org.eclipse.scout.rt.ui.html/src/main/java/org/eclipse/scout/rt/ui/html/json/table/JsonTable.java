@@ -51,6 +51,7 @@ import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -116,6 +117,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       @Override
       protected String modelValue() {
         return getModel().getDefaultIconId();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return BinaryResourceUrlUtility.createIconUrl((String) value);
       }
     });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_MULTI_SELECT, model) {

@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
@@ -86,7 +87,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
     IForm model = getModel();
     putProperty(json, PROP_TITLE, model.getTitle());
     putProperty(json, PROP_SUB_TITLE, model.getSubTitle());
-    putProperty(json, PROP_ICON_ID, model.getIconId());
+    putProperty(json, PROP_ICON_ID, BinaryResourceUrlUtility.createIconUrl(model.getIconId()));
     putProperty(json, PROP_MAXIMIZE_ENABLED, model.isMaximizeEnabled());
     putProperty(json, PROP_MINIMIZE_ENABLED, model.isMinimizeEnabled());
     putProperty(json, PROP_MAXIMIZED, model.isMaximized());

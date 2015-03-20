@@ -69,6 +69,13 @@ public abstract class JsonProperty<T> {
     return true;
   }
 
+  /**
+   * Returns the <i>raw</i> model value.
+   * <p>
+   * <b>Important:</b> Never convert the model value here! Use {@link #prepareValueForToJson(Object)} instead for that
+   * purpose. Otherwise, the conversion will not be applied when the property value changes and the new value is
+   * directly passed to {@link #valueToJsonOnPropertyChange(Object, Object)}.
+   */
   protected abstract Object modelValue();
 
   public Object prepareValueForToJson(Object value) {

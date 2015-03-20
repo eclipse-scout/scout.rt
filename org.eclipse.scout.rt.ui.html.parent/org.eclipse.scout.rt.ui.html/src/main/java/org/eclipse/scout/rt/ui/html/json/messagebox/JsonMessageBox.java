@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyObserver<T> {
@@ -51,6 +52,11 @@ public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyO
       @Override
       protected String modelValue() {
         return getModel().getIconId();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return BinaryResourceUrlUtility.createIconUrl((String) value);
       }
     });
     putJsonProperty(new JsonProperty<IMessageBox>("severity", model) {

@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -208,9 +209,10 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     if (event == null) {
       return;
     }
-    // Add event to buffer instead of handling it immediately. (This allows coalescing the events at JSON response level.)
-    m_eventBuffer.add(event);
-    registerAsBufferedEventsAdapter();
+    processBufferedEvent(event);
+//    // Add event to buffer instead of handling it immediately. (This allows coalescing the events at JSON response level.)
+//    m_eventBuffer.add(event);
+//    registerAsBufferedEventsAdapter();
   }
 
   @Override
@@ -447,7 +449,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void putCellProperties(JSONObject json, ICell cell) {
     // We deliberately don't use JsonCell here, because most properties are not supported in a tree anyway
     JsonObjectUtility.putProperty(json, "text", cell.getText());
-    JsonObjectUtility.putProperty(json, "iconId", cell.getIconId());
+    JsonObjectUtility.putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(cell.getIconId()));
     JsonObjectUtility.putProperty(json, "tooltipText", cell.getTooltipText());
     JsonObjectUtility.putProperty(json, "foregroundColor", cell.getForegroundColor());
     JsonObjectUtility.putProperty(json, "backgroundColor", cell.getBackgroundColor());

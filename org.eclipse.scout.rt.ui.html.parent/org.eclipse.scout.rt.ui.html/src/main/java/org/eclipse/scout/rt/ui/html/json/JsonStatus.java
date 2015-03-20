@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.IFieldStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonStatus implements IJsonObject {
@@ -20,7 +21,7 @@ public class JsonStatus implements IJsonObject {
   private final IStatus m_status;
 
   public JsonStatus(IStatus status) {
-    this.m_status = status;
+    m_status = status;
   }
 
   public IStatus getStatus() {
@@ -32,11 +33,11 @@ public class JsonStatus implements IJsonObject {
     JSONObject json = new JSONObject();
     JsonObjectUtility.putProperty(json, "message", m_status.getMessage());
     JsonObjectUtility.putProperty(json, "severity", m_status.getSeverity());
-    JsonObjectUtility.putProperty(json, "iconName", getIconUrl());
+    JsonObjectUtility.putProperty(json, "iconName", BinaryResourceUrlUtility.createIconUrl(getIconId()));
     return json;
   }
 
-  private String getIconUrl() {
+  protected String getIconId() {
     if (m_status instanceof IFieldStatus) {
       return ((IFieldStatus) m_status).getIconId();
     }
@@ -48,5 +49,4 @@ public class JsonStatus implements IJsonObject {
   public static Object toJson(IStatus status) {
     return status == null ? "" : new JsonStatus(status).toJson();
   }
-
 }

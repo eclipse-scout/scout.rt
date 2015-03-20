@@ -30,10 +30,7 @@ public class BinaryResourceUrlUtility {
    *         <p>
    *         Use this method for image-files located in the /resource/icons directories of all jars on the classpath.
    */
-  public static String createIconUrl(IJsonAdapter<?> jsonAdapter, String iconId) {
-    if (jsonAdapter == null) {
-      return null;
-    }
+  public static String createIconUrl(String iconId) {
     if (iconId == null) {
       return null;
     }
@@ -44,6 +41,7 @@ public class BinaryResourceUrlUtility {
     if (iconSpec != null) {
       return "icon/" + iconSpec.getName(); // includes file extension
     }
+    LOG.warn("iconId '" + iconId + "' could not be resolved");
     return null; // may happen, when no icon is available for the requested iconName
   }
 

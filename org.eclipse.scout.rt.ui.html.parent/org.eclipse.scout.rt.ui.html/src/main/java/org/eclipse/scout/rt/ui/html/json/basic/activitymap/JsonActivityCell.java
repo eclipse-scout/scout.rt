@@ -4,6 +4,7 @@ import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonActivityCell<RI, AI> implements IJsonObject {
@@ -37,7 +38,7 @@ public class JsonActivityCell<RI, AI> implements IJsonObject {
     JsonObjectUtility.putProperty(json, "minorColor", m_activityCell.getMinorColor());
     JsonObjectUtility.putProperty(json, "durationMinutes", m_activityCell.getDurationMinutes());
     JsonObjectUtility.putProperty(json, "tooltipText", m_activityCell.getTooltipText());
-    JsonObjectUtility.putProperty(json, "iconId", m_activityCell.getIconId());
+    JsonObjectUtility.putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(m_activityCell.getIconId()));
     JsonObjectUtility.putProperty(json, "customData", m_activityCell.getCustomData());
     return json;
   }

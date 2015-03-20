@@ -205,14 +205,13 @@
   };
 
   $.fn.setEnabled = function(enabled) {
-    enabled = !!enabled;
+    enabled = !! enabled;
     this.toggleClass('disabled', !enabled);
     // Toggle disabled attribute for elements that support it (see http://www.w3.org/TR/html5/disabled-elements.html)
     if (this.is('button, input, select, textarea, optgroup, option, fieldset')) {
       if (enabled) {
         this.removeAttr('disabled');
-      }
-      else {
+      } else {
         this.attr('disabled', 'disabled');
       }
     }
@@ -234,6 +233,11 @@
 
   $.fn.icon = function(iconId) {
     if (iconId) {
+      if (scout.strings.startsWith(iconId, "font:")) {
+        iconId = iconId.substr(5);
+      } else {
+        // FIXME BSH Handle URL icons. Check also: Button.js
+      }
       this.attr('data-icon', iconId);
     } else {
       this.removeAttr('data-icon');
@@ -484,7 +488,7 @@
     // Add key listener to TAB key to ensure, the "focus context" is not left. When the last
     // focusable element is reached, the focus should "wrap around" and focus the first element.
     this.off('.focusContext');
-    this.on('keydown.focusContext', function (event) {
+    this.on('keydown.focusContext', function(event) {
       var activeElement = document.activeElement;
       if (event.which === scout.keys.TAB) {
         var $focusableElements = $container.find(':focusable');

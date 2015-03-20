@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 
 public abstract class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<T> {
   public static final String EVENT_DO_ACTION = "doAction";
@@ -45,6 +46,11 @@ public abstract class JsonAction<T extends IAction> extends AbstractJsonProperty
       @Override
       protected String modelValue() {
         return getModel().getIconId();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return BinaryResourceUrlUtility.createIconUrl((String) value);
       }
     });
 

@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonCell implements IJsonObject {
@@ -53,7 +54,7 @@ public class JsonCell implements IJsonObject {
     JSONObject json = new JSONObject();
     JsonObjectUtility.putProperty(json, "value", m_cellValue);
     JsonObjectUtility.putProperty(json, "text", m_cellText);
-    JsonObjectUtility.putProperty(json, "iconId", m_cell.getIconId());
+    JsonObjectUtility.putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(m_cell.getIconId()));
     JsonObjectUtility.putProperty(json, "tooltipText", m_cell.getTooltipText());
     JsonObjectUtility.putProperty(json, "horizontalAlignment", m_cell.getHorizontalAlignment());
     JsonObjectUtility.putProperty(json, "foregroundColor", m_cell.getForegroundColor());

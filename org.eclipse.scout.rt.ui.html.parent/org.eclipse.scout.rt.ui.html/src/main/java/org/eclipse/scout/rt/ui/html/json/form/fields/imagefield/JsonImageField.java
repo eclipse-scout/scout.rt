@@ -28,7 +28,12 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
     putJsonProperty(new JsonProperty<T>(IImageField.PROP_IMAGE_ID, model) {
       @Override
       protected String modelValue() {
-        return BinaryResourceUrlUtility.createIconUrl(JsonImageField.this, getModel().getImageId());
+        return getModel().getImageId();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return BinaryResourceUrlUtility.createIconUrl((String) value);
       }
     });
     putJsonProperty(new JsonProperty<T>(IImageField.PROP_IMAGE, model) {

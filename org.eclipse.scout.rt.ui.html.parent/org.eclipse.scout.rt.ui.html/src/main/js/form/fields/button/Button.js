@@ -91,7 +91,7 @@ scout.Button.prototype._renderIconId = function() {
   this.$field.find('img, span').remove();
   if (this.iconId) {
     if (scout.strings.startsWith(this.iconId, "font:")) {
-      iconChar = this.iconId.substr(5, 1);
+      iconChar = this.iconId.substr(5);
       $icon = $('<span>')
         .addClass('font-icon')
         .text(iconChar);

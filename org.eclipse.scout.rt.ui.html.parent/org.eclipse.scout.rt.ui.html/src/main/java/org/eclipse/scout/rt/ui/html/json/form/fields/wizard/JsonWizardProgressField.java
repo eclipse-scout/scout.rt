@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -84,7 +85,7 @@ public class JsonWizardProgressField<T extends IWizardProgressField> extends Jso
     JsonObjectUtility.putProperty(jsonStep, "title", wizardStep.getTitle());
     JsonObjectUtility.putProperty(jsonStep, "description", wizardStep.getDescriptionHtml());
     JsonObjectUtility.putProperty(jsonStep, "enabled", wizardStep.isEnabled());
-    JsonObjectUtility.putProperty(jsonStep, "iconId", wizardStep.getIconId());
+    JsonObjectUtility.putProperty(jsonStep, "iconId", BinaryResourceUrlUtility.createIconUrl(wizardStep.getIconId()));
     JsonObjectUtility.putProperty(jsonStep, "tooltipText", wizardStep.getTooltipText());
     return jsonStep;
   }
