@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
-import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
@@ -169,8 +168,6 @@ public class JobListenerBlockedFutureTest {
   }
 
   private class P_JobManager extends JobManager {
-
-    private MutexSemaphores m_mutexSemaphores;
 
     /**
      * Blocks the current thread until the expected number of mutex-permits is acquired; Waits for maximal 30s.
