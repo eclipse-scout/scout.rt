@@ -21,8 +21,6 @@ import org.eclipse.scout.rt.client.fixture.MockServerProcessingCancelService;
 import org.eclipse.scout.rt.client.fixture.MockServiceTunnel;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
-import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -103,13 +101,13 @@ public class ClientJobCancelTest {
   protected String testInternal(long delay, boolean interrupt) throws Exception {
     pingServiceDelay = delay;
     //
-    IFuture<String> future = ModelJobs.schedule(new ICallable<String>() {
+    IFuture<String> future = ClientJobs.schedule(new ICallable<String>() {
       @Override
       public String call() throws Exception {
         IPingService serviceProxy = ServiceTunnelUtility.createProxy(IPingService.class, m_session.getServiceTunnel());
         return serviceProxy.ping("ABC");
       }
-    }, ModelJobInput.defaults().session(m_session).name("Client"));
+    }, ClientJobInput.defaults().session(m_session).name("Client"));
 
     //make user interrupt the job in 1 sec
     if (interrupt) {

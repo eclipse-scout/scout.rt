@@ -26,6 +26,9 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
+import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
+import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.OBJ;
 
@@ -34,6 +37,7 @@ import org.eclipse.scout.rt.platform.OBJ;
  * TODO [dwi/imo]: move into test-package?
  */
 //TODO dwi, imo prio?
+// FIXME abr rename this class to TestingClientSessionProviderWithCache and move it to rt.testing.client module
 @Priority(-10)
 @ApplicationScoped
 public class ClientSessionProviderWithCache extends ClientSessionProvider {
@@ -70,6 +74,26 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
         }
       }
     }
+  }
+
+  /**
+   * Adds a {@link DesktopListener} that automatically cancels all message boxes.
+   *
+   * @param clientSession
+   */
+  @Override
+  protected void beforeStartSession(IClientSession clientSession) {
+    // auto-cancel all message boxes
+    clientSession.getVirtualDesktop().addDesktopListener(new DesktopListener() {
+      @Override
+      public void desktopChanged(DesktopEvent e) {
+        switch (e.getType()) {
+          case DesktopEvent.TYPE_MESSAGE_BOX_ADDED:
+            e.getMessageBox().getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
+            break;
+        }
+      }
+    });
   }
 
   @Internal

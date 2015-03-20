@@ -52,6 +52,7 @@ public class ClientSessionProvider {
 
           @Override
           public void run() throws Exception {
+            beforeStartSession(clientSession);
             clientSession.startSession();
           }
         }, input.copy().name("client-session-initialization").session(clientSession)).awaitDoneAndGet();
@@ -59,6 +60,14 @@ public class ClientSessionProvider {
         return clientSession;
       }
     });
+  }
+
+  /**
+   * Callback method for performing any operations before the given session is started.
+   * 
+   * @param clientSession
+   */
+  protected void beforeStartSession(IClientSession clientSession) {
   }
 
   /**
