@@ -207,13 +207,13 @@ public final class ClientTestUtility {
               }
               // Number Field
             }
-            else if (formField instanceof AbstractNumberField) {
-              ((AbstractNumberField) formField).setValue(42L);
-              // Big Decimal Field
-            }
             else if (formField instanceof AbstractBigDecimalField) {
               ((AbstractBigDecimalField) formField).setValue(BigDecimal.valueOf(42.42));
               // Date Field
+            }
+            else if (formField instanceof AbstractNumberField) {
+              ((AbstractNumberField) formField).setValue(42L);
+              // Big Decimal Field
             }
             else if (formField instanceof AbstractDateField) {
               ((AbstractDateField) formField).setValue(new Date());
