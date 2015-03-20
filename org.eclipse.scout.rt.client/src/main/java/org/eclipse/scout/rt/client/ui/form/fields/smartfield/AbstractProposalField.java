@@ -180,7 +180,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
       else {
         try {
           if (proposalChooser == null) {
-        	proposalChooser = registerProposalChooserInternal();
+            proposalChooser = registerProposalChooserInternal();
           }
           proposalChooser.dataFetchedDelegate(result, getBrowseMaxRowCount());
         }
@@ -209,8 +209,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
            * empty text means null
            */
           if (text == null || text.length() == 0) {
-            boolean b = parseValue(text);
-            return b;
+            return parseValue(text);
           }
           else {
             // no proposal was selected...

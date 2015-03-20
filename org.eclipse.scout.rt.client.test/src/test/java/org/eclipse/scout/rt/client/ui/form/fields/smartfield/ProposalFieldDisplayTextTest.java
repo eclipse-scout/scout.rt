@@ -59,6 +59,7 @@ public class ProposalFieldDisplayTextTest {
   @Test
   public void testLookupRowDisplayText() throws ProcessingException {
     ProposalField field = new ProposalField();
+    field.registerProposalChooserInternal();
     // single match
     field.getUIFacade().setTextFromUI("a");
     // select proposal
