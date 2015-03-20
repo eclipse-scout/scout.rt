@@ -321,9 +321,10 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.ProposalChooser();
   }
-}, { // FIXME CGU: only needed temporarily, remove when switched to FormToolButton2
-  objectType: 'Null',
+}, {
+  objectType: 'ComposerField',
   create: function() {
-    return new scout.NullAdapter();
+    // Composer is actually just a tree field, there is currently no need to duplicate the js/css code
+    return new scout.TreeField();
   }
 }];

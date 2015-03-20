@@ -292,4 +292,9 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   @Override
   public void processBufferedEvents() {
   }
+
+  @Override
+  public String toString() {
+    return "Id: " + getId() + ". ObjectType: " + getObjectType() + ". ModelClass: " + getModel().getClass() + ". OwnerId: " + getParent().getId();
+  }
 }

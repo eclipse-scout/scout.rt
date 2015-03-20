@@ -32,7 +32,7 @@ public class JsonTreeField<T extends ITreeField> extends JsonFormField<T> {
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonAdapterProperty<ITreeField>(ITreeField.PROP_TREE, model, getJsonSession()) {
+    putJsonProperty(new JsonAdapterProperty<T>(ITreeField.PROP_TREE, model, getJsonSession()) {
       @Override
       protected ITree modelValue() {
         return getModel().getTree();
