@@ -251,7 +251,8 @@ scout.Session.prototype._coalesceEvents = function(previousEvents, event) {
 scout.Session.prototype._sendRequest = function(request) {
   var unload = !!request.unload;
 
-  if (this.offline) {
+  // No need to queue the request when document is unloading
+  if (!unload && this.offline) {
     request.events.forEach(function(event) {
       this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
     }.bind(this));
