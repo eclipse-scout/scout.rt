@@ -1433,11 +1433,11 @@ public class StatementProcessor implements IStatementProcessor {
           return new SingleInput(((IHolder) o).getValue(), nullType, bindToken);
         }
         else {
-          return new ArrayInput(((IHolder) o).getValue(), bindToken);
+          return new ArrayInput(m_callerService.getSqlStyle(), ((IHolder) o).getValue(), bindToken);
         }
       }
       else if (cls == TriState.class) {
-        return new TriStateInput((TriState) ((IHolder) o).getValue(), bindToken);
+        return new TriStateInput(m_callerService.getSqlStyle(), (TriState) ((IHolder) o).getValue(), bindToken);
       }
       else {
         return new SingleInput(((IHolder) o).getValue(), nullType, bindToken);
@@ -1445,7 +1445,7 @@ public class StatementProcessor implements IStatementProcessor {
     }
     else {
       if (o instanceof Collection) {
-        return new ArrayInput(((Collection) o).toArray(), bindToken);
+        return new ArrayInput(m_callerService.getSqlStyle(), ((Collection) o).toArray(), bindToken);
       }
       else if (o.getClass().isArray()) {
         Class cls = o.getClass();
@@ -1454,11 +1454,11 @@ public class StatementProcessor implements IStatementProcessor {
           return new SingleInput(o, nullType, bindToken);
         }
         else {
-          return new ArrayInput(o, bindToken);
+          return new ArrayInput(m_callerService.getSqlStyle(), o, bindToken);
         }
       }
       else if (o.getClass() == TriState.class) {
-        return new TriStateInput((TriState) o, bindToken);
+        return new TriStateInput(m_callerService.getSqlStyle(), (TriState) o, bindToken);
       }
       else {
         return new SingleInput(o, nullType, bindToken);

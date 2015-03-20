@@ -931,8 +931,14 @@ public abstract class AbstractSqlStyle implements ISqlStyle, ISqlStyle2 {
 
   protected abstract int getMaxListSize();
 
+
   @Override
   public String createInList(String attribute, Object array) {
+    return createInList(attribute, false, array);
+  }
+
+  @Override
+  public String createInList(String attribute, boolean plain, Object array) {
     Object[] values = toArray(array);
     if (values.length == 0) {
       return createNull(attribute);
@@ -963,6 +969,11 @@ public abstract class AbstractSqlStyle implements ISqlStyle, ISqlStyle2 {
 
   @Override
   public String createNotInList(String attribute, Object array) {
+    return createNotInList(attribute, false, array);
+  }
+
+  @Override
+  public String createNotInList(String attribute, boolean plain, Object array) {
     Object[] values = toArray(array);
     if (values.length == 0) {
       return createNotNull(attribute);
@@ -1064,7 +1075,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle, ISqlStyle2 {
    * that the old implementation (prior to Scout 3.10.0-M2) will be used: Numeric / decimal types without a scale are
    * converted to <code>java.lang.Long</code>, with a scale they are converted to <code>java.lang.Double</code>.
    * By default <code>DecimalConversion.NONE</code> will be returned.
-   * 
+   *
    * @since 3.10.0-M2
    * @return strategy for the decimal conversion
    */
