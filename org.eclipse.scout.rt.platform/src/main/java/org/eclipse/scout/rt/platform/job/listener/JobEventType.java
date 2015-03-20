@@ -52,5 +52,13 @@ public enum JobEventType {
    *
    * @see IBlockingCondition
    */
-  UNBLOCKED
+  UNBLOCKED,
+  /**
+   * Indicates that an unblocked job resumed execution. For jobs which do not operate on a mutex object, this event
+   * corresponds to the 'unblock-event'. If being a mutex job, this event is fired once the mutex is acquired to
+   * continue execution.
+   *
+   * @see IBlockingCondition
+   */
+  RESUMED
 }

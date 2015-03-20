@@ -160,6 +160,6 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
   }
 
   public static enum JobState {
-    Idle, Running, Blocked;
+    Idle, Running, Blocked, Resuming;
   }
 }

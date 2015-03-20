@@ -479,9 +479,12 @@ public class JobManager implements IJobManager {
         }
       }
 
-      // Acquire the mutex anew if being a mutex task.
-      if (currentTask != null && currentTask.isMutexTask()) {
-        m_mutexSemaphores.acquire(currentTask); // Wait until acquired the mutex anew.
+      if (currentTask != null) {
+        // Acquire the mutex anew if being a mutex task.
+        if (currentTask.isMutexTask()) {
+          m_mutexSemaphores.acquire(currentTask); // Wait until acquired the mutex anew.
+        }
+        m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.RESUMED, currentTask, this));
       }
     }
 

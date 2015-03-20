@@ -134,21 +134,23 @@ public class JobListenerBlockedFutureTest {
     expectedStati.add(JobEventType.ABOUT_TO_RUN); // inner
     expectedStati.add(JobEventType.UNBLOCKED); // outer
     expectedStati.add(JobEventType.DONE); // inner
-    expectedStati.add(JobEventType.DONE); // inner
+    expectedStati.add(JobEventType.RESUMED); // outer
+    expectedStati.add(JobEventType.DONE); // outer
     expectedStati.add(JobEventType.SHUTDOWN);
     assertEquals(expectedStati, modelJobListener.m_stati);
     assertEquals(Collections.singletonList(JobEventType.SHUTDOWN), clientJobListener.m_stati);
 
     // verify Futures
     List<IFuture<?>> expectedFutures = new ArrayList<>();
-    expectedFutures.add(outerFuture);
-    expectedFutures.add(outerFuture);
-    expectedFutures.add(innerFuture.getValue());
-    expectedFutures.add(outerFuture);
-    expectedFutures.add(innerFuture.getValue());
-    expectedFutures.add(outerFuture);
-    expectedFutures.add(innerFuture.getValue());
-    expectedFutures.add(outerFuture);
+    expectedFutures.add(outerFuture); // scheduled
+    expectedFutures.add(outerFuture); // about to run
+    expectedFutures.add(innerFuture.getValue()); // scheduled
+    expectedFutures.add(outerFuture); // blocked
+    expectedFutures.add(innerFuture.getValue()); // about to run
+    expectedFutures.add(outerFuture); // unblocked
+    expectedFutures.add(innerFuture.getValue()); // done
+    expectedFutures.add(outerFuture); // resumed
+    expectedFutures.add(outerFuture); // done
     expectedFutures.add(null); // shutdown
     assertEquals(expectedFutures, modelJobListener.m_futures);
     assertEquals(Collections.singletonList(null), clientJobListener.m_futures); // shutdown

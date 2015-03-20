@@ -68,11 +68,14 @@ public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, Chainable<
             currentThreadInfo.updateState(JobState.Blocked, event.getBlockingCondition().getName());
             break;
           case UNBLOCKED:
+            currentThreadInfo.updateState(JobState.Resuming, event.getBlockingCondition().getName());
+            break;
+          case RESUMED:
             currentThreadInfo.updateState(JobState.Running, null);
             break;
         }
       }
-    }, JobEventFilters.allFilter().currentFuture().eventTypes(JobEventType.BLOCKED, JobEventType.UNBLOCKED));
+    }, JobEventFilters.allFilter().currentFuture().eventTypes(JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.RESUMED));
 
     // Update the name of the thread.
     currentThreadInfo.updateNameAndState(m_threadName, m_jobName, JobState.Running);
