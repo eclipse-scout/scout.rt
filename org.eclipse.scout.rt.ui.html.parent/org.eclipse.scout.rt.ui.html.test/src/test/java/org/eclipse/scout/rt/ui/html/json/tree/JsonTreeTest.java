@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.tree;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -33,6 +34,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.rt.ui.html.json.tree.fixtures.Tree;
@@ -217,6 +219,32 @@ public class JsonTreeTest {
     assertNull(contextMenu.getAdapter(menu1));
     assertNotNull(contextMenu.getAdapter(menu2));
     assertTrue(contextMenu.getAdapter(menu2).isAttached());
+  }
+
+  /**
+   * Tests whether a menus property change event gets sent for the json tree if the context menu changes
+   */
+  @Test
+  public void testMenusChangedEvent() throws ProcessingException, JSONException {
+    ITree tree = createTreeWithOneNode();
+    ITreeNode node = tree.getRootNode().getChildNode(0);
+    assertFalse(node.isSelectedNode());
+
+    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+    IJsonAdapter<?> contextMenu = jsonTree.getAdapter(tree.getContextMenu());
+
+    Menu menu1 = new Menu();
+    tree.getContextMenu().addChildAction(menu1);
+    IJsonAdapter<?> jsonMenu1 = contextMenu.getAdapter(menu1);
+    assertNotNull(jsonMenu1);
+    assertTrue(jsonMenu1.isAttached());
+
+    JSONArray jsonMenus = JsonTestUtility.extractProperty(
+        m_jsonSession.currentJsonResponse(), jsonTree.getId(), IContextMenuOwner.PROP_MENUS);
+
+    assertNotNull(jsonMenus);
+    assertEquals(1, jsonMenus.length());
+    assertEquals(jsonMenu1.getId(), jsonMenus.get(0));
   }
 
   /**

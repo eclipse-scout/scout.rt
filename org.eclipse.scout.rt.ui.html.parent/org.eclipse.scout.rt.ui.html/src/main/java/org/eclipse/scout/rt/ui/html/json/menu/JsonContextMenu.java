@@ -95,10 +95,16 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
     }
     List<IJsonAdapter<?>> menuAdapters = attachAdapters(getModel().getChildActions(), new DisplayableActionFilter<IMenu>());
     m_jsonMenuAdapters.addAll(menuAdapters);
-    IJsonAdapter<?> owner = getAdapter(event.getSource().getOwner());
-    if (owner instanceof IContextMenuOwner) {
-      ((IContextMenuOwner) owner).handleModelContextMenuChanged(menuAdapters);
+
+    IJsonAdapter<?> parent = getParent();
+    if (parent.getModel() != event.getSource().getOwner()) {
+      // Not sure if this is really possible
+      throw new IllegalStateException("The model of the parent is different than the menu owner. Parent: " + parent + ". Owner: " + event.getSource().getOwner().getClass());
     }
+    if (!(parent instanceof IContextMenuOwner)) {
+      throw new IllegalStateException("Parent is not a context menu owner, context menu changed event cannot be handled. Parent: " + parent);
+    }
+    ((IContextMenuOwner) parent).handleModelContextMenuChanged(menuAdapters);
   }
 
   protected class P_ContextMenuListener implements ContextMenuListener {
