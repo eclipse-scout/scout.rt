@@ -26,7 +26,7 @@ class ArrayInput implements IBindInput {
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
 
-  public ArrayInput(Object array, ValueInputToken target) throws ProcessingException {
+  public ArrayInput(ISqlStyle sqlStyle, Object array, ValueInputToken target) throws ProcessingException {
     if (array != null && !array.getClass().isArray()) {
       throw new ProcessingException("array parameter must be an array type: " + array.getClass());
     }
@@ -37,14 +37,18 @@ class ArrayInput implements IBindInput {
     if (isBatch()) {
     }
     else {
-      m_target.setPlainValue(true);
-      // if the op is = or <> change it to IN or NOT IN
-      if (m_target.getParsedOp() != null) {
-        if (m_target.getParsedOp().equals("=")) {
-          m_target.setParsedOp("IN");
-        }
-        else if (m_target.getParsedOp().equals("<>")) {
-          m_target.setParsedOp("NOT IN");
+      if (!sqlStyle.isCreatingInListGeneratingBind(m_array)) {
+        m_target.setPlainValue(true);
+      }
+      if (m_target.isPlainValue() || m_target.isPlainSql()) {
+        // if the op is = or <> change it to IN or NOT IN
+        if (m_target.getParsedOp() != null) {
+          if (m_target.getParsedOp().equals("=")) {
+            m_target.setParsedOp("IN");
+          }
+          else { // != or <>
+            m_target.setParsedOp("NOT IN");
+          }
         }
       }
     }
@@ -89,7 +93,7 @@ class ArrayInput implements IBindInput {
       }
     }
     else {
-      return m_target.getParsedAttribute() != null && sqlStyle.isCreatingInListGeneratingBind(m_array);
+      return m_target.getParsedAttribute() != null && !m_target.isPlainSql() && !m_target.isPlainValue() && sqlStyle.isCreatingInListGeneratingBind(m_array);
     }
   }
 
@@ -131,17 +135,18 @@ class ArrayInput implements IBindInput {
 
   private SqlBind applyMultiValued(ISqlStyle sqlStyle) throws ProcessingException {
     if (m_target.getParsedAttribute() != null) {
+      boolean plain = m_target.isPlainSql() || m_target.isPlainValue();
       String att = m_target.getParsedAttribute();
       String op = m_target.getParsedOp();
       m_target.setParsedAttribute(null);
       m_target.setParsedOp(null);
       if (op.equalsIgnoreCase("IN") || op.equalsIgnoreCase("=")) {
-        m_target.setReplaceToken(sqlStyle.createInList(att, m_array));
+          m_target.setReplaceToken(sqlStyle.createInList(att, plain, m_array));
       }
       else {
-        m_target.setReplaceToken(sqlStyle.createNotInList(att, m_array));
+        m_target.setReplaceToken(sqlStyle.createNotInList(att, plain, m_array));
       }
-      if (sqlStyle.isCreatingInListGeneratingBind(m_array)) {
+      if (!plain && sqlStyle.isCreatingInListGeneratingBind(m_array)) {
         return sqlStyle.buildBindFor(m_array, null);
       }
     }
