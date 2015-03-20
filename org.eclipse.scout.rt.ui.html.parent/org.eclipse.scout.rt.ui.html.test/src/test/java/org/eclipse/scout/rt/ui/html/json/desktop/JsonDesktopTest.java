@@ -12,7 +12,11 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -23,10 +27,6 @@ import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
-import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -48,7 +48,7 @@ public class JsonDesktopTest {
   }
 
   private void setUp(IDesktop desktop) {
-    this.m_desktop = desktop;
+    m_desktop = desktop;
     m_session = new JsonSessionMock();
     m_jsonDesktop = new JsonDesktop<IDesktop>(desktop, m_session, m_session.createUniqueIdFor(null), null);
     m_jsonDesktop.attach();

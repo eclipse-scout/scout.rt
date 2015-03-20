@@ -16,15 +16,13 @@ package org.eclipse.scout.rt.ui.html.json;
 public enum JsonEventType {
 
   CLICKED("clicked"),
-
   PROPERTY("property"),
-
   SELECTED("selected");
 
   private String m_eventType;
 
   private JsonEventType(String eventType) {
-    this.m_eventType = eventType;
+    m_eventType = eventType;
   }
 
   public String getEventType() {
@@ -32,7 +30,7 @@ public enum JsonEventType {
   }
 
   public boolean matches(String eventType) {
-    return this.m_eventType.equals(eventType);
+    return m_eventType.equals(eventType);
   }
 
   public boolean matches(JsonEvent jsonEvent) {
