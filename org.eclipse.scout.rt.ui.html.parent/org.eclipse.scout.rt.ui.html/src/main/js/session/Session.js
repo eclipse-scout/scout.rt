@@ -1,6 +1,12 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
+scout.BackgroundJobPollingStatus = {
+  STOPPED: 0,
+  RUNNING: 1,
+  FAILURE: 2
+};
+
 /**
  * $entryPoint and jsonSessionId are required to create a new session. The 'options'
  * argument holds all optional values that may be used during initialization (it is
@@ -57,8 +63,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this.detachHelper = new scout.DetachHelper();
   this.partId = jsonSessionId.substring(0, jsonSessionId.indexOf(':'));
   this._backgroundJobPollingEnabled = false;
-  this._backgroundJobPollingSuccess = false;
-  this._backgroundJobPollingInProgress = false;
+  this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.STOPPED;
 
   // TODO BSH Detach | Check if there is another way
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
@@ -336,9 +341,14 @@ scout.Session.prototype._ajaxOptions = function(request, async) {
   };
 };
 
+/**
+ * (Re-)starts background job polling when not started yet or when an error occured while polling.
+ * In the latter case, polling is resumed when a user-initiated request has been successful.
+ */
 scout.Session.prototype._resumeBackgroundJobPolling = function() {
-  if (this._backgroundJobPollingEnabled && !this._backgroundJobPollingSuccess) {
-    $.log.info('Resume background jobs polling request');
+  if (this._backgroundJobPollingEnabled &&
+      this._backgroundJobPollingStatus != scout.BackgroundJobPollingStatus.RUNNING) {
+    $.log.info('Resume background jobs polling request, status was=' + this._backgroundJobPollingStatus);
     this._pollForBackgroundJobs();
   }
 };
@@ -350,21 +360,15 @@ scout.Session.prototype._resumeBackgroundJobPolling = function() {
  * a model job is done and no request initiated by a user is running.
  */
 scout.Session.prototype._pollForBackgroundJobs = function() {
-  // Ensure only one polling background job is running
-  if (this._backgroundJobPollingInProgress) {
-    return;
-  }
-  this._backgroundJobPollingInProgress = true;
-
   var request = {
       jsonSessionId: this.jsonSessionId,
       pollForBackgroundJobs: true
     };
 
+  this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.RUNNING;
   $.ajax(this._ajaxOptions(request))
     .done(onAjaxDone.bind(this))
-    .fail(onAjaxFail.bind(this))
-    .always(onAjaxAlways.bind(this));
+    .fail(onAjaxFail.bind(this));
 
   // --- Helper methods ---
 
@@ -374,23 +378,18 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
       // when the next user-initiated request succeeds, we re-enable polling
       // otherwise the polling would ping the server to death in case of an error
       $.log.warn('Polling request failed. Interrupt polling until the next user-initiated request succeeds');
-      this._backgroundJobPollingSuccess = false;
+      this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.FAILURE;
       this._processErrorJsonResponse(data.error);
     } else {
       this._processSuccessResponse(data);
       this.layoutValidator.validate();
-      this._backgroundJobPollingSuccess = true;
       setTimeout(this._pollForBackgroundJobs.bind(this));
     }
   }
 
   function onAjaxFail(jqXHR, textStatus, errorThrown) {
-    this._backgroundJobPollingSuccess = false;
+    this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.FAILURE;
     this._processErrorResponse(request, jqXHR, textStatus, errorThrown);
-  }
-
-  function onAjaxAlways(data, textStatus, errorThrown) {
-    this._backgroundJobPollingInProgress = false;
   }
 };
 
