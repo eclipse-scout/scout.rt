@@ -10,18 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.ui.html.ModelJobUtility;
+import org.eclipse.scout.rt.ui.html.JobUtil;
 
 /**
- * Processes JSON events from the UI in a Scout client job and waits until all sync jobs have been finished.
+ * Processes JSON events from the UI in a Scout model job and waits for all model jobs of that session to complete.
  */
 public class JsonEventProcessor {
 
@@ -34,30 +33,20 @@ public class JsonEventProcessor {
   }
 
   public void processEvents(final JsonRequest request, final JsonResponse response) {
-    IClientSession clientSession = m_jsonSession.getClientSession();
+    Assertions.assertFalse(ModelJobs.isModelThread(), "Event processing must be called from a thread other than the model thread [thread=%s, request=%s, response=%s]", Thread.currentThread().getName(), request, response);
+
+    // Process requested events.
     IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
-        ModelJobUtility.runAsSubject(new Runnable() {
-          @Override
-          public void run() {
-            for (final JsonEvent event : request.getEvents()) {
-              processEvent(event, response);
-            }
-          }
-        });
+        for (final JsonEvent event : request.getEvents()) {
+          processEvent(event, response);
+        }
       }
-    }, ModelJobInput.defaults().session(clientSession).name("processEvents"));
-    ModelJobUtility.waitUntilAllModelJobsJobsHaveFinished(clientSession);
-    try {
-      // If model job has finished (= not waitFor), check if there was an exception
-      if (future.isDone()) {
-        future.awaitDoneAndGet();
-      }
-    }
-    catch (ProcessingException e) {
-      throw new JsonException("Error while processing events", e);
-    }
+    }, ModelJobInput.defaults().session(m_jsonSession.getClientSession()).name("event-processing"));
+
+    // Wait for all events to be processed. It is not sufficient to only wait for the Future to complete, because other jobs might be started as well.
+    JobUtil.awaitModelJobs(future);
   }
 
   protected void processEvent(JsonEvent event, JsonResponse response) {
@@ -67,14 +56,14 @@ public class JsonEventProcessor {
     }
     try {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Handling event '" + event.getType() + "' for adapter with ID " + event.getTarget());
+        LOG.debug("Handling event '{}' for adapter with ID {}", event.getType(), event.getTarget());
       }
       jsonAdapter.handleUiEvent(event, response);
       jsonAdapter.cleanUpEventFilters();
     }
-    catch (Exception t) {
-      LOG.error("Error while handling event '" + event.getType() + "' for adapter with ID " + event.getTarget());
-      throw new JsonException(t);
+    catch (Exception e) {
+      LOG.error("Error while handling event '" + event.getType() + "' for adapter with ID " + event.getTarget(), e);
+      throw new JsonException(e);
     }
   }
 }

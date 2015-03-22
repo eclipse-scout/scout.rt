@@ -26,19 +26,15 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
+import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobEventFilters;
-import org.eclipse.scout.rt.client.job.ClientJobEventFilters.Filter;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -49,12 +45,12 @@ import org.eclipse.scout.rt.shared.ui.IUiLayer;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.rt.ui.html.ModelJobUtility;
+import org.eclipse.scout.rt.ui.html.JobUtil;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBindingListener {
+public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBindingListener, IJobListener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
   private static final long ROOT_ID = 1;
 
@@ -76,7 +72,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private final AtomicReference<HttpServletRequest> m_currentHttpRequest = new AtomicReference<>();
   private JsonEventProcessor m_jsonEventProcessor;
   private boolean m_disposing;
-  private IJobListener m_jobChangeListener;
   private Object m_backgroundJobLock = new Object();
 
   public AbstractJsonSession() {
@@ -86,21 +81,14 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_rootJsonAdapter = new P_RootAdapter(this);
     m_customHtmlRenderer = createCustomHtmlRenderer();
 
-    m_jobChangeListener = new P_JobListener();
-    Filter filter = ClientJobEventFilters.allFilter().modelJobsOnly().eventTypes(JobEventType.DONE).andFilter(new IFilter<JobEvent>() {
+    Jobs.getJobManager().addListener(this, ClientJobEventFilters.allFilter().modelJobsOnly().eventTypes(JobEventType.DONE).andFilter(new IFilter<JobEvent>() {
 
       @Override
-      public boolean accept(JobEvent element) {
-        return matchesClientSession(element.getFuture()) && !isProcessingClientRequest();
+      public boolean accept(JobEvent event) {
+        final ModelJobInput jobInput = (ModelJobInput) event.getFuture().getJobInput();
+        return jobInput.getSession() == getClientSession() && !isProcessingClientRequest();
       }
-
-      private boolean matchesClientSession(IFuture<?> future) {
-        IClientSession jobClientSession = ((ModelJobInput) future.getJobInput()).getSession();
-        return jobClientSession == getClientSession();
-      }
-    });
-
-    Jobs.getJobManager().addListener(m_jobChangeListener, filter);
+    }));
   }
 
   protected JsonResponse createJsonResponse() {
@@ -301,24 +289,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   protected void startUpClientSession(IClientSession clientSession) {
-    IRunnable runnable = new IRunnable() {
+    JobUtil.runAsModelJobAndAwait(ModelJobInput.defaults().session(clientSession), new IRunnable() {
       @Override
       public void run() throws Exception {
-        ModelJobUtility.runAsSubject(new Runnable() {
-          @Override
-          public void run() {
-            m_jsonClientSession.startUp();
-          }
-        });
+        m_jsonClientSession.startUp();
       }
-    };
-
-    try {
-      ModelJobUtility.runInModelThreadAndWait(clientSession, runnable);
-    }
-    catch (ProcessingException e) {
-      throw new JsonException(e);
-    }
+    });
 
     if (!clientSession.isActive()) {
       throw new JsonException("ClientSession is not active, there must have been a problem with loading or starting");
@@ -357,7 +333,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       return;
     }
 
-    Jobs.getJobManager().removeListener(m_jobChangeListener);
+    Jobs.getJobManager().removeListener(this);
+
     // Notify waiting requests - should not delay web-container shutdown
     notifyPollingBackgroundJobRequests();
     m_jsonAdapterRegistry.disposeAllJsonAdapters();
@@ -598,24 +575,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   protected JSONObject jsonResponseToJson() {
-    final IHolder<JSONObject> resultHolder = new Holder<JSONObject>(JSONObject.class);
-    try {
-      ModelJobUtility.runInModelThreadAndWait(getClientSession(), new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          ModelJobUtility.runAsSubject(new Runnable() {
-            @Override
-            public void run() {
-              resultHolder.setValue(currentJsonResponse().toJson());
-            }
-          });
-        }
-      });
-    }
-    catch (ProcessingException e) {
-      throw new JsonException(e); // TODO BSH Exception | Try to eliminate this pattern (5 others in html bundle)
-    }
-    return resultHolder.getValue();
+    return JobUtil.runAsModelJobAndAwait(ModelJobInput.defaults().session(getClientSession()), new ICallable<JSONObject>() {
+      @Override
+      public JSONObject call() throws Exception {
+        return currentJsonResponse().toJson();
+      }
+    });
   }
 
   @Override
@@ -627,16 +592,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       currentJsonResponse().addActionEvent(getJsonSessionId(), "logout", new JSONObject());
     }
     LOG.info("Logged out");
-  }
-
-  @Override
-  public void valueBound(HttpSessionBindingEvent event) {
-  }
-
-  @Override
-  public void valueUnbound(HttpSessionBindingEvent event) {
-    dispose();
-    LOG.info("JSON session with ID " + m_jsonSessionId + " unbound from HTTP session.");
   }
 
   /**
@@ -664,25 +619,13 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
       // Dispose model (if session was not already stopped earlier by itself)
       if (m_clientSession.isActive()) {
-        IRunnable runnable = new IRunnable() {
+        JobUtil.runAsModelJobAndAwait(ModelJobInput.defaults().session(m_clientSession), new IRunnable() {
 
           @Override
           public void run() throws Exception {
-            ModelJobUtility.runAsSubject(new Runnable() {
-              @Override
-              public void run() {
-                m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
-              }
-            });
+            m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
           }
-        };
-
-        try {
-          ModelJobUtility.runInModelThreadAndWait(m_clientSession, runnable);
-        }
-        catch (ProcessingException e) {
-          throw new JsonException(e);
-        }
+        });
       }
 
       LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
@@ -707,13 +650,23 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
-  private class P_JobListener implements IJobListener {
+  // === HttpSessionBindingListener ===
 
-    @Override
-    public void changed(JobEvent event) {
-      LOG.trace("Job done. Name=" + event.getFuture().getJobInput().getName() + ". Notify waiting requests...");
-      notifyPollingBackgroundJobRequests();
-    }
+  @Override
+  public void valueBound(HttpSessionBindingEvent event) {
   }
 
+  @Override
+  public void valueUnbound(HttpSessionBindingEvent event) {
+    dispose();
+    LOG.info("JSON session with ID " + m_jsonSessionId + " unbound from HTTP session.");
+  }
+
+  // === IJobListener ===
+
+  @Override
+  public void changed(JobEvent event) {
+    LOG.trace("Job done. Name=" + event.getFuture().getJobInput().getName() + ". Notify waiting requests...");
+    notifyPollingBackgroundJobRequests();
+  }
 }

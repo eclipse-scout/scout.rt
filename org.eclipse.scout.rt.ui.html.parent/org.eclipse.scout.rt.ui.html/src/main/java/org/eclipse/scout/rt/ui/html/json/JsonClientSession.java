@@ -22,14 +22,14 @@ import java.util.Locale;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
+import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.ui.html.ModelJobUtility;
+import org.eclipse.scout.rt.ui.html.JobUtil;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.json.JSONObject;
 
@@ -113,25 +113,14 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
     if (m_localeManagedByModel) {
       return;
     }
-    IRunnable runnable = new IRunnable() {
+    JobUtil.runAsModelJobAndAwait(ModelJobInput.defaults().session(getJsonSession().getClientSession()), new IRunnable() {
       @Override
       public void run() throws Exception {
-        ModelJobUtility.runAsSubject(new Runnable() {
-          @Override
-          public void run() {
-            if (!getModel().getLocale().equals(locale)) {
-              getModel().setLocale(locale);
-            }
-          }
-        });
+        if (!getModel().getLocale().equals(locale)) {
+          getModel().setLocale(locale);
+        }
       }
-    };
-    try {
-      ModelJobUtility.runInModelThreadAndWait(getJsonSession().getClientSession(), runnable);
-    }
-    catch (ProcessingException e) {
-      throw new JsonException(e);
-    }
+    });
   }
 
   protected JSONObject decimalFormatSymbolsToJson(DecimalFormatSymbols symbols) {
