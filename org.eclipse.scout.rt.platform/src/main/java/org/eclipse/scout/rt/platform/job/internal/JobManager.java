@@ -82,7 +82,7 @@ public class JobManager implements IJobManager {
     m_mutexSemaphores = Assertions.assertNotNull(createMutexSemaphores(m_executor));
     m_listeners = new JobListeners();
 
-    addListener(m_futures, JobEventFilters.allFilter().eventTypes(JobEventType.SCHEDULED, JobEventType.DONE, JobEventType.BLOCKED, JobEventType.UNBLOCKED));
+    addListener(m_futures, JobEventFilters.allFilter().eventTypes(JobEventType.SCHEDULED, JobEventType.DONE, JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.SHUTDOWN));
   }
 
   @Override
@@ -155,11 +155,11 @@ public class JobManager implements IJobManager {
 
   @Override
   public final void shutdown() {
-    m_listeners.fireEvent(new JobEvent(this, JobEventType.SHUTDOWN, null));
-
     m_futures.clear();
     m_mutexSemaphores.clear();
     m_executor.shutdownNow();
+
+    m_listeners.fireEvent(new JobEvent(this, JobEventType.SHUTDOWN, null));
   }
 
   @Override

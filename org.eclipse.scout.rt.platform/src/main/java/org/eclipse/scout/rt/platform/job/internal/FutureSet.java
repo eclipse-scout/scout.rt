@@ -94,7 +94,6 @@ public class FutureSet implements IJobListener {
         iterator.next().cancel(true);
         iterator.remove();
       }
-      m_changedCondition.signalAll();
     }
     finally {
       m_writeLock.unlock();
@@ -223,6 +222,9 @@ public class FutureSet implements IJobListener {
     }
   }
 
+  /**
+   * This method is called for the following events: SCHEDULED, DONE, BLOCKED, UNBLOCKED, SHUTDOWN
+   */
   @Override
   public void changed(final JobEvent event) {
     m_writeLock.lock();
