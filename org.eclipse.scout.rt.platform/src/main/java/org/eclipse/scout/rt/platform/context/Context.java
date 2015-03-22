@@ -57,7 +57,7 @@ import org.eclipse.scout.rt.platform.job.internal.callable.SubjectCallable;
 @Bean
 public class Context {
 
-  protected Subject m_subject;
+  protected PreferredValue<Subject> m_subject = new PreferredValue<>(null, false);
   protected PreferredValue<Locale> m_locale = new PreferredValue<>(null, false);
   protected PropertyMap m_propertyMap;
 
@@ -121,14 +121,14 @@ public class Context {
   }
 
   public Subject getSubject() {
-    return m_subject;
+    return m_subject.get();
   }
 
   /**
    * Sets the Subject to invoke the Callable under a particular user.
    */
   public Context subject(final Subject subject) {
-    m_subject = subject;
+    m_subject.set(subject, true);
     return this;
   }
 
@@ -173,7 +173,7 @@ public class Context {
    */
   public static Context defaults() {
     final Context defaults = OBJ.get(Context.class);
-    defaults.m_subject = Subject.getSubject(AccessController.getContext());
+    defaults.m_subject = new PreferredValue<>(Subject.getSubject(AccessController.getContext()), false);
     defaults.m_locale = new PreferredValue<>(NlsLocale.CURRENT.get(), false);
     defaults.m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
     return defaults;
@@ -184,7 +184,7 @@ public class Context {
    */
   public static Context empty() {
     final Context empty = OBJ.get(Context.class);
-    empty.m_subject = null;
+    empty.m_subject = new PreferredValue<>(null, true);
     empty.m_locale = new PreferredValue<>(null, true);
     empty.m_propertyMap = new PropertyMap();
     return empty;

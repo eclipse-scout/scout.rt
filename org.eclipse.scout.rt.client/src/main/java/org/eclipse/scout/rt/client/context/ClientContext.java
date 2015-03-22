@@ -99,6 +99,7 @@ public class ClientContext extends Context {
     if (session != null) {
       m_locale.set(session.getLocale(), false);
       m_userAgent.set(session.getUserAgent(), false);
+      m_subject.set(session.getSubject(), false);
     }
     return this;
   }
