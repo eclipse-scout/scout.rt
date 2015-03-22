@@ -47,12 +47,13 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
 
   @Override
   public Thread newThread(final Runnable runnable) {
-    final long sequence = m_sequence.incrementAndGet();
-    final Thread thread = new Thread(m_group, runnable, m_threadName, 0) {
+    final ThreadInfo threadInfo = new ThreadInfo(m_threadName, m_sequence.incrementAndGet());
+
+    final Thread thread = new Thread(m_group, runnable, threadInfo.buildThreadName(), 0) {
 
       @Override
       public void run() {
-        CURRENT_THREAD_INFO.set(new ThreadInfo(m_threadName, sequence));
+        CURRENT_THREAD_INFO.set(threadInfo);
         try {
           super.run();
         }
@@ -115,7 +116,7 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
     public void updateState(final JobState jobState, final String jobStateInfo) {
       m_currentJobStateInfo = jobStateInfo;
       m_currentJobState = jobState;
-      updateThreadName();
+      Thread.currentThread().setName(buildThreadName());
     }
 
     /**
@@ -129,18 +130,18 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
      *          state of the current job.
      */
     public void updateNameAndState(final String threadName, final String jobName, final JobState state) {
-      m_currentThreadName = StringUtility.nvl(threadName, m_originalThreadName);
+      m_currentThreadName = threadName;
       m_currentJobName = jobName;
       m_currentJobState = state;
       m_currentJobStateInfo = null;
-      updateThreadName();
+      Thread.currentThread().setName(buildThreadName());
     }
 
-    private void updateThreadName() {
+    private String buildThreadName() {
       final StringWriter writer = new StringWriter();
       final PrintWriter out = new PrintWriter(writer);
 
-      out.print(m_currentThreadName);
+      out.print(StringUtility.nvl(m_currentThreadName, m_originalThreadName));
       out.print("-");
       out.print(m_sequence);
       if (m_currentJobState != null) {
@@ -155,7 +156,7 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
         out.printf(" %s", m_currentJobName);
       }
 
-      Thread.currentThread().setName(writer.toString());
+      return writer.toString();
     }
   }
 
