@@ -104,13 +104,13 @@ class JobListeners {
     }
 
     for (final IJobListener listener : listeners.keySet()) {
-      if (listeners.get(listener).accept(eventToFire)) {
-        try {
+      try {
+        if (listeners.get(listener).accept(eventToFire)) {
           listener.changed(eventToFire);
         }
-        catch (final RuntimeException e) {
-          LOG.error(String.format("Failed to notify listener about lifecycle event [listener=%s, event=%s]", listener.getClass().getName(), eventToFire), e);
-        }
+      }
+      catch (final RuntimeException e) {
+        LOG.error(String.format("Failed to notify listener about lifecycle event [listener=%s, event=%s]", listener.getClass().getName(), eventToFire), e);
       }
     }
   }
