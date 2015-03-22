@@ -18,6 +18,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientContext;
+import org.eclipse.scout.rt.platform.context.Context;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
@@ -64,7 +65,7 @@ public class ModelJobInput extends ClientJobInput {
   }
 
   @Override
-  public ModelJobInput context(final ClientContext context) {
+  public ModelJobInput context(final Context context) {
     return (ModelJobInput) super.context(context);
   }
 

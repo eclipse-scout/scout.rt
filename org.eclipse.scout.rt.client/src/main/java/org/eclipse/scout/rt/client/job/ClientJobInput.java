@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientContext;
+import org.eclipse.scout.rt.platform.context.Context;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -35,7 +36,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * @see IJobManager
  * @since 5.1
  */
-public class ClientJobInput extends JobInput<ClientContext> {
+public class ClientJobInput extends JobInput {
 
   protected ClientJobInput(final JobInput origin) {
     super(origin);
@@ -63,7 +64,13 @@ public class ClientJobInput extends JobInput<ClientContext> {
   }
 
   @Override
-  public ClientJobInput context(final ClientContext context) {
+  public ClientContext getContext() {
+    return (ClientContext) super.getContext();
+  }
+
+  @Override
+  public ClientJobInput context(final Context context) {
+    Assertions.assertTrue(context instanceof ClientContext, "Wrong context type [expected=%s, actual=%s]", ClientContext.class.getName(), context);
     return (ClientJobInput) super.context(context);
   }
 

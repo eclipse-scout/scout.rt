@@ -18,7 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.rt.platform.context.Context;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerContext;
@@ -35,7 +37,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * @see IJobManager
  * @since 5.1
  */
-public class ServerJobInput extends JobInput<ServerContext> {
+public class ServerJobInput extends JobInput {
 
   protected ServerJobInput(final JobInput origin) {
     super(origin);
@@ -62,7 +64,13 @@ public class ServerJobInput extends JobInput<ServerContext> {
   }
 
   @Override
-  public ServerJobInput context(final ServerContext context) {
+  public ServerContext getContext() {
+    return (ServerContext) super.getContext();
+  }
+
+  @Override
+  public ServerJobInput context(final Context context) {
+    Assertions.assertTrue(context instanceof ServerContext, "Wrong context type [expected=%s, actual=%s]", ServerContext.class.getName(), context);
     return (ServerJobInput) super.context(context);
   }
 

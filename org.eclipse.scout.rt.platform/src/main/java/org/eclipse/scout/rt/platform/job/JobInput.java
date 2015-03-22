@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.platform.context.Context;
  * @see IJobManager
  * @since 5.1
  */
-public class JobInput<CONTEXT extends Context> {
+public class JobInput {
 
   public static final String N_A = "n/a";
 
@@ -45,12 +45,12 @@ public class JobInput<CONTEXT extends Context> {
   protected Object m_mutexObject;
   protected long m_expirationTime;
   protected boolean m_logOnError;
-  protected CONTEXT m_context;
+  protected Context m_context;
 
   protected JobInput() {
   }
 
-  protected JobInput(final JobInput<?> origin) {
+  protected JobInput(final JobInput origin) {
     m_id = origin.m_id;
     m_name = origin.m_name;
     m_mutexObject = origin.m_mutexObject;
@@ -116,14 +116,14 @@ public class JobInput<CONTEXT extends Context> {
     return this;
   }
 
-  public CONTEXT getContext() {
+  public Context getContext() {
     return m_context;
   }
 
   /**
    * Sets the {@link Context} to be set for the time of execution.
    */
-  public JobInput context(final CONTEXT context) {
+  public JobInput context(final Context context) {
     m_context = Assertions.assertNotNull(context, "Context must not be null");
     return this;
   }
@@ -189,14 +189,14 @@ public class JobInput<CONTEXT extends Context> {
    * Creates a shallow copy of the job-input represented by <code>this</code> context.
    */
   public JobInput copy() {
-    return new JobInput<>(this).context(getContext().copy());
+    return new JobInput(this).context(getContext().copy());
   }
 
   /**
    * Creates a job-input with a "snapshot" of the current calling context.
    */
   public static JobInput defaults() {
-    final JobInput<Context> defaults = new JobInput<>();
+    final JobInput defaults = new JobInput();
     defaults.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
     defaults.logOnError(true);
     defaults.context(Context.defaults());
@@ -207,7 +207,7 @@ public class JobInput<CONTEXT extends Context> {
    * Creates an empty job-input with <code>null</code> as preferred Locale.
    */
   public static JobInput empty() {
-    final JobInput<Context> empty = new JobInput<>();
+    final JobInput empty = new JobInput();
     empty.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
     empty.logOnError(true);
     empty.context(Context.empty());
