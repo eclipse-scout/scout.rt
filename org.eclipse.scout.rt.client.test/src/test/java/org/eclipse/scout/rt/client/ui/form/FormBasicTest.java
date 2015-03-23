@@ -70,7 +70,7 @@ public class FormBasicTest {
         Thread.sleep(200L);
         testSequence.add(3);
       }
-    }, 200, TimeUnit.MILLISECONDS, ModelJobInput.defaults().name("Close"));
+    }, 200, TimeUnit.MILLISECONDS, ModelJobInput.fillCurrent().name("Close"));
 
     try {
       f.start(new FormHandler());

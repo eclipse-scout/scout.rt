@@ -80,7 +80,7 @@ public interface IAuthenticationHandler extends SOAPHandler<SOAPMessageContext> 
           subject.getPrincipals().add(new SimplePrincipal(JaxWsConstants.USER_ANONYMOUS));
           subject.setReadOnly();
 
-          final ServerJobInput input = ServerJobInput.defaults().name("JAX-WS Session").subject(subject);
+          final ServerJobInput input = ServerJobInput.fillCurrent().name("JAX-WS Session").subject(subject);
           final IServerSession serverSession = OBJ.get(ServerSessionProviderWithCache.class).provide(input);
           JaxWsHelper.setContextSession(context, serverSession);
           return true;

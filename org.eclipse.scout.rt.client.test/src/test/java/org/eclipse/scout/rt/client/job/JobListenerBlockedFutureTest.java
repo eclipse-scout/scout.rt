@@ -58,7 +58,7 @@ public class JobListenerBlockedFutureTest {
     m_jobManager.addListener(listener, new AlwaysFilter<JobEvent>());
     IClientSession clientSession = mock(IClientSession.class);
 
-    ClientJobInput input = ClientJobInput.empty().session(clientSession);
+    ClientJobInput input = ClientJobInput.fillEmpty().session(clientSession);
     IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
@@ -97,7 +97,7 @@ public class JobListenerBlockedFutureTest {
     final IHolder<IFuture<?>> innerFuture = new Holder<IFuture<?>>();
     try {
       IClientSession clientSession = mock(IClientSession.class);
-      final ModelJobInput input = ModelJobInput.empty().session(clientSession);
+      final ModelJobInput input = ModelJobInput.fillEmpty().session(clientSession);
 
       // start recording of events
       outerFuture = m_jobManager.schedule(new IRunnable() {

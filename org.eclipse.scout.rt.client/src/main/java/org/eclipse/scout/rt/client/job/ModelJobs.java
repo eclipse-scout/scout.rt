@@ -48,7 +48,7 @@ public final class ModelJobs {
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable) throws ProcessingException {
     Assertions.assertTrue(isModelThread(), "The current thread must be the model thread");
-    return ClientContext.defaults().invoke(Executables.callable(executable));
+    return ClientContext.fillCurrent().invoke(Executables.callable(executable));
   }
 
   /**
@@ -78,7 +78,7 @@ public final class ModelJobs {
    * @see IJobManager#schedule(IExecutable, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable) {
-    return OBJ.get(IJobManager.class).schedule(executable, ModelJobInput.defaults());
+    return OBJ.get(IJobManager.class).schedule(executable, ModelJobInput.fillCurrent());
   }
 
   /**
@@ -128,7 +128,7 @@ public final class ModelJobs {
    * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit) {
-    return OBJ.get(IJobManager.class).schedule(executable, delay, delayUnit, ModelJobInput.defaults());
+    return OBJ.get(IJobManager.class).schedule(executable, delay, delayUnit, ModelJobInput.fillCurrent());
   }
 
   /**

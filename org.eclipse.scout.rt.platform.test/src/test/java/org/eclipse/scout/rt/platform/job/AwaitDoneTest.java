@@ -56,7 +56,7 @@ public class AwaitDoneTest {
         Thread.sleep(1000);
         protocol.add("run-1");
       }
-    }, JobInput.defaults());
+    }, JobInput.fillCurrent());
 
     assertTrue(m_jobManager.awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
@@ -74,7 +74,7 @@ public class AwaitDoneTest {
         Thread.sleep(1000);
         protocol.add("run-1");
       }
-    }, JobInput.defaults());
+    }, JobInput.fillCurrent());
 
     assertTrue(m_jobManager.awaitDone(JobFutureFilters.allFilter().futures(future1), 30, TimeUnit.SECONDS));
     assertEquals(CollectionUtility.hashSet("run-1"), protocol);
@@ -95,7 +95,7 @@ public class AwaitDoneTest {
         Thread.sleep(1000);
         protocol.add("run-1");
       }
-    }, JobInput.defaults());
+    }, JobInput.fillCurrent());
 
     m_jobManager.schedule(new IRunnable() {
 
@@ -104,7 +104,7 @@ public class AwaitDoneTest {
         latchJob2.await();
         protocol.add("run-2");
       }
-    }, JobInput.defaults());
+    }, JobInput.fillCurrent());
 
     assertTrue(m_jobManager.awaitDone(JobFutureFilters.allFilter().futures(future1), 30, TimeUnit.SECONDS));
     assertTrue(m_jobManager.isDone(JobFutureFilters.allFilter().futures(future1)));
@@ -133,7 +133,7 @@ public class AwaitDoneTest {
         bc.waitFor();
         protocol.add("after-2");
       }
-    }, JobInput.defaults());
+    }, JobInput.fillCurrent());
 
     assertTrue(m_jobManager.awaitDone(JobFutureFilters.allFilter().notBlocked(), 10, TimeUnit.SECONDS));
   }

@@ -107,11 +107,11 @@ public class ClientJobCancelTest {
         IPingService serviceProxy = ServiceTunnelUtility.createProxy(IPingService.class, m_session.getServiceTunnel());
         return serviceProxy.ping("ABC");
       }
-    }, ClientJobInput.defaults().session(m_session).name("Client"));
+    }, ClientJobInput.fillCurrent().session(m_session).name("Client"));
 
     //make user interrupt the job in 1 sec
     if (interrupt) {
-      ClientJobs.schedule(new JobThatInterrupts(future), 1, TimeUnit.SECONDS, ClientJobInput.defaults().session(m_session).name("Interrupter"));
+      ClientJobs.schedule(new JobThatInterrupts(future), 1, TimeUnit.SECONDS, ClientJobInput.fillCurrent().session(m_session).name("Interrupter"));
     }
     //wait for user job
     return future.awaitDoneAndGet();

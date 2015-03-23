@@ -111,7 +111,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
               public void run() throws Exception {
                 reloadCodeTypes(notification.getCodeTypes());
               }
-            }, ModelJobInput.defaults().name("Reload code types"));
+            }, ModelJobInput.fillCurrent().name("Reload code types"));
           }
         }
       }

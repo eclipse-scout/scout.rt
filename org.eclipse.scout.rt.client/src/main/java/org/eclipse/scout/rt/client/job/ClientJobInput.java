@@ -140,10 +140,10 @@ public class ClientJobInput extends JobInput {
    * Creates a {@link ClientJobInput} with a "snapshot" of the current calling context. This input requires a session to
    * be set.
    */
-  public static ClientJobInput defaults() {
+  public static ClientJobInput fillCurrent() {
     final ClientJobInput defaults = OBJ.get(ClientJobInput.class);
-    defaults.apply(JobInput.defaults());
-    defaults.context(ClientContext.defaults());
+    defaults.apply(JobInput.fillCurrent());
+    defaults.context(ClientContext.fillCurrent());
     defaults.sessionRequired(true);
     return defaults;
   }
@@ -153,10 +153,10 @@ public class ClientJobInput extends JobInput {
    * {@link UserAgent}. Preferred means, that those values will not be derived from other values, e.g. when setting the
    * session, but must be set explicitly instead.
    */
-  public static ClientJobInput empty() {
+  public static ClientJobInput fillEmpty() {
     final ClientJobInput empty = OBJ.get(ClientJobInput.class);
-    empty.apply(JobInput.empty());
-    empty.context(ClientContext.empty());
+    empty.apply(JobInput.fillEmpty());
+    empty.context(ClientContext.fillEmpty());
     empty.sessionRequired(true);
     return empty;
   }

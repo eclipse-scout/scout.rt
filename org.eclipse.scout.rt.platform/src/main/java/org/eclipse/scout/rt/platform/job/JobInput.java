@@ -204,11 +204,11 @@ public class JobInput {
   /**
    * Creates a {@link JobInput} with a "snapshot" of the current calling context.
    */
-  public static JobInput defaults() {
+  public static JobInput fillCurrent() {
     final JobInput defaults = OBJ.get(JobInput.class);
     defaults.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
     defaults.logOnError(true);
-    defaults.context(Context.defaults());
+    defaults.context(Context.fillCurrent());
     return defaults;
   }
 
@@ -216,11 +216,11 @@ public class JobInput {
    * Creates an empty {@link JobInput} with <code>null</code> as preferred {@link Subject} and {@link Locale}. Preferred
    * means, that those values are not derived from other values, but must be set explicitly instead.
    */
-  public static JobInput empty() {
+  public static JobInput fillEmpty() {
     final JobInput empty = OBJ.get(JobInput.class);
     empty.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
     empty.logOnError(true);
-    empty.context(Context.empty());
+    empty.context(Context.fillEmpty());
     return empty;
   }
 

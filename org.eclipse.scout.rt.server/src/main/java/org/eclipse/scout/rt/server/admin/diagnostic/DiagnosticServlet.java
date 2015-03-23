@@ -47,7 +47,7 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
 
     try {
       // Create the job-input on behalf of which the server-job is run.
-      ServerJobInput input = ServerJobInput.empty();
+      ServerJobInput input = ServerJobInput.fillEmpty();
       input.name("DiagnosticServiceCall");
       input.subject(subject);
       input.servletRequest(req);

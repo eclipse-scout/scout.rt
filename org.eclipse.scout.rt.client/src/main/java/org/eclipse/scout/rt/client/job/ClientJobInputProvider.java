@@ -20,11 +20,11 @@ public class ClientJobInputProvider implements IJobInputProvider {
 
   @Override
   public JobInput defaults() {
-    return ClientJobInput.defaults();
+    return ClientJobInput.fillCurrent();
   }
 
   @Override
   public JobInput empty() {
-    return ClientJobInput.empty();
+    return ClientJobInput.fillEmpty();
   }
 }

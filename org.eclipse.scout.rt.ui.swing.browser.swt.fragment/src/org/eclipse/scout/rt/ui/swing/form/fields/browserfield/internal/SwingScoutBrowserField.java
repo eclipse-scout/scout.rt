@@ -298,7 +298,7 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
       public Boolean call() throws Exception {
         return getScoutObject().getUIFacade().fireBeforeLocationChangedFromUI(location);
       }
-    }, ModelJobInput.defaults().session(getSwingEnvironment().getScoutSession()).name("fireBeforeLocationChangedFromSwt"));
+    }, ModelJobInput.fillCurrent().session(getSwingEnvironment().getScoutSession()).name("fireBeforeLocationChangedFromSwt"));
 
     try {
       return future.awaitDoneAndGet(10, TimeUnit.SECONDS);
@@ -315,7 +315,7 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
       public void run() throws Exception {
         getScoutObject().getUIFacade().fireAfterLocationChangedFromUI(location);
       }
-    }, ModelJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
+    }, ModelJobInput.fillCurrent().session(getSwingEnvironment().getScoutSession()));
   }
 
   /**

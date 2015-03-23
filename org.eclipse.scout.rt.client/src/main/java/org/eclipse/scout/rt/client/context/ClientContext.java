@@ -158,9 +158,9 @@ public class ClientContext extends Context {
   /**
    * Creates a "snapshot" of the current calling client context.
    */
-  public static ClientContext defaults() {
+  public static ClientContext fillCurrent() {
     final ClientContext defaults = OBJ.get(ClientContext.class);
-    defaults.apply(Context.defaults());
+    defaults.apply(Context.fillCurrent());
     defaults.m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
     defaults.sessionRequired(false);
     defaults.session(ClientSessionProvider.currentSession());
@@ -172,9 +172,9 @@ public class ClientContext extends Context {
    * {@link UserAgent}. Preferred means, that those values will not be derived from other values, e.g. when setting the
    * session, but must be set explicitly instead.
    */
-  public static ClientContext empty() {
+  public static ClientContext fillEmpty() {
     final ClientContext empty = OBJ.get(ClientContext.class);
-    empty.apply(Context.empty());
+    empty.apply(Context.fillEmpty());
     empty.m_userAgent = new PreferredValue<>(null, true);
     empty.sessionRequired(false);
     empty.session(null);

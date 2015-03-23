@@ -43,7 +43,7 @@ public class JobCallableChainTest {
    */
   @Test
   public void testCallableChain() throws Exception {
-    Callable<Void> actualCallable = new _JobManager().interceptCallable(m_targetCallable, JobInput.empty());
+    Callable<Void> actualCallable = new _JobManager().interceptCallable(m_targetCallable, JobInput.fillEmpty());
 
     // 1. ExceptionTranslator
     ExceptionTranslator c1 = getFirstAndAssert(actualCallable, ExceptionTranslator.class);
@@ -73,7 +73,7 @@ public class JobCallableChainTest {
       }
     };
 
-    Callable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, JobInput.empty());
+    Callable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, JobInput.fillEmpty());
 
     // 1. ExceptionTranslator
     ExceptionTranslator c1 = getFirstAndAssert(actualCallable, ExceptionTranslator.class);
@@ -109,7 +109,7 @@ public class JobCallableChainTest {
       }
     };
 
-    Callable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, JobInput.empty());
+    Callable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, JobInput.fillEmpty());
 
     // 1. Contribution1
     Contribution1 c1 = getFirstAndAssert(actualCallable, Contribution1.class);

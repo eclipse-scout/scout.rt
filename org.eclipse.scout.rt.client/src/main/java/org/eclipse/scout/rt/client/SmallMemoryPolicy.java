@@ -45,7 +45,7 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
     String jobId = getClass().getName();
 
     Jobs.getJobManager().cancel(ClientJobFutureFilters.allFilter().ids(jobId).currentSession(), true);
-    ClientJobs.schedule(new ForceGCJob(), ClientJobInput.defaults().name("release memory").id(jobId));
+    ClientJobs.schedule(new ForceGCJob(), ClientJobInput.fillCurrent().name("release memory").id(jobId));
 
     if (page.getTable() != null) {
       page.getTable().discardAllRows();

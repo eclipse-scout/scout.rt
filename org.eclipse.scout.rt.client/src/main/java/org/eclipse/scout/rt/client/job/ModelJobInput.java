@@ -119,9 +119,9 @@ public class ModelJobInput extends ClientJobInput {
    * Creates a {@link ModelJobInput} with a "snapshot" of the current calling context. This input requires a session to
    * be set.
    */
-  public static ModelJobInput defaults() {
+  public static ModelJobInput fillCurrent() {
     final ModelJobInput defaults = OBJ.get(ModelJobInput.class);
-    defaults.apply(ClientJobInput.defaults());
+    defaults.apply(ClientJobInput.fillCurrent());
     return defaults;
   }
 
@@ -130,9 +130,9 @@ public class ModelJobInput extends ClientJobInput {
    * {@link UserAgent}. Preferred means, that those values will not be derived from other values, e.g. when setting the
    * session, but must be set explicitly instead.
    */
-  public static ModelJobInput empty() {
+  public static ModelJobInput fillEmpty() {
     final ModelJobInput empty = OBJ.get(ModelJobInput.class);
-    empty.apply(ClientJobInput.empty());
+    empty.apply(ClientJobInput.fillEmpty());
     return empty;
   }
 }

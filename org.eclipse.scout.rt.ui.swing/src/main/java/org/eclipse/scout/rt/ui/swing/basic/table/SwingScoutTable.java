@@ -591,7 +591,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           }
         }
       }
-    }, 400, TimeUnit.MILLISECONDS, ModelJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
+    }, 400, TimeUnit.MILLISECONDS, ModelJobInput.fillCurrent().session(getSwingEnvironment().getScoutSession()));
 
   }
 
@@ -771,7 +771,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     if (m_swingAutoOptimizeColumnWidthsJob != null) {
       m_swingAutoOptimizeColumnWidthsJob.cancel(true);
     }
-    m_swingAutoOptimizeColumnWidthsJob = ClientJobs.schedule(new P_SwingAutoOptimizeColumnWidthsJob(), 200, TimeUnit.MILLISECONDS, ClientJobInput.defaults().session(getSwingEnvironment().getScoutSession()));
+    m_swingAutoOptimizeColumnWidthsJob = ClientJobs.schedule(new P_SwingAutoOptimizeColumnWidthsJob(), 200, TimeUnit.MILLISECONDS, ClientJobInput.fillCurrent().session(getSwingEnvironment().getScoutSession()));
   }
 
   protected void handleSwingEmptySpaceSelection(final MouseEvent e) {

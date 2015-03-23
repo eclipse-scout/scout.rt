@@ -68,7 +68,7 @@ public class ThreadNameDecoratorTest {
       }
     };
 
-    JobInput input = JobInput.empty().id("123").name("job1");
+    JobInput input = JobInput.fillEmpty().id("123").name("job1");
 
     NamedThreadFactory.CURRENT_THREAD_INFO.set(new ThreadInfo("scout-thread", 5));
     new ThreadNameDecorator<Void>(next, "scout-client-thread", input.getIdentifier()).call();
@@ -90,7 +90,7 @@ public class ThreadNameDecoratorTest {
       }
     };
 
-    JobInput input = JobInput.empty();
+    JobInput input = JobInput.fillEmpty();
 
     NamedThreadFactory.CURRENT_THREAD_INFO.set(new ThreadInfo("scout-thread", 5));
     new ThreadNameDecorator<Void>(next, "scout-client-thread", input.getIdentifier()).call();
@@ -122,7 +122,7 @@ public class ThreadNameDecoratorTest {
         assertTrue(currentThreadName, currentThreadName.matches("scout-thread-\\d+ \\[Running\\] job-1"));
         return true;
       }
-    }, JobInput.defaults().name("job-1").mutex(mutexObject));
+    }, JobInput.fillCurrent().name("job-1").mutex(mutexObject));
 
     // Job-2 (same mutex as job-1)
     IFuture<Boolean> future2 = m_jobManager.schedule(new ICallable<Boolean>() {
@@ -138,7 +138,7 @@ public class ThreadNameDecoratorTest {
 
         return true;
       }
-    }, JobInput.defaults().name("job-1").mutex(mutexObject));
+    }, JobInput.fillCurrent().name("job-1").mutex(mutexObject));
 
     assertTrue(future2.awaitDoneAndGet());
     assertTrue(future1.awaitDoneAndGet());

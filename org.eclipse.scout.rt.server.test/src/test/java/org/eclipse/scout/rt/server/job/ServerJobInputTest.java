@@ -59,7 +59,7 @@ public class ServerJobInputTest {
 
   @Test
   public void testEmpty() {
-    ServerJobInput input = ServerJobInput.empty();
+    ServerJobInput input = ServerJobInput.fillEmpty();
     assertNotNull(input.getContext());
     assertNull(input.getName());
     assertNull(input.getId());
@@ -72,7 +72,7 @@ public class ServerJobInputTest {
 
   @Test
   public void testCopy() {
-    ServerJobInput input = ServerJobInput.empty();
+    ServerJobInput input = ServerJobInput.fillEmpty();
     input.getPropertyMap().put("A", "B");
     input.name("name");
     input.id("123");
@@ -95,26 +95,26 @@ public class ServerJobInputTest {
 
   @Test
   public void testDefaultName() {
-    assertNull(ServerJobInput.defaults().getName());
-    assertEquals("ABC", ServerJobInput.defaults().name("ABC").getName());
+    assertNull(ServerJobInput.fillCurrent().getName());
+    assertEquals("ABC", ServerJobInput.fillCurrent().name("ABC").getName());
   }
 
   @Test
   public void testDefaultId() {
-    assertNull(ServerJobInput.defaults().getId());
-    assertEquals("123", ServerJobInput.defaults().id("123").getId());
+    assertNull(ServerJobInput.fillCurrent().getId());
+    assertEquals("123", ServerJobInput.fillCurrent().id("123").getId());
   }
 
   @Test
   public void testDefaultSubject() {
-    assertNull(ServerJobInput.defaults().getSubject());
+    assertNull(ServerJobInput.fillCurrent().getSubject());
 
     Subject subject = new Subject();
     ServerJobInput input = Subject.doAs(subject, new PrivilegedAction<ServerJobInput>() {
 
       @Override
       public ServerJobInput run() {
-        return ServerJobInput.defaults();
+        return ServerJobInput.fillCurrent();
       }
     });
     assertSame(subject, input.getSubject());
@@ -124,7 +124,7 @@ public class ServerJobInputTest {
 
       @Override
       public ServerJobInput run() {
-        return ServerJobInput.defaults();
+        return ServerJobInput.fillCurrent();
       }
     });
     input.subject(null);
@@ -133,34 +133,34 @@ public class ServerJobInputTest {
 
   @Test
   public void testDefaultSessionRequired() {
-    assertTrue(ServerJobInput.defaults().isSessionRequired());
+    assertTrue(ServerJobInput.fillCurrent().isSessionRequired());
   }
 
   @Test
   public void testSessionRequiredCopy() {
-    assertTrue(ServerJobInput.empty().sessionRequired(true).copy().isSessionRequired());
-    assertFalse(ServerJobInput.empty().sessionRequired(false).copy().isSessionRequired());
+    assertTrue(ServerJobInput.fillEmpty().sessionRequired(true).copy().isSessionRequired());
+    assertFalse(ServerJobInput.fillEmpty().sessionRequired(false).copy().isSessionRequired());
   }
 
   @Test
   public void testDefaultSession() {
     // No session on ThreadLocal
     ISession.CURRENT.remove();
-    assertNull(ServerJobInput.defaults().sessionRequired(false).getSession());
+    assertNull(ServerJobInput.fillCurrent().sessionRequired(false).getSession());
 
     // Session on ThreadLocal
     IServerSession sessionThreadLocal = mock(IServerSession.class);
     ISession.CURRENT.set(sessionThreadLocal);
-    assertSame(sessionThreadLocal, ServerJobInput.defaults().getSession());
+    assertSame(sessionThreadLocal, ServerJobInput.fillCurrent().getSession());
 
     // Session on ThreadLocal, but set explicitly
     ISession.CURRENT.set(sessionThreadLocal);
     IServerSession explicitSession = mock(IServerSession.class);
-    assertSame(explicitSession, ServerJobInput.defaults().session(explicitSession).getSession());
+    assertSame(explicitSession, ServerJobInput.fillCurrent().session(explicitSession).getSession());
 
     // Session on ThreadLocal, but set explicitly to null
     ISession.CURRENT.set(sessionThreadLocal);
-    assertNull(ServerJobInput.defaults().session(null).sessionRequired(false).getSession());
+    assertNull(ServerJobInput.fillCurrent().session(null).sessionRequired(false).getSession());
   }
 
   @Test
@@ -170,17 +170,17 @@ public class ServerJobInputTest {
     // ThreadLocal set, Session available --> Locale from ThreadLocal
     ISession.CURRENT.set(session);
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.CANADA_FRENCH, ServerJobInput.defaults().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, ServerJobInput.fillCurrent().getLocale());
 
     // ThreadLocal set, Session available --> Locale from ThreadLocal
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.CANADA_FRENCH, ServerJobInput.defaults().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, ServerJobInput.fillCurrent().getLocale());
 
     // ThreadLocal not set, Session not available --> no fallback to JVM default Locale.
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.remove();
-    assertNull(ServerJobInput.defaults().getLocale());
+    assertNull(ServerJobInput.fillCurrent().getLocale());
   }
 
   @Test
@@ -190,17 +190,17 @@ public class ServerJobInputTest {
     // ThreadLocal set, Session available --> explicit Locale (null)
     ISession.CURRENT.set(session);
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertNull(ServerJobInput.defaults().locale(null).session(session).getLocale());
+    assertNull(ServerJobInput.fillCurrent().locale(null).session(session).getLocale());
 
     // ThreadLocal set, Session not available --> explicit Locale (null)
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertNull(ServerJobInput.defaults().locale(null).session(session).getLocale());
+    assertNull(ServerJobInput.fillCurrent().locale(null).session(session).getLocale());
 
     // ThreadLocal not set, Session not available --> explicit Locale (null)
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.remove();
-    assertNull(ServerJobInput.defaults().locale(null).session(session).getLocale());
+    assertNull(ServerJobInput.fillCurrent().locale(null).session(session).getLocale());
   }
 
   @Test
@@ -210,17 +210,17 @@ public class ServerJobInputTest {
     // ThreadLocal set, Session available --> explicit Locale (JAPAN)
     ISession.CURRENT.set(session);
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.JAPAN, ServerJobInput.defaults().locale(Locale.JAPAN).session(session).getLocale());
+    assertEquals(Locale.JAPAN, ServerJobInput.fillCurrent().locale(Locale.JAPAN).session(session).getLocale());
 
     // ThreadLocal set, Session not available --> explicit Locale (JAPAN)
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.JAPAN, ServerJobInput.defaults().locale(Locale.JAPAN).session(session).getLocale());
+    assertEquals(Locale.JAPAN, ServerJobInput.fillCurrent().locale(Locale.JAPAN).session(session).getLocale());
 
     // ThreadLocal not set, Session not available --> explicit Locale (JAPAN)
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.remove();
-    assertEquals(Locale.JAPAN, ServerJobInput.defaults().locale(Locale.JAPAN).session(session).getLocale());
+    assertEquals(Locale.JAPAN, ServerJobInput.fillCurrent().locale(Locale.JAPAN).session(session).getLocale());
   }
 
   @Test
@@ -230,12 +230,12 @@ public class ServerJobInputTest {
     // ThreadLocal set --> Locale form ThreadLocal
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.CANADA_FRENCH, ServerJobInput.defaults().session(session).getLocale());
+    assertEquals(Locale.CANADA_FRENCH, ServerJobInput.fillCurrent().session(session).getLocale());
 
     // ThreadLocal not set --> Null Locale
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.remove();
-    assertNull(ServerJobInput.defaults().session(session).getLocale());
+    assertNull(ServerJobInput.fillCurrent().session(session).getLocale());
 
     IServerSession currentSession = mock(IServerSession.class);
 
@@ -243,13 +243,13 @@ public class ServerJobInputTest {
     ISession.CURRENT.set(currentSession);
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.CANADA_FRENCH, ServerJobInput.defaults().session(session).getLocale());
+    assertEquals(Locale.CANADA_FRENCH, ServerJobInput.fillCurrent().session(session).getLocale());
 
     // ThreadLocal-Session available, ThreadLocal not set --> Null Locale
     ISession.CURRENT.set(currentSession);
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.remove();
-    assertNull(ServerJobInput.defaults().session(session).getLocale());
+    assertNull(ServerJobInput.fillCurrent().session(session).getLocale());
   }
 
   @Test
@@ -261,17 +261,17 @@ public class ServerJobInputTest {
     // ThreadLocal set, Session available --> UserAgent from ThreadLocal
     ISession.CURRENT.set(session);
     UserAgent.CURRENT.set(userAgent);
-    assertSame(userAgent, ServerJobInput.defaults().getUserAgent());
+    assertSame(userAgent, ServerJobInput.fillCurrent().getUserAgent());
 
     // ThreadLocal set, Session available --> UserAgent from ThreadLocal
     ISession.CURRENT.remove();
     UserAgent.CURRENT.set(userAgent);
-    assertEquals(userAgent, ServerJobInput.defaults().getUserAgent());
+    assertEquals(userAgent, ServerJobInput.fillCurrent().getUserAgent());
 
     // ThreadLocal not set, Session not available
     ISession.CURRENT.remove();
     UserAgent.CURRENT.remove();
-    assertNull(ServerJobInput.defaults().getUserAgent());
+    assertNull(ServerJobInput.fillCurrent().getUserAgent());
   }
 
   @Test
@@ -282,17 +282,17 @@ public class ServerJobInputTest {
     // ThreadLocal set, Session available --> explicit UserAgent (null)
     ISession.CURRENT.set(session);
     UserAgent.CURRENT.set(userAgent);
-    assertNull(ServerJobInput.defaults().userAgent(null).session(session).getUserAgent());
+    assertNull(ServerJobInput.fillCurrent().userAgent(null).session(session).getUserAgent());
 
     // ThreadLocal set, Session not available --> explicit UserAgent (null)
     ISession.CURRENT.remove();
     UserAgent.CURRENT.set(userAgent);
-    assertNull(ServerJobInput.defaults().userAgent(null).session(session).getUserAgent());
+    assertNull(ServerJobInput.fillCurrent().userAgent(null).session(session).getUserAgent());
 
     // ThreadLocal not set, Session not available --> explicit UserAgent (null)
     ISession.CURRENT.remove();
     UserAgent.CURRENT.remove();
-    assertNull(ServerJobInput.defaults().userAgent(null).session(session).getUserAgent());
+    assertNull(ServerJobInput.fillCurrent().userAgent(null).session(session).getUserAgent());
   }
 
   @Test
@@ -305,17 +305,17 @@ public class ServerJobInputTest {
     // ThreadLocal set, Session available --> explicit UserAgent (userAgent2)
     ISession.CURRENT.set(session);
     UserAgent.CURRENT.set(userAgent1);
-    assertSame(userAgent2, ServerJobInput.defaults().userAgent(userAgent2).session(session).getUserAgent());
+    assertSame(userAgent2, ServerJobInput.fillCurrent().userAgent(userAgent2).session(session).getUserAgent());
 
     // ThreadLocal set, Session not available --> explicit UserAgent (userAgent2)
     ISession.CURRENT.remove();
     UserAgent.CURRENT.set(userAgent1);
-    assertSame(userAgent2, ServerJobInput.defaults().userAgent(userAgent2).session(session).getUserAgent());
+    assertSame(userAgent2, ServerJobInput.fillCurrent().userAgent(userAgent2).session(session).getUserAgent());
 
     // ThreadLocal not set, Session not available --> explicit UserAgent (userAgent2)
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.remove();
-    assertSame(userAgent2, ServerJobInput.defaults().userAgent(userAgent2).session(session).getUserAgent());
+    assertSame(userAgent2, ServerJobInput.fillCurrent().userAgent(userAgent2).session(session).getUserAgent());
   }
 
   @Test
@@ -327,12 +327,12 @@ public class ServerJobInputTest {
     // ThreadLocal set --> UserAgent form ThreadLocal
     ISession.CURRENT.remove();
     UserAgent.CURRENT.set(userAgent1);
-    assertSame(userAgent1, ServerJobInput.defaults().session(session).getUserAgent());
+    assertSame(userAgent1, ServerJobInput.fillCurrent().session(session).getUserAgent());
 
     // ThreadLocal not set --> Null UserAgent
     ISession.CURRENT.remove();
     UserAgent.CURRENT.remove();
-    assertNull(ServerJobInput.defaults().session(session).getUserAgent());
+    assertNull(ServerJobInput.fillCurrent().session(session).getUserAgent());
 
     IServerSession currentSession = mock(IServerSession.class);
 
@@ -340,13 +340,13 @@ public class ServerJobInputTest {
     ISession.CURRENT.set(currentSession);
     ISession.CURRENT.remove();
     UserAgent.CURRENT.set(userAgent1);
-    assertSame(userAgent1, ServerJobInput.defaults().session(session).getUserAgent());
+    assertSame(userAgent1, ServerJobInput.fillCurrent().session(session).getUserAgent());
 
     // ThreadLocal-Session available, ThreadLocal not set --> Null UserAgent
     ISession.CURRENT.set(currentSession);
     ISession.CURRENT.remove();
     UserAgent.CURRENT.remove();
-    assertNull(ServerJobInput.defaults().session(session).getUserAgent());
+    assertNull(ServerJobInput.fillCurrent().session(session).getUserAgent());
   }
 
   @Test
@@ -372,7 +372,7 @@ public class ServerJobInputTest {
       @Override
       public Object run() throws Exception {
         when(session.getSubject()).thenReturn(null);
-        assertSame(subject1, ServerJobInput.defaults().session(session).getSubject());
+        assertSame(subject1, ServerJobInput.fillCurrent().session(session).getSubject());
         return null;
       }
     });
@@ -383,7 +383,7 @@ public class ServerJobInputTest {
       @Override
       public Object run() throws Exception {
         when(session.getSubject()).thenReturn(subject1);
-        assertNull(ServerJobInput.defaults().session(session).getSubject());
+        assertNull(ServerJobInput.fillCurrent().session(session).getSubject());
         return null;
       }
     });
@@ -396,12 +396,12 @@ public class ServerJobInputTest {
 
     // No context on ThreadLocal
     PropertyMap.CURRENT.remove();
-    assertNotNull(ServerJobInput.defaults().getContext());
+    assertNotNull(ServerJobInput.fillCurrent().getContext());
 
     // Context on ThreadLocal
     PropertyMap.CURRENT.set(threadLocalContext);
-    assertNotSame(threadLocalContext, ServerJobInput.defaults().getContext());
-    assertEquals(toSet(threadLocalContext.iterator()), toSet(ServerJobInput.defaults().getPropertyMap().iterator()));
+    assertNotSame(threadLocalContext, ServerJobInput.fillCurrent().getContext());
+    assertEquals(toSet(threadLocalContext.iterator()), toSet(ServerJobInput.fillCurrent().getPropertyMap().iterator()));
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

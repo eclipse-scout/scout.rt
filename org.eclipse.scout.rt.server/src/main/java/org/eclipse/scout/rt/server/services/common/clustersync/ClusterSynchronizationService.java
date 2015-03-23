@@ -270,7 +270,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
     getStatusInfoInternal().updateReceiveStatus(message);
 
-    ServerJobInput jobInput = ServerJobInput.empty();
+    ServerJobInput jobInput = ServerJobInput.fillEmpty();
     jobInput.name("cluster-sync-receive");
     jobInput.subject(m_subject);
     jobInput.session(OBJ.get(ServerSessionProviderWithCache.class).provide(jobInput.copy()));

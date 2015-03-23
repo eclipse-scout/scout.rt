@@ -74,7 +74,7 @@ public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
       final IServerSession serverSession = Assertions.assertNotNull(JaxWsHelper.getContextSession(m_context.getMessageContext()), "server-session must not be null");
 
       try {
-        return invokeInServerJob(ServerJobInput.defaults().name("JAX-WS request").session(serverSession).subject(subject), portType, method, args);
+        return invokeInServerJob(ServerJobInput.fillCurrent().name("JAX-WS request").session(serverSession).subject(subject), portType, method, args);
       }
       catch (ProcessingException e) {
         Throwable cause = e.getCause();

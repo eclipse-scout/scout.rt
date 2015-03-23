@@ -195,10 +195,10 @@ public class ServerJobInput extends JobInput {
    * Creates a {@link ServerJobInput} with a "snapshot" of the current calling context. This input requires a session to
    * be set.
    */
-  public static ServerJobInput defaults() {
+  public static ServerJobInput fillCurrent() {
     final ServerJobInput defaults = OBJ.get(ServerJobInput.class);
-    defaults.apply(JobInput.defaults());
-    defaults.context(ServerContext.defaults());
+    defaults.apply(JobInput.fillCurrent());
+    defaults.context(ServerContext.fillCurrent());
     defaults.sessionRequired(true);
     return defaults;
   }
@@ -208,10 +208,10 @@ public class ServerJobInput extends JobInput {
    * {@link UserAgent}. Preferred means, that those values are not derived from other values, but must be set explicitly
    * instead. This input requires a session to be set.
    */
-  public static ServerJobInput empty() {
+  public static ServerJobInput fillEmpty() {
     final ServerJobInput empty = OBJ.get(ServerJobInput.class);
-    empty.apply(JobInput.empty());
-    empty.context(ServerContext.empty());
+    empty.apply(JobInput.fillEmpty());
+    empty.context(ServerContext.fillEmpty());
     empty.sessionRequired(true);
     return empty;
   }

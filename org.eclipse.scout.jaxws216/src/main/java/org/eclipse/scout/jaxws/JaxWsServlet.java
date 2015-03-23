@@ -45,7 +45,7 @@ public class JaxWsServlet extends EndpointServlet {
   protected void handleRequest(final HttpServletRequest request, final HttpServletResponse response, final Class<? extends Binding> bindingTypeFilter) throws ServletException, IOException {
     try {
       // Create the job-input on behalf of which the server-job is run.
-      final ServerJobInput input = ServerJobInput.empty();
+      final ServerJobInput input = ServerJobInput.fillEmpty();
       input.name("JAX-WS Request");
       input.subject(getOrCreateSubject());
       input.servletRequest(request);

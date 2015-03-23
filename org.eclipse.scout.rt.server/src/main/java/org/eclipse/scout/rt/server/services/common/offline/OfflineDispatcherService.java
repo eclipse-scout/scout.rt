@@ -43,7 +43,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
   public IServiceTunnelResponse dispatch(final IServiceTunnelRequest request) {
     try {
       // Create the job-input on behalf of which the server-job is run.
-      ServerJobInput input = ServerJobInput.empty();
+      ServerJobInput input = ServerJobInput.fillEmpty();
       input.name("OfflineServiceCall");
       input.id(String.valueOf(request.getRequestSequence())); // to cancel server jobs and associated transactions.
       input.subject(Subject.getSubject(AccessController.getContext()));

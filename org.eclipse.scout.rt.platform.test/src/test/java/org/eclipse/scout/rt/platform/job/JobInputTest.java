@@ -41,7 +41,7 @@ public class JobInputTest {
 
   @Test
   public void testEmpty() {
-    JobInput input = JobInput.empty();
+    JobInput input = JobInput.fillEmpty();
     assertNotNull(input.getContext());
     assertNull(input.getName());
     assertNull(input.getId());
@@ -52,7 +52,7 @@ public class JobInputTest {
 
   @Test
   public void testCopy() {
-    JobInput input = JobInput.empty();
+    JobInput input = JobInput.fillEmpty();
     input.getPropertyMap().put("A", "B");
     input.name("name");
     input.id("123");
@@ -73,26 +73,26 @@ public class JobInputTest {
 
   @Test
   public void testDefaultName() {
-    assertNull(JobInput.defaults().getName());
-    assertEquals("ABC", JobInput.defaults().name("ABC").getName());
+    assertNull(JobInput.fillCurrent().getName());
+    assertEquals("ABC", JobInput.fillCurrent().name("ABC").getName());
   }
 
   @Test
   public void testDefaultId() {
-    assertNull(JobInput.defaults().getId());
-    assertEquals("123", JobInput.defaults().id("123").getId());
+    assertNull(JobInput.fillCurrent().getId());
+    assertEquals("123", JobInput.fillCurrent().id("123").getId());
   }
 
   @Test
   public void testDefaultSubject() {
-    assertNull(JobInput.defaults().getSubject());
+    assertNull(JobInput.fillCurrent().getSubject());
 
     Subject subject = new Subject();
     JobInput input = Subject.doAs(subject, new PrivilegedAction<JobInput>() {
 
       @Override
       public JobInput run() {
-        return JobInput.defaults();
+        return JobInput.fillCurrent();
       }
     });
     assertSame(subject, input.getSubject());
@@ -102,7 +102,7 @@ public class JobInputTest {
 
       @Override
       public JobInput run() {
-        return JobInput.defaults();
+        return JobInput.fillCurrent();
       }
     });
     input.subject(null);
@@ -116,24 +116,24 @@ public class JobInputTest {
 
     // No context on ThreadLocal
     PropertyMap.CURRENT.remove();
-    assertNotNull(JobInput.defaults().getContext());
+    assertNotNull(JobInput.fillCurrent().getContext());
 
     // Context on ThreadLocal
     PropertyMap.CURRENT.set(propertyMap);
-    assertNotSame(propertyMap, JobInput.defaults().getContext());
-    assertEquals(toSet(propertyMap.iterator()), toSet(JobInput.defaults().getPropertyMap().iterator()));
+    assertNotSame(propertyMap, JobInput.fillCurrent().getContext());
+    assertEquals(toSet(propertyMap.iterator()), toSet(JobInput.fillCurrent().getPropertyMap().iterator()));
   }
 
   @Test
   public void testDefaultLocale() {
     NlsLocale.CURRENT.remove();
-    assertNull(JobInput.defaults().getLocale());
+    assertNull(JobInput.fillCurrent().getLocale());
 
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.CANADA_FRENCH, JobInput.defaults().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, JobInput.fillCurrent().getLocale());
 
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.KOREAN, JobInput.defaults().locale(Locale.KOREAN).getLocale());
+    assertEquals(Locale.KOREAN, JobInput.fillCurrent().locale(Locale.KOREAN).getLocale());
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

@@ -470,7 +470,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
                   closeMessageBox();
                 }
               }
-            }, dt, TimeUnit.MILLISECONDS, ClientJobInput.defaults().name("Auto-close " + getTitle()));
+            }, dt, TimeUnit.MILLISECONDS, ClientJobInput.fillCurrent().name("Auto-close " + getTitle()));
           }
           // start sub event dispatch thread
           waitFor();

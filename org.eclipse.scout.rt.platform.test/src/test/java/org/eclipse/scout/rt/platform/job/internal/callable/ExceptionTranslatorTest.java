@@ -49,7 +49,7 @@ public class ExceptionTranslatorTest {
 
   @Before
   public void before() {
-    m_input = JobInput.empty();
+    m_input = JobInput.fillEmpty();
   }
 
   @Test

@@ -75,7 +75,7 @@ public class ServerJobServletFilter implements Filter {
 
     try {
       // Create the job input on behalf of which the server job is run.
-      ServerJobInput input = ServerJobInput.empty();
+      ServerJobInput input = ServerJobInput.fillEmpty();
       input.name(ServerJobServletFilter.class.getSimpleName());
       input.subject(Subject.getSubject(AccessController.getContext()));
       input.servletRequest(httpRequest);

@@ -60,7 +60,7 @@ public class JobListenerTest {
       @Override
       public void run() throws Exception {
       }
-    }, JobInput.empty());
+    }, JobInput.fillEmpty());
     m_jobManager.awaitDone(JobFutureFilters.allFilter().futures(future), 1, TimeUnit.MINUTES);
     m_jobManager.removeListener(listener);
     m_jobManager.shutdown();
@@ -95,7 +95,7 @@ public class JobListenerTest {
       public void run() throws Exception {
         hasStarted.setValue(Boolean.TRUE);
       }
-    }, 200, TimeUnit.MILLISECONDS, JobInput.empty());
+    }, 200, TimeUnit.MILLISECONDS, JobInput.fillEmpty());
     future.cancel(true);
     m_jobManager.awaitDone(JobFutureFilters.allFilter().futures(future), 1, TimeUnit.MINUTES);
     m_jobManager.removeListener(listener);

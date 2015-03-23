@@ -34,7 +34,7 @@ public class JobIdFilterTest {
 
   @Test
   public void test1() {
-    JobInput input = JobInput.empty().id(null);
+    JobInput input = JobInput.fillEmpty().id(null);
     when(m_future.getJobInput()).thenReturn(input);
 
     assertTrue(JobFutureFilters.allFilter().ids(new String[]{null}).accept(m_future));
@@ -42,7 +42,7 @@ public class JobIdFilterTest {
 
   @Test
   public void test2() {
-    JobInput input = JobInput.empty().id(null);
+    JobInput input = JobInput.fillEmpty().id(null);
     when(m_future.getJobInput()).thenReturn(input);
 
     assertFalse(JobFutureFilters.allFilter().ids("ABC").accept(m_future));
@@ -50,7 +50,7 @@ public class JobIdFilterTest {
 
   @Test
   public void test3() {
-    JobInput input = JobInput.empty().id("ABC");
+    JobInput input = JobInput.fillEmpty().id("ABC");
     when(m_future.getJobInput()).thenReturn(input);
 
     assertFalse(JobFutureFilters.allFilter().ids("abc").accept(m_future));
@@ -58,7 +58,7 @@ public class JobIdFilterTest {
 
   @Test
   public void test4() {
-    JobInput input = JobInput.empty().id("ABC");
+    JobInput input = JobInput.fillEmpty().id("ABC");
     when(m_future.getJobInput()).thenReturn(input);
 
     assertTrue(JobFutureFilters.allFilter().ids("ABC").accept(m_future));
@@ -66,7 +66,7 @@ public class JobIdFilterTest {
 
   @Test
   public void test5() {
-    JobInput input = JobInput.empty().id("XYZ");
+    JobInput input = JobInput.fillEmpty().id("XYZ");
     when(m_future.getJobInput()).thenReturn(input);
 
     assertTrue(JobFutureFilters.allFilter().ids("ABC", "XYZ").accept(m_future));

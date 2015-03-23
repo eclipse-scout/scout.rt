@@ -87,7 +87,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
     try {
       // Create the job-input on behalf of which the server-job is run.
-      ServerJobInput input = ServerJobInput.empty();
+      ServerJobInput input = ServerJobInput.fillEmpty();
       input.name("AdminServiceCall");
       input.subject(subject);
       input.servletRequest(req);
@@ -121,7 +121,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       IServiceTunnelRequest serviceRequest = deserializeServiceRequest(req.getInputStream());
 
       // Create the job-input on behalf of which the server-job is run.
-      ServerJobInput input = ServerJobInput.empty();
+      ServerJobInput input = ServerJobInput.fillEmpty();
       input.name("RemoteServiceCall");
       input.id(String.valueOf(serviceRequest.getRequestSequence())); // to cancel server jobs and associated transactions.
       input.subject(subject);

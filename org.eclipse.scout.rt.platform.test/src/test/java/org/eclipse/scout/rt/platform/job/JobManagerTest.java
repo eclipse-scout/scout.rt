@@ -55,7 +55,7 @@ public class JobManagerTest {
       public void run() throws Exception {
         latch.countDownAndBlock();
       }
-    }, JobInput.defaults());
+    }, JobInput.fillCurrent());
 
     IFuture<Void> future2 = m_jobManager.schedule(new IRunnable() {
 
@@ -63,7 +63,7 @@ public class JobManagerTest {
       public void run() throws Exception {
         latch.countDownAndBlock();
       }
-    }, JobInput.defaults());
+    }, JobInput.fillCurrent());
 
     IFuture<Void> future3 = m_jobManager.schedule(new IRunnable() {
 
@@ -71,7 +71,7 @@ public class JobManagerTest {
       public void run() throws Exception {
         latch.countDownAndBlock();
       }
-    }, JobInput.defaults());
+    }, JobInput.fillCurrent());
 
     assertTrue(latch.await());
 
@@ -111,7 +111,7 @@ public class JobManagerTest {
           verifyLatch.countDown();
         }
       }
-    }, JobInput.defaults());
+    }, JobInput.fillCurrent());
 
     m_jobManager.schedule(new IRunnable() {
 
@@ -127,7 +127,7 @@ public class JobManagerTest {
           verifyLatch.countDown();
         }
       }
-    }, JobInput.defaults());
+    }, JobInput.fillCurrent());
 
     m_jobManager.schedule(new IRunnable() {
 
@@ -143,7 +143,7 @@ public class JobManagerTest {
           verifyLatch.countDown();
         }
       }
-    }, JobInput.defaults());
+    }, JobInput.fillCurrent());
 
     assertTrue(setupLatch.await());
 

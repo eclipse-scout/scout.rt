@@ -39,7 +39,7 @@ public final class Jobs {
    * 'Run-now'-style execution will be removed in 5.1.
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable) throws ProcessingException {
-    return Context.defaults().invoke(Executables.callable(executable));
+    return Context.fillCurrent().invoke(Executables.callable(executable));
   }
 
   /**
@@ -67,7 +67,7 @@ public final class Jobs {
    * @see IJobManager#schedule(IExecutable, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable) {
-    return OBJ.get(IJobManager.class).schedule(executable, JobInput.defaults());
+    return OBJ.get(IJobManager.class).schedule(executable, JobInput.fillCurrent());
   }
 
   /**
@@ -115,7 +115,7 @@ public final class Jobs {
    * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit) {
-    return OBJ.get(IJobManager.class).schedule(executable, delay, delayUnit, JobInput.defaults());
+    return OBJ.get(IJobManager.class).schedule(executable, delay, delayUnit, JobInput.fillCurrent());
   }
 
   /**

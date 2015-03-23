@@ -50,13 +50,13 @@ public class ClientJobEventFilterTest {
   public void before() {
     MockitoAnnotations.initMocks(this);
 
-    ClientJobInput clientJobInput = ClientJobInput.empty().session(m_clientSession1);
+    ClientJobInput clientJobInput = ClientJobInput.fillEmpty().session(m_clientSession1);
     when(m_clientJobFuture.getJobInput()).thenReturn(clientJobInput);
 
-    ModelJobInput modelJobInput = ModelJobInput.empty().session(m_clientSession1);
+    ModelJobInput modelJobInput = ModelJobInput.fillEmpty().session(m_clientSession1);
     when(m_modelJobFuture.getJobInput()).thenReturn(modelJobInput);
 
-    JobInput jobInput = JobInput.empty();
+    JobInput jobInput = JobInput.fillEmpty();
     when(m_jobFuture.getJobInput()).thenReturn(jobInput);
   }
 

@@ -171,7 +171,7 @@ public class Context {
   /**
    * Creates a "snapshot" of the current calling context.
    */
-  public static Context defaults() {
+  public static Context fillCurrent() {
     final Context defaults = OBJ.get(Context.class);
     defaults.m_subject = new PreferredValue<>(Subject.getSubject(AccessController.getContext()), false);
     defaults.m_locale = new PreferredValue<>(NlsLocale.CURRENT.get(), false);
@@ -183,7 +183,7 @@ public class Context {
    * Creates an empty {@link Context} with <code>null</code> as preferred {@link Subject} and {@link Locale}. Preferred
    * means, that those values are not derived from other values, but must be set explicitly instead.
    */
-  public static Context empty() {
+  public static Context fillEmpty() {
     final Context empty = OBJ.get(Context.class);
     empty.m_subject = new PreferredValue<>(null, true);
     empty.m_locale = new PreferredValue<>(null, true);

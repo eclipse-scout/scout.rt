@@ -202,7 +202,7 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
   private void addTimer(IFuture<?> future) {
     P_TimerJob runnable = new P_TimerJob(future);
     future.getJobInput().getPropertyMap().put(TIMER_PROPERTY, runnable);
-    ClientJobs.schedule(runnable, getShortOperationMillis(), TimeUnit.MILLISECONDS, ClientJobInput.defaults().sessionRequired(false));
+    ClientJobs.schedule(runnable, getShortOperationMillis(), TimeUnit.MILLISECONDS, ClientJobInput.fillCurrent().sessionRequired(false));
   }
 
   private void removeTimer(IFuture<?> future) {

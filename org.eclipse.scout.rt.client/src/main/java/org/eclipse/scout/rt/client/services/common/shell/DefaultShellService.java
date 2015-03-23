@@ -45,7 +45,7 @@ public class DefaultShellService extends AbstractService implements IShellServic
           public void run() throws Exception {
             clientSession.getDesktop().openUrlInBrowser(path);
           }
-        }, ModelJobInput.defaults().session(clientSession).name("Open url in browser"));
+        }, ModelJobInput.fillCurrent().session(clientSession).name("Open url in browser"));
       }
     }
     else {

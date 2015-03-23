@@ -278,7 +278,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
                 public void run() throws Exception {
                   updateSharedVariableMap(notification.getSharedVariableMap());
                 }
-              }, ModelJobInput.defaults().name("Update shared context"));
+              }, ModelJobInput.fillCurrent().name("Update shared context"));
             }
           }
         }
@@ -483,7 +483,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
           inactivateSession();
         }
       }
-    }, ClientJobInput.defaults().session(this).name("Wait for client jobs to finish before inactivating the session"));
+    }, ClientJobInput.fillCurrent().session(this).name("Wait for client jobs to finish before inactivating the session"));
   }
 
   /**

@@ -156,7 +156,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       public void run() throws Exception {
         interceptLoadItems(minDate, maxDate, result);
       }
-    }, ModelJobInput.defaults().session(session).name(getClass().getSimpleName() + " load items"));
+    }, ModelJobInput.fillCurrent().session(session).name(getClass().getSimpleName() + " load items"));
     future.awaitDoneAndGet();
   }
 
@@ -365,7 +365,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       public void run() throws Exception {
         setLoadInProgress(b);
       }
-    }, ModelJobInput.defaults().name(getClass().getSimpleName() + " prepare"));
+    }, ModelJobInput.fillCurrent().name(getClass().getSimpleName() + " prepare"));
   }
 
   @Override
@@ -425,7 +425,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     if (minDate != null && maxDate != null) {
       long refreshInterval = getRefreshIntervalMillis();
       P_ReloadJob runnable = new P_ReloadJob(minDate, maxDate);
-      ClientJobInput input = ClientJobInput.defaults().session(session).name(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " reload");
+      ClientJobInput input = ClientJobInput.fillCurrent().session(session).name(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " reload");
       if (refreshInterval > 0) {
         // interval load
         m_reloadJob = ClientJobs.scheduleWithFixedDelay(runnable, startDelayMillis, refreshInterval, TimeUnit.MILLISECONDS, input);
@@ -479,7 +479,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
               }
             }
           }
-        }, ModelJobInput.defaults().name(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " setItems"));
+        }, ModelJobInput.fillCurrent().name(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " setItems"));
         future.awaitDoneAndGet();
       }
       finally {

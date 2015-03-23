@@ -68,7 +68,7 @@ public class ModelJobTest {
       public void run() throws Exception {
         modelThread.set(ModelJobs.isModelThread());
       }
-    }, ModelJobInput.empty().session(m_clientSession1)).awaitDoneAndGet();
+    }, ModelJobInput.fillEmpty().session(m_clientSession1)).awaitDoneAndGet();
 
     assertFalse(ModelJobs.isModelThread());
     assertTrue(modelThread.get());
@@ -98,9 +98,9 @@ public class ModelJobTest {
             actualThreadName2.setValue(Thread.currentThread().getName());
             setupLatch.countDown();
           }
-        }, ModelJobInput.defaults().id("200").name("XYZ"));
+        }, ModelJobInput.fillCurrent().id("200").name("XYZ"));
       }
-    }, ModelJobInput.defaults().id("100").name("ABC"));
+    }, ModelJobInput.fillCurrent().id("100").name("ABC"));
 
     assertTrue(setupLatch.await());
 

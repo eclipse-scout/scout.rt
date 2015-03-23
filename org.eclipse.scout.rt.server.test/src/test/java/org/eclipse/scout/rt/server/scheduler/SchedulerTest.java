@@ -48,7 +48,7 @@ public class SchedulerTest {
     subject.getPrincipals().add(new SimplePrincipal("john"));
     subject.setReadOnly();
 
-    m_input = ServerJobInput.empty();
+    m_input = ServerJobInput.fillEmpty();
     m_input.subject(subject);
     m_input.session(OBJ.get(ServerSessionProvider.class).provide(m_input.copy()));
 

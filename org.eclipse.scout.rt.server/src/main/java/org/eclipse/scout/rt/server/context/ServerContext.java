@@ -217,9 +217,9 @@ public class ServerContext extends Context {
   /**
    * Creates a "snapshot" of the current calling server context.
    */
-  public static ServerContext defaults() {
+  public static ServerContext fillCurrent() {
     final ServerContext defaults = OBJ.get(ServerContext.class);
-    defaults.apply(Context.defaults());
+    defaults.apply(Context.fillCurrent());
     defaults.m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
     defaults.servletRequest(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
     defaults.servletResponse(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
@@ -235,9 +235,9 @@ public class ServerContext extends Context {
    * {@link UserAgent}. Preferred means, that those values will not be derived from other values, but must be set
    * explicitly instead.
    */
-  public static ServerContext empty() {
+  public static ServerContext fillEmpty() {
     final ServerContext empty = OBJ.get(ServerContext.class);
-    empty.apply(Context.empty());
+    empty.apply(Context.fillEmpty());
     empty.m_userAgent = new PreferredValue<>(null, true);
     empty.servletRequest(null);
     empty.servletResponse(null);

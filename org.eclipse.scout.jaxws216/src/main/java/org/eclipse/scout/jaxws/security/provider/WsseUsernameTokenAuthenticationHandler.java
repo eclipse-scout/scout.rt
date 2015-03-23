@@ -123,7 +123,7 @@ public class WsseUsernameTokenAuthenticationHandler implements IAuthenticationHa
     if (transactional) {
       final Subject authSubject = createAuthenticatorSubject();
 
-      final ServerJobInput input = ServerJobInput.defaults();
+      final ServerJobInput input = ServerJobInput.fillCurrent();
       input.name("JAX-WS authentication");
       input.subject(authSubject);
       input.session(lookupServerSession(authSubject));
@@ -147,7 +147,7 @@ public class WsseUsernameTokenAuthenticationHandler implements IAuthenticationHa
    */
   @Internal
   protected IServerSession lookupServerSession(final Subject subject) throws ProcessingException {
-    final ServerJobInput input = ServerJobInput.defaults().name("JAX-WS Session").subject(subject);
+    final ServerJobInput input = ServerJobInput.fillCurrent().name("JAX-WS Session").subject(subject);
     return OBJ.get(ServerSessionProviderWithCache.class).provide(input);
   }
 
