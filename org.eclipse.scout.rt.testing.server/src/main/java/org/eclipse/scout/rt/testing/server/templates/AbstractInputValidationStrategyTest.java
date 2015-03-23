@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
@@ -25,7 +26,6 @@ import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
-import org.eclipse.scout.service.ServiceUtility;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -63,7 +63,7 @@ public abstract class AbstractInputValidationStrategyTest {
 
   protected void checkServiceClass(Class<?> serviceClass, Set<Method> collector) throws Exception {
     Collection<Class<?>> interfacesHierarchy = new ArrayList<Class<?>>();
-    for (Class<?> ci : ServiceUtility.getInterfacesHierarchy(serviceClass, Object.class)) {
+    for (Class<?> ci : BeanUtility.getInterfacesHierarchy(serviceClass, Object.class)) {
       interfacesHierarchy.add(ci);
     }
 

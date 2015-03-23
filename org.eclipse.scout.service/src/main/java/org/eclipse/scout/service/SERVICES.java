@@ -15,21 +15,11 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.OBJ;
 
 /**
- * Utility class for querying registered OSGi services
- * <p>
- * There might be log warnings when a service returns null due to factory visiblity decisions. see bug
- * https://bugs.eclipse.org/bugs/show_bug.cgi?id=299351 (solved with eclipse 3.6)
- * <p>
- * see also {@link INullService}
- * <p>
- * Since 4.0 there is a service cache for much better performance. Set the config.ini property
- * <code>org.eclipse.scout.service.cache.enabled=true</code> to use it. Call {@link #clearCache()} to clear it at
- * runtime.
+ * Utility class for querying registered Scout services
  */
 public final class SERVICES {
 
   private SERVICES() {
-
   }
 
   /**

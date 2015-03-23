@@ -10,10 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.service;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.Map;
 
 import org.eclipse.scout.commons.BeanUtility;
@@ -25,6 +23,7 @@ import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.HolderUtility;
 import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ExceptionTranslator;
@@ -32,45 +31,12 @@ import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.service.internal.AbstractHolderArgumentVisitor;
 
 /**
- * Handle calls directly on current sesseion (no remoting)
+ * Handle calls directly on current session (no remoting)
  */
 public final class ServiceUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceUtility.class);
 
   private ServiceUtility() {
-  }
-
-  /**
-   * see {@link INullService} and {@link SERVICES#getService(Class)}
-   * <p>
-   * Creates a void proxy for a service interface that does nothing and uses a classloader that return itself for every
-   * query. This trick voids out the ServiceUse class type check.
-   */
-  public static final INullService NULL_SERVICE;
-
-  static {
-    INullService n = null;
-    try {
-      ClassLoader identityLoader = new ClassLoader(INullService.class.getClassLoader()) {
-        @Override
-        public Class<?> loadClass(String name) throws ClassNotFoundException {
-          if (name.startsWith("java.lang.")) {
-            return super.loadClass(name);
-          }
-          return INullService.class;
-        }
-      };
-      n = (INullService) Proxy.newProxyInstance(identityLoader, new Class<?>[]{INullService.class}, new InvocationHandler() {
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-          return null;
-        }
-      });
-    }
-    catch (Throwable t) {
-      //nop
-    }
-    NULL_SERVICE = n;
   }
 
   /**
@@ -138,7 +104,7 @@ public final class ServiceUtility {
    * @param callerArgs
    * @return the service result
    * @throws ProcessingException
-   *           Invoke the service operation usign reflection. The service supports OUT variables using {@link IHolder}
+   *           Invoke the service operation using reflection. The service supports OUT variables using {@link IHolder}
    *           objects
    */
   public static Object invoke(Method serviceOperation, Object service, Object[] callerArgs) throws ProcessingException {
@@ -216,7 +182,7 @@ public final class ServiceUtility {
   }
 
   /**
-   * Apply changed holder and nvpair values from updatedArgs to callerArgs
+   * Apply changed holder and {@link NVPair} values from updatedArgs to callerArgs
    *
    * @param clearNonOutArgs
    *          if true deletes calerArgs that aren't out parameters
@@ -241,12 +207,4 @@ public final class ServiceUtility {
       }.startVisiting(updatedArgs, callerArgs, 1, false);
     }
   }
-
-  /**
-   * @see BeanUtility#getInterfacesHierarchy(Class, Class)
-   */
-  public static Class[] getInterfacesHierarchy(Class type, Class filterClass) {
-    return BeanUtility.getInterfacesHierarchy(type, filterClass);
-  }
-
 }

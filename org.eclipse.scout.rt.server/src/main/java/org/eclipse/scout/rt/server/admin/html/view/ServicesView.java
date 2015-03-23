@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -32,7 +33,6 @@ import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
-import org.eclipse.scout.service.ServiceUtility;
 
 public class ServicesView extends DefaultView {
   private static final long serialVersionUID = -3977567784149624349L;
@@ -110,7 +110,7 @@ public class ServicesView extends DefaultView {
             sectionName = "Lookup Services";
           }
           else {
-            Class[] serviceInterfaces = ServiceUtility.getInterfacesHierarchy(inspector.getService().getClass(), Object.class);
+            Class[] serviceInterfaces = BeanUtility.getInterfacesHierarchy(inspector.getService().getClass(), Object.class);
             Class topInterface = (serviceInterfaces.length > 0 ? serviceInterfaces[serviceInterfaces.length - 1] : null);
             if (topInterface != null && topInterface.getPackage() != null && topInterface.getPackage().getName().indexOf(".common.") >= 0) {
               sectionOrder = 4;
@@ -204,10 +204,10 @@ public class ServicesView extends DefaultView {
     Class serviceClass = service.getService().getClass();
     ArrayList<Class> interfaceHierarchy = new ArrayList<Class>();
     for (Class c : serviceClass.getInterfaces()) {
-      interfaceHierarchy.addAll(Arrays.asList(ServiceUtility.getInterfacesHierarchy(c, Object.class)));
+      interfaceHierarchy.addAll(Arrays.asList(BeanUtility.getInterfacesHierarchy(c, Object.class)));
     }
     if (interfaceHierarchy.size() == 0) {
-      interfaceHierarchy.addAll(Arrays.asList(ServiceUtility.getInterfacesHierarchy(serviceClass, Object.class)));
+      interfaceHierarchy.addAll(Arrays.asList(BeanUtility.getInterfacesHierarchy(serviceClass, Object.class)));
     }
     interfaceHierarchy.add(serviceClass);
     ArrayList<Class> classHierarchy = new ArrayList<Class>();
