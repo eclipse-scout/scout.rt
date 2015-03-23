@@ -24,7 +24,7 @@ public class SearchFormTableControl extends AbstractTableControl {
   @Override
   protected void initConfig() {
     super.initConfig();
-    setIconId("\uF002"); // Icons.Search
+    setIconId("font:\uF002"); // Icons.Search
     setTooltipText("Search");
   }
 

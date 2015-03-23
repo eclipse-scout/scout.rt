@@ -26,7 +26,7 @@ public class AbstractSearchOutline extends AbstractOutline implements ISearchOut
 
   @Override
   protected String getConfiguredIconId() {
-    return "\\f002"; //Icons.Search
+    return "font:\uf002"; //Icons.Search
   }
 
   @Override
