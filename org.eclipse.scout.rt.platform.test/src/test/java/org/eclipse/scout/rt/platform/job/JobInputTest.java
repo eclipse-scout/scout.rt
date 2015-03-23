@@ -72,19 +72,19 @@ public class JobInputTest {
   }
 
   @Test
-  public void testDefaultName() {
+  public void testFillCurrentName() {
     assertNull(JobInput.fillCurrent().getName());
     assertEquals("ABC", JobInput.fillCurrent().name("ABC").getName());
   }
 
   @Test
-  public void testDefaultId() {
+  public void testFillCurrentId() {
     assertNull(JobInput.fillCurrent().getId());
     assertEquals("123", JobInput.fillCurrent().id("123").getId());
   }
 
   @Test
-  public void testDefaultSubject() {
+  public void testFillCurrentSubject() {
     assertNull(JobInput.fillCurrent().getSubject());
 
     Subject subject = new Subject();
@@ -110,7 +110,7 @@ public class JobInputTest {
   }
 
   @Test
-  public void testDefaultPropertyMap() {
+  public void testFillCurrentPropertyMap() {
     PropertyMap propertyMap = new PropertyMap();
     propertyMap.put("prop", "value");
 
@@ -125,7 +125,7 @@ public class JobInputTest {
   }
 
   @Test
-  public void testDefaultLocale() {
+  public void testFillCurrentLocale() {
     NlsLocale.CURRENT.remove();
     assertNull(JobInput.fillCurrent().getLocale());
 

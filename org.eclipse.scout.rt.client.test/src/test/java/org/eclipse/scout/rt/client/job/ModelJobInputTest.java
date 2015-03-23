@@ -108,7 +108,7 @@ public class ModelJobInputTest {
   // === Test methods of ModelJobInputTest ===
 
   @Test
-  public void testEmpty() {
+  public void testFillEmpty() {
     ModelJobInput input = ModelJobInput.fillEmpty();
     assertNotNull(input.getContext());
     assertNull(input.getName());
@@ -144,19 +144,19 @@ public class ModelJobInputTest {
   }
 
   @Test
-  public void testDefaultName() {
+  public void testFillCurrentName() {
     assertNull(ModelJobInput.fillCurrent().getName());
     assertEquals("ABC", ModelJobInput.fillCurrent().name("ABC").getName());
   }
 
   @Test
-  public void testDefaultId() {
+  public void testFillCurrentId() {
     assertNull(ModelJobInput.fillCurrent().getId());
     assertEquals("123", ModelJobInput.fillCurrent().id("123").getId());
   }
 
   @Test
-  public void testDefaultSubject() {
+  public void testFillCurrentSubject() {
     assertNull(ModelJobInput.fillCurrent().getSubject());
 
     Subject subject = new Subject();
@@ -182,7 +182,7 @@ public class ModelJobInputTest {
   }
 
   @Test
-  public void testDefaultSessionRequired() {
+  public void testFillCurrentSessionRequired() {
     assertTrue(ModelJobInput.fillCurrent().isSessionRequired());
   }
 
@@ -192,7 +192,7 @@ public class ModelJobInputTest {
   }
 
   @Test
-  public void testDefaultSession() {
+  public void testFillCurrentSession() {
     // No session on ThreadLocal
     ISession.CURRENT.remove();
 
@@ -208,7 +208,7 @@ public class ModelJobInputTest {
   }
 
   @Test
-  public void testDefaultLocale() {
+  public void testFillCurrentLocale() {
     IClientSession session = mock(IClientSession.class);
 
     // ThreadLocal set, Session set with Locale --> Locale from session
@@ -235,7 +235,7 @@ public class ModelJobInputTest {
   }
 
   @Test
-  public void testDefaultLocaleAndSetNullLocale() {
+  public void testFillCurrentLocaleAndSetNullLocale() {
     IClientSession session = mock(IClientSession.class);
 
     // ThreadLocal set, Session set with Locale --> explicit Locale (null)
@@ -262,7 +262,7 @@ public class ModelJobInputTest {
   }
 
   @Test
-  public void testDefaultLocaleAndSetNotNullLocale() {
+  public void testFillCurrentLocaleAndSetNotNullLocale() {
     IClientSession session = mock(IClientSession.class);
 
     // ThreadLocal set, Session set with Locale --> explicit Locale (JAPAN)
@@ -326,7 +326,7 @@ public class ModelJobInputTest {
   }
 
   @Test
-  public void testDefaultUserAgent() {
+  public void testFillCurrentUserAgent() {
     IClientSession session = mock(IClientSession.class);
     UserAgent userAgent1 = newUserAgent();
     UserAgent userAgent2 = newUserAgent();
@@ -355,7 +355,7 @@ public class ModelJobInputTest {
   }
 
   @Test
-  public void testDefaultUserAgentAndSetNullUserAgent() {
+  public void testFillCurrentUserAgentAndSetNullUserAgent() {
     IClientSession session = mock(IClientSession.class);
     UserAgent userAgent1 = newUserAgent();
     UserAgent userAgent2 = newUserAgent();
@@ -384,7 +384,7 @@ public class ModelJobInputTest {
   }
 
   @Test
-  public void testDefaultUserAgentAndSetNotNullUserAgent() {
+  public void testFillCurrentUserAgentAndSetNotNullUserAgent() {
     IClientSession session = mock(IClientSession.class);
     UserAgent userAgent1 = newUserAgent();
     UserAgent userAgent2 = newUserAgent();
@@ -453,7 +453,7 @@ public class ModelJobInputTest {
   }
 
   @Test
-  public void testDefaultPropertyMap() {
+  public void testFillCurrentPropertyMap() {
     PropertyMap threadLocalContext = new PropertyMap();
     threadLocalContext.put("prop", "value");
 
