@@ -31,6 +31,14 @@ scout.ProposalChooser.prototype._renderProperties = function() {
   this._updateStatus();
 };
 
+/**
+ * Delegates an event (e.g. keyup, keydown) to the model.$container of this instance,
+ * calling the JQuery trigger method.
+ */
+scout.ProposalChooser.prototype.delegateEvent = function(event) {
+  this.model.$container.trigger(event);
+};
+
 scout.ProposalChooser.prototype._renderStatus = function() {
   this._updateStatus();
 };

@@ -79,8 +79,8 @@ scout.AbstractSmartField.prototype._onIconClick = function(event) {
 };
 
 // navigate in options
-scout.AbstractSmartField.prototype._onKeyDown = function(e) {
-  if (e.which === scout.keys.TAB) {
+scout.AbstractSmartField.prototype._onKeyDown = function(event) {
+  if (event.which === scout.keys.TAB) {
     if (this._selectedOption > -1) {
       // FIXME AWE: (smart-field) apply selected proposal on TAB
       this._applyOption(value);
@@ -89,31 +89,21 @@ scout.AbstractSmartField.prototype._onKeyDown = function(e) {
     return;
   }
 
-  if (this._isNavigationKey(e)) {
+  if (this._isNavigationKey(event)) {
     // ensure popup is opened for following operations
     if (this._openPopup()) {
       return;
     }
 
-    var pos = this._selectedOption,
-      $options = this._get$Options(true);
-    switch (e.which) {
+    switch (event.which) {
       case scout.keys.PAGE_UP:
-        pos -= 10;
-        break;
       case scout.keys.PAGE_DOWN:
-        pos += 10;
-        break;
       case scout.keys.UP:
-        pos--;
-        break;
       case scout.keys.DOWN:
-        pos++;
+        if (this.proposalChooser) {
+          this.proposalChooser.delegateEvent(event);
+        }
         break;
-    }
-    pos = Math.min(Math.max(0, pos), $options.length - 1);
-    if (pos !== this._selectedOption) {
-      this._selectOption($options, pos);
     }
   }
 };
