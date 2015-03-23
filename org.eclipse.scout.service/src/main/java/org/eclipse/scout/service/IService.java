@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.service;
 
-
 /**
  * Convenience service interface for services that are interested in beeing
  * notified when they are lazily created.
@@ -26,7 +25,7 @@ package org.eclipse.scout.service;
  * <ul>
  * <li>OfflineState - indicates whether the osgi is running in offline mode or online mode</li>
  * <li>TierState - indicates whether the osgi is running in back-end, front-end or undetermined. The value can be set
- * using <code>scout.osgi.tier=frontend (or backend)</code></li>
+ * using <code>scout.tier=frontend (or backend)</code></li>
  * </ul>
  * <h2>Service visibilities</h2>
  *
@@ -146,7 +145,7 @@ package org.eclipse.scout.service;
  * Online Mode in client (even though there are offline plugins available) is FE and ON
  * </p>
  * <p>
- * Wicklet in server is BE and ON
+ * Wicket in server is BE and ON
  * </p>
  *
  * @since 1.0.0 see also {@link org.eclipse.scout.commons.annotations.Priority} for defining service ranking
