@@ -33,7 +33,7 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.context.Context;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -363,7 +363,7 @@ public class JobManager implements IJobManager {
    * @return the head of the chain to be invoked first.
    */
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final JobInput input) {
-    final Callable<RESULT> c3 = new ApplyContextCallable<RESULT>(next, input.getContext());
+    final Callable<RESULT> c3 = new ApplyContextCallable<RESULT>(next, input.getRunContext());
     final Callable<RESULT> c2 = new ThreadNameDecorator<RESULT>(c3, input.getThreadName(), input.getIdentifier());
     final Callable<RESULT> c1 = new ExceptionTranslator<>(c2, input);
 
@@ -384,15 +384,15 @@ public class JobManager implements IJobManager {
 
   /**
    * Method invoked to validate the given input. The default implementation ensures the input not to be
-   * <code>null</code> and calls {@link Context#validate}.
+   * <code>null</code> and calls {@link RunContext#validate}.
    *
    * @throws AssertionException
    *           thrown if the input is not valid.
    */
   protected void validate(final JobInput input) {
-    Assertions.assertNotNull(input, "job-input must not be null");
-    Assertions.assertNotNull(input.getContext(), "context must not be null");
-    input.getContext().validate();
+    Assertions.assertNotNull(input, "'JobInput' must not be null");
+    Assertions.assertNotNull(input.getRunContext(), "'RunContext' must not be null");
+    input.getRunContext().validate();
   }
 
   @Override

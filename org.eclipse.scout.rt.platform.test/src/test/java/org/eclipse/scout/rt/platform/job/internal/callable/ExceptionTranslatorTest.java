@@ -34,7 +34,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.rt.platform.context.Context.ContextInvocationException;
+import org.eclipse.scout.rt.platform.context.RunContext.ContextInvocationException;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

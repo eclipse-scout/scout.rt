@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.platform.context.Context;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.internal.Executables;
 
 /**
@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.job.internal.Executables;
  * @since 5.1
  * @see IJobManager
  * @see JobInput
- * @see Context
+ * @see RunContext
  */
 public final class Jobs {
 
@@ -39,14 +39,14 @@ public final class Jobs {
    * 'Run-now'-style execution will be removed in 5.1.
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable) throws ProcessingException {
-    return Context.fillCurrent().invoke(Executables.callable(executable));
+    return RunContext.fillCurrent().invoke(Executables.callable(executable));
   }
 
   /**
    * 'Run-now'-style execution will be removed in 5.1.
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable, final JobInput input) throws ProcessingException {
-    return input.getContext().invoke(Executables.callable(executable));
+    return input.getRunContext().invoke(Executables.callable(executable));
   }
 
   /**

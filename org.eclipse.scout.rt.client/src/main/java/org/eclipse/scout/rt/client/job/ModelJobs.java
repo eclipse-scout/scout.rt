@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientContext;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
  *
  * @since 5.1
  * @see IJobManager
- * @see ClientContext
+ * @see ClientRunContext
  * @see ModelJobInput
  */
 public final class ModelJobs {
@@ -48,7 +48,7 @@ public final class ModelJobs {
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable) throws ProcessingException {
     Assertions.assertTrue(isModelThread(), "The current thread must be the model thread");
-    return ClientContext.fillCurrent().invoke(Executables.callable(executable));
+    return ClientRunContext.fillCurrent().invoke(Executables.callable(executable));
   }
 
   /**
@@ -56,7 +56,7 @@ public final class ModelJobs {
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable, final ModelJobInput input) throws ProcessingException {
     Assertions.assertTrue(isModelThread(), "The current thread must be the model thread");
-    return input.getContext().invoke(Executables.callable(executable));
+    return input.getRunContext().invoke(Executables.callable(executable));
   }
 
   /**
@@ -169,7 +169,7 @@ public final class ModelJobs {
    * Returns <code>true</code> if the current Future belongs to a model job.
    *
    * @see ModelJobInput
-   * @see ClientContext
+   * @see ClientRunContext
    */
   public static boolean isModelJob() {
     return ModelJobs.isModelJob(IFuture.CURRENT.get());
@@ -179,7 +179,7 @@ public final class ModelJobs {
    * Returns <code>true</code> if the given Future belongs to a model job.
    *
    * @see ModelJobInput
-   * @see ClientContext
+   * @see ClientRunContext
    */
   public static boolean isModelJob(final IFuture<?> future) {
     return future != null && ModelJobInput.class.equals(future.getJobInput().getClass());

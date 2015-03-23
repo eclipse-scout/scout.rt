@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.platform.context.Context;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.PreferredValue;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.platform.job.internal.callable.InitThreadLocalCallable;
@@ -70,9 +70,9 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * </ul>
  *
  * @since 5.1
- * @see Context
+ * @see RunContext
  */
-public class ServerContext extends Context {
+public class ServerRunContext extends RunContext {
 
   protected IServerSession m_session;
   protected boolean m_sessionRequired;
@@ -82,7 +82,7 @@ public class ServerContext extends Context {
   protected long m_transactionId;
   private boolean m_transactional;
 
-  protected ServerContext() {
+  protected ServerRunContext() {
   }
 
   @Override
@@ -119,7 +119,7 @@ public class ServerContext extends Context {
    * <strong>There are no other values derived from the given session, meaning that {@link Subject}, {@link Locale} and
    * {@link UserAgent} must be set accordingly.</strong>
    */
-  public ServerContext session(final IServerSession session) {
+  public ServerRunContext session(final IServerSession session) {
     m_session = session;
     return this;
   }
@@ -131,7 +131,7 @@ public class ServerContext extends Context {
   /**
    * Set to <code>false</code> if the context does not require a session. By default, a session is required.
    */
-  public ServerContext sessionRequired(final boolean sessionRequired) {
+  public ServerRunContext sessionRequired(final boolean sessionRequired) {
     m_sessionRequired = sessionRequired;
     return this;
   }
@@ -140,7 +140,7 @@ public class ServerContext extends Context {
     return m_servletRequest;
   }
 
-  public ServerContext servletRequest(final HttpServletRequest servletRequest) {
+  public ServerRunContext servletRequest(final HttpServletRequest servletRequest) {
     m_servletRequest = servletRequest;
     return this;
   }
@@ -149,7 +149,7 @@ public class ServerContext extends Context {
     return m_servletResponse;
   }
 
-  public ServerContext servletResponse(final HttpServletResponse servletResponse) {
+  public ServerRunContext servletResponse(final HttpServletResponse servletResponse) {
     m_servletResponse = servletResponse;
     return this;
   }
@@ -158,7 +158,7 @@ public class ServerContext extends Context {
     return m_userAgent.get();
   }
 
-  public ServerContext userAgent(final UserAgent userAgent) {
+  public ServerRunContext userAgent(final UserAgent userAgent) {
     m_userAgent.set(userAgent, true);
     return this;
   }
@@ -167,7 +167,7 @@ public class ServerContext extends Context {
     return m_transactionId;
   }
 
-  public ServerContext transactionId(final long transactionId) {
+  public ServerRunContext transactionId(final long transactionId) {
     m_transactionId = transactionId;
     return this;
   }
@@ -176,26 +176,26 @@ public class ServerContext extends Context {
     return m_transactional;
   }
 
-  public ServerContext transactional(final boolean transactional) {
+  public ServerRunContext transactional(final boolean transactional) {
     m_transactional = transactional;
     return this;
   }
 
   @Override
-  public ServerContext subject(final Subject subject) {
-    return (ServerContext) super.subject(subject);
+  public ServerRunContext subject(final Subject subject) {
+    return (ServerRunContext) super.subject(subject);
   }
 
   @Override
-  public ServerContext locale(final Locale locale) {
-    return (ServerContext) super.locale(locale);
+  public ServerRunContext locale(final Locale locale) {
+    return (ServerRunContext) super.locale(locale);
   }
 
   // === construction methods ===
 
   @Override
-  public ServerContext copy() {
-    final ServerContext copy = OBJ.get(ServerContext.class);
+  public ServerRunContext copy() {
+    final ServerRunContext copy = OBJ.get(ServerRunContext.class);
     copy.apply(this);
     return copy;
   }
@@ -203,7 +203,7 @@ public class ServerContext extends Context {
   /**
    * Applies the given context-values to <code>this</code> context.
    */
-  protected void apply(final ServerContext origin) {
+  protected void apply(final ServerRunContext origin) {
     super.apply(origin);
     m_session = origin.m_session;
     m_sessionRequired = origin.m_sessionRequired;
@@ -217,9 +217,9 @@ public class ServerContext extends Context {
   /**
    * Creates a "snapshot" of the current calling server context.
    */
-  public static ServerContext fillCurrent() {
-    final ServerContext defaults = OBJ.get(ServerContext.class);
-    defaults.apply(Context.fillCurrent());
+  public static ServerRunContext fillCurrent() {
+    final ServerRunContext defaults = OBJ.get(ServerRunContext.class);
+    defaults.apply(RunContext.fillCurrent());
     defaults.m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
     defaults.servletRequest(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
     defaults.servletResponse(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
@@ -235,9 +235,9 @@ public class ServerContext extends Context {
    * {@link UserAgent}. Preferred means, that those values will not be derived from other values, but must be set
    * explicitly instead.
    */
-  public static ServerContext fillEmpty() {
-    final ServerContext empty = OBJ.get(ServerContext.class);
-    empty.apply(Context.fillEmpty());
+  public static ServerRunContext fillEmpty() {
+    final ServerRunContext empty = OBJ.get(ServerRunContext.class);
+    empty.apply(RunContext.fillEmpty());
     empty.m_userAgent = new PreferredValue<>(null, true);
     empty.servletRequest(null);
     empty.servletResponse(null);

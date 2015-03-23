@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.platform.job.internal.callable;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.rt.platform.context.Context;
+import org.eclipse.scout.rt.platform.context.RunContext;
 
 /**
- * Processor to run the subsequent sequence of actions on behalf of the given {@link Context}.
+ * Processor to run the subsequent sequence of actions on behalf of the given {@link RunContext}.
  * <p/>
  * This {@link Callable} is a processing object in the language of the design pattern 'chain-of-responsibility'.
  *
@@ -27,16 +27,16 @@ import org.eclipse.scout.rt.platform.context.Context;
 public class ApplyContextCallable<RESULT> implements Callable<RESULT>, Chainable<RESULT> {
 
   private final Callable<RESULT> m_next;
-  private final Context m_context;
+  private final RunContext m_runContext;
 
-  public ApplyContextCallable(final Callable<RESULT> next, final Context context) {
+  public ApplyContextCallable(final Callable<RESULT> next, final RunContext runContext) {
     m_next = Assertions.assertNotNull(next);
-    m_context = Assertions.assertNotNull(context);
+    m_runContext = Assertions.assertNotNull(runContext);
   }
 
   @Override
   public RESULT call() throws Exception {
-    return m_context.invoke(m_next);
+    return m_runContext.invoke(m_next);
   }
 
   @Override

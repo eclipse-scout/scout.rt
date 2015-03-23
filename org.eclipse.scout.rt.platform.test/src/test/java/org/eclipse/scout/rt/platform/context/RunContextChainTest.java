@@ -8,25 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.context;
+package org.eclipse.scout.rt.platform.context;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.platform.job.internal.callable.Chainable;
 import org.eclipse.scout.rt.platform.job.internal.callable.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.SubjectCallable;
-import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +28,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(PlatformTestRunner.class)
-public class ClientContextChainTest {
+public class RunContextChainTest {
 
   @Mock
   private Callable<Void> m_targetCallable;
@@ -42,20 +36,14 @@ public class ClientContextChainTest {
   @Before
   public void before() {
     MockitoAnnotations.initMocks(this);
-    ISession.CURRENT.set(mock(IClientSession.class));
-  }
-
-  @After
-  public void after() {
-    ISession.CURRENT.remove();
   }
 
   /**
-   * Tests the correct order of interceptors in {@link ClientContext}.
+   * Tests the correct order of interceptors in {@link RunContext}.
    */
   @Test
   public void testCallableChain() throws Exception {
-    Callable<Void> actualCallable = new ClientContext().interceptCallable(m_targetCallable);
+    Callable<Void> actualCallable = new RunContext().interceptCallable(m_targetCallable);
 
     // 1. SubjectCallable
     SubjectCallable c1 = getFirstAndAssert(actualCallable, SubjectCallable.class);
@@ -68,20 +56,8 @@ public class ClientContextChainTest {
     InitThreadLocalCallable c3 = getNextAndAssert(c2, InitThreadLocalCallable.class);
     assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c3).getThreadLocal());
 
-    // 4. InitThreadLocalCallable for ISession.CURRENT
-    InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
-    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
-
-    // 5. InitThreadLocalCallable for UserAgent.CURRENT
-    InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(UserAgent.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
-
-    // 6. InitThreadLocalCallable for ScoutTexts.CURRENT
-    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
-
-    // 7. Target
-    assertSame(m_targetCallable, c6.getNext());
+    // 4. Target
+    assertSame(m_targetCallable, c3.getNext());
   }
 
   /**
@@ -89,7 +65,7 @@ public class ClientContextChainTest {
    */
   @Test
   public void testCallableChainWithContributionsAfter() throws Exception {
-    ClientContext clientContext = new ClientContext() {
+    RunContext runContext = new RunContext() {
 
       @Override
       protected <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next) {
@@ -100,7 +76,7 @@ public class ClientContextChainTest {
       }
     };
 
-    Callable<Void> actualCallable = clientContext.interceptCallable(m_targetCallable);
+    Callable<Void> actualCallable = runContext.interceptCallable(m_targetCallable);
 
     // 1. SubjectCallable
     SubjectCallable c1 = getFirstAndAssert(actualCallable, SubjectCallable.class);
@@ -113,26 +89,14 @@ public class ClientContextChainTest {
     InitThreadLocalCallable c3 = getNextAndAssert(c2, InitThreadLocalCallable.class);
     assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c3).getThreadLocal());
 
-    // 4. InitThreadLocalCallable for ISession.CURRENT
-    InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
-    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
+    // 4. Contribution1
+    Contribution1 c4 = getNextAndAssert(c3, Contribution1.class);
 
-    // 5. InitThreadLocalCallable for UserAgent.CURRENT
-    InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(UserAgent.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
+    // 5. Contribution2
+    Contribution2 c5 = getNextAndAssert(c4, Contribution2.class);
 
-    // 6. InitThreadLocalCallable for ScoutTexts.CURRENT
-    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
-
-    // 7. Contribution1
-    Contribution1 c7 = getNextAndAssert(c6, Contribution1.class);
-
-    // 8. Contribution2
-    Contribution2 c8 = getNextAndAssert(c7, Contribution2.class);
-
-    // 9. Target
-    assertSame(m_targetCallable, c8.getNext());
+    // 6. Target
+    assertSame(m_targetCallable, c5.getNext());
   }
 
   /**
@@ -140,7 +104,7 @@ public class ClientContextChainTest {
    */
   @Test
   public void testCallableChainWithContributionsBefore() throws Exception {
-    ClientContext clientContext = new ClientContext() {
+    RunContext runContext = new RunContext() {
 
       @Override
       protected <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next) {
@@ -151,7 +115,7 @@ public class ClientContextChainTest {
       }
     };
 
-    Callable<Void> actualCallable = clientContext.interceptCallable(m_targetCallable);
+    Callable<Void> actualCallable = runContext.interceptCallable(m_targetCallable);
 
     // 1. Contribution1
     Contribution1 c1 = getFirstAndAssert(actualCallable, Contribution1.class);
@@ -170,20 +134,8 @@ public class ClientContextChainTest {
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
     assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    // 6. InitThreadLocalCallable for ISession.CURRENT
-    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
-
-    // 7. InitThreadLocalCallable for UserAgent.CURRENT
-    InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
-    assertSame(UserAgent.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
-
-    // 8. InitThreadLocalCallable for ScoutTexts.CURRENT
-    InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
-    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
-
-    // 9. Target
-    assertSame(m_targetCallable, c8.getNext());
+    // 6. Target
+    assertSame(m_targetCallable, c5.getNext());
   }
 
   @SuppressWarnings("unchecked")

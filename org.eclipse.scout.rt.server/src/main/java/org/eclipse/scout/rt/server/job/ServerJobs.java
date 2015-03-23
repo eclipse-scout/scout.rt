@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.internal.Executables;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.context.ServerContext;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
 
 /**
  * Factory and utility methods for {@link IJobManager} to schedule and interact with server jobs.
@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.server.context.ServerContext;
  * @since 5.1
  * @see IJobManager
  * @see ServerJobInput
- * @see ServerContext
+ * @see ServerRunContext
  */
 public final class ServerJobs {
 
@@ -44,14 +44,14 @@ public final class ServerJobs {
    * 'Run-now'-style execution will be removed in 5.1.
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable) throws ProcessingException {
-    return ServerContext.fillCurrent().invoke(Executables.callable(executable));
+    return ServerRunContext.fillCurrent().invoke(Executables.callable(executable));
   }
 
   /**
    * 'Run-now'-style execution will be removed in 5.1.
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable, final ServerJobInput input) throws ProcessingException {
-    return input.getContext().invoke(Executables.callable(executable));
+    return input.getRunContext().invoke(Executables.callable(executable));
   }
 
   /**
@@ -199,7 +199,7 @@ public final class ServerJobs {
    * Returns <code>true</code> if the current Future belongs to a server job.
    *
    * @see ServerJobInput
-   * @see ServerContext
+   * @see ServerRunContext
    */
   public static boolean isServerJob() {
     return ServerJobs.isServerJob(IFuture.CURRENT.get());
@@ -209,7 +209,7 @@ public final class ServerJobs {
    * Returns <code>true</code> if the given Future belongs to a server job.
    *
    * @see ServerJobInput
-   * @see ServerContext
+   * @see ServerRunContext
    */
   public static boolean isServerJob(final IFuture<?> future) {
     return future != null && ServerJobInput.class.equals(future.getJobInput().getClass());

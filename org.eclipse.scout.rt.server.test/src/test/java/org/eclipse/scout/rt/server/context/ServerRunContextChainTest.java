@@ -37,7 +37,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(PlatformTestRunner.class)
-public class ServerContextChainTest {
+public class ServerRunContextChainTest {
 
   @Mock
   private Callable<Void> m_targetCallable;
@@ -54,11 +54,11 @@ public class ServerContextChainTest {
   }
 
   /**
-   * Tests the correct order of interceptors in {@link ServerContext}.
+   * Tests the correct order of interceptors in {@link ServerRunContext}.
    */
   @Test
   public void testCallableChain() throws Exception {
-    Callable<Void> actualCallable = new ServerContext().interceptCallable(m_targetCallable);
+    Callable<Void> actualCallable = new ServerRunContext().interceptCallable(m_targetCallable);
 
     // 1. SubjectCallable
     SubjectCallable c1 = getFirstAndAssert(actualCallable, SubjectCallable.class);
@@ -111,7 +111,7 @@ public class ServerContextChainTest {
    */
   @Test
   public void testCallableChainWithContributionsAfter() throws Exception {
-    ServerContext serverContext = new ServerContext() {
+    ServerRunContext serverRunContext = new ServerRunContext() {
 
       @Override
       protected <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next) {
@@ -122,7 +122,7 @@ public class ServerContextChainTest {
       }
     };
 
-    Callable<Void> actualCallable = serverContext.interceptCallable(m_targetCallable);
+    Callable<Void> actualCallable = serverRunContext.interceptCallable(m_targetCallable);
 
     // 1. SubjectCallable
     SubjectCallable c1 = getFirstAndAssert(actualCallable, SubjectCallable.class);
@@ -181,7 +181,7 @@ public class ServerContextChainTest {
    */
   @Test
   public void testCallableChainWithContributionsBefore() throws Exception {
-    ServerContext serverContext = new ServerContext() {
+    ServerRunContext serverRunContext = new ServerRunContext() {
 
       @Override
       protected <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next) {
@@ -192,7 +192,7 @@ public class ServerContextChainTest {
       }
     };
 
-    Callable<Void> actualCallable = serverContext.interceptCallable(m_targetCallable);
+    Callable<Void> actualCallable = serverRunContext.interceptCallable(m_targetCallable);
 
     // 1. Contribution1
     Contribution1 c1 = getFirstAndAssert(actualCallable, Contribution1.class);

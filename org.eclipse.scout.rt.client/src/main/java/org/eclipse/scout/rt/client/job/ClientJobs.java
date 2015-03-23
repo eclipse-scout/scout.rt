@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientContext;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.platform.job.internal.Executables;
  *
  * @since 5.1
  * @see IJobManager
- * @see ClientContext
+ * @see ClientRunContext
  * @see ClientJobInput
  */
 public final class ClientJobs {
@@ -44,14 +44,14 @@ public final class ClientJobs {
    * 'Run-now'-style execution will be removed in 5.1.
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable) throws ProcessingException {
-    return ClientContext.fillCurrent().invoke(Executables.callable(executable));
+    return ClientRunContext.fillCurrent().invoke(Executables.callable(executable));
   }
 
   /**
    * 'Run-now'-style execution will be removed in 5.1.
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable, final ClientJobInput input) throws ProcessingException {
-    return input.getContext().invoke(Executables.callable(executable));
+    return input.getRunContext().invoke(Executables.callable(executable));
   }
 
   /**
@@ -199,7 +199,7 @@ public final class ClientJobs {
    * Returns <code>true</code> if the current Future belongs to a client job.
    *
    * @see ClientJobInput
-   * @see ClientContext
+   * @see ClientRunContext
    */
   public static boolean isClientJob() {
     return ClientJobs.isClientJob(IFuture.CURRENT.get());
@@ -209,7 +209,7 @@ public final class ClientJobs {
    * Returns <code>true</code> if the given Future belongs to a client job.
    *
    * @see ClientJobInput
-   * @see ClientContext
+   * @see ClientRunContext
    */
   public static boolean isClientJob(final IFuture<?> future) {
     return future != null && ClientJobInput.class.equals(future.getJobInput().getClass());

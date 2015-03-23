@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.platform.context.Context;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.PreferredValue;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.platform.job.internal.callable.InitThreadLocalCallable;
@@ -58,15 +58,15 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * </ul>
  *
  * @since 5.1
- * @see Context
+ * @see RunContext
  */
-public class ClientContext extends Context {
+public class ClientRunContext extends RunContext {
 
   protected IClientSession m_session;
   protected boolean m_sessionRequired;
   protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
 
-  protected ClientContext() {
+  protected ClientRunContext() {
   }
 
   @Override
@@ -95,7 +95,7 @@ public class ClientContext extends Context {
    * Set the session and its {@link Locale}, {@link UserAgent} and {@link Subject} as derived values. Those derived
    * values are only set if not explicitly set yet.
    */
-  public ClientContext session(final IClientSession session) {
+  public ClientRunContext session(final IClientSession session) {
     m_session = session;
     if (session != null) {
       m_locale.set(session.getLocale(), false);
@@ -112,7 +112,7 @@ public class ClientContext extends Context {
   /**
    * Set to <code>false</code> if the context does not require a session. By default, a session is required.
    */
-  public ClientContext sessionRequired(final boolean sessionRequired) {
+  public ClientRunContext sessionRequired(final boolean sessionRequired) {
     m_sessionRequired = sessionRequired;
     return this;
   }
@@ -121,26 +121,26 @@ public class ClientContext extends Context {
     return m_userAgent.get();
   }
 
-  public ClientContext userAgent(final UserAgent userAgent) {
+  public ClientRunContext userAgent(final UserAgent userAgent) {
     m_userAgent.set(userAgent, true);
     return this;
   }
 
   @Override
-  public ClientContext subject(final Subject subject) {
-    return (ClientContext) super.subject(subject);
+  public ClientRunContext subject(final Subject subject) {
+    return (ClientRunContext) super.subject(subject);
   }
 
   @Override
-  public ClientContext locale(final Locale locale) {
-    return (ClientContext) super.locale(locale);
+  public ClientRunContext locale(final Locale locale) {
+    return (ClientRunContext) super.locale(locale);
   }
 
   // === construction methods ===
 
   @Override
-  public ClientContext copy() {
-    final ClientContext copy = OBJ.get(ClientContext.class);
+  public ClientRunContext copy() {
+    final ClientRunContext copy = OBJ.get(ClientRunContext.class);
     copy.apply(this);
     return copy;
   }
@@ -148,7 +148,7 @@ public class ClientContext extends Context {
   /**
    * Applies the given context-values to <code>this</code> context.
    */
-  protected void apply(final ClientContext origin) {
+  protected void apply(final ClientRunContext origin) {
     super.apply(origin);
     m_userAgent = origin.m_userAgent;
     m_sessionRequired = origin.m_sessionRequired;
@@ -158,9 +158,9 @@ public class ClientContext extends Context {
   /**
    * Creates a "snapshot" of the current calling client context.
    */
-  public static ClientContext fillCurrent() {
-    final ClientContext defaults = OBJ.get(ClientContext.class);
-    defaults.apply(Context.fillCurrent());
+  public static ClientRunContext fillCurrent() {
+    final ClientRunContext defaults = OBJ.get(ClientRunContext.class);
+    defaults.apply(RunContext.fillCurrent());
     defaults.m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
     defaults.sessionRequired(false);
     defaults.session(ClientSessionProvider.currentSession());
@@ -168,13 +168,13 @@ public class ClientContext extends Context {
   }
 
   /**
-   * Creates an empty {@link ClientContext} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
+   * Creates an empty {@link ClientRunContext} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
    * {@link UserAgent}. Preferred means, that those values will not be derived from other values, e.g. when setting the
    * session, but must be set explicitly instead.
    */
-  public static ClientContext fillEmpty() {
-    final ClientContext empty = OBJ.get(ClientContext.class);
-    empty.apply(Context.fillEmpty());
+  public static ClientRunContext fillEmpty() {
+    final ClientRunContext empty = OBJ.get(ClientRunContext.class);
+    empty.apply(RunContext.fillEmpty());
     empty.m_userAgent = new PreferredValue<>(null, true);
     empty.sessionRequired(false);
     empty.session(null);

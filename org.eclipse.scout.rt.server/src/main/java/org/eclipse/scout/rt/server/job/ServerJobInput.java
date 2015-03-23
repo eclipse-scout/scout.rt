@@ -20,11 +20,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.platform.context.Context;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.context.ServerContext;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * <p/>
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining.
  *
- * @see ServerContext
+ * @see ServerRunContext
  * @see ServerJobs
  * @see IJobManager
  * @since 5.1
@@ -64,14 +64,14 @@ public class ServerJobInput extends JobInput {
   }
 
   @Override
-  public ServerContext getContext() {
-    return (ServerContext) super.getContext();
+  public ServerRunContext getRunContext() {
+    return (ServerRunContext) super.getRunContext();
   }
 
   @Override
-  public ServerJobInput context(final Context context) {
-    Assertions.assertTrue(context instanceof ServerContext, "Wrong context type [expected=%s, actual=%s]", ServerContext.class.getName(), context);
-    return (ServerJobInput) super.context(context);
+  public ServerJobInput runContext(final RunContext serverRunContext) {
+    Assertions.assertTrue(serverRunContext instanceof ServerRunContext, "Wrong 'RunContext' type [expected=%s, actual=%s]", ServerRunContext.class.getName(), serverRunContext);
+    return (ServerJobInput) super.runContext(serverRunContext);
   }
 
   @Override
@@ -90,7 +90,7 @@ public class ServerJobInput extends JobInput {
   }
 
   public IServerSession getSession() {
-    return getContext().getSession();
+    return getRunContext().getSession();
   }
 
   /**
@@ -99,12 +99,12 @@ public class ServerJobInput extends JobInput {
    * {@link UserAgent} must be set accordingly.</strong>
    */
   public ServerJobInput session(final IServerSession session) {
-    getContext().session(session);
+    getRunContext().session(session);
     return this;
   }
 
   public boolean isSessionRequired() {
-    return getContext().isSessionRequired();
+    return getRunContext().isSessionRequired();
   }
 
   /**
@@ -113,67 +113,67 @@ public class ServerJobInput extends JobInput {
    * @return <code>this</code> in order to support for method chaining
    */
   public ServerJobInput sessionRequired(final boolean sessionRequired) {
-    getContext().sessionRequired(sessionRequired);
+    getRunContext().sessionRequired(sessionRequired);
     return this;
   }
 
   public HttpServletRequest getServletRequest() {
-    return getContext().getServletRequest();
+    return getRunContext().getServletRequest();
   }
 
   /**
    * Sets the HTTP ServletRequest to be set for the time of execution.
    */
   public ServerJobInput servletRequest(final HttpServletRequest servletRequest) {
-    getContext().servletRequest(servletRequest);
+    getRunContext().servletRequest(servletRequest);
     return this;
   }
 
   public HttpServletResponse getServletResponse() {
-    return getContext().getServletResponse();
+    return getRunContext().getServletResponse();
   }
 
   /**
    * Sets the HTTP ServletResponse to be set for the time of execution.
    */
   public ServerJobInput servletResponse(final HttpServletResponse servletResponse) {
-    getContext().servletResponse(servletResponse);
+    getRunContext().servletResponse(servletResponse);
     return this;
   }
 
   public UserAgent getUserAgent() {
-    return getContext().getUserAgent();
+    return getRunContext().getUserAgent();
   }
 
   /**
    * Sets the UserAgent to be set for the time of execution.
    */
   public ServerJobInput userAgent(final UserAgent userAgent) {
-    getContext().userAgent(userAgent);
+    getRunContext().userAgent(userAgent);
     return this;
   }
 
   public long getTransactionId() {
-    return getContext().getTransactionId();
+    return getRunContext().getTransactionId();
   }
 
   /**
    * Sets the transaction-ID to be set for the time of execution.
    */
   public ServerJobInput transactionId(final long transactionId) {
-    getContext().transactionId(transactionId);
+    getRunContext().transactionId(transactionId);
     return this;
   }
 
   public boolean isTransactional() {
-    return getContext().isTransactional();
+    return getRunContext().isTransactional();
   }
 
   /**
    * Sets whether this job should run in a separate transaction.
    */
   public ServerJobInput transactional(final boolean transactional) {
-    getContext().transactional(transactional);
+    getRunContext().transactional(transactional);
     return this;
   }
 
@@ -192,13 +192,13 @@ public class ServerJobInput extends JobInput {
   }
 
   /**
-   * Creates a {@link ServerJobInput} with a "snapshot" of the current calling context. This input requires a session to
-   * be set.
+   * Creates a {@link ServerJobInput} with a "snapshot" of the current calling {@link RunContext}. This input requires a
+   * session to be set.
    */
   public static ServerJobInput fillCurrent() {
     final ServerJobInput defaults = OBJ.get(ServerJobInput.class);
     defaults.apply(JobInput.fillCurrent());
-    defaults.context(ServerContext.fillCurrent());
+    defaults.runContext(ServerRunContext.fillCurrent());
     defaults.sessionRequired(true);
     return defaults;
   }
@@ -211,7 +211,7 @@ public class ServerJobInput extends JobInput {
   public static ServerJobInput fillEmpty() {
     final ServerJobInput empty = OBJ.get(ServerJobInput.class);
     empty.apply(JobInput.fillEmpty());
-    empty.context(ServerContext.fillEmpty());
+    empty.runContext(ServerRunContext.fillEmpty());
     empty.sessionRequired(true);
     return empty;
   }

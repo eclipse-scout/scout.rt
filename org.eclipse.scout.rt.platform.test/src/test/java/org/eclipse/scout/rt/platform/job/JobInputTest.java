@@ -42,7 +42,7 @@ public class JobInputTest {
   @Test
   public void testEmpty() {
     JobInput input = JobInput.fillEmpty();
-    assertNotNull(input.getContext());
+    assertNotNull(input.getRunContext());
     assertNull(input.getName());
     assertNull(input.getId());
     assertNull(input.getSubject());
@@ -62,7 +62,7 @@ public class JobInputTest {
 
     JobInput copy = input.copy();
 
-    assertNotSame(input.getContext(), copy.getContext());
+    assertNotSame(input.getRunContext(), copy.getRunContext());
     assertEquals(toSet(input.getPropertyMap().iterator()), toSet(copy.getPropertyMap().iterator()));
     assertEquals(input.getName(), copy.getName());
     assertEquals(input.getId(), copy.getId());
@@ -116,11 +116,11 @@ public class JobInputTest {
 
     // No context on ThreadLocal
     PropertyMap.CURRENT.remove();
-    assertNotNull(JobInput.fillCurrent().getContext());
+    assertNotNull(JobInput.fillCurrent().getRunContext());
 
     // Context on ThreadLocal
     PropertyMap.CURRENT.set(propertyMap);
-    assertNotSame(propertyMap, JobInput.fillCurrent().getContext());
+    assertNotSame(propertyMap, JobInput.fillCurrent().getRunContext());
     assertEquals(toSet(propertyMap.iterator()), toSet(JobInput.fillCurrent().getPropertyMap().iterator()));
   }
 

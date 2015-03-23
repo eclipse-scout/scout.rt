@@ -17,9 +17,9 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientContext;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.platform.context.Context;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * <p/>
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining.
  *
- * @see ClientContext
+ * @see ClientRunContext
  * @see ModelJobs
  * @see IJobManager
  * @since 5.1
@@ -51,7 +51,7 @@ public class ModelJobInput extends ClientJobInput {
 
   @Override
   public Object getMutex() {
-    return Assertions.assertNotNull(getContext().getSession(), "For model jobs, the session must not be null because used as mutex object, so that no two jobs of the same session run in parallel at any time.");
+    return Assertions.assertNotNull(getRunContext().getSession(), "For model jobs, the session must not be null because used as mutex object, so that no two jobs of the same session run in parallel at any time.");
   }
 
   @Override
@@ -65,8 +65,8 @@ public class ModelJobInput extends ClientJobInput {
   }
 
   @Override
-  public ModelJobInput context(final Context context) {
-    return (ModelJobInput) super.context(context);
+  public ModelJobInput runContext(final RunContext clientRunContext) {
+    return (ModelJobInput) super.runContext(clientRunContext);
   }
 
   @Override
@@ -116,8 +116,8 @@ public class ModelJobInput extends ClientJobInput {
   }
 
   /**
-   * Creates a {@link ModelJobInput} with a "snapshot" of the current calling context. This input requires a session to
-   * be set.
+   * Creates a {@link ModelJobInput} with a "snapshot" of the current {@link RunContext} context. This input requires a
+   * session to be set.
    */
   public static ModelJobInput fillCurrent() {
     final ModelJobInput defaults = OBJ.get(ModelJobInput.class);

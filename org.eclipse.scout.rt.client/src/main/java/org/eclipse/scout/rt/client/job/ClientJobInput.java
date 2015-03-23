@@ -18,9 +18,9 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientContext;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.platform.context.Context;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.shared.ISession;
@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * <p/>
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining.
  *
- * @see ClientContext
+ * @see ClientRunContext
  * @see ClientJobs
  * @see IJobManager
  * @since 5.1
@@ -64,14 +64,14 @@ public class ClientJobInput extends JobInput {
   }
 
   @Override
-  public ClientContext getContext() {
-    return (ClientContext) super.getContext();
+  public ClientRunContext getRunContext() {
+    return (ClientRunContext) super.getRunContext();
   }
 
   @Override
-  public ClientJobInput context(final Context context) {
-    Assertions.assertTrue(context instanceof ClientContext, "Wrong context type [expected=%s, actual=%s]", ClientContext.class.getName(), context);
-    return (ClientJobInput) super.context(context);
+  public ClientJobInput runContext(final RunContext clientRunContext) {
+    Assertions.assertTrue(clientRunContext instanceof ClientRunContext, "Wrong 'RunContext' type [expected=%s, actual=%s]", ClientRunContext.class.getName(), clientRunContext);
+    return (ClientJobInput) super.runContext(clientRunContext);
   }
 
   @Override
@@ -90,35 +90,35 @@ public class ClientJobInput extends JobInput {
   }
 
   public IClientSession getSession() {
-    return getContext().getSession();
+    return getRunContext().getSession();
   }
 
   /**
    * Set the session and its Locale and UserAgent as derived values.
    */
   public ClientJobInput session(final IClientSession session) {
-    getContext().session(session);
+    getRunContext().session(session);
     return this;
   }
 
   public boolean isSessionRequired() {
-    return getContext().isSessionRequired();
+    return getRunContext().isSessionRequired();
   }
 
   /**
    * Set to <code>false</code> if the context does not require a session. By default, a session is required.
    */
   public ClientJobInput sessionRequired(final boolean sessionRequired) {
-    getContext().sessionRequired(sessionRequired);
+    getRunContext().sessionRequired(sessionRequired);
     return this;
   }
 
   public UserAgent getUserAgent() {
-    return getContext().getUserAgent();
+    return getRunContext().getUserAgent();
   }
 
   public ClientJobInput userAgent(final UserAgent userAgent) {
-    getContext().userAgent(userAgent);
+    getRunContext().userAgent(userAgent);
     return this;
   }
 
@@ -137,13 +137,13 @@ public class ClientJobInput extends JobInput {
   }
 
   /**
-   * Creates a {@link ClientJobInput} with a "snapshot" of the current calling context. This input requires a session to
-   * be set.
+   * Creates a {@link ClientJobInput} with a "snapshot" of the current calling {@link RunContext}. This input requires a
+   * session to be set.
    */
   public static ClientJobInput fillCurrent() {
     final ClientJobInput defaults = OBJ.get(ClientJobInput.class);
     defaults.apply(JobInput.fillCurrent());
-    defaults.context(ClientContext.fillCurrent());
+    defaults.runContext(ClientRunContext.fillCurrent());
     defaults.sessionRequired(true);
     return defaults;
   }
@@ -156,7 +156,7 @@ public class ClientJobInput extends JobInput {
   public static ClientJobInput fillEmpty() {
     final ClientJobInput empty = OBJ.get(ClientJobInput.class);
     empty.apply(JobInput.fillEmpty());
-    empty.context(ClientContext.fillEmpty());
+    empty.runContext(ClientRunContext.fillEmpty());
     empty.sessionRequired(true);
     return empty;
   }

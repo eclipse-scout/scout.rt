@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.platform.context.Context;
+import org.eclipse.scout.rt.platform.context.RunContext;
 
 /**
  * Describes a job with context information to be applied onto the executing worker thread during the time of the job's
@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.context.Context;
  * <p/>
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining.
  *
- * @see Context
+ * @see RunContext
  * @see IJobManager
  * @since 5.1
  */
@@ -48,7 +48,7 @@ public class JobInput {
   protected Object m_mutexObject;
   protected long m_expirationTime;
   protected boolean m_logOnError;
-  protected Context m_context;
+  protected RunContext m_runContext;
 
   protected JobInput() {
   }
@@ -111,39 +111,39 @@ public class JobInput {
     return this;
   }
 
-  public Context getContext() {
-    return m_context;
+  public RunContext getRunContext() {
+    return m_runContext;
   }
 
   /**
-   * Sets the {@link Context} to be set for the time of execution.
+   * Sets the {@link RunContext} to be set for the time of execution.
    */
-  public JobInput context(final Context context) {
-    m_context = Assertions.assertNotNull(context, "Context must not be null");
+  public JobInput runContext(final RunContext runContext) {
+    m_runContext = Assertions.assertNotNull(runContext, "RunContext must not be null");
     return this;
   }
 
   public Subject getSubject() {
-    return m_context.getSubject();
+    return getRunContext().getSubject();
   }
 
   /**
    * Sets the Subject to execute the job under a particular user.
    */
   public JobInput subject(final Subject subject) {
-    m_context.subject(subject);
+    getRunContext().subject(subject);
     return this;
   }
 
   public Locale getLocale() {
-    return m_context.getLocale();
+    return getRunContext().getLocale();
   }
 
   /**
    * Sets the Locale to be set for the time of execution.
    */
   public JobInput locale(final Locale locale) {
-    m_context.locale(locale);
+    getRunContext().locale(locale);
     return this;
   }
 
@@ -160,7 +160,7 @@ public class JobInput {
   }
 
   public PropertyMap getPropertyMap() {
-    return m_context.getPropertyMap();
+    return getRunContext().getPropertyMap();
   }
 
   /***
@@ -198,17 +198,17 @@ public class JobInput {
     m_mutexObject = origin.m_mutexObject;
     m_expirationTime = origin.m_expirationTime;
     m_logOnError = origin.m_logOnError;
-    m_context = origin.m_context.copy();
+    m_runContext = origin.m_runContext.copy();
   }
 
   /**
-   * Creates a {@link JobInput} with a "snapshot" of the current calling context.
+   * Creates a {@link JobInput} with a "snapshot" of the current calling {@link RunContext}.
    */
   public static JobInput fillCurrent() {
     final JobInput defaults = OBJ.get(JobInput.class);
     defaults.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
     defaults.logOnError(true);
-    defaults.context(Context.fillCurrent());
+    defaults.runContext(RunContext.fillCurrent());
     return defaults;
   }
 
@@ -220,7 +220,7 @@ public class JobInput {
     final JobInput empty = OBJ.get(JobInput.class);
     empty.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
     empty.logOnError(true);
-    empty.context(Context.fillEmpty());
+    empty.runContext(RunContext.fillEmpty());
     return empty;
   }
 

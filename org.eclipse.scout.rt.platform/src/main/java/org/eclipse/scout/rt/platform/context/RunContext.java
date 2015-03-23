@@ -55,13 +55,13 @@ import org.eclipse.scout.rt.platform.job.internal.callable.SubjectCallable;
  * @since 5.1
  */
 @Bean
-public class Context {
+public class RunContext {
 
   protected PreferredValue<Subject> m_subject = new PreferredValue<>(null, false);
   protected PreferredValue<Locale> m_locale = new PreferredValue<>(null, false);
   protected PropertyMap m_propertyMap;
 
-  protected Context() {
+  protected RunContext() {
   }
 
   public <RESULT> RESULT invoke(final Callable<RESULT> callable) {
@@ -127,7 +127,7 @@ public class Context {
   /**
    * Sets the Subject to invoke the Callable under a particular user.
    */
-  public Context subject(final Subject subject) {
+  public RunContext subject(final Subject subject) {
     m_subject.set(subject, true);
     return this;
   }
@@ -139,7 +139,7 @@ public class Context {
   /**
    * Sets the Locale to be set for the time of execution.
    */
-  public Context locale(final Locale locale) {
+  public RunContext locale(final Locale locale) {
     m_locale.set(locale, true);
     return this;
   }
@@ -153,8 +153,8 @@ public class Context {
   /**
    * Creates a shallow copy of the context represented by <code>this</code> context.
    */
-  public Context copy() {
-    final Context copy = OBJ.get(Context.class);
+  public RunContext copy() {
+    final RunContext copy = OBJ.get(RunContext.class);
     copy.apply(this);
     return copy;
   }
@@ -162,7 +162,7 @@ public class Context {
   /**
    * Applies the given context-values to <code>this</code> context.
    */
-  protected void apply(final Context origin) {
+  protected void apply(final RunContext origin) {
     m_subject = origin.m_subject;
     m_locale = origin.m_locale;
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
@@ -171,8 +171,8 @@ public class Context {
   /**
    * Creates a "snapshot" of the current calling context.
    */
-  public static Context fillCurrent() {
-    final Context defaults = OBJ.get(Context.class);
+  public static RunContext fillCurrent() {
+    final RunContext defaults = OBJ.get(RunContext.class);
     defaults.m_subject = new PreferredValue<>(Subject.getSubject(AccessController.getContext()), false);
     defaults.m_locale = new PreferredValue<>(NlsLocale.CURRENT.get(), false);
     defaults.m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
@@ -180,11 +180,11 @@ public class Context {
   }
 
   /**
-   * Creates an empty {@link Context} with <code>null</code> as preferred {@link Subject} and {@link Locale}. Preferred
+   * Creates an empty {@link RunContext} with <code>null</code> as preferred {@link Subject} and {@link Locale}. Preferred
    * means, that those values are not derived from other values, but must be set explicitly instead.
    */
-  public static Context fillEmpty() {
-    final Context empty = OBJ.get(Context.class);
+  public static RunContext fillEmpty() {
+    final RunContext empty = OBJ.get(RunContext.class);
     empty.m_subject = new PreferredValue<>(null, true);
     empty.m_locale = new PreferredValue<>(null, true);
     empty.m_propertyMap = new PropertyMap();
