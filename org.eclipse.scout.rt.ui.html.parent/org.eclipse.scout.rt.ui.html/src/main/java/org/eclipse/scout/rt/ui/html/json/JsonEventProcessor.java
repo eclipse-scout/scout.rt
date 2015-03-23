@@ -43,7 +43,7 @@ public class JsonEventProcessor {
           processEvent(event, response);
         }
       }
-    }, ModelJobInput.defaults().session(m_jsonSession.getClientSession()).name("event-processing"));
+    }, ModelJobInput.fillCurrent().session(m_jsonSession.getClientSession()).name("event-processing"));
 
     // Wait for all events to be processed. It is not sufficient to only wait for the Future to complete, because other jobs might be started as well.
     JobUtil.awaitModelJobs(future);

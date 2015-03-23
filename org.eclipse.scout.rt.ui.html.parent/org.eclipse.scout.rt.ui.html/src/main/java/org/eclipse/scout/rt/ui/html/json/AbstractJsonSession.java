@@ -289,7 +289,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   protected void startUpClientSession(IClientSession clientSession) {
-    JobUtil.runAsModelJobAndAwait(ModelJobInput.defaults().session(clientSession), new IRunnable() {
+    JobUtil.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(clientSession), new IRunnable() {
       @Override
       public void run() throws Exception {
         m_jsonClientSession.startUp();
@@ -575,7 +575,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   protected JSONObject jsonResponseToJson() {
-    return JobUtil.runAsModelJobAndAwait(ModelJobInput.defaults().session(getClientSession()), new ICallable<JSONObject>() {
+    return JobUtil.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(getClientSession()), new ICallable<JSONObject>() {
       @Override
       public JSONObject call() throws Exception {
         return currentJsonResponse().toJson();
@@ -619,7 +619,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
       // Dispose model (if session was not already stopped earlier by itself)
       if (m_clientSession.isActive()) {
-        JobUtil.runAsModelJobAndAwait(ModelJobInput.defaults().session(m_clientSession), new IRunnable() {
+        JobUtil.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(m_clientSession), new IRunnable() {
 
           @Override
           public void run() throws Exception {

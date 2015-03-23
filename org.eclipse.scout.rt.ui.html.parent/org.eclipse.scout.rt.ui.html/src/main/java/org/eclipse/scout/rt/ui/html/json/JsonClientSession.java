@@ -113,7 +113,7 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
     if (m_localeManagedByModel) {
       return;
     }
-    JobUtil.runAsModelJobAndAwait(ModelJobInput.defaults().session(getJsonSession().getClientSession()), new IRunnable() {
+    JobUtil.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(getJsonSession().getClientSession()), new IRunnable() {
       @Override
       public void run() throws Exception {
         if (!getModel().getLocale().equals(locale)) {
