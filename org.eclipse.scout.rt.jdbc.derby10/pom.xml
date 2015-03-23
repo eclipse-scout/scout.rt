@@ -30,6 +30,7 @@
       <groupId>org.apache.derby</groupId>
       <version>10.11.1.1</version>
       <artifactId>derby</artifactId>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>
