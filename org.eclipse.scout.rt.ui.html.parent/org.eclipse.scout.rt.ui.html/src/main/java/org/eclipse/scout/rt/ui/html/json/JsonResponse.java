@@ -40,9 +40,9 @@ public class JsonResponse {
   public static final String PROP_ERROR_CODE = "errorCode";
   public static final String PROP_ERROR_MESSAGE = "errorMessage";
 
+  private final Map<String/*adapterId*/, IJsonAdapter<?>> m_adapterMap;
   private final List<JsonEvent> m_eventList;
-  private final Map<String/*id*/, JsonEvent> m_idToPropertyChangeEventMap;
-  private final Map<String, IJsonAdapter<?>> m_adapterMap;
+  private final Map<String/*adapterId*/, JsonEvent> m_idToPropertyChangeEventMap; // helper map to ensure max. 1 event per adapter
   private final Set<IJsonAdapter<?>> m_bufferedEventsAdapters;
   private boolean m_error;
   private int m_errorCode;
@@ -52,10 +52,28 @@ public class JsonResponse {
   private boolean m_processingBufferedEvents;
 
   public JsonResponse() {
-    m_eventList = new ArrayList<>();
     m_adapterMap = new HashMap<>();
+    m_eventList = new ArrayList<>();
     m_idToPropertyChangeEventMap = new HashMap<>();
     m_bufferedEventsAdapters = new HashSet<>();
+  }
+
+  /**
+   * Adds an adapter to the response. All adapters stored on the response are transferred to the client (browser)
+   * as JSON object. Only new adapters must be transferred, adapters already transferred to the client can be
+   * solely referenced by their ID.
+   * <p>
+   * Note that in javascript the adapters are not created unless the first event is received or
+   * {@link IJsonAdapter#isCreateImmediately()} is set
+   */
+  public void addAdapter(IJsonAdapter<?> adapter) {
+    if (m_toJsonInProgress) {
+      throw new IllegalStateException("It is not allowed to modify the adapter list while toJson is executed. Adapter: " + adapter);
+    }
+
+    if (!m_adapterMap.containsKey(adapter.getId())) {
+      m_adapterMap.put(adapter.getId(), adapter);
+    }
   }
 
   /**
@@ -88,24 +106,6 @@ public class JsonResponse {
   }
 
   /**
-   * Adds an adapter to the response. All adapters stored on the response are transferred to the client (browser)
-   * as JSON object. Only new adapters must be transferred, adapters already transferred to the client can be
-   * solely referenced by their ID.
-   * <p>
-   * Note that in javascript the adapters are not created unless the first event is received or
-   * {@link IJsonAdapter#isCreateImmediately()} is set
-   */
-  public void addAdapter(IJsonAdapter<?> adapter) {
-    if (m_toJsonInProgress) {
-      throw new IllegalStateException("It is not allowed to modify the adapter list while toJson is executed. Adapter: " + adapter);
-    }
-
-    if (!m_adapterMap.containsKey(adapter.getId())) {
-      m_adapterMap.put(adapter.getId(), adapter);
-    }
-  }
-
-  /**
    * Note: when converting the response to JSON, events on adapters that are also part of this response are ignored, see
    * also {@link #doAddEvent(JsonEvent)}
    */
@@ -117,14 +117,14 @@ public class JsonResponse {
    * Note: when converting the response to JSON, events on adapters that are also part of this response are ignored, see
    * also {@link #doAddEvent(JsonEvent)}
    */
-  public void replaceActionEvent(String id, String eventName, JSONObject eventData) {
+  public void replaceActionEvent(String eventTarget, String eventName, JSONObject eventData) {
     for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
       JsonEvent event = it.next();
-      if (CompareUtility.equals(event.getType(), id)) {
+      if (CompareUtility.equals(event.getTarget(), eventTarget)) {
         it.remove();
       }
     }
-    addActionEvent(id, eventName, eventData);
+    addActionEvent(eventTarget, eventName, eventData);
   }
 
   /**
@@ -275,39 +275,61 @@ public class JsonResponse {
   }
 
   /**
-   * If the adapter with the given ID is contained in the response's adpaterMap, it is removed. Additionally,
-   * every event whose target is this particular adapter is removed from the response.
-   * <p>
-   * This is useful when an adapter that was created in the current request is disposed again. In this case, we don't
-   * have to send anything to the client at all (as if the adapter was never created in the first place).
+   * Removes all traces of the adapter with the given ID from the current response. This includes all events with
+   * the given ID as target. Also, if the adapter was registered as "buffered events adapter", it is unregistered
+   * automatically. Any deferred model event for this adapter will therefore not be handled. <b>This method should
+   * therefore only be called when disposing an adapter that was created in the <i>same</i> request!</b>.
+   *
+   * @param id
+   *          Adapter ID to be removed
    */
   public void removeJsonAdapter(String id) {
-    m_adapterMap.remove(id);
+    // Remove from adapterMap
+    IJsonAdapter<?> removedAdapter = m_adapterMap.remove(id);
+    if (removedAdapter == null) {
+      LOG.warn("Adapter with ID '" + id + "' was removed from the current JSON response, but it was apparently not created in the current request. Removing the adapter will most likely result in lost events. Please check carefully!");
+    }
+
+    // Remove all events with the given ID as event target
     for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
       JsonEvent event = it.next();
       if (CompareUtility.equals(event.getTarget(), id)) {
         it.remove();
       }
     }
+
+    // Remove property change events for this adapter
+    m_idToPropertyChangeEventMap.remove(id);
+
+    // Unregister as buffered events adapter (we are no longer interested in those buffered events)
+    for (Iterator<IJsonAdapter<?>> it = m_bufferedEventsAdapters.iterator(); it.hasNext();) {
+      IJsonAdapter<?> adapter = it.next();
+      if (CompareUtility.equals(adapter.getId(), id)) {
+        it.remove();
+      }
+    }
   }
 
+  /**
+   * @return a copy of the event list
+   */
   public List<JsonEvent> getEventList() {
     return CollectionUtility.arrayList(m_eventList);
-  }
-
-  protected List<JsonEvent> eventList() {
-    return m_eventList;
   }
 
   protected Map<String, IJsonAdapter<?>> adapterMap() {
     return m_adapterMap;
   }
 
+  protected List<JsonEvent> eventList() {
+    return m_eventList;
+  }
+
   protected boolean error() {
     return m_error;
   }
 
-  protected Integer errorCode() {
+  protected int errorCode() {
     return m_errorCode;
   }
 

@@ -373,7 +373,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public IClientSession getClientSession() {
-    return m_jsonClientSession.getModel();
+    return (m_jsonClientSession == null ? null : m_jsonClientSession.getModel());
   }
 
   @Override

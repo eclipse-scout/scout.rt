@@ -45,12 +45,13 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
   public boolean interceptPost(AbstractUiServlet servlet, HttpServletRequest httpReq, HttpServletResponse httpResp) throws ServletException, IOException {
     //serve only /json
     String pathInfo = httpReq.getPathInfo();
-    IJsonSession jsonSession = null;
     if (CompareUtility.notEquals(pathInfo, "/json")) {
       LOG.info("404_NOT_FOUND_POST: " + pathInfo);
       httpResp.sendError(HttpServletResponse.SC_NOT_FOUND);
       return true;
     }
+    IJsonSession jsonSession = null;
+    JsonRequest jsonReq = null;
     try {
       //disable cache
       servlet.getHttpCacheControl().disableCacheHeaders(httpReq, httpResp);
@@ -61,7 +62,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
         return true;
       }
 
-      JsonRequest jsonReq = new JsonRequest(jsonReqObj);
+      jsonReq = new JsonRequest(jsonReqObj);
       jsonSession = getOrCreateJsonSession(servlet, httpReq, httpResp, jsonReq);
       if (jsonSession == null) {
         return true;
@@ -81,7 +82,9 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       }
     }
     catch (Exception e) {
-      if (jsonSession == null) {
+      if (jsonReq == null || jsonSession == null || jsonReq.isStartupRequest()) {
+        // Send a special error code when an error happens during initialization, because
+        // the UI has no translated texts to show in this case.
         LOG.error("Error while initializing json session", e);
         writeResponse(httpResp, createStartupFailedJsonResponse());
       }

@@ -295,6 +295,14 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   @Override
   public String toString() {
-    return "Id: " + getId() + ". ObjectType: " + getObjectType() + ". ModelClass: " + getModel().getClass() + ". OwnerId: " + getParent().getId();
+    StringBuilder sb = new StringBuilder();
+    sb.append(getObjectType());
+    sb.append("[id=" + getId());
+    sb.append(", modelClass=");
+    sb.append(getModel() == null ? "null" : getModel().getClass().getName());
+    sb.append(", parentId=");
+    sb.append(getParent() == null ? "null" : getParent().getId());
+    sb.append("]");
+    return sb.toString();
   }
 }

@@ -581,10 +581,8 @@ public class JsonTableTest {
     // be coalesced and written to the response. --> Both events should cancel each other
     JSONObject response = m_jsonSession.currentJsonResponse().toJson();
     assertEquals(0, jsonTable.eventBuffer().size());
-    JSONArray events = response.getJSONArray("events");
-
-    // FIXME BSH Actually, we would expect 0. But coalesce does not do this yet. Change this later.
-    assertEquals(2, events.length());
+    JSONArray events = response.optJSONArray("events");
+    assertNull(events);
   }
 
   public static Table createTableFixture(int numRows) throws ProcessingException {
