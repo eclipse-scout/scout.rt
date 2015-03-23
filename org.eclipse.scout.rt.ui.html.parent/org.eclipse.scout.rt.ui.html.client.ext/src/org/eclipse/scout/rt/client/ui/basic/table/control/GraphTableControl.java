@@ -26,7 +26,7 @@ public class GraphTableControl extends AbstractTableControl implements IGraphTab
   protected void initConfig() {
     super.initConfig();
     setTooltipText("Netzwerk");
-    setIconId("\uE023"); //Icons.Graph
+    setIconId("font:\uE023"); //Icons.Graph
   }
 
   @Override

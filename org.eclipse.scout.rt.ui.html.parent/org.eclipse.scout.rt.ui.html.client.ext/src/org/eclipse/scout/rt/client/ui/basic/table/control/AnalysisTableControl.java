@@ -27,7 +27,7 @@ public class AnalysisTableControl extends AbstractTableControl implements IAnaly
   protected void initConfig() {
     super.initConfig();
     setTooltipText("Analyse");
-    setIconId("\uE020"); //Icons.Target
+    setIconId("font:\uE020"); //Icons.Target
   }
 
   @Override

@@ -30,7 +30,7 @@ public class MapTableControl extends AbstractTableControl implements IMapTableCo
   protected void initConfig() {
     super.initConfig();
     setTooltipText("Karte");
-    setIconId("\uE021"); //Icons.World
+    setIconId("font:\uE021"); //Icons.World
     setColumns(getConfiguredColumns());
   }
 
