@@ -22,10 +22,10 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanContext;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.mockito.Mockito;
 
 /**
@@ -171,12 +171,12 @@ public final class TestingUtility {
   /**
    * Registers the given service under the given type in the current {@link IBeanContext} and returns its registration.
    */
+  @SuppressWarnings("unchecked")
   public static <SERVICE> IBean<SERVICE> registerService(float priority, SERVICE object, Class<? extends SERVICE> clazz) {
-    BeanImplementor<SERVICE> bean = new BeanImplementor<>(clazz);
+    BeanData<SERVICE> bean = new BeanData<>(clazz, object);
     bean.addAnnotation(AnnotationFactory.createApplicationScoped());
     bean.addAnnotation(AnnotationFactory.createPriority(priority));
-    Platform.get().getBeanContext().registerBean(bean, object);
-    return bean;
+    return Platform.get().getBeanContext().registerBean(bean);
   }
 
   /**

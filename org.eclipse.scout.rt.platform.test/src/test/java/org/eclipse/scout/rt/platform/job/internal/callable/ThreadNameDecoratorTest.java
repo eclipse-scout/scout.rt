@@ -17,9 +17,10 @@ import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
+import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -36,16 +37,16 @@ import org.junit.runner.RunWith;
 public class ThreadNameDecoratorTest {
 
   private JobManager m_jobManager;
-  private BeanImplementor<JobManager> m_bean;
+  private IBean<JobManager> m_bean;
 
   @Before
   public void before() {
     m_jobManager = new JobManager();
 
-    m_bean = new BeanImplementor<>(JobManager.class);
-    m_bean.addAnnotation(AnnotationFactory.createApplicationScoped());
-    m_bean.addAnnotation(AnnotationFactory.createPriority(10000));
-    Platform.get().getBeanContext().registerBean(m_bean, m_jobManager);
+    BeanData b = new BeanData<>(JobManager.class, m_jobManager);
+    b.addAnnotation(AnnotationFactory.createApplicationScoped());
+    b.addAnnotation(AnnotationFactory.createPriority(10000));
+    m_bean = Platform.get().getBeanContext().registerBean(b);
   }
 
   @After

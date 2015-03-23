@@ -11,10 +11,8 @@
 package org.eclipse.scout.rt.platform;
 
 import java.util.List;
-import java.util.SortedSet;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.platform.internal.IBeanRegistration;
 
 /**
  * Used in {@link IBeanContext}
@@ -29,10 +27,10 @@ public interface IBeanInstanceFactory {
   /**
    * @return an object instance for the bean or null if none was created
    */
-  <T> T select(Class<T> queryClass, SortedSet<IBeanRegistration> regs);
+  <T> T select(Class<T> queryClass, List<IBean<T>> regs);
 
   /**
    * @return all object instances for the beans, never null
    */
-  <T> List<T> selectAll(Class<T> queryClass, SortedSet<IBeanRegistration> regs);
+  <T> List<T> selectAll(Class<T> queryClass, List<IBean<T>> regs);
 }

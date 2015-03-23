@@ -35,7 +35,7 @@ public final class OBJ {
 
   /**
    * @return the first instance of this type with respect to {@link Priority} and {@link Replace}. See also {@link Bean}
-   *         .
+   *         <p>
    *         returns null when no instance is available
    */
   public static <T> T getOptional(Class<T> beanClazz) {

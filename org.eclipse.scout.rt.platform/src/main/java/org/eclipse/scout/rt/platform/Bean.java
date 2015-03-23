@@ -7,14 +7,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 
 /**
  * All objects marked with this annotation (or an annotation that has this annotation) are automatically registered in
  * the scout {@link IBeanContext}
  * <p>
- * see also {@link Priority}, {@link ApplicationScoped}, and annotations qualifed with {@link BeanInvocationHint}
+ * see also {@link Order}, {@link ApplicationScoped}, and annotations qualifed with {@link BeanInvocationHint}
  * <p>
  * In more details...
  * <p>

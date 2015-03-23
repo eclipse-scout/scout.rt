@@ -11,42 +11,36 @@
 package org.eclipse.scout.rt.platform.internal;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.Inherited;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BeanCreationException;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 
 public class BeanImplementor<T> implements IBean<T> {
+  private static final ThreadLocal<Deque<String>> INSTANTIATION_STACK = new ThreadLocal<>();
   private final Class<? extends T> m_beanClazz;
   private final Map<Class<? extends Annotation>, Annotation> m_beanAnnotations;
+  private final Semaphore m_instanceLock = new Semaphore(1, true);
+  private final T m_initialInstance;
+  private T m_instance;
 
-  public BeanImplementor(Class<? extends T> clazz) {
-    m_beanClazz = Assertions.assertNotNull(clazz);
-    m_beanAnnotations = new HashMap<>();
-    readStaticAnnoations(clazz, false);
-  }
-
-  /**
-   * @return
-   */
-  protected void readStaticAnnoations(Class<?> clazz, boolean inheritedOnly) {
-    if (clazz == null || Object.class.getName().equals(clazz.getName())) {
-      return;
+  @SuppressWarnings("unchecked")
+  public BeanImplementor(BeanData beanData) {
+    m_beanClazz = Assertions.assertNotNull(beanData.getBeanClazz());
+    m_beanAnnotations = new HashMap<Class<? extends Annotation>, Annotation>(Assertions.assertNotNull(beanData.getBeanAnnotations()));
+    m_initialInstance = (T) beanData.getInitialInstance();
+    if (m_initialInstance != null && getBeanAnnotation(ApplicationScoped.class) == null) {
+      throw new IllegalArgumentException(String.format("Instance constructor only allows application scoped instances. Class '%s' does not have the '%s' annotation.", getBeanClazz().getName(), ApplicationScoped.class.getName()));
     }
-    for (Annotation a : clazz.getAnnotations()) {
-      if (inheritedOnly) {
-        if (a.annotationType().getAnnotation(Inherited.class) != null) {
-          m_beanAnnotations.put(a.annotationType(), a);
-        }
-      }
-      else {
-        m_beanAnnotations.put(a.annotationType(), a);
-      }
-    }
-    readStaticAnnoations(clazz.getSuperclass(), true);
+    m_instance = m_initialInstance;
   }
 
   @Override
@@ -54,8 +48,8 @@ public class BeanImplementor<T> implements IBean<T> {
     return m_beanClazz;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings("unchecked")
   public <ANNOTATION extends Annotation> ANNOTATION getBeanAnnotation(Class<ANNOTATION> annotationClazz) {
     synchronized (m_beanAnnotations) {
       return (ANNOTATION) m_beanAnnotations.get(annotationClazz);
@@ -69,22 +63,66 @@ public class BeanImplementor<T> implements IBean<T> {
     }
   }
 
-  public void setBeanAnnotations(Map<Class<? extends Annotation>, Annotation> annotations) {
-    synchronized (m_beanAnnotations) {
-      m_beanAnnotations.clear();
-      m_beanAnnotations.putAll(annotations);
-    }
+  @Override
+  public T getInitialInstance() {
+    return m_initialInstance;
   }
 
-  public void addAnnotation(Annotation annotation) {
-    synchronized (m_beanAnnotations) {
-      m_beanAnnotations.put(annotation.annotationType(), annotation);
+  @Override
+  public T createInstance() {
+    if (m_instance != null) {
+      return m_instance;
     }
+    if (getBeanClazz().isInterface()) {
+      return null;
+    }
+
+    Deque<String> stack = INSTANTIATION_STACK.get();
+    String beanName = getBeanClazz().getName();
+    if (stack != null && stack.contains(beanName)) {
+      String message = String.format("The requested bean is currently being created. Creation path: [%s]", CollectionUtility.format(stack, ", "));
+      throw new BeanCreationException(beanName, message);
+    }
+
+    if (BeanContextImplementor.isApplicationScoped(this)) {
+      m_instanceLock.acquireUninterruptibly();
+      try {
+        if (m_instance == null) {
+          m_instance = createNewInstance();
+        }
+        return m_instance;
+      }
+      finally {
+        m_instanceLock.release();
+      }
+    }
+    return createNewInstance();
   }
 
-  public void removeAnnotation(Annotation annotation) {
-    synchronized (m_beanAnnotations) {
-      m_beanAnnotations.remove(annotation.annotationType());
+  /**
+   * @returns Returns a new instance of the bean managed by this registration.
+   */
+  protected T createNewInstance() {
+    Class<? extends T> beanClass = getBeanClazz();
+    Deque<String> stack = INSTANTIATION_STACK.get();
+    boolean removeStack = false;
+    if (stack == null) {
+      stack = new LinkedList<>();
+      INSTANTIATION_STACK.set(stack);
+      removeStack = true;
+    }
+
+    try {
+      stack.addLast(beanClass.getName());
+      return BeanInstanceUtil.create(beanClass);
+    }
+    finally {
+      if (removeStack) {
+        INSTANTIATION_STACK.remove();
+      }
+      else {
+        stack.removeLast();
+      }
     }
   }
 
@@ -94,6 +132,10 @@ public class BeanImplementor<T> implements IBean<T> {
     int result = 1;
     result = prime * result + CollectionUtility.hashCode(m_beanAnnotations.values());
     result = prime * result + m_beanClazz.hashCode();
+    if (m_initialInstance != null) {
+      result = prime * result + (m_initialInstance != null ? 1231 : 1237);
+      result = prime * result + m_initialInstance.hashCode();
+    }
     return result;
   }
 
@@ -115,6 +157,14 @@ public class BeanImplementor<T> implements IBean<T> {
     }
     if (!m_beanClazz.equals(other.m_beanClazz)) {
       return false;
+    }
+    if ((m_initialInstance != null) != (other.m_initialInstance != null)) {
+      return false;
+    }
+    if (m_initialInstance != null) {
+      if (!m_initialInstance.equals(other.m_initialInstance)) {
+        return false;
+      }
     }
     return true;
   }

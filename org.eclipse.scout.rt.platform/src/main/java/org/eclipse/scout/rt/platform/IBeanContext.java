@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform;
 
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
@@ -25,7 +24,7 @@ public interface IBeanContext {
 
   /**
    * @param beanClazz
-   * @return the instance of the given bean.
+   * @return the instance of the given bean, see {@link Bean}
    * @throws AssertionException
    *           when no bean is registered to the given beanClazz
    */
@@ -33,7 +32,7 @@ public interface IBeanContext {
 
   /**
    * @param beanClazz
-   * @return the instance of the given bean.
+   * @return the instance of the given bean, see {@link Bean}
    * @throws AssertionException
    *           when no bean is registered to the given beanClazz
    */
@@ -41,7 +40,7 @@ public interface IBeanContext {
 
   /**
    * @param beanClazz
-   * @return
+   * @return all instances, see {@link Bean}
    */
   <T> List<T> getInstances(Class<T> beanClazz);
 
@@ -52,26 +51,21 @@ public interface IBeanContext {
   <T> List<IBean<T>> getBeans(Class<T> beanClazz);
 
   /**
-   * @return
-   */
-  Set<IBean<?>> getAllRegisteredBeans();
-
-  /**
+   * This is a convenience for {@link #registerBean(BeanData)}
+   *
    * @param beanClazz
-   * @return
+   * @return the registered {@link IBean}
    */
   <T> IBean<T> registerClass(Class<T> clazz);
 
   /**
-   * @param bean
-   * @param instance
-   *          optional initial raw instance value of the bean, undecorated, not intercepted by
-   *          {@link IBeanInstanceFactory}
+   * @param beanData
+   * @return the registered {@link IBean}
    */
-  void registerBean(IBean bean, Object instance);
+  <T> IBean<T> registerBean(BeanData beanData);
 
   /**
    * @param bean
    */
-  void unregisterBean(IBean bean);
+  void unregisterBean(IBean<?> bean);
 }

@@ -12,11 +12,10 @@ package org.eclipse.scout.rt.server.cdi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
 
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceFactory;
 import org.eclipse.scout.rt.platform.IPlatform;
-import org.eclipse.scout.rt.platform.internal.IBeanRegistration;
 import org.eclipse.scout.rt.server.Server;
 
 /**
@@ -25,9 +24,9 @@ import org.eclipse.scout.rt.server.Server;
 public class ServerBeanInstanceFactory implements IBeanInstanceFactory {
 
   @Override
-  public <T> T select(Class<T> queryClass, SortedSet<IBeanRegistration> regs) {
-    for (IBeanRegistration<?> reg : regs) {
-      if (reg.getBean().getBeanAnnotation(Server.class) != null) {
+  public <T> T select(Class<T> queryClass, List<IBean<T>> regs) {
+    for (IBean<?> reg : regs) {
+      if (reg.getBeanAnnotation(Server.class) != null) {
         return createServerInterceptor(queryClass, reg);
       }
       else {
@@ -38,12 +37,12 @@ public class ServerBeanInstanceFactory implements IBeanInstanceFactory {
   }
 
   @Override
-  public <T> List<T> selectAll(Class<T> queryClass, SortedSet<IBeanRegistration> regs) {
+  public <T> List<T> selectAll(Class<T> queryClass, List<IBean<T>> regs) {
     //TODO imo add context around queryClass (interface)
     ArrayList<T> result = new ArrayList<T>();
-    for (IBeanRegistration<?> reg : regs) {
+    for (IBean<?> reg : regs) {
       T instance;
-      if (reg.getBean().getBeanAnnotation(Server.class) != null) {
+      if (reg.getBeanAnnotation(Server.class) != null) {
         instance = createServerInterceptor(queryClass, reg);
       }
       else {
@@ -58,13 +57,13 @@ public class ServerBeanInstanceFactory implements IBeanInstanceFactory {
   }
 
   @SuppressWarnings("unchecked")
-  protected <T> T createServerInterceptor(Class<T> queryClass, IBeanRegistration reg) {
+  protected <T> T createServerInterceptor(Class<T> queryClass, IBean reg) {
     //TODO imo add context around queryClass (interface)
-    return (T) reg.getInstance();
+    return (T) reg.createInstance();
   }
 
   @SuppressWarnings("unchecked")
-  protected <T> T createDefaultInterceptor(Class<T> queryClass, IBeanRegistration reg) {
-    return (T) reg.getInstance();
+  protected <T> T createDefaultInterceptor(Class<T> queryClass, IBean reg) {
+    return (T) reg.createInstance();
   }
 }

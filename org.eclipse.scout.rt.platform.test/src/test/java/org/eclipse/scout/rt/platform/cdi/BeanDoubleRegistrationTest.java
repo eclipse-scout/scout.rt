@@ -28,9 +28,9 @@ public class BeanDoubleRegistrationTest {
     IBean<?> reg1 = context.registerClass(Bean01.class);
     IBean<?> reg2 = context.registerClass(Bean01.class);
     Assert.assertTrue(reg1 == reg2);
-    Assert.assertEquals(1, context.getAllRegisteredBeans().size());
+    Assert.assertEquals(1, context.getBeans(Object.class).size());
     context.unregisterBean(reg2);
-    Assert.assertEquals(0, context.getAllRegisteredBeans().size());
+    Assert.assertEquals(0, context.getBeans(Object.class).size());
   }
 
   private class Bean01 {

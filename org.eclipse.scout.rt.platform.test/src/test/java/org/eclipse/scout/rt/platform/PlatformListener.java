@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.eclipse.scout.rt.platform.job.JobExceptionHandler;
 import org.eclipse.scout.rt.platform.job.NullJobExceptionHandler;
 
@@ -35,6 +34,6 @@ public class PlatformListener implements IPlatformListener {
     }
 
     // Register NOOP-JobExceptionHandler to ignore exceptions thrown by intention to test job manager's internals.
-    beanContext.registerBean(new BeanImplementor<>(JobExceptionHandler.class), new NullJobExceptionHandler());
+    beanContext.registerBean(new BeanData<>(JobExceptionHandler.class, new NullJobExceptionHandler()));
   }
 }

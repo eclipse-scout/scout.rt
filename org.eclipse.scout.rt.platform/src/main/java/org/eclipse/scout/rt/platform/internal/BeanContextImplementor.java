@@ -11,13 +11,12 @@
 package org.eclipse.scout.rt.platform.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.Assertions;
@@ -26,6 +25,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.InitializationException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanContext;
@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.platform.IBeanInstanceFactory;
 
 public class BeanContextImplementor implements IBeanContext {
   private final ReentrantReadWriteLock m_lock;
-  private final Map<Class<?>, TreeSet<IBeanRegistration>> m_regs;
+  private final Map<Class<?>, TypeHierarchy> m_typeHierarchies;
   private IBeanInstanceFactory m_beanInstanceFactory;
 
   public BeanContextImplementor() {
@@ -42,7 +42,7 @@ public class BeanContextImplementor implements IBeanContext {
 
   public BeanContextImplementor(IBeanInstanceFactory f) {
     m_lock = new ReentrantReadWriteLock(true);
-    m_regs = new HashMap<Class<?>, TreeSet<IBeanRegistration>>();
+    m_typeHierarchies = new HashMap<>();
     m_beanInstanceFactory = f;
   }
 
@@ -52,18 +52,117 @@ public class BeanContextImplementor implements IBeanContext {
   }
 
   @Internal
-  protected TreeSet<IBeanRegistration> getRegistrationsInternal(Class<?> beanClazz) {
+  protected <T> List<IBean<T>> querySingle(Class<T> beanClazz) {
     m_lock.readLock().lock();
     try {
-      Assertions.assertNotNull(beanClazz);
-      TreeSet<IBeanRegistration> regs = m_regs.get(beanClazz);
-      if (regs == null) {
-        return CollectionUtility.emptyTreeSet();
+      @SuppressWarnings("unchecked")
+      TypeHierarchy<T> h = m_typeHierarchies.get(beanClazz);
+      if (h == null) {
+        return Collections.emptyList();
       }
-      return regs;
+      return h.querySingle();
     }
     finally {
       m_lock.readLock().unlock();
+    }
+  }
+
+  @Internal
+  protected <T> List<IBean<T>> queryAll(Class<T> beanClazz) {
+    m_lock.readLock().lock();
+    try {
+      @SuppressWarnings("unchecked")
+      TypeHierarchy<T> h = m_typeHierarchies.get(beanClazz);
+      if (h == null) {
+        return Collections.emptyList();
+      }
+      return h.queryAll();
+    }
+    finally {
+      m_lock.readLock().unlock();
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
+    m_lock.readLock().lock();
+    try {
+      TypeHierarchy<T> h = m_typeHierarchies.get(beanClazz);
+      if (h == null) {
+        return CollectionUtility.emptyArrayList();
+      }
+      return new ArrayList<IBean<T>>(h.getBeans());
+    }
+    finally {
+      m_lock.readLock().unlock();
+    }
+  }
+
+  protected Set<Class<?>> listImplementedTypes(IBean<?> bean) {
+    Class[] interfacesHierarchy = BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class);
+    HashSet<Class<?>> clazzes = new HashSet<Class<?>>(interfacesHierarchy.length + 1);
+    clazzes.add(bean.getBeanClazz());
+    clazzes.add(Object.class);
+    for (Class<?> c : interfacesHierarchy) {
+      clazzes.add(c);
+    }
+    return clazzes;
+  }
+
+  @Override
+  public <T> IBean<T> registerClass(Class<T> beanClazz) {
+    m_lock.writeLock().lock();
+    try {
+      for (IBean<T> bean : getBeans(beanClazz)) {
+        if (bean.getBeanClazz() == beanClazz) {
+          return bean;
+        }
+      }
+      BeanData<T> bean = new BeanData<T>(beanClazz);
+      return registerBean(bean);
+    }
+    finally {
+      m_lock.writeLock().unlock();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> IBean<T> registerBean(BeanData beanData) {
+    m_lock.writeLock().lock();
+    try {
+      IBean<T> bean = new BeanImplementor<T>(beanData);
+      for (Class<?> type : listImplementedTypes(bean)) {
+        TypeHierarchy h = m_typeHierarchies.get(type);
+        if (h == null) {
+          h = new TypeHierarchy(type);
+          m_typeHierarchies.put(type, h);
+        }
+        h.addBean(bean);
+      }
+      return bean;
+    }
+    finally {
+      m_lock.writeLock().unlock();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public synchronized void unregisterBean(IBean bean) {
+    m_lock.writeLock().lock();
+    try {
+      Assertions.assertNotNull(bean);
+      for (Class<?> type : listImplementedTypes(bean)) {
+        TypeHierarchy h = m_typeHierarchies.get(type);
+        if (h != null) {
+          h.removeBean(bean);
+        }
+      }
+    }
+    finally {
+      m_lock.writeLock().unlock();
     }
   }
 
@@ -79,8 +178,7 @@ public class BeanContextImplementor implements IBeanContext {
 
   @Override
   public <T> T getInstance(Class<T> beanClazz) {
-    TreeSet<IBeanRegistration> regs = getRegistrationsInternal(beanClazz);
-    T instance = m_beanInstanceFactory.select(beanClazz, regs);
+    T instance = getInstanceOrNull(beanClazz);
     if (instance != null) {
       return instance;
     }
@@ -89,120 +187,31 @@ public class BeanContextImplementor implements IBeanContext {
 
   @Override
   public <T> T getInstanceOrNull(Class<T> beanClazz) {
-    TreeSet<IBeanRegistration> regs = getRegistrationsInternal(beanClazz);
-    return m_beanInstanceFactory.select(beanClazz, regs);
+    List<IBean<T>> beans = querySingle(beanClazz);
+    return m_beanInstanceFactory.select(beanClazz, beans);
   }
 
   @Override
   public <T> List<T> getInstances(Class<T> beanClazz) {
-    TreeSet<IBeanRegistration> regs = getRegistrationsInternal(beanClazz);
-    return m_beanInstanceFactory.selectAll(beanClazz, regs);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
-    TreeSet<IBeanRegistration> regs = getRegistrationsInternal(beanClazz);
-    List<IBean<T>> result = new ArrayList<IBean<T>>(regs.size());
-    for (IBeanRegistration reg : regs) {
-      result.add((IBean<T>) reg.getBean());
-    }
-    return result;
-  }
-
-  @Override
-  public Set<IBean<?>> getAllRegisteredBeans() {
-    m_lock.readLock().lock();
-    try {
-      HashSet<IBean<?>> allBeans = new HashSet<IBean<?>>();
-      for (Set<IBeanRegistration> regs : m_regs.values()) {
-        for (IBeanRegistration reg : regs) {
-          allBeans.add(reg.getBean());
-        }
-      }
-      return allBeans;
-    }
-    finally {
-      m_lock.readLock().unlock();
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> IBean<T> registerClass(Class<T> beanClazz) {
-    m_lock.writeLock().lock();
-    try {
-      TreeSet<IBeanRegistration> regs = getRegistrationsInternal(beanClazz);
-      if (regs.size() == 1) {
-        return (IBean<T>) regs.first().getBean();
-      }
-      BeanImplementor<T> bean = new BeanImplementor<T>(beanClazz);
-      registerBean(bean, null);
-      return bean;
-    }
-    finally {
-      m_lock.writeLock().unlock();
-    }
-  }
-
-  @Override
-  public void registerBean(IBean bean, Object instance) {
-    m_lock.writeLock().lock();
-    try {
-      Class[] interfacesHierarchy = BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class);
-      List<Class<?>> clazzes = new ArrayList<Class<?>>(interfacesHierarchy.length + 1);
-      clazzes.add(bean.getBeanClazz());
-      for (Class<?> c : interfacesHierarchy) {
-        clazzes.add(c);
-      }
-
-      @SuppressWarnings("unchecked")
-      IBeanRegistration reg = new BeanRegistration(bean, instance);
-      for (Class<?> clazz : clazzes) {
-        TreeSet<IBeanRegistration> regs = m_regs.get(clazz);
-        if (regs == null) {
-          regs = new TreeSet<IBeanRegistration>();
-          m_regs.put(clazz, regs);
-        }
-        regs.add(reg);
-      }
-    }
-    finally {
-      m_lock.writeLock().unlock();
-    }
-  }
-
-  @Override
-  public synchronized void unregisterBean(IBean bean) {
-    m_lock.writeLock().lock();
-    try {
-      Assertions.assertNotNull(bean);
-      for (Set<IBeanRegistration> regs : m_regs.values()) {
-        Iterator<IBeanRegistration> regIt = regs.iterator();
-        while (regIt.hasNext()) {
-          if (regIt.next().getBean().equals(bean)) {
-            regIt.remove();
-          }
-        }
-      }
-    }
-    finally {
-      m_lock.writeLock().unlock();
-    }
+    List<IBean<T>> beans = queryAll(beanClazz);
+    return m_beanInstanceFactory.selectAll(beanClazz, beans);
   }
 
   public void startCreateImmediatelyBeans() {
     m_lock.readLock().lock();
     try {
-      for (Set<IBeanRegistration> regs : m_regs.values()) {
-        for (IBeanRegistration reg : regs) {
-          if (BeanContextImplementor.isCreateImmediately(reg.getBean())) {
-            if (BeanContextImplementor.isApplicationScoped(reg.getBean())) {
-              reg.getInstance();
-            }
-            else {
-              throw new InitializationException(String.format("Bean '%s' is marked with @CreateImmediately and is not application scoped (@ApplicationScoped) - unexpected configuration! ", reg.getBean().getBeanClazz()));
-            }
+      for (IBean bean : getBeans(Object.class)) {
+        if (BeanContextImplementor.isCreateImmediately(bean)) {
+          if (BeanContextImplementor.isApplicationScoped(bean)) {
+            bean.createInstance();
+          }
+          else {
+            throw new InitializationException(String.format(
+                "Bean '%s' is marked with @%s and is not application scoped (@%s) - unexpected configuration! ",
+                bean.getBeanClazz(),
+                CreateImmediately.class.getSimpleName(),
+                ApplicationScoped.class.getSimpleName()
+                ));
           }
         }
       }

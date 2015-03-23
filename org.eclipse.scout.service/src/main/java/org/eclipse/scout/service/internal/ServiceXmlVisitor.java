@@ -22,8 +22,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBeanContext;
-import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.eclipse.scout.rt.platform.pluginxml.IPluginXmlVisitor;
 import org.eclipse.scout.rt.platform.pluginxml.internal.IPluginXml;
 import org.eclipse.scout.service.IServiceReference;
@@ -80,13 +80,13 @@ public class ServiceXmlVisitor implements IPluginXmlVisitor {
   }
 
   private void registerService(IServiceReference ref, IPluginXml xmlFile) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
-    BeanImplementor<?> bean = new BeanImplementor<Object>(ref.getService());
+    BeanData<?> bean = new BeanData<Object>(ref.getService());
     fillServiceAnnotations(bean, xmlFile, ref);
     //TODO imo check to enhance the exiting bean (IService may receive a @Bean anno...) instead of re-registering it
-    m_context.registerBean(bean, null);
+    m_context.registerBean(bean);
   }
 
-  public static void fillServiceAnnotations(BeanImplementor<?> bean, IPluginXml pluginXml, IServiceReference ref) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
+  public static void fillServiceAnnotations(BeanData<?> bean, IPluginXml pluginXml, IServiceReference ref) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
     // ranking
     bean.addAnnotation(org.eclipse.scout.rt.platform.AnnotationFactory.createPriority(ref.getRanking()));
 

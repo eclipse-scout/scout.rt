@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -49,10 +49,9 @@ public class SERVICESTest {
 
   private IBean<?> registerService(Class<? extends ITestService> serviceClazz, float priority) {
 
-    BeanImplementor<? extends ITestService> bean = new BeanImplementor<ITestService>(serviceClazz);
+    BeanData<? extends ITestService> bean = new BeanData<ITestService>(serviceClazz);
     bean.addAnnotation(AnnotationFactory.createPriority(priority));
-    Platform.get().getBeanContext().registerBean(bean, null);
-    return bean;
+    return Platform.get().getBeanContext().registerBean(bean);
   }
 
   /**

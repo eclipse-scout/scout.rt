@@ -27,6 +27,8 @@ import java.lang.annotation.Target;
  * NOTE: this annotation is not sufficient to distinguish between subclassing with "REPLACE" semantics and subclassing
  * with "RE-USE CODE" semantics. Use the {@link Replace} annotation in addition when a "REPLACE" subclassing of a bean
  * is intended. Just delete the prio annotation when "RE-USE CODE" is intended.
+ * <p>
+ * TODO imo deprecate and remove
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

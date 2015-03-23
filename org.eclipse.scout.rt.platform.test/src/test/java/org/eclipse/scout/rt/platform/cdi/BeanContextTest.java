@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.platform.cdi;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.SimpleBeanInstanceFactory;
 import org.eclipse.scout.rt.platform.internal.BeanContextImplementor;
-import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,14 +42,14 @@ public class BeanContextTest {
   public void testUnregisterByBean() {
     BeanContextImplementor context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
 
-    context.registerClass(Bean01.class);
-    context.registerClass(Bean02.class);
+    IBean reg1 = context.registerClass(Bean01.class);
+    IBean reg2 = context.registerClass(Bean02.class);
 
-    Assert.assertEquals(2, context.getAllRegisteredBeans().size());
-    context.unregisterBean(new BeanImplementor<Bean01>(Bean01.class));
-    Assert.assertEquals(1, context.getAllRegisteredBeans().size());
-    context.unregisterBean(new BeanImplementor<Bean02>(Bean02.class));
-    Assert.assertEquals(0, context.getAllRegisteredBeans().size());
+    Assert.assertEquals(2, context.getBeans(Object.class).size());
+    context.unregisterBean(reg1);
+    Assert.assertEquals(1, context.getBeans(Object.class).size());
+    context.unregisterBean(reg2);
+    Assert.assertEquals(0, context.getBeans(Object.class).size());
   }
 
   private static interface ITestBean {

@@ -10,14 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.internal;
 
+import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanContext;
 import org.eclipse.scout.rt.platform.IBeanInstanceFactory;
 import org.eclipse.scout.rt.platform.IPlatform;
@@ -137,9 +138,9 @@ public class PlatformImplementor implements IPlatform {
     if (m_beanContext.getBeanInstanceFactory() != null) {
       return;
     }
-    TreeSet<IBeanRegistration> regs = m_beanContext.getRegistrationsInternal(IBeanInstanceFactory.class);
-    if (regs.size() > 0) {
-      m_beanContext.setBeanInstanceFactory((IBeanInstanceFactory) regs.first().getInstance());
+    List<IBean<IBeanInstanceFactory>> beans = m_beanContext.getBeans(IBeanInstanceFactory.class);
+    if (beans.size() > 0) {
+      m_beanContext.setBeanInstanceFactory(beans.get(0).createInstance());
     }
     if (m_beanContext.getBeanInstanceFactory() != null) {
       return;
@@ -253,13 +254,13 @@ public class PlatformImplementor implements IPlatform {
 
   protected void fireStateEvent(State newState) {
     PlatformEvent e = new PlatformEvent(this, newState);
-    for (IBeanRegistration reg : m_beanContext.getRegistrationsInternal(IPlatformListener.class)) {
+    for (IBean<IPlatformListener> bean : m_beanContext.getBeans(IPlatformListener.class)) {
       try {
-        IPlatformListener listener = (IPlatformListener) reg.getInstance();
+        IPlatformListener listener = (IPlatformListener) bean.createInstance();
         listener.stateChanged(e);
       }
       catch (Throwable t) {
-        LOG.warn(IPlatformListener.class.getSimpleName() + " " + reg.getBean().getBeanClazz(), t);
+        LOG.warn(IPlatformListener.class.getSimpleName() + " " + bean.getBeanClazz(), t);
       }
     }
   }

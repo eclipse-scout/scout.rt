@@ -26,9 +26,9 @@ public class BeanRegisterUnregisterTest {
     BeanContextImplementor context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
 
     IBean<?> reg = context.registerClass(TestObject.class);
-    Assert.assertEquals(1, context.getAllRegisteredBeans().size());
+    Assert.assertEquals(1, context.getBeans(Object.class).size());
     context.unregisterBean(reg);
-    Assert.assertEquals(0, context.getAllRegisteredBeans().size());
+    Assert.assertEquals(0, context.getBeans(Object.class).size());
   }
 
   private static class TestObject {
