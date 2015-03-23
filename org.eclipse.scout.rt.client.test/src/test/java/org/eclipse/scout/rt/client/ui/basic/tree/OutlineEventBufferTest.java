@@ -47,5 +47,4 @@ public class OutlineEventBufferTest {
     assertEquals(1, coalesced.size());
     assertSame(e2, coalesced.get(0));
   }
-
 }

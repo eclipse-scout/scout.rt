@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -41,6 +42,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     removeObsolete(events);
     replacePrevious(events, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED);
     coalesceSameType(events);
+    removeEmptyEvents(events);
     return events;
   }
 
@@ -52,8 +54,8 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     //previous events may be deleted from the list
     for (int j = 0; j < events.size() - 1; j++) {
       int i = events.size() - 1 - j;
-      TableEvent event = events.get(i);
 
+      TableEvent event = events.get(i);
       int type = event.getType();
 
       //remove all previous row related events
@@ -65,43 +67,58 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         remove(type, events.subList(0, i));
       }
       else if (type == TableEvent.TYPE_ROWS_DELETED) {
-        removeRows(event.getRows(), events.subList(0, i),
-            TableEvent.TYPE_ROWS_UPDATED,
-            TableEvent.TYPE_ROWS_CHECKED);
+        List<ITableRow> remainingRows = removeRowsFromPreviousEvents(event.getRows(), events.subList(0, i), TableEvent.TYPE_ROWS_INSERTED);
+        event.setRows(remainingRows);
       }
     }
   }
 
   /**
-   * Traverses the list backwards and removes rows of a given type from a list. If the row list becomes empty the whole
-   * event is removed. This process is stopped, when a event that may change row indexes is encountered.
+   * Removes the given 'rowsToRemove' from all 'events'. The event list is traversed backwards. This process is stopped,
+   * when a event that may change row indexes is encountered.
+   *
+   * @return a list with the same rows as 'rowsToRemove', except those that were removed from an
+   *         event whose type matches one of the 'creationTypes'. This allows for completely removing
+   *         a row that was created and deleted in the same request.
    */
-  protected void removeRows(List<ITableRow> rows, List<TableEvent> events, Integer... types) {
-    List<Integer> typeList = Arrays.asList(types);
-    for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
-      TableEvent event = it.previous();
-      if (typeList.contains(event.getType())) {
-        removeRows(rows, event);
-        if (event.getRowCount() == 0) {
-          it.remove();
+  protected List<ITableRow> removeRowsFromPreviousEvents(List<ITableRow> rowsToRemove, List<TableEvent> events, Integer... creationTypes) {
+    List<Integer> creationTypesList = Arrays.asList(creationTypes);
+    List<ITableRow> remainingRows = new ArrayList<ITableRow>();
+
+    for (ITableRow rowToRemove : rowsToRemove) {
+      boolean rowRemovedFromCreationEvent = false;
+
+      for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
+        TableEvent event = it.previous();
+        boolean removed = removeRow(event, rowToRemove);
+        if (removed && creationTypesList.contains(event.getType())) {
+          rowRemovedFromCreationEvent = true;
+        }
+        if (!isRowOrderUnchanged(event.getType())) {
+          break;
         }
       }
-      if (!isRowOrderUnchanged(event.getType())) {
-        break;
+
+      if (!rowRemovedFromCreationEvent) {
+        remainingRows.add(rowToRemove);
       }
     }
+
+    return remainingRows;
   }
 
-  protected void removeRows(List<ITableRow> rows, TableEvent event) {
-    Map<Integer, ITableRow> rowIndexes = getRowIndexMap(rows);
-    List<ITableRow> newRows = new ArrayList<>();
-
-    for (ITableRow r : event.getRows()) {
-      if (!rowIndexes.containsKey(r.getRowIndex())) {
-        newRows.add(r);
+  protected boolean removeRow(TableEvent event, ITableRow rowToRemove) {
+    boolean removed = false;
+    List<ITableRow> rows = event.getRows();
+    for (Iterator<ITableRow> it = rows.iterator(); it.hasNext();) {
+      ITableRow row = it.next();
+      if (row.getRowIndex() == rowToRemove.getRowIndex()) {
+        it.remove();
+        removed = true;
       }
     }
-    event.setRows(newRows);
+    event.setRows(rows);
+    return removed;
   }
 
   /**
@@ -115,11 +132,8 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       int type = event.getType();
 
       //merge current update event with previous insert event of the same row
-      if (type == newType && event.getRowCount() == 1) {
-        boolean updated = updatePreviousRow(event, events.subList(0, i), oldType);
-        if (updated) {
-          events.remove(i);
-        }
+      if (type == newType) {
+        updatePreviousRow(event, events.subList(0, i), oldType);
       }
     }
   }
@@ -135,7 +149,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       int type = event.getType();
 
       if (isCoalesceConsecutivePrevious(type)) {
-        coalesce(event, events.subList(0, i));
+        coalesceConsecutivePrevious(event, events.subList(0, i));
       }
     }
   }
@@ -144,39 +158,27 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    * Updates previous rows in the list, if it is of the given type. Breaks, if events are encountered, that may change
    * the row order.
    */
-  protected boolean updatePreviousRow(TableEvent event, List<TableEvent> events, int type) {
+  protected void updatePreviousRow(TableEvent event, List<TableEvent> events, int type) {
     for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
       TableEvent previous = it.previous();
       if (previous.getType() == type) {
-        boolean replaced = tryReplaceRow(previous, event.getFirstRow());
-        if (replaced) {
-          return true;
-        }
+        List<ITableRow> rows = event.getRows();
+        replaceRows(previous, rows);
+        event.setRows(rows);
       }
       if (!isRowOrderUnchanged(previous.getType())) {
-        return false;
+        break;
       }
     }
-    return false;
   }
 
-  /**
-   * @return <code>true</code>, if the event does not influence the row order.
-   */
-  protected boolean isRowOrderUnchanged(int type) {
-    switch (type) {
-      case TableEvent.TYPE_ROWS_SELECTED:
-      case TableEvent.TYPE_ROW_ACTION:
-      case TableEvent.TYPE_ROW_CLICK:
-      case TableEvent.TYPE_ROWS_UPDATED:
-      case TableEvent.TYPE_ROWS_CHECKED:
-      case TableEvent.TYPE_SCROLL_TO_SELECTION:
-      case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
-      case TableEvent.TYPE_COLUMN_ORDER_CHANGED:
-      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
-        return true;
-      default:
-        return false;
+  protected void replaceRows(TableEvent event, List<ITableRow> newRows) {
+    for (Iterator<ITableRow> it = newRows.iterator(); it.hasNext();) {
+      ITableRow newRow = it.next();
+      boolean replaced = tryReplaceRow(event, newRow);
+      if (replaced) {
+        it.remove();
+      }
     }
   }
 
@@ -186,18 +188,16 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    * @return <code>true</code> if successful.
    */
   protected boolean tryReplaceRow(TableEvent event, ITableRow newRow) {
-    List<ITableRow> rows = new ArrayList<>();
+    List<ITableRow> targetRows = new ArrayList<>();
     boolean replaced = false;
-    for (ITableRow r : event.getRows()) {
-      if (r.getRowIndex() == newRow.getRowIndex()) {
-        rows.add(newRow);
+    for (ITableRow row : event.getRows()) {
+      if (row.getRowIndex() == newRow.getRowIndex()) {
+        row = newRow;
         replaced = true;
       }
-      else {
-        rows.add(r);
-      }
+      targetRows.add(row);
     }
-    event.setRows(rows);
+    event.setRows(targetRows);
     return replaced;
   }
 
@@ -205,7 +205,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    * Merge events of the same type in the given list (rows and columns) into the current and delete the other events
    * from the list.
    */
-  protected void coalesce(TableEvent event, List<TableEvent> list) {
+  protected void coalesceConsecutivePrevious(TableEvent event, List<TableEvent> list) {
     for (ListIterator<TableEvent> it = list.listIterator(list.size()); it.hasPrevious();) {
       TableEvent previous = it.previous();
       if (event.getType() == previous.getType()) {
@@ -233,51 +233,74 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    */
   protected List<ITableRow> mergeRows(List<ITableRow> first, List<ITableRow> second) {
     List<ITableRow> rows = new ArrayList<>();
-    Map<Integer, ITableRow> rowIndexes = getRowIndexMap(second);
-
-    for (ITableRow r : first) {
-      if (!rowIndexes.containsKey(r.getRowIndex())) {
-        rows.add(r);
+    Map<Integer, ITableRow> rowIndexes = getRowsByRowIndexMap(second);
+    for (ITableRow row : first) {
+      if (!rowIndexes.containsKey(row.getRowIndex())) {
+        rows.add(row);
       }
     }
-
-    for (ITableRow r : second) {
-      rows.add(r);
+    for (ITableRow row : second) {
+      rows.add(row);
     }
     return rows;
   }
 
-  protected Map<Integer, ITableRow> getRowIndexMap(List<ITableRow> rows) {
-    Map<Integer, ITableRow> rowIndexes = new HashMap<>();
-    for (ITableRow r : rows) {
-      rowIndexes.put(r.getRowIndex(), r);
+  protected Map<Integer, ITableRow> getRowsByRowIndexMap(List<ITableRow> rows) {
+    Map<Integer, ITableRow> rowsByRowIndex = new HashMap<>();
+    for (ITableRow row : rows) {
+      rowsByRowIndex.put(row.getRowIndex(), row);
     }
-    return rowIndexes;
+    return rowsByRowIndex;
   }
 
   /**
    * Merge list of cols, such that, if a column of the same index is in both lists, only the one of the second list
-   * (later
-   * event) is kept.
+   * (later event) is kept.
    */
   protected Collection<IColumn<?>> mergeColumns(Collection<IColumn<?>> first, Collection<IColumn<?>> second) {
     List<IColumn<?>> cols = new ArrayList<>();
-    HashMap<Integer, IColumn<?>> colIndexes = new HashMap<>();
-
-    for (IColumn<?> r : second) {
-      colIndexes.put(r.getColumnIndex(), r);
+    Map<Integer, IColumn<?>> colIndexes = new HashMap<>();
+    for (IColumn<?> column : second) {
+      colIndexes.put(column.getColumnIndex(), column);
     }
-
-    for (IColumn<?> r : first) {
-      if (!colIndexes.containsKey(r.getColumnIndex())) {
-        cols.add(r);
+    for (IColumn<?> column : first) {
+      if (!colIndexes.containsKey(column.getColumnIndex())) {
+        cols.add(column);
       }
     }
-
-    for (IColumn<?> r : second) {
-      cols.add(r);
+    for (IColumn<?> column : second) {
+      cols.add(column);
     }
     return cols;
+  }
+
+  protected void removeEmptyEvents(List<TableEvent> events) {
+    for (Iterator<TableEvent> it = events.iterator(); it.hasNext();) {
+      TableEvent event = it.next();
+      if (isRowsRequired(event.getType()) && event.getRows().isEmpty()) {
+        it.remove();
+      }
+    }
+  }
+
+  /**
+   * @return <code>true</code>, if the event does not influence the row order.
+   */
+  protected boolean isRowOrderUnchanged(int type) {
+    switch (type) {
+      case TableEvent.TYPE_ROWS_SELECTED:
+      case TableEvent.TYPE_ROW_ACTION:
+      case TableEvent.TYPE_ROW_CLICK:
+      case TableEvent.TYPE_ROWS_UPDATED:
+      case TableEvent.TYPE_ROWS_CHECKED:
+      case TableEvent.TYPE_SCROLL_TO_SELECTION:
+      case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
+      case TableEvent.TYPE_COLUMN_ORDER_CHANGED:
+      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
+        return true;
+      default:
+        return false;
+    }
   }
 
   protected List<Integer> getRowRelatedEvents() {
@@ -298,6 +321,10 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     res.add(TableEvent.TYPE_REQUEST_FOCUS_IN_CELL);
     res.add(TableEvent.TYPE_SCROLL_TO_SELECTION);
     return res;
+  }
+
+  protected boolean isRowRelatedEvent(int type) {
+    return getRowRelatedEvents().contains(type);
   }
 
   /**
@@ -332,6 +359,25 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       case TableEvent.TYPE_ROWS_DELETED:
       case TableEvent.TYPE_ROWS_CHECKED:
       case TableEvent.TYPE_COLUMN_HEADERS_UPDATED: {
+        return true;
+      }
+      default: {
+        return false;
+      }
+    }
+  }
+
+  protected boolean isRowsRequired(int type) {
+    switch (type) {
+      case TableEvent.TYPE_ROW_ACTION:
+      case TableEvent.TYPE_ROW_CLICK:
+      case TableEvent.TYPE_ROW_DROP_ACTION:
+      case TableEvent.TYPE_ROW_ORDER_CHANGED:
+      case TableEvent.TYPE_ROWS_COPY_REQUEST:
+      case TableEvent.TYPE_ROWS_DELETED:
+      case TableEvent.TYPE_ROWS_DRAG_REQUEST:
+      case TableEvent.TYPE_ROWS_INSERTED:
+      case TableEvent.TYPE_ROWS_UPDATED: {
         return true;
       }
       default: {

@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
+import java.util.Collection;
+
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEventBuffer;
 
@@ -17,6 +20,14 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEventBuffer;
  * A buffer for outline events ({@link OutlineEvent}s and {@link TreeEvent}s)
  */
 public class OutlineEventBuffer extends TreeEventBuffer {
+
+  @Override
+  protected TreeEvent replaceNodesInEvent(TreeEvent event, Collection<ITreeNode> nodes) {
+    if (event instanceof OutlineEvent) {
+      return new OutlineEvent(event.getTree(), event.getType(), event.getNode());
+    }
+    return super.replaceNodesInEvent(event, nodes);
+  }
 
   @Override
   protected boolean isIgnorePrevious(int type) {
