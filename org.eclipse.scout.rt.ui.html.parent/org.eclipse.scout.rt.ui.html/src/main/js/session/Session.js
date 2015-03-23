@@ -251,8 +251,8 @@ scout.Session.prototype._coalesceEvents = function(previousEvents, event) {
 scout.Session.prototype._sendRequest = function(request) {
   var unload = !!request.unload;
 
-  // No need to queue the request when document is unloading
   if (this.offline) {
+    // No need to queue the request when document is unloading
     if (!unload) {
       request.events.forEach(function(event) {
         this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
@@ -349,8 +349,7 @@ scout.Session.prototype._ajaxOptions = function(request, async) {
  * In the latter case, polling is resumed when a user-initiated request has been successful.
  */
 scout.Session.prototype._resumeBackgroundJobPolling = function() {
-  if (this._backgroundJobPollingEnabled &&
-      this._backgroundJobPollingStatus != scout.BackgroundJobPollingStatus.RUNNING) {
+  if (this._backgroundJobPollingEnabled && this._backgroundJobPollingStatus !== scout.BackgroundJobPollingStatus.RUNNING) {
     $.log.info('Resume background jobs polling request, status was=' + this._backgroundJobPollingStatus);
     this._pollForBackgroundJobs();
   }
@@ -531,9 +530,8 @@ scout.Session.prototype.showFatalMessage = function(options) {
     }
   }.bind(this);
 
+  this._setApplicationLoading(false);
   ui.render(this.$entryPoint);
-  // In case error occurs during application loading, remove the animation
-  this.$entryPoint.children('.application-loading').remove();
 };
 
 scout.Session.prototype.goOffline = function() {
@@ -599,7 +597,7 @@ scout.Session.prototype.setBusy = function(busy) {
 scout.Session.prototype._renderBusyGlasspane = function() {
   // Don't show the busy glasspane immediately. Set a short timer instead (which may be
   // cancelled again if the busy state returns to false in the meantime).
-  this._busyGlasspaneTimer = setTimeout(function() {
+  this._busyGlasspaneTimeoutId = setTimeout(function() {
     // Create busy glasspane
     this._$busyGlasspane = scout.fields.new$Glasspane()
       .addClass('busy')
@@ -615,7 +613,7 @@ scout.Session.prototype._renderBusyGlasspane = function() {
     // (End workaround)
 
     if (this.desktop) {
-      this._darkBusyGlasspaneTimer = setTimeout(function() {
+      this._darkBusyGlasspaneTimeoutId = setTimeout(function() {
         this._$busyGlasspane.addClass('dark');
       }.bind(this), 2500);
     }
@@ -624,8 +622,8 @@ scout.Session.prototype._renderBusyGlasspane = function() {
 
 scout.Session.prototype._removeBusyGlasspane = function() {
   // Clear any pending timers
-  clearTimeout(this._busyGlasspaneTimer);
-  clearTimeout(this._darkBusyGlasspaneTimer);
+  clearTimeout(this._busyGlasspaneTimeoutId);
+  clearTimeout(this._darkBusyGlasspaneTimeoutId);
 
   // If the timer action was executed and the glasspane is showing, we have to remove it
   if (this._$busyGlasspane) {
@@ -637,6 +635,19 @@ scout.Session.prototype._removeBusyGlasspane = function() {
       this._$busyGlasspane.stop().fadeOut(150, $.removeThis);
       $('.taskbar-logo').removeClass('animated');
     }.bind(this), 0);
+  }
+};
+
+scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
+  if (applicationLoading) {
+    this._applicationLoadingTimeoutId = setTimeout(function() {
+      if (!this.desktop) {
+        this.$entryPoint.appendDiv('application-loading').fadeIn();
+      }
+    }.bind(this), 500);
+  } else {
+    clearTimeout(this._applicationLoadingTimeoutId);
+    this.$entryPoint.children('.application-loading').remove();
   }
 };
 
@@ -666,11 +677,7 @@ scout.Session.prototype._processEvents = function(events) {
 
 scout.Session.prototype.init = function() {
   // After a short time, display a loading animation (will be removed again in _onInitialized)
-  setTimeout(function() {
-    if (!this.desktop) {
-      this.$entryPoint.appendDiv('application-loading').fadeIn();
-    }
-  }.bind(this), 500);
+  this._setApplicationLoading(true);
 
   // Send startup request
   this._startup = true;
@@ -708,7 +715,7 @@ scout.Session.prototype._onInitialized = function(event) {
   this.locale = new scout.Locale(clientSessionData.locale);
   this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
   this.desktop.render(this.$entryPoint);
-  this.$entryPoint.children('.application-loading').remove();
+  this._setApplicationLoading(false);
   this._backgroundJobPollingEnabled = event.backgroundJobPollingEnabled;
 };
 
