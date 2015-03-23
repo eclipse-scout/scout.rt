@@ -71,7 +71,13 @@ button img {
   text-decoration: underline;
 }
 
+.table .button>.key-box {
+  top: 8px;
+}
+
 .button>.key-box {
   position: absolute;
   top: 8px;
 }
+
+
