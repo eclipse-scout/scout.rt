@@ -537,12 +537,21 @@ scout.Session.prototype.showFatalMessage = function(options) {
 scout.Session.prototype.goOffline = function() {
   $.log.error('goOffline');
   this.offline = true;
-  this.desktop.goOffline();
 
-  if (!this.reconnector) {
-    this.reconnector = new scout.Reconnector(this);
-  }
-  this.reconnector.start();
+  // In Firefox, the current async polling request is interrupted immediately when the page is unloaded. Therefore,
+  // an offline message would appear at once on the desktop. When reloading the page, all elements are cleared anyway,
+  // thus we wait some short period of time before displaying the message and starting the reconnector. If
+  // we find that goOffline() was called because of request unloading, we skip the unnecessary part.
+  setTimeout(function() {
+    if (this._unload) {
+      return;
+    }
+    this.desktop.goOffline();
+    if (!this.reconnector) {
+      this.reconnector = new scout.Reconnector(this);
+    }
+    this.reconnector.start();
+  }.bind(this), 100);
 };
 
 scout.Session.prototype.goOnline = function() {
