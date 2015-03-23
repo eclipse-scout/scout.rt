@@ -26,32 +26,27 @@ public class RegisterBeanStatement extends Statement {
 
   protected final Statement m_next;
   private final Class<?> m_beanClass;
-  private final Object m_beanInstance;
 
   /**
-   * Creates a statement to register a bean during the time of execution.
+   * Creates a statement to register a bean-class during the time of executing a statement.
+   *
+   * @param next
+   *          next {@link Statement} to be executed.
+   * @param beanClass
+   *          bean-class to be registered.
+   *          order of the bean-class to be registered. Lowest value is first in result list (preferred).
    */
   public RegisterBeanStatement(final Statement next, final Class<?> beanClass) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
-    m_beanClass = Assertions.assertNotNull(beanClass, "bean class must not be null");
-    m_beanInstance = null;
-  }
-
-  /**
-   * Creates a statement to register an 'application-scoped' bean during the time of execution.
-   */
-  public RegisterBeanStatement(final Statement next, final Object beanInstance) {
-    m_next = Assertions.assertNotNull(next, "next statement must not be null");
-    m_beanInstance = Assertions.assertNotNull(beanInstance, "bean instance must not be null");
-    m_beanClass = beanInstance.getClass();
+    m_beanClass = Assertions.assertNotNull(beanClass, "bean-class must not be null");
   }
 
   @Override
   public void evaluate() throws Throwable {
     final BeanData<?> bean = new BeanData<>(m_beanClass);
-    bean.addAnnotation(AnnotationFactory.createPriority(Long.MAX_VALUE));
+    bean.addAnnotation(AnnotationFactory.createOrder(-1000));
 
-    Platform.get().getBeanContext().registerBean(bean);
+    IBean reg = Platform.get().getBeanContext().registerBean(bean);
     try {
       m_next.evaluate();
     }

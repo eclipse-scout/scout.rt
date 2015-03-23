@@ -21,7 +21,10 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanContext;
@@ -149,7 +152,11 @@ public final class TestingUtility {
   /**
    * Registers the given services in the current {@link IBeanContext} and returns their registrations.<br/>
    * If registering Mockito mocks, use {@link #registerService(float, Object, Class)} instead.
+   * 
+   * @deprecated use {@link IBeanContext#registerClass(Class)} with {@link Order}, {@link ApplicationScoped} and
+   *             {@link Replace} instead, do not use implementations directly
    */
+  @Deprecated
   public static List<IBean<?>> registerServices(float priority, Object... services) {
     if (services == null) {
       return CollectionUtility.emptyArrayList();
@@ -170,12 +177,15 @@ public final class TestingUtility {
 
   /**
    * Registers the given service under the given type in the current {@link IBeanContext} and returns its registration.
+   * 
+   * @deprecated use {@link IBeanContext#registerClass(Class)} with {@link Order}, {@link ApplicationScoped} and
+   *             {@link Replace} instead, do not use implementations directly
    */
-  @SuppressWarnings("unchecked")
+  @Deprecated
   public static <SERVICE> IBean<SERVICE> registerService(float priority, SERVICE object, Class<? extends SERVICE> clazz) {
     BeanData<SERVICE> bean = new BeanData<>(clazz, object);
     bean.addAnnotation(AnnotationFactory.createApplicationScoped());
-    bean.addAnnotation(AnnotationFactory.createPriority(priority));
+    bean.addAnnotation(AnnotationFactory.createOrder(-priority));
     return Platform.get().getBeanContext().registerBean(bean);
   }
 

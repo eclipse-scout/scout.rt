@@ -12,7 +12,8 @@ package org.eclipse.scout.rt.platform;
 
 import java.lang.annotation.Annotation;
 
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Replace;
 
 public final class AnnotationFactory {
   private AnnotationFactory() {
@@ -26,17 +27,21 @@ public final class AnnotationFactory {
     return AnnotationFactory.Dummy.class.getAnnotation(CreateImmediately.class);
   }
 
-  public static Priority createPriority(final double priority) {
-    return new Priority() {
+  public static Replace createReplace() {
+    return AnnotationFactory.Dummy.class.getAnnotation(Replace.class);
+  }
+
+  public static Order createOrder(final double order) {
+    return new Order() {
 
       @Override
       public Class<? extends Annotation> annotationType() {
-        return Priority.class;
+        return Order.class;
       }
 
       @Override
       public double value() {
-        return priority;
+        return order;
       }
 
       @Override
@@ -52,10 +57,10 @@ public final class AnnotationFactory {
         if (obj == null) {
           return false;
         }
-        if (!(obj instanceof Priority)) {
+        if (!(obj instanceof Order)) {
           return false;
         }
-        Priority other = (Priority) obj;
+        Order other = (Order) obj;
         if (this.value() != other.value()) {
           return false;
         }
@@ -66,6 +71,7 @@ public final class AnnotationFactory {
 
   @ApplicationScoped
   @CreateImmediately
+  @Replace
   private static class Dummy {
   }
 }

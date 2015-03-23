@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBeanContext;
 import org.eclipse.scout.rt.platform.pluginxml.IPluginXmlVisitor;
@@ -87,14 +88,19 @@ public class ServiceXmlVisitor implements IPluginXmlVisitor {
   }
 
   public static void fillServiceAnnotations(BeanData<?> bean, IPluginXml pluginXml, IServiceReference ref) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
-    // ranking
-    bean.addAnnotation(org.eclipse.scout.rt.platform.AnnotationFactory.createPriority(ref.getRanking()));
+    // ranking (@Priority) is migrated to negative @Order
+    bean.addAnnotation(org.eclipse.scout.rt.platform.AnnotationFactory.createOrder(-ref.getRanking()));
 
     // services are always application scoped
     bean.addAnnotation(org.eclipse.scout.rt.platform.AnnotationFactory.createApplicationScoped());
 
     if (ref.isCreateImmediately()) {
       bean.addAnnotation(org.eclipse.scout.rt.platform.AnnotationFactory.createCreateImmediately());
+    }
+
+    //TODO abr: from imo: @Priority is migrated as if it would also be a @Replace. Also add this to the sdk utility
+    if (!ref.isProxy() && ref.getRanking() != 0) {
+      bean.addAnnotation(AnnotationFactory.createReplace());
     }
 
     if (ref.isProxy()) {

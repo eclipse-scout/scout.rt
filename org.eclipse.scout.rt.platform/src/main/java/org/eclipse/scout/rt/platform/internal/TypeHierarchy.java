@@ -102,7 +102,7 @@ public class TypeHierarchy<T> {
           }
         }
       }
-      Collections.sort(list, OBJ_GET_COMPARATOR);
+      Collections.sort(list, ORDER_COMPARATOR);
       m_querySingle = Collections.unmodifiableList(list);
     }
     if (m_queryAll == null) {
@@ -115,12 +115,12 @@ public class TypeHierarchy<T> {
           }
         }
       }
-      Collections.sort(list, OBJ_ALL_COMPARATOR);
+      Collections.sort(list, ORDER_COMPARATOR);
       m_queryAll = Collections.unmodifiableList(list);
     }
   }
 
-  private static final Comparator<IBean<?>> OBJ_GET_COMPARATOR = new Comparator<IBean<?>>() {
+  private static final Comparator<IBean<?>> ORDER_COMPARATOR = new Comparator<IBean<?>>() {
     @Override
     public int compare(IBean<?> o1, IBean<?> o2) {
       int cmp = orderOf(o1).compareTo(orderOf(o2));
@@ -128,13 +128,6 @@ public class TypeHierarchy<T> {
         return cmp;
       }
       return o1.getBeanClazz().getName().compareTo(o2.getBeanClazz().getName());
-    }
-  };
-
-  private static final Comparator<IBean> OBJ_ALL_COMPARATOR = new Comparator<IBean>() {
-    @Override
-    public int compare(IBean o1, IBean o2) {
-      return 0;
     }
   };
 

@@ -42,15 +42,14 @@ public class SERVICESTest {
    */
   @Before
   public void registerTestServices() {
-    m_ref1 = registerService(TestService1.class, 1);
-    m_ref2 = registerService(TestService2.class, 2);
-    m_ref3 = registerService(TestService3.class, 3);
+    m_ref1 = registerService(TestService1.class, 2);
+    m_ref2 = registerService(TestService2.class, 1);
+    m_ref3 = registerService(TestService3.class, 0);
   }
 
-  private IBean<?> registerService(Class<? extends ITestService> serviceClazz, float priority) {
-
+  private IBean<?> registerService(Class<? extends ITestService> serviceClazz, double order) {
     BeanData<? extends ITestService> bean = new BeanData<ITestService>(serviceClazz);
-    bean.addAnnotation(AnnotationFactory.createPriority(priority));
+    bean.addAnnotation(AnnotationFactory.createOrder(order));
     return Platform.get().getBeanContext().registerBean(bean);
   }
 
