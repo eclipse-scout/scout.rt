@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientContext;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -40,7 +41,8 @@ public class ClientSessionProvider {
    *           is thrown if the {@link IClientSession} could not be created or initialized.
    */
   public <SESSION extends IClientSession> SESSION provide(final ModelJobInput input) throws ProcessingException {
-    return input.getContext().invoke(new ICallable<SESSION>() {
+    ClientContext runContext = input.copy().getContext();
+    return runContext.sessionRequired(false).invoke(new ICallable<SESSION>() {
 
       @Override
       public SESSION call() throws Exception {
@@ -64,7 +66,7 @@ public class ClientSessionProvider {
 
   /**
    * Callback method for performing any operations before the given session is started.
-   * 
+   *
    * @param clientSession
    */
   protected void beforeStartSession(IClientSession clientSession) {
