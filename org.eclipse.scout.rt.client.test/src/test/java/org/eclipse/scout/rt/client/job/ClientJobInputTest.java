@@ -21,6 +21,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
@@ -401,6 +403,69 @@ public class ClientJobInputTest {
     UserAgent.CURRENT.set(userAgent1);
     when(session.getUserAgent()).thenReturn(userAgent2);
     assertEquals(userAgent2, ClientJobInput.defaults().session(session).getUserAgent());
+  }
+
+  @Test
+  public void testDerivedSubjectWhenSettingSession() throws PrivilegedActionException {
+    // Test with session ThreadLocal not set
+    ISession.CURRENT.remove();
+    testDerivedSubjectWhenSettingSessionImpl();
+
+    // Test with session ThreadLocal set: expected same behavior because session is set explicitly
+    IClientSession currentSession = mock(IClientSession.class);
+    when(currentSession.getSubject()).thenReturn(new Subject());
+    ISession.CURRENT.set(currentSession);
+    testDerivedSubjectWhenSettingSessionImpl();
+  }
+
+  private void testDerivedSubjectWhenSettingSessionImpl() throws PrivilegedActionException {
+    final IClientSession session = mock(IClientSession.class);
+    final Subject subject1 = new Subject();
+    final Subject subject2 = new Subject();
+
+    // Current Subject set, Subject on session not set --> Null Subject
+    Subject.doAs(subject1, new PrivilegedExceptionAction<Object>() {
+
+      @Override
+      public Object run() throws Exception {
+        when(session.getSubject()).thenReturn(null);
+        assertNull(ClientJobInput.defaults().session(session).getSubject());
+        return null;
+      }
+    });
+
+    // Current Subject not set, Subject on session not set --> Null Subject
+    Subject.doAs(null, new PrivilegedExceptionAction<Object>() {
+
+      @Override
+      public Object run() throws Exception {
+        when(session.getSubject()).thenReturn(null);
+        assertNull(ClientJobInput.defaults().session(session).getSubject());
+        return null;
+      }
+    });
+
+    // Current Subject not set, Subject on session set --> Subject from session
+    Subject.doAs(null, new PrivilegedExceptionAction<Object>() {
+
+      @Override
+      public Object run() throws Exception {
+        when(session.getSubject()).thenReturn(subject1);
+        assertSame(subject1, ClientJobInput.defaults().session(session).getSubject());
+        return null;
+      }
+    });
+
+    // Current Subject set, Subject on session set --> Subject from session
+    Subject.doAs(subject1, new PrivilegedExceptionAction<Object>() {
+
+      @Override
+      public Object run() throws Exception {
+        when(session.getSubject()).thenReturn(subject2);
+        assertSame(subject2, ClientJobInput.defaults().session(session).getSubject());
+        return null;
+      }
+    });
   }
 
   @Test

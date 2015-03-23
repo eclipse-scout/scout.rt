@@ -18,8 +18,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
@@ -344,6 +347,46 @@ public class ServerJobInputTest {
     ISession.CURRENT.remove();
     UserAgent.CURRENT.remove();
     assertNull(ServerJobInput.defaults().session(session).getUserAgent());
+  }
+
+  @Test
+  public void testDerivedSubjectWhenSettingSession() throws PrivilegedActionException {
+    // Test with session ThreadLocal not set
+    ISession.CURRENT.remove();
+    testDerivedSubjectWhenSettingSessionImpl();
+
+    // Test with session ThreadLocal set: expected same behavior because session is set explicitly
+    IServerSession currentSession = mock(IServerSession.class);
+    when(currentSession.getSubject()).thenReturn(new Subject());
+    ISession.CURRENT.set(currentSession);
+    testDerivedSubjectWhenSettingSessionImpl();
+  }
+
+  private void testDerivedSubjectWhenSettingSessionImpl() throws PrivilegedActionException {
+    final IServerSession session = mock(IServerSession.class);
+    final Subject subject1 = new Subject();
+
+    // Current Subject set, Subject on session not set --> Current Subject
+    Subject.doAs(subject1, new PrivilegedExceptionAction<Object>() {
+
+      @Override
+      public Object run() throws Exception {
+        when(session.getSubject()).thenReturn(null);
+        assertSame(subject1, ServerJobInput.defaults().session(session).getSubject());
+        return null;
+      }
+    });
+
+    // Current Subject not set, Subject on session set --> NULL Subject
+    Subject.doAs(null, new PrivilegedExceptionAction<Object>() {
+
+      @Override
+      public Object run() throws Exception {
+        when(session.getSubject()).thenReturn(subject1);
+        assertNull(ServerJobInput.defaults().session(session).getSubject());
+        return null;
+      }
+    });
   }
 
   @Test

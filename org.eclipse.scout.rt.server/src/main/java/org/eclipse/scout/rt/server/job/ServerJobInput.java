@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.context.Context;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -39,8 +40,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  */
 public class ServerJobInput extends JobInput {
 
-  protected ServerJobInput(final JobInput origin) {
-    super(origin);
+  protected ServerJobInput() {
   }
 
   @Override
@@ -94,7 +94,9 @@ public class ServerJobInput extends JobInput {
   }
 
   /**
-   * Sets the session. There are no other values derived from the given session.
+   * Sets the session.<br/>
+   * <strong>There are no other values derived from the given session, meaning that {@link Subject}, {@link Locale} and
+   * {@link UserAgent} must be set accordingly.</strong>
    */
   public ServerJobInput session(final IServerSession session) {
     getContext().session(session);
@@ -184,18 +186,31 @@ public class ServerJobInput extends JobInput {
 
   @Override
   public ServerJobInput copy() {
-    return new ServerJobInput(this).context(getContext().copy());
+    final ServerJobInput copy = OBJ.get(ServerJobInput.class);
+    copy.apply(this);
+    return copy;
   }
 
+  /**
+   * Creates a {@link ServerJobInput} with a "snapshot" of the current calling context. This input requires a session to
+   * be set.
+   */
   public static ServerJobInput defaults() {
-    final ServerJobInput defaults = new ServerJobInput(JobInput.defaults());
+    final ServerJobInput defaults = OBJ.get(ServerJobInput.class);
+    defaults.apply(JobInput.defaults());
     defaults.context(ServerContext.defaults());
     defaults.sessionRequired(true);
     return defaults;
   }
 
+  /**
+   * Creates an empty {@link ServerJobInput} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
+   * {@link UserAgent}. Preferred means, that those values are not derived from other values, but must be set explicitly
+   * instead. This input requires a session to be set.
+   */
   public static ServerJobInput empty() {
-    final ServerJobInput empty = new ServerJobInput(JobInput.empty());
+    final ServerJobInput empty = OBJ.get(ServerJobInput.class);
+    empty.apply(JobInput.empty());
     empty.context(ServerContext.empty());
     empty.sessionRequired(true);
     return empty;

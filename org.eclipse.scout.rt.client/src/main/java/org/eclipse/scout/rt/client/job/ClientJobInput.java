@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientContext;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.context.Context;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -38,8 +39,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  */
 public class ClientJobInput extends JobInput {
 
-  protected ClientJobInput(final JobInput origin) {
-    super(origin);
+  protected ClientJobInput() {
   }
 
   @Override
@@ -131,18 +131,31 @@ public class ClientJobInput extends JobInput {
 
   @Override
   public ClientJobInput copy() {
-    return new ClientJobInput(this).context(getContext().copy());
+    final ClientJobInput copy = OBJ.get(ClientJobInput.class);
+    copy.apply(this);
+    return copy;
   }
 
+  /**
+   * Creates a {@link ClientJobInput} with a "snapshot" of the current calling context. This input requires a session to
+   * be set.
+   */
   public static ClientJobInput defaults() {
-    final ClientJobInput defaults = new ClientJobInput(JobInput.defaults());
+    final ClientJobInput defaults = OBJ.get(ClientJobInput.class);
+    defaults.apply(JobInput.defaults());
     defaults.context(ClientContext.defaults());
     defaults.sessionRequired(true);
     return defaults;
   }
 
+  /**
+   * Creates an empty {@link ClientJobInput} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
+   * {@link UserAgent}. Preferred means, that those values will not be derived from other values, e.g. when setting the
+   * session, but must be set explicitly instead.
+   */
   public static ClientJobInput empty() {
-    final ClientJobInput empty = new ClientJobInput(JobInput.empty());
+    final ClientJobInput empty = OBJ.get(ClientJobInput.class);
+    empty.apply(JobInput.empty());
     empty.context(ClientContext.empty());
     empty.sessionRequired(true);
     return empty;

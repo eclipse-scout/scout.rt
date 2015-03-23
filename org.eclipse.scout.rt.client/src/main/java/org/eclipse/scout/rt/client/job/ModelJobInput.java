@@ -18,6 +18,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientContext;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.context.Context;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -35,8 +36,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  */
 public class ModelJobInput extends ClientJobInput {
 
-  protected ModelJobInput(final ClientJobInput origin) {
-    super(origin);
+  protected ModelJobInput() {
   }
 
   @Override
@@ -86,12 +86,14 @@ public class ModelJobInput extends ClientJobInput {
 
   @Override
   public ModelJobInput session(final IClientSession session) {
+    Assertions.assertNotNull(session, "Model jobs require a session to be set");
     return (ModelJobInput) super.session(session);
   }
 
   @Override
   public ModelJobInput sessionRequired(final boolean sessionRequired) {
-    return (ModelJobInput) super.sessionRequired(true);
+    Assertions.assertTrue(sessionRequired, "Model jobs require a session to be set");
+    return (ModelJobInput) super.sessionRequired(sessionRequired);
   }
 
   @Override
@@ -108,14 +110,29 @@ public class ModelJobInput extends ClientJobInput {
 
   @Override
   public ModelJobInput copy() {
-    return new ModelJobInput(this).context(getContext().copy());
+    final ModelJobInput copy = OBJ.get(ModelJobInput.class);
+    copy.apply(this);
+    return copy;
   }
 
+  /**
+   * Creates a {@link ModelJobInput} with a "snapshot" of the current calling context. This input requires a session to
+   * be set.
+   */
   public static ModelJobInput defaults() {
-    return new ModelJobInput(ClientJobInput.defaults()).context(ClientContext.defaults());
+    final ModelJobInput defaults = OBJ.get(ModelJobInput.class);
+    defaults.apply(ClientJobInput.defaults());
+    return defaults;
   }
 
+  /**
+   * Creates an empty {@link ModelJobInput} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
+   * {@link UserAgent}. Preferred means, that those values will not be derived from other values, e.g. when setting the
+   * session, but must be set explicitly instead.
+   */
   public static ModelJobInput empty() {
-    return new ModelJobInput(ClientJobInput.empty()).context(ClientContext.empty());
+    final ModelJobInput empty = OBJ.get(ModelJobInput.class);
+    empty.apply(ClientJobInput.empty());
+    return empty;
   }
 }

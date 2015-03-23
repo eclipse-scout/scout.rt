@@ -92,7 +92,8 @@ public class ClientContext extends Context {
   }
 
   /**
-   * Set the session and its Locale and UserAgent as derived values.
+   * Set the session and its {@link Locale}, {@link UserAgent} and {@link Subject} as derived values. Those derived
+   * values are only set if not explicitly set yet.
    */
   public ClientContext session(final IClientSession session) {
     m_session = session;
@@ -167,7 +168,9 @@ public class ClientContext extends Context {
   }
 
   /**
-   * Creates an empty client context with <code>null</code> as preferred Locale and UserAgent.
+   * Creates an empty {@link ClientContext} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
+   * {@link UserAgent}. Preferred means, that those values will not be derived from other values, e.g. when setting the
+   * session, but must be set explicitly instead.
    */
   public static ClientContext empty() {
     final ClientContext empty = OBJ.get(ClientContext.class);

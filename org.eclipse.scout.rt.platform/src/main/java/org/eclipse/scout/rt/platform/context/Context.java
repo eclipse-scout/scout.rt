@@ -180,7 +180,8 @@ public class Context {
   }
 
   /**
-   * Creates an empty context with <code>null</code> as preferred Locale.
+   * Creates an empty {@link Context} with <code>null</code> as preferred {@link Subject} and {@link Locale}. Preferred
+   * means, that those values are not derived from other values, but must be set explicitly instead.
    */
   public static Context empty() {
     final Context empty = OBJ.get(Context.class);

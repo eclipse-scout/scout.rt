@@ -18,6 +18,8 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.context.Context;
 
 /**
@@ -30,6 +32,7 @@ import org.eclipse.scout.rt.platform.context.Context;
  * @see IJobManager
  * @since 5.1
  */
+@Bean
 public class JobInput {
 
   public static final String N_A = "n/a";
@@ -48,14 +51,6 @@ public class JobInput {
   protected Context m_context;
 
   protected JobInput() {
-  }
-
-  protected JobInput(final JobInput origin) {
-    m_id = origin.m_id;
-    m_name = origin.m_name;
-    m_mutexObject = origin.m_mutexObject;
-    m_expirationTime = origin.m_expirationTime;
-    m_logOnError = origin.m_logOnError;
   }
 
   public String getId() {
@@ -189,14 +184,28 @@ public class JobInput {
    * Creates a shallow copy of the job-input represented by <code>this</code> context.
    */
   public JobInput copy() {
-    return new JobInput(this).context(getContext().copy());
+    final JobInput copy = OBJ.get(JobInput.class);
+    copy.apply(this);
+    return copy;
   }
 
   /**
-   * Creates a job-input with a "snapshot" of the current calling context.
+   * Applies the given input values to <code>this</code> input.
+   */
+  protected void apply(final JobInput origin) {
+    m_id = origin.m_id;
+    m_name = origin.m_name;
+    m_mutexObject = origin.m_mutexObject;
+    m_expirationTime = origin.m_expirationTime;
+    m_logOnError = origin.m_logOnError;
+    m_context = origin.m_context.copy();
+  }
+
+  /**
+   * Creates a {@link JobInput} with a "snapshot" of the current calling context.
    */
   public static JobInput defaults() {
-    final JobInput defaults = new JobInput();
+    final JobInput defaults = OBJ.get(JobInput.class);
     defaults.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
     defaults.logOnError(true);
     defaults.context(Context.defaults());
@@ -204,10 +213,11 @@ public class JobInput {
   }
 
   /**
-   * Creates an empty job-input with <code>null</code> as preferred Locale.
+   * Creates an empty {@link JobInput} with <code>null</code> as preferred {@link Subject} and {@link Locale}. Preferred
+   * means, that those values are not derived from other values, but must be set explicitly instead.
    */
   public static JobInput empty() {
-    final JobInput empty = new JobInput();
+    final JobInput empty = OBJ.get(JobInput.class);
     empty.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
     empty.logOnError(true);
     empty.context(Context.empty());

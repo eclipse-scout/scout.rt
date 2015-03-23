@@ -115,7 +115,9 @@ public class ServerContext extends Context {
   }
 
   /**
-   * Sets the session. There are no other values derived from the given session.
+   * Sets the session.<br/>
+   * <strong>There are no other values derived from the given session, meaning that {@link Subject}, {@link Locale} and
+   * {@link UserAgent} must be set accordingly.</strong>
    */
   public ServerContext session(final IServerSession session) {
     m_session = session;
@@ -229,7 +231,9 @@ public class ServerContext extends Context {
   }
 
   /**
-   * Creates an empty server context with <code>null</code> as preferred Locale and UserAgent.
+   * Creates an empty {@link ClientContext} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
+   * {@link UserAgent}. Preferred means, that those values will not be derived from other values, but must be set
+   * explicitly instead.
    */
   public static ServerContext empty() {
     final ServerContext empty = OBJ.get(ServerContext.class);
