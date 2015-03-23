@@ -5,4 +5,7 @@ scout.TreeKeyStrokeAdapter = function(field) {
 };
 scout.inherits(scout.TreeKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
-//TODO nbu install menus
+scout.TreeKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
+  scout.TreeKeyStrokeAdapter.parent.prototype.installModelKeystrokes.call(this);
+  this.keyStrokes = this.keyStrokes.concat(this._field.menus);
+};

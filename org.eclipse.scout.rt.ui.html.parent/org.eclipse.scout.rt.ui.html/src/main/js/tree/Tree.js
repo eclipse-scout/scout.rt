@@ -15,7 +15,7 @@ scout.Tree = function() {
   this._treeItemPaddingLeft = 20;
   this._treeItemCheckBoxPaddingLeft = 28;
   this._treeItemPaddingLevel = 15;
-
+  this.menus = [];
   this.keyStrokeAdapter = new scout.TreeKeyStrokeAdapter(this);
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
