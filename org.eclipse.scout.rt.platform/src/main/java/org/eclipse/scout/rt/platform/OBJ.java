@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.internal.BeanContextImplementor;
 
 /**
@@ -23,18 +25,25 @@ public final class OBJ {
   }
 
   /**
-   * @return the first instance of this type.
+   * @return the first instance of this type with respect to {@link Priority} and {@link Replace}. See also {@link Bean}
+   * @throws PlatformException
+   *           when no instance is available
    */
   public static <T> T get(Class<T> beanClazz) {
     return Platform.get().getBeanContext().getInstance(beanClazz);
   }
 
+  /**
+   * @return the first instance of this type with respect to {@link Priority} and {@link Replace}. See also {@link Bean}
+   *         .
+   *         returns null when no instance is available
+   */
   public static <T> T getOptional(Class<T> beanClazz) {
     return Platform.get().getBeanContext().getInstanceOrNull(beanClazz);
   }
 
   /**
-   * @return all instances of this type
+   * @return all instances of this type ordered by {@link Priority}
    */
   public static <T> List<T> all(Class<T> beanClazz) {
     return Platform.get().getBeanContext().getInstances(beanClazz);
