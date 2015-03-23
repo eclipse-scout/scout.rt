@@ -339,7 +339,7 @@ public class JsonTableTest {
     Menu menu1 = new Menu();
     table.getContextMenu().addChildAction(menu1);
     assertNotNull(jsonContextMenu.getAdapter(menu1));
-    assertTrue(jsonContextMenu.getAdapter(menu1).isAttached());
+    assertTrue(jsonContextMenu.getAdapter(menu1).isInitialized());
 
     table.getContextMenu().removeChildAction(menu1);
     m_jsonSession.flush();
@@ -361,7 +361,7 @@ public class JsonTableTest {
     NotDisplayableMenu notDisplayableMenu = table.getMenu(TableWithNotDisplayableMenu.NotDisplayableMenu.class);
     assertNull(jsonContextMenu.getAdapter(notDisplayableMenu));
     assertNotNull(jsonContextMenu.getAdapter(displayableMenu));
-    assertTrue(jsonContextMenu.getAdapter(displayableMenu).isAttached());
+    assertTrue(jsonContextMenu.getAdapter(displayableMenu).isInitialized());
 
     table.getContextMenu().removeChildAction(notDisplayableMenu);
     table.getContextMenu().removeChildAction(displayableMenu);
@@ -380,7 +380,7 @@ public class JsonTableTest {
     TableControl control = new TableControl();
     table.addTableControl(control);
     assertNotNull(jsonTable.getAdapter(control));
-    assertTrue(jsonTable.getAdapter(control).isAttached());
+    assertTrue(jsonTable.getAdapter(control).isInitialized());
 
     table.removeTableControl(control);
     m_jsonSession.flush();
@@ -398,15 +398,15 @@ public class JsonTableTest {
     table.addTableControl(tableControl1);
     table.addTableControl(tableControl2);
     assertNotNull(jsonTable.getAdapter(tableControl1));
-    assertTrue(jsonTable.getAdapter(tableControl1).isAttached());
+    assertTrue(jsonTable.getAdapter(tableControl1).isInitialized());
     assertNotNull(jsonTable.getAdapter(tableControl2));
-    assertTrue(jsonTable.getAdapter(tableControl2).isAttached());
+    assertTrue(jsonTable.getAdapter(tableControl2).isInitialized());
 
     table.removeTableControl(tableControl1);
     m_jsonSession.flush();
     assertNull(jsonTable.getAdapter(tableControl1));
     assertNotNull(jsonTable.getAdapter(tableControl2));
-    assertTrue(jsonTable.getAdapter(tableControl2).isAttached());
+    assertTrue(jsonTable.getAdapter(tableControl2).isInitialized());
   }
 
   /**

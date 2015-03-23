@@ -252,11 +252,13 @@ scout.Session.prototype._sendRequest = function(request) {
   var unload = !!request.unload;
 
   // No need to queue the request when document is unloading
-  if (!unload && this.offline) {
-    request.events.forEach(function(event) {
-      this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
-    }.bind(this));
-    this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
+  if (this.offline) {
+    if (!unload) {
+      request.events.forEach(function(event) {
+        this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
+      }.bind(this));
+      this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
+    }
     return;
   }
 
@@ -535,6 +537,7 @@ scout.Session.prototype.showFatalMessage = function(options) {
 };
 
 scout.Session.prototype.goOffline = function() {
+  $.log.error('goOffline');
   this.offline = true;
   this.desktop.goOffline();
 

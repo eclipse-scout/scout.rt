@@ -27,11 +27,15 @@ public interface IJsonAdapter<T extends Object> extends IJsonObject {
    */
   T getModel();
 
+  /**
+   * Init method which is called by the factory <em>after</em> the constructor has been executed. The default
+   * implementation calls <code>attachModel()</code> and <code>attachChildAdapters()</code>.
+   */
   void init();
 
-  void attach();
+  boolean isInitialized();
 
-  boolean isAttached();
+  boolean isDisposed();
 
   void dispose();
 

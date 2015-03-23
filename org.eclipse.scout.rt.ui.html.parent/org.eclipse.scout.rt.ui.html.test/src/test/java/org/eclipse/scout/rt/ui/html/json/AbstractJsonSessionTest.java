@@ -34,12 +34,12 @@ public class AbstractJsonSessionTest {
 
   @Test
   public void testDispose() throws Exception {
-    AbstractJsonSession object = (AbstractJsonSession) JsonTestUtility.createAndInitializeJsonSession();
-    WeakReference<IJsonSession> ref = new WeakReference<IJsonSession>(object);
+    AbstractJsonSession session = (AbstractJsonSession) JsonTestUtility.createAndInitializeJsonSession();
+    WeakReference<IJsonSession> ref = new WeakReference<IJsonSession>(session);
 
-    JsonTestUtility.endRequest(object);
-    object.dispose();
-    object = null;
+    JsonTestUtility.endRequest(session);
+    session.dispose();
+    session = null;
     JsonTestUtility.assertGC(ref);
   }
 
@@ -80,14 +80,14 @@ public class AbstractJsonSessionTest {
     };
     IJsonAdapter<?> adapter = session.getOrCreateJsonAdapter(model, null);
 
-    // Note: Additionally, registry contains the "root adapter"
-    assertEquals(2, session.getJsonAdapterRegistry().getJsonAdapterCount());
-    assertEquals(1, session.currentJsonResponse().adapterMap().size());
+    // Note: Additionally, registry contains the "root adapter" and a context-menu
+    assertEquals(3, session.getJsonAdapterRegistry().getJsonAdapterCount());
+    assertEquals(2, session.currentJsonResponse().adapterMap().size());
     assertEquals(0, session.currentJsonResponse().eventList().size());
 
     model.setDisplayText("Test");
-    assertEquals(2, session.getJsonAdapterRegistry().getJsonAdapterCount());
-    assertEquals(1, session.currentJsonResponse().adapterMap().size());
+    assertEquals(3, session.getJsonAdapterRegistry().getJsonAdapterCount());
+    assertEquals(2, session.currentJsonResponse().adapterMap().size());
     assertEquals(1, session.currentJsonResponse().eventList().size());
 
     adapter.dispose();

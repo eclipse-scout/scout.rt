@@ -74,7 +74,7 @@ public class JsonTableFieldTest {
     m_jsonSession.flush();
     assertNull(jsonTableField.getAdapter(table));
     assertNotNull(jsonTableField.getAdapter(table2));
-    assertTrue(jsonTableField.getAdapter(table2).isAttached());
+    assertTrue(jsonTableField.getAdapter(table2).isInitialized());
 
     jsonTableField.dispose();
     m_jsonSession.flush();
@@ -98,7 +98,7 @@ public class JsonTableFieldTest {
     jsonTableField.dispose();
     m_jsonSession.flush();
     assertNotNull(jsonOutline.getAdapter(tablePageTable));
-    assertTrue(jsonOutline.getAdapter(tablePageTable).isAttached());
+    assertTrue(jsonOutline.getAdapter(tablePageTable).isInitialized());
   }
 
   private IPageWithTable<?> createTablePageAndSelectNode() {
@@ -129,9 +129,9 @@ public class JsonTableFieldTest {
     tableField.setTable(table2, true);
     m_jsonSession.flush();
     assertNotNull(jsonTableField.getAdapter(table2));
-    assertTrue(jsonTableField.getAdapter(table2).isAttached());
+    assertTrue(jsonTableField.getAdapter(table2).isInitialized());
     assertNotNull(jsonOutline.getAdapter(tablePageTable));
-    assertTrue(jsonOutline.getAdapter(tablePageTable).isAttached());
+    assertTrue(jsonOutline.getAdapter(tablePageTable).isInitialized());
   }
 
 }

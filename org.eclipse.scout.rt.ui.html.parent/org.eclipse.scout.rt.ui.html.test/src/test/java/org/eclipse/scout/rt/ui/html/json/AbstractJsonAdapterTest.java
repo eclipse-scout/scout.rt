@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
@@ -43,11 +42,11 @@ public class AbstractJsonAdapterTest {
   @Test
   public void testIsAttached() {
     AbstractJsonAdapter<?> adapter = newAdapter(new Object());
-    adapter.attach();
-    assertTrue(adapter.isAttached());
+    adapter.init();
+    assertTrue(adapter.isInitialized());
 
     adapter.dispose();
-    assertFalse(adapter.isAttached());
+    assertTrue(adapter.isDisposed());
   }
 
   private AbstractJsonAdapter<?> newAdapter(Object model) {

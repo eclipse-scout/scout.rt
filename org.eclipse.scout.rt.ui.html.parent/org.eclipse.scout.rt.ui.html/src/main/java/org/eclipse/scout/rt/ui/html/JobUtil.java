@@ -26,8 +26,8 @@ public final class JobUtil {
   }
 
   /**
-   * Waits for the given Future and for all jobs associated with the Future's session to complete. Thereby, blocked jobs
-   * are ignored.
+   * Waits for the given Future and for all model jobs associated with the Future's session to complete. Thereby,
+   * blocked jobs are ignored.
    *
    * @param future
    *          the Future to wait for, and additionally all jobs associated with its session.

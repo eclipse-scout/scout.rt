@@ -189,7 +189,7 @@ public class JsonTreeTest {
     Menu menu1 = new Menu();
     tree.getContextMenu().addChildAction(menu1);
     assertNotNull(contextMenu.getAdapter(menu1));
-    assertTrue(contextMenu.getAdapter(menu1).isAttached());
+    assertTrue(contextMenu.getAdapter(menu1).isInitialized());
 
     tree.getContextMenu().removeChildAction(menu1);
     m_jsonSession.flush();
@@ -210,15 +210,15 @@ public class JsonTreeTest {
     tree.getContextMenu().addChildAction(menu1);
     tree.getContextMenu().addChildAction(menu2);
     assertNotNull(contextMenu.getAdapter(menu1));
-    assertTrue(contextMenu.getAdapter(menu1).isAttached());
+    assertTrue(contextMenu.getAdapter(menu1).isInitialized());
     assertNotNull(contextMenu.getAdapter(menu2));
-    assertTrue(contextMenu.getAdapter(menu2).isAttached());
+    assertTrue(contextMenu.getAdapter(menu2).isInitialized());
 
     tree.getContextMenu().removeChildAction(menu1);
     m_jsonSession.flush();
     assertNull(contextMenu.getAdapter(menu1));
     assertNotNull(contextMenu.getAdapter(menu2));
-    assertTrue(contextMenu.getAdapter(menu2).isAttached());
+    assertTrue(contextMenu.getAdapter(menu2).isInitialized());
   }
 
   /**
@@ -237,7 +237,7 @@ public class JsonTreeTest {
     tree.getContextMenu().addChildAction(menu1);
     IJsonAdapter<?> jsonMenu1 = contextMenu.getAdapter(menu1);
     assertNotNull(jsonMenu1);
-    assertTrue(jsonMenu1.isAttached());
+    assertTrue(jsonMenu1.isInitialized());
 
     JSONArray jsonMenus = JsonTestUtility.extractProperty(
         m_jsonSession.currentJsonResponse(), jsonTree.getId(), IContextMenuOwner.PROP_MENUS);

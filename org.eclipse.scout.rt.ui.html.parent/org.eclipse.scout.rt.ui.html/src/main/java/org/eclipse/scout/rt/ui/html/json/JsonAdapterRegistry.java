@@ -116,7 +116,9 @@ public class JsonAdapterRegistry {
       P_RegistryValue value = m_idAdapterMap.get(key);
       if (value != null) { // Check if still in registry (it might already have been removed by a parent adapter)
         IJsonAdapter<?> jsonAdapter = value.getJsonAdapter();
-        jsonAdapter.dispose();
+        if (!jsonAdapter.isDisposed()) {
+          jsonAdapter.dispose();
+        }
       }
     }
   }

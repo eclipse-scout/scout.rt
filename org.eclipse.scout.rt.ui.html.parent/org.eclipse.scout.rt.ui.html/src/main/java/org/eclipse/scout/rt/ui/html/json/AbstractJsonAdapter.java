@@ -25,7 +25,8 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   private final IJsonSession m_jsonSession;
   private final T m_model;
   private final String m_id;
-  private boolean m_attached;
+  private boolean m_initialized;
+  private boolean m_disposed;
   private IJsonAdapter<?> m_parent;
 
   public AbstractJsonAdapter(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
@@ -37,15 +38,6 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     m_id = id;
     m_parent = parent;
     m_jsonSession.registerJsonAdapter(this);
-  }
-
-  /**
-   * Init method which is called by the factory <em>after</em> the constructor has been executed. The default
-   * implementation calls <code>attach()</code> and <code>attachChildAdapters()</code>.
-   */
-  @Override
-  public void init() {
-    attach();
   }
 
   @Override
@@ -82,18 +74,20 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   protected void disposeChildAdapters() {
     List<IJsonAdapter<?>> childAdapters = getJsonSession().getJsonChildAdapters(this);
     for (IJsonAdapter<?> childAdapter : childAdapters) {
-      childAdapter.dispose();
+      if (!childAdapter.isDisposed()) {
+        childAdapter.dispose();
+      }
     }
   }
 
   @Override
-  public final void attach() {
-    if (m_attached) {
-      throw new IllegalStateException("Adapter already attached");
+  public void init() {
+    if (m_initialized) {
+      throw new IllegalStateException("Adapter already initialized");
     }
     attachModel();
     attachChildAdapters();
-    m_attached = true;
+    m_initialized = true;
   }
 
   /**
@@ -106,20 +100,26 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   @Override
   public final void dispose() {
-    if (m_attached) {
-      detachModel();
-      disposeChildAdapters();
-      m_attached = false;
+    if (m_disposed) {
+      throw new IllegalStateException("Adapter already disposed");
     }
+    detachModel();
+    disposeChildAdapters();
     m_jsonSession.unregisterJsonAdapter(m_id);
+    m_disposed = true;
   }
 
   protected void detachModel() {
   }
 
   @Override
-  public boolean isAttached() {
-    return m_attached;
+  public boolean isDisposed() {
+    return m_disposed;
+  }
+
+  @Override
+  public boolean isInitialized() {
+    return m_initialized;
   }
 
   @Override

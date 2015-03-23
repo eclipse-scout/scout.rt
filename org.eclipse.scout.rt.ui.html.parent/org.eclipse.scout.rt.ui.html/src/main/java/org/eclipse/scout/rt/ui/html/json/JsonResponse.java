@@ -249,7 +249,9 @@ public class JsonResponse {
     m_processingBufferedEvents = true;
     try {
       for (IJsonAdapter<?> adapter : m_bufferedEventsAdapters) {
-        adapter.processBufferedEvents();
+        if (!adapter.isDisposed()) {
+          adapter.processBufferedEvents();
+        }
       }
     }
     finally {
