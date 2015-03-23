@@ -121,9 +121,9 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
       acceptedProposalRow = proposalChooser.getAcceptedProposal();
     }
     //
+    boolean unregister = true;
     try {
       String oldText = getDisplayText();
-
       boolean parsingError = getErrorStatus() != null && getErrorStatus().containsStatus(ParsingFailedStatus.class);
       if (acceptedProposalRow == null && (!parsingError) && getCurrentLookupRow() != null && StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(oldText))) {
         // no change
@@ -150,25 +150,16 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
             return interceptConvertKeyToValue(acceptedProposalRow.getKey());
           }
           else {
-            // FIXME AWE: check if this code is still required (looks quite silly)
-            // no match possible and proposal is inactive; reject change
-            // wenn man etwas eingetippt hat, das nicht im proposal ist
-            // --> proposal öffnen und fehlermeldung dort anzeigen, weiter-tabben
-            // nicht möglich
-//          if (smartForm == null) {
-//            smartForm = createProposalForm();
-//            smartForm.startForm();
-//            smartForm.dataFetchedDelegate(fetchResult, getConfiguredBrowseMaxRowCount());
-//          }
-//          registerProposalFormInternal(smartForm);
-//          smartForm = null;// prevent close in finally
+            unregister = false;// prevent close in finally
             throw new VetoException(ScoutTexts.get("SmartFieldCannotComplete", text));
           }
         }
       }
     }
     finally {
-      unregisterProposalChooserInternal();
+      if (unregister) {
+        unregisterProposalChooserInternal();
+      }
     }
   }
 
@@ -276,17 +267,6 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
       }
-    }
-  }
-
-  @Override
-  protected void handleProposalChooserClosed() throws ProcessingException {
-    ILookupRow<LOOKUP_KEY> row = getProposalChooser().getAcceptedProposal();
-    if (row != null) {
-      acceptProposal(row);
-    }
-    else {
-      revertValue();
     }
   }
 

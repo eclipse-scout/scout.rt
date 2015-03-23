@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
@@ -1210,11 +1211,16 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return rows;
   }
 
-  protected abstract void handleProposalChooserClosed() throws ProcessingException;
+  protected void handleProposalChooserClosed() throws ProcessingException {
+    ILookupRow<LOOKUP_KEY> row = getProposalChooser().getAcceptedProposal();
+    if (row != null) {
+      acceptProposal(row);
+    }
+    else {
+      throw new VetoException("No accepted proposal");
+    }
+  }
 
-  /**
-   * @param newValue
-   */
   protected abstract void handleFetchResult(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result);
 
   protected IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> createLookupRowFetcher() {

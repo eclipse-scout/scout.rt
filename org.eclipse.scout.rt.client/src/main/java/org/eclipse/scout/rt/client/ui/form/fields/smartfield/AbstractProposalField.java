@@ -83,6 +83,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     if (proposalChooser != null && StringUtility.equalsIgnoreNewLines(proposalChooser.getSearchText(), text)) {
       acceptedProposalRow = proposalChooser.getAcceptedProposal();
     }
+    boolean unregister = true;
     try {
       String oldText = getDisplayText();
       boolean parsingError = getErrorStatus() != null && getErrorStatus().containsStatus(ParsingFailedStatus.class);
@@ -111,7 +112,8 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
               return acceptedProposalRow.getText();
             }
             else {
-              // no match possible and proposal is inactive; reject change
+              // no match possible; reject change, but keep proposal chooser open
+              unregister = false;
               setCurrentLookupRow(null);
             }
           }
@@ -120,7 +122,9 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
       }
     }
     finally {
-      unregisterProposalChooserInternal();
+      if (unregister) {
+        unregisterProposalChooserInternal();
+      }
     }
   }
 
@@ -139,14 +143,6 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
       return text;
     }
     return validKey;
-  }
-
-  @Override
-  protected void handleProposalChooserClosed() throws ProcessingException {
-    ILookupRow<LOOKUP_KEY> row = getProposalChooser().getAcceptedProposal();
-    if (row != null) {
-      acceptProposal(row);
-    }
   }
 
   @Override

@@ -11,13 +11,16 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -27,6 +30,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -38,48 +42,55 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class SmartFieldParseValueTest {
 
-  @Test
-  public void testSingleMatch() throws ProcessingException {
-    SmartField smartField = new SmartField();
-    // single match
-    smartField.getUIFacade().setTextFromUI("a");
-    assertEquals(Long.valueOf(1L), smartField.getValue());
-    assertNull(smartField.getProposalChooser().getModel());
+  private SmartField m_smartField;
+
+  @Before
+  public void setUp() throws ProcessingException {
+    m_smartField = new SmartField();
+    m_smartField.registerProposalChooserInternal();
   }
 
-//  @Test
-//  public void testMultiMatch() throws ProcessingException {
-//    SmartField smartField = new SmartField();
-//    // match with two elements
-//    smartField.getUIFacade().setTextFromUI("b");
-//    assertNull(smartField.getValue());
-//    assertNotNull(smartField.getProposalChooser().getModel());
-//    assertEquals(2, smartField.getProposalChooser().getSearchResult().getLookupRows().size());
-//    // select first
-//    smartField.getProposalChooser().forceProposalSelection();
-//    // close the proposal form
-//    smartField.getProposalChooser().doOk();
-//    assertNull(smartField.getProposalChooser().getModel());
-//    assertEquals(Long.valueOf(1L), smartField.getValue());
-//  }
+  @Test
+  public void testSingleMatch() throws ProcessingException {
+    // single match
+    m_smartField.getUIFacade().setTextFromUI("a");
+    assertEquals(Long.valueOf(1L), m_smartField.getValue());
+    assertNull(m_smartField.getProposalChooser());
+  }
 
-//  @Test
-//  public void testNoMatch() throws ProcessingException {
-//    SmartField smartField = new SmartField();
-//    // single match
-//    smartField.getUIFacade().setTextFromUI("c");
-//    assertNull(smartField.getValue());
-//    assertNotNull(smartField.getProposalChooser().getModel());
-//    assertEquals(0, smartField.getProposalChooser().getSearchResult().getLookupRows().size());
-//    try {
-//      smartField.getProposalChooser().doOk();
-//      fail();
-//    }
-//    catch (VetoException e) {
-//      // void
-//    }
-//    assertNotNull(smartField.getProposalChooser().getModel());
-//  }
+  @Test
+  public void testMultiMatch() throws ProcessingException {
+    // match with two elements
+    m_smartField.getUIFacade().setTextFromUI("b");
+    assertNull(m_smartField.getValue());
+    assertNotNull(m_smartField.getProposalChooser());
+    assertEquals(2, m_smartField.getProposalChooser().getSearchResult().getLookupRows().size());
+    // select first
+    m_smartField.getProposalChooser().forceProposalSelection();
+    // close the proposal form
+    m_smartField.getProposalChooser().doOk();
+    assertNull(m_smartField.getProposalChooser());
+    assertEquals(Long.valueOf(1L), m_smartField.getValue());
+  }
+
+  @Test
+  public void testNoMatch() throws ProcessingException {
+    // single match
+    m_smartField.getUIFacade().setTextFromUI("c");
+    assertNull(m_smartField.getValue());
+    assertNotNull(m_smartField.getProposalChooser());
+    assertEquals(0, m_smartField.getProposalChooser().getSearchResult().getLookupRows().size());
+
+    // proposal chooser should not be closed when proposal is not valid
+    try {
+      m_smartField.getProposalChooser().doOk();
+      fail();
+    }
+    catch (VetoException e) {
+      // void
+    }
+    assertNotNull(m_smartField.getProposalChooser());
+  }
 
   private static class SmartField extends AbstractSmartField<Long> {
     @Override

@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -40,46 +41,48 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class ProposalFieldParseValueTest {
 
+  private ProposalField m_proposalField = new ProposalField();
+
+  @Before
+  public void setUp() throws ProcessingException {
+    m_proposalField.registerProposalChooserInternal();
+  }
+
   @Test
   public void testSingleMatch() throws ProcessingException {
-    ProposalField field = new ProposalField();
     // single match
-    field.getUIFacade().setTextFromUI("a");
-    assertEquals("a", field.getValue());
+    m_proposalField.getUIFacade().setTextFromUI("a");
+    assertEquals("a", m_proposalField.getValue());
     // select proposal
-    assertNotNull(field.getProposalChooser().getModel());
-    field.getProposalChooser().forceProposalSelection();
-    field.getProposalChooser().doOk();
-    assertEquals("aName", field.getValue());
-    assertNull(field.getProposalChooser().getModel());
+    assertNotNull(m_proposalField.getProposalChooser());
+    m_proposalField.getProposalChooser().forceProposalSelection();
+    m_proposalField.getProposalChooser().doOk();
+    assertEquals("aName", m_proposalField.getValue());
+    assertNull(m_proposalField.getProposalChooser());
 
   }
 
-  // FIXME AWE: braucht es die methode getSearchResult noch?
-
-//  @Test
-//  public void testMultiMatch() throws ProcessingException {
-//    ProposalField field = new ProposalField();
-//    // match with two elements
-//    field.getUIFacade().setTextFromUI("b");
-//    assertEquals("b", field.getValue());
-//    assertNotNull(field.getProposalChooser().getModel());
-//    assertEquals(2, field.getProposalChooser().getSearchResult().getLookupRows().size());
-//    // select first
-//    field.getProposalChooser().forceProposalSelection();
-//    // close the proposal form
-//    field.getProposalChooser().doOk();
-//    assertNull(field.getProposalChooser().getModel());
-//    assertEquals("aName", field.getValue());
-//  }
+  @Test
+  public void testMultiMatch() throws ProcessingException {
+    // match with two elements
+    m_proposalField.getUIFacade().setTextFromUI("b");
+    assertEquals("b", m_proposalField.getValue());
+    assertNotNull(m_proposalField.getProposalChooser());
+    assertEquals(2, m_proposalField.getProposalChooser().getSearchResult().getLookupRows().size());
+    // select first
+    m_proposalField.getProposalChooser().forceProposalSelection();
+    // close the proposal form
+    m_proposalField.getProposalChooser().doOk();
+    assertNull(m_proposalField.getProposalChooser());
+    assertEquals("aName", m_proposalField.getValue());
+  }
 
   @Test
   public void testNoMatch() throws ProcessingException {
-    ProposalField field = new ProposalField();
     // single match
-    field.getUIFacade().setTextFromUI("c");
-    assertEquals("c", field.getValue());
-    assertNull(field.getProposalChooser().getModel());
+    m_proposalField.getUIFacade().setTextFromUI("c");
+    assertEquals("c", m_proposalField.getValue());
+    assertNull(m_proposalField.getProposalChooser());
 
   }
 

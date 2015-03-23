@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -40,40 +41,44 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class ProposalFieldDisplayTextTest {
 
+  private ProposalField m_proposalField = new ProposalField();
+
+  @Before
+  public void setUp() throws ProcessingException {
+    m_proposalField.registerProposalChooserInternal();
+  }
+
   @Test
   public void testNoLookupRowDisplayText() throws ProcessingException {
-    ProposalField field = new ProposalField();
     // no lookup row before and after text entry
-    assertNull(field.getCurrentLookupRow());
-    field.getUIFacade().setTextFromUI("c");
-    assertEquals("c", field.getValue());
-    assertEquals("c", field.getDisplayText());
-    assertNull(field.getCurrentLookupRow());
+    assertNull(m_proposalField.getCurrentLookupRow());
+    m_proposalField.getUIFacade().setTextFromUI("c");
+    assertEquals("c", m_proposalField.getValue());
+    assertEquals("c", m_proposalField.getDisplayText());
+    assertNull(m_proposalField.getCurrentLookupRow());
 
-    field.setValue("d");
-    assertEquals("d", field.getValue());
-    assertEquals("d", field.getDisplayText());
-    assertNull(field.getCurrentLookupRow());
+    m_proposalField.setValue("d");
+    assertEquals("d", m_proposalField.getValue());
+    assertEquals("d", m_proposalField.getDisplayText());
+    assertNull(m_proposalField.getCurrentLookupRow());
   }
 
   @Test
   public void testLookupRowDisplayText() throws ProcessingException {
-    ProposalField field = new ProposalField();
-    field.registerProposalChooserInternal();
     // single match
-    field.getUIFacade().setTextFromUI("a");
+    m_proposalField.getUIFacade().setTextFromUI("a");
     // select proposal
-    field.getProposalChooser().forceProposalSelection();
-    field.getProposalChooser().doOk();
-    assertEquals("aName", field.getValue());
-    assertEquals("aName", field.getDisplayText());
+    m_proposalField.getProposalChooser().forceProposalSelection();
+    m_proposalField.getProposalChooser().doOk();
+    assertEquals("aName", m_proposalField.getValue());
+    assertEquals("aName", m_proposalField.getDisplayText());
     // lookup row available now
-    assertNotNull(field.getCurrentLookupRow());
+    assertNotNull(m_proposalField.getCurrentLookupRow());
 
-    field.setValue("d");
-    assertEquals("d", field.getValue());
-    assertEquals("d", field.getDisplayText());
-    assertNull(field.getCurrentLookupRow());
+    m_proposalField.setValue("d");
+    assertEquals("d", m_proposalField.getValue());
+    assertEquals("d", m_proposalField.getDisplayText());
+    assertNull(m_proposalField.getCurrentLookupRow());
   }
 
   private static class ProposalField extends AbstractProposalField<String> {
