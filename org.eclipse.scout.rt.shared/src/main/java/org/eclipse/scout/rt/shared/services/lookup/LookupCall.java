@@ -21,12 +21,12 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
-import org.eclipse.scout.rt.platform.job.JobExecutionException;
-import org.eclipse.scout.rt.shared.services.common.session.ISessionService;
+import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.shared.job.IJobInputProvider;
 import org.eclipse.scout.rt.shared.validate.annotations.MaxLength;
 import org.eclipse.scout.service.SERVICES;
 
@@ -59,7 +59,6 @@ import org.eclipse.scout.service.SERVICES;
  * {@link LocalLookupCall#execCreateLookupRows()}
  */
 public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, Serializable, ITypeWithClassId {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LookupCall.class);
 
   private static final long serialVersionUID = 0L;
 
@@ -324,7 +323,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       return null;
     }
     else {
-      IRunnable runnable = new IRunnable() {
+      return Jobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           try {
@@ -339,9 +338,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      };
-
-      return scheduleAsync(getClass().getSimpleName() + ".getDataByKeyInBackground", runnable);
+      }, newJobInput("getDataByKeyInBackground"));
     }
   }
 
@@ -383,7 +380,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       return null;
     }
     else {
-      IRunnable runnable = new IRunnable() {
+      return Jobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           try {
@@ -398,9 +395,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      };
-
-      return scheduleAsync(getClass().getSimpleName() + ".getDataByTextInBackground", runnable);
+      }, newJobInput("getDataByTextInBackground"));
     }
   }
 
@@ -442,7 +437,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       return null;
     }
     else {
-      IRunnable runnable = new IRunnable() {
+      return Jobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           try {
@@ -457,9 +452,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      };
-
-      return scheduleAsync(getClass().getSimpleName() + ".getDataByAllInBackground", runnable);
+      }, newJobInput("getDataByAllInBackground"));
     }
   }
 
@@ -500,7 +493,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       return null;
     }
     else {
-      IRunnable runnable = new IRunnable() {
+      return Jobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           try {
@@ -515,24 +508,12 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      };
-
-      return scheduleAsync(getClass().getSimpleName() + ".getDataByRecInBackground", runnable);
+      }, newJobInput("getDataByRecInBackground"));
     }
   }
 
-  private IFuture<?> scheduleAsync(String name, IRunnable runnable) {
-    ISessionService service = SERVICES.getService(ISessionService.class);
-    if (service == null) {
-      return null;
-    }
-    try {
-      return service.schedule(runnable, service.defaults().name(name));
-    }
-    catch (JobExecutionException e) {
-      LOG.error("Unable to schedule lookup call job.", e);
-      return null;
-    }
+  private JobInput newJobInput(String name) {
+    return OBJ.get(IJobInputProvider.class).defaults().name(String.format("%s.%s", getClass().getName(), name));
   }
 
   @Override

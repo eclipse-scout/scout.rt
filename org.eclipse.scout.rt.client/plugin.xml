@@ -35,11 +35,6 @@
           ranking="-1000">
     </service>
     <service
-          class="org.eclipse.scout.rt.client.services.common.session.DefaultClientSessionService"
-          createImmediately="false"
-          factory="org.eclipse.scout.rt.client.services.ClientServiceFactory" >
-    </service>
-    <service
           class="org.eclipse.scout.rt.client.services.lookup.DefaultLookupCallProvisioningService"
           createImmediately="false"
           factory="org.eclipse.scout.rt.client.services.ClientServiceFactory">
