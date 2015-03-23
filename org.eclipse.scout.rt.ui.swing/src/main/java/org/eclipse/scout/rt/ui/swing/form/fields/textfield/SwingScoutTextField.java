@@ -15,10 +15,8 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.scout.rt.client.services.common.spellchecker.ISpellingMonitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
-import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.action.menu.SwingScoutContextMenu;
@@ -27,12 +25,8 @@ import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTextFieldEx;
 import org.eclipse.scout.rt.ui.swing.ext.decoration.ContextMenuDecorationItem;
 import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcons;
-import org.eclipse.scout.rt.ui.swing.spellchecker.ISwingSpellCheckerService;
-import org.eclipse.scout.rt.ui.swing.spellchecker.SwingFieldHolder;
 
 public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringField> implements ISwingScoutTextField {
-
-  private ISpellingMonitor m_spellingMonitor;
 
   private ContextMenuDecorationItem m_contextMenuMarker;
   private SwingScoutContextMenu m_contextMenu;
@@ -98,22 +92,12 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
   @Override
   protected void attachScout() {
     super.attachScout();
-    // spell checking
-    ISwingSpellCheckerService spellCheckerService = OBJ.getOptional(ISwingSpellCheckerService.class);
-    if (spellCheckerService != null && spellCheckerService.isInstalled()) {
-      m_spellingMonitor = spellCheckerService.createSpellingMonitor(new SwingFieldHolder(this, this.getSwingTextField()));
-    }
     installContextMenu();
     updateContextMenuFromScout();
   }
 
   @Override
   protected void detachScout() {
-    // spell checking
-    if (m_spellingMonitor != null) {
-      m_spellingMonitor.dispose();
-      m_spellingMonitor = null;
-    }
     if (m_contextMenuMarker != null) {
       m_contextMenuMarker.destroy();
     }

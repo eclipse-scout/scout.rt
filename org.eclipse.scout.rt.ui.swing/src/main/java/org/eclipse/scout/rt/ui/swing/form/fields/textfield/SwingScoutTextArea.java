@@ -13,9 +13,7 @@ package org.eclipse.scout.rt.ui.swing.form.fields.textfield;
 import javax.swing.JScrollPane;
 import javax.swing.text.JTextComponent;
 
-import org.eclipse.scout.rt.client.services.common.spellchecker.ISpellingMonitor;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
-import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -24,13 +22,10 @@ import org.eclipse.scout.rt.ui.swing.ext.JScrollPaneEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JTextAreaEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.LogicalGridDataBuilder;
-import org.eclipse.scout.rt.ui.swing.spellchecker.ISwingSpellCheckerService;
-import org.eclipse.scout.rt.ui.swing.spellchecker.SwingFieldHolder;
 
 public class SwingScoutTextArea extends SwingScoutTextFieldComposite<IStringField> implements ISwingScoutTextArea {
 
   private JScrollPane m_swingScrollPane;
-  private ISpellingMonitor m_spellingMonitor;
 
   @Override
   protected void initializeSwing() {
@@ -68,21 +63,6 @@ public class SwingScoutTextArea extends SwingScoutTextFieldComposite<IStringFiel
   protected void attachScout() {
     super.attachScout();
     setTextWrapFromScout(getScoutObject().isWrapText());
-    // spell checking
-    ISwingSpellCheckerService spellCheckerService = OBJ.getOptional(ISwingSpellCheckerService.class);
-    if (spellCheckerService != null && spellCheckerService.isInstalled()) {
-      m_spellingMonitor = spellCheckerService.createSpellingMonitor(new SwingFieldHolder(this, this.getSwingTextArea()));
-    }
-  }
-
-  @Override
-  protected void detachScout() {
-    // spell checking
-    if (m_spellingMonitor != null) {
-      m_spellingMonitor.dispose();
-      m_spellingMonitor = null;
-    }
-    super.detachScout();
   }
 
   @Override
