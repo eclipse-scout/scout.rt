@@ -8,7 +8,7 @@ scout.GroupBoxKeyStrokeAdapter.prototype.registerKeyStroke = function(keyStroke)
   if (this._field.mainBox) {
     scout.GroupBoxKeyStrokeAdapter.parent.prototype.registerKeyStroke.call(this, keyStroke);
   } else {
-    this._field.getForm().rootGroupBox().keyStrokeAdapter.registerKeyStroke(keyStroke);
+    this._field.getForm().rootGroupBox.keyStrokeAdapter.registerKeyStroke(keyStroke);
   }
 };
 
@@ -16,6 +16,6 @@ scout.GroupBoxKeyStrokeAdapter.prototype.unregisterKeyStroke = function(keyStrok
   if (this._field.mainBox) {
     scout.GroupBoxKeyStrokeAdapter.parent.prototype.unregisterKeyStroke.call(this, keyStroke);
   } else {
-    this._field.getForm().rootGroupBox().keyStrokeAdapter.unregisterKeyStroke(keyStroke);
+    this._field.getForm().rootGroupBox.keyStrokeAdapter.unregisterKeyStroke(keyStroke);
   }
 };
