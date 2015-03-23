@@ -86,6 +86,15 @@
      * tool-forms.
      */
     margin-left: 20px;
+    position: relative;
+  }
+  &.taskbar .key-box {
+    top: 8px;
+  }
+
+  &.selected {
+    background-color: @selection-row-background-color;
+    border-color: @selection-row-border-color;
   }
 }
 
@@ -122,6 +131,10 @@
       padding-top: 6px;
       padding-bottom: 4px;
     }
+  }
+
+  &:focus {
+    outline: none;
   }
 }
 
@@ -166,3 +179,5 @@
   left: 1px;
   background-color:@body-background-color;
 }
+
+

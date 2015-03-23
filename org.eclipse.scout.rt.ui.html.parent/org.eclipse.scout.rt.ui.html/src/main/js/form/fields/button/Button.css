@@ -70,3 +70,8 @@ button img {
 .form-field.link-button > div {
   text-decoration: underline;
 }
+
+.button>.key-box {
+  position: absolute;
+  top: 8px;
+}

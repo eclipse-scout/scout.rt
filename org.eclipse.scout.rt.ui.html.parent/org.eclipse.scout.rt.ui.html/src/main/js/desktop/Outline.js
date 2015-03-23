@@ -20,7 +20,7 @@ scout.Outline.prototype._render = function($parent) {
   }
 };
 
-scout.Outline.prototype.installKeyStrokeAdapter = function(){
+scout.Outline.prototype.installKeyStrokeAdapter = function() {
   if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
     scout.keyStrokeManager.installAdapter(this.$container.closest('.scout'), this.keyStrokeAdapter);
   }
@@ -46,10 +46,12 @@ scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, nod
   // FIXME AWE: soll node (=page) eine outline property bekommen? Dann müssten wir nicht node + outline übergeben
   var menus = scout.arrays.ensure(formOrTable.staticMenus);
   if (!this._hasButton(menus, scout.NavigateUpButton)) {
-    menus.push(new scout.NavigateUpButton(this, node));
+    var upButton = new scout.NavigateUpButton(this, node);
+    menus.push(upButton);
   }
   if (!this._hasButton(menus, scout.NavigateDownButton)) {
-    menus.push(new scout.NavigateDownButton(this, node));
+    var downButton = new scout.NavigateDownButton(this, node);
+    menus.push(downButton);
   }
 
   if (formOrTable instanceof scout.Form) {
@@ -156,7 +158,6 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
     node: node
   });
 };
-
 
 /**
  * Returns the selected row or null when no row is selected. When multiple rows are selected

@@ -44,6 +44,9 @@ public class JsonOutlineViewButton<T extends IOutlineViewButton> extends JsonAct
     if (JsonEventType.CLICKED.matches(event)) {
       handleUiClick(event, res);
     }
+    else if (EVENT_DO_ACTION.equals(event.getType())) {
+      handleUiClick(event, res);
+    }
     else {
       throw new IllegalArgumentException("unsupported event type");
     }

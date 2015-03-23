@@ -5,7 +5,7 @@ scout.ViewTabAutoKeyStroke = function(enabled, tabs, keyStroke) {
   this.keyStroke = keyStroke;
   this.initKeyStrokeParts();
   this.keyBoxDrawed = false;
-  this.drawHint=true;
+  this.drawHint = true;
 };
 scout.inherits(scout.ViewTabAutoKeyStroke, scout.KeyStroke);
 
@@ -41,13 +41,13 @@ scout.ViewTabAutoKeyStroke.prototype.accept = function(event) {
 /**
  * @Override scout.KeyStroke
  */
-scout.ViewTabAutoKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys){
-  if(scout.keyStrokeBox.keyStrokesAlreadyDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9])){
+scout.ViewTabAutoKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
+  if (scout.keyStrokeBox.keyStrokesAlreadyDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9])) {
     return;
   }
-  if(this.drawHint){
+  if (this.drawHint) {
     this._drawKeyBox($container);
-    drawedKeys[this.keyStrokeName()]=true;
+    drawedKeys[this.keyStrokeName()] = true;
     scout.keyStrokeBox.keyStrokeRangeDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9]);
   }
 };
@@ -60,7 +60,6 @@ scout.ViewTabAutoKeyStroke.prototype._drawKeyBox = function($container) {
   }
   if (this._enabled && this._tabs) {
     for (var i = 0; i < this._tabs.length; i++) {
-      //TODO nbu fix bug->table is not first tab but displayed as first.
       var offsetLeft = 4,
         firstField = true;
       if (i === 0) {
@@ -68,11 +67,11 @@ scout.ViewTabAutoKeyStroke.prototype._drawKeyBox = function($container) {
         firstField = false;
       }
       if (i < 8) {
-        scout.keyStrokeBox.drawSingleKeyBoxItem(offsetLeft, i + 1, this._tabs[i].$container,this.ctrl, this.alt, this.shift);
+        scout.keyStrokeBox.drawSingleKeyBoxItem(offsetLeft, i + 1, this._tabs[i].$container, this.ctrl, this.alt, this.shift);
         firstField = false;
       }
       if (i + 1 === this._tabs.length) {
-        scout.keyStrokeBox.drawSingleKeyBoxItem(offsetLeft, 9, this._tabs[i].$container,  this.ctrl, this.alt, this.shift);
+        scout.keyStrokeBox.drawSingleKeyBoxItem(offsetLeft, 9, this._tabs[i].$container, this.ctrl, this.alt, this.shift);
         firstField = false;
       }
     }

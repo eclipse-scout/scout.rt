@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.control;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
 public class MapTableControl extends AbstractTableControl implements IMapTableControl {
@@ -45,5 +46,10 @@ public class MapTableControl extends AbstractTableControl implements IMapTableCo
 
   protected List<? extends IColumn<?>> getConfiguredColumns() {
     return new ArrayList<IColumn<?>>();
+  }
+
+  @Override
+  protected String getConfiguredKeyStroke() {
+    return IKeyStroke.CONTROL + "-" + IKeyStroke.F8;
   }
 }

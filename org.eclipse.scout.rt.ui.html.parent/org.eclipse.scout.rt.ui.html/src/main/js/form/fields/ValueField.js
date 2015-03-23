@@ -4,12 +4,18 @@
 scout.ValueField = function() {
   scout.ValueField.parent.call(this);
   this._keyUpListener;
+  this._addAdapterProperties('menus');
 };
 scout.inherits(scout.ValueField, scout.FormField);
 
 scout.ValueField.prototype._renderProperties = function() {
   scout.ValueField.parent.prototype._renderProperties.call(this);
   this._renderDisplayText(this.displayText);
+  if (this.menus) {
+    for (var j = 0; j < this.menus.length; j++) {
+      this.keyStrokeAdapter.registerKeyStroke(this.menus[j]);
+    }
+  }
 };
 
 scout.ValueField.prototype._renderDisplayText = function(displayText) {

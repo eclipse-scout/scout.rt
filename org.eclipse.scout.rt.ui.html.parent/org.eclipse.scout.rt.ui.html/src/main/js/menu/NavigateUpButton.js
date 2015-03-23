@@ -3,6 +3,7 @@ scout.NavigateUpButton = function(outline, node) {
   this._text1 = 'Back';
   this._text2 = 'Up';
   this.id = 'NavigateUpButton';
+  this.keyStroke = 'ESCAPE';
 };
 scout.inherits(scout.NavigateUpButton, scout.AbstractNavigationButton);
 
@@ -23,7 +24,7 @@ scout.NavigateUpButton.prototype._toggleDetail = function() {
  */
 scout.NavigateUpButton.prototype._buttonEnabled = function() {
   var parentNode = this.node.parentNode;
-  return !!parentNode || !!this.outline.defaultDetailForm;
+  return !!parentNode || !! this.outline.defaultDetailForm;
 };
 
 scout.NavigateUpButton.prototype._drill = function() {

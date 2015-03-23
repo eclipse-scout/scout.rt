@@ -61,7 +61,8 @@
       "systemType": 0,
       "processButton": true,
       "selected": false,
-      "displayStyle": 0
+      "displayStyle": 0,
+      "KeyStroke": null
     },
     "GroupBox": {
       "borderDecoration": "auto",

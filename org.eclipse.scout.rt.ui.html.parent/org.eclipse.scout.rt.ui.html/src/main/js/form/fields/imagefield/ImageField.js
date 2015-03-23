@@ -1,6 +1,7 @@
 scout.ImageField = function() {
   scout.ImageField.parent.call(this);
   this.$fieldContainer;
+  this._addAdapterProperties('menus');
 };
 scout.inherits(scout.ImageField, scout.FormField);
 
@@ -27,6 +28,11 @@ scout.ImageField.prototype._render = function($parent) {
   this.addMandatoryIndicator();
   this.addField($field);
   this.addStatus();
+  if (this.menus) {
+    for (var j = 0; j < this.menus.length; j++) {
+      this.keyStrokeAdapter.registerKeyStroke(this.menus[j]);
+    }
+  }
 };
 
 scout.ImageField.prototype._onImageLoad = function(event) {

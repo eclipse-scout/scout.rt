@@ -107,3 +107,10 @@ scout.FormToolButton.prototype._renderEnabled = function(enabled) {
   }
   this.$container.setEnabled(enabled);
 };
+
+scout.FormToolButton.prototype.handle = function(event) {
+  this.toggle();
+  if (this.preventDefaultOnEvent) {
+    event.preventDefault();
+  }
+};

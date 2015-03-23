@@ -8,8 +8,10 @@ scout.Action = function() {
   this.ctrl = false;
   this.alt = false;
   this.shift = false;
-  this.bubbleUp=false;
-  this.drawHint=true;
+  this.bubbleUp = false;
+  this.drawHint = true;
+
+  this.preventDefaultOnEvent = true;
 };
 scout.inherits(scout.Action, scout.ModelAdapter);
 
@@ -168,34 +170,37 @@ scout.Action.prototype.accept = function(event) {
 
 scout.Action.prototype.handle = function(event) {
   this.sendDoAction();
+  if (this.preventDefaultOnEvent) {
+    event.preventDefault();
+  }
 };
 
-scout.Action.prototype.checkAndDrawKeyBox = function($container, drawedKeys){
-  if(drawedKeys[this.keyStrokeName()]){
+scout.Action.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
+  if (drawedKeys[this.keyStrokeName()]) {
     return;
   }
-  if(this.drawHint){
+  if (this.drawHint) {
     this._drawKeyBox($container);
-    drawedKeys[this.keyStrokeName()]=true;
+    drawedKeys[this.keyStrokeName()] = true;
   }
 };
 
-scout.Action.prototype._drawKeyBox = function($container){
-  if (!this.drawHint||!this.keyStroke) {
+scout.Action.prototype._drawKeyBox = function($container) {
+  if (!this.drawHint || !this.keyStroke) {
     return;
   }
   var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
   scout.keyStrokeBox.drawSingleKeyBoxItem(4, keyBoxText, $container, this.ctrl, this.alt, this.shift);
 };
 
-scout.Action.prototype.removeKeyBox = function($container){
+scout.Action.prototype.removeKeyBox = function($container) {
   $('.key-box', $container).remove();
   $('.key-box-additional', $container).remove();
 };
 
-scout.Action.prototype.keyStrokeName = function(){
-  var name = this.ctrl ? 'ctrl+':'';
-  name += this.alt ? 'alt+':'' ;
-  name += this.shift ? 'shift+':'';
+scout.Action.prototype.keyStrokeName = function() {
+  var name = this.ctrl ? 'ctrl+' : '';
+  name += this.alt ? 'alt+' : '';
+  name += this.shift ? 'shift+' : '';
   return name + this.keyStrokeKeyPart;
 };

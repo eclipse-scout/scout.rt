@@ -15,7 +15,7 @@ scout.Table = function() {
   this.rowsMap = {}; // rows by id
   this._rowWidth = 0;
   this.staticMenus = [];
-  this._addAdapterProperties(['tableControls', 'menus']);
+  this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
   this.events = new scout.EventSupport();
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this._filterMap = {};

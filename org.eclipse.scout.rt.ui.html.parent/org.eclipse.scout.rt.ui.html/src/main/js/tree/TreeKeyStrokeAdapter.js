@@ -4,3 +4,5 @@ scout.TreeKeyStrokeAdapter = function(field) {
   this.keyStrokes.push(new scout.TreeControlKeyStrokes(field));
 };
 scout.inherits(scout.TreeKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
+
+//TODO nbu install menus

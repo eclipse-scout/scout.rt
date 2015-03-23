@@ -37,11 +37,21 @@ scout.AbstractKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
  * @param event
  * @returns {Boolean}
  */
-scout.AbstractKeyStrokeAdapter.prototype.accept = function(event){
+scout.AbstractKeyStrokeAdapter.prototype.accept = function(event) {
   return true;
 };
 
-
-scout.AbstractKeyStrokeAdapter.prototype.preventBubbleUp = function(event){
+scout.AbstractKeyStrokeAdapter.prototype.preventBubbleUp = function(event) {
   return false;
+};
+
+scout.AbstractKeyStrokeAdapter.prototype.registerKeyStroke = function(keyStroke) {
+  this.keyStrokes.push(keyStroke);
+};
+
+scout.AbstractKeyStrokeAdapter.prototype.unregisterKeyStroke = function(keyStroke) {
+  var index = this.keyStrokes.indexOf(keyStroke);
+  if (index > -1) {
+    this.keyStrokes.splice(index, 1);
+  }
 };

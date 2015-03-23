@@ -17,11 +17,6 @@ scout.AbstractNavigationButton = function(outline, node) {
 scout.inherits(scout.AbstractNavigationButton, scout.Button);
 
 // @override
-scout.AbstractNavigationButton.prototype._onClick = function() {
-  this._onClickFunc();
-};
-
-// @override
 scout.AbstractNavigationButton.prototype._render = function($parent) {
   if (this._isDetail()) {
     this._onClickFunc = this._setDetailVisible.bind(this);
@@ -39,4 +34,27 @@ scout.AbstractNavigationButton.prototype._setDetailVisible = function() {
   $.log.debug('show detail-' + detailVisible ? 'form' : 'table');
   this.node.detailFormHiddenByUi = !detailVisible;
   this.outline._updateOutlineTab(this.node);
+};
+
+scout.AbstractNavigationButton.prototype.doAction = function() {
+  this._onClickFunc();
+};
+
+//@Override scout.Button
+scout.AbstractNavigationButton.prototype._registerButtonKeyStroke = function() {
+  if (this.defaultKeyStroke) {
+    this._unregisterButtonKeyStroke();
+  }
+  if (this.keyStroke) {
+    //register buttons key stroke on root Groupbox
+    this.defaultKeyStroke = new scout.ButtonKeyStroke(this, this.keyStroke);
+    this.outline.keyStrokeAdapter.registerKeyStroke(this.defaultKeyStroke);
+  }
+};
+
+scout.AbstractNavigationButton.prototype._unregisterButtonKeyStroke = function() {
+  //unregister buttons key stroke on root Groupbox
+  if (this.defaultKeyStroke) {
+    this.outline.keyStrokeAdapter.unregisterKeyStroke(this.defaultKeyStroke);
+  }
 };

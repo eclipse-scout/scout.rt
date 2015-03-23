@@ -7,6 +7,7 @@ scout.keys = {
   ALT: 18,
   PAUSE: 19,
   ESC: 27,
+  ESCAPE: 27,
   PAGE_UP: 33,
   PAGE_DOWN: 34,
   END: 35,
@@ -191,74 +192,73 @@ scout.codesToKeys = {
 };
 
 scout.keyStrokeBox = {
-    additionalMarginLeft: 22,
-    marginLeft: 28,
-    drawSingleKeyBoxItem: function(offset, keyBoxText, $container, ctrl, alt, shift) {
-      var $existingKeyBoxes = $('.key-box', $container);
-      var boxGroup = 0;
-      if ($existingKeyBoxes.length>0) {
-        boxGroup = $existingKeyBoxes.first().attr('box-group');
-      }
-      offset = offset + this.marginLeft*$existingKeyBoxes.length + boxGroup*this.additionalMarginLeft;
-      boxGroup++;
-      if (ctrl) {
-        $container.prependDiv('key-box ', 'ctrl').css('left', '' + offset + 'px').attr('box-group', boxGroup);
-        offset = offset + this.marginLeft;
-      }
-      if (alt) {
-        $container.prependDiv('key-box ', 'alt').css('left', '' + offset + 'px').attr('box-group', boxGroup);
-        offset = offset + this.marginLeft;
-      }
-      if (shift) {
-        $container.prependDiv('key-box ', 'shift').css('left', '' + offset + 'px').attr('box-group', boxGroup);
-        offset = offset + this.marginLeft;
-      }
-      $container.prependDiv('key-box ', keyBoxText).css('left', '' + offset + 'px').attr('box-group', boxGroup);
+  additionalMarginLeft: 22,
+  marginLeft: 28,
+  drawSingleKeyBoxItem: function(offset, keyBoxText, $container, ctrl, alt, shift) {
+    var $existingKeyBoxes = $('.key-box', $container);
+    var boxGroup = 0;
+    if ($existingKeyBoxes.length > 0) {
+      boxGroup = $existingKeyBoxes.first().attr('box-group');
+    }
+    offset = offset + this.marginLeft * $existingKeyBoxes.length + boxGroup * this.additionalMarginLeft;
+    boxGroup++;
+    if (ctrl) {
+      $container.prependDiv('key-box ', 'ctrl').css('left', '' + offset + 'px').attr('box-group', boxGroup);
       offset = offset + this.marginLeft;
-      return offset;
-    },
+    }
+    if (alt) {
+      $container.prependDiv('key-box ', 'alt').css('left', '' + offset + 'px').attr('box-group', boxGroup);
+      offset = offset + this.marginLeft;
+    }
+    if (shift) {
+      $container.prependDiv('key-box ', 'shift').css('left', '' + offset + 'px').attr('box-group', boxGroup);
+      offset = offset + this.marginLeft;
+    }
+    $container.prependDiv('key-box ', keyBoxText).css('left', '' + offset + 'px').attr('box-group', boxGroup);
+    offset = offset + this.marginLeft;
+    return offset;
+  },
 
-    keyStrokeName: function(ctrl, alt, shift, keyStroke){
-      var name =ctrl ? 'ctrl+':'';
-      name +=alt ? 'alt+':'' ;
-      name += shift ? 'shift+':'';
-      name += keyStroke;
-      return name;
-    },
+  keyStrokeName: function(ctrl, alt, shift, keyStroke) {
+    var name = ctrl ? 'ctrl+' : '';
+    name += alt ? 'alt+' : '';
+    name += shift ? 'shift+' : '';
+    name += keyStroke;
+    return name;
+  },
 
-    keyStrokesAlreadyDrawn: function(paintedKeyStrokes,ctrl, alt, shift, start, end){
-      var name =ctrl ? 'ctrl+':'';
-      name +=alt ? 'alt+':'' ;
-      name += shift ? 'shift+':'';
-      for(var i = start ; i<=end; i++ ){
-        if(paintedKeyStrokes[name+i]){
-          return true;
-        }
-      }
-      return false;
-    },
-    /**
-     * check if key stroke is already drawn. if its already drawn it returns true. if not add it and return false
-     */
-    keyStrokeAlreadyDrawnAndDraw: function(paintedKeyStrokes,ctrl, alt, shift, keyStrokeNr){
-      var name =ctrl ? 'ctrl+':'';
-      name +=alt ? 'alt+':'' ;
-      name += shift ? 'shift+':'';
-      name += keyStrokeNr;
-        if(paintedKeyStrokes[name]){
-          return true;
-        }
-      paintedKeyStrokes[name]=true;
-      return false;
-    },
-
-    keyStrokeRangeDrawn: function(paintedKeyStrokes,ctrl, alt, shift, start, end){
-      var name =ctrl ? 'ctrl+':'';
-      name +=alt ? 'alt+':'' ;
-      name += shift ? 'shift+':'';
-      for(var i = start ; i<=end; i++ ){
-        paintedKeyStrokes[name+i]=true;
+  keyStrokesAlreadyDrawn: function(paintedKeyStrokes, ctrl, alt, shift, start, end) {
+    var name = ctrl ? 'ctrl+' : '';
+    name += alt ? 'alt+' : '';
+    name += shift ? 'shift+' : '';
+    for (var i = start; i <= end; i++) {
+      if (paintedKeyStrokes[name + i]) {
+        return true;
       }
     }
-  };
+    return false;
+  },
+  /**
+   * check if key stroke is already drawn. if its already drawn it returns true. if not add it and return false
+   */
+  keyStrokeAlreadyDrawnAndDraw: function(paintedKeyStrokes, ctrl, alt, shift, keyStrokeNr) {
+    var name = ctrl ? 'ctrl+' : '';
+    name += alt ? 'alt+' : '';
+    name += shift ? 'shift+' : '';
+    name += keyStrokeNr;
+    if (paintedKeyStrokes[name]) {
+      return true;
+    }
+    paintedKeyStrokes[name] = true;
+    return false;
+  },
 
+  keyStrokeRangeDrawn: function(paintedKeyStrokes, ctrl, alt, shift, start, end) {
+    var name = ctrl ? 'ctrl+' : '';
+    name += alt ? 'alt+' : '';
+    name += shift ? 'shift+' : '';
+    for (var i = start; i <= end; i++) {
+      paintedKeyStrokes[name + i] = true;
+    }
+  }
+};

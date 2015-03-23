@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.control;
 
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
 
 public class AnalysisTableControl extends AbstractTableControl implements IAnalysisTableControl {
@@ -36,5 +37,10 @@ public class AnalysisTableControl extends AbstractTableControl implements IAnaly
 
   public void setDataModel(IDataModel dataModel) {
     propertySupport.setProperty(PROP_DATA_MODEL, dataModel);
+  }
+
+  @Override
+  protected String getConfiguredKeyStroke() {
+    return IKeyStroke.CONTROL + "-" + IKeyStroke.F3;
   }
 }

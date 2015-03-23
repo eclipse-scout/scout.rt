@@ -2,6 +2,7 @@ scout.Menu = function() {
   scout.Menu.parent.call(this);
   this.childMenus = [];
   this._addAdapterProperties('childMenus');
+  this.popup = undefined;
 };
 scout.inherits(scout.Menu, scout.Action);
 
@@ -23,8 +24,8 @@ scout.Menu.prototype._renderSeparator = function($parent) {
 
 scout.Menu.prototype._renderItem = function($parent) {
   this.$container = $parent
-  .appendDiv('menu-item')
-  .on('click', '', onClicked.bind(this));
+    .appendDiv('menu-item')
+    .on('click', '', onClicked.bind(this));
 
   if ('taskbar' === this.menuStyle) {
     this.$container.addClass('taskbar');
@@ -42,14 +43,7 @@ scout.Menu.prototype._renderItem = function($parent) {
 };
 
 scout.Menu.prototype._onMenuClicked = function(event) {
-  if (this.children.length > 0) {
-    var popup = new scout.PopupMenuItem($(event.target));
-    popup.render();
-    scout.menus.appendMenuItems(popup, this.children);
-    popup.alignTo();
-  } else {
-    this.sendDoAction();
-  }
+  this.doAction($(event.target));
 };
 
 scout.Menu.prototype._renderText = function(text) {
@@ -64,5 +58,34 @@ scout.Menu.prototype._renderIconId = function(iconId) {
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {
   var textAndIcon = (this.text && this.text.length > 0 && this.iconId);
-  this.$container.toggleClass('menu-textandicon', !!textAndIcon);
+  this.$container.toggleClass('menu-textandicon', !! textAndIcon);
+};
+
+scout.Menu.prototype.doAction = function($target) {
+  if (this.children.length > 0) {
+    this.popup = new scout.PopupMenuItem($target);
+    this.popup.render();
+    scout.menus.appendMenuItems(this.popup, this.children);
+    this.popup.alignTo();
+  } else {
+    this.sendDoAction();
+  }
+};
+
+scout.Menu.prototype.handle = function(event) {
+  if (this.popup && this.popup.$container) {
+    return;
+  }
+  this.doAction(this.$container);
+  if (this.preventDefaultOnEvent) {
+    event.preventDefault();
+  }
+};
+
+scout.Menu.prototype.ignore = function(event) {
+  return this.popup && this.popup.$container;
+};
+
+scout.Menu.prototype._drawKeyBox = function($container) {
+  scout.Menu.parent.prototype._drawKeyBox.call(this, $container);
 };

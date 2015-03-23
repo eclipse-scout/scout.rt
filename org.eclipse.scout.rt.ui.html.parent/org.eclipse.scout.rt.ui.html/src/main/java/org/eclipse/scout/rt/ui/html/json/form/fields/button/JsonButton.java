@@ -10,17 +10,26 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.button;
 
+import java.util.List;
+
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
+import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
+import org.json.JSONObject;
 
-public class JsonButton<T extends IButton> extends JsonFormField<T> {
+public class JsonButton<T extends IButton> extends JsonFormField<T> implements IContextMenuOwner {
 
   public static final String PROP_SYSTEM_TYPE = "systemType";
   public static final String PROP_PROCESS_BUTTON = "processButton";
@@ -73,6 +82,34 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> {
         return BinaryResourceUrlUtility.createIconUrl((String) value);
       }
     });
+
+    putJsonProperty(new JsonProperty<IButton>(IButton.PROP_KEY_STOKE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getKeyStroke();
+      }
+    });
+  }
+
+  @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
+    if (jsonContextMenu != null) {
+      JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
+    }
+    return super.toJson();
+  }
+
+  @Override
+  public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
+    addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
+  }
+
+  @Override
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
+    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
   }
 
   @Override

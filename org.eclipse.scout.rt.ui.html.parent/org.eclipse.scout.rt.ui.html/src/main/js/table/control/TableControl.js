@@ -174,10 +174,12 @@ scout.TableControl.prototype.onResize = function() {
   }
 };
 
-scout.TableControl.prototype._drawKeyBox = function($container){
-  scout.TableControl.parent.prototype._drawKeyBox.call(this, this.$container);
+scout.TableControl.prototype._drawKeyBox = function($container) {
+  if (this.rendered) {
+    scout.TableControl.parent.prototype._drawKeyBox.call(this, this.$container);
+  }
 };
 
-scout.TableControl.prototype.handle = function(event){
+scout.TableControl.prototype.handle = function(event) {
   this.toggle();
 };

@@ -4,14 +4,14 @@ scout.NavigateDownButton = function(outline, node) {
   this._text2 = 'Show';
   this.systemType = scout.Button.SYSTEM_TYPE.OK;
   this.id = 'NavigateDownButton';
+  this.keyStroke = 'ENTER';
 };
 scout.inherits(scout.NavigateDownButton, scout.AbstractNavigationButton);
 
 scout.NavigateDownButton.prototype._isDetail = function() {
   // Button is in "detail mode" if there are both detail form and detail table visible and detail form is _not_ hidden.
   return !!(this.node.detailFormVisible && this.node.detailForm &&
-    this.node.detailTableVisible && this.node.detailTable &&
-    !this.node.detailFormHiddenByUi);
+    this.node.detailTableVisible && this.node.detailTable && !this.node.detailFormHiddenByUi);
 };
 
 scout.NavigateDownButton.prototype._toggleDetail = function() {
@@ -31,8 +31,7 @@ scout.NavigateDownButton.prototype._drill = function() {
       var row = this.node.detailTable.rowById(rowIds[0]);
       drillNode = this.outline.nodesMap[row.nodeId];
     }
-  }
-  else {
+  } else {
     drillNode = this.node.childNodes[0];
   }
   if (drillNode) {

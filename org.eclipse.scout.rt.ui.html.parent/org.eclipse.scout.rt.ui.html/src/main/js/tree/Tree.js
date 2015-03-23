@@ -23,6 +23,9 @@ scout.inherits(scout.Tree, scout.ModelAdapter);
 scout.Tree.prototype.init = function(model, session) {
   scout.Tree.parent.prototype.init.call(this, model, session);
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
+  for (var i = 0; i < this.menus.length; i++) {
+    this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
+  }
 };
 
 scout.Tree.prototype._initTreeNode = function(parentNode, node) {

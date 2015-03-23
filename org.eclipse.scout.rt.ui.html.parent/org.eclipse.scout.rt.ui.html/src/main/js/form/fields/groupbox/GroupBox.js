@@ -103,13 +103,16 @@ scout.GroupBox.prototype._prepareFields = function() {
       } else {
         this.controls.push(field);
       }
-      if(res){
+      if (res) {
         this.keyStrokeAdapter.registerKeyStroke(new scout.ButtonMnemonicKeyStroke(res, field));
       }
-
+      //Register all buttonkey strokes
+      for (var j = 0; j < field.keyStrokes.length; j++) {
+        this.keyStrokeAdapter.registerKeyStroke(field.keyStrokes[j]);
+      }
     } else {
       this.controls.push(field);
-      if(res){
+      if (res) {
         this.keyStrokeAdapter.registerKeyStroke(new scout.MnemonicKeyStroke(res, field));
       }
     }
@@ -150,10 +153,10 @@ scout.GroupBox.prototype._computeBorderVisible = function(borderVisible) {
     fields[0].$container.addClass('single');
     borderVisible = false;
   } else if (this.parent instanceof scout.GroupBox &&
-      this.parent.parent instanceof scout.Form &&
-      this.parent.parent.parent instanceof scout.WrappedFormField &&
-      this.parent.parent.parent.parent instanceof scout.SplitBox &&
-      this.parent.getFields().length === 1) {
+    this.parent.parent instanceof scout.Form &&
+    this.parent.parent.parent instanceof scout.WrappedFormField &&
+    this.parent.parent.parent.parent instanceof scout.SplitBox &&
+    this.parent.getFields().length === 1) {
     // Special case for wizard: wrapped form in split box with a single group box
     borderVisible = false;
   }
@@ -173,8 +176,7 @@ scout.GroupBox.prototype._renderExpandable = function(expandable) {
     this._$groupBoxTitle
       .addClass('expandable')
       .on('click.group-box-control', this._onGroupBoxControlClick.bind(this));
-  }
-  else {
+  } else {
     $control.remove();
     this._$groupBoxTitle
       .removeClass('expandable')

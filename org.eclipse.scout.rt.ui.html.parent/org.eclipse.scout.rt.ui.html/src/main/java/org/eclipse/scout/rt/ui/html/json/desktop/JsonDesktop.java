@@ -70,7 +70,10 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     attachGlobalAdapters(getModel().getMessageBoxStack());
     attachAdapters(filterModelActions());
     attachAdapters(getModel().getAddOns());
+    attachAdapters(getModel().getKeyStrokes());
+    attachAdapters(getModel().getMenus());
     if (!isFormBased()) {
+      attachAdapters(getModel().getToolButtons());
       attachAdapters(getModel().getViewButtons());
       attachGlobalAdapter(getModel().getOutline());
       attachGlobalAdapter(getSearchOutline());
@@ -158,8 +161,11 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxStack());
     putAdapterIdsProperty(json, "actions", filterModelActions());
     putAdapterIdsProperty(json, "addOns", getModel().getAddOns());
+    putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes());
+    putAdapterIdsProperty(json, "menus", getModel().getMenus());
     if (!isFormBased()) {
       // FIXME CGU: view and tool buttons should be removed from desktop by device transformer
+      putAdapterIdsProperty(json, "toolButtons", getModel().getToolButtons());
       putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons());
       putAdapterIdProperty(json, "outline", getModel().getOutline());
       putAdapterIdProperty(json, "searchOutline", getSearchOutline());

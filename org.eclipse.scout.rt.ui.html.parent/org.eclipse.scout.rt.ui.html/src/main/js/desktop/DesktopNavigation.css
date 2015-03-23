@@ -66,6 +66,10 @@
   .navigation-breadcrumb > .navigation-header > & {
     width: 50%;
   }
+
+  & > .key-box {
+    top:10px;
+  }
 }
 
 /* navigation header buttons*/

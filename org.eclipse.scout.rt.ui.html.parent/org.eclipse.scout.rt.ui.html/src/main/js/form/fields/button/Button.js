@@ -1,6 +1,9 @@
 scout.Button = function() {
   scout.Button.parent.call(this);
   this._$icon;
+  this._addAdapterProperties('menus');
+  this.keyStroke;
+  this.defaultKeyStroke;
 };
 scout.inherits(scout.Button, scout.FormField);
 
@@ -46,16 +49,34 @@ scout.Button.prototype._render = function($parent) {
   this.addField($button);
   $button.on('click', this._onClick.bind(this));
   if (this.systemType === scout.Button.SYSTEM_TYPE.OK ||
-      this.systemType === scout.Button.SYSTEM_TYPE.SAVE_WITHOUT_MARKER_CHANGE) {
+    this.systemType === scout.Button.SYSTEM_TYPE.SAVE_WITHOUT_MARKER_CHANGE) {
     $button.addClass('default-button');
   }
+  if (this.menus) {
+    for (var j = 0; j < this.menus.length; j++) {
+      this.keyStrokeAdapter.registerKeyStroke(this.menus[j]);
+    }
+  }
+
+  this._registerButtonKeyStroke();
 };
 
 scout.Button.prototype._onClick = function() {
+  this.doAction();
+};
+
+scout.Button.prototype._remove = function() {
+  scout.Button.parent.prototype._remove.call(this);
+  this._unregisterButtonKeyStroke();
+};
+
+scout.Button.prototype.doAction = function() {
   if (this.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {
     this.selected = !this.selected;
     this._renderSelected();
-    this.session.send(this.id, 'selected', {selected: this.selected});
+    this.session.send(this.id, 'selected', {
+      selected: this.selected
+    });
   } else {
     this.session.send(this.id, 'clicked');
   }
@@ -72,7 +93,7 @@ scout.Button.prototype._renderProperties = function() {
 
 scout.Button.prototype._renderSelected = function() {
   if (this.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {
-    this.$field.toggleClass('selected', !!this.selected);
+    this.$field.toggleClass('selected', !! this.selected);
   }
 };
 
@@ -99,7 +120,30 @@ scout.Button.prototype._renderIconId = function() {
       $icon = $('<img>')
         .attr('src', scout.helpers.dynamicResourceUrl(this, this.iconId));
     }
-    $icon.toggleClass('with-label', !!this.label);
+    $icon.toggleClass('with-label', !! this.label);
     this.$field.prepend($icon);
   }
+};
+
+scout.Button.prototype._registerButtonKeyStroke = function() {
+  //register buttons key stroke on root Groupbox
+  if (this.defaultKeyStroke) {
+    this._unregisterButtonKeyStroke();
+  }
+  if (this.keyStroke) {
+    this.defaultKeyStroke = new scout.ButtonKeyStroke(this, this.keyStroke);
+    this.getForm().rootGroupBox.keyStrokeAdapter.registerKeyStroke(this.defaultKeyStroke);
+  }
+};
+
+scout.Button.prototype._unregisterButtonKeyStroke = function() {
+  //unregister buttons key stroke on root Groupbox
+  if (this.defaultKeyStroke) {
+    this.getForm().rootGroupBox.keyStrokeAdapter.unregisterKeyStroke(this.defaultKeyStroke);
+  }
+};
+
+scout.Button.prototype._syncKeyStroke = function(keyStroke) {
+  this.keyStroke = keyStroke;
+  this._registerButtonKeyStroke();
 };

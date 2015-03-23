@@ -24,7 +24,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.MouseButton;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -172,12 +171,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().isAutoResizeColumns();
       }
     });
-    putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_KEY_STROKES, model, getJsonSession()) {
-      @Override
-      protected List<IKeyStroke> modelValue() {
-        return getModel().getKeyStrokes();
-      }
-    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_SCROLL_TO_SELECTION, model) {
       @Override
       protected Boolean modelValue() {
@@ -202,6 +195,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
+    attachAdapters(getModel().getKeyStrokes());
     attachColumns();
   }
 
@@ -256,6 +250,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     putProperty(json, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
+    putAdapterIdsProperty(json, ITable.PROP_KEY_STROKES, getModel().getKeyStrokes());
     JSONArray jsonRows = new JSONArray();
     for (ITableRow row : getModel().getFilteredRows()) {
       if (row.isStatusDeleted()) { // Ignore deleted rows, because for the UI, they don't exist

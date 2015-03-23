@@ -15,6 +15,7 @@ scout.Popup.prototype.render = function() {
     .append(this.$body)
     .appendTo($docBody);
   this._attachCloseHandler();
+
   return this.$container;
 };
 
@@ -22,7 +23,7 @@ scout.Popup.prototype.render = function() {
  * Every user action will close menu. menu is removed in 'click' event,
  */
 scout.Popup.prototype._attachCloseHandler = function() {
-  $(document).one(scout.menus.CLOSING_EVENTS, this.remove.bind(this));
+  $(document).one( /*scout.menus.CLOSING_EVENTS*/ 'mousedown.popupContextMenu', this.remove.bind(this));
   if (this.$origin) {
     scout.scrollbars.attachScrollHandlers(this.$origin, this.remove.bind(this));
   }
@@ -38,8 +39,9 @@ scout.Popup.prototype.addClassToBody = function(clazz) {
 
 scout.Popup.prototype.remove = function() {
   this.$container.remove();
+  this.$container = undefined;
   // remove all clean-up handlers
-  $(document).off('.contextMenu');
+  $(document).off('.popupContextMenu');
   if (this.$origin) {
     scout.scrollbars.detachScrollHandlers(this.$origin);
   }
@@ -60,6 +62,8 @@ scout.PopupMenuItem = function($menuItem) {
   this.$menuItem = $menuItem;
   this.$head;
   this.$deco;
+  this.keyStrokeAdapter;
+  this._registerKeyStrokeAdapter();
 };
 scout.inherits(scout.PopupMenuItem, scout.Popup);
 
@@ -83,6 +87,11 @@ scout.PopupMenuItem.prototype.render = function($parent) {
   }
   this._copyCssClass('has-submenu');
   this._copyCssClass('taskbar');
+  this._installKeyStrokeAdapter();
+  setTimeout(function() {
+    this.$container.installFocusContext('auto');
+    this.$container.focus();
+  }.bind(this), 0);
   return this.$container;
 };
 
@@ -130,4 +139,25 @@ scout.PopupMenuItem.prototype.alignTo = function() {
   }
 
   this.setLocation(new scout.Point(left, top));
+};
+
+scout.PopupMenuItem.prototype._registerKeyStrokeAdapter = function() {
+  this.keyStrokeAdapter = new scout.PopupKeyStrokeAdapter(this);
+};
+
+scout.PopupMenuItem.prototype._installKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+  }
+};
+
+scout.PopupMenuItem.prototype._uninstallKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  }
+};
+
+scout.PopupMenuItem.prototype.remove = function() {
+  scout.PopupMenuItem.parent.prototype.remove();
+  this._uninstallKeyStrokeAdapter();
 };

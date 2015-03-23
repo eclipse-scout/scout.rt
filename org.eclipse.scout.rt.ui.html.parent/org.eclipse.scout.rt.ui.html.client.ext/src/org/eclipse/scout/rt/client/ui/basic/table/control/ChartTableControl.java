@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.control;
 
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+
 public class ChartTableControl extends AbstractTableControl implements IChartTableControl {
 
   public ChartTableControl() {
@@ -27,4 +29,8 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
     setIconId("\uE022"); //Icons.Chart
   }
 
+  @Override
+  protected String getConfiguredKeyStroke() {
+    return IKeyStroke.CONTROL + "-" + IKeyStroke.F7;
+  }
 }

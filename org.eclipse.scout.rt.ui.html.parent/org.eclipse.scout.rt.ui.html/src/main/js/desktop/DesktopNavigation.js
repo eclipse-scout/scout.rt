@@ -13,6 +13,8 @@ scout.DesktopNavigation = function(desktop) {
   this.$outlineTitle;
   this.previousOutline;
   this.breadcrumbSwitchWidth = 190;
+  this.keyStrokeAdapter;
+  this._registerKeyStrokeAdapter();
 };
 
 scout.DesktopNavigation.prototype.render = function($parent) {
@@ -36,20 +38,21 @@ scout.DesktopNavigation.prototype.render = function($parent) {
   if (this.desktop.searchOutline) {
     this.searchTab = new scout.DesktopNavigation.TabAndContent(this._createSearchTab());
     this.searchTab.$tab.on('click', function() {
-    this._selectTab(this.searchTab, this.desktop.searchOutline);
+      this._selectTab(this.searchTab, this.desktop.searchOutline);
     }.bind(this));
     this.$header.addClass('search-available');
   }
 
   this.$container = this.$navigation.appendDiv('navigation-container');
+  this._installKeyStrokeAdapter();
 };
 
 scout.DesktopNavigation.prototype._selectTab = function(tab, outline) {
-   this.desktop.changeOutline(outline);
-   this.session.send(this.desktop.id, 'outlineChanged', {
-     outlineId: outline.id
-   });
-   this._setActiveTab(tab);
+  this.desktop.changeOutline(outline);
+  this.session.send(this.desktop.id, 'outlineChanged', {
+    outlineId: outline.id
+  });
+  this._setActiveTab(tab);
 };
 
 // outline tab creation
@@ -128,7 +131,6 @@ scout.DesktopNavigation.prototype._createSearchTab = function() {
   // create button
   $tab.appendDiv('navigation-tab-search-button')
     .on('click', this._onSearchButtonClick.bind(this));
-
   return $tab;
 };
 
@@ -147,7 +149,7 @@ scout.DesktopNavigation.prototype._onQueryFieldInput = function(event) {
   this.desktop.searchOutline.searchQuery = this.$queryField.val();
 };
 
-scout.DesktopNavigation.prototype._onQueryFieldKeyPress  = function(event) {
+scout.DesktopNavigation.prototype._onQueryFieldKeyPress = function(event) {
   if (event.which === scout.keys.ENTER) {
     this.desktop.searchOutline.performSearch();
   }
@@ -231,6 +233,22 @@ scout.DesktopNavigation.prototype.onOutlinePropertyChange = function(event) {
     if (propertyName === "text") {
       this.$outlineTitle.text(event.properties[propertyName]);
     }
+  }
+};
+
+scout.DesktopNavigation.prototype._registerKeyStrokeAdapter = function() {
+  this.keyStrokeAdapter = new scout.DesktopNavigationKeyStrokeAdapter(this);
+};
+
+scout.DesktopNavigation.prototype._installKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.installAdapter(this.desktop.$parent, this.keyStrokeAdapter);
+  }
+};
+
+scout.DesktopNavigation.prototype._uninstallKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
   }
 };
 
