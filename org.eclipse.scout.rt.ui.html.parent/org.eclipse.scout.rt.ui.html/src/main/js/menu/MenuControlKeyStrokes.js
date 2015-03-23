@@ -17,10 +17,8 @@ scout.MenuControlKeyStrokes.prototype.handle = function(event) {
     this._popup.remove();
   }
 
-  if (keycode === scout.keys.SPACE || keycode === scout.keys.ENTER) {
-    if ($selectedMenuItem.length > 0) {
-      $selectedMenuItem.trigger('click');
-    }
+  if ((keycode === scout.keys.SPACE || keycode === scout.keys.ENTER) && $selectedMenuItem.length > 0) {
+    $selectedMenuItem.trigger('click');
   }
   // up: move up
   if (keycode === scout.keys.UP) {

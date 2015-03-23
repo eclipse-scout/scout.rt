@@ -11,7 +11,7 @@ scout.inherits(scout.DesktopNavigationKeyStroke, scout.KeyStroke);
  * @Override scout.KeyStroke
  */
 scout.DesktopNavigationKeyStroke.prototype.handle = function(event) {
-  if (event && event.which === scout.keys.F2 && this._desktopNavigation.activeTab != this._desktopNavigation.searchTab) {
+  if (event && event.which === scout.keys.F2 && this._desktopNavigation.activeTab !== this._desktopNavigation.searchTab) {
     this._desktopNavigation.searchTab.$tab.trigger('click');
   }
 
@@ -28,7 +28,7 @@ scout.DesktopNavigationKeyStroke.prototype.handle = function(event) {
  * @Override scout.KeyStroke
  */
 scout.DesktopNavigationKeyStroke.prototype.accept = function(event) {
-  if (event && ((event.which === scout.keys.F2 && this._desktopNavigation.activeTab != this._desktopNavigation.searchTab) || event.which === scout.keys.F11) &&
+  if (event && ((event.which === scout.keys.F2 && this._desktopNavigation.activeTab !== this._desktopNavigation.searchTab) || event.which === scout.keys.F11) &&
     event.ctrlKey === this.ctrl && event.altKey === this.alt && event.shiftKey === this.shift) {
     return true;
   }
@@ -48,7 +48,7 @@ scout.DesktopNavigationKeyStroke.prototype._drawKeyBox = function($container, dr
   if (this.keyBoxDrawed) {
     return;
   }
-  if (!drawedKeys.F2 && this._desktopNavigation.activeTab != this._desktopNavigation.searchTab) {
+  if (!drawedKeys.F2 && this._desktopNavigation.activeTab !== this._desktopNavigation.searchTab) {
     scout.keyStrokeBox.drawSingleKeyBoxItem(10, 'F2', this._desktopNavigation.searchTab.$tab, this.ctrl, this.alt, this.shift);
     drawedKeys.F2 = true;
   }
