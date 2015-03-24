@@ -208,10 +208,9 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     if (event == null) {
       return;
     }
-    processBufferedEvent(event);
-//    // Add event to buffer instead of handling it immediately. (This allows coalescing the events at JSON response level.)
-//    m_eventBuffer.add(event);
-//    registerAsBufferedEventsAdapter();
+    // Add event to buffer instead of handling it immediately. (This allows coalescing the events at JSON response level.)
+    m_eventBuffer.add(event);
+    registerAsBufferedEventsAdapter();
   }
 
   @Override

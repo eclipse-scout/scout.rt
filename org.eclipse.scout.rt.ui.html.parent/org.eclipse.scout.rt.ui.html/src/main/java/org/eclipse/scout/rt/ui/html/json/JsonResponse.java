@@ -117,14 +117,16 @@ public class JsonResponse {
    * Note: when converting the response to JSON, events on adapters that are also part of this response are ignored, see
    * also {@link #doAddEvent(JsonEvent)}
    */
-  public void replaceActionEvent(String eventTarget, String eventName, JSONObject eventData) {
+  public void replaceActionEvent(String eventTarget, String eventType, JSONObject eventData) {
     for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
       JsonEvent event = it.next();
-      if (CompareUtility.equals(event.getTarget(), eventTarget)) {
+      // Same target and same type --> remove existing event
+      if (CompareUtility.equals(event.getTarget(), eventTarget) &&
+          CompareUtility.equals(event.getType(), eventType)) {
         it.remove();
       }
     }
-    addActionEvent(eventTarget, eventName, eventData);
+    addActionEvent(eventTarget, eventType, eventData);
   }
 
   /**
