@@ -40,6 +40,18 @@ scout.Tree.prototype._initTreeNode = function(parentNode, node) {
   this._updateMarkChildrenChecked(node, true, node.checked);
 };
 
+scout.Tree.prototype.destroy = function() {
+  scout.Tree.parent.prototype.destroy.call(this);
+  this._visitNodes(this.nodes, this._destroyTreeNode.bind(this));
+};
+
+scout.Tree.prototype._destroyTreeNode = function(parentNode, node) {
+  delete this.nodesMap[node.id];
+  if (this._onNodeDeleted) { // Necessary for subclasses
+    this._onNodeDeleted(node);
+  }
+};
+
 scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
   var i, node;
   if (!nodes) {
@@ -445,15 +457,7 @@ scout.Tree.prototype._onNodesUpdated = function(nodes, parentNodeId) {
 };
 
 scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
-  var updateNodeMap, parentNode, i, nodeId, node, deletedNodes = [];
-
-  //update model and nodemap
-  updateNodeMap = function(parentNode, node) {
-    delete this.nodesMap[node.id];
-    if (this._onNodeDeleted) { // Necessary for subclasses
-      this._onNodeDeleted(node);
-    }
-  }.bind(this);
+  var parentNode, i, nodeId, node, deletedNodes = [];
 
   if (parentNodeId >= 0) {
     parentNode = this.nodesMap[parentNodeId];
@@ -465,7 +469,6 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   for (i = 0; i < nodeIds.length; i++) {
     nodeId = nodeIds[i];
     node = this.nodesMap[nodeId];
-    this._updateMarkChildrenChecked(node, false, false);
     if (parentNode) {
       if (node.parentNode !== parentNode) {
         throw new Error('Unexpected parent. Node.parent: ' + node.parentNode + ', parentNode: ' + parentNode);
@@ -474,14 +477,12 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
     } else {
       scout.arrays.remove(this.nodes, node);
     }
-    delete this.nodesMap[nodeId];
-    if (this._onNodeDeleted) { // Necessary for subclasses
-      this._onNodeDeleted(node);
-    }
+    this._destroyTreeNode(node.parentNode, node);
     deletedNodes.push(node);
+    this._updateMarkChildrenChecked(node, false, false);
 
     //remove children from node map
-    this._visitNodes(node.childNodes, updateNodeMap);
+    this._visitNodes(node.childNodes, this._destroyTreeNode.bind(this));
   }
 
   //remove node from html document
@@ -495,11 +496,8 @@ scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
 
   // Update model and nodemap
   updateNodeMap = function(parentNode, node) {
+    this._destroyTreeNode(parentNode, node);
     this._updateMarkChildrenChecked(node, false, false);
-    delete this.nodesMap[node.id];
-    if (this._onNodeDeleted) { // Necessary for subclasses
-      this._onNodeDeleted(node);
-    }
   }.bind(this);
 
   if (parentNodeId >= 0) {

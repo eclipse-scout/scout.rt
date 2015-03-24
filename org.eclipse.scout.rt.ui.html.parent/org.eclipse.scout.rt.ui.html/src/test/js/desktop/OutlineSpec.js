@@ -86,6 +86,44 @@ describe("Outline", function() {
     };
   }
 
+  describe("dispose", function() {
+    var model;
+    var tree;
+    var node0;
+    var node1;
+    var node2;
+
+    beforeEach(function() {
+      // A large tree is used to properly test recursion
+      model = createModelFixture(3, 2, true);
+      tree = createOutline(model);
+      node0 = model.nodes[0];
+      node1 = model.nodes[1];
+      node2 = model.nodes[2];
+    });
+
+    it("calls onNodeDeleted for every node to be able to cleanup", function() {
+      spyOn(tree, '_onNodeDeleted');
+      tree.destroy();
+      expect(tree._onNodeDeleted.calls.count()).toBe(39);
+    });
+
+    it("calls onNodeDeleted for every node (which was not already deleted before) to be able to cleanup", function() {
+      spyOn(tree, '_onNodeDeleted');
+
+      var message = {
+        events: [createNodesDeletedEvent(model, [node0.id])]
+      };
+      session._processSuccessResponse(message);
+      expect(tree._onNodeDeleted.calls.count()).toBe(13);
+
+      tree._onNodeDeleted.calls.reset();
+      tree.destroy();
+      expect(tree._onNodeDeleted.calls.count()).toBe(26);
+    });
+
+  });
+
 
   describe("onModelAction", function() {
 
