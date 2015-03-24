@@ -15,6 +15,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -25,7 +26,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * <p/>
  * This class is necessary because a {@link ScheduledThreadPoolExecutor} cannot be given a FutureTask as it would be
  * possible with {@link ThreadPoolExecutor}.
- * 
+ *
  * @since 5.1
  */
 @Internal
@@ -34,9 +35,9 @@ public class Job<RESULT> implements Callable<RESULT>, Runnable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(Job.class);
 
   private final IFutureTask<RESULT> m_futureTask;
-  private final Callable<RESULT> m_callable;
+  private final ICallable<RESULT> m_callable;
 
-  public Job(final IFutureTask<RESULT> futureTask, final Callable<RESULT> callable) {
+  public Job(final IFutureTask<RESULT> futureTask, final ICallable<RESULT> callable) {
     m_futureTask = Assertions.assertNotNull(futureTask, "FutureTask must not be null");
     m_callable = Assertions.assertNotNull(callable, "Callable must not be null");
   }

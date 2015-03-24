@@ -11,20 +11,20 @@
 package org.eclipse.scout.rt.client.context;
 
 import java.util.Locale;
-import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.context.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.context.PreferredValue;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
-import org.eclipse.scout.rt.platform.job.internal.callable.InitThreadLocalCallable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -70,11 +70,11 @@ public class ClientRunContext extends RunContext {
   }
 
   @Override
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, (getSession() != null ? getSession().getTexts() : ScoutTexts.CURRENT.get()));
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, UserAgent.CURRENT, getUserAgent());
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, getSession());
-    final Callable<RESULT> c1 = super.interceptCallable(c2);
+  protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next) {
+    final ICallable<RESULT> c4 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, (getSession() != null ? getSession().getTexts() : ScoutTexts.CURRENT.get()));
+    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(c4, UserAgent.CURRENT, getUserAgent());
+    final ICallable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, getSession());
+    final ICallable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;
   }

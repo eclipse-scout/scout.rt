@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.platform.job.internal.callable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.concurrent.Callable;
-
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.StringHolder;
@@ -59,7 +57,7 @@ public class ThreadNameDecoratorTest {
   public void testThreadName() throws Exception {
     final StringHolder threadName = new StringHolder();
 
-    Callable<Void> next = new Callable<Void>() {
+    ICallable<Void> next = new ICallable<Void>() {
 
       @Override
       public Void call() throws Exception {
@@ -81,7 +79,7 @@ public class ThreadNameDecoratorTest {
   public void testThreadNameWithEmptyJobIdentifier() throws Exception {
     final StringHolder threadName = new StringHolder();
 
-    Callable<Void> next = new Callable<Void>() {
+    ICallable<Void> next = new ICallable<Void>() {
 
       @Override
       public Void call() throws Exception {

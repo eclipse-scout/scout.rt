@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job.internal.callable;
+package org.eclipse.scout.rt.platform.context;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.concurrent.Callable;
-
+import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.junit.Test;
 
@@ -25,7 +24,7 @@ public class InitThreadLocalCallableTest {
   public void test() throws Exception {
     final StringHolder actualValue = new StringHolder();
 
-    Callable<Void> next = new Callable<Void>() {
+    ICallable<Void> next = new ICallable<Void>() {
 
       @Override
       public Void call() throws Exception {

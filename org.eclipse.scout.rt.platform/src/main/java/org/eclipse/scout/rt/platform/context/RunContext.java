@@ -12,22 +12,19 @@ package org.eclipse.scout.rt.platform.context;
 
 import java.security.AccessController;
 import java.util.Locale;
-import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.Callables;
 import org.eclipse.scout.rt.platform.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
-import org.eclipse.scout.rt.platform.job.internal.callable.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.job.internal.callable.SubjectCallable;
 
 /**
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
@@ -54,7 +51,7 @@ import org.eclipse.scout.rt.platform.job.internal.callable.SubjectCallable;
  * </ul>
  * Implementers:<br/>
  * Internally, the context is obtained by <code>OBJ.one(Context.class)</code>, meaning that the context can be
- * intercepted, or replaced. Thereto, the method {@link #interceptCallable(Callable)} can be overwritten to contribute
+ * intercepted, or replaced. Thereto, the method {@link #interceptCallable(ICallable)} can be overwritten to contribute
  * some additional behavior.
  *
  * @since 5.1
@@ -79,13 +76,7 @@ public class RunContext {
    *           exception thrown during the runnable's execution.
    */
   public void run(final IRunnable runnable) throws ProcessingException {
-    validate();
-    try {
-      interceptCallable(Callables.callable(runnable)).call();
-    }
-    catch (final Exception e) {
-      throw OBJ.get(ExceptionTranslator.class).translate(e);
-    }
+    call(Callables.callable(runnable));
   }
 
   /**
@@ -119,9 +110,9 @@ public class RunContext {
    * form:
    * <p/>
    * <code>
-   *   Callable c2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
-   *   Callable c1 = new YourInterceptor1(c2); // executed 2nd<br/>
-   *   Callable head = <i>super.interceptCallable(c1)</i>; // executed 1st<br/>
+   *   ICallable c2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
+   *   ICallable c1 = new YourInterceptor1(c2); // executed 2nd<br/>
+   *   ICallable head = <i>super.interceptCallable(c1)</i>; // executed 1st<br/>
    *   return head;
    * </code>
    * </p>
@@ -129,9 +120,9 @@ public class RunContext {
    * form:
    * <p/>
    * <code>
-   *   Callable c2 = <i>super.interceptCallable(<strong>next</strong>)</i>; // executed 3th<br/>
-   *   Callable c1 = new YourInterceptor2(c2); // executed 2nd<br/>
-   *   Callable head = new YourInterceptor1(c1); // executed 1st<br/>
+   *   ICallable c2 = <i>super.interceptCallable(<strong>next</strong>)</i>; // executed 3th<br/>
+   *   ICallable c1 = new YourInterceptor2(c2); // executed 2nd<br/>
+   *   ICallable head = new YourInterceptor1(c1); // executed 1st<br/>
    *   return head;
    * </code>
    *
@@ -139,10 +130,10 @@ public class RunContext {
    *          the callable to be run in the context.
    * @return the head of the chain to be invoked first.
    */
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, m_propertyMap);
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, NlsLocale.CURRENT, getLocale());
-    final Callable<RESULT> c1 = new SubjectCallable<>(c2, getSubject());
+  protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next) {
+    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, m_propertyMap);
+    final ICallable<RESULT> c2 = new InitThreadLocalCallable<>(c3, NlsLocale.CURRENT, getLocale());
+    final ICallable<RESULT> c1 = new SubjectCallable<>(c2, getSubject());
 
     return c1;
   }

@@ -8,23 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job.internal.callable;
-
-import java.util.concurrent.Callable;
+package org.eclipse.scout.commons;
 
 /**
  * Interface to mark a processing object as 'chainable' in the language of the design pattern 'chain-of-responsibility'.
  * <p/>
  * <i>Currently, this interface is only used to test the concatenation of element processors in JUnit.</i>
  *
- * @param <RESULT>
- *          the result type of the callable's computation.
+ * @param <ELEMENT>
+ *          element type of the chain.
  * @since 5.1
  */
-public interface Chainable<RESULT> {
+public interface IChainable<ELEMENT> {
 
   /**
    * @return next element in the chain.
    */
-  Callable<RESULT> getNext();
+  ELEMENT getNext();
 }

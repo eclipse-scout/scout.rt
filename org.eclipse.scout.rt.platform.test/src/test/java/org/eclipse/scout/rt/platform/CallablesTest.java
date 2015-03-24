@@ -20,10 +20,11 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
+import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.junit.Test;
 
 public class CallablesTest {
@@ -44,7 +45,7 @@ public class CallablesTest {
     IRunnable origin = mock(IRunnable.class);
     doThrow(new RuntimeException()).when(origin).run();
 
-    Callable<Void> callable = Callables.callable(origin);
+    ICallable<Void> callable = Callables.callable(origin);
     callable.call();
   }
 
@@ -53,14 +54,14 @@ public class CallablesTest {
   public void testCallableFromICallable1() throws Exception {
     ICallable<String> origin = mock(ICallable.class);
 
-    Callable<String> callable = Callables.callable(origin);
+    ICallable<String> callable = Callables.callable(origin);
     assertSame(origin, callable);
   }
 
   @Test(expected = AssertionException.class)
   @SuppressWarnings("unchecked")
   public void testCallableFromIExecutable() throws Exception {
-    Callable<String> callable = Callables.callable(mock(IExecutable.class));
+    ICallable<String> callable = Callables.callable(mock(IExecutable.class));
     callable.call();
   }
 }

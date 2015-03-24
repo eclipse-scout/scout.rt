@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal.callable;
 
-import java.util.concurrent.Callable;
-
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.ICallable;
+import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.rt.platform.job.JobEventFilters;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -25,16 +25,15 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
 /**
  * Processor to decorate the thread-name of the worker-thread during the time of execution with the job name.
- * <p/>
- * This {@link Callable} is a processing object in the language of the design pattern 'chain-of-responsibility'.
  *
  * @param <RESULT>
  *          the result type of the job's computation.
  * @since 5.1
+ * @see <i>design pattern: chain of responsibility</i>
  */
-public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, Chainable<RESULT> {
+public class ThreadNameDecorator<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
 
-  private final Callable<RESULT> m_next;
+  private final ICallable<RESULT> m_next;
   private final String m_threadName;
   private final String m_jobName;
 
@@ -48,7 +47,7 @@ public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, Chainable<
    * @param jobName
    *          the job's identifier to be appended to the thread-name.
    */
-  public ThreadNameDecorator(final Callable<RESULT> next, final String threadName, final String jobName) {
+  public ThreadNameDecorator(final ICallable<RESULT> next, final String threadName, final String jobName) {
     m_next = Assertions.assertNotNull(next);
     m_threadName = threadName;
     m_jobName = JobInput.N_A.equals(jobName) ? null : jobName;
@@ -89,7 +88,7 @@ public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, Chainable<
   }
 
   @Override
-  public Callable<RESULT> getNext() {
+  public ICallable<RESULT> getNext() {
     return m_next;
   }
 }

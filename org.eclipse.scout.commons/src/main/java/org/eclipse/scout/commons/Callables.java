@@ -8,14 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform;
-
-import java.util.concurrent.Callable;
+package org.eclipse.scout.commons;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
-import org.eclipse.scout.commons.ICallable;
-import org.eclipse.scout.commons.IExecutable;
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 
 /**
@@ -31,17 +26,17 @@ public final class Callables {
   }
 
   /**
-   * Returns a {@link Callable} object that represents the given {@link IExecutable}.
+   * Returns a callable object that represents the given {@link IExecutable}.
    *
    * @throws AssertionException
    *           is thrown if the given {@link IExecutable} is not of the type {@link IRunnable} or {@link ICallable}.
    */
-  public static <RESULT> Callable<RESULT> callable(final IExecutable<RESULT> executable) {
+  public static <RESULT> ICallable<RESULT> callable(final IExecutable<RESULT> executable) {
     if (executable instanceof ICallable) {
       return (ICallable<RESULT>) executable;
     }
     else if (executable instanceof IRunnable) {
-      return new Callable<RESULT>() {
+      return new ICallable<RESULT>() {
 
         @Override
         public RESULT call() throws Exception {
@@ -56,13 +51,13 @@ public final class Callables {
   }
 
   /**
-   * @return {@link Callable} that does nothing when being called.
+   * @return callable that does nothing when being called.
    */
-  public static <RESULT> Callable<Void> nullCallable() {
+  public static <RESULT> ICallable<Void> nullCallable() {
     return NULL_CALLABLE;
   }
 
-  private static final Callable<Void> NULL_CALLABLE = new Callable<Void>() {
+  private static final ICallable<Void> NULL_CALLABLE = new ICallable<Void>() {
 
     @Override
     public Void call() throws Exception {

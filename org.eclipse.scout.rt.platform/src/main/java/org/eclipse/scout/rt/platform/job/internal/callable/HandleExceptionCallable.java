@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal.callable;
 
-import java.util.concurrent.Callable;
-
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.ICallable;
+import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ExceptionTranslator;
@@ -22,17 +22,16 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
  * Processor to translate computing exceptions into {@link ProcessingException}s.
- * <p/>
- * This {@link Callable} is a processing object in the language of the design pattern 'chain-of-responsibility'.
  *
  * @param <RESULT>
  *          the result type of the job's computation.
  * @since 5.1
+ * @see <i>design pattern: chain of responsibility</i>
  */
-public class HandleExceptionCallable<RESULT> implements Callable<RESULT>, Chainable<RESULT> {
+public class HandleExceptionCallable<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
 
   @Internal
-  protected final Callable<RESULT> m_next;
+  protected final ICallable<RESULT> m_next;
   @Internal
   protected final JobInput m_input;
 
@@ -44,7 +43,7 @@ public class HandleExceptionCallable<RESULT> implements Callable<RESULT>, Chaina
    * @param input
    *          input that describes the job.
    */
-  public HandleExceptionCallable(final Callable<RESULT> next, final JobInput input) {
+  public HandleExceptionCallable(final ICallable<RESULT> next, final JobInput input) {
     m_input = input;
     m_next = Assertions.assertNotNull(next);
   }
@@ -70,7 +69,7 @@ public class HandleExceptionCallable<RESULT> implements Callable<RESULT>, Chaina
   }
 
   @Override
-  public Callable<RESULT> getNext() {
+  public ICallable<RESULT> getNext() {
     return m_next;
   }
 }

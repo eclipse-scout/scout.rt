@@ -11,20 +11,20 @@
 package org.eclipse.scout.rt.server.context;
 
 import java.util.Locale;
-import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.context.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.context.PreferredValue;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
-import org.eclipse.scout.rt.platform.job.internal.callable.InitThreadLocalCallable;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -94,18 +94,18 @@ public class ServerRunContext extends RunContext {
   }
 
   @Override
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
+  protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next) {
     final ITransaction tx = OBJ.get(ITransactionProvider.class).provide(m_transactionId);
 
-    final Callable<RESULT> c9 = new TwoPhaseTransactionBoundaryCallable<>(next, tx);
-    final Callable<RESULT> c8 = new InitThreadLocalCallable<>(c9, ITransaction.CURRENT, tx);
-    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ScoutTexts.CURRENT, (getSession() != null ? getSession().getTexts() : ScoutTexts.CURRENT.get()));
-    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, UserAgent.CURRENT, getUserAgent());
-    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ISession.CURRENT, getSession());
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, getServletResponse());
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, getServletRequest());
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, OfflineState.CURRENT, OfflineState.CURRENT.get());
-    final Callable<RESULT> c1 = super.interceptCallable(c2);
+    final ICallable<RESULT> c9 = new TwoPhaseTransactionBoundaryCallable<>(next, tx);
+    final ICallable<RESULT> c8 = new InitThreadLocalCallable<>(c9, ITransaction.CURRENT, tx);
+    final ICallable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ScoutTexts.CURRENT, (getSession() != null ? getSession().getTexts() : ScoutTexts.CURRENT.get()));
+    final ICallable<RESULT> c6 = new InitThreadLocalCallable<>(c7, UserAgent.CURRENT, getUserAgent());
+    final ICallable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ISession.CURRENT, getSession());
+    final ICallable<RESULT> c4 = new InitThreadLocalCallable<>(c5, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, getServletResponse());
+    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, getServletRequest());
+    final ICallable<RESULT> c2 = new InitThreadLocalCallable<>(c3, OfflineState.CURRENT, OfflineState.CURRENT.get());
+    final ICallable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;
   }

@@ -21,7 +21,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.Assertions.AssertionException;
+import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.IVisitor;
@@ -33,7 +35,6 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.Callables;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -198,7 +199,7 @@ public class JobManager implements IJobManager {
     }
 
     // Create the Callable to be given to the executor.
-    final Callable<RESULT> callable = interceptCallable(Callables.callable(executable), input);
+    final ICallable<RESULT> callable = interceptCallable(Callables.callable(executable), input);
 
     // Create the Future to be returned to the caller.
     final JobFutureTask<RESULT> futureTask = new JobFutureTask<RESULT>(input, periodic, m_mutexSemaphores, callable) {
@@ -331,7 +332,7 @@ public class JobManager implements IJobManager {
   }
 
   /**
-   * Overwrite this method to contribute some behavior to the {@link Callable} given to the executor for execution.
+   * Overwrite this method to contribute some behavior to the {@link ICallable} given to the executor for execution.
    * <p/>
    * Contributions are plugged according to the design pattern: 'chain-of-responsibility' - it is easiest to read the
    * chain from 'bottom-to-top'.
@@ -341,9 +342,9 @@ public class JobManager implements IJobManager {
    * form:
    * <p/>
    * <code>
-   *   Callable c2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
-   *   Callable c1 = new YourInterceptor1(c2); // executed 2nd<br/>
-   *   Callable head = <i>super.interceptCallable(c1)</i>; // executed 1st<br/>
+   *   ICallable c2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
+   *   ICallable c1 = new YourInterceptor1(c2); // executed 2nd<br/>
+   *   ICallable head = <i>super.interceptCallable(c1)</i>; // executed 1st<br/>
    *   return head;
    * </code>
    * </p>
@@ -351,22 +352,22 @@ public class JobManager implements IJobManager {
    * form:
    * <p/>
    * <code>
-   *   Callable c2 = <i>super.interceptCallable(<strong>next</strong>)</i>; // executed 3th<br/>
-   *   Callable c1 = new YourInterceptor2(c2); // executed 2nd<br/>
-   *   Callable head = new YourInterceptor1(c1); // executed 1st<br/>
+   *   ICallable c2 = <i>super.interceptCallable(<strong>next</strong>)</i>; // executed 3th<br/>
+   *   ICallable c1 = new YourInterceptor2(c2); // executed 2nd<br/>
+   *   ICallable head = new YourInterceptor1(c1); // executed 1st<br/>
    *   return head;
    * </code>
    *
    * @param next
-   *          subsequent chain element which is typically the {@link Callable} to be executed.
+   *          subsequent chain element which is typically the {@link ICallable} to be executed.
    * @param input
    *          describes the job to be executed.
    * @return the head of the chain to be invoked first.
    */
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final JobInput input) {
-    final Callable<RESULT> c3 = new ApplyRunContextCallable<RESULT>(next, input.getRunContext());
-    final Callable<RESULT> c2 = new ThreadNameDecorator<RESULT>(c3, input.getThreadName(), input.getIdentifier());
-    final Callable<RESULT> c1 = new HandleExceptionCallable<>(c2, input);
+  protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next, final JobInput input) {
+    final ICallable<RESULT> c3 = new ApplyRunContextCallable<RESULT>(next, input.getRunContext());
+    final ICallable<RESULT> c2 = new ThreadNameDecorator<RESULT>(c3, input.getThreadName(), input.getIdentifier());
+    final ICallable<RESULT> c1 = new HandleExceptionCallable<>(c2, input);
 
     return c1;
   }

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job.internal.callable;
+package org.eclipse.scout.rt.platform.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -16,10 +16,10 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
 import java.security.AccessController;
-import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.holders.Holder;
 import org.junit.Test;
 
@@ -31,7 +31,7 @@ public class SubjectCallableTest {
   public void test() throws Exception {
     final Holder<Subject> actualSubject = new Holder<>();
 
-    Callable<String> callable = new Callable<String>() {
+    ICallable<String> callable = new ICallable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -53,7 +53,7 @@ public class SubjectCallableTest {
   public void testWithoutSubject() throws Exception {
     final Holder<Subject> actualSubject = new Holder<>();
 
-    Callable<String> callable = new Callable<String>() {
+    ICallable<String> callable = new ICallable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -77,7 +77,7 @@ public class SubjectCallableTest {
 
     final Exception exception = new Exception("error");
 
-    Callable<String> callable = new Callable<String>() {
+    ICallable<String> callable = new ICallable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -105,7 +105,7 @@ public class SubjectCallableTest {
 
     final RuntimeException runtimeException = new RuntimeException("error");
 
-    Callable<String> callable = new Callable<String>() {
+    ICallable<String> callable = new ICallable<String>() {
 
       @Override
       public String call() throws Exception {

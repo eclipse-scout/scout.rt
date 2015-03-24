@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal.future;
 
+import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.rt.platform.Callables;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
 

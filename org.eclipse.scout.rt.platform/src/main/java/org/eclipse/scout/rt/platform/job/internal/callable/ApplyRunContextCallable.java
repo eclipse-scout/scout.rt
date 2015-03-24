@@ -10,45 +10,36 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal.callable;
 
-import java.util.concurrent.Callable;
-
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ICallable;
+import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.rt.platform.context.RunContext;
 
 /**
  * Processor to run the subsequent sequence of actions on behalf of the given {@link RunContext}.
- * <p/>
- * This {@link Callable} is a processing object in the language of the design pattern 'chain-of-responsibility'.
  *
  * @param <RESULT>
  *          the result type of the job's computation.
  * @since 5.1
+ * @see <i>design pattern: chain of responsibility</i>
  */
-public class ApplyRunContextCallable<RESULT> implements Callable<RESULT>, Chainable<RESULT> {
+public class ApplyRunContextCallable<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
 
-  private final Callable<RESULT> m_next;
+  private final ICallable<RESULT> m_next;
   private final RunContext m_runContext;
 
-  public ApplyRunContextCallable(final Callable<RESULT> next, final RunContext runContext) {
+  public ApplyRunContextCallable(final ICallable<RESULT> next, final RunContext runContext) {
     m_next = Assertions.assertNotNull(next);
     m_runContext = Assertions.assertNotNull(runContext);
   }
 
   @Override
   public RESULT call() throws Exception {
-    // TODO [dwi]: change to only use ICallable
-    return m_runContext.call(new ICallable<RESULT>() {
-
-      @Override
-      public RESULT call() throws Exception {
-        return m_next.call();
-      }
-    });
+    return m_runContext.call(m_next);
   }
 
   @Override
-  public Callable<RESULT> getNext() {
+  public ICallable<RESULT> getNext() {
     return m_next;
   }
 }

@@ -13,13 +13,10 @@ package org.eclipse.scout.rt.platform.context;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.util.concurrent.Callable;
-
+import org.eclipse.scout.commons.ICallable;
+import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
-import org.eclipse.scout.rt.platform.job.internal.callable.Chainable;
-import org.eclipse.scout.rt.platform.job.internal.callable.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.job.internal.callable.SubjectCallable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +28,7 @@ import org.mockito.MockitoAnnotations;
 public class RunContextChainTest {
 
   @Mock
-  private Callable<Void> m_targetCallable;
+  private ICallable<Void> m_targetCallable;
 
   @Before
   public void before() {
@@ -43,7 +40,7 @@ public class RunContextChainTest {
    */
   @Test
   public void testCallableChain() throws Exception {
-    Callable<Void> actualCallable = new RunContext().interceptCallable(m_targetCallable);
+    ICallable<Void> actualCallable = new RunContext().interceptCallable(m_targetCallable);
 
     // 1. SubjectCallable
     SubjectCallable c1 = getFirstAndAssert(actualCallable, SubjectCallable.class);
@@ -68,15 +65,15 @@ public class RunContextChainTest {
     RunContext runContext = new RunContext() {
 
       @Override
-      protected <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next) {
-        Callable<RESULT> p2 = new Contribution2<>(next); // executed 3th
-        Callable<RESULT> p1 = new Contribution1<>(p2); // executed 2nd
-        Callable<RESULT> head = super.interceptCallable(p1); // executed 1st
+      protected <RESULT> ICallable<RESULT> interceptCallable(ICallable<RESULT> next) {
+        ICallable<RESULT> p2 = new Contribution2<>(next); // executed 3th
+        ICallable<RESULT> p1 = new Contribution1<>(p2); // executed 2nd
+        ICallable<RESULT> head = super.interceptCallable(p1); // executed 1st
         return head;
       }
     };
 
-    Callable<Void> actualCallable = runContext.interceptCallable(m_targetCallable);
+    ICallable<Void> actualCallable = runContext.interceptCallable(m_targetCallable);
 
     // 1. SubjectCallable
     SubjectCallable c1 = getFirstAndAssert(actualCallable, SubjectCallable.class);
@@ -107,15 +104,15 @@ public class RunContextChainTest {
     RunContext runContext = new RunContext() {
 
       @Override
-      protected <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next) {
-        Callable<RESULT> p2 = super.interceptCallable(next); // executed 3th
-        Callable<RESULT> p1 = new Contribution2<>(p2); // executed 2nd
-        Callable<RESULT> head = new Contribution1<>(p1); // executed 1st
+      protected <RESULT> ICallable<RESULT> interceptCallable(ICallable<RESULT> next) {
+        ICallable<RESULT> p2 = super.interceptCallable(next); // executed 3th
+        ICallable<RESULT> p1 = new Contribution2<>(p2); // executed 2nd
+        ICallable<RESULT> head = new Contribution1<>(p1); // executed 1st
         return head;
       }
     };
 
-    Callable<Void> actualCallable = runContext.interceptCallable(m_targetCallable);
+    ICallable<Void> actualCallable = runContext.interceptCallable(m_targetCallable);
 
     // 1. Contribution1
     Contribution1 c1 = getFirstAndAssert(actualCallable, Contribution1.class);
@@ -139,23 +136,23 @@ public class RunContextChainTest {
   }
 
   @SuppressWarnings("unchecked")
-  private static <RESULT, TYPE> TYPE getFirstAndAssert(Callable<RESULT> first, Class<TYPE> expectedType) {
+  private static <RESULT, TYPE> TYPE getFirstAndAssert(ICallable<RESULT> first, Class<TYPE> expectedType) {
     assertTrue(expectedType.equals(first.getClass()));
     return (TYPE) first;
   }
 
   @SuppressWarnings("unchecked")
-  private static <RESULT, TYPE> TYPE getNextAndAssert(Chainable<?> c, Class<TYPE> expectedType) {
-    Callable<?> next = c.getNext();
+  private static <RESULT, TYPE> TYPE getNextAndAssert(IChainable<?> c, Class<TYPE> expectedType) {
+    ICallable<?> next = (ICallable<?>) c.getNext();
     assertTrue(expectedType.equals(next.getClass()));
     return (TYPE) next;
   }
 
-  private static class Contribution1<RESULT> implements Callable<RESULT>, Chainable<RESULT> {
+  private static class Contribution1<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
 
-    private final Callable<RESULT> m_next;
+    private final ICallable<RESULT> m_next;
 
-    public Contribution1(Callable<RESULT> next) {
+    public Contribution1(ICallable<RESULT> next) {
       m_next = next;
     }
 
@@ -165,16 +162,16 @@ public class RunContextChainTest {
     }
 
     @Override
-    public Callable<RESULT> getNext() {
+    public ICallable<RESULT> getNext() {
       return m_next;
     }
   }
 
-  private static class Contribution2<RESULT> implements Callable<RESULT>, Chainable<RESULT> {
+  private static class Contribution2<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
 
-    private final Callable<RESULT> m_next;
+    private final ICallable<RESULT> m_next;
 
-    public Contribution2(Callable<RESULT> next) {
+    public Contribution2(ICallable<RESULT> next) {
       m_next = next;
     }
 
@@ -184,7 +181,7 @@ public class RunContextChainTest {
     }
 
     @Override
-    public Callable<RESULT> getNext() {
+    public ICallable<RESULT> getNext() {
       return m_next;
     }
   }

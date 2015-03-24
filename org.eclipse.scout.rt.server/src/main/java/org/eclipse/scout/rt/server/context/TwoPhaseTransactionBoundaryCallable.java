@@ -11,12 +11,12 @@
 package org.eclipse.scout.rt.server.context;
 
 import java.lang.reflect.UndeclaredThrowableException;
-import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.ICallable;
+import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.job.internal.callable.Chainable;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
 import org.eclipse.scout.rt.server.transaction.internal.TransactionSafeDelegator;
@@ -26,17 +26,16 @@ import org.eclipse.scout.rt.server.transaction.internal.TransactionSafeDelegator
  * according to the XA specification (eXtended Architecture) upon completion. Thereto, the
  * <code>2-phase-commit-protocol (2PC)</code> is applied in order to successfully commit the transaction consistently
  * over all involved transaction members like relational databases, message queues and so on.
- * <p/>
- * This {@link Callable} is a processing object in the language of the design pattern 'chain-of-responsibility'.
  *
  * @param <RESULT>
  *          the result type of the job's computation.
  * @since 5.1
+ * @see <i>design pattern: chain of responsibility</i>
  */
-public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RESULT>, Chainable<RESULT> {
+public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
 
   @Internal
-  protected final Callable<RESULT> m_next;
+  protected final ICallable<RESULT> m_next;
   @Internal
   protected final ITransaction m_transaction;
 
@@ -49,7 +48,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RES
    * @param transaction
    *          transaction to set the demarcation boundaries; must not be <code>null</code>.
    */
-  public TwoPhaseTransactionBoundaryCallable(final Callable<RESULT> next, final ITransaction transaction) {
+  public TwoPhaseTransactionBoundaryCallable(final ICallable<RESULT> next, final ITransaction transaction) {
     m_next = Assertions.assertNotNull(next);
     m_transaction = Assertions.assertNotNull(transaction);
   }
@@ -133,7 +132,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RES
   }
 
   @Override
-  public Callable<RESULT> getNext() {
+  public ICallable<RESULT> getNext() {
     return m_next;
   }
 }
