@@ -674,7 +674,6 @@ scout.Calendar.prototype.layoutComponents = function() {
               .hover(this._onMouseenter.bind(this), this._onMouseleave.bind(this));
 
           }
-target
         }
       }
     }
