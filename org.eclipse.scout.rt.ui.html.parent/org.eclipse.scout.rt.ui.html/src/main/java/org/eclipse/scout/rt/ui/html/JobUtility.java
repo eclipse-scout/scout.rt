@@ -18,10 +18,10 @@ import org.eclipse.scout.rt.ui.html.json.JsonException;
 /**
  * Utility methods to work with the Job API.
  */
-public final class JobUtil {
+public final class JobUtility {
   private static final long AWAIT_TIMEOUT = TimeUnit.HOURS.toMillis(1);
 
-  private JobUtil() {
+  private JobUtility() {
     // static access only
   }
 

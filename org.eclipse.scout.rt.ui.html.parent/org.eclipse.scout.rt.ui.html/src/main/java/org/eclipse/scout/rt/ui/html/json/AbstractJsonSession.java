@@ -45,7 +45,7 @@ import org.eclipse.scout.rt.shared.ui.IUiLayer;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.rt.ui.html.JobUtil;
+import org.eclipse.scout.rt.ui.html.JobUtility;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -289,7 +289,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   protected void startUpClientSession(IClientSession clientSession) {
-    JobUtil.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(clientSession), new IRunnable() {
+    JobUtility.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(clientSession), new IRunnable() {
       @Override
       public void run() throws Exception {
         m_jsonClientSession.startUp();
@@ -575,7 +575,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   protected JSONObject jsonResponseToJson() {
-    return JobUtil.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(getClientSession()), new ICallable<JSONObject>() {
+    return JobUtility.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(getClientSession()), new ICallable<JSONObject>() {
       @Override
       public JSONObject call() throws Exception {
         return currentJsonResponse().toJson();
@@ -619,7 +619,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
       // Dispose model (if session was not already stopped earlier by itself)
       if (m_clientSession.isActive()) {
-        JobUtil.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(m_clientSession), new IRunnable() {
+        JobUtility.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(m_clientSession), new IRunnable() {
 
           @Override
           public void run() throws Exception {

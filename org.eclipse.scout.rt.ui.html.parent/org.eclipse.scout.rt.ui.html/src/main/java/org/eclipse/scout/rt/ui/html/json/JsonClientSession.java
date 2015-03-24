@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.ui.html.JobUtil;
+import org.eclipse.scout.rt.ui.html.JobUtility;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.json.JSONObject;
 
@@ -113,7 +113,7 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
     if (m_localeManagedByModel) {
       return;
     }
-    JobUtil.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(getJsonSession().getClientSession()), new IRunnable() {
+    JobUtility.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(getJsonSession().getClientSession()), new IRunnable() {
       @Override
       public void run() throws Exception {
         if (!getModel().getLocale().equals(locale)) {
