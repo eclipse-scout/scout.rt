@@ -37,6 +37,14 @@ scout.FormToolButton.prototype.setSelected = function(selected) {
 };
 
 scout.FormToolButton.prototype._openContainer = function() {
+  var containerOffsetBounds = scout.graphics.offsetBounds(this.$container),
+    right = this.desktop.$parent.outerWidth() - containerOffsetBounds.x - containerOffsetBounds.width;
+
+  // Tool container has to be visible before rendering and layouting, otherwise sizes cannot be read
+  this.desktop.$toolContainer
+    .css('right', right)
+    .show();
+
   if (this.$storage && this.$storage.length > 0) {
     this.desktop.$toolContainer.append(this.$storage);
   } else if (this.form) {
@@ -47,10 +55,6 @@ scout.FormToolButton.prototype._openContainer = function() {
   }
   this.desktop.$toolContainer.data('toolButton', this);
 
-  var right = parseFloat(this.desktop.$parent[0].offsetWidth) - parseFloat(this.$container.offset().left) - parseFloat(this.$container[0].offsetWidth);
-  this.desktop.$toolContainer
-    .css('right', right)
-    .show();
 
   // setTimeout is required because the container is opened on mouse-down
   setTimeout(function() {
