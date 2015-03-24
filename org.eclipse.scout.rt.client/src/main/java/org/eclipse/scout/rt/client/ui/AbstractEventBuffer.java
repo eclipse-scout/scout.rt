@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -36,7 +37,7 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
 
   private List<T> m_buffer = new LinkedList<>();
 
-  protected List<T> getBuffer() {
+  protected List<T> getBufferInternal() {
     return m_buffer;
   }
 
@@ -115,5 +116,19 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
         it.remove();
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder("EventBuffer");
+    if (isEmpty()) {
+      sb.append(" is empty");
+    }
+    else {
+      sb.append(" contains " + size() + " events:");
+      sb.append("\n- ");
+      sb.append(CollectionUtility.format(m_buffer, "\n- "));
+    }
+    return sb.toString();
   }
 }
