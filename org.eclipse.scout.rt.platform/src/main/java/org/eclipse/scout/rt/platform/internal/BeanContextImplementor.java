@@ -100,18 +100,15 @@ public class BeanContextImplementor implements IBeanContext {
 
   @Override
   public <T> IBean<T> registerClass(Class<T> beanClazz) {
-    m_lock.writeLock().lock();
-    try {
-      for (IBean<T> bean : getRegisteredBeans(beanClazz)) {
-        if (bean.getBeanClazz() == beanClazz) {
-          return bean;
-        }
+    return registerBean(new BeanData<T>(beanClazz));
+  }
+
+  @Override
+  public <T> void unregisterClass(Class<T> beanClazz) {
+    for (IBean<T> bean : getRegisteredBeans(beanClazz)) {
+      if (bean.getBeanClazz() == beanClazz) {
+        unregisterBean(bean);
       }
-      BeanData<T> bean = new BeanData<T>(beanClazz);
-      return registerBean(bean);
-    }
-    finally {
-      m_lock.writeLock().unlock();
     }
   }
 

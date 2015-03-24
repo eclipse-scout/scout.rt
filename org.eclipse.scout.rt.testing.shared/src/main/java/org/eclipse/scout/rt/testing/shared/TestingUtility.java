@@ -153,9 +153,9 @@ public final class TestingUtility {
    * Registers the given services in the current {@link IBeanContext} and returns their registrations.<br/>
    * If registering Mockito mocks, use {@link #registerService(float, Object, Class)} instead.
    *
-   * @deprecated use {@link IBeanContext#registerClass(Class)} and {@link IBeanContext#registerBean(BeanData)} with
+   * @deprecated use {@link IBeanContext#registerClass(Class)} or {@link IBeanContext#registerBean(BeanData)} with
    *             {@link Order}, {@link ApplicationScoped} and {@link Replace} instead, do not use implementations
-   *             directly
+   *             directly. Note that Order is the negative equal to Priority, so legacy priority(10) is order(-10).
    */
   @Deprecated
   public static List<IBean<?>> registerServices(float priority, Object... services) {

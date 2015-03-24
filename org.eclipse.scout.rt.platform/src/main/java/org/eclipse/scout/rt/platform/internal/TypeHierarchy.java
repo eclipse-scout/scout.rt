@@ -90,10 +90,20 @@ public class TypeHierarchy<T> {
   @SuppressWarnings("unchecked")
   protected void validate() {
     if (m_querySingle == null || m_queryAll == null) {
-      //manage replaced beans
       ArrayList<IBean<T>> list = new ArrayList<>(m_beans);
+      //sort by Order ascending
       Collections.sort(list, ORDER_COMPARATOR);
+      //remove duplicate classes
+      Class<?> lastSeen = null;
+      for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
+        IBean<T> bean = it.next();
+        if (bean.getBeanClazz() == lastSeen) {
+          it.remove();
+        }
+        lastSeen = bean.getBeanClazz();
+      }
 
+      //manage replaced beans
       HashMap<Class<?>, Class<?>> extendsMap = new HashMap<>();//key is replaced by value
       for (IBean<T> bean : list) {
         if (bean.getBeanAnnotation(Replace.class) != null) {
@@ -122,16 +132,18 @@ public class TypeHierarchy<T> {
 
       m_queryAll = Collections.unmodifiableList(new ArrayList<IBean<T>>(list));
 
-      //now retain only beans that are exactly of type refClazz or interface
-      for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
-        IBean<T> bean = it.next();
-        if (bean.getBeanClazz().isInterface()) {
-          continue;
+      //now retain only beans that are exactly of type refClazz, only if refClass is not an interface
+      if (!refClazz.isInterface()) {
+        for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
+          IBean<T> bean = it.next();
+          if (bean.getBeanClazz().isInterface()) {
+            continue;
+          }
+          if (bean.getBeanClazz() == refClazz) {
+            continue;
+          }
+          it.remove();
         }
-        if (bean.getBeanClazz() == refClazz) {
-          continue;
-        }
-        it.remove();
       }
       m_querySingle = Collections.unmodifiableList(list);
     }

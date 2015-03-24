@@ -128,45 +128,12 @@ public class BeanImplementor<T> implements IBean<T> {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + CollectionUtility.hashCode(m_beanAnnotations.values());
-    result = prime * result + m_beanClazz.hashCode();
-    if (m_initialInstance != null) {
-      result = prime * result + (m_initialInstance != null ? 1231 : 1237);
-      result = prime * result + m_initialInstance.hashCode();
-    }
-    return result;
+    return m_beanClazz.hashCode();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    BeanImplementor other = (BeanImplementor) obj;
-    if (!CollectionUtility.equalsCollection(m_beanAnnotations.values(), other.m_beanAnnotations.values())) {
-      return false;
-    }
-    if (!m_beanClazz.equals(other.m_beanClazz)) {
-      return false;
-    }
-    if ((m_initialInstance != null) != (other.m_initialInstance != null)) {
-      return false;
-    }
-    if (m_initialInstance != null) {
-      if (!m_initialInstance.equals(other.m_initialInstance)) {
-        return false;
-      }
-    }
-    return true;
+    return (this == obj);
   }
 
   @Override

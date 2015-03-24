@@ -72,12 +72,21 @@ public interface IBeanContext {
   <T> List<IBean<T>> getBeans(Class<T> beanClazz);
 
   /**
-   * This is a convenience for {@link #registerBean(BeanData)}
+   * This is a convenience for {@link #registerBean(BeanData)} and calls {@link #registerBean(BeanData)} with a new
+   * {@link BeanData#BeanData(Class)}
    *
    * @param beanClazz
    * @return the registered {@link IBean}
    */
   <T> IBean<T> registerClass(Class<T> clazz);
+
+  /**
+   * This is a convenience for {@link #unregisterBean(IBean)} and unregisters all {@link IBean} with
+   * {@link IBean#getBeanClazz()} == clazz
+   *
+   * @param beanClazz
+   */
+  <T> void unregisterClass(Class<T> clazz);
 
   /**
    * @param beanData
