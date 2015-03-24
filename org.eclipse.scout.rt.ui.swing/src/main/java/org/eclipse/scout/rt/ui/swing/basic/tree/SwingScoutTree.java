@@ -882,10 +882,10 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            getScoutObject().getUIFacade().fireNodeClickFromUI(scoutNode, SwingUtility.swingToScoutMouseButton(swingMouseButton));
             if (getScoutObject().isCheckable()) {
               getScoutObject().getUIFacade().setNodesCheckedFromUI(CollectionUtility.arrayList(scoutNode), !scoutNode.isChecked());
             }
+            getScoutObject().getUIFacade().fireNodeClickFromUI(scoutNode, SwingUtility.swingToScoutMouseButton(swingMouseButton));
           }
         };
 
