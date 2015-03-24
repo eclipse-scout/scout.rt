@@ -47,7 +47,7 @@ public interface IProposalChooser<T, LOOKUP_KEY> extends IPropertyObserver {
 
   boolean isStatusVisible();
 
-  ILookupRow<LOOKUP_KEY> getAcceptedProposal() throws ProcessingException;
+  ILookupRow<LOOKUP_KEY> getAcceptedProposal();
 
   /**
    * Returns the model used to implement a proposal chooser. Typically this is either an ITable or an ITree.

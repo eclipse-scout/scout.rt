@@ -48,7 +48,7 @@ abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPropertyOb
   }
 
   @Override
-  public ILookupRow<LOOKUP_KEY> getAcceptedProposal() throws ProcessingException {
+  public ILookupRow<LOOKUP_KEY> getAcceptedProposal() {
     ILookupRow<LOOKUP_KEY> row = getSelectedLookupRow();
     if (row != null && row.isEnabled()) {
       return row;

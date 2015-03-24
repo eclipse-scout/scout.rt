@@ -195,47 +195,41 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
       IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
       // accept proposal form if either input text matches search text or
       // existing display text is valid
-      try {
-        if (proposalChooser != null && proposalChooser.getAcceptedProposal() != null) {
-          // a proposal was selected
-          return acceptProposalFromUI();
-        }
-        if (proposalChooser != null && (StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) || StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
-          /*
-           * empty text means null
-           */
-          if (text == null || text.length() == 0) {
-            return parseValue(text);
-          }
-          else {
-            // no proposal was selected...
-            if (!StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText))) {
-              return parseValue(text);
-            }
-            else {
-              // ... and current display is unchanged from model value -> nop
-              unregisterProposalChooserInternal();
-              return true;
-            }
-          }
-
+      if (proposalChooser != null && proposalChooser.getAcceptedProposal() != null) {
+        // a proposal was selected
+        return acceptProposalFromUI();
+      }
+      if (proposalChooser != null && (StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) || StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
+        /*
+         * empty text means null
+         */
+        if (text == null || text.length() == 0) {
+          return parseValue(text);
         }
         else {
-          /*
-           * ticket 88359
-           * check if changed at all
-           */
-          if (CompareUtility.equals(text, currentValidText)) {
-            return true;
-          }
-          else {
+          // no proposal was selected...
+          if (!StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText))) {
             return parseValue(text);
           }
+          else {
+            // ... and current display is unchanged from model value -> nop
+            unregisterProposalChooserInternal();
+            return true;
+          }
         }
+
       }
-      catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-        return true;
+      else {
+        /*
+         * ticket 88359
+         * check if changed at all
+         */
+        if (CompareUtility.equals(text, currentValidText)) {
+          return true;
+        }
+        else {
+          return parseValue(text);
+        }
       }
     }
 
