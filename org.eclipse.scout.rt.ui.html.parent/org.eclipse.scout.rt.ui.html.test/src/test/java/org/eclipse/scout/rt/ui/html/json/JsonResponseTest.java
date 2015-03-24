@@ -13,14 +13,22 @@ package org.eclipse.scout.rt.ui.html.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonResponseTest {
 
   JsonSessionMock m_jsonSession = new JsonSessionMock();
