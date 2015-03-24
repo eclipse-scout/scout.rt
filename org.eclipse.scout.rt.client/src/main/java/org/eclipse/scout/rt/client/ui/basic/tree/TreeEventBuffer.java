@@ -128,7 +128,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       TreeEvent event = events.get(i);
       int type = event.getType();
 
-      //merge current update event with previous insert event of the same row
+      //merge current update event with previous insert event of the same node
       if (type == newType) {
         events.set(i, updatePreviousNode(event, events.subList(0, i), oldType));
       }
@@ -136,7 +136,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   }
 
   /**
-   * Merge previous events of the same type (rows and columns) into the current and delete the previous events
+   * Merge previous events of the same type into the current and delete the previous events
    */
   protected void coalesceSameType(List<TreeEvent> events) {
     for (int j = 0; j < events.size() - 1; j++) {
@@ -152,7 +152,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   }
 
   /**
-   * Updates previous rows in the list, if it is of the given type.
+   * Updates previous nodes in the list, if it is of the given type.
    */
   protected TreeEvent updatePreviousNode(TreeEvent event, List<TreeEvent> events, int type) {
     Collection<ITreeNode> nodes = event.getNodes();
@@ -165,11 +165,11 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     return replaceNodesInEvent(event, nodes);
   }
 
-  protected TreeEvent replaceNodes(TreeEvent event, Collection<ITreeNode> newRows) {
-    for (Iterator<ITreeNode> it = newRows.iterator(); it.hasNext();) {
-      ITreeNode newRow = it.next();
+  protected TreeEvent replaceNodes(TreeEvent event, Collection<ITreeNode> newNodes) {
+    for (Iterator<ITreeNode> it = newNodes.iterator(); it.hasNext();) {
+      ITreeNode newNode = it.next();
       IHolder<TreeEvent> eventHolder = new Holder<>(event);
-      boolean replaced = tryReplaceRow(eventHolder, newRow);
+      boolean replaced = tryReplaceNode(eventHolder, newNode);
       if (replaced) {
         event = eventHolder.getValue();
         it.remove();
@@ -179,22 +179,22 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   }
 
   /**
-   * Replaces the row in the event, if it is contained.
+   * Replaces the node in the event, if it is contained.
    *
    * @return <code>true</code> if successful.
    */
-  protected boolean tryReplaceRow(IHolder<TreeEvent> eventHolder, ITreeNode newNode) {
+  protected boolean tryReplaceNode(IHolder<TreeEvent> eventHolder, ITreeNode newNode) {
     TreeEvent event = eventHolder.getValue();
-    List<ITreeNode> targetRows = new ArrayList<>();
+    List<ITreeNode> targetNodes = new ArrayList<>();
     boolean replaced = false;
     for (ITreeNode node : event.getNodes()) {
       if (node == newNode) {
         node = newNode;
         replaced = true;
       }
-      targetRows.add(node);
+      targetNodes.add(node);
     }
-    eventHolder.setValue(replaceNodesInEvent(event, targetRows));
+    eventHolder.setValue(replaceNodesInEvent(event, targetNodes));
     return replaced;
   }
 
