@@ -21,8 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -40,7 +38,6 @@ import org.junit.Assert;
 import org.mockito.Mockito;
 
 public final class JsonTestUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTestUtility.class);
 
   private JsonTestUtility() {
   }
@@ -161,9 +158,10 @@ public final class JsonTestUtility {
     return getEvent(json, index).getJSONObject("properties");
   }
 
-  public static void initField(ICompositeField compositeField) {
+  public static void initField(ICompositeField compositeField) throws ProcessingException {
     InitFieldVisitor visitor = new InitFieldVisitor();
     compositeField.visitFields(visitor, 0);
+    visitor.handleResult();
   }
 
   // copy from FormUtility
