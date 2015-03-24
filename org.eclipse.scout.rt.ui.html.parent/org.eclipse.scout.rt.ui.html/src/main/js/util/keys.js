@@ -202,17 +202,21 @@ scout.keyStrokeBox = {
     }
     offset = offset + this.marginLeft * $existingKeyBoxes.length + boxGroup * this.additionalMarginLeft;
     boxGroup++;
-    if (ctrl) {
-      $container.prependDiv('key-box ', 'ctrl').css('left', '' + offset + 'px').attr('box-group', boxGroup);
-      offset = offset + this.marginLeft;
-    }
+    if (shift) {
+      //$container.prependDiv('key-box ', 'shift').css('left', '' + offset + 'px').attr('box-group', boxGroup);
+      //offset = offset + this.marginLeft;
+      keyBoxText = 'shift + ' + keyBoxText;
+      }
+
     if (alt) {
       $container.prependDiv('key-box ', 'alt').css('left', '' + offset + 'px').attr('box-group', boxGroup);
       offset = offset + this.marginLeft;
+      keyBoxText = 'alt + ' + keyBoxText;
     }
-    if (shift) {
-      $container.prependDiv('key-box ', 'shift').css('left', '' + offset + 'px').attr('box-group', boxGroup);
-      offset = offset + this.marginLeft;
+    if (ctrl) {
+      //$container.prependDiv('key-box ', 'ctrl').css('left', '' + offset + 'px').attr('box-group', boxGroup);
+      //offset = offset + this.marginLeft;
+      keyBoxText = 'ctrl + ' + keyBoxText;
     }
     $container.prependDiv('key-box ', keyBoxText).css('left', '' + offset + 'px').attr('box-group', boxGroup);
     offset = offset + this.marginLeft;
