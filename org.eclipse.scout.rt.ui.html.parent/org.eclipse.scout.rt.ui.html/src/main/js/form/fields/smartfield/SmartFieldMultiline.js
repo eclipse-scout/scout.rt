@@ -58,9 +58,3 @@ scout.SmartFieldMultiline.prototype._splitValue = function(value) {
   };
 };
 
-// @override AbstractSmartField.js
-scout.SmartFieldMultiline.prototype._applyOption = function(option) {
-  var tmp = this._splitValue(option);
-  scout.SmartFieldMultiline.parent.prototype._applyOption.call(this, tmp.firstLine);
-  this._$multilineField.html(tmp.multiLines);
-};

@@ -14,6 +14,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.CachingEnabled;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldUIFacade;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -96,8 +98,27 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
     else if ("closeProposal".equals(event.getType())) {
       handleUiCloseProposal();
     }
+    else if ("acceptProposal".equals(event.getType())) {
+      handleUiAcceptProposal(event);
+    }
     else {
       super.handleUiEvent(event, res);
+    }
+  }
+
+  private void handleUiAcceptProposal(JsonEvent event) {
+    String searchText = event.getData().optString("searchText");
+    IProposalChooser proposalChooser = getModel().getProposalChooser();
+    LOG.debug("handle acceptProposal -> setTextFromUI. searchText=" + searchText + " proposalChooser=" + (proposalChooser != null));
+    if (proposalChooser != null) {
+      IContentAssistFieldUIFacade uiFacade = getModel().getUIFacade();
+      if (proposalChooser.getAcceptedProposal() != null) {
+        uiFacade.acceptProposalFromUI();
+      }
+      else {
+        uiFacade.setTextFromUI(searchText);
+        uiFacade.closeProposalFromUI();
+      }
     }
   }
 

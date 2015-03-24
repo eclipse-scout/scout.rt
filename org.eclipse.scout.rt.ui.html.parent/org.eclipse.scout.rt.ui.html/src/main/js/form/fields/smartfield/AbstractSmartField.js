@@ -38,7 +38,7 @@ scout.AbstractSmartField.prototype._renderProposalChooser = function() {
     // We always expect the popup to be open at this point
     return;
   }
-  // FIXME AWE: können wir besser auf diesen PC reagieren (spezifisches event?)
+  // FIXME AWE: (smart-field) können wir besser auf diesen PC reagieren (spezifisches event?)
   $.log.info('_renderProposalChooser proposalChooser=' + this.proposalChooser);
   if (this.proposalChooser) {
     this.proposalChooser.render(this._$popup);
@@ -78,14 +78,19 @@ scout.AbstractSmartField.prototype._onIconClick = function(event) {
   }
 };
 
+// FIXME AWE: (smart-field) hier das konzept von N.BU mit Actions, KeyStrokes verwenden (keyup, keydown)
+
 // navigate in options
 scout.AbstractSmartField.prototype._onKeyDown = function(event) {
   if (event.which === scout.keys.TAB) {
-    if (this._selectedOption > -1) {
-      // FIXME AWE: (smart-field) apply selected proposal on TAB
-      this._applyOption(value);
-      this._closePopup();
-    }
+    this._acceptProposal();
+    return;
+  }
+
+  // stop propagation so other key listeners aren't triggered (e.g. form close)
+  if (event.which === scout.keys.ENTER ||
+      event.which === scout.keys.ESCAPE) {
+    event.stopPropagation();
     return;
   }
 
@@ -94,7 +99,6 @@ scout.AbstractSmartField.prototype._onKeyDown = function(event) {
     if (this._openPopup()) {
       return;
     }
-
     switch (event.which) {
       case scout.keys.PAGE_UP:
       case scout.keys.PAGE_DOWN:
@@ -119,19 +123,17 @@ scout.AbstractSmartField.prototype._selectOption = function($options, pos) {
 };
 
 scout.AbstractSmartField.prototype._onKeyUp = function(e) {
-  // escape
+  // Escape
   if (e.which === scout.keys.ESC) {
-    this.$field.blur();
+    this._closePopup();
+    e.stopPropagation();
     return;
   }
 
-  // enter
+  // Enter
   if (e.which === scout.keys.ENTER) {
-    if (this._selectedOption > -1) {
-      // FIXME AWE: (smart-field) apply selected proposal on ENTER
-      this._applyOption(value);
-      this._closePopup();
-    }
+    this._acceptProposal();
+    e.stopPropagation();
     return;
   }
 
@@ -149,17 +151,6 @@ scout.AbstractSmartField.prototype._onKeyUp = function(e) {
 
   // filter options
   this._filterOptions();
-};
-
-/**
- * Applies the given option on the text-field. Subclasses may override this method
- * to implement a different apply-behavior (for multiline fields for instance).
- * @param option
- */
-scout.AbstractSmartField.prototype._applyOption = function(option) {
-  this.$field
-    .val(option)
-    .get(0).select();
 };
 
 scout.AbstractSmartField.prototype._filterOptions = function() {
@@ -192,8 +183,18 @@ scout.AbstractSmartField.prototype._getInputBounds = function() {
 
 scout.AbstractSmartField.prototype._onFieldBlur = function() {
   scout.AbstractSmartField.parent.prototype._onFieldBlur.call(this);
-  $.log.debug("_onBlur");
+  $.log.debug('AbstractSmartField#_onBlur');
   this._closePopup();
+};
+
+/**
+ * This method is called when the user presses the TAB key in the UI.
+ * onFieldBlur is also executed, but won't do anything, since the $popup is already closed in the UI.
+ */
+scout.AbstractSmartField.prototype._acceptProposal = function() {
+  $.log.debug('AbstractSmartField#_acceptProposal');
+  this.session.send(this.id, 'acceptProposal', {searchText: this._searchText()});
+  this._closePopup(false);
 };
 
 scout.AbstractSmartField.prototype._closePopup = function(notifyServer) {
