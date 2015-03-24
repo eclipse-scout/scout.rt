@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-   Copyright (c) 2014 BSI Business Systems Integration AG.
-   All rights reserved. This program and the accompanying materials
-   are made available under the terms of the BSI AG Software License v1.0
-   which accompanies this distribution as bsi-v10.html
--->
+<!-- Copyright (c) 2014 BSI Business Systems Integration AG. All rights reserved.
+  This program and the accompanying materials are made available under the
+  terms of the BSI AG Software License v1.0 which accompanies this distribution
+  as bsi-v10.html -->
 <project
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
   xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -17,130 +15,153 @@
   </parent>
 
   <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
-  <packaging>eclipse-plugin</packaging>
+  <packaging>jar</packaging>
 
   <properties>
     <scout.script.version>5.0.0</scout.script.version>
   </properties>
 
-<build>
-  <plugins>
+  <dependencies>
+    <dependency>
+      <artifactId>org.eclipse.scout.rt.ui.html.client.ext</artifactId>
+      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+      <version>5.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <artifactId>org.eclipse.scout.rt.server.commons</artifactId>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <version>5.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20140107</version>
+    </dependency>
+    <dependency>
+      <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
+      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+      <version>5.1.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 
-  <plugin>
-      <!-- Loads phantomjs executable, necessary for jasmine plugin -->
-      <groupId>com.github.klieber</groupId>
-      <artifactId>phantomjs-maven-plugin</artifactId>
-      <version> 0.2.1</version>
-      <executions>
-        <execution>
-          <goals>
-            <goal>install</goal>
-          </goals>
-        </execution>
-      </executions>
-      <configuration>
-        <version>1.9.2</version>
-      </configuration>
-    </plugin>
-
-    <!-- JS testing with Jasmine -->
-    <plugin>
-      <groupId>com.github.searls</groupId>
-      <artifactId>jasmine-maven-plugin</artifactId>
-      <version>1.3.1.4</version>
-      <executions>
-        <execution>
-          <goals>
-            <goal>test</goal>
-          </goals>
-        </execution>
-      </executions>
-      <configuration>
-        <!-- AWE: do not break build when Jasmine tests fail -->
-        <haltOnFailure>false</haltOnFailure>
-        <jsSrcDir>${project.basedir}/../org.eclipse.scout.rt.ui.html/src/main/js</jsSrcDir>
-        <jsTestSrcDir>${project.basedir}/src/test/js</jsTestSrcDir>
-        <customRunnerTemplate>${project.basedir}/src/test/js/SpecRunnerMaven.html</customRunnerTemplate>
-        <sourceExcludes>
-          <!-- jasmine files are explicitly included in SpecRunnerMaven.html because the need to be before actual sources-->
-          <sourceExclude>**/jasmine/*.js</sourceExclude>
-          <!-- for tests, scout namespace is defined in boot.ext.js -->
-          <sourceExclude>scout-4.0.1-module.js</sourceExclude>
-        </sourceExcludes>
-        <!-- HtmlUnitDriver does not work with jQuery 2.1.0, throws exception -->
-        <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
-        <webDriverCapabilities>
-          <capability>
-            <name>phantomjs.binary.path</name>
-            <value>${phantomjs.binary}</value>
-          </capability>
-        </webDriverCapabilities>
-      </configuration>
-    </plugin>
-
-  </plugins>
-
-  <pluginManagement>
+  <build>
     <plugins>
 
-      <!-- Disable jgit warning in workspace, when some files are not yet
-        committed -->
       <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-packaging-plugin</artifactId>
+        <!-- Loads phantomjs executable, necessary for jasmine plugin -->
+        <groupId>com.github.klieber</groupId>
+        <artifactId>phantomjs-maven-plugin</artifactId>
+        <version> 0.2.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>install</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
-          <timestampProvider>jgit</timestampProvider>
-          <jgit.dirtyWorkingTree>warning</jgit.dirtyWorkingTree>
+          <version>1.9.2</version>
         </configuration>
       </plugin>
 
-      <!-- Disable error message in m2e. This long xml section is only necessary
-        in tycho to make it not display a red error marker... -->
-      <!--This plugin's configuration is used to store Eclipse m2e settings
-        only. It has no influence on the Maven build itself. -->
+      <!-- JS testing with Jasmine -->
       <plugin>
-        <groupId>org.eclipse.m2e</groupId>
-        <artifactId>lifecycle-mapping</artifactId>
-        <version>1.0.0</version>
+        <groupId>com.github.searls</groupId>
+        <artifactId>jasmine-maven-plugin</artifactId>
+        <version>1.3.1.4</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
-          <lifecycleMappingMetadata>
-            <pluginExecutions>
-
-              <pluginExecution>
-                <pluginExecutionFilter>
-                  <groupId>com.github.klieber</groupId>
-                  <artifactId>phantomjs-maven-plugin</artifactId>
-                  <versionRange>[0.2.1,)</versionRange>
-                  <goals>
-                    <goal>install</goal>
-                  </goals>
-                </pluginExecutionFilter>
-                <action>
-                  <ignore></ignore>
-                </action>
-              </pluginExecution>
-
-          <pluginExecution>
-            <pluginExecutionFilter>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>exec-maven-plugin</artifactId>
-              <versionRange>[1.1.1,)</versionRange>
-              <goals>
-                <goal>exec</goal>
-                <goal>java</goal>
-              </goals>
-            </pluginExecutionFilter>
-            <action>
-              <execute />
-            </action>
-          </pluginExecution>
-
-            </pluginExecutions>
-          </lifecycleMappingMetadata>
+          <!-- AWE: do not break build when Jasmine tests fail -->
+          <haltOnFailure>false</haltOnFailure>
+          <jsSrcDir>${project.basedir}/../org.eclipse.scout.rt.ui.html/src/main/js</jsSrcDir>
+          <jsTestSrcDir>${project.basedir}/src/test/js</jsTestSrcDir>
+          <customRunnerTemplate>${project.basedir}/src/test/js/SpecRunnerMaven.html</customRunnerTemplate>
+          <sourceExcludes>
+            <!-- jasmine files are explicitly included in SpecRunnerMaven.html
+              because the need to be before actual sources -->
+            <sourceExclude>**/jasmine/*.js</sourceExclude>
+            <!-- for tests, scout namespace is defined in boot.ext.js -->
+            <sourceExclude>scout-4.0.1-module.js</sourceExclude>
+          </sourceExcludes>
+          <!-- HtmlUnitDriver does not work with jQuery 2.1.0, throws exception -->
+          <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
+          <webDriverCapabilities>
+            <capability>
+              <name>phantomjs.binary.path</name>
+              <value>${phantomjs.binary}</value>
+            </capability>
+          </webDriverCapabilities>
         </configuration>
       </plugin>
+
     </plugins>
-  </pluginManagement>
-</build>
+
+    <pluginManagement>
+      <plugins>
+
+        <!-- Disable jgit warning in workspace, when some files are not yet committed -->
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-packaging-plugin</artifactId>
+          <configuration>
+            <timestampProvider>jgit</timestampProvider>
+            <jgit.dirtyWorkingTree>warning</jgit.dirtyWorkingTree>
+          </configuration>
+        </plugin>
+
+        <!-- Disable error message in m2e. This long xml section is only necessary
+          in tycho to make it not display a red error marker... -->
+        <!--This plugin's configuration is used to store Eclipse m2e settings
+          only. It has no influence on the Maven build itself. -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>com.github.klieber</groupId>
+                    <artifactId>phantomjs-maven-plugin</artifactId>
+                    <versionRange>[0.2.1,)</versionRange>
+                    <goals>
+                      <goal>install</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
+                  </action>
+                </pluginExecution>
+
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <versionRange>[1.1.1,)</versionRange>
+                    <goals>
+                      <goal>exec</goal>
+                      <goal>java</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute />
+                  </action>
+                </pluginExecution>
+
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>

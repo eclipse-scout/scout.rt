@@ -16,10 +16,10 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.res.StaticResourceRequestInterceptor;
@@ -82,7 +82,7 @@ public class ScriptFileBuilder {
     }
     switch (script.getNodeType()) {
       case LIBRARY: {
-        return new ScriptOutput(pathInfo, StreamUtility.readResource(script.getURL()), script.getURL().openConnection().getLastModified());
+        return new ScriptOutput(pathInfo, IOUtility.readFromUrl(script.getURL()), script.getURL().openConnection().getLastModified());
       }
       case MACRO: {
         return processMacroWithIncludesRec(pathInfo, script);
@@ -182,7 +182,7 @@ public class ScriptFileBuilder {
     }
     ByteArrayOutputStream buf = new ByteArrayOutputStream();
     long lastModified = script.getURL().openConnection().getLastModified();
-    String content = new String(StreamUtility.readResource(script.getURL()), UTF_8);
+    String content = new String(IOUtility.readFromUrl(script.getURL()), UTF_8);
     Matcher mat = INCLUDE_PAT.matcher(content);
     int pos = 0;
     while (mat.find()) {
@@ -193,7 +193,7 @@ public class ScriptFileBuilder {
       if (includeScript != null) {
         switch (includeScript.getNodeType()) {
           case LIBRARY: {
-            replacement = StreamUtility.readResource(includeScript.getURL());
+            replacement = IOUtility.readFromUrl(includeScript.getURL());
             lastModified = Math.max(lastModified, includeScript.getURL().openConnection().getLastModified());
             break;
           }
@@ -245,7 +245,7 @@ public class ScriptFileBuilder {
     }
     StringBuilder buf = new StringBuilder();
     long lastModified = script.getURL().openConnection().getLastModified();
-    String content = new String(StreamUtility.readResource(script.getURL()), UTF_8);
+    String content = new String(IOUtility.readFromUrl(script.getURL()), UTF_8);
     Matcher mat = INCLUDE_PAT.matcher(content);
     int pos = 0;
     while (mat.find()) {
@@ -256,7 +256,7 @@ public class ScriptFileBuilder {
       if (includeFragment != null) {
         switch (includeFragment.getNodeType()) {
           case SRC_FRAGMENT: {
-            replacement = new String(StreamUtility.readResource(includeFragment.getURL()), UTF_8);
+            replacement = new String(IOUtility.readFromUrl(includeFragment.getURL()), UTF_8);
             lastModified = Math.max(lastModified, includeFragment.getURL().openConnection().getLastModified());
             break;
           }

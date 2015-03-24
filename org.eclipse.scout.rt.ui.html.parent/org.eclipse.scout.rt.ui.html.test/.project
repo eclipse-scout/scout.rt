@@ -11,16 +11,6 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.eclipse.pde.ManifestBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>org.eclipse.pde.SchemaBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>org.eclipse.m2e.core.maven2Builder</name>
 			<arguments>
 			</arguments>
@@ -29,7 +19,6 @@
 	<natures>
 		<nature>org.sonar.ide.eclipse.core.sonarNature</nature>
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
-		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 	<linkedResources>
@@ -51,7 +40,7 @@
 		<link>
 			<name>.settings/org.eclipse.jdt.core.prefs</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/com.bsiag.tools.rt.parent/com.bsiag.tools.rt-feature/.settings/org.eclipse.jdt.core.prefs</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.eclipse.jdt.core.prefs</locationURI>
 		</link>
 		<link>
 			<name>.settings/org.eclipse.jdt.ui.prefs</name>

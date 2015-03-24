@@ -3,14 +3,4 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Thirdparty libs for Scout Html UI
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.html.scriptprocessor;singleton:=true
 Bundle-Version: 5.1.0.qualifier
-Bundle-ClassPath: .,
- src/main/resources/private-libs/commons-cli.jar,
- src/main/resources/private-libs/commons-logging.jar,
- src/main/resources/private-libs/lesscss-engine.jar,
- src/main/resources/private-libs/rhino.jar,
- src/main/resources/private-libs/yuicompressor.jar
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: BSI Business Systems Integration AG
-Bundle-ActivationPolicy: lazy
-Require-Bundle: org.junit4;bundle-version="4.8.1";resolution:=optional
-Export-Package: org.eclipse.scout.rt.ui.html.scriptprocessor

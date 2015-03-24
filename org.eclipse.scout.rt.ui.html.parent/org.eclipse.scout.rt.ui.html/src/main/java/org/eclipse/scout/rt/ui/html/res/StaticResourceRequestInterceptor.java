@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.FileUtility;
+import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -33,7 +34,6 @@ import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
-import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
@@ -233,7 +233,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       //not handled here
       return null;
     }
-    byte[] bytes = StreamUtility.readResource(url);
+    byte[] bytes = IOUtility.readFromUrl(url);
     bytes = replaceHtmlScriptTags(servlet, req, bytes);
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), bytes, System.currentTimeMillis());
     // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
@@ -250,7 +250,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       return null;
     }
     // TODO BSH Maybe optimize memory consumption (unnecessary conversion of byte[] to String)
-    String json = new String(StreamUtility.readResource(url), UTF_8);
+    String json = new String(IOUtility.readFromUrl(url), UTF_8);
     json = JsonUtility.stripCommentsFromJson(json);
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), json.getBytes(UTF_8), System.currentTimeMillis());
     // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
@@ -306,7 +306,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       //not handled here
       return null;
     }
-    byte[] bytes = StreamUtility.readResource(url);
+    byte[] bytes = IOUtility.readFromUrl(url);
     URLConnection uc = url.openConnection();
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), bytes, uc.getLastModified());
     // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete

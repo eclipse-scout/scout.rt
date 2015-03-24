@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-   Copyright (c) 2014 BSI Business Systems Integration AG.
-   All rights reserved. This program and the accompanying materials
-   are made available under the terms of the BSI AG Software License v1.0
-   which accompanies this distribution as bsi-v10.html
--->
+<!-- Copyright (c) 2014 BSI Business Systems Integration AG. All rights reserved.
+  This program and the accompanying materials are made available under the
+  terms of the BSI AG Software License v1.0 which accompanies this distribution
+  as bsi-v10.html -->
 <project
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
   xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -17,8 +15,23 @@
   </parent>
 
   <artifactId>org.eclipse.scout.rt.ui.html.test</artifactId>
-  <packaging>eclipse-test-plugin</packaging>
-<build>
+  <packaging>jar</packaging>
 
-</build>
+  <dependencies>
+    <dependency>
+      <artifactId>org.eclipse.scout.rt.testing.client</artifactId>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <version>5.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <artifactId>org.eclipse.scout.rt.client.testenvironment</artifactId>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <version>5.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
+      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+      <version>5.1.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 </project>
