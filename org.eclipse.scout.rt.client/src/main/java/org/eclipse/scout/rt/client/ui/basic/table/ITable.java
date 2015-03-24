@@ -258,28 +258,38 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   List<ITableRow> getRows();
 
   /**
-   * see {@link #setRowFilter(ITableRowFilter)} and {@link #getRowFilter()} This
-   * method is Thread-Safe.
+   * Returns all rows that remain after applying all {@link ITableRowFilter}s. To get all rows (including the
+   * unaccepted ones) use {@link #getRows()}.
    * <p>
-   * For performance reasons, this method returns the life array. Do NOT change the array contents directly!
+   * This method is thread-safe.
+   * <p>
+   * <b>For performance reasons, this method returns the life array. Do NOT change the array contents directly!</b>
    */
   List<ITableRow> getFilteredRows();
 
   /**
-   * see {@link #setRowFilter(ITableRowFilter)} and {@link #getRowFilter()} This
-   * method is Thread-Safe.
+   * Returns the number of filtered rows (accepted by all {@link ITableRowFilter}s).
+   * <p>
+   * This method is thread-safe.
    */
   int getFilteredRowCount();
 
   /**
-   * see {@link #setRowFilter(ITableRowFilter)} and {@link #getRowFilter()} This
-   * method is Thread-Safe.
+   * Returns a row with its index relative to the list of filtered rows ({@link #getFilteredRows()}).
+   * Because the list of filtered rows might be smaller than the total row count, this index differs
+   * from the ordinary {@link ITableRow#getRowIndex()}. It can be obtained with {@link #getFilteredRowIndex(ITableRow)}.
+   * <p>
+   * This method is thread-safe.
    */
   ITableRow getFilteredRow(int index);
 
   /**
-   * see {@link #setRowFilter(ITableRowFilter)} and {@link #getRowFilter()} This
-   * method is Thread-Safe.
+   * Returns the index of a given row relative to the list of filtered rows (instead of all rows).
+   * Because the list of filtered rows might be smaller than the total row count, this index differs
+   * from the ordinary {@link ITableRow#getRowIndex()}. It can be used to retrieve a row again with
+   * {@link #getFilteredRow(int)}.
+   * <p>
+   * This method is thread-safe.
    */
   int getFilteredRowIndex(ITableRow row);
 
