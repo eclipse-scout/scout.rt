@@ -50,6 +50,9 @@ import org.xml.sax.SAXException;
  * @since 5.1
  */
 public final class XmlUtility {
+
+  public static final String INDENT_AMOUNT_TRANSFORMER_PROPERTY = "{http://xml.apache.org/xslt}indent-amount";
+
   private XmlUtility() {
   }
 
@@ -213,9 +216,9 @@ public final class XmlUtility {
     try {
       // format transformer
       TransformerFactory tf = TransformerFactory.newInstance();
-      tf.setAttribute("indent-number", 3);
       Transformer transformer = tf.newTransformer();
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.setOutputProperty(INDENT_AMOUNT_TRANSFORMER_PROPERTY, "2");
 
       // do transform
       transformer.transform(new DOMSource(document), result);
