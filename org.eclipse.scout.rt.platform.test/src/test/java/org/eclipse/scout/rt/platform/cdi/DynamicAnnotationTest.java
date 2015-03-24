@@ -26,7 +26,7 @@ public class DynamicAnnotationTest {
 
   @CreateImmediately
   @ApplicationScoped
-  @Order(30)
+  @Order(-30)
   private static class Bean01 implements IBean01 {
 
   }
