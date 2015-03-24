@@ -24,7 +24,6 @@ public class TableWith3Cols extends AbstractTable {
     protected String getConfiguredHeaderText() {
       return "col0";
     }
-
   }
 
   @Order(20.0)
@@ -34,7 +33,6 @@ public class TableWith3Cols extends AbstractTable {
     protected String getConfiguredHeaderText() {
       return "col1";
     }
-
   }
 
   @Order(30.0)
@@ -44,15 +42,14 @@ public class TableWith3Cols extends AbstractTable {
     protected String getConfiguredHeaderText() {
       return "col2";
     }
-
   }
 
   public void fill(int rowCount) throws ProcessingException {
     Object[][] rows = new Object[rowCount][3];
     for (int i = 0; i < rowCount; i++) {
-      rows[i][0] = "cell" + i + "_0";
-      rows[i][1] = "cell" + i + "_1";
-      rows[i][2] = "cell" + i + "_2";
+      rows[i][0] = "CELL{row" + i + ",col0}";
+      rows[i][1] = "CELL{row" + i + ",col1}";
+      rows[i][2] = "CELL{row" + i + ",col2}";
     }
     replaceRowsByMatrix(rows);
   }

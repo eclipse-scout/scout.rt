@@ -25,12 +25,10 @@ public class TableWithoutMenus extends AbstractTable {
     protected String getConfiguredHeaderText() {
       return "col1";
     }
-
   }
 
   @Override
   protected void addHeaderMenus(OrderedCollection<IMenu> menus) {
     // don't add menus
   }
-
 }

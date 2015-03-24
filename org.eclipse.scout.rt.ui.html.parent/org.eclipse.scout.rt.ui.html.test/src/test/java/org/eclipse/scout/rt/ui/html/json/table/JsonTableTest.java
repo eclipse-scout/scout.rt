@@ -15,6 +15,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -464,11 +465,60 @@ public class JsonTableTest {
     JsonTestUtility.assertGC(ref);
   }
 
-  @Test(expected = JsonException.class)
+  @Test
   public void testRowFilter() throws ProcessingException, JSONException {
     TableWith3Cols table = new TableWith3Cols();
 
-    table.fill(2);
+    table.fill(3);
+    table.initTable();
+
+    JsonTable<ITable> jsonTable = m_jsonSession.createJsonAdapter(table, null);
+    ITableRow row0 = table.getRow(0);
+    ITableRow row1 = table.getRow(1);
+    ITableRow row2 = table.getRow(2);
+
+    jsonTable.toJson();
+    assertNotNull(jsonTable.tableRowIdsMap().get(row0));
+    assertNotNull(jsonTable.tableRowIdsMap().get(row1));
+    assertNotNull(jsonTable.tableRowIdsMap().get(row2));
+
+    String row0Id = jsonTable.getOrCreatedRowId(row0);
+    String row1Id = jsonTable.getOrCreatedRowId(row1);
+    assertNotNull(row0Id);
+    assertNotNull(jsonTable.getTableRowForRowId(row0Id));
+    assertNotNull(row1Id);
+    assertNotNull(jsonTable.getTableRowForRowId(row1Id));
+
+    table.addRowFilter(new ITableRowFilter() {
+      @Override
+      public boolean accept(ITableRow r) {
+        return r.getRowIndex() > 0; // hide first row
+      }
+    });
+
+    // After flushing the event buffers and applying the model changes
+    // to the JsonTable, the row should not exist anymore on the JsonTable
+    JsonTestUtility.processBufferedEvents(m_jsonSession);
+    assertEquals(3, table.getRowCount());
+    assertEquals(2, table.getFilteredRowCount());
+    assertNull(jsonTable.tableRowIdsMap().get(row0));
+    assertNotNull(jsonTable.tableRowIdsMap().get(row1));
+    assertNotNull(jsonTable.tableRowIdsMap().get(row2));
+
+    jsonTable.getTableRowForRowId(row1Id); // should still exist -> should NOT throw an exception
+    try {
+      jsonTable.getTableRowForRowId(row0Id); // throws exception
+      fail("Expected an exception, but no exception was thrown");
+    }
+    catch (JsonException e) {
+      // ok
+    }
+  }
+
+  @Test
+  public void testRowFilterWithUpdates() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(3);
     table.initTable();
 
     JsonTable<ITable> jsonTable = m_jsonSession.createJsonAdapter(table, null);
@@ -482,14 +532,23 @@ public class JsonTableTest {
 
       @Override
       public boolean accept(ITableRow r) {
-        return r.getRowIndex() == 0;
+        return r.getRowIndex() > 0; // hide first row
       }
     });
 
-    // After flushing the event buffers and applying the model changes
-    // to the JsonTable, the row should not exist anymore on the JsonTable
+    // Update the (now hidden) row --> should not trigger an update event, because the row does not exist in the UI
+    row.getCellForUpdate(0).setValue("Updated text");
+
+    // We expect the first row to be removed from the table, and no update event!
+    assertEquals(3, table.getRowCount());
+    assertEquals(2, table.getFilteredRowCount());
+    assertEquals(0, m_jsonSession.currentJsonResponse().getEventList().size());
+    assertEquals(2, jsonTable.eventBuffer().size()); // TYPE_ROW_FILTER_CHANGED + TYPE_ROWS_UPDATED
+
+    // Only one deletion event should be emitted (no update event!)
     JsonTestUtility.processBufferedEvents(m_jsonSession);
-    assertNull(jsonTable.getTableRowForRowId(row0Id));
+    assertEquals(1, m_jsonSession.currentJsonResponse().getEventList().size());
+    assertEquals("rowsDeleted", m_jsonSession.currentJsonResponse().getEventList().get(0).getType());
   }
 
   /**

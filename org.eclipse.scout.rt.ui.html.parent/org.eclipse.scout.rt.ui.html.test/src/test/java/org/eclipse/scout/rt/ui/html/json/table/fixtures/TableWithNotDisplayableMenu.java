@@ -27,7 +27,6 @@ public class TableWithNotDisplayableMenu extends AbstractTable {
     protected String getConfiguredHeaderText() {
       return "col1";
     }
-
   }
 
   @Override
@@ -37,7 +36,6 @@ public class TableWithNotDisplayableMenu extends AbstractTable {
 
   @Order(10.0)
   public class DisplayableMenu extends AbstractMenu {
-
   }
 
   @Order(20.0)
@@ -47,7 +45,5 @@ public class TableWithNotDisplayableMenu extends AbstractTable {
     protected void execInitAction() throws ProcessingException {
       setVisibleGranted(false);
     }
-
   }
-
 }

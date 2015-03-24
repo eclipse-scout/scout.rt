@@ -17,6 +17,5 @@ public class TableWithLongColumn extends AbstractTable {
     protected String getConfiguredHeaderText() {
       return "col0";
     }
-
   }
 }

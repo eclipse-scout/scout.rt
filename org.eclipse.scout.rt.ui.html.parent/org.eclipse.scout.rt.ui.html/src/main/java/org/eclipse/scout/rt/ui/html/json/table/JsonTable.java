@@ -583,11 +583,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
     List<TableEvent> coalescedEvents = m_eventBuffer.consumeAndCoalesceEvents();
     for (TableEvent event : coalescedEvents) {
-      processBufferedEvent(event);
+      processEvent(event);
     }
   }
 
-  protected void processBufferedEvent(TableEvent event) {
+  protected void processEvent(TableEvent event) {
     switch (event.getType()) {
       case TableEvent.TYPE_ROWS_INSERTED:
         handleModelRowsInserted(event.getRows());
@@ -620,7 +620,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         handleModelRowsChecked(event.getRows());
         break;
       case TableEvent.TYPE_ROW_FILTER_CHANGED:
-        handleModelRowFilterChanged(event.getTable());
+        handleModelRowFilterChanged();
         break;
       default:
         // NOP
@@ -644,13 +644,26 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     addActionEvent(EVENT_ROWS_INSERTED, jsonEvent);
   }
 
-  protected void handleModelRowFilterChanged(ITable table) {
-    disposeRows(getModel().getRows());
-    addActionEvent(EVENT_ALL_ROWS_DELETED, new JSONObject());
-
-    handleModelRowsInserted(table.getFilteredRows());
-
-    // TODO BSH Selection
+  protected void handleModelRowFilterChanged() {
+    List<ITableRow> rowsToInsert = new ArrayList<>();
+    List<ITableRow> rowsToDelete = new ArrayList<>();
+    for (ITableRow row : getModel().getRows()) {
+      String existingRowId = m_tableRowIds.get(row);
+      if (row.isFilterAccepted()) {
+        if (existingRowId == null) {
+          // Row is not filtered but JsonTable does not know it yet --> handle as insertion event
+          rowsToInsert.add(row);
+        }
+      }
+      else {
+        if (existingRowId != null) {
+          // Row is filtered, but JsonTable has it in its list --> handle as deletion event
+          rowsToDelete.add(row);
+        }
+      }
+    }
+    handleModelRowsDeleted(rowsToDelete);
+    handleModelRowsInserted(rowsToDelete);
   }
 
   protected void handleModelRowsUpdated(Collection<ITableRow> modelRows) {
@@ -760,12 +773,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  protected void disposeRows(Collection<ITableRow> modelRows) {
-    for (ITableRow row : modelRows) {
-      disposeRow(row);
-    }
-  }
-
   protected void disposeRow(ITableRow row) {
     String rowId = m_tableRowIds.get(row);
     m_tableRowIds.remove(row);
@@ -785,6 +792,18 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   @Override
   public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
     addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
+  }
+
+  protected Map<String, ITableRow> tableRowsMap() {
+    return m_tableRows;
+  }
+
+  protected Map<ITableRow, String> tableRowIdsMap() {
+    return m_tableRowIds;
+  }
+
+  protected Map<IColumn, JsonColumn> jsonColumns() {
+    return m_jsonColumns;
   }
 
   protected AbstractEventBuffer<TableEvent> eventBuffer() {

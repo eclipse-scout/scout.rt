@@ -17,6 +17,5 @@ public class TableWithDateColumn extends AbstractTable {
     protected String getConfiguredHeaderText() {
       return "col0";
     }
-
   }
 }
