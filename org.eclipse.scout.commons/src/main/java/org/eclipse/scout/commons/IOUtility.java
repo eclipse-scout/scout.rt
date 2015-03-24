@@ -13,6 +13,7 @@ package org.eclipse.scout.commons;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -31,12 +32,15 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -87,6 +91,59 @@ public final class IOUtility {
    */
   public static String getContentUtf8(InputStream stream) throws ProcessingException {
     return getContent(stream, "UTF-8");
+  }
+
+  public static byte[] getContent(InputStream in, int len) throws IOException {
+    if (len >= 0) {
+      byte[] buf = new byte[len];
+      int count = 0;
+      while (count < len) {
+        count += in.read(buf, count, len - count);
+      }
+      return buf;
+    }
+    else {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      int b;
+      while ((b = in.read()) >= 0) {
+        out.write(b);
+      }
+      return out.toByteArray();
+    }
+  }
+
+  public static byte[] compressGzip(byte[] b) throws IOException {
+    ByteArrayOutputStream buf = new ByteArrayOutputStream();
+    try (GZIPOutputStream out = new GZIPOutputStream(buf)) {
+      out.write(b);
+    }
+    return buf.toByteArray();
+  }
+
+  public static byte[] uncompressGzip(byte[] b) throws IOException {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    try (BufferedInputStream in = new BufferedInputStream(new GZIPInputStream(new ByteArrayInputStream(b)))) {
+      int val;
+      while ((val = in.read()) >= 0) {
+        out.write(val);
+      }
+    }
+    return out.toByteArray();
+  }
+
+  public static byte[] readFromUrl(URL url) throws IOException {
+    URLConnection uc = url.openConnection();
+    int len = uc.getContentLength();
+    if (len >= 0) {
+      try (InputStream in = uc.getInputStream()) {
+        return getContent(in, len);
+      }
+    }
+    else {
+      try (BufferedInputStream in = new BufferedInputStream(uc.getInputStream())) {
+        return getContent(in, -1);
+      }
+    }
   }
 
   public static byte[] getContent(InputStream stream, boolean autoClose) throws ProcessingException {

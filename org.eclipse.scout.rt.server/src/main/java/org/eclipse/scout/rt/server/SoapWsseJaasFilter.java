@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +41,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.server.commons.BufferedServletInputStream;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
 import org.eclipse.scout.rt.server.commons.servletfilter.security.SecureHttpServletRequestWrapper;
 import org.xml.sax.Attributes;
@@ -129,59 +129,18 @@ public class SoapWsseJaasFilter implements Filter {
       ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
       return;
     }
-    final InputStream cacheIn = new ByteArrayInputStream(cacheOut.toByteArray());
-    cacheOut = null;
     //
-    continueChainWithPrincipal(subject, createReplayRequest(request, cacheIn), (HttpServletResponse) response, chain);
+    continueChainWithPrincipal(subject, createReplayRequest(request, cacheOut.toByteArray()), (HttpServletResponse) response, chain);
   }
 
   /**
    * @return request with new {@link ServletInputStream} that can be read again with original data
    */
-  private HttpServletRequestWrapper createReplayRequest(ServletRequest request, final InputStream cacheIn) {
+  private HttpServletRequestWrapper createReplayRequest(final ServletRequest request, final byte[] data) {
     return new HttpServletRequestWrapper((HttpServletRequest) request) {
       @Override
       public ServletInputStream getInputStream() throws IOException {
-        return new ServletInputStream() {
-          private javax.servlet.ReadListener m_readListener;
-          private boolean m_finished = false;
-
-          @Override
-          public int read() throws IOException {
-            final int next = cacheIn.read();
-            if (next == -1) {
-              m_finished = true;
-              if (m_readListener != null) {
-                m_readListener.onAllDataRead();
-              }
-            }
-            return next;
-          }
-
-          @Override
-          public boolean isFinished() {
-            return m_finished;
-          }
-
-          @Override
-          public boolean isReady() {
-            return true;
-          }
-
-          @Override
-          public void setReadListener(javax.servlet.ReadListener readListener) {
-            m_readListener = readListener;
-            if (m_readListener != null) {
-              try {
-                m_readListener.onDataAvailable();
-              }
-              catch (IOException e) {
-                LOG.error("Error reading stream", e);
-                m_readListener.onError(e);
-              }
-            }
-          }
-        };
+        return new BufferedServletInputStream(data);
       }
     };
   }
