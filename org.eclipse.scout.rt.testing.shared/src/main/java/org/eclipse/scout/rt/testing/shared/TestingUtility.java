@@ -152,9 +152,10 @@ public final class TestingUtility {
   /**
    * Registers the given services in the current {@link IBeanContext} and returns their registrations.<br/>
    * If registering Mockito mocks, use {@link #registerService(float, Object, Class)} instead.
-   * 
-   * @deprecated use {@link IBeanContext#registerClass(Class)} with {@link Order}, {@link ApplicationScoped} and
-   *             {@link Replace} instead, do not use implementations directly
+   *
+   * @deprecated use {@link IBeanContext#registerClass(Class)} and {@link IBeanContext#registerBean(BeanData)} with
+   *             {@link Order}, {@link ApplicationScoped} and {@link Replace} instead, do not use implementations
+   *             directly
    */
   @Deprecated
   public static List<IBean<?>> registerServices(float priority, Object... services) {
@@ -177,9 +178,10 @@ public final class TestingUtility {
 
   /**
    * Registers the given service under the given type in the current {@link IBeanContext} and returns its registration.
-   * 
-   * @deprecated use {@link IBeanContext#registerClass(Class)} with {@link Order}, {@link ApplicationScoped} and
-   *             {@link Replace} instead, do not use implementations directly
+   *
+   * @deprecated use {@link IBeanContext#registerClass(Class)} and {@link IBeanContext#registerBean(BeanData)} with
+   *             {@link Order}, {@link ApplicationScoped} and {@link Replace} instead, do not use implementations
+   *             directly
    */
   @Deprecated
   public static <SERVICE> IBean<SERVICE> registerService(float priority, SERVICE object, Class<? extends SERVICE> clazz) {
@@ -193,7 +195,11 @@ public final class TestingUtility {
    * Unregisters the given services.
    *
    * @param dynamicServices
+   * @deprecated use {@link IBeanContext#registerClass(Class)} and {@link IBeanContext#registerBean(BeanData)} with
+   *             {@link Order}, {@link ApplicationScoped} and {@link Replace} instead, do not use implementations
+   *             directly
    */
+  @Deprecated
   public static void unregisterServices(List<? extends IBean<?>> beans) {
     if (beans == null) {
       return;

@@ -14,7 +14,9 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -85,38 +87,53 @@ public class TypeHierarchy<T> {
     m_queryAll = null;
   }
 
+  @SuppressWarnings("unchecked")
   protected void validate() {
-    if (m_querySingle == null) {
+    if (m_querySingle == null || m_queryAll == null) {
+      //manage replaced beans
       ArrayList<IBean<T>> list = new ArrayList<>(m_beans);
-      for (IBean<T> bean : m_beans) {
+      Collections.sort(list, ORDER_COMPARATOR);
+
+      HashMap<Class<?>, Class<?>> extendsMap = new HashMap<>();//key is replaced by value
+      for (IBean<T> bean : list) {
         if (bean.getBeanAnnotation(Replace.class) != null) {
           Class<?> superClazz = bean.getBeanClazz().getSuperclass();
           if (superClazz != null && !superClazz.isInterface() && !Modifier.isAbstract(superClazz.getModifiers())) {
-            list.remove(superClazz);
-          }
-        }
-        else {
-          Class<?> clazz = bean.getBeanClazz();
-          if (!clazz.isInterface() && clazz != m_clazz) {
-            list.remove(clazz);
+            //only add if first to override, respects @Order annotation
+            if (!extendsMap.containsKey(superClazz)) {
+              extendsMap.put(superClazz, bean.getBeanClazz());
+            }
           }
         }
       }
-      Collections.sort(list, ORDER_COMPARATOR);
+      //find most specific version of @Replaced class if this hierarchy is not based on an interface
+      Class<T> refClazz = m_clazz;
+      if (!refClazz.isInterface()) {
+        while (extendsMap.containsKey(refClazz)) {
+          refClazz = (Class<T>) extendsMap.get(refClazz);
+        }
+      }
+      //remove replaced beans
+      for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
+        if (extendsMap.containsKey(it.next().getBeanClazz())) {
+          it.remove();
+        }
+      }
+
+      m_queryAll = Collections.unmodifiableList(new ArrayList<IBean<T>>(list));
+
+      //now retain only beans that are exactly of type refClazz or interface
+      for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
+        IBean<T> bean = it.next();
+        if (bean.getBeanClazz().isInterface()) {
+          continue;
+        }
+        if (bean.getBeanClazz() == refClazz) {
+          continue;
+        }
+        it.remove();
+      }
       m_querySingle = Collections.unmodifiableList(list);
-    }
-    if (m_queryAll == null) {
-      ArrayList<IBean<T>> list = new ArrayList<>(m_beans);
-      for (IBean<T> bean : m_beans) {
-        if (bean.getBeanAnnotation(Replace.class) != null) {
-          Class<?> superClazz = bean.getBeanClazz().getSuperclass();
-          if (superClazz != null && !superClazz.isInterface() && !Modifier.isAbstract(superClazz.getModifiers())) {
-            list.remove(superClazz);
-          }
-        }
-      }
-      Collections.sort(list, ORDER_COMPARATOR);
-      m_queryAll = Collections.unmodifiableList(list);
     }
   }
 

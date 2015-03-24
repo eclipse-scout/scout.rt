@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -83,30 +84,17 @@ public class BeanContextImplementor implements IBeanContext {
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
-    m_lock.readLock().lock();
-    try {
-      TypeHierarchy<T> h = m_typeHierarchies.get(beanClazz);
-      if (h == null) {
-        return CollectionUtility.emptyArrayList();
-      }
-      return new ArrayList<IBean<T>>(h.getBeans());
-    }
-    finally {
-      m_lock.readLock().unlock();
-    }
-  }
-
   protected Set<Class<?>> listImplementedTypes(IBean<?> bean) {
-    Class[] interfacesHierarchy = BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class);
-    HashSet<Class<?>> clazzes = new HashSet<Class<?>>(interfacesHierarchy.length + 1);
-    clazzes.add(bean.getBeanClazz());
-    clazzes.add(Object.class);
-    for (Class<?> c : interfacesHierarchy) {
+    //interfaces
+    Class<?>[] interfacesHierarchy = BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class);
+    HashSet<Class<?>> clazzes = new HashSet<Class<?>>(Arrays.asList(interfacesHierarchy));
+    //super types
+    Class c = bean.getBeanClazz();
+    while (c != null && c != Object.class) {
       clazzes.add(c);
+      c = c.getSuperclass();
     }
+    clazzes.add(Object.class);
     return clazzes;
   }
 
@@ -114,7 +102,7 @@ public class BeanContextImplementor implements IBeanContext {
   public <T> IBean<T> registerClass(Class<T> beanClazz) {
     m_lock.writeLock().lock();
     try {
-      for (IBean<T> bean : getBeans(beanClazz)) {
+      for (IBean<T> bean : getRegisteredBeans(beanClazz)) {
         if (bean.getBeanClazz() == beanClazz) {
           return bean;
         }
@@ -166,6 +154,32 @@ public class BeanContextImplementor implements IBeanContext {
     }
   }
 
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> List<IBean<T>> getRegisteredBeans(Class<T> beanClazz) {
+    m_lock.readLock().lock();
+    try {
+      TypeHierarchy<T> h = m_typeHierarchies.get(beanClazz);
+      if (h == null) {
+        return CollectionUtility.emptyArrayList();
+      }
+      return new ArrayList<IBean<T>>(h.getBeans());
+    }
+    finally {
+      m_lock.readLock().unlock();
+    }
+  }
+
+  @Override
+  public <T> List<IBean<T>> getBean(Class<T> beanClazz) {
+    return querySingle(beanClazz);
+  }
+
+  @Override
+  public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
+    return queryAll(beanClazz);
+  }
+
   @Internal
   protected void setBeanInstanceFactory(IBeanInstanceFactory f) {
     m_beanInstanceFactory = f;
@@ -187,14 +201,12 @@ public class BeanContextImplementor implements IBeanContext {
 
   @Override
   public <T> T getInstanceOrNull(Class<T> beanClazz) {
-    List<IBean<T>> beans = querySingle(beanClazz);
-    return m_beanInstanceFactory.select(beanClazz, beans);
+    return m_beanInstanceFactory.select(beanClazz, getBean(beanClazz));
   }
 
   @Override
   public <T> List<T> getInstances(Class<T> beanClazz) {
-    List<IBean<T>> beans = queryAll(beanClazz);
-    return m_beanInstanceFactory.selectAll(beanClazz, beans);
+    return m_beanInstanceFactory.selectAll(beanClazz, getBeans(beanClazz));
   }
 
   public void startCreateImmediatelyBeans() {

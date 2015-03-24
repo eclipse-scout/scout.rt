@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
+import org.eclipse.scout.commons.annotations.Replace;
 
 /**
  * @since 5.2
@@ -46,7 +47,27 @@ public interface IBeanContext {
 
   /**
    * @param beanClazz
-   * @return
+   * @return all registered beans regardless if they have a {@link Replace} annotation
+   */
+  <T> List<IBean<T>> getRegisteredBeans(Class<T> beanClazz);
+
+  /**
+   * @param beanClazz
+   * @return beans that are of exact type beanClazz or subclasses of beanClazz with a {@link Replace}
+   *         <p>
+   *         When B extends A and B has a {@link Replace} then A is removed from the result
+   *         <p>
+   *         these are the candidate beans used in {@link #getInstance(Class)}
+   */
+  <T> List<IBean<T>> getBean(Class<T> beanClazz);
+
+  /**
+   * @param beanClazz
+   * @return beans that are of type beanClazz or subclasses of it
+   *         <p>
+   *         When B extends A and B has a {@link Replace} then A is removed from the result
+   *         <p>
+   *         these are the candidate beans used in {@link #getInstances(Class)}
    */
   <T> List<IBean<T>> getBeans(Class<T> beanClazz);
 

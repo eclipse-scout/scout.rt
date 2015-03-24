@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.platform.cdi;
+package org.eclipse.scout.rt.platform;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.AnnotationFactory;

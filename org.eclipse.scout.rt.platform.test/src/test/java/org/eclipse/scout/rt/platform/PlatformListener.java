@@ -28,7 +28,7 @@ public class PlatformListener implements IPlatformListener {
    * TODO [dwi][abr]: Temporary workaround to register a bean that does not implement an interface.
    */
   private void registerNullJobExceptionHandler(final IBeanContext beanContext) {
-    final List<IBean<JobExceptionHandler>> beans = beanContext.getBeans(JobExceptionHandler.class);
+    final List<IBean<JobExceptionHandler>> beans = beanContext.getRegisteredBeans(JobExceptionHandler.class);
     for (final IBean<?> bean : beans) {
       beanContext.unregisterBean(bean);
     }
