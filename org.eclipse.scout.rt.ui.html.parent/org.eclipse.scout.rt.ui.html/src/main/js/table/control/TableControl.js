@@ -32,6 +32,11 @@ scout.TableControl.prototype._renderContent = function($parent) {
   this.form.htmlComp.validateRoot = true;
   this.form.htmlComp.invalidate();
   this.form.htmlComp.layout();
+
+  var rootGroupBox = this.form.rootGroupBox;
+  if (rootGroupBox.fields[0] instanceof scout.TabBox) {
+    rootGroupBox.fields[0].$container.addClass('in-table-control');
+  }
 };
 
 scout.TableControl.prototype._removeContent = function() {

@@ -5,7 +5,7 @@ scout.TableFooter = function(table) {
 };
 
 scout.TableFooter.FILTER_KEY = 'TEXTFIELD';
-scout.TableFooter.CONTAINER_SIZE = 350;
+scout.TableFooter.CONTAINER_SIZE = 340;
 
 scout.TableFooter.prototype._render = function($parent) {
   var filter, that = this;
