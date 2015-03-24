@@ -604,7 +604,7 @@ scout.Calendar.prototype._onYearHoverOut = function(event) {
 
 
 /* -- components ----------------------------------------------- */
-// TODO
+// TODO: Einträtge nebeneinander
 
 scout.Calendar.prototype.layoutComponents = function() {
   $('.calendar-component', this.$grid).remove();
