@@ -12,6 +12,7 @@ package org.eclipse.scout.extension;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.extension.ExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
@@ -32,12 +33,14 @@ public abstract class AbstractLocalExtensionTestCase {
 
   @Before
   public void registerLocalRegistry() {
-    IExtensionRegistry localRegistry = new ExtensionRegistry();
-    m_localServiceRegistrations = TestingUtility.registerServices(100, localRegistry);
+    m_localServiceRegistrations = TestingUtility.registerBeans(
+        new BeanData(ExtensionRegistry.class).
+            applicationScoped(true)
+        );
   }
 
   @After
   public void unregisterLocalRegistry() {
-    TestingUtility.unregisterServices(m_localServiceRegistrations);
+    TestingUtility.unregisterBeans(m_localServiceRegistrations);
   }
 }

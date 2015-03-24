@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
@@ -74,12 +75,19 @@ public class ClientJobCancelTest {
     m_session = ClientSessionProvider.currentSession(TestEnvironmentClientSession.class);
     MockServiceTunnel tunnel = new MockServiceTunnel(m_session);
     m_session.setServiceTunnel(tunnel);
-    m_serviceReg = TestingUtility.registerServices(0, new MockPingService(), new MockServerProcessingCancelService(tunnel));
+    m_serviceReg = TestingUtility.registerBeans(
+        new BeanData(MockPingService.class).
+        initialInstance(new MockPingService()).
+        applicationScoped(true),
+        new BeanData(MockServerProcessingCancelService.class).
+        initialInstance(new MockServerProcessingCancelService(tunnel)).
+        applicationScoped(true)
+        );
   }
 
   @After
   public void tearDown() {
-    TestingUtility.unregisterServices(m_serviceReg);
+    TestingUtility.unregisterBeans(m_serviceReg);
     m_session = null;
   }
 

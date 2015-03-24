@@ -26,8 +26,8 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartFieldTest.TestForm.MainBox.StyleField;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -190,7 +190,10 @@ public class SmartFieldTest {
 
   @Before
   public void setUp() throws Throwable {
-    m_reg = TestingUtility.registerServices(0, BeanInstanceUtil.create(StyleLookupService.class));
+    m_reg = TestingUtility.registerBeans(
+        new BeanData(StyleLookupService.class).
+            applicationScoped(true)
+        );
     m_form = new TestForm();
     m_form.startForm();
   }
@@ -232,7 +235,7 @@ public class SmartFieldTest {
 
   @After
   public void tearDown() throws Throwable {
-    TestingUtility.unregisterServices(m_reg);
+    TestingUtility.unregisterBeans(m_reg);
     m_form.doClose();
   }
 

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.shared.OfflineState;
@@ -52,7 +53,11 @@ public class OfflineStateSharedVariableNotificationTest {
     OfflineState.setOfflineDefault(false);
     OfflineState.CURRENT.remove();
     m_serverSession = new TestServerSession();
-    m_registrationList = TestingUtility.registerServices(1000, new MockClientNotificationService());
+    m_registrationList = TestingUtility.registerBeans(
+        new BeanData(IClientNotificationService.class).
+            initialInstance(new MockClientNotificationService()).
+            applicationScoped(true)
+        );
   }
 
   @After
@@ -60,7 +65,7 @@ public class OfflineStateSharedVariableNotificationTest {
     OfflineState.setOfflineDefault(false);
     OfflineState.CURRENT.remove();
     m_serverSession = null;
-    TestingUtility.unregisterServices(m_registrationList);
+    TestingUtility.unregisterBeans(m_registrationList);
     m_registrationList = null;
   }
 
