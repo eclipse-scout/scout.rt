@@ -297,18 +297,14 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
 
   protected boolean isNodesRequired(int type) {
     switch (type) {
-      // Multiple nodes
-      case TreeEvent.TYPE_BEFORE_NODES_SELECTED:
       case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED:
-      case TreeEvent.TYPE_NODES_CHECKED:
       case TreeEvent.TYPE_NODES_DELETED:
       case TreeEvent.TYPE_NODES_DRAG_REQUEST:
       case TreeEvent.TYPE_NODES_INSERTED:
-      case TreeEvent.TYPE_NODES_SELECTED:
       case TreeEvent.TYPE_NODES_UPDATED: {
+        // Multiple nodes
         return true;
       }
-      // Single node
       case TreeEvent.TYPE_NODE_ACTION:
       case TreeEvent.TYPE_NODE_CHANGED:
       case TreeEvent.TYPE_NODE_CLICK:
@@ -318,6 +314,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       case TreeEvent.TYPE_NODE_ENSURE_VISIBLE:
       case TreeEvent.TYPE_NODE_EXPANDED:
       case TreeEvent.TYPE_NODE_FILTER_CHANGED: {
+        // Single node
         return true;
       }
       default: {
