@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
 
 /**
  * Interface for a client side service tunnel used to invoke a service.
- * 
+ *
  * @author awe (refactoring)
  */
 public interface IClientServiceTunnel extends IServiceTunnel {
@@ -29,8 +29,7 @@ public interface IClientServiceTunnel extends IServiceTunnel {
   /**
    * Set the intervall to automatically read {@link IClientNotification}s from
    * the server. A negative value disables polling. Note: {@link IClientNotification}s are also recevied on every tunnel
-   * reponse from
-   * the server.
+   * response from the server.
    */
   void setClientNotificationPollInterval(long intervallMillis);
 
