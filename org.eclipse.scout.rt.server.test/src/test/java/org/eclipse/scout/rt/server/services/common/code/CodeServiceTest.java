@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.server.TestServerSession;
@@ -58,7 +59,10 @@ public class CodeServiceTest {
   /* ---------------------------------------------------------------------------------------------- */
 
   private void testImpl(ICodeService testService, boolean testCodeType1Expected, boolean testCodeType2Expected) {
-    List<IBean<?>> reg = TestingUtility.registerServices(1000, testService);
+    List<IBean<?>> reg = TestingUtility.registerBeans(
+        new BeanData(ICodeService.class).
+            initialInstance(testService).
+            applicationScoped(true));
     try {
       ICodeService service = SERVICES.getService(ICodeService.class);
       assertSame(testService, service);
@@ -89,7 +93,7 @@ public class CodeServiceTest {
       }
     }
     finally {
-      TestingUtility.unregisterServices(reg);
+      TestingUtility.unregisterBeans(reg);
     }
   }
 
@@ -154,7 +158,10 @@ public class CodeServiceTest {
   @Test
   public void testReloadCodeType() throws Exception {
     IClientNotificationService clientNotificationService = Mockito.mock(IClientNotificationService.class);
-    List<IBean<?>> reg = TestingUtility.registerServices(1000, clientNotificationService);
+    List<IBean<?>> reg = TestingUtility.registerBeans(
+        new BeanData(IClientNotificationService.class).
+            initialInstance(clientNotificationService).
+            applicationScoped(true));
     try {
       CodeService codeService = new CodeService();
 
@@ -168,14 +175,17 @@ public class CodeServiceTest {
       assertEquals("CodeType list(0) class", SomeCodeType.class, notification.getValue().getCodeTypes().get(0));
     }
     finally {
-      TestingUtility.unregisterServices(reg);
+      TestingUtility.unregisterBeans(reg);
     }
   }
 
   @Test
   public void testReloadCodeTypes() throws Exception {
     IClientNotificationService clientNotificationService = Mockito.mock(IClientNotificationService.class);
-    List<IBean<?>> reg = TestingUtility.registerServices(1000, clientNotificationService);
+    List<IBean<?>> reg = TestingUtility.registerBeans(
+        new BeanData(IClientNotificationService.class).
+            initialInstance(clientNotificationService).
+            applicationScoped(true));
     try {
       CodeService codeService = new CodeService();
 
@@ -193,7 +203,7 @@ public class CodeServiceTest {
       assertEquals("CodeType list(1) class", DummyCodeType.class, notification.getValue().getCodeTypes().get(1));
     }
     finally {
-      TestingUtility.unregisterServices(reg);
+      TestingUtility.unregisterBeans(reg);
     }
   }
 

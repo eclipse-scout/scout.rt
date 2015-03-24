@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission1;
@@ -45,7 +46,10 @@ public class PermissionServiceTest {
   /* ---------------------------------------------------------------------------------------------- */
 
   private void testImpl(IPermissionService testService, boolean testPermission1Expected, boolean testPermission2Expected) {
-    List<IBean<?>> reg = TestingUtility.registerServices(1000, testService);
+    List<IBean<?>> reg = TestingUtility.registerBeans(
+        new BeanData(IPermissionService.class).
+        initialInstance(testService).
+        applicationScoped(true));
     try {
       IPermissionService service = SERVICES.getService(IPermissionService.class);
       assertSame(testService, service);
@@ -76,7 +80,7 @@ public class PermissionServiceTest {
       }
     }
     finally {
-      TestingUtility.unregisterServices(reg);
+      TestingUtility.unregisterBeans(reg);
     }
   }
 

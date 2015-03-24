@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
@@ -90,7 +91,10 @@ public class FileServiceTest {
   @Test
   public void syncRemoteFilesToPath() {
     //register services
-    List<IBean<?>> reg = TestingUtility.registerServices(0, new DummyRemoteFileService());
+    List<IBean<?>> reg = TestingUtility.registerBeans(
+        new BeanData(DummyRemoteFileService.class).
+        initialInstance(new DummyRemoteFileService()).
+        applicationScoped(true));
 
     //start with clean setup
     File outFolder = new File(TEST_DIR_OUT);
@@ -122,14 +126,14 @@ public class FileServiceTest {
       fail(e.getMessage());
     }
     finally {
-      TestingUtility.unregisterServices(reg);
+      TestingUtility.unregisterBeans(reg);
     }
   }
 
   /**
    * Dummy remote file service to test fileservice
    */
-  class DummyRemoteFileService implements IRemoteFileService {
+  private static class DummyRemoteFileService implements IRemoteFileService {
 
     @Override
     public RemoteFile getRemoteFile(RemoteFile spec) throws ProcessingException {
