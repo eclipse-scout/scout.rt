@@ -100,7 +100,7 @@ public class BeanContextImplementor implements IBeanContext {
 
   @Override
   public <T> IBean<T> registerClass(Class<T> beanClazz) {
-    return registerBean(new BeanData<T>(beanClazz));
+    return registerBean(new BeanData(beanClazz));
   }
 
   @Override

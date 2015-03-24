@@ -22,8 +22,8 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -35,6 +35,7 @@ import org.mockito.Mockito;
  *
  */
 public final class TestingUtility {
+  public static final int TESTING_BEAN_ORDER = -10000;
 
   private static final String REGEX_MARKER = "regex:";
 
@@ -153,8 +154,9 @@ public final class TestingUtility {
    * Registers the given services in the current {@link IBeanContext} and returns their registrations.<br/>
    * If registering Mockito mocks, use {@link #registerService(float, Object, Class)} instead.
    *
-   * @deprecated use {@link IBeanContext#registerClass(Class)} or {@link IBeanContext#registerBean(BeanData)} with
-   *             {@link Order}, {@link ApplicationScoped} and {@link Replace} instead, do not use implementations
+   * @deprecated use {@link #registerBeans(BeanData...)} or {@link IBeanContext#registerClass(Class)} or
+   *             {@link IBeanContext#registerBean(BeanData)} with {@link Order}, {@link ApplicationScoped} and
+   *             {@link Replace} instead, do not use implementations
    *             directly. Note that Order is the negative equal to Priority, so legacy priority(10) is order(-10).
    */
   @Deprecated
@@ -165,12 +167,6 @@ public final class TestingUtility {
     List<IBean<?>> registeredBeans = new ArrayList<>();
 
     for (Object service : services) {
-      Assertions.assertFalse(Mockito.mockingDetails(service).isMock(), "Cannot register mocked bean. Use 'registerService' and provide the concrete type. [mock=%s]", service);
-// TODO [dwi][mvi]: enable concrete class resolution for mocks once running without OSGI.
-//      if (Mockito.mockingDetails(service).isMock()) {
-//        Class clazz = new MockUtil().getMockHandler(service).getMockSettings().getTypeToMock();
-//      }
-
       registeredBeans.add(registerService(priority, service, service.getClass()));
     }
     return registeredBeans;
@@ -179,28 +175,77 @@ public final class TestingUtility {
   /**
    * Registers the given service under the given type in the current {@link IBeanContext} and returns its registration.
    *
-   * @deprecated use {@link IBeanContext#registerClass(Class)} and {@link IBeanContext#registerBean(BeanData)} with
-   *             {@link Order}, {@link ApplicationScoped} and {@link Replace} instead, do not use implementations
+   * @deprecated use {@link #registerBeans(BeanData...)} or {@link IBeanContext#registerClass(Class)} or
+   *             {@link IBeanContext#registerBean(BeanData)} with {@link Order}, {@link ApplicationScoped} and
+   *             {@link Replace} instead, do not use implementations
    *             directly
    */
+  @SuppressWarnings("unchecked")
   @Deprecated
   public static <SERVICE> IBean<SERVICE> registerService(float priority, SERVICE object, Class<? extends SERVICE> clazz) {
-    BeanData<SERVICE> bean = new BeanData<>(clazz, object);
-    bean.addAnnotation(AnnotationFactory.createApplicationScoped());
-    bean.addAnnotation(AnnotationFactory.createOrder(-priority));
-    return Platform.get().getBeanContext().registerBean(bean);
+    return (IBean<SERVICE>) registerBean(new BeanData(clazz).
+        initialInstance(object).
+        applicationScoped(true).
+        order(-priority));
   }
 
   /**
    * Unregisters the given services.
    *
-   * @param dynamicServices
-   * @deprecated use {@link IBeanContext#registerClass(Class)} and {@link IBeanContext#registerBean(BeanData)} with
-   *             {@link Order}, {@link ApplicationScoped} and {@link Replace} instead, do not use implementations
-   *             directly
+   * @deprecated use {@link #unregisterBeans(List)}
    */
   @Deprecated
   public static void unregisterServices(List<? extends IBean<?>> beans) {
+    if (beans == null) {
+      return;
+    }
+    unregisterBeans(beans);
+  }
+
+  /**
+   * Registers the given beans in the {@link IBeanContext} of {@link Platform#get()} with an {@link Order} value of
+   * {@link #TESTING_BEAN_ORDER} (if none is already set) that overrides all other beans
+   * <p>
+   * If registering Mockito mocks, use {@link BeanData#BeanData(Class, Object)}.
+   *
+   * @return the registrations
+   */
+  public static List<IBean<?>> registerBeans(BeanData... beanDatas) {
+    if (beanDatas == null) {
+      return CollectionUtility.emptyArrayList();
+    }
+    List<IBean<?>> registeredBeans = new ArrayList<>();
+    for (BeanData beanData : beanDatas) {
+      registeredBeans.add(registerBean(beanData));
+    }
+    return registeredBeans;
+  }
+
+  /**
+   * Registers the given bean in the {@link IBeanContext} of {@link Platform#get()} with an {@link Order} value of
+   * {@link #TESTING_BEAN_ORDER} (if none is already set) that overrides all other beans
+   * <p>
+   * If registering Mockito mocks, use {@link BeanData#BeanData(Class, Object)}.
+   *
+   * @return the registration
+   */
+  public static IBean<?> registerBean(BeanData beanData) {
+    if (beanData == null) {
+      return null;
+    }
+    Assertions.assertFalse(Mockito.mockingDetails(beanData.getBeanClazz()).isMock() && beanData.getInitialInstance() == null, "Cannot register mocked bean. Use 'registerService' and provide the concrete type. [mock=%s]", beanData.getBeanClazz());
+    if (beanData.getBeanAnnotation(Order.class) == null && beanData.getBeanAnnotation(Priority.class) == null) {
+      beanData.order(TESTING_BEAN_ORDER);
+    }
+    return Platform.get().getBeanContext().registerBean(beanData);
+  }
+
+  /**
+   * Unregisters the given beans
+   *
+   * @param beans
+   */
+  public static void unregisterBeans(List<? extends IBean<?>> beans) {
     if (beans == null) {
       return;
     }

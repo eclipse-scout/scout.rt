@@ -18,12 +18,14 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.CodeRow;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.lookup.fixture.ILegacyCodeLookupCallVisitor;
 import org.eclipse.scout.rt.shared.services.lookup.fixture.LegacyCodeLookupCall;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -57,12 +59,16 @@ public class CodeLookupCallTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    s_services = TestingUtility.registerServices(1000, new TestingCodeService(new CodeLookupCallTestCodeType()));
+    s_services = TestingUtility.registerBeans(
+        new BeanData(ICodeService.class).
+            initialInstance(new TestingCodeService(new CodeLookupCallTestCodeType())).
+            applicationScoped(true)
+        );
   }
 
   @AfterClass
   public static void afterClass() throws Exception {
-    TestingUtility.unregisterServices(s_services);
+    TestingUtility.unregisterBeans(s_services);
   }
 
   @Test

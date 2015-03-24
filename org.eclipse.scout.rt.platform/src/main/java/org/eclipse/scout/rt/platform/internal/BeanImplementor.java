@@ -34,7 +34,7 @@ public class BeanImplementor<T> implements IBean<T> {
 
   @SuppressWarnings("unchecked")
   public BeanImplementor(BeanData beanData) {
-    m_beanClazz = Assertions.assertNotNull(beanData.getBeanClazz());
+    m_beanClazz = (Class<? extends T>) Assertions.assertNotNull(beanData.getBeanClazz());
     m_beanAnnotations = new HashMap<Class<? extends Annotation>, Annotation>(Assertions.assertNotNull(beanData.getBeanAnnotations()));
     m_initialInstance = (T) beanData.getInitialInstance();
     if (m_initialInstance != null && getBeanAnnotation(ApplicationScoped.class) == null) {
@@ -51,16 +51,12 @@ public class BeanImplementor<T> implements IBean<T> {
   @Override
   @SuppressWarnings("unchecked")
   public <ANNOTATION extends Annotation> ANNOTATION getBeanAnnotation(Class<ANNOTATION> annotationClazz) {
-    synchronized (m_beanAnnotations) {
-      return (ANNOTATION) m_beanAnnotations.get(annotationClazz);
-    }
+    return (ANNOTATION) m_beanAnnotations.get(annotationClazz);
   }
 
   @Override
   public Map<Class<? extends Annotation>, Annotation> getBeanAnnotations() {
-    synchronized (m_beanAnnotations) {
-      return new HashMap<Class<? extends Annotation>, Annotation>(m_beanAnnotations);
-    }
+    return new HashMap<Class<? extends Annotation>, Annotation>(m_beanAnnotations);
   }
 
   @Override

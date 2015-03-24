@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -46,12 +47,11 @@ import org.mockito.Mockito;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class PageTest {
   private static final String TEST_PAGE_CLASS_ID = "TEST_CLASS_ID";
-  private List<IBean<?>> m_serviceRegs = new ArrayList<>();
-  private static final int TEST_SERVICE_RANKING = 10000;
+  private List<IBean<?>> m_beans = new ArrayList<>();
 
   @After
-  public void tearDown() {
-    TestingUtility.unregisterServices(m_serviceRegs);
+  public void after() {
+    TestingUtility.unregisterBeans(m_beans);
   }
 
   @Test
@@ -113,7 +113,12 @@ public class PageTest {
 
   private IExceptionHandlerService createMockExceptionHandlerService() {
     IExceptionHandlerService svc = Mockito.mock(IExceptionHandlerService.class);
-    m_serviceRegs.add(TestingUtility.registerService(TEST_SERVICE_RANKING, svc, IExceptionHandlerService.class));
+    m_beans.add(TestingUtility.registerBean(
+        new BeanData(IExceptionHandlerService.class).
+            initialInstance(svc).
+            applicationScoped(true)
+        )
+        );
     return svc;
   }
 

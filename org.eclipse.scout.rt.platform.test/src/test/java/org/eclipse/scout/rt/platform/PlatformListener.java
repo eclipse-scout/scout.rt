@@ -34,6 +34,6 @@ public class PlatformListener implements IPlatformListener {
     }
 
     // Register NOOP-JobExceptionHandler to ignore exceptions thrown by intention to test job manager's internals.
-    beanContext.registerBean(new BeanData<>(JobExceptionHandler.class, new NullJobExceptionHandler()));
+    beanContext.registerBean(new BeanData(JobExceptionHandler.class, new NullJobExceptionHandler()));
   }
 }

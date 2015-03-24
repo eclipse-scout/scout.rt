@@ -16,25 +16,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Replace;
 
-public class BeanData<T> {
-  private final Class<? extends T> m_beanClazz;
-  private final Object m_initialInstance;
+public class BeanData {
+  private final Class<?> m_beanClazz;
   private final Map<Class<? extends Annotation>, Annotation> m_beanAnnotations;
+  private Object m_initialInstance;
 
-  public BeanData(Class<? extends T> clazz) {
+  public BeanData(Class<?> clazz) {
     this(clazz, null);
   }
 
-  public BeanData(Class<? extends T> clazz, Object initialInstance) {
+  public BeanData(Class<?> clazz, Object initialInstance) {
     m_beanClazz = Assertions.assertNotNull(clazz);
     m_beanAnnotations = new HashMap<>();
     readStaticAnnoations(clazz, false);
     m_initialInstance = initialInstance;
   }
 
-  public BeanData(IBean<T> template) {
+  public BeanData(IBean<?> template) {
     m_beanClazz = Assertions.assertNotNull(template.getBeanClazz());
     m_beanAnnotations = new HashMap<>(template.getBeanAnnotations());
     m_initialInstance = template.getInitialInstance();
@@ -60,7 +61,7 @@ public class BeanData<T> {
     readStaticAnnoations(clazz.getSuperclass(), true);
   }
 
-  public Class<? extends T> getBeanClazz() {
+  public Class<?> getBeanClazz() {
     return m_beanClazz;
   }
 
@@ -68,66 +69,88 @@ public class BeanData<T> {
     return m_initialInstance;
   }
 
+  /**
+   * set the initial instance
+   *
+   * @return this supporting the fluent api
+   */
+  public BeanData initialInstance(Object initialInstance) {
+    m_initialInstance = initialInstance;
+    return this;
+  }
+
+  /**
+   * convenience set or reset the {@link Replace} annotation
+   *
+   * @return this supporting the fluent api
+   */
+  public BeanData replace(boolean set) {
+    if (set) {
+      addAnnotation(AnnotationFactory.createReplace());
+    }
+    else {
+      removeAnnotation(Replace.class);
+    }
+    return this;
+  }
+
+  /**
+   * convenience set or reset the {@link Order} annotation
+   *
+   * @return this supporting the fluent api
+   */
+  public BeanData order(double order) {
+    addAnnotation(AnnotationFactory.createOrder(order));
+    return this;
+  }
+
+  /**
+   * convenience set or remove reset the {@link ApplicationScoped} annotation
+   *
+   * @return this supporting the fluent api
+   */
+  public BeanData applicationScoped(boolean set) {
+    if (set) {
+      addAnnotation(AnnotationFactory.createApplicationScoped());
+    }
+    else {
+      removeAnnotation(ApplicationScoped.class);
+    }
+    return this;
+  }
+
   @SuppressWarnings("unchecked")
   public <ANNOTATION extends Annotation> ANNOTATION getBeanAnnotation(Class<ANNOTATION> annotationClazz) {
-    synchronized (m_beanAnnotations) {
-      return (ANNOTATION) m_beanAnnotations.get(annotationClazz);
-    }
+    return (ANNOTATION) m_beanAnnotations.get(annotationClazz);
   }
 
   public Map<Class<? extends Annotation>, Annotation> getBeanAnnotations() {
-    synchronized (m_beanAnnotations) {
-      return new HashMap<Class<? extends Annotation>, Annotation>(m_beanAnnotations);
-    }
+    return new HashMap<Class<? extends Annotation>, Annotation>(m_beanAnnotations);
   }
 
   public void setBeanAnnotations(Map<Class<? extends Annotation>, Annotation> annotations) {
-    synchronized (m_beanAnnotations) {
-      m_beanAnnotations.clear();
-      m_beanAnnotations.putAll(annotations);
-    }
+    m_beanAnnotations.clear();
+    m_beanAnnotations.putAll(annotations);
   }
 
-  public void addAnnotation(Annotation annotation) {
-    synchronized (m_beanAnnotations) {
-      m_beanAnnotations.put(annotation.annotationType(), annotation);
-    }
+  /**
+   * add an annotation
+   *
+   * @return this supporting the fluent api
+   */
+  public BeanData addAnnotation(Annotation annotation) {
+    m_beanAnnotations.put(annotation.annotationType(), annotation);
+    return this;
   }
 
-  public void removeAnnotation(Annotation annotation) {
-    synchronized (m_beanAnnotations) {
-      m_beanAnnotations.remove(annotation.annotationType());
-    }
+  /**
+   * remove an annotation
+   *
+   * @return this supporting the fluent api
+   */
+  public BeanData removeAnnotation(Class<? extends Annotation> annotationType) {
+    m_beanAnnotations.remove(annotationType);
+    return this;
   }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + CollectionUtility.hashCode(m_beanAnnotations.values());
-    result = prime * result + m_beanClazz.hashCode();
-    return result;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    BeanData other = (BeanData) obj;
-    if (!CollectionUtility.equalsCollection(m_beanAnnotations.values(), other.m_beanAnnotations.values())) {
-      return false;
-    }
-    if (!m_beanClazz.equals(other.m_beanClazz)) {
-      return false;
-    }
-    return true;
-  }
 }

@@ -43,7 +43,7 @@ public class ThreadNameDecoratorTest {
   public void before() {
     m_jobManager = new JobManager();
 
-    BeanData b = new BeanData<>(JobManager.class, m_jobManager);
+    BeanData b = new BeanData(JobManager.class, m_jobManager);
     b.addAnnotation(AnnotationFactory.createApplicationScoped());
     b.addAnnotation(AnnotationFactory.createOrder(-10000));
     m_bean = Platform.get().getBeanContext().registerBean(b);

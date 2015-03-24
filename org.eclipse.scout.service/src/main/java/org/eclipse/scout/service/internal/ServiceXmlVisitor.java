@@ -81,13 +81,13 @@ public class ServiceXmlVisitor implements IPluginXmlVisitor {
   }
 
   private void registerService(IServiceReference ref, IPluginXml xmlFile) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
-    BeanData<?> bean = new BeanData<Object>(ref.getService());
+    BeanData bean = new BeanData(ref.getService());
     fillServiceAnnotations(bean, xmlFile, ref);
     //TODO imo check to enhance the exiting bean (IService may receive a @Bean anno...) instead of re-registering it
     m_context.registerBean(bean);
   }
 
-  public static void fillServiceAnnotations(BeanData<?> bean, IPluginXml pluginXml, IServiceReference ref) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
+  public static void fillServiceAnnotations(BeanData bean, IPluginXml pluginXml, IServiceReference ref) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
     // ranking (@Priority) is migrated to negative @Order
     bean.addAnnotation(org.eclipse.scout.rt.platform.AnnotationFactory.createOrder(-ref.getRanking()));
 

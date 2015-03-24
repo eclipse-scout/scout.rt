@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -58,12 +59,17 @@ public class BatchLookupTest {
     Mockito.doAnswer(answer).when(m_lookupService).getDataByText(Mockito.<ILookupCall<Object>> any());
     Mockito.doAnswer(answer).when(m_lookupService).getDataByRec(Mockito.<ILookupCall<Object>> any());
 
-    m_reg.add(TestingUtility.registerService(0, m_lookupService, IFlowerLookupService.class));
+    m_reg.add(
+        TestingUtility.registerBean(
+            new BeanData(IFlowerLookupService.class).
+            initialInstance(m_lookupService).
+            applicationScoped(true)
+            ));
   }
 
   @After
   public void tearDown() throws Exception {
-    TestingUtility.unregisterServices(m_reg);
+    TestingUtility.unregisterBeans(m_reg);
   }
 
   @Test

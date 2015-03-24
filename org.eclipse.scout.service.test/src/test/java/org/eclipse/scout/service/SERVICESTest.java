@@ -48,7 +48,7 @@ public class SERVICESTest {
   }
 
   private IBean<?> registerService(Class<? extends ITestService> serviceClazz, double order) {
-    BeanData<? extends ITestService> bean = new BeanData<ITestService>(serviceClazz);
+    BeanData bean = new BeanData(serviceClazz);
     bean.addAnnotation(AnnotationFactory.createOrder(order));
     return Platform.get().getBeanContext().registerBean(bean);
   }

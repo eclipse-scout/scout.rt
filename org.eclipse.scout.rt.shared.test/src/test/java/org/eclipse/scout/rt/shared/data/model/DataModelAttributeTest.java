@@ -29,12 +29,15 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.MutableCode;
 import org.eclipse.scout.rt.shared.services.lookup.DefaultCodeLookupCallFactoryService;
+import org.eclipse.scout.rt.shared.services.lookup.ICodeLookupCallFactoryService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -61,12 +64,19 @@ public class DataModelAttributeTest {
   public static void beforeClass() throws Exception {
     TestingCodeService codeService = new TestingCodeService(new AttributeTestCodeType());
     DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
-    s_services = TestingUtility.registerServices(1000, codeService, codeLookupCallFactoryService);
+    s_services = TestingUtility.registerBeans(
+        new BeanData(ICodeService.class).
+        initialInstance(codeService).
+        applicationScoped(true),
+        new BeanData(ICodeLookupCallFactoryService.class).
+        initialInstance(codeLookupCallFactoryService).
+        applicationScoped(true)
+        );
   }
 
   @AfterClass
   public static void afterClass() throws Exception {
-    TestingUtility.unregisterServices(s_services);
+    TestingUtility.unregisterBeans(s_services);
   }
 
   @Before

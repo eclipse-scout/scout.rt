@@ -39,6 +39,7 @@ import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -50,6 +51,7 @@ import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
@@ -69,7 +71,7 @@ import org.mockito.stubbing.Answer;
 @RunWithSubject("default")
 public class ServiceTunnelServletTest {
 
-  private static final int TEST_SERVICE_RANKING = 1000;
+  private static final int TEST_SERVICE_ORDER = -1000;
 
   private List<IBean<?>> m_beans;
 
@@ -84,10 +86,20 @@ public class ServiceTunnelServletTest {
   public void before() throws ServletException, InstantiationException, IllegalAccessException {
     m_serverSessionProviderSpy = spy(OBJ.get(ServerSessionProvider.class));
 
-    m_beans = TestingUtility.registerServices(TEST_SERVICE_RANKING, new StickySessionCacheService(), new AbstractAccessControlService() {
-    });
-    // Register the service provider by specifying the concrete class because being a Mockito mock.
-    m_beans.add(TestingUtility.registerService(TEST_SERVICE_RANKING, m_serverSessionProviderSpy, ServerSessionProvider.class));
+    m_beans = TestingUtility.registerBeans(
+        new BeanData(StickySessionCacheService.class).
+            order(TEST_SERVICE_ORDER).
+            applicationScoped(true),
+        new BeanData(IAccessControlService.class).
+            initialInstance(new AbstractAccessControlService() {
+            }).
+            order(TEST_SERVICE_ORDER).
+            applicationScoped(true),
+        new BeanData(ServerSessionProvider.class).
+            initialInstance(m_serverSessionProviderSpy).
+            order(TEST_SERVICE_ORDER).
+            applicationScoped(true)
+        );
 
     m_testServiceTunnelServlet = new ServiceTunnelServlet();
     m_testServiceTunnelServlet.lazyInit(null, null);
@@ -100,7 +112,7 @@ public class ServiceTunnelServletTest {
 
   @After
   public void after() {
-    TestingUtility.unregisterServices(m_beans);
+    TestingUtility.unregisterBeans(m_beans);
   }
 
   @Test

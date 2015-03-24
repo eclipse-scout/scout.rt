@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
@@ -50,12 +51,17 @@ public class ClusterSynchronizationServiceTest {
     when(m_message.getProperties()).thenReturn(new ClusterNotificationMessageProperties(TEST_NODE, TEST_USER));
 
     final IPublishSubscribeMessageService ps = mock(IPublishSubscribeMessageService.class);
-    regs.add(TestingUtility.registerService(9000, ps, IPublishSubscribeMessageService.class));
+    regs.add(
+        TestingUtility.registerBean(
+            new BeanData(IPublishSubscribeMessageService.class).
+            initialInstance(ps).
+            applicationScoped(true)
+            ));
   }
 
   @After
   public void tearDown() {
-    TestingUtility.unregisterServices(regs);
+    TestingUtility.unregisterBeans(regs);
   }
 
   /**

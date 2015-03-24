@@ -38,6 +38,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -90,14 +91,17 @@ public class MutualExclusionTest {
     MockitoAnnotations.initMocks(this);
 
     m_jobManager = new P_JobManager();
-    m_beans = TestingUtility.registerServices(1000, m_jobManager);
+    m_beans = TestingUtility.registerBeans(
+        new BeanData(JobManager.class).
+        initialInstance(m_jobManager).
+        applicationScoped(true));
 
     ISession.CURRENT.set(m_clientSession);
   }
 
   @After
   public void after() {
-    TestingUtility.unregisterServices(m_beans);
+    TestingUtility.unregisterBeans(m_beans);
 
     ISession.CURRENT.remove();
   }

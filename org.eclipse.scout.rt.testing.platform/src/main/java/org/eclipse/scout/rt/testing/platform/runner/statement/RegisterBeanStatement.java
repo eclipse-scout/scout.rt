@@ -43,7 +43,7 @@ public class RegisterBeanStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
-    final BeanData<?> bean = new BeanData<>(m_beanClass);
+    final BeanData bean = new BeanData(m_beanClass);
     bean.addAnnotation(AnnotationFactory.createOrder(-1000));
 
     IBean reg = Platform.get().getBeanContext().registerBean(bean);
