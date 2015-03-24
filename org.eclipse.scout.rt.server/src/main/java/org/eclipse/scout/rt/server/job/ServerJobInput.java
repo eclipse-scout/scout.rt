@@ -182,12 +182,35 @@ public class ServerJobInput extends JobInput {
     return "scout-server-thread";
   }
 
+  @Override
+  public String toString() {
+    final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("id", getId());
+    builder.attr("name", getName());
+    builder.ref("session", getSession());
+    return builder.toString();
+  }
+
   // === construction methods ===
+
+  @Override
+  protected void fillCurrentValues() {
+    super.fillCurrentValues();
+    m_runContext = ServerRunContext.fillCurrent();
+    sessionRequired(true); // server jobs require a session by default
+  }
+
+  @Override
+  protected void fillEmptyValues() {
+    super.fillEmptyValues();
+    m_runContext = ServerRunContext.fillEmpty();
+    sessionRequired(true); // server jobs require a session by default
+  }
 
   @Override
   public ServerJobInput copy() {
     final ServerJobInput copy = OBJ.get(ServerJobInput.class);
-    copy.apply(this);
+    copy.copyValues(this);
     return copy;
   }
 
@@ -196,11 +219,9 @@ public class ServerJobInput extends JobInput {
    * session to be set.
    */
   public static ServerJobInput fillCurrent() {
-    final ServerJobInput defaults = OBJ.get(ServerJobInput.class);
-    defaults.apply(JobInput.fillCurrent());
-    defaults.runContext(ServerRunContext.fillCurrent());
-    defaults.sessionRequired(true);
-    return defaults;
+    final ServerJobInput jobInput = OBJ.get(ServerJobInput.class);
+    jobInput.fillCurrentValues();
+    return jobInput;
   }
 
   /**
@@ -209,19 +230,8 @@ public class ServerJobInput extends JobInput {
    * instead. This input requires a session to be set.
    */
   public static ServerJobInput fillEmpty() {
-    final ServerJobInput empty = OBJ.get(ServerJobInput.class);
-    empty.apply(JobInput.fillEmpty());
-    empty.runContext(ServerRunContext.fillEmpty());
-    empty.sessionRequired(true);
-    return empty;
-  }
-
-  @Override
-  public String toString() {
-    final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("id", getId());
-    builder.attr("name", getName());
-    builder.ref("session", getSession());
-    return builder.toString();
+    final ServerJobInput jobInput = OBJ.get(ServerJobInput.class);
+    jobInput.fillEmptyValues();
+    return jobInput;
   }
 }

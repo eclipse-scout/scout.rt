@@ -16,9 +16,14 @@ import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.ICallable;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.Callables;
+import org.eclipse.scout.rt.platform.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.platform.job.internal.callable.InitThreadLocalCallable;
@@ -31,10 +36,10 @@ import org.eclipse.scout.rt.platform.job.internal.callable.SubjectCallable;
  * Usage:</br>
  *
  * <pre>
- * Context.defaults().setLocale(Locale.US).setSubject(...).invoke(new Callable&lt;Void&gt;() {
+ * RunContext.fillCurrent().locale(Locale.US).subject(...).run(new IRunnable() {
  * 
  *   &#064;Override
- *   public void call() throws Exception {
+ *   public void run() throws Exception {
  *      // run code on behalf of the new context
  *   }
  * });
@@ -64,14 +69,42 @@ public class RunContext {
   protected RunContext() {
   }
 
-  public <RESULT> RESULT invoke(final Callable<RESULT> callable) {
+  /**
+   * Runs the given runnable on behalf of this {@link RunContext}. Use this method if you run code that does not return
+   * a result.
+   *
+   * @param runnable
+   *          runnable to be run.
+   * @throws ProcessingException
+   *           exception thrown during the runnable's execution.
+   */
+  public void run(final IRunnable runnable) throws ProcessingException {
     validate();
+    try {
+      interceptCallable(Callables.callable(runnable)).call();
+    }
+    catch (final Exception e) {
+      throw OBJ.get(ExceptionTranslator.class).translate(e);
+    }
+  }
 
+  /**
+   * Runs the given callable on behalf of this {@link RunContext}. Use this method if you run code that returns a
+   * result.
+   *
+   * @param callable
+   *          callable to be run.
+   * @return the return value of the callable.
+   * @throws ProcessingException
+   *           exception thrown during the callable's execution.
+   */
+  public <RESULT> RESULT call(final ICallable<RESULT> callable) throws ProcessingException {
+    validate();
     try {
       return interceptCallable(callable).call();
     }
     catch (final Exception e) {
-      throw new ContextInvocationException(e);
+      throw OBJ.get(ExceptionTranslator.class).translate(e);
     }
   }
 
@@ -120,6 +153,8 @@ public class RunContext {
   public void validate() {
   }
 
+  // === getter/setter ===
+
   public Subject getSubject() {
     return m_subject.get();
   }
@@ -148,49 +183,6 @@ public class RunContext {
     return m_propertyMap;
   }
 
-  // === construction methods ===
-
-  /**
-   * Creates a shallow copy of the context represented by <code>this</code> context.
-   */
-  public RunContext copy() {
-    final RunContext copy = OBJ.get(RunContext.class);
-    copy.apply(this);
-    return copy;
-  }
-
-  /**
-   * Applies the given context-values to <code>this</code> context.
-   */
-  protected void apply(final RunContext origin) {
-    m_subject = origin.m_subject;
-    m_locale = origin.m_locale;
-    m_propertyMap = new PropertyMap(origin.m_propertyMap);
-  }
-
-  /**
-   * Creates a "snapshot" of the current calling context.
-   */
-  public static RunContext fillCurrent() {
-    final RunContext defaults = OBJ.get(RunContext.class);
-    defaults.m_subject = new PreferredValue<>(Subject.getSubject(AccessController.getContext()), false);
-    defaults.m_locale = new PreferredValue<>(NlsLocale.CURRENT.get(), false);
-    defaults.m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
-    return defaults;
-  }
-
-  /**
-   * Creates an empty {@link RunContext} with <code>null</code> as preferred {@link Subject} and {@link Locale}. Preferred
-   * means, that those values are not derived from other values, but must be set explicitly instead.
-   */
-  public static RunContext fillEmpty() {
-    final RunContext empty = OBJ.get(RunContext.class);
-    empty.m_subject = new PreferredValue<>(null, true);
-    empty.m_locale = new PreferredValue<>(null, true);
-    empty.m_propertyMap = new PropertyMap();
-    return empty;
-  }
-
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
@@ -199,16 +191,62 @@ public class RunContext {
     return builder.toString();
   }
 
+  // === fill methods ===
+
   /**
-   * This exception is thrown if the invoked {@link Callable} returned with an exception. The origin exception is set as
-   * the exception's cause.
+   * Method invoked to fill this {@link RunContext} with values from the given {@link RunContext}.
    */
-  public static class ContextInvocationException extends RuntimeException {
+  protected void copyValues(final RunContext origin) {
+    m_subject = origin.m_subject;
+    m_locale = origin.m_locale;
+    m_propertyMap = new PropertyMap(origin.m_propertyMap);
+  }
 
-    private static final long serialVersionUID = 1L;
+  /**
+   * Method invoked to fill this {@link RunContext} with values from the current calling {@link RunContext}.
+   */
+  protected void fillCurrentValues() {
+    m_subject = new PreferredValue<>(Subject.getSubject(AccessController.getContext()), false);
+    m_locale = new PreferredValue<>(NlsLocale.CURRENT.get(), false);
+    m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
+  }
 
-    public ContextInvocationException(final Throwable cause) {
-      super(cause);
-    }
+  /**
+   * Method invoked to fill this {@link RunContext} with empty values.
+   */
+  protected void fillEmptyValues() {
+    m_subject = new PreferredValue<>(null, true); // null as preferred Subject
+    m_locale = new PreferredValue<>(null, true); // null as preferred Locale
+    m_propertyMap = new PropertyMap();
+  }
+
+  // === construction methods ===
+
+  /**
+   * Creates a shallow copy of the context represented by <code>this</code>.
+   */
+  public RunContext copy() {
+    final RunContext copy = OBJ.get(RunContext.class);
+    copy.copyValues(this);
+    return copy;
+  }
+
+  /**
+   * Creates a "snapshot" of the current calling context.
+   */
+  public static RunContext fillCurrent() {
+    final RunContext runContext = OBJ.get(RunContext.class);
+    runContext.fillCurrentValues();
+    return runContext;
+  }
+
+  /**
+   * Creates an empty {@link RunContext} with <code>null</code> as preferred {@link Subject} and {@link Locale}.
+   * Preferred means, that those values are not derived from other values, but must be set explicitly instead.
+   */
+  public static RunContext fillEmpty() {
+    final RunContext runContext = OBJ.get(RunContext.class);
+    runContext.fillEmptyValues();
+    return runContext;
   }
 }

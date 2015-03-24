@@ -21,8 +21,8 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.PreferredValue;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.platform.job.internal.callable.InitThreadLocalCallable;
 import org.eclipse.scout.rt.shared.ISession;
@@ -37,10 +37,10 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * Usage:</br>
  *
  * <pre>
- * ClientContext.defaults().setLocale(Locale.US).setSubject(...).invoke(new Callable&lt;Void&gt;() {
+ * ClientRunContext.fillCurrent().locale(Locale.US).subject(...).run(new IRunnable() {
  * 
  *   &#064;Override
- *   public void call() throws Exception {
+ *   public void run() throws Exception {
  *      // run code on behalf of the new context
  *   }
  * });
@@ -136,51 +136,6 @@ public class ClientRunContext extends RunContext {
     return (ClientRunContext) super.locale(locale);
   }
 
-  // === construction methods ===
-
-  @Override
-  public ClientRunContext copy() {
-    final ClientRunContext copy = OBJ.get(ClientRunContext.class);
-    copy.apply(this);
-    return copy;
-  }
-
-  /**
-   * Applies the given context-values to <code>this</code> context.
-   */
-  protected void apply(final ClientRunContext origin) {
-    super.apply(origin);
-    m_userAgent = origin.m_userAgent;
-    m_sessionRequired = origin.m_sessionRequired;
-    m_session = origin.m_session;
-  }
-
-  /**
-   * Creates a "snapshot" of the current calling client context.
-   */
-  public static ClientRunContext fillCurrent() {
-    final ClientRunContext defaults = OBJ.get(ClientRunContext.class);
-    defaults.apply(RunContext.fillCurrent());
-    defaults.m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
-    defaults.sessionRequired(false);
-    defaults.session(ClientSessionProvider.currentSession());
-    return defaults;
-  }
-
-  /**
-   * Creates an empty {@link ClientRunContext} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
-   * {@link UserAgent}. Preferred means, that those values will not be derived from other values, e.g. when setting the
-   * session, but must be set explicitly instead.
-   */
-  public static ClientRunContext fillEmpty() {
-    final ClientRunContext empty = OBJ.get(ClientRunContext.class);
-    empty.apply(RunContext.fillEmpty());
-    empty.m_userAgent = new PreferredValue<>(null, true);
-    empty.sessionRequired(false);
-    empty.session(null);
-    return empty;
-  }
-
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
@@ -190,5 +145,62 @@ public class ClientRunContext extends RunContext {
     builder.attr("sessionRequired", isSessionRequired());
     builder.attr("userAgent", getUserAgent());
     return builder.toString();
+  }
+
+  // === fill methods ===
+
+  @Override
+  protected void copyValues(final RunContext origin) {
+    final ClientRunContext originCRC = (ClientRunContext) origin;
+
+    super.copyValues(originCRC);
+    m_userAgent = originCRC.m_userAgent;
+    m_sessionRequired = originCRC.m_sessionRequired;
+    m_session = originCRC.m_session;
+  }
+
+  @Override
+  protected void fillCurrentValues() {
+    super.fillCurrentValues();
+    m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
+    m_sessionRequired = false;
+    session(ClientSessionProvider.currentSession()); // method call to derive other values.
+  }
+
+  @Override
+  protected void fillEmptyValues() {
+    super.fillEmptyValues();
+    m_userAgent = new PreferredValue<>(null, true); // null as preferred UserAgent
+    m_sessionRequired = false;
+    session(null); // method call to derive other values.
+  }
+
+  // === construction methods ===
+
+  @Override
+  public ClientRunContext copy() {
+    final ClientRunContext copy = OBJ.get(ClientRunContext.class);
+    copy.copyValues(this);
+    return copy;
+  }
+
+  /**
+   * Creates a "snapshot" of the current calling client context.
+   */
+  public static ClientRunContext fillCurrent() {
+    final ClientRunContext runContext = OBJ.get(ClientRunContext.class);
+    runContext.fillCurrentValues();
+    return runContext;
+  }
+
+  /**
+   * Creates an empty {@link ClientRunContext} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
+   * {@link UserAgent}. Preferred means, that those values will not be derived from other values, e.g. when setting the
+   * session, but must be set explicitly instead.
+   */
+  public static ClientRunContext fillEmpty() {
+    final ClientRunContext runContext = OBJ.get(ClientRunContext.class);
+    runContext.fillEmptyValues();
+    return runContext;
   }
 }

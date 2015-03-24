@@ -42,7 +42,7 @@ public class ClientSessionProvider {
    */
   public <SESSION extends IClientSession> SESSION provide(final ModelJobInput input) throws ProcessingException {
     final ClientRunContext bootstrapRunContext = input.getRunContext().copy().sessionRequired(false);
-    return bootstrapRunContext.invoke(new ICallable<SESSION>() {
+    return bootstrapRunContext.call(new ICallable<SESSION>() {
 
       @Override
       public SESSION call() throws Exception {

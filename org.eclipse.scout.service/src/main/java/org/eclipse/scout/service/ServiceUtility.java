@@ -27,6 +27,8 @@ import org.eclipse.scout.commons.holders.HolderUtility;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.service.internal.AbstractHolderArgumentVisitor;
 
 /**
@@ -125,22 +127,8 @@ public final class ServiceUtility {
       }
       return serviceClass.getMethod(operation, paramTypes);
     }
-    catch (ProcessingException e) {
-      throw e;
-    }
     catch (Throwable t) {
-      if (t instanceof InvocationTargetException) {
-        Throwable test = ((InvocationTargetException) t).getTargetException();
-        if (test != null) {
-          t = test;
-        }
-      }
-      if (t instanceof ProcessingException) {
-        throw (ProcessingException) t;
-      }
-      else {
-        throw new ProcessingException(serviceClass.getName() + "#" + operation, t);
-      }
+      throw OBJ.get(ExceptionTranslator.class).translate(t);
     }
   }
 

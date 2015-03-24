@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.platform.job.internal.future;
 
 import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.rt.platform.Callables;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.internal.Executables;
 import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
 
 /**
@@ -33,7 +33,7 @@ public abstract class MutexAcquisitionFutureTask extends ScheduledFutureDelegate
     m_mutexSemaphores = mutexSemaphores;
     m_mutexObject = mutexObject;
     m_awaitMutex = true;
-    m_nullJob = new Job<>(this, Executables.nullCallable());
+    m_nullJob = new Job<>(this, Callables.nullCallable());
   }
 
   @Override

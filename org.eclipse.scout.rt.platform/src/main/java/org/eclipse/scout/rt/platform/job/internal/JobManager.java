@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.Callables;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -41,8 +42,8 @@ import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.JobEventFilters;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.platform.job.internal.callable.ApplyContextCallable;
-import org.eclipse.scout.rt.platform.job.internal.callable.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.job.internal.callable.ApplyRunContextCallable;
+import org.eclipse.scout.rt.platform.job.internal.callable.HandleExceptionCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.ThreadNameDecorator;
 import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
 import org.eclipse.scout.rt.platform.job.internal.future.Job;
@@ -197,7 +198,7 @@ public class JobManager implements IJobManager {
     }
 
     // Create the Callable to be given to the executor.
-    final Callable<RESULT> callable = interceptCallable(Executables.callable(executable), input);
+    final Callable<RESULT> callable = interceptCallable(Callables.callable(executable), input);
 
     // Create the Future to be returned to the caller.
     final JobFutureTask<RESULT> futureTask = new JobFutureTask<RESULT>(input, periodic, m_mutexSemaphores, callable) {
@@ -363,9 +364,9 @@ public class JobManager implements IJobManager {
    * @return the head of the chain to be invoked first.
    */
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final JobInput input) {
-    final Callable<RESULT> c3 = new ApplyContextCallable<RESULT>(next, input.getRunContext());
+    final Callable<RESULT> c3 = new ApplyRunContextCallable<RESULT>(next, input.getRunContext());
     final Callable<RESULT> c2 = new ThreadNameDecorator<RESULT>(c3, input.getThreadName(), input.getIdentifier());
-    final Callable<RESULT> c1 = new ExceptionTranslator<>(c2, input);
+    final Callable<RESULT> c1 = new HandleExceptionCallable<>(c2, input);
 
     return c1;
   }

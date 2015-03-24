@@ -127,12 +127,37 @@ public class ClientJobInput extends JobInput {
     return "scout-client-thread";
   }
 
+  @Override
+  public String toString() {
+    final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("id", getId());
+    builder.attr("name", getName());
+    builder.ref("session", getSession());
+    return builder.toString();
+  }
+
+  // === fill methods ===
+
+  @Override
+  protected void fillCurrentValues() {
+    super.fillCurrentValues();
+    m_runContext = ClientRunContext.fillCurrent();
+    sessionRequired(true); // client jobs require a session by default
+  }
+
+  @Override
+  protected void fillEmptyValues() {
+    super.fillEmptyValues();
+    m_runContext = ClientRunContext.fillEmpty();
+    sessionRequired(true); // client jobs require a session by default
+  }
+
   // === construction methods ===
 
   @Override
   public ClientJobInput copy() {
     final ClientJobInput copy = OBJ.get(ClientJobInput.class);
-    copy.apply(this);
+    copy.copyValues(this);
     return copy;
   }
 
@@ -141,11 +166,9 @@ public class ClientJobInput extends JobInput {
    * session to be set.
    */
   public static ClientJobInput fillCurrent() {
-    final ClientJobInput defaults = OBJ.get(ClientJobInput.class);
-    defaults.apply(JobInput.fillCurrent());
-    defaults.runContext(ClientRunContext.fillCurrent());
-    defaults.sessionRequired(true);
-    return defaults;
+    final ClientJobInput jobInput = OBJ.get(ClientJobInput.class);
+    jobInput.fillCurrentValues();
+    return jobInput;
   }
 
   /**
@@ -154,19 +177,8 @@ public class ClientJobInput extends JobInput {
    * session, but must be set explicitly instead.
    */
   public static ClientJobInput fillEmpty() {
-    final ClientJobInput empty = OBJ.get(ClientJobInput.class);
-    empty.apply(JobInput.fillEmpty());
-    empty.runContext(ClientRunContext.fillEmpty());
-    empty.sessionRequired(true);
-    return empty;
-  }
-
-  @Override
-  public String toString() {
-    final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("id", getId());
-    builder.attr("name", getName());
-    builder.ref("session", getSession());
-    return builder.toString();
+    final ClientJobInput jobInput = OBJ.get(ClientJobInput.class);
+    jobInput.fillEmptyValues();
+    return jobInput;
   }
 }

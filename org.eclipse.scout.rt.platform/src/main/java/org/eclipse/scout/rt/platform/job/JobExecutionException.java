@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.job;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -61,5 +62,19 @@ public class JobExecutionException extends ProcessingException {
    */
   public boolean isRejection() {
     return getStatus() != null && (getStatus().getException() instanceof RejectedExecutionException);
+  }
+
+  /**
+   * Creates a {@link JobExecutionException} from the given {@link InterruptedException}.
+   */
+  public static JobExecutionException fromInterruptedException(final InterruptedException e, final String job) {
+    return new JobExecutionException(String.format("Interrupted while waiting for the job to complete. [job=%s]", job), e);
+  }
+
+  /**
+   * Creates a {@link JobExecutionException} from the given {@link TimeoutException}.
+   */
+  public static JobExecutionException fromTimeoutException(final TimeoutException e, final long timeout, final TimeUnit unit, final String job) {
+    return new JobExecutionException(String.format("Failed to wait for the job to complete because it took longer than %sms [job=%s]", unit.toMillis(timeout), job), e);
   }
 }

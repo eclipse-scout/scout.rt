@@ -21,8 +21,8 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.PreferredValue;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.platform.job.internal.callable.InitThreadLocalCallable;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -45,10 +45,10 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * Usage:</br>
  *
  * <pre>
- * ServerContext.defaults().setLocale(Locale.US).setSubject(...).invoke(new Callable&lt;Void&gt;() {
+ * ServerRunContext.fillCurrent().locale(Locale.US).subject(...).run(new IRunnable() {
  * 
  *   &#064;Override
- *   public void call() throws Exception {
+ *   public void run() throws Exception {
  *      // run code on behalf of the new context
  *   }
  * });
@@ -191,63 +191,6 @@ public class ServerRunContext extends RunContext {
     return (ServerRunContext) super.locale(locale);
   }
 
-  // === construction methods ===
-
-  @Override
-  public ServerRunContext copy() {
-    final ServerRunContext copy = OBJ.get(ServerRunContext.class);
-    copy.apply(this);
-    return copy;
-  }
-
-  /**
-   * Applies the given context-values to <code>this</code> context.
-   */
-  protected void apply(final ServerRunContext origin) {
-    super.apply(origin);
-    m_session = origin.m_session;
-    m_sessionRequired = origin.m_sessionRequired;
-    m_userAgent = origin.m_userAgent;
-    m_servletRequest = origin.m_servletRequest;
-    m_servletResponse = origin.m_servletResponse;
-    m_transactionId = origin.m_transactionId;
-    m_transactional = origin.m_transactional;
-  }
-
-  /**
-   * Creates a "snapshot" of the current calling server context.
-   */
-  public static ServerRunContext fillCurrent() {
-    final ServerRunContext defaults = OBJ.get(ServerRunContext.class);
-    defaults.apply(RunContext.fillCurrent());
-    defaults.m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
-    defaults.servletRequest(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
-    defaults.servletResponse(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
-    defaults.transactionId(ITransaction.TX_ZERO_ID);
-    defaults.transactional(true);
-    defaults.sessionRequired(false);
-    defaults.session(ServerSessionProvider.currentSession());
-    return defaults;
-  }
-
-  /**
-   * Creates an empty {@link ClientContext} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
-   * {@link UserAgent}. Preferred means, that those values will not be derived from other values, but must be set
-   * explicitly instead.
-   */
-  public static ServerRunContext fillEmpty() {
-    final ServerRunContext empty = OBJ.get(ServerRunContext.class);
-    empty.apply(RunContext.fillEmpty());
-    empty.m_userAgent = new PreferredValue<>(null, true);
-    empty.servletRequest(null);
-    empty.servletResponse(null);
-    empty.transactionId(ITransaction.TX_ZERO_ID);
-    empty.transactional(true);
-    empty.sessionRequired(false);
-    empty.session(null);
-    return empty;
-  }
-
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
@@ -261,5 +204,74 @@ public class ServerRunContext extends RunContext {
     builder.ref("transactionId", getTransactionId());
     builder.ref("transactional", isTransactional());
     return builder.toString();
+  }
+
+  // === fill methods ===
+
+  @Override
+  protected void copyValues(final RunContext origin) {
+    final ServerRunContext originSRC = (ServerRunContext) origin;
+
+    super.copyValues(originSRC);
+    m_session = originSRC.m_session;
+    m_sessionRequired = originSRC.m_sessionRequired;
+    m_userAgent = originSRC.m_userAgent;
+    m_servletRequest = originSRC.m_servletRequest;
+    m_servletResponse = originSRC.m_servletResponse;
+    m_transactionId = originSRC.m_transactionId;
+    m_transactional = originSRC.m_transactional;
+  }
+
+  @Override
+  protected void fillCurrentValues() {
+    super.fillCurrentValues();
+    m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
+    m_servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+    m_servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
+    m_transactionId = ITransaction.TX_ZERO_ID;
+    m_transactional = true;
+    m_sessionRequired = false;
+    session(ServerSessionProvider.currentSession()); // method call to derive other values.
+  }
+
+  @Override
+  protected void fillEmptyValues() {
+    super.fillEmptyValues();
+    m_userAgent = new PreferredValue<>(null, true); // null as preferred UserAgent
+    m_servletRequest = null;
+    m_servletResponse = null;
+    m_transactionId = ITransaction.TX_ZERO_ID;
+    m_transactional = true;
+    m_sessionRequired = false;
+    session(null); // method call to derive other values.
+  }
+
+  // === construction methods ===
+
+  @Override
+  public ServerRunContext copy() {
+    final ServerRunContext copy = OBJ.get(ServerRunContext.class);
+    copy.copyValues(this);
+    return copy;
+  }
+
+  /**
+   * Creates a "snapshot" of the current calling server context.
+   */
+  public static ServerRunContext fillCurrent() {
+    final ServerRunContext runContext = OBJ.get(ServerRunContext.class);
+    runContext.fillCurrentValues();
+    return runContext;
+  }
+
+  /**
+   * Creates an empty {@link ClientContext} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
+   * {@link UserAgent}. Preferred means, that those values will not be derived from other values, but must be set
+   * explicitly instead.
+   */
+  public static ServerRunContext fillEmpty() {
+    final ServerRunContext runContext = OBJ.get(ServerRunContext.class);
+    runContext.fillEmptyValues();
+    return runContext;
   }
 }

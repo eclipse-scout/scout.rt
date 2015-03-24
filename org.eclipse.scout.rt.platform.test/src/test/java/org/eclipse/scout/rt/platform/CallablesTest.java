@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job;
+package org.eclipse.scout.rt.platform;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -24,16 +24,15 @@ import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.rt.platform.job.internal.Executables;
 import org.junit.Test;
 
-public class ExecutablesTest {
+public class CallablesTest {
 
   @Test
   public void testCallableFromIRunnable1() throws Exception {
     IRunnable origin = mock(IRunnable.class);
 
-    Callable<Void> callable = Executables.callable(origin);
+    Callable<Void> callable = Callables.callable(origin);
     assertNull(callable.call());
 
     verify(origin, times(1)).run();
@@ -45,7 +44,7 @@ public class ExecutablesTest {
     IRunnable origin = mock(IRunnable.class);
     doThrow(new RuntimeException()).when(origin).run();
 
-    Callable<Void> callable = Executables.callable(origin);
+    Callable<Void> callable = Callables.callable(origin);
     callable.call();
   }
 
@@ -54,14 +53,14 @@ public class ExecutablesTest {
   public void testCallableFromICallable1() throws Exception {
     ICallable<String> origin = mock(ICallable.class);
 
-    Callable<String> callable = Executables.callable(origin);
+    Callable<String> callable = Callables.callable(origin);
     assertSame(origin, callable);
   }
 
   @Test(expected = AssertionException.class)
   @SuppressWarnings("unchecked")
   public void testCallableFromIExecutable() throws Exception {
-    Callable<String> callable = Executables.callable(mock(IExecutable.class));
+    Callable<String> callable = Callables.callable(mock(IExecutable.class));
     callable.call();
   }
 }

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.job;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
@@ -19,10 +20,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.platform.job.internal.Executables;
 
 /**
  * Factory and utility methods for {@link IJobManager} to schedule and interact with client jobs.
@@ -44,14 +45,23 @@ public final class ClientJobs {
    * 'Run-now'-style execution will be removed in 5.1.
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable) throws ProcessingException {
-    return ClientRunContext.fillCurrent().invoke(Executables.callable(executable));
+    return ClientJobs.runNow(executable, ClientJobInput.fillCurrent());
   }
 
   /**
    * 'Run-now'-style execution will be removed in 5.1.
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable, final ClientJobInput input) throws ProcessingException {
-    return input.getRunContext().invoke(Executables.callable(executable));
+    Assertions.assertTrue(executable instanceof IRunnable || executable instanceof ICallable, "Illegal executable provided: must be a '%s' or '%s'", IRunnable.class.getSimpleName(), ICallable.class.getSimpleName());
+    final RunContext runContext = input.getRunContext();
+
+    if (executable instanceof IRunnable) {
+      runContext.run((IRunnable) executable);
+      return null;
+    }
+    else {
+      return runContext.call((ICallable<RESULT>) executable);
+    }
   }
 
   /**

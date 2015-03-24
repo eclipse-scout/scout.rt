@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job.internal;
+package org.eclipse.scout.rt.platform;
 
 import java.util.concurrent.Callable;
 
@@ -19,25 +19,28 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 
 /**
- * Factory to create executable objects.
+ * Factory to create callable objects.
  *
  * @since 5.1
  */
 @Internal
-public final class Executables {
+public final class Callables {
 
-  private Executables() {
+  private Callables() {
     // private constructor for utility classes.
   }
 
   /**
-   * Returns a {@link Callable} object representing the given {@link IExecutable}.
+   * Returns a {@link Callable} object that represents the given {@link IExecutable}.
    *
    * @throws AssertionException
    *           is thrown if the given {@link IExecutable} is not of the type {@link IRunnable} or {@link ICallable}.
    */
   public static <RESULT> Callable<RESULT> callable(final IExecutable<RESULT> executable) {
-    if (executable instanceof IRunnable) {
+    if (executable instanceof ICallable) {
+      return (ICallable<RESULT>) executable;
+    }
+    else if (executable instanceof IRunnable) {
       return new Callable<RESULT>() {
 
         @Override
@@ -46,11 +49,6 @@ public final class Executables {
           return null;
         }
       };
-    }
-    else if (executable instanceof ICallable) {
-      @SuppressWarnings("unchecked")
-      final Callable<RESULT> callable = (Callable) executable;
-      return callable;
     }
     else {
       throw new AssertionException("Illegal executable provided: must be a '%s' or '%s'", IRunnable.class.getSimpleName(), ICallable.class.getSimpleName());

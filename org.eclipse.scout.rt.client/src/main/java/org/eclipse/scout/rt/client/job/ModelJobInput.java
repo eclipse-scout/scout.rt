@@ -111,7 +111,7 @@ public class ModelJobInput extends ClientJobInput {
   @Override
   public ModelJobInput copy() {
     final ModelJobInput copy = OBJ.get(ModelJobInput.class);
-    copy.apply(this);
+    copy.copyValues(this);
     return copy;
   }
 
@@ -120,9 +120,9 @@ public class ModelJobInput extends ClientJobInput {
    * session to be set.
    */
   public static ModelJobInput fillCurrent() {
-    final ModelJobInput defaults = OBJ.get(ModelJobInput.class);
-    defaults.apply(ClientJobInput.fillCurrent());
-    return defaults;
+    final ModelJobInput jobInput = OBJ.get(ModelJobInput.class);
+    jobInput.fillCurrentValues();
+    return jobInput;
   }
 
   /**
@@ -131,8 +131,8 @@ public class ModelJobInput extends ClientJobInput {
    * session, but must be set explicitly instead.
    */
   public static ModelJobInput fillEmpty() {
-    final ModelJobInput empty = OBJ.get(ModelJobInput.class);
-    empty.apply(ClientJobInput.fillEmpty());
-    return empty;
+    final ModelJobInput jobInput = OBJ.get(ModelJobInput.class);
+    jobInput.fillEmptyValues();
+    return jobInput;
   }
 }

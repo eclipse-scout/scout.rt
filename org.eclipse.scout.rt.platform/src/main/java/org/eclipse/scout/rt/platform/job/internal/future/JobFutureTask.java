@@ -23,13 +23,14 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
+import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.ProgressMonitorProvider;
 import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
-import org.eclipse.scout.rt.platform.job.internal.callable.ExceptionTranslator;
 
 /**
  * Future to be given to the executor for execution. This class combines both, the Executable and its Future. This
@@ -181,16 +182,16 @@ public class JobFutureTask<RESULT> extends ScheduledFutureDelegate<RESULT> imple
       return get();
     }
     catch (final ExecutionException e) {
-      throw ExceptionTranslator.translate(e.getCause());
+      throw OBJ.get(ExceptionTranslator.class).translate(e.getCause());
     }
     catch (final CancellationException e) {
-      return null; // Cancellation should not result in an exception.
+      return null; // Cancellation does not result in an exception.
     }
     catch (final InterruptedException e) {
-      throw ExceptionTranslator.translateInterruptedException(e, m_input.getIdentifier());
+      throw JobExecutionException.fromInterruptedException(e, m_input.getIdentifier());
     }
     catch (final RuntimeException e) {
-      throw ExceptionTranslator.translate(e);
+      throw OBJ.get(ExceptionTranslator.class).translate(e);
     }
   }
 
@@ -200,19 +201,19 @@ public class JobFutureTask<RESULT> extends ScheduledFutureDelegate<RESULT> imple
       return get(timeout, unit);
     }
     catch (final ExecutionException e) {
-      throw ExceptionTranslator.translate(e.getCause());
+      throw OBJ.get(ExceptionTranslator.class).translate(e.getCause());
     }
     catch (final CancellationException e) {
-      return null; // Cancellation should not result in an exception.
+      return null; // Cancellation does not result in an exception.
     }
     catch (final InterruptedException e) {
-      throw ExceptionTranslator.translateInterruptedException(e, m_input.getIdentifier());
+      throw JobExecutionException.fromInterruptedException(e, m_input.getIdentifier());
     }
     catch (final TimeoutException e) {
-      throw ExceptionTranslator.translateTimeoutException(e, timeout, unit, m_input.getIdentifier());
+      throw JobExecutionException.fromTimeoutException(e, timeout, unit, m_input.getIdentifier());
     }
     catch (final RuntimeException e) {
-      throw ExceptionTranslator.translate(e);
+      throw OBJ.get(ExceptionTranslator.class).translate(e);
     }
   }
 

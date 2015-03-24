@@ -168,7 +168,12 @@ public class JobInput {
    */
   public String getIdentifier() {
     final String identifier = StringUtility.join(":", m_id, m_name);
-    return StringUtility.nvl(identifier, JobInput.N_A);
+    if (identifier.isEmpty()) {
+      return JobInput.N_A;
+    }
+    else {
+      return identifier;
+    }
   }
 
   /**
@@ -178,21 +183,20 @@ public class JobInput {
     return "scout-thread";
   }
 
-  // === construction methods ===
-
-  /**
-   * Creates a shallow copy of the job-input represented by <code>this</code> context.
-   */
-  public JobInput copy() {
-    final JobInput copy = OBJ.get(JobInput.class);
-    copy.apply(this);
-    return copy;
+  @Override
+  public String toString() {
+    final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("id", getId());
+    builder.attr("name", getName());
+    return builder.toString();
   }
 
+  // === fill methods ===
+
   /**
-   * Applies the given input values to <code>this</code> input.
+   * Method invoked to fill this {@link JobInput} with values from the given {@link JobInput}.
    */
-  protected void apply(final JobInput origin) {
+  protected void copyValues(final JobInput origin) {
     m_id = origin.m_id;
     m_name = origin.m_name;
     m_mutexObject = origin.m_mutexObject;
@@ -202,14 +206,41 @@ public class JobInput {
   }
 
   /**
+   * Method invoked to fill this {@link JobInput} with values from the current calling {@link RunContext}.
+   */
+  protected void fillCurrentValues() {
+    m_expirationTime = INFINITE_EXPIRATION;
+    m_logOnError = true;
+    m_runContext = RunContext.fillCurrent();
+  }
+
+  /**
+   * Method invoked to fill this {@link JobInput} with empty values.
+   */
+  protected void fillEmptyValues() {
+    m_expirationTime = INFINITE_EXPIRATION;
+    m_logOnError = true;
+    m_runContext = RunContext.fillEmpty();
+  }
+
+  // === construction methods ===
+
+  /**
+   * Creates a shallow copy of the input represented by <code>this</code>.
+   */
+  public JobInput copy() {
+    final JobInput copy = OBJ.get(JobInput.class);
+    copy.copyValues(this);
+    return copy;
+  }
+
+  /**
    * Creates a {@link JobInput} with a "snapshot" of the current calling {@link RunContext}.
    */
   public static JobInput fillCurrent() {
-    final JobInput defaults = OBJ.get(JobInput.class);
-    defaults.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
-    defaults.logOnError(true);
-    defaults.runContext(RunContext.fillCurrent());
-    return defaults;
+    final JobInput jobInput = OBJ.get(JobInput.class);
+    jobInput.fillCurrentValues();
+    return jobInput;
   }
 
   /**
@@ -217,18 +248,8 @@ public class JobInput {
    * means, that those values are not derived from other values, but must be set explicitly instead.
    */
   public static JobInput fillEmpty() {
-    final JobInput empty = OBJ.get(JobInput.class);
-    empty.expirationTime(INFINITE_EXPIRATION, TimeUnit.MILLISECONDS);
-    empty.logOnError(true);
-    empty.runContext(RunContext.fillEmpty());
-    return empty;
-  }
-
-  @Override
-  public String toString() {
-    final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("id", getId());
-    builder.attr("name", getName());
-    return builder.toString();
+    final JobInput jobInput = OBJ.get(JobInput.class);
+    jobInput.fillEmptyValues();
+    return jobInput;
   }
 }

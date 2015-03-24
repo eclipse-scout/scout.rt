@@ -16,9 +16,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
-import org.eclipse.scout.rt.platform.job.internal.callable.ApplyContextCallable;
+import org.eclipse.scout.rt.platform.job.internal.callable.ApplyRunContextCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.Chainable;
-import org.eclipse.scout.rt.platform.job.internal.callable.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.job.internal.callable.HandleExceptionCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.ThreadNameDecorator;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
@@ -45,14 +45,14 @@ public class JobCallableChainTest {
   public void testCallableChain() throws Exception {
     Callable<Void> actualCallable = new _JobManager().interceptCallable(m_targetCallable, JobInput.fillEmpty());
 
-    // 1. ExceptionTranslator
-    ExceptionTranslator c1 = getFirstAndAssert(actualCallable, ExceptionTranslator.class);
+    // 1. HandleExceptionCallable
+    HandleExceptionCallable c1 = getFirstAndAssert(actualCallable, HandleExceptionCallable.class);
 
     // 2. ThreadNameDecorator
     ThreadNameDecorator c2 = getNextAndAssert(c1, ThreadNameDecorator.class);
 
     // 3. ApplyContextCallable
-    ApplyContextCallable c3 = getNextAndAssert(c2, ApplyContextCallable.class);
+    ApplyRunContextCallable c3 = getNextAndAssert(c2, ApplyRunContextCallable.class);
 
     // 4. Target
     assertSame(m_targetCallable, c3.getNext());
@@ -75,14 +75,14 @@ public class JobCallableChainTest {
 
     Callable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, JobInput.fillEmpty());
 
-    // 1. ExceptionTranslator
-    ExceptionTranslator c1 = getFirstAndAssert(actualCallable, ExceptionTranslator.class);
+    // 1. HandleExceptionCallable
+    HandleExceptionCallable c1 = getFirstAndAssert(actualCallable, HandleExceptionCallable.class);
 
     // 2. ThreadNameDecorator
     ThreadNameDecorator c2 = getNextAndAssert(c1, ThreadNameDecorator.class);
 
     // 3. ApplyContextCallable
-    ApplyContextCallable c3 = getNextAndAssert(c2, ApplyContextCallable.class);
+    ApplyRunContextCallable c3 = getNextAndAssert(c2, ApplyRunContextCallable.class);
 
     // 4. Contribution1
     Contribution1 c4 = getNextAndAssert(c3, Contribution1.class);
@@ -117,14 +117,14 @@ public class JobCallableChainTest {
     // 2. Contribution2
     Contribution2 c2 = getNextAndAssert(c1, Contribution2.class);
 
-    // 3. ExceptionTranslator
-    ExceptionTranslator c3 = getNextAndAssert(c2, ExceptionTranslator.class);
+    // 3. HandleExceptionCallable
+    HandleExceptionCallable c3 = getNextAndAssert(c2, HandleExceptionCallable.class);
 
     // 4. ThreadNameDecorator
     ThreadNameDecorator c4 = getNextAndAssert(c3, ThreadNameDecorator.class);
 
     // 5. ApplyContextCallable
-    ApplyContextCallable c5 = getNextAndAssert(c4, ApplyContextCallable.class);
+    ApplyRunContextCallable c5 = getNextAndAssert(c4, ApplyRunContextCallable.class);
 
     // 6. Target
     assertSame(m_targetCallable, c5.getNext());

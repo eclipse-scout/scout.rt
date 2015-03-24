@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.job.internal.callable;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.rt.platform.context.RunContext;
 
 /**
@@ -24,19 +25,26 @@ import org.eclipse.scout.rt.platform.context.RunContext;
  *          the result type of the job's computation.
  * @since 5.1
  */
-public class ApplyContextCallable<RESULT> implements Callable<RESULT>, Chainable<RESULT> {
+public class ApplyRunContextCallable<RESULT> implements Callable<RESULT>, Chainable<RESULT> {
 
   private final Callable<RESULT> m_next;
   private final RunContext m_runContext;
 
-  public ApplyContextCallable(final Callable<RESULT> next, final RunContext runContext) {
+  public ApplyRunContextCallable(final Callable<RESULT> next, final RunContext runContext) {
     m_next = Assertions.assertNotNull(next);
     m_runContext = Assertions.assertNotNull(runContext);
   }
 
   @Override
   public RESULT call() throws Exception {
-    return m_runContext.invoke(m_next);
+    // TODO [dwi]: change to only use ICallable
+    return m_runContext.call(new ICallable<RESULT>() {
+
+      @Override
+      public RESULT call() throws Exception {
+        return m_next.call();
+      }
+    });
   }
 
   @Override
