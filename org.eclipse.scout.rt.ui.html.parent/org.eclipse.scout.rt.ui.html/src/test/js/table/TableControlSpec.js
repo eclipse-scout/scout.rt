@@ -33,7 +33,9 @@ describe("TableControl", function() {
       render: function() {},
       remove: function() {},
       $container: $('<div>'),
-      rootGroupBox: {}
+      rootGroupBox: {
+        fields: []
+      }
     };
     form.htmlComp = new scout.HtmlComponent(form.$container, session);
     return form;

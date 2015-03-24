@@ -23,8 +23,16 @@ scout.TableControl.prototype.remove = function() {
 };
 
 scout.TableControl.prototype._renderContent = function($parent) {
-  this.form.rootGroupBox.menuBarPosition = 'bottom';
+  var rootGroupBox = this.form.rootGroupBox;
+
+  rootGroupBox.menuBarPosition = 'bottom';
   this.form.render($parent);
+
+  // Tab box gets a special style if it is the first field in the root group box
+  if (rootGroupBox.fields[0] instanceof scout.TabBox) {
+    rootGroupBox.fields[0].$container.addClass('in-table-control');
+  }
+
   this.form.$container.height($parent.height());
   this.form.$container.width($parent.width());
   //FIXME CGU make this more easy to use
@@ -32,11 +40,6 @@ scout.TableControl.prototype._renderContent = function($parent) {
   this.form.htmlComp.validateRoot = true;
   this.form.htmlComp.invalidate();
   this.form.htmlComp.layout();
-
-  var rootGroupBox = this.form.rootGroupBox;
-  if (rootGroupBox.fields[0] instanceof scout.TabBox) {
-    rootGroupBox.fields[0].$container.addClass('in-table-control');
-  }
 };
 
 scout.TableControl.prototype._removeContent = function() {
