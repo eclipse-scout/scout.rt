@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,6 +140,42 @@ public class TreeEventBufferTest {
     assertEquals(1, coalesced.get(0).getNodes().size());
   }
 
+  /**
+   * Insert a tree of nodes, and then again a subtree
+   */
+  @Test
+  public void testInsertSameNodesTwice() {
+    // A
+    // +-B
+    // | +-E
+    // |   +-F
+    // +-C
+    //   +-G
+    // +-D
+    ITreeNode nodeA = mockNode("A");
+    ITreeNode nodeB = mockNode("B");
+    ITreeNode nodeC = mockNode("C");
+    ITreeNode nodeD = mockNode("D");
+    ITreeNode nodeE = mockNode("E");
+    ITreeNode nodeF = mockNode("F");
+    ITreeNode nodeG = mockNode("G");
+    ITreeNode nodeH = mockNode("H");
+    installChildNodes(nodeA, nodeB, nodeC, nodeD);
+    installChildNodes(nodeB, nodeE);
+    installChildNodes(nodeE, nodeF);
+    installChildNodes(nodeC, nodeG);
+
+    TreeEvent e1 = mockEvent(TreeEvent.TYPE_NODES_INSERTED, nodeA, nodeB, nodeE);
+    TreeEvent e2 = mockEvent(TreeEvent.TYPE_NODES_UPDATED, nodeE, nodeH);
+    TreeEvent e3 = mockEvent(TreeEvent.TYPE_NODES_INSERTED, nodeB);
+    m_testBuffer.add(e1);
+    m_testBuffer.add(e2);
+    m_testBuffer.add(e3);
+
+    List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(2, coalesced.size()); // e1, e2
+  }
+
   @SuppressWarnings("unused")
   private TreeEvent mockEvent(int type) {
     return mockEvent(type, 0);
@@ -156,7 +193,15 @@ public class TreeEventBufferTest {
   }
 
   private TreeEvent mockEvent(int type, String... nodeIds) {
-    return new TreeEvent(mock(ITree.class), type, mockNodes(nodeIds));
+    return mockEvent(type, mockNodes(nodeIds));
+  }
+
+  private TreeEvent mockEvent(int type, ITreeNode... nodes) {
+    return mockEvent(type, Arrays.asList(nodes));
+  }
+
+  private TreeEvent mockEvent(int type, List<ITreeNode> nodes) {
+    return new TreeEvent(mock(ITree.class), type, nodes);
   }
 
   private List<ITreeNode> mockNodes(String... nodeIds) {
@@ -176,9 +221,15 @@ public class TreeEventBufferTest {
       return node;
     }
     // Create a new
-    node = mock(ITreeNode.class);
+    node = mock(ITreeNode.class, "MockNode[" + nodeId + "]");
     when(node.getNodeId()).thenReturn(nodeId);
     m_mockNodes.put(nodeId, node);
     return node;
+  }
+
+  private void installChildNodes(ITreeNode node, ITreeNode... childNodes) {
+    List<ITreeNode> childNodeList = Arrays.asList(childNodes);
+    when(node.getChildNodes()).thenReturn(childNodeList);
+    when(node.getChildNodeCount()).thenReturn(childNodeList.size());
   }
 }

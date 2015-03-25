@@ -17,8 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 
 /**
@@ -39,7 +37,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   @Override
   protected List<TreeEvent> coalesce(List<TreeEvent> events) {
     removeObsolete(events);
-    replacePrevious(events, TreeEvent.TYPE_NODES_INSERTED, TreeEvent.TYPE_NODES_UPDATED);
+    removeNodesContainedInPreviousEvents(events, TreeEvent.TYPE_NODES_UPDATED, TreeEvent.TYPE_NODES_INSERTED);
+    removeNodesContainedInPreviousEvents(events, TreeEvent.TYPE_NODES_INSERTED, TreeEvent.TYPE_NODES_INSERTED);
     coalesceSameType(events);
     removeEmptyEvents(events);
     return events;
@@ -53,12 +52,11 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     //previous events may be deleted from the list
     for (int j = 0; j < events.size() - 1; j++) {
       int i = events.size() - 1 - j;
-
       TreeEvent event = events.get(i);
-      int type = event.getType();
 
-      //remove all previous events of the same type
+      int type = event.getType();
       if (isIgnorePrevious(type)) {
+        //remove all previous events of the same type
         remove(type, events.subList(0, i));
       }
       else if (type == TreeEvent.TYPE_NODES_DELETED) {
@@ -119,20 +117,64 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   }
 
   /**
-   * Update a previous event of given type and removes a newer one of another type.
+   * Traverses the given list of events backwards, and checks for each event of type 'newType'
+   * if there is an older event of type 'oldType' that already contains the same nodes. If yes,
+   * the corresponding nodes are removed from the newer event.
+   * <p>
+   * Example: INSERT(A[B,C[E],D]), UPDATE(C[E],F) = UPDATE(C[F]) can be removed because INSERT already contains C[E] als
+   * child of A.
    */
-  protected void replacePrevious(List<TreeEvent> events, int oldType, int newType) {
+  protected void removeNodesContainedInPreviousEvents(List<TreeEvent> events, int newType, int oldType) {
     for (int j = 0; j < events.size() - 1; j++) {
       int i = events.size() - 1 - j;
-
       TreeEvent event = events.get(i);
-      int type = event.getType();
 
-      //merge current update event with previous insert event of the same node
-      if (type == newType) {
-        events.set(i, updatePreviousNode(event, events.subList(0, i), oldType));
+      if (event.getType() == newType) {
+        // Build a mutable list of nodes, filter it and then replace it in the event (if there were some nodes removed)
+        List<ITreeNode> nodes = new ArrayList<>(event.getChildNodes());
+        boolean removed = filterNodesByPreviousEvents(nodes, events.subList(0, i), oldType);
+        if (removed) {
+          events.set(i, replaceNodesInEvent(event, nodes));
+        }
       }
     }
+  }
+
+  /**
+   * Removes all nodes from the list 'nodes' that are contained in one of the events of 'events' matching the type
+   * 'oldType'. A node is considered contained if it is a member of an events node list, or a child (at any level) of
+   * such a node. Please note that 'nodes' is a live-list, i.e. it is manipulated directly by this method.
+   *
+   * @return <code>true</code> if one or more nodes have been removed from 'nodes'.
+   */
+  protected boolean filterNodesByPreviousEvents(List<ITreeNode> nodes, List<TreeEvent> events, int oldType) {
+    boolean removed = false;
+    for (Iterator<ITreeNode> it = nodes.iterator(); it.hasNext();) {
+      ITreeNode node = it.next();
+      for (TreeEvent event : events) {
+        if (event.getType() == oldType && containsNodeRec(event.getNodes(), node)) {
+          it.remove();
+          removed = true;
+          break; // no need to look further
+        }
+      }
+    }
+    return removed;
+  }
+
+  /**
+   * @return <code>true</code> if 'nodes' contains 'nodeToFind' or one of the children does so.
+   */
+  protected boolean containsNodeRec(Collection<ITreeNode> nodes, ITreeNode nodeToFind) {
+    for (ITreeNode node : nodes) {
+      if (node == nodeToFind) {
+        return true;
+      }
+      if (containsNodeRec(node.getChildNodes(), nodeToFind)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -141,61 +183,12 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   protected void coalesceSameType(List<TreeEvent> events) {
     for (int j = 0; j < events.size() - 1; j++) {
       int i = events.size() - 1 - j;
-
       TreeEvent event = events.get(i);
-      int type = event.getType();
 
-      if (isCoalesceConsecutivePrevious(type)) {
+      if (isCoalesceConsecutivePrevious(event.getType())) {
         coalesceConsecutivePrevious(event, events.subList(0, i));
       }
     }
-  }
-
-  /**
-   * Updates previous nodes in the list, if it is of the given type.
-   */
-  protected TreeEvent updatePreviousNode(TreeEvent event, List<TreeEvent> events, int type) {
-    Collection<ITreeNode> nodes = event.getNodes();
-    for (ListIterator<TreeEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
-      TreeEvent previous = it.previous();
-      if (previous.getType() == type) {
-        it.set(replaceNodes(previous, nodes));
-      }
-    }
-    return replaceNodesInEvent(event, nodes);
-  }
-
-  protected TreeEvent replaceNodes(TreeEvent event, Collection<ITreeNode> newNodes) {
-    for (Iterator<ITreeNode> it = newNodes.iterator(); it.hasNext();) {
-      ITreeNode newNode = it.next();
-      IHolder<TreeEvent> eventHolder = new Holder<>(event);
-      boolean replaced = tryReplaceNode(eventHolder, newNode);
-      if (replaced) {
-        event = eventHolder.getValue();
-        it.remove();
-      }
-    }
-    return event;
-  }
-
-  /**
-   * Replaces the node in the event, if it is contained.
-   *
-   * @return <code>true</code> if successful.
-   */
-  protected boolean tryReplaceNode(IHolder<TreeEvent> eventHolder, ITreeNode newNode) {
-    TreeEvent event = eventHolder.getValue();
-    List<ITreeNode> targetNodes = new ArrayList<>();
-    boolean replaced = false;
-    for (ITreeNode node : event.getNodes()) {
-      if (node == newNode) {
-        node = newNode;
-        replaced = true;
-      }
-      targetNodes.add(node);
-    }
-    eventHolder.setValue(replaceNodesInEvent(event, targetNodes));
-    return replaced;
   }
 
   /**

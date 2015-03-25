@@ -410,13 +410,13 @@ public class TableEventBufferTest {
   }
 
   private ITableRow mockRow(int rowIndex) {
-    final ITableRow row = mock(ITableRow.class);
+    final ITableRow row = mock(ITableRow.class, "MockRow[" + rowIndex + "]");
     when(row.getRowIndex()).thenReturn(rowIndex);
     return row;
   }
 
   private IColumn<?> mockColumn(int colIndex) {
-    final IColumn column = mock(IColumn.class);
+    final IColumn column = mock(IColumn.class, "MockColumn[" + colIndex + "]");
     when(column.getColumnIndex()).thenReturn(colIndex);
     return column;
   }

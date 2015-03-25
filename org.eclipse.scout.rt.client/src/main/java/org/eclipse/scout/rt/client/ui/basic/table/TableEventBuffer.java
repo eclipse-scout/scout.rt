@@ -54,16 +54,15 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     //previous events may be deleted from the list
     for (int j = 0; j < events.size() - 1; j++) {
       int i = events.size() - 1 - j;
-
       TableEvent event = events.get(i);
-      int type = event.getType();
 
-      //remove all previous row related events
+      int type = event.getType();
       if (type == TableEvent.TYPE_ALL_ROWS_DELETED) {
+        //remove all previous row related events
         remove(getRowRelatedEvents(), events.subList(0, i));
       }
-      //remove all previous events of the same type
       else if (isIgnorePrevious(type)) {
+        //remove all previous events of the same type
         remove(type, events.subList(0, i));
       }
       else if (type == TableEvent.TYPE_ROWS_DELETED) {
@@ -127,12 +126,10 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
   protected void replacePrevious(List<TableEvent> events, int oldType, int newType) {
     for (int j = 0; j < events.size() - 1; j++) {
       int i = events.size() - 1 - j;
-
       TableEvent event = events.get(i);
-      int type = event.getType();
 
-      //merge current update event with previous insert event of the same row
-      if (type == newType) {
+      if (event.getType() == newType) {
+        //merge current update event with previous insert event of the same row
         updatePreviousRow(event, events.subList(0, i), oldType);
       }
     }
@@ -144,11 +141,9 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
   protected void coalesceSameType(List<TableEvent> events) {
     for (int j = 0; j < events.size() - 1; j++) {
       int i = events.size() - 1 - j;
-
       TableEvent event = events.get(i);
-      int type = event.getType();
 
-      if (isCoalesceConsecutivePrevious(type)) {
+      if (isCoalesceConsecutivePrevious(event.getType())) {
         coalesceConsecutivePrevious(event, events.subList(0, i));
       }
     }
