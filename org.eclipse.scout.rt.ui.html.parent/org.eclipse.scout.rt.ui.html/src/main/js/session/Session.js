@@ -257,7 +257,12 @@ scout.Session.prototype._sendRequest = function(request) {
       request.events.forEach(function(event) {
         this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
       }.bind(this));
-      this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
+      if (this._queuedRequest.events) {
+        this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
+      }
+      else {
+        this._queuedRequest.events = request.events;
+      }
     }
     return;
   }
@@ -561,7 +566,9 @@ scout.Session.prototype.goOnline = function() {
 };
 
 scout.Session.prototype.onReconnecting = function() {
-  this.desktop.onReconnecting();
+  if (this.desktop) {
+    this.desktop.onReconnecting();
+  }
 };
 
 scout.Session.prototype.onReconnectingSucceeded = function() {
