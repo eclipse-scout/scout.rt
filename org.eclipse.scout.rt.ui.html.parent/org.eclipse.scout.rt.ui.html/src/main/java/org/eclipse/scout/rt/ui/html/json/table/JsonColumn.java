@@ -61,6 +61,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
       JsonObjectUtility.putProperty(json, "custom", true);
     }
     JsonObjectUtility.putProperty(json, IColumn.PROP_FIXED_WIDTH, getColumn().isFixedWidth());
+    JsonObjectUtility.putProperty(json, IColumn.PROP_EDITABLE, getColumn().isEditable());
     // FIXME CGU: complete
     return json;
   }

@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilte
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -74,6 +75,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_ROWS_CHECKED = "rowsChecked";
   public static final String EVENT_COLUMN_ORDER_CHANGED = "columnOrderChanged";
   public static final String EVENT_COLUMN_HEADERS_UPDATED = "columnHeadersUpdated";
+  public static final String EVENT_START_CELL_EDIT = "startCellEdit";
+  public static final String EVENT_PREPARE_CELL_EDIT = "prepareCellEdit";
+  public static final String EVENT_COMPLETE_CELL_EDIT = "completeCellEdit";
+  public static final String EVENT_CANCEL_CELL_EDIT = "cancelCellEdit";
 
   public static final String PROP_ROWS = "rows";
   public static final String PROP_ROW_IDS = "rowIds";
@@ -303,6 +308,15 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     else if (EVENT_ROWS_CHECKED.equals(event.getType())) {
       handleUiRowChecked(event, res);
     }
+    else if (EVENT_PREPARE_CELL_EDIT.equals(event.getType())) {
+      handleUiPrepareCellEdit(event, res);
+    }
+    else if (EVENT_COMPLETE_CELL_EDIT.equals(event.getType())) {
+      handleUiCompleteCellEdit(event, res);
+    }
+    else if (EVENT_CANCEL_CELL_EDIT.equals(event.getType())) {
+      handleUiCancelCellEdit(event, res);
+    }
     else {
       super.handleUiEvent(event, res);
     }
@@ -433,6 +447,45 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (row != null && column != null && url != null) {
       getModel().getUIFacade().fireHyperlinkActionFromUI(row, column, url);
     }
+  }
+
+  protected void handleUiPrepareCellEdit(JsonEvent event, JsonResponse res) {
+    ITableRow row = extractTableRow(event.getData());
+    IColumn column = extractColumn(event.getData());
+    IFormField field = getModel().getUIFacade().prepareCellEditFromUI(row, column);
+    if (field == null) {
+      throw new IllegalStateException("PrepareCellEditFromUi returned null for " + row + " and " + column);
+    }
+
+    IJsonAdapter<?> jsonField = attachAdapter(field);
+    LOG.debug("Created new field adapter for cell editing. Adapter: " + jsonField);
+    JSONObject json = new JSONObject();
+    putProperty(json, "columnId", JsonObjectUtility.getString(event.getData(), PROP_COLUMN_ID));
+    putProperty(json, "rowId", JsonObjectUtility.getString(event.getData(), PROP_ROW_ID));
+    putProperty(json, "field", jsonField.getId());
+    addActionEvent(EVENT_START_CELL_EDIT, json);
+  }
+
+  protected void handleUiCompleteCellEdit(JsonEvent event, JsonResponse res) {
+    String fieldId = JsonObjectUtility.getString(event.getData(), "fieldId");
+    getModel().getUIFacade().completeCellEditFromUI();
+
+    IJsonAdapter<?> jsonAdapter = getJsonSession().getJsonAdapter(fieldId);
+    if (jsonAdapter == null) {
+      throw new IllegalStateException("No field adapter found for id " + fieldId);
+    }
+    jsonAdapter.dispose();
+  }
+
+  protected void handleUiCancelCellEdit(JsonEvent event, JsonResponse res) {
+    String fieldId = JsonObjectUtility.getString(event.getData(), "fieldId");
+    getModel().getUIFacade().cancelCellEditFromUI();
+
+    IJsonAdapter<?> jsonAdapter = getJsonSession().getJsonAdapter(fieldId);
+    if (jsonAdapter == null) {
+      throw new IllegalStateException("No field adapter found for id " + fieldId);
+    }
+    jsonAdapter.dispose();
   }
 
   protected JSONObject tableRowToJson(ITableRow row) {

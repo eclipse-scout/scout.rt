@@ -40,12 +40,15 @@ scout.ValueField.prototype._renderUpdateDisplayTextOnModify = function() {
 };
 
 scout.ValueField.prototype._onFieldKeyUp = function() {
-  var displayText = this._readDisplayText();
-  this._updateDisplayText(displayText, true);
+  this.acceptDisplayText(true);
 };
 
 scout.ValueField.prototype._onFieldBlur = function() {
-  this._updateDisplayText(this._readDisplayText(), false);
+  this.acceptDisplayText();
+};
+
+scout.ValueField.prototype.acceptDisplayText = function(whileTyping) {
+  this._updateDisplayText(this._readDisplayText(), whileTyping);
 };
 
 scout.ValueField.prototype._updateDisplayText = function(displayText, whileTyping) {

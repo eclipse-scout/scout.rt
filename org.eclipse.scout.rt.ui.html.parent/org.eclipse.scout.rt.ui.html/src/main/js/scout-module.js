@@ -88,6 +88,8 @@ __include("table/TableOrganizeMenu.js");
 __include("table/TableSelectionHandler.js");
 __include("table/TableControlKeyStrokes.js");
 __include("table/TableFilterControlKeyStrokes.js");
+__include("table/editor/CellEditorPopup.js");
+__include("table/editor/CellEditorPopupKeyStrokeAdapter.js");
 // Desktop
 __include("tree/Tree.js");
 __include("tree/TreeCompact.js");

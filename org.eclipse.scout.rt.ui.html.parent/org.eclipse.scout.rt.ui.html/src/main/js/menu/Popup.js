@@ -68,7 +68,7 @@ scout.PopupMenuItem = function($menuItem) {
 scout.inherits(scout.PopupMenuItem, scout.Popup);
 
 scout.PopupMenuItem.prototype.render = function($parent) {
-  scout.PopupMenuItem.parent.prototype.render($parent);
+  scout.PopupMenuItem.parent.prototype.render.call(this, $parent);
   this.$head = $.makeDiv('popup-head');
   this.$deco = $.makeDiv('popup-deco');
   this.$container
@@ -158,6 +158,6 @@ scout.PopupMenuItem.prototype._uninstallKeyStrokeAdapter = function() {
 };
 
 scout.PopupMenuItem.prototype.remove = function() {
-  scout.PopupMenuItem.parent.prototype.remove();
+  scout.PopupMenuItem.parent.prototype.remove.call(this);
   this._uninstallKeyStrokeAdapter();
 };

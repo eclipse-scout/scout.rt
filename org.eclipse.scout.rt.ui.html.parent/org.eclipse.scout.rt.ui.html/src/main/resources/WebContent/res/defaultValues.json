@@ -142,6 +142,7 @@
       "enabled": true
     },
     "TableColumn": {
+      "editable": false,
       "horizontalAlignment": -1,
       "sortActive": false,
       "sortAscending": true,

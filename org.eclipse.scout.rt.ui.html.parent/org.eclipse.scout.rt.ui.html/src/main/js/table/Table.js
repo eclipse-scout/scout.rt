@@ -140,6 +140,9 @@ scout.Table.prototype._unwrapCells = function(cells) {
       };
       cells[i] = cell;
     }
+    if (cell.editable === undefined) {
+      cell.editable = this.columns[i].editable;
+    }
   }
 };
 
@@ -647,6 +650,28 @@ scout.Table.prototype.sendRowClicked = function($row, columnId) {
   this.session.send(this.id, 'rowClicked', data);
 };
 
+scout.Table.prototype.sendPrepareCellEdit = function(rowId, columnId) {
+  var data = {
+    rowId: rowId,
+    columnId: columnId
+  };
+  this.session.send(this.id, 'prepareCellEdit', data);
+};
+
+scout.Table.prototype.sendCompleteCellEdit = function(fieldId) {
+  var data = {
+    fieldId: fieldId
+  };
+  this.session.send(this.id, 'completeCellEdit', data);
+};
+
+scout.Table.prototype.sendCancelCellEdit = function(fieldId) {
+  var data = {
+    fieldId: fieldId
+  };
+  this.session.send(this.id, 'cancelCellEdit', data);
+};
+
 scout.Table.prototype.sendRowsChecked = function(rows) {
   var data = {
     rows: []
@@ -681,8 +706,12 @@ scout.Table.prototype.sendReload = function() {
   this.session.send(this.id, 'reload');
 };
 
+scout.Table.prototype.cell = function(column, row) {
+  return row.cells[column.index];
+};
+
 scout.Table.prototype.cellValue = function(column, row) {
-  var cell = row.cells[column.index];
+  var cell = this.cell(column, row);
 
   if (cell === null) { //cell may be a number so don't use !cell
     return null;
@@ -697,7 +726,7 @@ scout.Table.prototype.cellValue = function(column, row) {
 };
 
 scout.Table.prototype.cellText = function(column, row) {
-  var cell = row.cells[column.index];
+  var cell = this.cell(column, row);
 
   if (!cell) {
     return '';
@@ -1539,6 +1568,17 @@ scout.Table.prototype._renderAutoResizeColumns = function() {
   }
 };
 
+scout.Table.prototype.injectKeyStrokeAdapter = function(adapter, target) {
+  if (adapter === this.keyStrokeAdapter) {
+    return;
+  }
+  if (scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  }
+  this.keyStrokeAdapter = adapter;
+  scout.keyStrokeManager.installAdapter(target, this.keyStrokeAdapter);
+};
+
 scout.Table.prototype._onRowOrderChanged = function(rowIds) {
   var newPos, rows, row;
   if (rowIds.length !== this.rows.length) {
@@ -1619,6 +1659,12 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
   }
 };
 
+scout.Table.prototype._onStartCellEdit = function(columnId, rowId, field) {
+  var column = this.columnById(columnId);
+  var row = this.rowById(rowId);
+  column.startCellEdit(row, field);
+};
+
 scout.Table.prototype.onModelAction = function(event) {
   // _drawData() might not have drawn all rows yet, therefore postpone the
   // execution of this method to prevent conflicts on the row objects.
@@ -1652,6 +1698,8 @@ scout.Table.prototype.onModelAction = function(event) {
     this._onColumnOrderChanged(event.columnIds);
   } else if (event.type === 'columnHeadersUpdated') {
     this._onColumnHeadersUpdated(event.columns);
+  } else if (event.type === 'startCellEdit') {
+    this._onStartCellEdit(event.columnId, event.rowId, event.field);
   } else {
     $.log.warn('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');
   }
@@ -1679,15 +1727,4 @@ scout.Table.linkRowToDiv = function(row, $row) {
   if ($row) {
     $row.data('row', row);
   }
-};
-
-scout.Table.prototype.injectKeyStrokeAdapter = function(adapter, target) {
-  if (adapter === this.keyStrokeAdapter) {
-    return;
-  }
-  if (scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
-  }
-  this.keyStrokeAdapter = adapter;
-  scout.keyStrokeManager.installAdapter(target, this.keyStrokeAdapter);
 };
