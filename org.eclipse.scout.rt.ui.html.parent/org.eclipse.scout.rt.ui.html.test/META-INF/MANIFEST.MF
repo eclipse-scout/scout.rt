@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Scout Json Test Plugin
-Bundle-SymbolicName: org.eclipse.scout.rt.ui.html.test
-Bundle-Version: 5.1.0.qualifier

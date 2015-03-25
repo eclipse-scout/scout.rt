@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Scout Html UI Ext
-Bundle-SymbolicName: org.eclipse.scout.rt.ui.html.client.ext
-Bundle-Version: 5.1.0.qualifier
