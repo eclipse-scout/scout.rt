@@ -44,6 +44,7 @@ public class JsonStatus implements IJsonObject {
     }
   }
 
+  // FIXME AWE: unit-test ""
   public static Object toJson(IStatus status) {
     return status == null ? "" : new JsonStatus(status).toJson();
   }

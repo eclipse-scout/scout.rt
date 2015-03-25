@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.CachingEnabled;
@@ -51,25 +48,11 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
-    getModel().addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (IContentAssistField.PROP_PROPOSAL_CHOOSER.equals(evt.getPropertyName())) {
-          System.out.println("dafuq=" + evt.getNewValue());
-        }
-      }
-    });
-  }
-
-  @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonAdapterProperty<IContentAssistField<K, V>>(IContentAssistField.PROP_PROPOSAL_CHOOSER, model, getJsonSession()) {
       @Override
       protected Object modelValue() {
-        System.out.println("PROP CHANGE " + getModel().getProposalChooser());
         return getModel().getProposalChooser();
       }
     });
@@ -124,32 +107,28 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
   }
 
   private void handleUiAcceptProposal(JsonEvent event) {
-    String searchText = event.getData().optString("searchText");
     IProposalChooser proposalChooser = getModel().getProposalChooser();
-    LOG.debug("handle acceptProposal -> setTextFromUI. searchText=" + searchText + " proposalChooser=" + (proposalChooser != null));
     if (proposalChooser != null) { // in case the proposal chooser has been closed in the mean-time
       addEventFilterForCloseProposal();
       IContentAssistFieldUIFacade uiFacade = getModel().getUIFacade();
       if (proposalChooser.getAcceptedProposal() != null) {
-        System.out.println("accept");
+        LOG.debug("handle acceptProposal. acceptedProposal=" + proposalChooser.getAcceptedProposal() + " -> acceptProposalFromUI");
         uiFacade.acceptProposalFromUI();
       }
       else {
-//      uiFacade.setTextFromUI(searchText);
-        System.out.println("close");
+        LOG.debug("handle acceptProposal. No accepted proposal -> closeProposalFromUI");
         uiFacade.closeProposalFromUI();
       }
     }
   }
 
-  private void addEventFilterForCloseProposal() {
-    addPropertyEventFilterCondition(IContentAssistField.PROP_PROPOSAL_CHOOSER, null);
+  private void handleUiCloseProposal() {
+    addEventFilterForCloseProposal();
+    getModel().getUIFacade().closeProposalFromUI();
   }
 
-  private void handleUiCloseProposal() {
-    LOG.debug("handle closeProposal");
-//    addEventFilterForCloseProposal();
-    getModel().getUIFacade().closeProposalFromUI();
+  private void addEventFilterForCloseProposal() {
+    addPropertyEventFilterCondition(IContentAssistField.PROP_PROPOSAL_CHOOSER, null);
   }
 
   private void handleUiOpenProposal(JsonEvent event) {
