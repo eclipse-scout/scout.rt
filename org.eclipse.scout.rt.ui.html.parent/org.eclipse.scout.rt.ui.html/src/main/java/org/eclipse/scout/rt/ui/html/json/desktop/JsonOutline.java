@@ -104,12 +104,14 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     IPage page = (IPage) node;
     ITable table = page.getTable();
     if (table != null) {
-      IJsonAdapter<?> jsonAdapter = getGlobalAdapter(table);
-      if (jsonAdapter != null) {
+      IJsonAdapter<?> jsonTableAdapter = getGlobalAdapter(table);
+      if (jsonTableAdapter != null) {
         // Detail tables are global to make them reusable by other components (e.g. table field)
         // Therefore we have to dispose them by our own
-        m_jsonDetailTables.remove(jsonAdapter);
-        jsonAdapter.dispose();
+        m_jsonDetailTables.remove(jsonTableAdapter);
+        if (!jsonTableAdapter.isDisposed()) {
+          jsonTableAdapter.dispose();
+        }
       }
     }
 
