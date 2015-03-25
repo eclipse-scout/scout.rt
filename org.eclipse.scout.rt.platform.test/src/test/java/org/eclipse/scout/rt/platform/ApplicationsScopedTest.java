@@ -37,7 +37,7 @@ public class ApplicationsScopedTest {
    * A @ApplicationScoped bean is expected to be the same instance in case of multiple context lookups.
    */
   @Test
-  public void testApplicaitonScopded() {
+  public void testApplicationScopded() {
     TestObject i1 = OBJ.get(TestObject.class);
     Assert.assertNotNull(i1);
     ITestObject i2 = OBJ.get(TestObject.class);
@@ -49,7 +49,7 @@ public class ApplicationsScopedTest {
    * Tests if the @ApplicationScoped annotation is inherited from super classes.
    */
   @Test
-  public void testInheritedApplicaitonScopded() {
+  public void testInheritedApplicationScopded() {
     Bean02 i1 = OBJ.get(Bean02.class);
     Assert.assertNotNull(i1);
     Bean02 i2 = OBJ.get(Bean02.class);

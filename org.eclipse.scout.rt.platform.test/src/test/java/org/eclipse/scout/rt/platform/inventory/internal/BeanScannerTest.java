@@ -49,7 +49,7 @@ public class BeanScannerTest {
     JandexClassInventory classInventory = new JandexClassInventory(finder.getIndex());
     final Set<Class> actual = new BeanFilter().collect(classInventory);
 
-    HashSet<Class> expected = new HashSet<Class>();
+    Set<Class> expected = new HashSet<>();
     expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.class);
     expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S1.class);
     expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S1Sub1.class);
