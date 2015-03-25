@@ -52,13 +52,7 @@ public class JsonSessionMock extends AbstractJsonSession {
   }
 
   @Override
-  protected IClientSession createClientSession() {
-    return null;
-  }
-
-  @Override
   public IClientSession getClientSession() {
     return TestEnvironmentClientSession.get();
   }
-
 }

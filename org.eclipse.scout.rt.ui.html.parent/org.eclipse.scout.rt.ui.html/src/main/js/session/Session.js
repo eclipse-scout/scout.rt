@@ -373,7 +373,12 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
     };
 
   this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.RUNNING;
-  $.ajax(this._ajaxOptions(request))
+
+  var ajaxOptions = this._ajaxOptions(request);
+  // Add dummy parameter as marker (for debugging purposes)
+  ajaxOptions.url = new scout.URL(ajaxOptions.url).addParameter('poll').toString();
+
+  $.ajax(ajaxOptions)
     .done(onAjaxDone.bind(this))
     .fail(onAjaxFail.bind(this));
 
@@ -551,7 +556,9 @@ scout.Session.prototype.goOffline = function() {
     if (this._unload) {
       return;
     }
-    this.desktop.goOffline();
+    if (this.desktop) {
+      this.desktop.goOffline();
+    }
     if (!this.reconnector) {
       this.reconnector = new scout.Reconnector(this);
     }
@@ -721,14 +728,15 @@ scout.Session.prototype.onModelAction = function(event) {
 };
 
 scout.Session.prototype._onLocaleChanged = function(event) {
-  this.locale = new scout.Locale(event);
+  this.locale = new scout.Locale(event.locale);
+  this._texts = new scout.Texts(event.textMap);
   // FIXME inform components to reformat display text?
 };
 
 scout.Session.prototype._onInitialized = function(event) {
+  this.locale = new scout.Locale(event.locale);
   this._texts = new scout.Texts(event.textMap);
   var clientSessionData = this._getAdapterData(event.clientSession);
-  this.locale = new scout.Locale(clientSessionData.locale);
   this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
   this.desktop.render(this.$entryPoint);
   this._setApplicationLoading(false);

@@ -99,7 +99,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
   /**
    * Check if request is a simple ping. We don't use JsonRequest here because a ping request has no jsonSessionId.
    */
-  private boolean isPingRequest(JSONObject json) {
+  protected boolean isPingRequest(JSONObject json) {
     return json.has("ping");
   }
 

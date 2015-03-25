@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,13 +29,15 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.ClientJobEventFilters;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -50,8 +53,16 @@ import org.eclipse.scout.rt.ui.html.UiHints;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+// TODO BSH Remove abstract, maybe rename to UiSession
 public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBindingListener, IJobListener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
+
+  /**
+   * Prefix for name of HTTP session attribute that is used to store the associated {@link IClientSession}s.
+   * <p>
+   * The full attribute name is: <b><code>{@link #CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX} + clientSessionId</code></b>
+   */
+  public static final String CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX = "scout.htmlui.session.client."/*+m_clientSessionId*/;
   private static final long ROOT_ID = 1;
 
   private final JsonObjectFactory m_jsonObjectFactory;
@@ -60,8 +71,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private final ICustomHtmlRenderer m_customHtmlRenderer;
   private final P_RootAdapter m_rootJsonAdapter;
 
-  private JsonClientSession<? extends IClientSession> m_jsonClientSession;
+  private boolean m_initialized;
+  private String m_clientSessionId;
   private String m_jsonSessionId;
+  private JsonClientSession<? extends IClientSession> m_jsonClientSession;
   private long m_jsonAdapterSeq = ROOT_ID;
   private JsonResponse m_currentJsonResponse;
   private JsonRequest m_currentJsonRequest;
@@ -70,7 +83,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
    * The variable is accessed by different threads, thus it is an atomic reference.
    */
   private final AtomicReference<HttpServletRequest> m_currentHttpRequest = new AtomicReference<>();
-  private JsonEventProcessor m_jsonEventProcessor;
+  private final JsonEventProcessor m_jsonEventProcessor;
   private boolean m_disposing;
   private Object m_backgroundJobLock = new Object();
 
@@ -80,6 +93,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
     m_rootJsonAdapter = new P_RootAdapter(this);
     m_customHtmlRenderer = createCustomHtmlRenderer();
+    m_jsonEventProcessor = createJsonEventProcessor();
 
     Jobs.getJobManager().addListener(this, ClientJobEventFilters.allFilter().modelJobsOnly().eventTypes(JobEventType.DONE).andFilter(new IFilter<JobEvent>() {
 
@@ -89,6 +103,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         return jobInput.getSession() == getClientSession() && !isProcessingClientRequest();
       }
     }));
+  }
+
+  protected boolean isInitialized() {
+    return m_initialized;
   }
 
   protected JsonResponse createJsonResponse() {
@@ -105,6 +123,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   protected ICustomHtmlRenderer createCustomHtmlRenderer() {
     return new CustomHtmlRenderer();
+  }
+
+  protected JsonEventProcessor createJsonEventProcessor() {
+    return new JsonEventProcessor(this);
   }
 
   /**
@@ -188,117 +210,140 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return map;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
-    m_currentHttpRequest.set(request);
-    m_currentJsonRequest = jsonStartupRequest;
-    m_jsonSessionId = jsonStartupRequest.getJsonSessionId();
+  public void init(HttpServletRequest httpRequest, JsonStartupRequest jsonStartupRequest) {
     if (currentSubject() == null) {
       throw new SecurityException("/json request is not authenticated with a Subject");
     }
-
-    IClientSession clientSession;
-    synchronized (this) {
-      HttpSession httpSession = currentHttpRequest().getSession();
-      // Lookup the requested client session
-      String clientSessionId = jsonStartupRequest.getClientSessionId();
-      if (clientSessionId == null) {
-        throw new IllegalStateException("Missing clientSessionId in JSON request");
-      }
-      String clientSessionAttributeName = "scout.htmlui.session.client." + clientSessionId;
-      clientSession = (IClientSession) httpSession.getAttribute(clientSessionAttributeName);
-      if (clientSession != null) {
-        // Found existing client session
-        LOG.info("Using cached client session [clientSessionId=" + clientSessionId + "]");
-      }
-      else {
-        // No client session for the requested ID was found, so create one and store it in the map
-        LOG.info("Creating new client session [clientSessionId=" + clientSessionId + "]");
-        // FIXME CGU session must be started later, see JsonClientSession
-        // return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
-        Locale oldLocale = NlsLocale.get(false);
-        UserAgent oldUserAgent = UserAgent.CURRENT.get();
-        try {
-          NlsLocale.set(request.getLocale());
-          UserAgent.CURRENT.set(createUserAgent(jsonStartupRequest));
-          //
-          clientSession = createClientSession();
-          initClientSession(clientSession, jsonStartupRequest);
-        }
-        finally {
-          UserAgent.CURRENT.set(oldUserAgent);
-          NlsLocale.set(oldLocale);
-        }
-        httpSession.setAttribute(clientSessionAttributeName, clientSession);
-        httpSession.setAttribute(clientSessionAttributeName + ".cleanup", new P_ClientSessionCleanupHandler(clientSessionId, clientSession));
-      }
-      // Handle detach
-      String parentJsonSessionId = jsonStartupRequest.getParentJsonSessionId();
-      if (parentJsonSessionId != null) {
-        IJsonSession parentJsonSession = (IJsonSession) httpSession.getAttribute(HTTP_SESSION_ATTRIBUTE_PREFIX + parentJsonSessionId);
-        if (parentJsonSession != null) {
-          LOG.info("Attaching jsonSession '" + m_jsonSessionId + "' to parentJsonSession '" + parentJsonSessionId + "'");
-          // TODO BSH Detach | Actually do something
-        }
-      }
+    if (m_initialized) {
+      throw new IllegalStateException("Already initialized");
     }
+    m_initialized = true;
 
-    m_jsonClientSession = (JsonClientSession) createJsonAdapter(clientSession, m_rootJsonAdapter);
-    m_jsonEventProcessor = createJsonEventProcessor();
-    startUpClientSession(clientSession);
+    m_currentHttpRequest.set(httpRequest);
+    m_currentJsonRequest = jsonStartupRequest;
+    m_clientSessionId = jsonStartupRequest.getClientSessionId();
+    m_jsonSessionId = jsonStartupRequest.getJsonSessionId();
 
-    JSONObject jsonEvent = new JSONObject();
-    JsonObjectUtility.putProperty(jsonEvent, "clientSession", m_jsonClientSession.getId());
-    JsonObjectUtility.putProperty(jsonEvent, "textMap", getTextMap(request.getLocale()));
-    JsonObjectUtility.putProperty(jsonEvent, "backgroundJobPollingEnabled", isBackgroundJobPollingEnabled());
-    m_currentJsonResponse.addActionEvent(m_jsonSessionId, "initialized", jsonEvent);
+    HttpSession httpSession = httpRequest.getSession();
+
+    // Look up the requested client session
+    IClientSession clientSession = getOrCreateClientSession(httpSession, httpRequest, jsonStartupRequest);
+    // Create JsonAdapter for client session and ensure it is started and attached
+    initializeJsonClientSession(clientSession);
+
+    // Check if startup succeeded
+    if (!clientSession.isActive()) {
+      throw new JsonException("ClientSession is not active, there must have been a problem with loading or starting");
+    }
+    // ...if success, store the client session in the HTTP session. This must _not_ happen earlier,
+    // otherwise, we might store a client session with errors!
+    storeClientSessionInHttpSession(httpSession, clientSession);
+
+    // Handle detach
+    handleDetach(jsonStartupRequest, httpSession);
+
+    // Send "initialized" event
+    sendInitializationEvent();
     LOG.info("JsonSession with ID " + m_jsonSessionId + " initialized");
   }
 
-  @Override
-  public boolean isBackgroundJobPollingEnabled() {
-    return true;
+  protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
+    IClientSession clientSession = loadClientSessionFromHttpSession(httpSession);
+
+    if (clientSession != null) {
+      // Found existing client session
+      LOG.info("Using cached client session [clientSessionId=" + m_clientSessionId + "]");
+    }
+    else {
+      // No client session for the requested ID was found, so create one and store it in the map
+      LOG.info("Creating new client session [clientSessionId=" + m_clientSessionId + "]");
+      clientSession = createClientSession(request.getLocale(), createUserAgent(jsonStartupRequest));
+      initCustomParams(clientSession, jsonStartupRequest.getCustomParams());
+    }
+    return clientSession;
   }
 
-  /**
-   * @return a new {@link IClientSession} that is not yet initialized, so
-   *         {@link IClientSession#startSession(org.osgi.framework.Bundle)} was not yet called
-   */
-  protected abstract IClientSession createClientSession();
+  protected IClientSession loadClientSessionFromHttpSession(HttpSession httpSession) {
+    if (m_clientSessionId == null) {
+      throw new IllegalStateException("Missing clientSessionId in JSON request");
+    }
+    IClientSession clientSession = (IClientSession) httpSession.getAttribute(CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX + m_clientSessionId);
+    return clientSession;
+  }
 
-  protected JsonEventProcessor createJsonEventProcessor() {
-    return new JsonEventProcessor(this);
+  protected void storeClientSessionInHttpSession(HttpSession httpSession, IClientSession clientSession) {
+    IClientSession existingClientSession = loadClientSessionFromHttpSession(httpSession);
+
+    // Implementation note: The cleanup listener is triggered, when the attribute value is changed.
+    // This happens in two cases:
+    //   1. when the attribute is set manually
+    //   2. the entire session is invalidated.
+    if (existingClientSession != clientSession) {
+      String clientSessionAttributeName = getClientSessionAttributeName();
+      httpSession.setAttribute(clientSessionAttributeName, clientSession);
+      httpSession.setAttribute(clientSessionAttributeName + ".cleanup", new P_ClientSessionCleanupHandler(m_clientSessionId, clientSession));
+    }
+  }
+
+  protected String getClientSessionAttributeName() {
+    if (m_clientSessionId == null) {
+      throw new IllegalStateException("Missing clientSessionId in JSON request");
+    }
+    return CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX + m_clientSessionId;
+  }
+
+  protected IClientSession createClientSession(Locale locale, UserAgent userAgent) {
+    try {
+      return OBJ.get(ClientSessionProvider.class).provide(ModelJobInput.fillEmpty().locale(locale).userAgent(userAgent));
+    }
+    catch (ProcessingException e) {
+      throw new JsonException("Error while creating new client session for clientSessionId=" + m_clientSessionId, e);
+    }
   }
 
   /**
    * initialize the properties of the {@link IClientSession} but does not yet start it
    * {@link IClientSession#startSession(org.osgi.framework.Bundle)} was not yet called
    */
-  protected void initClientSession(IClientSession clientSession, JsonStartupRequest jsonStartupRequest) {
-    //custom props
-    HashMap<String, String> customProps = new HashMap<String, String>();
-    JSONObject obj = jsonStartupRequest.getCustomParams();
-    if (obj != null) {
-      JSONArray names = jsonStartupRequest.getCustomParams().names();
+  protected void initCustomParams(IClientSession clientSession, JSONObject customParams) {
+    Map<String, String> customParamsMap = new HashMap<String, String>();
+    if (customParams != null) {
+      JSONArray names = customParams.names();
       for (int i = 0; i < names.length(); i++) {
-        customProps.put(names.optString(i), obj.optString(names.optString(i)));
+        customParamsMap.put(names.optString(i), customParams.optString(names.optString(i)));
       }
     }
-    clientSession.initCustomParams(customProps);
+    clientSession.initCustomParams(customParamsMap);
   }
 
-  protected void startUpClientSession(IClientSession clientSession) {
+  protected void initializeJsonClientSession(IClientSession clientSession) {
+    m_jsonClientSession = (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
     JobUtility.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(clientSession), new IRunnable() {
       @Override
       public void run() throws Exception {
         m_jsonClientSession.startUp();
       }
     });
+  }
 
-    if (!clientSession.isActive()) {
-      throw new JsonException("ClientSession is not active, there must have been a problem with loading or starting");
+  protected void handleDetach(JsonStartupRequest jsonStartupRequest, HttpSession httpSession) {
+    String parentJsonSessionId = jsonStartupRequest.getParentJsonSessionId();
+    if (parentJsonSessionId != null) {
+      IJsonSession parentJsonSession = (IJsonSession) httpSession.getAttribute(HTTP_SESSION_ATTRIBUTE_PREFIX + parentJsonSessionId);
+      if (parentJsonSession != null) {
+        LOG.info("Attaching jsonSession '" + m_jsonSessionId + "' to parentJsonSession '" + parentJsonSessionId + "'");
+        // TODO BSH Detach | Actually do something
+      }
     }
+  }
+
+  protected void sendInitializationEvent() {
+    JSONObject jsonEvent = new JSONObject();
+    JsonObjectUtility.putProperty(jsonEvent, "clientSession", m_jsonClientSession.getId());
+    putLocaleData(jsonEvent, m_jsonClientSession.getModel().getLocale());
+    JsonObjectUtility.putProperty(jsonEvent, "backgroundJobPollingEnabled", isBackgroundJobPollingEnabled());
+    m_currentJsonResponse.addActionEvent(m_jsonSessionId, "initialized", jsonEvent);
   }
 
   protected UserAgent createUserAgent(JsonStartupRequest jsonStartupRequest) {
@@ -334,7 +379,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
 
     Jobs.getJobManager().removeListener(this);
-
     // Notify waiting requests - should not delay web-container shutdown
     notifyPollingBackgroundJobRequests();
     m_jsonAdapterRegistry.disposeAllJsonAdapters();
@@ -343,12 +387,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     // "Leak detection". After disposing all adapters and flushing the session, no adapters should be remaining.
     if (!m_jsonAdapterRegistry.isEmpty() && !m_unregisterAdapterSet.isEmpty()) {
       throw new IllegalStateException("JsonAdapterRegistry should be empty, but is not!");
-    }
-  }
-
-  private void notifyPollingBackgroundJobRequests() {
-    synchronized (m_backgroundJobLock) {
-      m_backgroundJobLock.notifyAll();
     }
   }
 
@@ -369,6 +407,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   @Override
   public String getJsonSessionId() {
     return m_jsonSessionId;
+  }
+
+  @Override
+  public String getClientSessionId() {
+    return m_clientSessionId;
   }
 
   @Override
@@ -531,9 +574,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     try {
       m_currentHttpRequest.set(httpRequest);
       m_currentJsonRequest = jsonRequest;
-      if (jsonRequest.isStartupRequest()) {
-        getJsonClientSession().processRequestLocale(httpRequest.getLocale());
-      }
       getJsonEventProcessor().processEvents(m_currentJsonRequest, currentJsonResponse());
       return jsonResponseToJson();
     }
@@ -555,6 +595,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
+  public boolean isBackgroundJobPollingEnabled() {
+    return true;
+  }
+
+  @Override
   public void waitForBackgroundJobs() {
     LOG.trace("Wait until background job terminates...");
     synchronized (m_backgroundJobLock) {
@@ -567,6 +612,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       finally {
         LOG.trace("Background job terminated. Continue request processing...");
       }
+    }
+  }
+
+  protected void notifyPollingBackgroundJobRequests() {
+    synchronized (m_backgroundJobLock) {
+      m_backgroundJobLock.notifyAll();
     }
   }
 
@@ -584,14 +635,39 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
+  public void sendLocaleChangedEvent(Locale locale) {
+    JSONObject jsonEvent = new JSONObject();
+    putLocaleData(jsonEvent, locale);
+    currentJsonResponse().addActionEvent(getJsonSessionId(), "localeChanged", jsonEvent);
+  }
+
+  /**
+   * Writes <code>"locale"</code> and <code>"textMap"</code> according to the given <code>locale</code> as JSON into the
+   * given <code>jsonEvent</code>.
+   */
+  protected void putLocaleData(JSONObject jsonEvent, Locale locale) {
+    JsonObjectUtility.putProperty(jsonEvent, "locale", JsonLocale.toJson(locale));
+    JsonObjectUtility.putProperty(jsonEvent, "textMap", getTextMap(locale));
+  }
+
+  @Override
   public void logout() {
     LOG.info("Logging out...");
     // when timeout occurs, logout is called without a http context
     if (currentHttpRequest() != null) {
-      currentHttpRequest().getSession(false).invalidate();
+      HttpSession httpSession = currentHttpRequest().getSession(false);
+      if (httpSession != null) {
+        httpSession.invalidate();
+      }
       currentJsonResponse().addActionEvent(getJsonSessionId(), "logout", new JSONObject());
     }
     LOG.info("Logged out");
+  }
+
+  @Override
+  public boolean isInspectorHint() {
+    HttpServletRequest req = currentHttpRequest();
+    return (req != null && UiHints.isInspectorHint(req));
   }
 
   /**
@@ -630,12 +706,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
       LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
     }
-  }
-
-  @Override
-  public boolean isInspectorHint() {
-    HttpServletRequest req = currentHttpRequest();
-    return (req != null && UiHints.isInspectorHint(req));
   }
 
   private static class P_RootAdapter extends AbstractJsonAdapter<Object> {

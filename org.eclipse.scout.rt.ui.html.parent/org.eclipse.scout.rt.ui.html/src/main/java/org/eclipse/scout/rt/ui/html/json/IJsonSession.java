@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,6 +20,11 @@ import org.json.JSONObject;
 
 public interface IJsonSession {
 
+  /**
+   * Prefix for name of HTTP session attribute that is used to store the associated {@link IJsonSession}s.
+   * <p>
+   * The full attribute name is: <b><code>{@link #HTTP_SESSION_ATTRIBUTE_PREFIX} + jsonSessionId</code></b>
+   */
   String HTTP_SESSION_ATTRIBUTE_PREFIX = "scout.htmlui.session.json."/*+JsonRequest.PROP_JSON_SESSION_ID*/;
 
   void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest);
@@ -45,6 +51,8 @@ public interface IJsonSession {
   void flush();
 
   String getJsonSessionId();
+
+  String getClientSessionId();
 
   IClientSession getClientSession();
 
@@ -101,4 +109,8 @@ public interface IJsonSession {
    */
   void waitForBackgroundJobs();
 
+  /**
+   * Sends a "localeChanged" event to the UI. All locale-relevant data (number formats, texts map etc.) is sent along.
+   */
+  void sendLocaleChangedEvent(Locale locale);
 }

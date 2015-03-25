@@ -10,41 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import java.text.DateFormat;
-import java.text.DateFormatSymbols;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Locale;
-
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.ui.html.JobUtility;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.json.JSONObject;
 
 public class JsonClientSession<T extends IClientSession> extends AbstractJsonAdapter<T> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonClientSession.class);
-
   private ILocaleListener m_localeListener;
-  private boolean m_localeManagedByModel;
   private boolean m_started;
   private JsonDesktop<IDesktop> m_jsonDesktop;
 
   public JsonClientSession(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
-    m_localeManagedByModel = false;
     m_started = false;
   }
 
@@ -55,7 +37,9 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
   }
 
   protected void startUp() {
-    // same as in attachModel. Necessary for locale workaround. Find better solution in scout model
+    Assertions.assertTrue(ModelJobs.isModelThread(), "startUp() must be run in model job context");
+
+    // TODO BSH Why is this attached before startSession?
     if (m_localeListener == null) {
       m_localeListener = new P_LocaleListener();
       getModel().addLocaleListener(m_localeListener);
@@ -105,84 +89,18 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     putAdapterIdProperty(json, "desktop", getModel().getDesktop());
-    putProperty(json, "locale", localeToJson(getModel().getLocale()));
     return json;
-  }
-
-  protected void processRequestLocale(final Locale locale) {
-    if (m_localeManagedByModel) {
-      return;
-    }
-    JobUtility.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(getJsonSession().getClientSession()), new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        if (!getModel().getLocale().equals(locale)) {
-          getModel().setLocale(locale);
-        }
-      }
-    });
-  }
-
-  protected JSONObject decimalFormatSymbolsToJson(DecimalFormatSymbols symbols) {
-    JSONObject json = new JSONObject();
-    putProperty(json, "decimalSeparator", String.valueOf(symbols.getDecimalSeparator()));
-    putProperty(json, "groupingSeparator", String.valueOf(symbols.getGroupingSeparator()));
-    putProperty(json, "minusSign", String.valueOf(symbols.getMinusSign()));
-    return json;
-  }
-
-  protected JSONObject dateFormatSymbolsToJson(DateFormatSymbols symbols) {
-    JSONObject json = new JSONObject();
-    putProperty(json, "months", JsonObjectUtility.newJSONArray(symbols.getMonths()));
-    putProperty(json, "monthsShort", JsonObjectUtility.newJSONArray(symbols.getShortMonths()));
-    putProperty(json, "weekdays", JsonObjectUtility.newJSONArray(Arrays.copyOfRange(symbols.getWeekdays(), 1, 8)));
-    putProperty(json, "weekdaysShort", JsonObjectUtility.newJSONArray(Arrays.copyOfRange(symbols.getShortWeekdays(), 1, 8)));
-    putProperty(json, "am", symbols.getAmPmStrings()[Calendar.AM]);
-    putProperty(json, "pm", symbols.getAmPmStrings()[Calendar.PM]);
-    return json;
-  }
-
-  protected JSONObject localeToJson(Locale locale) {
-    JSONObject json = new JSONObject();
-    DecimalFormat defaultDecimalFormat = getDefaultDecimalFormat(locale);
-    SimpleDateFormat defaultDateFormat = getDefaultSimpleDateFormat(locale);
-    putProperty(json, "languageTag", locale.toLanguageTag());
-    putProperty(json, "decimalFormatPatternDefault", defaultDecimalFormat.toPattern());
-    putProperty(json, "dateFormatPatternDefault", defaultDateFormat.toPattern());
-    putProperty(json, "decimalFormatSymbols", decimalFormatSymbolsToJson(defaultDecimalFormat.getDecimalFormatSymbols()));
-    putProperty(json, "dateFormatSymbols", dateFormatSymbolsToJson(defaultDateFormat.getDateFormatSymbols()));
-    return json;
-  }
-
-  protected static DecimalFormat getDefaultDecimalFormat(Locale locale) {
-    NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
-    if (numberFormat instanceof DecimalFormat) {
-      return (DecimalFormat) numberFormat;
-    }
-    LOG.info("No locale specific decimal format available, using default locale");
-    return new DecimalFormat();
-  }
-
-  protected static SimpleDateFormat getDefaultSimpleDateFormat(Locale locale) {
-    DateFormat format = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
-    if (format instanceof SimpleDateFormat) {
-      return (SimpleDateFormat) format;
-    }
-    LOG.info("No locale specific date format available, using default locale");
-    return new SimpleDateFormat();
   }
 
   private class P_LocaleListener implements ILocaleListener {
+
     @Override
     public void localeChanged(LocaleChangeEvent event) {
-      final Locale locale = event.getLocale();
-      if (!CompareUtility.equals(getJsonSession().currentHttpRequest().getLocale(), locale)) {
-        m_localeManagedByModel = true;
+      if (!isStarted()) {
         // If Locale changes during session startup (execLoadSession) it is not necessary to notify the GUI
-        if (isStarted()) {
-          addActionEvent("localeChanged", localeToJson(locale));
-        }
+        return;
       }
+      getJsonSession().sendLocaleChangedEvent(event.getLocale());
     }
   }
 }

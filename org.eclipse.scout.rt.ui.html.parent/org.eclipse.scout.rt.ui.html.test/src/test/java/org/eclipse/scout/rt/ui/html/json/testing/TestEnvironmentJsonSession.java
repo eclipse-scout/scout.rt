@@ -13,16 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.testing;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
 
 public class TestEnvironmentJsonSession extends AbstractJsonSession {
-
-  @Override
-  protected IClientSession createClientSession() {
-    return TestEnvironmentClientSession.get();
-  }
 
   @Override
   protected Subject currentSubject() {
@@ -30,5 +23,4 @@ public class TestEnvironmentJsonSession extends AbstractJsonSession {
     subject.getPrincipals().add(new SimplePrincipal("tester"));
     return subject;
   }
-
 }
