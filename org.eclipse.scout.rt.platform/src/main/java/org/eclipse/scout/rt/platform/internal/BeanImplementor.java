@@ -23,17 +23,20 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BeanCreationException;
 import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 
 public class BeanImplementor<T> implements IBean<T> {
   private static final ThreadLocal<Deque<String>> INSTANTIATION_STACK = new ThreadLocal<>();
+
   private final Class<? extends T> m_beanClazz;
   private final Map<Class<? extends Annotation>, Annotation> m_beanAnnotations;
   private final Semaphore m_instanceLock = new Semaphore(1, true);
   private final T m_initialInstance;
+  private BeanManagerImplementor m_beanManager;
   private T m_instance;
 
   @SuppressWarnings("unchecked")
-  public BeanImplementor(BeanData beanData) {
+  public BeanImplementor(BeanData beanData, BeanManagerImplementor beanManager) {
     m_beanClazz = (Class<? extends T>) Assertions.assertNotNull(beanData.getBeanClazz());
     m_beanAnnotations = new HashMap<Class<? extends Annotation>, Annotation>(Assertions.assertNotNull(beanData.getBeanAnnotations()));
     m_initialInstance = (T) beanData.getInitialInstance();
@@ -41,6 +44,7 @@ public class BeanImplementor<T> implements IBean<T> {
       throw new IllegalArgumentException(String.format("Instance constructor only allows application scoped instances. Class '%s' does not have the '%s' annotation.", getBeanClazz().getName(), ApplicationScoped.class.getName()));
     }
     m_instance = m_initialInstance;
+    m_beanManager = beanManager;
   }
 
   @Override
@@ -65,7 +69,16 @@ public class BeanImplementor<T> implements IBean<T> {
   }
 
   @Override
-  public T createInstance() {
+  public T getInstance() {
+    T instance = getRawInstance();
+    IBeanDecorationFactory deco = m_beanManager.getBeanDecorationFactory();
+    if (deco != null) {
+      instance = deco.decorate(this, instance);
+    }
+    return instance;
+  }
+
+  protected T getRawInstance() {
     if (m_instance != null) {
       return m_instance;
     }
@@ -80,7 +93,7 @@ public class BeanImplementor<T> implements IBean<T> {
       throw new BeanCreationException(beanName, message);
     }
 
-    if (BeanContextImplementor.isApplicationScoped(this)) {
+    if (BeanManagerImplementor.isApplicationScoped(this)) {
       m_instanceLock.acquireUninterruptibly();
       try {
         if (m_instance == null) {
@@ -120,6 +133,11 @@ public class BeanImplementor<T> implements IBean<T> {
         stack.removeLast();
       }
     }
+  }
+
+  protected void dispose() {
+    m_instance = null;
+    m_beanManager = null;
   }
 
   @Override

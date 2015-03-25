@@ -15,6 +15,7 @@ import java.lang.reflect.Modifier;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.jboss.jandex.ClassInfo;
 
@@ -46,8 +47,13 @@ public class JandexClassInfo implements IClassInfo {
   }
 
   @Override
-  public Class<?> resolveClass() throws ClassNotFoundException {
-    return Class.forName(name());
+  public Class<?> resolveClass() throws PlatformException {
+    try {
+      return Class.forName(name());
+    }
+    catch (ClassNotFoundException ex) {
+      throw new PlatformException("Error loading class '" + name() + "' with flags 0x" + Integer.toHexString(flags()), ex);
+    }
   }
 
   @Override
@@ -67,8 +73,8 @@ public class JandexClassInfo implements IClassInfo {
         return false;
       }
     }
-    catch (ClassNotFoundException ex) {
-      LOG.warn("Error loading class '" + name() + "' with flags 0x" + Integer.toHexString(flags()), ex);
+    catch (Exception ex) {
+      LOG.warn("loading class", ex);
       return false;
     }
     return true;

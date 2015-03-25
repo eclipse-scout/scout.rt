@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.platform;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.rt.platform.internal.BeanContextImplementor;
+import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -20,80 +20,80 @@ public class ReUseVsReplaceTest {
 
   @Test
   public void testReUse() {
-    BeanContextImplementor context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
+    BeanManagerImplementor context = new BeanManagerImplementor(new SimpleBeanDecorationFactory());
     context.registerClass(FooParam.class);
     context.registerClass(SpecialFooParam.class);
-    Assert.assertEquals(FooParam.class, context.getInstance(FooParam.class).getClass());
+    Assert.assertEquals(FooParam.class, context.getBean(FooParam.class).getBeanClazz());
     Assert.assertEquals(2, context.getBeans(FooParam.class).size());
 
-    Assert.assertEquals(SpecialFooParam.class, context.getInstance(SpecialFooParam.class).getClass());
+    Assert.assertEquals(SpecialFooParam.class, context.getBean(SpecialFooParam.class).getBeanClazz());
     Assert.assertEquals(1, context.getBeans(SpecialFooParam.class).size());
   }
 
   @Test
   public void testReplace() {
-    BeanContextImplementor context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
+    BeanManagerImplementor context = new BeanManagerImplementor(new SimpleBeanDecorationFactory());
     context.registerClass(FooParam.class);
     context.registerClass(FooParamEx1.class);
 
-    Assert.assertEquals(FooParamEx1.class, context.getInstance(FooParam.class).getClass());
+    Assert.assertEquals(FooParamEx1.class, context.getBean(FooParam.class).getBeanClazz());
     Assert.assertEquals(1, context.getBeans(FooParam.class).size());
 
-    Assert.assertEquals(FooParamEx1.class, context.getInstance(FooParamEx1.class).getClass());
+    Assert.assertEquals(FooParamEx1.class, context.getBean(FooParamEx1.class).getBeanClazz());
     Assert.assertEquals(1, context.getBeans(FooParamEx1.class).size());
   }
 
   @Test
   public void testReplaceWithTwoParallelReplaces() {
-    BeanContextImplementor context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
+    BeanManagerImplementor context = new BeanManagerImplementor(new SimpleBeanDecorationFactory());
     context.registerClass(FooParam.class);
     context.registerClass(FooParamEx1.class);
     context.registerClass(FooParamEx2.class);
 
-    Assert.assertEquals(FooParamEx2.class, context.getInstance(FooParam.class).getClass());
+    Assert.assertEquals(FooParamEx2.class, context.getBean(FooParam.class).getBeanClazz());
     Assert.assertEquals(2, context.getBeans(FooParam.class).size());
 
-    Assert.assertEquals(FooParamEx1.class, context.getInstance(FooParamEx1.class).getClass());
-    Assert.assertEquals(FooParamEx2.class, context.getInstance(FooParamEx2.class).getClass());
+    Assert.assertEquals(FooParamEx1.class, context.getBean(FooParamEx1.class).getBeanClazz());
+    Assert.assertEquals(FooParamEx2.class, context.getBean(FooParamEx2.class).getBeanClazz());
   }
 
   @Test
   public void testReplaceWithTwoLevelsOfReplace() {
-    BeanContextImplementor context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
+    BeanManagerImplementor context = new BeanManagerImplementor(new SimpleBeanDecorationFactory());
     context.registerClass(FooParam.class);
     context.registerClass(FooParamEx1.class);
     context.registerClass(FooParamEx1Ex.class);
 
-    Assert.assertEquals(FooParamEx1Ex.class, context.getInstance(FooParam.class).getClass());
+    Assert.assertEquals(FooParamEx1Ex.class, context.getBean(FooParam.class).getBeanClazz());
     Assert.assertEquals(1, context.getBeans(FooParam.class).size());
 
-    Assert.assertEquals(FooParamEx1Ex.class, context.getInstance(FooParamEx1.class).getClass());
+    Assert.assertEquals(FooParamEx1Ex.class, context.getBean(FooParamEx1.class).getBeanClazz());
     Assert.assertEquals(1, context.getBeans(FooParamEx1.class).size());
 
-    Assert.assertEquals(FooParamEx1Ex.class, context.getInstance(FooParamEx1Ex.class).getClass());
+    Assert.assertEquals(FooParamEx1Ex.class, context.getBean(FooParamEx1Ex.class).getBeanClazz());
     Assert.assertEquals(1, context.getBeans(FooParamEx1Ex.class).size());
   }
 
   @Test
   public void testReplaceWithTwoLevelsOfReplaceMixedWithParallelReplace() {
-    BeanContextImplementor context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
+    BeanManagerImplementor context = new BeanManagerImplementor(new SimpleBeanDecorationFactory());
     context.registerClass(FooParam.class);
     context.registerClass(FooParamEx1.class);
     context.registerClass(FooParamEx2.class);
     context.registerClass(FooParamEx1Ex.class);
 
-    Assert.assertEquals(FooParamEx2.class, context.getInstance(FooParam.class).getClass());
+    Assert.assertEquals(FooParamEx2.class, context.getBean(FooParam.class).getBeanClazz());
     Assert.assertEquals(2, context.getBeans(FooParam.class).size());
     Assert.assertEquals(FooParamEx2.class, context.getBeans(FooParam.class).get(0).getBeanClazz());
     Assert.assertEquals(FooParamEx1Ex.class, context.getBeans(FooParam.class).get(1).getBeanClazz());
 
-    Assert.assertEquals(FooParamEx1Ex.class, context.getInstance(FooParamEx1.class).getClass());
+    Assert.assertEquals(FooParamEx1Ex.class, context.getBean(FooParamEx1.class).getBeanClazz());
     Assert.assertEquals(1, context.getBeans(FooParamEx1.class).size());
 
-    Assert.assertEquals(FooParamEx1Ex.class, context.getInstance(FooParamEx1Ex.class).getClass());
+    Assert.assertEquals(FooParamEx1Ex.class, context.getBean(FooParamEx1Ex.class).getBeanClazz());
     Assert.assertEquals(1, context.getBeans(FooParamEx1Ex.class).size());
 
-    Assert.assertEquals(FooParamEx2.class, context.getInstance(FooParamEx2.class).getClass());
+    Assert.assertEquals(FooParamEx2.class, context.getBean(FooParamEx2.class).getBeanClazz());
     Assert.assertEquals(1, context.getBeans(FooParamEx2.class).size());
 
   }

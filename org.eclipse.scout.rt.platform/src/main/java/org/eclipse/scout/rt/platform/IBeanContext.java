@@ -13,37 +13,15 @@ package org.eclipse.scout.rt.platform;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.annotations.Replace;
 
 /**
  * @since 5.2
  */
+//TODO imo rename to IBeanManager
 public interface IBeanContext {
 
   ReentrantReadWriteLock getReadWriteLock();
-
-  /**
-   * @param beanClazz
-   * @return the instance of the given bean, see {@link Bean}
-   * @throws AssertionException
-   *           when no bean is registered to the given beanClazz
-   */
-  <T> T getInstance(Class<T> beanClazz);
-
-  /**
-   * @param beanClazz
-   * @return the instance of the given bean, see {@link Bean}
-   * @throws AssertionException
-   *           when no bean is registered to the given beanClazz
-   */
-  <T> T getInstanceOrNull(Class<T> beanClazz);
-
-  /**
-   * @param beanClazz
-   * @return all instances, see {@link Bean}
-   */
-  <T> List<T> getInstances(Class<T> beanClazz);
 
   /**
    * @param beanClazz
@@ -53,13 +31,15 @@ public interface IBeanContext {
 
   /**
    * @param beanClazz
-   * @return beans that are of exact type beanClazz or subclasses of beanClazz with a {@link Replace}
+   * @return the single bean (or null) that is of exact type beanClazz or subclasses of beanClazz with a {@link Replace}
    *         <p>
    *         When B extends A and B has a {@link Replace} then A is removed from the result
    *         <p>
-   *         these are the candidate beans used in {@link #getInstance(Class)}
+   *         this is the bean used in {@link IBean#getInstance()} and {@link OBJ#getOptional(Class)}
+   * @throws PlatformException
+   *           when multiple beans exist
    */
-  <T> List<IBean<T>> getBean(Class<T> beanClazz);
+  <T> IBean<T> getBean(Class<T> beanClazz);
 
   /**
    * @param beanClazz

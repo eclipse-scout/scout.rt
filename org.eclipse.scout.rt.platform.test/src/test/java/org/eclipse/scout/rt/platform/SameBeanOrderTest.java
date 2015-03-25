@@ -12,10 +12,8 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -27,7 +25,7 @@ import org.junit.runner.RunWith;
  *
  */
 @RunWith(PlatformTestRunner.class)
-public class SamePriotrityTest {
+public class SameBeanOrderTest {
 
   private static IBean<ABean> m_bean01;
   private static IBean<BBean> m_bean02;
@@ -38,17 +36,17 @@ public class SamePriotrityTest {
     m_bean02 = Platform.get().getBeanContext().registerClass(BBean.class);
   }
 
-  /**
-   * Tests if two beans with the same priority registered to the bean context are ordered on behaviour of their class
-   * name.
-   */
   @Test
-  public void testPriority() {
-    Assert.assertEquals(ABean.class, OBJ.get(ITestBean.class).getClass());
+  public void testOrder() {
     List<ITestBean> all = OBJ.all(ITestBean.class);
     Assert.assertEquals(2, all.size());
     Assert.assertEquals(ABean.class, all.get(0).getClass());
     Assert.assertEquals(BBean.class, all.get(1).getClass());
+  }
+
+  @Test(expected = Assertions.AssertionException.class)
+  public void testMultipleException() {
+    Assert.assertEquals(ABean.class, OBJ.get(ITestBean.class).getClass());
   }
 
   @AfterClass
@@ -61,12 +59,12 @@ public class SamePriotrityTest {
 
   }
 
-  @Priority(10)
+  @Order(10)
   private static class ABean implements ITestBean {
 
   }
 
-  @Priority(10)
+  @Order(10)
   private static class BBean implements ITestBean {
 
   }

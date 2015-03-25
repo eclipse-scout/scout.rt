@@ -10,42 +10,67 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.rt.platform.internal.BeanContextImplementor;
+import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 
 /**
- * The static accessor to the {@link BeanContextImplementor}
+ * The static accessor to the {@link BeanManagerImplementor}
  */
+//TODO imo rename to BEANS
 public final class OBJ {
 
   private OBJ() {
   }
 
   /**
-   * @return the first instance of this type with respect to {@link Priority} and {@link Replace}. See also {@link Bean}
+   * @return the single instance of this type with respect to {@link Priority} and {@link Replace}. See also
+   *         {@link IBeanContext#getBean(Class)}
    * @throws PlatformException
-   *           when no instance is available
+   *           when no instance is available or when multiple instances are registered
    */
   public static <T> T get(Class<T> beanClazz) {
-    return Platform.get().getBeanContext().getInstance(beanClazz);
+    T instance = getOptional(beanClazz);
+    if (instance == null) {
+      throw new Assertions.AssertionException("no instance found for query: " + beanClazz);
+    }
+    return instance;
   }
 
   /**
-   * @return the first instance of this type with respect to {@link Priority} and {@link Replace}. See also {@link Bean}
+   * @return the single instance of this type with respect to {@link Priority} and {@link Replace}. See also
+   *         {@link Bean}
    *         <p>
    *         returns null when no instance is available
+   * @throws PlatformException
+   *           when multiple instances are registered
    */
+//TODO imo rename to opt
   public static <T> T getOptional(Class<T> beanClazz) {
-    return Platform.get().getBeanContext().getInstanceOrNull(beanClazz);
+    IBean<T> bean = Platform.get().getBeanContext().getBean(beanClazz);
+    if (bean == null) {
+      return null;
+    }
+    return bean.getInstance();
   }
 
   /**
-   * @return all instances of this type ordered by {@link Priority}
+   * @return all instances of this type ordered by {@link Order}
    */
   public static <T> List<T> all(Class<T> beanClazz) {
-    return Platform.get().getBeanContext().getInstances(beanClazz);
+    List<IBean<T>> beans = Platform.get().getBeanContext().getBeans(beanClazz);
+    ArrayList<T> instances = new ArrayList<T>(beans.size());
+    for (IBean<T> bean : beans) {
+      T instance = bean.getInstance();
+      if (instance != null) {
+        instances.add(instance);
+      }
+    }
+    return instances;
   }
 }

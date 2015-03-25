@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 
+//TODO imo rename to BeanMetaData
 public class BeanData {
   private final Class<?> m_beanClazz;
   private final Map<Class<? extends Annotation>, Annotation> m_beanAnnotations;

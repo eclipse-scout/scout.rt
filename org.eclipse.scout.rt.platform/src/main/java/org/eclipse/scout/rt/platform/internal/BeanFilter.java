@@ -41,8 +41,8 @@ public class BeanFilter {
           collectWithSubClasses(classInventory, ci, allBeans);
         }
       }
-      catch (ClassNotFoundException e) {
-        LOG.warn("Error loading class '" + annotation.name() + "' with flags 0x" + Integer.toHexString(annotation.flags()), e);
+      catch (Exception e) {
+        LOG.warn("loading class", e);
       }
     }
 
@@ -67,8 +67,8 @@ public class BeanFilter {
           collect(subClass, collector);
         }
       }
-      catch (ClassNotFoundException e) {
-        LOG.warn("Error loading class '" + ci.name() + "' with flags 0x" + Integer.toHexString(ci.flags()), e);
+      catch (Exception e) {
+        LOG.warn("loading class", e);
       }
     }
   }
@@ -81,8 +81,8 @@ public class BeanFilter {
     try {
       collector.add(ci.resolveClass());
     }
-    catch (ClassNotFoundException ex) {
-      LOG.warn("Error loading class '" + ci.name() + "' with flags 0x" + Integer.toHexString(ci.flags()), ex);
+    catch (Exception ex) {
+      LOG.warn("loading class", ex);
     }
   }
 }

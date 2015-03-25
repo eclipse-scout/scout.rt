@@ -27,12 +27,12 @@ import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.rt.shared.services.common.code.SharedCodeService;
+import org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
 
 @Priority(-1)
-public class CodeService extends SharedCodeService implements IClusterNotificationListenerService {
+public class CodeService extends AbstractSharedCodeService implements IClusterNotificationListenerService {
 
   @Override
   protected Long provideCurrentPartitionId() {

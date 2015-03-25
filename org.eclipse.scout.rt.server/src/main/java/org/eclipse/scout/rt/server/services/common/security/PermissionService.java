@@ -54,7 +54,7 @@ public class PermissionService extends AbstractService implements IPermissionSer
                 discoveredPermissions.add(permClass);
               }
             }
-            catch (ClassNotFoundException e) {
+            catch (Exception e) {
               LOG.error("Unable to load permission.", e);
             }
           }

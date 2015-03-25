@@ -38,20 +38,16 @@ public interface IBean<T> {
    *
    * @return the initial instance of the bean, undecorated, not intercepted, may be null
    *         <p>
-   *         used in {@link IBeanInstanceFactory}
+   *         used in {@link IBeanDecorationFactory}
    */
   @Internal
   T getInitialInstance();
 
   /**
-   * Do not call this method directly, use {@link OBJ#get(Class)} instead!
-   * <p>
-   *
-   * @return the (cached) runtime instance of the bean, undecorated, not intercepted, may be null
+   * @return the instance of the bean, decorated and intercepted by {@link IBeanDecorationFactory}
    *         <p>
-   *         used in {@link IBeanInstanceFactory}
+   *         Not that this may create the bean instance prior to returning it.
    */
-  @Internal
-  T createInstance();
+  T getInstance();
 
 }

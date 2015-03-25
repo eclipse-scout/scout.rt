@@ -30,21 +30,21 @@ import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanContext;
-import org.eclipse.scout.rt.platform.IBeanInstanceFactory;
+import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 
-public class BeanContextImplementor implements IBeanContext {
+public class BeanManagerImplementor implements IBeanContext {
   private final ReentrantReadWriteLock m_lock;
   private final Map<Class<?>, TypeHierarchy> m_typeHierarchies;
-  private IBeanInstanceFactory m_beanInstanceFactory;
+  private IBeanDecorationFactory m_beanDecorationFactory;
 
-  public BeanContextImplementor() {
+  public BeanManagerImplementor() {
     this(null);
   }
 
-  public BeanContextImplementor(IBeanInstanceFactory f) {
+  public BeanManagerImplementor(IBeanDecorationFactory f) {
     m_lock = new ReentrantReadWriteLock(true);
     m_typeHierarchies = new HashMap<>();
-    m_beanInstanceFactory = f;
+    m_beanDecorationFactory = f;
   }
 
   @Override
@@ -58,10 +58,7 @@ public class BeanContextImplementor implements IBeanContext {
     try {
       @SuppressWarnings("unchecked")
       TypeHierarchy<T> h = m_typeHierarchies.get(beanClazz);
-      if (h == null) {
-        return Collections.emptyList();
-      }
-      return h.querySingle();
+      return (h == null) ? Collections.<IBean<T>> emptyList() : h.querySingle();
     }
     finally {
       m_lock.readLock().unlock();
@@ -117,7 +114,7 @@ public class BeanContextImplementor implements IBeanContext {
   public <T> IBean<T> registerBean(BeanData beanData) {
     m_lock.writeLock().lock();
     try {
-      IBean<T> bean = new BeanImplementor<T>(beanData);
+      IBean<T> bean = new BeanImplementor<T>(beanData, this);
       for (Class<?> type : listImplementedTypes(bean)) {
         TypeHierarchy h = m_typeHierarchies.get(type);
         if (h == null) {
@@ -145,6 +142,9 @@ public class BeanContextImplementor implements IBeanContext {
           h.removeBean(bean);
         }
       }
+      if (bean instanceof BeanImplementor) {
+        ((BeanImplementor) bean).dispose();
+      }
     }
     finally {
       m_lock.writeLock().unlock();
@@ -168,8 +168,15 @@ public class BeanContextImplementor implements IBeanContext {
   }
 
   @Override
-  public <T> List<IBean<T>> getBean(Class<T> beanClazz) {
-    return querySingle(beanClazz);
+  public <T> IBean<T> getBean(Class<T> beanClazz) {
+    List<IBean<T>> list = querySingle(beanClazz);
+    if (list.size() == 1) {
+      return list.get(0);
+    }
+    if (list.size() == 0) {
+      return null;
+    }
+    throw new Assertions.AssertionException("multiple instances found for query: " + beanClazz + " " + list);
   }
 
   @Override
@@ -178,41 +185,22 @@ public class BeanContextImplementor implements IBeanContext {
   }
 
   @Internal
-  protected void setBeanInstanceFactory(IBeanInstanceFactory f) {
-    m_beanInstanceFactory = f;
+  protected void setBeanDecorationFactory(IBeanDecorationFactory f) {
+    m_beanDecorationFactory = f;
   }
 
   @Internal
-  protected IBeanInstanceFactory getBeanInstanceFactory() {
-    return m_beanInstanceFactory;
-  }
-
-  @Override
-  public <T> T getInstance(Class<T> beanClazz) {
-    T instance = getInstanceOrNull(beanClazz);
-    if (instance != null) {
-      return instance;
-    }
-    throw new Assertions.AssertionException("no instance found for query: " + beanClazz);
-  }
-
-  @Override
-  public <T> T getInstanceOrNull(Class<T> beanClazz) {
-    return m_beanInstanceFactory.select(beanClazz, getBean(beanClazz));
-  }
-
-  @Override
-  public <T> List<T> getInstances(Class<T> beanClazz) {
-    return m_beanInstanceFactory.selectAll(beanClazz, getBeans(beanClazz));
+  protected IBeanDecorationFactory getBeanDecorationFactory() {
+    return m_beanDecorationFactory;
   }
 
   public void startCreateImmediatelyBeans() {
     m_lock.readLock().lock();
     try {
       for (IBean bean : getBeans(Object.class)) {
-        if (BeanContextImplementor.isCreateImmediately(bean)) {
-          if (BeanContextImplementor.isApplicationScoped(bean)) {
-            bean.createInstance();
+        if (BeanManagerImplementor.isCreateImmediately(bean)) {
+          if (BeanManagerImplementor.isApplicationScoped(bean)) {
+            bean.getInstance();
           }
           else {
             throw new InitializationException(String.format(

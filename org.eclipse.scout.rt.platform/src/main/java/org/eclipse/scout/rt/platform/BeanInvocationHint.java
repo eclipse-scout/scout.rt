@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * All annotations marked with this annotation are typically interpreted in the {@link IBeanInstanceFactory}
+ * All annotations marked with this annotation are typically interpreted in the {@link IBeanDecorationFactory}
  * <p>
  * These annotations specify requirements about the execution context of the annotated bean or service.
  * <p>

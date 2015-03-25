@@ -33,15 +33,15 @@ import org.eclipse.scout.service.AbstractService;
  *
  * @since 4.3.0 (Mars-M5)
  */
-public class SharedCodeService extends AbstractService implements ICodeService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SharedCodeService.class);
+public abstract class AbstractSharedCodeService extends AbstractService implements ICodeService {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSharedCodeService.class);
   private static final Long DEFAULT_PARTITION_ID = 0L;
 
   private final CodeTypeStore m_codeTypeStore;
   private final Object m_codeTypeClassDescriptorMapLock;
   private final Map<String, Set<Class<? extends ICodeType<?, ?>>>> m_codeTypeClassDescriptorMap;
 
-  public SharedCodeService() {
+  protected AbstractSharedCodeService() {
     m_codeTypeStore = new CodeTypeStore();
     m_codeTypeClassDescriptorMapLock = new Object();
     m_codeTypeClassDescriptorMap = new HashMap<>();
@@ -170,8 +170,8 @@ public class SharedCodeService extends AbstractService implements ICodeService {
               discoveredCodeTypes.add(codeTypeClass);
             }
           }
-          catch (ClassNotFoundException e) {
-            LOG.error("Unable to load code type.", e);
+          catch (Exception e) {
+            LOG.error("load code type", e);
           }
         }
       }

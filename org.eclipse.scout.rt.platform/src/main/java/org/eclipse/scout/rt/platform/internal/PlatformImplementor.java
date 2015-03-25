@@ -20,14 +20,15 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanContext;
-import org.eclipse.scout.rt.platform.IBeanInstanceFactory;
+import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformException;
-import org.eclipse.scout.rt.platform.SimpleBeanInstanceFactory;
+import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
+import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexClassInventory;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexInventoryBuilder;
@@ -42,7 +43,7 @@ public class PlatformImplementor implements IPlatform {
   private final ReentrantReadWriteLock m_stateLock;
   private volatile State m_state; // may be read at any time by any thread
   private IClassInventory m_classInventory;
-  private BeanContextImplementor m_beanContext;
+  private BeanManagerImplementor m_beanContext;
   private IApplication m_application;
 
   public PlatformImplementor() {
@@ -92,10 +93,10 @@ public class PlatformImplementor implements IPlatform {
       changeState(State.ClassInventoryValid);
       changeState(State.BeanContextPrepared);
 
-      initBeanInstanceFactory();
+      initBeanDecorationFactory();
+      checkServices();
       changeState(State.BeanContextValid);
       startCreateImmediatelyBeans();
-
     }
     finally {
       m_stateLock.writeLock().unlock();
@@ -125,8 +126,8 @@ public class PlatformImplementor implements IPlatform {
     }
   }
 
-  protected BeanContextImplementor createBeanContext() {
-    BeanContextImplementor context = new BeanContextImplementor();
+  protected BeanManagerImplementor createBeanContext() {
+    BeanManagerImplementor context = new BeanManagerImplementor();
     Set<Class> allBeans = new BeanFilter().collect(getClassInventory());
     for (Class<?> bean : allBeans) {
       context.registerClass(bean);
@@ -134,23 +135,48 @@ public class PlatformImplementor implements IPlatform {
     return context;
   }
 
-  protected void initBeanInstanceFactory() {
-    if (m_beanContext.getBeanInstanceFactory() != null) {
+  protected void initBeanDecorationFactory() {
+    if (m_beanContext.getBeanDecorationFactory() != null) {
       return;
     }
-    List<IBean<IBeanInstanceFactory>> beans = m_beanContext.getBeans(IBeanInstanceFactory.class);
-    if (beans.size() > 0) {
-      m_beanContext.setBeanInstanceFactory(beans.get(0).createInstance());
-    }
-    if (m_beanContext.getBeanInstanceFactory() != null) {
+    IBean<IBeanDecorationFactory> bean = m_beanContext.getBean(IBeanDecorationFactory.class);
+    if (bean != null) {
+      m_beanContext.setBeanDecorationFactory(bean.getInstance());
       return;
     }
-    LOG.warn("Using " + SimpleBeanInstanceFactory.class.getName() + ". Please verify that this application really has no client or server side " + IBeanInstanceFactory.class.getSimpleName());
-    m_beanContext.setBeanInstanceFactory(new SimpleBeanInstanceFactory());
+    LOG.warn("Using " + SimpleBeanDecorationFactory.class.getName() + ". Please verify that this application really has no client or server side " + IBeanDecorationFactory.class.getSimpleName());
+    m_beanContext.setBeanDecorationFactory(new SimpleBeanDecorationFactory());
+  }
+
+  protected void checkServices() {
+    //TODO imo remove
+    try {
+      for (IClassInfo ci : getClassInventory().getAllKnownSubClasses(Class.forName("org.eclipse.scout.service.IService"))) {
+        if (!ci.isInterface()) {
+          continue;
+        }
+        if (ci.name().equals("org.eclipse.scout.service.IService")) {
+          continue;
+        }
+        Class s = ci.resolveClass();
+        @SuppressWarnings("unchecked")
+        List<IBean<Object>> list = getBeanContext().getBeans(s);
+        if (list.size() <= 1) {
+          continue;
+        }
+        System.out.println("-------- " + s.getName() + " --------");
+        for (IBean<?> bean : list) {
+          System.out.println(" " + bean.getBeanClazz());
+        }
+      }
+    }
+    catch (ClassNotFoundException e) {
+      //nop
+    }
   }
 
   protected void startCreateImmediatelyBeans() {
-    ((BeanContextImplementor) m_beanContext).startCreateImmediatelyBeans();
+    ((BeanManagerImplementor) m_beanContext).startCreateImmediatelyBeans();
   }
 
   protected void startApplication() {
@@ -256,7 +282,7 @@ public class PlatformImplementor implements IPlatform {
     PlatformEvent e = new PlatformEvent(this, newState);
     for (IBean<IPlatformListener> bean : m_beanContext.getBeans(IPlatformListener.class)) {
       try {
-        IPlatformListener listener = (IPlatformListener) bean.createInstance();
+        IPlatformListener listener = bean.getInstance();
         listener.stateChanged(e);
       }
       catch (Throwable t) {

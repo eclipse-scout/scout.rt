@@ -12,10 +12,8 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -27,7 +25,7 @@ import org.junit.runner.RunWith;
  *
  */
 @RunWith(PlatformTestRunner.class)
-public class PriorityTest {
+public class BeanOrderTest {
 
   private static IBean<TestBean01> m_bean01;
   private static IBean<TestBean02> m_bean02;
@@ -42,12 +40,16 @@ public class PriorityTest {
    * Tests if two beans registered to the bean context are ordered on behaviour of their priortity.
    */
   @Test
-  public void testPriority() {
-    Assert.assertEquals(TestBean01.class, OBJ.get(ITestBean.class).getClass());
+  public void testOrder() {
     List<ITestBean> all = OBJ.all(ITestBean.class);
     Assert.assertEquals(2, all.size());
     Assert.assertEquals(TestBean01.class, all.get(0).getClass());
     Assert.assertEquals(TestBean02.class, all.get(1).getClass());
+  }
+
+  @Test(expected = Assertions.AssertionException.class)
+  public void testMutlipleException() {
+    Assert.assertEquals(TestBean01.class, OBJ.get(ITestBean.class).getClass());
   }
 
   @AfterClass
@@ -60,12 +62,12 @@ public class PriorityTest {
 
   }
 
-  @Priority(30)
+  @Order(20)
   private static class TestBean01 implements ITestBean {
 
   }
 
-  @Priority(20)
+  @Order(30)
   private static class TestBean02 implements ITestBean {
 
   }

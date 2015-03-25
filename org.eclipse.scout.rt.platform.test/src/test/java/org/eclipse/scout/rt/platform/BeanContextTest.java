@@ -10,37 +10,28 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.SimpleBeanInstanceFactory;
-import org.eclipse.scout.rt.platform.internal.BeanContextImplementor;
+import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- *
- */
 public class BeanContextTest {
 
   @Test
   public void testRegistration() {
-    BeanContextImplementor context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
+    BeanManagerImplementor context = new BeanManagerImplementor(new SimpleBeanDecorationFactory());
 
     context.registerClass(Bean01.class);
-    Assert.assertEquals(1, context.getInstances(ITestBean.class).size());
+    Assert.assertEquals(1, context.getBeans(ITestBean.class).size());
     // register a second
     context.registerClass(Bean02.class);
-    Assert.assertEquals(2, context.getInstances(ITestBean.class).size());
-    Assert.assertNotNull(context.getInstance(ITestBean01.class));
-    Assert.assertNotNull(context.getInstance(ITestBean.class));
-
-    Assert.assertNotNull(context.getInstance(ITestBean02.class));
-    Assert.assertNotNull(context.getInstance(ITestBean.class));
+    Assert.assertEquals(2, context.getBeans(ITestBean.class).size());
+    Assert.assertNotNull(context.getBean(ITestBean01.class));
+    Assert.assertNotNull(context.getBean(ITestBean02.class));
   }
 
   @Test
   public void testUnregisterByBean() {
-    BeanContextImplementor context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
+    BeanManagerImplementor context = new BeanManagerImplementor(new SimpleBeanDecorationFactory());
 
     IBean reg1 = context.registerClass(Bean01.class);
     IBean reg2 = context.registerClass(Bean02.class);

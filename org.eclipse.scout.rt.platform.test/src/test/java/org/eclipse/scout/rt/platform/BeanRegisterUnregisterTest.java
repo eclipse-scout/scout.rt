@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.platform;
 
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.SimpleBeanInstanceFactory;
-import org.eclipse.scout.rt.platform.internal.BeanContextImplementor;
+import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
+import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,7 +23,7 @@ public class BeanRegisterUnregisterTest {
 
   @Test
   public void testOneBean() {
-    BeanContextImplementor context = new BeanContextImplementor(new SimpleBeanInstanceFactory());
+    BeanManagerImplementor context = new BeanManagerImplementor(new SimpleBeanDecorationFactory());
 
     IBean<?> reg = context.registerClass(TestObject.class);
     Assert.assertEquals(1, context.getBeans(Object.class).size());
