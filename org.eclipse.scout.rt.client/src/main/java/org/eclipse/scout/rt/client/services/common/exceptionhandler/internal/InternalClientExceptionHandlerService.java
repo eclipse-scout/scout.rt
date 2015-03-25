@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -26,6 +27,7 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-1)
+@Client
 public class InternalClientExceptionHandlerService extends AbstractService implements IExceptionHandlerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(InternalClientExceptionHandlerService.class);
   private static final String SESSION_DATA_KEY = "clientExceptionHandlerServiceState";

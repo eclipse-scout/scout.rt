@@ -16,10 +16,12 @@ import java.util.List;
 
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-1)
+@Client
 public class PlatformService extends AbstractService implements IPlatformService {
 
   @Override

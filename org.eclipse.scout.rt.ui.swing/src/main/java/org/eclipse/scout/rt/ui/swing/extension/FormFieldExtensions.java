@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.extension;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
 
@@ -20,19 +20,19 @@ import org.eclipse.scout.commons.CollectionUtility;
  */
 public final class FormFieldExtensions {
 
-  private final List<IFormFieldExtension> m_extensions;
+  private final Map<Class<?> /*model */, Class<?> /*ui or factory */> m_extensions;
 
   public final static FormFieldExtensions INSTANCE = new FormFieldExtensions();
 
   private FormFieldExtensions() {
-    m_extensions = new ArrayList<>();
+    m_extensions = new HashMap<>();
   }
 
-  public List<IFormFieldExtension> getFormFieldExtensions() {
-    return CollectionUtility.arrayList(m_extensions);
+  public Map<Class<?>, Class<?>> getFormFieldExtensions() {
+    return CollectionUtility.copyMap(m_extensions);
   }
 
-  void add(IFormFieldExtension ext) {
-    m_extensions.add(ext);
+  public void put(Class<?> model, Class<?> ui) {
+    m_extensions.put(model, ui);
   }
 }

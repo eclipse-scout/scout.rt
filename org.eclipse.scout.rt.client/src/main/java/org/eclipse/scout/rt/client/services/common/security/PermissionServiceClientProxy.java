@@ -18,6 +18,7 @@ import java.util.Set;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
@@ -30,6 +31,7 @@ import org.eclipse.scout.service.AbstractService;
  * Service state is per [{@link IClientSession} type and stored in global map
  */
 @Priority(-3)
+@Client
 public class PermissionServiceClientProxy extends AbstractService implements IPermissionService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PermissionServiceClientProxy.class);
 

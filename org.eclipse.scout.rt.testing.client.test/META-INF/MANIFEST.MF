@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Scout RT Testing Client Test
-Bundle-SymbolicName: org.eclipse.scout.rt.testing.client.test
-Bundle-Version: 5.1.0.qualifier
-Bundle-Vendor: Eclipse Scout Project

@@ -11,11 +11,13 @@
 package org.eclipse.scout.rt.server.services.common.processing;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.server.Server;
 import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-1)
+@Server
 public class ServerProcessingCancelService extends AbstractService implements IServerProcessingCancelService {
 
   @Override

@@ -1,9 +1,6 @@
 package org.eclipse.scout.rt.platform;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.rt.platform.AnnotationFactory;
-import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.junit.Assert;
 import org.junit.Test;
 

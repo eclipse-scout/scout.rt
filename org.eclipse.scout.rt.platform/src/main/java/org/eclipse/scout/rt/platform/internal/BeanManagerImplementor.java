@@ -11,13 +11,10 @@
 package org.eclipse.scout.rt.platform.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.Assertions;
@@ -81,18 +78,17 @@ public class BeanManagerImplementor implements IBeanContext {
     }
   }
 
-  protected Set<Class<?>> listImplementedTypes(IBean<?> bean) {
+  protected List<Class<?>> listImplementedTypes(IBean<?> bean) {
     //interfaces
-    Class<?>[] interfacesHierarchy = BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class);
-    HashSet<Class<?>> clazzes = new HashSet<Class<?>>(Arrays.asList(interfacesHierarchy));
+    List<Class<?>> classes = BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class);
     //super types
     Class c = bean.getBeanClazz();
     while (c != null && c != Object.class) {
-      clazzes.add(c);
+      classes.add(c);
       c = c.getSuperclass();
     }
-    clazzes.add(Object.class);
-    return clazzes;
+    classes.add(Object.class);
+    return classes;
   }
 
   @Override

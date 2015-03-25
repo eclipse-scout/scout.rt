@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Scout Client SVG Field Swing Implementation
-Bundle-SymbolicName: org.eclipse.scout.svg.ui.swing;singleton:=true
-Bundle-Version: 5.1.0.qualifier
-Bundle-Vendor: Eclipse Scout Project

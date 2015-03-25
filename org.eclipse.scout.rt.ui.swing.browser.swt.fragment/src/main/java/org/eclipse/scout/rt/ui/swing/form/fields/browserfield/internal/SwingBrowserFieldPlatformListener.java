@@ -8,21 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.service.internal;
+package org.eclipse.scout.rt.ui.swing.form.fields.browserfield.internal;
 
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformException;
-import org.eclipse.scout.rt.platform.pluginxml.internal.PluginXmlParser;
+import org.eclipse.scout.rt.ui.swing.extension.FormFieldExtensions;
 
-public class PlatformListener implements IPlatformListener {
+/**
+ *
+ */
+public class SwingBrowserFieldPlatformListener implements IPlatformListener {
 
   @Override
   public void stateChanged(PlatformEvent event) throws PlatformException {
     if (event.getState() == IPlatform.State.BeanContextPrepared) {
-      // parse all servies registered as extensions in plugin.xml.
-      PluginXmlParser.get().visit(new ServiceXmlVisitor(event.getSource().getBeanContext()));
+      FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField.class, org.eclipse.scout.rt.ui.swing.form.fields.browserfield.internal.SwingScoutBrowserField.class);
     }
   }
 

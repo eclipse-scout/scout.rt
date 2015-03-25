@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.service;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+
 /**
  * Convenience service interface for services that are interested in beeing
  * notified when they are lazily created.
@@ -150,6 +152,7 @@ package org.eclipse.scout.service;
  *
  * @since 1.0.0 see also {@link org.eclipse.scout.commons.annotations.Priority} for defining service ranking
  */
+@ApplicationScoped
 public interface IService {
 
 }

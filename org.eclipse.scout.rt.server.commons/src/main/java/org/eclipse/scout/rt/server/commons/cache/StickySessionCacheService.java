@@ -13,12 +13,15 @@ package org.eclipse.scout.rt.server.commons.cache;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.annotations.Priority;
+
 /**
  * This cache store service is for Scout Applications with "sticky sessions": A client always connects to the same node.
  * Or for applications with only one single server instance. The data stored does not to be serializable.
  * 
  * @since 4.0.0
  */
+@Priority(-1)
 public class StickySessionCacheService extends AbstractHttpSessionCacheService {
 
   @Override

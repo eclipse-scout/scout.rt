@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
+import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -19,6 +20,7 @@ import org.eclipse.scout.service.AbstractService;
 /**
  * @since 3.9.0
  */
+@Priority(-1000)
 public class DeviceTransformationService extends AbstractService implements IDeviceTransformationService {
   private String SESSION_DATA_KEY = "DeviceTransformationServiceData";
 

@@ -20,11 +20,11 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.concurrent.Callable;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.junit.Test;
 
 public class CallablesTest {

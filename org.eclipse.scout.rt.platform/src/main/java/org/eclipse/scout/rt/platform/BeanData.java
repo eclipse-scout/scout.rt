@@ -46,9 +46,10 @@ public class BeanData {
    * @return
    */
   protected void readStaticAnnoations(Class<?> clazz, boolean inheritedOnly) {
-    if (clazz == null || Object.class.getName().equals(clazz.getName())) {
+    if (clazz == null || Object.class.equals(clazz)) {
       return;
     }
+
     for (Annotation a : clazz.getAnnotations()) {
       if (inheritedOnly) {
         if (a.annotationType().getAnnotation(Inherited.class) != null) {
@@ -60,6 +61,9 @@ public class BeanData {
       }
     }
     readStaticAnnoations(clazz.getSuperclass(), true);
+    for (Class<?> ifc : clazz.getInterfaces()) {
+      readStaticAnnoations(ifc, true);
+    }
   }
 
   public Class<?> getBeanClazz() {

@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.text;
 
 import org.eclipse.scout.commons.annotations.Priority;
 
-@Priority(-100.0f)
+@Priority(-50)
 public class ScoutTextProviderService extends AbstractDynamicNlsTextProviderService {
   @Override
   protected String getDynamicNlsBaseName() {

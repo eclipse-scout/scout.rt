@@ -20,7 +20,6 @@ import org.eclipse.scout.service.IServiceInitializer.ServiceInitializerResult;
  * Convenience {@link IService} implementation with support for config.ini
  * variable injection. see {@link ServiceUtility#injectConfigProperties(IService)}
  */
-//@ApplicationScoped // FIXME abr uncomment after switching from plugin.xml to scout.xml
 public abstract class AbstractService implements IService {
 
   /**

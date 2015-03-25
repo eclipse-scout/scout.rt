@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.busy;
 
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobManager;
 
 /**
  * Shows blocking progress on a long operation for a {@link ModelJobManager} with respect to

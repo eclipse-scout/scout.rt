@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -41,6 +42,7 @@ import org.eclipse.scout.service.SERVICES;
  * service state is per {@link IClientSession} instance
  */
 @Priority(-3)
+@Client
 public class BookmarkService extends AbstractService implements IBookmarkService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BookmarkService.class);
   private static final String SESSION_DATA_KEY = "bookmarkServiceState";

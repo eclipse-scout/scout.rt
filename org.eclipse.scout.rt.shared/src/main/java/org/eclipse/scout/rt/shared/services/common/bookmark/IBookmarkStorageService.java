@@ -14,19 +14,21 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.service.IService;
 
 @Priority(-3)
+@TunnelToServer
 @InputValidation(IValidationStrategy.PROCESS.class)
 public interface IBookmarkStorageService extends IService {
 
   /**
    * insert, update or delete bookmarks of the current user (subject) AND global bookmarks <br>
    * check the property {@link Bookmark#getKind()} for switching
-   * 
+   *
    * @return the new complete set of bookmarks with (eventually) updated ids
    */
   BookmarkData storeBookmarkData(BookmarkData data) throws ProcessingException;
@@ -43,7 +45,7 @@ public interface IBookmarkStorageService extends IService {
    * <p>
    * Bookmarks are published to the {@link Bookmark#SPOOL_FOLDER_NAME} folder. Once the bookmarks are retrieved by the
    * user, that folder is copied into {@link Bookmark#INBOX_FOLDER_NAME} and the spool folder is cleared.
-   * 
+   *
    * @param publishFolder
    * @param targetGroup
    *          is a map that contains for example userId=scott or something like ou=eclipse.org,

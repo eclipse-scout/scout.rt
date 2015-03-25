@@ -11,9 +11,11 @@
 package org.eclipse.scout.rt.client.services.common.exceptionhandler;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.internal.InternalClientExceptionHandlerService;
 
+@Replace
 @Priority(-1)
 public class ClientExceptionHandlerService extends InternalClientExceptionHandlerService {
 

@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.swing.extension.FormFieldExtensions;
-import org.eclipse.scout.rt.ui.swing.extension.IFormFieldExtension;
 import org.eclipse.scout.rt.ui.swing.extension.IFormFieldFactory;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 
@@ -40,52 +39,42 @@ public class FormFieldFactory implements IFormFieldFactory {
 
   public FormFieldFactory() {
     TreeMap<CompositeObject, P_FormFieldExtension> sortedMap = new TreeMap<CompositeObject, P_FormFieldExtension>();
-    for (IFormFieldExtension extension : FormFieldExtensions.INSTANCE.getFormFieldExtensions()) {
-      if (extension.isActive()) {
-        final Class<?> modelClazz = extension.getModelClass();
-        final Class<? extends ISwingScoutFormField> uiClazz = extension.getUiClass();
-        final Class<? extends IFormFieldFactory> factoryClazz = extension.getFactoryClass();
-        IFormFieldFactory factory = null;
-        if (uiClazz != null) {
-          factory = new P_DirectLinkFormFieldFactory(uiClazz);
-        }
-        else if (factoryClazz != null) {
-          try {
-            factory = factoryClazz.newInstance();
-          }
-          catch (Exception e) {
-            LOG.warn("could not create a factory instance of '" + factoryClazz.getName() + "' ", e);
-          }
-        }
-        else {
-          LOG.debug("extension '" + extension.getName() + "' has neither an UiClass nor a factory defined! Skipping extension.");
-          break;
-        }
-
-        int distance = -distanceToIFormField(modelClazz, 0);
-        CompositeObject key = new CompositeObject(distance, modelClazz.getName());
-        if (sortedMap.containsKey(key)) {
-          P_FormFieldExtension existingExt = sortedMap.get(key);
-          // check scope
-          if (existingExt.getFormFieldExtension().getScope() == extension.getScope()) {
-            LOG.warn("Duplicate form field extension for '" + extension.getModelClass().getName() + "' with the same scope.");
-          }
-          else if (existingExt.getFormFieldExtension().getScope() < extension.getScope()) {
-            // replace
-            sortedMap.put(key, new P_FormFieldExtension(modelClazz, factory, extension));
-          }
-        }
-        else {
-          sortedMap.put(key, new P_FormFieldExtension(modelClazz, factory, extension));
-        }
+    for (Entry<Class<?>, Class<?>> element : FormFieldExtensions.INSTANCE.getFormFieldExtensions().entrySet()) {
+      Class<?> model = element.getKey();
+      Class<?> ui = element.getValue();
+      IFormFieldFactory factory = getFormFieldFactory(ui);
+      if (factory != null) {
+        int distance = -distanceToIFormField(model, 0);
+        CompositeObject key = new CompositeObject(distance, model.getName());
+        sortedMap.put(key, new P_FormFieldExtension(model, factory));
       }
     }
 
-    m_fields = new LinkedHashMap<Class<?>, IFormFieldFactory>();
+    Map<Class<?>, IFormFieldFactory> fields = new LinkedHashMap<Class<?>, IFormFieldFactory>(sortedMap.size());
     for (P_FormFieldExtension ext : sortedMap.values()) {
-      m_fields.put(ext.getModelClazz(), ext.getFactory());
+      fields.put(ext.getModelClazz(), ext.getFactory());
     }
 
+    m_fields = fields;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static IFormFieldFactory getFormFieldFactory(Class<?> ui) {
+    if (IFormFieldFactory.class.isAssignableFrom(ui)) {
+      try {
+        return (IFormFieldFactory) ui.newInstance();
+      }
+      catch (Exception e) {
+        LOG.error("could not create a factory instance of '" + ui.getName() + "'.", e);
+      }
+    }
+    else if (ISwingScoutFormField.class.isAssignableFrom(ui)) {
+      return new P_DirectLinkFormFieldFactory((Class<? extends ISwingScoutFormField>) ui);
+    }
+    else {
+      LOG.error("extension '" + ui.getName() + "' has neither an UiClass nor a factory! Skipping.");
+    }
+    return null;
   }
 
   private static int distanceToIFormField(Class<?> visitee, int dist) {
@@ -136,15 +125,15 @@ public class FormFieldFactory implements IFormFieldFactory {
     return null;
   }
 
-  private class P_DirectLinkFormFieldFactory implements IFormFieldFactory {
+  private static final class P_DirectLinkFormFieldFactory implements IFormFieldFactory {
     private final Class<? extends ISwingScoutFormField> m_uiClazz;
 
     public P_DirectLinkFormFieldFactory(Class<? extends ISwingScoutFormField> uiClazz) {
       m_uiClazz = uiClazz;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     public ISwingScoutFormField<?> createFormField(JComponent parent, IFormField field, ISwingEnvironment environment) {
       try {
         ISwingScoutFormField newInstance = m_uiClazz.newInstance();
@@ -163,15 +152,13 @@ public class FormFieldFactory implements IFormFieldFactory {
     }
   }// end class P_DirectLinkFormFieldFactory
 
-  private class P_FormFieldExtension {
+  private static final class P_FormFieldExtension {
     private final Class<?> m_modelClazz;
     private final IFormFieldFactory m_factory;
-    private final IFormFieldExtension m_formFieldExtension;
 
-    public P_FormFieldExtension(Class<?> modelClazz, IFormFieldFactory factory, IFormFieldExtension formFieldExtension) {
+    public P_FormFieldExtension(Class<?> modelClazz, IFormFieldFactory factory) {
       m_modelClazz = modelClazz;
       m_factory = factory;
-      m_formFieldExtension = formFieldExtension;
     }
 
     public Class<?> getModelClazz() {
@@ -180,10 +167,6 @@ public class FormFieldFactory implements IFormFieldFactory {
 
     public IFormFieldFactory getFactory() {
       return m_factory;
-    }
-
-    public IFormFieldExtension getFormFieldExtension() {
-      return m_formFieldExtension;
     }
   } // end class P_FormFieldExtension
 

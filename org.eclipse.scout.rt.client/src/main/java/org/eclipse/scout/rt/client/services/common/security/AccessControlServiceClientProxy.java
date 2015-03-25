@@ -21,11 +21,13 @@ import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.security.FineGrainedAccessCheckRequiredException;
@@ -41,6 +43,8 @@ import org.eclipse.scout.service.SERVICES;
  * Service state is per [{@link IClientSession} instance and stored as {@link IClientSession#getData(String)}
  */
 @Priority(-3)
+@Client
+@CreateImmediately
 public class AccessControlServiceClientProxy extends AbstractService implements IAccessControlService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AccessControlServiceClientProxy.class);
   private static final String SESSION_DATA_KEY = "accessControlServiceState";

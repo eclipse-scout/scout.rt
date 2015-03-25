@@ -35,6 +35,7 @@ import org.eclipse.scout.commons.dnd.TransferObjectRequest;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -45,6 +46,7 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.service.AbstractService;
 
 @Priority(-2)
+@Client
 public class SwingScoutClipboardService extends AbstractService implements IClipboardService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutClipboardService.class);
 

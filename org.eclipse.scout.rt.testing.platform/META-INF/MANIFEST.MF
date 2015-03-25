@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Testing Platform
-Bundle-SymbolicName: org.eclipse.scout.rt.testing.platform
-Bundle-Version: 5.1.0.qualifier
-Bundle-Vendor: Eclipse Scout Project

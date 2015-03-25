@@ -32,6 +32,7 @@ import org.eclipse.scout.service.AbstractService;
  * @author imo
  * @since 3.8
  */
+
 @Priority(-1000)
 public class BusyManagerService extends AbstractService implements IBusyManagerService {
   private static final String HANDLER_CLIENT_SESSION_KEY = IBusyHandler.class.getName();

@@ -8,23 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swing.internal;
+package org.eclipse.scout.svg.ui.swing.internal;
 
-import org.eclipse.scout.rt.platform.IBeanContext;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformException;
-import org.eclipse.scout.rt.platform.pluginxml.internal.PluginXmlParser;
-import org.eclipse.scout.rt.ui.swing.extension.FormFieldsPluginXmlVisitor;
+import org.eclipse.scout.rt.ui.swing.extension.FormFieldExtensions;
 
-public class PlatformListener implements IPlatformListener {
+/**
+ *
+ */
+public class SvgSwingPlatformListener implements IPlatformListener {
 
   @Override
   public void stateChanged(PlatformEvent event) throws PlatformException {
     if (event.getState() == IPlatform.State.BeanContextPrepared) {
-      IBeanContext context = event.getSource().getBeanContext();
-      PluginXmlParser.get().visit(new FormFieldsPluginXmlVisitor(context));
+      FormFieldExtensions.INSTANCE.put(org.eclipse.scout.svg.client.svgfield.ISvgField.class, org.eclipse.scout.svg.ui.swing.svgfield.SwingScoutSvgField.class);
     }
   }
+
 }

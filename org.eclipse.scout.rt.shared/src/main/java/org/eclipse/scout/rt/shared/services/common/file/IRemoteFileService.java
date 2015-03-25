@@ -15,6 +15,7 @@ import java.io.OutputStream;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
@@ -22,6 +23,7 @@ import org.eclipse.scout.service.IService;
 
 @Priority(-3)
 @InputValidation(IValidationStrategy.PROCESS.class)
+@TunnelToServer
 public interface IRemoteFileService extends IService {
 
   /**

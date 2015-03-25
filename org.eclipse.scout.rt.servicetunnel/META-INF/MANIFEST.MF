@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Scout Servicetunnel
-Bundle-SymbolicName: org.eclipse.scout.rt.servicetunnel;singleton:=true
-Bundle-Version: 5.1.0.qualifier
-Bundle-ActivationPolicy: lazy
-Bundle-Vendor: Eclipse Scout Project

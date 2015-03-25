@@ -9,8 +9,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.services.text;
 
+import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService;
 
+@Priority(-25)
 public class TextProviderService extends AbstractDynamicNlsTextProviderService {
 
   @Override

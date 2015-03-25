@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Scout Client Mobile Test
-Bundle-SymbolicName: org.eclipse.scout.rt.client.mobile.test
-Bundle-Version: 5.1.0.qualifier

@@ -16,6 +16,7 @@ import java.util.Map;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.server.Server;
 import org.eclipse.scout.rt.server.services.common.clientnotification.AllUserFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
@@ -24,14 +25,15 @@ import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificat
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
 
 @Priority(-1)
+@Server
 public class CodeService extends AbstractSharedCodeService implements IClusterNotificationListenerService {
 
   @Override

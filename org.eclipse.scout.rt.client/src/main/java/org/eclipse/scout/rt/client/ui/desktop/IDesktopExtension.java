@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.Bean;
 
 /**
  * A desktop extension can contribute to a core {@link IDesktop} and react on desktop state changes using the
@@ -36,6 +37,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
  * <li>actions (menu, keyStroke, toolButton, viewButton)</li>
  * </ul>
  */
+@Bean
 public interface IDesktopExtension {
 
   /**

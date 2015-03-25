@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.processing;
 
+import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.service.IService;
 
+@TunnelToServer
 public interface IServerProcessingCancelService extends IService {
 
   /**

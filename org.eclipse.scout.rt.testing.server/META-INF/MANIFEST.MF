@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Scout Server Testing
-Bundle-SymbolicName: org.eclipse.scout.rt.testing.server
-Bundle-Version: 5.1.0.qualifier
-Bundle-Vendor: Eclipse Scout Project

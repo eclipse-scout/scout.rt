@@ -19,10 +19,14 @@ import javax.swing.SwingUtilities;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
+import org.eclipse.scout.rt.client.Client;
+import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.services.common.useractivity.IUserActivityProvider;
 
+@Client
+@CreateImmediately
 public class UserActivityProvider extends AbstractPropertyObserver implements IUserActivityProvider {
   private long m_idleTrigger;
   private boolean m_userActive;

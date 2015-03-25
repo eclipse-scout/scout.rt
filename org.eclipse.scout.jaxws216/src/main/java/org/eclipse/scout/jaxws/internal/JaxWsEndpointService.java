@@ -29,6 +29,7 @@ import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.internal.resources.ProxyResourceLoader;
@@ -38,6 +39,7 @@ import org.eclipse.scout.jaxws.internal.servlet.ServletAdapterFactory;
 import org.eclipse.scout.jaxws.internal.servlet.ServletContainer;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
 import org.eclipse.scout.jaxws.service.IJaxWsEndpointService;
+import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.service.AbstractService;
 
 import com.sun.xml.internal.ws.api.server.Container;
@@ -46,6 +48,8 @@ import com.sun.xml.internal.ws.transport.http.DeploymentDescriptorParser;
 import com.sun.xml.internal.ws.transport.http.DeploymentDescriptorParser.AdapterFactory;
 
 @SuppressWarnings("restriction")
+@Priority(-1)
+@CreateImmediately
 public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpointService {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JaxWsEndpointService.class);

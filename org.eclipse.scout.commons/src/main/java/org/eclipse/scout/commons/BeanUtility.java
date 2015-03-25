@@ -401,10 +401,10 @@ public final class BeanUtility {
   }
 
   @SuppressWarnings("unchecked")
-  public static Class[] getInterfacesHierarchy(Class type, Class filterClass) {
-    Set<Class> resultSet = new HashSet<Class>();
-    List<Class> workList = new ArrayList<Class>();
-    List<Class> lookAheadList = new ArrayList<Class>();
+  public static List<Class<?>> getInterfacesHierarchy(Class type, Class filterClass) {
+    Set<Class> resultSet = new HashSet<>();
+    List<Class> workList = new ArrayList<>();
+    List<Class> lookAheadList = new ArrayList<>();
     if (type.isInterface()) {
       lookAheadList.add(type);
     }
@@ -429,7 +429,7 @@ public final class BeanUtility {
         }
       }
     }
-    Map<CompositeObject, Class> resultMap = new TreeMap<CompositeObject, Class>();
+    Map<CompositeObject, Class<?>> resultMap = new TreeMap<>();
     int index = 0;
     for (Class c : resultSet) {
       if (filterClass.isAssignableFrom(c)) {
@@ -450,6 +450,6 @@ public final class BeanUtility {
         resultMap.put(new CompositeObject(depth, index++), c);
       }
     }
-    return resultMap.values().toArray(new Class[resultMap.size()]);
+    return CollectionUtility.arrayList(resultMap.values());
   }
 }

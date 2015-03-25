@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.server.admin.html.view;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -110,8 +110,8 @@ public class ServicesView extends DefaultView {
             sectionName = "Lookup Services";
           }
           else {
-            Class[] serviceInterfaces = BeanUtility.getInterfacesHierarchy(inspector.getService().getClass(), Object.class);
-            Class topInterface = (serviceInterfaces.length > 0 ? serviceInterfaces[serviceInterfaces.length - 1] : null);
+            List<Class<?>> serviceInterfaces = BeanUtility.getInterfacesHierarchy(inspector.getService().getClass(), Object.class);
+            Class topInterface = (serviceInterfaces.size() > 0 ? serviceInterfaces.get(serviceInterfaces.size() - 1) : null);
             if (topInterface != null && topInterface.getPackage() != null && topInterface.getPackage().getName().indexOf(".common.") >= 0) {
               sectionOrder = 4;
               sectionName = "Common Services";
@@ -204,10 +204,10 @@ public class ServicesView extends DefaultView {
     Class serviceClass = service.getService().getClass();
     ArrayList<Class> interfaceHierarchy = new ArrayList<Class>();
     for (Class c : serviceClass.getInterfaces()) {
-      interfaceHierarchy.addAll(Arrays.asList(BeanUtility.getInterfacesHierarchy(c, Object.class)));
+      interfaceHierarchy.addAll(BeanUtility.getInterfacesHierarchy(c, Object.class));
     }
     if (interfaceHierarchy.size() == 0) {
-      interfaceHierarchy.addAll(Arrays.asList(BeanUtility.getInterfacesHierarchy(serviceClass, Object.class)));
+      interfaceHierarchy.addAll(BeanUtility.getInterfacesHierarchy(serviceClass, Object.class));
     }
     interfaceHierarchy.add(serviceClass);
     ArrayList<Class> classHierarchy = new ArrayList<Class>();

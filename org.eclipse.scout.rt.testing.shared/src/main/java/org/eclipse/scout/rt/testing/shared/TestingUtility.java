@@ -23,8 +23,6 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanContext;
@@ -148,58 +146,6 @@ public final class TestingUtility {
     pattern = pattern.replaceAll("[*]", ".*");
     pattern = pattern.replaceAll("[?]", ".");
     return pattern;
-  }
-
-  /**
-   * Registers the given services in the current {@link IBeanContext} and returns their registrations.<br/>
-   * If registering Mockito mocks, use {@link #registerService(float, Object, Class)} instead.
-   *
-   * @deprecated use {@link #registerBeans(BeanData...)} or {@link IBeanContext#registerClass(Class)} or
-   *             {@link IBeanContext#registerBean(BeanData)} with {@link Order}, {@link ApplicationScoped} and
-   *             {@link Replace} instead, do not use implementations
-   *             directly. Note that Order is the negative equal to Priority, so legacy priority(10) is order(-10).
-   */
-  @Deprecated
-  public static List<IBean<?>> registerServices(float priority, Object... services) {
-    if (services == null) {
-      return CollectionUtility.emptyArrayList();
-    }
-    List<IBean<?>> registeredBeans = new ArrayList<>();
-
-    for (Object service : services) {
-      registeredBeans.add(registerService(priority, service, service.getClass()));
-    }
-    return registeredBeans;
-  }
-
-  /**
-   * Registers the given service under the given type in the current {@link IBeanContext} and returns its registration.
-   *
-   * @deprecated use {@link #registerBeans(BeanData...)} or {@link IBeanContext#registerClass(Class)} or
-   *             {@link IBeanContext#registerBean(BeanData)} with {@link Order}, {@link ApplicationScoped} and
-   *             {@link Replace} instead, do not use implementations
-   *             directly
-   */
-  @SuppressWarnings("unchecked")
-  @Deprecated
-  public static <SERVICE> IBean<SERVICE> registerService(float priority, SERVICE object, Class<? extends SERVICE> clazz) {
-    return (IBean<SERVICE>) registerBean(new BeanData(clazz).
-        initialInstance(object).
-        applicationScoped(true).
-        order(-priority));
-  }
-
-  /**
-   * Unregisters the given services.
-   *
-   * @deprecated use {@link #unregisterBeans(List)}
-   */
-  @Deprecated
-  public static void unregisterServices(List<? extends IBean<?>> beans) {
-    if (beans == null) {
-      return;
-    }
-    unregisterBeans(beans);
   }
 
   /**

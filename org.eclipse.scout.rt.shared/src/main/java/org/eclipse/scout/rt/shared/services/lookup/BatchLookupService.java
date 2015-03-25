@@ -15,17 +15,15 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.service.AbstractService;
 
 /**
- * Implementation of {@link IBatchLookupService} that can be used from in a server or in a client-only application.
+ * Implementation of {@link IBatchLookupService} that can be used in a server or in a client-only application.
  * See Bug 447592.
  *
  * @since 4.3.0 (Mars-M5)
  */
-@ApplicationScoped
-@Priority(-1)
+@Priority(-10)
 public class BatchLookupService extends AbstractService implements IBatchLookupService {
 
   @Override

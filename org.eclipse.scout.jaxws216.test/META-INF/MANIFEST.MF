@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Scout JaxWS Test
-Bundle-SymbolicName: org.eclipse.scout.jaxws216.test
-Bundle-Version: 5.1.0.qualifier
-Bundle-Vendor: Eclipse Scout Project

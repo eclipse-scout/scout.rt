@@ -3,16 +3,18 @@ package org.eclipse.scout.rt.server.commons.cache;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.service.IService;
+
 /**
  * This service identifies the requesting client
- * 
+ *
  * @since 4.0.0
  */
-public interface IClientIdentificationService {
+public interface IClientIdentificationService extends IService {
 
   /**
    * returns the session id of the HTTP-Request. If no session id is set a new id will be generated and set.
-   * 
+   *
    * @param req
    *          HttpServletRequest
    * @param res

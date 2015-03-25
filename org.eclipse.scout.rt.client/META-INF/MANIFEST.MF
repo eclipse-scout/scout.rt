@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Scout Client
-Bundle-SymbolicName: org.eclipse.scout.rt.client;singleton:=true
-Bundle-Version: 5.1.0.qualifier
-Bundle-Vendor: Eclipse Scout Project
- org.eclipse.scout.rt.client.ui.form.fields.beanfield,

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.services.lookup;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.service.AbstractService;
@@ -19,6 +20,7 @@ import org.eclipse.scout.service.AbstractService;
  * @since 3.8.1
  */
 @Priority(-1)
+@Client
 public class DefaultLookupCallProvisioningService extends AbstractService implements ILookupCallProvisioningService {
 
   @SuppressWarnings("unchecked")

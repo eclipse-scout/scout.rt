@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Derby 10 Support for Eclipse Scout
-Bundle-SymbolicName: org.eclipse.scout.rt.jdbc.derby10
-Bundle-Version: 5.1.0.qualifier
-Bundle-Vendor: Eclipse Scout Project
