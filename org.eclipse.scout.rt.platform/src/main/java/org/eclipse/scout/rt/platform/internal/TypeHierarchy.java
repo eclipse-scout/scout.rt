@@ -132,7 +132,7 @@ public class TypeHierarchy<T> {
 
       m_queryAll = Collections.unmodifiableList(new ArrayList<IBean<T>>(list));
 
-      //now retain only beans that are exactly of type refClazz, only if refClass is not an interface
+      //now retain only beans that are exactly of type refClazz, but only if refClass is not an interface
       if (!refClazz.isInterface()) {
         for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
           IBean<T> bean = it.next();
@@ -140,6 +140,21 @@ public class TypeHierarchy<T> {
             continue;
           }
           if (bean.getBeanClazz() == refClazz) {
+            continue;
+          }
+          it.remove();
+        }
+      }
+      //only retain lowest order and if lowest order is same for multiple beans, keep them all, provocating a mutliple instance exception on getBean()
+      if (list.size() > 1) {
+        Double lowestOrder = null;
+        for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
+          IBean<T> bean = it.next();
+          if (lowestOrder == null || orderOf(bean) == lowestOrder.doubleValue()) {
+            //keep it
+            if (lowestOrder == null) {
+              lowestOrder = orderOf(bean);
+            }
             continue;
           }
           it.remove();
@@ -160,7 +175,7 @@ public class TypeHierarchy<T> {
     }
   };
 
-  private static Double orderOf(IBean<?> b) {
+  public static Double orderOf(IBean<?> b) {
     double o = 0;
     Priority priorityAnnotation = b.getBeanAnnotation(Priority.class);
     if (priorityAnnotation != null) {

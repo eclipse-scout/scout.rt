@@ -46,6 +46,9 @@ public class PermissionService extends AbstractService implements IPermissionSer
         Set<IClassInfo> allKnownPermissions = Platform.get().getClassInventory().getAllKnownSubClasses(Permission.class);
         Set<Class<? extends Permission>> discoveredPermissions = new HashSet<>(allKnownPermissions.size());
         for (IClassInfo permInfo : allKnownPermissions) {
+          if (!permInfo.isInstanciable()) {
+            continue;
+          }
           if (acceptClassName(permInfo.name())) {
             try {
               if (acceptClass(permInfo)) {

@@ -22,6 +22,9 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
     if (event.getState() == IPlatform.State.BeanContextPrepared) {
       //register all tunnels to server
       for (IClassInfo ci : event.getSource().getClassInventory().getKnownAnnotatedTypes(TunnelToServer.class)) {
+        if (!ci.isPublic()) {
+          continue;
+        }
         if (!ci.isInterface()) {
           LOG.error("The annotation @" + TunnelToServer.class.getSimpleName() + " can only be used on interfaces, not on " + ci.name());
           continue;

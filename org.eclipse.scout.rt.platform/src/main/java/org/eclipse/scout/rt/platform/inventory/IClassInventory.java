@@ -20,10 +20,11 @@ import java.util.Set;
 public interface IClassInventory {
 
   /**
-   * Returns all known subclasses that are assignable to the given queryClass, but no sub-interfaces.
+   * Returns all known subclasses that are assignable to the given queryClass, including interfaces. Use
+   * {@link IClassInfo#isInstanciable()} to check if it is an instantiable bean.
    *
    * @param clazz
-   * @return All known subclasses, no interfaces.
+   * @return all known subclasses, including interfaces and private types.
    */
   Set<IClassInfo> getAllKnownSubClasses(Class<?> clazz);
 

@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.internal;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -28,7 +30,6 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformException;
 import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
-import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexClassInventory;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexInventoryBuilder;
@@ -86,15 +87,16 @@ public class PlatformImplementor implements IPlatform {
     try {
       changeState(State.PlatformStopped);
       m_classInventory = createClassInventory();
-      m_beanContext = createBeanContext();
+      m_beanContext = createBeanManager();
       //now all IPlatformListener are registered and can receive platform events
 
       changeState(State.PlatformInit);
       changeState(State.ClassInventoryValid);
       changeState(State.BeanContextPrepared);
 
+      //validateBeanManager();
       initBeanDecorationFactory();
-      checkServices();
+
       changeState(State.BeanContextValid);
       startCreateImmediatelyBeans();
     }
@@ -126,7 +128,7 @@ public class PlatformImplementor implements IPlatform {
     }
   }
 
-  protected BeanManagerImplementor createBeanContext() {
+  protected BeanManagerImplementor createBeanManager() {
     BeanManagerImplementor context = new BeanManagerImplementor();
     Set<Class> allBeans = new BeanFilter().collect(getClassInventory());
     for (Class<?> bean : allBeans) {
@@ -148,29 +150,39 @@ public class PlatformImplementor implements IPlatform {
     m_beanContext.setBeanDecorationFactory(new SimpleBeanDecorationFactory());
   }
 
-  protected void checkServices() {
-    //TODO imo remove
+  protected void validateBeanManager() {
     try {
-      for (IClassInfo ci : getClassInventory().getAllKnownSubClasses(Class.forName("org.eclipse.scout.service.IService"))) {
-        if (!ci.isInterface()) {
+      //collect all service interfaces
+      Class<?> serviceClazz = Class.forName("org.eclipse.scout.service.IService");
+      HashSet<Class> serviceInterfaces = new HashSet<>();
+      for (IBean bean : getBeanContext().getRegisteredBeans(serviceClazz)) {
+        for (Class<?> i : BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class)) {
+          if (serviceClazz.isAssignableFrom(i)) {
+            serviceInterfaces.add(i);
+          }
+        }
+      }
+      for (Class s : serviceInterfaces) {
+        if (s.getName().equals("org.eclipse.scout.service.IService")) {
           continue;
         }
-        if (ci.name().equals("org.eclipse.scout.service.IService")) {
-          continue;
+        try {
+          @SuppressWarnings("unchecked")
+          List<IBean<Object>> list = getBeanContext().getBeans(s);
+          if (list.size() <= 1) {
+            continue;
+          }
+          System.out.println("-------- " + s.getName() + " --------");
+          for (IBean<?> bean : list) {
+            System.out.println(" @Order(" + TypeHierarchy.orderOf(bean) + ") " + bean.getBeanClazz());
+          }
         }
-        Class s = ci.resolveClass();
-        @SuppressWarnings("unchecked")
-        List<IBean<Object>> list = getBeanContext().getBeans(s);
-        if (list.size() <= 1) {
-          continue;
-        }
-        System.out.println("-------- " + s.getName() + " --------");
-        for (IBean<?> bean : list) {
-          System.out.println(" " + bean.getBeanClazz());
+        catch (Exception e) {
+          e.printStackTrace();
         }
       }
     }
-    catch (ClassNotFoundException e) {
+    catch (Exception e) {
       //nop
     }
   }
@@ -205,7 +217,7 @@ public class PlatformImplementor implements IPlatform {
         Platform.set(null);
       }
       changeState(State.PlatformStopped);
-      destroyBeanContext();
+      destroyBeanManager();
       destroyClassInventory();
     }
     finally {
@@ -231,7 +243,7 @@ public class PlatformImplementor implements IPlatform {
     m_classInventory = null;
   }
 
-  protected void destroyBeanContext() {
+  protected void destroyBeanManager() {
     m_beanContext = null;
   }
 

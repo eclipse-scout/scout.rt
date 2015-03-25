@@ -37,19 +37,19 @@ public interface IPlatform {
      * {@link IPlatform#getClassInventory()} and may manipulated using
      * {@link IBeanContext#registerBean(org.eclipse.scout.rt.platform.IBean, Object)} etc.
      * <p>
-     * However, {@link IBeanContext#getInstance(Class)} is not available yet
+     * However, {@link IBean#getInstance()} is not available yet
      * <p>
      * Next phase is bean context valid
      */
-    BeanContextPrepared,
+    BeanContextPrepared, //TODO imo rename to BeanManagerPrepared
     /**
      * This event signals that {@link IPlatform#getBeanContext()} is now valid and should not be manipulated anymore
      * <p>
-     * {@link IBeanContext#getInstance(Class)} is valid now.
+     * {@link IBean#getInstance()} is valid now.
      * <p>
      * Next phase is starting the application
      */
-    BeanContextValid,
+    BeanContextValid, //TODO imo rename to BeanManagerValid
     /**
      * This event signals that the platform is about to start the application, special init code that requires the valid
      * platform may be run now (former Activator.start logic)
@@ -89,6 +89,7 @@ public interface IPlatform {
 
   IClassInventory getClassInventory();
 
+  //TODO imo rename to getBeanManager
   IBeanContext getBeanContext();
 
   void start() throws PlatformException;
@@ -97,6 +98,6 @@ public interface IPlatform {
    *
    */
   void stop() throws PlatformException;
-  
+
   boolean inDevelopmentMode();
 }

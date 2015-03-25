@@ -42,6 +42,9 @@ public interface IClassInfo {
 
   Class<?> resolveClass() throws PlatformException;
 
+  /**
+   * must be public, not abstract, not interface, not inner member type
+   */
   boolean isInstanciable();
 
   boolean isPublic();

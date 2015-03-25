@@ -162,6 +162,9 @@ public abstract class AbstractSharedCodeService extends AbstractService implemen
       Set<IClassInfo> allKnownCodeTypes = Platform.get().getClassInventory().getAllKnownSubClasses(ICodeType.class);
       Set<Class<? extends ICodeType<?, ?>>> discoveredCodeTypes = new HashSet<>(allKnownCodeTypes.size());
       for (IClassInfo codeTypeInfo : allKnownCodeTypes) {
+        if (!codeTypeInfo.isInstanciable()) {
+          continue;
+        }
         if (acceptClassName(codeTypeInfo.name())) {
           try {
             if (acceptClass(codeTypeInfo)) {

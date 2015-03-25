@@ -75,7 +75,9 @@ public class BeanFilter {
 
   private void collect(IClassInfo ci, Set<Class> collector) {
     if (!ci.isInstanciable()) {
-      LOG.debug("Skipping bean candidate '{0}' because it is not instanciable.", ci.name());
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Skipping bean candidate '{0}' because it is not instanciable.", ci.name());
+      }
       return;
     }
     try {
