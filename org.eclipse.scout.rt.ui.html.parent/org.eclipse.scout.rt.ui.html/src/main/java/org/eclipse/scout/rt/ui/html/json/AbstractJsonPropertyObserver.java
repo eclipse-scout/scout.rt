@@ -126,41 +126,63 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
 
   protected void handleModelPropertyChange(PropertyChangeEvent event) {
     String propertyName = event.getPropertyName();
+    Object oldValue = event.getOldValue();
+    Object newValue = event.getNewValue();
+
     if (m_jsonProperties.containsKey(propertyName)) {
       JsonProperty<?> jsonProperty = m_jsonProperties.get(propertyName);
       handleSlaveJsonProperties(jsonProperty);
-      event = m_propertyEventFilter.filter(event);
-      if (event != null && jsonProperty.accept()) {
-        handleJsonPropertyChange(jsonProperty, event.getOldValue(), event.getNewValue());
+      jsonProperty.handlePropertyChange(oldValue, newValue);
+      if (!jsonProperty.accept()) {
+        return;
+      }
+      // Check if a property-event-filter prevents the property change to be added to the JSON response
+      PropertyChangeEvent filteredEvent = filterPropertyChangeEvent(event);
+      if (filteredEvent != null) {
+        addPropertyChangeEvent(jsonProperty, oldValue, newValue);
       }
     }
     else {
-      event = m_propertyEventFilter.filter(event);
-      if (event != null) {
-        handleModelPropertyChange(propertyName, event.getOldValue(), event.getNewValue());
-      }
+      // No JsonProperty is registered for this property. Subclass must deal itself with the
+      // property change event and is responsible for adding a suitable propertyChange event
+      // to the JSON response (or not).
+      handleModelPropertyChange(propertyName, oldValue, newValue);
     }
   }
 
-  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
+  /**
+   * Returns null when the given event has been filtered by current event-filters, or the event itself when no filtering
+   * has been applied.
+   */
+  protected PropertyChangeEvent filterPropertyChangeEvent(PropertyChangeEvent event) {
+    return m_propertyEventFilter.filter(event);
   }
 
   private void handleSlaveJsonProperties(JsonProperty<?> masterProperty) {
-    for (JsonProperty<?> slave : masterProperty.getSlaveProperties()) {
-      Object modelValue = slave.modelValue();
-      if (!slave.isValueSent() && modelValue != null) {
-        handleJsonPropertyChange(slave, null, modelValue);
+    for (JsonProperty<?> slaveProperty : masterProperty.getSlaveProperties()) {
+      Object modelValue = slaveProperty.modelValue();
+      slaveProperty.handlePropertyChange(null, modelValue);
+      // Note: at this point we don'check if the a property-change-event is filtered or not
+      if (modelValue != null && slaveProperty.accept() && !slaveProperty.isValueSent()) {
+        addPropertyChangeEvent(slaveProperty, null, modelValue);
       }
     }
   }
 
-  private void handleJsonPropertyChange(JsonProperty<?> jsonProperty, Object oldValue, Object newValue) {
+  private void addPropertyChangeEvent(JsonProperty<?> jsonProperty, Object oldValue, Object newValue) {
     String propertyName = jsonProperty.getPropertyName();
-    if (jsonProperty.accept()) {
-      addPropertyChangeEvent(propertyName, jsonProperty.valueToJsonOnPropertyChange(oldValue, newValue));
-      jsonProperty.setValueSent(true);
-      LOG.debug("Added property change event '" + propertyName + ": " + newValue + "' for " + getObjectType() + " with id " + getId() + ". Model: " + getModel());
-    }
+    addPropertyChangeEvent(propertyName, jsonProperty.prepareValueForToJson(newValue));
+    jsonProperty.setValueSent(true);
+    LOG.debug("Added property change event '" + propertyName + ": " + newValue + "' for " + getObjectType() + " with id " + getId() + ". Model: " + getModel());
+  }
+
+  /**
+   * This method is called, when no a PropertyChangeEvent from the model occurs and no JsonProperty is registered for
+   * the given propertyName. Note that you must check if the property-change-event has been filtered by using the
+   * {@link #filterPropertyChangeEvent(PropertyChangeEvent)} method before you add an event to the JSON response.
+   * The default implementation does nothing.
+   */
+  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
   }
 
   private class P_PropertyChangeListener implements PropertyChangeListener {

@@ -69,6 +69,7 @@ public class JsonMenu<T extends IMenu> extends JsonAction<T> {
   }
 
   @Override
+  // FIXME: AWE gucken ob das noch funktioniert wenn wir das löschen
   protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
     if (IMenu.PROP_MENU_TYPES.equals(propertyName)) {
       JsonProperty jsonProperty = getJsonProperty(IMenu.PROP_MENU_TYPES);

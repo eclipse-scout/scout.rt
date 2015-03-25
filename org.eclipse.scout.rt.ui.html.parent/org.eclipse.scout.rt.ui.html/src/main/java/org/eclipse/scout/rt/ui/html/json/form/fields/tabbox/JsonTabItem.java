@@ -55,17 +55,17 @@ public class JsonTabItem<T extends IGroupBox> extends JsonGroupBox<T> {
   @Override
   protected void attachModel() {
     super.attachModel();
-    setSaveNeededFromScout();
-    setEmptyFromScout();
+    handleModelSaveNeededChanged();
+    handleModelEmptyChanged();
   }
 
   @Override
   protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
     if (IGroupBox.PROP_EMPTY.equals(propertyName)) {
-      setEmptyFromScout();
+      handleModelEmptyChanged();
     }
     else if (IGroupBox.PROP_SAVE_NEEDED.equals(propertyName)) {
-      setSaveNeededFromScout();
+      handleModelSaveNeededChanged();
     }
     else {
       super.handleModelPropertyChange(propertyName, oldValue, newValue);
@@ -85,14 +85,14 @@ public class JsonTabItem<T extends IGroupBox> extends JsonGroupBox<T> {
     return false;
   }
 
-  protected void setSaveNeededFromScout() {
+  protected void handleModelSaveNeededChanged() {
     if (updateMarker(ITabBox.MARK_STRATEGY_SAVE_NEEDED)) {
       m_marked = getModel().isSaveNeeded();
       addMarkedPropertyChangeEvent();
     }
   }
 
-  protected void setEmptyFromScout() {
+  protected void handleModelEmptyChanged() {
     if (updateMarker(ITabBox.MARK_STRATEGY_EMPTY)) {
       m_marked = !getModel().isEmpty();
       addMarkedPropertyChangeEvent();

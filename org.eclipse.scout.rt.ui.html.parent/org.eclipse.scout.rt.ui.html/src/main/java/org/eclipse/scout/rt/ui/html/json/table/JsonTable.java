@@ -810,10 +810,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     return m_eventBuffer;
   }
 
-  protected final TableEventFilter getTableEventFilter() {
-    return m_tableEventFilter;
-  }
-
   protected TableEventFilterCondition addTableEventFilterCondition(int tableEventType) {
     TableEventFilterCondition conditon = new TableEventFilterCondition(tableEventType);
     m_tableEventFilter.addCondition(conditon);

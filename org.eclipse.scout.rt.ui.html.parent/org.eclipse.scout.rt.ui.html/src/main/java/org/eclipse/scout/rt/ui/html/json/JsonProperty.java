@@ -61,12 +61,22 @@ public abstract class JsonProperty<T> {
     m_valueSent = valueSent;
   }
 
+  //FIXME CGU: (von A.WE) dokumentieren wozu diese methode gut sein soll, wie und wann sie verwendet wird.
   public boolean isValueSent() {
     return m_valueSent;
   }
 
+  // FIXME CGU: (von A.WE) dokumentieren wozu diese methode gut sein soll, wie und wann sie verwendet wird.
   public boolean accept() {
     return true;
+  }
+
+  public boolean shouldAddEvent() {
+    return hasModelValue() && accept() && !isValueSent();
+  }
+
+  protected boolean hasModelValue() {
+    return modelValue() != null;
   }
 
   /**
@@ -78,6 +88,11 @@ public abstract class JsonProperty<T> {
    */
   protected abstract Object modelValue();
 
+  /**
+   * Returns an Object which is suitable to be used in a JSONObject. The default implementation simply returns
+   * the given value. Complex model objects require more sophisticated approaches to transform the model
+   * state into JSON.
+   */
   public Object prepareValueForToJson(Object value) {
     // TODO BSH JSON | Check if we can / should add convenience here (e.g. for Date, lists etc.)
     return value;
@@ -87,8 +102,14 @@ public abstract class JsonProperty<T> {
     return prepareValueForToJson(modelValue());
   }
 
-  public Object valueToJsonOnPropertyChange(Object oldValue, Object newValue) {
-    return prepareValueForToJson(newValue);
+  /**
+   * This method is called when the property value changes. Subclasses of JsonProperty may
+   * do something in that case. The default implementation does nothing. Note: this method
+   * must be always executed, event when the event itself is filtered (which means, it isn't
+   * sent to the browser - however, the method may still have an impact on JsonAdapter instances
+   * on the client side).
+   */
+  public void handlePropertyChange(Object oldValue, Object newValue) {
   }
 
   public void attachChildAdapters() {

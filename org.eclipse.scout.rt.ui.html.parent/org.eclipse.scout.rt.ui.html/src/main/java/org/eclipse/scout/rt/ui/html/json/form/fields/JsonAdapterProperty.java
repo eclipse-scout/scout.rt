@@ -42,12 +42,11 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
   }
 
   @Override
-  public Object valueToJsonOnPropertyChange(Object oldValue, Object newValue) {
+  public void handlePropertyChange(Object oldValue, Object newValue) {
     if (!m_global) {
       disposeAdapters(newValue);
     }
     createAdapters(newValue);
-    return super.valueToJsonOnPropertyChange(oldValue, newValue);
   }
 
   @SuppressWarnings("unchecked")
@@ -86,7 +85,6 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
     }
     else {
       IJsonAdapter<?> adapter = getParentJsonAdapter().attachAdapter(model, m_filter);
-
       // Only track owned adapters, only those may be disposed
       if (getParentJsonAdapter() == adapter.getParent()) {
         m_ownedAdapters.add(adapter);

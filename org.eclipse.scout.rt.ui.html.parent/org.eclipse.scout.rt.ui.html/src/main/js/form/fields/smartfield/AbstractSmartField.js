@@ -45,13 +45,17 @@ scout.AbstractSmartField.prototype._renderProposalChooser = function() {
     this._resizePopup();
   }
   else {
-    this._closePopup(false);
+    // FIXME AWE: (smart-field) check - kommen wir je hier durch - 1?
+    $.log.info('???? 1');
+    // this._closePopup(false);
   }
 };
 
 scout.AbstractSmartField.prototype._removeProposalChooser = function() {
   $.log.info('_removeProposalChooser proposalChooser=' + this.proposalChooser);
-  this._closePopup(false);
+  //FIXME AWE: (smart-field) check - kommen wir je hier durch - 2?
+//  this._closePopup(false);
+  $.log.info('???? 2');
 };
 
 scout.AbstractSmartField.prototype._updateScrollbar = function() {
@@ -182,7 +186,7 @@ scout.AbstractSmartField.prototype._getInputBounds = function() {
 };
 
 scout.AbstractSmartField.prototype._onFieldBlur = function() {
-  scout.AbstractSmartField.parent.prototype._onFieldBlur.call(this);
+//  scout.AbstractSmartField.parent.prototype._onFieldBlur.call(this);
   $.log.debug('AbstractSmartField#_onBlur');
   this._closePopup();
 };
@@ -205,6 +209,10 @@ scout.AbstractSmartField.prototype._closePopup = function(notifyServer) {
     }
     this._$popup.remove();
     this._$popup = null;
+    if (this.proposalChooser) { // FIXME AWE: get rid of this if
+      this.proposalChooser.destroy();
+      this.proposalChooser = null;
+    }
   }
 };
 
