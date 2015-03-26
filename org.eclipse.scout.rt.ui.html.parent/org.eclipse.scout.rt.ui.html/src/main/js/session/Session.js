@@ -340,7 +340,7 @@ scout.Session.prototype._sendRequest = function(request) {
 
 scout.Session.prototype.defaultAjaxOptions = function(request, async) {
   request = request || {};
-  async = async || true;
+  async = (async === undefined ? true : !!async);
   return {
     async: async,
     type: 'POST',
