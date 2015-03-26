@@ -626,6 +626,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   protected JSONObject jsonResponseToJson() {
+    // Because the model might be accessed during toJson(), we have to execute it in a model job
     return JobUtility.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(getClientSession()), new ICallable<JSONObject>() {
       @Override
       public JSONObject call() throws Exception {

@@ -30,25 +30,23 @@ scout.Reconnector.prototype.ping = function() {
     ping: true
   };
 
-  var that = this;
+  var ajaxOptions = this.session.defaultAjaxOptions(request);
+  // Add dummy parameter as marker (for debugging purposes)
+  ajaxOptions.url = new scout.URL(ajaxOptions.url).addParameter('ping').toString();
 
-  $.ajax({
-    async: true,
-    type: 'POST',
-    dataType: 'json',
-    contentType: 'application/json',
-    cache: false,
-    url: this.session.url,
-    data: JSON.stringify(request),
-    context: request
-  })
-  .done(function(data) {
-    that._onSuccess(data);
-  })
-  .fail(function(jqXHR, textStatus, errorThrown) {
-    var request = this;
-    that._onFailure(request, jqXHR, textStatus, errorThrown);
-  });
+  $.ajax(ajaxOptions)
+    .done(onAjaxDone.bind(this))
+    .fail(onAjaxFail.bind(this));
+
+  // --- Helper methods ---
+
+  function onAjaxDone(data) {
+    this._onSuccess(data);
+  }
+
+  function onAjaxFail(jqXHR, textStatus, errorThrown) {
+    this._onFailure(request, jqXHR, textStatus, errorThrown);
+  }
 };
 
 scout.Reconnector.prototype._onSuccess = function() {

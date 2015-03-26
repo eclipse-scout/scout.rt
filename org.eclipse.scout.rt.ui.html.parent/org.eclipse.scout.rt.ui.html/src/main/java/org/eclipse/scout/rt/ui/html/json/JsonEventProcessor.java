@@ -35,6 +35,11 @@ public class JsonEventProcessor {
   public void processEvents(final JsonRequest request, final JsonResponse response) {
     Assertions.assertFalse(ModelJobs.isModelThread(), "Event processing must be called from a thread other than the model thread [thread=%s, request=%s, response=%s]", Thread.currentThread().getName(), request, response);
 
+    // No need to schedule job and wait if there are no requests (e.g. polling for background jobs)
+    if (request.getEvents().isEmpty()) {
+      return;
+    }
+
     // Process requested events.
     IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
       @Override

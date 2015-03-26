@@ -58,7 +58,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
 
       JSONObject jsonReqObj = decodeJSONRequest(httpReq);
       if (isPingRequest(jsonReqObj)) {
-        writeResponse(httpResp, createPingJsonResponse().toJson());
+        writeResponse(httpResp, createPingResponse());
         return true;
       }
 
@@ -77,6 +77,11 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
 
       // GUI requests for the same session must be processed consecutively
       synchronized (jsonSession) {
+        if (jsonSession.currentJsonResponse() == null) {
+          // Missing current JSON response, probably because the JsonSession is disposed -> send empty answer
+          writeResponse(httpResp, createSessionTerminatedResponse());
+          return true;
+        }
         JSONObject jsonResp = jsonSession.processRequest(httpReq, jsonReq);
         writeResponse(httpResp, jsonResp);
       }
@@ -86,11 +91,11 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
         // Send a special error code when an error happens during initialization, because
         // the UI has no translated texts to show in this case.
         LOG.error("Error while initializing json session", e);
-        writeResponse(httpResp, createStartupFailedJsonResponse());
+        writeResponse(httpResp, createStartupFailedResponse());
       }
       else {
         LOG.error("Unexpected error while processing JSON request", e);
-        writeResponse(httpResp, createUnrecoverableFailureJsonResponse());
+        writeResponse(httpResp, createUnrecoverableFailureResponse());
       }
     }
     return true;
@@ -117,14 +122,14 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
           // Unbinding the jsonSession will cause it to be disposed automatically, see AbstractJsonSession.valueUnbound()
           httpSession.removeAttribute(jsonSessionAttributeName);
         }
-        writeResponse(resp, new JSONObject()); // send empty response to satisfy clients expecting a valid response
+        writeResponse(resp, createEmptyResponse()); // send empty response to satisfy clients expecting a valid response
         return null;
       }
 
       if (jsonSession == null) {
         if (!jsonReq.isStartupRequest()) {
           LOG.info("Request cannot be processed due to JSON session timeout [id=" + jsonReq.getJsonSessionId() + "]");
-          writeResponse(resp, createSessionTimeoutJsonResponse());
+          writeResponse(resp, createSessionTimeoutResponse());
           return null;
         }
         LOG.info("Creating new JSON session with ID " + jsonReq.getJsonSessionId() + "...");
@@ -139,26 +144,38 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     }
   }
 
-  protected JsonResponse createSessionTimeoutJsonResponse() {
+  protected JSONObject createSessionTimeoutResponse() {
     JsonResponse response = new JsonResponse();
     response.markAsError(JsonResponse.ERR_SESSION_TIMEOUT, "The session has expired, please reload the page.");
-    return response;
+    return response.toJson();
   }
 
-  protected JsonResponse createUnrecoverableFailureJsonResponse() {
+  protected JSONObject createUnrecoverableFailureResponse() {
     JsonResponse response = new JsonResponse();
     response.markAsError(JsonResponse.ERR_UI_PROCESSING, "UI processing error");
-    return response;
+    return response.toJson();
   }
 
-  protected JsonResponse createStartupFailedJsonResponse() {
+  protected JSONObject createStartupFailedResponse() {
     JsonResponse response = new JsonResponse();
     response.markAsError(JsonResponse.ERR_STARTUP_FAILED, "Initialization failed");
-    return response;
+    return response.toJson();
   }
 
-  protected JsonResponse createPingJsonResponse() {
-    return new JsonResponse();
+  protected JSONObject createPingResponse() {
+    JSONObject json = new JSONObject();
+    JsonObjectUtility.putProperty(json, "pong", Boolean.TRUE);
+    return json;
+  }
+
+  protected JSONObject createEmptyResponse() {
+    return new JSONObject();
+  }
+
+  protected JSONObject createSessionTerminatedResponse() {
+    JSONObject json = new JSONObject();
+    JsonObjectUtility.putProperty(json, "sessionTerminated", Boolean.TRUE);
+    return json;
   }
 
   protected void writeResponse(HttpServletResponse res, JsonResponse response) throws IOException {

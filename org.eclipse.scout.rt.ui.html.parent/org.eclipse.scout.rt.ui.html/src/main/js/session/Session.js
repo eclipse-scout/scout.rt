@@ -214,8 +214,7 @@ scout.Session.prototype.sendEvent = function(event, delay) {
 
 scout.Session.prototype._sendNow = function() {
   var request = {
-    jsonSessionId: this.jsonSessionId,
-    events: this._asyncEvents
+    jsonSessionId: this.jsonSessionId
   };
 
   if (this._startup) {
@@ -236,6 +235,9 @@ scout.Session.prototype._sendNow = function() {
     request.unload = true;
   }
 
+  if (this._asyncEvents.length > 0) {
+    request.events = this._asyncEvents;
+  }
   this._sendRequest(request);
   this._asyncEvents = [];
 };
@@ -287,7 +289,7 @@ scout.Session.prototype._sendRequest = function(request) {
   }
   this._requestsPendingCounter++;
 
-  $.ajax(this._ajaxOptions(request, !unload))
+  $.ajax(this.defaultAjaxOptions(request, !unload))
     .done(onAjaxDone.bind(this))
     .fail(onAjaxFail.bind(this))
     .always(onAjaxAlways.bind(this));
@@ -336,7 +338,9 @@ scout.Session.prototype._sendRequest = function(request) {
   }
 };
 
-scout.Session.prototype._ajaxOptions = function(request, async) {
+scout.Session.prototype.defaultAjaxOptions = function(request, async) {
+  request = request || {};
+  async = async || true;
   return {
     async: async,
     type: 'POST',
@@ -374,7 +378,7 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
 
   this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.RUNNING;
 
-  var ajaxOptions = this._ajaxOptions(request);
+  var ajaxOptions = this.defaultAjaxOptions(request);
   // Add dummy parameter as marker (for debugging purposes)
   ajaxOptions.url = new scout.URL(ajaxOptions.url).addParameter('poll').toString();
 
@@ -392,6 +396,8 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
       $.log.warn('Polling request failed. Interrupt polling until the next user-initiated request succeeds');
       this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.FAILURE;
       this._processErrorJsonResponse(data.error);
+    } else if (data.sessionTerminated) {
+      $.log.warn('Session terminated, stopped polling for background jobs');
     } else {
       this._processSuccessResponse(data);
       this.layoutValidator.validate();
