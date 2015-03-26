@@ -48,23 +48,23 @@ body {
   color: @text-disabled-color;
 
   & ::-moz-selection {
-    .selectionDisabled();
+    .selection-disabled();
   }
   & ::selection {
-    .selectionDisabled();
+    .selection-disabled();
   }
 
   &::-webkit-input-placeholder {
-    .placeholderDisabled();
+    .placeholder-disabled();
   }
   &:-moz-placeholder { /* older versions of firefox */
-    .placeholderDisabled();
+    .placeholder-disabled();
   }
   &::-moz-placeholder {
-    .placeholderDisabled();
+    .placeholder-disabled();
   }
   &:-ms-input-placeholder {
-    .placeholderDisabled();
+    .placeholder-disabled();
   }
 }
 

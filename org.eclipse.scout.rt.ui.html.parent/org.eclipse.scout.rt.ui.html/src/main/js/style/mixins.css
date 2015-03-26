@@ -24,7 +24,7 @@
   background: @selection-background-color;
   color: @selection-text-color;
 }
-.selectionDisabled() {
+.selection-disabled() {
   background: @selection-background-disabled-color;
   color: @selection-text-disabled-color;
 }
@@ -32,7 +32,7 @@
 .placeholder() {
   opacity: 0.54; /* see https://developer.mozilla.org/de/docs/Web/CSS/::-moz-placeholder */
 }
-.placeholderDisabled() {
+.placeholder-disabled() {
   opacity: 0.2;
 }
 
