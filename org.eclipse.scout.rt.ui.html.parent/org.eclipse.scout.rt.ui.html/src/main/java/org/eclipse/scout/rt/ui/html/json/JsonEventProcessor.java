@@ -58,7 +58,7 @@ public class JsonEventProcessor {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Handling event '{}' for adapter with ID {}", event.getType(), event.getTarget());
       }
-      jsonAdapter.handleUiEvent(event, response);
+      jsonAdapter.handleUiEvent(event);
       jsonAdapter.cleanUpEventFilters();
     }
     catch (Exception e) {

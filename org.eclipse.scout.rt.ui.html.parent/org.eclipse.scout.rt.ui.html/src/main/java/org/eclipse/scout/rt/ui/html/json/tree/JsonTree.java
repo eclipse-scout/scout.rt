@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
@@ -500,28 +499,28 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (EVENT_NODE_CLICKED.equals(event.getType())) {
-      handleUiNodeClicked(event, res);
+      handleUiNodeClicked(event);
     }
     else if (EVENT_NODE_ACTION.equals(event.getType())) {
-      handleUiNodeAction(event, res);
+      handleUiNodeAction(event);
     }
     else if (EVENT_NODES_SELECTED.equals(event.getType())) {
-      handleUiNodesSelected(event, res);
+      handleUiNodesSelected(event);
     }
     else if (EVENT_NODE_EXPANDED.equals(event.getType())) {
-      handleUiNodeExpanded(event, res);
+      handleUiNodeExpanded(event);
     }
     else if (EVENT_NODES_CHECKED.equals(event.getType())) {
-      handleUiNodesChecked(event, res);
+      handleUiNodesChecked(event);
     }
     else {
-      super.handleUiEvent(event, res);
+      super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiNodesChecked(JsonEvent event, JsonResponse res) {
+  protected void handleUiNodesChecked(JsonEvent event) {
     CheckedInfo treeNodesChecked = jsonToCheckedInfo(event.getData());
     addTreeEventFilterCondition(TreeEvent.TYPE_NODES_CHECKED, treeNodesChecked.getAllNodes());
     if (treeNodesChecked.getCheckedNodes().size() > 0) {
@@ -532,23 +531,23 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     }
   }
 
-  protected void handleUiNodeClicked(JsonEvent event, JsonResponse res) {
+  protected void handleUiNodeClicked(JsonEvent event) {
     final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
     getModel().getUIFacade().fireNodeClickFromUI(node, MouseButton.Left);
   }
 
-  protected void handleUiNodeAction(JsonEvent event, JsonResponse res) {
+  protected void handleUiNodeAction(JsonEvent event) {
     final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
     getModel().getUIFacade().fireNodeActionFromUI(node);
   }
 
-  protected void handleUiNodesSelected(JsonEvent event, JsonResponse res) {
+  protected void handleUiNodesSelected(JsonEvent event) {
     final List<ITreeNode> nodes = extractTreeNodes(event.getData());
     addTreeEventFilterCondition(TreeEvent.TYPE_NODES_SELECTED, nodes);
     getModel().getUIFacade().setNodesSelectedFromUI(nodes);
   }
 
-  protected void handleUiNodeExpanded(JsonEvent event, JsonResponse res) {
+  protected void handleUiNodeExpanded(JsonEvent event) {
     ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
     boolean expanded = JsonObjectUtility.getBoolean(event.getData(), PROP_EXPANDED);
     int eventType = expanded ? TreeEvent.TYPE_NODE_EXPANDED : TreeEvent.TYPE_NODE_COLLAPSED;

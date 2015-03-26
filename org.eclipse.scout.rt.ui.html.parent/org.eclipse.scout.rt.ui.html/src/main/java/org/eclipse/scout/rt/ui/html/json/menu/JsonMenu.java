@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 import org.json.JSONObject;
 
@@ -79,16 +78,16 @@ public class JsonMenu<T extends IMenu> extends JsonAction<T> {
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (EVENT_ABOUT_TO_SHOW.equals(event.getType())) {
-      handleUiMenuAboutToShow(event, res);
+      handleUiMenuAboutToShow(event);
     }
     else {
-      super.handleUiEvent(event, res);
+      super.handleUiEvent(event);
     }
   }
 
-  public void handleUiMenuAboutToShow(JsonEvent event, JsonResponse res) {
+  public void handleUiMenuAboutToShow(JsonEvent event) {
     getModel().aboutToShow();
   }
 }

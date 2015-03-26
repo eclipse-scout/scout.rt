@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
@@ -150,13 +149,13 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (EVENT_FORM_CLOSING.equals(event.getType())) {
-      handleUiFormClosing(event, res);
+      handleUiFormClosing(event);
     }
   }
 
-  public void handleUiFormClosing(JsonEvent event, JsonResponse res) {
+  public void handleUiFormClosing(JsonEvent event) {
     getModel().getUIFacade().fireFormClosingFromUI();
   }
 

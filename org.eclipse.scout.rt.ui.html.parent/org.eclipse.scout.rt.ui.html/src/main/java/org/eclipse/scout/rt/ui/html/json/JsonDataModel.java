@@ -52,7 +52,7 @@ public class JsonDataModel<T extends IDataModel> extends AbstractJsonAdapter<T> 
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
   }
 
 }

@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
@@ -113,7 +112,7 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> implements I
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (JsonEventType.CLICKED.matches(event)) {
       getModel().getUIFacade().fireButtonClickedFromUI();
     }
@@ -122,7 +121,7 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> implements I
       getModel().getUIFacade().setSelectedFromUI(selected);
     }
     else {
-      super.handleUiEvent(event, res);
+      super.handleUiEvent(event);
     }
   }
 }

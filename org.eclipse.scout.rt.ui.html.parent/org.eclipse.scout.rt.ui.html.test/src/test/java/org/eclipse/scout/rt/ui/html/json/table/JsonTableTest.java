@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
@@ -84,7 +83,7 @@ public class JsonTableTest {
     JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
 
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row));
-    jsonTable.handleUiEvent(event, new JsonResponse());
+    jsonTable.handleUiEvent(event);
 
     assertTrue(row.isSelected());
   }
@@ -104,7 +103,7 @@ public class JsonTableTest {
     JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
     JsonEvent event = createJsonSelectedEvent(null);
 
-    jsonTable.handleUiEvent(event, new JsonResponse());
+    jsonTable.handleUiEvent(event);
 
     assertTrue(table.getSelectedRows().size() == 0);
   }
@@ -120,7 +119,7 @@ public class JsonTableTest {
     JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
 
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row));
-    jsonTable.handleUiEvent(event, new JsonResponse());
+    jsonTable.handleUiEvent(event);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_jsonSession.currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
@@ -150,7 +149,7 @@ public class JsonTableTest {
     assertFalse(row2.isSelected());
     assertFalse(row4.isSelected());
 
-    jsonTable.handleUiEvent(event, new JsonResponse());
+    jsonTable.handleUiEvent(event);
 
     assertFalse(row2.isSelected());
     assertTrue(row4.isSelected());
@@ -189,7 +188,7 @@ public class JsonTableTest {
     assertTrue(row2.isSelected());
     assertFalse(row4.isSelected());
 
-    jsonTable.handleUiEvent(event, new JsonResponse());
+    jsonTable.handleUiEvent(event);
 
     assertFalse(row2.isSelected());
     assertTrue(row4.isSelected());
@@ -217,12 +216,12 @@ public class JsonTableTest {
     assertEquals(table.getColumnSet().getVisibleColumn(1), column1);
 
     JsonEvent event = createJsonColumnMovedEvent(column0.getColumnId(), 2);
-    jsonTable.handleUiEvent(event, new JsonResponse());
+    jsonTable.handleUiEvent(event);
 
     assertEquals(table.getColumnSet().getVisibleColumn(2), column0);
 
     event = createJsonColumnMovedEvent(column1.getColumnId(), 0);
-    jsonTable.handleUiEvent(event, new JsonResponse());
+    jsonTable.handleUiEvent(event);
 
     assertEquals(table.getColumnSet().getVisibleColumn(0), column1);
   }
@@ -241,7 +240,7 @@ public class JsonTableTest {
     JSONArray jsonCells = (JSONArray) jsonRow.get("cells");
 
     JsonEvent event = createJsonColumnMovedEvent(column0.getColumnId(), 2);
-    jsonTable.handleUiEvent(event, new JsonResponse());
+    jsonTable.handleUiEvent(event);
 
     JSONObject jsonRowAfterMoving = jsonTable.tableRowToJson(table.getRow(0));
     JSONArray jsonCellsAfterMoving = (JSONArray) jsonRowAfterMoving.get("cells");
@@ -267,7 +266,7 @@ public class JsonTableTest {
     JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
 
     JsonEvent event = createJsonColumnMovedEvent(column.getColumnId(), 2);
-    jsonTable.handleUiEvent(event, new JsonResponse());
+    jsonTable.handleUiEvent(event);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_jsonSession.currentJsonResponse(), "columnOrderChanged");

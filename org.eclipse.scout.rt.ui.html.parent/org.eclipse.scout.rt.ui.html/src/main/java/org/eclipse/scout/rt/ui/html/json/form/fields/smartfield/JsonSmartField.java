@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONObject;
@@ -91,7 +90,7 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if ("openProposal".equals(event.getType())) {
       handleUiOpenProposal(event);
     }
@@ -102,7 +101,7 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
       handleUiAcceptProposal(event);
     }
     else {
-      super.handleUiEvent(event, res);
+      super.handleUiEvent(event);
     }
   }
 

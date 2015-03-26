@@ -152,7 +152,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     throw new IllegalStateException("Event not handled. " + event);
   }
 

@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
@@ -72,7 +71,7 @@ public class JsonTreeTest {
     JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
 
     JsonEvent event = createJsonSelectedEvent(jsonTree.getOrCreateNodeId(node));
-    jsonTree.handleUiEvent(event, new JsonResponse());
+    jsonTree.handleUiEvent(event);
 
     assertTrue(node.isSelectedNode());
   }
@@ -88,7 +87,7 @@ public class JsonTreeTest {
     JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
 
     JsonEvent event = createJsonSelectedEvent(jsonTree.getOrCreateNodeId(node));
-    jsonTree.handleUiEvent(event, new JsonResponse());
+    jsonTree.handleUiEvent(event);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_jsonSession.currentJsonResponse(), JsonTree.EVENT_NODES_SELECTED);
@@ -148,7 +147,7 @@ public class JsonTreeTest {
 
     //Check expanded = true
     JsonEvent event = createJsonExpansionEvent(jsonTree.getOrCreateNodeId(node), true);
-    jsonTree.handleUiEvent(event, new JsonResponse());
+    jsonTree.handleUiEvent(event);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_jsonSession.currentJsonResponse(), JsonTree.EVENT_NODE_EXPANDED);
@@ -156,7 +155,7 @@ public class JsonTreeTest {
 
     //Check expanded = false
     event = createJsonExpansionEvent(jsonTree.getOrCreateNodeId(node), false);
-    jsonTree.handleUiEvent(event, new JsonResponse());
+    jsonTree.handleUiEvent(event);
 
     responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_jsonSession.currentJsonResponse(), JsonTree.EVENT_NODE_EXPANDED);

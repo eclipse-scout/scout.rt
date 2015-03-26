@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
@@ -112,12 +111,12 @@ public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFo
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (EVENT_EXPANDED.equals(event.getType())) {
       handleUiExpanded(event);
     }
     else {
-      super.handleUiEvent(event, res);
+      super.handleUiEvent(event);
     }
   }
 

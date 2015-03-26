@@ -17,7 +17,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 
 public abstract class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<T> {
@@ -98,16 +97,16 @@ public abstract class JsonAction<T extends IAction> extends AbstractJsonProperty
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (EVENT_DO_ACTION.equals(event.getType())) {
-      handleUiDoAction(event, res);
+      handleUiDoAction(event);
     }
     else if (IAction.PROP_SELECTED.equals(event.getType())) {
       handleUiSelected(event);
     }
   }
 
-  public void handleUiDoAction(JsonEvent event, JsonResponse res) {
+  public void handleUiDoAction(JsonEvent event) {
     getModel().getUIFacade().fireActionFromUI();
   }
 

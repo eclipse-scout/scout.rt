@@ -15,7 +15,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 
 public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> {
 
@@ -47,12 +46,12 @@ public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> 
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if ("search".equals(event.getType())) {
       handleUiSearch(event);
     }
     else {
-      super.handleUiEvent(event, res);
+      super.handleUiEvent(event);
     }
   }
 

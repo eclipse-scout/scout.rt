@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.json.JSONArray;
 
 public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends AbstractJsonPropertyObserver<P> {
@@ -207,25 +206,25 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (EVENT_SELECTION.equals(event.getType())) {
-      handleUiSelection(event, res);
+      handleUiSelection(event);
     }
     else if (EVENT_SET_DAYS.equals(event.getType())) {
-      handleUiSetDays(event, res);
+      handleUiSetDays(event);
     }
     else if (EVENT_SET_SELECTED_ACTIVITY_CELLS.equals(event.getType())) {
-      handleUiSetSelectedActivityCells(event, res);
+      handleUiSetSelectedActivityCells(event);
     }
     else if (EVENT_CELL_ACTION.equals(event.getType())) {
-      handleCellAction(event, res);
+      handleCellAction(event);
     }
     else {
-      super.handleUiEvent(event, res);
+      super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiSelection(JsonEvent event, JsonResponse res) {
+  protected void handleUiSelection(JsonEvent event) {
     JSONArray resourceIdsArray = event.getData().optJSONArray("resourceIds");
     List<RI> resourceIds = new ArrayList<>();
     for (int i = 0; i < resourceIdsArray.length(); i++) {
@@ -249,7 +248,7 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
     uiFacade.setSelectionFromUI(resourceIds, normalizedRange);
   }
 
-  protected void handleUiSetDays(JsonEvent event, JsonResponse res) {
+  protected void handleUiSetDays(JsonEvent event) {
     JSONArray jsonDays = event.getData().optJSONArray("days");
     Date[] days = new Date[jsonDays.length()];
     for (int i = 0; i < jsonDays.length(); i++) {
@@ -261,7 +260,7 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
     uiFacade.setDaysFromUI(days);
   }
 
-  protected void handleUiSetSelectedActivityCells(JsonEvent event, JsonResponse res) {
+  protected void handleUiSetSelectedActivityCells(JsonEvent event) {
     ActivityCell<RI, AI> activityCell = null;
     // TODO Map data from JSON
 
@@ -270,7 +269,7 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
     uiFacade.setSelectedActivityCellFromUI(activityCell);
   }
 
-  protected void handleCellAction(JsonEvent event, JsonResponse res) {
+  protected void handleCellAction(JsonEvent event) {
     RI resourceId = null;
     // TODO Map data from JSON
 

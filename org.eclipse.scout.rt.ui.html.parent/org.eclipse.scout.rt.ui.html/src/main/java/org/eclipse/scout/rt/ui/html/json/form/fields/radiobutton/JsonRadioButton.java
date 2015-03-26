@@ -15,7 +15,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 
 public class JsonRadioButton<T extends IRadioButton> extends JsonButton<T> {
@@ -43,14 +42,14 @@ public class JsonRadioButton<T extends IRadioButton> extends JsonButton<T> {
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (SELECTED.equals(event.getType())) {
       addPropertyEventFilterCondition(IRadioButton.PROP_SELECTED, true);
       getModel().getUIFacade().fireButtonClickedFromUI();
       getModel().getUIFacade().setSelectedFromUI(true);
     }
     else {
-      super.handleUiEvent(event, res);
+      super.handleUiEvent(event);
     }
   }
 }

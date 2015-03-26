@@ -39,7 +39,7 @@ public interface IJsonAdapter<T extends Object> extends IJsonObject {
 
   void dispose();
 
-  void handleUiEvent(JsonEvent event, JsonResponse res);
+  void handleUiEvent(JsonEvent event);
 
   /**
    * An adapter may clean up it's event filters when this method is called after an UI event has been processed.

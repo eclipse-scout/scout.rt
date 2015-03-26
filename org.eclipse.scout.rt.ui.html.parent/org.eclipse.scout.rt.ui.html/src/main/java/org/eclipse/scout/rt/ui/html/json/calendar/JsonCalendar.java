@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -229,27 +228,27 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (EVENT_COMPONENT_ACTION.equals(event.getType())) {
-      handleUiComponentAction(event, res);
+      handleUiComponentAction(event);
     }
     else if (EVENT_COMPONENT_MOVED.equals(event.getType())) {
-      handleUiComponentMoved(event, res);
+      handleUiComponentMoved(event);
     }
     else if (EVENT_RELOAD.equals(event.getType())) {
-      handleUiReload(event, res);
+      handleUiReload(event);
     }
     else if (EVENT_SET_VISIBLE_RANGE.equals(event.getType())) {
-      handleUiSetVisibleRange(event, res);
+      handleUiSetVisibleRange(event);
     }
     else if (EVENT_SET_SELECTION.equals(event.getType())) {
-      handleUiSetSelection(event, res);
+      handleUiSetSelection(event);
     }
     else if (EVENT_SET_DISPLAY_MODE.equals(event.getType())) {
-      handleUiSetDisplayMode(event, res);
+      handleUiSetDisplayMode(event);
     }
     else {
-      super.handleUiEvent(event, res);
+      super.handleUiEvent(event);
     }
   }
 
@@ -260,24 +259,24 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 //    getModel().getUIFacade().setSelectedFromUI(selected);
 //  }
 
-  protected void handleUiComponentAction(JsonEvent event, JsonResponse res) {
+  protected void handleUiComponentAction(JsonEvent event) {
     getModel().getUIFacade().fireComponentActionFromUI();
     waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
-  protected void handleUiComponentMoved(JsonEvent event, JsonResponse res) {
+  protected void handleUiComponentMoved(JsonEvent event) {
     CalendarComponent comp = resolveCalendarComponent(event.getData().optString("component"));
     Date newDate = new JsonDate(event.getData().optString("newDate")).asJavaDate();
     getModel().getUIFacade().fireComponentMovedFromUI(comp, newDate);
     waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
-  protected void handleUiReload(JsonEvent event, JsonResponse res) {
+  protected void handleUiReload(JsonEvent event) {
     getModel().getUIFacade().fireReloadFromUI();
     waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
-  protected void handleUiSetVisibleRange(JsonEvent event, JsonResponse res) {
+  protected void handleUiSetVisibleRange(JsonEvent event) {
     JSONObject dateRange = event.getData().optJSONObject("dateRange");
     Date fromDate = new JsonDate(dateRange.optString("from")).asJavaDate();
     Date toDate = new JsonDate(dateRange.optString("to")).asJavaDate();
@@ -285,14 +284,14 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
-  protected void handleUiSetSelection(JsonEvent event, JsonResponse res) {
+  protected void handleUiSetSelection(JsonEvent event) {
     Date date = new JsonDate(event.getData().optString("date")).asJavaDate();
     CalendarComponent comp = resolveCalendarComponent(event.getData().optString("component"));
     getModel().getUIFacade().setSelectionFromUI(date, comp);
     waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
-  protected void handleUiSetDisplayMode(JsonEvent event, JsonResponse res) {
+  protected void handleUiSetDisplayMode(JsonEvent event) {
     int displayMode = event.getData().optInt("displayMode");
     // TODO BSH Calendar | Check if we should add this method to the UI facade
     getModel().setDisplayMode(displayMode);

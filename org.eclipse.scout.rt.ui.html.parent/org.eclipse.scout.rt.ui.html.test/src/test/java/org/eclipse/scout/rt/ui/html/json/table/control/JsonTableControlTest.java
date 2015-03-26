@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
@@ -69,7 +68,7 @@ public class JsonTableControlTest {
     assertNull(jsonControl.getAdapter(form));
 
     JsonEvent event = createJsonSelectedEvent(jsonControl.getId(), true);
-    jsonControl.handleUiEvent(event, new JsonResponse());
+    jsonControl.handleUiEvent(event);
 
     // Form needs to be created and sent if selection changes to true
     IJsonAdapter<?> formAdapter = jsonControl.getAdapter(form);
@@ -80,13 +79,13 @@ public class JsonTableControlTest {
 
     // Don't send form again on subsequent selection changes
     event = createJsonSelectedEvent(jsonControl.getId(), false);
-    jsonControl.handleUiEvent(event, new JsonResponse());
+    jsonControl.handleUiEvent(event);
     formId = JsonTestUtility.extractProperty(m_jsonSession.currentJsonResponse(), jsonControl.getId(), "form");
     assertNull(formId);
     JsonTestUtility.endRequest(m_jsonSession);
 
     event = createJsonSelectedEvent(jsonControl.getId(), true);
-    jsonControl.handleUiEvent(event, new JsonResponse());
+    jsonControl.handleUiEvent(event);
     formId = JsonTestUtility.extractProperty(m_jsonSession.currentJsonResponse(), jsonControl.getId(), "form");
     assertNull(formId);
   }

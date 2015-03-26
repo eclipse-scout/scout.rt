@@ -44,7 +44,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.ICellValueReader;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
@@ -274,55 +273,55 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (EVENT_ROW_CLICKED.equals(event.getType())) {
-      handleUiRowClicked(event, res);
+      handleUiRowClicked(event);
     }
     else if (EVENT_ROW_ACTION.equals(event.getType())) {
-      handleUiRowAction(event, res);
+      handleUiRowAction(event);
     }
     else if (EVENT_ROWS_SELECTED.equals(event.getType())) {
-      handleUiRowsSelected(event, res);
+      handleUiRowsSelected(event);
     }
     else if (EVENT_RELOAD.equals(event.getType())) {
-      handleUiReload(event, res);
+      handleUiReload(event);
     }
     else if (EVENT_RESET_COLUMNS.equals(event.getType())) {
-      handleUiResetColumns(event, res);
+      handleUiResetColumns(event);
     }
     else if (EVENT_SORT_ROWS.equals(event.getType())) {
-      handleUiSortRows(event, res);
+      handleUiSortRows(event);
     }
     else if (EVENT_ROWS_SORTED.equals(event.getType())) {
-      handleUiRowsSorted(event, res);
+      handleUiRowsSorted(event);
     }
     else if (EVENT_COLUMN_MOVED.equals(event.getType())) {
-      handleUiColumnMoved(event, res);
+      handleUiColumnMoved(event);
     }
     else if (EVENT_COLUMN_RESIZED.equals(event.getType())) {
-      handleUiColumnResized(event, res);
+      handleUiColumnResized(event);
     }
     else if (EVENT_HYPERLINK_ACTION.equals(event.getType())) {
-      handleUiHyperlinkAction(event, res);
+      handleUiHyperlinkAction(event);
     }
     else if (EVENT_ROWS_CHECKED.equals(event.getType())) {
-      handleUiRowChecked(event, res);
+      handleUiRowChecked(event);
     }
     else if (EVENT_PREPARE_CELL_EDIT.equals(event.getType())) {
-      handleUiPrepareCellEdit(event, res);
+      handleUiPrepareCellEdit(event);
     }
     else if (EVENT_COMPLETE_CELL_EDIT.equals(event.getType())) {
-      handleUiCompleteCellEdit(event, res);
+      handleUiCompleteCellEdit(event);
     }
     else if (EVENT_CANCEL_CELL_EDIT.equals(event.getType())) {
-      handleUiCancelCellEdit(event, res);
+      handleUiCancelCellEdit(event);
     }
     else {
-      super.handleUiEvent(event, res);
+      super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiRowClicked(JsonEvent event, JsonResponse res) {
+  protected void handleUiRowClicked(JsonEvent event) {
     ITableRow tableRow = extractTableRow(event.getData());
     IColumn column = extractColumn(event.getData());
     ArrayList<ITableRow> rows = new ArrayList<ITableRow>();
@@ -332,7 +331,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     getModel().getUIFacade().fireRowClickFromUI(tableRow, MouseButton.Left);
   }
 
-  protected void handleUiRowChecked(JsonEvent event, JsonResponse res) {
+  protected void handleUiRowChecked(JsonEvent event) {
     CheckedInfo tableRowsChecked = jsonToCheckedInfo(event.getData());
     addTableEventFilterCondition(TableEvent.TYPE_ROWS_CHECKED).setRows(tableRowsChecked.getAllRows());
     addTableEventFilterCondition(TableEvent.TYPE_ROWS_UPDATED).setRows(tableRowsChecked.getAllRows());
@@ -345,17 +344,17 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  protected void handleUiRowsSelected(JsonEvent event, JsonResponse res) {
+  protected void handleUiRowsSelected(JsonEvent event) {
     List<ITableRow> tableRows = extractTableRows(event.getData());
     addTableEventFilterCondition(TableEvent.TYPE_ROWS_SELECTED).setRows(tableRows);
     getModel().getUIFacade().setSelectedRowsFromUI(tableRows);
   }
 
-  protected void handleUiReload(JsonEvent event, JsonResponse res) {
+  protected void handleUiReload(JsonEvent event) {
     getModel().getUIFacade().fireTableReloadFromUI();
   }
 
-  protected void handleUiResetColumns(JsonEvent event, JsonResponse res) {
+  protected void handleUiResetColumns(JsonEvent event) {
     //FIXME AWE/CGU Code from ResetColumnsMenu, move to ITableUiFacade
     try {
       getModel().setTableChanging(true);
@@ -383,12 +382,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
    * Makes sure that no rowOrderChanged event is returned to the client after sorting because the sorting already
    * happened on client as well.
    */
-  protected void handleUiRowsSorted(JsonEvent event, JsonResponse res) {
+  protected void handleUiRowsSorted(JsonEvent event) {
     addTableEventFilterCondition(TableEvent.TYPE_ROW_ORDER_CHANGED);
     fireSortRowsFromUi(event.getData());
   }
 
-  protected void handleUiSortRows(JsonEvent event, JsonResponse res) {
+  protected void handleUiSortRows(JsonEvent event) {
     fireSortRowsFromUi(event.getData());
   }
 
@@ -407,7 +406,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  protected void handleUiColumnMoved(JsonEvent event, JsonResponse res) {
+  protected void handleUiColumnMoved(JsonEvent event) {
     IColumn column = extractColumn(event.getData());
     int viewIndex = JsonObjectUtility.getInt(event.getData(), "index");
 
@@ -419,21 +418,21 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     getModel().getUIFacade().fireColumnMovedFromUI(column, viewIndex);
   }
 
-  protected void handleUiColumnResized(JsonEvent event, JsonResponse res) {
+  protected void handleUiColumnResized(JsonEvent event) {
     IColumn column = extractColumn(event.getData());
     int width = JsonObjectUtility.getInt(event.getData(), "width");
 
     getModel().getUIFacade().setColumnWidthFromUI(column, width);
   }
 
-  protected void handleUiRowAction(JsonEvent event, JsonResponse res) {
+  protected void handleUiRowAction(JsonEvent event) {
     ITableRow tableRow = extractTableRow(event.getData());
     IColumn column = extractColumn(event.getData());
     getModel().getUIFacade().setContextColumnFromUI(column);
     getModel().getUIFacade().fireRowActionFromUI(tableRow);
   }
 
-  protected void handleUiHyperlinkAction(JsonEvent event, JsonResponse res) {
+  protected void handleUiHyperlinkAction(JsonEvent event) {
     ITableRow row = extractTableRow(event.getData());
     IColumn column = extractColumn(event.getData());
     URL url = null;
@@ -449,7 +448,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  protected void handleUiPrepareCellEdit(JsonEvent event, JsonResponse res) {
+  protected void handleUiPrepareCellEdit(JsonEvent event) {
     ITableRow row = extractTableRow(event.getData());
     IColumn column = extractColumn(event.getData());
     IFormField field = getModel().getUIFacade().prepareCellEditFromUI(row, column);
@@ -466,7 +465,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     addActionEvent(EVENT_START_CELL_EDIT, json);
   }
 
-  protected void handleUiCompleteCellEdit(JsonEvent event, JsonResponse res) {
+  protected void handleUiCompleteCellEdit(JsonEvent event) {
     String fieldId = JsonObjectUtility.getString(event.getData(), "fieldId");
     getModel().getUIFacade().completeCellEditFromUI();
 
@@ -477,7 +476,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     jsonAdapter.dispose();
   }
 
-  protected void handleUiCancelCellEdit(JsonEvent event, JsonResponse res) {
+  protected void handleUiCancelCellEdit(JsonEvent event) {
     String fieldId = JsonObjectUtility.getString(event.getData(), "fieldId");
     getModel().getUIFacade().cancelCellEditFromUI();
 

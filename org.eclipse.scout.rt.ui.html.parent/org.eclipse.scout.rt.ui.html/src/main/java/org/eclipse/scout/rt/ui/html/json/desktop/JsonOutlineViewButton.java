@@ -7,7 +7,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonGlobalAdapterProperty;
 
@@ -40,19 +39,19 @@ public class JsonOutlineViewButton<T extends IOutlineViewButton> extends JsonAct
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (JsonEventType.CLICKED.matches(event)) {
-      handleUiClick(event, res);
+      handleUiClick(event);
     }
     else if (EVENT_DO_ACTION.equals(event.getType())) {
-      handleUiClick(event, res);
+      handleUiClick(event);
     }
     else {
       throw new IllegalArgumentException("unsupported event type");
     }
   }
 
-  protected void handleUiClick(JsonEvent event, JsonResponse res) {
+  protected void handleUiClick(JsonEvent event) {
     getModel().getUIFacade().setSelectedFromUI(true);
     getModel().getUIFacade().fireActionFromUI();
   }

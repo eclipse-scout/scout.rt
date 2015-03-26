@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONArray;
@@ -101,16 +100,16 @@ public class JsonWizardProgressField<T extends IWizardProgressField> extends Jso
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (EVENT_STEP_CLICKED.equals(event.getType())) {
-      handleUiStepClicked(event, res);
+      handleUiStepClicked(event);
     }
     else {
-      super.handleUiEvent(event, res);
+      super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiStepClicked(JsonEvent event, JsonResponse res) {
+  protected void handleUiStepClicked(JsonEvent event) {
     int targetStepIndex = event.getData().optInt("stepIndex", -1);
     getModel().getUIFacade().activateStepFromUI(targetStepIndex);
   }

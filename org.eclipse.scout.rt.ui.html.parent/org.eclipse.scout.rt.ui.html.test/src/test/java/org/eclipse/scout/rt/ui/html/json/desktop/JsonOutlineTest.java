@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NodePage;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NodePageWithForm;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.Outline;
@@ -202,7 +201,7 @@ public class JsonOutlineTest {
 
     // Simulate "select page2" event
     JsonEvent event = createNodeSelectionEvent(jsonOutline, page2);
-    jsonOutline.handleUiEvent(event, new JsonResponse());
+    jsonOutline.handleUiEvent(event);
 
     assertEquals(1, initPageCounter.getValue().intValue());
 

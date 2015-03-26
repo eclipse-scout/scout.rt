@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 
 public class JsonTabBox<T extends ITabBox> extends JsonCompositeField<T, IGroupBox> {
@@ -63,12 +62,12 @@ public class JsonTabBox<T extends ITabBox> extends JsonCompositeField<T, IGroupB
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (JsonEventType.SELECTED.matches(event)) {
       handleUiTabSelected(event);
     }
     else {
-      super.handleUiEvent(event, res);
+      super.handleUiEvent(event);
     }
   }
 

@@ -17,20 +17,19 @@ import static org.junit.Assert.assertNull;
 import java.util.Collections;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.OutlineViewButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.OutlineWithOneNode;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
-import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,7 +76,7 @@ public class JsonOutlineViewButtonTest {
     assertNull(jsonViewButton.getAdapter(outline));
 
     JsonEvent event = createJsonClickedEvent(jsonViewButton.getId());
-    jsonViewButton.handleUiEvent(event, new JsonResponse());
+    jsonViewButton.handleUiEvent(event);
 
     // Outline needs to be created and sent if selection changes to true
     IJsonAdapter<?> outlineAdapter = jsonViewButton.getAdapter(outline);

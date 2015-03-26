@@ -15,7 +15,6 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.json.JSONObject;
 
@@ -39,12 +38,12 @@ public class JsonTableOrganizeMenu extends JsonMenu<TableOrganizeMenu> {
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public void handleUiEvent(JsonEvent event) {
     if (JsonEventType.CLICKED.matches(event)) {
       getModel().getUIFacade().fireActionFromUI();
     }
     else {
-      super.handleUiEvent(event, res);
+      super.handleUiEvent(event);
     }
   }
 
