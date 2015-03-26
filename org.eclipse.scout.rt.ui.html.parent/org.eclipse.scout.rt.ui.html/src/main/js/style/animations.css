@@ -23,6 +23,14 @@
   animation-name: @name;
 }
 
+.animation-delay(@delay) {
+  -webkit-animation-delay: @delay;
+  -moz-animation-delay: @delay;
+  -ms-animation-delay: @delay;
+  -o-animation-delay: @delay;
+  animation-delay: @delay;
+}
+
 .animation-fill-mode(@fillMode) {
   -webkit-animation-fill-mode: @fillMode;
   -moz-animation-fill-mode: @fillMode;
@@ -167,12 +175,27 @@
 .keyframes-rotate-x () {
   0% {
     .transform(perspective(120px) rotateY(0deg));
-  } 50% {
+  }
+  50% {
     .transform(perspective(120px) rotateY(-180.0deg));
-  } 100% {
+  }
+  100% {
     .transform(perspective(120px) rotateY(-360deg));
   }
 }
 
 @-webkit-keyframes rotate-x { .keyframes-rotate-x; }
 @keyframes rotate-x { .keyframes-rotate-x; }
+
+/*** Animate Dot ***/
+
+.keyframes-animate-dot () {
+  0%   { color: @text-color;     bottom:0px; }
+  25%  { color: @palette-gray-6; bottom:4px; }
+  50%  { color: @text-color;     bottom:0px; }
+  100% { color: @text-color;     bottom:0px; }
+}
+
+@-webkit-keyframes animateDot { .keyframes-animate-dot; }
+@keyframes animateDot { .keyframes-animate-dot; }
+

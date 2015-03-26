@@ -71,6 +71,21 @@
     background-color: @panel-background-color;
     border-top: solid 1px @desktop-border-color;
     height: @logical-grid-height;
-    padding-top: 5px;
+    padding: 7px 8px 0 8px;
   }
 }
+
+.elipsis {
+  padding-left: 3px;
+}
+
+.animate-dot {
+  position: relative;
+  .animation-name(animateDot);
+  .animation-duration(1650ms);
+  .animation-iteration-count(infinite);
+}
+
+.delay-0 { .animation-delay(0ms); }
+.delay-1 { .animation-delay(200ms); }
+.delay-2 { .animation-delay(400ms); }
