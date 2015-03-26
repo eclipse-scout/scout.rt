@@ -41,16 +41,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-compiler-plugin</artifactId>
-        <configuration>
-          <compilerArguments>
-            <properties>${project.basedir}/../../com.bsiag.tools.rt.parent/com.bsiag.tools.rt-feature/.settings/org.eclipse.jdt.core.prefs</properties>
-          </compilerArguments>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>org.eclipse.tycho.extras</groupId>
         <artifactId>tycho-source-feature-plugin</artifactId>
         <configuration>
