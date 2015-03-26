@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
-import org.eclipse.scout.rt.platform.job.internal.future.Job;
 import org.eclipse.scout.rt.platform.job.internal.future.MutexAcquisitionFutureTask;
 
 /**
@@ -215,7 +214,7 @@ public class MutexSemaphores {
   public void passMutexToNextTask(final IFutureTask<?> currentMutexOwner) {
     final IFutureTask<?> nextTask = releaseAndPoll(currentMutexOwner);
     if (nextTask != null) {
-      m_executor.submit(Job.callable(nextTask.getJob()));
+      m_executor.execute(nextTask);
     }
   }
 

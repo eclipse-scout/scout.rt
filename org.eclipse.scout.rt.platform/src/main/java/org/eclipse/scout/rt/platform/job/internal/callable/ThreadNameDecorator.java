@@ -16,7 +16,6 @@ import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.rt.platform.job.JobEventFilters;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -55,7 +54,7 @@ public class ThreadNameDecorator<RESULT> implements ICallable<RESULT>, IChainabl
 
   @Override
   public RESULT call() throws Exception {
-    final ThreadInfo currentThreadInfo = NamedThreadFactory.CURRENT_THREAD_INFO.get();
+    final ThreadInfo currentThreadInfo = ThreadInfo.CURRENT.get();
 
     // Install job listener to decorate the thread's name once being blocked.
     final IJobListener listener = Jobs.getJobManager().addListener(new IJobListener() {

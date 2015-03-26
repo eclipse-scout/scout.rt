@@ -29,8 +29,6 @@ import org.eclipse.scout.rt.platform.job.JobExceptionHandler;
  */
 public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandler {
 
-  public static final ThreadLocal<ThreadInfo> CURRENT_THREAD_INFO = new ThreadLocal<>();
-
   protected static final IScoutLogger LOG = ScoutLogManager.getLogger(NamedThreadFactory.class);
 
   private final AtomicLong m_sequence;
@@ -53,12 +51,12 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
 
       @Override
       public void run() {
-        CURRENT_THREAD_INFO.set(threadInfo);
+        ThreadInfo.CURRENT.set(threadInfo);
         try {
           super.run();
         }
         finally {
-          CURRENT_THREAD_INFO.remove();
+          ThreadInfo.CURRENT.remove();
         }
       }
     };
@@ -91,6 +89,12 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
    * Information about the worker thread.
    */
   public static class ThreadInfo {
+
+    /**
+     * The {@link ThreadInfo} which is currently associated with the current thread.
+     */
+    public static final ThreadLocal<ThreadInfo> CURRENT = new ThreadLocal<>();
+
     private final String m_originalThreadName;
     private final long m_sequence;
 

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal.future;
 
+import java.util.concurrent.FutureTask;
+
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
@@ -22,18 +24,17 @@ import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
  * @since 5.1
  */
 @Internal
-public abstract class MutexAcquisitionFutureTask extends ScheduledFutureDelegate<Void> implements IFutureTask<Void> {
+public abstract class MutexAcquisitionFutureTask extends FutureTask<Void> implements IFutureTask<Void> {
 
   private final MutexSemaphores m_mutexSemaphores;
   private final Object m_mutexObject;
   private volatile boolean m_awaitMutex;
-  private final Job<Void> m_nullJob;
 
   public MutexAcquisitionFutureTask(final MutexSemaphores mutexSemaphores, final Object mutexObject) {
+    super(Callables.nullCallable());
     m_mutexSemaphores = mutexSemaphores;
     m_mutexObject = mutexObject;
     m_awaitMutex = true;
-    m_nullJob = new Job<>(this, Callables.nullCallable());
   }
 
   @Override
@@ -78,11 +79,6 @@ public abstract class MutexAcquisitionFutureTask extends ScheduledFutureDelegate
   @Override
   public void setBlocked(final boolean blocked) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Job<Void> getJob() {
-    return m_nullJob;
   }
 
   /**

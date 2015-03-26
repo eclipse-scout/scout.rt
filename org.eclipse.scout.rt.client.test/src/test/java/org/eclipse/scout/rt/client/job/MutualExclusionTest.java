@@ -16,10 +16,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,14 +25,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -51,8 +45,8 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory;
+import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
-import org.eclipse.scout.rt.platform.job.internal.future.Job;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.commons.UncaughtExceptionRunnable;
@@ -581,17 +575,16 @@ public class MutualExclusionTest {
    * We have 3 jobs that get scheduled simultaneously. The first waits some time so that job2 and job3 get queued. If
    * job2 gets scheduled, it is rejected by the executor. This test verifies, that job3 still gets scheduled.
    */
-  @SuppressWarnings("unchecked")
   @Test
   public void testRejection() throws InterruptedException, JobExecutionException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    final ScheduledThreadPoolExecutor executorMock = mock(ScheduledThreadPoolExecutor.class);
+    final ExecutorService executorMock = mock(ExecutorService.class);
 
     class TestJobManager extends JobManager {
 
       @Override
-      protected ScheduledExecutorService createExecutor() {
+      protected ExecutorService createExecutor() {
         return executorMock;
       }
     }
@@ -607,7 +600,7 @@ public class MutualExclusionTest {
 
       @Override
       public Future answer(InvocationOnMock invocation) throws Throwable {
-        final Job<?> job = (Job<?>) invocation.getArguments()[0];
+        final IFutureTask<?> futureTask = (IFutureTask) invocation.getArguments()[0];
 
         switch (count.incrementAndGet()) {
           case 1: // job-1: RUN
@@ -617,7 +610,13 @@ public class MutualExclusionTest {
               public void run() {
                 try {
                   jobsScheduledLatch.await(); // wait for all jobs to be scheduled.
-                  registerScheduledFuture(job).run(); // let job1 run
+                  ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo("mock-thread", 0));
+                  try {
+                    futureTask.run(); // let job1 run
+                  }
+                  finally {
+                    ThreadInfo.CURRENT.remove();
+                  }
                 }
                 catch (InterruptedException e) {
                   // NOOP
@@ -626,21 +625,27 @@ public class MutualExclusionTest {
             });
             break;
           case 2: // job-2: REJECT
-            job.getFutureTask().reject();
+            futureTask.reject();
             break;
           case 3: // job-3: RUN
             s_executor.execute(new Runnable() {
 
               @Override
               public void run() {
-                registerScheduledFuture(job).run();
+                ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo("mock-thread", 0));
+                try {
+                  futureTask.run();
+                }
+                finally {
+                  ThreadInfo.CURRENT.remove();
+                }
               }
             });
             break;
         }
         return null;
       }
-    }).when(executorMock).submit(any(Callable.class));
+    }).when(executorMock).execute(any(Runnable.class));
 
     final IFuture<Void> future1 = jobManager.schedule(new IRunnable() {
 
@@ -680,7 +685,6 @@ public class MutualExclusionTest {
    * job1 competes for the mutex anew. After job2 completes, job1 is rejected by the executor. However, to mutex was
    * acquired and therefore job1 can run. After job1 complete, job3 and job4 gets scheduled.
    */
-  @SuppressWarnings("unchecked")
   @Test
   public void testBlockedJobRejection() throws InterruptedException, ProcessingException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
@@ -710,7 +714,7 @@ public class MutualExclusionTest {
 
       @Override
       public Future answer(InvocationOnMock invocation) throws Throwable {
-        final Job<?> job = (Job<?>) invocation.getArguments()[0];
+        final IFutureTask<?> futureTask = (IFutureTask) invocation.getArguments()[0];
 
         switch (count.incrementAndGet()) {
           case 1: // job-1: RUN
@@ -720,7 +724,14 @@ public class MutualExclusionTest {
               public void run() {
                 try {
                   jobsScheduledLatch.await(); // wait for all jobs to be scheduled.
-                  registerScheduledFuture(job).run();
+
+                  ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo("mock-thread", 0));
+                  try {
+                    futureTask.run();
+                  }
+                  finally {
+                    ThreadInfo.CURRENT.remove();
+                  }
                 }
                 catch (InterruptedException e) {
                   // NOOP
@@ -735,17 +746,23 @@ public class MutualExclusionTest {
 
               @Override
               public void run() {
-                registerScheduledFuture(job).run();
+                ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo("mock-thread", 0));
+                try {
+                  futureTask.run();
+                }
+                finally {
+                  ThreadInfo.CURRENT.remove();
+                }
               }
             });
             break;
           case 3: // job-1:  re-acquires the mutex after being released from the blocking condition
-            job.getFutureTask().reject();
+            futureTask.reject();
             break;
         }
         return null;
       }
-    }).when(executorMock).submit(any(Callable.class));
+    }).when(executorMock).execute(any(Runnable.class));
 
     final IBlockingCondition BC = jobManager.createBlockingCondition("bc", true);
 
@@ -1216,51 +1233,6 @@ public class MutualExclusionTest {
     catch (JobExecutionException e) {
       fail();
     }
-  }
-
-  private <T> IFutureTask<T> registerScheduledFuture(final Job<T> job) {
-    final FutureTask<T> task = new FutureTask<>(job);
-    @SuppressWarnings("unchecked")
-    final RunnableScheduledFuture<T> javaFuture = mock(RunnableScheduledFuture.class);
-    doAnswer(new Answer<Void>() {
-
-      @Override
-      public Void answer(InvocationOnMock invocation) throws Throwable {
-        NamedThreadFactory.CURRENT_THREAD_INFO.set(new NamedThreadFactory.ThreadInfo("mock-thread", 0));
-        try {
-          task.run();
-        }
-        finally {
-          NamedThreadFactory.CURRENT_THREAD_INFO.remove();
-        }
-        return null;
-      }
-    }).when(javaFuture).run();
-    when(javaFuture.isCancelled()).thenAnswer(new Answer<Boolean>() {
-
-      @Override
-      public Boolean answer(InvocationOnMock invocation) throws Throwable {
-        return task.isCancelled();
-      }
-    });
-    when(javaFuture.isDone()).thenAnswer(new Answer<Boolean>() {
-
-      @Override
-      public Boolean answer(InvocationOnMock invocation) throws Throwable {
-        return task.isDone();
-      }
-    });
-    when(javaFuture.cancel(anyBoolean())).thenAnswer(new Answer<Boolean>() {
-
-      @Override
-      public Boolean answer(InvocationOnMock invocation) throws Throwable {
-        return task.cancel((boolean) invocation.getArguments()[0]);
-      }
-    });
-
-    job.getFutureTask().setDelegate(javaFuture);
-
-    return job.getFutureTask();
   }
 
   private class P_JobManager extends JobManager {

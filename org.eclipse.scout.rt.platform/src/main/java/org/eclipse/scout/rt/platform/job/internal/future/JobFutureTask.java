@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.platform.job.internal.future;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -33,22 +32,17 @@ import org.eclipse.scout.rt.platform.job.ProgressMonitorProvider;
 import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
 
 /**
- * Future to be given to the executor for execution. This class combines both, the Executable and its Future. This
- * FutureTask works on behalf of the origin {@link ScheduledFutureTask} created by the
- * {@link ScheduledThreadPoolExecutor}, which is set during scheduling. That 'lazy initialization' is due to the fact
- * that unlike {@link FutureTask}, a {@link ScheduledFutureTask} cannot be instantiated because of visibility
- * restrictions.
+ * Future to be given to the executor for execution. This class combines both, the Executable and its Future.
  *
- * @see ScheduledThreadPoolExecutor#decorateTask
+ * @see FutureTask
  * @since 5.1
  */
 @Internal
-public class JobFutureTask<RESULT> extends ScheduledFutureDelegate<RESULT> implements IFutureTask<RESULT>, IFuture<RESULT> {
+public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFutureTask<RESULT>, IFuture<RESULT> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobFutureTask.class);
 
   protected final JobInput m_input;
-  private final Job<RESULT> m_job;
   protected final Long m_expirationDate;
   private volatile boolean m_blocked;
   private final IProgressMonitor m_progressMonitor;
@@ -57,10 +51,10 @@ public class JobFutureTask<RESULT> extends ScheduledFutureDelegate<RESULT> imple
   private final MutexSemaphores m_mutexSemaphores;
 
   public JobFutureTask(final JobInput input, final boolean periodic, final MutexSemaphores mutexSemaphores, final ICallable<RESULT> callable) {
+    super(callable);
     m_input = input;
     m_periodic = periodic;
     m_mutexSemaphores = mutexSemaphores;
-    m_job = new Job<>(this, callable);
     m_progressMonitor = OBJ.get(ProgressMonitorProvider.class).provide(this);
 
     final long expirationTime = input.getExpirationTimeMillis();
@@ -73,8 +67,15 @@ public class JobFutureTask<RESULT> extends ScheduledFutureDelegate<RESULT> imple
   @Internal
   public void run() {
     beforeExecuteSafe();
+
+    // delegate control to the 'FutureTask' which in turn calls 'call' on the given Callable.
     try {
-      super.run(); // delegate control to the 'ScheduledFutureTask' which in turn calls 'call' on the job.
+      if (m_periodic) {
+        super.runAndReset(); // reset the FutureTask's state after execution so it can be executed anew once the period expires.
+      }
+      else {
+        super.run();
+      }
     }
     finally {
       afterExecuteSafe();
@@ -109,11 +110,6 @@ public class JobFutureTask<RESULT> extends ScheduledFutureDelegate<RESULT> imple
   @Override
   public boolean isMutexOwner() {
     return m_mutexSemaphores.isMutexOwner(this);
-  }
-
-  @Override
-  public Job<RESULT> getJob() {
-    return m_job;
   }
 
   /**

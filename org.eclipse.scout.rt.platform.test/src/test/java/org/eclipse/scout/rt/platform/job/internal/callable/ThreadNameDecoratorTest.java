@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
-import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
@@ -68,11 +67,11 @@ public class ThreadNameDecoratorTest {
 
     JobInput input = JobInput.fillEmpty().id("123").name("job1");
 
-    NamedThreadFactory.CURRENT_THREAD_INFO.set(new ThreadInfo("scout-thread", 5));
+    ThreadInfo.CURRENT.set(new ThreadInfo("scout-thread", 5));
     new ThreadNameDecorator<Void>(next, "scout-client-thread", input.getIdentifier()).call();
     assertEquals("scout-client-thread-5 [Running] 123:job1", threadName.getValue());
     assertEquals("scout-thread-5 [Idle]", Thread.currentThread().getName());
-    NamedThreadFactory.CURRENT_THREAD_INFO.remove();
+    ThreadInfo.CURRENT.remove();
   }
 
   @Test
@@ -90,11 +89,11 @@ public class ThreadNameDecoratorTest {
 
     JobInput input = JobInput.fillEmpty();
 
-    NamedThreadFactory.CURRENT_THREAD_INFO.set(new ThreadInfo("scout-thread", 5));
+    ThreadInfo.CURRENT.set(new ThreadInfo("scout-thread", 5));
     new ThreadNameDecorator<Void>(next, "scout-client-thread", input.getIdentifier()).call();
     assertEquals("scout-client-thread-5 [Running]", threadName.getValue());
     assertEquals("scout-thread-5 [Idle]", Thread.currentThread().getName());
-    NamedThreadFactory.CURRENT_THREAD_INFO.remove();
+    ThreadInfo.CURRENT.remove();
   }
 
   @Test

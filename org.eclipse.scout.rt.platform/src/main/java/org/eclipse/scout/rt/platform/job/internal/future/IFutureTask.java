@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal.future;
 
-import java.util.concurrent.RunnableScheduledFuture;
+import java.util.concurrent.RunnableFuture;
 
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
  * @see MutexAcquisitionFutureTask
  */
 @Internal
-public interface IFutureTask<RESULT> extends RunnableScheduledFuture<RESULT> {
+public interface IFutureTask<RESULT> extends RunnableFuture<RESULT> {
 
   /**
    * Invoke this method if the Future was rejected by the executor.
@@ -54,20 +54,4 @@ public interface IFutureTask<RESULT> extends RunnableScheduledFuture<RESULT> {
    * @see IBlockingCondition
    */
   void setBlocked(boolean blocked);
-
-  /**
-   * @return actual job given to the executor for execution.
-   */
-  Job<RESULT> getJob();
-
-  /**
-   * @param delegate
-   *          Future which this task should delegate to.
-   */
-  void setDelegate(final RunnableScheduledFuture<RESULT> delegate);
-
-  /**
-   * @return Future which this task delegates to; is <code>null</code> if not being scheduled yet.
-   */
-  RunnableScheduledFuture<RESULT> getDelegate();
 }

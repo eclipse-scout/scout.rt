@@ -10,12 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.RunnableScheduledFuture;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -47,7 +45,6 @@ import org.eclipse.scout.rt.platform.job.internal.callable.ApplyRunContextCallab
 import org.eclipse.scout.rt.platform.job.internal.callable.HandleExceptionCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.ThreadNameDecorator;
 import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
-import org.eclipse.scout.rt.platform.job.internal.future.Job;
 import org.eclipse.scout.rt.platform.job.internal.future.JobFutureTask;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -55,6 +52,11 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
 /**
  * Default implementation of {@link IJobManager}.
+ * <p/>
+ * This job manager is not based on {@link ScheduledThreadPoolExecutor} due to its fixed-size thread pool. That means,
+ * that once the <code>core-pool-size</code> is exceeded, the creation of on-demand threads up to a
+ * <code>maximum-pool-size</code> would not be supported. Instead, 'delayed scheduling' is implemented by
+ * {@link DelayedExecutor}.
  *
  * @since 5.1
  */
@@ -66,23 +68,35 @@ public class JobManager implements IJobManager {
   protected static final String PROP_CORE_POOL_SIZE = "org.eclipse.scout.job.corePoolSize";
   protected static final int DEFAULT_CORE_POOL_SIZE = 10; // The number of threads to keep in the pool, even if they are idle;
 
-  protected static final String PROP_KEEP_ALIVE_TIME = "org.eclipse.scout.job.keepAliveTime"; // The time limit for which threads may remain idle before being terminated; use 0 to keep them alive forever.
-  protected static final long DEFAULT_KEEP_ALIVE_TIME = 30; // minutes
+  protected static final String PROP_MAXIMUM_POOL_SIZE = "org.eclipse.scout.job.maximumPoolSize";
+  protected static final int DEFAULT_MAXIMUM_POOL_SIZE = Integer.MAX_VALUE; // The maximal number of threads to be created once the core-pool-size is exceeded.
+
+  protected static final String PROP_KEEP_ALIVE_TIME = "org.eclipse.scout.job.keepAliveTime"; // The time limit for which threads, which are created upon exceeding the 'core-pool-size' limit, may remain idle before being terminated.
+  protected static final long DEFAULT_KEEP_ALIVE_TIME = 60; // seconds
+
+  protected static final String PROP_ALLOW_CORE_THREAD_TIME_OUT = "org.eclipse.scout.job.allowCoreThreadTimeOut"; // Specifies whether threads of the core-pool should be terminated after being idle for longer than 'keepAliveTime'.
+  protected static final boolean DEFAULT_ALLOW_CORE_THREAD_TIME_OUT = false;
+
+  protected static final String PROP_DISPATCHER_THREAD_COUNT = "org.eclipse.scout.job.dispatcherThreadCount";
+  protected static final int DEFAULT_DISPATCHER_THREAD_COUNT = 1; // The number of dispatcher threads to be used to dispatch delayed jobs, meaning jobs scheduled with a delay or periodic jobs.
 
   @Internal
-  protected final ScheduledExecutorService m_executor;
+  protected final ExecutorService m_executor;
   @Internal
   protected final MutexSemaphores m_mutexSemaphores;
   @Internal
   protected final FutureSet m_futures;
   @Internal
   protected final JobListeners m_listeners;
+  @Internal
+  private final DelayedExecutor m_delayedExecutor;
 
   public JobManager() {
     m_executor = Assertions.assertNotNull(createExecutor());
     m_futures = new FutureSet();
     m_mutexSemaphores = Assertions.assertNotNull(createMutexSemaphores(m_executor));
     m_listeners = new JobListeners();
+    m_delayedExecutor = new DelayedExecutor(m_executor, "delayed-job-dispatcher", ConfigIniUtility.getPropertyInt(PROP_DISPATCHER_THREAD_COUNT, DEFAULT_DISPATCHER_THREAD_COUNT));
 
     addListener(m_futures, JobEventFilters.allFilter().eventTypes(JobEventType.SCHEDULED, JobEventType.DONE, JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.SHUTDOWN));
   }
@@ -92,7 +106,7 @@ public class JobManager implements IJobManager {
     final JobFutureTask<RESULT> futureTask = createJobFutureTask(executable, input, false);
 
     if (!futureTask.isMutexTask() || m_mutexSemaphores.tryAcquireElseOfferTail(futureTask)) {
-      m_executor.submit(Job.callable(futureTask.getJob()));
+      m_executor.execute(futureTask);
     }
 
     return futureTask;
@@ -102,20 +116,20 @@ public class JobManager implements IJobManager {
   public final <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit, final JobInput input) {
     final JobFutureTask<RESULT> futureTask = createJobFutureTask(executable, input, false);
 
-    if (futureTask.isMutexTask()) {
-      m_executor.schedule(new Runnable() {
+    m_delayedExecutor.schedule(new Runnable() {
 
-        @Override
-        public void run() {
+      @Override
+      public void run() {
+        if (futureTask.isMutexTask()) {
           if (m_mutexSemaphores.tryAcquireElseOfferTail(futureTask)) {
-            m_executor.submit(Job.callable(futureTask.getJob()));
+            futureTask.run();
           }
         }
-      }, delay, delayUnit);
-    }
-    else {
-      m_executor.schedule(Job.callable(futureTask.getJob()), delay, delayUnit);
-    }
+        else {
+          futureTask.run();
+        }
+      }
+    }, delay, delayUnit);
 
     return futureTask;
   }
@@ -125,7 +139,7 @@ public class JobManager implements IJobManager {
     final JobFutureTask<Void> futureTask = createJobFutureTask(runnable, input, true);
     Assertions.assertFalse(futureTask.isMutexTask(), "Mutual exclusion is not supported for periodic jobs");
 
-    m_executor.scheduleAtFixedRate(Job.runnable(futureTask.getJob()), initialDelay, period, unit);
+    m_delayedExecutor.schedule(new FixedRateRunnable(m_delayedExecutor, futureTask, period, unit), initialDelay, unit);
 
     return futureTask;
   }
@@ -135,7 +149,7 @@ public class JobManager implements IJobManager {
     final JobFutureTask<Void> futureTask = createJobFutureTask(runnable, input, true);
     Assertions.assertFalse(futureTask.isMutexTask(), "Mutual exclusion is not supported for periodic jobs");
 
-    m_executor.scheduleWithFixedDelay(Job.runnable(futureTask.getJob()), initialDelay, delay, unit);
+    m_delayedExecutor.schedule(new FixedDelayRunnable(m_delayedExecutor, futureTask, delay, unit), initialDelay, unit);
 
     return futureTask;
   }
@@ -253,7 +267,7 @@ public class JobManager implements IJobManager {
       }
     };
 
-    return futureTask;
+    return interceptFuture(futureTask);
   }
 
   /**
@@ -268,9 +282,12 @@ public class JobManager implements IJobManager {
    * Creates the executor to run jobs.
    */
   @Internal
-  protected ScheduledExecutorService createExecutor() {
+  protected ExecutorService createExecutor() {
     final int corePoolSize = ConfigIniUtility.getPropertyInt(PROP_CORE_POOL_SIZE, DEFAULT_CORE_POOL_SIZE);
+    final int maximumPoolSize = ConfigIniUtility.getPropertyInt(PROP_MAXIMUM_POOL_SIZE, DEFAULT_MAXIMUM_POOL_SIZE);
     final long keepAliveTime = ConfigIniUtility.getPropertyLong(PROP_KEEP_ALIVE_TIME, DEFAULT_KEEP_ALIVE_TIME);
+    final boolean allowCoreThreadTimeOut = ConfigIniUtility.getPropertyBoolean(PROP_ALLOW_CORE_THREAD_TIME_OUT, DEFAULT_ALLOW_CORE_THREAD_TIME_OUT);
+    final int dispatcherThreadCount = Assertions.assertGreater(ConfigIniUtility.getPropertyInt(PROP_DISPATCHER_THREAD_COUNT, DEFAULT_DISPATCHER_THREAD_COUNT), 0);
 
     // Create the rejection handler.
     final RejectedExecutionHandler rejectHandler = new RejectedExecutionHandler() {
@@ -287,47 +304,11 @@ public class JobManager implements IJobManager {
         if (runnable instanceof IFutureTask) {
           ((IFutureTask<?>) runnable).reject();
         }
-        else {
-          ((RunnableScheduledFuture) runnable).cancel(false);
-        }
       }
     };
 
-    // Create the executor.
-    final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(corePoolSize, new NamedThreadFactory("scout-thread"), rejectHandler) {
-
-      @Override
-      protected <RESULT> RunnableScheduledFuture<RESULT> decorateTask(final Callable<RESULT> callable, final RunnableScheduledFuture<RESULT> javaFuture) {
-        return decorate(callable, javaFuture);
-      }
-
-      @Override
-      protected <RESULT> RunnableScheduledFuture<RESULT> decorateTask(final Runnable runnable, final RunnableScheduledFuture<RESULT> javaFuture) {
-        return decorate(runnable, javaFuture);
-      }
-
-      @SuppressWarnings("unchecked")
-      private <RESULT> RunnableScheduledFuture<RESULT> decorate(final Object command, final RunnableScheduledFuture<RESULT> javaFuture) {
-        // Method invoked immediately after a task was offered to the executor but before being scheduled.
-        if (command instanceof Job) {
-          final IFutureTask<RESULT> futureTask = ((Job<RESULT>) command).getFutureTask();
-          futureTask.setDelegate(javaFuture);
-          return interceptFuture(futureTask);
-        }
-        else {
-          return javaFuture;
-        }
-      }
-    };
-
-    // Instrument the executor.
-    if (keepAliveTime == 0L) {
-      executor.allowCoreThreadTimeOut(false);
-    }
-    else {
-      executor.setKeepAliveTime(keepAliveTime, TimeUnit.MINUTES);
-      executor.allowCoreThreadTimeOut(true);
-    }
+    final ThreadPoolExecutor executor = new ThreadPoolExecutor(corePoolSize + dispatcherThreadCount, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new NamedThreadFactory("scout-thread"), rejectHandler);
+    executor.allowCoreThreadTimeOut(allowCoreThreadTimeOut);
     return executor;
   }
 
@@ -380,7 +361,7 @@ public class JobManager implements IJobManager {
    *          Future to be adapted.
    * @return adapted Future.
    */
-  protected <RESULT> IFutureTask<RESULT> interceptFuture(final IFutureTask<RESULT> future) {
+  protected <RESULT> JobFutureTask<RESULT> interceptFuture(final JobFutureTask<RESULT> future) {
     return future;
   }
 
