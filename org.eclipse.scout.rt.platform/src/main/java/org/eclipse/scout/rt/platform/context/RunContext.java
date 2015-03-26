@@ -30,18 +30,6 @@ import org.eclipse.scout.rt.platform.job.PropertyMap;
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
  * state among different threads, or allows temporary state changes to be done for the time of executing some code.
  * <p/>
- * Usage:</br>
- *
- * <pre>
- * RunContext.fillCurrent().locale(Locale.US).subject(...).run(new IRunnable() {
- * 
- *   &#064;Override
- *   public void run() throws Exception {
- *      // run code on behalf of the new context
- *   }
- * });
- * </pre>
- * <p/>
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
  * characteristics:
  * <ul>
@@ -62,9 +50,6 @@ public class RunContext {
   protected PreferredValue<Subject> m_subject = new PreferredValue<>(null, false);
   protected PreferredValue<Locale> m_locale = new PreferredValue<>(null, false);
   protected PropertyMap m_propertyMap;
-
-  protected RunContext() {
-  }
 
   /**
    * Runs the given runnable on behalf of this {@link RunContext}. Use this method if you run code that does not return
@@ -211,8 +196,6 @@ public class RunContext {
     m_propertyMap = new PropertyMap();
   }
 
-  // === construction methods ===
-
   /**
    * Creates a shallow copy of the context represented by <code>this</code>.
    */
@@ -220,24 +203,5 @@ public class RunContext {
     final RunContext copy = OBJ.get(RunContext.class);
     copy.copyValues(this);
     return copy;
-  }
-
-  /**
-   * Creates a "snapshot" of the current calling context.
-   */
-  public static RunContext fillCurrent() {
-    final RunContext runContext = OBJ.get(RunContext.class);
-    runContext.fillCurrentValues();
-    return runContext;
-  }
-
-  /**
-   * Creates an empty {@link RunContext} with <code>null</code> as preferred {@link Subject} and {@link Locale}.
-   * Preferred means, that those values are not derived from other values, but must be set explicitly instead.
-   */
-  public static RunContext fillEmpty() {
-    final RunContext runContext = OBJ.get(RunContext.class);
-    runContext.fillEmptyValues();
-    return runContext;
   }
 }

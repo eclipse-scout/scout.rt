@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -141,14 +142,14 @@ public class ClientJobInput extends JobInput {
   @Override
   protected void fillCurrentValues() {
     super.fillCurrentValues();
-    m_runContext = ClientRunContext.fillCurrent();
+    m_runContext = ClientRunContexts.copyCurrent();
     sessionRequired(true); // client jobs require a session by default
   }
 
   @Override
   protected void fillEmptyValues() {
     super.fillEmptyValues();
-    m_runContext = ClientRunContext.fillEmpty();
+    m_runContext = ClientRunContexts.empty();
     sessionRequired(true); // client jobs require a session by default
   }
 

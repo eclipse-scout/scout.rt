@@ -30,21 +30,11 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
+ * Use this class to propagate client-side context.
+ * <p/>
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
  * client state among different threads, or allows temporary state changes to be done for the time of executing some
  * code.
- * <p/>
- * Usage:</br>
- *
- * <pre>
- * ClientRunContext.fillCurrent().locale(Locale.US).subject(...).run(new IRunnable() {
- * 
- *   &#064;Override
- *   public void run() throws Exception {
- *      // run code on behalf of the new context
- *   }
- * });
- * </pre>
  * <p/>
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
  * characteristics:
@@ -58,6 +48,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * </ul>
  *
  * @since 5.1
+ * @see ClientRunContexts
  * @see RunContext
  */
 public class ClientRunContext extends RunContext {
@@ -65,9 +56,6 @@ public class ClientRunContext extends RunContext {
   protected IClientSession m_session;
   protected boolean m_sessionRequired;
   protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
-
-  protected ClientRunContext() {
-  }
 
   @Override
   protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next) {
@@ -175,32 +163,10 @@ public class ClientRunContext extends RunContext {
     session(null); // method call to derive other values.
   }
 
-  // === construction methods ===
-
   @Override
   public ClientRunContext copy() {
     final ClientRunContext copy = OBJ.get(ClientRunContext.class);
     copy.copyValues(this);
     return copy;
-  }
-
-  /**
-   * Creates a "snapshot" of the current calling client context.
-   */
-  public static ClientRunContext fillCurrent() {
-    final ClientRunContext runContext = OBJ.get(ClientRunContext.class);
-    runContext.fillCurrentValues();
-    return runContext;
-  }
-
-  /**
-   * Creates an empty {@link ClientRunContext} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
-   * {@link UserAgent}. Preferred means, that those values will not be derived from other values, e.g. when setting the
-   * session, but must be set explicitly instead.
-   */
-  public static ClientRunContext fillEmpty() {
-    final ClientRunContext runContext = OBJ.get(ClientRunContext.class);
-    runContext.fillEmptyValues();
-    return runContext;
   }
 }

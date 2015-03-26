@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
@@ -196,14 +197,14 @@ public class ServerJobInput extends JobInput {
   @Override
   protected void fillCurrentValues() {
     super.fillCurrentValues();
-    m_runContext = ServerRunContext.fillCurrent();
+    m_runContext = ServerRunContexts.copyCurrent();
     sessionRequired(true); // server jobs require a session by default
   }
 
   @Override
   protected void fillEmptyValues() {
     super.fillEmptyValues();
-    m_runContext = ServerRunContext.fillEmpty();
+    m_runContext = ServerRunContexts.empty();
     sessionRequired(true); // server jobs require a session by default
   }
 

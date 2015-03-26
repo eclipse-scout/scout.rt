@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 
 /**
  * Describes a job with context information to be applied onto the executing worker thread during the time of the job's
@@ -211,7 +212,7 @@ public class JobInput {
   protected void fillCurrentValues() {
     m_expirationTime = INFINITE_EXPIRATION;
     m_logOnError = true;
-    m_runContext = RunContext.fillCurrent();
+    m_runContext = RunContexts.copyCurrent();
   }
 
   /**
@@ -220,7 +221,7 @@ public class JobInput {
   protected void fillEmptyValues() {
     m_expirationTime = INFINITE_EXPIRATION;
     m_logOnError = true;
-    m_runContext = RunContext.fillEmpty();
+    m_runContext = RunContexts.empty();
   }
 
   // === construction methods ===

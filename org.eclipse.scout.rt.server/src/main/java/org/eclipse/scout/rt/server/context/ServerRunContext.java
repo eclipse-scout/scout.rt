@@ -36,23 +36,11 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
- * Use this class to propagate server-side context.
+ * Use this class to propagate server-side context and to run code in a new transaction.
  * <p/>
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
  * server state among different threads, or allows temporary state changes to be done for the time of executing some
  * code.
- * <p/>
- * Usage:</br>
- *
- * <pre>
- * ServerRunContext.fillCurrent().locale(Locale.US).subject(...).run(new IRunnable() {
- * 
- *   &#064;Override
- *   public void run() throws Exception {
- *      // run code on behalf of the new context
- *   }
- * });
- * </pre>
  * <p/>
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
  * characteristics:
@@ -81,9 +69,6 @@ public class ServerRunContext extends RunContext {
   protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
   protected long m_transactionId;
   private boolean m_transactional;
-
-  protected ServerRunContext() {
-  }
 
   @Override
   public void validate() {
@@ -246,32 +231,10 @@ public class ServerRunContext extends RunContext {
     session(null); // method call to derive other values.
   }
 
-  // === construction methods ===
-
   @Override
   public ServerRunContext copy() {
     final ServerRunContext copy = OBJ.get(ServerRunContext.class);
     copy.copyValues(this);
     return copy;
-  }
-
-  /**
-   * Creates a "snapshot" of the current calling server context.
-   */
-  public static ServerRunContext fillCurrent() {
-    final ServerRunContext runContext = OBJ.get(ServerRunContext.class);
-    runContext.fillCurrentValues();
-    return runContext;
-  }
-
-  /**
-   * Creates an empty {@link ClientContext} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
-   * {@link UserAgent}. Preferred means, that those values will not be derived from other values, but must be set
-   * explicitly instead.
-   */
-  public static ServerRunContext fillEmpty() {
-    final ServerRunContext runContext = OBJ.get(ServerRunContext.class);
-    runContext.fillEmptyValues();
-    return runContext;
   }
 }
