@@ -13,6 +13,7 @@
 # Eclipse #
 bin/
 classes/
+.classpath
 
 # Maven #
 target/

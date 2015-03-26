@@ -20,8 +20,8 @@ import java.util.Arrays;
 import org.eclipse.scout.commons.exception.fixture.CustomProcessingException;
 import org.eclipse.scout.commons.exception.fixture.CustomProcessingExceptionWithStringConstructor;
 import org.eclipse.scout.commons.exception.fixture.CustomProcessingStatus;
+import org.ietf.jgss.GSSException;
 import org.junit.Test;
-import org.omg.CORBA.portable.RemarshalException;
 import org.xml.sax.SAXNotRecognizedException;
 
 /**
@@ -64,7 +64,7 @@ public class PlaceholderExceptionTest {
 
   @Test
   public void testDefaultConstructorNonPkgJava() {
-    RemarshalException e = new RemarshalException();
+    GSSException e = new GSSException(15);
     Throwable t = PlaceholderException.transformException(e);
     assertEqualExceptionAndCause(new PlaceholderException(e, null), t);
   }

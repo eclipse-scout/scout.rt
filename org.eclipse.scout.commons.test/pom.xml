@@ -31,8 +31,8 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-surefire-plugin</artifactId>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <!-- <debugPort>18081</debugPort> -->
               <excludes>
@@ -53,8 +53,8 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-surefire-plugin</artifactId>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <!-- <debugPort>18081</debugPort> -->
               <includes>
@@ -72,6 +72,12 @@
       <artifactId>org.eclipse.scout.rt.testing.commons</artifactId>
       <groupId>org.eclipse.scout.rt</groupId>
       <version>5.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4.3</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>
