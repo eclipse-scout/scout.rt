@@ -7,7 +7,6 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobFutureFilters;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -40,7 +39,7 @@ public final class JobUtility {
 
     boolean timeout;
     try {
-      timeout = !Jobs.getJobManager().awaitDone(ClientJobFutureFilters.allFilter().modelJobsOnly().session(session).notBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+      timeout = !Jobs.getJobManager().awaitDone(ModelJobs.newFutureFilter().session(session).notBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     catch (final InterruptedException e) {
       throw new JsonException("Interrupted while waiting for all events to be processed. [future=%s]", e, future);
@@ -90,7 +89,7 @@ public final class JobUtility {
       final IFuture<RESULT> future = ModelJobs.schedule(job, input);
       boolean timeout;
       try {
-        timeout = !Jobs.getJobManager().awaitDone(ClientJobFutureFilters.allFilter().futures(future).notBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+        timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().futures(future).notBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
       }
       catch (final InterruptedException e) {
         throw new JsonException("Interrupted while waiting for a job to complete. [job=%s, future=%s]", e, job.getClass().getName(), future);

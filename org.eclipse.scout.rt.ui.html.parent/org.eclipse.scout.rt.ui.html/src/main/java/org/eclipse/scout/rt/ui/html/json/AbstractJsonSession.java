@@ -35,7 +35,6 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobEventFilters;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.OBJ;
@@ -97,14 +96,14 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_customHtmlRenderer = createCustomHtmlRenderer();
     m_jsonEventProcessor = createJsonEventProcessor();
 
-    Jobs.getJobManager().addListener(this, ClientJobEventFilters.allFilter().modelJobsOnly().eventTypes(JobEventType.DONE).andFilter(new IFilter<JobEvent>() {
+    Jobs.getJobManager().addListener(ModelJobs.newEventFilter().eventTypes(JobEventType.DONE).andFilter(new IFilter<JobEvent>() {
 
       @Override
       public boolean accept(JobEvent event) {
         final ModelJobInput jobInput = (ModelJobInput) event.getFuture().getJobInput();
         return jobInput.getSession() == getClientSession() && !isProcessingClientRequest();
       }
-    }));
+    }), this);
   }
 
   protected boolean isInitialized() {
