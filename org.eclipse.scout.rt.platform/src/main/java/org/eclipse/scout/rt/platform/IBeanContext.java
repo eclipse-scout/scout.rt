@@ -31,6 +31,18 @@ public interface IBeanContext {
 
   /**
    * @param beanClazz
+   * @return the single bean that is of exact type beanClazz or subclasses of beanClazz with a {@link Replace}
+   *         <p>
+   *         When B extends A and B has a {@link Replace} then A is removed from the result
+   *         <p>
+   *         this is the bean used in {@link IBean#getInstance()} and {@link OBJ#get(Class)}
+   * @throws PlatformException
+   *           when multiple beans exist or no bean exists.
+   */
+  <T> IBean<T> getBean(Class<T> beanClazz);
+
+  /**
+   * @param beanClazz
    * @return the single bean (or null) that is of exact type beanClazz or subclasses of beanClazz with a {@link Replace}
    *         <p>
    *         When B extends A and B has a {@link Replace} then A is removed from the result
@@ -39,7 +51,7 @@ public interface IBeanContext {
    * @throws PlatformException
    *           when multiple beans exist
    */
-  <T> IBean<T> getBean(Class<T> beanClazz);
+  <T> IBean<T> optBean(Class<T> beanClazz);
 
   /**
    * @param beanClazz

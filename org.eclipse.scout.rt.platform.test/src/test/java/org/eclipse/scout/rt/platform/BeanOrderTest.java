@@ -67,7 +67,7 @@ public class BeanOrderTest {
 
   }
 
-  @Order(30)
+  @Order(20)
   private static class TestBean02 implements ITestBean {
 
   }

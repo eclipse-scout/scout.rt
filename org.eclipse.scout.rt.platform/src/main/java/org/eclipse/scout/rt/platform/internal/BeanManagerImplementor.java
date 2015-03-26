@@ -174,6 +174,18 @@ public class BeanManagerImplementor implements IBeanContext {
       return list.get(0);
     }
     if (list.size() == 0) {
+      throw new Assertions.AssertionException("no instances found for query: " + beanClazz + " " + list);
+    }
+    throw new Assertions.AssertionException("multiple instances found for query: " + beanClazz + " " + list);
+  }
+
+  @Override
+  public <T> IBean<T> optBean(Class<T> beanClazz) {
+    List<IBean<T>> list = querySingle(beanClazz);
+    if (list.size() == 1) {
+      return list.get(0);
+    }
+    if (list.size() == 0) {
       return null;
     }
     throw new Assertions.AssertionException("multiple instances found for query: " + beanClazz + " " + list);

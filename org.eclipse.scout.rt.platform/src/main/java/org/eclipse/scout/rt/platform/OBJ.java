@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.annotations.Replace;
@@ -31,15 +32,15 @@ public final class OBJ {
   /**
    * @return the single instance of this type with respect to {@link Priority} and {@link Replace}. See also
    *         {@link IBeanContext#getBean(Class)}
-   * @throws PlatformException
+   * @throws AssertionException
    *           when no instance is available or when multiple instances are registered
    */
   public static <T> T get(Class<T> beanClazz) {
     T instance = getOptional(beanClazz);
-    if (instance == null) {
-      throw new Assertions.AssertionException("no instance found for query: " + beanClazz);
+    if (instance != null) {
+      return instance;
     }
-    return instance;
+    throw new Assertions.AssertionException("no instance found for query: " + beanClazz);
   }
 
   /**
@@ -47,16 +48,16 @@ public final class OBJ {
    *         {@link Bean}
    *         <p>
    *         returns null when no instance is available
-   * @throws PlatformException
+   * @throws AssertionException
    *           when multiple instances are registered
    */
 //TODO imo rename to opt
   public static <T> T getOptional(Class<T> beanClazz) {
-    IBean<T> bean = Platform.get().getBeanContext().getBean(beanClazz);
-    if (bean == null) {
-      return null;
+    IBean<T> bean = Platform.get().getBeanContext().optBean(beanClazz);
+    if (bean != null) {
+      return bean.getInstance();
     }
-    return bean.getInstance();
+    return null;
   }
 
   /**

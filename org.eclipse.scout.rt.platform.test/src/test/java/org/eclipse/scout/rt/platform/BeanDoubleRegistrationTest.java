@@ -26,7 +26,7 @@ public class BeanDoubleRegistrationTest {
     IBean<?> reg1 = context.registerClass(Bean01.class);
     IBean<?> reg2 = context.registerClass(Bean01.class);
     Assert.assertFalse(reg1 == reg2);
-    Assert.assertNull(context.getBean(Object.class));
+    Assert.assertNull(context.optBean(Object.class));
     Assert.assertNotNull(context.getBean(Bean01.class));
     Assert.assertEquals(1, context.getBeans(Object.class).size());
     Assert.assertEquals(1, context.getBeans(Bean01.class).size());
@@ -34,7 +34,7 @@ public class BeanDoubleRegistrationTest {
     Assert.assertEquals(2, context.getRegisteredBeans(Bean01.class).size());
 
     context.unregisterBean(reg2);
-    Assert.assertNull(context.getBean(Object.class));
+    Assert.assertNull(context.optBean(Object.class));
     Assert.assertNotNull(context.getBean(Bean01.class));
     Assert.assertEquals(1, context.getBeans(Object.class).size());
     Assert.assertEquals(1, context.getBeans(Bean01.class).size());
@@ -42,8 +42,8 @@ public class BeanDoubleRegistrationTest {
     Assert.assertEquals(1, context.getRegisteredBeans(Bean01.class).size());
 
     context.unregisterBean(reg1);
-    Assert.assertNull(context.getBean(Object.class));
-    Assert.assertNull(context.getBean(Bean01.class));
+    Assert.assertNull(context.optBean(Object.class));
+    Assert.assertNull(context.optBean(Bean01.class));
     Assert.assertEquals(0, context.getBeans(Object.class).size());
     Assert.assertEquals(0, context.getBeans(Bean01.class).size());
     Assert.assertEquals(0, context.getRegisteredBeans(Object.class).size());
