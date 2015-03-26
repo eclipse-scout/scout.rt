@@ -706,12 +706,12 @@ scout.Table.prototype.sendReload = function() {
   this.session.send(this.id, 'reload');
 };
 
-scout.Table.prototype.cell = function(column, row) {
-  return row.cells[column.index];
+scout.Table.prototype.cell = function(columnIndex, row) {
+  return row.cells[columnIndex];
 };
 
 scout.Table.prototype.cellValue = function(column, row) {
-  var cell = this.cell(column, row);
+  var cell = this.cell(column.index, row);
 
   if (cell === null) { //cell may be a number so don't use !cell
     return null;
@@ -726,7 +726,7 @@ scout.Table.prototype.cellValue = function(column, row) {
 };
 
 scout.Table.prototype.cellText = function(column, row) {
-  var cell = this.cell(column, row);
+  var cell = this.cell(column.index, row);
 
   if (!cell) {
     return '';
@@ -761,6 +761,66 @@ scout.Table.prototype.cellTooltipText = function(column, row) {
     return cell.tooltipText;
   }
   return '';
+};
+
+/**
+ *
+ * @returns the next editable position in the table, starting from the cell at (currentColumn / currentRow).
+ * A position is an object containing row and column (cell has no reference to a row or column due to memory reasons).
+ */
+scout.Table.prototype.nextEditableCellPos = function(currentColumn, currentRow, backwards) {
+  var pos, row, startColumnIndex, rowIndex, startRowIndex, predicate,
+    colIndex = this.columns.indexOf(currentColumn);
+
+  startColumnIndex = colIndex + 1;
+  if (backwards) {
+    startColumnIndex = colIndex - 1;
+  }
+  pos = this.nextEditableCellPosForRow(startColumnIndex, currentRow, backwards);
+  if (pos) {
+    return pos;
+  }
+
+  predicate = function(row) {
+    if (!row.$row.isVisible()) {
+      return false;
+    }
+
+    startColumnIndex = 0;
+    if (backwards) {
+      startColumnIndex = this.columns.length - 1;
+    }
+    pos = this.nextEditableCellPosForRow(startColumnIndex, row, backwards);
+    if (pos) {
+      return true;
+    }
+  }.bind(this);
+
+  rowIndex = this.rows.indexOf(currentRow);
+  startRowIndex = rowIndex + 1;
+  if (backwards) {
+    startRowIndex = rowIndex - 1;
+  }
+  scout.arrays.findFrom(this.rows, startRowIndex, predicate, backwards);
+
+  return pos;
+};
+
+scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row, backwards) {
+  var pos, cell, column, predicate;
+
+  predicate = function(column) {
+    cell = this.cell(column.index, row);
+    return cell.editable;
+  }.bind(this);
+
+  column = scout.arrays.findFrom(this.columns, startColumnIndex, predicate, backwards);
+  if (column) {
+    return {
+      column: column,
+      row: row
+    };
+  }
 };
 
 scout.Table.prototype._group = function() {
@@ -923,11 +983,10 @@ scout.Table.prototype.colorData = function(column, mode) {
     };
   }
 
-  columnIndex = this.columns.indexOf(column);
   for (i = 0; i < filteredRows.length; i++) {
     row = filteredRows[i];
     value = this.cellValue(column, row);
-    $cell = this.$cell(columnIndex, row.$row);
+    $cell = this.$cell(column, row.$row);
     colorFunc($cell, value);
   }
 };
@@ -1150,7 +1209,8 @@ scout.Table.prototype.$cellsForColIndex = function(colIndex, includeSumRows) {
   return this.$data.find(selector);
 };
 
-scout.Table.prototype.$cell = function(columnIndex, $row) {
+scout.Table.prototype.$cell = function(column, $row) {
+  var columnIndex = this.columns.indexOf(column);
   return $row.children().eq(columnIndex);
 };
 

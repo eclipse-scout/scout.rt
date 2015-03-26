@@ -1,9 +1,9 @@
 scout.CellEditorPopup = function(column, row, cell) {
   scout.CellEditorPopup.parent.call(this);
-  this._table = column.table;
-  this._column = column;
-  this._row = row;
-  this._cell = cell;
+  this.table = column.table;
+  this.column = column;
+  this.row = row;
+  this.cell = cell;
   this.keyStrokeAdapter = new scout.CellEditorPopupKeyStrokeAdapter(this);
 };
 scout.inherits(scout.CellEditorPopup, scout.Popup);
@@ -11,8 +11,8 @@ scout.inherits(scout.CellEditorPopup, scout.Popup);
 scout.CellEditorPopup.prototype.render = function($parent) {
   scout.CellEditorPopup.parent.prototype.render.call(this, $parent);
   var offsetBounds,
-    field = this._cell.field,
-    $cell = this._table.$cell(this._column.index, this._row.$row);
+    field = this.cell.field,
+    $cell = this.table.$cell(this.column, this.row.$row);
 
   field.render(this.$container);
   offsetBounds = scout.graphics.offsetBounds($cell);
@@ -22,6 +22,9 @@ scout.CellEditorPopup.prototype.render = function($parent) {
   scout.HtmlComponent.get(field.$container).layout();
 
   scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+  setTimeout(function() {
+    this.$container.installFocusContext('auto');
+  }.bind(this), 0);
 };
 
 scout.CellEditorPopup.prototype._remove = function($parent) {
@@ -37,15 +40,15 @@ scout.CellEditorPopup.prototype._attachCloseHandler = function() {
 };
 
 scout.CellEditorPopup.prototype.completeEdit = function() {
-  var field = this._cell.field;
-  this._table.sendCompleteCellEdit(field.id);
+  var field = this.cell.field;
+  this.table.sendCompleteCellEdit(field.id);
   //FIXME CGU what if there is a validation error?
-  this._cell.field.destroy();
+  this.cell.field.destroy();
   this.remove();
 };
 
 scout.CellEditorPopup.prototype.cancelEdit = function() {
-  this._table.sendCancelCellEdit(this._cell.field.id);
-  this._cell.field.destroy();
+  this.table.sendCancelCellEdit(this.cell.field.id);
+  this.cell.field.destroy();
   this.remove();
 };

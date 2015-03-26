@@ -123,6 +123,32 @@ scout.arrays = {
     }
   },
 
+  findFrom: function(arr, startIndex, predicate, backwards) {
+    if (backwards) {
+      return scout.arrays.findFromPrev(arr, startIndex, predicate);
+    } else {
+      return scout.arrays.findFromNext(arr, startIndex, predicate);
+    }
+  },
+
+  findFromNext: function(arr, startIndex, predicate) {
+    for (var i = startIndex; i < arr.length; i++) {
+      var element = arr[i];
+      if (predicate(element)) {
+        return element;
+      }
+    }
+  },
+
+  findFromPrev: function(arr, startIndex, predicate) {
+    for (var i = startIndex; i >= 0; i--) {
+      var element = arr[i];
+      if (predicate(element)) {
+        return element;
+      }
+    }
+  },
+
   format: function(arr, delimiter) {
     if (!arr || arr.length === 0) {
       return '';

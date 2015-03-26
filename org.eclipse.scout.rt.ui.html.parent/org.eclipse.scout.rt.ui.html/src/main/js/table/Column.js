@@ -31,7 +31,7 @@ scout.Column.prototype.buildCell = function(row) {
 
 scout.Column.prototype.onMouseUp = function(event, $row) {
   var row = $row.data('row'),
-    cell = this.table.cell(this, row);
+    cell = this.table.cell(this.index, row);
 
   if (cell.editable) {
     this.table.sendPrepareCellEdit(row.id, this.id);
@@ -40,9 +40,9 @@ scout.Column.prototype.onMouseUp = function(event, $row) {
 
 scout.Column.prototype.startCellEdit = function(row, fieldId) {
   var popup,
-    cell = this.table.cell(this, row),
+    cell = this.table.cell(this.index, row),
     $row = row.$row,
-    $cell = this.table.$cell(this.index, $row);
+    $cell = this.table.$cell(this, $row);
 
   cell.field = this.session.getOrCreateModelAdapter(fieldId, this.table);
   popup = new scout.CellEditorPopup(this, row, cell);

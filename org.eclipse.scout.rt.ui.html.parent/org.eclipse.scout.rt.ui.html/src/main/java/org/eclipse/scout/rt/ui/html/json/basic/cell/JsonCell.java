@@ -60,7 +60,7 @@ public class JsonCell implements IJsonObject {
     JsonObjectUtility.putProperty(json, "foregroundColor", m_cell.getForegroundColor());
     JsonObjectUtility.putProperty(json, "backgroundColor", m_cell.getBackgroundColor());
     JsonObjectUtility.putProperty(json, "font", (m_cell.getFont() == null ? null : m_cell.getFont().toPattern()));
-    JsonObjectUtility.putProperty(json, "editable", m_cell.isEditable());
+    JsonObjectUtility.putProperty(json, "editable", m_cell.isEditable());//TODO CGU maybe only send if it differs from column, same for horizontal alignment
     // TODO BSH Table | Add property "errorStatus"
     // TODO BSH Table | Add generic "cssStyle" property
     return json;
