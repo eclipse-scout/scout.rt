@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 
 public class BinaryResourceUrlUtility {
@@ -31,7 +33,7 @@ public class BinaryResourceUrlUtility {
    *         Use this method for image-files located in the /resource/icons directories of all jars on the classpath.
    */
   public static String createIconUrl(String iconId) {
-    if (iconId == null) {
+    if (!StringUtility.hasText(iconId) || AbstractIcons.Null.equals(iconId)) {
       return null;
     }
     if (iconId.startsWith("font:")) {
