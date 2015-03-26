@@ -3,10 +3,13 @@
   display: inline-block;
   padding: 0 @table-control-padding;
   cursor: pointer;
-  margin-top: -1px;
   height: @table-footer-height;
   line-height: @table-footer-height;
-  border: 1px solid transparent;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  /* draw over border-top of .table-footer */
+  margin-top: -1px;
+  padding-top: 1px;
 
   &[data-icon]::before {
     .font-icon;
@@ -15,6 +18,7 @@
     content: attr(data-icon);
   }
 
+  /* Separator */
   &:last-child::after {
     content: '';
     position: absolute;
@@ -38,10 +42,13 @@
   }
 
   &.selected {
-    border-left: 1px solid @desktop-border-color;
-    border-right: 1px solid @desktop-border-color;
-    border-top: 1px solid @palette-white;
+    border-left-color: @desktop-border-color;
+    border-right-color: @desktop-border-color;
     background-color: @body-background-color;
+
+    &:first-child {
+      border-left-color: transparent;
+    }
   }
 }
 
