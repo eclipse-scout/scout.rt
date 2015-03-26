@@ -16,7 +16,6 @@ scout.ProposalChooser.prototype._render = function($parent) {
   this._$status = this.$container.appendDiv('status');
 
   // support for activeFilter
-  this.activeFilter = 'TRUE'; // FIXME AWE: (smart-field) remove hardcoded filter
   if (this.activeFilter) {
     var $activeFilter = $.makeDiv('active-filter')
       .appendTo(this.$container);
@@ -36,6 +35,7 @@ scout.ProposalChooser.prototype._renderProperties = function() {
  * calling the JQuery trigger method.
  */
 scout.ProposalChooser.prototype.delegateEvent = function(event) {
+  $.log.info('$container=' + this.model.$container);
   this.model.$container.trigger(event);
 };
 

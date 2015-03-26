@@ -38,24 +38,19 @@ scout.AbstractSmartField.prototype._renderProposalChooser = function() {
     // We always expect the popup to be open at this point
     return;
   }
-  // FIXME AWE: (smart-field) können wir besser auf diesen PC reagieren (spezifisches event?)
   $.log.info('_renderProposalChooser proposalChooser=' + this.proposalChooser);
   if (this.proposalChooser) {
     this.proposalChooser.render(this._$popup);
     this._resizePopup();
   }
-  else {
-    // FIXME AWE: (smart-field) check - kommen wir je hier durch - 1?
-    $.log.info('???? 1');
-    // this._closePopup(false);
-  }
 };
 
+/**
+ * This method is called after a valid option has been selected in the proposal chooser.
+ */
 scout.AbstractSmartField.prototype._removeProposalChooser = function() {
   $.log.info('_removeProposalChooser proposalChooser=' + this.proposalChooser);
-  //FIXME AWE: (smart-field) check - kommen wir je hier durch - 2?
-//  this._closePopup(false);
-  $.log.info('???? 2');
+  this._closePopup(false);
 };
 
 scout.AbstractSmartField.prototype._updateScrollbar = function() {
@@ -189,7 +184,7 @@ scout.AbstractSmartField.prototype._getInputBounds = function() {
 
 scout.AbstractSmartField.prototype._onFieldBlur = function() {
 //  scout.AbstractSmartField.parent.prototype._onFieldBlur.call(this);
-  $.log.debug('AbstractSmartField#_onBlur');
+  $.log.debug('AbstractSmartField#_onFieldBlur');
   this._closePopup();
 };
 
@@ -211,7 +206,7 @@ scout.AbstractSmartField.prototype._closePopup = function(notifyServer) {
     }
     this._$popup.remove();
     this._$popup = null;
-    if (this.proposalChooser) { // FIXME AWE: get rid of this if
+    if (this.proposalChooser) { // FIXME AWE: (smart-field) get rid of this if
       this.proposalChooser.destroy();
       this.proposalChooser = null;
     }
@@ -243,7 +238,7 @@ scout.AbstractSmartField.prototype._searchText = function() {
   return scout.strings.hasText(displayText) ? displayText : '*';
 };
 
-// FIXME AWE: an dieser stelle müssten wir auch die screen-boundaries berücksichtigen
+// FIXME AWE: (smart-field) an dieser stelle müssten wir auch die screen-boundaries berücksichtigen
 // und entscheiden, ob das popup gegen unten oder gegen oben geöffnet werden soll.
 /**
  * This method opens a popup before we contact the server to load proposals. This means
@@ -298,6 +293,6 @@ scout.AbstractSmartField.prototype._resizePopup = function() {
     inputBounds = this._getInputBounds();
   prefSize.width = Math.max(inputBounds.width, prefSize.width);
   prefSize.height = Math.min(400, prefSize.height);
-  $.log.info('_resizePopup prefSize=' + prefSize);
+  $.log.debug('_resizePopup prefSize=' + prefSize);
   htmlPopup.setSize(prefSize);
 };
