@@ -62,20 +62,6 @@
     </pluginRepository>
   </pluginRepositories>
 
-<build>
-<pluginManagement>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.1</version>
-          <configuration>
-            <source>${jdk.source.version}</source>
-            <target>${jdk.source.version}</target>
-          </configuration>
-        </plugin>
-        </pluginManagement>
-</build>
-
   <modules>
     <module>org.eclipse.scout.rt.parent</module>
   </modules>
