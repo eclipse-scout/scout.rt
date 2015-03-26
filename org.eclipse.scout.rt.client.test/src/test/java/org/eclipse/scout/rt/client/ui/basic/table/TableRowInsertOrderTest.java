@@ -10,8 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -71,28 +74,30 @@ public class TableRowInsertOrderTest {
     P_TableListener tableListener = new P_TableListener();
     table.addTableListener(tableListener);
 
-    table.setTableChanging(true);
-    try {
-      for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++) {
+      table.setTableChanging(true);
+      try {
         table.addRowByArray(new Object[]{i, "Item" + i});
       }
-    }
-    finally {
-      table.setTableChanging(false);
+      finally {
+        table.setTableChanging(false);
+      }
     }
 
-    assertTrue(table.getRows().get(0) != tableListener.getInsertedRows().get(0));
+    assertNotSame(table.getRows().get(0), tableListener.getInsertedRows().get(0));
+    assertSame(table.getRows().get(table.getRows().size() - 1), tableListener.getInsertedRows().get(0));
+    assertTrue(CollectionUtility.equalsCollection(table.getRows(), tableListener.getInsertedRows(), false));
     assertTrue(CollectionUtility.equalsCollection(table.getRows(), tableListener.getOrderedRows()));
   }
 
   private static class P_TableListener extends TableAdapter {
-    private List<ITableRow> m_insertedRows;
+    private final List<ITableRow> m_insertedRows = new ArrayList<>();
     private List<ITableRow> m_orderedRows;
 
     @Override
     public void tableChanged(TableEvent e) {
       if (e.getType() == TableEvent.TYPE_ROWS_INSERTED) {
-        m_insertedRows = e.getRows();
+        m_insertedRows.addAll(e.getRows());
       }
       else if (e.getType() == TableEvent.TYPE_ROW_ORDER_CHANGED) {
         m_orderedRows = e.getRows();
@@ -106,7 +111,6 @@ public class TableRowInsertOrderTest {
     public List<ITableRow> getOrderedRows() {
       return m_orderedRows;
     }
-
   }
 
   private static class P_Table extends AbstractTable {
@@ -128,5 +132,4 @@ public class TableRowInsertOrderTest {
     public class SecondColumn extends AbstractStringColumn {
     }
   }
-
 }

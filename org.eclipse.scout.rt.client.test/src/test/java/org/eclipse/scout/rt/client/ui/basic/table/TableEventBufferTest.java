@@ -274,10 +274,10 @@ public class TableEventBufferTest {
   @Test
   public void testInsertedFollowedUpdatedIndexChanging() {
     final TableEvent insert = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(1, 2, 3));
-    final TableEvent orderChanged = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROW_ORDER_CHANGED, mockRows(3, 2, 1));
+    final TableEvent rowFilterChanged = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROW_FILTER_CHANGED);
     final TableEvent update = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0));
     m_testBuffer.add(insert);
-    m_testBuffer.add(orderChanged);
+    m_testBuffer.add(rowFilterChanged);
     m_testBuffer.add(update);
     final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(3, events.size());
@@ -386,7 +386,7 @@ public class TableEventBufferTest {
   public void testInsertChangeRowOrder() {
     final TableEvent insert1 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(0, 1, 2, 3, 4));
     final TableEvent insert2 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(6, 5));
-    final TableEvent orderChanged = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(6, 5, 4, 3, 2, 1, 0));
+    final TableEvent orderChanged = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROW_ORDER_CHANGED, mockRows(6, 5, 4, 3, 2, 1, 0));
     m_testBuffer.add(insert1);
     m_testBuffer.add(insert2);
     m_testBuffer.add(orderChanged);
