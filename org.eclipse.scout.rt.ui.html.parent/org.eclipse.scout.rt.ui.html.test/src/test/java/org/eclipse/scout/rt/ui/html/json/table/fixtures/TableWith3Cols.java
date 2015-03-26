@@ -45,12 +45,22 @@ public class TableWith3Cols extends AbstractTable {
   }
 
   public void fill(int rowCount) throws ProcessingException {
+    fill(rowCount, true);
+  }
+
+  public void fill(int rowCount, boolean replace) throws ProcessingException {
     Object[][] rows = new Object[rowCount][3];
+    int offset = (replace ? 0 : getRowCount());
     for (int i = 0; i < rowCount; i++) {
-      rows[i][0] = "CELL{row" + i + ",col0}";
-      rows[i][1] = "CELL{row" + i + ",col1}";
-      rows[i][2] = "CELL{row" + i + ",col2}";
+      rows[i][0] = "CELL{row" + (i + offset) + ",col0}";
+      rows[i][1] = "CELL{row" + (i + offset) + ",col1}";
+      rows[i][2] = "CELL{row" + (i + offset) + ",col2}";
     }
-    replaceRowsByMatrix(rows);
+    if (replace) {
+      replaceRowsByMatrix(rows);
+    }
+    else {
+      addRowsByMatrix(rows);
+    }
   }
 }

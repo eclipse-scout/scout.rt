@@ -643,6 +643,30 @@ public class JsonTableTest {
     assertNull(events);
   }
 
+  /**
+   * Tests that multiple model events are coalseced in JSON layer
+   */
+  @Test
+  public void testTableEventCoalesceInUi_InsertAndRowOrderChanged() throws Exception {
+    TableWith3Cols table = new TableWith3Cols();
+    table.initTable();
+    table.resetDisplayableColumns();
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
+
+    table.fill(2, false);
+    table.fill(3, false);
+    table.getColumnSet().setSortColumn(table.getColumns().get(1), false, 0);
+    table.fill(2, false);
+    table.getColumnSet().setSortColumn(table.getColumns().get(1), true, 0);
+
+    // Apply event buffer --> only one insertion (with the correct order and a COLUMN_HEADERS_UPDATED event should remain)
+    JSONObject response = m_jsonSession.currentJsonResponse().toJson();
+    assertEquals(0, jsonTable.eventBuffer().size());
+    JSONArray events = response.optJSONArray("events");
+    assertNotNull(events);
+    assertEquals(2, events.length());
+  }
+
   public static Table createTableFixture(int numRows) throws ProcessingException {
     Table table = new Table();
     table.fill(numRows);
