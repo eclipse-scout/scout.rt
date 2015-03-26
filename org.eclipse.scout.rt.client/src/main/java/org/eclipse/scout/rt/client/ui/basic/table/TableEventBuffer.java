@@ -14,10 +14,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -42,6 +44,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     removeObsolete(events);
     replacePrevious(events, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED);
     coalesceSameType(events);
+    applyRowOrderChangedToRowsInserted(events);
     removeEmptyEvents(events);
     return events;
   }
@@ -208,7 +211,10 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         it.remove();
       }
       else {
-        return;
+        // Stop only if the event and the previous event are of the same "relation type" (e.g. both row-related or both non-row-related)
+        if (isRowRelatedEvent(event.getType()) == isRowRelatedEvent(previous.getType())) {
+          return;
+        }
       }
     }
   }
@@ -248,6 +254,14 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     return rowsByRowIndex;
   }
 
+  protected Set<Integer> getRowIndexSet(List<ITableRow> rows) {
+    Set<Integer> rowIndexes = new HashSet<>();
+    for (ITableRow row : rows) {
+      rowIndexes.add(row.getRowIndex());
+    }
+    return rowIndexes;
+  }
+
   /**
    * Merge list of cols, such that, if a column of the same index is in both lists, only the one of the second list
    * (later event) is kept.
@@ -267,6 +281,44 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       cols.add(column);
     }
     return cols;
+  }
+
+  /**
+   * If a ROW_ORDER_CHANGED event happens directly after ROWS_INSERTED, we may removed the ROW_ORDER_CHANGED event
+   * and send the new order in the ROWS_INSERTED event instead.
+   */
+  protected void applyRowOrderChangedToRowsInserted(List<TableEvent> events) {
+    for (int j = 0; j < events.size() - 1; j++) {
+      int i = events.size() - 1 - j;
+      TableEvent event = events.get(i);
+
+      if (event.getType() == TableEvent.TYPE_ROW_ORDER_CHANGED) {
+        TableEvent previous = findInsertionBeforeRowOrderChanged(events.subList(0, i));
+        // Check if previous is ROWS_INSERTED and they have the same rows
+        if (previous != null && previous.getType() == TableEvent.TYPE_ROWS_INSERTED &&
+            event.getRowCount() == previous.getRowCount() && getRowIndexSet(event.getRows()).equals(getRowIndexSet(previous.getRows()))) {
+          // replace rows and remove ROW_ORDER_CHANGED event
+          previous.setRows(event.getRows());
+          events.remove(i);
+        }
+      }
+    }
+  }
+
+  /**
+   * Finds previous ROWS_INSERTED event while ignoring events that don't change row order (e.g. COLUMN_HEADERS_UPDATED)
+   */
+  protected TableEvent findInsertionBeforeRowOrderChanged(List<TableEvent> events) {
+    for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
+      TableEvent previous = it.previous();
+      if (previous.getType() == TableEvent.TYPE_ROWS_INSERTED) {
+        return previous;
+      }
+      if (!isRowOrderUnchanged(previous.getType())) {
+        break;
+      }
+    }
+    return null;
   }
 
   protected void removeEmptyEvents(List<TableEvent> events) {

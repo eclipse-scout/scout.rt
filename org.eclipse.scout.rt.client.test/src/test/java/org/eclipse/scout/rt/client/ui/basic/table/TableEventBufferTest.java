@@ -382,6 +382,23 @@ public class TableEventBufferTest {
     assertEquals(TableEvent.TYPE_ROWS_DELETED, events.get(1).getType());
   }
 
+  @Test
+  public void testInsertChangeRowOrder() {
+    final TableEvent insert1 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(0, 1, 2, 3, 4));
+    final TableEvent insert2 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(6, 5));
+    final TableEvent orderChanged = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(6, 5, 4, 3, 2, 1, 0));
+    m_testBuffer.add(insert1);
+    m_testBuffer.add(insert2);
+    m_testBuffer.add(orderChanged);
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(1, events.size());
+    assertEquals(TableEvent.TYPE_ROWS_INSERTED, events.get(0).getType());
+    assertEquals(7, events.get(0).getRowCount());
+    assertEquals(6, events.get(0).getRows().get(0).getRowIndex());
+    assertEquals(4, events.get(0).getRows().get(2).getRowIndex());
+    assertEquals(0, events.get(0).getRows().get(6).getRowIndex());
+  }
+
   private TableEvent createTestUpdateEvent() {
     return new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0, 1));
   }
