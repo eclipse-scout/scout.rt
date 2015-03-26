@@ -76,7 +76,8 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       }
 
       // GUI requests for the same session must be processed consecutively
-      synchronized (jsonSession) {
+      jsonSession.jsonSessionLock().lock();
+      try {
         if (jsonSession.currentJsonResponse() == null) {
           // Missing current JSON response, probably because the JsonSession is disposed -> send empty answer
           writeResponse(httpResp, createSessionTerminatedResponse());
@@ -84,6 +85,9 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
         }
         JSONObject jsonResp = jsonSession.processRequest(httpReq, jsonReq);
         writeResponse(httpResp, jsonResp);
+      }
+      finally {
+        jsonSession.jsonSessionLock().unlock();
       }
     }
     catch (Exception e) {
@@ -120,7 +124,13 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
         LOG.info("Unloading JSON session with ID " + jsonReq.getJsonSessionId() + " (requested by UI)");
         if (jsonSession != null) {
           // Unbinding the jsonSession will cause it to be disposed automatically, see AbstractJsonSession.valueUnbound()
-          httpSession.removeAttribute(jsonSessionAttributeName);
+          jsonSession.jsonSessionLock().lock();
+          try {
+            httpSession.removeAttribute(jsonSessionAttributeName);
+          }
+          finally {
+            jsonSession.jsonSessionLock().unlock();
+          }
         }
         writeResponse(resp, createEmptyResponse()); // send empty response to satisfy clients expecting a valid response
         return null;
@@ -134,8 +144,14 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
         }
         LOG.info("Creating new JSON session with ID " + jsonReq.getJsonSessionId() + "...");
         jsonSession = servlet.createJsonSession();
-        jsonSession.init(req, new JsonStartupRequest(jsonReq));
-        httpSession.setAttribute(jsonSessionAttributeName, jsonSession);
+        jsonSession.jsonSessionLock().lock();
+        try {
+          jsonSession.init(req, new JsonStartupRequest(jsonReq));
+          httpSession.setAttribute(jsonSessionAttributeName, jsonSession);
+        }
+        finally {
+          jsonSession.jsonSessionLock().unlock();
+        }
       }
       else if (jsonReq.isStartupRequest()) {
         throw new IllegalStateException("Startup requested for existing JSON session with ID " + jsonReq.getJsonSessionId());

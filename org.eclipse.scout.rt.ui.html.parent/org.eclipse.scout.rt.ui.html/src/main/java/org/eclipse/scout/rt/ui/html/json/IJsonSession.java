@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -28,6 +29,11 @@ public interface IJsonSession {
   String HTTP_SESSION_ATTRIBUTE_PREFIX = "scout.htmlui.session.json."/*+JsonRequest.PROP_JSON_SESSION_ID*/;
 
   void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest);
+
+  /**
+   * Returns a reentrant lock that can be used to synchronize on the JsonSession.
+   */
+  ReentrantLock jsonSessionLock();
 
   void dispose();
 

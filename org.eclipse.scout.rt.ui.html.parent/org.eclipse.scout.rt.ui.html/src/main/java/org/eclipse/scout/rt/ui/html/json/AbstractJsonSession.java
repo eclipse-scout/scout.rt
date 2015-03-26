@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
@@ -85,7 +86,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private final AtomicReference<HttpServletRequest> m_currentHttpRequest = new AtomicReference<>();
   private final JsonEventProcessor m_jsonEventProcessor;
   private boolean m_disposing;
-  private Object m_backgroundJobLock = new Object();
+  private final Object m_backgroundJobLock = new Object();
+  private final ReentrantLock m_jsonSessionLock = new ReentrantLock();
 
   public AbstractJsonSession() {
     m_currentJsonResponse = createJsonResponse();
@@ -246,6 +248,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     // Send "initialized" event
     sendInitializationEvent();
     LOG.info("JsonSession with ID " + m_jsonSessionId + " initialized");
+  }
+
+  @Override
+  public ReentrantLock jsonSessionLock() {
+    return m_jsonSessionLock;
   }
 
   protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
