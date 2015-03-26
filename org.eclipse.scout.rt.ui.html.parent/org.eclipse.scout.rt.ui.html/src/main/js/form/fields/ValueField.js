@@ -8,6 +8,10 @@ scout.ValueField = function() {
 };
 scout.inherits(scout.ValueField, scout.FormField);
 
+scout.ValueField.prototype._registerKeyStrokeAdapter = function() {
+  this.keyStrokeAdapter = new scout.ValueFieldKeyStrokeAdapter(this);
+};
+
 scout.ValueField.prototype._renderProperties = function() {
   scout.ValueField.parent.prototype._renderProperties.call(this);
   this._renderDisplayText(this.displayText);

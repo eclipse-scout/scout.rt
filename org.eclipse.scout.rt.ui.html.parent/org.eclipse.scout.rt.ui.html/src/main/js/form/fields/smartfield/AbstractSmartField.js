@@ -91,10 +91,12 @@ scout.AbstractSmartField.prototype._onKeyDown = function(event) {
     return;
   }
 
-  // stop propagation so other key listeners aren't triggered (e.g. form close)
+  // stop propagation if popup is open, so other key listeners aren't triggered (e.g. form close)
   if (event.which === scout.keys.ENTER ||
       event.which === scout.keys.ESCAPE) {
-    event.stopPropagation();
+    if (this._$popup) {
+      event.stopPropagation();
+    }
     return;
   }
 

@@ -38,10 +38,6 @@ scout.CellEditorPopup.prototype._attachCloseHandler = function() {
 
 scout.CellEditorPopup.prototype.completeEdit = function() {
   var field = this._cell.field;
-  if (field instanceof scout.ValueField) {
-    // FIXME CGU maybe make sure field calls this when pressing enter.
-    field.acceptDisplayText();
-  }
   this._table.sendCompleteCellEdit(field.id);
   //FIXME CGU what if there is a validation error?
   this._cell.field.destroy();

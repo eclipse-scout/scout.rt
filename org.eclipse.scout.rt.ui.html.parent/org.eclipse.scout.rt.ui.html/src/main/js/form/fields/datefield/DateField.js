@@ -102,11 +102,17 @@ scout.DateField.prototype._onKeyDown = function(event) {
   if (event.which === scout.keys.ENTER) {
     //Update model and close picker
     this._updateDisplayText(this.$field.val(), false);
-    this._picker.close();
+    if (this._picker.isOpen()) {
+      this._picker.close();
+      event.stopPropagation();
+    }
     return;
   }
   if (event.which === scout.keys.ESC) {
-    this._picker.close();
+    if (this._picker.isOpen()) {
+      this._picker.close();
+      event.stopPropagation();
+    }
     return;
   }
 

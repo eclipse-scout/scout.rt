@@ -1,18 +1,17 @@
 scout.StringFieldKeyStrokeAdapter = function(field) {
   scout.StringFieldKeyStrokeAdapter.parent.call(this, field);
-  var that = this;
-  //prevent enter to bubble up and execute form or groupbox enter key.
-  var enterKeyStroke = new scout.StringFieldEnterKeyStroke();
-  enterKeyStroke.initKeyStrokeParts();
-  this.keyStrokes.push(enterKeyStroke);
+
+  // Prevent enter to bubble up and execute form or groupbox enter key.
+  this.keyStrokes.push(new scout.StringFieldEnterKeyStroke());
 };
 
-scout.inherits(scout.StringFieldKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
+scout.inherits(scout.StringFieldKeyStrokeAdapter, scout.ValueFieldKeyStrokeAdapter);
 
 scout.StringFieldEnterKeyStroke = function() {
   scout.StringFieldEnterKeyStroke.parent.call(this);
   this.keyStroke = 'ENTER';
   this.drawHint = false;
+  this.initKeyStrokeParts();
 };
 scout.inherits(scout.StringFieldEnterKeyStroke, scout.KeyStroke);
 

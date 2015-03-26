@@ -156,6 +156,10 @@ scout.DatePicker.prototype.close = function() {
   scout.scrollbars.detachScrollHandlers(this._dateField.$field);
 };
 
+scout.DatePicker.prototype.isOpen = function() {
+  return !!this.$popup;
+};
+
 scout.DatePicker.prototype._onCloseEvent = function() {
   if ($.contains(this.$popup[0], event.target)) {
     return;

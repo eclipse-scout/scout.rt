@@ -115,10 +115,11 @@ __include("form/Form.js");
 __include("form/FormLayout.js");
 __include("form/fields/fields.js");
 __include("form/fields/FormField.js");
-__include("form/fields/CompositeField.js");
-__include("form/fields/ValueField.js");
 __include("form/fields/FormFieldKeyStrokeAdapter.js");
 __include("form/fields/FormFieldLayout.js");
+__include("form/fields/CompositeField.js");
+__include("form/fields/ValueField.js");
+__include("form/fields/ValueFieldKeyStrokeAdapter.js");
 __include("form/fields/TextFieldLayout.js");
 // Form fields (A-Z)
 __include("form/fields/button/Button.js");
