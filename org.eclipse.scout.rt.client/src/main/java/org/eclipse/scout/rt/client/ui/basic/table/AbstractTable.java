@@ -2807,11 +2807,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       setTableChanging(true);
       //
       int oldRowCount = m_rows.size();
-      List<ITableRow> newIRows = new ArrayList<ITableRow>(newRows.size());
-      for (ITableRow newRow : newRows) {
-        newIRows.add(addRowImpl(newRow, markAsInserted));
-      }
+      List<ITableRow> newIRows = createInternalRows(newRows, markAsInserted);
+      // Fire ROWS_INSERTED event before really adding the internal rows to the table, because adding might trigger ROWS_UPDATED events (due to validation)
       fireRowsInserted(newIRows);
+      for (ITableRow newIRow : newIRows) {
+        addInternalRow((InternalTableRow) newIRow);
+      }
       if (getColumnSet().getSortColumnCount() > 0) {
         // restore order of rows according to sort criteria
         if (isTableChanging()) {
@@ -2853,11 +2854,19 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  private ITableRow addRowImpl(ITableRow newRow, boolean markAsInserted) throws ProcessingException {
-    if (markAsInserted) {
-      newRow.setStatus(ITableRow.STATUS_INSERTED);
+  private List<ITableRow> createInternalRows(List<? extends ITableRow> newRows, boolean markAsInserted) throws ProcessingException {
+    List<ITableRow> newIRows = new ArrayList<>(newRows.size());
+    for (ITableRow newRow : newRows) {
+      if (markAsInserted) {
+        newRow.setStatus(ITableRow.STATUS_INSERTED);
+      }
+      InternalTableRow newIRow = new InternalTableRow(this, newRow);
+      newIRows.add(newIRow);
     }
-    InternalTableRow newIRow = new InternalTableRow(this, newRow);
+    return newIRows;
+  }
+
+  private ITableRow addInternalRow(InternalTableRow newIRow) throws ProcessingException {
     for (IColumn<?> col : getColumns()) {
       if (col instanceof AbstractColumn<?>) {
         ((AbstractColumn<?>) col).validateColumnValue(newIRow);
