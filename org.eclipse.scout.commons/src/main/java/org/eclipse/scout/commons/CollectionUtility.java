@@ -30,12 +30,17 @@ public final class CollectionUtility {
   }
 
   /**
-   * compares the two collection of same content in any order. Is overloaded ({@link #equalsCollection(List, List)} for
-   * lists where the order of the list is considered.
+   * Compares the two collection of same content in any order.
+   * <p>
+   * Note: This method is overloaded ({@link #equalsCollection(List, List)} for lists where the order of the list is
+   * considered. If the order of lists should be ignored, use {@link #equalsCollection(Collection, Collection, boolean)}
+   * and pass <code>false</code> as last argument.
    *
    * @param c1
+   *          first collection
    * @param c2
-   * @return true if the two collections contains the same elements in any order.
+   *          second collection
+   * @return <code>true</code> if the two collections contains the same elements <i>in any order</i>.
    */
   public static <T> boolean equalsCollection(Collection<? extends T> c1, Collection<? extends T> c2) {
     return equalsCollection(c1, c2, false);
@@ -43,9 +48,14 @@ public final class CollectionUtility {
 
   /**
    * @param c1
+   *          first collection
    * @param c2
+   *          second collection
    * @param considerElementPosition
-   * @return true if the two collections contains the same elements if considerElementPosition in the same order.
+   *          If <code>true</code>, the order of the elements in the two collections must match. If <code>false</code>,
+   *          the order is not relevant (only the elements must be the same).
+   * @return <code>true</code> if the two collections contains the same elements <i>in any <b>or</b> the same order</i>
+   *         (depending on the value of 'considerElementPosition').
    */
   public static <T> boolean equalsCollection(Collection<? extends T> c1, Collection<? extends T> c2, boolean considerElementPosition) {
     if (c1 == c2) {
@@ -77,8 +87,10 @@ public final class CollectionUtility {
    * {@link #equalsCollection(Collection, Collection)}.
    *
    * @param c1
+   *          first list
    * @param c2
-   * @return true if the two lists contains the same elements in the same order.
+   *          second list
+   * @return <code>true</code> if the two lists contains the same elements <i>in the same order</i>.
    */
   public static <T> boolean equalsCollection(List<? extends T> c1, List<? extends T> c2) {
     if (c1 == c2) {
