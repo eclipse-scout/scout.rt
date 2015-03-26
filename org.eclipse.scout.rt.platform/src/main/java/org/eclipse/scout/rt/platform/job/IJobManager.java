@@ -43,7 +43,7 @@ public interface IJobManager {
    * <p/>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
-   * <code>result = jobManager.schedule(...).awaitDone();</code>.
+   * <code>result = Jobs.schedule(...).awaitDone();</code>.
    *
    * @param executable
    *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
@@ -61,7 +61,7 @@ public interface IJobManager {
    * <p/>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
-   * <code>result = jobManager.schedule(...).awaitDone();</code>.
+   * <code>result = Jobs.schedule(...).awaitDone();</code>.
    *
    * @param executable
    *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
@@ -122,15 +122,12 @@ public interface IJobManager {
    * <p/>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}. Also see {@link JobFutureFilters} for simplified usage:<br/>
-   * <code>JobFutureFilters.allFilter().notCurrentFuture().session(...);</code>
+   * <code>Jobs.newFutureFilter().notCurrentFuture().session(...);</code>
    *
    * @param filter
    *          filter to limit the Futures to be checked for their 'done-state'. If <code>null</code>, all Futures are
    *          checked, which is the same as using {@link AlwaysFilter}.
    * @return <code>true</code> if all Futures matching the given Filter are in 'done-state'.
-   * @see JobFutureFilters
-   * @see ServerJobFutureFilters
-   * @see ClientJobFutureFilters
    */
   boolean isDone(IFilter<IFuture<?>> filter);
 
@@ -140,7 +137,7 @@ public interface IJobManager {
    * <p/>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}. Also see {@link JobFutureFilters} for simplified usage:<br/>
-   * <code>JobFutureFilters.allFilter().notCurrentFuture().session(...);</code>
+   * <code>Jobs.newFutureFilter().notCurrentFuture().session(...);</code>
    *
    * @param filter
    *          filter to limit the Futures to await to become 'done'. If <code>null</code>, all Futures are awaited,
@@ -152,9 +149,6 @@ public interface IJobManager {
    * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
    * @throws InterruptedException
    *           if the current thread is interrupted while waiting.
-   * @see JobFutureFilters
-   * @see ServerJobFutureFilters
-   * @see ClientJobFutureFilters
    */
   boolean awaitDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit) throws InterruptedException;
 
@@ -163,16 +157,13 @@ public interface IJobManager {
    * <p/>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}. Also see {@link JobFutureFilters} for simplified usage:<br/>
-   * <code>JobFutureFilters.allFilter().notCurrentFuture().session(...);</code>
+   * <code>Jobs.newFutureFilter().notCurrentFuture().session(...);</code>
    *
    * @param filter
    *          to limit the Futures to be visited. If <code>null</code>, all Futures are visited, which is the same as
    *          using {@link AlwaysFilter}.
    * @param visitor
    *          called for each Futures that passed the filter.
-   * @see JobFutureFilters
-   * @see ServerJobFutureFilters
-   * @see ClientJobFutureFilters
    */
   void visit(IFilter<IFuture<?>> filter, IVisitor<IFuture<?>> visitor);
 
@@ -181,7 +172,7 @@ public interface IJobManager {
    * <p/>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}. Also see {@link JobFutureFilters} for simplified usage:<br/>
-   * <code>JobFutureFilters.allFilter().notCurrentFuture().session(...);</code>
+   * <code>Jobs.newFutureFilter().notCurrentFuture().session(...);</code>
    *
    * @param filter
    *          to limit the Futures to be cancelled. If <code>null</code>, all Futures are cancelled, which is the same
@@ -190,9 +181,6 @@ public interface IJobManager {
    *          <code>true</code> to interrupt in-progress jobs.
    * @return <code>true</code> if all Futures matching the Filter are cancelled successfully, or <code>false</code>, if
    *         a Future could not be cancelled, typically because already completed normally.
-   * @see JobFutureFilters
-   * @see ServerJobFutureFilters
-   * @see ClientJobFutureFilters
    */
   boolean cancel(IFilter<IFuture<?>> filter, boolean interruptIfRunning);
 
@@ -219,19 +207,16 @@ public interface IJobManager {
    * previous registration is replaced.
    * <p/>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. Also see {@link JobFutureFilters} for simplified usage:<br/>
-   * <code>JobEventFilters.allFilter().notCurrentFuture().session(...);</code>
+   * a filter in {@link NotFilter}. Also see {@link JobEventFilters} for simplified usage:<br/>
+   * <code>Jobs.newEventFilter().notCurrentFuture().session(...);</code>
    *
-   * @param listener
-   *          listener to be registered.
    * @param filter
    *          filter to only get notified about events of interest - that is for events accepted by the filter.
+   * @param listener
+   *          listener to be registered.
    * @return the given listener.
-   * @see JobEventFilters
-   * @see ServerJobEventFilters
-   * @see ClientJobEventFilters
    */
-  IJobListener addListener(IJobListener listener, IFilter<JobEvent> filter);
+  IJobListener addListener(IFilter<JobEvent> filter, IJobListener listener);
 
   /**
    * Removes the given listener from the list.

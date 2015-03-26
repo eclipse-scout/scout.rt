@@ -25,25 +25,23 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
- * Factory methods to create event filters related to client- and model jobs.
+ * Filters for client-/model job events.
  *
  * @since 5.1
  */
 public final class ClientJobEventFilters {
 
-  private static final IFilter<JobEvent> CLIENT_JOB_EVENT_FILTER = new FutureEventFilterDelegate(ClientJobFilter.INSTANCE);
-  private static final IFilter<JobEvent> MODEL_JOB_EVENT_FILTER = new FutureEventFilterDelegate(ModelJobFilter.INSTANCE);
-
-  private ClientJobEventFilters() {
-  }
+  /**
+   * Filter to accept events only of client jobs, and not model jobs.
+   */
+  static final IFilter<JobEvent> CLIENT_JOB_EVENT_FILTER = new FutureEventFilterDelegate(ClientJobFilter.INSTANCE);
 
   /**
-   * Creates a filter to accept events of all client- or model jobs that comply with some specific characteristics. By
-   * default, the filter returned accepts all client/model-job related events. The filter is designed to support method
-   * chaining.
+   * Filter to accept events only of model jobs, and not client jobs.
    */
-  public static Filter allFilter() {
-    return new Filter();
+  static final IFilter<JobEvent> MODEL_JOB_EVENT_FILTER = new FutureEventFilterDelegate(ModelJobFilter.INSTANCE);
+
+  private ClientJobEventFilters() {
   }
 
   /**

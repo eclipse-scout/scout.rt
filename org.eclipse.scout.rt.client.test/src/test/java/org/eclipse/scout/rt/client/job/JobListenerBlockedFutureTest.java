@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -55,7 +55,7 @@ public class JobListenerBlockedFutureTest {
   @Test
   public void testEvents() throws Exception {
     P_JobChangeListener listener = new P_JobChangeListener();
-    m_jobManager.addListener(listener, new AlwaysFilter<JobEvent>());
+    m_jobManager.addListener(Jobs.newEventFilter(), listener);
     IClientSession clientSession = mock(IClientSession.class);
 
     ClientJobInput input = ClientJobInput.fillEmpty().session(clientSession);
@@ -64,7 +64,7 @@ public class JobListenerBlockedFutureTest {
       public void run() throws Exception {
       }
     }, input);
-    assertTrue(m_jobManager.awaitDone(ClientJobFutureFilters.allFilter().futures(future), 1, TimeUnit.MINUTES));
+    assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 1, TimeUnit.MINUTES));
     m_jobManager.shutdown();
     m_jobManager.removeListener(listener);
 
@@ -91,8 +91,8 @@ public class JobListenerBlockedFutureTest {
     P_JobChangeListener modelJobListener = new P_JobChangeListener();
     P_JobChangeListener clientJobListener = new P_JobChangeListener();
 
-    m_jobManager.addListener(modelJobListener, ClientJobEventFilters.allFilter().modelJobsOnly());
-    m_jobManager.addListener(clientJobListener, ClientJobEventFilters.allFilter().clientJobsOnly());
+    m_jobManager.addListener(ModelJobs.newEventFilter(), modelJobListener);
+    m_jobManager.addListener(ClientJobs.newEventFilter(), clientJobListener);
     IFuture<Void> outerFuture = null;
     final IHolder<IFuture<?>> innerFuture = new Holder<IFuture<?>>();
     try {
@@ -116,7 +116,7 @@ public class JobListenerBlockedFutureTest {
           condition.waitFor();
         }
       }, input);
-      assertTrue(m_jobManager.awaitDone(ClientJobFutureFilters.allFilter().futures(outerFuture), 1, TimeUnit.MINUTES));
+      assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().futures(outerFuture), 1, TimeUnit.MINUTES));
       m_jobManager.shutdown();
     }
     finally {

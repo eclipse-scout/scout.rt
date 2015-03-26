@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
- * Factory methods to create event filters related to server jobs.
+ * Filters for server job events.
  *
  * @since 5.1
  */
@@ -31,14 +31,6 @@ public final class ServerJobEventFilters {
   private static final IFilter<JobEvent> SERVER_JOB_EVENT_FILTER = new FutureEventFilterDelegate(ServerJobFutureFilters.ServerJobFilter.INSTANCE);
 
   private ServerJobEventFilters() {
-  }
-
-  /**
-   * Creates a filter to accept events of all server jobs that comply with some specific characteristics. By default,
-   * the filter returned accepts all server-job related events. The filter is designed to support method chaining.
-   */
-  public static Filter allFilter() {
-    return new Filter();
   }
 
   /**

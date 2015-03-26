@@ -167,7 +167,8 @@ public final class ModelJobs {
   }
 
   /**
-   * Returns <code>true</code> if the current thread represents the model thread.
+   * Returns <code>true</code> if the current thread represents the model thread. At any given time, there is only one
+   * model thread.
    */
   public static boolean isModelThread() {
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
@@ -175,22 +176,39 @@ public final class ModelJobs {
   }
 
   /**
-   * Returns <code>true</code> if the current Future belongs to a model job.
-   *
-   * @see ModelJobInput
-   * @see ClientRunContext
-   */
-  public static boolean isModelJob() {
-    return ModelJobs.isModelJob(IFuture.CURRENT.get());
-  }
-
-  /**
    * Returns <code>true</code> if the given Future belongs to a model job.
-   *
-   * @see ModelJobInput
-   * @see ClientRunContext
    */
   public static boolean isModelJob(final IFuture<?> future) {
     return future != null && ModelJobInput.class.equals(future.getJobInput().getClass());
+  }
+
+  /**
+   * Creates a filter to accept Futures of all model jobs (and not client jobs) that comply with some specific
+   * characteristics. The filter returned accepts all model job Futures. The filter is designed to support method
+   * chaining.
+   * <p/>
+   * To accept both, model and client jobs, use a construct like the following:
+   *
+   * <pre>
+   * new OrFilter&lt;&gt;(ModelJobs.newFutureFilter(), ClientJobs.newFutureFilter());
+   * </pre>
+   */
+  public static ClientJobFutureFilters.Filter newFutureFilter() {
+    return new ClientJobFutureFilters.Filter().andFilter(ClientJobFutureFilters.ModelJobFilter.INSTANCE);
+  }
+
+  /**
+   * Creates a filter to accept events of all model jobs (and not client jobs) that comply with some specific
+   * characteristics. The filter returned accepts all model job events. The filter is designed to support method
+   * chaining.
+   * <p/>
+   * To accept both, model and client jobs, use a construct like the following:
+   *
+   * <pre>
+   * new OrFilter&lt;&gt;(ModelJobs.newEventFilter(), ClientJobs.newEventFilter());
+   * </pre>
+   */
+  public static ClientJobEventFilters.Filter newEventFilter() {
+    return new ClientJobEventFilters.Filter().andFilter(ClientJobEventFilters.MODEL_JOB_EVENT_FILTER);
   }
 }

@@ -36,6 +36,8 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -43,7 +45,6 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
-import org.eclipse.scout.rt.client.job.ClientJobFutureFilters;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobInput;
@@ -507,7 +508,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
       }
     };
 
-    Jobs.getJobManager().visit(ClientJobFutureFilters.allFilter().session(this), visitor);
+    Jobs.getJobManager().visit(new OrFilter<>(ClientJobs.newFutureFilter().session(this), ModelJobs.newFutureFilter().session(this)), visitor);
 
     return futures;
   }

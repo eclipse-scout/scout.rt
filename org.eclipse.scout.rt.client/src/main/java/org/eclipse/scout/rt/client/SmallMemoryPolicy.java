@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.job.ClientJobFutureFilters;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -42,10 +41,12 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
     desktop.releaseUnusedPages();
     System.gc();
 
-    String jobId = getClass().getName();
+    String gcJobId = getClass().getName();
 
-    Jobs.getJobManager().cancel(ClientJobFutureFilters.allFilter().ids(jobId).currentSession(), true);
-    ClientJobs.schedule(new ForceGCJob(), ClientJobInput.fillCurrent().name("release memory").id(jobId));
+    // Cancel already running GC job
+    Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().ids(gcJobId).currentSession(), true);
+    // Schedule new GC job
+    ClientJobs.schedule(new ForceGCJob(), ClientJobInput.fillCurrent().name("release memory").id(gcJobId));
 
     if (page.getTable() != null) {
       page.getTable().discardAllRows();

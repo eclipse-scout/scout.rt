@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
+import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -181,7 +182,7 @@ public class MultipleSessionTest {
     assertTrue(latch1.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2"), protocol);
 
-    Jobs.getJobManager().cancel(ClientJobFutureFilters.allFilter().session(m_clientSession1), true); // cancel all jobs of session1
+    Jobs.getJobManager().cancel(new OrFilter<>(ClientJobs.newFutureFilter().session(m_clientSession1), ModelJobs.newFutureFilter().session(m_clientSession1)), true); // cancel all jobs of session1
 
     assertTrue(interruptedLatch.await());
 

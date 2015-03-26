@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.server.context.ServerRunContext;
 /**
  * Factory and utility methods for {@link IJobManager} to schedule and interact with server jobs.
  * <p/>
- * Use this class to schedule jobs that do require a server context for execution. By default, server jobs require a
+ * Use this class to schedule jobs that do require a server RunContext for execution. By default, server jobs require a
  * {@link IServerSession} to be set.
  *
  * @since 5.1
@@ -207,9 +207,6 @@ public final class ServerJobs {
 
   /**
    * Returns <code>true</code> if the current Future belongs to a server job.
-   *
-   * @see ServerJobInput
-   * @see ServerRunContext
    */
   public static boolean isServerJob() {
     return ServerJobs.isServerJob(IFuture.CURRENT.get());
@@ -217,11 +214,24 @@ public final class ServerJobs {
 
   /**
    * Returns <code>true</code> if the given Future belongs to a server job.
-   *
-   * @see ServerJobInput
-   * @see ServerRunContext
    */
   public static boolean isServerJob(final IFuture<?> future) {
     return future != null && ServerJobInput.class.equals(future.getJobInput().getClass());
+  }
+
+  /**
+   * Creates a filter to accept Futures of all server jobs that comply with some specific characteristics. The filter
+   * returned accepts all server job Futures. The filter is designed to support method chaining.
+   */
+  public static ServerJobFutureFilters.Filter newFutureFilter() {
+    return new ServerJobFutureFilters.Filter();
+  }
+
+  /**
+   * Creates a filter to accept events of all server jobs that comply with some specific characteristics. The filter
+   * returned accepts all server job events. The filter is designed to support method chaining.
+   */
+  public static ServerJobEventFilters.Filter newEventFilter() {
+    return new ServerJobEventFilters.Filter();
   }
 }

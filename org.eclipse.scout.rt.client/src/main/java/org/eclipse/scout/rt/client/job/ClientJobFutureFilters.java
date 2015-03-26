@@ -21,22 +21,13 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
- * Factory methods to create Future filters related to client and model jobs.
+ * Filters for client-/model job Futures.
  *
  * @since 5.1
  */
 public final class ClientJobFutureFilters {
 
   private ClientJobFutureFilters() {
-  }
-
-  /**
-   * Creates a filter to accept Futures of all client- or model jobs that comply with some specific characteristics. By
-   * default, the filter returned accepts all client/model-job Futures. The filter is designed to support method
-   * chaining.
-   */
-  public static Filter allFilter() {
-    return new Filter();
   }
 
   /**
@@ -132,22 +123,6 @@ public final class ClientJobFutureFilters {
      */
     public Filter notCurrentSession() {
       andFilter(new NotFilter<>(new SessionFilter(ISession.CURRENT.get())));
-      return this;
-    }
-
-    /**
-     * To accept only model jobs, and not client jobs.
-     */
-    public Filter modelJobsOnly() {
-      andFilter(ModelJobFilter.INSTANCE);
-      return this;
-    }
-
-    /**
-     * To accept only client jobs, and not model jobs.
-     */
-    public Filter clientJobsOnly() {
-      andFilter(ClientJobFilter.INSTANCE);
       return this;
     }
   }

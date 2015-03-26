@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 /**
  * Factory and utility methods for {@link IJobManager} to schedule and interact with client jobs.
  * <p/>
- * Use this class to schedule jobs that do require a client context for execution. By default, client jobs require a
+ * Use this class to schedule jobs that do require a client RunContext for execution. By default, client jobs require a
  * {@link IClientSession} to be set.
  *
  * @since 5.1
@@ -207,9 +207,6 @@ public final class ClientJobs {
 
   /**
    * Returns <code>true</code> if the current Future belongs to a client job.
-   *
-   * @see ClientJobInput
-   * @see ClientRunContext
    */
   public static boolean isClientJob() {
     return ClientJobs.isClientJob(IFuture.CURRENT.get());
@@ -217,11 +214,38 @@ public final class ClientJobs {
 
   /**
    * Returns <code>true</code> if the given Future belongs to a client job.
-   *
-   * @see ClientJobInput
-   * @see ClientRunContext
    */
   public static boolean isClientJob(final IFuture<?> future) {
     return future != null && ClientJobInput.class.equals(future.getJobInput().getClass());
+  }
+
+  /**
+   * Creates a filter to accept Futures of all client jobs (and not model jobs) that comply with some specific
+   * characteristics. The filter returned accepts all client job Futures. The filter is designed to support method
+   * chaining.
+   * <p/>
+   * To accept both, client and model jobs, use a construct like the following:
+   *
+   * <pre>
+   * new OrFilter&lt;&gt;(ClientJobs.newFutureFilter(), ModelJobs.newFutureFilter());
+   * </pre>
+   */
+  public static ClientJobFutureFilters.Filter newFutureFilter() {
+    return new ClientJobFutureFilters.Filter().andFilter(ClientJobFutureFilters.ClientJobFilter.INSTANCE);
+  }
+
+  /**
+   * Creates a filter to accept events of all client jobs (and not model jobs) that comply with some specific
+   * characteristics. The filter returned accepts all client job events. The filter is designed to support method
+   * chaining.
+   * <p/>
+   * To accept both, client and model jobs, use a construct like the following:
+   *
+   * <pre>
+   * new OrFilter&lt;&gt;(ClientJobs.newEventFilter(), ModelJobs.newEventFilter());
+   * </pre>
+   */
+  public static ClientJobEventFilters.Filter newEventFilter() {
+    return new ClientJobEventFilters.Filter().andFilter(ClientJobEventFilters.CLIENT_JOB_EVENT_FILTER);
   }
 }

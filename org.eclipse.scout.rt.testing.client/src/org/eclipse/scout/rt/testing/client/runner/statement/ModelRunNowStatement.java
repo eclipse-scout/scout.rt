@@ -30,7 +30,7 @@ public class ModelRunNowStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
-    Assertions.assertFalse(ModelJobs.isModelJob(), "already running within a model context");
+    Assertions.assertFalse(ModelJobs.isModelThread(), "already running in model thread");
     final Holder<Throwable> throwable = new Holder<>();
 
     IRunnable runnable = new IRunnable() {

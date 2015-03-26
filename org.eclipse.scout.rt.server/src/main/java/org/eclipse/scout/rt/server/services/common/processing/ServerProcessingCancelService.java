@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.server.job.ServerJobFutureFilters;
+import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.service.AbstractService;
@@ -32,7 +32,7 @@ public class ServerProcessingCancelService extends AbstractService implements IS
     success.add(ActiveTransactionRegistry.cancel(requestSequence));
 
     // Cancel the job.
-    success.add(Jobs.getJobManager().cancel(ServerJobFutureFilters.allFilter().ids(String.valueOf(requestSequence)).currentSession(), true));
+    success.add(Jobs.getJobManager().cancel(ServerJobs.newFutureFilter().ids(String.valueOf(requestSequence)).currentSession(), true));
 
     return Collections.singleton(Boolean.TRUE).equals(success);
   }

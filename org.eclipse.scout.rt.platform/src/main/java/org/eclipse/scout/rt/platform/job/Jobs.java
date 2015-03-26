@@ -207,6 +207,22 @@ public final class Jobs {
   }
 
   /**
+   * Creates a filter to accept Futures of all jobs that comply with some specific characteristics. The filter returned
+   * accepts all Futures. The filter is designed to support method chaining.
+   */
+  public static JobFutureFilters.Filter newFutureFilter() {
+    return new JobFutureFilters.Filter();
+  }
+
+  /**
+   * Creates a filter to accept events of all jobs that comply with some specific characteristics. The filter returned
+   * accepts all events. The filter is designed to support method chaining.
+   */
+  public static JobEventFilters.Filter newEventFilter() {
+    return new JobEventFilters.Filter();
+  }
+
+  /**
    * Returns <code>true</code> if the given {@link ProcessingException} describes a job timeout.
    */
   public static boolean isTimeout(final ProcessingException e) {

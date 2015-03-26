@@ -22,21 +22,13 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
 
 /**
- * Factory methods to create Future filters related to jobs.
+ * Filters for job Futures.
  *
  * @since 5.1
  */
+
 public final class JobFutureFilters {
-
   private JobFutureFilters() {
-  }
-
-  /**
-   * Creates a filter to accept Futures of all jobs that comply with some specific characteristics. By default, the
-   * filter returned accepts all Futures. The filter is designed to support method chaining.
-   */
-  public static Filter allFilter() {
-    return new Filter();
   }
 
   /**

@@ -38,9 +38,9 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
-import org.eclipse.scout.rt.platform.job.JobEventFilters;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.callable.ApplyRunContextCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.HandleExceptionCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.ThreadNameDecorator;
@@ -98,7 +98,7 @@ public class JobManager implements IJobManager {
     m_listeners = new JobListeners();
     m_delayedExecutor = new DelayedExecutor(m_executor, "delayed-job-dispatcher", ConfigIniUtility.getPropertyInt(PROP_DISPATCHER_THREAD_COUNT, DEFAULT_DISPATCHER_THREAD_COUNT));
 
-    addListener(m_futures, JobEventFilters.allFilter().eventTypes(JobEventType.SCHEDULED, JobEventType.DONE, JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.SHUTDOWN));
+    addListener(Jobs.newEventFilter().eventTypes(JobEventType.SCHEDULED, JobEventType.DONE, JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.SHUTDOWN), m_futures);
   }
 
   @Override
@@ -120,12 +120,7 @@ public class JobManager implements IJobManager {
 
       @Override
       public void run() {
-        if (futureTask.isMutexTask()) {
-          if (m_mutexSemaphores.tryAcquireElseOfferTail(futureTask)) {
-            futureTask.run();
-          }
-        }
-        else {
+        if (!futureTask.isMutexTask() || m_mutexSemaphores.tryAcquireElseOfferTail(futureTask)) {
           futureTask.run();
         }
       }
@@ -184,7 +179,7 @@ public class JobManager implements IJobManager {
   }
 
   @Override
-  public IJobListener addListener(final IJobListener listener, final IFilter<JobEvent> filter) {
+  public IJobListener addListener(final IFilter<JobEvent> filter, final IJobListener listener) {
     return m_listeners.add(listener, Filters.alwaysFilterIfNull(filter));
   }
 
@@ -237,7 +232,7 @@ public class JobManager implements IJobManager {
 
       @Override
       protected void beforeExecute() {
-        // Check, if the Future is expired and therefore should not be executed. The ScheduledFutureTask ensures that 'cancelled' Futures do not commence execution.
+        // Check, if the Future is expired and therefore should not be executed. The FutureTask ensures that 'cancelled' Futures do not commence execution.
         if (isExpired()) {
           cancel(true);
         }

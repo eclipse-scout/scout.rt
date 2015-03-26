@@ -50,10 +50,10 @@ public class JobListenerTest {
   @Test
   public void testEvents() throws Exception {
     P_JobChangeListener listener = new P_JobChangeListener();
-    m_jobManager.addListener(listener, JobEventFilters.allFilter());
+    m_jobManager.addListener(Jobs.newEventFilter(), listener);
 
     P_ShutdownListener shutdownListener = new P_ShutdownListener();
-    m_jobManager.addListener(shutdownListener, JobEventFilters.allFilter().eventTypes(JobEventType.SHUTDOWN));
+    m_jobManager.addListener(Jobs.newEventFilter().eventTypes(JobEventType.SHUTDOWN), shutdownListener);
 
     IFuture<Void> future = null;
     future = m_jobManager.schedule(new IRunnable() {
@@ -61,7 +61,7 @@ public class JobListenerTest {
       public void run() throws Exception {
       }
     }, JobInput.fillEmpty());
-    m_jobManager.awaitDone(JobFutureFilters.allFilter().futures(future), 1, TimeUnit.MINUTES);
+    m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 1, TimeUnit.MINUTES);
     m_jobManager.removeListener(listener);
     m_jobManager.shutdown();
     m_jobManager.removeListener(shutdownListener);
@@ -84,10 +84,10 @@ public class JobListenerTest {
   @Test
   public void testCancel() throws Exception {
     P_JobChangeListener listener = new P_JobChangeListener();
-    m_jobManager.addListener(listener, JobEventFilters.allFilter());
+    m_jobManager.addListener(Jobs.newEventFilter(), listener);
 
     P_ShutdownListener shutdownListener = new P_ShutdownListener();
-    m_jobManager.addListener(shutdownListener, JobEventFilters.allFilter().eventTypes(JobEventType.SHUTDOWN));
+    m_jobManager.addListener(Jobs.newEventFilter().eventTypes(JobEventType.SHUTDOWN), shutdownListener);
 
     final BooleanHolder hasStarted = new BooleanHolder(Boolean.FALSE);
     IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
@@ -97,7 +97,7 @@ public class JobListenerTest {
       }
     }, 200, TimeUnit.MILLISECONDS, JobInput.fillEmpty());
     future.cancel(true);
-    m_jobManager.awaitDone(JobFutureFilters.allFilter().futures(future), 1, TimeUnit.MINUTES);
+    m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 1, TimeUnit.MINUTES);
     m_jobManager.removeListener(listener);
     m_jobManager.shutdown();
     m_jobManager.removeListener(shutdownListener);

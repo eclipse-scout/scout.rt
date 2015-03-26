@@ -15,10 +15,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobFutureFilters;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
@@ -57,110 +59,114 @@ public class ClientJobFutureFilterTest {
 
   @Test
   public void testEmptyFilter() {
-    assertTrue(JobFutureFilters.allFilter().accept(m_jobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().accept(m_jobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().accept(m_clientJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().accept(m_clientJobFuture));
-  }
+    assertTrue(Jobs.newFutureFilter().accept(m_jobFuture));
+    assertFalse(ClientJobs.newFutureFilter().accept(m_jobFuture));
+    assertFalse(ModelJobs.newFutureFilter().accept(m_jobFuture));
+    assertFalse(new OrFilter<>(ClientJobs.newFutureFilter(), ModelJobs.newFutureFilter()).accept(m_jobFuture));
 
-  @Test
-  public void testJobType() {
-    assertTrue(ClientJobFutureFilters.allFilter().accept(m_clientJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().clientJobsOnly().accept(m_clientJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().modelJobsOnly().accept(m_clientJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().accept(m_clientJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().accept(m_clientJobFuture));
 
-    assertTrue(ClientJobFutureFilters.allFilter().accept(m_modelJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().clientJobsOnly().accept(m_modelJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().modelJobsOnly().accept(m_modelJobFuture));
-
-    assertFalse(ClientJobFutureFilters.allFilter().accept(m_jobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().clientJobsOnly().accept(m_jobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().modelJobsOnly().accept(m_jobFuture));
+    assertFalse(ClientJobs.newFutureFilter().accept(m_modelJobFuture));
+    assertTrue(ModelJobs.newFutureFilter().accept(m_modelJobFuture));
   }
 
   @Test
   public void testBlocked() {
     when(m_clientJobFuture.isBlocked()).thenReturn(true);
-    assertTrue(ClientJobFutureFilters.allFilter().accept(m_clientJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().blocked().accept(m_clientJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().notBlocked().accept(m_clientJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().accept(m_clientJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().blocked().accept(m_clientJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().notBlocked().accept(m_clientJobFuture));
 
     when(m_modelJobFuture.isBlocked()).thenReturn(true);
-    assertTrue(ClientJobFutureFilters.allFilter().accept(m_modelJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().blocked().accept(m_modelJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().notBlocked().accept(m_modelJobFuture));
+    assertTrue(ModelJobs.newFutureFilter().accept(m_modelJobFuture));
+    assertTrue(ModelJobs.newFutureFilter().blocked().accept(m_modelJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().notBlocked().accept(m_modelJobFuture));
   }
 
   @Test
   public void testPeriodic() {
     when(m_clientJobFuture.isPeriodic()).thenReturn(true);
-    assertTrue(ClientJobFutureFilters.allFilter().accept(m_clientJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().periodic().accept(m_clientJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().notPeriodic().accept(m_clientJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().accept(m_clientJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().periodic().accept(m_clientJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().notPeriodic().accept(m_clientJobFuture));
 
     when(m_modelJobFuture.isPeriodic()).thenReturn(true);
-    assertTrue(ClientJobFutureFilters.allFilter().accept(m_modelJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().periodic().accept(m_modelJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().notPeriodic().accept(m_modelJobFuture));
+    assertTrue(ModelJobs.newFutureFilter().accept(m_modelJobFuture));
+    assertTrue(ModelJobs.newFutureFilter().periodic().accept(m_modelJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().notPeriodic().accept(m_modelJobFuture));
   }
 
   @Test
   public void testSession() {
-    assertTrue(ClientJobFutureFilters.allFilter().session(m_clientSession1).accept(m_clientJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().session(m_clientSession1).accept(m_modelJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().session(m_clientSession2).accept(m_clientJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().session(m_clientSession2).accept(m_modelJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().session(m_clientSession1).accept(m_clientJobFuture));
+    assertTrue(ModelJobs.newFutureFilter().session(m_clientSession1).accept(m_modelJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().session(m_clientSession2).accept(m_clientJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().session(m_clientSession2).accept(m_modelJobFuture));
   }
 
   @Test
   public void testCurrentSession() {
     ISession.CURRENT.set(m_clientSession1);
-    assertTrue(ClientJobFutureFilters.allFilter().currentSession().accept(m_clientJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().currentSession().accept(m_modelJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().currentSession().accept(m_clientJobFuture));
+    assertTrue(ModelJobs.newFutureFilter().currentSession().accept(m_modelJobFuture));
     ISession.CURRENT.set(m_clientSession2);
-    assertFalse(ClientJobFutureFilters.allFilter().currentSession().accept(m_clientJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().currentSession().accept(m_modelJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().currentSession().accept(m_clientJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().currentSession().accept(m_modelJobFuture));
     ISession.CURRENT.remove();
   }
 
   @Test
   public void testNotCurrentSession() {
     ISession.CURRENT.set(m_clientSession1);
-    assertFalse(ClientJobFutureFilters.allFilter().notCurrentSession().accept(m_clientJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().notCurrentSession().accept(m_modelJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().notCurrentSession().accept(m_clientJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().notCurrentSession().accept(m_modelJobFuture));
     ISession.CURRENT.set(m_clientSession2);
-    assertTrue(ClientJobFutureFilters.allFilter().notCurrentSession().accept(m_clientJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().notCurrentSession().accept(m_modelJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().notCurrentSession().accept(m_clientJobFuture));
+    assertTrue(ModelJobs.newFutureFilter().notCurrentSession().accept(m_modelJobFuture));
     ISession.CURRENT.remove();
   }
 
   @Test
   public void testFuture() {
-    assertTrue(ClientJobFutureFilters.allFilter().futures(m_clientJobFuture, m_modelJobFuture).accept(m_clientJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().futures(m_clientJobFuture, m_modelJobFuture).accept(m_modelJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().futures(m_modelJobFuture).accept(m_clientJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().futures(m_clientJobFuture).accept(m_modelJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().futures(m_clientJobFuture, m_modelJobFuture).accept(m_clientJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().futures(m_clientJobFuture, m_modelJobFuture).accept(m_clientJobFuture));
+    assertTrue(new JobFutureFilters.FutureFilter(m_clientJobFuture, m_modelJobFuture).accept(m_clientJobFuture));
+
+    assertFalse(ClientJobs.newFutureFilter().futures(m_clientJobFuture, m_modelJobFuture).accept(m_modelJobFuture));
+    assertTrue(ModelJobs.newFutureFilter().futures(m_clientJobFuture, m_modelJobFuture).accept(m_modelJobFuture));
+    assertTrue(new JobFutureFilters.FutureFilter(m_clientJobFuture, m_modelJobFuture).accept(m_modelJobFuture));
+
+    assertTrue(ModelJobs.newFutureFilter().futures(m_modelJobFuture).accept(m_modelJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().futures(m_modelJobFuture).accept(m_modelJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().futures(m_clientJobFuture).accept(m_modelJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().futures(m_clientJobFuture).accept(m_modelJobFuture));
+
+    assertFalse(ModelJobs.newFutureFilter().futures(m_modelJobFuture).accept(m_clientJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().futures(m_modelJobFuture).accept(m_clientJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().futures(m_clientJobFuture).accept(m_clientJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().futures(m_clientJobFuture).accept(m_clientJobFuture));
   }
 
   @Test
   public void testCurrentFuture() {
     IFuture.CURRENT.set(m_clientJobFuture);
-    assertTrue(ClientJobFutureFilters.allFilter().currentFuture().accept(m_clientJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().currentFuture().accept(m_modelJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().currentFuture().accept(m_clientJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().currentFuture().accept(m_modelJobFuture));
     IFuture.CURRENT.set(m_modelJobFuture);
-    assertFalse(ClientJobFutureFilters.allFilter().currentFuture().accept(m_clientJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().currentFuture().accept(m_modelJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().currentFuture().accept(m_clientJobFuture));
+    assertTrue(ModelJobs.newFutureFilter().currentFuture().accept(m_modelJobFuture));
     IFuture.CURRENT.remove();
   }
 
   @Test
   public void testNotCurrentFuture() {
     IFuture.CURRENT.set(m_clientJobFuture);
-    assertFalse(ClientJobFutureFilters.allFilter().notCurrentFuture().accept(m_clientJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().notCurrentFuture().accept(m_modelJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().notCurrentFuture().accept(m_clientJobFuture));
+    assertTrue(ModelJobs.newFutureFilter().notCurrentFuture().accept(m_modelJobFuture));
     IFuture.CURRENT.set(m_modelJobFuture);
-    assertTrue(ClientJobFutureFilters.allFilter().notCurrentFuture().accept(m_clientJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().notCurrentFuture().accept(m_modelJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().notCurrentFuture().accept(m_clientJobFuture));
+    assertFalse(ModelJobs.newFutureFilter().notCurrentFuture().accept(m_modelJobFuture));
     IFuture.CURRENT.remove();
   }
 
@@ -170,22 +176,22 @@ public class ClientJobFutureFilterTest {
     Object mutexObject2 = new Object();
 
     m_clientJobFuture.getJobInput().mutex(mutexObject1);
-    assertTrue(ClientJobFutureFilters.allFilter().accept(m_clientJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().mutex(null).accept(m_clientJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().mutex(mutexObject1).accept(m_clientJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().mutex(mutexObject2).accept(m_clientJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().accept(m_clientJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().mutex(null).accept(m_clientJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().mutex(mutexObject1).accept(m_clientJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().mutex(mutexObject2).accept(m_clientJobFuture));
 
     m_clientJobFuture.getJobInput().mutex(null);
-    assertTrue(ClientJobFutureFilters.allFilter().accept(m_clientJobFuture));
-    assertTrue(ClientJobFutureFilters.allFilter().mutex(null).accept(m_clientJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().mutex(mutexObject1).accept(m_clientJobFuture));
-    assertFalse(ClientJobFutureFilters.allFilter().mutex(mutexObject2).accept(m_clientJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().accept(m_clientJobFuture));
+    assertTrue(ClientJobs.newFutureFilter().mutex(null).accept(m_clientJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().mutex(mutexObject1).accept(m_clientJobFuture));
+    assertFalse(ClientJobs.newFutureFilter().mutex(mutexObject2).accept(m_clientJobFuture));
   }
 
   @Test
   public void testCustomFilter() {
     // False Filter
-    assertFalse(ClientJobFutureFilters.allFilter().andFilter(new IFilter<IFuture<?>>() {
+    assertFalse(ClientJobs.newFutureFilter().andFilter(new IFilter<IFuture<?>>() {
 
       @Override
       public boolean accept(IFuture<?> future) {
@@ -194,7 +200,7 @@ public class ClientJobFutureFilterTest {
     }).accept(m_clientJobFuture));
 
     // True Filter
-    assertTrue(ClientJobFutureFilters.allFilter().andFilter(new IFilter<IFuture<?>>() {
+    assertTrue(ClientJobs.newFutureFilter().andFilter(new IFilter<IFuture<?>>() {
 
       @Override
       public boolean accept(IFuture<?> future) {
@@ -203,7 +209,7 @@ public class ClientJobFutureFilterTest {
     }).accept(m_clientJobFuture));
 
     // True/False Filter
-    assertFalse(ClientJobFutureFilters.allFilter().andFilter(new IFilter<IFuture<?>>() {
+    assertFalse(ClientJobs.newFutureFilter().andFilter(new IFilter<IFuture<?>>() {
 
       @Override
       public boolean accept(IFuture<?> future) {

@@ -20,22 +20,13 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
- * Factory methods to create Future filters related to server jobs.
+ * Filters for server job Futures.
  *
  * @since 5.1
  */
 public final class ServerJobFutureFilters {
 
   private ServerJobFutureFilters() {
-  }
-
-  /**
-   * Creates a filter to accept Futures of all server jobs that comply with some specific characteristics. By default,
-   * the filter returned accepts all server job Futures. The filter is designed to support method
-   * chaining.
-   */
-  public static Filter allFilter() {
-    return new Filter();
   }
 
   /**

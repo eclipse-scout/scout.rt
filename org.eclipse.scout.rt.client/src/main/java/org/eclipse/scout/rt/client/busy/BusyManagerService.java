@@ -14,9 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobEventFilters;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -46,7 +44,7 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
   @Override
   public void initializeService() {
     super.initializeService();
-    Jobs.getJobManager().addListener(m_jobChangeListener, new AlwaysFilter<JobEvent>());
+    Jobs.getJobManager().addListener(Jobs.newEventFilter(), m_jobChangeListener);
   }
 
   @Override
@@ -116,7 +114,7 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
 
       IJobListener listener = new P_JobChangeListenerEx();
       m_listeners.put(future, listener);
-      Jobs.getJobManager().addListener(listener, ClientJobEventFilters.allFilter().futures(future));
+      Jobs.getJobManager().addListener(Jobs.newEventFilter().futures(future), listener);
 
       handler.onJobBegin(future);
     }

@@ -53,7 +53,7 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobFutureFilters;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.Jobs;
 //bugs.eclipse.org/bugs/show_bug.cgi?id=458143
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -139,7 +139,7 @@ public class SwingMock extends AbstractGuiMock {
       //wait until model queue is empty
       try {
         IClientSession clientSession = getClientSession();
-        Jobs.getJobManager().awaitDone(ClientJobFutureFilters.allFilter().modelJobsOnly().session(clientSession).notPeriodic(), 1, TimeUnit.HOURS);
+        Jobs.getJobManager().awaitDone(ModelJobs.newFutureFilter().session(clientSession).notPeriodic(), 1, TimeUnit.HOURS);
       }
       catch (InterruptedException e) {
         throw new IllegalStateException("Interrupted", e);

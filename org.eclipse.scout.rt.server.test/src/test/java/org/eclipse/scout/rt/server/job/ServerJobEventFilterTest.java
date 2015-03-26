@@ -17,8 +17,8 @@ import static org.mockito.Mockito.when;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.JobEventFilters;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -57,26 +57,26 @@ public class ServerJobEventFilterTest {
 
   @Test
   public void testEmptyFilter() {
-    assertTrue(JobEventFilters.allFilter().accept(new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_serverJobFuture)));
-    assertFalse(ServerJobEventFilters.allFilter().accept(new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_jobFuture)));
-    assertTrue(ServerJobEventFilters.allFilter().accept(new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_serverJobFuture)));
+    assertTrue(Jobs.newEventFilter().accept(new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_serverJobFuture)));
+    assertFalse(ServerJobs.newEventFilter().accept(new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_jobFuture)));
+    assertTrue(ServerJobs.newEventFilter().accept(new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_serverJobFuture)));
   }
 
   @Test
   public void testEventTypes() {
-    assertFalse(ServerJobEventFilters.allFilter().eventTypes(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_serverJobFuture)));
-    assertTrue(ServerJobEventFilters.allFilter().eventTypes(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_serverJobFuture)));
-    assertTrue(ServerJobEventFilters.allFilter().eventTypes(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.DONE, m_serverJobFuture)));
-    assertFalse(ServerJobEventFilters.allFilter().eventTypes(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.SHUTDOWN, m_serverJobFuture)));
+    assertFalse(ServerJobs.newEventFilter().eventTypes(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_serverJobFuture)));
+    assertTrue(ServerJobs.newEventFilter().eventTypes(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_serverJobFuture)));
+    assertTrue(ServerJobs.newEventFilter().eventTypes(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.DONE, m_serverJobFuture)));
+    assertFalse(ServerJobs.newEventFilter().eventTypes(JobEventType.ABOUT_TO_RUN, JobEventType.DONE).accept(new JobEvent(m_jobManager, JobEventType.SHUTDOWN, m_serverJobFuture)));
   }
 
   @Test
   public void testJobType() {
     JobEvent serverEvent = new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_serverJobFuture);
-    assertTrue(ServerJobEventFilters.allFilter().accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().accept(serverEvent));
 
     JobEvent jobEvent = new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_jobFuture);
-    assertFalse(ServerJobEventFilters.allFilter().accept(jobEvent));
+    assertFalse(ServerJobs.newEventFilter().accept(jobEvent));
   }
 
   @Test
@@ -84,28 +84,28 @@ public class ServerJobEventFilterTest {
     when(m_serverJobFuture.isPeriodic()).thenReturn(true);
     JobEvent serverEvent = new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_serverJobFuture);
 
-    assertTrue(ServerJobEventFilters.allFilter().accept(serverEvent));
-    assertTrue(ServerJobEventFilters.allFilter().periodic().accept(serverEvent));
-    assertFalse(ServerJobEventFilters.allFilter().notPeriodic().accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().periodic().accept(serverEvent));
+    assertFalse(ServerJobs.newEventFilter().notPeriodic().accept(serverEvent));
   }
 
   @Test
   public void testSession() {
     JobEvent serverEvent = new JobEvent(m_jobManager, JobEventType.SCHEDULED, m_serverJobFuture);
 
-    assertTrue(ServerJobEventFilters.allFilter().session(m_serverSession1).accept(serverEvent));
-    assertFalse(ServerJobEventFilters.allFilter().session(m_serverSession2).accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().session(m_serverSession1).accept(serverEvent));
+    assertFalse(ServerJobs.newEventFilter().session(m_serverSession2).accept(serverEvent));
   }
 
   @Test
   public void testShutdownEvent() {
     JobEvent serverEvent = new JobEvent(m_jobManager, JobEventType.SHUTDOWN, null);
 
-    assertTrue(ServerJobEventFilters.allFilter().session(m_serverSession1).accept(serverEvent));
-    assertTrue(ServerJobEventFilters.allFilter().session(m_serverSession2).accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().session(m_serverSession1).accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().session(m_serverSession2).accept(serverEvent));
 
-    assertFalse(ServerJobEventFilters.allFilter().eventTypes(JobEventType.ABOUT_TO_RUN).session(m_serverSession1).accept(serverEvent));
-    assertFalse(ServerJobEventFilters.allFilter().eventTypes(JobEventType.ABOUT_TO_RUN).session(m_serverSession2).accept(serverEvent));
+    assertFalse(ServerJobs.newEventFilter().eventTypes(JobEventType.ABOUT_TO_RUN).session(m_serverSession1).accept(serverEvent));
+    assertFalse(ServerJobs.newEventFilter().eventTypes(JobEventType.ABOUT_TO_RUN).session(m_serverSession2).accept(serverEvent));
   }
 
   @Test
@@ -113,9 +113,9 @@ public class ServerJobEventFilterTest {
     JobEvent serverEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_serverJobFuture);
 
     ISession.CURRENT.set(m_serverSession1);
-    assertTrue(ServerJobEventFilters.allFilter().currentSession().accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().currentSession().accept(serverEvent));
     ISession.CURRENT.set(m_serverSession2);
-    assertFalse(ServerJobEventFilters.allFilter().currentSession().accept(serverEvent));
+    assertFalse(ServerJobs.newEventFilter().currentSession().accept(serverEvent));
     ISession.CURRENT.remove();
   }
 
@@ -124,9 +124,9 @@ public class ServerJobEventFilterTest {
     JobEvent serverEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_serverJobFuture);
 
     ISession.CURRENT.set(m_serverSession1);
-    assertFalse(ServerJobEventFilters.allFilter().notCurrentSession().accept(serverEvent));
+    assertFalse(ServerJobs.newEventFilter().notCurrentSession().accept(serverEvent));
     ISession.CURRENT.set(m_serverSession2);
-    assertTrue(ServerJobEventFilters.allFilter().notCurrentSession().accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().notCurrentSession().accept(serverEvent));
     ISession.CURRENT.remove();
   }
 
@@ -134,8 +134,8 @@ public class ServerJobEventFilterTest {
   public void testFuture() {
     JobEvent serverEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_serverJobFuture);
 
-    assertTrue(ServerJobEventFilters.allFilter().futures(m_serverJobFuture, m_jobFuture).accept(serverEvent));
-    assertFalse(ServerJobEventFilters.allFilter().futures(m_jobFuture).accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().futures(m_serverJobFuture, m_jobFuture).accept(serverEvent));
+    assertFalse(ServerJobs.newEventFilter().futures(m_jobFuture).accept(serverEvent));
   }
 
   @Test
@@ -143,10 +143,10 @@ public class ServerJobEventFilterTest {
     JobEvent serverEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_serverJobFuture);
 
     IFuture.CURRENT.remove();
-    assertFalse(ServerJobEventFilters.allFilter().currentFuture().accept(serverEvent));
+    assertFalse(ServerJobs.newEventFilter().currentFuture().accept(serverEvent));
 
     IFuture.CURRENT.set(m_serverJobFuture);
-    assertTrue(ServerJobEventFilters.allFilter().currentFuture().accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().currentFuture().accept(serverEvent));
     IFuture.CURRENT.remove();
   }
 
@@ -156,17 +156,17 @@ public class ServerJobEventFilterTest {
     JobEvent jobEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_jobFuture);
 
     IFuture.CURRENT.set(m_serverJobFuture);
-    assertFalse(JobEventFilters.allFilter().notCurrentFuture().accept(serverEvent));
-    assertTrue(JobEventFilters.allFilter().notCurrentFuture().accept(jobEvent));
+    assertFalse(Jobs.newEventFilter().notCurrentFuture().accept(serverEvent));
+    assertTrue(Jobs.newEventFilter().notCurrentFuture().accept(jobEvent));
     IFuture.CURRENT.remove();
 
     IFuture.CURRENT.set(m_jobFuture);
-    assertTrue(JobEventFilters.allFilter().notCurrentFuture().accept(serverEvent));
-    assertFalse(JobEventFilters.allFilter().notCurrentFuture().accept(jobEvent));
+    assertTrue(Jobs.newEventFilter().notCurrentFuture().accept(serverEvent));
+    assertFalse(Jobs.newEventFilter().notCurrentFuture().accept(jobEvent));
     IFuture.CURRENT.remove();
 
-    assertTrue(JobEventFilters.allFilter().notCurrentFuture().accept(serverEvent));
-    assertTrue(JobEventFilters.allFilter().notCurrentFuture().accept(jobEvent));
+    assertTrue(Jobs.newEventFilter().notCurrentFuture().accept(serverEvent));
+    assertTrue(Jobs.newEventFilter().notCurrentFuture().accept(jobEvent));
   }
 
   @Test
@@ -176,17 +176,17 @@ public class ServerJobEventFilterTest {
 
     JobEvent serverEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_serverJobFuture);
     m_serverJobFuture.getJobInput().mutex(mutexObject1);
-    assertTrue(ServerJobEventFilters.allFilter().accept(serverEvent));
-    assertFalse(ServerJobEventFilters.allFilter().mutex(null).accept(serverEvent));
-    assertTrue(ServerJobEventFilters.allFilter().mutex(mutexObject1).accept(serverEvent));
-    assertFalse(ServerJobEventFilters.allFilter().mutex(mutexObject2).accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().accept(serverEvent));
+    assertFalse(ServerJobs.newEventFilter().mutex(null).accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().mutex(mutexObject1).accept(serverEvent));
+    assertFalse(ServerJobs.newEventFilter().mutex(mutexObject2).accept(serverEvent));
 
     serverEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_serverJobFuture);
     m_serverJobFuture.getJobInput().mutex(null);
-    assertTrue(ServerJobEventFilters.allFilter().accept(serverEvent));
-    assertTrue(ServerJobEventFilters.allFilter().mutex(null).accept(serverEvent));
-    assertFalse(ServerJobEventFilters.allFilter().mutex(mutexObject1).accept(serverEvent));
-    assertFalse(ServerJobEventFilters.allFilter().mutex(mutexObject2).accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().accept(serverEvent));
+    assertTrue(ServerJobs.newEventFilter().mutex(null).accept(serverEvent));
+    assertFalse(ServerJobs.newEventFilter().mutex(mutexObject1).accept(serverEvent));
+    assertFalse(ServerJobs.newEventFilter().mutex(mutexObject2).accept(serverEvent));
   }
 
   @Test
@@ -194,7 +194,7 @@ public class ServerJobEventFilterTest {
     JobEvent serverEvent = new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, m_serverJobFuture);
 
     // False Filter
-    assertFalse(ServerJobEventFilters.allFilter().andFilter(new IFilter<JobEvent>() {
+    assertFalse(ServerJobs.newEventFilter().andFilter(new IFilter<JobEvent>() {
 
       @Override
       public boolean accept(JobEvent event) {
@@ -203,7 +203,7 @@ public class ServerJobEventFilterTest {
     }).accept(serverEvent));
 
     // True Filter
-    assertTrue(ServerJobEventFilters.allFilter().andFilter(new IFilter<JobEvent>() {
+    assertTrue(ServerJobs.newEventFilter().andFilter(new IFilter<JobEvent>() {
 
       @Override
       public boolean accept(JobEvent event) {
@@ -212,7 +212,7 @@ public class ServerJobEventFilterTest {
     }).accept(serverEvent));
 
     // True/False Filter
-    assertFalse(ServerJobEventFilters.allFilter().andFilter(new IFilter<JobEvent>() {
+    assertFalse(ServerJobs.newEventFilter().andFilter(new IFilter<JobEvent>() {
 
       @Override
       public boolean accept(JobEvent event) {

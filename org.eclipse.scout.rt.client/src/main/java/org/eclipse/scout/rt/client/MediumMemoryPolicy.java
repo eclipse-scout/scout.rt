@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.job.ClientJobFutureFilters;
 import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -185,12 +184,12 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
       desktop.releaseUnusedPages();
       System.gc();
 
-      String jobId = getClass().getName();
+      String gcJobId = getClass().getName();
 
-      // Cancel pending job
-      Jobs.getJobManager().cancel(ClientJobFutureFilters.allFilter().currentSession().ids(jobId), true);
-
-      ClientJobs.schedule(new ForceGCJob(), ClientJobInput.fillCurrent().name("release memory").id(getClass().getName()));
+      // Cancel already running GC job
+      Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().currentSession().ids(gcJobId), true);
+      // Schedule new GC job
+      ClientJobs.schedule(new ForceGCJob(), ClientJobInput.fillCurrent().name("release memory").id(gcJobId));
 
       m_release = false;
     }

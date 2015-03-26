@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
-import org.eclipse.scout.rt.client.job.ClientJobEventFilters;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -82,7 +82,7 @@ public class SwingProgressHandler {
       }
     };
 
-    Jobs.getJobManager().addListener(m_modelJobListener, ClientJobEventFilters.allFilter().modelJobsOnly());
+    Jobs.getJobManager().addListener(ModelJobs.newEventFilter(), m_modelJobListener);
   }
 
   private void dispose() {

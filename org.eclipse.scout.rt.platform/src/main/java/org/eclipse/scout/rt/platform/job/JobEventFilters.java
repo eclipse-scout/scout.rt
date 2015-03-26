@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
 /**
- * Factory methods to create event filters related to jobs.
+ * Filters for job events.
  *
  * @since 5.1
  */
@@ -33,14 +33,6 @@ public final class JobEventFilters {
   private static final IFilter<JobEvent> NON_PERIODIC_JOB_EVENT_FILTER = new FutureEventFilterDelegate(JobFutureFilters.PeriodicFilter.FALSE_INSTANCE);
 
   private JobEventFilters() {
-  }
-
-  /**
-   * Creates a filter to accept events of all jobs that comply with some specific characteristics. By default, the
-   * filter returned accepts all events. The filter is designed to support method chaining.
-   */
-  public static Filter allFilter() {
-    return new Filter();
   }
 
   /**
