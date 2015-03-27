@@ -24,13 +24,12 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 
 /**
- * Describes a job with context information to be applied onto the executing worker thread during the time of the job's
- * execution.
+ * A <code>JobInput</code> contains information about a job like its name with execution instructions like 'serial
+ * execution' or 'expiration', and tells the job manager in what {@link RunContext} to run the job.
  * <p/>
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining.
  *
  * @see RunContext
- * @see IJobManager
  * @since 5.1
  */
 @Bean
@@ -50,9 +49,6 @@ public class JobInput {
   protected long m_expirationTime;
   protected boolean m_logOnError;
   protected RunContext m_runContext;
-
-  protected JobInput() {
-  }
 
   public String getId() {
     return m_id;

@@ -21,8 +21,6 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -118,22 +116,5 @@ public class ClientJobTest {
     assertTrue(actualThreadName1.getValue().matches("scout-client-thread-(\\d)+ \\[Running\\] 100:ABC"));
     assertTrue(actualThreadName2.getValue().matches("scout-client-thread-(\\d)+ \\[Running\\] 200:XYZ"));
     assertEquals("main", Thread.currentThread().getName());
-  }
-
-  @Test
-  public void testJobInput() throws ProcessingException {
-    ISession.CURRENT.set(m_clientSession1);
-
-    final Holder<JobInput> jobInput = new Holder<>();
-
-    ClientJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        jobInput.setValue(IFuture.CURRENT.get().getJobInput());
-      }
-    }).awaitDoneAndGet();
-
-    assertTrue(jobInput.getValue() instanceof ClientJobInput);
   }
 }

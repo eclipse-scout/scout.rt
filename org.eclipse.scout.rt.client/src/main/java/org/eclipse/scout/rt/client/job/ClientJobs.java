@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -26,15 +27,35 @@ import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
- * Factory and utility methods for {@link IJobManager} to schedule and interact with client jobs.
+ * Factory and utility methods for {@link IJobManager} to schedule jobs that run on behalf of a
+ * <code>ClientRunContext</code>. Such jobs are called client jobs. This class is for convenience purpose to facilitate
+ * the creation and scheduling of client jobs.
  * <p/>
- * Use this class to schedule jobs that do require a client RunContext for execution. By default, client jobs require a
- * {@link IClientSession} to be set.
+ * The following code snippet illustrates what happens behind the scene:
+ *
+ * <pre>
+ *   <i>
+ *   final IClientSession session = ...;
+ *   final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().session(session).locale(Locale.US);
+ *   </i>
+ *   Beans.get(IJobManager.class).schedule(new IRunnable() {
+ * 
+ *       &#064;Override
+ *       public void run() throws Exception {
+ *         clientRunContext.run(new IRunnable() {
+ * 
+ *           &#064;Override
+ *           public void run() throws Exception {
+ *             // do some work
+ *           }
+ *         });
+ *       }
+ *     });
+ * </pre>
  *
  * @since 5.1
  * @see IJobManager
  * @see ClientRunContext
- * @see ClientJobInput
  */
 public final class ClientJobs {
 
@@ -45,14 +66,16 @@ public final class ClientJobs {
    * 'Run-now'-style execution will be removed in 5.1.
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable) throws ProcessingException {
-    return ClientJobs.runNow(executable, ClientJobInput.fillCurrent());
+    return ClientJobs.runNow(executable, ClientJobs.newInput(ClientRunContexts.copyCurrent().sessionRequired(true)));
   }
 
   /**
    * 'Run-now'-style execution will be removed in 5.1.
    */
-  public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable, final ClientJobInput input) throws ProcessingException {
+  public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable, final JobInput input) throws ProcessingException {
     Assertions.assertTrue(executable instanceof IRunnable || executable instanceof ICallable, "Illegal executable provided: must be a '%s' or '%s'", IRunnable.class.getSimpleName(), ICallable.class.getSimpleName());
+    validateInput(input);
+
     final RunContext runContext = input.getRunContext();
 
     if (executable instanceof IRunnable) {
@@ -69,7 +92,8 @@ public final class ClientJobs {
    * this method continues to run in parallel. If the job is subject for mutual exclusion, the job only commence
    * execution once acquired the mutex.
    * <p/>
-   * The job manager will use a default {@link ClientJobInput} with values from the current calling context.
+   * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext} and requires a
+   * session to be set.
    * <p/>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
@@ -82,7 +106,7 @@ public final class ClientJobs {
    * @see IJobManager#schedule(IExecutable, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable) {
-    return OBJ.get(IJobManager.class).schedule(executable, ClientJobInput.fillCurrent());
+    return ClientJobs.schedule(executable, ClientJobs.newInput(ClientRunContexts.copyCurrent().sessionRequired(true)));
   }
 
   /**
@@ -98,12 +122,13 @@ public final class ClientJobs {
    *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
    *          job.
    * @param input
-   *          describes the job to be executed.
+   *          describes the job to be executed and contains execution instructions like 'serial execution' or
+   *          'expiration', and tells the job manager in what {@link ClientRunContext} to run the job.
    * @return Future to wait for the job's completion or to cancel the job's execution.
    * @see IJobManager#schedule(IExecutable, JobInput)
    */
-  public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final ClientJobInput input) {
-    return OBJ.get(IJobManager.class).schedule(executable, input);
+  public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final JobInput input) {
+    return OBJ.get(IJobManager.class).schedule(executable, ClientJobs.validateInput(input));
   }
 
   /**
@@ -111,7 +136,8 @@ public final class ClientJobs {
    * this method continues to run in parallel. If the job is subject for mutual exclusion, the job only commence
    * execution once acquired the mutex.
    * <p/>
-   * The job manager will use a default {@link ClientJobInput} with values from the current calling context.
+   * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext} and requires a
+   * session to be set.
    * <p/>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
@@ -124,13 +150,11 @@ public final class ClientJobs {
    *          the delay after which the job should commence execution.
    * @param delayUnit
    *          the time unit of the <code>delay</code> argument.
-   * @param input
-   *          describes the job to be executed.
    * @return Future to wait for the job's completion or to cancel the job's execution.
    * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit) {
-    return OBJ.get(IJobManager.class).schedule(executable, delay, delayUnit, ClientJobInput.fillCurrent());
+    return ClientJobs.schedule(executable, delay, delayUnit, ClientJobs.newInput(ClientRunContexts.copyCurrent().sessionRequired(true)));
   }
 
   /**
@@ -150,12 +174,13 @@ public final class ClientJobs {
    * @param delayUnit
    *          the time unit of the <code>delay</code> argument.
    * @param input
-   *          describes the job to be executed.
+   *          describes the job to be executed and contains execution instructions like 'serial execution' or
+   *          'expiration', and tells the job manager in what {@link ClientRunContext} to run the job.
    * @return Future to wait for the job's completion or to cancel the job's execution.
    * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
    */
-  public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit, final ClientJobInput input) {
-    return OBJ.get(IJobManager.class).schedule(executable, delay, delayUnit, input);
+  public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit, final JobInput input) {
+    return OBJ.get(IJobManager.class).schedule(executable, delay, delayUnit, ClientJobs.validateInput(input));
   }
 
   /**
@@ -174,12 +199,13 @@ public final class ClientJobs {
    * @param unit
    *          the time unit of the <code>initialDelay</code> and <code>period</code> arguments.
    * @param input
-   *          describes the job to be executed.
+   *          describes the job to be executed and contains execution instructions like 'expiration', and tells the job
+   *          manager in what {@link ClientRunContext} to run the job.
    * @return Future to cancel the periodic action.
    * @see IJobManager#scheduleAtFixedRate(IRunnable, long, long, TimeUnit, JobInput)
    */
-  public static IFuture<Void> scheduleAtFixedRate(final IRunnable runnable, final long initialDelay, final long period, final TimeUnit unit, final ClientJobInput input) {
-    return OBJ.get(IJobManager.class).scheduleAtFixedRate(runnable, initialDelay, period, unit, input);
+  public static IFuture<Void> scheduleAtFixedRate(final IRunnable runnable, final long initialDelay, final long period, final TimeUnit unit, final JobInput input) {
+    return OBJ.get(IJobManager.class).scheduleAtFixedRate(runnable, initialDelay, period, unit, ClientJobs.validateInput(input));
   }
 
   /**
@@ -197,12 +223,13 @@ public final class ClientJobs {
    * @param unit
    *          the time unit of the <code>initialDelay</code> and <code>period</code> arguments.
    * @param input
-   *          describes the job to be executed.
+   *          describes the job to be executed and contains execution instructions like 'expiration', and tells the job
+   *          manager in what {@link ClientRunContext} to run the job.
    * @return Future to cancel the periodic action.
    * @see IJobManager#scheduleWithFixedDelay(IRunnable, long, long, TimeUnit, JobInput)
    */
-  public static IFuture<Void> scheduleWithFixedDelay(final IRunnable runnable, final long initialDelay, final long delay, final TimeUnit unit, final ClientJobInput input) {
-    return OBJ.get(IJobManager.class).scheduleWithFixedDelay(runnable, initialDelay, delay, unit, input);
+  public static IFuture<Void> scheduleWithFixedDelay(final IRunnable runnable, final long initialDelay, final long delay, final TimeUnit unit, final JobInput input) {
+    return OBJ.get(IJobManager.class).scheduleWithFixedDelay(runnable, initialDelay, delay, unit, ClientJobs.validateInput(input));
   }
 
   /**
@@ -216,7 +243,24 @@ public final class ClientJobs {
    * Returns <code>true</code> if the given Future belongs to a client job.
    */
   public static boolean isClientJob(final IFuture<?> future) {
-    return future != null && ClientJobInput.class.equals(future.getJobInput().getClass());
+    if (future == null) {
+      return false;
+    }
+    if (!(future.getJobInput().getRunContext() instanceof ClientRunContext)) {
+      return false;
+    }
+    if (future.getJobInput().getMutex() instanceof IClientSession) {
+      return false; // this is a model job
+    }
+    return true;
+  }
+
+  /**
+   * Creates a {@link JobInput} with the given {@link ClientRunContext} set to be given to the job manager.
+   */
+  public static JobInput newInput(final ClientRunContext clientRunContext) {
+    Assertions.assertNotNull(clientRunContext, "ClientRunContext must not be null for client jobs");
+    return OBJ.get(JobInput.class).runContext(clientRunContext);
   }
 
   /**
@@ -247,5 +291,13 @@ public final class ClientJobs {
    */
   public static ClientJobEventFilters.Filter newEventFilter() {
     return new ClientJobEventFilters.Filter().andFilter(ClientJobEventFilters.CLIENT_JOB_EVENT_FILTER);
+  }
+
+  /**
+   * Validates the given {@link JobInput} and {@link ClientRunContext}.
+   */
+  private static JobInput validateInput(final JobInput input) {
+    OBJ.get(ClientJobInputValidator.class).validate(input);
+    return input;
   }
 }
