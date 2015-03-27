@@ -18,8 +18,8 @@ scout.Form.prototype._render = function($parent) {
   this.$container = $('<div>')
     .appendTo($parent)
     .attr('id', 'Form-' + this.id)
-    // FIXME AWE: (modal dialog) rename class 'form' to view so we can use the displayHint as class-name
-    .addClass(this.displayHint === 'dialog' ? 'dialog' : 'form')
+  // FIXME AWE: (modal dialog) rename class 'form' to view so we can use the displayHint as class-name
+  .addClass(this.displayHint === 'dialog' ? 'dialog' : 'form')
     .data('model', this);
 
   if (this.isDialog()) {
@@ -32,15 +32,17 @@ scout.Form.prototype._render = function($parent) {
           this.session.send(this.id, 'formClosing');
         }.bind(this));
     }
-    this.$container.resizable({resize: function(event, ui) {
-      this.htmlComp.invalidate();
-      this.htmlComp.layout();
-    }.bind(this)});
+    this.$container.resizable({
+      resize: function(event, ui) {
+        this.htmlComp.invalidate();
+        this.htmlComp.layout();
+      }.bind(this)
+    });
     this._setDialogTitle();
 
     setTimeout(function() {
       this.$container.addClass('shown');
-      this._$glassPane.installFocusContext('auto');
+      this._$glassPane.installFocusContext('auto', this.session.jsonSessionId);
     }.bind(this));
   }
 
@@ -76,8 +78,8 @@ scout.Form.prototype._isClosable = function() {
   for (i = 0; i < systemButtons.length; i++) {
     btn = systemButtons[i];
     if (btn.visible &&
-        btn.systemType === scout.Button.SYSTEM_TYPE.CANCEL ||
-        btn.systemType === scout.Button.SYSTEM_TYPE.CLOSE) {
+      btn.systemType === scout.Button.SYSTEM_TYPE.CANCEL ||
+      btn.systemType === scout.Button.SYSTEM_TYPE.CLOSE) {
       return true;
     }
   }

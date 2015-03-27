@@ -4,11 +4,11 @@ scout.MessageBoxModelAdapter = function() {
 scout.inherits(scout.MessageBoxModelAdapter, scout.ModelAdapter);
 
 scout.MessageBoxModelAdapter.prototype._createUi = function() {
-  return new scout.MessageBox(this);
+  return new scout.MessageBox(this, this.session);
 };
 
 scout.MessageBoxModelAdapter.prototype.render = function($parent) {
-  var ui = new scout.MessageBox(this);
+  var ui = new scout.MessageBox(this, this.session);
   scout.MessageBoxModelAdapter.parent.prototype.render.call(this, $parent, ui);
 };
 

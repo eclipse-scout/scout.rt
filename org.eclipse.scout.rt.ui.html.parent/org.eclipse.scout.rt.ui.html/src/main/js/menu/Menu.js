@@ -63,7 +63,7 @@ scout.Menu.prototype._updateIconAndTextStyle = function() {
 
 scout.Menu.prototype.doAction = function($target) {
   if (this.children.length > 0) {
-    this.popup = new scout.PopupMenuItem($target);
+    this.popup = new scout.PopupMenuItem($target, this.session);
     this.popup.render();
     scout.menus.appendMenuItems(this.popup, this.children);
     this.popup.alignTo();

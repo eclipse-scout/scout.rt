@@ -57,13 +57,14 @@ scout.Popup.prototype.setLocation = function(location) {
  * A popup as used in the menu-bar. The popup is tightly coupled with a menu-item and shows a header
  * which has a different size than the popup-body.
  */
-scout.PopupMenuItem = function($menuItem) {
+scout.PopupMenuItem = function($menuItem, session) {
   scout.PopupMenuItem.parent.call(this);
   this.$menuItem = $menuItem;
   this.$head;
   this.$deco;
   this.keyStrokeAdapter;
   this._registerKeyStrokeAdapter();
+  this._session = session;
 };
 scout.inherits(scout.PopupMenuItem, scout.Popup);
 
@@ -89,7 +90,7 @@ scout.PopupMenuItem.prototype.render = function($parent) {
   this._copyCssClass('taskbar');
   this._installKeyStrokeAdapter();
   setTimeout(function() {
-    this.$container.installFocusContext('auto');
+    this.$container.installFocusContext('auto', this._session.jsonSessionId);
     this.$container.focus();
   }.bind(this), 0);
   return this.$container;

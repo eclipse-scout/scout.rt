@@ -7,7 +7,7 @@ scout.inherits(scout.TableOrganizeMenu, scout.Menu);
 // FIXME CGU: finalize ;)
 scout.TableOrganizeMenu.prototype._onMenuClicked = function(event) {
   // basic frame
-  var popup = new scout.PopupMenuItem($(event.target));
+  var popup = new scout.PopupMenuItem($(event.target), this.session);
   popup.render();
   popup.addClassToBody('table-menu-organize');
 
@@ -34,13 +34,13 @@ scout.TableOrganizeMenu.prototype._createSlotSave = function(popup) {
   // event handling for slots
   $('.slot', $group)
     .click(function() {
-        if ($(event.target).hasClass('rename-active')) {
-          $.suppressEvent(event);
-        } else {
-          popup.remove();
-          this.session.send('saveColumns', this.parent.id, $(event.target).data('id'));
-        }
-      }.bind(this))
+      if ($(event.target).hasClass('rename-active')) {
+        $.suppressEvent(event);
+      } else {
+        popup.remove();
+        this.session.send('saveColumns', this.parent.id, $(event.target).data('id'));
+      }
+    }.bind(this))
     .on(scout.menus.CLOSING_EVENTS, $.suppressEvent);
 
   // button toggels rename mode
@@ -48,30 +48,29 @@ scout.TableOrganizeMenu.prototype._createSlotSave = function(popup) {
     .html('Slots umbenennen')
     .click(function() {
       if ($(event.target).hasClass('rename-active')) {
-          $('.slot', $group)
-            .attr('contentEditable', false)
-            .removeClass('rename-active');
-          $(event.target)
-            .html('Slots umbenennen')
-            .removeClass('rename-active');
-          $('.slot', $group).each(function (index){
-            $('.slot', $group.parent()).eq(index + 3).text($(this).text());
-          });
-        } else {
-          $('.slot', $group)
-            .attr('contentEditable', true)
-            .addClass('rename-active');
-          $(event.target)
-            .html('Namen speichern')
-            .addClass('rename-active');
-        }
-        return false;
-      }.bind(this))
+        $('.slot', $group)
+          .attr('contentEditable', false)
+          .removeClass('rename-active');
+        $(event.target)
+          .html('Slots umbenennen')
+          .removeClass('rename-active');
+        $('.slot', $group).each(function(index) {
+          $('.slot', $group.parent()).eq(index + 3).text($(this).text());
+        });
+      } else {
+        $('.slot', $group)
+          .attr('contentEditable', true)
+          .addClass('rename-active');
+        $(event.target)
+          .html('Namen speichern')
+          .addClass('rename-active');
+      }
+      return false;
+    }.bind(this))
     .on(scout.menus.CLOSING_EVENTS, $.suppressEvent);
 
   return $group;
 };
-
 
 scout.TableOrganizeMenu.prototype._createSlotLoad = function(popup) {
   // main element
@@ -112,7 +111,7 @@ scout.TableOrganizeMenu.prototype._createFixedColumn = function() {
   $group.appendDiv('plus')
     .click(function() {
       this._setFixedColumn(null, 1);
-     }.bind(this))
+    }.bind(this))
     .on(scout.menus.CLOSING_EVENTS, $.suppressEvent);
 
   // temp. solution to show the old column organize dialog
@@ -133,8 +132,7 @@ scout.TableOrganizeMenu.prototype._setFixedColumn = function(value, diff) {
   // adds diff or sets to value
   if (value) {
     newValue = value;
-  }
-  else if (diff) {
+  } else if (diff) {
     newValue = $fixed.text();
     newValue = isNaN(newValue) ? 0 : parseFloat(newValue);
     newValue = Math.max(newValue + diff, 0);

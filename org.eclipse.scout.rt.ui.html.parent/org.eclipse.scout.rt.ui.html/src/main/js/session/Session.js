@@ -251,7 +251,7 @@ scout.Session.prototype._coalesceEvents = function(previousEvents, event) {
 };
 
 scout.Session.prototype._sendRequest = function(request) {
-  var unload = !!request.unload;
+  var unload = !! request.unload;
 
   if (this.offline) {
     // No need to queue the request when document is unloading
@@ -303,8 +303,7 @@ scout.Session.prototype._sendRequest = function(request) {
     try {
       if (data.error) {
         this._processErrorJsonResponse(data.error);
-      }
-      else {
+      } else {
         this._processSuccessResponse(data);
         success = true;
       }
@@ -372,9 +371,9 @@ scout.Session.prototype._resumeBackgroundJobPolling = function() {
  */
 scout.Session.prototype._pollForBackgroundJobs = function() {
   var request = {
-      jsonSessionId: this.jsonSessionId,
-      pollForBackgroundJobs: true
-    };
+    jsonSessionId: this.jsonSessionId,
+    pollForBackgroundJobs: true
+  };
 
   this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.RUNNING;
 
@@ -530,7 +529,7 @@ scout.Session.prototype.showFatalMessage = function(options) {
     noButtonText: options.noButtonText,
     cancelButtonText: options.cancelButtonText
   };
-  var ui = new scout.MessageBox(model);
+  var ui = new scout.MessageBox(model, this);
 
   model.onButtonClicked = function($button, event) {
     var option = $button.data('option');

@@ -80,9 +80,8 @@ scout.Table.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.TableLayout(this));
   this.htmlComp.pixelBasedSizing = false;
-
+  this.$container.attr('tabIndex', 0);
   if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    this.$container.attr('tabIndex', 0);
     scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
   }
 

@@ -1,4 +1,4 @@
-scout.MessageBox = function(modelAdapter) {
+scout.MessageBox = function(modelAdapter, session) {
   this.modelAdapter = modelAdapter || {};
   this.$container;
   this.$content;
@@ -13,6 +13,7 @@ scout.MessageBox = function(modelAdapter) {
   this.previouslyFocusedElement;
   this.focusListener;
   this._$glassPane;
+  this._session = session;
 };
 
 scout.MessageBox.prototype.render = function($parent) {
@@ -57,7 +58,7 @@ scout.MessageBox.prototype.render = function($parent) {
   setTimeout(function() {
     // Class 'shown' is used for css animation
     this.$container.addClass('shown');
-    this._$glassPane.installFocusContext('auto');
+    this._$glassPane.installFocusContext('auto', this._session.jsonSessionId);
     // Prevent resizing when message-box is dragged off the viewport
     this.$container.css('min-width', this.$container.width());
   }.bind(this));
