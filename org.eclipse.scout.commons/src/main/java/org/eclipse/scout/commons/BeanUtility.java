@@ -400,36 +400,35 @@ public final class BeanUtility {
     return minSuperClassesDistance + 1;
   }
 
-  @SuppressWarnings("unchecked")
-  public static List<Class> getInterfacesHierarchy(Class type, Class filterClass) {
-    Set<Class> resultSet = new HashSet<>();
-    List<Class> workList = new ArrayList<>();
-    List<Class> lookAheadList = new ArrayList<>();
+  public static List<Class<?>> getInterfacesHierarchy(Class type, Class<?> filterClass) {
+    Set<Class<?>> resultSet = new HashSet<>();
+    List<Class<?>> workList = new ArrayList<>();
+    List<Class<?>> lookAheadList = new ArrayList<>();
     if (type.isInterface()) {
       lookAheadList.add(type);
     }
     else {
       Class test = type;
       while (test != null) {
-        lookAheadList.addAll(Arrays.asList(test.getInterfaces()));
+        lookAheadList.addAll(Arrays.<Class<?>> asList(test.getInterfaces()));
         test = test.getSuperclass();
       }
     }
     while (lookAheadList.size() > 0) {
       workList = lookAheadList;
-      lookAheadList = new ArrayList<Class>();
+      lookAheadList = new ArrayList<>();
       for (Class c : workList) {
         if (!resultSet.contains(c)) {
           resultSet.add(c);
           // look ahead
           Class[] ifs = c.getInterfaces();
           if (ifs.length > 0) {
-            lookAheadList.addAll(Arrays.asList(ifs));
+            lookAheadList.addAll(Arrays.<Class<?>> asList(ifs));
           }
         }
       }
     }
-    Map<CompositeObject, Class> resultMap = new TreeMap<>();
+    Map<CompositeObject, Class<?>> resultMap = new TreeMap<>();
     int index = 0;
     for (Class c : resultSet) {
       if (filterClass.isAssignableFrom(c)) {
