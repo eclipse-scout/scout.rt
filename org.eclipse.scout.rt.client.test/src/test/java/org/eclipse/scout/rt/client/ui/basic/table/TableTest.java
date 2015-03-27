@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,13 +69,13 @@ public class TableTest {
 
     List<ITableRow> deletedRows = table.getDeletedRows();
     assertEquals(2, deletedRows.size());
-    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(0));
-    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(1));
+    assertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(0));
+    assertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(1));
 
     table.discardDeletedRow(deletedRows.get(0));
     assertRowCount(0, 1, table);
     asssertNoTable(deletedRows.get(0));
-    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(1));
+    assertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(1));
     assertEquals(1, ta.getEvents().size());
     assertEquals(TableEvent.TYPE_ALL_ROWS_DELETED, ta.getEvents().get(0).getType());
   }
@@ -96,13 +97,13 @@ public class TableTest {
     table.deleteRow(row1);
     assertRowCount(1, 1, table);
 
-    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, row1);
-    asssertStatusAndTable(table, ITableRow.STATUS_NON_CHANGED, row2);
+    assertStatusAndTable(table, ITableRow.STATUS_DELETED, row1);
+    assertStatusAndTable(table, ITableRow.STATUS_NON_CHANGED, row2);
 
     table.discardDeletedRow(row1);
     assertRowCount(1, 0, table);
     asssertNoTable(row1);
-    asssertStatusAndTable(table, ITableRow.STATUS_NON_CHANGED, row2);
+    assertStatusAndTable(table, ITableRow.STATUS_NON_CHANGED, row2);
 
   }
 
@@ -121,8 +122,8 @@ public class TableTest {
 
     List<ITableRow> deletedRows = table.getDeletedRows();
     assertEquals(2, deletedRows.size());
-    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(0));
-    asssertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(1));
+    assertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(0));
+    assertStatusAndTable(table, ITableRow.STATUS_DELETED, deletedRows.get(1));
 
     table.discardAllDeletedRows();
     assertRowCount(0, 0, table);
@@ -331,6 +332,13 @@ public class TableTest {
     table.initTable();
   }
 
+  @Test
+  public void testInitConfig_DefaultValues() throws Exception {
+    P_Table table = new P_Table();
+    table.initConfig();
+    assertTrue(table.isEnabled());
+  }
+
   /**
    * Creates a table with 2 rows. with given status.
    */
@@ -340,8 +348,8 @@ public class TableTest {
 
     table.addRowsByMatrix(new Object[][]{new Object[]{10, "Lorem"}, new Object[]{11, "Ipsum"}}, status);
     assertRowCount(2, 0, table);
-    asssertStatusAndTable(table, status, table.getRow(0));
-    asssertStatusAndTable(table, status, table.getRow(1));
+    assertStatusAndTable(table, status, table.getRow(0));
+    assertStatusAndTable(table, status, table.getRow(1));
 
     return table;
   }
@@ -368,7 +376,7 @@ public class TableTest {
     assertEquals(expectedDeletedRowCount, table.getDeletedRowCount());
   }
 
-  private static void asssertStatusAndTable(P_Table expectedTable, int expectedStatus, ITableRow row) {
+  private static void assertStatusAndTable(P_Table expectedTable, int expectedStatus, ITableRow row) {
     assertEquals("status", decodeStatus(expectedStatus), decodeStatus(row.getStatus()));
     assertEquals("table", expectedTable, row.getTable());
   }

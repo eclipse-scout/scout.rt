@@ -458,6 +458,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     m_eventBuffer = createEventBuffer();
     m_uiFacade = createUIFacade();
     m_contributionHolder = new ContributionComposite(this);
+    setEnabled(true);
     setTitle(getConfiguredTitle());
     setIconId(getConfiguredIconId());
     setAutoTitle(getConfiguredAutoTitle());

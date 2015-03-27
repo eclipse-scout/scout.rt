@@ -852,6 +852,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_eventBuffer = createEventBuffer();
     m_uiFacade = createUIFacade();
     m_contributionHolder = new ContributionComposite(this);
+    setEnabled(true);
     setTitle(getConfiguredTitle());
     setAutoDiscardOnDelete(getConfiguredAutoDiscardOnDelete());
     setSortEnabled(getConfiguredSortEnabled());

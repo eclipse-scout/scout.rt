@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
@@ -108,6 +109,12 @@ public class AbstractTreeTest {
       m_node.getTree().setTreeChanging(false);
     }
     assertNotifications(1, 5);
+  }
+
+  @Test
+  public void testInitConfig_DefaultValues() throws Exception {
+    m_tree.initConfig();
+    assertTrue(m_tree.isEnabled());
   }
 
   private void assertNotifications(int expectedNotifications, int expectedEvents) {
