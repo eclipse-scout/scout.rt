@@ -13,7 +13,6 @@ scout.init = function(options) {
     var session = new scout.Session($container, jsonSessionId, options);
     session.init();
     scout.sessions.push(session);
-    scout.focusManager.installManagerForSession(session, options);
   });
 };
 

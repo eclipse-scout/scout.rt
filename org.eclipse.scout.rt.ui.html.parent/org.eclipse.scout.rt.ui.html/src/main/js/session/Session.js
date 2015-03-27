@@ -87,6 +87,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   }, this);
 
   this._initCustomParams();
+  scout.focusManager.installManagerForSession(this, options);
 };
 
 /**
