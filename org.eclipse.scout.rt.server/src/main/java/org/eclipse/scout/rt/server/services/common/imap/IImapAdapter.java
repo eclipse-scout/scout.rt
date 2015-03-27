@@ -15,7 +15,6 @@ import javax.mail.Store;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 
-@SuppressWarnings("restriction")
 public interface IImapAdapter {
 
   Message[] getUnseenMessages() throws ProcessingException;

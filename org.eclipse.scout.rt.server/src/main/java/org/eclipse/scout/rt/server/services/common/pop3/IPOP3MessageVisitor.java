@@ -15,7 +15,6 @@ import javax.mail.MessagingException;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 
-@SuppressWarnings("restriction")
 public interface IPOP3MessageVisitor {
   /**
    * @return true to continue visiting, false to break up further visiting

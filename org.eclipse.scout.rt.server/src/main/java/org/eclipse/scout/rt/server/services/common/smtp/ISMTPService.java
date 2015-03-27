@@ -33,7 +33,6 @@ import org.eclipse.scout.service.IService;
  *
  * @see org.eclipse.scout.commons.mail.MailUtility
  */
-@SuppressWarnings("restriction")
 public interface ISMTPService extends IService {
 
   /**

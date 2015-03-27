@@ -20,7 +20,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
-@SuppressWarnings("restriction")
 public class CharsetSafeMimeMessage extends MimeMessage {
   private String m_charset;
 

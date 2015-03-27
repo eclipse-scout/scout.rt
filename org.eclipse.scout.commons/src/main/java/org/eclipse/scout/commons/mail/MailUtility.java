@@ -52,7 +52,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
-@SuppressWarnings("restriction")
 public class MailUtility {
 
   public static final String CONTENT_TYPE_ID = "Content-Type";

@@ -35,7 +35,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
-@SuppressWarnings("restriction")
 public class ImapAdapter implements IImapAdapter {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ImapAdapter.class);
@@ -277,7 +276,7 @@ public class ImapAdapter implements IImapAdapter {
 
   /**
    * Callback to modify IMAP mail properties.
-   * 
+   *
    * @param props
    *          live list of mail properties
    */

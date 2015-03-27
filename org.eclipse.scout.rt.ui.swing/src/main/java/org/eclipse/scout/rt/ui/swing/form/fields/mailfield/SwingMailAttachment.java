@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
-@SuppressWarnings("restriction")
 public class SwingMailAttachment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingMailAttachment.class);
   private Part m_part;

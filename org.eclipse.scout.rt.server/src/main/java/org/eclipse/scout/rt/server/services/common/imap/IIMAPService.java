@@ -19,7 +19,6 @@ import org.eclipse.scout.service.IService;
  * This service is normally registered as a scout server service extension, so
  * it exists per session
  */
-@SuppressWarnings("restriction")
 public interface IIMAPService extends IService {
 
   Message[] getUnreadMessages() throws ProcessingException;
