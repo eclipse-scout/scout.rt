@@ -125,6 +125,9 @@ scout.DatePicker.prototype._onNavigationMouseDown = function(event) {
   var $target = $(event.currentTarget);
   var diff = $target.data('shift');
   this.shiftViewDate(0, diff, 0);
+
+  // Don't propagate
+  return false;
 };
 
 scout.DatePicker.prototype._onDayClick = function(event) {
@@ -132,6 +135,9 @@ scout.DatePicker.prototype._onDayClick = function(event) {
   var date = $target.data('date');
   this._dateField.onDateSelected(date);
   this.close();
+
+  // Don't propagate
+  return false;
 };
 
 scout.DatePicker.prototype._onMouseWheel = function(event) {
@@ -144,8 +150,9 @@ scout.DatePicker.prototype._onMouseWheel = function(event) {
 };
 
 scout.DatePicker.prototype._onMouseDown = function(event) {
-  // Make sure field blur won't be triggered -> popup must not be closed on mouse down
-  event.preventDefault();
+  // Make sure field blur won't be triggered (using preventDefault).
+  // Also makes sure event does not get propagated (and handled by another mouse down handler, e.g. the one from CellEditorPopup.js)
+  return false;
 };
 
 scout.DatePicker.prototype.close = function() {

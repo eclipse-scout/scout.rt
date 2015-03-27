@@ -170,6 +170,72 @@ describe("scout.arrays", function() {
 
   });
 
+  describe("findFrom", function() {
+
+    it("returns the element for which the given predicate returns true, starting from a given index", function() {
+      var arr = ['a', 'b', 'c', 'd'];
+
+      var element = scout.arrays.findFrom(arr, 1, function(element) {
+        return element === 'c';
+      });
+      expect(element).toBe('c');
+
+      element = scout.arrays.findFrom(arr, 1, function(element) {
+        return element === 'z';
+      });
+      expect(element).toBeFalsy();
+    });
+
+    it("does not return the element for which the given predicate returns true, if it is on the left side of the start index", function() {
+      var arr = ['a', 'b', 'c', 'd'];
+
+      var element = scout.arrays.findFrom(arr, 1, function(element) {
+        return element === 'a';
+      });
+      expect(element).toBeFalsy();
+    });
+
+    it("also checks the element at start index ", function() {
+      var arr = ['a', 'b', 'c', 'd'];
+
+      var element = scout.arrays.findFrom(arr, 1, function(element) {
+        return element === 'b';
+      });
+      expect(element).toBeTruthy();
+
+      // edge cases
+      element = scout.arrays.findFrom(arr, 0, function(element) {
+        return element === 'a';
+      });
+      expect(element).toBeTruthy();
+
+      element = scout.arrays.findFrom(arr, 3, function(element) {
+        return element === 'd';
+      });
+      expect(element).toBeTruthy();
+
+      element = scout.arrays.findFrom(arr, 3, function(element) {
+        return element === 'z';
+      });
+      expect(element).toBeFalsy();
+    });
+
+  });
+
+  it("searches from right to left if backwards is true", function() {
+    var arr = ['a', 'b', 'c', 'd'];
+
+    var element = scout.arrays.findFrom(arr, 2, function(element) {
+      return element === 'a';
+    }, true);
+    expect(element).toBeTruthy();
+
+    element = scout.arrays.findFrom(arr, 2, function(element) {
+      return element === 'd';
+    }, true);
+    expect(element).toBeFalsy();
+  });
+
   describe("format", function() {
 
     it("formats an array by concatenating each entry", function() {

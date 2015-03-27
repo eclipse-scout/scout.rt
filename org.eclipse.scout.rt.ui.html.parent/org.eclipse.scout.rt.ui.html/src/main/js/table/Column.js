@@ -17,16 +17,23 @@ scout.Column.prototype.init = function(model, session) {
 };
 
 scout.Column.prototype.buildCell = function(row) {
-  var style, text, tooltipText, tooltip;
+  var style, text, tooltipText, tooltip, cssClass, cell, alignment;
+  cell = this.table.cell(this.index, row);
   style = this.table.cellStyle(this, row);
   text = this.table.cellText(this, row);
   if (this.table.multilineText) {
     text = scout.strings.nl2br(text);
   }
+  cssClass = 'table-cell';
+  if (cell.editable) {
+    cssClass += ' editable';
+  }
+  alignment = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
+  cssClass += ' cell-align-' + alignment;
   tooltipText = this.table.cellTooltipText(this, row);
   tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
 
-  return '<div class="table-cell" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + text + '</div>';
+  return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + text + '</div>';
 };
 
 scout.Column.prototype.onMouseUp = function(event, $row) {

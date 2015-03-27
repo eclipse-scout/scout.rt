@@ -27,20 +27,49 @@ scout.CellEditorPopup.prototype.render = function($parent) {
   }.bind(this), 0);
 };
 
-scout.CellEditorPopup.prototype._remove = function($parent) {
-  scout.CellEditorPopup.parent.prototype._remove($parent);
+scout.CellEditorPopup.prototype.remove = function() {
+  scout.CellEditorPopup.parent.prototype.remove.call(this);
   scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  if (this._mouseDownHandler) {
+    $(document).off('mousedown', this._mouseDownHandler);
+    this._mouseDownHandler = null;
+  }
 };
 
 scout.CellEditorPopup.prototype._attachCloseHandler = function() {
   //FIXME CGU merge with popup.js
+  this._mouseDownHandler = this._onMouseDown.bind(this);
+  $(document).on('mousedown', this._mouseDownHandler);
+
   if (this.$origin) {
     scout.scrollbars.attachScrollHandlers(this.$origin, this.remove.bind(this));
   }
 };
 
+scout.CellEditorPopup.prototype._onMouseDown = function(event) {
+  var $target = $(event.target);
+  //FIXME CGU only necessary if popup would open with mousedown?
+//  if ($target.is(this.$container)) {
+//    return;
+//  }
+
+  // close the popup only if the click happened outside of the popup
+  if (this.$container.has($target).length === 0) {
+    this._onMouseDownOutside();
+  }
+};
+
+scout.CellEditorPopup.prototype._onMouseDownOutside = function(event) {
+  this.completeEdit();
+};
+
 scout.CellEditorPopup.prototype.completeEdit = function() {
   var field = this.cell.field;
+
+  // There is no blur event when the popup gets closed -> trigger blur so that the field may react (accept display text, close popups etc.)
+  var $activeElement = $(document.activeElement);
+  $activeElement.blur();
+
   this.table.sendCompleteCellEdit(field.id);
   //FIXME CGU what if there is a validation error?
   this.cell.field.destroy();
