@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
+import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
+
 /**
  * Used in {@link IBeanContext}
  * <p>
@@ -21,5 +23,5 @@ public interface IBeanDecorationFactory {
   /**
    * @return the decorated instance
    */
-  <T> T decorate(IBean<T> bean, T instance);
+  <T> IBeanInterceptor<T> decorate(IBean<T> bean, Class<T> queryType);
 }

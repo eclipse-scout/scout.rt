@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
+import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 
 /**
  * Default server-side {@link IBeanDecorationFactory} used in {@link IPlatform#getBeanContext()}
@@ -23,16 +24,16 @@ import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
 public class ServerBeanDecorationFactory extends SimpleBeanDecorationFactory {
 
   @Override
-  public <T> T decorate(IBean<T> bean, T instance) {
+  public <T> IBeanInterceptor<T> decorate(IBean<T> bean, Class<T> queryType) {
     if (bean.getBeanAnnotation(Server.class) != null) {
-      return decorateWithServerSessionCheck(bean, instance);
+      return decorateWithServerSessionCheck(bean, queryType);
     }
-    return decorateDefault(bean, instance);
+    return decorateDefault(bean, queryType);
   }
 
-  protected <T> T decorateWithServerSessionCheck(IBean<T> bean, T instance) {
-    //TODO imo add context around queryClass (interface)
-    return instance;
+  protected <T> IBeanInterceptor<T> decorateWithServerSessionCheck(IBean<T> bean, Class<T> queryType) {
+    //TODO imo add context check
+    return null;
   }
 
 }

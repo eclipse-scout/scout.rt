@@ -48,6 +48,6 @@ public interface IBean<T> {
    *         <p>
    *         Not that this may create the bean instance prior to returning it.
    */
-  T getInstance();
+  T getInstance(Class<T> queryType);
 
 }

@@ -202,13 +202,14 @@ public class BeanManagerImplementor implements IBeanContext {
     return m_beanDecorationFactory;
   }
 
+  @SuppressWarnings("unchecked")
   public void startCreateImmediatelyBeans() {
     m_lock.readLock().lock();
     try {
       for (IBean bean : getBeans(Object.class)) {
         if (BeanManagerImplementor.isCreateImmediately(bean)) {
           if (BeanManagerImplementor.isApplicationScoped(bean)) {
-            bean.getInstance();
+            bean.getInstance(Object.class);
           }
           else {
             throw new InitializationException(String.format(

@@ -143,7 +143,7 @@ public class PlatformImplementor implements IPlatform {
     }
     IBean<IBeanDecorationFactory> bean = m_beanContext.getBean(IBeanDecorationFactory.class);
     if (bean != null) {
-      m_beanContext.setBeanDecorationFactory(bean.getInstance());
+      m_beanContext.setBeanDecorationFactory(bean.getInstance(IBeanDecorationFactory.class));
       return;
     }
     LOG.warn("Using " + SimpleBeanDecorationFactory.class.getName() + ". Please verify that this application really has no client or server side " + IBeanDecorationFactory.class.getSimpleName());
@@ -294,7 +294,7 @@ public class PlatformImplementor implements IPlatform {
     PlatformEvent e = new PlatformEvent(this, newState);
     for (IBean<IPlatformListener> bean : m_beanContext.getBeans(IPlatformListener.class)) {
       try {
-        IPlatformListener listener = bean.getInstance();
+        IPlatformListener listener = bean.getInstance(IPlatformListener.class);
         listener.stateChanged(e);
       }
       catch (Throwable t) {

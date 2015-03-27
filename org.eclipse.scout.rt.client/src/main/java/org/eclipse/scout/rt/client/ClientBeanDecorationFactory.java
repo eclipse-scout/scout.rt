@@ -1,12 +1,12 @@
 package org.eclipse.scout.rt.client;
 
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.rt.client.services.ClientServiceTunnelInvocationHandler;
+import org.eclipse.scout.rt.client.services.TunnelToServerBeanInterceptor;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
-import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
+import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
 /**
@@ -16,24 +16,24 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 public class ClientBeanDecorationFactory extends SimpleBeanDecorationFactory {
 
   @Override
-  public <T> T decorate(IBean<T> bean, T instance) {
+  public <T> IBeanInterceptor<T> decorate(IBean<T> bean, Class<T> queryType) {
     if (bean.getBeanAnnotation(TunnelToServer.class) != null) {
-      return decorateWithTunnelToServer(bean, instance);
+      return decorateWithTunnelToServer(bean, queryType);
     }
     if (bean.getBeanAnnotation(Client.class) != null) {
-      return decorateWithClientSessionCheck(bean, instance);
+      return decorateWithClientSessionCheck(bean, queryType);
     }
-    return decorateDefault(bean, instance);
+    return decorateDefault(bean, queryType);
   }
 
-  protected <T> T decorateWithTunnelToServer(IBean<T> bean, T instance) {
-    //TODO imo add context around queryClass (interface)
-    return ServiceTunnelUtility.createProxy(bean.getBeanClazz(), new ClientServiceTunnelInvocationHandler(bean.getBeanClazz()));
+  protected <T> IBeanInterceptor<T> decorateWithTunnelToServer(IBean<T> bean, Class<T> queryType) {
+    //TODO imo add context check
+    return new TunnelToServerBeanInterceptor<T>(queryType);
   }
 
-  protected <T> T decorateWithClientSessionCheck(IBean<T> bean, T instance) {
-    //TODO imo add context around queryClass (interface)
-    return instance;
+  protected <T> IBeanInterceptor<T> decorateWithClientSessionCheck(IBean<T> bean, Class<T> queryType) {
+    //TODO imo add context check
+    return null;
   }
 
 }

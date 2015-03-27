@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.platform;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 
 /**
  * Default simple {@link IBeanDecorationFactory} used in {@link IPlatform#getBeanContext()}
@@ -9,12 +10,12 @@ import org.eclipse.scout.commons.annotations.Priority;
 public class SimpleBeanDecorationFactory implements IBeanDecorationFactory {
 
   @Override
-  public <T> T decorate(IBean<T> bean, T instance) {
-    return decorateDefault(bean, instance);
+  public <T> IBeanInterceptor<T> decorate(IBean<T> bean, Class<T> queryType) {
+    return decorateDefault(bean, queryType);
   }
 
-  protected <T> T decorateDefault(IBean<T> bean, T instance) {
-    return instance;
+  protected <T> IBeanInterceptor<T> decorateDefault(IBean<T> bean, Class<T> queryType) {
+    return null;
   }
 
 }

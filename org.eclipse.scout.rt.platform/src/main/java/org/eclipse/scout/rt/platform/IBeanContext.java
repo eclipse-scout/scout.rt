@@ -35,7 +35,7 @@ public interface IBeanContext {
    *         <p>
    *         When B extends A and B has a {@link Replace} then A is removed from the result
    *         <p>
-   *         this is the bean used in {@link IBean#getInstance()} and {@link OBJ#get(Class)}
+   *         this is the bean used in {@link IBean#getInstance(Class)} and {@link OBJ#get(Class)}
    * @throws PlatformException
    *           when multiple beans exist or no bean exists.
    */
@@ -47,7 +47,7 @@ public interface IBeanContext {
    *         <p>
    *         When B extends A and B has a {@link Replace} then A is removed from the result
    *         <p>
-   *         this is the bean used in {@link IBean#getInstance()} and {@link OBJ#getOptional(Class)}
+   *         this is the bean used in {@link IBean#getInstance(Class)} and {@link OBJ#getOptional(Class)}
    * @throws PlatformException
    *           when multiple beans exist
    */

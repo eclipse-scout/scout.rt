@@ -36,9 +36,9 @@ public class SimpleInstanceTest {
 
   @Test
   public void test() {
-    TestObject i1 = context.getBean(TestObject.class).getInstance();
+    TestObject i1 = context.getBean(TestObject.class).getInstance(TestObject.class);
     Assert.assertNotNull(i1);
-    ITestObject i2 = context.getBean(ITestObject.class).getInstance();
+    ITestObject i2 = context.getBean(ITestObject.class).getInstance(ITestObject.class);
     Assert.assertNotNull(i2);
     Assert.assertNotEquals(i1, i2);
   }

@@ -10,41 +10,40 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.VerboseUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
+import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 import org.eclipse.scout.rt.servicetunnel.IServiceTunnel;
 
 /**
- * Invocation handler that uses the {@link IServiceTunnel} available in the current {@link IClientSession}.
+ * {@link IBeanInterceptor} that uses the {@link IServiceTunnel} available in the current {@link IClientSession}.
  */
-public class ClientServiceTunnelInvocationHandler implements InvocationHandler {
+public class TunnelToServerBeanInterceptor<T> implements IBeanInterceptor<T> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientServiceTunnelInvocationHandler.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TunnelToServerBeanInterceptor.class);
 
   private final Class<?> m_serviceInterfaceClass;
 
-  public ClientServiceTunnelInvocationHandler(Class<?> interfaceClass) {
+  public TunnelToServerBeanInterceptor(Class<?> interfaceClass) {
     m_serviceInterfaceClass = interfaceClass;
   }
 
   @Override
-  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-    if (Object.class.isAssignableFrom(method.getDeclaringClass())) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Soap call to " + m_serviceInterfaceClass.getName() + "." + method.getName() + "(" + VerboseUtility.dumpObjects(args) + ")");
-      }
-      IClientSession session = ClientSessionProvider.currentSession();
-      return session.getServiceTunnel().invokeService(m_serviceInterfaceClass, method, args);
+  public Object invoke(IBeanInvocationContext<T> context) throws ProcessingException {
+    Method method = context.getTargetMethod();
+    Object[] args = context.getTargetArgs();
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Soap call to " + m_serviceInterfaceClass.getName() + "." + method.getName() + "(" + VerboseUtility.dumpObjects(args) + ")");
     }
-    else {
-      return getClass().getMethod(method.getName(), method.getParameterTypes()).invoke(this, args);
-    }
+    IClientSession session = ClientSessionProvider.currentSession();
+    return session.getServiceTunnel().invokeService(m_serviceInterfaceClass, method, args);
   }
 
 }

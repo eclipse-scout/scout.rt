@@ -24,6 +24,8 @@ import org.eclipse.scout.rt.platform.BeanCreationException;
 import org.eclipse.scout.rt.platform.BeanData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
+import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
+import org.eclipse.scout.rt.platform.interceptor.internal.BeanProxyImplementor;
 
 public class BeanImplementor<T> implements IBean<T> {
   private static final ThreadLocal<Deque<String>> INSTANTIATION_STACK = new ThreadLocal<>();
@@ -69,11 +71,14 @@ public class BeanImplementor<T> implements IBean<T> {
   }
 
   @Override
-  public T getInstance() {
+  public T getInstance(Class<T> queryType) {
     T instance = getRawInstance();
     IBeanDecorationFactory deco = m_beanManager.getBeanDecorationFactory();
-    if (deco != null) {
-      instance = deco.decorate(this, instance);
+    if (deco != null && queryType.isInterface()) {
+      IBeanInterceptor<T> interceptor = deco.decorate(this, queryType);
+      if (interceptor != null) {
+        instance = new BeanProxyImplementor<T>(this, interceptor, instance, queryType).getProxy();
+      }
     }
     return instance;
   }

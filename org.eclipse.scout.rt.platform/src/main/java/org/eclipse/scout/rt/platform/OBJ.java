@@ -55,7 +55,7 @@ public final class OBJ {
   public static <T> T getOptional(Class<T> beanClazz) {
     IBean<T> bean = Platform.get().getBeanContext().optBean(beanClazz);
     if (bean != null) {
-      return bean.getInstance();
+      return bean.getInstance(beanClazz);
     }
     return null;
   }
@@ -67,7 +67,7 @@ public final class OBJ {
     List<IBean<T>> beans = Platform.get().getBeanContext().getBeans(beanClazz);
     ArrayList<T> instances = new ArrayList<T>(beans.size());
     for (IBean<T> bean : beans) {
-      T instance = bean.getInstance();
+      T instance = bean.getInstance(beanClazz);
       if (instance != null) {
         instances.add(instance);
       }
