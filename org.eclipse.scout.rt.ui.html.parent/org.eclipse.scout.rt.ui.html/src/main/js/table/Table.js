@@ -768,7 +768,7 @@ scout.Table.prototype.cellTooltipText = function(column, row) {
  * A position is an object containing row and column (cell has no reference to a row or column due to memory reasons).
  */
 scout.Table.prototype.nextEditableCellPos = function(currentColumn, currentRow, backwards) {
-  var pos, row, startColumnIndex, rowIndex, startRowIndex, predicate,
+  var pos, startColumnIndex, rowIndex, startRowIndex, predicate,
     colIndex = this.columns.indexOf(currentColumn);
 
   startColumnIndex = colIndex + 1;
@@ -806,7 +806,7 @@ scout.Table.prototype.nextEditableCellPos = function(currentColumn, currentRow, 
 };
 
 scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row, backwards) {
-  var pos, cell, column, predicate;
+  var cell, column, predicate;
 
   predicate = function(column) {
     cell = this.cell(column.index, row);
@@ -929,7 +929,7 @@ scout.Table.prototype.group = function(column, remove) {
 };
 
 scout.Table.prototype.colorData = function(column, mode) {
-  var minValue, maxValue, colorFunc, row, value, v, i, $cell, columnIndex,
+  var minValue, maxValue, colorFunc, row, value, v, i, $cell,
     filteredRows = this.filteredRows();
 
   for (i = 0; i < this.rows.length; i++) {
