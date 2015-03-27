@@ -400,7 +400,8 @@ public final class BeanUtility {
     return minSuperClassesDistance + 1;
   }
 
-  public static List<Class<?>> getInterfacesHierarchy(Class type, Class<?> filterClass) {
+  @SuppressWarnings("unchecked")
+  public static <T> List<Class<? extends T>> getInterfacesHierarchy(Class<?> type, Class<T> filterClass) {
     Set<Class<?>> resultSet = new HashSet<>();
     List<Class<?>> workList = new ArrayList<>();
     List<Class<?>> lookAheadList = new ArrayList<>();
@@ -408,7 +409,7 @@ public final class BeanUtility {
       lookAheadList.add(type);
     }
     else {
-      Class test = type;
+      Class<?> test = type;
       while (test != null) {
         lookAheadList.addAll(Arrays.<Class<?>> asList(test.getInterfaces()));
         test = test.getSuperclass();
@@ -417,23 +418,23 @@ public final class BeanUtility {
     while (lookAheadList.size() > 0) {
       workList = lookAheadList;
       lookAheadList = new ArrayList<>();
-      for (Class c : workList) {
+      for (Class<?> c : workList) {
         if (!resultSet.contains(c)) {
           resultSet.add(c);
           // look ahead
-          Class[] ifs = c.getInterfaces();
+          Class<?>[] ifs = c.getInterfaces();
           if (ifs.length > 0) {
             lookAheadList.addAll(Arrays.<Class<?>> asList(ifs));
           }
         }
       }
     }
-    Map<CompositeObject, Class<?>> resultMap = new TreeMap<>();
+    Map<CompositeObject, Class<? extends T>> resultMap = new TreeMap<>();
     int index = 0;
-    for (Class c : resultSet) {
+    for (Class<?> c : resultSet) {
       if (filterClass.isAssignableFrom(c)) {
         int depth = 0;
-        Class test = c;
+        Class<T> test = (Class<T>) c;
         while (test != null) {
           depth++;
           Class[] xa = test.getInterfaces();
@@ -446,7 +447,7 @@ public final class BeanUtility {
             }
           }
         }
-        resultMap.put(new CompositeObject(depth, index++), c);
+        resultMap.put(new CompositeObject(depth, index++), (Class<T>) c);
       }
     }
     return CollectionUtility.arrayList(resultMap.values());
