@@ -32,13 +32,15 @@ import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.basic.table.SwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.basic.table.SwingTableColumn;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Junit test for {@link SwingScoutTableField}
- * 
+ *
  * @since 3.9.0
  */
+@Ignore
 public class SwingScoutTableFieldUiTest {
 
   /**
