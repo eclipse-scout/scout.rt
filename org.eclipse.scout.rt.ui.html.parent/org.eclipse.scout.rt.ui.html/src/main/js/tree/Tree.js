@@ -143,6 +143,9 @@ scout.Tree.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
+
+  // FIXME AWE/NBU/CGU: (key-strokes) die enabled/un-install logik generell für alle widgets
+  // konsistent implementieren: im Table z.B. wird der enabled-status nicht geprüft.
   if (this.enabled) {
     this.installKeyStrokeAdapter();
   }

@@ -14,13 +14,14 @@ scout.TreeControlKeyStrokes.prototype.handle = function(event) {
     $currentNode = this._field.$selectedNodes().eq(0),
     currentNode = $currentNode.data('node');
 
-    if (keycode === scout.keys.SPACE && $currentNode.length > 0) {
-      var check = !$($currentNode[0]).data('node').checked;
-      for (var j = 0; j < $currentNode.length; j++) {
-        var node = $($currentNode[j]).data('node');
-        this._field.checkNodeAndRender(node, check);
-      }
+  if (keycode === scout.keys.SPACE && $currentNode.length > 0) {
+    var check = !$($currentNode[0]).data('node').checked;
+    for (var j = 0; j < $currentNode.length; j++) {
+      var node = $($currentNode[j]).data('node');
+      this._field.checkNodeAndRender(node, check);
     }
+  }
+
   if (keycode === scout.keys.UP) {
     if ($currentNode.length === 0) {
       $targetNode = this._field.$nodes().last();
