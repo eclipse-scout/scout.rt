@@ -23,7 +23,7 @@ scout.CellEditorPopup.prototype.render = function($parent) {
 
   scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
   setTimeout(function() {
-    this.$container.installFocusContext('auto');
+    this.$container.installFocusContext('auto', this.table.session.jsonSessionId);
   }.bind(this), 0);
 };
 

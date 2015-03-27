@@ -70,6 +70,9 @@ scout.CellEditorTabKeyStroke.prototype.handle = function(event) {
   if (pos) {
     this._popup.table.sendPrepareCellEdit(pos.row.id, pos.column.id);
   }
+
+  // Prevent default tabbing
+  event.preventDefault();
 };
 
 /**

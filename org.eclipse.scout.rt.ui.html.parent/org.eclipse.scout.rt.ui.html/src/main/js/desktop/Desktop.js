@@ -95,7 +95,6 @@ scout.Desktop.prototype._render = function($parent) {
     }
   });
 
-  // TODO CRU: split and move
   scout.keyStrokeManager.installAdapter($parent, new scout.DesktopKeyStrokeAdapter(this));
 };
 
@@ -298,8 +297,8 @@ scout.Desktop.prototype._openUrlInBrowser = function(event) {
 
 scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   if (this._outlineTab.content && this._outlineTab.content !== content) {
-    if (scout.keyStrokeManager.isAdapterInstalled(this._outlineTab.keyStrokeAdapter)) {
-      scout.keyStrokeManager.uninstallAdapter(this._outlineTab.keyStrokeAdapter);
+    if (scout.keyStrokeManager.isAdapterInstalled(this._outlineTab.content.keyStrokeAdapter)) {
+      scout.keyStrokeManager.uninstallAdapter(this._outlineTab.content.keyStrokeAdapter);
     }
     this._outlineTab.content.remove();
     // Also remove storage to make sure selectTab does not restore the content
