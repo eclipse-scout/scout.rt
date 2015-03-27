@@ -401,7 +401,7 @@ public final class BeanUtility {
   }
 
   @SuppressWarnings("unchecked")
-  public static List<Class<?>> getInterfacesHierarchy(Class type, Class filterClass) {
+  public static List<Class> getInterfacesHierarchy(Class type, Class filterClass) {
     Set<Class> resultSet = new HashSet<>();
     List<Class> workList = new ArrayList<>();
     List<Class> lookAheadList = new ArrayList<>();
@@ -429,7 +429,7 @@ public final class BeanUtility {
         }
       }
     }
-    Map<CompositeObject, Class<?>> resultMap = new TreeMap<>();
+    Map<CompositeObject, Class> resultMap = new TreeMap<>();
     int index = 0;
     for (Class c : resultSet) {
       if (filterClass.isAssignableFrom(c)) {
