@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.job;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.CollectorVisitor;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
@@ -156,14 +157,15 @@ public interface IJobManager {
    * Visits all Futures that are accepted by the given Filter and are not in 'done-state'.
    * <p/>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}. Also see {@link JobFutureFilters} for simplified usage:<br/>
-   * <code>Jobs.newFutureFilter().notCurrentFuture().session(...);</code>
+   * a filter in {@link NotFilter}. Use a {@link CollectorVisitor} to collect all visited Futures. Also see
+   * {@link JobFutureFilters} for simplified usage: <code>Jobs.newFutureFilter().notCurrentFuture().notBlocked();</code>
    *
    * @param filter
    *          to limit the Futures to be visited. If <code>null</code>, all Futures are visited, which is the same as
    *          using {@link AlwaysFilter}.
    * @param visitor
    *          called for each Futures that passed the filter.
+   * @see CollectorVisitor
    */
   void visit(IFilter<IFuture<?>> filter, IVisitor<IFuture<?>> visitor);
 

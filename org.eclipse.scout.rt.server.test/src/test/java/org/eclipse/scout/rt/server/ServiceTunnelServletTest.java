@@ -41,10 +41,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.commons.cache.ICacheEntry;
 import org.eclipse.scout.rt.server.commons.cache.StickySessionCacheService;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.ServerJobs;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -102,7 +103,7 @@ public class ServiceTunnelServletTest {
 
   @Test
   public void testNewSessionCreatedOnLookupHttpSession() throws ProcessingException, ServletException {
-    IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerJobInput.fillEmpty().servletRequest(m_requestMock).servletResponse(m_responseMock));
+    IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty().servletRequest(m_requestMock).servletResponse(m_responseMock));
     assertNotNull(session);
   }
 
@@ -114,12 +115,12 @@ public class ServiceTunnelServletTest {
     when(cacheMock.isActive()).thenReturn(true);
 
     when(m_testHttpSession.getAttribute(IServerSession.class.getName())).thenReturn(cacheMock);
-    IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerJobInput.fillEmpty().servletRequest(m_requestMock).servletResponse(m_responseMock));
+    IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty().servletRequest(m_requestMock).servletResponse(m_responseMock));
     assertEquals(testSession, session);
   }
 
-/**
-   * Calls {@link ServiceTunnelServlet#lookupServerSessionOnHttpSession(ServerJobInput) in 4 different threads within
+  /**
+   * Calls {@link ServiceTunnelServlet#lookupServerSessionOnHttpSession(ServerRunContext) in 4 different threads within
    * the same HTTP session. Test ensures that the same server session is returned in all threads and that
    *
    * @link ServerSessionProvider#provide(ServerJobInput)} is called only once.
@@ -140,7 +141,7 @@ public class ServiceTunnelServletTest {
     doAnswer(putValueInCache(cache)).when(testHttpSession).setAttribute(eq(IServerSession.class.getName()), anyObject());
     when(testHttpSession.getAttribute(IServerSession.class.getName())).thenAnswer(getCachedValue(cache));
 
-    doAnswer(slowCreateTestsession(testServerSession)).when(m_serverSessionProviderSpy).provide(any(ServerJobInput.class));
+    doAnswer(slowCreateTestsession(testServerSession)).when(m_serverSessionProviderSpy).provide(any(ServerRunContext.class));
 
     List<HttpSessionLookupRunnable> jobs = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
@@ -156,7 +157,7 @@ public class ServiceTunnelServletTest {
 
     assertEquals(CollectionUtility.hashSet(testServerSession), serverSessions);
 
-    verify(m_serverSessionProviderSpy, times(1)).provide(any(ServerJobInput.class));
+    verify(m_serverSessionProviderSpy, times(1)).provide(any(ServerRunContext.class));
   }
 
   private Answer<IServerSession> slowCreateTestsession(final TestServerSession testSession) {
@@ -197,7 +198,7 @@ public class ServiceTunnelServletTest {
     List<IFuture<?>> futures = new ArrayList<>();
 
     for (IExecutable<?> job : jobs) {
-      futures.add(ServerJobs.schedule(job, ServerJobInput.fillEmpty().sessionRequired(false).transactional(false)));
+      futures.add(Jobs.schedule(job));
     }
 
     for (IFuture<?> future : futures) {
@@ -221,7 +222,7 @@ public class ServiceTunnelServletTest {
 
     @Override
     public IServerSession call() throws Exception {
-      return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(ServerJobInput.fillEmpty().servletRequest(m_request).servletResponse(m_response));
+      return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty().servletRequest(m_request).servletResponse(m_response));
     }
   }
 }

@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -45,7 +44,7 @@ public class DefaultShellService extends AbstractService implements IShellServic
           public void run() throws Exception {
             clientSession.getDesktop().openUrlInBrowser(path);
           }
-        }, ModelJobInput.fillCurrent().session(clientSession).name("Open url in browser"));
+        });
       }
     }
     else {

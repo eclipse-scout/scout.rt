@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
  *   final IClientSession session = ...;
  *   final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().session(session).locale(Locale.US);
  *   </i>
- *   Beans.get(IJobManager.class).schedule(new IRunnable() {
+ *   BEANS.get(IJobManager.class).schedule(new IRunnable() {
  * 
  *       &#064;Override
  *       public void run() throws Exception {
@@ -53,7 +53,7 @@ import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
  *           }
  *         });
  *       }
- *     }, Jobs.newInput().<strong>mutex(session)</strong>);
+ *     }, BEANS.get(JobInput.class).<strong>mutex(session)</strong>);
  *
  * </pre>
  *
@@ -81,7 +81,7 @@ public final class ModelJobs {
     Assertions.assertTrue(executable instanceof IRunnable || executable instanceof ICallable, "Illegal executable provided: must be a '%s' or '%s'", IRunnable.class.getSimpleName(), ICallable.class.getSimpleName());
     validateInput(input);
 
-    final RunContext runContext = input.getRunContext();
+    final RunContext runContext = input.runContext();
 
     if (executable instanceof IRunnable) {
       runContext.run((IRunnable) executable);
@@ -206,22 +206,22 @@ public final class ModelJobs {
     if (future == null) {
       return false;
     }
-    if (!(future.getJobInput().getRunContext() instanceof ClientRunContext)) {
+    if (!(future.getJobInput().runContext() instanceof ClientRunContext)) {
       return false;
     }
-    if (!(future.getJobInput().getMutex() instanceof IClientSession)) {
+    if (!(future.getJobInput().mutex() instanceof IClientSession)) {
       return false; // this is a client job
     }
     return true;
   }
 
   /**
-   * Creates a {@link JobInput} with the given {@link ClientRunContext} set to be given to the job manager.
+   * Creates a {@link JobInput} initialized with the given {@link ClientRunContext}.
    */
   public static JobInput newInput(final ClientRunContext clientRunContext) {
-    Assertions.assertNotNull(clientRunContext, "ClientRunContext must not be null for model jobs");
-    Assertions.assertNotNull(clientRunContext.getSession(), "ClientSession must not be null for model jobs");
-    return OBJ.get(JobInput.class).runContext(clientRunContext).mutex(clientRunContext.getSession());
+    Assertions.assertNotNull(clientRunContext, "'RunContext' must not be null for model jobs");
+    Assertions.assertNotNull(clientRunContext.session(), "'ClientSession' must not be null for model jobs");
+    return OBJ.get(JobInput.class).threadName("scout-model-thread").runContext(clientRunContext).mutex(clientRunContext.session());
   }
 
   /**

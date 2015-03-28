@@ -71,9 +71,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -591,7 +590,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           }
         }
       }
-    }, 400, TimeUnit.MILLISECONDS, ModelJobInput.fillCurrent().session(getSwingEnvironment().getScoutSession()));
+    }, 400, TimeUnit.MILLISECONDS, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
 
   }
 
@@ -771,7 +770,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     if (m_swingAutoOptimizeColumnWidthsJob != null) {
       m_swingAutoOptimizeColumnWidthsJob.cancel(true);
     }
-    m_swingAutoOptimizeColumnWidthsJob = ClientJobs.schedule(new P_SwingAutoOptimizeColumnWidthsJob(), 200, TimeUnit.MILLISECONDS, ClientJobInput.fillCurrent().session(getSwingEnvironment().getScoutSession()));
+    m_swingAutoOptimizeColumnWidthsJob = ClientJobs.schedule(new P_SwingAutoOptimizeColumnWidthsJob(), 200, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
   }
 
   protected void handleSwingEmptySpaceSelection(final MouseEvent e) {

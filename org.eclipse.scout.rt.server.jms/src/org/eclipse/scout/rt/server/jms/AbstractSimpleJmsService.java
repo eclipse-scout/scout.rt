@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
 import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 
@@ -109,7 +108,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
   protected synchronized void startMessageConsumer() throws ProcessingException {
     stopMessageConsumer();
-    m_messageConsumerFuture = ServerJobs.schedule(createMessageConsumerRunnable(), ServerJobInput.fillEmpty().sessionRequired(false).transactional(false));
+    m_messageConsumerFuture = Jobs.schedule(createMessageConsumerRunnable());
   }
 
   protected synchronized void stopMessageConsumer() throws ProcessingException {

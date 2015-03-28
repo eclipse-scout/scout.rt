@@ -15,9 +15,10 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -58,15 +59,12 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
   }
 
   private IBusyHandler getHandlerInternal(IFuture<?> future) {
-    if (future == null) {
+    if (ClientJobs.isClientJob(future) || ModelJobs.isModelJob(future)) {
+      return getHandler(((ClientRunContext) future.getJobInput().runContext()).session());
+    }
+    else {
       return null;
     }
-
-    JobInput input = future.getJobInput();
-    if (input instanceof ClientJobInput) {
-      return getHandler(((ClientJobInput) input).getSession());
-    }
-    return null;
   }
 
   @Override

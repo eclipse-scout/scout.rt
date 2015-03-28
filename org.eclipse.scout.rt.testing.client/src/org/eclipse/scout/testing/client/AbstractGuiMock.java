@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
@@ -50,7 +50,7 @@ public abstract class AbstractGuiMock implements IGuiMock {
           }
         }
       }
-    }, ModelJobInput.fillCurrent().session(clientSession).name(r.toString()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession)));
 
     future.awaitDoneAndGet(runTimeout, TimeUnit.MILLISECONDS);
     Throwable t = throwables.get();

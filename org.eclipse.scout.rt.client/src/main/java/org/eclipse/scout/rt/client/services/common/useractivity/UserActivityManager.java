@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
@@ -149,7 +149,7 @@ public class UserActivityManager {
             }
           }
         }
-      }, ClientJobInput.fillCurrent().session(m_clientSession).name("user activity " + newStatus));
+      }, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(m_clientSession)).name("user activity %s", newStatus));
     }
   }
 

@@ -26,8 +26,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.internal.servlet.EndpointServlet;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.ServerJobs;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 
 /**
  * Runs the webservice request in a server-job to propagate the current request-context and to run on behalf of a
@@ -44,23 +44,20 @@ public class JaxWsServlet extends EndpointServlet {
   @Override
   protected void handleRequest(final HttpServletRequest request, final HttpServletResponse response, final Class<? extends Binding> bindingTypeFilter) throws ServletException, IOException {
     try {
-      // Create the job-input on behalf of which the server-job is run.
-      final ServerJobInput input = ServerJobInput.fillEmpty();
-      input.name("JAX-WS Request");
-      input.subject(getOrCreateSubject());
-      input.servletRequest(request);
-      input.servletResponse(response);
-      input.locale(Locale.getDefault());
-      input.sessionRequired(false);
-      input.transactional(false);
+      final ServerRunContext runContext = ServerRunContexts.empty();
+      runContext.subject(getOrCreateSubject());
+      runContext.servletRequest(request);
+      runContext.servletResponse(response);
+      runContext.locale(Locale.getDefault());
+      runContext.transactional(false);
 
-      ServerJobs.runNow(new IRunnable() {
+      runContext.run(new IRunnable() {
 
         @Override
         public void run() throws Exception {
           JaxWsServlet.super.handleRequest(request, response, bindingTypeFilter);
         }
-      }, input);
+      });
     }
     catch (final ProcessingException | RuntimeException e) {
       LOG.error(String.format("Webservice request failed: [requestor=%s@%s/%s]", request.getRemoteUser(), request.getRemoteAddr(), request.getRemoteHost()), e);

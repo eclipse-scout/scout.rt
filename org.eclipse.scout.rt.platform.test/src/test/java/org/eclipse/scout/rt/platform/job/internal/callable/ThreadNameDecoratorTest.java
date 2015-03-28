@@ -18,10 +18,12 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -65,10 +67,10 @@ public class ThreadNameDecoratorTest {
       }
     };
 
-    JobInput input = JobInput.fillEmpty().id("123").name("job1");
+    JobInput input = Jobs.newInput(RunContexts.empty()).id("123").name("job1");
 
     ThreadInfo.CURRENT.set(new ThreadInfo("scout-thread", 5));
-    new ThreadNameDecorator<Void>(next, "scout-client-thread", input.getIdentifier()).call();
+    new ThreadNameDecorator<Void>(next, "scout-client-thread", input.identifier()).call();
     assertEquals("scout-client-thread-5 [Running] 123:job1", threadName.getValue());
     assertEquals("scout-thread-5 [Idle]", Thread.currentThread().getName());
     ThreadInfo.CURRENT.remove();
@@ -87,10 +89,10 @@ public class ThreadNameDecoratorTest {
       }
     };
 
-    JobInput input = JobInput.fillEmpty();
+    JobInput input = Jobs.newInput(RunContexts.empty());
 
     ThreadInfo.CURRENT.set(new ThreadInfo("scout-thread", 5));
-    new ThreadNameDecorator<Void>(next, "scout-client-thread", input.getIdentifier()).call();
+    new ThreadNameDecorator<Void>(next, "scout-client-thread", input.identifier()).call();
     assertEquals("scout-client-thread-5 [Running]", threadName.getValue());
     assertEquals("scout-thread-5 [Idle]", Thread.currentThread().getName());
     ThreadInfo.CURRENT.remove();
@@ -119,7 +121,7 @@ public class ThreadNameDecoratorTest {
         assertTrue(currentThreadName, currentThreadName.matches("scout-thread-\\d+ \\[Running\\] job-1"));
         return true;
       }
-    }, JobInput.fillCurrent().name("job-1").mutex(mutexObject));
+    }, Jobs.newInput(RunContexts.copyCurrent()).name("job-1").mutex(mutexObject));
 
     // Job-2 (same mutex as job-1)
     IFuture<Boolean> future2 = m_jobManager.schedule(new ICallable<Boolean>() {
@@ -135,7 +137,7 @@ public class ThreadNameDecoratorTest {
 
         return true;
       }
-    }, JobInput.fillCurrent().name("job-1").mutex(mutexObject));
+    }, Jobs.newInput(RunContexts.copyCurrent()).name("job-1").mutex(mutexObject));
 
     assertTrue(future2.awaitDoneAndGet());
     assertTrue(future1.awaitDoneAndGet());

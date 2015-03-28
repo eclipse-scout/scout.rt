@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.swing.window.desktop;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -168,6 +168,6 @@ public class ColumnSplitStrategy implements IMultiSplitStrategy {
         m_prefs.setDesktopColumnSplits(m_definedLocation);
       }
     };
-    m_storageJob = ClientJobs.schedule(t, 400, TimeUnit.MILLISECONDS, ClientJobInput.fillCurrent().session(m_prefs.getSession()));
+    m_storageJob = ClientJobs.schedule(t, 400, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(m_prefs.getSession())));
   }
 }

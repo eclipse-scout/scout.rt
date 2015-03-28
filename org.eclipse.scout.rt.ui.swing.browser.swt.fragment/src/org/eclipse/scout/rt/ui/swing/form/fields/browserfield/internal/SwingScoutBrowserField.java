@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -298,7 +298,7 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
       public Boolean call() throws Exception {
         return getScoutObject().getUIFacade().fireBeforeLocationChangedFromUI(location);
       }
-    }, ModelJobInput.fillCurrent().session(getSwingEnvironment().getScoutSession()).name("fireBeforeLocationChangedFromSwt"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
 
     try {
       return future.awaitDoneAndGet(10, TimeUnit.SECONDS);
@@ -315,7 +315,7 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
       public void run() throws Exception {
         getScoutObject().getUIFacade().fireAfterLocationChangedFromUI(location);
       }
-    }, ModelJobInput.fillCurrent().session(getSwingEnvironment().getScoutSession()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
   }
 
   /**

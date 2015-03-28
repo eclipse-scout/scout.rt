@@ -51,7 +51,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -352,7 +352,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
         m_pendingProposalFuture.cancel(true);
       }
       P_PendingProposalRunnable job = new P_PendingProposalRunnable(text, selectCurrentValue);
-      m_pendingProposalFuture = ClientJobs.schedule(job, initialDelay, TimeUnit.MILLISECONDS, ClientJobInput.fillCurrent().session(getSwingEnvironment().getScoutSession()));
+      m_pendingProposalFuture = ClientJobs.schedule(job, initialDelay, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
     }
   }
 

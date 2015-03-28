@@ -22,7 +22,7 @@ import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.SVGUserAgent;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -154,7 +154,7 @@ public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> impl
           public void run() throws Exception {
             getScoutObject().getUIFacade().fireHyperlinkFromUI(url);
           }
-        }, ModelJobInput.fillCurrent().session(getSwingEnvironment().getScoutSession()));
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
         // end notify
       }
       catch (Exception t) {

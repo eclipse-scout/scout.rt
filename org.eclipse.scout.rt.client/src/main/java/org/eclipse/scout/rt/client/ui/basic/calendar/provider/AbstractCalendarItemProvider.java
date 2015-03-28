@@ -29,6 +29,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderItemActionChain;
@@ -36,9 +38,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.Calendar
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderLoadItemsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.CalendarItemProviderChains.CalendarItemProviderLoadItemsInBackgroundChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.ICalendarItemProviderExtension;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -156,7 +156,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       public void run() throws Exception {
         interceptLoadItems(minDate, maxDate, result);
       }
-    }, ModelJobInput.fillCurrent().session(session).name(getClass().getSimpleName() + " load items"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(session)));
     future.awaitDoneAndGet();
   }
 
@@ -355,17 +355,23 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   @Override
-  public void setLoadInProgress(boolean b) {
-    propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, b);
-  }
-
-  private void setLoadInProgressInSyncJob(final boolean b) {
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        setLoadInProgress(b);
+  public void setLoadInProgress(final boolean loadInProgress) {
+    if (ModelJobs.isModelThread()) {
+      propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, loadInProgress);
+    }
+    else {
+      try {
+        ModelJobs.schedule(new IRunnable() {
+          @Override
+          public void run() throws Exception {
+            propertySupport.setPropertyBool(PROP_LOAD_IN_PROGRESS, loadInProgress);
+          }
+        }).awaitDoneAndGet();
       }
-    }, ModelJobInput.fillCurrent().name(getClass().getSimpleName() + " prepare"));
+      catch (ProcessingException e) {
+        LOG.error("Failed to update property 'loadInProgress'", e);
+      }
+    }
   }
 
   @Override
@@ -425,14 +431,15 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     if (minDate != null && maxDate != null) {
       long refreshInterval = getRefreshIntervalMillis();
       P_ReloadJob runnable = new P_ReloadJob(minDate, maxDate);
-      ClientJobInput input = ClientJobInput.fillCurrent().session(session).name(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " reload");
+
+      ClientRunContext runContext = ClientRunContexts.copyCurrent().session(session);
       if (refreshInterval > 0) {
         // interval load
-        m_reloadJob = ClientJobs.scheduleWithFixedDelay(runnable, startDelayMillis, refreshInterval, TimeUnit.MILLISECONDS, input);
+        m_reloadJob = ClientJobs.scheduleWithFixedDelay(runnable, startDelayMillis, refreshInterval, TimeUnit.MILLISECONDS, ClientJobs.newInput(runContext));
       }
       else {
         // single load
-        m_reloadJob = ClientJobs.schedule(runnable, startDelayMillis, TimeUnit.MILLISECONDS, input);
+        m_reloadJob = ClientJobs.schedule(runnable, startDelayMillis, TimeUnit.MILLISECONDS, ClientJobs.newInput(runContext));
       }
     }
   }
@@ -458,7 +465,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       }
 
       // set loading property in scout
-      setLoadInProgressInSyncJob(true);
+      setLoadInProgress(true);
       try {
         // call user code
         try {
@@ -479,11 +486,11 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
               }
             }
           }
-        }, ModelJobInput.fillCurrent().name(AbstractCalendarItemProvider.this.getClass().getSimpleName() + " setItems"));
+        });
         future.awaitDoneAndGet();
       }
       finally {
-        setLoadInProgressInSyncJob(false);
+        setLoadInProgress(false);
       }
     }
   }

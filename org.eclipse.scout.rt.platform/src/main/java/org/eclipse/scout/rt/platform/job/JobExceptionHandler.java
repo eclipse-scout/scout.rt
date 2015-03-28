@@ -27,7 +27,7 @@ public class JobExceptionHandler {
 
   /**
    * Method invoked to handle a job execution exception. Any exception thrown by this method will be ignored. This
-   * method is only invoked if {@link JobInput#isLogOnError()} is enabled.
+   * method is only invoked if {@link JobInput#logOnError()} is enabled.
    *
    * @param job
    *          job that caused the exception.

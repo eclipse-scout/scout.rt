@@ -19,15 +19,14 @@ import javax.swing.SwingUtilities;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.services.common.useractivity.IUserActivityProvider;
 
 public class UserActivityProvider extends AbstractPropertyObserver implements IUserActivityProvider {
   private long m_idleTrigger;
   private boolean m_userActive;
-  private IFuture<Void> m_userInactiveJob;
+  private IFuture<Void> m_future;
   private long m_postponed;
 
   public UserActivityProvider() {
@@ -60,21 +59,21 @@ public class UserActivityProvider extends AbstractPropertyObserver implements IU
     if (!m_userActive) {
       setActiveInternal(true);
     }
-    if (m_userInactiveJob == null) {
-      m_userInactiveJob = ClientJobs.schedule(new UserInactiveRunnable(), m_idleTrigger + 1000L, TimeUnit.MILLISECONDS, ClientJobInput.fillCurrent().sessionRequired(false));
+    if (m_future == null) {
+      m_future = Jobs.schedule(new UserInactiveRunnable(), m_idleTrigger + 1000L, TimeUnit.MILLISECONDS);
     }
     m_postponed = System.currentTimeMillis() + m_idleTrigger;
   }
 
   private synchronized void userIdle() {
-    if (m_userInactiveJob != null) {
+    if (m_future != null) {
       long delta = m_postponed - System.currentTimeMillis();
       if (delta < 1000L) {
         setActiveInternal(false);
-        m_userInactiveJob = null;
+        m_future = null;
       }
       else {
-        m_userInactiveJob = ClientJobs.schedule(new UserInactiveRunnable(), delta, TimeUnit.MILLISECONDS, ClientJobInput.fillCurrent().sessionRequired(false));
+        m_future = Jobs.schedule(new UserInactiveRunnable(), delta, TimeUnit.MILLISECONDS);
       }
     }
   }

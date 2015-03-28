@@ -68,8 +68,8 @@ public class ExceptionTranslator {
 
     // Add the current job to the context message.
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
-    if (currentFuture != null && !JobInput.N_A.equals(currentFuture.getJobInput().getIdentifier())) {
-      pe.addContextMessage("job=%s", currentFuture.getJobInput().getIdentifier());
+    if (currentFuture != null && !JobInput.N_A.equals(currentFuture.getJobInput().identifier())) {
+      pe.addContextMessage("job=%s", currentFuture.getJobInput().identifier());
     }
 
     return pe;

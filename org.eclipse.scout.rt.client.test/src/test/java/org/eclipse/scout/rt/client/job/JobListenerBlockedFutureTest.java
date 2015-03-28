@@ -24,8 +24,10 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -58,12 +60,11 @@ public class JobListenerBlockedFutureTest {
     m_jobManager.addListener(Jobs.newEventFilter(), listener);
     IClientSession clientSession = mock(IClientSession.class);
 
-    ClientJobInput input = ClientJobInput.fillEmpty().session(clientSession);
     IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
       }
-    }, input);
+    }, ClientJobs.newInput(ClientRunContexts.empty().session(clientSession)));
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 1, TimeUnit.MINUTES));
     m_jobManager.shutdown();
     m_jobManager.removeListener(listener);
@@ -97,7 +98,7 @@ public class JobListenerBlockedFutureTest {
     final IHolder<IFuture<?>> innerFuture = new Holder<IFuture<?>>();
     try {
       IClientSession clientSession = mock(IClientSession.class);
-      final ModelJobInput input = ModelJobInput.fillEmpty().session(clientSession);
+      final JobInput input = ModelJobs.newInput(ClientRunContexts.empty().session(clientSession));
 
       // start recording of events
       outerFuture = m_jobManager.schedule(new IRunnable() {
@@ -109,7 +110,7 @@ public class JobListenerBlockedFutureTest {
               condition.setBlocking(false);
 
               // Wait until the outer future is re-acquiring the mutex.
-              m_jobManager.waitForPermitsAcquired(input.getMutex(), 2); // 2=outer-job + inner-job
+              m_jobManager.waitForPermitsAcquired(input.mutex(), 2); // 2=outer-job + inner-job
             }
           }, 200, TimeUnit.MILLISECONDS, input));
 

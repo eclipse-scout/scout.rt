@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
@@ -121,7 +121,7 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
           desktop.releaseUnusedPages();
           System.gc();
         }
-      }, ModelJobInput.fillCurrent().name("Check memory"));
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("Check memory"));
     }
   }
 

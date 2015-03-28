@@ -23,19 +23,30 @@ import org.eclipse.scout.rt.platform.context.RunContext;
  * @since 5.1
  * @see <i>design pattern: chain of responsibility</i>
  */
-public class ApplyRunContextCallable<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
+public class RunContextCallable<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
 
   private final ICallable<RESULT> m_next;
   private final RunContext m_runContext;
 
-  public ApplyRunContextCallable(final ICallable<RESULT> next, final RunContext runContext) {
+  /**
+   * @param next
+   *          next processor in the chain; must not be <code>null</code>.
+   * @param runContext
+   *          <code>RunContext</code> or <code>null</code> to not run on behalf a <code>RunContext</code>.
+   */
+  public RunContextCallable(final ICallable<RESULT> next, final RunContext runContext) {
     m_next = Assertions.assertNotNull(next);
-    m_runContext = Assertions.assertNotNull(runContext);
+    m_runContext = runContext;
   }
 
   @Override
   public RESULT call() throws Exception {
-    return m_runContext.call(m_next);
+    if (m_runContext != null) {
+      return m_runContext.call(m_next);
+    }
+    else {
+      return m_next.call();
+    }
   }
 
   @Override

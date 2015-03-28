@@ -28,7 +28,7 @@ import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
@@ -231,7 +231,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
           handleNavigationChangedFromScout();
         }
       }
-    }, ModelJobInput.fillCurrent().session(getSwingEnvironment().getScoutSession()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
   }
 
   @Override
@@ -249,7 +249,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
           m_scoutNavListener = null;
         }
       }
-    }, ModelJobInput.fillCurrent().session(getSwingEnvironment().getScoutSession()));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
   }
 
   @Override

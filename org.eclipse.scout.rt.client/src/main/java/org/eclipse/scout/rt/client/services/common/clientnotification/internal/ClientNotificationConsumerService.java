@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
@@ -67,17 +67,15 @@ public class ClientNotificationConsumerService extends AbstractService implement
       return;
     }
     if (ClientSessionProvider.currentSession() == session) {
-      // we are sync
       fireEvent(session, notifications, true);
     }
     else {
-      // async
       ClientJobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           fireEvent(session, notifications, false);
         }
-      }, ClientJobInput.fillCurrent().session(session).name("Dispatch client notifications"));
+      }, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(session)).name("Dispatch client notifications"));
     }
   }
 

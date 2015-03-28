@@ -75,7 +75,6 @@ public class RunContext {
    *           exception thrown during the callable's execution.
    */
   public <RESULT> RESULT call(final ICallable<RESULT> callable) throws ProcessingException {
-    validate();
     try {
       return interceptCallable(callable).call();
     }
@@ -116,65 +115,55 @@ public class RunContext {
    * @return the head of the chain to be invoked first.
    */
   protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next) {
-    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, m_propertyMap);
-    final ICallable<RESULT> c2 = new InitThreadLocalCallable<>(c3, NlsLocale.CURRENT, getLocale());
-    final ICallable<RESULT> c1 = new SubjectCallable<>(c2, getSubject());
+    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, propertyMap());
+    final ICallable<RESULT> c2 = new InitThreadLocalCallable<>(c3, NlsLocale.CURRENT, locale());
+    final ICallable<RESULT> c1 = new SubjectCallable<>(c2, subject());
 
     return c1;
   }
 
-  /**
-   * Validates this context.
-   */
-  public void validate() {
-  }
-
-  // === getter/setter ===
-
-  public Subject getSubject() {
+  public Subject subject() {
     return m_subject.get();
   }
 
   /**
-   * Sets the Subject to invoke the Callable under a particular user.
+   * Set the Subject to run code under a particular user.
    */
   public RunContext subject(final Subject subject) {
     m_subject.set(subject, true);
     return this;
   }
 
-  public Locale getLocale() {
+  public Locale locale() {
     return m_locale.get();
   }
 
   /**
-   * Sets the Locale to be set for the time of execution.
+   * Set a specific Locale.
    */
   public RunContext locale(final Locale locale) {
     m_locale.set(locale, true);
     return this;
   }
 
-  public PropertyMap getPropertyMap() {
+  public PropertyMap propertyMap() {
     return m_propertyMap;
   }
 
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.ref("subject", getSubject());
-    builder.attr("locale", getLocale());
+    builder.ref("subject", subject());
+    builder.attr("locale", locale());
     return builder.toString();
   }
-
-  // === fill methods ===
 
   /**
    * Method invoked to fill this {@link RunContext} with values from the given {@link RunContext}.
    */
   protected void copyValues(final RunContext origin) {
-    m_subject = origin.m_subject;
-    m_locale = origin.m_locale;
+    m_subject = origin.m_subject.copy();
+    m_locale = origin.m_locale.copy();
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
   }
 
@@ -197,7 +186,7 @@ public class RunContext {
   }
 
   /**
-   * Creates a shallow copy of the context represented by <code>this</code>.
+   * Creates a copy of <code>this RunContext</code>.
    */
   public RunContext copy() {
     final RunContext copy = OBJ.get(RunContext.class);

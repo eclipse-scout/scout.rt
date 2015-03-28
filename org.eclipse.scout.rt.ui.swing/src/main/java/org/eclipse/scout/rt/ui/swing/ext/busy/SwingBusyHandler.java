@@ -13,9 +13,8 @@ package org.eclipse.scout.rt.ui.swing.ext.busy;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.busy.AbstractBusyHandler;
 import org.eclipse.scout.rt.client.busy.IBusyHandler;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
@@ -37,6 +36,6 @@ public class SwingBusyHandler extends AbstractBusyHandler {
   @Override
   protected void runBusy(IFuture<?> future) {
     IRunnable runnable = new SwingBusyJob(this);
-    ClientJobs.schedule(runnable, ClientJobInput.fillCurrent().sessionRequired(false).name(TEXTS.get("BusyJob")));
+    Jobs.schedule(runnable, Jobs.newInput(null).name(TEXTS.get("BusyJob")));
   }
 }

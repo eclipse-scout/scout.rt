@@ -47,7 +47,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -508,7 +508,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
                   }
                 });
               }
-            }, ClientJobInput.fillCurrent().session(getSwingEnvironment().getScoutSession()));
+            }, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
             future.awaitDoneAndGet(1, TimeUnit.MINUTES); // wait no longer than one minute
           }
           catch (ProcessingException ex) {

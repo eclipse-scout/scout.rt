@@ -27,7 +27,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
 
 /**
  * Provider for server sessions. A server session is only created if not contained in the session cache.
@@ -46,8 +46,8 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
   }
 
   @Override
-  public <SESSION extends IServerSession> SESSION provide(final ServerJobInput input) throws ProcessingException {
-    final Subject subject = Assertions.assertNotNull(input.getSubject(), "Subject must not be null");
+  public <SESSION extends IServerSession> SESSION provide(ServerRunContext runContext) throws ProcessingException {
+    final Subject subject = Assertions.assertNotNull(runContext.subject(), "Subject must not be null");
     final Set<Principal> principals = subject.getPrincipals();
     Assertions.assertFalse(principals.isEmpty(), "Subject contains no principals");
 
@@ -57,7 +57,7 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
     }
     else {
       // create and initialize a new session; use optimistic locking because initializing the session is a long-running operation.
-      final SESSION newServerSession = super.provide(input);
+      final SESSION newServerSession = super.provide(runContext);
 
       synchronized (m_cache) {
         serverSession = getFromCache(principals, newServerSession.getClass()); // optimistic locking: check, whether another thread already created and cached the session.

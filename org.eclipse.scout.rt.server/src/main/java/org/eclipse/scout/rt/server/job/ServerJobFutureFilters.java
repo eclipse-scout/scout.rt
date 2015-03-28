@@ -14,9 +14,10 @@ import java.util.Collection;
 
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
@@ -141,9 +142,9 @@ public final class ServerJobFutureFilters {
 
     @Override
     public boolean accept(final IFuture<?> future) {
-      final JobInput jobInput = future.getJobInput();
-      if (jobInput instanceof ServerJobInput) {
-        return m_session == ((ServerJobInput) jobInput).getSession();
+      final RunContext runContext = future.getJobInput().runContext();
+      if (runContext instanceof ServerRunContext) {
+        return m_session == ((ServerRunContext) runContext).session();
       }
       else {
         return false;

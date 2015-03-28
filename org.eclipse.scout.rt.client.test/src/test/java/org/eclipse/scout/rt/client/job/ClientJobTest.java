@@ -16,11 +16,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -43,7 +43,7 @@ public class ClientJobTest {
     MockitoAnnotations.initMocks(this);
   }
 
-  @Test(expected = AssertionException.class)
+  @Test
   public void testNoSession() throws ProcessingException {
     ISession.CURRENT.remove();
     ClientJobs.schedule(new IRunnable() {
@@ -52,17 +52,6 @@ public class ClientJobTest {
       public void run() throws Exception {
       }
     }).awaitDoneAndGet();
-  }
-
-  @Test
-  public void testNoSessionRequired() throws ProcessingException {
-    ISession.CURRENT.remove();
-    ClientJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-      }
-    }, ClientJobInput.fillCurrent().sessionRequired(false)).awaitDoneAndGet();
   }
 
   @Test
@@ -77,7 +66,7 @@ public class ClientJobTest {
       public void run() throws Exception {
         modelThread.set(ModelJobs.isModelThread());
       }
-    }, ClientJobInput.fillEmpty().session(m_clientSession1)).awaitDoneAndGet();
+    }, ClientJobs.newInput(ClientRunContexts.empty().session(m_clientSession1))).awaitDoneAndGet();
 
     assertFalse(ModelJobs.isModelThread());
     assertFalse(modelThread.get());
@@ -107,9 +96,9 @@ public class ClientJobTest {
             actualThreadName2.setValue(Thread.currentThread().getName());
             setupLatch.countDown();
           }
-        }, ClientJobInput.fillCurrent().id("200").name("XYZ"));
+        }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).id("200").name("XYZ"));
       }
-    }, ClientJobInput.fillCurrent().id("100").name("ABC"));
+    }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).id("100").name("ABC"));
 
     assertTrue(setupLatch.await());
 

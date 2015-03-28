@@ -18,8 +18,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceEvent;
 import org.eclipse.scout.rt.client.services.common.bookmark.BookmarkServiceListener;
@@ -323,13 +321,12 @@ public class BookmarkViewForm extends AbstractForm {
       @Override
       public void handleEvent(ClientNotificationConsumerEvent e, boolean sync) {
         if (e.getClientNotification() instanceof BookmarkChangedClientNotification) {
-          IClientSession clientSession = ClientSessionProvider.currentSession();
           ModelJobs.schedule(new IRunnable() {
             @Override
             public void run() throws Exception {
               SERVICES.getService(IBookmarkService.class).loadBookmarks();
             }
-          }, ModelJobInput.fillCurrent().session(clientSession).name("Bookmarks changed"));
+          });
         }
       }
     };

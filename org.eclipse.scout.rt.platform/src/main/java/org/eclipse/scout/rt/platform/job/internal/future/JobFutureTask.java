@@ -56,9 +56,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_periodic = periodic;
     m_mutexSemaphores = mutexSemaphores;
     m_progressMonitor = OBJ.get(ProgressMonitorProvider.class).provide(this);
-
-    final long expirationTime = input.getExpirationTimeMillis();
-    m_expirationDate = (expirationTime != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + expirationTime : null);
+    m_expirationDate = (input.expirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.expirationTimeMillis() : null);
 
     postConstruct();
   }
@@ -99,7 +97,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public Object getMutexObject() {
-    return m_input.getMutex();
+    return m_input.mutex();
   }
 
   @Override
@@ -184,7 +182,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return null; // Cancellation does not result in an exception.
     }
     catch (final InterruptedException e) {
-      throw JobExecutionException.fromInterruptedException(e, m_input.getIdentifier());
+      throw JobExecutionException.fromInterruptedException(e, m_input.identifier());
     }
     catch (final RuntimeException e) {
       throw OBJ.get(ExceptionTranslator.class).translate(e);
@@ -203,10 +201,10 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return null; // Cancellation does not result in an exception.
     }
     catch (final InterruptedException e) {
-      throw JobExecutionException.fromInterruptedException(e, m_input.getIdentifier());
+      throw JobExecutionException.fromInterruptedException(e, m_input.identifier());
     }
     catch (final TimeoutException e) {
-      throw JobExecutionException.fromTimeoutException(e, timeout, unit, m_input.getIdentifier());
+      throw JobExecutionException.fromTimeoutException(e, timeout, unit, m_input.identifier());
     }
     catch (final RuntimeException e) {
       throw OBJ.get(ExceptionTranslator.class).translate(e);

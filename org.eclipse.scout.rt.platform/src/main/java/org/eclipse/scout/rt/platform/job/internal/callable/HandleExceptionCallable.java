@@ -55,7 +55,7 @@ public class HandleExceptionCallable<RESULT> implements ICallable<RESULT>, IChai
     }
     catch (final Throwable t) {
       // If logging is enabled for the current job, pass the exception to the JobExceptionHandler. That is important if the job's result is not queried by the submitter, so that the exception is not swallowed silently.
-      if (m_input.isLogOnError()) {
+      if (m_input.logOnError()) {
         try {
           OBJ.get(JobExceptionHandler.class).handleException(m_input, t);
         }

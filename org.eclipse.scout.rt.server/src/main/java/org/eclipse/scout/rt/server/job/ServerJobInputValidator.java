@@ -29,8 +29,8 @@ public class ServerJobInputValidator {
    * Validates the given {@link JobInput} and {@link ServerRunContext}.
    */
   public void validate(final JobInput input) {
-    Assertions.assertNotNull(input, "For server jobs, JobInput must not be null");
-    Assertions.assertTrue(input.getRunContext() instanceof ServerRunContext, "For server jobs, RunContext must be of the type 'ServerRunContext'");
-    input.getRunContext().validate();
+    Assertions.assertNotNull(input, "For server jobs, 'JobInput' must not be null");
+    Assertions.assertNotNull(input.runContext(), "For server jobs, 'RunContext' must not be null");
+    Assertions.assertTrue(input.runContext() instanceof ServerRunContext, "For server jobs, 'RunContext' must be of the type 'ServerRunContext'");
   }
 }

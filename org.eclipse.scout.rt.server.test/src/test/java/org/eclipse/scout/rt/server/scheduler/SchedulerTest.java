@@ -22,7 +22,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.TestServerSession;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
@@ -39,7 +40,7 @@ import org.junit.runner.RunWith;
 @RunWithSubject("john")
 public class SchedulerTest {
 
-  private ServerJobInput m_input;
+  private ServerRunContext m_runContext;
   private Ticker m_ticker;
 
   @Before
@@ -48,9 +49,9 @@ public class SchedulerTest {
     subject.getPrincipals().add(new SimplePrincipal("john"));
     subject.setReadOnly();
 
-    m_input = ServerJobInput.fillEmpty();
-    m_input.subject(subject);
-    m_input.session(OBJ.get(ServerSessionProvider.class).provide(m_input.copy()));
+    m_runContext = ServerRunContexts.empty();
+    m_runContext.subject(subject);
+    m_runContext.session(OBJ.get(ServerSessionProvider.class).provide(m_runContext.copy()));
 
     m_ticker = new Ticker(Calendar.SECOND);
 
@@ -58,7 +59,7 @@ public class SchedulerTest {
 
   @Test
   public void testRunningJobCount() throws ProcessingException, InterruptedException {
-    IScheduler scheduler = new TestScheduler(m_ticker, m_input);
+    IScheduler scheduler = new TestScheduler(m_ticker, m_runContext);
     scheduler.addJob(new JobAcceptTick("groupId", "jobIdAccept"));
     scheduler.addJob(new JobDontAcceptTick("groupId", "jobIdDontAccept"));
     assertEquals("JobCount must be 2", 2, scheduler.getJobCount());
@@ -79,7 +80,7 @@ public class SchedulerTest {
 
   @Test
   public void testServerJobName() throws ProcessingException {
-    TestScheduler scheduler = new TestScheduler(m_ticker, m_input);
+    TestScheduler scheduler = new TestScheduler(m_ticker, m_runContext);
     JobAcceptTick job = new JobAcceptTick("groupId", "jobId");
     assertEquals("Scheduler.groupId.jobId", scheduler.getJobName(job));
   }
@@ -87,8 +88,8 @@ public class SchedulerTest {
 
 class TestScheduler extends Scheduler {
 
-  public TestScheduler(Ticker ticker, ServerJobInput jobInput) throws ProcessingException {
-    super(ticker, jobInput);
+  public TestScheduler(Ticker ticker, ServerRunContext runContext) throws ProcessingException {
+    super(ticker, runContext);
   }
 
   @Override

@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.holders.BooleanHolder;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -60,7 +61,7 @@ public class JobListenerTest {
       @Override
       public void run() throws Exception {
       }
-    }, JobInput.fillEmpty());
+    }, Jobs.newInput(RunContexts.empty()));
     m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 1, TimeUnit.MINUTES);
     m_jobManager.removeListener(listener);
     m_jobManager.shutdown();
@@ -95,7 +96,7 @@ public class JobListenerTest {
       public void run() throws Exception {
         hasStarted.setValue(Boolean.TRUE);
       }
-    }, 200, TimeUnit.MILLISECONDS, JobInput.fillEmpty());
+    }, 200, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.empty()));
     future.cancel(true);
     m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 1, TimeUnit.MINUTES);
     m_jobManager.removeListener(listener);

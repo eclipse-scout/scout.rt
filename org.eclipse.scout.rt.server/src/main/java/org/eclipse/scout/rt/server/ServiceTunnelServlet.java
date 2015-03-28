@@ -37,7 +37,8 @@ import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
@@ -86,19 +87,17 @@ public class ServiceTunnelServlet extends HttpServletEx {
     lazyInit(req, res);
 
     try {
-      // Create the job-input on behalf of which the server-job is run.
-      ServerJobInput input = ServerJobInput.fillEmpty();
-      input.name("AdminServiceCall");
-      input.subject(subject);
-      input.servletRequest(req);
-      input.servletResponse(res);
-      input.locale(Locale.getDefault());
-      input.userAgent(UserAgent.createDefault());
-      input.session(lookupServerSessionOnHttpSession(input.copy()));
+      ServerRunContext runContext = ServerRunContexts.empty();
+      runContext.subject(subject);
+      runContext.servletRequest(req);
+      runContext.servletResponse(res);
+      runContext.locale(Locale.getDefault());
+      runContext.userAgent(UserAgent.createDefault());
+      runContext.session(lookupServerSessionOnHttpSession(runContext.copy()));
 
-      input = interceptServerJobInput(input);
+      runContext = interceptRunContext(runContext);
 
-      invokeAdminServiceInServerJob(input);
+      invokeAdminService(runContext);
     }
     catch (ProcessingException e) {
       throw new ServletException("Failed to invoke AdminServlet", e);
@@ -120,20 +119,17 @@ public class ServiceTunnelServlet extends HttpServletEx {
     try {
       IServiceTunnelRequest serviceRequest = deserializeServiceRequest(req.getInputStream());
 
-      // Create the job-input on behalf of which the server-job is run.
-      ServerJobInput input = ServerJobInput.fillEmpty();
-      input.name("RemoteServiceCall");
-      input.id(String.valueOf(serviceRequest.getRequestSequence())); // to cancel server jobs and associated transactions.
-      input.subject(subject);
-      input.servletRequest(req);
-      input.servletResponse(res);
-      input.locale(serviceRequest.getLocale());
-      input.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
-      input.session(lookupServerSessionOnHttpSession(input.copy()));
+      ServerRunContext runContext = ServerRunContexts.empty();
+      runContext.subject(subject);
+      runContext.servletRequest(req);
+      runContext.servletResponse(res);
+      runContext.locale(serviceRequest.getLocale());
+      runContext.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
+      runContext.session(lookupServerSessionOnHttpSession(runContext.copy()));
 
-      input = interceptServerJobInput(input);
+      runContext = interceptRunContext(runContext);
 
-      IServiceTunnelResponse serviceResponse = invokeServiceInServerJob(input, serviceRequest);
+      IServiceTunnelResponse serviceResponse = invokeService(runContext, serviceRequest);
 
       serializeServiceResponse(res, serviceResponse);
     }
@@ -151,14 +147,15 @@ public class ServiceTunnelServlet extends HttpServletEx {
   // === SERVICE INVOCATION ===
 
   /**
-   * Method invoked to delegate the HTTP request to the 'admin service' on behalf of a server job.
+   * Method invoked to delegate the HTTP request to the 'admin service'.
    *
-   * @param input
-   *          input to be used to run the server job with current context information set.
+   * @param runContext
+   *          <code>RunContext</code> with information about the ongoing HTTP-request to be used to invoke the admin
+   *          service.
    */
-  protected void invokeAdminServiceInServerJob(final ServerJobInput input) throws ProcessingException {
-    final HttpServletRequest request = input.getServletRequest();
-    final HttpServletResponse response = input.getServletResponse();
+  protected void invokeAdminService(final ServerRunContext runContext) throws ProcessingException {
+    final HttpServletRequest request = runContext.servletRequest();
+    final HttpServletResponse response = runContext.servletResponse();
 
     ServerJobs.runNow(new IRunnable() {
 
@@ -173,26 +170,26 @@ public class ServiceTunnelServlet extends HttpServletEx {
         }
         adminSession.serviceRequest(request, response);
       }
-    }, input);
+    }, ServerJobs.newInput(runContext).name("AdminServiceCall"));
   }
 
   /**
-   * Method invoked to delegate the HTTP request to the 'process service' on behalf of a server job.
+   * Method invoked to delegate the HTTP request to the 'process service'.
    *
-   * @param input
-   *          input to be used to run the server job with current context information set.
+   * @param runContext
+   *          <code>RunContext</code> with information about the ongoing HTTP-request to be used to invoke the service.
    * @param serviceTunnelRequest
    *          describes the service to be invoked.
    * @return {@link IServiceTunnelResponse} response sent back to the client.
    */
-  protected IServiceTunnelResponse invokeServiceInServerJob(final ServerJobInput input, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
+  protected IServiceTunnelResponse invokeService(final ServerRunContext runContext, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
     return ServerJobs.runNow(new ICallable<IServiceTunnelResponse>() {
 
       @Override
       public IServiceTunnelResponse call() throws Exception {
         return new DefaultTransactionDelegate(getRequestMinVersion(), isDebug()).invoke(serviceTunnelRequest);
       }
-    }, input);
+    }, ServerJobs.newInput(runContext).name("RemoteServiceCall").id(String.valueOf(serviceTunnelRequest.getRequestSequence()))); // the job's id is set so that the client can cancel ongoing service calls.
   }
 
   // === MESSAGE UNMARSHALLING / MARSHALLING ===
@@ -275,19 +272,19 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   /**
-   * Override this method to intercept the {@link ServerJobInput} used to run server jobs. The default implementation
-   * simply returns the given input.
+   * Override this method to intercept the {@link ServerRunContext} used to process a request. The default
+   * implementation simply returns the given <code>runContext</code>.
    */
-  protected ServerJobInput interceptServerJobInput(final ServerJobInput input) {
-    return input;
+  protected ServerRunContext interceptRunContext(final ServerRunContext runContext) {
+    return runContext;
   }
 
   // === SESSION LOOKUP ===
 
   @Internal
-  protected IServerSession lookupServerSessionOnHttpSession(ServerJobInput jobInput) throws ProcessingException, ServletException {
-    HttpServletRequest req = jobInput.getServletRequest();
-    HttpServletResponse res = jobInput.getServletResponse();
+  protected IServerSession lookupServerSessionOnHttpSession(final ServerRunContext runContext) throws ProcessingException, ServletException {
+    HttpServletRequest req = runContext.servletRequest();
+    HttpServletResponse res = runContext.servletResponse();
 
     //external request: apply locking, this is the session initialization phase
     IHttpSessionCacheService cacheService = SERVICES.getService(IHttpSessionCacheService.class);
@@ -296,7 +293,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
       synchronized (req.getSession()) {
         serverSession = (IServerSession) cacheService.get(IServerSession.class.getName(), req, res); // double checking
         if (serverSession == null) {
-          serverSession = provideServerSession(jobInput);
+          serverSession = provideServerSession(runContext);
           cacheService.put(IServerSession.class.getName(), serverSession, req, res);
         }
       }
@@ -307,13 +304,13 @@ public class ServiceTunnelServlet extends HttpServletEx {
   /**
    * Method invoked to provide a new {@link IServerSession} for the current HTTP-request.
    *
-   * @param input
-   *          context information about the ongoing HTTP-request.
+   * @param runContext
+   *          <code>RunContext</code> with information about the ongoing HTTP-request.
    * @return {@link IServerSession}; must not be <code>null</code>.
    */
-  protected IServerSession provideServerSession(final ServerJobInput input) throws ProcessingException {
-    final IServerSession serverSession = OBJ.get(ServerSessionProvider.class).provide(input);
-    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(input.getServletRequest(), input.getServletResponse()));
+  protected IServerSession provideServerSession(final ServerRunContext runContext) throws ProcessingException {
+    final IServerSession serverSession = OBJ.get(ServerSessionProvider.class).provide(runContext);
+    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(runContext.servletRequest(), runContext.servletResponse()));
     return serverSession;
   }
 

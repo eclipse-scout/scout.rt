@@ -17,9 +17,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.fixture.MockServerProcessingCancelService;
 import org.eclipse.scout.rt.client.fixture.MockServiceTunnel;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -107,11 +107,11 @@ public class ClientJobCancelTest {
         IPingService serviceProxy = ServiceTunnelUtility.createProxy(IPingService.class, m_session.getServiceTunnel());
         return serviceProxy.ping("ABC");
       }
-    }, ClientJobInput.fillCurrent().session(m_session).name("Client"));
+    }, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(m_session)));
 
     //make user interrupt the job in 1 sec
     if (interrupt) {
-      ClientJobs.schedule(new JobThatInterrupts(future), 1, TimeUnit.SECONDS, ClientJobInput.fillCurrent().session(m_session).name("Interrupter"));
+      ClientJobs.schedule(new JobThatInterrupts(future), 1, TimeUnit.SECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(m_session)));
     }
     //wait for user job
     return future.awaitDoneAndGet();

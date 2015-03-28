@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
  *   <i>
  *   final RunContext runContext = RunContexts.copyCurrent().subject(...).locale(Locale.US);
  *   </i>
- *   Beans.get(IJobManager.class).schedule(new IRunnable() {
+ *   BEANS.get(IJobManager.class).schedule(new IRunnable() {
  * 
  *     &#064;Override
  *     public void run() throws Exception {
@@ -74,7 +74,7 @@ public final class Jobs {
     Assertions.assertTrue(executable instanceof IRunnable || executable instanceof ICallable, "Illegal executable provided: must be a '%s' or '%s'", IRunnable.class.getSimpleName(), ICallable.class.getSimpleName());
     validateInput(input);
 
-    final RunContext runContext = input.getRunContext();
+    final RunContext runContext = input.runContext();
 
     if (executable instanceof IRunnable) {
       runContext.run((IRunnable) executable);
@@ -236,7 +236,7 @@ public final class Jobs {
   }
 
   /**
-   * Creates a {@link JobInput} with the optional {@link RunContext} to be given to the job manager. Use
+   * Creates a {@link JobInput} which is optionally initialized with the given {@link ServerRunContext}. Use
    * <code>null</code> for <code>runContext</code> to not run the job on behalf of a {@link RunContext}.
    */
   public static JobInput newInput(final RunContext runContext) {

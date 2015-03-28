@@ -33,7 +33,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
@@ -270,10 +271,9 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
     getStatusInfoInternal().updateReceiveStatus(message);
 
-    ServerJobInput jobInput = ServerJobInput.fillEmpty();
-    jobInput.name("cluster-sync-receive");
-    jobInput.subject(m_subject);
-    jobInput.session(OBJ.get(ServerSessionProviderWithCache.class).provide(jobInput.copy()));
+    ServerRunContext runContext = ServerRunContexts.empty();
+    runContext.subject(m_subject);
+    runContext.session(OBJ.get(ServerSessionProviderWithCache.class).provide(runContext.copy()));
 
     ServerJobs.runNow(new IRunnable() {
 
@@ -281,7 +281,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
       public void run() throws Exception {
         notifyListeners(message);
       }
-    }, jobInput);
+    }, ServerJobs.newInput(runContext).name("cluster-sync-receive"));
   }
 
   @Override

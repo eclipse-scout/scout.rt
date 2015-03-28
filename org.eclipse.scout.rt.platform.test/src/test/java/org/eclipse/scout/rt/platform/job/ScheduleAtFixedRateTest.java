@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
@@ -67,7 +68,7 @@ public class ScheduleAtFixedRateTest {
           protocol.add(System.nanoTime());
         }
       }
-    }, initialDelayNano, periodNano, TimeUnit.NANOSECONDS, JobInput.fillEmpty());
+    }, initialDelayNano, periodNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()));
 
     // verify
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 30, TimeUnit.SECONDS));
@@ -108,7 +109,7 @@ public class ScheduleAtFixedRateTest {
           protocol.add(System.nanoTime());
         }
       }
-    }, initialDelayNano, periodNano, TimeUnit.NANOSECONDS, JobInput.fillEmpty().logOnError(false));
+    }, initialDelayNano, periodNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).logOnError(false));
 
     // verify
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 30, TimeUnit.SECONDS));
@@ -151,7 +152,7 @@ public class ScheduleAtFixedRateTest {
           Thread.sleep(TimeUnit.NANOSECONDS.toMillis(sleepTimeNano));
         }
       }
-    }, initialDelayNano, periodNano, TimeUnit.NANOSECONDS, JobInput.fillEmpty().logOnError(false));
+    }, initialDelayNano, periodNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).logOnError(false));
 
     // verify
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 30, TimeUnit.SECONDS));
@@ -194,7 +195,7 @@ public class ScheduleAtFixedRateTest {
           Thread.sleep(TimeUnit.NANOSECONDS.toMillis(sleepTimeNano));
         }
       }
-    }, initialDelayNano, periodNano, TimeUnit.NANOSECONDS, JobInput.fillEmpty().logOnError(false));
+    }, initialDelayNano, periodNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()).logOnError(false));
 
     // verify
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 30, TimeUnit.SECONDS));

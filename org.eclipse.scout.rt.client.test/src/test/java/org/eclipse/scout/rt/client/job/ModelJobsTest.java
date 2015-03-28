@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.job;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -23,6 +25,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -99,5 +102,24 @@ public class ModelJobsTest {
   public void testScheduleWithoutInputWithoutSession() throws ProcessingException {
     ISession.CURRENT.set(null);
     ModelJobs.schedule(mock(IRunnable.class));
+  }
+
+  @Test
+  public void testNewInput() {
+    ClientRunContext runContext = ClientRunContexts.empty().session(m_clientSession);
+
+    assertSame(runContext, ModelJobs.newInput(runContext).runContext());
+    assertEquals("scout-model-thread", ModelJobs.newInput(runContext).threadName());
+    assertSame(m_clientSession, ModelJobs.newInput(runContext).mutex());
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testNewInputNullInput() {
+    ModelJobs.newInput(null);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testNewInputNullSession() {
+    ModelJobs.newInput(ClientRunContexts.empty().session(null));
   }
 }

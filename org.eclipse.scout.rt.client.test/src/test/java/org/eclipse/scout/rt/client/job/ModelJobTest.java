@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -44,7 +45,7 @@ public class ModelJobTest {
   }
 
   @Test(expected = AssertionException.class)
-  public void testNoSession1() {
+  public void testNoSession() {
     ISession.CURRENT.remove();
     ModelJobs.schedule(new IRunnable() {
 
@@ -66,7 +67,7 @@ public class ModelJobTest {
       public void run() throws Exception {
         modelThread.set(ModelJobs.isModelThread());
       }
-    }, ModelJobInput.fillEmpty().session(m_clientSession1)).awaitDoneAndGet();
+    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1))).awaitDoneAndGet();
 
     assertFalse(ModelJobs.isModelThread());
     assertTrue(modelThread.get());
@@ -96,9 +97,9 @@ public class ModelJobTest {
             actualThreadName2.setValue(Thread.currentThread().getName());
             setupLatch.countDown();
           }
-        }, ModelJobInput.fillCurrent().id("200").name("XYZ"));
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).id("200").name("XYZ"));
       }
-    }, ModelJobInput.fillCurrent().id("100").name("ABC"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).id("100").name("ABC"));
 
     assertTrue(setupLatch.await());
 

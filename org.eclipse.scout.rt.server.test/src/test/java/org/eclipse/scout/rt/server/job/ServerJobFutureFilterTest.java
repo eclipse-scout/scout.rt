@@ -16,10 +16,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
@@ -44,10 +46,10 @@ public class ServerJobFutureFilterTest {
   public void before() {
     MockitoAnnotations.initMocks(this);
 
-    ServerJobInput serverJobInput = ServerJobInput.fillEmpty().session(m_serverSession1);
+    JobInput serverJobInput = ServerJobs.newInput(ServerRunContexts.empty().session(m_serverSession1));
     when(m_serverJobFuture.getJobInput()).thenReturn(serverJobInput);
 
-    JobInput jobInput = JobInput.fillEmpty();
+    JobInput jobInput = Jobs.newInput(RunContexts.empty());
     when(m_jobFuture.getJobInput()).thenReturn(jobInput);
   }
 

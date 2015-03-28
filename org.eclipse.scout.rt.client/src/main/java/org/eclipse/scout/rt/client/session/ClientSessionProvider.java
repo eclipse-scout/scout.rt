@@ -18,8 +18,6 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.OBJ;
@@ -32,17 +30,16 @@ import org.eclipse.scout.rt.shared.ISession;
 public class ClientSessionProvider {
 
   /**
-   * Provides a new {@link IClientSession} for the {@link Subject} contained in the given {@link ClientJobInput}.
+   * Provides a new {@link IClientSession} for the {@link Subject} of the given {@link ClientRunContext}.
    *
-   * @param input
-   *          Input to run the client job which initializes the {@link IClientSession}.
+   * @param runContext
+   *          <code>RunContext</code> initialized with the Subject used to create and load the session.
    * @return {@link IClientSession} created; is never <code>null</code>.
    * @throws ProcessingException
    *           is thrown if the {@link IClientSession} could not be created or initialized.
    */
-  public <SESSION extends IClientSession> SESSION provide(final ModelJobInput input) throws ProcessingException {
-    final ClientRunContext bootstrapRunContext = input.getRunContext().copy().sessionRequired(false);
-    return bootstrapRunContext.call(new ICallable<SESSION>() {
+  public <SESSION extends IClientSession> SESSION provide(final ClientRunContext runContext) throws ProcessingException {
+    return runContext.call(new ICallable<SESSION>() {
 
       @Override
       public SESSION call() throws Exception {
@@ -57,7 +54,7 @@ public class ClientSessionProvider {
             beforeStartSession(clientSession);
             clientSession.startSession();
           }
-        }, input.copy().name("client-session-initialization").session(clientSession)).awaitDoneAndGet();
+        }, ModelJobs.newInput(runContext.copy().session(clientSession)).name("initialize ClientSession [user=%s]", runContext.subject())).awaitDoneAndGet();
 
         return clientSession;
       }

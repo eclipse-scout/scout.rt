@@ -30,9 +30,9 @@ public class ClientJobInputValidator {
    * Validates the given {@link JobInput} and {@link ClientRunContext}.
    */
   public void validate(final JobInput input) {
-    Assertions.assertNotNull(input, "For client jobs, JobInput must not be null");
-    Assertions.assertTrue(input.getRunContext() instanceof ClientRunContext, "For client jobs, RunContext must be of the type 'ClientRunContext'");
-    Assertions.assertFalse(input.getMutex() instanceof IClientSession, "For client jobs, mutex object must not be the 'ClientSession' to not interfere with model jobs");
-    input.getRunContext().validate();
+    Assertions.assertNotNull(input, "For client jobs, 'JobInput' must not be null");
+    Assertions.assertNotNull(input.runContext(), "For client jobs, 'RunContext' must not be null");
+    Assertions.assertTrue(input.runContext() instanceof ClientRunContext, "For client jobs, 'RunContext' must be of the type 'ClientRunContext'");
+    Assertions.assertFalse(input.mutex() instanceof IClientSession, "For client jobs, mutex object must not be the 'clientSession' to not interfere with model jobs");
   }
 }

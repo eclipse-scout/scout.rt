@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.job;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -128,9 +130,22 @@ public class ClientJobsTest {
     assertFalse(ModelJobs.isModelJob(actualFutureHolder.getValue()));
   }
 
-  @Test(expected = AssertionException.class)
+  @Test
   public void testScheduleWithoutInputWithoutSession() throws ProcessingException {
     ISession.CURRENT.set(null);
     ClientJobs.schedule(mock(IRunnable.class));
+  }
+
+  @Test
+  public void testNewInput() {
+    ClientRunContext runContext = ClientRunContexts.empty();
+
+    assertSame(runContext, ClientJobs.newInput(runContext).runContext());
+    assertEquals("scout-client-thread", ClientJobs.newInput(runContext).threadName());
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testNewInputNullInput() {
+    ClientJobs.newInput(null);
   }
 }

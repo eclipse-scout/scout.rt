@@ -8,23 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.job;
+package org.eclipse.scout.rt.client.job;
 
-import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.shared.job.IJobInputProvider;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.shared.job.IRunContextProvider;
 
 /**
- * Provides a {@link ServerJobInput}.
+ * Provides a {@link ClientRunContext}.
+ * 
+ * @since 5.1
  */
-public class ServerJobInputProvider implements IJobInputProvider {
+public class ClientRunContextProvider implements IRunContextProvider {
 
   @Override
-  public JobInput defaults() {
-    return ServerJobInput.fillCurrent();
+  public ClientRunContext copyCurrent() {
+    return ClientRunContexts.copyCurrent();
   }
 
   @Override
-  public JobInput empty() {
-    return ServerJobInput.fillEmpty();
+  public ClientRunContext empty() {
+    return ClientRunContexts.empty();
   }
 }

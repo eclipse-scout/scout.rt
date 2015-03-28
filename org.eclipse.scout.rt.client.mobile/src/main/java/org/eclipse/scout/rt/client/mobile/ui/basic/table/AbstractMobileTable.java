@@ -12,14 +12,11 @@ package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.DefaultTableRowFormProvider;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.ITableRowForm;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.ITableRowFormProvider;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -259,13 +256,12 @@ public abstract class AbstractMobileTable extends AbstractTable implements IMobi
   }
 
   protected void clearSelectionDelayed() {
-    IClientSession clientSession = ClientSessionProvider.currentSession();
     ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
         clearSelection();
       }
-    }, ModelJobInput.fillCurrent().session(clientSession).name("Clearing selection"));
+    });
   }
 
   protected void clearSelection() {

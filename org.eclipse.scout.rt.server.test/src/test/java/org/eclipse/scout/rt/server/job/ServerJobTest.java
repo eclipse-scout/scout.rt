@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.server.job;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -40,7 +40,7 @@ public class ServerJobTest {
     MockitoAnnotations.initMocks(this);
   }
 
-  @Test(expected = AssertionException.class)
+  @Test
   public void testNoSession() throws ProcessingException {
     ISession.CURRENT.remove();
     ServerJobs.schedule(new IRunnable() {
@@ -49,17 +49,6 @@ public class ServerJobTest {
       public void run() throws Exception {
       }
     }).awaitDoneAndGet();
-  }
-
-  @Test
-  public void testNoSessionRequired() throws ProcessingException {
-    ISession.CURRENT.remove();
-    ServerJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-      }
-    }, ServerJobInput.fillCurrent().sessionRequired(false)).awaitDoneAndGet();
   }
 
   @Test
@@ -86,9 +75,9 @@ public class ServerJobTest {
             actualThreadName2.setValue(Thread.currentThread().getName());
             setupLatch.countDown();
           }
-        }, ServerJobInput.fillCurrent().id("200").name("XYZ"));
+        }, ServerJobs.newInput(ServerRunContexts.copyCurrent()).id("200").name("XYZ"));
       }
-    }, ServerJobInput.fillCurrent().id("100").name("ABC"));
+    }, ServerJobs.newInput(ServerRunContexts.copyCurrent()).id("100").name("ABC"));
 
     assertTrue(setupLatch.await());
 

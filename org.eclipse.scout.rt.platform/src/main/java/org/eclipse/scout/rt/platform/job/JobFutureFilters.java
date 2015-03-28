@@ -241,7 +241,7 @@ public final class JobFutureFilters {
 
     @Override
     public boolean accept(final IFuture<?> future) {
-      return m_ids.contains(future.getJobInput().getId());
+      return m_ids.contains(future.getJobInput().id());
     }
   }
 
@@ -260,7 +260,7 @@ public final class JobFutureFilters {
 
     @Override
     public boolean accept(final IFuture<?> future) {
-      return CompareUtility.equals(m_mutexObject, future.getJobInput().getMutex());
+      return CompareUtility.equals(m_mutexObject, future.getJobInput().mutex());
     }
   }
 }

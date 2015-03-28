@@ -18,7 +18,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.ICallable;
@@ -33,7 +32,6 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -41,8 +39,8 @@ import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.internal.callable.ApplyRunContextCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.HandleExceptionCallable;
+import org.eclipse.scout.rt.platform.job.internal.callable.RunContextCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.ThreadNameDecorator;
 import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
 import org.eclipse.scout.rt.platform.job.internal.future.JobFutureTask;
@@ -96,7 +94,7 @@ public class JobManager implements IJobManager {
     m_futures = new FutureSet();
     m_mutexSemaphores = Assertions.assertNotNull(createMutexSemaphores(m_executor));
     m_listeners = new JobListeners();
-    m_delayedExecutor = new DelayedExecutor(m_executor, "delayed-job-dispatcher", ConfigIniUtility.getPropertyInt(PROP_DISPATCHER_THREAD_COUNT, DEFAULT_DISPATCHER_THREAD_COUNT));
+    m_delayedExecutor = new DelayedExecutor(m_executor, "internal-dispatcher", ConfigIniUtility.getPropertyInt(PROP_DISPATCHER_THREAD_COUNT, DEFAULT_DISPATCHER_THREAD_COUNT));
 
     addListener(Jobs.newEventFilter().eventTypes(JobEventType.SCHEDULED, JobEventType.DONE, JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.SHUTDOWN), m_futures);
   }
@@ -200,12 +198,10 @@ public class JobManager implements IJobManager {
    */
   @Internal
   protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final IExecutable<RESULT> executable, JobInput input, final boolean periodic) {
-    validate(input);
+    Assertions.assertNotNull(input, "'JobInput' must not be null");
 
     // Ensure a job name to be set.
-    if (input.getName() == null) {
-      input = input.copy().name(executable.getClass().getName());
-    }
+    input = input.copy().name(StringUtility.nvl(input.name(), executable.getClass().getName()));
 
     // Create the Callable to be given to the executor.
     final ICallable<RESULT> callable = interceptCallable(Callables.callable(executable), input);
@@ -341,8 +337,8 @@ public class JobManager implements IJobManager {
    * @return the head of the chain to be invoked first.
    */
   protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next, final JobInput input) {
-    final ICallable<RESULT> c3 = new ApplyRunContextCallable<RESULT>(next, input.getRunContext());
-    final ICallable<RESULT> c2 = new ThreadNameDecorator<RESULT>(c3, input.getThreadName(), input.getIdentifier());
+    final ICallable<RESULT> c3 = new RunContextCallable<RESULT>(next, input.runContext());
+    final ICallable<RESULT> c2 = new ThreadNameDecorator<RESULT>(c3, input.threadName(), input.identifier());
     final ICallable<RESULT> c1 = new HandleExceptionCallable<>(c2, input);
 
     return c1;
@@ -358,19 +354,6 @@ public class JobManager implements IJobManager {
    */
   protected <RESULT> JobFutureTask<RESULT> interceptFuture(final JobFutureTask<RESULT> future) {
     return future;
-  }
-
-  /**
-   * Method invoked to validate the given input. The default implementation ensures the input not to be
-   * <code>null</code> and calls {@link RunContext#validate}.
-   *
-   * @throws AssertionException
-   *           thrown if the input is not valid.
-   */
-  protected void validate(final JobInput input) {
-    Assertions.assertNotNull(input, "'JobInput' must not be null");
-    Assertions.assertNotNull(input.getRunContext(), "'RunContext' must not be null");
-    input.getRunContext().validate();
   }
 
   @Override

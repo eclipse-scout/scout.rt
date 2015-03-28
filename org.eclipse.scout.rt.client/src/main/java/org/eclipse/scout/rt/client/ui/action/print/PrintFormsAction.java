@@ -24,7 +24,6 @@ import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -242,7 +241,7 @@ public class PrintFormsAction extends AbstractAction {
             }
           });
         }
-      }, ModelJobInput.fillCurrent().name("print " + f.getClass().getSimpleName()));
+      });
     }
   }
 

@@ -14,14 +14,14 @@ import java.util.UUID;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.ServerJobs;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
@@ -31,28 +31,35 @@ import org.eclipse.scout.rt.shared.ISession;
 public class ServerSessionProvider {
 
   /**
-   * Provides a new {@link IServerSession} for the {@link Subject} contained in the given {@link ServerJobInput}.
+   * Provides a new {@link IServerSession} for the {@link Subject} of the given {@link ServerRunContext}.
    *
-   * @param input
-   *          Input to run the server job which initializes the {@link IServerSession}.
+   * @param runContext
+   *          <code>RunContext</code> initialized with the Subject used to create and load the session.
    * @return {@link IServerSession} created; is never <code>null</code>.
    * @throws ProcessingException
    *           is thrown if the {@link IServerSession} could not be created or initialized.
    */
-  public <SESSION extends IServerSession> SESSION provide(final ServerJobInput input) throws ProcessingException {
-    // Create an empty session instance.
-    final SESSION serverSession = ServerSessionProvider.cast(OBJ.get(IServerSession.class));
-    serverSession.setIdInternal(String.format("%s-%s", serverSession.getClass().getName(), UUID.randomUUID()));
+  public <SESSION extends IServerSession> SESSION provide(final ServerRunContext runContext) throws ProcessingException {
+    return runContext.copy().transactional(false).call(new ICallable<SESSION>() {
 
-    // Initialize the session.
-    ServerJobs.runNow(new IRunnable() {
       @Override
-      public void run() throws Exception {
-        serverSession.loadSession();
-      }
-    }, input.copy().name("server-session-initialization").session(serverSession));
+      public SESSION call() throws Exception {
+        // 1. Create an empty session instance.
+        final SESSION serverSession = ServerSessionProvider.cast(OBJ.get(IServerSession.class));
+        serverSession.setIdInternal(String.format("%s-%s", serverSession.getClass().getName(), UUID.randomUUID()));
 
-    return serverSession;
+        // 2. Load the session.
+        runContext.copy().session(serverSession).run(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            serverSession.loadSession();
+          }
+        });
+
+        return serverSession;
+      }
+    });
   }
 
   /**

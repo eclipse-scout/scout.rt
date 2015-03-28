@@ -19,10 +19,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 
@@ -124,7 +121,6 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
 
   private void markDirty() {
     m_dirty = true;
-    IClientSession clientSession = ClientSessionProvider.currentSession();
     ModelJobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
@@ -137,7 +133,7 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
           }
         }
       }
-    }, ModelJobInput.fillCurrent().session(clientSession).name("Wizard status - mark dirty"));
+    });
   }
 
   public void refreshStatus() throws ProcessingException {

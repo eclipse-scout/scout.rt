@@ -19,10 +19,9 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 
 /**
  * <p>
@@ -201,25 +200,25 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
 
   private void addTimer(IFuture<?> future) {
     P_TimerJob runnable = new P_TimerJob(future);
-    future.getJobInput().getPropertyMap().put(TIMER_PROPERTY, runnable);
-    ClientJobs.schedule(runnable, getShortOperationMillis(), TimeUnit.MILLISECONDS, ClientJobInput.fillCurrent().sessionRequired(false));
+    future.getJobInput().propertyMap().put(TIMER_PROPERTY, runnable);
+    Jobs.schedule(runnable, getShortOperationMillis(), TimeUnit.MILLISECONDS);
   }
 
   private void removeTimer(IFuture<?> future) {
-    P_TimerJob t = (P_TimerJob) future.getJobInput().getPropertyMap().get(TIMER_PROPERTY);
+    P_TimerJob t = (P_TimerJob) future.getJobInput().propertyMap().get(TIMER_PROPERTY);
     if (t != null) {
-      future.getJobInput().getPropertyMap().put(TIMER_PROPERTY, null);
+      future.getJobInput().propertyMap().put(TIMER_PROPERTY, null);
     }
   }
 
   private P_TimerJob getTimer(IFuture<?> future) {
-    return (P_TimerJob) future.getJobInput().getPropertyMap().get(TIMER_PROPERTY);
+    return (P_TimerJob) future.getJobInput().propertyMap().get(TIMER_PROPERTY);
   }
 
   private void addBusyOperation(IFuture<?> future) {
     int oldSize, newSize;
     synchronized (getStateLock()) {
-      future.getJobInput().getPropertyMap().put(BUSY_OPERATION_PROPERTY, "true");
+      future.getJobInput().propertyMap().put(BUSY_OPERATION_PROPERTY, "true");
       oldSize = m_list.size();
       m_list.add(future);
       newSize = m_list.size();
@@ -232,14 +231,14 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
 
   private void removeBusyOperation(IFuture<?> future) {
     synchronized (getStateLock()) {
-      future.getJobInput().getPropertyMap().put(BUSY_OPERATION_PROPERTY, null);
+      future.getJobInput().propertyMap().put(BUSY_OPERATION_PROPERTY, null);
       m_list.remove(future);
       getStateLock().notifyAll();
     }
   }
 
   private boolean isBusyOperationNoLock(IFuture<?> future) {
-    return "true".equals(future.getJobInput().getPropertyMap().get(BUSY_OPERATION_PROPERTY));
+    return "true".equals(future.getJobInput().propertyMap().get(BUSY_OPERATION_PROPERTY));
   }
 
   private static boolean isJobActive(IFuture<?> future) {

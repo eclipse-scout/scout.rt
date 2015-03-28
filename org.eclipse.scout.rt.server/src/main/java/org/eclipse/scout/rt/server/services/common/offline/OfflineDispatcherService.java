@@ -21,12 +21,14 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
-import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
@@ -42,18 +44,15 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
   @Override
   public IServiceTunnelResponse dispatch(final IServiceTunnelRequest request) {
     try {
-      // Create the job-input on behalf of which the server-job is run.
-      ServerJobInput input = ServerJobInput.fillEmpty();
-      input.name("OfflineServiceCall");
-      input.id(String.valueOf(request.getRequestSequence())); // to cancel server jobs and associated transactions.
-      input.subject(Subject.getSubject(AccessController.getContext()));
-      input.locale(request.getLocale());
-      input.userAgent(UserAgent.createByIdentifier(request.getUserAgent()));
-      input.session(provideServerSession(input.copy()));
+      ServerRunContext runContext = ServerRunContexts.empty();
+      runContext.subject(Subject.getSubject(AccessController.getContext()));
+      runContext.locale(request.getLocale());
+      runContext.userAgent(UserAgent.createByIdentifier(request.getUserAgent()));
+      runContext.session(provideServerSession(runContext.copy()));
 
-      input = interceptServerJobInput(input);
+      runContext = interceptRunContext(runContext);
 
-      final IServiceTunnelResponse response = invokeServiceInServerJob(input, request);
+      final IServiceTunnelResponse response = invokeService(runContext, request);
       if (response != null) {
         return response;
       }
@@ -67,43 +66,47 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
   }
 
   /**
-   * Override this method to intercept the {@link ServerJobInput} used to run server jobs. The default implementation
-   * simply returns the given input.
+   * Override this method to intercept the {@link ServerRunContext} used to process a request. The default
+   * implementation simply returns the given <code>runContext</code>.
    */
-  protected ServerJobInput interceptServerJobInput(final ServerJobInput input) {
-    return input;
+  protected ServerRunContext interceptRunContext(final ServerRunContext runContext) {
+    return runContext;
   }
 
   /**
    * Method invoked to provide a new or cached {@link IServerSession} for the current request.
    *
-   * @param input
-   *          context information about the ongoing request.
+   * @param runContext
+   *          <code>RunContext</code> with information about the ongoing request.
    * @return {@link IServerSession}; must not be <code>null</code>.
    */
-  protected IServerSession provideServerSession(final ServerJobInput input) throws ProcessingException {
-    final IServerSession serverSession = OBJ.get(ServerSessionProviderWithCache.class).provide(input);
-    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(input.getServletRequest(), input.getServletResponse()));
+  protected IServerSession provideServerSession(final ServerRunContext runContext) throws ProcessingException {
+    final IServerSession serverSession = OBJ.get(ServerSessionProvider.class).provide(runContext);
+    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(runContext.servletRequest(), runContext.servletResponse()));
     return serverSession;
   }
 
   /**
    * Method invoked to delegate the request to the 'process service' on behalf of a server job.
    *
-   * @param input
-   *          input to be used to run the server job with current context information set.
+   * @param runContext
+   *          <code>RunContext</code> with information about the ongoing request to be used to invoke the service.
    * @param serviceTunnelRequest
    *          describes the service to be invoked.
    * @return {@link IServiceTunnelResponse} response sent back to the caller.
    */
-  protected IServiceTunnelResponse invokeServiceInServerJob(final ServerJobInput input, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
+  protected IServiceTunnelResponse invokeService(final ServerRunContext runContext, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
+    JobInput jobInput = ServerJobs.newInput(runContext);
+    jobInput.name("OfflineServiceCall");
+    jobInput.id(String.valueOf(serviceTunnelRequest.getRequestSequence())); // to cancel server jobs and associated transactions.
+
     return ServerJobs.schedule(new ICallable<IServiceTunnelResponse>() {
 
       @Override
       public IServiceTunnelResponse call() throws Exception {
         return invokeService(serviceTunnelRequest);
       }
-    }, input).awaitDoneAndGet(); // schedule the service-request to enable cancellation by 'ServerProcessingCancelService.cancel(requestSequence)'
+    }, jobInput).awaitDoneAndGet(); // schedule the service-request to enable cancellation by 'ServerProcessingCancelService.cancel(requestSequence)'
   }
 
   /**

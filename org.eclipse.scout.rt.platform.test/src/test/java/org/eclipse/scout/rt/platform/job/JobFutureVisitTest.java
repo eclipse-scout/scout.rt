@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -67,29 +68,29 @@ public class JobFutureVisitTest {
 
       @Override
       public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
+        protocol.add(IFuture.CURRENT.get().getJobInput().name());
         bc1.waitFor();
       }
-    }, JobInput.fillEmpty().id("session1").name("mutex1_job1").mutex(m_mutexObject1));
+    }, Jobs.newInput(RunContexts.empty()).id("session1").name("mutex1_job1").mutex(m_mutexObject1));
 
     // SESSION 1 (JOB-2)
     m_jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
+        protocol.add(IFuture.CURRENT.get().getJobInput().name());
         latch.countDownAndBlock();
       }
-    }, JobInput.fillEmpty().id("session1").name("mutex1_job2").mutex(m_mutexObject1));
+    }, Jobs.newInput(RunContexts.empty()).id("session1").name("mutex1_job2").mutex(m_mutexObject1));
 
     // SESSION 1 (JOB-3)
     m_jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
+        protocol.add(IFuture.CURRENT.get().getJobInput().name());
       }
-    }, JobInput.fillEmpty().id("session1").name("mutex1_job3").mutex(m_mutexObject1));
+    }, Jobs.newInput(RunContexts.empty()).id("session1").name("mutex1_job3").mutex(m_mutexObject1));
 
     // =========
     // SESSION 2 (JOB-1)
@@ -97,42 +98,42 @@ public class JobFutureVisitTest {
 
       @Override
       public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
+        protocol.add(IFuture.CURRENT.get().getJobInput().name());
       }
-    }, JobInput.fillEmpty().id("session2").name("mutex2_job1").mutex(m_mutexObject2));
+    }, Jobs.newInput(RunContexts.empty()).id("session2").name("mutex2_job1").mutex(m_mutexObject2));
 
     // SESSION 2 (JOB-2)
     m_jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
+        protocol.add(IFuture.CURRENT.get().getJobInput().name());
         bc2.waitFor();
       }
-    }, JobInput.fillEmpty().id("session2").name("mutex2_job2").mutex(m_mutexObject2));
+    }, Jobs.newInput(RunContexts.empty()).id("session2").name("mutex2_job2").mutex(m_mutexObject2));
 
     // SESSION 2  (JOB-3)
     m_jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
+        protocol.add(IFuture.CURRENT.get().getJobInput().name());
         bc2.setBlocking(false);
 
         m_jobManager.waitForPermitsAcquired(m_mutexObject2, 3); // Wait until job 'mutex2_job2' is re-acquiring the mutex. [3=job-2, job-3, job-4]
 
         latch.countDownAndBlock();
       }
-    }, JobInput.fillEmpty().id("session2").name("mutex2_job3").mutex(m_mutexObject2));
+    }, Jobs.newInput(RunContexts.empty()).id("session2").name("mutex2_job3").mutex(m_mutexObject2));
 
     // SESSION 2  (JOB-4)
     m_jobManager.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
+        protocol.add(IFuture.CURRENT.get().getJobInput().name());
       }
-    }, JobInput.fillEmpty().id("session2").name("mutex2_job4").mutex(m_mutexObject2));
+    }, Jobs.newInput(RunContexts.empty()).id("session2").name("mutex2_job4").mutex(m_mutexObject2));
 
     // =========
     // SESSION 3 (JOB-1)
@@ -140,10 +141,10 @@ public class JobFutureVisitTest {
 
       @Override
       public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
+        protocol.add(IFuture.CURRENT.get().getJobInput().name());
         latch.countDownAndBlock();
       }
-    }, JobInput.fillEmpty().id("session3").name("mutex3_job1").mutex(m_mutexObject3));
+    }, Jobs.newInput(RunContexts.empty()).id("session3").name("mutex3_job1").mutex(m_mutexObject3));
 
     assertTrue(latch.await());
   }
@@ -175,7 +176,7 @@ public class JobFutureVisitTest {
 
       @Override
       public boolean visit(IFuture<?> future) {
-        visitedFutures.add(future.getJobInput().getName());
+        visitedFutures.add(future.getJobInput().name());
         return true;
       }
     });
@@ -198,7 +199,7 @@ public class JobFutureVisitTest {
 
       @Override
       public boolean visit(IFuture<?> future) {
-        visitedFutures.add(future.getJobInput().getName());
+        visitedFutures.add(future.getJobInput().name());
         return true;
       }
     });
@@ -221,7 +222,7 @@ public class JobFutureVisitTest {
 
       @Override
       public boolean visit(IFuture<?> future) {
-        visitedFutures.add(future.getJobInput().getName());
+        visitedFutures.add(future.getJobInput().name());
         return true;
       }
     });
@@ -244,7 +245,7 @@ public class JobFutureVisitTest {
 
       @Override
       public boolean visit(IFuture<?> future) {
-        visitedFutures.add(future.getJobInput().getName());
+        visitedFutures.add(future.getJobInput().name());
         return true;
       }
     });
@@ -267,7 +268,7 @@ public class JobFutureVisitTest {
 
       @Override
       public boolean visit(IFuture<?> future) {
-        visitedFutures.add(future.getJobInput().getName());
+        visitedFutures.add(future.getJobInput().name());
         return true;
       }
     });
@@ -290,7 +291,7 @@ public class JobFutureVisitTest {
 
       @Override
       public boolean visit(IFuture<?> future) {
-        visitedFutures.add(future.getJobInput().getName());
+        visitedFutures.add(future.getJobInput().name());
         return true;
       }
     });
@@ -313,7 +314,7 @@ public class JobFutureVisitTest {
 
       @Override
       public boolean visit(IFuture<?> future) {
-        visitedFutures.add(future.getJobInput().getName());
+        visitedFutures.add(future.getJobInput().name());
         return true;
       }
     });

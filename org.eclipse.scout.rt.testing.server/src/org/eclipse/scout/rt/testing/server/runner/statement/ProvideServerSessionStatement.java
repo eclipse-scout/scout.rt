@@ -17,7 +17,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -51,7 +51,7 @@ public class ProvideServerSessionStatement extends Statement {
   public void evaluate() throws Throwable {
     Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "Subject must not be null. Use the annotation '%s' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
 
-    final IServerSession serverSession = OBJ.get(m_providerClass).provide(ServerJobInput.fillCurrent().copy());
+    final IServerSession serverSession = OBJ.get(m_providerClass).provide(ServerRunContexts.copyCurrent());
 
     final ISession oldSession = ISession.CURRENT.get();
 

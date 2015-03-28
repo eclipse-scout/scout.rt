@@ -16,8 +16,9 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
 import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
@@ -142,9 +143,9 @@ public final class ClientJobFutureFilters {
 
     @Override
     public boolean accept(final IFuture<?> future) {
-      final JobInput jobInput = future.getJobInput();
-      if (jobInput instanceof ClientJobInput) {
-        return (m_session == ((ClientJobInput) jobInput).getSession());
+      final RunContext runContext = future.getJobInput().runContext();
+      if (runContext instanceof ClientRunContext) {
+        return m_session == ((ClientRunContext) runContext).session();
       }
       else {
         return false;

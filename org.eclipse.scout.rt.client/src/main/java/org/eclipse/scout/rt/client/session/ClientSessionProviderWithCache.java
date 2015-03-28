@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -51,8 +51,8 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
   }
 
   @Override
-  public <SESSION extends IClientSession> SESSION provide(final ModelJobInput input) throws ProcessingException {
-    final Subject subject = Assertions.assertNotNull(input.getSubject(), "Subject must not be null");
+  public <SESSION extends IClientSession> SESSION provide(ClientRunContext runContext) throws ProcessingException {
+    final Subject subject = Assertions.assertNotNull(runContext.subject(), "Subject must not be null");
     final Set<Principal> principals = subject.getPrincipals();
     Assertions.assertFalse(principals.isEmpty(), "Subject contains no principals");
 
@@ -62,7 +62,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
     }
     else {
       // create and initialize a new session; use optimistic locking because initializing the session is a long-running operation.
-      final SESSION newClientSession = super.provide(input);
+      final SESSION newClientSession = super.provide(runContext);
 
       synchronized (m_cache) {
         clientSession = getFromCache(principals, newClientSession.getClass()); // optimistic locking: check, whether another thread already created and cached the session.

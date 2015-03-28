@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -189,7 +189,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
       // Cancel already running GC job
       Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().currentSession().ids(gcJobId), true);
       // Schedule new GC job
-      ClientJobs.schedule(new ForceGCJob(), ClientJobInput.fillCurrent().name("release memory").id(gcJobId));
+      ClientJobs.schedule(new ForceGCJob(), ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("release memory").id(gcJobId));
 
       m_release = false;
     }

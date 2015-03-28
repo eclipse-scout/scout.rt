@@ -14,6 +14,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class JobIdFilterTest {
 
   @Test
   public void test1() {
-    JobInput input = JobInput.fillEmpty().id(null);
+    JobInput input = Jobs.newInput(RunContexts.empty()).id(null);
     when(m_future.getJobInput()).thenReturn(input);
 
     assertTrue(Jobs.newFutureFilter().ids(new String[]{null}).accept(m_future));
@@ -42,7 +43,7 @@ public class JobIdFilterTest {
 
   @Test
   public void test2() {
-    JobInput input = JobInput.fillEmpty().id(null);
+    JobInput input = Jobs.newInput(RunContexts.empty()).id(null);
     when(m_future.getJobInput()).thenReturn(input);
 
     assertFalse(Jobs.newFutureFilter().ids("ABC").accept(m_future));
@@ -50,7 +51,7 @@ public class JobIdFilterTest {
 
   @Test
   public void test3() {
-    JobInput input = JobInput.fillEmpty().id("ABC");
+    JobInput input = Jobs.newInput(RunContexts.empty()).id("ABC");
     when(m_future.getJobInput()).thenReturn(input);
 
     assertFalse(Jobs.newFutureFilter().ids("abc").accept(m_future));
@@ -58,7 +59,7 @@ public class JobIdFilterTest {
 
   @Test
   public void test4() {
-    JobInput input = JobInput.fillEmpty().id("ABC");
+    JobInput input = Jobs.newInput(RunContexts.empty()).id("ABC");
     when(m_future.getJobInput()).thenReturn(input);
 
     assertTrue(Jobs.newFutureFilter().ids("ABC").accept(m_future));
@@ -66,7 +67,7 @@ public class JobIdFilterTest {
 
   @Test
   public void test5() {
-    JobInput input = JobInput.fillEmpty().id("XYZ");
+    JobInput input = Jobs.newInput(RunContexts.empty()).id("XYZ");
     when(m_future.getJobInput()).thenReturn(input);
 
     assertTrue(Jobs.newFutureFilter().ids("ABC", "XYZ").accept(m_future));

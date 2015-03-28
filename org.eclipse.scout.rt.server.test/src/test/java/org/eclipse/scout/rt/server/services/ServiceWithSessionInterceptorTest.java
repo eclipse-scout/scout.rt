@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.server.TestServerSession;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.service.AbstractService;
@@ -49,7 +49,7 @@ public class ServiceWithSessionInterceptorTest {
       public void run() throws Exception {
         runInServerJob();
       }
-    }, ServerJobInput.fillEmpty().name("test-job").session(serverSession));
+    }, ServerJobs.newInput(ServerRunContexts.empty().session(serverSession)).name("test-job"));
   }
 
   protected void runInServerJob() {

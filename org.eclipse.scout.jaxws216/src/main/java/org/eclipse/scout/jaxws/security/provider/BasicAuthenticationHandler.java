@@ -32,7 +32,8 @@ import org.eclipse.scout.jaxws.internal.JaxWsConstants;
 import org.eclipse.scout.jaxws.internal.JaxWsHelper;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.service.ServiceUtility;
@@ -122,10 +123,9 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
     if (transactional) {
       final Subject authSubject = createAuthenticatorSubject();
 
-      final ServerJobInput input = ServerJobInput.fillCurrent();
-      input.name("JAX-WS authentication");
-      input.subject(authSubject);
-      input.session(lookupServerSession(authSubject));
+      final ServerRunContext runContext = ServerRunContexts.copyCurrent();
+      runContext.subject(authSubject);
+      runContext.session(lookupServerSession(authSubject));
 
       return ServerJobs.runNow(new ICallable<Boolean>() {
 
@@ -133,7 +133,7 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
         public Boolean call() throws Exception {
           return authenticator.authenticate(username, password);
         }
-      }, input);
+      }, ServerJobs.newInput(runContext).name("JAX-WS authentication"));
     }
     else {
       return authenticator.authenticate(username, password);
@@ -146,8 +146,7 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
    */
   @Internal
   protected IServerSession lookupServerSession(final Subject subject) throws ProcessingException {
-    final ServerJobInput input = ServerJobInput.fillCurrent().name("JAX-WS Session").subject(subject);
-    return OBJ.get(ServerSessionProviderWithCache.class).provide(input);
+    return OBJ.get(ServerSessionProviderWithCache.class).provide(ServerRunContexts.copyCurrent().subject(subject));
   }
 
   /**

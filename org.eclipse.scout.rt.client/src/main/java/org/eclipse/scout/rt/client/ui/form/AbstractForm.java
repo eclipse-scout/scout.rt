@@ -58,6 +58,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCheckFieldsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCloseTimerChain;
@@ -75,9 +76,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormTimerChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormValidateChain;
 import org.eclipse.scout.rt.client.extension.ui.form.IFormExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.MoveFormFieldsHandler;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ClientJobs;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -2920,9 +2919,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
             }
           }
-        }, ModelJobInput.fillCurrent().name("Form timer")).awaitDoneAndGet();
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("Form timer")).awaitDoneAndGet();
       }
-    }, intervalSeconds, intervalSeconds, TimeUnit.SECONDS, ClientJobInput.fillCurrent());
+    }, intervalSeconds, intervalSeconds, TimeUnit.SECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent()));
   }
 
   /**
@@ -2948,7 +2947,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           public void run() throws Exception {
             setSubTitle("" + m_seconds);
           }
-        }, ModelJobInput.fillCurrent().name("Form close countdown").session(m_session));
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_session)));
 
         try {
           sleep(TimeUnit.SECONDS.toMillis(1));
@@ -2975,7 +2974,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               SERVICES.getService(IExceptionHandlerService.class).handleException(se);
             }
           }
-        }, ModelJobInput.fillCurrent().name("Form close timer").session(m_session));
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_session)).name("Form close timer"));
       }
     }
   }// end private class

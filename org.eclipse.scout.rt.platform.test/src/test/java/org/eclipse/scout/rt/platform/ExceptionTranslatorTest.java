@@ -25,8 +25,9 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -94,7 +95,7 @@ public class ExceptionTranslatorTest {
     // test context message with 'anonymous job' and 'no subject'
     IFuture future = mock(IFuture.class);
     IFuture.CURRENT.set(future);
-    when(future.getJobInput()).thenReturn(JobInput.fillEmpty());
+    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()));
     pe = Subject.doAs(null, new PrivilegedAction<ProcessingException>() {
 
       @Override
@@ -107,7 +108,7 @@ public class ExceptionTranslatorTest {
     // test context message with 'job' and 'no subject'
     future = mock(IFuture.class);
     IFuture.CURRENT.set(future);
-    when(future.getJobInput()).thenReturn(JobInput.fillEmpty().name("do-something"));
+    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).name("do-something"));
     pe = Subject.doAs(null, new PrivilegedAction<ProcessingException>() {
 
       @Override
@@ -124,7 +125,7 @@ public class ExceptionTranslatorTest {
     subject.getPrincipals().add(new SimplePrincipal("anna"));
     subject.getPrincipals().add(new SimplePrincipal("john"));
 
-    when(future.getJobInput()).thenReturn(JobInput.fillEmpty().id("7").name("do-something"));
+    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).id("7").name("do-something"));
     pe = Subject.doAs(subject, new PrivilegedAction<ProcessingException>() {
 
       @Override

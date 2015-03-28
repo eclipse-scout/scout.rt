@@ -12,16 +12,17 @@ package org.eclipse.scout.rt.platform.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class JobsTest {
       }
     }).awaitDoneAndGet();
 
-    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().runContext().locale());
 
     // schedule with delay
     actualFuture = Jobs.schedule(new ICallable<IFuture<?>>() {
@@ -54,7 +55,7 @@ public class JobsTest {
       }
     }, 0, TimeUnit.MILLISECONDS).awaitDoneAndGet();
 
-    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().runContext().locale());
 
     // schedule at fixed rate
     final Holder<IFuture<?>> actualFutureHolder = new Holder<IFuture<?>>();
@@ -67,7 +68,7 @@ public class JobsTest {
       }
     }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.copyCurrent())).awaitDoneAndGet();
 
-    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().runContext().locale());
 
     // schedule with fixed delay
     actualFutureHolder.setValue(null);
@@ -80,10 +81,10 @@ public class JobsTest {
       }
     }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.copyCurrent())).awaitDoneAndGet();
 
-    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().runContext().locale());
   }
 
-  @Test(expected = AssertionException.class)
+  @Test
   public void testScheduleWithoutRunContext() throws ProcessingException {
     NlsLocale.set(Locale.CANADA_FRENCH);
 
@@ -96,7 +97,7 @@ public class JobsTest {
       }
     }, Jobs.newInput(null)).awaitDoneAndGet();
 
-    assertNull(actualFuture.getJobInput().getRunContext().getLocale());
+    assertNull(actualFuture.getJobInput().runContext());
 
     // schedule with delay
     actualFuture = Jobs.schedule(new ICallable<IFuture<?>>() {
@@ -107,7 +108,7 @@ public class JobsTest {
       }
     }, 0, TimeUnit.MILLISECONDS, Jobs.newInput(null)).awaitDoneAndGet();
 
-    assertNull(actualFuture.getJobInput().getRunContext().getLocale());
+    assertNull(actualFuture.getJobInput().runContext());
 
     // schedule at fixed rate
     final Holder<IFuture<?>> actualFutureHolder = new Holder<IFuture<?>>();
@@ -120,7 +121,7 @@ public class JobsTest {
       }
     }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(null)).awaitDoneAndGet();
 
-    assertNull(actualFuture.getJobInput().getRunContext().getLocale());
+    assertNull(actualFuture.getJobInput().runContext());
 
     // schedule with fixed delay
     actualFutureHolder.setValue(null);
@@ -133,6 +134,18 @@ public class JobsTest {
       }
     }, 0, 0, TimeUnit.MILLISECONDS, Jobs.newInput(null)).awaitDoneAndGet();
 
-    assertNull(actualFuture.getJobInput().getRunContext().getLocale());
+    assertNull(actualFuture.getJobInput().runContext());
+  }
+
+  @Test
+  public void testNewInput() {
+    RunContext runContext = RunContexts.empty();
+    assertSame(runContext, Jobs.newInput(runContext).runContext());
+    assertEquals("scout-thread", Jobs.newInput(null).threadName());
+  }
+
+  @Test
+  public void testNewInputNullInput() {
+    assertNull(Jobs.newInput(null).runContext());
   }
 }

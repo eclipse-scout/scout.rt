@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
@@ -56,7 +57,7 @@ public class ScheduleDelayedTest {
       public void run() throws Exception {
         protocol.add(System.nanoTime());
       }
-    }, delayNano, TimeUnit.NANOSECONDS, JobInput.fillEmpty());
+    }, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()));
 
     // verify
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 30, TimeUnit.SECONDS));

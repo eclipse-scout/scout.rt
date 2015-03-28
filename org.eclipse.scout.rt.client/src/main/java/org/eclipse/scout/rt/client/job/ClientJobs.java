@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.platform.job.JobInput;
  *   final IClientSession session = ...;
  *   final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().session(session).locale(Locale.US);
  *   </i>
- *   Beans.get(IJobManager.class).schedule(new IRunnable() {
+ *   BEANS.get(IJobManager.class).schedule(new IRunnable() {
  * 
  *       &#064;Override
  *       public void run() throws Exception {
@@ -66,7 +66,7 @@ public final class ClientJobs {
    * 'Run-now'-style execution will be removed in 5.1.
    */
   public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable) throws ProcessingException {
-    return ClientJobs.runNow(executable, ClientJobs.newInput(ClientRunContexts.copyCurrent().sessionRequired(true)));
+    return ClientJobs.runNow(executable, ClientJobs.newInput(ClientRunContexts.copyCurrent()));
   }
 
   /**
@@ -76,7 +76,7 @@ public final class ClientJobs {
     Assertions.assertTrue(executable instanceof IRunnable || executable instanceof ICallable, "Illegal executable provided: must be a '%s' or '%s'", IRunnable.class.getSimpleName(), ICallable.class.getSimpleName());
     validateInput(input);
 
-    final RunContext runContext = input.getRunContext();
+    final RunContext runContext = input.runContext();
 
     if (executable instanceof IRunnable) {
       runContext.run((IRunnable) executable);
@@ -106,7 +106,7 @@ public final class ClientJobs {
    * @see IJobManager#schedule(IExecutable, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable) {
-    return ClientJobs.schedule(executable, ClientJobs.newInput(ClientRunContexts.copyCurrent().sessionRequired(true)));
+    return ClientJobs.schedule(executable, ClientJobs.newInput(ClientRunContexts.copyCurrent()));
   }
 
   /**
@@ -154,7 +154,7 @@ public final class ClientJobs {
    * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit) {
-    return ClientJobs.schedule(executable, delay, delayUnit, ClientJobs.newInput(ClientRunContexts.copyCurrent().sessionRequired(true)));
+    return ClientJobs.schedule(executable, delay, delayUnit, ClientJobs.newInput(ClientRunContexts.copyCurrent()));
   }
 
   /**
@@ -246,21 +246,21 @@ public final class ClientJobs {
     if (future == null) {
       return false;
     }
-    if (!(future.getJobInput().getRunContext() instanceof ClientRunContext)) {
+    if (!(future.getJobInput().runContext() instanceof ClientRunContext)) {
       return false;
     }
-    if (future.getJobInput().getMutex() instanceof IClientSession) {
+    if (future.getJobInput().mutex() instanceof IClientSession) {
       return false; // this is a model job
     }
     return true;
   }
 
   /**
-   * Creates a {@link JobInput} with the given {@link ClientRunContext} set to be given to the job manager.
+   * Creates a {@link JobInput} initialized with the given {@link ClientRunContext}.
    */
   public static JobInput newInput(final ClientRunContext clientRunContext) {
-    Assertions.assertNotNull(clientRunContext, "ClientRunContext must not be null for client jobs");
-    return OBJ.get(JobInput.class).runContext(clientRunContext);
+    Assertions.assertNotNull(clientRunContext, "'RunContext' must not be null for client jobs");
+    return OBJ.get(JobInput.class).threadName("scout-client-thread").runContext(clientRunContext);
   }
 
   /**

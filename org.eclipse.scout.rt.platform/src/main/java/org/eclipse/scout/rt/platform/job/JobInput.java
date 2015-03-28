@@ -10,18 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job;
 
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import javax.security.auth.Subject;
-
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.context.RunContexts;
 
 /**
  * A <code>JobInput</code> contains information about a job like its name with execution instructions like 'serial
@@ -46,16 +41,17 @@ public class JobInput {
   protected String m_id;
   protected String m_name;
   protected Object m_mutexObject;
-  protected long m_expirationTime;
-  protected boolean m_logOnError;
+  protected long m_expirationTime = INFINITE_EXPIRATION;
+  protected boolean m_logOnError = true;
+  protected String m_threadName = "scout-thread";
   protected RunContext m_runContext;
 
-  public String getId() {
+  public String id() {
     return m_id;
   }
 
   /**
-   * Sets the <code>id</code> of a job; must not be set; must not be unique; is primarily used for logging purpose, to
+   * To set the <code>id</code> of a job; must not be set; must not be unique; is primarily used for logging purpose, to
    * decorate the worker thread's name and to identify the job's Future.
    */
   public JobInput id(final String id) {
@@ -63,37 +59,42 @@ public class JobInput {
     return this;
   }
 
-  public String getName() {
+  public String name() {
     return m_name;
   }
 
   /**
-   * Sets the name of a job; is used to decorate the worker thread's name and for logging purpose; must not be set.
+   * To set the name of a job; is used to decorate the worker thread's name and for logging purpose; must not be set.
+   *
+   * @param name
+   *          the name
+   * @param args
+   *          arguments to be used in the name, e.g. <code>JobInput.name("load data [id=%s]", id)</code>
    */
-  public JobInput name(final String name) {
-    m_name = name;
+  public JobInput name(final String name, final Object... args) {
+    m_name = (name != null ? String.format(name, args) : null);
     return this;
   }
 
-  public Object getMutex() {
+  public Object mutex() {
     return m_mutexObject;
   }
 
   /**
-   * Sets the mutex object (mutual exclusion) for the job. This is used to run the job in sequence among other jobs with
-   * the same mutex object, so that no two such jobs are run in parallel at the same time.
+   * To set the mutex object (mutual exclusion) for the job. This is used to run the job in sequence among other jobs
+   * with the same mutex object, so that no two such jobs are run in parallel at the same time.
    */
   public JobInput mutex(final Object mutexObject) {
     m_mutexObject = mutexObject;
     return this;
   }
 
-  public long getExpirationTimeMillis() {
+  public long expirationTimeMillis() {
     return m_expirationTime;
   }
 
   /**
-   * Sets the maximal expiration time, until the job must commence execution; if elapsed, the executable is cancelled
+   * To set the maximal expiration time, until the job must commence execution; if elapsed, the executable is cancelled
    * and never commence execution; is useful, if using a scheduling strategy which might queue scheduled executables
    * prior execution. By default, there is no expiration time set.
    *
@@ -101,69 +102,56 @@ public class JobInput {
    *          the maximal expiration time until an executable must commence execution.
    * @param timeUnit
    *          the time unit of the <code>time</code> argument.
-   * @return this in order to support for method chaining
    */
   public JobInput expirationTime(final long time, final TimeUnit timeUnit) {
     m_expirationTime = timeUnit.toMillis(time);
     return this;
   }
 
-  public RunContext getRunContext() {
+  public RunContext runContext() {
     return m_runContext;
   }
 
   /**
-   * Sets the {@link RunContext} to be set for the time of execution.
+   * To set the <code>RunContext</code> to be applied for the time of execution.
    */
   public JobInput runContext(final RunContext runContext) {
-    m_runContext = Assertions.assertNotNull(runContext, "RunContext must not be null");
+    m_runContext = runContext;
     return this;
   }
 
-  public Subject getSubject() {
-    return getRunContext().getSubject();
-  }
-
-  /**
-   * Sets the Subject to execute the job under a particular user.
-   */
-  public JobInput subject(final Subject subject) {
-    getRunContext().subject(subject);
-    return this;
-  }
-
-  public Locale getLocale() {
-    return getRunContext().getLocale();
-  }
-
-  /**
-   * Sets the Locale to be set for the time of execution.
-   */
-  public JobInput locale(final Locale locale) {
-    getRunContext().locale(locale);
-    return this;
-  }
-
-  public boolean isLogOnError() {
+  public boolean logOnError() {
     return m_logOnError;
   }
 
   /**
-   * Instrument the job manager to log execution exceptions caused by this job; is <code>true</code> by default.
+   * To instrument the job manager to log execution exceptions; is <code>true</code> by default.
    */
   public JobInput logOnError(final boolean logOnError) {
     m_logOnError = logOnError;
     return this;
   }
 
-  public PropertyMap getPropertyMap() {
-    return getRunContext().getPropertyMap();
+  public String threadName() {
+    return m_threadName;
+  }
+
+  /**
+   * To set the thread name of the worker thread that will execute the job.
+   */
+  public JobInput threadName(final String threadName) {
+    m_threadName = threadName;
+    return this;
+  }
+
+  public PropertyMap propertyMap() {
+    return runContext().propertyMap();
   }
 
   /***
    * @return the job's identifier consisting of the job's 'id' and 'name', or {@link JobInput#N_A} if not set.
    */
-  public String getIdentifier() {
+  public String identifier() {
     final String identifier = StringUtility.join(":", m_id, m_name);
     if (identifier.isEmpty()) {
       return JobInput.N_A;
@@ -173,80 +161,32 @@ public class JobInput {
     }
   }
 
-  /**
-   * @return name used to name the worker thread during the job's execution.
-   */
-  public String getThreadName() {
-    return "scout-thread";
-  }
-
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("id", getId());
-    builder.attr("name", getName());
+    builder.attr("id", id());
+    builder.attr("name", name());
+    builder.ref("mutexObject", mutex());
+    builder.attr("expirationTime", expirationTimeMillis());
+    builder.attr("logOnError", logOnError());
+    builder.attr("threadName", threadName());
+    builder.attr("runContext", runContext());
+
     return builder.toString();
   }
 
-  // === fill methods ===
-
   /**
-   * Method invoked to fill this {@link JobInput} with values from the given {@link JobInput}.
-   */
-  protected void copyValues(final JobInput origin) {
-    m_id = origin.m_id;
-    m_name = origin.m_name;
-    m_mutexObject = origin.m_mutexObject;
-    m_expirationTime = origin.m_expirationTime;
-    m_logOnError = origin.m_logOnError;
-    m_runContext = origin.m_runContext.copy();
-  }
-
-  /**
-   * Method invoked to fill this {@link JobInput} with values from the current calling {@link RunContext}.
-   */
-  protected void fillCurrentValues() {
-    m_expirationTime = INFINITE_EXPIRATION;
-    m_logOnError = true;
-    m_runContext = RunContexts.copyCurrent();
-  }
-
-  /**
-   * Method invoked to fill this {@link JobInput} with empty values.
-   */
-  protected void fillEmptyValues() {
-    m_expirationTime = INFINITE_EXPIRATION;
-    m_logOnError = true;
-    m_runContext = RunContexts.empty();
-  }
-
-  // === construction methods ===
-
-  /**
-   * Creates a shallow copy of the input represented by <code>this</code>.
+   * Creates a copy of <code>this</code> input.
    */
   public JobInput copy() {
     final JobInput copy = OBJ.get(JobInput.class);
-    copy.copyValues(this);
+    copy.id(m_id);
+    copy.name(m_name);
+    copy.mutex(m_mutexObject);
+    copy.expirationTime(m_expirationTime, TimeUnit.MILLISECONDS);
+    copy.logOnError(m_logOnError);
+    copy.threadName(m_threadName);
+    copy.runContext(m_runContext != null ? m_runContext.copy() : null);
     return copy;
-  }
-
-  /**
-   * Creates a {@link JobInput} with a "snapshot" of the current calling {@link RunContext}.
-   */
-  public static JobInput fillCurrent() {
-    final JobInput jobInput = OBJ.get(JobInput.class);
-    jobInput.fillCurrentValues();
-    return jobInput;
-  }
-
-  /**
-   * Creates an empty {@link JobInput} with <code>null</code> as preferred {@link Subject} and {@link Locale}. Preferred
-   * means, that those values are not derived from other values, but must be set explicitly instead.
-   */
-  public static JobInput fillEmpty() {
-    final JobInput jobInput = OBJ.get(JobInput.class);
-    jobInput.fillEmptyValues();
-    return jobInput;
   }
 }

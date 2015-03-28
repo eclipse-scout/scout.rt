@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -74,7 +73,7 @@ public class FormWaitForTest {
 
         LOG.debug("ClientSyncWaitForTest.testStartAndWaitImpl(...).new ClientSyncJob() {...}.runVoid() finished");
       }
-    }, ModelJobInput.fillCurrent().name("Close"));
+    });
 
     LOG.debug("ClientSessionProvider.currentSession()");
     LOG.debug("ClientSessionProvider.currentSession().getDesktop()");

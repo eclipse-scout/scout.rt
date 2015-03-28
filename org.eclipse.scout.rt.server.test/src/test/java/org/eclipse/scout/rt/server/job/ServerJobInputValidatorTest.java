@@ -24,13 +24,8 @@ public class ServerJobInputValidatorTest {
 
   @Test
   public void test1() {
-    new ServerJobInputValidator().validate(new JobInput().runContext(new ServerRunContext().sessionRequired(false).session(null)));
-    assertTrue(true);
-  }
-
-  @Test
-  public void test2() {
-    new ServerJobInputValidator().validate(new JobInput().runContext(new ServerRunContext().sessionRequired(true).session(mock(IServerSession.class))));
+    new ServerJobInputValidator().validate(new JobInput().runContext(new ServerRunContext().session(null)));
+    new ServerJobInputValidator().validate(new JobInput().runContext(new ServerRunContext().session(mock(IServerSession.class))));
     assertTrue(true);
   }
 
@@ -42,10 +37,5 @@ public class ServerJobInputValidatorTest {
   @Test(expected = AssertionException.class)
   public void testWrongRunContext() {
     new ServerJobInputValidator().validate(new JobInput().runContext(new RunContext()));
-  }
-
-  @Test(expected = AssertionException.class)
-  public void testNullSession() {
-    new ServerJobInputValidator().validate(new JobInput().runContext(new ServerRunContext().sessionRequired(true).session(null)));
   }
 }

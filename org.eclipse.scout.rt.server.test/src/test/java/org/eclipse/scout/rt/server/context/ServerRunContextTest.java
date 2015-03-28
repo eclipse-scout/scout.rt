@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.context;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -60,17 +59,16 @@ public class ServerRunContextTest {
   @Test
   public void testEmpty() {
     ServerRunContext runContext = ServerRunContexts.empty();
-    assertNull(runContext.getSubject());
-    assertNull(runContext.getSession());
-    assertFalse(runContext.isSessionRequired());
-    assertNull(runContext.getUserAgent());
-    assertNull(runContext.getLocale());
+    assertNull(runContext.subject());
+    assertNull(runContext.session());
+    assertNull(runContext.userAgent());
+    assertNull(runContext.locale());
   }
 
   @Test
   public void testCopy() {
     ServerRunContext runContext = ServerRunContexts.empty();
-    runContext.getPropertyMap().put("A", "B");
+    runContext.propertyMap().put("A", "B");
     runContext.subject(new Subject());
     runContext.session(mock(IServerSession.class));
     runContext.userAgent(UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a"));
@@ -78,11 +76,11 @@ public class ServerRunContextTest {
 
     ServerRunContext copy = runContext.copy();
 
-    assertEquals(toSet(runContext.getPropertyMap().iterator()), toSet(copy.getPropertyMap().iterator()));
-    assertSame(runContext.getSubject(), copy.getSubject());
-    assertSame(runContext.getUserAgent(), copy.getUserAgent());
-    assertSame(runContext.getLocale(), copy.getLocale());
-    assertSame(runContext.getLocale(), copy.getLocale());
+    assertEquals(toSet(runContext.propertyMap().iterator()), toSet(copy.propertyMap().iterator()));
+    assertSame(runContext.subject(), copy.subject());
+    assertSame(runContext.userAgent(), copy.userAgent());
+    assertSame(runContext.locale(), copy.locale());
+    assertSame(runContext.locale(), copy.locale());
   }
 
   @Test
@@ -95,7 +93,7 @@ public class ServerRunContextTest {
         return ServerRunContexts.copyCurrent();
       }
     });
-    assertSame(subject, runContext.getSubject());
+    assertSame(subject, runContext.subject());
 
     runContext = Subject.doAs(null, new PrivilegedAction<ServerRunContext>() {
 
@@ -104,39 +102,28 @@ public class ServerRunContextTest {
         return ServerRunContexts.copyCurrent();
       }
     });
-    assertNull(runContext.getSubject());
-  }
-
-  @Test
-  public void testCurrentSessionRequired() {
-    assertFalse(ServerRunContexts.copyCurrent().isSessionRequired());
-  }
-
-  @Test
-  public void testSessionRequiredCopy() {
-    assertTrue(ServerRunContexts.empty().sessionRequired(true).copy().isSessionRequired());
-    assertFalse(ServerRunContexts.empty().sessionRequired(false).copy().isSessionRequired());
+    assertNull(runContext.subject());
   }
 
   @Test
   public void testCurrentSession() {
     // No session on ThreadLocal
     ISession.CURRENT.remove();
-    assertNull(ServerRunContexts.copyCurrent().sessionRequired(false).getSession());
+    assertNull(ServerRunContexts.copyCurrent().session());
 
     // Session on ThreadLocal
     IServerSession sessionThreadLocal = mock(IServerSession.class);
     ISession.CURRENT.set(sessionThreadLocal);
-    assertSame(sessionThreadLocal, ServerRunContexts.copyCurrent().getSession());
+    assertSame(sessionThreadLocal, ServerRunContexts.copyCurrent().session());
 
     // Session on ThreadLocal, but set explicitly
     ISession.CURRENT.set(sessionThreadLocal);
     IServerSession explicitSession = mock(IServerSession.class);
-    assertSame(explicitSession, ServerRunContexts.copyCurrent().session(explicitSession).getSession());
+    assertSame(explicitSession, ServerRunContexts.copyCurrent().session(explicitSession).session());
 
     // Session on ThreadLocal, but set explicitly to null
     ISession.CURRENT.set(sessionThreadLocal);
-    assertNull(ServerRunContexts.copyCurrent().session(null).sessionRequired(false).getSession());
+    assertNull(ServerRunContexts.copyCurrent().session(null).session());
   }
 
   @Test
@@ -146,17 +133,17 @@ public class ServerRunContextTest {
     // ThreadLocal set, Session available --> Locale from ThreadLocal
     ISession.CURRENT.set(session);
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.CANADA_FRENCH, ServerRunContexts.copyCurrent().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, ServerRunContexts.copyCurrent().locale());
 
     // ThreadLocal set, Session available --> Locale from ThreadLocal
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.CANADA_FRENCH, ServerRunContexts.copyCurrent().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, ServerRunContexts.copyCurrent().locale());
 
     // ThreadLocal not set, Session not available --> no fallback to JVM default Locale.
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.remove();
-    assertNull(ServerRunContexts.copyCurrent().getLocale());
+    assertNull(ServerRunContexts.copyCurrent().locale());
   }
 
   @Test
@@ -166,17 +153,17 @@ public class ServerRunContextTest {
     // ThreadLocal set, Session available --> explicit Locale (null)
     ISession.CURRENT.set(session);
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertNull(ServerRunContexts.copyCurrent().locale(null).session(session).getLocale());
+    assertNull(ServerRunContexts.copyCurrent().locale(null).session(session).locale());
 
     // ThreadLocal set, Session not available --> explicit Locale (null)
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertNull(ServerRunContexts.copyCurrent().locale(null).session(session).getLocale());
+    assertNull(ServerRunContexts.copyCurrent().locale(null).session(session).locale());
 
     // ThreadLocal not set, Session not available --> explicit Locale (null)
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.remove();
-    assertNull(ServerRunContexts.copyCurrent().locale(null).session(session).getLocale());
+    assertNull(ServerRunContexts.copyCurrent().locale(null).session(session).locale());
   }
 
   @Test
@@ -186,17 +173,17 @@ public class ServerRunContextTest {
     // ThreadLocal set, Session available --> explicit Locale (JAPAN)
     ISession.CURRENT.set(session);
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.JAPAN, ServerRunContexts.copyCurrent().locale(Locale.JAPAN).session(session).getLocale());
+    assertEquals(Locale.JAPAN, ServerRunContexts.copyCurrent().locale(Locale.JAPAN).session(session).locale());
 
     // ThreadLocal set, Session not available --> explicit Locale (JAPAN)
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.JAPAN, ServerRunContexts.copyCurrent().locale(Locale.JAPAN).session(session).getLocale());
+    assertEquals(Locale.JAPAN, ServerRunContexts.copyCurrent().locale(Locale.JAPAN).session(session).locale());
 
     // ThreadLocal not set, Session not available --> explicit Locale (JAPAN)
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.remove();
-    assertEquals(Locale.JAPAN, ServerRunContexts.copyCurrent().locale(Locale.JAPAN).session(session).getLocale());
+    assertEquals(Locale.JAPAN, ServerRunContexts.copyCurrent().locale(Locale.JAPAN).session(session).locale());
   }
 
   @Test
@@ -206,12 +193,12 @@ public class ServerRunContextTest {
     // ThreadLocal set --> Locale form ThreadLocal
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.CANADA_FRENCH, ServerRunContexts.copyCurrent().session(session).getLocale());
+    assertEquals(Locale.CANADA_FRENCH, ServerRunContexts.copyCurrent().session(session).locale());
 
     // ThreadLocal not set --> Null Locale
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.remove();
-    assertNull(ServerRunContexts.copyCurrent().session(session).getLocale());
+    assertNull(ServerRunContexts.copyCurrent().session(session).locale());
 
     IServerSession currentSession = mock(IServerSession.class);
 
@@ -219,13 +206,13 @@ public class ServerRunContextTest {
     ISession.CURRENT.set(currentSession);
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.CANADA_FRENCH, ServerRunContexts.copyCurrent().session(session).getLocale());
+    assertEquals(Locale.CANADA_FRENCH, ServerRunContexts.copyCurrent().session(session).locale());
 
     // ThreadLocal-Session available, ThreadLocal not set --> Null Locale
     ISession.CURRENT.set(currentSession);
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.remove();
-    assertNull(ServerRunContexts.copyCurrent().session(session).getLocale());
+    assertNull(ServerRunContexts.copyCurrent().session(session).locale());
   }
 
   @Test
@@ -237,17 +224,17 @@ public class ServerRunContextTest {
     // ThreadLocal set, Session available --> UserAgent from ThreadLocal
     ISession.CURRENT.set(session);
     UserAgent.CURRENT.set(userAgent);
-    assertSame(userAgent, ServerRunContexts.copyCurrent().getUserAgent());
+    assertSame(userAgent, ServerRunContexts.copyCurrent().userAgent());
 
     // ThreadLocal set, Session available --> UserAgent from ThreadLocal
     ISession.CURRENT.remove();
     UserAgent.CURRENT.set(userAgent);
-    assertEquals(userAgent, ServerRunContexts.copyCurrent().getUserAgent());
+    assertEquals(userAgent, ServerRunContexts.copyCurrent().userAgent());
 
     // ThreadLocal not set, Session not available
     ISession.CURRENT.remove();
     UserAgent.CURRENT.remove();
-    assertNull(ServerRunContexts.copyCurrent().getUserAgent());
+    assertNull(ServerRunContexts.copyCurrent().userAgent());
   }
 
   @Test
@@ -258,17 +245,17 @@ public class ServerRunContextTest {
     // ThreadLocal set, Session available --> explicit UserAgent (null)
     ISession.CURRENT.set(session);
     UserAgent.CURRENT.set(userAgent);
-    assertNull(ServerRunContexts.copyCurrent().userAgent(null).session(session).getUserAgent());
+    assertNull(ServerRunContexts.copyCurrent().userAgent(null).session(session).userAgent());
 
     // ThreadLocal set, Session not available --> explicit UserAgent (null)
     ISession.CURRENT.remove();
     UserAgent.CURRENT.set(userAgent);
-    assertNull(ServerRunContexts.copyCurrent().userAgent(null).session(session).getUserAgent());
+    assertNull(ServerRunContexts.copyCurrent().userAgent(null).session(session).userAgent());
 
     // ThreadLocal not set, Session not available --> explicit UserAgent (null)
     ISession.CURRENT.remove();
     UserAgent.CURRENT.remove();
-    assertNull(ServerRunContexts.copyCurrent().userAgent(null).session(session).getUserAgent());
+    assertNull(ServerRunContexts.copyCurrent().userAgent(null).session(session).userAgent());
   }
 
   @Test
@@ -281,17 +268,17 @@ public class ServerRunContextTest {
     // ThreadLocal set, Session available --> explicit UserAgent (userAgent2)
     ISession.CURRENT.set(session);
     UserAgent.CURRENT.set(userAgent1);
-    assertSame(userAgent2, ServerRunContexts.copyCurrent().userAgent(userAgent2).session(session).getUserAgent());
+    assertSame(userAgent2, ServerRunContexts.copyCurrent().userAgent(userAgent2).session(session).userAgent());
 
     // ThreadLocal set, Session not available --> explicit UserAgent (userAgent2)
     ISession.CURRENT.remove();
     UserAgent.CURRENT.set(userAgent1);
-    assertSame(userAgent2, ServerRunContexts.copyCurrent().userAgent(userAgent2).session(session).getUserAgent());
+    assertSame(userAgent2, ServerRunContexts.copyCurrent().userAgent(userAgent2).session(session).userAgent());
 
     // ThreadLocal not set, Session not available --> explicit UserAgent (userAgent2)
     ISession.CURRENT.remove();
     NlsLocale.CURRENT.remove();
-    assertSame(userAgent2, ServerRunContexts.copyCurrent().userAgent(userAgent2).session(session).getUserAgent());
+    assertSame(userAgent2, ServerRunContexts.copyCurrent().userAgent(userAgent2).session(session).userAgent());
   }
 
   @Test
@@ -303,12 +290,12 @@ public class ServerRunContextTest {
     // ThreadLocal set --> UserAgent form ThreadLocal
     ISession.CURRENT.remove();
     UserAgent.CURRENT.set(userAgent1);
-    assertSame(userAgent1, ServerRunContexts.copyCurrent().session(session).getUserAgent());
+    assertSame(userAgent1, ServerRunContexts.copyCurrent().session(session).userAgent());
 
     // ThreadLocal not set --> Null UserAgent
     ISession.CURRENT.remove();
     UserAgent.CURRENT.remove();
-    assertNull(ServerRunContexts.copyCurrent().session(session).getUserAgent());
+    assertNull(ServerRunContexts.copyCurrent().session(session).userAgent());
 
     IServerSession currentSession = mock(IServerSession.class);
 
@@ -316,13 +303,13 @@ public class ServerRunContextTest {
     ISession.CURRENT.set(currentSession);
     ISession.CURRENT.remove();
     UserAgent.CURRENT.set(userAgent1);
-    assertSame(userAgent1, ServerRunContexts.copyCurrent().session(session).getUserAgent());
+    assertSame(userAgent1, ServerRunContexts.copyCurrent().session(session).userAgent());
 
     // ThreadLocal-Session available, ThreadLocal not set --> Null UserAgent
     ISession.CURRENT.set(currentSession);
     ISession.CURRENT.remove();
     UserAgent.CURRENT.remove();
-    assertNull(ServerRunContexts.copyCurrent().session(session).getUserAgent());
+    assertNull(ServerRunContexts.copyCurrent().session(session).userAgent());
   }
 
   @Test
@@ -341,25 +328,48 @@ public class ServerRunContextTest {
   private void testDerivedSubjectWhenSettingSessionImpl() throws PrivilegedActionException {
     final IServerSession session = mock(IServerSession.class);
     final Subject subject1 = new Subject();
+    final Subject subject2 = new Subject();
 
-    // Current Subject set, Subject on session not set --> Current Subject
+    // Current Subject set, Subject on session not set --> Null Subject
     Subject.doAs(subject1, new PrivilegedExceptionAction<Object>() {
 
       @Override
       public Object run() throws Exception {
         when(session.getSubject()).thenReturn(null);
-        assertSame(subject1, ServerRunContexts.copyCurrent().session(session).getSubject());
+        assertNull(ServerRunContexts.copyCurrent().session(session).subject());
         return null;
       }
     });
 
-    // Current Subject not set, Subject on session set --> NULL Subject
+    // Current Subject not set, Subject on session not set --> Null Subject
+    Subject.doAs(null, new PrivilegedExceptionAction<Object>() {
+
+      @Override
+      public Object run() throws Exception {
+        when(session.getSubject()).thenReturn(null);
+        assertNull(ServerRunContexts.copyCurrent().session(session).subject());
+        return null;
+      }
+    });
+
+    // Current Subject not set, Subject on session set --> Subject from session
     Subject.doAs(null, new PrivilegedExceptionAction<Object>() {
 
       @Override
       public Object run() throws Exception {
         when(session.getSubject()).thenReturn(subject1);
-        assertNull(ServerRunContexts.copyCurrent().session(session).getSubject());
+        assertSame(subject1, ServerRunContexts.copyCurrent().session(session).subject());
+        return null;
+      }
+    });
+
+    // Current Subject set, Subject on session set --> Subject from session
+    Subject.doAs(subject1, new PrivilegedExceptionAction<Object>() {
+
+      @Override
+      public Object run() throws Exception {
+        when(session.getSubject()).thenReturn(subject2);
+        assertSame(subject2, ServerRunContexts.copyCurrent().session(session).subject());
         return null;
       }
     });
@@ -373,12 +383,12 @@ public class ServerRunContextTest {
     // No context on ThreadLocal
     PropertyMap.CURRENT.remove();
     assertNotNull(ServerRunContexts.copyCurrent());
-    assertTrue(toSet(ServerRunContexts.copyCurrent().getPropertyMap().iterator()).isEmpty());
+    assertTrue(toSet(ServerRunContexts.copyCurrent().propertyMap().iterator()).isEmpty());
 
     // Context on ThreadLocal
     PropertyMap.CURRENT.set(propertyMap);
-    assertNotSame(propertyMap, ServerRunContexts.copyCurrent().getPropertyMap()); // test for copy
-    assertEquals(toSet(propertyMap.iterator()), toSet(ServerRunContexts.copyCurrent().getPropertyMap().iterator()));
+    assertNotSame(propertyMap, ServerRunContexts.copyCurrent().propertyMap()); // test for copy
+    assertEquals(toSet(propertyMap.iterator()), toSet(ServerRunContexts.copyCurrent().propertyMap().iterator()));
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

@@ -32,7 +32,8 @@ import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -74,18 +75,16 @@ public class ServerJobServletFilter implements Filter {
     }
 
     try {
-      // Create the job input on behalf of which the server job is run.
-      ServerJobInput input = ServerJobInput.fillEmpty();
-      input.name(ServerJobServletFilter.class.getSimpleName());
-      input.subject(Subject.getSubject(AccessController.getContext()));
-      input.servletRequest(httpRequest);
-      input.servletResponse(httpResponse);
-      input.session(lookupServerSessionOnHttpSession(input.copy()));
+      ServerRunContext runContext = ServerRunContexts.empty();
+      runContext.subject(Subject.getSubject(AccessController.getContext()));
+      runContext.servletRequest(httpRequest);
+      runContext.servletResponse(httpResponse);
+      runContext.session(lookupServerSessionOnHttpSession(runContext.copy()));
 
-      input = interceptServerJobInput(input);
+      runContext = interceptRunContext(runContext);
 
       try {
-        continueChainInServerJob(chain, input);
+        continueChain(chain, runContext);
       }
       catch (ProcessingException e) {
         handleException(e, httpRequest);
@@ -102,17 +101,17 @@ public class ServerJobServletFilter implements Filter {
   // === SESSION LOOKUP ===
 
   /**
-   * Override this method to intercept the {@link ServerJobInput} used to run server jobs. The default implementation
-   * simply returns the given input.
+   * Override this method to intercept the {@link ServerRunContext} used to process a request. The default
+   * implementation simply returns the given <code>runContext</code>.
    */
-  protected ServerJobInput interceptServerJobInput(final ServerJobInput input) {
-    return input;
+  protected ServerRunContext interceptRunContext(final ServerRunContext runContext) {
+    return runContext;
   }
 
   @Internal
-  protected IServerSession lookupServerSessionOnHttpSession(ServerJobInput jobInput) throws ProcessingException, ServletException {
-    HttpServletRequest req = jobInput.getServletRequest();
-    HttpServletResponse res = jobInput.getServletResponse();
+  protected IServerSession lookupServerSessionOnHttpSession(final ServerRunContext runContext) throws ProcessingException, ServletException {
+    HttpServletRequest req = runContext.servletRequest();
+    HttpServletResponse res = runContext.servletResponse();
 
     //external request: apply locking, this is the session initialization phase
     IHttpSessionCacheService cacheService = SERVICES.getService(IHttpSessionCacheService.class);
@@ -121,7 +120,7 @@ public class ServerJobServletFilter implements Filter {
       synchronized (req.getSession()) {
         serverSession = (IServerSession) cacheService.get(IServerSession.class.getName(), req, res); // double checking
         if (serverSession == null) {
-          serverSession = provideServerSession(jobInput);
+          serverSession = provideServerSession(runContext);
           cacheService.put(IServerSession.class.getName(), serverSession, req, res);
         }
       }
@@ -132,13 +131,13 @@ public class ServerJobServletFilter implements Filter {
   /**
    * Method invoked to provide a new {@link IServerSession} for the current HTTP-request.
    *
-   * @param input
-   *          context information about the ongoing HTTP-request.
+   * @param runContext
+   *          <code>RunContext</code> with information about the ongoing HTTP-request.
    * @return {@link IServerSession}; must not be <code>null</code>.
    */
-  protected IServerSession provideServerSession(final ServerJobInput input) throws ProcessingException {
-    final IServerSession serverSession = OBJ.get(ServerSessionProvider.class).provide(input);
-    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(input.getServletRequest(), input.getServletResponse()));
+  protected IServerSession provideServerSession(final ServerRunContext runContext) throws ProcessingException {
+    final IServerSession serverSession = OBJ.get(ServerSessionProvider.class).provide(runContext);
+    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(runContext.servletRequest(), runContext.servletResponse()));
     return serverSession;
   }
 
@@ -156,18 +155,18 @@ public class ServerJobServletFilter implements Filter {
   }
 
   /**
-   * Method invoked to continue chain on behalf of a server job.
+   * Method invoked to continue the chain on behalf of the given <code>RunContext</code>.
    *
-   * @param input
-   *          input to be used to run the server job with current context information set.
+   * @param runContext
+   *          <code>RunContext</code> with information about the ongoing HTTP-request.
    */
-  protected void continueChainInServerJob(final FilterChain chain, final ServerJobInput input) throws ProcessingException {
+  protected void continueChain(final FilterChain chain, final ServerRunContext runContext) throws ProcessingException {
     ServerJobs.runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        chain.doFilter(input.getServletRequest(), input.getServletResponse());
+        chain.doFilter(runContext.servletRequest(), runContext.servletResponse());
       }
-    }, input);
+    }, ServerJobs.newInput(runContext));
   }
 }

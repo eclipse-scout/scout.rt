@@ -17,11 +17,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -55,7 +55,7 @@ public class JobManagerTest {
       public void run() throws Exception {
         latch.countDownAndBlock();
       }
-    }, JobInput.fillCurrent());
+    }, Jobs.newInput(RunContexts.copyCurrent()));
 
     IFuture<Void> future2 = m_jobManager.schedule(new IRunnable() {
 
@@ -63,7 +63,7 @@ public class JobManagerTest {
       public void run() throws Exception {
         latch.countDownAndBlock();
       }
-    }, JobInput.fillCurrent());
+    }, Jobs.newInput(RunContexts.copyCurrent()));
 
     IFuture<Void> future3 = m_jobManager.schedule(new IRunnable() {
 
@@ -71,7 +71,7 @@ public class JobManagerTest {
       public void run() throws Exception {
         latch.countDownAndBlock();
       }
-    }, JobInput.fillCurrent());
+    }, Jobs.newInput(RunContexts.copyCurrent()));
 
     assertTrue(latch.await());
 
@@ -111,7 +111,7 @@ public class JobManagerTest {
           verifyLatch.countDown();
         }
       }
-    }, JobInput.fillCurrent());
+    }, Jobs.newInput(RunContexts.copyCurrent()));
 
     m_jobManager.schedule(new IRunnable() {
 
@@ -127,7 +127,7 @@ public class JobManagerTest {
           verifyLatch.countDown();
         }
       }
-    }, JobInput.fillCurrent());
+    }, Jobs.newInput(RunContexts.copyCurrent()));
 
     m_jobManager.schedule(new IRunnable() {
 
@@ -143,7 +143,7 @@ public class JobManagerTest {
           verifyLatch.countDown();
         }
       }
-    }, JobInput.fillCurrent());
+    }, Jobs.newInput(RunContexts.copyCurrent()));
 
     assertTrue(setupLatch.await());
 
@@ -154,24 +154,5 @@ public class JobManagerTest {
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.hashSet("interrupted-1", "interrupted-2", "interrupted-3"), protocol);
-  }
-
-  @Test(expected = AssertionException.class)
-  public void testValidateInput() {
-    new _JobManager().validate(null);
-  }
-
-  private class _JobManager extends JobManager {
-
-    @Override
-    protected void validate(JobInput input) {
-      super.validate(input);
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-      shutdown();
-      super.finalize();
-    }
   }
 }

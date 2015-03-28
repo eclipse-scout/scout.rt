@@ -59,7 +59,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.IBusyManagerService;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -481,7 +481,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
           desktop.getUIFacade().fireDesktopOpenedFromUI();
           desktop.getUIFacade().fireGuiAttached();
         }
-      }, ModelJobInput.fillCurrent().session(session));
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(session)));
     }
     attachBusyHandler();
   }

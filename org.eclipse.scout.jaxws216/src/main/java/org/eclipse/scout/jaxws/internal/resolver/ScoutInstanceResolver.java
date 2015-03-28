@@ -22,8 +22,8 @@ import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.jaxws.internal.JaxWsHelper;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.ServerJobs;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 
 import com.sun.xml.internal.ws.api.message.Packet;
 import com.sun.xml.internal.ws.api.server.Invoker;
@@ -74,7 +74,7 @@ public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
       final IServerSession serverSession = Assertions.assertNotNull(JaxWsHelper.getContextSession(m_context.getMessageContext()), "server-session must not be null");
 
       try {
-        return invokeInServerJob(ServerJobInput.fillCurrent().name("JAX-WS request").session(serverSession).subject(subject), portType, method, args);
+        return invokePortTypeMethod(ServerRunContexts.copyCurrent().session(serverSession).subject(subject), portType, method, args);
       }
       catch (ProcessingException e) {
         Throwable cause = e.getCause();
@@ -98,16 +98,16 @@ public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
     }
 
     /**
-     * Method invoked to invoke the port-type method on behalf of a server job.
+     * Method invoked to invoke the port-type method on behalf of the given <code>RunContext</code>.
      */
-    protected Object invokeInServerJob(ServerJobInput input, final T portType, final Method method, final Object... args) throws ProcessingException {
-      return ServerJobs.runNow(new ICallable<Object>() {
+    protected Object invokePortTypeMethod(ServerRunContext runContext, final T portType, final Method method, final Object... args) throws ProcessingException {
+      return runContext.call(new ICallable<Object>() {
 
         @Override
         public Object call() throws Exception {
           return method.invoke(portType, args);
         }
-      }, input);
+      });
     }
   }
 }

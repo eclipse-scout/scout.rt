@@ -15,8 +15,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
-import org.eclipse.scout.rt.platform.job.internal.callable.ApplyRunContextCallable;
+import org.eclipse.scout.rt.platform.job.internal.callable.RunContextCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.HandleExceptionCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.ThreadNameDecorator;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -42,7 +43,7 @@ public class JobCallableChainTest {
    */
   @Test
   public void testCallableChain() throws Exception {
-    ICallable<Void> actualCallable = new _JobManager().interceptCallable(m_targetCallable, JobInput.fillEmpty());
+    ICallable<Void> actualCallable = new _JobManager().interceptCallable(m_targetCallable, Jobs.newInput(RunContexts.empty()));
 
     // 1. HandleExceptionCallable
     HandleExceptionCallable c1 = getFirstAndAssert(actualCallable, HandleExceptionCallable.class);
@@ -50,8 +51,8 @@ public class JobCallableChainTest {
     // 2. ThreadNameDecorator
     ThreadNameDecorator c2 = getNextAndAssert(c1, ThreadNameDecorator.class);
 
-    // 3. ApplyContextCallable
-    ApplyRunContextCallable c3 = getNextAndAssert(c2, ApplyRunContextCallable.class);
+    // 3. RunContextCallable
+    RunContextCallable c3 = getNextAndAssert(c2, RunContextCallable.class);
 
     // 4. Target
     assertSame(m_targetCallable, c3.getNext());
@@ -72,7 +73,7 @@ public class JobCallableChainTest {
       }
     };
 
-    ICallable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, JobInput.fillEmpty());
+    ICallable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, Jobs.newInput(RunContexts.empty()));
 
     // 1. HandleExceptionCallable
     HandleExceptionCallable c1 = getFirstAndAssert(actualCallable, HandleExceptionCallable.class);
@@ -80,8 +81,8 @@ public class JobCallableChainTest {
     // 2. ThreadNameDecorator
     ThreadNameDecorator c2 = getNextAndAssert(c1, ThreadNameDecorator.class);
 
-    // 3. ApplyContextCallable
-    ApplyRunContextCallable c3 = getNextAndAssert(c2, ApplyRunContextCallable.class);
+    // 3. RunContextCallable
+    RunContextCallable c3 = getNextAndAssert(c2, RunContextCallable.class);
 
     // 4. Contribution1
     Contribution1 c4 = getNextAndAssert(c3, Contribution1.class);
@@ -108,7 +109,7 @@ public class JobCallableChainTest {
       }
     };
 
-    ICallable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, JobInput.fillEmpty());
+    ICallable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, Jobs.newInput(RunContexts.empty()));
 
     // 1. Contribution1
     Contribution1 c1 = getFirstAndAssert(actualCallable, Contribution1.class);
@@ -122,8 +123,8 @@ public class JobCallableChainTest {
     // 4. ThreadNameDecorator
     ThreadNameDecorator c4 = getNextAndAssert(c3, ThreadNameDecorator.class);
 
-    // 5. ApplyContextCallable
-    ApplyRunContextCallable c5 = getNextAndAssert(c4, ApplyRunContextCallable.class);
+    // 5. RunContextCallable
+    RunContextCallable c5 = getNextAndAssert(c4, RunContextCallable.class);
 
     // 6. Target
     assertSame(m_targetCallable, c5.getNext());

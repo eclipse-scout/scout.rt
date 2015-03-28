@@ -16,7 +16,6 @@ import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -63,7 +62,6 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 public class ServerRunContext extends RunContext {
 
   protected IServerSession m_session;
-  protected boolean m_sessionRequired;
   protected HttpServletRequest m_servletRequest;
   protected HttpServletResponse m_servletResponse;
   protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
@@ -71,57 +69,39 @@ public class ServerRunContext extends RunContext {
   private boolean m_transactional;
 
   @Override
-  public void validate() {
-    super.validate();
-    if (isSessionRequired()) {
-      Assertions.assertNotNull(m_session, "ServerSession must not be null");
-    }
-  }
-
-  @Override
   protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next) {
     final ITransaction tx = OBJ.get(ITransactionProvider.class).provide(m_transactionId);
 
     final ICallable<RESULT> c9 = new TwoPhaseTransactionBoundaryCallable<>(next, tx);
     final ICallable<RESULT> c8 = new InitThreadLocalCallable<>(c9, ITransaction.CURRENT, tx);
-    final ICallable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ScoutTexts.CURRENT, (getSession() != null ? getSession().getTexts() : ScoutTexts.CURRENT.get()));
-    final ICallable<RESULT> c6 = new InitThreadLocalCallable<>(c7, UserAgent.CURRENT, getUserAgent());
-    final ICallable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ISession.CURRENT, getSession());
-    final ICallable<RESULT> c4 = new InitThreadLocalCallable<>(c5, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, getServletResponse());
-    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, getServletRequest());
+    final ICallable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
+    final ICallable<RESULT> c6 = new InitThreadLocalCallable<>(c7, UserAgent.CURRENT, userAgent());
+    final ICallable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ISession.CURRENT, session());
+    final ICallable<RESULT> c4 = new InitThreadLocalCallable<>(c5, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, servletResponse());
+    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, servletRequest());
     final ICallable<RESULT> c2 = new InitThreadLocalCallable<>(c3, OfflineState.CURRENT, OfflineState.CURRENT.get());
     final ICallable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;
   }
 
-  public IServerSession getSession() {
+  public IServerSession session() {
     return m_session;
   }
 
   /**
-   * Sets the session.<br/>
-   * <strong>There are no other values derived from the given session, meaning that {@link Subject}, {@link Locale} and
-   * {@link UserAgent} must be set accordingly.</strong>
+   * Sets the session with its {@link Subject} if not set yet. The session's {@link Locale} and {@link UserAgent} are
+   * not set.
    */
   public ServerRunContext session(final IServerSession session) {
     m_session = session;
+    if (session != null) {
+      m_subject.set(session.getSubject(), false);
+    }
     return this;
   }
 
-  public boolean isSessionRequired() {
-    return m_sessionRequired;
-  }
-
-  /**
-   * Set to <code>false</code> if the context does not require a session. By default, a session is required.
-   */
-  public ServerRunContext sessionRequired(final boolean sessionRequired) {
-    m_sessionRequired = sessionRequired;
-    return this;
-  }
-
-  public HttpServletRequest getServletRequest() {
+  public HttpServletRequest servletRequest() {
     return m_servletRequest;
   }
 
@@ -130,7 +110,7 @@ public class ServerRunContext extends RunContext {
     return this;
   }
 
-  public HttpServletResponse getServletResponse() {
+  public HttpServletResponse servletResponse() {
     return m_servletResponse;
   }
 
@@ -139,7 +119,7 @@ public class ServerRunContext extends RunContext {
     return this;
   }
 
-  public UserAgent getUserAgent() {
+  public UserAgent userAgent() {
     return m_userAgent.get();
   }
 
@@ -148,7 +128,7 @@ public class ServerRunContext extends RunContext {
     return this;
   }
 
-  public long getTransactionId() {
+  public long transactionId() {
     return m_transactionId;
   }
 
@@ -157,7 +137,7 @@ public class ServerRunContext extends RunContext {
     return this;
   }
 
-  public boolean isTransactional() {
+  public boolean transactional() {
     return m_transactional;
   }
 
@@ -179,15 +159,14 @@ public class ServerRunContext extends RunContext {
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("subject", getSubject());
-    builder.attr("locale", getLocale());
-    builder.ref("session", getSession());
-    builder.attr("sessionRequired", isSessionRequired());
-    builder.attr("userAgent", getUserAgent());
-    builder.ref("servletRequest", getServletRequest());
-    builder.ref("servletResponse", getServletResponse());
-    builder.ref("transactionId", getTransactionId());
-    builder.ref("transactional", isTransactional());
+    builder.attr("subject", subject());
+    builder.attr("locale", locale());
+    builder.ref("session", session());
+    builder.attr("userAgent", userAgent());
+    builder.ref("servletRequest", servletRequest());
+    builder.ref("servletResponse", servletResponse());
+    builder.ref("transactionId", transactionId());
+    builder.ref("transactional", transactional());
     return builder.toString();
   }
 
@@ -195,16 +174,15 @@ public class ServerRunContext extends RunContext {
 
   @Override
   protected void copyValues(final RunContext origin) {
-    final ServerRunContext originSRC = (ServerRunContext) origin;
+    final ServerRunContext originRunContext = (ServerRunContext) origin;
 
-    super.copyValues(originSRC);
-    m_session = originSRC.m_session;
-    m_sessionRequired = originSRC.m_sessionRequired;
-    m_userAgent = originSRC.m_userAgent;
-    m_servletRequest = originSRC.m_servletRequest;
-    m_servletResponse = originSRC.m_servletResponse;
-    m_transactionId = originSRC.m_transactionId;
-    m_transactional = originSRC.m_transactional;
+    super.copyValues(originRunContext);
+    m_session = originRunContext.m_session;
+    m_userAgent = originRunContext.m_userAgent.copy();
+    m_servletRequest = originRunContext.m_servletRequest;
+    m_servletResponse = originRunContext.m_servletResponse;
+    m_transactionId = originRunContext.m_transactionId;
+    m_transactional = originRunContext.m_transactional;
   }
 
   @Override
@@ -215,7 +193,6 @@ public class ServerRunContext extends RunContext {
     m_servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
     m_transactionId = ITransaction.TX_ZERO_ID;
     m_transactional = true;
-    m_sessionRequired = false;
     session(ServerSessionProvider.currentSession()); // method call to derive other values.
   }
 
@@ -227,7 +204,6 @@ public class ServerRunContext extends RunContext {
     m_servletResponse = null;
     m_transactionId = ITransaction.TX_ZERO_ID;
     m_transactional = true;
-    m_sessionRequired = false;
     session(null); // method call to derive other values.
   }
 

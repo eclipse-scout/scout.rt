@@ -27,7 +27,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.jaxws.annotation.ScoutTransaction;
 import org.eclipse.scout.jaxws.annotation.ScoutWebService;
 import org.eclipse.scout.jaxws.internal.JaxWsHelper;
@@ -35,8 +34,7 @@ import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticator;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
-import org.eclipse.scout.rt.server.job.ServerJobs;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 
 import com.sun.xml.internal.ws.api.WSBinding;
 import com.sun.xml.internal.ws.api.pipe.ClientTubeAssemblerContext;
@@ -139,7 +137,13 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
           final MessageContext messageContext = Assertions.assertNotNull((MessageContext) args[0], "message context must not be null");
           final IServerSession serverSession = Assertions.assertNotNull(JaxWsHelper.getContextSession(messageContext), "Missig server-session on message context [messageContext=%s]", messageContext);
 
-          return ScoutTubelineAssembler.this.invokeInServerJob(ServerJobInput.fillCurrent().name("JAX-WS TX-Handler").session(serverSession), handler, method, args);
+          return ServerRunContexts.copyCurrent().session(serverSession).call(new ICallable<Object>() {
+
+            @Override
+            public Object call() throws Exception {
+              return method.invoke(handler, args);
+            }
+          });
         }
         else {
           return method.invoke(handler, args);
@@ -195,30 +199,6 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
     }
     else {
       return OBJ.get(authenticatorClass);
-    }
-  }
-
-  /**
-   * Method invoked to run the given method on behalf of a new server job.
-   */
-  @Internal
-  protected Object invokeInServerJob(final ServerJobInput input, final Object object, final Method method, final Object[] args) throws Throwable {
-    try {
-      return ServerJobs.runNow(new ICallable<Object>() {
-
-        @Override
-        public Object call() throws Exception {
-          try {
-            return method.invoke(object, args); // InvocationTargetException is unpacked in server-job.
-          }
-          catch (ReflectiveOperationException e) {
-            throw new WebServiceException("Failed to invoke proxy method", e);
-          }
-        }
-      }, input);
-    }
-    catch (final ProcessingException e) {
-      throw e.getCause(); // propagate the real cause.
     }
   }
 }

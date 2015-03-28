@@ -31,6 +31,8 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldBrowseNewChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldFilterBrowseLookupResultChain;
@@ -44,7 +46,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAs
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldPrepareRecLookupChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldPrepareTextLookupChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IContentAssistFieldExtension;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
@@ -1001,7 +1002,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     ILookupCallFetcher<LOOKUP_KEY> internalFetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
       public void dataFetched(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final ProcessingException failed) {
-        IRunnable scoutSyncJob = new IRunnable() {
+        IRunnable lookupRunnable = new IRunnable() {
           @Override
           public void run() throws Exception {
             if (failed == null) {
@@ -1020,13 +1021,13 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           }
         };
 
-        ModelJobInput input = ModelJobInput.fillCurrent().session(session).name("Smartfield text lookup");
+        ClientRunContext runContext = ClientRunContexts.copyCurrent().session(session);
         if (background) {
-          ModelJobs.schedule(scoutSyncJob, input);
+          ModelJobs.schedule(lookupRunnable, ModelJobs.newInput(runContext).name("Smartfield text lookup"));
         }
         else {
           try {
-            ModelJobs.runNow(scoutSyncJob, input);
+            ModelJobs.runNow(lookupRunnable, ModelJobs.newInput(runContext).name("Smartfield text lookup"));
           }
           catch (ProcessingException e) {
             fetcher.dataFetched(null, e);
@@ -1109,7 +1110,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       @Override
       public void dataFetched(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final ProcessingException failed) {
 
-        IRunnable scoutSyncJob = new IRunnable() {
+        IRunnable lookupRunnable = new IRunnable() {
           @Override
           public void run() throws Exception {
             if (failed == null) {
@@ -1128,13 +1129,13 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           }
         };
 
-        ModelJobInput input = ModelJobInput.fillCurrent().session(session).name("ContentAssistField browse lookup");
+        ClientRunContext runContext = ClientRunContexts.copyCurrent().session(session);
         if (background) {
-          ModelJobs.schedule(scoutSyncJob, input);
+          ModelJobs.schedule(lookupRunnable, ModelJobs.newInput(runContext).name("ContentAssistField browse lookup"));
         }
         else {
           try {
-            ModelJobs.runNow(scoutSyncJob, input);
+            ModelJobs.runNow(lookupRunnable, ModelJobs.newInput(runContext).name("ContentAssistField browse lookup"));
           }
           catch (ProcessingException e) {
             fetcher.dataFetched(null, e);

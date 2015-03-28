@@ -8,24 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.job;
+package org.eclipse.scout.commons;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.job.JobInput;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Provider used in 'shared' Plug-Ins to work on concrete job inputs, e.g. for lookup calls.
+ * A visitor which collects all visited elements.
+ *
+ * @since 5.1
  */
-@ApplicationScoped
-public interface IJobInputProvider {
+public class CollectorVisitor<ELEMENT> implements IVisitor<ELEMENT> {
+
+  private final List<ELEMENT> m_elements;
+
+  public CollectorVisitor() {
+    m_elements = new ArrayList<>();
+  }
 
   /**
-   * Creates a job input with a "snapshot" of the current calling context.
+   * @return visited elements.
    */
-  JobInput defaults();
+  public List<ELEMENT> getElements() {
+    return m_elements;
+  }
 
-  /**
-   * Creates an empty job input.
-   */
-  JobInput empty();
+  @Override
+  public boolean visit(final ELEMENT element) {
+    m_elements.add(element);
+    return true;
+  }
 }

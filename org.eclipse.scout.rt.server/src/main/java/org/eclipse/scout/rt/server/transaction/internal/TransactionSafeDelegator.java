@@ -111,7 +111,7 @@ public class TransactionSafeDelegator {
   private String getCurrentJobName() {
     IFuture<?> future = IFuture.CURRENT.get();
     if (future != null) {
-      return future.getJobInput().getIdentifier();
+      return future.getJobInput().identifier();
     }
     else {
       return "";

@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -470,7 +470,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
                   closeMessageBox();
                 }
               }
-            }, dt, TimeUnit.MILLISECONDS, ClientJobInput.fillCurrent().name("Auto-close " + getTitle()));
+            }, dt, TimeUnit.MILLISECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("Auto-close %s", getTitle()));
           }
           // start sub event dispatch thread
           waitFor();

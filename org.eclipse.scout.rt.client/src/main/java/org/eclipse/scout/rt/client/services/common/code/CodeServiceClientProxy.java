@@ -30,7 +30,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
@@ -111,7 +111,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
               public void run() throws Exception {
                 reloadCodeTypes(notification.getCodeTypes());
               }
-            }, ModelJobInput.fillCurrent().name("Reload code types"));
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("Reload code types"));
           }
         }
       }

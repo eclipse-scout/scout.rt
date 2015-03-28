@@ -19,7 +19,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.session.ClientSessionProviderWithCache;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.Bean;
@@ -37,8 +37,8 @@ public class LoginTestClientSessionProvider extends ClientSessionProviderWithCac
   }
 
   @Override
-  public <SESSION extends IClientSession> SESSION provide(ModelJobInput input) throws ProcessingException {
-    SESSION clientSession = super.provide(input);
+  public <SESSION extends IClientSession> SESSION provide(ClientRunContext runContext) throws ProcessingException {
+    SESSION clientSession = super.provide(runContext);
     s_currentSession = clientSession;
     return clientSession;
   }

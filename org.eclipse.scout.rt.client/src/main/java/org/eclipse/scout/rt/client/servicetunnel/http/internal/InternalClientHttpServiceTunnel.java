@@ -18,7 +18,8 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
@@ -130,8 +131,8 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
         // cancel the old
         m_pollingJob.cancel(true);
       }
-      ClientJobInput input = ClientJobInput.fillCurrent().session(getSession()).name("Client notification fetcher");
-      m_pollingJob = ClientJobs.scheduleWithFixedDelay(new ClientNotificationPollingJob(), p, p, TimeUnit.MILLISECONDS, input);
+      ClientRunContext runContext = ClientRunContexts.copyCurrent().session(getSession());
+      m_pollingJob = ClientJobs.scheduleWithFixedDelay(new ClientNotificationPollingJob(), p, p, TimeUnit.MILLISECONDS, ClientJobs.newInput(runContext).name("Client notification fetcher"));
     }
     else {
       if (m_pollingJob != null) {
@@ -181,6 +182,6 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
 
   @Override
   protected IFuture<?> schedule(IRunnable runnable, IServiceTunnelRequest req) throws JobExecutionException {
-    return ClientJobs.schedule(runnable, ClientJobInput.fillCurrent().session(getSession()));
+    return ClientJobs.schedule(runnable, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(getSession())));
   }
 }

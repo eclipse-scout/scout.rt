@@ -23,7 +23,8 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
@@ -46,19 +47,17 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
     lazyInit(req, res);
 
     try {
-      // Create the job-input on behalf of which the server-job is run.
-      ServerJobInput input = ServerJobInput.fillEmpty();
-      input.name("DiagnosticServiceCall");
-      input.subject(subject);
-      input.servletRequest(req);
-      input.servletResponse(res);
-      input.locale(Locale.getDefault());
-      input.userAgent(UserAgent.createDefault());
-      input.session(lookupServerSessionOnHttpSession(input.copy()));
+      ServerRunContext runContext = ServerRunContexts.empty();
+      runContext.subject(subject);
+      runContext.servletRequest(req);
+      runContext.servletResponse(res);
+      runContext.locale(Locale.getDefault());
+      runContext.userAgent(UserAgent.createDefault());
+      runContext.session(lookupServerSessionOnHttpSession(runContext.copy()));
 
-      input = interceptServerJobInput(input);
+      runContext = interceptRunContext(runContext);
 
-      invokeDiagnosticServiceInServerJob(input);
+      invokeDiagnosticService(runContext);
 
     }
     catch (ProcessingException e) {
@@ -67,18 +66,19 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
   }
 
   /**
-   * Method invoked to delegate the HTTP request to the 'diagnostic service' on behalf of a server job.
+   * Method invoked to delegate the HTTP request to the 'diagnostic service'.
    *
-   * @param input
-   *          input to be used to run the server job with current context information set.
+   * @param runContext
+   *          <code>RunContext</code> with information about the ongoing HTTP-request to be used to invoke the
+   *          diagnostic service.
    */
-  protected void invokeDiagnosticServiceInServerJob(final ServerJobInput input) throws ProcessingException {
+  protected void invokeDiagnosticService(final ServerRunContext runContext) throws ProcessingException {
     ServerJobs.runNow(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        final HttpServletRequest request = input.getServletRequest();
-        final HttpServletResponse response = input.getServletResponse();
+        final HttpServletRequest request = runContext.servletRequest();
+        final HttpServletResponse response = runContext.servletResponse();
         final HttpSession httpSession = request.getSession();
         final String key = DiagnosticSession.class.getName();
 
@@ -89,6 +89,6 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
         }
         diagnosticSession.serviceRequest(request, response);
       }
-    }, input);
+    }, ServerJobs.newInput(runContext).name("DiagnosticServiceCall"));
   }
 }

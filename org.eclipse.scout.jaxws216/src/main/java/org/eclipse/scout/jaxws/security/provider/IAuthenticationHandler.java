@@ -23,7 +23,7 @@ import org.eclipse.scout.jaxws.internal.JaxWsConstants;
 import org.eclipse.scout.jaxws.internal.JaxWsHelper;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.job.ServerJobInput;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 
 /**
@@ -80,8 +80,7 @@ public interface IAuthenticationHandler extends SOAPHandler<SOAPMessageContext> 
           subject.getPrincipals().add(new SimplePrincipal(JaxWsConstants.USER_ANONYMOUS));
           subject.setReadOnly();
 
-          final ServerJobInput input = ServerJobInput.fillCurrent().name("JAX-WS Session").subject(subject);
-          final IServerSession serverSession = OBJ.get(ServerSessionProviderWithCache.class).provide(input);
+          final IServerSession serverSession = OBJ.get(ServerSessionProviderWithCache.class).provide(ServerRunContexts.copyCurrent().subject(subject));
           JaxWsHelper.setContextSession(context, serverSession);
           return true;
         }

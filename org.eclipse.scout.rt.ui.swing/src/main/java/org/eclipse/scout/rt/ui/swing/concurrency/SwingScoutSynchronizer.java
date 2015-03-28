@@ -15,7 +15,7 @@ import javax.swing.SwingUtilities;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
@@ -63,7 +63,7 @@ public class SwingScoutSynchronizer {
           j.run();
         }
       }
-    }, ModelJobInput.fillCurrent().session(m_env.getScoutSession()).name("Swing post::" + j));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_env.getScoutSession())).name("Swing post::%s", j));
     return future;
   }
 

@@ -8,26 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job;
+package org.eclipse.scout.rt.shared.job;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.context.RunContext;
 
 /**
- * Validator for {@link JobInput} used for jobs.
+ * Provider used in 'shared' Plug-Ins to work on concrete <code>RunContexts</code>, e.g. for lookup calls.
  *
  * @since 5.1
- * @see JobInput
- * @see RunContext
  */
 @ApplicationScoped
-public class JobInputValidator {
+public interface IRunContextProvider {
 
   /**
-   * Validates the given {@link JobInput} and {@link ClientRunContext}.
+   * Creates a "snapshot" of the current calling context.
    */
-  public void validate(final JobInput input) {
-    Assertions.assertNotNull(input, "'JobInput' must not be null");
-  }
+  RunContext copyCurrent();
+
+  /**
+   * Creates an empty <code>RunContext</code>.
+   */
+  RunContext empty();
 }

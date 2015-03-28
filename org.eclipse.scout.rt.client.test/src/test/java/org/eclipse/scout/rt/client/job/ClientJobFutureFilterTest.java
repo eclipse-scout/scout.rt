@@ -17,6 +17,8 @@ import static org.mockito.Mockito.when;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobFutureFilters;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -47,13 +49,13 @@ public class ClientJobFutureFilterTest {
   public void before() {
     MockitoAnnotations.initMocks(this);
 
-    ClientJobInput clientJobInput = ClientJobInput.fillEmpty().session(m_clientSession1);
+    JobInput clientJobInput = ClientJobs.newInput(ClientRunContexts.empty().session(m_clientSession1));
     when(m_clientJobFuture.getJobInput()).thenReturn(clientJobInput);
 
-    ModelJobInput modelJobInput = ModelJobInput.fillEmpty().session(m_clientSession1);
+    JobInput modelJobInput = ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1));
     when(m_modelJobFuture.getJobInput()).thenReturn(modelJobInput);
 
-    JobInput jobInput = JobInput.fillEmpty();
+    JobInput jobInput = Jobs.newInput(RunContexts.empty());
     when(m_jobFuture.getJobInput()).thenReturn(jobInput);
   }
 

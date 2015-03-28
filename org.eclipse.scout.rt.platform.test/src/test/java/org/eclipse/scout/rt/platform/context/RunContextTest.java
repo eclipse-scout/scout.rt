@@ -43,23 +43,23 @@ public class RunContextTest {
   @Test
   public void testEmpty() {
     RunContext runContext = RunContexts.empty();
-    assertNull(runContext.getSubject());
-    assertNull(runContext.getLocale());
-    assertTrue(toSet(runContext.getPropertyMap().iterator()).isEmpty());
+    assertNull(runContext.subject());
+    assertNull(runContext.locale());
+    assertTrue(toSet(runContext.propertyMap().iterator()).isEmpty());
   }
 
   @Test
   public void testCopy() {
     RunContext runContext = RunContexts.empty();
-    runContext.getPropertyMap().put("A", "B");
+    runContext.propertyMap().put("A", "B");
     runContext.subject(new Subject());
     runContext.locale(Locale.CANADA_FRENCH);
 
     RunContext copy = runContext.copy();
 
-    assertEquals(toSet(runContext.getPropertyMap().iterator()), toSet(copy.getPropertyMap().iterator()));
-    assertSame(runContext.getSubject(), copy.getSubject());
-    assertSame(runContext.getLocale(), copy.getLocale());
+    assertEquals(toSet(runContext.propertyMap().iterator()), toSet(copy.propertyMap().iterator()));
+    assertSame(runContext.subject(), copy.subject());
+    assertSame(runContext.locale(), copy.locale());
   }
 
   @Test
@@ -72,7 +72,7 @@ public class RunContextTest {
         return RunContexts.copyCurrent();
       }
     });
-    assertSame(subject, runContext.getSubject());
+    assertSame(subject, runContext.subject());
 
     runContext = Subject.doAs(null, new PrivilegedAction<RunContext>() {
 
@@ -81,7 +81,7 @@ public class RunContextTest {
         return RunContexts.copyCurrent();
       }
     });
-    assertNull(runContext.getSubject());
+    assertNull(runContext.subject());
   }
 
   @Test
@@ -92,24 +92,24 @@ public class RunContextTest {
     // No context on ThreadLocal
     PropertyMap.CURRENT.remove();
     assertNotNull(RunContexts.copyCurrent());
-    assertTrue(toSet(RunContexts.copyCurrent().getPropertyMap().iterator()).isEmpty());
+    assertTrue(toSet(RunContexts.copyCurrent().propertyMap().iterator()).isEmpty());
 
     // Context on ThreadLocal
     PropertyMap.CURRENT.set(propertyMap);
-    assertNotSame(propertyMap, RunContexts.copyCurrent().getPropertyMap()); // test for copy
-    assertEquals(toSet(propertyMap.iterator()), toSet(RunContexts.copyCurrent().getPropertyMap().iterator()));
+    assertNotSame(propertyMap, RunContexts.copyCurrent().propertyMap()); // test for copy
+    assertEquals(toSet(propertyMap.iterator()), toSet(RunContexts.copyCurrent().propertyMap().iterator()));
   }
 
   @Test
   public void testCurrentLocale() {
     NlsLocale.CURRENT.remove();
-    assertNull(RunContexts.copyCurrent().getLocale());
+    assertNull(RunContexts.copyCurrent().locale());
 
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.CANADA_FRENCH, RunContexts.copyCurrent().getLocale());
+    assertEquals(Locale.CANADA_FRENCH, RunContexts.copyCurrent().locale());
 
     NlsLocale.CURRENT.set(Locale.CANADA_FRENCH);
-    assertEquals(Locale.KOREAN, RunContexts.copyCurrent().locale(Locale.KOREAN).getLocale());
+    assertEquals(Locale.KOREAN, RunContexts.copyCurrent().locale(Locale.KOREAN).locale());
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

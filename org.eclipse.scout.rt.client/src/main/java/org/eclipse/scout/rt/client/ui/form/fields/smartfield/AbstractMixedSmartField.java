@@ -26,11 +26,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IMixedSmartFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.MixedSmartFieldChains.MixedSmartFieldConvertKeyToValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.MixedSmartFieldChains.MixedSmartFieldConvertValueToKeyChain;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
@@ -237,7 +237,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
                 filterKeyLookup(call, result);
                 return cleanupResultList(result);
               }
-            }, ClientJobInput.fillCurrent().name("Fetch smartfield data"));
+            }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("Fetch smartfield data"));
 
             ModelJobs.schedule(new IRunnable() {
               @Override

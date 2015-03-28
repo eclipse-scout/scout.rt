@@ -61,4 +61,11 @@ public class PreferredValue<VALUE> {
   public boolean isPreferred() {
     return m_preferred;
   }
+
+  /**
+   * @return a shallow copy of <code>this</code> PreferredValue.
+   */
+  public PreferredValue<VALUE> copy() {
+    return new PreferredValue<>(m_value, m_preferred);
+  }
 }

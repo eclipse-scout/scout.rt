@@ -24,9 +24,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.shared.job.IJobInputProvider;
+import org.eclipse.scout.rt.shared.job.IRunContextProvider;
 import org.eclipse.scout.rt.shared.validate.annotations.MaxLength;
 import org.eclipse.scout.service.SERVICES;
 
@@ -338,7 +337,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      }, newJobInput("getDataByKeyInBackground"));
+      }, Jobs.newInput(OBJ.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByKeyInBackground", getClass().getName()));
     }
   }
 
@@ -395,7 +394,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      }, newJobInput("getDataByTextInBackground"));
+      }, Jobs.newInput(OBJ.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByTextInBackground", getClass().getName()));
     }
   }
 
@@ -452,7 +451,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      }, newJobInput("getDataByAllInBackground"));
+      }, Jobs.newInput(OBJ.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByAllInBackground", getClass().getName()));
     }
   }
 
@@ -508,12 +507,8 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      }, newJobInput("getDataByRecInBackground"));
+      }, Jobs.newInput(OBJ.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByRecInBackground", getClass().getName()));
     }
-  }
-
-  private JobInput newJobInput(String name) {
-    return OBJ.get(IJobInputProvider.class).defaults().name(String.format("%s.%s", getClass().getName(), name));
   }
 
   @Override

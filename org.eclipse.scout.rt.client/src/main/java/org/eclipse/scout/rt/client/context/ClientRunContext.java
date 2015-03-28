@@ -14,7 +14,6 @@ import java.util.Locale;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -54,34 +53,24 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 public class ClientRunContext extends RunContext {
 
   protected IClientSession m_session;
-  protected boolean m_sessionRequired;
   protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
 
   @Override
   protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next) {
-    final ICallable<RESULT> c4 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, (getSession() != null ? getSession().getTexts() : ScoutTexts.CURRENT.get()));
-    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(c4, UserAgent.CURRENT, getUserAgent());
-    final ICallable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, getSession());
+    final ICallable<RESULT> c4 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
+    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(c4, UserAgent.CURRENT, userAgent());
+    final ICallable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, session());
     final ICallable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;
   }
 
-  @Override
-  public void validate() {
-    super.validate();
-    if (isSessionRequired()) {
-      Assertions.assertNotNull(m_session, "ClientSession must not be null");
-    }
-  }
-
-  public IClientSession getSession() {
+  public IClientSession session() {
     return m_session;
   }
 
   /**
-   * Set the session and its {@link Locale}, {@link UserAgent} and {@link Subject} as derived values. Those derived
-   * values are only set if not explicitly set yet.
+   * Set the session with its {@link Locale}, {@link UserAgent} and {@link Subject} if not set yet.
    */
   public ClientRunContext session(final IClientSession session) {
     m_session = session;
@@ -93,19 +82,7 @@ public class ClientRunContext extends RunContext {
     return this;
   }
 
-  public boolean isSessionRequired() {
-    return m_sessionRequired;
-  }
-
-  /**
-   * Set to <code>false</code> if the context does not require a session. By default, a session is required.
-   */
-  public ClientRunContext sessionRequired(final boolean sessionRequired) {
-    m_sessionRequired = sessionRequired;
-    return this;
-  }
-
-  public UserAgent getUserAgent() {
+  public UserAgent userAgent() {
     return m_userAgent.get();
   }
 
@@ -127,11 +104,10 @@ public class ClientRunContext extends RunContext {
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("subject", getSubject());
-    builder.attr("locale", getLocale());
-    builder.ref("session", getSession());
-    builder.attr("sessionRequired", isSessionRequired());
-    builder.attr("userAgent", getUserAgent());
+    builder.attr("subject", subject());
+    builder.attr("locale", locale());
+    builder.ref("session", session());
+    builder.attr("userAgent", userAgent());
     return builder.toString();
   }
 
@@ -139,19 +115,17 @@ public class ClientRunContext extends RunContext {
 
   @Override
   protected void copyValues(final RunContext origin) {
-    final ClientRunContext originCRC = (ClientRunContext) origin;
+    final ClientRunContext originRunContext = (ClientRunContext) origin;
 
-    super.copyValues(originCRC);
-    m_userAgent = originCRC.m_userAgent;
-    m_sessionRequired = originCRC.m_sessionRequired;
-    m_session = originCRC.m_session;
+    super.copyValues(originRunContext);
+    m_userAgent = originRunContext.m_userAgent.copy();
+    m_session = originRunContext.m_session;
   }
 
   @Override
   protected void fillCurrentValues() {
     super.fillCurrentValues();
     m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
-    m_sessionRequired = false;
     session(ClientSessionProvider.currentSession()); // method call to derive other values.
   }
 
@@ -159,7 +133,6 @@ public class ClientRunContext extends RunContext {
   protected void fillEmptyValues() {
     super.fillEmptyValues();
     m_userAgent = new PreferredValue<>(null, true); // null as preferred UserAgent
-    m_sessionRequired = false;
     session(null); // method call to derive other values.
   }
 

@@ -15,6 +15,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,26 +31,26 @@ public class JobInputTest {
 
   @Test
   public void testCopy() {
-    JobInput input = JobInput.fillEmpty();
+    JobInput input = Jobs.newInput(RunContexts.empty());
     input.name("name");
     input.id("123");
 
     JobInput copy = input.copy();
 
-    assertNotSame(input.getRunContext(), copy.getRunContext());
-    assertEquals(input.getName(), copy.getName());
-    assertEquals(input.getId(), copy.getId());
+    assertNotSame(input.runContext(), copy.runContext());
+    assertEquals(input.name(), copy.name());
+    assertEquals(input.id(), copy.id());
   }
 
   @Test
   public void testFillCurrentName() {
-    assertNull(JobInput.fillCurrent().getName());
-    assertEquals("ABC", JobInput.fillCurrent().name("ABC").getName());
+    assertNull(Jobs.newInput(RunContexts.copyCurrent()).name());
+    assertEquals("ABC", Jobs.newInput(RunContexts.copyCurrent()).name("ABC").name());
   }
 
   @Test
   public void testFillCurrentId() {
-    assertNull(JobInput.fillCurrent().getId());
-    assertEquals("123", JobInput.fillCurrent().id("123").getId());
+    assertNull(Jobs.newInput(RunContexts.copyCurrent()).id());
+    assertEquals("123", Jobs.newInput(RunContexts.copyCurrent()).id("123").id());
   }
 }

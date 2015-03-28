@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.job;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -124,9 +126,22 @@ public class ServerJobsTest {
     assertTrue(ServerJobs.isServerJob(actualFutureHolder.getValue()));
   }
 
-  @Test(expected = AssertionException.class)
+  @Test
   public void testScheduleWithoutInputWithoutSession() throws ProcessingException {
     ISession.CURRENT.set(null);
     ServerJobs.schedule(mock(IRunnable.class));
+  }
+
+  @Test
+  public void testNewInput() {
+    ServerRunContext runContext = ServerRunContexts.empty();
+
+    assertSame(runContext, ServerJobs.newInput(runContext).runContext());
+    assertEquals("scout-server-thread", ServerJobs.newInput(runContext).threadName());
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testNewInputNullInput() {
+    ServerJobs.newInput(null);
   }
 }

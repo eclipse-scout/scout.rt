@@ -36,7 +36,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardConsumer;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
@@ -64,7 +64,7 @@ public class SwingScoutClipboardService extends AbstractService implements IClip
               public void run() throws Exception {
                 clipboardConsumer.consume(transferObjects);
               }
-            }, ModelJobInput.fillCurrent().session(clientSession));
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession)));
           }
           catch (Throwable t) {
             LOG.debug("Cannot get system clipboard's contents", t);

@@ -96,7 +96,7 @@ public class SwingProgressHandler {
     }
     else {
       m_jobRunning = true;
-      m_monitorProps = new MonitorProperties(0, future.getJobInput().getIdentifier(), ""); //TODO: more progress required?
+      m_monitorProps = new MonitorProperties(0, future.getJobInput().identifier(), "");
     }
     fireStateChanged();
   }
