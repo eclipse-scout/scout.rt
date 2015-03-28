@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.ui.html.JobUtility;
@@ -48,7 +48,7 @@ public class JsonEventProcessor {
           processEvent(event, response);
         }
       }
-    }, ModelJobInput.fillCurrent().session(m_jsonSession.getClientSession()).name("event-processing"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_jsonSession.getClientSession())).name("event-processing"));
 
     // Wait for all events to be processed. It is not sufficient to only wait for the Future to complete, because other jobs might be started as well.
     JobUtility.awaitModelJobs(future);

@@ -35,7 +35,9 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -100,8 +102,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
       @Override
       public boolean accept(JobEvent event) {
-        final ModelJobInput jobInput = (ModelJobInput) event.getFuture().getJobInput();
-        return jobInput.getSession() == getClientSession() && !isProcessingClientRequest();
+        ClientRunContext runContext = (ClientRunContext) event.getFuture().getJobInput().runContext();
+        return runContext.session() == getClientSession() && !isProcessingClientRequest();
       }
     }), this);
   }
@@ -301,7 +303,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   protected IClientSession createClientSession(Locale locale, UserAgent userAgent) {
     try {
-      return OBJ.get(ClientSessionProvider.class).provide(ModelJobInput.fillEmpty().locale(locale).userAgent(userAgent));
+      return OBJ.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().locale(locale).userAgent(userAgent));
     }
     catch (ProcessingException e) {
       throw new JsonException("Error while creating new client session for clientSessionId=" + m_clientSessionId, e);
@@ -325,7 +327,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   protected void initializeJsonClientSession(IClientSession clientSession) {
     m_jsonClientSession = (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
-    JobUtility.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(clientSession), new IRunnable() {
+    JobUtility.runAsModelJobAndAwait(ClientRunContexts.copyCurrent().session(clientSession), new IRunnable() {
       @Override
       public void run() throws Exception {
         m_jsonClientSession.startUp();
@@ -633,7 +635,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   protected JSONObject jsonResponseToJson() {
     // Because the model might be accessed during toJson(), we have to execute it in a model job
-    return JobUtility.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(getClientSession()), new ICallable<JSONObject>() {
+    return JobUtility.runAsModelJobAndAwait(ClientRunContexts.copyCurrent().session(getClientSession()), new ICallable<JSONObject>() {
       @Override
       public JSONObject call() throws Exception {
         return currentJsonResponse().toJson();
@@ -702,7 +704,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
       // Dispose model (if session was not already stopped earlier by itself)
       if (m_clientSession.isActive()) {
-        JobUtility.runAsModelJobAndAwait(ModelJobInput.fillCurrent().session(m_clientSession), new IRunnable() {
+        JobUtility.runAsModelJobAndAwait(ClientRunContexts.copyCurrent().session(m_clientSession), new IRunnable() {
 
           @Override
           public void run() throws Exception {
@@ -743,7 +745,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public void changed(JobEvent event) {
-    LOG.trace("Job done. Name=" + event.getFuture().getJobInput().getName() + ". Notify waiting requests...");
+    LOG.trace("Job done. Name=" + event.getFuture().getJobInput().name() + ". Notify waiting requests...");
     notifyPollingBackgroundJobRequests();
   }
 }

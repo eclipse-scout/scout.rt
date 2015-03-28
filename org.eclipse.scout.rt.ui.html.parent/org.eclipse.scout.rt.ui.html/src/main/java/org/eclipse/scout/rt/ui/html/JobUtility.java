@@ -7,8 +7,8 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJobInput;
-import org.eclipse.scout.rt.client.job.ModelJobInput;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -35,7 +35,8 @@ public final class JobUtility {
    *           processing exception.
    */
   public static void awaitModelJobs(final IFuture<Void> future) {
-    final IClientSession session = Assertions.assertNotNull(((ClientJobInput) future.getJobInput()).getSession(), "client session must not be null");
+    Assertions.assertTrue(ClientJobs.isClientJob(future) || ModelJobs.isModelJob(future), "Future must be a client- or model job Future");
+    final IClientSession session = Assertions.assertNotNull(((ClientRunContext) future.getJobInput().runContext()).session(), "client session must not be null");
 
     boolean timeout;
     try {
@@ -67,8 +68,8 @@ public final class JobUtility {
    * Runs the given job in the model-thread. The calling thread can be the model thread itself, or any other
    * thread. This method blocks until the job completed, or enters a blocking condition.
    *
-   * @param input
-   *          ModelJobInput to run the job.
+   * @param runContext
+   *          RunContext to run the model job on behalf.
    * @param job
    *          job to be executed
    * @throws JsonException
@@ -76,17 +77,17 @@ public final class JobUtility {
    *           processing exception.
    * @return the job's result.
    */
-  public static <RESULT> RESULT runAsModelJobAndAwait(final ModelJobInput input, final IExecutable<RESULT> job) {
+  public static <RESULT> RESULT runAsModelJobAndAwait(final ClientRunContext runContext, final IExecutable<RESULT> job) {
     if (ModelJobs.isModelThread()) {
       try {
-        return ModelJobs.runNow(job, input);
+        return ModelJobs.runNow(job, ModelJobs.newInput(runContext));
       }
       catch (final ProcessingException e) {
         throw new JsonException("Event processing failed [job=%s]", e, job.getClass().getName());
       }
     }
     else {
-      final IFuture<RESULT> future = ModelJobs.schedule(job, input);
+      final IFuture<RESULT> future = ModelJobs.schedule(job, ModelJobs.newInput(runContext));
       boolean timeout;
       try {
         timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().futures(future).notBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
