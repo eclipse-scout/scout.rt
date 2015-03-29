@@ -236,8 +236,24 @@ public final class Jobs {
   }
 
   /**
-   * Creates a {@link JobInput} which is optionally initialized with the given {@link ServerRunContext}. Use
-   * <code>null</code> for <code>runContext</code> to not run the job on behalf of a {@link RunContext}.
+   * Creates a {@link JobInput} which is optionally initialized with the given {@link RunContext}.
+   * <p/>
+   * A <code>JobInput</code> contains information about the job like its name and execution instructions, whereas a
+   * <code>RunContext</code> defines contextual values such as <code>Subject</code> and <code>Locale</code>. The context
+   * given to the <code>JobInput</code> is applied during the job's execution. A context is created as following:
+   *
+   * <pre>
+   * <code>
+   * // to create a "snapshot" of the current calling state
+   * RunContexts.copyCurrent();
+   * 
+   * // to create a "snapshot" of the current calling state, but with some values changed
+   * RunContexts.copyCurrent().subject(...).locale(Locale.US)
+   * 
+   * // to create an empty context with no values set
+   * RunContexts.empty();
+   * </code>
+   * </pre>
    */
   public static JobInput newInput(final RunContext runContext) {
     return OBJ.get(JobInput.class).runContext(runContext);

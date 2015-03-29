@@ -92,8 +92,7 @@ public final class ClientJobs {
    * this method continues to run in parallel. If the job is subject for mutual exclusion, the job only commence
    * execution once acquired the mutex.
    * <p/>
-   * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext} and requires a
-   * session to be set.
+   * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext}.
    * <p/>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
@@ -136,8 +135,7 @@ public final class ClientJobs {
    * this method continues to run in parallel. If the job is subject for mutual exclusion, the job only commence
    * execution once acquired the mutex.
    * <p/>
-   * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext} and requires a
-   * session to be set.
+   * The job manager will use a {@link JobInput} with a copy of the current {@link ClientRunContext}.
    * <p/>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
    * immediately block waiting for the job to complete, you can use constructions of the form
@@ -256,7 +254,25 @@ public final class ClientJobs {
   }
 
   /**
-   * Creates a {@link JobInput} initialized with the given {@link ClientRunContext}.
+   * Creates a {@link JobInput} initialized with the given {@link ClientRunContext}
+   * <p/>
+   * A <code>JobInput</code> contains information about the job like its name and execution instructions, whereas a
+   * <code>RunContext</code> defines contextual values such as <code>Subject</code>, <code>Locale</code>,
+   * <code>Session</code>, and more. The context given to the <code>JobInput</code> is applied during the job's
+   * execution. A context is created as following:
+   *
+   * <pre>
+   * <code>
+   * // to create a "snapshot" of the current calling state
+   * ClientRunContexts.copyCurrent();
+   * 
+   * // to create a "snapshot" of the current calling state, but with some values changed
+   * ClientRunContexts.copyCurrent().session(...).subject(...).locale(Locale.US)
+   * 
+   * // to create an empty context with no values set
+   * ClientRunContexts.empty();
+   * </code>
+   * </pre>
    */
   public static JobInput newInput(final ClientRunContext clientRunContext) {
     Assertions.assertNotNull(clientRunContext, "'RunContext' must not be null for client jobs");
