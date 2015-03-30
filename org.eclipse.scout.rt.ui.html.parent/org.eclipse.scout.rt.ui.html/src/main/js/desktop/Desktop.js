@@ -154,7 +154,6 @@ scout.Desktop.prototype._addTab = function(tab, prepend) {
   }.bind(this));
 
   this._allTabs.push(tab);
-  this._selectTab(tab);
 };
 
 scout.Desktop.prototype._isTabVisible = function(tab) {
@@ -258,6 +257,7 @@ scout.Desktop.prototype._renderDialog = function(dialog) {
 scout.Desktop.prototype._renderView = function(view) {
   var tab = new scout.Desktop.TabAndContent(view, view.title, view.subTitle);
   this._addTab(tab);
+  this._selectTab(tab);
   view.render(this.$bench);
 
   // FIXME CGU: maybe include in render?
@@ -311,11 +311,10 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
     return;
   }
 
+  this._outlineTab._update(content, title, subTitle);
   if (!this._isTabVisible(this._outlineTab)) {
     this._addTab(this._outlineTab, true);
   }
-
-  this._outlineTab._update(content, title, subTitle);
   this._updateTab(this._outlineTab);
   this._selectTab(this._outlineTab);
   //FIXME CGU create DesktopTable or OutlineTable
