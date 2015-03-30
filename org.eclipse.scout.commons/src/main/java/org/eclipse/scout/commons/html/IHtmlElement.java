@@ -25,4 +25,12 @@ public interface IHtmlElement extends CharSequence, IHtmlContent {
    */
   IHtmlElement style(CharSequence style);
 
+  /**
+   * Add an application local link
+   *
+   * @param path
+   *          path to identify what is the link referring to.
+   */
+  IHtmlElement appLink(CharSequence path);
+
 }

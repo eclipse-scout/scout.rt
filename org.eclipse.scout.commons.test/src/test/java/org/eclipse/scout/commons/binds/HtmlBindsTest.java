@@ -11,9 +11,9 @@
 package org.eclipse.scout.commons.binds;
 
 import static org.eclipse.scout.commons.html.HTML.bold;
+import static org.eclipse.scout.commons.html.HTML.cell;
 import static org.eclipse.scout.commons.html.HTML.div;
 import static org.eclipse.scout.commons.html.HTML.link;
-import static org.eclipse.scout.commons.html.HTML.cell;
 import static org.eclipse.scout.commons.html.HTML.row;
 import static org.junit.Assert.assertEquals;
 
@@ -60,6 +60,7 @@ public class HtmlBindsTest {
     assertEncodedText("td", binds.applyBindParameters(cell(binds.put(BIND_TEXT))));
     assertEncodedText("div", binds.applyBindParameters(div(binds.put(BIND_TEXT))));
     assertEncodedText("p", binds.applyBindParameters(HTML.p(binds.put(BIND_TEXT))));
+    assertEncodedText("span", binds.applyBindParameters(HTML.span(binds.put(BIND_TEXT))));
   }
 
   /**
@@ -83,6 +84,16 @@ public class HtmlBindsTest {
     assertEquals("<img src=\"logo.png\">", html);
   }
 
+  /**
+   * Test for {@link IHtmlElement#appLink(CharSequence)}
+   */
+  @Test
+  public void testAppLink() {
+    HtmlBinds binds = new HtmlBinds();
+    final IHtmlElement html = HTML.span(binds.put("Link Text")).appLink("domain=123&text=456");
+    assertEquals("<span class=\"hyperlink\" data-hyperlink=\"domain=123&text=456\">Link&nbsp;Text</span>", binds.applyBindParameters(html));
+  }
+
   @Test
   public void testTable() {
     HtmlBinds binds = new HtmlBinds();
@@ -95,7 +106,7 @@ public class HtmlBindsTest {
     HtmlBinds binds = new HtmlBinds();
     final IHtmlTable table = HTML.table(
         row(
-        cell(binds.put(BIND_TEXT)))
+            cell(binds.put(BIND_TEXT)))
         ).cellspacing(1).cellpadding(2);
 
     final String htmlString = binds.applyBindParameters(table);

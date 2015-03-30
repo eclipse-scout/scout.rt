@@ -78,7 +78,7 @@ public class HtmlNodeBuilder extends AbstractExpressionBuilder implements IHtmlE
   }
 
   protected void addAttribute(String name, int value) {
-    addAttribute(name, Integer.valueOf(value).toString());
+    addAttribute(name, Integer.toString(value));
   }
 
   protected void addAttribute(String name, CharSequence value) {
@@ -95,6 +95,13 @@ public class HtmlNodeBuilder extends AbstractExpressionBuilder implements IHtmlE
   @Override
   public IHtmlElement clazz(CharSequence clazz) {
     addAttribute("class", clazz);
+    return this;
+  }
+
+  @Override
+  public IHtmlElement appLink(CharSequence path) {
+    clazz("hyperlink");
+    addAttribute("data-hyperlink", path);
     return this;
   }
 

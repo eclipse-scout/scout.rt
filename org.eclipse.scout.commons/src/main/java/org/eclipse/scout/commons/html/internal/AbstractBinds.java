@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.html.IHtmlContent;
  * Contains bind variables (bindName, value) <br>
  * not thread safe
  */
-public class AbstractBinds {
+public abstract class AbstractBinds {
 
   /**
    * Internal map to store bind variables.
@@ -73,8 +73,8 @@ public class AbstractBinds {
    * @return a new bind name as <code>bindPrefix + sequenceId</code> for example <code>:b__0</code>
    */
   private String nextBindName() {
-    long nextId = m_sequenceId++;
-    String name = getBindName(nextId);
+    String name = getBindName(m_sequenceId);
+    m_sequenceId++;
     return name;
   }
 

@@ -27,6 +27,12 @@ import org.eclipse.scout.commons.html.internal.HtmlTableRowBuilder;
 public class HTML {
 
   /**
+   * Utility class
+   */
+  private HTML() {
+  }
+
+  /**
    * Create a html element with encoded text for &lt;b&gt;text&lt;/b&gt;.
    * <p>
    * Example:<br>
@@ -120,6 +126,16 @@ public class HTML {
    */
   public static IHtmlElement div(IHtmlContent... content) {
     return new HtmlNodeBuilder("div", content);
+  }
+
+  /**
+   * Create a html element with encoded text for &lt;span&gt;content&lt;/span&gt;.
+   *
+   * @param text
+   *          text as bind
+   */
+  public static IHtmlElement span(IHtmlContent text) {
+    return new HtmlNodeBuilder("span", text);
   }
 
   /**
