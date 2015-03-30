@@ -80,6 +80,11 @@ public class JsonProposalChooser extends AbstractJsonPropertyObserver<IProposalC
     }
   }
 
+  @Override
+  protected void detachModel() {
+    getJsonSession().currentJsonResponse().getEventList();
+  }
+
   private void handleActiveFilterChanged(JsonEvent event) {
     String state = event.getData().optString("state");
     getModel().updateActiveFilter(TriState.valueOf(state));

@@ -14,8 +14,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.CachingEnabled;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistFieldUIFacade;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -73,7 +71,7 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
     }
   }
 
-  // TODO AWE: (smart-field) event 'code-type neu laden' behandeln.
+  // FIXME AWE: (smart-field) event 'code-type neu laden' behandeln.
   // browser-seitige felder mit cachingEnabled neu laden evtl. nur wenn der Code-Type passt
 
   /**
@@ -94,8 +92,11 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
     if ("openProposal".equals(event.getType())) {
       handleUiOpenProposal(event);
     }
-    else if ("closeProposal".equals(event.getType())) {
-      handleUiCloseProposal();
+    else if ("proposalTyped".equals(event.getType())) {
+      handleUiProposalTyped(event);
+    }
+    else if ("cancelProposal".equals(event.getType())) {
+      handleUiCancelProposal();
     }
     else if ("acceptProposal".equals(event.getType())) {
       handleUiAcceptProposal(event);
@@ -105,42 +106,31 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
     }
   }
 
+  private void handleUiProposalTyped(JsonEvent event) {
+    String text = event.getData().optString("searchText");
+    getModel().getUIFacade().proposalTypedFromUI(text);
+  }
+
   private void handleUiAcceptProposal(JsonEvent event) {
-    IProposalChooser proposalChooser = getModel().getProposalChooser();
-    if (proposalChooser != null) { // in case the proposal chooser has been closed in the mean-time
-      addEventFilterForCloseProposal();
-      IContentAssistFieldUIFacade uiFacade = getModel().getUIFacade();
-      if (proposalChooser.getAcceptedProposal() != null) {
-        LOG.debug("handle acceptProposal. acceptedProposal=" + proposalChooser.getAcceptedProposal() + " -> acceptProposalFromUI");
-        uiFacade.acceptProposalFromUI();
-      }
-      else {
-        LOG.debug("handle acceptProposal. No accepted proposal -> closeProposalFromUI");
-        uiFacade.closeProposalFromUI();
-      }
-    }
+    String text = event.getData().optString("searchText");
+    getModel().getUIFacade().acceptProposalFromUI(text);
   }
 
-  private void handleUiCloseProposal() {
-    addEventFilterForCloseProposal();
-    getModel().getUIFacade().closeProposalFromUI();
-  }
-
-  private void addEventFilterForCloseProposal() {
-    addPropertyEventFilterCondition(IContentAssistField.PROP_PROPOSAL_CHOOSER, null);
+  private void handleUiCancelProposal() {
+    getModel().getUIFacade().cancelProposalChooserFromUI();
   }
 
   private void handleUiOpenProposal(JsonEvent event) {
     String searchText = event.getData().optString("searchText");
     boolean selectCurrentValue = event.getData().optBoolean("selectCurrentValue", false);
     LOG.debug("handle openProposal -> openProposalFromUI. searchText=" + searchText + " selectCurrentValue=" + selectCurrentValue);
-    getModel().getUIFacade().openProposalFromUI(searchText, selectCurrentValue);
+    getModel().getUIFacade().openProposalChooserFromUI(searchText);
   }
 
   @Override
   protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
     LOG.debug("handle displayText changed -> setTextFromUI. displayText=" + displayText + " whileTyping=" + whileTyping);
-    getModel().getUIFacade().setTextFromUI(displayText);
+    getModel().getUIFacade().setTextFromUI(displayText); // FIXME AWE: wird das überhaipt noch aufgerufen?
   }
 
   @Override

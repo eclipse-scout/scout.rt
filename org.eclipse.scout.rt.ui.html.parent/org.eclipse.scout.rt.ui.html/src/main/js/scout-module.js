@@ -155,6 +155,7 @@ __include("jquery-scout.js");
   __include("form/fields/smartfield/ProposalChooser.js");
   __include("form/fields/smartfield/ProposalChooserLayout.js");
   __include("form/fields/smartfield/SmartField.js");
+  __include("form/fields/smartfield/SmartFieldKeyStrokeAdapter.js");
   __include("form/fields/smartfield/SmartFieldMultiline.js");
   __include("form/fields/smartfield/SmartFieldMultilineLayout.js");
   __include("form/fields/splitbox/SplitBox.js");

@@ -13,6 +13,13 @@ scout.AbstractSmartField.prototype.init = function(model, session) {
   scout.AbstractSmartField.parent.prototype.init.call(this, model, session);
 };
 
+/**
+ * @override
+ */
+scout.AbstractSmartField.prototype._registerKeyStrokeAdapter = function() {
+  this.keyStrokeAdapter = new scout.SmartFieldKeyStrokeAdapter(this);
+};
+
 scout.AbstractSmartField.prototype._render = function($parent) {
   var cssClass = this.proposal ? 'proposal-field' : 'smart-field';
   this.addContainer($parent, cssClass);
@@ -161,7 +168,7 @@ scout.AbstractSmartField.prototype._filterOptions = function() {
     return;
   }
   this._selectedOption = -1;
-  this.session.send(this.id, 'openProposal', {
+  this.session.send(this.id, 'proposalTyped', {
     searchText: this._searchText(),
     selectCurrentValue: false});
 
@@ -183,7 +190,7 @@ scout.AbstractSmartField.prototype._getInputBounds = function() {
 };
 
 scout.AbstractSmartField.prototype._onFieldBlur = function() {
-//  scout.AbstractSmartField.parent.prototype._onFieldBlur.call(this);
+  // omit super call
   $.log.debug('AbstractSmartField#_onFieldBlur');
   this._closePopup();
 };
@@ -202,14 +209,10 @@ scout.AbstractSmartField.prototype._closePopup = function(notifyServer) {
   if (this._$popup) {
     notifyServer = notifyServer === undefined ? true : notifyServer;
     if (notifyServer) {
-      this.session.send(this.id, 'closeProposal');
+      this.session.send(this.id, 'cancelProposal');
     }
     this._$popup.remove();
     this._$popup = null;
-    if (this.proposalChooser) { // FIXME AWE: (smart-field) get rid of this if
-      this.proposalChooser.destroy();
-      this.proposalChooser = null;
-    }
   }
 };
 
@@ -234,8 +237,7 @@ scout.AbstractSmartField.prototype._setStatusText = function(vararg) {
 };
 
 scout.AbstractSmartField.prototype._searchText = function() {
-  var displayText = this.$field.val();
-  return scout.strings.hasText(displayText) ? displayText : '*';
+  return this.$field.val();
 };
 
 // FIXME AWE: (smart-field) an dieser stelle müssten wir auch die screen-boundaries berücksichtigen
@@ -249,10 +251,8 @@ scout.AbstractSmartField.prototype._openPopup = function() {
   if (this._$popup) {
     return false;
   } else {
-    // FIXME AWE: (smart-field) compare with Swing client when searchText is '*' and when it's == the
-    // display text. Asteriks means "browse all".
     this.session.send(this.id, 'openProposal', {
-      searchText: '*', // this._searchText(),
+      searchText: this._searchText(),
       selectCurrentValue: false});
 
     this._$popup = $.makeDiv('smart-field-popup')
@@ -295,4 +295,11 @@ scout.AbstractSmartField.prototype._resizePopup = function() {
   prefSize.height = Math.min(400, prefSize.height);
   $.log.debug('_resizePopup prefSize=' + prefSize);
   htmlPopup.setSize(prefSize);
+};
+
+/**
+ * @override
+ */
+scout.AbstractSmartField.prototype.acceptDisplayText = function() {
+  this._acceptProposal();
 };
