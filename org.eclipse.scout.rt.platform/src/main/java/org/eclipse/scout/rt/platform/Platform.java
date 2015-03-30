@@ -13,7 +13,10 @@ package org.eclipse.scout.rt.platform;
 import org.eclipse.scout.rt.platform.internal.PlatformImplementor;
 
 /**
- *
+ * This is the main scout platform, typically installed {@link Platform#setDefault()} and started
+ * {@link IPlatform#start()} from within a servlet listener.
+ * <p>
+ * Tests use a PlatformTestRunner
  */
 public final class Platform {
 

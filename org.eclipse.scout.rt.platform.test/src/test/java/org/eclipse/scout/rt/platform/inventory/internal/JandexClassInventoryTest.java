@@ -17,15 +17,15 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.internal.BeanFilter;
 import org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean;
+import org.jboss.jandex.Indexer;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class BeanScannerTest {
+public class JandexClassInventoryTest {
 
   @Test
   public void testJandex() throws Exception {
-    JandexInventoryBuilder finder = new JandexInventoryBuilder();
-
+    Indexer indexer = new Indexer();
     String basePath = TestingBean.class.getName().replace('.', '/');
     for (String path : new String[]{
         Bean.class.getName().replace('.', '/'),
@@ -43,10 +43,9 @@ public class BeanScannerTest {
         basePath + "$E1",
         basePath + "$A1",
     }) {
-      finder.handleClass(TestingBean.class.getClassLoader().getResource(path + ".class"));
+      indexer.index(TestingBean.class.getClassLoader().getResource(path + ".class").openStream());
     }
-    finder.finish();
-    JandexClassInventory classInventory = new JandexClassInventory(finder.getIndex());
+    JandexClassInventory classInventory = new JandexClassInventory(indexer.complete());
     final Set<Class> actual = new BeanFilter().collect(classInventory);
 
     Set<Class> expected = new HashSet<>();

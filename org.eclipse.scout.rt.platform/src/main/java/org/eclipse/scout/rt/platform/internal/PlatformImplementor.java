@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexClassInventory;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexInventoryBuilder;
-import org.jboss.jandex.Index;
+import org.jboss.jandex.IndexView;
 
 /**
  * @since 15.2
@@ -116,9 +116,8 @@ public class PlatformImplementor implements IPlatform {
 
       JandexInventoryBuilder beanFinder = new JandexInventoryBuilder();
       beanFinder.scanAllModules();
-      beanFinder.finish();
+      IndexView index = beanFinder.finish();
       long millis = (System.nanoTime() - t0) / 1000000L;
-      Index index = beanFinder.getIndex();
       LOG.info("created class inventory  in {0} ms", millis);
 
       return new JandexClassInventory(index);
