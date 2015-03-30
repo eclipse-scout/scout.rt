@@ -39,6 +39,7 @@ import org.junit.runner.RunWith;
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
+@SuppressWarnings("deprecation")
 public class ProposalFieldParseValueTest {
 
   private ProposalField m_proposalField = new ProposalField();
@@ -51,7 +52,7 @@ public class ProposalFieldParseValueTest {
   @Test
   public void testSingleMatch() throws ProcessingException {
     // single match
-    m_proposalField.getUIFacade().setTextFromUI("a");
+    m_proposalField.getUIFacadeLegacy().setTextFromUI("a");
     assertEquals("a", m_proposalField.getValue());
     // select proposal
     assertNotNull(m_proposalField.getProposalChooser());
@@ -65,7 +66,7 @@ public class ProposalFieldParseValueTest {
   @Test
   public void testMultiMatch() throws ProcessingException {
     // match with two elements
-    m_proposalField.getUIFacade().setTextFromUI("b");
+    m_proposalField.getUIFacadeLegacy().setTextFromUI("b");
     assertEquals("b", m_proposalField.getValue());
     assertNotNull(m_proposalField.getProposalChooser());
     assertEquals(2, m_proposalField.getProposalChooser().getSearchResult().getLookupRows().size());

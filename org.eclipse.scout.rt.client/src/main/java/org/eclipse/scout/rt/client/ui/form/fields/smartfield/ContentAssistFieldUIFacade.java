@@ -58,33 +58,41 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
 
   @Override
   public void cancelProposalChooserFromUI() {
-    System.out.println("cancelProposalChooserFromUI");
+    LOG.debug("cancelProposalChooserFromUI");
     assert m_field.isProposalChooserRegistered();
     m_field.unregisterProposalChooserInternal();
   }
 
   @Override
   public void acceptProposalFromUI(String text) {
-    String searchText = toSearchText(text);
     if (m_field.hasAcceptedProposal()) {
-      LOG.debug("acceptProposalFromUI -> acceptProposal");
+      LOG.debug("acceptProposalFromUI -> acceptProposal. acceptedProposal=" + m_field.getProposalChooser().getAcceptedProposal());
       m_field.setDisplayText(text);
       m_field.acceptProposal(m_field.getProposalChooser().getAcceptedProposal());
     }
     else {
+      String searchText = toSearchText(text);
       LOG.debug("acceptProposalFromUI, no accepted proposalsearchText -> parseValue searchText=" + searchText);
-      m_field.parseValue(searchText);
+      /* Covers these cases:
+       * 1. No valid proposal found for text: parseValue sets the error-status of the smart-field when text
+       *    is not a valid value. However, it also sets the display-text to null when the value is invalid,
+       *    that's why we must set the display-text again, when validation fails.
+       */
+      if (!m_field.parseValue(searchText)) {
+        m_field.setDisplayText(text);
+      }
     }
     m_field.unregisterProposalChooserInternal();
   }
 
   @Override
   public void setTextFromUI(String text) {
-    throw new IllegalStateException();
-//    String searchText = toSearchText(text);
-//    LOG.debug("setTextFromUI searchText=" + searchText);
-//    m_field.parseValue(searchText);
-//    m_field.unregisterProposalChooserInternal();
+    // throw new IllegalStateException();
+    // FIXME AWE: check / refactor / remove setTextFromUI
+    String searchText = toSearchText(text);
+    LOG.debug("setTextFromUI searchText=" + searchText);
+    m_field.parseValue(searchText);
+    m_field.unregisterProposalChooserInternal();
   }
 
 }

@@ -196,6 +196,7 @@ public class SmartFieldTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void testSmartfieldStyle() throws Throwable {
 
     StyleField f = m_form.getStyleField();
@@ -209,13 +210,13 @@ public class SmartFieldTest {
     f.setValue(null);
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
     //ui-side test
-    f.getUIFacade().setTextFromUI("Red");
+    f.getUIFacadeLegacy().setTextFromUI("Red");
     assertFieldStyle(f, ICON_FILE, "Red tooltip", "ff8888", "880000", "italic");
-    f.getUIFacade().setTextFromUI("Empty");
+    f.getUIFacadeLegacy().setTextFromUI("Empty");
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
-    f.getUIFacade().setTextFromUI("Yellow");
+    f.getUIFacadeLegacy().setTextFromUI("Yellow");
     assertFieldStyle(f, ICON_FILE, "Yellow tooltip", "ffff88", "888800", "italic");
-    f.getUIFacade().setTextFromUI(null);
+    f.getUIFacadeLegacy().setTextFromUI(null);
     assertFieldStyle(f, ICON_BOOKMARK, "Default tooltip", "000000", "cccccc", "bold");
     //proposal-side test
     f.acceptProposal(new LookupRow<Long>(10L, "Red", ICON_FILE, "Red tooltip", "ff8888", "880000", FontSpec.parse("italic")));

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
@@ -58,7 +59,7 @@ import org.eclipse.scout.service.SERVICES;
 public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY> implements IMixedSmartField<VALUE, LOOKUP_KEY> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMixedSmartField.class);
   private P_UIFacadeLegacy m_uiFacadeLegacy;
-  private volatile IFuture<List<ILookupRow<LOOKUP_KEY>>> m_backgroundJob;
+  private AtomicReference<IFuture<List<ILookupRow<LOOKUP_KEY>>>> m_backgroundJobFuture;
   private IContentAssistFieldUIFacade m_uiFacade;
 
   public AbstractMixedSmartField() {
@@ -97,6 +98,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
 
   @Override
   protected void initConfig() {
+    m_backgroundJobFuture = new AtomicReference<>();
     super.initConfig();
     m_uiFacadeLegacy = new P_UIFacadeLegacy();
     m_uiFacade = new ContentAssistFieldUIFacade<LOOKUP_KEY>(this);
@@ -180,7 +182,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   @Override
   public void applyLazyStyles() {
     // override: ensure that (async loading) lookup context has been set
-    if (m_backgroundJob != null && ModelJobs.isModelThread()) {
+    if (m_backgroundJobFuture.get() != null && ModelJobs.isModelThread()) {
       waitForLookupRows();
     }
   }
@@ -200,10 +202,11 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     /*
      * Ticket 76232
      */
-    if (m_backgroundJob != null) {
-      m_backgroundJob.cancel(true);
+    IFuture<List<ILookupRow<LOOKUP_KEY>>> backgroundJobFuture = m_backgroundJobFuture.get();
+    if (backgroundJobFuture != null) {
+      backgroundJobFuture.cancel(true);
     }
-    //
+
     // trivial case for null
     if (getCurrentLookupRow() == null) {
       if (validKey == null) {
@@ -238,14 +241,14 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
             final ILookupCall<LOOKUP_KEY> call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractMixedSmartField.this));
             prepareKeyLookup(call, interceptConvertValueToKey(validKey));
 
-            m_backgroundJob = ClientJobs.schedule(new ICallable<List<ILookupRow<LOOKUP_KEY>>>() {
+            m_backgroundJobFuture.set(ClientJobs.schedule(new ICallable<List<ILookupRow<LOOKUP_KEY>>>() {
               @Override
               public List<ILookupRow<LOOKUP_KEY>> call() throws Exception {
                 List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(call.getDataByKey());
                 filterKeyLookup(call, result);
                 return cleanupResultList(result);
               }
-            }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("Fetch smartfield data"));
+            }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("Fetch smart-field data")));
 
             ModelJobs.schedule(new IRunnable() {
               @Override
@@ -307,7 +310,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
         }
         if (proposalChooser != null &&
             (StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) ||
-                StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
+            StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
           /*
            * empty text means null
            */
@@ -406,11 +409,14 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   }
 
   private void waitForLookupRows() {
+    IFuture<List<ILookupRow<LOOKUP_KEY>>> backgroundJobFuture = m_backgroundJobFuture.get();
+    if (backgroundJobFuture == null) {
+      return;
+    }
     // here we are in the scout thread and simply need to wait until the
     // background thread finished fetching
     try {
-      List<ILookupRow<LOOKUP_KEY>> rows = m_backgroundJob.awaitDoneAndGet();
-      m_backgroundJob = null;
+      List<ILookupRow<LOOKUP_KEY>> rows = backgroundJobFuture.awaitDoneAndGet();
       if (CollectionUtility.hasElements(rows)) {
         installLookupRowContext(rows.get(0));
       }
@@ -420,6 +426,9 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     }
     catch (ProcessingException e) {
       LOG.error("Error loading smartfield data.", e);
+    }
+    finally {
+      m_backgroundJobFuture.set(null);
     }
   }
 

@@ -40,6 +40,7 @@ import org.junit.runner.RunWith;
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
+@SuppressWarnings("deprecation")
 public class SmartFieldParseValueTest {
 
   private SmartField m_smartField;
@@ -53,7 +54,7 @@ public class SmartFieldParseValueTest {
   @Test
   public void testSingleMatch() throws ProcessingException {
     // single match
-    m_smartField.getUIFacade().setTextFromUI("a");
+    m_smartField.getUIFacadeLegacy().setTextFromUI("a");
     assertEquals(Long.valueOf(1L), m_smartField.getValue());
     assertNull(m_smartField.getProposalChooser());
   }
@@ -61,7 +62,7 @@ public class SmartFieldParseValueTest {
   @Test
   public void testMultiMatch() throws ProcessingException {
     // match with two elements
-    m_smartField.getUIFacade().setTextFromUI("b");
+    m_smartField.getUIFacadeLegacy().setTextFromUI("b");
     assertNull(m_smartField.getValue());
     assertNotNull(m_smartField.getProposalChooser());
     assertEquals(2, m_smartField.getProposalChooser().getSearchResult().getLookupRows().size());
@@ -76,7 +77,7 @@ public class SmartFieldParseValueTest {
   @Test
   public void testNoMatch() throws ProcessingException {
     // single match
-    m_smartField.getUIFacade().setTextFromUI("c");
+    m_smartField.getUIFacadeLegacy().setTextFromUI("c");
     assertNull(m_smartField.getValue());
     assertNotNull(m_smartField.getProposalChooser());
     assertEquals(0, m_smartField.getProposalChooser().getSearchResult().getLookupRows().size());
