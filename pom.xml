@@ -1,66 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright (c) 2012,2013 BSI Business Systems Integration AG. All rights
-  reserved. This program and the accompanying materials are made available
-  under the terms of the Eclipse Public License v1.0 which accompanies this
-  distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
-  Contributors: Stephan Leicht Vogt - initial implementation -->
+	reserved. This program and the accompanying materials are made available
+	under the terms of the Eclipse Public License v1.0 which accompanies this
+	distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+	Contributors: Stephan Leicht Vogt - initial implementation -->
 <project
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
 
-  <!-- parent> <groupId>org.eclipse.scout</groupId> <artifactId>org.eclipse.scout.parent</artifactId>
-    <version>5.1.0-SNAPSHOT</version> <relativePath>../org.eclipse.scout.parent</relativePath>
-    </parent -->
+	<!-- parent> <groupId>org.eclipse.scout</groupId> <artifactId>org.eclipse.scout.parent</artifactId>
+		<version>5.1.0-SNAPSHOT</version> <relativePath>../org.eclipse.scout.parent</relativePath>
+		</parent -->
 
-  <groupId>org.eclipse.scout</groupId>
-  <artifactId>org.eclipse.scout.rt</artifactId>
-  <version>5.1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+	<groupId>org.eclipse.scout</groupId>
+	<artifactId>org.eclipse.scout.rt</artifactId>
+	<version>5.1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-  <scm>
-    <url>http://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/</url>
-    <connection>${tycho.scmUrl}</connection>
-  </scm>
+	<scm>
+		<url>http://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/</url>
+		<connection>${tycho.scmUrl}</connection>
+	</scm>
 
-  <properties>
-    <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git</tycho.scmUrl>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+	<properties>
+		<tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git</tycho.scmUrl>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
-  <repositories>
-    <repository>
-      <id>eclipse.release</id>
-      <name>eclipse-release-repo</name>
-      <url>https://repo.eclipse.org/content/groups/releases/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>eclipse.snapshot</id>
-      <name>eclipse-snapshot-repo</name>
-      <url>https://repo.eclipse.org/content/groups/snapshots/</url>
-      <snapshots />
-    </repository>
-  </repositories>
+	<repositories>
+		<repository>
+			<id>eclipse.release</id>
+			<name>eclipse-release-repo</name>
+			<url>https://repo.eclipse.org/content/groups/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>eclipse.snapshot</id>
+			<name>eclipse-snapshot-repo</name>
+			<url>https://repo.eclipse.org/content/groups/snapshots/</url>
+			<snapshots />
+		</repository>
+	</repositories>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>eclipse.release</id>
-      <name>eclipse-release-repo</name>
-      <url>https://repo.eclipse.org/content/groups/releases/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-    <pluginRepository>
-      <id>eclipse.snapshot</id>
-      <name>eclipse-snapshot-repo</name>
-      <url>https://repo.eclipse.org/content/groups/snapshots/</url>
-      <snapshots />
-    </pluginRepository>
-  </pluginRepositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>eclipse.release</id>
+			<name>eclipse-release-repo</name>
+			<url>https://repo.eclipse.org/content/groups/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>eclipse.snapshot</id>
+			<name>eclipse-snapshot-repo</name>
+			<url>https://repo.eclipse.org/content/groups/snapshots/</url>
+			<snapshots />
+		</pluginRepository>
+	</pluginRepositories>
 
 	<profiles>
 		<profile>
@@ -109,8 +109,46 @@
 		</profile>
 	</profiles>
 
-  <modules>
-    <module>org.eclipse.scout.rt.parent</module>
-  </modules>
+	<build>
+		<pluginManagement>
+			<!--This plugin's configuration is used to store Eclipse m2e settings
+				only. It has no influence on the Maven build itself. -->
+			<plugin>
+				<groupId>org.eclipse.m2e</groupId>
+				<artifactId>lifecycle-mapping</artifactId>
+				<version>1.0.0</version>
+				<configuration>
+					<lifecycleMappingMetadata>
+						<pluginExecutions>
+							<pluginExecution>
+								<pluginExecutionFilter>
+									<groupId>
+										org.jboss.jandex
+									</groupId>
+									<artifactId>
+										jandex-maven-plugin
+									</artifactId>
+									<versionRange>
+										[1.0.1,)
+									</versionRange>
+									<goals>
+										<goal>jandex</goal>
+									</goals>
+								</pluginExecutionFilter>
+								<action>
+									<ignore></ignore>
+								</action>
+							</pluginExecution>
+						</pluginExecutions>
+					</lifecycleMappingMetadata>
+				</configuration>
+			</plugin>
+		</plugins>
+		</pluginManagement>
+	</build>
+
+	<modules>
+		<module>org.eclipse.scout.rt.parent</module>
+	</modules>
 
 </project>
