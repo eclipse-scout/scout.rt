@@ -85,6 +85,15 @@ public class HtmlBindsTest {
   }
 
   /**
+   * Tests for {@link HTML#br()}
+   */
+  public void testBr() {
+    HtmlBinds binds = new HtmlBinds();
+    IHtmlElement br = HTML.br();
+    assertEquals("<br>", binds.applyBindParameters(br));
+  }
+
+  /**
    * Test for {@link IHtmlElement#appLink(CharSequence)}
    */
   @Test

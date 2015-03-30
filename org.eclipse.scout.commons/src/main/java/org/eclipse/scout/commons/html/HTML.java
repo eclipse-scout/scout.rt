@@ -59,6 +59,13 @@ public class HTML {
   }
 
   /**
+   * Create a html element for &lt;br&gt;.
+   */
+  public static IHtmlElement br() {
+    return new HtmlNodeBuilder("br");
+  }
+
+  /**
    * Create a html element with encoded text for &lt;h1&gt;text&lt;/h1&gt;.
    *
    * @param text
@@ -125,7 +132,17 @@ public class HTML {
    *          content as bind
    */
   public static IHtmlElement div(IHtmlContent... content) {
-    return new HtmlNodeBuilder("div", content);
+    return div(Arrays.asList(content));
+  }
+
+  /**
+   * Create a html element with encoded text for &lt;div&gt;content&lt;/div&gt;.
+   *
+   * @param content
+   *          content as bind
+   */
+  public static IHtmlElement div(List<IHtmlContent> contents) {
+    return new HtmlNodeBuilder("div", contents);
   }
 
   /**
