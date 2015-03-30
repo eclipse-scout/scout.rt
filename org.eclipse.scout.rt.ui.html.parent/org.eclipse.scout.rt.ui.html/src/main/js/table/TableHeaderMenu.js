@@ -11,7 +11,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   // create container
   var $menuHeader = table.$container.appendDiv('table-header-menu')
-    .css('left', x).css('top', y + $header.outerHeight() + 1);
+    .css('left', x).css('top', y + $header.outerHeight());
 
   $menuHeader.appendDiv('table-header-menu-whiter').width($header[0].offsetWidth - 2);
 

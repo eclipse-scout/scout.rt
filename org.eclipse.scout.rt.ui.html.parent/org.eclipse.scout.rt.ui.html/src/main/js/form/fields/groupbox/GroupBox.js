@@ -149,9 +149,6 @@ scout.GroupBox.prototype._computeBorderVisible = function(borderVisible) {
   var fields = this.getFields();
   if (this.mainBox) {
     borderVisible = false;
-  } else if (fields.length === 1 && fields[0].objectType === 'TableField' && !fields[0].labelVisible) {
-    fields[0].$container.addClass('single');
-    borderVisible = false;
   } else if (this.parent instanceof scout.GroupBox &&
     this.parent.parent instanceof scout.Form &&
     this.parent.parent.parent instanceof scout.WrappedFormField &&

@@ -30,6 +30,7 @@
 @palette-bsi-active: #005164;
 
 @palette-gray-9: #FEFEFE;
+@palette-gray-8-5: #F6F6F6;
 @palette-gray-8: #EFEFEF;
 @palette-gray-7: #DDDDDD;
 @palette-gray-6: #CCCCCC;
@@ -105,7 +106,9 @@
 @selection-text-disabled-color: @palette-gray-8;
 
 @selection-row-background-color: @palette-bsi-background;
+@selection-nonfocus-row-background-color: @palette-gray-8-5;
 @selection-row-border-color: @palette-bsi-normal;
+@selection-nonfocus-row-border-color: @palette-gray-6;
 @selection-row-background-disabled-color: @palette-gray-7;
 @selection-row-border-disabled-color: @palette-gray-5;
 

@@ -22,6 +22,7 @@ scout.Table = function() {
   this.selectedRowIds = [];
   this.animationRowLimit = 25;
   this.menuBar;
+  this.menuBarPosition = 'bottom';
   this._drawDataInProgress = false;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
@@ -89,7 +90,7 @@ scout.Table.prototype._render = function($parent) {
   scout.scrollbars.install(this.$data);
   this.session.detachHelper.pushScrollable(this.$data);
 
-  this.menuBar = new scout.MenuBar(this.$container, 'top', scout.TableMenuItemsOrder.order);
+  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.TableMenuItemsOrder.order);
 
   this._updateRowWidth();
   this.drawData();
@@ -1610,7 +1611,14 @@ scout.Table.prototype._renderTableFooter = function() {
 
 scout.Table.prototype._renderEnabled = function() {
   // FIXME CGU remove/add events. Maybe extend jquery to not fire on disabled events?
-  this.$data.setEnabled(this.enabled);
+  var enabled = this.enabled;
+  this.$data.setEnabled(enabled);
+  // Enable/disable all checkboxes
+  this.$rows().each(function() {
+    var $row = $(this),
+      row = $row.data('row');
+    $row.find('input').setEnabled(enabled && row.enabled);
+  });
 };
 
 scout.Table.prototype._renderMultiSelect = function() {

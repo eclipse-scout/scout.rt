@@ -21,7 +21,7 @@ scout.CheckBoxColumn.prototype.buildCell = function(row) {
   if (row.checked) {
     cell += ' checked="checked" ';
   }
-  if (!row.enabled) {
+  if (!row.enabled || !this.table.enabled) {
     cell += ' disabled="disabled" ';
   }
   cell += '/><label for="' + row.id + '-checkable">&nbsp;</label></div>';

@@ -1,10 +1,9 @@
-@table-header-padding-y: 6px;
+@table-header-padding-y: @table-row-padding-y;
 @table-header-padding-left: @table-row-padding-left;
 
 .table-header {
   position: relative;
   background-color: @panel-background-color;
-  border-top: 1px solid @desktop-border-color;
   border-bottom: 1px solid @desktop-border-color;
   white-space: nowrap;
   overflow: hidden;
@@ -70,7 +69,7 @@
   top: 0px;
   height: 100%;
   width: 17px;
-  padding: 8px;
+  padding: 6px 8px;
   margin-left: -8px;
   background-color: @desktop-border-color;
   background-clip: content-box;

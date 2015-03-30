@@ -1,4 +1,4 @@
-@table-row-padding-y: 6px;
+@table-row-padding-y: 7px;
 @table-row-padding-left: 8px;
 /* Adjustment to shift the checkbox a little upwards to align it with the text (resp. first line of the text in case of multiline cells) */
 @checkable-cell-padding-adjustment: 2px;
@@ -14,7 +14,12 @@
   }
 
   &:focus {
-    outline: none;
+    .focus-border;
+
+    & > .table-data > .table-row.selected {
+      background-color: @selection-row-background-color;
+      border-color: @selection-row-border-color;
+    }
 
     /* editable cell marker is only shown if table has the focus */
     & > .table-data > .table-row > .table-cell.editable.cell-align-left,
@@ -40,11 +45,9 @@
   }
 
   & > .menubar {
-    border-bottom: none;
-
     &:not(.main-menubar) {
-      margin-left: @table-row-padding-left;
-      margin-right: @table-row-padding-left;
+      padding-left: @table-row-padding-left;
+      padding-right: @table-row-padding-left;
     }
   }
 }
@@ -64,21 +67,18 @@
 .table-row-sum {
   position:relative;
   overflow: hidden;
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
+  border-left: 0px solid transparent;
+  border-right: 0px solid transparent;
   border-bottom: 1px solid @desktop-border-color;
 
   &.selected {
-    background-color: @selection-row-background-color;
-    border-color: @selection-row-border-color;
+    background-color: @selection-nonfocus-row-background-color;
+    border-color: @selection-nonfocus-row-border-color;
+    border-left-color: transparent;
+    border-right-color: transparent;
 
     &::after {
       background-color: red;
-    }
-
-    .disabled & {
-      background-color: @selection-row-background-disabled-color;
-      border-color: @selection-row-border-disabled-color;
     }
 
     &.select-top,
@@ -98,7 +98,7 @@
 
   &.select-single,
   &.select-top {
-    border-top: 1px solid @selection-row-border-color;
+    border-top: 1px solid @selection-nonfocus-row-border-color;
     /* Move the row 1px up to cover the bottom border of the previous row. */
     margin-top: -1px;
   }

@@ -1,5 +1,6 @@
 @menu-margin-x: @bench-margin-x;
 @menu-item-margin-right: 14px;
+@menu-item-height: 39px;
 
 /* Mixins */
 .menu-icon(@icon) {
@@ -39,8 +40,8 @@
 
 .menu-item {
   /* vertical-align:middle only works with line-height */
-  height: 39px;
-  line-height: 39px;
+  height: @menu-item-height;
+  line-height: @menu-item-height;
   white-space: nowrap;
   cursor: pointer;
   padding-top: 1px;
@@ -117,7 +118,7 @@
 
   & > .popup-head {
     position: absolute;
-    line-height: 39px;
+    line-height: @menu-item-height;
     padding: 0 13px;
     white-space: nowrap;
     background-color: white;

@@ -5,15 +5,4 @@
   border: 1px solid @border-color;
   border-radius: @border-radius;
   background-color: @control-background-color;
-
-  &.disabled {
-    background-color: @control-background-disabled-color;
-  }
-}
-
-.table-field.single > .table {
-  border: 0;
-  border-bottom: 0;
-  border-radius: 0;
-  background-color: transparent;
 }

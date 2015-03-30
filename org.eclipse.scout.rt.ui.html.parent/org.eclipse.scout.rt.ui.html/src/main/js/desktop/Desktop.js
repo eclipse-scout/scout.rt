@@ -328,6 +328,9 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
     }
   }
   if (!content.rendered) {
+    if (content instanceof scout.Table) {
+      content.menuBarPosition = 'top';
+    }
     content.render(this.$bench);
     if (content instanceof scout.Table) {
       content.menuBar.$container.addClass('main-menubar');

@@ -73,6 +73,11 @@
     height: @logical-grid-height;
     padding: 7px 8px 0 8px;
   }
+
+  & .table-row.selected {
+    background-color: @selection-row-background-color;
+    border-color: @selection-row-border-color;
+  }
 }
 
 .elipsis {

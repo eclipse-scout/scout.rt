@@ -3,9 +3,16 @@
   height: 100%;
   width: 100%;
 
+  &:focus {
+    .focus-border;
+
+    & > .tree-data > .tree-item.selected {
+      background-color: @selection-row-background-color;
+      border-color: @selection-row-border-color;
+    }
+  }
+
   & .menubar {
-    margin-left: -3px;
-    margin-right: -3px;
     padding: 0 8px;
   }
 }
@@ -26,30 +33,15 @@
   position: relative;
   .overflow-ellipsis-nowrap;
   border: 1px solid transparent;
-
-  /* leave some space for the scrollbar */
-  padding-right: 6px;
-  /* set top/bottom padding for item */
-  padding-top: 6px;
-  padding-bottom: 6px;
-
-  &.parent {
-  }
-
-  &.children {
-  }
-
-  &.group {
-  }
+  border-left: 0px solid transparent;
+  border-right: 0px solid transparent;
+  padding: 6px;
 
   &.selected {
-    background-color: @selection-row-background-color;
-    border: 1px solid @selection-row-border-color;
-
-    .disabled & {
-      background-color: @selection-row-background-disabled-color;
-      border-color: @selection-row-border-disabled-color;
-    }
+    background-color: @selection-nonfocus-row-background-color;
+    border-color: @selection-nonfocus-row-border-color;
+    border-left-color: transparent;
+    border-right-color: transparent;
   }
 }
 
@@ -125,7 +117,7 @@
   cursor: pointer;
 
   /* adjust control position */
-  margin-left: -@tree-item-control-size - 5px;
+  margin-left: -@tree-item-control-size - 2px;
   margin-top: -1px;
 
   /* for good animation, ensure that the control is a square and the icon is centered */

@@ -3,9 +3,4 @@
   border: 1px solid @border-color;
   border-radius: @border-radius;
   background-color: @control-background-color;
-  padding: 3px;
-
-  &.disabled {
-    background-color: @control-background-disabled-color;
-  }
  }

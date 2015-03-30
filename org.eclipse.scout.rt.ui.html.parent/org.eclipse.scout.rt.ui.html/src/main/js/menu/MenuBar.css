@@ -1,6 +1,8 @@
+@menubar-height: @logical-grid-height;
+
 .menubar {
   position: relative;
-  height: 40px;
+  height: @menubar-height;
   border-bottom: 1px solid @desktop-border-color;
 
   & div {
@@ -20,6 +22,9 @@
   }
 
   & > .menu-item {
+    height: @menubar-height;
+    line-height: @menubar-height;
+
     &[data-icon]::before {
       font-size: 18px;
       line-height: @logical-grid-height;
@@ -27,7 +32,8 @@
   }
 
   & > .menu-separator {
-    height: @logical-grid-height - 10px;
+    margin-top: 4px;
+    height: @logical-grid-height - 12px;
   }
 }
 
@@ -38,6 +44,9 @@
   padding: 6px 0 10px 0;
 
   & > .menu-item {
+    height: @menu-item-height;
+    line-height: @menu-item-height;
+
     &[data-icon]::before {
       font-size: 22px;
     }
