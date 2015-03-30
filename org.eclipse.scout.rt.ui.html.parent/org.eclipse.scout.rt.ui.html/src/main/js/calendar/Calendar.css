@@ -309,6 +309,21 @@
     margin-bottom: 4px;
     border-left: 4px solid @palette-orange-disabled;
     text-align: left;
+
+     &:first-child {
+      margin-top: 6px;
+     }
+
+     &.many-items {
+      width: calc(~"50%" - 38px);
+      margin-right: -20px;
+     }
+
+     &.tomuch-items {
+      margin-top: 6px;
+     }
+
+
   }
 
   & .component-day {

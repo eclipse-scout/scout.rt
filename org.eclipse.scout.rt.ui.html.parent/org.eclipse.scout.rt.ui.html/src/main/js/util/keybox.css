@@ -2,7 +2,7 @@
   position: absolute;
   height: 17px;
   min-width: 34px;
-  padding: 0 1px;
+  padding: 0 3px;
   z-index: 100;
   color: @text-color;
   line-height: 17px;

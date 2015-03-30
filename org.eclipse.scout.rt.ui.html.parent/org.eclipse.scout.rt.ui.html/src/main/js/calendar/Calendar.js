@@ -315,8 +315,6 @@ scout.Calendar.prototype.layoutSize = function() {
   var width = this.$container.width(),
     weekdays;
 
-  $.l(width);
-
   if (this.displayMode === this.DAY) {
     width /= 1;
   } else if (this.displayMode ===  this.WORK) {
@@ -611,6 +609,7 @@ scout.Calendar.prototype.layoutComponents = function() {
   $('.calendar-component', this.$grid).remove();
 
   var countTask = 5;
+  $.l(this.components);
 
   for (var i = 0; i < this.components.length; i++) {
     var c = this.components[i],
@@ -679,6 +678,18 @@ scout.Calendar.prototype.layoutComponents = function() {
       }
     }
   }
+
+  // TODO: many items
+
+  if (this.displayMode === this.MONTH) {
+    var maxComponents = 0;
+    $('.calendar-day', this.grid).each(function() {
+      var $children = $(this).children('.calendar-component');
+      if ($children.length > 2) {
+        $(this).addClass('many-items');
+      }
+    });
+  }
 };
 
 // to do!
@@ -686,6 +697,7 @@ scout.Calendar.prototype.layoutComponents = function() {
 // alle zugehörigen termine anzeigen
 // alle anderen TEmrine etwas heller machen?
 /// wenn zu klein: temrin irgendwei öffnen und anzeigen.
+// TODO: öffnennlinks bei component mitanzeigen
 scout.Calendar.prototype._onMouseenter = function (date) {
   var $e = $(event.target),
     $w = $e.parent().parent();
@@ -745,7 +757,7 @@ scout.Calendar.prototype._findDay = function (date) {
 /* -----------  Scout  -------------------------------*/
 
 scout.Calendar.prototype._renderComponents = function() {
-  this.layoutComponents();
+//  this.layoutComponents();
 };
 
 scout.Calendar.prototype._renderLoadInProgress = function() {
