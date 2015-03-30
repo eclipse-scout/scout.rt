@@ -88,6 +88,7 @@ import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutPopup;
  * popup typing space just AFTER up/down key selects the currently selected row
  * in the proposal popup
  */
+@SuppressWarnings("deprecation")
 public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContentAssistField<?, ?>> implements ISwingScoutSmartField {
 
   // proposal support
@@ -368,7 +369,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().setTextFromUI(text);
+        getScoutObject().getUIFacadeLegacy().setTextFromUI(text);
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 0);
@@ -396,7 +397,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
            * Unregister proposal form from UI
            * If not, accessing the same smartfield will not open the proposal form again
            */
-          getScoutObject().getUIFacade().closeProposalFromUI();
+          getScoutObject().getUIFacadeLegacy().closeProposalFromUI();
         }
       }, 0);
       return;
@@ -523,7 +524,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
           Runnable t = new Runnable() {
             @Override
             public void run() {
-              getScoutObject().getUIFacade().closeProposalFromUI();
+              getScoutObject().getUIFacadeLegacy().closeProposalFromUI();
             }
           };
           getSwingEnvironment().invokeScoutLater(t, 0);
@@ -618,7 +619,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        boolean b = getScoutObject().getUIFacade().setTextFromUI(text);
+        boolean b = getScoutObject().getUIFacadeLegacy().setTextFromUI(text);
         result.setValue(b);
       }
     };
@@ -736,7 +737,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
             Runnable t = new Runnable() {
               @Override
               public void run() {
-                getScoutObject().getUIFacade().openProposalFromUI(m_text, m_selectCurrentValue);
+                getScoutObject().getUIFacadeLegacy().openProposalFromUI(m_text, m_selectCurrentValue);
               }
             };
             getSwingEnvironment().invokeScoutLater(t, 0);

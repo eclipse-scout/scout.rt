@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,17 +10,44 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+/**
+ * @since Scout 6.0
+ */
 public interface IContentAssistFieldUIFacade {
 
-  boolean setTextFromUI(String newText);
+  /**
+   * Called when smart-field is clicked or when a key (character or navigation) is pressed in the smart-field.
+   * Proposal chooser must be closed.<br/>
+   * Calling this method may cause a property change for property {@code PROP_PROPOSAL_CHOOSER} in
+   * {@link IContentAssistField}.
+   */
+  void openProposalChooserFromUI(String text);
 
   /**
-   * This may result in a property change {@link IContentAssistField#PROP_PROPOSAL_FORM} see
-   * {@link IContentAssistField#getProposalForm()}
+   * Called when ever a (non-navigation) key is pressed in the smart-field.
+   * Proposal chooser must be open.
    */
-  void openProposalFromUI(String searchText, boolean selectCurrentValue);
+  void proposalTypedFromUI(String text);
 
-  boolean acceptProposalFromUI();
+  /**
+   * Called when Escape key has been pressed or a mouse click event occurs.
+   * Proposal chooser must be open.<br/>
+   * Calling this method may cause a property change for property {@code PROP_PROPOSAL_CHOOSER} in
+   * {@link IContentAssistField}.
+   */
+  void cancelProposalChooserFromUI();
 
-  void closeProposalFromUI();
+  /**
+   * Called when Enter key has been pressed.<br/>
+   * Calling this method may cause a property change for property {@code PROP_PROPOSAL_CHOOSER} in
+   * {@link IContentAssistField}.
+   */
+  void acceptProposalFromUI(String text);
+
+  /**
+   * Called when smart-field loses focus, for instance when Tab is pressed.
+   * Proposal chooser may be open but doesn't have to.
+   */
+  void setTextFromUI(String text);
+
 }

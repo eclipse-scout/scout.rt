@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 BSI Business Systems Integration AG.
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,13 +11,20 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 /**
- * A smart field with a key type different from the value type.
- * The default implementation of {@link #convertKeyToValue(Object)} and {@link #convertValueToKey(Object)} methods works
- * for any case where <VALUE_TYPE extends LOOKUP_CALL_KEY_TYPE>. For all other cases provide your own conversion
- * methods.
- *
- * @param <VALUE>
- * @param <LOOKUP_KEY>
+ * @deprecated Remove with Scout 6.0, when Swing client is not required anymore
  */
-public interface IMixedSmartField<VALUE, LOOKUP_KEY> extends IContentAssistField<VALUE, LOOKUP_KEY> {
+@Deprecated
+public interface IContentAssistFieldUIFacadeLegacy {
+
+  boolean setTextFromUI(String newText);
+
+  /**
+   * This may result in a property change {@link IContentAssistField#PROP_PROPOSAL_FORM} see
+   * {@link IContentAssistField#getProposalForm()}
+   */
+  void openProposalFromUI(String searchText, boolean selectCurrentValue);
+
+  boolean acceptProposalFromUI();
+
+  void closeProposalFromUI();
 }

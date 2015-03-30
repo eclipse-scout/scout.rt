@@ -851,9 +851,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   @Override
   public void doSearch(String searchText, boolean selectCurrentValue, boolean synchronous) {
-    IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
-    if (proposalChooser != null) {
-      proposalChooser.setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.WARNING));
+    if (isProposalChooserRegistered()) {
+      getProposalChooser().setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.WARNING));
     }
     getLookupRowFetcher().update(searchText, selectCurrentValue, synchronous);
   }
@@ -1388,8 +1387,17 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return proposalChooser;
   }
 
+  protected boolean isProposalChooserRegistered() {
+    return getProposalChooser() != null;
+  }
+
+  protected boolean hasAcceptedProposal() {
+    IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
+    return proposalChooser != null && proposalChooser.getAcceptedProposal() != null;
+  }
+
   protected void unregisterProposalChooserInternal() {
-    if (getProposalChooser() != null) {
+    if (isProposalChooserRegistered()) {
       getProposalChooser().dispose();
       propertySupport.setProperty(PROP_PROPOSAL_CHOOSER, null);
     }

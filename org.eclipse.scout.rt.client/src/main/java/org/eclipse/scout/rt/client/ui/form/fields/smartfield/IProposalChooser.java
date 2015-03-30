@@ -75,7 +75,7 @@ public interface IProposalChooser<T, LOOKUP_KEY> extends IPropertyObserver {
    */
   void doOk() throws ProcessingException;
 
-  // FIXME AWE: besser acceptProposal() nennen
+  // FIXME AWE: entfernen --> stattdessen acceptProposal auf contentAssistField aufrufen
 
   boolean isActiveFilterEnabled();
 

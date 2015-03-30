@@ -30,7 +30,10 @@ import org.eclipse.scout.service.SERVICES;
  * {@link String}. The proposals are delivered as lookup rows of any type.
  */
 public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentAssistField<String, LOOKUP_KEY> implements IProposalField<LOOKUP_KEY> {
-  private P_UIFacade m_uiFacade;
+
+  @SuppressWarnings("deprecation")
+  private IContentAssistFieldUIFacadeLegacy m_uiFacadeLegacy;
+  private IContentAssistFieldUIFacade m_uiFacade;
 
   public AbstractProposalField() {
     this(true);
@@ -43,8 +46,14 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_uiFacade = new P_UIFacade();
+    m_uiFacadeLegacy = new P_UIFacadeLegacy();
+    m_uiFacade = new ContentAssistFieldUIFacade<LOOKUP_KEY>(this);
+  }
 
+  @Override
+  @SuppressWarnings("deprecation")
+  public IContentAssistFieldUIFacadeLegacy getUIFacadeLegacy() {
+    return m_uiFacadeLegacy;
   }
 
   @Override
@@ -187,7 +196,8 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     }
   }
 
-  private class P_UIFacade implements IContentAssistFieldUIFacade {
+  @SuppressWarnings("deprecation")
+  private class P_UIFacadeLegacy implements IContentAssistFieldUIFacadeLegacy {
 
     @Override
     public boolean setTextFromUI(String text) {

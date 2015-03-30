@@ -57,8 +57,9 @@ import org.eclipse.scout.service.SERVICES;
 @ScoutSdkIgnore
 public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY> implements IMixedSmartField<VALUE, LOOKUP_KEY> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMixedSmartField.class);
-  private P_UIFacade m_uiFacade;
+  private P_UIFacadeLegacy m_uiFacadeLegacy;
   private volatile IFuture<List<ILookupRow<LOOKUP_KEY>>> m_backgroundJob;
+  private IContentAssistFieldUIFacade m_uiFacade;
 
   public AbstractMixedSmartField() {
     this(true);
@@ -97,7 +98,14 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_uiFacade = new P_UIFacade();
+    m_uiFacadeLegacy = new P_UIFacadeLegacy();
+    m_uiFacade = new ContentAssistFieldUIFacade<LOOKUP_KEY>(this);
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
+  public IContentAssistFieldUIFacadeLegacy getUIFacadeLegacy() {
+    return m_uiFacadeLegacy;
   }
 
   @Override
@@ -283,7 +291,8 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     }
   }
 
-  private class P_UIFacade implements IContentAssistFieldUIFacade {
+  @SuppressWarnings("deprecation")
+  private class P_UIFacadeLegacy implements IContentAssistFieldUIFacadeLegacy {
 
     @Override
     public boolean setTextFromUI(String text) {
@@ -296,7 +305,9 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
           // a proposal was selected
           return acceptProposalFromUI();
         }
-        if (proposalChooser != null && (StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) || StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
+        if (proposalChooser != null &&
+            (StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) ||
+                StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
           /*
            * empty text means null
            */
@@ -306,8 +317,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
           else {
             // no proposal was selected...
             if (!StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText))) {
-              // ...and the current value is incomplete -> force proposal
-              // selection
+              // ...and the current value is incomplete -> force proposal selection
               proposalChooser.forceProposalSelection();
               return false;
             }

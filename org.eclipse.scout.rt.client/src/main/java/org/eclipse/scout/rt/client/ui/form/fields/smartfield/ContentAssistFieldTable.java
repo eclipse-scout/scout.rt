@@ -30,9 +30,6 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-/**
- *
- */
 @FormData(value = AbstractTableRowData.class, sdkCommand = FormData.SdkCommand.USE, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE)
 public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implements IContentAssistFieldTable<LOOKUP_KEY> {
 
@@ -73,7 +70,7 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
 
   /**
    * This method might be used to decorate the passed cell with the decoration properties of the lookup row.
-   * 
+   *
    * @param cell
    * @param row
    */
