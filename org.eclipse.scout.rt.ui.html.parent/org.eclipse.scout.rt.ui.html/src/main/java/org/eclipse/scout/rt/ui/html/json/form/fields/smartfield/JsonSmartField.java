@@ -114,6 +114,7 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
   private void handleUiAcceptProposal(JsonEvent event) {
     String text = event.getData().optString("searchText");
     getModel().getUIFacade().acceptProposalFromUI(text);
+    System.out.println("XXX displayText=" + getModel().getDisplayText() + " errorStatus=" + getModel().getErrorStatus());
   }
 
   private void handleUiCancelProposal() {

@@ -214,6 +214,8 @@ scout.FormField.prototype._onStatusClick = function() {
 };
 
 scout.FormField.prototype._showStatusMessage = function(options) {
+  // FIXME AWE:
+
   if (this.tooltip && this.tooltip.rendered) {
     return;
   }
