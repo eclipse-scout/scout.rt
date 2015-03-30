@@ -98,8 +98,7 @@ import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormFooter;
 import org.eclipse.scout.rt.ui.rap.window.desktop.IRwtScoutFormHeader;
 import org.eclipse.scout.rt.ui.rap.window.desktop.navigation.RwtScoutNavigationSupport;
 import org.eclipse.scout.rt.ui.rap.window.dialog.RwtScoutDialog;
-import org.eclipse.scout.rt.ui.rap.window.filechooser.IRwtScoutFileChooser;
-import org.eclipse.scout.rt.ui.rap.window.filechooser.IRwtScoutFileChooserService;
+import org.eclipse.scout.rt.ui.rap.window.filechooser.RwtScoutFileChooser;
 import org.eclipse.scout.rt.ui.rap.window.messagebox.RwtScoutMessageBoxDialog;
 import org.eclipse.scout.rt.ui.rap.window.popup.RwtScoutPopup;
 import org.eclipse.scout.service.SERVICES;
@@ -506,12 +505,12 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
         }
         catch (Exception e) {
           String msg = new StringBuilder()
-              .append(" [thread=").append(Thread.currentThread())
-              .append(", httpSession=").append(event.getSession().getId())
-              .append(", clientSession=").append(clientSession)
-              .append(", environment=").append(AbstractRwtEnvironment.this)
-              .append(", userAgent=").append(clientSession.getUserAgent())
-              .append("]").toString();
+          .append(" [thread=").append(Thread.currentThread())
+          .append(", httpSession=").append(event.getSession().getId())
+          .append(", clientSession=").append(clientSession)
+          .append(", environment=").append(AbstractRwtEnvironment.this)
+          .append(", userAgent=").append(clientSession.getUserAgent())
+          .append("]").toString();
 
           if (Platform.isRunning()) {
             LOG.error("Failed to stop application." + msg, e);
@@ -847,12 +846,7 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
 
   @Override
   public void showFileChooserFromScout(IFileChooser fileChooser) {
-    IRwtScoutFileChooserService rwtScoutFileChooserService = SERVICES.getService(IRwtScoutFileChooserService.class);
-    if (rwtScoutFileChooserService == null) {
-      LOG.warn("Missing bundle: org.eclipse.scout.rt.ui.rap.incubator.filechooser. Please activate it in your Scout perspective under Technologies.");
-      return;
-    }
-    IRwtScoutFileChooser sfc = rwtScoutFileChooserService.createFileChooser(getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS), fileChooser);
+    RwtScoutFileChooser sfc = new RwtScoutFileChooser(getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS), fileChooser);
     sfc.showFileChooser();
   }
 

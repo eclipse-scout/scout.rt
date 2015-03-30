@@ -12,26 +12,20 @@ package org.eclipse.scout.rt.ui.rap.dnd;
 
 /**
  * More detailed information about the uploaded files. Belongs to {@link RwtScoutFileUploadEvent}
- * 
+ *
  * @since 4.0.0-M7
  */
 public class RwtScoutFileUploadFileDetail {
   private final String m_contentType;
-  private final long m_contentLength;
   private final String m_fileName;
 
-  public RwtScoutFileUploadFileDetail(String fileName, String contentType, long contentLength) {
+  public RwtScoutFileUploadFileDetail(String fileName, String contentType) {
     m_fileName = fileName;
     m_contentType = contentType;
-    m_contentLength = contentLength;
   }
 
   public String getContentType() {
     return m_contentType;
-  }
-
-  public long getContentLength() {
-    return m_contentLength;
   }
 
   public String getFileName() {

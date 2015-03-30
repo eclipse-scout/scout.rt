@@ -24,7 +24,6 @@
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.extension.client"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.extension.client.test"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.feature.about"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/scout.rt.incubator.git,releases/4.3.x,org.eclipse.scout.rt.incubator.parent"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.jdbc.derby10"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.parent"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.rap-feature"/>
@@ -64,9 +63,6 @@
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.testing.ui.swing"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.testing.ui.swt"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.ui.rap"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/scout.rt.incubator.git,releases/4.3.x,org.eclipse.scout.rt.ui.rap.incubator.filechooser"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/scout.rt.incubator.git,releases/4.3.x,org.eclipse.scout.rt.ui.rap.incubator.filechooser-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/scout.rt.incubator.git,releases/4.3.x,org.eclipse.scout.rt.ui.rap.incubator.filechooser-repository"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.ui.rap.mobile"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.ui.rap.test"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.ui.rap.theme.rayo"/>
@@ -94,10 +90,8 @@
 <item elementID="=org.eclipse.scout.rt.extension.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.apache.derby.jdbc_1091.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.incubator.parent" type="4"/>
 <item elementID="=org.eclipse.scout.rt.server.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.server.testenvironment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.ui.rap.incubator.filechooser-repository" type="4"/>
 <item elementID="=org.eclipse.scout.service" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.shared" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.jdbc.derby10" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -118,7 +112,6 @@
 <item elementID="=org.eclipse.scout.rt.ui.swing.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.ui.rap.theme.rayo.mobile" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.ui.swt" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.ui.rap.incubator.filechooser" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.ui.swing.browser.swt.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -148,7 +141,6 @@
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.rap.testing-feature" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.testing.swing-feature" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.testing.swt-feature" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.ui.rap.incubator.filechooser-feature" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.testing.core-feature" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt-feature" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.swing-feature" type="4"/>
