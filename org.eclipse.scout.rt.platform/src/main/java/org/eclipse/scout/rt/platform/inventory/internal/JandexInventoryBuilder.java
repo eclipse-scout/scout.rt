@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.PlatformException;
@@ -25,10 +26,13 @@ public class JandexInventoryBuilder {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JandexInventoryBuilder.class);
   private static final String SCOUT_XML_PATH = "META-INF/scout.xml";
   private static final String JANDEX_INDEX_PATH = "META-INF/jandex.idx";
+  private static final String SYSTEM_PROPERTY_JANDEX_IDX = "jandex.idx";
 
   private final ArrayList<IndexView> m_indexList = new ArrayList<>();
+  private final boolean m_rebuildFolderIndexes;
 
   public JandexInventoryBuilder() {
+    m_rebuildFolderIndexes = ConfigIniUtility.getProperty(SYSTEM_PROPERTY_JANDEX_IDX, "auto").equals("rebuild");
   }
 
   public void scanAllModules() throws PlatformException {
@@ -53,17 +57,19 @@ public class JandexInventoryBuilder {
       throw new PlatformException("create URI from: " + urlText + "/../../" + JANDEX_INDEX_PATH, ex);
     }
     //check for prepared index
-    try (InputStream in = indexUri.toURL().openStream()) {
-      Index index = new IndexReader(in).read();
-      m_indexList.add(index);
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("found pre-built " + indexUri);
+    if (!m_rebuildFolderIndexes || !urlText.startsWith("file:")) {
+      try (InputStream in = indexUri.toURL().openStream()) {
+        Index index = new IndexReader(in).read();
+        m_indexList.add(index);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("found pre-built " + indexUri);
+        }
+        return;
       }
-      return;
-    }
-    catch (Exception ex) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("reading " + indexUri, ex);
+      catch (Exception ex) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("reading " + indexUri, ex);
+        }
       }
     }
     //scan location

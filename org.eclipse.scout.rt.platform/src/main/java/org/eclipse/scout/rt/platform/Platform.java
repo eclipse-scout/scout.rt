@@ -17,6 +17,12 @@ import org.eclipse.scout.rt.platform.internal.PlatformImplementor;
  * {@link IPlatform#start()} from within a servlet listener.
  * <p>
  * Tests use a PlatformTestRunner
+ * <p>
+ * When running in workspace, the jandex class scanner used in scout is automatically creating and caching the
+ * target/classes/META-INF/jandex.idx files.
+ * <p>
+ * Use the system property <code>jandex.idx=rebuild</code> in order to force a rebuild in case some beans were changed,
+ * added or removed from the source code.
  */
 public final class Platform {
 
