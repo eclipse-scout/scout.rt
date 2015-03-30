@@ -11,6 +11,7 @@ scout.Tooltip = function(options) {
   this.$context = options.$context;
   this.cssClass = options.cssClass;
   this.tooltipPosition = options.position || 'top';
+  this.$content;
 };
 
 scout.Tooltip.prototype.render = function($parent) {
@@ -28,7 +29,7 @@ scout.Tooltip.prototype.render = function($parent) {
   }
 
   this.$arrow = $.makeDiv('tooltip-arrow').appendTo(this.$container);
-  this.$container.appendDiv('tooltip-content', this.text);
+  this.$content = $.makeDiv('tooltip-content').appendTo(this.$container).text(this.text);
   this.position();
   this.$container.show();
 
@@ -41,6 +42,10 @@ scout.Tooltip.prototype.render = function($parent) {
     }
   }
   this.rendered = true;
+};
+
+scout.Tooltip.prototype.renderText = function(text) {
+  this.$content.text(text);
 };
 
 scout.Tooltip.prototype.position = function() {

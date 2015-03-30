@@ -214,12 +214,6 @@ scout.FormField.prototype._onStatusClick = function() {
 };
 
 scout.FormField.prototype._showStatusMessage = function(options) {
-  // FIXME AWE:
-
-  if (this.tooltip && this.tooltip.rendered) {
-    return;
-  }
-
   var text = this.tooltipText;
   if (this.errorStatusUi) {
     text = this.errorStatusUi.message;
@@ -227,15 +221,21 @@ scout.FormField.prototype._showStatusMessage = function(options) {
     text = this.errorStatus.message;
   }
 
-  var form = this.getForm();
-  var opts = {
-    text: text,
-    $origin: this.$status,
-    $context: (form && form.$container)
-  };
-  $.extend(opts, options);
-  this.tooltip = new scout.Tooltip(opts);
-  this.tooltip.render();
+  if (this.tooltip && this.tooltip.rendered) {
+    // update existing tooltip
+    this.tooltip.renderText(text);
+  } else {
+    // create new tooltip
+    var form = this.getForm(),
+      opts = {
+        text: text,
+        $origin: this.$status,
+        $context: (form && form.$container)
+      };
+    $.extend(opts, options);
+    this.tooltip = new scout.Tooltip(opts);
+    this.tooltip.render();
+  }
 };
 
 scout.FormField.prototype.getForm = function() {
