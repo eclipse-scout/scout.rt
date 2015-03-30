@@ -62,7 +62,55 @@
     </pluginRepository>
   </pluginRepositories>
 
+	<profiles>
+		<profile>
+			<!-- The default profile skips all tests, though you can tune it to run
+				just unit tests based on a custom pattern -->
+			<!-- Seperate profiles are provided for running all tests, including Arquillian
+				tests that execute in the specified container -->
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<maven-surefire-plugin.skip>true</maven-surefire-plugin.skip>
+			</properties>
+		</profile>
+		<profile>
+			<!-- Only create the jandex.idx when a beans.xml or scout.xml is found -->
+			<id>jandex-idx</id>
+			<activation>
+				<file>
+					<exists>${basedir}/src/main/resources/META-INF/scout.xml</exists>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<!-- Create META-INF/jandex.idx -->
+					<plugin>
+						<groupId>org.jboss.jandex</groupId>
+						<artifactId>jandex-maven-plugin</artifactId>
+						<version>1.0.1</version>
+						<executions>
+							<execution>
+								<id>make-index</id>
+								<goals>
+									<goal>jandex</goal>
+								</goals>
+								<!-- phase is 'process-classes by default' -->
+								<configuration>
+									<!-- Nothing needed here for simple cases -->
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
   <modules>
     <module>org.eclipse.scout.rt.parent</module>
   </modules>
+
 </project>
