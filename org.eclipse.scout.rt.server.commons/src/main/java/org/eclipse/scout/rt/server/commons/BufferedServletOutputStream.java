@@ -61,12 +61,12 @@ public class BufferedServletOutputStream extends ServletOutputStream {
   }
 
   @Override
-  public void write(byte[] b, int off, int len) {
+  public void write(byte[] b, int off, int len) throws IOException {
     m_buf.write(b, off, len);
   }
 
   @Override
-  public void write(int b) {
+  public void write(int b) throws IOException {
     m_buf.write(b);
   }
 
