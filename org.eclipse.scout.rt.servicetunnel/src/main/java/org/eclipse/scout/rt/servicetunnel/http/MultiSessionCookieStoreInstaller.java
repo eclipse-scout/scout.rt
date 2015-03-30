@@ -15,39 +15,25 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.CookieStore;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
+/**
+ * Install and uninstall {@link MultiSessionCookieStore}
+ */
 public class MultiSessionCookieStoreInstaller {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MultiSessionCookieStoreInstaller.class);
-
-  public static final String PROP_MULTI_SESSION_COOKIE_STORE_ENABLED = "org.eclipse.scout.rt.servicetunnel.multiSessionCookieStoreEnabled";
 
   private CookieHandler m_newCookieHandler;
 
   public void install() {
     CookieHandler cookieHandler = CookieHandler.getDefault();
-    boolean multiSessionCookieStoreEnabled = ConfigIniUtility.getPropertyBoolean(PROP_MULTI_SESSION_COOKIE_STORE_ENABLED, false);
-
-    if (multiSessionCookieStoreEnabled) {
-      // Install MultiSessionCookieStore
-      if (cookieHandler != null) {
-        LOG.warn("Overriding pre-installed cookie handler: " + cookieHandlerToString(cookieHandler));
-      }
-      m_newCookieHandler = new CookieManager(new MultiSessionCookieStore(), CookiePolicy.ACCEPT_ALL);
-      CookieHandler.setDefault(m_newCookieHandler);
-      LOG.info("Successfully installed " + cookieHandlerToString(m_newCookieHandler));
+    if (cookieHandler != null) {
+      LOG.warn("Overriding pre-installed cookie handler: " + cookieHandlerToString(cookieHandler));
     }
-    else {
-      if (cookieHandler != null) {
-        LOG.info("Using pre-installed cookie handler: " + cookieHandlerToString(cookieHandler));
-      }
-      // Warn unless disabled explicitly
-      else if (ConfigIniUtility.getProperty(PROP_MULTI_SESSION_COOKIE_STORE_ENABLED) != null) {
-        LOG.warn("No cookie handler is installed. This will result in the creation of a new HTTP session for every request. Please check the value of the property " + PROP_MULTI_SESSION_COOKIE_STORE_ENABLED + ".");
-      }
-    }
+    m_newCookieHandler = new CookieManager(new MultiSessionCookieStore(), CookiePolicy.ACCEPT_ALL);
+    CookieHandler.setDefault(m_newCookieHandler);
+    LOG.info("Successfully installed " + cookieHandlerToString(m_newCookieHandler));
   }
 
   public void uninstall() {
