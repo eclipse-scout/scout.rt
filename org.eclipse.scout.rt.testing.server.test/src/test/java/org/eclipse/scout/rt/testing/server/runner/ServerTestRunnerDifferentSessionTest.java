@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -102,7 +103,8 @@ public class ServerTestRunnerDifferentSessionTest {
     assertEquals(5, m_transactions.size()); // (beforeClass), (before,test1,after), (before,test2,after), (before,test3,after), (afterClass)
   }
 
-  public static class JUnitServerSession1 extends TestServerSession {
+  public static class JUnitServerSession1 extends AbstractServerSession {
+
     private static final long serialVersionUID = 1L;
 
     public JUnitServerSession1() {
@@ -110,7 +112,7 @@ public class ServerTestRunnerDifferentSessionTest {
     }
   }
 
-  public static class JUnitServerSession2 extends TestServerSession {
+  public static class JUnitServerSession2 extends AbstractServerSession {
 
     private static final long serialVersionUID = 1L;
 

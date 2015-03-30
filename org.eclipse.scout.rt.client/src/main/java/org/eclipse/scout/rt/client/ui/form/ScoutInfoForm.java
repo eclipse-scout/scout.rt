@@ -10,49 +10,35 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
-import static org.eclipse.scout.commons.html.HTML.p;
-import static org.eclipse.scout.commons.html.HTML.table;
-import static org.eclipse.scout.commons.html.HTML.cell;
-
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import org.eclipse.core.runtime.IProduct;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.html.HTML;
-import org.eclipse.scout.commons.html.HtmlBinds;
-import org.eclipse.scout.commons.html.IHtmlElement;
-import org.eclipse.scout.commons.html.IHtmlTable;
-import org.eclipse.scout.commons.html.IHtmlTableRow;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.CloseButton;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.GroupBox.HtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
+import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.services.common.shell.IShellService;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.Version;
 
-/**
- * Form for general information about the application
- */
 public class ScoutInfoForm extends AbstractForm {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScoutInfoForm.class);
 
@@ -143,7 +129,9 @@ public class ScoutInfoForm extends AbstractForm {
 
         @Override
         protected int getConfiguredGridH() {
-          return 12;
+          // If the client is a webclient then some of these informations must be omitted (Security) so that the html
+          // field is smaller @see https://bugs.eclipse.org/bugs/show_bug.cgi?id=365761
+          return UserAgentUtility.isWebClient() ? 12 : 20;
         }
 
         @Override
@@ -184,84 +172,72 @@ public class ScoutInfoForm extends AbstractForm {
     }
   }
 
-  /**
-   * @return text contained in Html Field
-   */
-  protected String createHtmlBody() {
-    final HtmlBinds binds = new HtmlBinds();
-
-    final IHtmlElement html = HTML.div(
-        p(getLogoHtml(binds)),
-        getTitleHtml(binds),
-        getPropertyTable(binds)
-        );
-
-    return binds.applyBindParameters(html);
-  }
-
-  /**
-   * @return Product Logo Html
-   */
-  protected IHtmlElement getLogoHtml(HtmlBinds binds) {
+  protected void createHtmlBody(StringBuffer buf) {
+    IApplication app = OBJ.getOptional(IApplication.class);
+    String title = "unknown";
+    String version = "0.0.0";
+    if (app != null) {
+      title = app.getName();
+      version = app.getVersion();
+    }
+    buf.append("<head>\n");
+    buf.append("<style type=\"text/css\">\n");
+    buf.append("h1 {font-family: sans-serif}\n");
+    buf.append("h2 {font-family: sans-serif}\n");
+    buf.append("h3 {font-family: sans-serif}\n");
+    buf.append("body {font-family: sans-serif}\n");
+    buf.append("p {font-family: sans-serif}\n");
+    buf.append("</style>\n");
+    buf.append("</head>\n");
+    buf.append("<p>");
     RemoteFile f = getLogoImage();
-    HTML.img(binds.put(f.getPath()));
-    if (f != null && f.getPath() != null) {
-      return HTML.img(binds.put(f.getPath()));
+    if (f != null) {
+      buf.append("<img src=\"" + f.getPath() + "\">");
     }
     else {
-      return HTML.h3(binds.put(getProductName()));
+      buf.append("<h3>" + title + "</h3>");
     }
+    buf.append("<p>");
+    buf.append("<h2>" + title + " " + version + "</h2>");
+    buf.append("<table cellspacing=0 cellpadding=0>");
+    //
+    StringBuffer contentBuf = new StringBuffer();
+    createHtmlPropertyTableContent(contentBuf);
+    buf.append(contentBuf.toString());
+    buf.append("<tr><td>" + ScoutTexts.get("DetailedVersion") + ":</td><td>&nbsp;</td><td>" + version + "</td></tr>");
+    //
+    buf.append("</table>");
   }
 
-  /**
-   * @return Product Name with Version Html
-   */
-  private IHtmlElement getTitleHtml(HtmlBinds binds) {
-    Version v = getVersion();
-    final String version = v.getMajor() + "." + v.getMinor() + "." + v.getMicro();
-    String title = getProductName() + " " + version;
-    return HTML.h2(binds.put(title));
-  }
+  protected void createHtmlPropertyTableContent(StringBuffer buf) {
+    IClientSession session = ClientSessionProvider.currentSession();
+    long memUsed = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024 / 1024;
+    long memTotal = Runtime.getRuntime().totalMemory() / 1024 / 1024;
+    long memMax = Runtime.getRuntime().maxMemory() / 1024 / 1024;
+    //
+    buf.append("<tr><td>" + ScoutTexts.get("Username") + ":</td><td>&nbsp;</td><td>" + session.getUserId() + "</td></tr>");
+    buf.append("<tr><td>" + ScoutTexts.get("Language") + ":</td><td>&nbsp;</td><td>" + NlsLocale.get().getDisplayLanguage() + "</td></tr>");
+    buf.append("<tr><td>" + ScoutTexts.get("FormattingLocale") + ":</td><td>&nbsp;</td><td>" + NlsLocale.get() + "</td></tr>");
 
-  private String getProductName() {
-    IProduct product = Platform.getProduct();
-    if (product != null) {
-      return product.getName();
+    /**
+     * These information must only be presented in the case of an richclient. If the client is a webclient (ui.rap) then
+     * these informations must be omitted (Security) https://bugs.eclipse.org/bugs/show_bug.cgi?id=365761
+     */
+    if (UserAgentUtility.isRichClient()) {
+      buf.append("<tr><td>" + ScoutTexts.get("JavaVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.version") + "</td></tr>");
+      buf.append("<tr><td>" + ScoutTexts.get("JavaVMVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.vm.version") + "</td></tr>");
+      buf.append("<tr><td>" + ScoutTexts.get("OSVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("os.name") + " " + System.getProperty("os.version") + "</td></tr>");
+      buf.append("<tr><td>" + ScoutTexts.get("OSUser") + ":</td><td>&nbsp;</td><td>" + System.getProperty("user.name") + "</td></tr>");
+      buf.append("<tr><td>" + ScoutTexts.get("MemoryStatus") + ":</td><td>&nbsp;</td><td>" + memUsed + "MB (total " + memTotal + "MB / max " + memMax + "MB)</td></tr>");
+      IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
+      if (perf != null) {
+        buf.append("<tr><td>" + ScoutTexts.get("NetworkLatency") + ":</td><td>&nbsp;</td><td>" + perf.getNetworkLatency() + " ms</td></tr>");
+        buf.append("<tr><td>" + ScoutTexts.get("ExecutionTime") + ":</td><td>&nbsp;</td><td>" + perf.getServerExecutionTime() + " ms</td></tr>");
+      }
+      if (session.getServiceTunnel() != null) {
+        buf.append("<tr><td>" + ScoutTexts.get("Server") + ":</td><td>&nbsp;</td><td>" + session.getServiceTunnel().getServerURL() + "</td></tr>");
+      }
     }
-    else {
-      return "unknown";
-    }
-  }
-
-  private Version getVersion() {
-    Version v = Version.emptyVersion;
-    IProduct product = Platform.getProduct();
-    if (product != null) {
-      v = Version.parseVersion("" + product.getDefiningBundle().getHeaders().get("Bundle-Version"));
-    }
-    return v;
-  }
-
-  protected IHtmlTable getPropertyTable(final HtmlBinds binds) {
-    List<IHtmlTableRow> rows = new ArrayList<>();
-    final Map<String, Object> props = getProperties();
-    for (Entry<String, Object> p : props.entrySet()) {
-      rows.add(createHtmlRow(binds, p.getKey(), p.getValue()));
-    }
-    return table(rows).cellspacing(0).cellpadding(0);
-  }
-
-  protected Map<String, Object> getProperties() {
-    Map<String, Object> props = new LinkedHashMap<>();
-    props.put(ScoutTexts.get("Username"), ClientSessionProvider.currentSession().getUserId());
-    props.put(ScoutTexts.get("Language"), NlsLocale.get().getDisplayLanguage());
-    props.put(ScoutTexts.get("FormattingLocale"), NlsLocale.get());
-    props.put(ScoutTexts.get("DetailedVersion"), getVersion().toString());
-    return props;
-  }
-
-  protected IHtmlTableRow createHtmlRow(HtmlBinds binds, String property, Object value) {
-    return HTML.row(cell(binds.put(property + ":")), cell(binds.put(value)));
   }
 
   @Order(20.0f)
@@ -274,7 +250,9 @@ public class ScoutInfoForm extends AbstractForm {
       if (attachments.size() > 0) {
         getHtmlField().setAttachments(attachments);
       }
-      getHtmlField().setValue(createHtmlBody());
+      StringBuffer buf = new StringBuffer();
+      createHtmlBody(buf);
+      getHtmlField().setValue(buf.toString());
     }
   }
 }
