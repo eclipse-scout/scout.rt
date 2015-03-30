@@ -272,6 +272,11 @@ scout.defaultObjectFactories = [{
     return new scout.Calendar();
   }
 }, {
+  objectType: 'CalendarComponent',
+  create: function() {
+    return new scout.CalendarComponent();
+  }
+}, {
   objectType: 'CalendarField',
   create: function() {
     return new scout.CalendarField();

@@ -11,9 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.calendar;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.Range;
@@ -29,6 +27,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -47,9 +46,6 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   private static final String EVENT_SET_DISPLAY_MODE = "setDisplayMode";
 
   private CalendarListener m_calendarListener;
-
-  private final Map<CalendarComponent, String> m_calendarComponents = new HashMap<>();
-  private final Map<String, CalendarComponent> m_calendarComponentsById = new HashMap<>();
 
   public JsonCalendar(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -82,32 +78,17 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   @Override
   protected void initJsonProperties(T model) {
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_COMPONENTS, model) {
+    //FIXME CGU/BSH improve adapterproperty so that components are not disposed when changed?
+    putJsonProperty(new JsonAdapterProperty<T>(ICalendar.PROP_COMPONENTS, model, getJsonSession()) {
       @Override
       protected Set<? extends CalendarComponent> modelValue() {
         return getModel().getComponents();
       }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        @SuppressWarnings("unchecked")
-        Set<? extends CalendarComponent> modelValue = (Set<? extends CalendarComponent>) value;
-        JSONArray jsonArray = new JSONArray();
-        for (CalendarComponent calendarComponent : modelValue) {
-          jsonArray.put(getJsonCalendarComponentOrId(calendarComponent));
-        }
-        return jsonArray;
-      }
     });
-    putJsonProperty(new JsonProperty<T>(ICalendar.PROP_SELECTED_COMPONENT, model) {
+    putJsonProperty(new JsonAdapterProperty<T>(ICalendar.PROP_SELECTED_COMPONENT, model, getJsonSession()) {
       @Override
       protected CalendarComponent modelValue() {
         return getModel().getSelectedComponent();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        return getJsonCalendarComponentOrId((CalendarComponent) value);
       }
     });
     putJsonProperty(new JsonProperty<T>(ICalendar.PROP_DISPLAY_MODE, model) {
@@ -204,27 +185,12 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     // TODO BSH | Calendar String PROP_CONTEXT_MENU = "contextMenus";
   }
 
-  public Object getJsonCalendarComponentOrId(CalendarComponent component) {
-    if (component == null) {
-      return null;
-    }
-    String id = m_calendarComponents.get(component);
-    if (id != null) {
-      return id;
-    }
-    id = getJsonSession().createUniqueIdFor(null);
-    m_calendarComponents.put(component, id);
-    m_calendarComponentsById.put(id, component);
-    JSONObject json = new JsonCalendarComponent(getJsonSession(), component).toJson();
-    JsonObjectUtility.putProperty(json, "id", id);
-    return json;
-  }
-
-  public CalendarComponent resolveCalendarComponent(String id) {
+  @SuppressWarnings("unchecked")
+  public <C extends CalendarComponent> JsonCalendarComponent<C> resolveCalendarComponent(String id) {
     if (id == null) {
       return null;
     }
-    return m_calendarComponentsById.get(id);
+    return (JsonCalendarComponent<C>) getJsonSession().getJsonAdapter(id);
   }
 
   @Override
@@ -261,19 +227,16 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   protected void handleUiComponentAction(JsonEvent event) {
     getModel().getUIFacade().fireComponentActionFromUI();
-    waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected void handleUiComponentMoved(JsonEvent event) {
-    CalendarComponent comp = resolveCalendarComponent(event.getData().optString("component"));
+    JsonCalendarComponent<CalendarComponent> comp = resolveCalendarComponent(event.getData().optString("component"));
     Date newDate = new JsonDate(event.getData().optString("newDate")).asJavaDate();
-    getModel().getUIFacade().fireComponentMovedFromUI(comp, newDate);
-    waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
+    getModel().getUIFacade().fireComponentMovedFromUI(comp.getModel(), newDate);
   }
 
   protected void handleUiReload(JsonEvent event) {
     getModel().getUIFacade().fireReloadFromUI();
-    waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected void handleUiSetVisibleRange(JsonEvent event) {
@@ -281,21 +244,18 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     Date fromDate = new JsonDate(dateRange.optString("from")).asJavaDate();
     Date toDate = new JsonDate(dateRange.optString("to")).asJavaDate();
     getModel().getUIFacade().setVisibleRangeFromUI(fromDate, toDate);
-    waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected void handleUiSetSelection(JsonEvent event) {
     Date date = new JsonDate(event.getData().optString("date")).asJavaDate();
-    CalendarComponent comp = resolveCalendarComponent(event.getData().optString("component"));
-    getModel().getUIFacade().setSelectionFromUI(date, comp);
-    waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
+    JsonCalendarComponent<CalendarComponent> comp = resolveCalendarComponent(event.getData().optString("component"));
+    getModel().getUIFacade().setSelectionFromUI(date, comp.getModel());
   }
 
   protected void handleUiSetDisplayMode(JsonEvent event) {
     int displayMode = event.getData().optInt("displayMode");
     // TODO BSH Calendar | Check if we should add this method to the UI facade
     getModel().setDisplayMode(displayMode);
-    waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected class P_CalendarListener extends CalendarAdapter {
@@ -317,27 +277,4 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     }
   }
 
-  private static void waitForAllOtherJobs() {
-    // TODO [bsh][dw]: verify
-//    final IBlockingCondition waitForClientJobsToComplete = Jobs.getJobManager().createBlockingCondition("Wait for ClientJobs to complete", true);
-//    try {
-//      ClientJobs.schedule(new IRunnable() {
-//        @Override
-//        public void run() throws Exception {
-//          try {
-//            Filter filter = ClientJobFutureFilters.newFilter().currentSession().notCurrentFuture().notPeriodic();
-//            Jobs.getJobManager().awaitDone(filter, 1, TimeUnit.MINUTES);
-//          }
-//          finally {
-//            waitForClientJobsToComplete.setBlocking(false);
-//          }
-//        }
-//      });
-//
-//      waitForClientJobsToComplete.waitFor();
-//    }
-//    catch (JobExecutionException e) {
-//      LOG.error("Could not schedule waiting job.", e);
-//    }
-  }
 }

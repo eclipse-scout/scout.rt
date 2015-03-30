@@ -30,7 +30,7 @@ public class JsonCalendarEvent implements IJsonObject {
     }
     JSONObject json = new JSONObject();
     JsonObjectUtility.putProperty(json, "type", m_event.getType());
-    JsonObjectUtility.putProperty(json, "component", m_jsonCalendar.getJsonCalendarComponentOrId(m_event.getComponent()));
+    JsonObjectUtility.putProperty(json, "component", m_jsonCalendar.getAdapter(m_event.getComponent()).getId());
     JsonObjectUtility.putProperty(json, "popupMenus", m_event.getPopupMenus()); // TODO BSH Calendar | Convert JSON menus
     return json;
   }

@@ -27,6 +27,7 @@ scout.Calendar = function() {
   // additional modes; should be stored in model
   this.showYear = false;
   this.showList = false;
+  this._addAdapterProperties(['components', 'selectedComponent']);
 };
 scout.inherits(scout.Calendar, scout.ModelAdapter);
 

@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
+import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -67,6 +68,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.basic.activitymap.JsonActivityMap;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendar;
+import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendarComponent;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormToolButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
@@ -274,6 +276,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (model instanceof ICalendar) {
       return new JsonCalendar((ICalendar) model, session, id, parent);
+    }
+    if (model instanceof CalendarComponent) {
+      return new JsonCalendarComponent((CalendarComponent) model, session, id, parent);
     }
     if (model instanceof IActivityMap<?, ?>) {
       return new JsonActivityMap((IActivityMap<?, ?>) model, session, id, parent);

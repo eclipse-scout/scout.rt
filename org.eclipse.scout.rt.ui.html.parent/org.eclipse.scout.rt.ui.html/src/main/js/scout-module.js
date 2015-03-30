@@ -65,6 +65,7 @@ __include("jquery-scout.js");
   __include("activitymap/ActivityMap.js");
   __include("activitymap/ActivityMapLayout.js");
   __include("calendar/Calendar.js");
+  __include("calendar/CalendarComponent.js");
   __include("calendar/CalendarLayout.js");
   __include("messagebox/MessageBox.js");
   __include("messagebox/MessageBoxModelAdapter.js");
