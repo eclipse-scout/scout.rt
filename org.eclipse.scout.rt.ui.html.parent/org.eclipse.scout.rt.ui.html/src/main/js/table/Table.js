@@ -1726,10 +1726,15 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
   }
 };
 
-scout.Table.prototype._onStartCellEdit = function(columnId, rowId, field) {
+scout.Table.prototype._onStartCellEdit = function(columnId, rowId, fieldId) {
   var column = this.columnById(columnId);
   var row = this.rowById(rowId);
-  column.startCellEdit(row, field);
+  column.startCellEdit(row, fieldId);
+};
+
+scout.Table.prototype._onEndCellEdit = function(fieldId) {
+  var field = this.session.getModelAdapter(fieldId);
+  field.destroy();
 };
 
 scout.Table.prototype.onModelAction = function(event) {
@@ -1766,7 +1771,9 @@ scout.Table.prototype.onModelAction = function(event) {
   } else if (event.type === 'columnHeadersUpdated') {
     this._onColumnHeadersUpdated(event.columns);
   } else if (event.type === 'startCellEdit') {
-    this._onStartCellEdit(event.columnId, event.rowId, event.field);
+    this._onStartCellEdit(event.columnId, event.rowId, event.fieldId);
+  } else if (event.type === 'endCellEdit') {
+    this._onEndCellEdit(event.fieldId);
   } else {
     $.log.warn('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');
   }

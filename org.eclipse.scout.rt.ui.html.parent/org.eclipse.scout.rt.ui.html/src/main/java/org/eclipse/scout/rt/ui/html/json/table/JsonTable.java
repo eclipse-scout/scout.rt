@@ -75,6 +75,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_COLUMN_ORDER_CHANGED = "columnOrderChanged";
   public static final String EVENT_COLUMN_HEADERS_UPDATED = "columnHeadersUpdated";
   public static final String EVENT_START_CELL_EDIT = "startCellEdit";
+  public static final String EVENT_END_CELL_EDIT = "endCellEdit";
   public static final String EVENT_PREPARE_CELL_EDIT = "prepareCellEdit";
   public static final String EVENT_COMPLETE_CELL_EDIT = "completeCellEdit";
   public static final String EVENT_CANCEL_CELL_EDIT = "cancelCellEdit";
@@ -461,30 +462,38 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject json = new JSONObject();
     putProperty(json, "columnId", JsonObjectUtility.getString(event.getData(), PROP_COLUMN_ID));
     putProperty(json, "rowId", JsonObjectUtility.getString(event.getData(), PROP_ROW_ID));
-    putProperty(json, "field", jsonField.getId());
+    putProperty(json, "fieldId", jsonField.getId());
     addActionEvent(EVENT_START_CELL_EDIT, json);
   }
 
   protected void handleUiCompleteCellEdit(JsonEvent event) {
     String fieldId = JsonObjectUtility.getString(event.getData(), "fieldId");
     getModel().getUIFacade().completeCellEditFromUI();
-
-    IJsonAdapter<?> jsonAdapter = getJsonSession().getJsonAdapter(fieldId);
-    if (jsonAdapter == null) {
-      throw new IllegalStateException("No field adapter found for id " + fieldId);
-    }
-    jsonAdapter.dispose();
+    endCellEdit(fieldId);
   }
 
   protected void handleUiCancelCellEdit(JsonEvent event) {
     String fieldId = JsonObjectUtility.getString(event.getData(), "fieldId");
     getModel().getUIFacade().cancelCellEditFromUI();
+    endCellEdit(fieldId);
+  }
 
-    IJsonAdapter<?> jsonAdapter = getJsonSession().getJsonAdapter(fieldId);
-    if (jsonAdapter == null) {
+  protected void endCellEdit(String fieldId) {
+    IJsonAdapter<?> jsonField = getJsonSession().getJsonAdapter(fieldId);
+    if (jsonField == null) {
       throw new IllegalStateException("No field adapter found for id " + fieldId);
     }
-    jsonAdapter.dispose();
+
+    // Confirm end cell edit so that gui can dispose the adapter.
+    // It is not possible to dispose the adapter on the gui before sending complete or cancelCellEdit, because the field may send property change events back)
+    // It would be possible if we added a filter mechanism so that events for disposed adapters won't be sent to client
+    // TODO maybe optimize by adding a filter for disposed adapters
+    JSONObject json = new JSONObject();
+    putProperty(json, "fieldId", jsonField.getId());
+    addActionEvent(EVENT_END_CELL_EDIT, json);
+
+    //FIXME CGU feld merken, revert bei toJson für page reload
+    jsonField.dispose();
   }
 
   protected JSONObject tableRowToJson(ITableRow row) {

@@ -164,3 +164,11 @@
   .focus-border;
   border-radius: @border-radius;
 }
+
+.triangle-top-left(@size, @color) {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: @size @size 0 0;
+  border-color: @color transparent transparent transparent;
+}

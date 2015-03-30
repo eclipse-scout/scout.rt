@@ -10,25 +10,47 @@ scout.inherits(scout.CellEditorPopup, scout.Popup);
 
 scout.CellEditorPopup.prototype.render = function($parent) {
   scout.CellEditorPopup.parent.prototype.render.call(this, $parent);
-  var offsetBounds,
+
+  this.$container.addClass('cell-editor-popup');
+  this.$container.data('popup', this);
+  this.$body.addClass('cell-editor-popup-body');
+  var offsetBounds, rowOffsetBounds,
     field = this.cell.field,
-    $cell = this.table.$cell(this.column, this.row.$row);
+    $row = this.row.$row,
+    $cell = this.table.$cell(this.column, $row);
 
   field.render(this.$container);
+  field.$container.addClass('cell-editor');
+
+  // remove mandatory and status indicators (popup should 'fill' the whole cell)
+  if (field.$mandatory) {
+    field.$mandatory.remove();
+    field.$mandatory = null;
+  }
+  if (field.$status) {
+    field.$status.remove();
+    field.$status = null;
+  }
+
   offsetBounds = scout.graphics.offsetBounds($cell);
-  this.setLocation(new scout.Point(offsetBounds.x, offsetBounds.y));
-  scout.graphics.setSize(this.$container, offsetBounds.width, offsetBounds.height);
-  scout.graphics.setSize(field.$container, offsetBounds.width, offsetBounds.height);
+  rowOffsetBounds = scout.graphics.offsetBounds($row);
+  this.setLocation(new scout.Point(offsetBounds.x, rowOffsetBounds.y));
+  scout.graphics.setSize(this.$container, offsetBounds.width, rowOffsetBounds.height);
+  scout.graphics.setSize(field.$container, offsetBounds.width, rowOffsetBounds.height);
   scout.HtmlComponent.get(field.$container).layout();
 
   scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
   setTimeout(function() {
-    this.$container.installFocusContext('auto', this.table.session.jsonSessionId);
+    //FIXME CGU Maybe null if removed directly after render, better remove $container = undefined in popup.js?
+    if (this.$container) {
+      this.$container.installFocusContext('auto', this.table.session.jsonSessionId);
+    }
   }.bind(this), 0);
 };
 
 scout.CellEditorPopup.prototype.remove = function() {
   scout.CellEditorPopup.parent.prototype.remove.call(this);
+  this.cell.field.remove();
   scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
   if (this._mouseDownHandler) {
     $(document).off('mousedown', this._mouseDownHandler);
@@ -71,13 +93,10 @@ scout.CellEditorPopup.prototype.completeEdit = function() {
   $activeElement.blur();
 
   this.table.sendCompleteCellEdit(field.id);
-  //FIXME CGU what if there is a validation error?
-  this.cell.field.destroy();
   this.remove();
 };
 
 scout.CellEditorPopup.prototype.cancelEdit = function() {
   this.table.sendCancelCellEdit(this.cell.field.id);
-  this.cell.field.destroy();
   this.remove();
 };

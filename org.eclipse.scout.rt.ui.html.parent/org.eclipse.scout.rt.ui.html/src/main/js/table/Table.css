@@ -20,28 +20,6 @@
       background-color: @selection-row-background-color;
       border-color: @selection-row-border-color;
     }
-
-    /* editable cell marker is only shown if table has the focus */
-    & > .table-data > .table-row > .table-cell.editable.cell-align-left,
-    & > .table-data > .table-row > .table-cell.editable.cell-align-center {
-      &:after {
-        position: absolute;
-        .font-icon;
-        right: 5px;
-        content: @icon-pencil;
-        color: @text-field-icon-color;
-      }
-    }
-
-    & > .table-data > .table-row > .table-cell.editable.cell-align-right {
-      &:before {
-        position: absolute;
-        .font-icon;
-        left: 5px;
-        content: @icon-pencil;
-        color: @text-field-icon-color;
-      }
-    }
   }
 
   & > .menubar {
@@ -114,6 +92,14 @@
 
   .table-row-sum & {
     font-weight: bold;
+  }
+
+  &.editable:before {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    .triangle-top-left(5px, @desktop-border-color);
   }
 
   &.checkable {
