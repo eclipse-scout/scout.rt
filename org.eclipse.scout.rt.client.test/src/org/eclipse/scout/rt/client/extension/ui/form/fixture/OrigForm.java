@@ -32,7 +32,7 @@ public class OrigForm extends AbstractForm {
   public OrigForm() throws ProcessingException {
     super(false);
     m_operations = new ArrayList<String>();
-    initConfig();
+    callInitializer();
   }
 
   public void logOperation(Class<?> fieldClass, String operation) {
