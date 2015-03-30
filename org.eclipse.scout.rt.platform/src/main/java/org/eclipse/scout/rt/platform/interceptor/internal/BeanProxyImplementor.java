@@ -38,7 +38,7 @@ public class BeanProxyImplementor<T> implements InvocationHandler {
     m_interceptor = interceptor;
     m_impl = impl;
     m_types = types;
-    m_proxy = (T) Proxy.newProxyInstance(impl.getClass().getClassLoader(), m_types, this);
+    m_proxy = (T) Proxy.newProxyInstance(BeanProxyImplementor.class.getClassLoader(), m_types, this);
   }
 
   public T getImpl() {
