@@ -135,7 +135,16 @@ public class ExtensionRegistry extends AbstractService implements IInternalExten
         // 2. try @Extends annotation
         Extends extendsAnnotation = getExtendsAnnotation(extensionClass);
         if (extendsAnnotation != null) {
-          ownerClassIdentifier = new ClassIdentifier(extendsAnnotation.value());
+          int pathToContainerLength = extendsAnnotation.pathToContainer().length;
+          if (pathToContainerLength > 0) {
+            Class[] segments = new Class[pathToContainerLength + 1];
+            System.arraycopy(extendsAnnotation.pathToContainer(), 0, segments, 0, pathToContainerLength);
+            segments[pathToContainerLength] = extendsAnnotation.value();
+            ownerClassIdentifier = new ClassIdentifier(segments);
+          }
+          else {
+            ownerClassIdentifier = new ClassIdentifier(extendsAnnotation.value());
+          }
         }
 
         if (ownerClassIdentifier == null) {
