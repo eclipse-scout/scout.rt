@@ -49,6 +49,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.eclipse.core.runtime.prefs</locationURI>
 		</link>
 		<link>
+			<name>.settings/org.eclipse.jdt.core.prefs</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.eclipse.jdt.core.prefs</locationURI>
+		</link>
+		<link>
 			<name>.settings/org.eclipse.jdt.ui.prefs</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.eclipse.jdt.ui.prefs</locationURI>
