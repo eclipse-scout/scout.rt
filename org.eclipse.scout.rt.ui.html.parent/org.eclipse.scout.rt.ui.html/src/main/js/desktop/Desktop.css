@@ -175,7 +175,7 @@
 
 .desktop-bench > .table {
   &:focus {
-    .no-focus-border;
+    outline: none;
   }
 
   & > .table-header > .header-item {
@@ -189,7 +189,7 @@
     margin-right: @bench-margin-x;
   }
 
-  & > .table-data > .table-row > .table-cell {
+  & .table-cell {
     padding-top: @desktop-table-row-padding-y;
     padding-bottom: @desktop-table-row-padding-y;
 

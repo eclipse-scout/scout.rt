@@ -14,9 +14,7 @@
   }
 
   &:focus {
-    .focus-border;
-
-    & > .table-data > .table-row.selected {
+    & .table-row.selected {
       background-color: @selection-row-background-color;
       border-color: @selection-row-border-color;
     }

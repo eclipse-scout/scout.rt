@@ -1,6 +1,10 @@
-.tree-box > .tree,
 .tree-box > .field > .tree {
   border: 1px solid @border-color;
   border-radius: @border-radius;
   background-color: @control-background-color;
- }
+  overflow: hidden; /* necessary due to rounded borders and background color*/
+
+  &:focus {
+    .focus-border;
+  }
+}

@@ -3,8 +3,9 @@
   border: 1px solid @border-color;
   border-radius: @border-radius;
   background-color: @control-background-color;
+  overflow: hidden; /* necessary due to rounded borders and background color*/
 
-  &.disabled {
-    background-color: @control-background-disabled-color;
+  &:focus {
+    .focus-border;
   }
 }

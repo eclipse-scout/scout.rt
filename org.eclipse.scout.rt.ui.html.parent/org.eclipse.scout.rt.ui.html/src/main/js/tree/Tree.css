@@ -4,9 +4,7 @@
   width: 100%;
 
   &:focus {
-    .focus-border;
-
-    & > .tree-data > .tree-item.selected {
+    & .tree-item.selected {
       background-color: @selection-row-background-color;
       border-color: @selection-row-border-color;
     }

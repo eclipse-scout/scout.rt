@@ -16,6 +16,8 @@ scout.Tree = function() {
   this._treeItemCheckBoxPaddingLeft = 28;
   this._treeItemPaddingLevel = 15;
   this.menus = [];
+  this.menuBar;
+  this.menuBarPosition = 'bottom';
   this.keyStrokeAdapter = new scout.TreeKeyStrokeAdapter(this);
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
@@ -154,7 +156,7 @@ scout.Tree.prototype._render = function($parent) {
 
   scout.scrollbars.install(this.$data);
   this.session.detachHelper.pushScrollable(this.$data);
-  this.menuBar = new scout.MenuBar(this.$container, 'top', scout.TreeMenuItemsOrder.order);
+  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.TreeMenuItemsOrder.order);
   this._addNodes(this.nodes);
   if (this.selectedNodeIds.length > 0) {
     this._renderSelection();

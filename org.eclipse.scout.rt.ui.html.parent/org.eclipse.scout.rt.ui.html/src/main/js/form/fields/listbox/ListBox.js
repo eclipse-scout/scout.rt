@@ -20,7 +20,7 @@ scout.ListBox.prototype._render = function($parent) {
   if (this.table) {
     this._renderTable();
   }
-  if(this.filterBox){
+  if (this.filterBox) {
     this._renderFilterBox();
   }
 
