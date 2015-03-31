@@ -89,7 +89,7 @@ public final class ConfigIniUtility {
     }
     else {
       // don't log here because the logger needs this class (cyclic dependencies)
-      System.err.println("No configuration area found. Running with empty configuration.");
+      System.err.println("No config.ini found. Running with empty configuration.");
     }
   }
 
