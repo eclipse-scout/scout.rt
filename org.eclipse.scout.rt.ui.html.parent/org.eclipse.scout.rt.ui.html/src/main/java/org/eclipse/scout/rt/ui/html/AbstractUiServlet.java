@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +25,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.ui.html.cache.DefaultHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
@@ -59,10 +61,14 @@ public abstract class AbstractUiServlet extends HttpServlet {
   }
 
   @Override
-  public void init() throws ServletException {
+  public void init(ServletConfig config) throws ServletException {
+    super.init(config);
     try {
+      String appParam = config.getInitParameter("application");
+      @SuppressWarnings("unchecked")
+      Class<? extends IApplication> appType = (Class<? extends IApplication>) (appParam != null ? Class.forName(appParam) : null);
       Platform.setDefault();
-      Platform.get().start();
+      Platform.get().start(appType);
     }
     catch (Exception e) {
       throw new ServletException(e);
