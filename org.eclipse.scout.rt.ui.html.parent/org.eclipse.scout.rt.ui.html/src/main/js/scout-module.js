@@ -71,6 +71,7 @@ __include("jquery-scout.js");
   __include("messagebox/MessageBoxModelAdapter.js");
   // Table
   __include("table/Column.js");
+  __include("table/BeanColumn.js"); // requires Column.js
   __include("table/CheckBoxColumn.js"); // requires Column.js
   __include("table/control/TableControl.js");
   __include("table/control/AnalysisTableControl.js"); // requires TableControl.js
@@ -124,6 +125,7 @@ __include("jquery-scout.js");
   __include("form/fields/ValueFieldKeyStrokeAdapter.js");
   __include("form/fields/TextFieldLayout.js");
   // Form fields (A-Z)
+  __include("form/fields/beanfield/BeanField.js");
   __include("form/fields/button/Button.js");
   __include("form/fields/button/ButtonLayout.js");
   __include("form/fields/button/ButtonMnemonicKeyStroke.js");

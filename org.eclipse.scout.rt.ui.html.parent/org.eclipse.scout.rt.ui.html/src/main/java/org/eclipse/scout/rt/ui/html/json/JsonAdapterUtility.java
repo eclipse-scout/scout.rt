@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.util.Collection;
 
 import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.json.JSONArray;
 
 public final class JsonAdapterUtility {
@@ -58,5 +59,15 @@ public final class JsonAdapterUtility {
 
   public static <M extends Object> JSONArray getAdapterIdsForModel(IJsonSession jsonSession, Collection<M> models, IJsonAdapter<?> parent) {
     return getAdapterIdsForModel(jsonSession, models, parent, null);
+  }
+
+  public static String getObjectType(String objectType, Object model) {
+    if (model.getClass().isAnnotationPresent(ModelVariant.class)) {
+      ModelVariant modelVariant = model.getClass().getAnnotation(ModelVariant.class);
+      return objectType + "." + modelVariant.value();
+    }
+    else {
+      return objectType;
+    }
   }
 }

@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
@@ -31,7 +32,11 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   }
 
   public String getObjectType() {
-    return "TableColumn";
+    return "Column";
+  }
+
+  protected String getObjectTypeVariant() {
+    return JsonAdapterUtility.getObjectType(getObjectType(), m_column);
   }
 
   public void setColumnIndexOffset(int indexOffset) {
@@ -42,7 +47,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
     JsonObjectUtility.putProperty(json, "id", getColumn().getColumnId());
-    JsonObjectUtility.putProperty(json, "objectType", getObjectType());
+    JsonObjectUtility.putProperty(json, "objectType", getObjectTypeVariant());
     JsonObjectUtility.putProperty(json, "index", getColumn().getColumnIndex() - m_indexOffset);
     JsonObjectUtility.putProperty(json, "text", getJsonSession().getCustomHtmlRenderer().convert(getColumn().getHeaderCell().getText(), true));
     JsonObjectUtility.putProperty(json, "type", computeColumnType(getColumn()));

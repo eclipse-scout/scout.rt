@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IBeanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
@@ -35,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.beanfield.IBeanField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
@@ -81,6 +83,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.calendar.JsonCalendarField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.composer.JsonComposerField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.customfield.JsonBeanField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield.JsonHtmlField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.imagefield.JsonImageField;
@@ -108,6 +111,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.wrappedform.JsonWrappedForm
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
+import org.eclipse.scout.rt.ui.html.json.table.JsonBeanColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonDateColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonNumberColumn;
@@ -222,6 +226,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     if (model instanceof IComposerField) {
       return new JsonComposerField((IComposerField) model, session, id, parent);
     }
+    if (model instanceof IBeanField) {
+      return new JsonBeanField((IBeanField) model, session, id, parent);
+    }
 
     // Fallback for all other form fields (will generate a 'not implemented' placeholder). Note: insert more form fields _before_ this line!
     if (model instanceof IFormField) {
@@ -289,6 +296,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (model instanceof IDateColumn) {
       return new JsonDateColumn((IDateColumn) model, session);
+    }
+    if (model instanceof IBeanColumn<?>) {
+      return new JsonBeanColumn((IBeanColumn<?>) model, session);
     }
     if (model instanceof IColumn<?>) {
       return new JsonColumn((IColumn<?>) model, session);

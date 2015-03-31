@@ -112,9 +112,14 @@ scout.defaultObjectFactories = [{
     return new scout.Table();
   }
 }, {
-  objectType: 'TableColumn',
+  objectType: 'Column',
   create: function() {
     return new scout.Column();
+  }
+}, {
+  objectType: 'BeanColumn',
+  create: function() {
+    return new scout.BeanColumn();
   }
 }, {
   objectType: 'TableControl',
@@ -331,5 +336,10 @@ scout.defaultObjectFactories = [{
   create: function() {
     // Composer is actually just a tree field, there is currently no need to duplicate the js/css code
     return new scout.TreeField();
+  }
+}, {
+  objectType: 'BeanField',
+  create: function() {
+    return new scout.BeanField();
   }
 }];
