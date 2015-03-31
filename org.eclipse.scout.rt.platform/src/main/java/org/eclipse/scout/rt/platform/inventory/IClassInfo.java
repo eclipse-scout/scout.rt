@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.platform.inventory;
 
 import java.lang.reflect.Modifier;
 
-import org.eclipse.scout.rt.platform.PlatformException;
-
 /**
  *
  */
@@ -40,7 +38,7 @@ public interface IClassInfo {
 
   boolean hasNoArgsConstructor();
 
-  Class<?> resolveClass() throws PlatformException;
+  Class<?> resolveClass();
 
   /**
    * must be public, not abstract, not interface, not inner member type

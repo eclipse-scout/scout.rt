@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.inventory.internal;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
 import org.eclipse.scout.commons.Assertions;
@@ -25,6 +26,8 @@ import org.jboss.jandex.ClassInfo;
 public class JandexClassInfo implements IClassInfo {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JandexClassInfo.class);
   private final ClassInfo m_classInfo;
+  private volatile boolean m_hasNoArgsConstructor;
+  private volatile Class<?> m_class;
 
   public JandexClassInfo(ClassInfo classInfo) {
     Assertions.assertNotNull(classInfo);
@@ -41,32 +44,54 @@ public class JandexClassInfo implements IClassInfo {
     return m_classInfo.flags();
   }
 
-  @Override
-  public boolean hasNoArgsConstructor() {
-    return m_classInfo.hasNoArgsConstructor();
+  protected void ensureClassLoaded() {
+    if (m_class == null) {
+      synchronized (this) {
+        if (m_class == null) {
+          try {
+            m_class = Class.forName(name());
+            m_hasNoArgsConstructor = hasNoArgsConstructor(m_class);
+          }
+          catch (ClassNotFoundException ex) {
+            throw new PlatformException("Error loading class '" + name() + "' with flags 0x" + Integer.toHexString(flags()), ex);
+          }
+        }
+      }
+    }
+  }
+
+  protected boolean hasNoArgsConstructor(Class<?> c) {
+    for (Constructor<?> a : c.getConstructors()) {
+      if (a.getParameterTypes().length == 0) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
-  public Class<?> resolveClass() throws PlatformException {
-    try {
-      return Class.forName(name());
-    }
-    catch (ClassNotFoundException ex) {
-      throw new PlatformException("Error loading class '" + name() + "' with flags 0x" + Integer.toHexString(flags()), ex);
-    }
+  public boolean hasNoArgsConstructor() {
+    ensureClassLoaded();
+    return m_hasNoArgsConstructor;
+  }
+
+  @Override
+  public Class<?> resolveClass() {
+    ensureClassLoaded();
+    return m_class;
   }
 
   @Override
   public boolean isInstanciable() {
-    if (isAbstract() || isInterface()) {
-      return false;
-    }
-
-    if (!hasNoArgsConstructor()) {
+    if (isAbstract() || isInterface() || !isPublic()) {
       return false;
     }
 
     try {
+      if (!hasNoArgsConstructor()) {
+        return false;
+      }
+
       Class<?> clazz = resolveClass();
       // top level or static inner
       if (clazz.isMemberClass() && !Modifier.isStatic(clazz.getModifiers())) {
