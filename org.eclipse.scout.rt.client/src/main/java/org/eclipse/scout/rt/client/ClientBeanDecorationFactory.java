@@ -23,7 +23,7 @@ public class ClientBeanDecorationFactory extends SimpleBeanDecorationFactory {
     if (bean.getBeanAnnotation(Client.class) != null) {
       return decorateWithClientSessionCheck(bean, queryType);
     }
-    return decorateDefault(bean, queryType);
+    return super.decorate(bean, queryType);
   }
 
   protected <T> IBeanInterceptor<T> decorateWithTunnelToServer(IBean<T> bean, Class<T> queryType) {

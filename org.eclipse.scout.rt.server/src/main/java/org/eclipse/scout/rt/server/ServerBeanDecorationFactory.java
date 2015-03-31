@@ -28,7 +28,7 @@ public class ServerBeanDecorationFactory extends SimpleBeanDecorationFactory {
     if (bean.getBeanAnnotation(Server.class) != null) {
       return decorateWithServerSessionCheck(bean, queryType);
     }
-    return decorateDefault(bean, queryType);
+    return super.decorate(bean, queryType);
   }
 
   protected <T> IBeanInterceptor<T> decorateWithServerSessionCheck(IBean<T> bean, Class<T> queryType) {
