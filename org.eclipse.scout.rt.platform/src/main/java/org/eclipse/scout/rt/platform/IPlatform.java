@@ -82,7 +82,7 @@ public interface IPlatform {
   //TODO imo rename to getBeanManager
   IBeanContext getBeanContext();
 
-  void start() throws PlatformException;
+  void start(Class<? extends IApplication> appType) throws PlatformException;
 
   /**
    *

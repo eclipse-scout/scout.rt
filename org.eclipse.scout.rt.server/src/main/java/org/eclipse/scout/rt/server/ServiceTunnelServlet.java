@@ -213,8 +213,11 @@ public class ServiceTunnelServlet extends HttpServlet {
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
     try {
+      String appParam = config.getInitParameter("application");
+      @SuppressWarnings("unchecked")
+      Class<? extends IApplication> appType = (Class<? extends IApplication>) (appParam != null ? Class.forName(appParam) : null);
       Platform.setDefault();
-      Platform.get().start();
+      Platform.get().start(appType);
     }
     catch (Exception e) {
       throw new ServletException(e);

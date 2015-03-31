@@ -15,9 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.ReflectionUtility;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.testing.platform.ITestExecutionListener;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.UnwrapProcessingRuntimeExceptionStatement;
 import org.junit.AfterClass;
@@ -31,6 +30,7 @@ import org.junit.runners.model.Statement;
 
 /**
  * Use this Runner to run tests which require the platform to be started.
+ * The {@link Platform#setDefault()} is started {@link IPlatform#start(Class)} without an application.
  * <p/>
  * Use <code>RunWithSubject</code> annotation to specify the user to run the test. This annotation can be defined on
  * class or method-level. If defining the user on class-level, all test-methods inherit that user.
@@ -50,26 +50,34 @@ import org.junit.runners.model.Statement;
  */
 public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
+  private IPlatform m_platformBackup;
+
   public PlatformTestRunner(final Class<?> clazz) throws InitializationError {
     super(clazz);
   }
 
   @Override
   protected Statement classBlock(final RunNotifier notifier) {
-    ensurePlatformStarted();
-    return super.classBlock(notifier);
-  }
-
-  protected void ensurePlatformStarted() {
-    // Ensure the platform to be started.
-    if (Platform.get() == null) {
-      Platform.setDefault();
-      Platform.get().start();
-      final ITestExecutionListener listener = OBJ.getOptional(ITestExecutionListener.class);
-      if (listener != null) {
-        listener.platformStarted();
+    return new Statement() {
+      @Override
+      public void evaluate() throws Throwable {
+        try {
+          m_platformBackup = Platform.get();
+          try {
+            Platform.setDefault();
+            Platform.get().start(null);
+            //
+            PlatformTestRunner.super.classBlock(notifier);
+          }
+          finally {
+            Platform.get().stop();
+          }
+        }
+        finally {
+          Platform.set(m_platformBackup);
+        }
       }
-    }
+    };
   }
 
   @Override

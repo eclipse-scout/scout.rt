@@ -66,7 +66,7 @@ public class PlatformImplementor implements IPlatform {
   }
 
   @Override
-  public synchronized void start() {
+  public synchronized void start(Class<? extends IApplication> appType) {
     m_stateLock.writeLock().lock();
     try {
       changeState(State.PlatformStopped);
@@ -88,7 +88,7 @@ public class PlatformImplementor implements IPlatform {
 
     // start of application not part of the lock to allow the application to use the bean context and the inventory
     changeState(State.ApplicationStarting);
-    startApplication();
+    startApplication(appType);
     changeState(State.ApplicationStarted);
   }
 
@@ -155,8 +155,8 @@ public class PlatformImplementor implements IPlatform {
     ((BeanManagerImplementor) m_beanContext).startCreateImmediatelyBeans();
   }
 
-  protected void startApplication() {
-    m_application = OBJ.getOptional(IApplication.class);
+  protected void startApplication(Class<? extends IApplication> appType) {
+    m_application = OBJ.getOptional(appType);
     if (m_application != null) {
       try {
         m_application.start();
