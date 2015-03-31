@@ -598,6 +598,7 @@ public class MutualExclusionTest {
     final TestJobManager jobManager = new TestJobManager();
     m_beans.addAll(TestingUtility.registerBeans(
         new BeanData(IJobManager.class).
+            order(-1000).
             initialInstance(jobManager).
             applicationScoped(true)));
 
@@ -714,6 +715,7 @@ public class MutualExclusionTest {
 
     m_beans.addAll(TestingUtility.registerBeans(
         new BeanData(IJobManager.class).
+        order(-1000).
         initialInstance(jobManager).
         applicationScoped(true)));
 
