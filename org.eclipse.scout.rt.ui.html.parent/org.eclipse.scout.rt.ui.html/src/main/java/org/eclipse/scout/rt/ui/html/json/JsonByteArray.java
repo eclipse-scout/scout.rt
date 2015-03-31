@@ -8,27 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.table;
+package org.eclipse.scout.rt.ui.html.json;
 
-import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.commons.Base64Utility;
 import org.json.JSONObject;
 
-public class JsonNumberColumn<T extends INumberColumn<?>> extends JsonColumn<T> {
+public class JsonByteArray implements IJsonObject {
+  private byte[] m_bytes;
 
-  public JsonNumberColumn(T model) {
-    super(model);
+  public JsonByteArray(byte[] bytes) {
+    m_bytes = bytes;
   }
 
   @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    JsonObjectUtility.putProperty(json, "format", ((INumberColumn) getColumn()).getFormat().toPattern());
-    return json;
+  public Object toJson() {
+    //TODO CGU/IMO is a json object necessary?
+    JSONObject b64 = new JSONObject();
+    JsonObjectUtility.putProperty(b64, "b64", Base64Utility.encode((byte[]) m_bytes));
+    return b64;
   }
 
-  @Override
-  public Object cellValueToJson(Object value) {
-    return value;
-  }
 }

@@ -1,0 +1,148 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.ui.html.json;
+
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import org.eclipse.scout.commons.Base64Utility;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.junit.Test;
+
+public class JsonBeanTest {
+
+  @Test
+  public void testBeanWithPrimitive() {
+    BeanWithPrimitives bean = new BeanWithPrimitives();
+    bean.setLong(4);
+    bean.setString("hello");
+
+    JsonObjectFactory factory = new JsonObjectFactory();
+    IJsonObject jsonObj = factory.createJsonObject(bean);
+
+    JSONObject json = (JSONObject) jsonObj.toJson();
+    assertEquals(4, json.optLong("long"));
+    assertEquals("hello", json.optString("string"));
+  }
+
+  @Test
+  public void testBeanWithDate() {
+    BeanWithDate bean = new BeanWithDate();
+    Calendar cal = Calendar.getInstance();
+    cal.set(2015, 8, 24, 17, 38, 9);
+    cal.set(Calendar.MILLISECOND, 0);
+    bean.setDate(cal.getTime());
+
+    JsonObjectFactory factory = new JsonObjectFactory();
+    IJsonObject jsonObj = factory.createJsonObject(bean);
+
+    JSONObject json = (JSONObject) jsonObj.toJson();
+    assertEquals("2015-09-24 17:38:09.000", json.optString("date"));
+  }
+
+  @Test
+  public void testBeanWithByteArray() {
+    BeanWithByteArray bean = new BeanWithByteArray();
+    String str = "hello";
+    bean.setBytes(str.getBytes());
+
+    JsonObjectFactory factory = new JsonObjectFactory();
+    IJsonObject jsonObj = factory.createJsonObject(bean);
+
+    JSONObject json = (JSONObject) jsonObj.toJson();
+    JSONObject jsonB64 = json.optJSONObject("bytes");
+    assertEquals(Base64Utility.encode(str.getBytes()), jsonB64.opt("b64"));
+  }
+
+  @Test
+  public void testBeanWithCollection() {
+    BeanWithCollection bean = new BeanWithCollection();
+    List<Long> list = new ArrayList<Long>();
+    list.add(2L);
+    list.add(400L);
+    list.add(5000L);
+    bean.setLongs(list);
+
+    JsonObjectFactory factory = new JsonObjectFactory();
+    IJsonObject jsonObj = factory.createJsonObject(bean);
+
+    JSONObject json = (JSONObject) jsonObj.toJson();
+    JSONArray jsonArray = json.optJSONArray("longs");
+    assertEquals(2, jsonArray.optLong(0));
+    assertEquals(400, jsonArray.optLong(1));
+    assertEquals(5000, jsonArray.optLong(2));
+  }
+
+  public static class BeanWithPrimitives {
+    private long m_long;
+    private String m_string;
+
+    public long getLong() {
+      return m_long;
+    }
+
+    public void setLong(long l) {
+      m_long = l;
+    }
+
+    public String getString() {
+      return m_string;
+    }
+
+    public void setString(String string) {
+      m_string = string;
+    }
+  }
+
+  public static class BeanWithDate {
+    private Date m_date;
+
+    public Date getDate() {
+      return m_date;
+    }
+
+    public void setDate(Date date) {
+      m_date = date;
+    }
+
+  }
+
+  public static class BeanWithCollection {
+    private List<Long> m_longs;
+
+    public List<Long> getLongs() {
+      return m_longs;
+    }
+
+    public void setLongs(List<Long> longs) {
+      m_longs = longs;
+    }
+
+  }
+
+  public static class BeanWithByteArray {
+    private byte[] m_bytes;
+
+    public byte[] getBytes() {
+      return m_bytes;
+    }
+
+    public void setBytes(byte[] bytes) {
+      m_bytes = bytes;
+    }
+
+  }
+}

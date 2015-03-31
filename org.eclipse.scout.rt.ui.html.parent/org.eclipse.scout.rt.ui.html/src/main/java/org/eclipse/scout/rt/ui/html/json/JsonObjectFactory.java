@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.util.Date;
+
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -132,7 +134,7 @@ public class JsonObjectFactory implements IJsonObjectFactory {
 
   @Override
   @SuppressWarnings("unchecked")
-  public IJsonObject createJsonObject(Object model, IJsonSession session, String id, IJsonAdapter<?> parent) {
+  public IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession session, String id, IJsonAdapter<?> parent) {
     // --- form fields ----
     if (model instanceof IGroupBox) {
       // we must distinct between normal group-boxes and group-boxes in tab-boxes
@@ -291,19 +293,6 @@ public class JsonObjectFactory implements IJsonObjectFactory {
       return new JsonActivityMap((IActivityMap<?, ?>) model, session, id, parent);
     }
 
-    if (model instanceof INumberColumn<?>) {
-      return new JsonNumberColumn((INumberColumn<?>) model, session);
-    }
-    if (model instanceof IDateColumn) {
-      return new JsonDateColumn((IDateColumn) model, session);
-    }
-    if (model instanceof IBeanColumn<?>) {
-      return new JsonBeanColumn((IBeanColumn<?>) model, session);
-    }
-    if (model instanceof IColumn<?>) {
-      return new JsonColumn((IColumn<?>) model, session);
-    }
-
     if (model instanceof IChartTableControl) { // needs to be before ITableControl
       return new JsonChartTableControl((IChartTableControl) model, session, id, parent);
     }
@@ -321,5 +310,29 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
 
     throw new IllegalArgumentException("Cannot create JSON adapter for model-object " + model);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public IJsonObject createJsonObject(Object object) {
+    if (object instanceof Date) {
+      return new JsonDate((Date) object);
+    }
+    else if (object instanceof byte[]) {
+      return new JsonByteArray((byte[]) object);
+    }
+    if (object instanceof INumberColumn<?>) {
+      return new JsonNumberColumn((INumberColumn<?>) object);
+    }
+    if (object instanceof IDateColumn) {
+      return new JsonDateColumn((IDateColumn) object);
+    }
+    if (object instanceof IBeanColumn<?>) {
+      return new JsonBeanColumn((IBeanColumn<?>) object);
+    }
+    if (object instanceof IColumn<?>) {
+      return new JsonColumn((IColumn<?>) object);
+    }
+    return new JsonBean(object, this);
   }
 }

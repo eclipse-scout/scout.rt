@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.IJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
@@ -167,8 +168,13 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public IJsonAdapter<?> createJsonObject(Object model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    public IJsonAdapter<Object> createJsonAdapter(Object model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
       return new JsonOutlineTable((ITable) model, jsonSession, id, new P_JsonOutlineAdapter(m_page), parent);
+    }
+
+    @Override
+    public IJsonObject createJsonObject(Object object) {
+      return null;
     }
   }
 }

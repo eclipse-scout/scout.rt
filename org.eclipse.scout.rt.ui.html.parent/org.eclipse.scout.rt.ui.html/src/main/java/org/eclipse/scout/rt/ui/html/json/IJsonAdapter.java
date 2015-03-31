@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.util.Collection;
 
 import org.eclipse.scout.commons.filter.IFilter;
+import org.json.JSONObject;
 
 /**
  * Creates JSON output for a Scout model object.
@@ -21,6 +22,9 @@ public interface IJsonAdapter<T extends Object> extends IJsonObject {
    * (JSON attribute 'objectType').
    */
   String getObjectType();
+
+  @Override
+  JSONObject toJson();
 
   /**
    * Returns the Scout model object.

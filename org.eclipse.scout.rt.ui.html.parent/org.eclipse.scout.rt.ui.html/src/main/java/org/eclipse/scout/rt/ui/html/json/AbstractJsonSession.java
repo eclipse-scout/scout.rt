@@ -67,7 +67,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   public static final String CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX = "scout.htmlui.session.client."/*+m_clientSessionId*/;
   private static final long ROOT_ID = 1;
 
-  private final JsonObjectFactory m_jsonObjectFactory;
+  private final IJsonObjectFactory m_jsonObjectFactory;
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final Set<String> m_unregisterAdapterSet = new HashSet<String>();
   private final ICustomHtmlRenderer m_customHtmlRenderer;
@@ -116,7 +116,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return new JsonResponse();
   }
 
-  protected JsonObjectFactory createJsonObjectFactory() {
+  protected IJsonObjectFactory createJsonObjectFactory() {
     return new JsonObjectFactory();
   }
 
@@ -399,7 +399,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public JsonObjectFactory getJsonObjectFactory() {
+  public IJsonObjectFactory getJsonObjectFactory() {
     return m_jsonObjectFactory;
   }
 
@@ -509,7 +509,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       objectFactory = m_jsonObjectFactory;
     }
     String id = createUniqueIdFor(null); // FIXME CGU
-    A adapter = (A) objectFactory.createJsonObject(model, this, id, parent);
+    A adapter = (A) objectFactory.createJsonAdapter(model, this, id, parent);
     adapter.init();
     return adapter;
   }

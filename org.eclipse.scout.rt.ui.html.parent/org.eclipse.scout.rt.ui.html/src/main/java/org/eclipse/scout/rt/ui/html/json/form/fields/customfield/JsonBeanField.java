@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.customfield;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
@@ -39,7 +38,7 @@ public class JsonBeanField<T extends IValueField<?>> extends JsonValueField<T> {
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        return JsonObjectUtility.javaToJson(value);
+        return getJsonSession().getJsonObjectFactory().createJsonObject(value).toJson();
       }
     });
   }

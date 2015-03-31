@@ -10,13 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import org.json.JSONObject;
 
 /**
  * Implementations of this interface transform a model object into a JSONObject.
  */
 public interface IJsonObject {
 
-  JSONObject toJson();
+  Object toJson();
 
 }

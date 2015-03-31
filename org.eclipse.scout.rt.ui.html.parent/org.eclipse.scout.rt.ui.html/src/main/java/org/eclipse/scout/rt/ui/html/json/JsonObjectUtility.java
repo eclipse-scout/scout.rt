@@ -271,7 +271,9 @@ public final class JsonObjectUtility {
    * @param o
    *          the java bean
    * @return {@link JSONObject}, {@link JSONArray} or a basic type
+   * @deprecated Use {@link JsonObjectFactory} instead
    */
+  @Deprecated
   public static Object javaToJson(Object o) {
     if (o == null) {
       return null;

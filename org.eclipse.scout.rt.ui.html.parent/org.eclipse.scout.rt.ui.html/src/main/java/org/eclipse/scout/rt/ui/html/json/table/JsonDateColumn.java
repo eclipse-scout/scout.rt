@@ -19,7 +19,6 @@ import java.util.Locale;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -27,8 +26,8 @@ import org.json.JSONObject;
 
 public class JsonDateColumn<T extends IDateColumn> extends JsonColumn<T> {
 
-  public JsonDateColumn(T model, IJsonSession jsonSession) {
-    super(model, jsonSession);
+  public JsonDateColumn(T model) {
+    super(model);
   }
 
   @Override

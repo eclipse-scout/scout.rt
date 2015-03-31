@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.StaticDate;
  * @see DateFormat.js
  * @see StaticDate.java
  */
-public class JsonDate {
+public class JsonDate implements IJsonObject {
 
   public static final String JSON_PATTERN_FULL = "yyyy-MM-dd HH:mm:ss.SSS";
   public static final String JSON_PATTERN_DATE_ONLY = "yyyy-MM-dd";
@@ -76,6 +76,11 @@ public class JsonDate {
    */
   public String asJsonString() {
     return asJsonString(false);
+  }
+
+  @Override
+  public Object toJson() {
+    return asJsonString();
   }
 
   /**

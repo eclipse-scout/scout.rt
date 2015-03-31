@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 public interface IJsonObjectFactory {
 
-  IJsonObject createJsonObject(Object model, IJsonSession session, String id, IJsonAdapter<?> parent);
+  IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession session, String id, IJsonAdapter<?> parent);
 
+  IJsonObject createJsonObject(Object object);
 }

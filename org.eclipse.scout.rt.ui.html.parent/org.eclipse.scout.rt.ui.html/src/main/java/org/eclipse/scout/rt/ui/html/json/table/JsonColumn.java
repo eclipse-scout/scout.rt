@@ -26,9 +26,8 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   private T m_column;
   private int m_indexOffset;
 
-  public JsonColumn(T model, IJsonSession jsonSession) {
+  public JsonColumn(T model) {
     m_column = model;
-    m_jsonSession = jsonSession;
   }
 
   public String getObjectType() {
@@ -94,4 +93,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     return m_jsonSession;
   }
 
+  public void setJsonSession(IJsonSession jsonSession) {
+    m_jsonSession = jsonSession;
+  }
 }

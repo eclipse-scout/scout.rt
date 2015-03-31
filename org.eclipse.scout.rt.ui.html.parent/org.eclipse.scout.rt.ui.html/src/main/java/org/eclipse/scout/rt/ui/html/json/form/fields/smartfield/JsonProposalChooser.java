@@ -22,9 +22,9 @@ import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.json.JSONObject;
 
-public class JsonProposalChooser extends AbstractJsonPropertyObserver<IProposalChooser> {
+public class JsonProposalChooser<T extends IProposalChooser> extends AbstractJsonPropertyObserver<T> {
 
-  public JsonProposalChooser(IProposalChooser model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+  public JsonProposalChooser(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
   }
 
@@ -34,7 +34,7 @@ public class JsonProposalChooser extends AbstractJsonPropertyObserver<IProposalC
   }
 
   @Override
-  protected void initJsonProperties(IProposalChooser model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     // We don't support that a smart-field could change the activeStateFilterEnabled property at runtime
     // Because very few smart-fields do have such a filter we'd rather not send the additional JSON data

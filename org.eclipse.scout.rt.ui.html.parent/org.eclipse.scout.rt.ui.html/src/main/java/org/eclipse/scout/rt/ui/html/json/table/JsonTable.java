@@ -213,7 +213,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         continue;
       }
 
-      JsonColumn jsonColumn = (JsonColumn) getJsonSession().getJsonObjectFactory().createJsonObject(column, getJsonSession(), null, null);
+      JsonColumn jsonColumn = (JsonColumn) getJsonSession().getJsonObjectFactory().createJsonObject(column);
+      jsonColumn.setJsonSession(getJsonSession());
       jsonColumn.setColumnIndexOffset(offset);
       m_jsonColumns.put(column, jsonColumn);
     }
