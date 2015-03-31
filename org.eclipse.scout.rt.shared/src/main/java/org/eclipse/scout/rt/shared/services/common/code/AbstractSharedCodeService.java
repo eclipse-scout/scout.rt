@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
@@ -159,7 +159,7 @@ public abstract class AbstractSharedCodeService extends AbstractService implemen
         return CollectionUtility.hashSet(a);
       }
 
-      Set<IClassInfo> allKnownCodeTypes = Platform.get().getClassInventory().getAllKnownSubClasses(ICodeType.class);
+      Set<IClassInfo> allKnownCodeTypes = ClassInventory.get().getAllKnownSubClasses(ICodeType.class);
       Set<Class<? extends ICodeType<?, ?>>> discoveredCodeTypes = new HashSet<>(allKnownCodeTypes.size());
       for (IClassInfo codeTypeInfo : allKnownCodeTypes) {
         if (!codeTypeInfo.isInstanciable()) {

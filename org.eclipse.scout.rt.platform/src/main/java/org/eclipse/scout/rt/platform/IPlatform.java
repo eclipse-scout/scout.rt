@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 
 /**
  * All instances of IPlatformListener receive event notifications from the platform
@@ -86,8 +85,6 @@ public interface IPlatform {
    * @return
    */
   State getState();
-
-  IClassInventory getClassInventory();
 
   //TODO imo rename to getBeanManager
   IBeanContext getBeanContext();

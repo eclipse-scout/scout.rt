@@ -30,10 +30,7 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformException;
 import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
-import org.eclipse.scout.rt.platform.inventory.IClassInventory;
-import org.eclipse.scout.rt.platform.inventory.internal.JandexClassInventory;
-import org.eclipse.scout.rt.platform.inventory.internal.JandexInventoryBuilder;
-import org.jboss.jandex.IndexView;
+import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 
 /**
  * @since 15.2
@@ -43,7 +40,6 @@ public class PlatformImplementor implements IPlatform {
 
   private final ReentrantReadWriteLock m_stateLock;
   private volatile State m_state; // may be read at any time by any thread
-  private IClassInventory m_classInventory;
   private BeanManagerImplementor m_beanContext;
   private IApplication m_application;
 
@@ -55,18 +51,6 @@ public class PlatformImplementor implements IPlatform {
   @Override
   public State getState() {
     return m_state;
-  }
-
-  @Override
-  public IClassInventory getClassInventory() {
-    // use lock to ensure the caller waits until the platform has been started completely
-    m_stateLock.readLock().lock();
-    try {
-      return m_classInventory;
-    }
-    finally {
-      m_stateLock.readLock().unlock();
-    }
   }
 
   @Override
@@ -86,7 +70,6 @@ public class PlatformImplementor implements IPlatform {
     m_stateLock.writeLock().lock();
     try {
       changeState(State.PlatformStopped);
-      m_classInventory = createClassInventory();
       m_beanContext = createBeanManager();
       //now all IPlatformListener are registered and can receive platform events
 
@@ -110,26 +93,9 @@ public class PlatformImplementor implements IPlatform {
     changeState(State.ApplicationStarted);
   }
 
-  protected IClassInventory createClassInventory() {
-    try {
-      long t0 = System.nanoTime();
-
-      JandexInventoryBuilder beanFinder = new JandexInventoryBuilder();
-      beanFinder.scanAllModules();
-      IndexView index = beanFinder.finish();
-      long millis = (System.nanoTime() - t0) / 1000000L;
-      LOG.info("created class inventory  in {0} ms", millis);
-
-      return new JandexClassInventory(index);
-    }
-    catch (Throwable t) {
-      throw new PlatformException("Error while building class inventory", t);
-    }
-  }
-
   protected BeanManagerImplementor createBeanManager() {
     BeanManagerImplementor context = new BeanManagerImplementor();
-    Set<Class> allBeans = new BeanFilter().collect(getClassInventory());
+    Set<Class> allBeans = new BeanFilter().collect(ClassInventory.get());
     for (Class<?> bean : allBeans) {
       context.registerClass(bean);
     }
@@ -217,7 +183,6 @@ public class PlatformImplementor implements IPlatform {
       }
       changeState(State.PlatformStopped);
       destroyBeanManager();
-      destroyClassInventory();
     }
     finally {
       m_stateLock.writeLock().unlock();
@@ -236,10 +201,6 @@ public class PlatformImplementor implements IPlatform {
         m_application = null;
       }
     }
-  }
-
-  protected void destroyClassInventory() {
-    m_classInventory = null;
   }
 
   protected void destroyBeanManager() {

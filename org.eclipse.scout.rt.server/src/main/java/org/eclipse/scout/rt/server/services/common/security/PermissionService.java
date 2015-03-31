@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 import org.eclipse.scout.service.AbstractService;
@@ -43,7 +43,7 @@ public class PermissionService extends AbstractService implements IPermissionSer
     synchronized (m_permissionClassesLock) {
       // null-check with lock (valid check)
       if (m_permissionClasses == null) {
-        Set<IClassInfo> allKnownPermissions = Platform.get().getClassInventory().getAllKnownSubClasses(Permission.class);
+        Set<IClassInfo> allKnownPermissions = ClassInventory.get().getAllKnownSubClasses(Permission.class);
         Set<Class<? extends Permission>> discoveredPermissions = new HashSet<>(allKnownPermissions.size());
         for (IClassInfo permInfo : allKnownPermissions) {
           if (!permInfo.isInstanciable()) {

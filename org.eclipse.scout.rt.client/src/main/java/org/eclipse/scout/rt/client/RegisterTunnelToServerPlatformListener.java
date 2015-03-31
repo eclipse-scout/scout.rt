@@ -8,6 +8,7 @@ import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformException;
+import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
@@ -21,7 +22,7 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
   public void stateChanged(PlatformEvent event) throws PlatformException {
     if (event.getState() == IPlatform.State.BeanContextPrepared) {
       //register all tunnels to server
-      for (IClassInfo ci : event.getSource().getClassInventory().getKnownAnnotatedTypes(TunnelToServer.class)) {
+      for (IClassInfo ci : ClassInventory.get().getKnownAnnotatedTypes(TunnelToServer.class)) {
         if (!ci.isPublic()) {
           continue;
         }
