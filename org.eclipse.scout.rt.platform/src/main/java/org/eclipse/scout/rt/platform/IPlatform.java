@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-
 /**
  * All instances of IPlatformListener receive event notifications from the platform
  */
@@ -22,15 +21,9 @@ public interface IPlatform {
      * <p>
      * No state is valid so far
      * <p>
-     * Next phase is creating the class inventory
-     */
-    PlatformInit,
-    /**
-     * This event signals that {@link IPlatform#getClassInventory()} is now valid.
-     * <p>
      * Next phase is building the bean-context
      */
-    ClassInventoryValid,
+    PlatformInit,
     /**
      * This event signals that {@link IPlatform#getBeanContext()} was prepared with the beans found in the
      * {@link IPlatform#getClassInventory()} and may manipulated using

@@ -74,7 +74,6 @@ public class PlatformImplementor implements IPlatform {
       //now all IPlatformListener are registered and can receive platform events
 
       changeState(State.PlatformInit);
-      changeState(State.ClassInventoryValid);
       changeState(State.BeanContextPrepared);
 
       //validateBeanManager();
@@ -220,10 +219,7 @@ public class PlatformImplementor implements IPlatform {
     if (oldState == newState) {
       return;
     }
-    else if (oldState == State.PlatformInit && newState == State.ClassInventoryValid) {
-      return;
-    }
-    else if (oldState == State.ClassInventoryValid && newState == State.BeanContextPrepared) {
+    else if (oldState == State.PlatformInit && newState == State.BeanContextPrepared) {
       return;
     }
     else if (oldState == State.BeanContextPrepared && newState == State.BeanContextValid) {
