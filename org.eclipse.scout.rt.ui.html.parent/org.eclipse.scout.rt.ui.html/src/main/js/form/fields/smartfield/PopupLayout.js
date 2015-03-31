@@ -30,6 +30,7 @@ scout.PopupLayout.prototype.layout = function($container) {
   if (htmlProposalChooser) {
     size = popupSize.subtract(this._htmlPopup.getInsets());
     $.log.info('set propal-chooser size to ' + popupSize);
+    htmlProposalChooser.invalidate(); // FIXME AWE: warum ist das hier plötzlich notwendig damit der status korrekt dargestellt wird???
     htmlProposalChooser.setSize(size);
   }
 };
@@ -52,6 +53,7 @@ scout.PopupLayout.prototype.preferredLayoutSize = function($container) {
       scout.HtmlEnvironment.formColumnWidth,
       scout.HtmlEnvironment.formRowHeight * 2);
   }
+  $.log.info('YYY popup pref size=' + prefSize);
   return prefSize.add(this._htmlPopup.getInsets());
 };
 

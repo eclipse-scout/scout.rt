@@ -4,7 +4,7 @@ scout.AbstractSmartField = function() {
   this._$optionsDiv;
   this.options;
   this._selectedOption = -1;
-  this._oldVal;
+  this._oldSearchText;
   this._addAdapterProperties(['proposalChooser']);
 };
 scout.inherits(scout.AbstractSmartField, scout.ValueField);
@@ -23,7 +23,7 @@ scout.AbstractSmartField.prototype._registerKeyStrokeAdapter = function() {
 
 scout.AbstractSmartField.prototype._render = function($parent) {
   var cssClass = this.proposal ? 'proposal-field' : 'smart-field';
-  this.addContainer($parent, cssClass);
+  this.addContainer($parent, cssClass, new scout.SmartFieldLayout(this));
   this.addLabel();
   this.addField(scout.fields.new$TextField()
     .blur(this._onFieldBlur.bind(this))
@@ -48,9 +48,17 @@ scout.AbstractSmartField.prototype._renderProposalChooser = function() {
   if (this.proposalChooser) {
     this._openPopup(false);
     this.proposalChooser.render(this._$popup);
-    this._resizePopup();
-  } else {
-    $.log.info('XXX'); // FIXME AWE: ever happens? false -> remove if/else
+    if (this.rendered) {
+      // a.) render after a click (property change), form is completely laid out
+      this._resizePopup();
+    } else {
+      // b.) render when HTML page is loaded, layout of form is not done yet
+      //     we must aquire the foucs, because popup is only closed when field
+      //     loses focus.
+      if (document.activeElement !== this.$field) {
+        this.$field.focus();
+      }
+    }
   }
 };
 
@@ -62,10 +70,6 @@ scout.AbstractSmartField.prototype._removeProposalChooser = function() {
   this._closePopup(false);
 };
 
-scout.AbstractSmartField.prototype._updateScrollbar = function() {
-  scout.scrollbars.update(this._$optionsDiv);
-};
-
 scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
   return e.which === scout.keys.PAGE_UP ||
     e.which === scout.keys.PAGE_DOWN ||
@@ -75,14 +79,14 @@ scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
 
 scout.AbstractSmartField.prototype._onClick = function(e) {
   if (!this._$popup) {
-    this._openPopup();
+    this._openPopupAndLayout();
   }
 };
 
 scout.AbstractSmartField.prototype._onIconClick = function(event) {
   scout.AbstractSmartField.parent.prototype._onIconClick.call(this, event);
   if (!this._$popup) {
-    this._openPopup();
+    this._openPopupAndLayout();
   }
 };
 
@@ -104,7 +108,7 @@ scout.AbstractSmartField.prototype._onKeyDown = function(event) {
 
   if (this._isNavigationKey(event)) {
     // ensure popup is opened for following operations
-    if (this._openPopup()) {
+    if (this._openPopupAndLayout()) {
       return;
     }
     switch (event.which) {
@@ -118,16 +122,6 @@ scout.AbstractSmartField.prototype._onKeyDown = function(event) {
         break;
     }
   }
-};
-
-scout.AbstractSmartField.prototype._selectOption = function($options, pos) {
-  if (this._selectedOption >= 0 && this._selectedOption < $options.length) {
-    $($options[this._selectedOption]).removeClass('selected');
-  }
-  var $selectedOption = $($options[pos]);
-  $selectedOption.addClass('selected');
-  this._selectedOption = pos;
-  scout.scrollbars.scrollTo(this._$optionsDiv, $selectedOption);
 };
 
 scout.AbstractSmartField.prototype._onKeyUp = function(e) {
@@ -153,7 +147,7 @@ scout.AbstractSmartField.prototype._onKeyUp = function(e) {
   }
 
   // ensure pop-up is opened for following operations
-  if (this._openPopup()) {
+  if (this._openPopupAndLayout()) {
     return;
   }
 
@@ -162,18 +156,17 @@ scout.AbstractSmartField.prototype._onKeyUp = function(e) {
 };
 
 scout.AbstractSmartField.prototype._filterOptions = function() {
-  var val = this._searchText();
-  if (this._oldVal === val) {
-    $.log.debug('value of field has not changed - do not filter (oldVal=' + this._oldVal + ')');
+  var searchText = this._searchText();
+  if (this._oldSearchText === searchText) {
+    $.log.debug('value of field has not changed - do not filter (oldSearchText=' + this._oldSearchText + ')');
     return;
   }
   this._selectedOption = -1;
   this.session.send(this.id, 'proposalTyped', {
-    searchText: this._searchText(),
+    searchText: searchText,
     selectCurrentValue: false});
-
-  this._oldVal = val;
-  $.log.debug('updated oldVal=' + this._oldVal);
+  this._oldSearchText = searchText;
+  $.log.debug('updated oldSearchText=' + this._oldSearchText);
 };
 
 scout.AbstractSmartField.prototype._onPopupMousedown = function(event) {
@@ -216,28 +209,13 @@ scout.AbstractSmartField.prototype._closePopup = function(notifyServer) {
   }
 };
 
-/**
- * @param vararg if vararg is numeric, a text is generated according to the given number of options and set in the status-bar<br/>
- *   if vararg is text, the given text is set in the status-bar
- */
-scout.AbstractSmartField.prototype._setStatusText = function(vararg) {
-  var text;
-  if ($.isNumeric(vararg)) {
-    if (vararg === 0) {
-      text = this.session.text('NoOptions');
-    } else if (vararg === 1) {
-      text = this.session.text('OneOption');
-    } else {
-      text = this.session.text('NumOptions', vararg);
-    }
-  } else {
-    text = vararg;
-  }
-  this._$popup.children('.status').text(text);
-};
-
 scout.AbstractSmartField.prototype._searchText = function() {
   return this.$field.val();
+};
+
+scout.AbstractSmartField.prototype._openPopupAndLayout = function(notifyServer) {
+  this._openPopup(notifyServer);
+  this._resizePopup();
 };
 
 // FIXME AWE: (smart-field) an dieser stelle müssten wir auch die screen-boundaries berücksichtigen
@@ -266,22 +244,8 @@ scout.AbstractSmartField.prototype._openPopup = function(notifyServer) {
       popupLayout = new scout.PopupLayout(htmlPopup),
       fieldBounds = this._getInputBounds();
 
-    popupLayout.autoSize = false;
-    popupLayout.adjustAutoSize = function(prefSize) {
-      return new scout.Dimension(
-          Math.max(fieldBounds.width, prefSize.width),
-          Math.min(350, prefSize.height));
-    };
-
     htmlPopup.validateRoot = true;
     htmlPopup.setLayout(popupLayout);
-    htmlPopup.setBounds(new scout.Rectangle(
-      fieldBounds.x,
-      fieldBounds.y + fieldBounds.height,
-      fieldBounds.width,
-      scout.HtmlEnvironment.formRowHeight * 2));
-    popupLayout.autoSize = true;
-
     return true;
   }
 };
@@ -292,12 +256,23 @@ scout.AbstractSmartField.prototype._openPopup = function(notifyServer) {
  */
 scout.AbstractSmartField.prototype._resizePopup = function() {
   var htmlPopup = scout.HtmlComponent.get(this._$popup),
+    popupLayout = htmlPopup.layoutManager,
     prefSize = htmlPopup.getPreferredSize(),
-    inputBounds = this._getInputBounds();
+    inputBounds = this._getInputBounds(),
+    bounds;
+
   prefSize.width = Math.max(inputBounds.width, prefSize.width);
   prefSize.height = Math.min(400, prefSize.height);
-  $.log.debug('_resizePopup prefSize=' + prefSize);
-  htmlPopup.setSize(prefSize);
+  bounds = new scout.Rectangle(
+    inputBounds.x,
+    inputBounds.y + inputBounds.height,
+    prefSize.width,
+    prefSize.height);
+  $.log.debug('_resizePopup bounds=' + bounds + ' prefSize=' + prefSize);
+
+  popupLayout.autoSize = false; // FIXME AWE: check autoSize, still required? when?
+  htmlPopup.setBounds(bounds);
+  popupLayout.autoSize = true;
 };
 
 /**

@@ -8,7 +8,7 @@ scout.inherits(scout.SmartFieldMultiline, scout.AbstractSmartField);
 scout.SmartFieldMultiline.prototype._render = function($parent) {
   var $field, htmlComp;
 
-  this.addContainer($parent, 'smart-field');
+  this.addContainer($parent, 'smart-field', new scout.SmartFieldLayout(this));
   this.addLabel();
   this.addMandatoryIndicator();
   this.addFieldContainer($('<div>'));
