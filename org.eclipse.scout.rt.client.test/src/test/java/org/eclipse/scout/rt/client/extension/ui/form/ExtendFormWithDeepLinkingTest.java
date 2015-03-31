@@ -25,11 +25,14 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.AbstractTemplateFie
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.AbstractTemplateGroupsBox.BottomFieldsBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.AbstractTemplateGroupsBox.TopFieldsBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.ContributedTestField;
+import org.eclipse.scout.rt.client.extension.ui.form.fixture.ExtendedForm;
+import org.eclipse.scout.rt.client.extension.ui.form.fixture.ExtendedFormExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MultiTemplateUsageForm;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MultiTemplateUsageForm.MainBox.FirstTemplateBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MultiTemplateUsageForm.MainBox.FirstTemplateBox.MiddleStringField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MultiTemplateUsageForm.MainBox.MainBoxStringField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.MultiTemplateUsageForm.MainBox.SecondTemplateBox;
+import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.TemplateStringFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
@@ -266,6 +269,26 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
     assertEquals("A", form.getSecondTemplateBox().getTopFieldsBox().getBottomStringField().getValue());
     assertEquals("A", form.getSecondTemplateBox().getBottomFieldsBox().getTopStringField().getValue());
     assertEquals("A", form.getSecondTemplateBox().getBottomFieldsBox().getBottomStringField().getValue());
+  }
+
+  @Test
+  public void testDeepLinkingWithExtendsAnnotationOrigForm() throws Exception {
+    SERVICES.getService(IExtensionRegistry.class).register(ExtendedFormExtension.class);
+
+    OrigForm form = new OrigForm();
+    form.initForm();
+
+    assertTypes(form.getMainBox().getFields(), OrigForm.MainBox.TopBox.class, OrigForm.MainBox.BottomBox.class);
+  }
+
+  @Test
+  public void testDeepLinkingWithExtendsAnnotationExtendedForm() throws Exception {
+    SERVICES.getService(IExtensionRegistry.class).register(ExtendedFormExtension.class);
+
+    ExtendedForm form = new ExtendedForm();
+    form.initForm();
+
+    assertTypes(form.getMainBox().getFields(), ExtendedFormExtension.DetailBox.class, OrigForm.MainBox.TopBox.class, OrigForm.MainBox.BottomBox.class);
   }
 
   protected static void assertTypes(List<?> objects, Class<?>... expectedTypes) {
