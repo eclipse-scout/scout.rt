@@ -130,7 +130,7 @@ public class ClientJobsTest {
     assertFalse(ModelJobs.isModelJob(actualFutureHolder.getValue()));
   }
 
-  @Test
+  @Test(expected = AssertionException.class)
   public void testScheduleWithoutInputWithoutSession() throws ProcessingException {
     ISession.CURRENT.set(null);
     ClientJobs.schedule(mock(IRunnable.class));

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.context;
 
+import java.util.Locale;
+
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.ToStringBuilder;
@@ -37,6 +39,16 @@ import org.eclipse.scout.rt.platform.job.PropertyMap;
  * @see RunContext
  */
 public class RestRunContext extends RunContext {
+
+  @Override
+  public RestRunContext subject(final Subject subject) {
+    return (RestRunContext) super.subject(subject);
+  }
+
+  @Override
+  public RestRunContext locale(final Locale locale) {
+    return (RestRunContext) super.locale(locale);
+  }
 
   // TODO [dwi]: implement this class
 

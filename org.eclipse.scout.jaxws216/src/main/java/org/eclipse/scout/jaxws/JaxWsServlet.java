@@ -26,8 +26,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.internal.servlet.EndpointServlet;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
-import org.eclipse.scout.rt.server.context.ServerRunContext;
-import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.context.ServletRunContext;
+import org.eclipse.scout.rt.server.context.ServletRunContexts;
 
 /**
  * Runs the webservice request in a server-job to propagate the current request-context and to run on behalf of a
@@ -44,12 +44,14 @@ public class JaxWsServlet extends EndpointServlet {
   @Override
   protected void handleRequest(final HttpServletRequest request, final HttpServletResponse response, final Class<? extends Binding> bindingTypeFilter) throws ServletException, IOException {
     try {
-      final ServerRunContext runContext = ServerRunContexts.empty();
+      // TODO [dwi][nosgi] do not set the Subject yet
+      // TODO [dwi][nosgi] remove this class on behalf of NOSGI
+
+      ServletRunContext runContext = ServletRunContexts.empty();
       runContext.subject(getOrCreateSubject());
       runContext.servletRequest(request);
       runContext.servletResponse(response);
       runContext.locale(Locale.getDefault());
-      runContext.transactional(false);
 
       runContext.run(new IRunnable() {
 

@@ -53,13 +53,4 @@ public final class OfflineState {
   public static boolean isOnlineInCurrentThread() {
     return !isOfflineInCurrentThread();
   }
-
-  /**
-   * @param b
-   *          true, false, null null clears the thread-specific value and uses
-   *          the default of {@link #isOfflineDefault()}
-   */
-  public static void setOfflineInCurrentThread(Boolean b) {
-    CURRENT.set(b);
-  }
 }

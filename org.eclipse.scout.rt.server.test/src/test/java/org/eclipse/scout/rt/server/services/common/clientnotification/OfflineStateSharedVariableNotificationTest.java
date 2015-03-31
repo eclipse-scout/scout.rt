@@ -50,7 +50,7 @@ public class OfflineStateSharedVariableNotificationTest {
   @Before
   public void setUp() {
     OfflineState.setOfflineDefault(false);
-    OfflineState.setOfflineInCurrentThread(null);
+    OfflineState.CURRENT.remove();
     m_serverSession = new TestServerSession();
     m_registrationList = TestingUtility.registerServices(1000, new MockClientNotificationService());
   }
@@ -58,7 +58,7 @@ public class OfflineStateSharedVariableNotificationTest {
   @After
   public void tearDown() {
     OfflineState.setOfflineDefault(false);
-    OfflineState.setOfflineInCurrentThread(null);
+    OfflineState.CURRENT.remove();
     m_serverSession = null;
     TestingUtility.unregisterServices(m_registrationList);
     m_registrationList = null;
@@ -80,7 +80,7 @@ public class OfflineStateSharedVariableNotificationTest {
     assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
 
     OfflineState.setOfflineDefault(true);
-    OfflineState.setOfflineInCurrentThread(null);
+    OfflineState.CURRENT.remove();
     m_serverSession.setMySharedVariable(new Object());
 
     assertNotNull("Shared variable should be set.", m_serverSession.getMySharedVariable());
@@ -103,7 +103,7 @@ public class OfflineStateSharedVariableNotificationTest {
     assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
 
     OfflineState.setOfflineDefault(true);
-    OfflineState.setOfflineInCurrentThread(true);
+    OfflineState.CURRENT.set(true);
     m_serverSession.setMySharedVariable(new Object());
 
     assertNotNull("Shared variable should be set.", m_serverSession.getMySharedVariable());
@@ -126,7 +126,7 @@ public class OfflineStateSharedVariableNotificationTest {
     assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
 
     OfflineState.setOfflineDefault(true);
-    OfflineState.setOfflineInCurrentThread(false);
+    OfflineState.CURRENT.set(false);
     m_serverSession.setMySharedVariable(new Object());
 
     assertNotNull("Shared variable should be set.", m_serverSession.getMySharedVariable());
@@ -149,7 +149,7 @@ public class OfflineStateSharedVariableNotificationTest {
     assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
 
     OfflineState.setOfflineDefault(false);
-    OfflineState.setOfflineInCurrentThread(null);
+    OfflineState.CURRENT.remove();
     m_serverSession.setMySharedVariable(new Object());
 
     assertNotNull("Shared variable should be set.", m_serverSession.getMySharedVariable());
@@ -172,7 +172,7 @@ public class OfflineStateSharedVariableNotificationTest {
     assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
 
     OfflineState.setOfflineDefault(false);
-    OfflineState.setOfflineInCurrentThread(false);
+    OfflineState.CURRENT.set(false);
     m_serverSession.setMySharedVariable(new Object());
 
     assertNotNull("Shared variable should be set.", m_serverSession.getMySharedVariable());
@@ -195,7 +195,7 @@ public class OfflineStateSharedVariableNotificationTest {
     assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
 
     OfflineState.setOfflineDefault(false);
-    OfflineState.setOfflineInCurrentThread(true);
+    OfflineState.CURRENT.set(true);
     m_serverSession.setMySharedVariable(new Object());
 
     assertNotNull("Shared variable should be set.", m_serverSession.getMySharedVariable());

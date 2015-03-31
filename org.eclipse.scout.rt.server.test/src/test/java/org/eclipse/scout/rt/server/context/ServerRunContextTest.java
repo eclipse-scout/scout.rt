@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.context;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -34,6 +35,7 @@ import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
@@ -52,6 +54,7 @@ public class ServerRunContextTest {
     NlsLocale.CURRENT.remove();
     ScoutTexts.CURRENT.remove();
     UserAgent.CURRENT.remove();
+    OfflineState.CURRENT.remove();
   }
 
   @Test
@@ -61,6 +64,7 @@ public class ServerRunContextTest {
     assertNull(runContext.session());
     assertNull(runContext.userAgent());
     assertNull(runContext.locale());
+    assertFalse(runContext.offline());
     assertEquals(TransactionScope.REQUIRES_NEW, runContext.transactionScope());
   }
 
@@ -72,6 +76,7 @@ public class ServerRunContextTest {
     runContext.session(mock(IServerSession.class));
     runContext.userAgent(UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a"));
     runContext.locale(Locale.CANADA_FRENCH);
+    runContext.offline(true);
     runContext.transactionScope(TransactionScope.MANDATORY);
 
     ServerRunContext copy = runContext.copy();
@@ -80,6 +85,7 @@ public class ServerRunContextTest {
     assertSame(runContext.subject(), copy.subject());
     assertSame(runContext.userAgent(), copy.userAgent());
     assertSame(runContext.locale(), copy.locale());
+    assertSame(runContext.offline(), copy.offline());
     assertEquals(TransactionScope.MANDATORY, runContext.transactionScope());
   }
 
@@ -328,6 +334,18 @@ public class ServerRunContextTest {
   @Test
   public void testCurrentTransactionScope() {
     assertEquals(TransactionScope.REQUIRES_NEW, ServerRunContexts.copyCurrent().transactionScope());
+  }
+
+  @Test
+  public void testCurrentOfflineState() {
+    OfflineState.CURRENT.remove();
+    assertFalse(ServerRunContexts.copyCurrent().offline());
+
+    OfflineState.CURRENT.set(false);
+    assertFalse(ServerRunContexts.copyCurrent().offline());
+
+    OfflineState.CURRENT.set(true);
+    assertTrue(ServerRunContexts.copyCurrent().offline());
   }
 
   private void testDerivedSubjectWhenSettingSessionImpl() throws PrivilegedActionException {

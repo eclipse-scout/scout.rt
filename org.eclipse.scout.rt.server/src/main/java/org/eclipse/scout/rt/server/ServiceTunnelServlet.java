@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.net.SocketException;
 import java.security.AccessController;
@@ -36,10 +35,11 @@ import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
+import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.job.ServerJobs;
+import org.eclipse.scout.rt.server.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -58,6 +58,7 @@ import org.osgi.framework.Version;
  */
 public class ServiceTunnelServlet extends HttpServletEx {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.server.http.debug";
+  private static final String ADMIN_SESSION_KEY = AdminSession.class.getName();
 
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelServlet.class);
@@ -77,27 +78,26 @@ public class ServiceTunnelServlet extends HttpServletEx {
   // === HTTP-GET ===
 
   @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
-    Subject subject = Subject.getSubject(AccessController.getContext());
-    if (subject == null) {
-      res.sendError(HttpServletResponse.SC_FORBIDDEN);
+  protected void doGet(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IOException, ServletException {
+    if (Subject.getSubject(AccessController.getContext()) == null) {
+      servletResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
       return;
     }
 
-    lazyInit(req, res);
+    lazyInit(servletRequest, servletResponse);
 
     try {
-      ServerRunContext runContext = ServerRunContexts.empty();
-      runContext.subject(subject);
-      runContext.servletRequest(req);
-      runContext.servletResponse(res);
-      runContext.locale(Locale.getDefault());
-      runContext.userAgent(UserAgent.createDefault());
-      runContext.session(lookupServerSessionOnHttpSession(runContext.copy()));
+      ServletRunContexts.copyCurrent().locale(Locale.getDefault()).servletRequest(servletRequest).servletResponse(servletResponse).run(new IRunnable() {
 
-      runContext = interceptRunContext(runContext);
+        @Override
+        public void run() throws Exception {
+          ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
+          serverRunContext.userAgent(UserAgent.createDefault());
+          serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
-      invokeAdminService(runContext);
+          invokeAdminService(serverRunContext);
+        }
+      });
     }
     catch (ProcessingException e) {
       throw new ServletException("Failed to invoke AdminServlet", e);
@@ -107,39 +107,40 @@ public class ServiceTunnelServlet extends HttpServletEx {
   // === HTTP-POST ===
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-    Subject subject = Subject.getSubject(AccessController.getContext());
-    if (subject == null) {
-      res.sendError(HttpServletResponse.SC_FORBIDDEN);
+  protected void doPost(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException, IOException {
+    if (Subject.getSubject(AccessController.getContext()) == null) {
+      servletResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
       return;
     }
 
-    lazyInit(req, res);
+    lazyInit(servletRequest, servletResponse);
 
     try {
-      IServiceTunnelRequest serviceRequest = deserializeServiceRequest(req.getInputStream());
+      ServletRunContexts.copyCurrent().servletRequest(servletRequest).servletResponse(servletResponse).run(new IRunnable() {
 
-      ServerRunContext runContext = ServerRunContexts.empty();
-      runContext.subject(subject);
-      runContext.servletRequest(req);
-      runContext.servletResponse(res);
-      runContext.locale(serviceRequest.getLocale());
-      runContext.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
-      runContext.session(lookupServerSessionOnHttpSession(runContext.copy()));
+        @Override
+        public void run() throws Exception {
+          IServiceTunnelRequest serviceRequest = deserializeServiceRequest();
 
-      runContext = interceptRunContext(runContext);
+          ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
+          serverRunContext.locale(serviceRequest.getLocale());
+          serverRunContext.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
+          serverRunContext.transactionId(serviceRequest.getRequestSequence());
+          serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
-      IServiceTunnelResponse serviceResponse = invokeService(runContext, serviceRequest);
+          IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
 
-      serializeServiceResponse(res, serviceResponse);
+          serializeServiceResponse(serviceResponse);
+        }
+      });
     }
     catch (Exception e) {
       if (isConnectionError(e)) {
         // NOOP: Ignore disconnect errors: we do not want to throw an exception, if the client closed the connection.
       }
       else {
-        LOG.error(String.format("Client=%s@%s/%s", req.getRemoteUser(), req.getRemoteAddr(), req.getRemoteHost()), e);
-        res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        LOG.error(String.format("Client=%s@%s/%s", servletRequest.getRemoteUser(), servletRequest.getRemoteAddr(), servletRequest.getRemoteHost()), e);
+        servletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
     }
   }
@@ -148,48 +149,36 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
   /**
    * Method invoked to delegate the HTTP request to the 'admin service'.
-   *
-   * @param runContext
-   *          <code>RunContext</code> with information about the ongoing HTTP-request to be used to invoke the admin
-   *          service.
    */
-  protected void invokeAdminService(final ServerRunContext runContext) throws ProcessingException {
-    final HttpServletRequest request = runContext.servletRequest();
-    final HttpServletResponse response = runContext.servletResponse();
-
-    ServerJobs.runNow(new IRunnable() {
+  protected void invokeAdminService(final ServerRunContext serverRunContext) throws ProcessingException {
+    serverRunContext.run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        String key = AdminSession.class.getName();
+        final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+        final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
-        AdminSession adminSession = (AdminSession) SERVICES.getService(IHttpSessionCacheService.class).getAndTouch(key, request, response);
+        AdminSession adminSession = (AdminSession) SERVICES.getService(IHttpSessionCacheService.class).getAndTouch(ADMIN_SESSION_KEY, servletRequest, servletResponse);
         if (adminSession == null) {
           adminSession = new AdminSession();
-          SERVICES.getService(IHttpSessionCacheService.class).put(key, adminSession, request, response);
+          SERVICES.getService(IHttpSessionCacheService.class).put(ADMIN_SESSION_KEY, adminSession, servletRequest, servletResponse);
         }
-        adminSession.serviceRequest(request, response);
+        adminSession.serviceRequest(servletRequest, servletResponse);
       }
-    }, ServerJobs.newInput(runContext).name("AdminServiceCall"));
+    });
   }
 
   /**
    * Method invoked to delegate the HTTP request to the 'process service'.
-   *
-   * @param runContext
-   *          <code>RunContext</code> with information about the ongoing HTTP-request to be used to invoke the service.
-   * @param serviceTunnelRequest
-   *          describes the service to be invoked.
-   * @return {@link IServiceTunnelResponse} response sent back to the client.
    */
-  protected IServiceTunnelResponse invokeService(final ServerRunContext runContext, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
-    return ServerJobs.runNow(new ICallable<IServiceTunnelResponse>() {
+  protected IServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
+    return serverRunContext.call(new ICallable<IServiceTunnelResponse>() {
 
       @Override
       public IServiceTunnelResponse call() throws Exception {
         return new DefaultTransactionDelegate(getRequestMinVersion(), isDebug()).invoke(serviceTunnelRequest);
       }
-    }, ServerJobs.newInput(runContext).name("RemoteServiceCall").id(String.valueOf(serviceTunnelRequest.getRequestSequence()))); // the job's id is set so that the client can cancel ongoing service calls.
+    });
   }
 
   // === MESSAGE UNMARSHALLING / MARSHALLING ===
@@ -197,24 +186,25 @@ public class ServiceTunnelServlet extends HttpServletEx {
   /**
    * Method invoked to deserialize a service request to be given to the service handler.
    */
-  protected IServiceTunnelRequest deserializeServiceRequest(InputStream in) throws Exception {
-    return m_contentHandler.readRequest(in);
+  protected IServiceTunnelRequest deserializeServiceRequest() throws Exception {
+    return m_contentHandler.readRequest(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get().getInputStream());
   }
 
   /**
    * Method invoked to serialize a service response to be sent back to the client.
    */
-  protected void serializeServiceResponse(HttpServletResponse httpResponse, IServiceTunnelResponse res) throws Exception {
+  protected void serializeServiceResponse(IServiceTunnelResponse serviceResponse) throws Exception {
     // security: do not send back error stack trace
-    if (res.getException() != null) {
-      res.getException().setStackTrace(new StackTraceElement[0]);
+    if (serviceResponse.getException() != null) {
+      serviceResponse.getException().setStackTrace(new StackTraceElement[0]);
     }
 
-    httpResponse.setDateHeader("Expires", -1);
-    httpResponse.setHeader("Cache-Control", "no-cache");
-    httpResponse.setHeader("pragma", "no-cache");
-    httpResponse.setContentType("text/xml");
-    m_contentHandler.writeResponse(httpResponse.getOutputStream(), res);
+    HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
+    servletResponse.setDateHeader("Expires", -1);
+    servletResponse.setHeader("Cache-Control", "no-cache");
+    servletResponse.setHeader("pragma", "no-cache");
+    servletResponse.setContentType("text/xml");
+    m_contentHandler.writeResponse(servletResponse.getOutputStream(), serviceResponse);
   }
 
   // === INITIALIZATION ===
@@ -230,7 +220,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
    * for serialization/deserialization.
    */
   @Internal
-  protected void lazyInit(HttpServletRequest req, HttpServletResponse res) throws ServletException {
+  protected void lazyInit(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException {
     m_contentHandler = createContentHandler();
   }
 
@@ -271,30 +261,22 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return e;
   }
 
-  /**
-   * Override this method to intercept the {@link ServerRunContext} used to process a request. The default
-   * implementation simply returns the given <code>runContext</code>.
-   */
-  protected ServerRunContext interceptRunContext(final ServerRunContext runContext) {
-    return runContext;
-  }
-
   // === SESSION LOOKUP ===
 
   @Internal
-  protected IServerSession lookupServerSessionOnHttpSession(final ServerRunContext runContext) throws ProcessingException, ServletException {
-    HttpServletRequest req = runContext.servletRequest();
-    HttpServletResponse res = runContext.servletResponse();
+  protected IServerSession lookupServerSessionOnHttpSession(final ServerRunContext serverRunContext) throws ProcessingException, ServletException {
+    final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+    final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
     //external request: apply locking, this is the session initialization phase
     IHttpSessionCacheService cacheService = SERVICES.getService(IHttpSessionCacheService.class);
-    IServerSession serverSession = (IServerSession) cacheService.getAndTouch(IServerSession.class.getName(), req, res);
+    IServerSession serverSession = (IServerSession) cacheService.getAndTouch(IServerSession.class.getName(), servletRequest, servletResponse);
     if (serverSession == null) {
-      synchronized (req.getSession()) {
-        serverSession = (IServerSession) cacheService.get(IServerSession.class.getName(), req, res); // double checking
+      synchronized (servletRequest.getSession()) {
+        serverSession = (IServerSession) cacheService.get(IServerSession.class.getName(), servletRequest, servletResponse); // double checking
         if (serverSession == null) {
-          serverSession = provideServerSession(runContext);
-          cacheService.put(IServerSession.class.getName(), serverSession, req, res);
+          serverSession = provideServerSession(serverRunContext);
+          cacheService.put(IServerSession.class.getName(), serverSession, servletRequest, servletResponse);
         }
       }
     }
@@ -304,13 +286,16 @@ public class ServiceTunnelServlet extends HttpServletEx {
   /**
    * Method invoked to provide a new {@link IServerSession} for the current HTTP-request.
    *
-   * @param runContext
-   *          <code>RunContext</code> with information about the ongoing HTTP-request.
+   * @param serverRunContext
+   *          <code>ServerRunContext</code> with information about the ongoing service request.
    * @return {@link IServerSession}; must not be <code>null</code>.
    */
-  protected IServerSession provideServerSession(final ServerRunContext runContext) throws ProcessingException {
-    final IServerSession serverSession = OBJ.get(ServerSessionProvider.class).provide(runContext);
-    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(runContext.servletRequest(), runContext.servletResponse()));
+  protected IServerSession provideServerSession(final ServerRunContext serverRunContext) throws ProcessingException {
+    final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+    final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
+
+    final IServerSession serverSession = OBJ.get(ServerSessionProvider.class).provide(serverRunContext);
+    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(servletRequest, servletResponse));
     return serverSession;
   }
 

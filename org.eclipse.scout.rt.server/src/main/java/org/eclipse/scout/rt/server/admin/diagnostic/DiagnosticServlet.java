@@ -18,18 +18,22 @@ import javax.security.auth.Subject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
+import org.eclipse.scout.rt.server.admin.html.AdminSession;
+import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
+import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.job.ServerJobs;
+import org.eclipse.scout.rt.server.context.ServletRunContexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.service.SERVICES;
 
 public class DiagnosticServlet extends ServiceTunnelServlet {
   private static final long serialVersionUID = 1L;
+  private static final String DIAGNOSTIC_SESSION_KEY = AdminSession.class.getName();
 
   @Override
   protected void doPost(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
@@ -37,28 +41,26 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
   }
 
   @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-    Subject subject = Subject.getSubject(AccessController.getContext());
-    if (subject == null) {
-      res.sendError(HttpServletResponse.SC_FORBIDDEN);
+  protected void doGet(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException, IOException {
+    if (Subject.getSubject(AccessController.getContext()) == null) {
+      servletResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
       return;
     }
 
-    lazyInit(req, res);
+    lazyInit(servletRequest, servletResponse);
 
     try {
-      ServerRunContext runContext = ServerRunContexts.empty();
-      runContext.subject(subject);
-      runContext.servletRequest(req);
-      runContext.servletResponse(res);
-      runContext.locale(Locale.getDefault());
-      runContext.userAgent(UserAgent.createDefault());
-      runContext.session(lookupServerSessionOnHttpSession(runContext.copy()));
+      ServletRunContexts.copyCurrent().locale(Locale.getDefault()).servletRequest(servletRequest).servletResponse(servletResponse).run(new IRunnable() {
 
-      runContext = interceptRunContext(runContext);
+        @Override
+        public void run() throws Exception {
+          ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
+          serverRunContext.userAgent(UserAgent.createDefault());
+          serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
-      invokeDiagnosticService(runContext);
-
+          invokeDiagnosticService(serverRunContext);
+        }
+      });
     }
     catch (ProcessingException e) {
       throw new ServletException("Failed to invoke DiagnosticServlet", e);
@@ -67,28 +69,22 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
 
   /**
    * Method invoked to delegate the HTTP request to the 'diagnostic service'.
-   *
-   * @param runContext
-   *          <code>RunContext</code> with information about the ongoing HTTP-request to be used to invoke the
-   *          diagnostic service.
    */
-  protected void invokeDiagnosticService(final ServerRunContext runContext) throws ProcessingException {
-    ServerJobs.runNow(new IRunnable() {
+  protected void invokeDiagnosticService(final ServerRunContext serverRunContext) throws ProcessingException {
+    serverRunContext.run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        final HttpServletRequest request = runContext.servletRequest();
-        final HttpServletResponse response = runContext.servletResponse();
-        final HttpSession httpSession = request.getSession();
-        final String key = DiagnosticSession.class.getName();
+        final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+        final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
-        DiagnosticSession diagnosticSession = (DiagnosticSession) httpSession.getAttribute(key);
+        DiagnosticSession diagnosticSession = (DiagnosticSession) SERVICES.getService(IHttpSessionCacheService.class).getAndTouch(DIAGNOSTIC_SESSION_KEY, servletRequest, servletResponse);
         if (diagnosticSession == null) {
           diagnosticSession = new DiagnosticSession();
-          httpSession.setAttribute(key, diagnosticSession);
+          SERVICES.getService(IHttpSessionCacheService.class).put(DIAGNOSTIC_SESSION_KEY, diagnosticSession, servletRequest, servletResponse);
         }
-        diagnosticSession.serviceRequest(request, response);
+        diagnosticSession.serviceRequest(servletRequest, servletResponse);
       }
-    }, ServerJobs.newInput(runContext).name("DiagnosticServiceCall"));
+    });
   }
 }

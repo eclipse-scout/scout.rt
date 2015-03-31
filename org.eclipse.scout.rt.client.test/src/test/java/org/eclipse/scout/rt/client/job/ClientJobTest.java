@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
@@ -43,7 +44,7 @@ public class ClientJobTest {
     MockitoAnnotations.initMocks(this);
   }
 
-  @Test
+  @Test(expected = AssertionException.class)
   public void testNoSession() throws ProcessingException {
     ISession.CURRENT.remove();
     ClientJobs.schedule(new IRunnable() {

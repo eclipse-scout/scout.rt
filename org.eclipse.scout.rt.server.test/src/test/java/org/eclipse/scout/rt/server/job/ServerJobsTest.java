@@ -126,7 +126,7 @@ public class ServerJobsTest {
     assertTrue(ServerJobs.isServerJob(actualFutureHolder.getValue()));
   }
 
-  @Test
+  @Test(expected = AssertionException.class)
   public void testScheduleWithoutInputWithoutSession() throws ProcessingException {
     ISession.CURRENT.set(null);
     ServerJobs.schedule(mock(IRunnable.class));

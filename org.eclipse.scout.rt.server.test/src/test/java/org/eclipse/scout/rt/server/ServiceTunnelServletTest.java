@@ -37,6 +37,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.OBJ;
@@ -46,6 +47,7 @@ import org.eclipse.scout.rt.server.commons.cache.ICacheEntry;
 import org.eclipse.scout.rt.server.commons.cache.StickySessionCacheService;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -103,23 +105,35 @@ public class ServiceTunnelServletTest {
 
   @Test
   public void testNewSessionCreatedOnLookupHttpSession() throws ProcessingException, ServletException {
-    IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty().servletRequest(m_requestMock).servletResponse(m_responseMock));
-    assertNotNull(session);
+    ServletRunContexts.empty().servletRequest(m_requestMock).servletResponse(m_responseMock).run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty());
+        assertNotNull(session);
+      }
+    });
   }
 
   @Test
   public void testNoNewServerSessionOnLookup() throws ProcessingException, ServletException {
-    TestServerSession testSession = new TestServerSession();
+    final TestServerSession testSession = new TestServerSession();
     ICacheEntry cacheMock = mock(ICacheEntry.class);
     when(cacheMock.getValue()).thenReturn(testSession);
     when(cacheMock.isActive()).thenReturn(true);
 
     when(m_testHttpSession.getAttribute(IServerSession.class.getName())).thenReturn(cacheMock);
-    IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty().servletRequest(m_requestMock).servletResponse(m_responseMock));
-    assertEquals(testSession, session);
+
+    ServletRunContexts.empty().servletRequest(m_requestMock).servletResponse(m_responseMock).run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        assertEquals(testSession, m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty()));
+      }
+    });
   }
 
-  /**
+/**
    * Calls {@link ServiceTunnelServlet#lookupServerSessionOnHttpSession(ServerRunContext) in 4 different threads within
    * the same HTTP session. Test ensures that the same server session is returned in all threads and that
    *
@@ -222,7 +236,13 @@ public class ServiceTunnelServletTest {
 
     @Override
     public IServerSession call() throws Exception {
-      return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty().servletRequest(m_request).servletResponse(m_response));
+      return ServletRunContexts.empty().servletRequest(m_request).servletResponse(m_response).call(new ICallable<IServerSession>() {
+
+        @Override
+        public IServerSession call() throws Exception {
+          return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty());
+        }
+      });
     }
   }
 }

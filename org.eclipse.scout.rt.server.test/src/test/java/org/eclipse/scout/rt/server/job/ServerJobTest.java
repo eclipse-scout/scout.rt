@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.job;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
@@ -40,7 +41,7 @@ public class ServerJobTest {
     MockitoAnnotations.initMocks(this);
   }
 
-  @Test
+  @Test(expected = AssertionException.class)
   public void testNoSession() throws ProcessingException {
     ISession.CURRENT.remove();
     ServerJobs.schedule(new IRunnable() {

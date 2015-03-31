@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.context;
 
+import java.util.Locale;
+
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.ToStringBuilder;
@@ -37,6 +39,16 @@ import org.eclipse.scout.rt.platform.job.PropertyMap;
  * @see RunContext
  */
 public class JmsRunContext extends RunContext {
+
+  @Override
+  public JmsRunContext subject(final Subject subject) {
+    return (JmsRunContext) super.subject(subject);
+  }
+
+  @Override
+  public JmsRunContext locale(final Locale locale) {
+    return (JmsRunContext) super.locale(locale);
+  }
 
   // TODO [dwi]: implement this class
 

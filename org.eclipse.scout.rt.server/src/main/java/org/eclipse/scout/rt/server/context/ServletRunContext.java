@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.context;
 
+import java.util.Locale;
+
 import javax.security.auth.Subject;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +58,16 @@ public class ServletRunContext extends RunContext {
     final ICallable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;
+  }
+
+  @Override
+  public ServletRunContext subject(final Subject subject) {
+    return (ServletRunContext) super.subject(subject);
+  }
+
+  @Override
+  public ServletRunContext locale(final Locale locale) {
+    return (ServletRunContext) super.locale(locale);
   }
 
   public HttpServletRequest servletRequest() {
