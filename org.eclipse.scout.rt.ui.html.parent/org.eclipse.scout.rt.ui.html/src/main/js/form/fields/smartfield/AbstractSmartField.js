@@ -17,6 +17,7 @@ scout.AbstractSmartField.prototype.init = function(model, session) {
  * @override
  */
 scout.AbstractSmartField.prototype._registerKeyStrokeAdapter = function() {
+  // FIXME AWE: (smart-field) andere keystrokes implementieren
   this.keyStrokeAdapter = new scout.SmartFieldKeyStrokeAdapter(this);
 };
 
@@ -39,16 +40,17 @@ scout.AbstractSmartField.prototype._renderProperties = function() {
   this._renderProposalChooser();
 };
 
-
+/**
+ * When popup is not rendered at this point, we render the popup.
+ */
 scout.AbstractSmartField.prototype._renderProposalChooser = function() {
-  if (!this._$popup) {
-    // We always expect the popup to be open at this point
-    return;
-  }
-  $.log.info('_renderProposalChooser proposalChooser=' + this.proposalChooser);
+  $.log.debug('_renderProposalChooser proposalChooser=' + this.proposalChooser);
   if (this.proposalChooser) {
+    this._openPopup(false);
     this.proposalChooser.render(this._$popup);
     this._resizePopup();
+  } else {
+    $.log.info('XXX'); // FIXME AWE: ever happens? false -> remove if/else
   }
 };
 
@@ -56,7 +58,7 @@ scout.AbstractSmartField.prototype._renderProposalChooser = function() {
  * This method is called after a valid option has been selected in the proposal chooser.
  */
 scout.AbstractSmartField.prototype._removeProposalChooser = function() {
-  $.log.info('_removeProposalChooser proposalChooser=' + this.proposalChooser);
+  $.log.debug('_removeProposalChooser proposalChooser=' + this.proposalChooser);
   this._closePopup(false);
 };
 
@@ -83,8 +85,6 @@ scout.AbstractSmartField.prototype._onIconClick = function(event) {
     this._openPopup();
   }
 };
-
-// FIXME AWE: (smart-field) hier das konzept von N.BU mit Actions, KeyStrokes verwenden (keyup, keydown)
 
 // navigate in options
 scout.AbstractSmartField.prototype._onKeyDown = function(event) {
@@ -247,13 +247,16 @@ scout.AbstractSmartField.prototype._searchText = function() {
  * at this point we cannot know what size the popup should have. We have to set a fixed
  * size and resize the popup later when proposals are available.
  */
-scout.AbstractSmartField.prototype._openPopup = function() {
+scout.AbstractSmartField.prototype._openPopup = function(notifyServer) {
+  notifyServer = notifyServer === undefined ? true : notifyServer;
   if (this._$popup) {
     return false;
   } else {
-    this.session.send(this.id, 'openProposal', {
-      searchText: this._searchText(),
-      selectCurrentValue: false});
+    if (notifyServer) {
+      this.session.send(this.id, 'openProposal', {
+        searchText: this._searchText(),
+        selectCurrentValue: false});
+    }
 
     this._$popup = $.makeDiv('smart-field-popup')
       .on('mousedown', this._onPopupMousedown.bind(this))
