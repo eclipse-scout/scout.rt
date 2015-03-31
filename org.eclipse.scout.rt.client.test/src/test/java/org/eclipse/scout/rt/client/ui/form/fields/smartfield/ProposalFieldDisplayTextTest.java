@@ -39,6 +39,7 @@ import org.junit.runner.RunWith;
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
+@SuppressWarnings("deprecation")
 public class ProposalFieldDisplayTextTest {
 
   private ProposalField m_proposalField = new ProposalField();
@@ -52,7 +53,7 @@ public class ProposalFieldDisplayTextTest {
   public void testNoLookupRowDisplayText() throws ProcessingException {
     // no lookup row before and after text entry
     assertNull(m_proposalField.getCurrentLookupRow());
-    m_proposalField.getUIFacade().setTextFromUI("c");
+    m_proposalField.getUIFacadeLegacy().setTextFromUI("c");
     assertEquals("c", m_proposalField.getValue());
     assertEquals("c", m_proposalField.getDisplayText());
     assertNull(m_proposalField.getCurrentLookupRow());
@@ -66,7 +67,7 @@ public class ProposalFieldDisplayTextTest {
   @Test
   public void testLookupRowDisplayText() throws ProcessingException {
     // single match
-    m_proposalField.getUIFacade().setTextFromUI("a");
+    m_proposalField.getUIFacadeLegacy().setTextFromUI("a");
     // select proposal
     m_proposalField.getProposalChooser().forceProposalSelection();
     m_proposalField.getProposalChooser().doOk();
