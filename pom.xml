@@ -65,41 +65,11 @@
 	<profiles>
 		<profile>
 			<!-- Only create the jandex.idx when a scout.xml is found -->
-			<id>main-jandex-idx</id>
+			<id>jandex-idx</id>
 			<activation>
 				<file>
-					<exists>${basedir}/src/main/resources/META-INF/scout.xml</exists>
-				</file>
-			</activation>
-			<build>
-				<plugins>
-					<!-- Create META-INF/jandex.idx -->
-					<plugin>
-						<groupId>org.jboss.jandex</groupId>
-						<artifactId>jandex-maven-plugin</artifactId>
-						<version>1.0.1</version>
-						<executions>
-							<execution>
-								<id>make-index</id>
-								<goals>
-									<goal>jandex</goal>
-								</goals>
-								<!-- phase is 'process-classes by default' -->
-								<configuration>
-									<!-- Nothing needed here for simple cases -->
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<!-- Only create the jandex.idx when a scout.xml is found -->
-			<id>test-jandex-idx</id>
-			<activation>
-				<file>
-					<exists>${basedir}/src/test/resources/META-INF/scout.xml</exists>
+					<exists>${basedir}/target/classes/META-INF/scout.xml</exists>
+					<missing>${basedir}/target/classes/META-INF/jandex.idx</missing>
 				</file>
 			</activation>
 			<build>
