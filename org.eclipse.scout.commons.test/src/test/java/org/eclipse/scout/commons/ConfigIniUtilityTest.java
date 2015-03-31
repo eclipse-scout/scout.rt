@@ -12,9 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,9 +58,8 @@ public class ConfigIniUtilityTest {
 
   @Before
   public void before() throws MalformedURLException {
-    URL url = new URL("configini", "localhost", 80, ConfigIniUtility.DEFAULT_CONFIG_FILE_NAME, getConfigIniContent());
-    Set<String> externalConfigPaths = new HashSet<>();
-    ConfigIniUtility.parseConfigIni(url, externalConfigPaths);
+    URL url = new URL("configini", "localhost", 80, ConfigIniUtility.CONFIG_INI, getConfigIniContent());
+    ConfigIniUtility.parseConfigIni(url);
   }
 
   @Test

@@ -15,13 +15,10 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,7 +26,12 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * Utility to extract properties stored in the <code>config.ini</code> file of scout applications.<br>
+ * Utility to extract properties stored in the <code>config.ini</code> file of scout applications.
+ * <p>
+ * The file is located on the classpath, typically in WEB-INF/classes/config.ini
+ * <p>
+ * It can also be specified by setting the system property <code>-Dconfig.ini=path-to-config.ini-file</code>
+ * <p>
  * Properties can be simple key-value-pairs or can use the class#property format: <code>
  * <ul>
  * <li>myKey=value</li>
@@ -39,22 +41,10 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * </ul>
  * </code> Other properties, system properties or environment variables may be accessed using
  * <code>${variableName}</code>. These variables are then resolved once when the properties are initialized.<br>
- * Furthermore it supports storing the configs in several external config files. In that case the property
- * <code>external.configuration.area</code> must be specified:
- * <p>
- * <code>
- * <ul>
- * <li>external.configuration.area=[url | file | ${variable}]</li>
- * <li>external.configuration.area.0=[url | file | ${variable}]</li>
- * <li>external.configuration.area.1=[url | file | ${variable}]</li>
- * <li>external.configuration.area.2=[url | file | ${variable}]</li>
- * </ul>
- * </code>
  * </p>
  * Examples: <code>
  * <ul>
  * <li>customProperty=customValue</li>
- * <li>user.area=/usr/exampleUser/</li>
  * <li>com.myapp.MyService#realm=MyRealm</li>
  * <li>com.myapp.MyService#realm=${customProperty}</li>
  * <li>com.myapp.MyService/process#realm=ProcessRealm</li>
@@ -64,39 +54,19 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * </code>
  */
 public final class ConfigIniUtility {
-
   // Do not statically initialize this variable using the 'ScoutLogManager' because ConfigIniUtility is used during the ScoutLogManager's static initialization; use 'getLogger()' instead.
   private static volatile IScoutLogger logger;
 
   /**
-   * Name of the default configuration file
+   * Property to specify the configuration file. If not specified then {@link ClassLoader#getResource(String)} with
+   * "/config.ini" is used.
    */
-  public static final String DEFAULT_CONFIG_FILE_NAME = "config.ini";
-
-  /**
-   * Property to specify the configuration file name. If not specified {@value #DEFAULT_CONFIG_FILE_NAME} is used.<br>
-   * This property must be set as system property or command line property.<br>
-   * The file is searched on the file system first and on the classpath afterwards.
-   */
-  public static final String KEY_CONFIG_FILE_NAME = "scout.config.file.name";
-
-  /**
-   * Property to specify the directory in which the configuration file is stored. If not specified, no directory is used
-   * (root level).<br>
-   * This property must be set as system property or command line property.<br>
-   * The file is searched on the file system first and on the classpath afterwards.
-   */
-  public static final String KEY_CONFIG_FILE_DIR = "scout.config.file.dir";
+  public static final String CONFIG_INI = "config.ini";
 
   /**
    * Property to specify if the application is running in development mode. Default is <code>false</code>.
    */
   public static final String KEY_PLATFORM_DEV_MODE = "scout.dev.mode";
-
-  /**
-   * Property key for the pre-defined working directory variable.
-   */
-  public static final String KEY_WORKING_DIR = "working_dir";
 
   /**
    * char used as delimiter for the filter in the class#property format.
@@ -112,13 +82,15 @@ public final class ConfigIniUtility {
 
   static {
     configProperties = new HashMap<>();
-    configProperties.put(KEY_WORKING_DIR, Paths.get(".").toAbsolutePath().normalize().toFile().toString());
-    Set<String> externalConfigPaths = new LinkedHashSet<>();
-
-    parseLocalConfigIniFile(externalConfigPaths);
-    parseExternalConfigIniFiles(externalConfigPaths);
-
-    resolveAll();
+    URL url = getConfigIniUrl();
+    if (url != null) {
+      parseConfigIni(url);
+      resolveAll();
+    }
+    else {
+      // don't log here because the logger needs this class (cyclic dependencies)
+      System.err.println("No configuration area found. Running with empty configuration.");
+    }
   }
 
   /**
@@ -421,48 +393,18 @@ public final class ConfigIniUtility {
     return null;
   }
 
-  protected static void parseLocalConfigIniFile(Set<String> externalConfigPaths) {
-    URL url = getConfigIniUrl();
-    if (url == null) {
-      // don't log here because the logger needs this class (cyclic dependencies)
-      System.err.println("No configuration area found. Running with empty configuration.");
-      return;
-    }
-    parseConfigIni(url, externalConfigPaths);
-  }
-
   protected static URL getConfigIniUrl() {
-    String fileName = resolve(System.getProperty(KEY_CONFIG_FILE_NAME));
-    if (!StringUtility.hasText(fileName)) {
-      fileName = DEFAULT_CONFIG_FILE_NAME;
-    }
-
-    String dir = resolve(System.getProperty(KEY_CONFIG_FILE_DIR));
-    File configFile = new File(dir, fileName);
-
-    // check file-system first
-    if (configFile.exists() && !configFile.isDirectory() && configFile.canRead()) {
+    String configIniFile = resolve(System.getProperty(CONFIG_INI));
+    if (StringUtility.hasText(configIniFile)) {
       try {
-        URL ret = configFile.toURI().toURL();
-        return ret;
+        return new File(configIniFile).toURI().toURL();
       }
       catch (MalformedURLException e) {
-        // don't log this exception because the logger needs this class (cyclic dependencies)
+        e.printStackTrace();
+        return null;
       }
     }
-
-    // check classpath
-    String nameOnClassPath = configFile.toString().replace('\\', '/');
-    return ConfigIniUtility.class.getClassLoader().getResource(nameOnClassPath);
-  }
-
-  protected static void parseExternalConfigIniFiles(Set<String> externalConfigPaths) {
-    for (String path : externalConfigPaths) {
-      URL url = getExternalConfigIniUrl(path);
-      if (url != null) {
-        parseConfigIni(url, null /* no second level of external files*/);
-      }
-    }
+    return ConfigIniUtility.class.getClassLoader().getResource("/" + CONFIG_INI);
   }
 
   protected static void resolveAll() {
@@ -471,7 +413,7 @@ public final class ConfigIniUtility {
     }
   }
 
-  protected static void parseConfigIni(URL configIniUrl, Set<String> externalConfigPaths) {
+  protected static void parseConfigIni(URL configIniUrl) {
     Properties props = new Properties();
     try (BufferedReader in = new BufferedReader(new InputStreamReader(configIniUrl.openStream(), "UTF-8"))) {
       props.load(in);
@@ -481,66 +423,13 @@ public final class ConfigIniUtility {
       t.printStackTrace();
       return;
     }
-
-    if (externalConfigPaths != null) {
-      Object sharedConfigArea = props.remove("osgi.sharedConfiguration.area"); // legacy
-      if (sharedConfigArea != null) {
-        externalConfigPaths.add(sharedConfigArea.toString());
-      }
-    }
-
-    Pattern externalConfigFilePattern = Pattern.compile("external\\.configuration\\.area(\\.[0-9]+)?");
     for (Entry<Object, Object> entry : props.entrySet()) {
       String key = (String) entry.getKey();
       String value = (String) entry.getValue();
       if (key != null && value != null) {
-        if (externalConfigFilePattern.matcher(key).matches()) {
-          if (externalConfigPaths != null) {
-            externalConfigPaths.add(value);
-          }
-        }
-        else {
-          configProperties.put(key, value);
-        }
+        configProperties.put(key, value);
       }
     }
-
-    if (externalConfigPaths != null) {
-      String furtherExternalConfigFile = resolve(System.getProperty("external.configuration.file"));
-      if (furtherExternalConfigFile != null) {
-        externalConfigPaths.add(furtherExternalConfigFile);
-      }
-    }
-  }
-
-  protected static URL getExternalConfigIniUrl(String externalPath) {
-    URL url = null;
-    String resolvedPath = resolve(externalPath.replaceAll("\\\\(.)", "$1"));
-    File f = new File(resolvedPath);
-
-    try {
-      if (f.exists()) {
-        if (f.isFile()) {
-          url = f.toURI().toURL();
-        }
-        else {
-          url = new File(resolvedPath, DEFAULT_CONFIG_FILE_NAME).toURI().toURL();
-        }
-      }
-      else {
-        if (resolvedPath.toLowerCase().endsWith(".ini") || resolvedPath.toLowerCase().endsWith(".properties")) {
-          url = new URL(resolvedPath);
-        }
-        else {
-          url = new URL(new URL(resolvedPath), DEFAULT_CONFIG_FILE_NAME);
-        }
-      }
-    }
-    catch (Exception e) {
-      // Do not use logger here. Because the logger uses this class, it is not yet initialized
-      e.printStackTrace();
-    }
-    return url;
   }
 
   /**
