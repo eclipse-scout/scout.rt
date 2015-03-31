@@ -15,15 +15,19 @@ import java.util.Locale;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
- * Factory methods to create new {@link ServerRunContext} objects to propagate server-side context and to run code in a
- * new transaction.
+ * Factory methods to create new {@link ServerRunContext} objects to propagate server-side state and to control
+ * {@link TransactionScope}.
  * <p/>
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
  * server state among different threads, or allows temporary state changes to be done for the time of executing some
  * code.
+ * <p/>
+ * A transaction scope controls in which transaction to run executables. By default, a new transaction is started, and
+ * committed or rolled back upon completion.
  * <p/>
  * Usage:
  *

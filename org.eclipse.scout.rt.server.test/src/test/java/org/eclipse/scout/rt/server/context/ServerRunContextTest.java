@@ -32,7 +32,6 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -53,8 +52,6 @@ public class ServerRunContextTest {
     NlsLocale.CURRENT.remove();
     ScoutTexts.CURRENT.remove();
     UserAgent.CURRENT.remove();
-    IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.remove();
-    IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.remove();
   }
 
   @Test
@@ -82,7 +79,6 @@ public class ServerRunContextTest {
     assertEquals(toSet(runContext.propertyMap().iterator()), toSet(copy.propertyMap().iterator()));
     assertSame(runContext.subject(), copy.subject());
     assertSame(runContext.userAgent(), copy.userAgent());
-    assertSame(runContext.locale(), copy.locale());
     assertSame(runContext.locale(), copy.locale());
     assertEquals(TransactionScope.MANDATORY, runContext.transactionScope());
   }

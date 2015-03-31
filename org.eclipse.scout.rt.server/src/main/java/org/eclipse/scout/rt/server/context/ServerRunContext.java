@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.server.context;
 import java.util.Locale;
 
 import javax.security.auth.Subject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.ToStringBuilder;
@@ -25,7 +23,6 @@ import org.eclipse.scout.rt.platform.context.PreferredValue;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
@@ -60,8 +57,6 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * <li>{@link UserAgent#CURRENT}</li>
  * <li>{@link ScoutTexts#CURRENT}</li>
  * <li>{@link ITransaction#CURRENT}</li>
- * <li>{@link IHttpServletRoundtrip#CURRENT}</li>
- * <li>{@link IHttpServletRoundtrip#CURRENT}</li>
  * <li>{@link OfflineState#CURRENT}</li>
  * </ul>
  *
@@ -71,20 +66,16 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 public class ServerRunContext extends RunContext {
 
   protected IServerSession m_session;
-  protected HttpServletRequest m_servletRequest;
-  protected HttpServletResponse m_servletResponse;
   protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
   protected long m_transactionId;
   protected TransactionScope m_transactionScope;
 
   @Override
   protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next) {
-    final ICallable<RESULT> c8 = new TwoPhaseTransactionBoundaryCallable<>(next, transactionScope(), transactionId());
-    final ICallable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
-    final ICallable<RESULT> c6 = new InitThreadLocalCallable<>(c7, UserAgent.CURRENT, userAgent());
-    final ICallable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ISession.CURRENT, session());
-    final ICallable<RESULT> c4 = new InitThreadLocalCallable<>(c5, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, servletResponse());
-    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, servletRequest());
+    final ICallable<RESULT> c6 = new TwoPhaseTransactionBoundaryCallable<>(next, transactionScope(), transactionId());
+    final ICallable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
+    final ICallable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, userAgent());
+    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(c4, ISession.CURRENT, session());
     final ICallable<RESULT> c2 = new InitThreadLocalCallable<>(c3, OfflineState.CURRENT, OfflineState.CURRENT.get());
     final ICallable<RESULT> c1 = super.interceptCallable(c2);
 
@@ -104,24 +95,6 @@ public class ServerRunContext extends RunContext {
     if (session != null) {
       m_subject.set(session.getSubject(), false);
     }
-    return this;
-  }
-
-  public HttpServletRequest servletRequest() {
-    return m_servletRequest;
-  }
-
-  public ServerRunContext servletRequest(final HttpServletRequest servletRequest) {
-    m_servletRequest = servletRequest;
-    return this;
-  }
-
-  public HttpServletResponse servletResponse() {
-    return m_servletResponse;
-  }
-
-  public ServerRunContext servletResponse(final HttpServletResponse servletResponse) {
-    m_servletResponse = servletResponse;
     return this;
   }
 
@@ -179,8 +152,6 @@ public class ServerRunContext extends RunContext {
     builder.attr("locale", locale());
     builder.ref("session", session());
     builder.attr("userAgent", userAgent());
-    builder.ref("servletRequest", servletRequest());
-    builder.ref("servletResponse", servletResponse());
     builder.attr("transactionId", transactionId());
     builder.attr("transactionScope", transactionScope());
     return builder.toString();
@@ -195,8 +166,6 @@ public class ServerRunContext extends RunContext {
     super.copyValues(originRunContext);
     m_session = originRunContext.m_session;
     m_userAgent = originRunContext.m_userAgent.copy();
-    m_servletRequest = originRunContext.m_servletRequest;
-    m_servletResponse = originRunContext.m_servletResponse;
     m_transactionId = originRunContext.m_transactionId;
     m_transactionScope = originRunContext.m_transactionScope;
   }
@@ -205,8 +174,6 @@ public class ServerRunContext extends RunContext {
   protected void fillCurrentValues() {
     super.fillCurrentValues();
     m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
-    m_servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
-    m_servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
     m_transactionId = ITransaction.TX_ZERO_ID;
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     session(ServerSessionProvider.currentSession()); // method call to derive other values.
@@ -216,8 +183,6 @@ public class ServerRunContext extends RunContext {
   protected void fillEmptyValues() {
     super.fillEmptyValues();
     m_userAgent = new PreferredValue<>(null, true); // null as preferred UserAgent
-    m_servletRequest = null;
-    m_servletResponse = null;
     m_transactionId = ITransaction.TX_ZERO_ID;
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     session(null); // method call to derive other values.
