@@ -38,7 +38,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.StoppableThread;
 import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -57,7 +56,6 @@ import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCheckFieldsChain;
@@ -174,7 +172,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private IValidateContentDescriptor m_currentValidateContentDescriptor;
 
   // current timers
-  private P_CloseTimer m_scoutCloseTimer;
+  private IFuture<?> m_closeTimerFuture;
   private Map<String, IFuture<Void>> m_timerFutureMap;
   private DataChangeListener m_internalDataChangeListener;
   private final IEventHistory<FormEvent> m_eventHistory;
@@ -206,6 +204,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (callInitializer) {
       callInitializer();
     }
+
   }
 
   @Override
@@ -1606,13 +1605,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void setCloseTimer(int seconds) {
+    removeCloseTimer();
+
     if (seconds > 0) {
       setCloseTimerArmed(true);
-      m_scoutCloseTimer = new P_CloseTimer(seconds);
-      m_scoutCloseTimer.start();
-    }
-    else {
-      removeCloseTimer();
+      m_closeTimerFuture = installFormCloseTimer(seconds);
     }
   }
 
@@ -1633,7 +1630,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void removeCloseTimer() {
     setCloseTimerArmed(false);
-    m_scoutCloseTimer = null;
     setSubTitle(null);
   }
 
@@ -2081,8 +2077,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       setButtonsArmed(false);
       setCloseTimerArmed(false);
-      //
-      m_scoutCloseTimer = null;
 
       for (IFuture<?> future : m_timerFutureMap.values()) {
         future.cancel(false);
@@ -2804,8 +2798,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void setCloseTimerArmed(boolean b) {
-    m_closeTimerArmed = b;
+  public void setCloseTimerArmed(boolean closeTimerArmed) {
+    m_closeTimerArmed = closeTimerArmed;
+    if (!closeTimerArmed && m_closeTimerFuture != null) {
+      m_closeTimerFuture.cancel(false);
+      m_closeTimerFuture = null;
+    }
   }
 
   @Override
@@ -2925,59 +2923,45 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * form close timer
+   * Installs the timer to close the Form once the given seconds elapse
    */
-  private class P_CloseTimer extends StoppableThread {
-    private long m_seconds;
-    private final IClientSession m_session;
+  private IFuture<?> installFormCloseTimer(final long seconds) {
+    final long startMillis = System.currentTimeMillis();
+    final long delayMillis = TimeUnit.SECONDS.toMillis(seconds);
 
-    public P_CloseTimer(long seconds) {
-      setName("IForm.P_CloseTimer");
-      setDaemon(true);
-      m_seconds = seconds;
-      m_session = ClientSessionProvider.currentSession();
-    }
+    return ClientJobs.scheduleAtFixedRate(new IRunnable() {
 
-    @Override
-    public void run() {
-      while (this == m_scoutCloseTimer && m_seconds > 0 && isCloseTimerArmed()) {
+      @Override
+      public void run() throws Exception {
         ModelJobs.schedule(new IRunnable() {
 
           @Override
           public void run() throws Exception {
-            setSubTitle("" + m_seconds);
-          }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_session)));
+            final long elapsedMillis = System.currentTimeMillis() - startMillis;
+            final long remainingSeconds = TimeUnit.MILLISECONDS.toSeconds(delayMillis - elapsedMillis);
 
-        try {
-          sleep(TimeUnit.SECONDS.toMillis(1));
-        }
-        catch (InterruptedException ex) {
-        }
-        m_seconds--;
-      }
-      if (this == m_scoutCloseTimer) {
-        ModelJobs.schedule(new IRunnable() {
+            if (!isCloseTimerArmed()) {
+              setSubTitle(null);
+            }
+            else if (remainingSeconds > 0) {
+              setSubTitle("" + remainingSeconds);
+            }
+            else {
+              setCloseTimerArmed(false); // cancel the periodic action
 
-          @Override
-          public void run() throws Exception {
-            try {
-              if (isCloseTimerArmed()) {
+              try {
                 interceptCloseTimer();
               }
-              else {
-                setSubTitle(null);
+              catch (ProcessingException se) {
+                se.addContextMessage(ScoutTexts.get("FormCloseTimerActivated") + " " + getTitle());
+                SERVICES.getService(IExceptionHandlerService.class).handleException(se);
               }
             }
-            catch (ProcessingException se) {
-              se.addContextMessage(ScoutTexts.get("FormCloseTimerActivated") + " " + getTitle());
-              SERVICES.getService(IExceptionHandlerService.class).handleException(se);
-            }
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_session)).name("Form close timer"));
+        }).awaitDoneAndGet();
       }
-    }
-  }// end private class
+    }, 0, 1, TimeUnit.SECONDS, ClientJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("Close timer"));
+  }
 
   private abstract static class P_AbstractCollectingFieldVisitor<T> implements IFormFieldVisitor {
     private final ArrayList<T> m_list = new ArrayList<T>();
