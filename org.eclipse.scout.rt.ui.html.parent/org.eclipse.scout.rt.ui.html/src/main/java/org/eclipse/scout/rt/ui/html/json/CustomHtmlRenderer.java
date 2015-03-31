@@ -147,8 +147,9 @@ public class CustomHtmlRenderer implements ICustomHtmlRenderer {
         }
 
         // --- Blacklist ---
+        //FIXME CGU probably remove whole class
         updateBlacklistContext(blacklistContext, "script", tag);
-        updateBlacklistContext(blacklistContext, "style", tag);
+//        updateBlacklistContext(blacklistContext, "style", tag);
         updateBlacklistContext(blacklistContext, "iframe", tag);
       }
       // Text without tags
