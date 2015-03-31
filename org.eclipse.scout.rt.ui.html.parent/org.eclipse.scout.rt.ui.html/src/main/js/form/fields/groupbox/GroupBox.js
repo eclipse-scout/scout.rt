@@ -146,7 +146,6 @@ scout.GroupBox.prototype._renderBorderDecoration = function() {
  * @returns false if it is the mainbox. Or if the groupbox contains exactly one tablefield which has an invisible label
  */
 scout.GroupBox.prototype._computeBorderVisible = function(borderVisible) {
-  var fields = this.getFields();
   if (this.mainBox) {
     borderVisible = false;
   } else if (this.parent instanceof scout.GroupBox &&
