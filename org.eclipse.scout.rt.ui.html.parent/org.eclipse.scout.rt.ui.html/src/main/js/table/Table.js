@@ -1712,7 +1712,7 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
 
   //Update model columns
   for (var i = 0; i < columns.length; i++) {
-    scout.defaultValues.applyTo(columns[i], 'TableColumn');
+    scout.defaultValues.applyTo(columns[i], 'Column');
     column = this.columnById(columns[i].id);
     column.text = columns[i].text;
     column.sortActive = columns[i].sortActive;

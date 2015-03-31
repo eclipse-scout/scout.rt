@@ -68,9 +68,9 @@ TableSpecHelper.prototype.createModelColumn = function(id, text, type) {
     "id": id,
     "text": text,
     "type": type,
-    "objectType": "TableColumn"
+    "objectType": "Column"
   };
-  scout.defaultValues.applyTo(column, 'TableColumn');
+  scout.defaultValues.applyTo(column, 'Column');
   return column;
 };
 

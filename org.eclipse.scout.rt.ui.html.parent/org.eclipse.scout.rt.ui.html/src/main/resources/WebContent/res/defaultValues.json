@@ -141,7 +141,7 @@
       "checked": false,
       "enabled": true
     },
-    "TableColumn": {
+    "Column": {
       "editable": false,
       "horizontalAlignment": -1,
       "sortActive": false,
