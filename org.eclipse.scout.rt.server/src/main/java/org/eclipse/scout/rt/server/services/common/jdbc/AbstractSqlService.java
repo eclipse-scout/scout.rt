@@ -81,8 +81,8 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
 
   @Override
   protected void initializeService() {
-    super.initializeService();
     initConfig();
+    super.initializeService();
 
     // load code and permission names
     m_permissionNameToDescriptor = new HashMap<String, List<BundleClassDescriptor>>();
