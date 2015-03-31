@@ -34,6 +34,8 @@ import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
  * model to read and write model values. This class is for convenience purpose to facilitate the creation and scheduling
  * of model jobs.
  * <p/>
+ * <strong>By definition, a <code>ModelJob</code> requires a <code>ClientSession</code>.</strong>
+ * <p/>
  * The following code snippet illustrates what happens behind the scene:
  *
  * <pre>

@@ -31,6 +31,8 @@ import org.eclipse.scout.rt.platform.job.JobInput;
  * <code>ClientRunContext</code>. Such jobs are called client jobs. This class is for convenience purpose to facilitate
  * the creation and scheduling of client jobs.
  * <p/>
+ * <strong>By definition, a <code>ClientJob</code> requires a <code>ClientSession</code>.</strong>
+ * <p/>
  * The following code snippet illustrates what happens behind the scene:
  *
  * <pre>

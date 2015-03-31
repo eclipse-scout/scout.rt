@@ -28,19 +28,28 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.server.transaction.ITransactionProvider;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
- * Use this class to propagate server-side context and to run code in a new transaction.
+ * The <code>ServerRunContext</code> controls propagation of server-side state and sets the transaction boundaries. To
+ * control transaction scope, configure the <code>ServerRunContext</code> with the respective {@link TransactionScope}.
  * <p/>
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
  * server state among different threads, or allows temporary state changes to be done for the time of executing some
  * code.
  * <p/>
+ * A transaction scope controls in which transaction to run executables. By default, a new transaction is started, and
+ * committed or rolled back upon completion.
+ * <ul>
+ * <li>Use {@link TransactionScope#REQUIRES_NEW} to run executables in a new transaction.</li>
+ * <li>Use {@link TransactionScope#REQUIRED} to only start a new transaction if not running in a transaction yet.</li>
+ * <li>Use {@link TransactionScope#MANDATORY} to enforce that the caller is already running in a transaction. Otherwise,
+ * a {@link TransactionRequiredException} is thrown.</li>
+ * </ul>
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
  * characteristics:
  * <ul>
@@ -66,14 +75,11 @@ public class ServerRunContext extends RunContext {
   protected HttpServletResponse m_servletResponse;
   protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
   protected long m_transactionId;
-  private boolean m_transactional;
+  protected TransactionScope m_transactionScope;
 
   @Override
   protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next) {
-    final ITransaction tx = OBJ.get(ITransactionProvider.class).provide(m_transactionId);
-
-    final ICallable<RESULT> c9 = new TwoPhaseTransactionBoundaryCallable<>(next, tx);
-    final ICallable<RESULT> c8 = new InitThreadLocalCallable<>(c9, ITransaction.CURRENT, tx);
+    final ICallable<RESULT> c8 = new TwoPhaseTransactionBoundaryCallable<>(next, transactionScope(), transactionId());
     final ICallable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
     final ICallable<RESULT> c6 = new InitThreadLocalCallable<>(c7, UserAgent.CURRENT, userAgent());
     final ICallable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ISession.CURRENT, session());
@@ -137,12 +143,22 @@ public class ServerRunContext extends RunContext {
     return this;
   }
 
-  public boolean transactional() {
-    return m_transactional;
+  public TransactionScope transactionScope() {
+    return m_transactionScope;
   }
 
-  public ServerRunContext transactional(final boolean transactional) {
-    m_transactional = transactional;
+  /**
+   * Sets the transaction scope to control in which transaction to run executables. By default, a new transaction is
+   * started, and committed or rolled back upon completion.
+   * <ul>
+   * <li>Use {@link TransactionScope#REQUIRES_NEW} to run executables in a new transaction.</li>
+   * <li>Use {@link TransactionScope#REQUIRED} to only start a new transaction if not running in a transaction yet.</li>
+   * <li>Use {@link TransactionScope#MANDATORY} to enforce that the caller is already running in a transaction.
+   * Otherwise, a {@link TransactionRequiredException} is thrown.</li>
+   * </ul>
+   */
+  public ServerRunContext transactionScope(final TransactionScope transactionScope) {
+    m_transactionScope = transactionScope;
     return this;
   }
 
@@ -165,8 +181,8 @@ public class ServerRunContext extends RunContext {
     builder.attr("userAgent", userAgent());
     builder.ref("servletRequest", servletRequest());
     builder.ref("servletResponse", servletResponse());
-    builder.ref("transactionId", transactionId());
-    builder.ref("transactional", transactional());
+    builder.attr("transactionId", transactionId());
+    builder.attr("transactionScope", transactionScope());
     return builder.toString();
   }
 
@@ -182,7 +198,7 @@ public class ServerRunContext extends RunContext {
     m_servletRequest = originRunContext.m_servletRequest;
     m_servletResponse = originRunContext.m_servletResponse;
     m_transactionId = originRunContext.m_transactionId;
-    m_transactional = originRunContext.m_transactional;
+    m_transactionScope = originRunContext.m_transactionScope;
   }
 
   @Override
@@ -192,7 +208,7 @@ public class ServerRunContext extends RunContext {
     m_servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
     m_servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
     m_transactionId = ITransaction.TX_ZERO_ID;
-    m_transactional = true;
+    m_transactionScope = TransactionScope.REQUIRES_NEW;
     session(ServerSessionProvider.currentSession()); // method call to derive other values.
   }
 
@@ -203,7 +219,7 @@ public class ServerRunContext extends RunContext {
     m_servletRequest = null;
     m_servletResponse = null;
     m_transactionId = ITransaction.TX_ZERO_ID;
-    m_transactional = true;
+    m_transactionScope = TransactionScope.REQUIRES_NEW;
     session(null); // method call to derive other values.
   }
 

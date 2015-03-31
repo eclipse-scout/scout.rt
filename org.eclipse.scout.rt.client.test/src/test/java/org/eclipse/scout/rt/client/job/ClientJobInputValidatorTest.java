@@ -15,18 +15,20 @@ import static org.mockito.Mockito.mock;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientRunContext;
-import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(PlatformTestRunner.class)
 public class ClientJobInputValidatorTest {
 
   @Test
   public void test1() {
-    new ClientJobInputValidator().validate(new JobInput().runContext(new ClientRunContext().session(null)));
-    new ClientJobInputValidator().validate(new JobInput().runContext(new ClientRunContext().session(mock(IClientSession.class))));
-    new ClientJobInputValidator().validate(new JobInput().mutex(new Object()).runContext(new ClientRunContext().session(mock(IClientSession.class))));
+    new ClientJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty().session(mock(IClientSession.class))));
+    new ClientJobInputValidator().validate(new JobInput().mutex(new Object()).runContext(ClientRunContexts.empty().session(mock(IClientSession.class))));
     assertTrue(true);
   }
 
@@ -37,11 +39,21 @@ public class ClientJobInputValidatorTest {
 
   @Test(expected = AssertionException.class)
   public void testWrongRunContext() {
-    new ClientJobInputValidator().validate(new JobInput().runContext(new RunContext()));
+    new ClientJobInputValidator().validate(new JobInput().runContext(RunContexts.empty()));
   }
 
   @Test(expected = AssertionException.class)
   public void testSessionMutex() {
-    new ClientJobInputValidator().validate(new JobInput().mutex(mock(IClientSession.class)).runContext(new ClientRunContext().session(mock(IClientSession.class))));
+    new ClientJobInputValidator().validate(new JobInput().mutex(mock(IClientSession.class)).runContext(ClientRunContexts.empty().session(mock(IClientSession.class))));
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testNullClientSession1() {
+    new ClientJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty()));
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testNullClientSession2() {
+    new ClientJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty().session(null)));
   }
 }

@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
@@ -63,6 +64,7 @@ public class ServerRunContextTest {
     assertNull(runContext.session());
     assertNull(runContext.userAgent());
     assertNull(runContext.locale());
+    assertEquals(TransactionScope.REQUIRES_NEW, runContext.transactionScope());
   }
 
   @Test
@@ -73,6 +75,7 @@ public class ServerRunContextTest {
     runContext.session(mock(IServerSession.class));
     runContext.userAgent(UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a"));
     runContext.locale(Locale.CANADA_FRENCH);
+    runContext.transactionScope(TransactionScope.MANDATORY);
 
     ServerRunContext copy = runContext.copy();
 
@@ -81,6 +84,7 @@ public class ServerRunContextTest {
     assertSame(runContext.userAgent(), copy.userAgent());
     assertSame(runContext.locale(), copy.locale());
     assertSame(runContext.locale(), copy.locale());
+    assertEquals(TransactionScope.MANDATORY, runContext.transactionScope());
   }
 
   @Test
@@ -323,6 +327,11 @@ public class ServerRunContextTest {
     when(currentSession.getSubject()).thenReturn(new Subject());
     ISession.CURRENT.set(currentSession);
     testDerivedSubjectWhenSettingSessionImpl();
+  }
+
+  @Test
+  public void testCurrentTransactionScope() {
+    assertEquals(TransactionScope.REQUIRES_NEW, ServerRunContexts.copyCurrent().transactionScope());
   }
 
   private void testDerivedSubjectWhenSettingSessionImpl() throws PrivilegedActionException {

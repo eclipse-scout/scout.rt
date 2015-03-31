@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.platform.context.SubjectCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -94,15 +93,11 @@ public class ServerRunContextChainTest {
     InitThreadLocalCallable c9 = getNextAndAssert(c8, InitThreadLocalCallable.class);
     assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c9).getThreadLocal());
 
-    // 10. InitThreadLocalCallable for ITransaction.CURRENT
-    InitThreadLocalCallable c10 = getNextAndAssert(c9, InitThreadLocalCallable.class);
-    assertSame(ITransaction.CURRENT, ((InitThreadLocalCallable) c10).getThreadLocal());
+    // 10. TwoPhaseTransactionBoundaryCallable
+    TwoPhaseTransactionBoundaryCallable c10 = getNextAndAssert(c9, TwoPhaseTransactionBoundaryCallable.class);
 
-    // 11. TwoPhaseTransactionBoundaryCallable
-    TwoPhaseTransactionBoundaryCallable c11 = getNextAndAssert(c10, TwoPhaseTransactionBoundaryCallable.class);
-
-    // 12. Target
-    assertSame(m_targetCallable, c11.getNext());
+    // 11. Target
+    assertSame(m_targetCallable, c10.getNext());
   }
 
   /**
@@ -158,21 +153,17 @@ public class ServerRunContextChainTest {
     InitThreadLocalCallable c9 = getNextAndAssert(c8, InitThreadLocalCallable.class);
     assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c9).getThreadLocal());
 
-    // 10. InitThreadLocalCallable for ITransaction.CURRENT
-    InitThreadLocalCallable c10 = getNextAndAssert(c9, InitThreadLocalCallable.class);
-    assertSame(ITransaction.CURRENT, ((InitThreadLocalCallable) c10).getThreadLocal());
+    // 10. TwoPhaseTransactionBoundaryCallable
+    TwoPhaseTransactionBoundaryCallable c10 = getNextAndAssert(c9, TwoPhaseTransactionBoundaryCallable.class);
 
-    // 11. TwoPhaseTransactionBoundaryCallable
-    TwoPhaseTransactionBoundaryCallable c11 = getNextAndAssert(c10, TwoPhaseTransactionBoundaryCallable.class);
+    // 11. Contribution1
+    Contribution1 c11 = getNextAndAssert(c10, Contribution1.class);
 
-    // 12. Contribution1
-    Contribution1 c12 = getNextAndAssert(c11, Contribution1.class);
+    // 12. Contribution2
+    Contribution2 c12 = getNextAndAssert(c11, Contribution2.class);
 
-    // 13. Contribution2
-    Contribution2 c13 = getNextAndAssert(c12, Contribution2.class);
-
-    // 14. Target
-    assertSame(m_targetCallable, c13.getNext());
+    // 13. Target
+    assertSame(m_targetCallable, c12.getNext());
   }
 
   /**
@@ -234,15 +225,11 @@ public class ServerRunContextChainTest {
     InitThreadLocalCallable c11 = getNextAndAssert(c10, InitThreadLocalCallable.class);
     assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c11).getThreadLocal());
 
-    // 12. InitThreadLocalCallable for ITransaction.CURRENT
-    InitThreadLocalCallable c12 = getNextAndAssert(c11, InitThreadLocalCallable.class);
-    assertSame(ITransaction.CURRENT, ((InitThreadLocalCallable) c12).getThreadLocal());
+    // 12. TwoPhaseTransactionBoundaryCallable
+    TwoPhaseTransactionBoundaryCallable c12 = getNextAndAssert(c11, TwoPhaseTransactionBoundaryCallable.class);
 
-    // 13. TwoPhaseTransactionBoundaryCallable
-    TwoPhaseTransactionBoundaryCallable c13 = getNextAndAssert(c12, TwoPhaseTransactionBoundaryCallable.class);
-
-    // 14. Target
-    assertSame(m_targetCallable, c13.getNext());
+    // 13. Target
+    assertSame(m_targetCallable, c12.getNext());
   }
 
   @SuppressWarnings("unchecked")

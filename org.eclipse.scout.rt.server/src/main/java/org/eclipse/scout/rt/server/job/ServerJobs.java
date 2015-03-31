@@ -24,11 +24,15 @@ import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
  * Factory and utility methods for {@link IJobManager} to schedule jobs that run on behalf of a
  * <code>ServerRunContext</code>. Such jobs are called server jobs. This class is for convenience purpose to facilitate
  * the creation and scheduling of server jobs.
+ * <p/>
+ * <strong>By definition, a <code>ServerJob</code> requires a <code>ServerSession</code> and is run within a new
+ * transaction. Other transaction scopes than {@link TransactionScope#REQUIRES_NEW} are not supported.</strong>
  * <p/>
  * The following code snippet illustrates what happens behind the scene:
  *

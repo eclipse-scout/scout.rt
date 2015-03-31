@@ -10,22 +10,30 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.context;
 
-import java.lang.reflect.UndeclaredThrowableException;
-
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.context.InitThreadLocalCallable;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.server.transaction.ITransactionProvider;
+import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
-import org.eclipse.scout.rt.server.transaction.internal.TransactionSafeDelegator;
 
 /**
- * Processor that demarcates the transaction boundaries for the subsequent sequence of actions and ends the transaction
- * according to the XA specification (eXtended Architecture) upon completion. Thereto, the
- * <code>2-phase-commit-protocol (2PC)</code> is applied in order to successfully commit the transaction consistently
- * over all involved transaction members like relational databases, message queues and so on.
+ * Depending on the {@link TransactionScope} and the existence of a caller transaction, this processor starts a new
+ * transaction for the subsequent sequence of actions and ends the transaction according to the XA specification
+ * (eXtended Architecture) upon completion. Thereto, the <code>2-phase-commit-protocol (2PC)</code> is applied in order
+ * to successfully commit the transaction consistently over all involved transaction members like relational databases,
+ * message queues and so on.
  *
  * @param <RESULT>
  *          the result type of the job's computation.
@@ -34,79 +42,96 @@ import org.eclipse.scout.rt.server.transaction.internal.TransactionSafeDelegator
  */
 public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
 
-  @Internal
-  protected final ICallable<RESULT> m_next;
-  @Internal
-  protected final ITransaction m_transaction;
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TwoPhaseTransactionBoundaryCallable.class);
 
-  /**
-   * Creates a processor that demarcates the transaction boundaries for the subsequent sequence of actions and ends the
-   * transaction according to the XA specification (eXtended Architecture) upon completion.
-   *
-   * @param next
-   *          next processor in the chain; must not be <code>null</code>.
-   * @param transaction
-   *          transaction to set the demarcation boundaries; must not be <code>null</code>.
-   */
-  public TwoPhaseTransactionBoundaryCallable(final ICallable<RESULT> next, final ITransaction transaction) {
+  protected final ICallable<RESULT> m_next;
+  private final long m_transactionId;
+  private final TransactionScope m_transactionScope;
+
+  public TwoPhaseTransactionBoundaryCallable(final ICallable<RESULT> next, final TransactionScope transactionScope, final long transactionId) {
     m_next = Assertions.assertNotNull(next);
-    m_transaction = Assertions.assertNotNull(transaction);
+    m_transactionScope = (transactionScope != null ? transactionScope : TransactionScope.REQUIRES_NEW);
+    m_transactionId = transactionId;
   }
 
   @Override
   public RESULT call() throws Exception {
-    ActiveTransactionRegistry.register(m_transaction);
-    try {
-      return runAsTransaction(m_transaction);
-    }
-    finally {
-      ActiveTransactionRegistry.unregister(m_transaction);
+    switch (m_transactionScope) {
+      case MANDATORY:
+        return runMandatoryTxBoundary();
+      case REQUIRES_NEW:
+        return runRequiresNewTxBoundary();
+      case REQUIRED:
+        return runRequiredTxBoundary();
+      default:
+        throw new AssertionException("Unsupported transaction scope [%s]", m_transactionScope);
     }
   }
 
   /**
-   * Delegates control to the next processor, commits the transaction on success or rolls it back on error.
-   *
-   * @param tx
-   *          {@link ITransaction} to be coordinated.
-   * @return result of the processing.
-   * @throws Exception
-   *           if the processing throws an error.
+   * Ensures a caller transaction to exist and continues the chain.
    */
   @Internal
-  protected RESULT runAsTransaction(final ITransaction tx) throws Exception {
-    final TransactionSafeDelegator txDelegator = new TransactionSafeDelegator(tx); // ITransaction-delegate that does not propagate errors.
+  protected RESULT runMandatoryTxBoundary() throws Exception {
+    final ITransaction callerTransaction = ITransaction.CURRENT.get();
 
+    if (callerTransaction == null) {
+      throw new TransactionRequiredException();
+    }
+    else {
+      return runNextAndRegisterTxError(callerTransaction);
+    }
+  }
+
+  /**
+   * Creates a new transaction and continues the chain. Upon completion, the transaction is committed or rolled back.
+   */
+  @Internal
+  protected RESULT runRequiresNewTxBoundary() throws Exception {
+    final ITransaction transaction = OBJ.get(ITransactionProvider.class).provide(m_transactionId);
+
+    ActiveTransactionRegistry.register(transaction);
+    try {
+      return runNextAndRegisterTxError(transaction);
+    }
+    finally {
+      endTransactionSafe(transaction);
+      ActiveTransactionRegistry.unregister(transaction);
+    }
+  }
+
+  /**
+   * Continues the chain on behalf of the current caller transaction. If not available, a new transaction is started and
+   * upon completion, that transaction is committed or rolled back.
+   */
+  @Internal
+  protected RESULT runRequiredTxBoundary() throws Exception {
+    final ITransaction callerTransaction = ITransaction.CURRENT.get();
+
+    if (callerTransaction != null) {
+      return runNextAndRegisterTxError(callerTransaction);
+    }
+    else {
+      return runRequiresNewTxBoundary();
+    }
+  }
+
+  /**
+   * Registers the given transaction on {@link ITransaction#CURRENT}, delegates control to the next processor and
+   * registers exceptions on the given transaction.
+   */
+  @Internal
+  protected RESULT runNextAndRegisterTxError(final ITransaction tx) throws Exception {
     RESULT result = null;
     Exception error = null;
+
     try {
-      result = m_next.call();
-    }
-    catch (final UndeclaredThrowableException e) {
-      error = e;
-      tx.addFailure(e.getCause() != null ? e.getCause() : e);
+      result = new InitThreadLocalCallable<>(m_next, ITransaction.CURRENT, tx).call();
     }
     catch (final Exception e) {
       error = e;
-      tx.addFailure((e instanceof ProcessingException && e.getCause() != null) ? e.getCause() : e); // Consider the real cause if wrapped by a ProcessingException.
+      tx.addFailure(OBJ.get(ExceptionTranslator.class).translate(e));
     }
-
-    boolean commitSuccess = false;
-    if (tx.hasFailures()) {
-      logTxFailures(tx);
-      commitSuccess = false;
-    }
-    else {
-      // Commit the XA transaction in 2PC-style.
-      commitSuccess = (txDelegator.commitPhase1() && txDelegator.commitPhase2());
-    }
-
-    if (!commitSuccess) {
-      // Rollback the XA transaction because at least one XA member rejected the voting for commit or the final commit failed unexpectedly.
-      txDelegator.rollback();
-    }
-
-    txDelegator.release();
 
     if (error != null) {
       throw error;
@@ -116,23 +141,106 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
     }
   }
 
-  @Internal
-  protected void logTxFailures(final ITransaction tx) {
-    // TODO [dwi]: see Scout ticket
-//    for (final Throwable failure : tx.getFailures()) {
-//      LOG.debug(String.format("Current transaction was rolled back because of a processing error. [reason=%s, job=%s, tx=%s]", StringUtility.nvl(failure.getMessage(), "n/a"), m_input.getIdentifier(), tx), failure);
-//    }
-  }
-
   /**
-   * @return the underlying transaction.
+   * Commits the transaction on success, or rolls it back on error.
    */
-  public ITransaction getTransaction() {
-    return m_transaction;
+  @Internal
+  protected void endTransactionSafe(final ITransaction tx) {
+    boolean commitSuccess = false;
+    if (tx.hasFailures()) {
+      commitSuccess = false;
+    }
+    else {
+      // Commit the XA transaction in 2PC-style.
+      commitSuccess = (commitPhase1Safe(tx) && commitPhase2Safe(tx));
+    }
+
+    if (!commitSuccess) {
+      // Rollback the XA transaction because at least one XA member rejected the voting for commit or the final commit failed unexpectedly.
+      rollbackSafe(tx);
+    }
+
+    releaseSafe(tx);
   }
 
   @Override
   public ICallable<RESULT> getNext() {
     return m_next;
+  }
+
+  // === Utility methods for a safe interaction with a ITransaction ===
+
+  /**
+   * @return <code>true</code> on success, or <code>false</code> on failure.
+   * @see ITransaction#commitPhase1()
+   */
+  @Internal
+  protected boolean commitPhase1Safe(final ITransaction tx) {
+    try {
+      return tx.commitPhase1();
+    }
+    catch (ProcessingException | RuntimeException e) {
+      LOG.error(String.format("Failed to commit XA transaction [2PC-phase='voting', job=%s, tx=%s]", getCurrentJobName(), tx), e);
+      return false;
+    }
+  }
+
+  /**
+   * @return <code>true</code> on success, or <code>false</code> on failure.
+   * @see ITransaction#commitPhase2()
+   */
+  @Internal
+  protected boolean commitPhase2Safe(final ITransaction tx) {
+    try {
+      tx.commitPhase2();
+      return true;
+    }
+    catch (final RuntimeException e) {
+      LOG.error(String.format("Failed to commit XA transaction [2PC-phase='commit', job=%s, tx=%s]", getCurrentJobName(), tx), e);
+      return false;
+    }
+  }
+
+  /**
+   * @return <code>true</code> on success, or <code>false</code> on failure.
+   * @see ITransaction#rollback()
+   */
+  @Internal
+  protected boolean rollbackSafe(final ITransaction tx) {
+    try {
+      tx.rollback();
+      return true;
+    }
+    catch (final RuntimeException e) {
+      LOG.error(String.format("Failed to rollback XA transaction [job=%s, tx=%s]", getCurrentJobName(), tx), e);
+      return false;
+    }
+  }
+
+  /**
+   * @return <code>true</code> on success, or <code>false</code> on failure.
+   * @see ITransaction#release()
+   */
+  @Internal
+  protected boolean releaseSafe(final ITransaction tx) {
+    try {
+      tx.release();
+      return true;
+    }
+    catch (final RuntimeException e) {
+      LOG.error(String.format("Failed to release XA transaction members [job=%s, tx=%s]", getCurrentJobName(), tx), e);
+      return false;
+    }
+  }
+
+  @Internal
+  protected String getCurrentJobName() {
+    final IFuture<?> future = IFuture.CURRENT.get();
+    if (future != null) {
+      return future.getJobInput().identifier();
+    }
+    else {
+      return "";
+    }
   }
 }

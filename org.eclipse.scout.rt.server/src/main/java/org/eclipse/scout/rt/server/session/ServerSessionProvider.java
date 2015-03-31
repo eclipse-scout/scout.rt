@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
@@ -40,7 +41,7 @@ public class ServerSessionProvider {
    *           is thrown if the {@link IServerSession} could not be created or initialized.
    */
   public <SESSION extends IServerSession> SESSION provide(final ServerRunContext runContext) throws ProcessingException {
-    return runContext.copy().transactional(false).call(new ICallable<SESSION>() {
+    return runContext.copy().call(new ICallable<SESSION>() {
 
       @Override
       public SESSION call() throws Exception {
@@ -49,7 +50,7 @@ public class ServerSessionProvider {
         serverSession.setIdInternal(String.format("%s-%s", serverSession.getClass().getName(), UUID.randomUUID()));
 
         // 2. Load the session.
-        runContext.copy().session(serverSession).run(new IRunnable() {
+        runContext.copy().session(serverSession).transactionScope(TransactionScope.MANDATORY).run(new IRunnable() {
 
           @Override
           public void run() throws Exception {

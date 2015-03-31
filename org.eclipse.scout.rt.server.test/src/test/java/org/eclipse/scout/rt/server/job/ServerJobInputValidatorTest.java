@@ -14,18 +14,21 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
-import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(PlatformTestRunner.class)
 public class ServerJobInputValidatorTest {
 
   @Test
   public void test1() {
-    new ServerJobInputValidator().validate(new JobInput().runContext(new ServerRunContext().session(null)));
-    new ServerJobInputValidator().validate(new JobInput().runContext(new ServerRunContext().session(mock(IServerSession.class))));
+    new ServerJobInputValidator().validate(new JobInput().runContext(ServerRunContexts.empty().session(mock(IServerSession.class))));
     assertTrue(true);
   }
 
@@ -36,6 +39,37 @@ public class ServerJobInputValidatorTest {
 
   @Test(expected = AssertionException.class)
   public void testWrongRunContext() {
-    new ServerJobInputValidator().validate(new JobInput().runContext(new RunContext()));
+    new ServerJobInputValidator().validate(new JobInput().runContext(RunContexts.empty()));
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testNullServerSession1() {
+    new ServerJobInputValidator().validate(new JobInput().runContext(ServerRunContexts.empty()));
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testNullServerSession2() {
+    new ServerJobInputValidator().validate(new JobInput().runContext(ServerRunContexts.empty().session(null)));
+  }
+
+  @Test
+  public void testTransactionScopeRequiresNew() {
+    new ServerJobInputValidator().validate(new JobInput().runContext(ServerRunContexts.empty().session(mock(IServerSession.class)).transactionScope(TransactionScope.REQUIRES_NEW)));
+    assertTrue(true);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testTransactionScopeRequired() {
+    new ServerJobInputValidator().validate(new JobInput().runContext(ServerRunContexts.empty().session(mock(IServerSession.class)).transactionScope(TransactionScope.REQUIRED)));
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testTransactionScopeMandatory() {
+    new ServerJobInputValidator().validate(new JobInput().runContext(ServerRunContexts.empty().session(mock(IServerSession.class)).transactionScope(TransactionScope.MANDATORY)));
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testTransactionScopeNull() {
+    new ServerJobInputValidator().validate(new JobInput().runContext(ServerRunContexts.empty().session(mock(IServerSession.class)).transactionScope(null)));
   }
 }
