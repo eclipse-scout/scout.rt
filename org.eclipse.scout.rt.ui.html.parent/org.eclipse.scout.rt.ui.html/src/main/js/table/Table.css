@@ -78,6 +78,10 @@
     /* Move the row 1px up to cover the bottom border of the previous row. */
     margin-top: -1px;
   }
+
+  &.disabled {
+    background-color: @control-background-disabled-color;
+  }
 }
 
 .table-cell {

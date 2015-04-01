@@ -111,15 +111,8 @@ scout.AbstractSmartField.prototype._onKeyDown = function(event) {
     if (this._openPopup()) {
       return;
     }
-    switch (event.which) {
-      case scout.keys.PAGE_UP:
-      case scout.keys.PAGE_DOWN:
-      case scout.keys.UP:
-      case scout.keys.DOWN:
-        if (this.proposalChooser) {
-          this.proposalChooser.delegateEvent(event);
-        }
-        break;
+    if (this.proposalChooser) {
+      this.proposalChooser.delegateEvent(event);
     }
   }
 };

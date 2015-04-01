@@ -117,10 +117,7 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
 
   // restore
   this._typeHandler.restoreDom($container);
-  $container
-    .css('display', 'block');
-
-  $.log.info('proposal-chooser prefSize=' + prefSize);
+  $container.css('display', 'block');
   return prefSize;
 };
 

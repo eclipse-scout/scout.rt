@@ -384,6 +384,9 @@ scout.Table.prototype._buildRowDiv = function(row) {
   if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
     rowClass += ' selected';
   }
+  if (!row.enabled) {
+    rowClass += ' disabled';
+  }
   var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute + '>';
   for (var c = 0; c < this.columns.length; c++) {
     rowDiv += this.columns[c].buildCell(row);

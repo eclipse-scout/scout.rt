@@ -35,7 +35,6 @@ scout.ProposalChooser.prototype._renderProperties = function() {
  * calling the JQuery trigger method.
  */
 scout.ProposalChooser.prototype.delegateEvent = function(event) {
-  $.log.info('$container=' + this.model.$container);
   this.model.$container.trigger(event);
 };
 
