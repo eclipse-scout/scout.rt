@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.context;
+package org.eclipse.scout.rt.server.commons.context;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
@@ -20,11 +19,8 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.context.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.context.SubjectCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,12 +36,6 @@ public class ServletRunContextChainTest {
   @Before
   public void before() {
     MockitoAnnotations.initMocks(this);
-    ISession.CURRENT.set(mock(IServerSession.class));
-  }
-
-  @After
-  public void after() {
-    ISession.CURRENT.remove();
   }
 
   /**

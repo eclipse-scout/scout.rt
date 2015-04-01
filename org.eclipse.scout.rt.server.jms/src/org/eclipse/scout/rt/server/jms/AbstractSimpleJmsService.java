@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.server.jms.context.JmsRunContexts;
 import org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService;
 import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
@@ -180,7 +181,13 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
           try {
             final Message jmsMessage = m_consumer.receive(m_receiveTimeout);
             if (jmsMessage != null) {
-              onMessage(jmsMessage);
+              JmsRunContexts.empty().jmsMessage(jmsMessage).run(new IRunnable() {
+
+                @Override
+                public void run() throws Exception {
+                  onMessage(jmsMessage);
+                }
+              });
             }
           }
           catch (final Exception e) {

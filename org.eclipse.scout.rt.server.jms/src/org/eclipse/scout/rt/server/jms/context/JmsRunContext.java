@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.context;
+package org.eclipse.scout.rt.server.jms.context;
 
 import java.util.Locale;
 
+import javax.jms.Message;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.ToStringBuilder;
@@ -40,6 +41,13 @@ import org.eclipse.scout.rt.platform.job.PropertyMap;
  */
 public class JmsRunContext extends RunContext {
 
+  /**
+   * The {@link Message} which is currently associated with the current thread.
+   */
+  public static final ThreadLocal<Message> CURRENT_JMS_MESSAGE = new ThreadLocal<>();
+
+  protected Message m_jmsMessage;
+
   @Override
   public JmsRunContext subject(final Subject subject) {
     return (JmsRunContext) super.subject(subject);
@@ -50,13 +58,21 @@ public class JmsRunContext extends RunContext {
     return (JmsRunContext) super.locale(locale);
   }
 
-  // TODO [dwi]: implement this class
+  public JmsRunContext jmsMessage(final Message jmsMessage) {
+    m_jmsMessage = jmsMessage;
+    return this;
+  }
+
+  public Message jmsMessage() {
+    return m_jmsMessage;
+  }
 
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("subject", subject());
     builder.attr("locale", locale());
+    builder.ref("message", jmsMessage());
     return builder.toString();
   }
 
@@ -67,16 +83,19 @@ public class JmsRunContext extends RunContext {
     final JmsRunContext originRunContext = (JmsRunContext) origin;
 
     super.copyValues(originRunContext);
+    m_jmsMessage = originRunContext.m_jmsMessage;
   }
 
   @Override
   protected void fillCurrentValues() {
     super.fillCurrentValues();
+    m_jmsMessage = JmsRunContext.CURRENT_JMS_MESSAGE.get();
   }
 
   @Override
   protected void fillEmptyValues() {
     super.fillEmptyValues();
+    m_jmsMessage = null;
   }
 
   @Override

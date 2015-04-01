@@ -8,22 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.context;
+package org.eclipse.scout.rt.server.jms.context;
 
-import javax.servlet.Servlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.jms.Message;
 
 import org.eclipse.scout.rt.platform.OBJ;
 
 /**
- * Factory methods to create new {@link ServletRunContext} objects to propagate {@link Servlet} state like
- * {@link HttpServletRequest} and {@link HttpServletResponse}.
+ * Factory methods to create new {@link JmsRunContext} objects to propagate <i>JMS Java Message Service</i> state like
+ * {@link Message}.
  * <p/>
  * Usage:
  *
  * <pre>
- * ServletRunContexts.empty().locale(Locale.US).servletRequest(...).servletResponse(...).run(new IRunnable() {
+ * JmsRunContexts.empty().locale(Locale.US).message(...).run(new IRunnable() {
  * 
  *   &#064;Override
  *   public void run() throws Exception {
@@ -33,27 +31,27 @@ import org.eclipse.scout.rt.platform.OBJ;
  * </pre>
  *
  * @since 5.1
- * @see ServletRunContext
+ * @see JmsRunContext
  */
-public final class ServletRunContexts {
+public final class JmsRunContexts {
 
-  private ServletRunContexts() {
+  private JmsRunContexts() {
   }
 
   /**
-   * Creates an empty {@link ServletRunContext}.
+   * Creates an empty <code>JmsRunContext</code>.
    */
-  public static final ServletRunContext empty() {
-    final ServletRunContext runContext = OBJ.get(ServletRunContext.class);
+  public static final JmsRunContext empty() {
+    final JmsRunContext runContext = OBJ.get(JmsRunContext.class);
     runContext.fillEmptyValues();
     return runContext;
   }
 
   /**
-   * Creates a "snapshot" of the current calling <code>ServletRunContext</code>.
+   * Creates a "snapshot" of the current calling <code>JmsRunContext</code>.
    */
-  public static ServletRunContext copyCurrent() {
-    final ServletRunContext runContext = OBJ.get(ServletRunContext.class);
+  public static JmsRunContext copyCurrent() {
+    final JmsRunContext runContext = OBJ.get(JmsRunContext.class);
     runContext.fillCurrentValues();
     return runContext;
   }

@@ -26,8 +26,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.internal.servlet.EndpointServlet;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
-import org.eclipse.scout.rt.server.context.ServletRunContext;
-import org.eclipse.scout.rt.server.context.ServletRunContexts;
+import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
+import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 
 /**
  * Runs the webservice request in a server-job to propagate the current request-context and to run on behalf of a
