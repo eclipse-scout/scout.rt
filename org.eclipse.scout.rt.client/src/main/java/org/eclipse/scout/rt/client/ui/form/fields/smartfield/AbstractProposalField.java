@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
-import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -94,40 +93,32 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     }
     boolean unregister = true;
     try {
-      String oldText = getDisplayText();
-      boolean parsingError = getErrorStatus() != null && getErrorStatus().containsStatus(ParsingFailedStatus.class);
-      if (acceptedProposalRow == null && (!parsingError) && getCurrentLookupRow() != null && StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(oldText))) {
-        // no change
-        return getValue();
+      // changed
+      if (acceptedProposalRow != null) {
+        setCurrentLookupRow(acceptedProposalRow);
+        return acceptedProposalRow.getText();
+      }
+      else if (text == null) {
+        setCurrentLookupRow(EMPTY_LOOKUP_ROW);
+        return null;
       }
       else {
-        // changed
-        if (acceptedProposalRow != null) {
-          setCurrentLookupRow(acceptedProposalRow);
-          return acceptedProposalRow.getText();
-        }
-        else if (text == null) {
-          setCurrentLookupRow(EMPTY_LOOKUP_ROW);
-          return null;
-        }
-        else {
-          setCurrentLookupRow(null);
-          doSearch(text, false, true);
-          proposalChooser = getProposalChooser();
-          if (proposalChooser != null) {
-            acceptedProposalRow = proposalChooser.getAcceptedProposal();
-            if (acceptedProposalRow != null) {
-              setCurrentLookupRow(acceptedProposalRow);
-              return acceptedProposalRow.getText();
-            }
-            else {
-              // no match possible; reject change, but keep proposal chooser open
-              unregister = false;
-              setCurrentLookupRow(null);
-            }
+        setCurrentLookupRow(null);
+        doSearch(text, false, true);
+        proposalChooser = getProposalChooser();
+        if (proposalChooser != null) {
+          acceptedProposalRow = proposalChooser.getAcceptedProposal();
+          if (acceptedProposalRow != null) {
+            setCurrentLookupRow(acceptedProposalRow);
+            return acceptedProposalRow.getText();
           }
-          return text;
+          else {
+            // no match possible; reject change, but keep proposal chooser open
+            unregister = false;
+            setCurrentLookupRow(null);
+          }
         }
+        return text;
       }
     }
     finally {
