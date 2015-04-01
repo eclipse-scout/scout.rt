@@ -7,7 +7,6 @@ scout.Table = function() {
   this.$data;
   this.header;
   this.selectionHandler;
-  this.keyStrokeAdapter;
   this.columns = [];
   this.tableControls = [];
   this.menus = [];
@@ -35,7 +34,6 @@ scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
 
 scout.Table.prototype.init = function(model, session) {
   scout.Table.parent.prototype.init.call(this, model, session);
-  this.keyStrokeAdapter = new scout.TableKeyStrokeAdapter(this);
 
   this._initColumns();
   for (var i = 0; i < this.rows.length; i++) {
@@ -64,15 +62,15 @@ scout.Table.prototype._initColumns = function() {
   }
 };
 
+scout.Table.prototype._createKeyStrokeAdapter = function() {
+  return new scout.TableKeyStrokeAdapter(this);
+};
+
 scout.Table.prototype._insertCheckBoxColumn = function() {
   var column = new scout.CheckBoxColumn();
   column.init();
   column.table = this;
   scout.arrays.insert(this.columns, column, 0);
-};
-
-scout.Table.prototype.dispose = function() {
-  scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
 };
 
 scout.Table.prototype._render = function($parent) {
@@ -81,17 +79,10 @@ scout.Table.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.TableLayout(this));
   this.htmlComp.pixelBasedSizing = false;
-  this.$container.attr('tabIndex', 0);
-  if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
-  }
-
   this.$data = this.$container.appendDiv('table-data');
   scout.scrollbars.install(this.$data);
   this.session.detachHelper.pushScrollable(this.$data);
-
   this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.TableMenuItemsOrder.order);
-
   this._updateRowWidth();
   this.drawData();
 };
@@ -101,6 +92,7 @@ scout.Table.prototype._renderProperties = function() {
   this._renderMenus();
   this._renderTableHeader();
   this._renderTableFooter();
+  this._renderEnabled();
 };
 
 scout.Table.prototype._remove = function() {
@@ -1613,15 +1605,18 @@ scout.Table.prototype._renderTableFooter = function() {
 };
 
 scout.Table.prototype._renderEnabled = function() {
-  // FIXME CGU remove/add events. Maybe extend jquery to not fire on disabled events?
   var enabled = this.enabled;
   this.$data.setEnabled(enabled);
-  // Enable/disable all checkboxes
-  this.$rows().each(function() {
-    var $row = $(this),
-      row = $row.data('row');
-    $row.find('input').setEnabled(enabled && row.enabled);
-  });
+  this.$container.setTabbable(enabled);
+
+  if (this.rendered) {
+    // Enable/disable all checkboxes
+    this.$rows().each(function() {
+      var $row = $(this),
+        row = $row.data('row');
+      $row.find('input').setEnabled(enabled && row.enabled);
+    });
+  }
 };
 
 scout.Table.prototype._renderMultiSelect = function() {

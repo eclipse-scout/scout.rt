@@ -18,6 +18,13 @@ scout.GroupBox = function() {
 };
 scout.inherits(scout.GroupBox, scout.CompositeField);
 
+/**
+ * @override
+ */
+scout.GroupBox.prototype._createKeyStrokeAdapter = function() {
+  return new scout.GroupBoxKeyStrokeAdapter(this);
+};
+
 scout.GroupBox.prototype._render = function($parent) {
   var htmlBody, i,
     env = scout.HtmlEnvironment,
@@ -106,7 +113,7 @@ scout.GroupBox.prototype._prepareFields = function() {
       if (res) {
         this.keyStrokeAdapter.registerKeyStroke(new scout.ButtonMnemonicKeyStroke(res, field));
       }
-      //Register all buttonkey strokes
+      // Register all button key strokes
       for (var j = 0; j < field.keyStrokes.length; j++) {
         this.keyStrokeAdapter.registerKeyStroke(field.keyStrokes[j]);
       }
@@ -120,7 +127,7 @@ scout.GroupBox.prototype._prepareFields = function() {
 };
 
 /**
- * @override CompositeField.js
+ * @override
  */
 scout.GroupBox.prototype.getFields = function() {
   return this.controls;
@@ -191,19 +198,12 @@ scout.GroupBox.prototype._renderExpanded = function(expanded) {
 };
 
 /**
- * @override FormField.js
+ * @override
  */
 scout.GroupBox.prototype._renderLabelVisible = function(visible) {
   // TODO AWE: (concept) discuss with C.GU -> auf dem GUI server korrigieren oder im Browser UI?
   // --> kein hack für main-box, wenn die auf dem model ein label hat, hat es im UI auch eins
   this._$groupBoxTitle.setVisible(visible && this.label && !this.mainBox);
-};
-
-/**
- * @override FormField.js
- */
-scout.GroupBox.prototype._registerKeyStrokeAdapter = function() {
-  this.keyStrokeAdapter = new scout.GroupBoxKeyStrokeAdapter(this);
 };
 
 scout.GroupBox.prototype._onGroupBoxControlClick = function(event) {

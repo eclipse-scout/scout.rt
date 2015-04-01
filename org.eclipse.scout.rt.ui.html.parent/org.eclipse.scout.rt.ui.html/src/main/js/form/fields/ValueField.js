@@ -11,8 +11,8 @@ scout.inherits(scout.ValueField, scout.FormField);
 /**
  * @override
  */
-scout.ValueField.prototype._registerKeyStrokeAdapter = function() {
-  this.keyStrokeAdapter = new scout.ValueFieldKeyStrokeAdapter(this);
+scout.ValueField.prototype._createKeyStrokeAdapter = function() {
+  return new scout.ValueFieldKeyStrokeAdapter(this);
 };
 
 scout.ValueField.prototype._renderProperties = function() {

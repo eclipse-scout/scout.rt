@@ -62,11 +62,26 @@ scout.PopupMenuItem = function($menuItem, session) {
   this.$menuItem = $menuItem;
   this.$head;
   this.$deco;
-  this.keyStrokeAdapter;
-  this._registerKeyStrokeAdapter();
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
   this._session = session;
 };
 scout.inherits(scout.PopupMenuItem, scout.Popup);
+
+scout.PopupMenuItem.prototype._createKeyStrokeAdapter = function() {
+  return new scout.PopupKeyStrokeAdapter(this);
+};
+
+scout.PopupMenuItem.prototype._installKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+  }
+};
+
+scout.PopupMenuItem.prototype._uninstallKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  }
+};
 
 scout.PopupMenuItem.prototype.render = function($parent) {
   scout.PopupMenuItem.parent.prototype.render.call(this, $parent);
@@ -140,22 +155,6 @@ scout.PopupMenuItem.prototype.alignTo = function() {
   }
 
   this.setLocation(new scout.Point(left, top));
-};
-
-scout.PopupMenuItem.prototype._registerKeyStrokeAdapter = function() {
-  this.keyStrokeAdapter = new scout.PopupKeyStrokeAdapter(this);
-};
-
-scout.PopupMenuItem.prototype._installKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
-  }
-};
-
-scout.PopupMenuItem.prototype._uninstallKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
-  }
 };
 
 scout.PopupMenuItem.prototype.remove = function() {

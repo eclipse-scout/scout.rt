@@ -3,6 +3,10 @@ scout.StringField = function() {
 };
 scout.inherits(scout.StringField, scout.ValueField);
 
+scout.StringField.prototype._createKeyStrokeAdapter = function(){
+  return new scout.StringFieldKeyStrokeAdapter(this);
+};
+
 scout.StringField.prototype._render = function($parent) {
   this.addContainer($parent, 'string-field');
   this.addLabel();
@@ -32,9 +36,4 @@ scout.StringField.prototype._renderInputMasked = function(inputMasked){
     return;
   }
   this.$field.attr('type', (inputMasked ? 'password' : 'text'));
-};
-
-
-scout.StringField.prototype._registerKeyStrokeAdapter = function(){
-  this.keyStrokeAdapter = new scout.StringFieldKeyStrokeAdapter(this);
 };

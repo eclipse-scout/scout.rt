@@ -13,8 +13,7 @@ scout.DesktopNavigation = function(desktop) {
   this.$outlineTitle;
   this.previousOutline;
   this.breadcrumbSwitchWidth = 190;
-  this.keyStrokeAdapter;
-  this._registerKeyStrokeAdapter();
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 
 scout.DesktopNavigation.prototype.render = function($parent) {
@@ -236,8 +235,8 @@ scout.DesktopNavigation.prototype.onOutlinePropertyChange = function(event) {
   }
 };
 
-scout.DesktopNavigation.prototype._registerKeyStrokeAdapter = function() {
-  this.keyStrokeAdapter = new scout.DesktopNavigationKeyStrokeAdapter(this);
+scout.DesktopNavigation.prototype._createKeyStrokeAdapter = function() {
+  return new scout.DesktopNavigationKeyStrokeAdapter(this);
 };
 
 scout.DesktopNavigation.prototype._installKeyStrokeAdapter = function() {

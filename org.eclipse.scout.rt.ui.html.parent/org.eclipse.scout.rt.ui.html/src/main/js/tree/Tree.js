@@ -18,13 +18,14 @@ scout.Tree = function() {
   this.menus = [];
   this.menuBar;
   this.menuBarPosition = 'bottom';
-  this.keyStrokeAdapter = new scout.TreeKeyStrokeAdapter(this);
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
 scout.Tree.prototype.init = function(model, session) {
   scout.Tree.parent.prototype.init.call(this, model, session);
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
+
+  //FIXME NBU menus may change dynamically. Move this code to this._syncMenus and please create a test. Same on table and other controls.
   for (var i = 0; i < this.menus.length; i++) {
     this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
   }
@@ -54,6 +55,10 @@ scout.Tree.prototype._destroyTreeNode = function(parentNode, node) {
   }
 };
 
+scout.Tree.prototype._createKeyStrokeAdapter = function() {
+  return new scout.TreeKeyStrokeAdapter(this);
+};
+
 scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
   var i, node;
   if (!nodes) {
@@ -67,6 +72,87 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
       this._visitNodes(node.childNodes, func, node);
     }
   }
+};
+
+scout.Tree.prototype._render = function($parent) {
+  this.$parent = $parent;
+  this.$container = $parent.appendDiv('tree');
+  if (this.containerClasses) {
+    this.$container.addClass(this.containerClasses);
+  }
+
+  var layout = new scout.TreeLayout(this);
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(layout);
+  this.htmlComp.pixelBasedSizing = false;
+  this.$data = this.$container.appendDiv('tree-data');
+  scout.scrollbars.install(this.$data);
+  this.session.detachHelper.pushScrollable(this.$data);
+  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.TreeMenuItemsOrder.order);
+  this._addNodes(this.nodes);
+  if (this.selectedNodeIds.length > 0) {
+    this._renderSelection();
+  }
+  this._updateItemPath();
+};
+
+scout.Tree.prototype._remove = function() {
+  this.session.detachHelper.removeScrollable(this.$data);
+  scout.Tree.parent.prototype._remove.call(this);
+};
+
+scout.Tree.prototype._renderProperties = function() {
+  scout.Tree.parent.prototype._renderProperties.call(this);
+  this._renderEnabled();
+  this._renderMenus();
+};
+
+
+scout.Tree.prototype._renderMenus = function() {
+  var menuItems = this._filterMenus(['Tree.EmptySpace']);
+  this.menuBar.updateItems(menuItems);
+};
+
+scout.Tree.prototype._filterMenus = function(allowedTypes) {
+  allowedTypes = allowedTypes || [];
+  if (this.selectedNodeIds.length === 1) {
+    allowedTypes.push('Tree.SingleSelection');
+  } else if (this.selectedNodeIds.length > 1) {
+    allowedTypes.push('Tree.MultiSelection');
+  }
+  return scout.menus.filter(this.menus, allowedTypes);
+};
+
+scout.Tree.prototype._renderEnabled = function() {
+  var enabled = this.enabled;
+  this.$data.setEnabled(enabled);
+  this.$container.setTabbable(enabled);
+
+  if (this.rendered) {
+    // Enable/disable all checkboxes
+    this.$nodes().each(function() {
+      var $node = $(this),
+        node = $node.data('node');
+      $node.find('input').setEnabled(enabled && node.enabled);
+    });
+  }
+};
+
+scout.Tree.prototype._renderTitle = function() {
+  // NOP
+};
+
+scout.Tree.prototype._renderAutoCheckChildren = function() {
+  // NOP
+};
+
+scout.Tree.prototype.onResize = function() {
+  this.updateScrollbar();
+};
+
+scout.Tree.prototype.updateScrollbar = function() {
+  scout.scrollbars.update(this.$data);
+  this.htmlComp.invalidateTree();
 };
 
 scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, checkChildrenChecked) {
@@ -131,65 +217,6 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
       }
     }
   }
-
-};
-
-scout.Tree.prototype._render = function($parent) {
-  this.$parent = $parent;
-  this.$container = $parent.appendDiv('tree');
-  if (this.containerClasses) {
-    this.$container.addClass(this.containerClasses);
-  }
-
-  var layout = new scout.TreeLayout(this);
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(layout);
-  this.htmlComp.pixelBasedSizing = false;
-
-  // FIXME AWE/NBU/CGU: (key-strokes) die enabled/un-install logik generell für alle widgets
-  // konsistent implementieren: im Table z.B. wird der enabled-status nicht geprüft.
-  if (this.enabled) {
-    this.installKeyStrokeAdapter();
-  }
-
-  this.$data = this.$container.appendDiv('tree-data');
-
-  scout.scrollbars.install(this.$data);
-  this.session.detachHelper.pushScrollable(this.$data);
-  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.TreeMenuItemsOrder.order);
-  this._addNodes(this.nodes);
-  if (this.selectedNodeIds.length > 0) {
-    this._renderSelection();
-  }
-  this._updateItemPath();
-};
-
-scout.Tree.prototype.installKeyStrokeAdapter = function() {
-  this.$container.attr('tabIndex', 0);
-  if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
-  }
-};
-
-scout.Tree.prototype.uninstallKeyStrokeAdapter = function() {
-  this.$container.attr('tabIndex', -1);
-  if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.$container, this.keyStrokeAdapter);
-  }
-};
-
-scout.Tree.prototype._remove = function() {
-  this.session.detachHelper.removeScrollable(this.$data);
-  scout.Tree.parent.prototype._remove.call(this);
-};
-
-scout.Tree.prototype.onResize = function() {
-  this.updateScrollbar();
-};
-
-scout.Tree.prototype.updateScrollbar = function() {
-  scout.scrollbars.update(this.$data);
-  this.htmlComp.invalidateTree();
 };
 
 scout.Tree.prototype.setBreadcrumbEnabled = function(enabled) {
@@ -1004,56 +1031,6 @@ scout.Tree.prototype.onModelAction = function(event) {
   } else {
     $.log.warn('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
   }
-};
-
-scout.Tree.prototype._renderProperties = function() {
-  scout.Tree.parent.prototype._renderProperties.call(this);
-  this._renderMenus();
-};
-
-scout.Tree.prototype._renderMenus = function() {
-  var menuItems = this._filterMenus(['Tree.EmptySpace']);
-  this.menuBar.updateItems(menuItems);
-};
-
-scout.Tree.prototype._filterMenus = function(allowedTypes) {
-  allowedTypes = allowedTypes || [];
-  if (this.selectedNodeIds.length === 1) {
-    allowedTypes.push('Tree.SingleSelection');
-  } else if (this.selectedNodeIds.length > 1) {
-    allowedTypes.push('Tree.MultiSelection');
-  }
-  return scout.menus.filter(this.menus, allowedTypes);
-};
-
-scout.Tree.prototype._renderTitle = function() {
-  // NOP
-};
-
-scout.Tree.prototype._renderAutoCheckChildren = function() {
-  // NOP
-};
-
-scout.Tree.prototype._renderEnabled = function() {
-  // FIXME CGU remove/add events. Maybe extend jquery to not fire on disabled events?
-  var enabled = this.enabled;
-  this.$data.setEnabled(enabled);
-
-  // Enable/disable all checkboxes
-  this.$nodes().each(function() {
-    var $node = $(this),
-      node = $node.data('node');
-    $node.find('input').setEnabled(enabled && node.enabled);
-  });
-  if (enabled) {
-    this.installKeyStrokeAdapter();
-  } else {
-    this.uninstallKeyStrokeAdapter();
-  }
-};
-
-scout.Tree.prototype.dispose = function() {
-  scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

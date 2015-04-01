@@ -4,9 +4,25 @@ scout.CellEditorPopup = function(column, row, cell) {
   this.column = column;
   this.row = row;
   this.cell = cell;
-  this.keyStrokeAdapter = new scout.CellEditorPopupKeyStrokeAdapter(this);
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 scout.inherits(scout.CellEditorPopup, scout.Popup);
+
+scout.CellEditorPopup.prototype._createKeyStrokeAdapter = function() {
+  return new scout.CellEditorPopupKeyStrokeAdapter(this);
+};
+
+scout.CellEditorPopup.prototype._installKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+  }
+};
+
+scout.CellEditorPopup.prototype._uninstallKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  }
+};
 
 scout.CellEditorPopup.prototype.render = function($parent) {
   scout.CellEditorPopup.parent.prototype.render.call(this, $parent);
@@ -39,23 +55,23 @@ scout.CellEditorPopup.prototype.render = function($parent) {
   scout.graphics.setSize(field.$container, offsetBounds.width, rowOffsetBounds.height);
   scout.HtmlComponent.get(field.$container).layout();
 
-  scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
   setTimeout(function() {
     //FIXME CGU Maybe null if removed directly after render, better remove $container = undefined in popup.js?
     if (this.$container) {
       this.$container.installFocusContext('auto', this.table.session.jsonSessionId);
     }
   }.bind(this), 0);
+  this._installKeyStrokeAdapter();
 };
 
 scout.CellEditorPopup.prototype.remove = function() {
   scout.CellEditorPopup.parent.prototype.remove.call(this);
   this.cell.field.remove();
-  scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
   if (this._mouseDownHandler) {
     $(document).off('mousedown', this._mouseDownHandler);
     this._mouseDownHandler = null;
   }
+  this._uninstallKeyStrokeAdapter();
 };
 
 scout.CellEditorPopup.prototype._attachCloseHandler = function() {

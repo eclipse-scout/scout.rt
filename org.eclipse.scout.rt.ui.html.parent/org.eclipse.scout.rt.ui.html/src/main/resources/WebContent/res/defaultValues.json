@@ -82,7 +82,7 @@
     "StringField": {
       "inputMasked": false,
       "multilineText": false,
-      "validateOnAnyKey": false
+      "updateDisplayTextOnModify": false
     },
     "Table": {
       "autoResizeColumns": false,

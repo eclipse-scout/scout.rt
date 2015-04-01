@@ -5,12 +5,21 @@ scout.Outline = function() {
   this.containerClasses += ' outline';
   this._treeItemPaddingLeft = 37;
   this._treeItemPaddingLevel = 20;
-  this.keyStrokeAdapter = new scout.DesktopTreeKeyStrokeAdapter(this);
 };
 scout.inherits(scout.Outline, scout.Tree);
 
+scout.Outline.prototype._createKeyStrokeAdapter = function() {
+  return new scout.OutlineKeyStrokeAdapter(this);
+};
+
+scout.Outline.prototype._installKeyStrokeAdapter = function() {
+  if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.installAdapter(this.$container.closest('.scout'), this.keyStrokeAdapter);
+  }
+};
+
 /**
- * @Override
+ * @override
  */
 scout.Outline.prototype._render = function($parent) {
   scout.Outline.parent.prototype._render.call(this, $parent);
@@ -20,14 +29,16 @@ scout.Outline.prototype._render = function($parent) {
   }
 };
 
-scout.Outline.prototype.installKeyStrokeAdapter = function() {
-  if (!scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.$container.closest('.scout'), this.keyStrokeAdapter);
-  }
+/**
+ * @override
+ */
+scout.Outline.prototype._renderEnabled = function() {
+  scout.Outline.parent.prototype._renderEnabled.call(this);
+  this.$container.setTabbable(false);
 };
 
 /**
- * @Override
+ * @override
  */
 scout.Outline.prototype._initTreeNode = function(parentNode, node) {
   scout.Outline.parent.prototype._initTreeNode.call(this, parentNode, node);

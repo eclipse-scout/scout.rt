@@ -20,7 +20,6 @@ scout.FormField = function() {
   this.$status;
   this.keyStrokes = [];
   this._addAdapterProperties('keyStrokes');
-  this.keyStrokeAdapter;
   this.refFieldId;
 };
 scout.inherits(scout.FormField, scout.ModelAdapter);
@@ -34,33 +33,10 @@ scout.FormField.LABEL_POSITION_TOP = 4;
 scout.FormField.prototype.init = function(model, session) {
   scout.FormField.parent.prototype.init.call(this, model, session);
   this.refFieldId = this.session.getUniqueFieldIdPrefix() + this.id;
-  this._registerKeyStrokeAdapter();
 };
 
-scout.FormField.prototype.render = function($parent) {
-  scout.FormField.parent.prototype.render.call(this, $parent);
-  this._installKeyStrokeAdapter();
-};
-
-scout.FormField.prototype.dispose = function() {
-  scout.FormField.parent.prototype.dispose.call(this);
-  this._uninstallKeyStrokeAdapter();
-};
-
-scout.FormField.prototype._registerKeyStrokeAdapter = function() {
-  this.keyStrokeAdapter = new scout.FormFieldKeyStrokeAdapter(this);
-};
-
-scout.FormField.prototype._installKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
-  }
-};
-
-scout.FormField.prototype._uninstallKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
-  }
+scout.FormField.prototype._createKeyStrokeAdapter = function() {
+  return new scout.FormFieldKeyStrokeAdapter(this);
 };
 
 scout.FormField.prototype._render = function($parent) {

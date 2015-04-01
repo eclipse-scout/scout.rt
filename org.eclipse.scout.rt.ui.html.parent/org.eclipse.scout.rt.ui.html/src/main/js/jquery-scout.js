@@ -218,6 +218,14 @@
     return this;
   };
 
+  $.fn.setTabbable = function(tabbable) {
+    var tabIndex = 0;
+    if (!tabbable) {
+      tabIndex = null;
+    }
+    this.attr('tabIndex', tabIndex);
+  };
+
   $.fn.isEnabled = function() {
     return !this.hasClass('disabled');
   };

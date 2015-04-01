@@ -106,11 +106,11 @@ __include("jquery-scout.js");
   __include("desktop/DesktopNavigationKeyStroke.js");
   __include("desktop/DesktopNavigationKeyStrokeAdapter.js");
   __include("desktop/DesktopTableKeyStrokeAdapter.js");
-  __include("desktop/DesktopTreeKeyStrokeAdapter.js");
   __include("desktop/ViewTabAutoKeyStroke.js");
   __include("desktop/DesktopNavigation.js");
   __include("desktop/FormToolButton.js");
   __include("desktop/Outline.js");
+  __include("desktop/OutlineKeyStrokeAdapter.js");
   __include("desktop/OutlineViewButton.js");
   __include("desktop/SearchOutline.js");
   // Basics for form fields

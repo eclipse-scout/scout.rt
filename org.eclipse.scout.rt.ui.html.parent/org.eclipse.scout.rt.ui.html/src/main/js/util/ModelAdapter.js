@@ -1,19 +1,20 @@
 scout.ModelAdapter = function() {
-  this.session = undefined;
+  this.session;
 
   // Adapter structure
-  this.owner = undefined;
+  this.owner;
   this.ownedAdapters = [];
+
   // Model structure
-  this.parent = undefined;
+  this.parent;
   this.children = [];
 
   this._adapterProperties = [];
   this.rendered = false;
   this.destroyed = false;
-  this.$container = undefined;
+  this.$container;
 
-  this.ui = undefined;
+  this.ui;
 };
 
 scout.ModelAdapter.prototype.init = function(model, session) {
@@ -31,6 +32,7 @@ scout.ModelAdapter.prototype.init = function(model, session) {
 
   // Fill in the missing default values
   scout.defaultValues.applyTo(this);
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 
 scout.ModelAdapter.prototype.render = function($parent) {
@@ -51,6 +53,7 @@ scout.ModelAdapter.prototype.render = function($parent) {
   if (this.$container && this.modelClass) {
     this.$container.attr('data-modelClass', this.modelClass);
   }
+  this._installKeyStrokeAdapter();
   this.rendered = true;
   if (this.session.offline) {
     this.goOffline();
@@ -107,6 +110,7 @@ scout.ModelAdapter.prototype.remove = function() {
     }
 
     this._remove();
+    this._uninstallKeyStrokeAdapter();
     this.rendered = false;
   }
   this.dispose();
@@ -143,6 +147,22 @@ scout.ModelAdapter.prototype.destroy = function() {
     this.owner = null;
   }
   this.destroyed = true;
+};
+
+scout.ModelAdapter.prototype._createKeyStrokeAdapter = function() {
+  // to be implemented by subclass
+};
+
+scout.ModelAdapter.prototype._installKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+  }
+};
+
+scout.ModelAdapter.prototype._uninstallKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  }
 };
 
 scout.ModelAdapter.prototype.addOwnedAdapter = function(ownedAdapter) {

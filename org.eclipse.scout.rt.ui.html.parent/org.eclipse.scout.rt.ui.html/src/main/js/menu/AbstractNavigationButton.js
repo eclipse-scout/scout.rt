@@ -40,7 +40,9 @@ scout.AbstractNavigationButton.prototype.doAction = function() {
   this._onClickFunc();
 };
 
-//@Override scout.Button
+/**
+ * @override
+ */
 scout.AbstractNavigationButton.prototype._registerButtonKeyStroke = function() {
   if (this.defaultKeyStroke) {
     this._unregisterButtonKeyStroke();
@@ -52,6 +54,9 @@ scout.AbstractNavigationButton.prototype._registerButtonKeyStroke = function() {
   }
 };
 
+/**
+ * @override
+ */
 scout.AbstractNavigationButton.prototype._unregisterButtonKeyStroke = function() {
   //unregister buttons key stroke on root Groupbox
   if (this.defaultKeyStroke) {

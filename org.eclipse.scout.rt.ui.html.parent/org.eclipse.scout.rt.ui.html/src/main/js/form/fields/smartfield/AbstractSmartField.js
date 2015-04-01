@@ -16,9 +16,9 @@ scout.AbstractSmartField.prototype.init = function(model, session) {
 /**
  * @override
  */
-scout.AbstractSmartField.prototype._registerKeyStrokeAdapter = function() {
+scout.AbstractSmartField.prototype._createKeyStrokeAdapter = function() {
   // FIXME AWE: (smart-field) andere keystrokes implementieren
-  this.keyStrokeAdapter = new scout.SmartFieldKeyStrokeAdapter(this);
+  return new scout.SmartFieldKeyStrokeAdapter(this);
 };
 
 scout.AbstractSmartField.prototype._render = function($parent) {
