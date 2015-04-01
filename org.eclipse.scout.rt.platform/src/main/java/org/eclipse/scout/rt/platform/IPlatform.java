@@ -46,7 +46,7 @@ public interface IPlatform {
      * This event signals that the platform is about to start the application, special init code that requires the valid
      * platform may be run now (former Activator.start logic)
      * <p>
-     * Next phase is platform started
+     * Next phase is application started
      */
     ApplicationStarting,
     /**
