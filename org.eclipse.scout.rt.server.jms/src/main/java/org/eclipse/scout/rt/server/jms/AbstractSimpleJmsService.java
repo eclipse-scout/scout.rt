@@ -48,11 +48,13 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  */
 public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSimpleJmsService.class);
+  private static final String PROP_REQUEST_TIMEOUT = String.format("%s#requestTimeout", AbstractSimpleJmsService.class.getName());
 
+  private final long m_receiveTimeout = ConfigIniUtility.getPropertyLong(PROP_REQUEST_TIMEOUT, TimeUnit.SECONDS.toMillis(1));
   private volatile IFuture<Void> m_messageConsumerFuture;
 
-  private static final String PROP_REQUEST_TIMEOUT = String.format("%s#requestTimeout", AbstractSimpleJmsService.class.getName());
-  private final long m_receiveTimeout = ConfigIniUtility.getPropertyLong(PROP_REQUEST_TIMEOUT, TimeUnit.SECONDS.toMillis(1));
+  protected AbstractSimpleJmsService() {
+  }
 
   protected Session createSession(Connection connection) throws JMSException {
     return connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -80,7 +82,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
     MessageProducer producer = null;
     try {
       session = createSession(connection);
-      producer = session.createProducer(lookupDestination());
+      producer = session.createProducer(getDestination());
       IJmsMessageSerializer<T> serializer = createMessageSerializer();
       for (T message : messages) {
         producer.send(serializer.createMessage(message, session));
@@ -130,7 +132,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
   }
 
   protected MessageConsumerRunnable createMessageConsumerRunnable() throws ProcessingException {
-    return new MessageConsumerRunnable(getConnection(), lookupDestination(), createMessageSerializer(), m_receiveTimeout);
+    return new MessageConsumerRunnable(getConnection(), getDestination(), createMessageSerializer(), m_receiveTimeout);
   }
 
   /**

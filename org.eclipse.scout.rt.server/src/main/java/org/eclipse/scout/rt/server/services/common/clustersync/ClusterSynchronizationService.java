@@ -63,7 +63,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
   public ClusterSynchronizationService() {
     m_subject = new Subject();
-    m_subject.getPrincipals().add(new SimplePrincipal(ConfigIniUtility.getProperty(PROP_USER_CLUSTER_SYNC, "cluster-synchronization")));
+    m_subject.getPrincipals().add(new SimplePrincipal(ConfigIniUtility.getProperty(PROP_USER_CLUSTER_SYNC, "system")));
     m_subject.setReadOnly();
   }
 

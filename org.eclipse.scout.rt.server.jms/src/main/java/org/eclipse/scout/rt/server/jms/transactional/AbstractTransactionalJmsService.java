@@ -29,16 +29,10 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
  */
 public abstract class AbstractTransactionalJmsService<T> extends AbstractJmsService<T> {
 
-  private final String m_transactionId;
-
-  public AbstractTransactionalJmsService(String transactionId) {
-    super();
-    m_transactionId = transactionId;
+  protected AbstractTransactionalJmsService() {
   }
 
-  public final String getTransactionId() {
-    return m_transactionId;
-  }
+  public abstract String getTransactionId();
 
   @Override
   protected synchronized void setupConnection() throws ProcessingException {
@@ -67,7 +61,7 @@ public abstract class AbstractTransactionalJmsService<T> extends AbstractJmsServ
     JmsTransactionMember<T> m = (JmsTransactionMember<T>) tx.getMember(getTransactionId());
     if (m == null) {
       Connection connection = getConnection();
-      m = new JmsTransactionMember<T>(getTransactionId(), connection, createSession(connection), lookupDestination(), createMessageSerializer());
+      m = new JmsTransactionMember<T>(getTransactionId(), connection, createSession(connection), getDestination(), createMessageSerializer());
       tx.registerMember(m);
     }
     return m;

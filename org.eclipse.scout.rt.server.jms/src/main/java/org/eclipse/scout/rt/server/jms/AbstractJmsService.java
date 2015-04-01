@@ -22,18 +22,18 @@ import javax.jms.Session;
 
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
+import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * Base class for a JNDI configured scout service for JMS. See {@link AbstractJndiService} for configuring example.
+ * Configure jndi by simply placing the jndi.properties on the classpath, i.e. place it in WEB-INF/classes or in
+ * development in src/main/resources
  * <p>
  * This class is thread save.
  * <p>
@@ -51,56 +51,17 @@ import org.eclipse.scout.service.SERVICES;
  * @param <T>
  *          the type of message that should be sent and received
  */
-public abstract class AbstractJmsService<T> extends AbstractJndiService {
+public abstract class AbstractJmsService<T> extends AbstractService {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJmsService.class);
-
-  private String m_connectionFactory;
-  private String m_destination;
 
   private Connection m_connection;
 
-  @Override
-  protected void initConfig() {
-    super.initConfig();
-    setConnectionFactory(getConfiguredConnectionFactory());
-    setDestination(getConfiguredDestination());
+  protected AbstractJmsService() {
   }
 
-  @ConfigProperty(ConfigProperty.STRING)
-  @Order(10)
-  protected String getConfiguredConnectionFactory() {
-    return null;
-  }
+  protected abstract ConnectionFactory getConnectionFactory();
 
-  @ConfigProperty(ConfigProperty.STRING)
-  @Order(20)
-  protected String getConfiguredDestination() {
-    return null;
-  }
-
-  public String getConnectionFactory() {
-    return m_connectionFactory;
-  }
-
-  public void setConnectionFactory(String connectionFactory) {
-    m_connectionFactory = connectionFactory;
-  }
-
-  public String getDestination() {
-    return m_destination;
-  }
-
-  public void setDestination(String destination) {
-    m_destination = destination;
-  }
-
-  protected ConnectionFactory lookupConnectionFactory() throws ProcessingException {
-    return lookup(getConnectionFactory(), ConnectionFactory.class);
-  }
-
-  protected Destination lookupDestination() throws ProcessingException {
-    return lookup(getDestination(), Destination.class);
-  }
+  protected abstract Destination getDestination();
 
   protected boolean isEnabled() {
     return getConnectionFactory() != null && getDestination() != null;
@@ -112,7 +73,7 @@ public abstract class AbstractJmsService<T> extends AbstractJndiService {
   }
 
   protected IJmsMessageSerializer<T> createMessageSerializer() {
-    return new JmsMessageSerializer<T>(getMessageType());
+    return new JmsMessageSerializer<>(getMessageType());
   }
 
   protected synchronized Connection getConnection() {
@@ -121,7 +82,7 @@ public abstract class AbstractJmsService<T> extends AbstractJndiService {
 
   protected synchronized void setupConnection() throws ProcessingException {
     closeConnection();
-    ConnectionFactory connectionFactory = lookupConnectionFactory();
+    ConnectionFactory connectionFactory = getConnectionFactory();
     Connection con;
     try {
       con = connectionFactory.createConnection();
