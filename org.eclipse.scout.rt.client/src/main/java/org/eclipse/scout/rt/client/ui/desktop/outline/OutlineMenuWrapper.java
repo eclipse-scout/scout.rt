@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.table.internal;
+package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import java.beans.PropertyChangeListener;
 import java.security.Permission;
@@ -26,10 +26,7 @@ import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 
-/**
- *
- */
-public class TablePageTreeMenuWrapper implements IMenu {
+public class OutlineMenuWrapper implements IMenu {
 
   private IMenu m_wrappedMenu;
   private List<IMenu> m_childMenus;
@@ -40,7 +37,7 @@ public class TablePageTreeMenuWrapper implements IMenu {
   /**
    * API to ensure at least one menu type!
    */
-  public TablePageTreeMenuWrapper(IMenu wrappedMenu, IMenuType firstMenuType, IMenuType... additionalTypes) {
+  public OutlineMenuWrapper(IMenu wrappedMenu, IMenuType firstMenuType, IMenuType... additionalTypes) {
     Set<IMenuType> menuTypeSet = CollectionUtility.hashSet(firstMenuType);
     if (additionalTypes != null) {
       for (IMenuType t : additionalTypes) {
@@ -54,7 +51,7 @@ public class TablePageTreeMenuWrapper implements IMenu {
     setup();
   }
 
-  public TablePageTreeMenuWrapper(IMenu wrappedMenu, Set<? extends IMenuType> menuTypes) {
+  public OutlineMenuWrapper(IMenu wrappedMenu, Set<? extends IMenuType> menuTypes) {
     m_wrappedMenu = wrappedMenu;
     m_menuTypes = CollectionUtility.hashSet(menuTypes);
     setup();
@@ -68,7 +65,7 @@ public class TablePageTreeMenuWrapper implements IMenu {
     List<IMenu> wrappedChildActions = new ArrayList<IMenu>(childActions.size());
     // create child wrapper
     for (IMenu m : childActions) {
-      wrappedChildActions.add(new TablePageTreeMenuWrapper(m, getMenuTypes()));
+      wrappedChildActions.add(new OutlineMenuWrapper(m, getMenuTypes()));
     }
     m_childMenus = wrappedChildActions;
   }

@@ -597,20 +597,30 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public void setDetailForm(IForm form) {
-    if (form != null) {
-      if (form.getDisplayHint() != IForm.DISPLAY_HINT_VIEW) {
-        form.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
-      }
-      if (form.getDisplayViewId() == null) {
-        form.setDisplayViewId(IForm.VIEW_ID_PAGE_DETAIL);
-      }
-      form.setAutoAddRemoveOnDesktop(false);
-    }
     m_detailForm = form;
+    if (m_detailForm != null) {
+      try {
+        decorateDetailForm();
+      }
+      catch (ProcessingException e) {
+        throw new RuntimeException("Decoration of detail form failed", e);
+      }
+    }
     firePageChanged(this);
     if (isSelectedNode()) {
       getOutline().setDetailForm(m_detailForm);
     }
+  }
+
+  protected void decorateDetailForm() throws ProcessingException {
+    IForm form = getDetailForm();
+    if (form.getDisplayHint() != IForm.DISPLAY_HINT_VIEW) {
+      form.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
+    }
+    if (form.getDisplayViewId() == null) {
+      form.setDisplayViewId(IForm.VIEW_ID_PAGE_DETAIL);
+    }
+    form.setAutoAddRemoveOnDesktop(false);
   }
 
   /**

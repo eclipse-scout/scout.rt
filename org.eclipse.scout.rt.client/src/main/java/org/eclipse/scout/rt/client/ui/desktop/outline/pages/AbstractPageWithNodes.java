@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -37,11 +38,12 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
@@ -283,20 +285,37 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
         IPageWithTable<?> tablePage = (IPageWithTable<?>) node;
         List<IMenu> menus = ActionUtility.getActions(tablePage.getTable().getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace), false));
         for (IMenu m : menus) {
-          pageMenus.add(new TablePageTreeMenuWrapper(m, TableMenuType.SingleSelection));
+          pageMenus.add(new OutlineMenuWrapper(m, TableMenuType.SingleSelection));
         }
       }
       else if (node instanceof IPageWithNodes) {
         IPageWithNodes pageWithNodes = (IPageWithNodes) node;
         List<IMenu> menus = ActionUtility.getActions(pageWithNodes.getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TreeMenuType.SingleSelection), false));
         for (IMenu m : menus) {
-          pageMenus.add(new TablePageTreeMenuWrapper(m, TableMenuType.SingleSelection));
+          pageMenus.add(new OutlineMenuWrapper(m, TableMenuType.SingleSelection));
         }
       }
     }
     getTable().getContextMenu().addChildActions(pageMenus);
     m_pageMenusOfSelection = pageMenus;
+  }
 
+  @Override
+  protected void decorateDetailForm() throws ProcessingException {
+    super.decorateDetailForm();
+    enhanceDetailFormWithPageMenus();
+  }
+
+  protected void enhanceDetailFormWithPageMenus() throws ProcessingException {
+    IForm form = getDetailForm();
+    IFormFieldContextMenu mainBoxContextMenu = form.getRootGroupBox().getContextMenu();
+    List<IMenu> menus = mainBoxContextMenu.getChildActions();
+    for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
+      menus.add(new OutlineMenuWrapper(menu, menu.getMenuTypes()));
+    }
+    if (!CollectionUtility.equalsCollection(menus, mainBoxContextMenu.getChildActions())) {
+      mainBoxContextMenu.setChildActions(menus);
+    }
   }
 
   /**

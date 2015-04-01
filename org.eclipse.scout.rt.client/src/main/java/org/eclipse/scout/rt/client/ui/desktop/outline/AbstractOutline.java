@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
@@ -562,7 +561,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         wrappedMenus.add(m);
       }
       else {
-        wrappedMenus.add(new TablePageTreeMenuWrapper(m, TreeMenuType.SingleSelection));
+        wrappedMenus.add(new OutlineMenuWrapper(m, TreeMenuType.SingleSelection));
       }
     }
     m_inheritedMenusOfPage = wrappedMenus;

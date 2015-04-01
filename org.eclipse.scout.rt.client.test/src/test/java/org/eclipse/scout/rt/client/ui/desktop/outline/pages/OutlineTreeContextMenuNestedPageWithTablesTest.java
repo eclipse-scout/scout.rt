@@ -33,11 +33,11 @@ import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.OutlineTreeContextMenuNestedPageWithTablesTest.PageWithTable.Table.PageWithTableRowMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.OutlineTreeContextMenuNestedPageWithTablesTest.SubPageWithTable.Table.SubPageWithTableEmptySpaceMenu;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -103,8 +103,8 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
     // normalize reference
     List<IMenu> refNormalized = new ArrayList<IMenu>(reference.size());
     for (IMenu m : reference) {
-      if (m instanceof TablePageTreeMenuWrapper) {
-        refNormalized.add(((TablePageTreeMenuWrapper) m).getWrappedMenu());
+      if (m instanceof OutlineMenuWrapper) {
+        refNormalized.add(((OutlineMenuWrapper) m).getWrappedMenu());
       }
       else {
         refNormalized.add(m);
@@ -112,8 +112,8 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
     }
     List<IMenu> menusNormalized = new ArrayList<IMenu>(menus.size());
     for (IMenu m : menus) {
-      if (m instanceof TablePageTreeMenuWrapper) {
-        menusNormalized.add(((TablePageTreeMenuWrapper) m).getWrappedMenu());
+      if (m instanceof OutlineMenuWrapper) {
+        menusNormalized.add(((OutlineMenuWrapper) m).getWrappedMenu());
       }
       else {
         menusNormalized.add(m);
