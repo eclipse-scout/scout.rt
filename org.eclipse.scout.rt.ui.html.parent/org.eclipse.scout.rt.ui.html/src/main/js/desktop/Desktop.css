@@ -189,48 +189,51 @@
     margin-right: @bench-margin-x;
   }
 
-  & .table-cell {
-    padding-top: @desktop-table-row-padding-y;
-    padding-bottom: @desktop-table-row-padding-y;
+  & > .table-data {
 
-    &.checkable {
-      padding-top: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment;
-      padding-bottom: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment;
-    }
-  }
+    & > .table-row,
+    & > .table-row-sum {
+      /* Desktop table has a 2px border. For this we create a div which spans the full row and has */
+      /* border-top/bottom set to 1px. Middle rows don't have 2px border so no need to do it for those. */
+      border-left-width: 2px;
+      border-right-width: 2px;
 
-  /* Desktop table has a 2px border. For this we create a div which spans the full row and has */
-  /* border-top/bottom set to 1px. Middle rows don't have 2px border so no need to do it for those. */
-  & .table-row,
-  & .table-row-sum {
-    border-left-width: 2px;
-    border-right-width: 2px;
+      &.selected {
+        background-color: @selection-row-background-color;
+        border-color: @selection-row-border-color;
+      }
 
-    &.selected {
-      background-color: @selection-row-background-color;
-      border-color: @selection-row-border-color;
-    }
+      &.select-single::before,
+      &.select-top::before,
+      &.select-bottom::before {
+        .overlay;
+        /* Make sure overlay does not get target of mouse events, necessary for links inside table-cell.
+        FIXME CGU verify if this really works with IE 9 */
+        pointer-events: none;
+      }
 
-    &.select-single::before,
-    &.select-top::before,
-    &.select-bottom::before {
-      .overlay;
-      /* Make sure overlay does not get target of mouse events, necessary for links inside table-cell.
-      FIXME CGU verify if this really works with IE 9 */
-      pointer-events: none;
-    }
+      &.select-top::before {
+        border-top: 1px solid @selection-row-border-color;
+      }
 
-    &.select-top::before {
-      border-top: 1px solid @selection-row-border-color;
-    }
+      &.select-bottom::before {
+        border-bottom: 1px solid @selection-row-border-color;
+      }
 
-    &.select-bottom::before {
-      border-bottom: 1px solid @selection-row-border-color;
-    }
+      &.select-single::before {
+        border-top: 1px solid @selection-row-border-color;
+        border-bottom: 1px solid @selection-row-border-color;
+      }
 
-    &.select-single::before {
-      border-top: 1px solid @selection-row-border-color;
-      border-bottom: 1px solid @selection-row-border-color;
+      & > .table-cell {
+        padding-top: @desktop-table-row-padding-y;
+        padding-bottom: @desktop-table-row-padding-y;
+
+        &.checkable {
+          padding-top: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment;
+          padding-bottom: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment;
+        }
+      }
     }
   }
 }
