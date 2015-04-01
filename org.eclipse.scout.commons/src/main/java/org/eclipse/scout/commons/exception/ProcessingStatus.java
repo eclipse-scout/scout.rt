@@ -25,6 +25,33 @@ import org.eclipse.scout.commons.status.Status;
 public class ProcessingStatus extends Status implements IProcessingStatus, Serializable {
   private static final long serialVersionUID = 1L;
 
+  public static final ProcessingStatus OK_STATUS = new ProcessingStatus(Status.OK_STATUS) {
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * ensure unmodifiable
+     */
+    @Override
+    public void setBody(String messageBody) {
+      throw new UnsupportedOperationException("The default OK STATUS is unmodifiable.");
+    }
+
+    /**
+     * ensure unmodifiable
+     */
+    @Override
+    public void setException(Throwable exception) {
+      throw new UnsupportedOperationException("The default OK STATUS is unmodifiable.");
+    }
+
+    /**
+     * ensure unmodifiable
+     */
+    @Override
+    public void setTitle(String title) {
+      throw new UnsupportedOperationException("The default OK STATUS is unmodifiable.");
+    }
+  };
   /**
    * Title, localized to the current locale.
    */

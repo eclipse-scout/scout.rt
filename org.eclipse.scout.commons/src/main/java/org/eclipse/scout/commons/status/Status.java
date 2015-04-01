@@ -23,6 +23,11 @@ import org.eclipse.scout.commons.annotations.Order;
 public class Status implements IStatus, Serializable {
   private static final long serialVersionUID = 382223180907716448L;
 
+  /**
+   * default ok status.
+   */
+  public static final Status OK_STATUS = new Status(OK);
+
   private final int m_severity;
   private final String m_message;
   private final int m_code;
