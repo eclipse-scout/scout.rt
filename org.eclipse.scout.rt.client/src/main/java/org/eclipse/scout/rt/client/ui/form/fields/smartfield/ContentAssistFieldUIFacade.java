@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.service.SERVICES;
 
 class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFacade {
@@ -33,23 +34,21 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
 
   @Override
   public void proposalTypedFromUI(String text) {
-    String searchText = toSearchText(text);
-    LOG.debug("proposalTypedFromUI searchText=" + searchText);
+    LOG.debug("proposalTypedFromUI text=" + text);
     assert m_field.isProposalChooserRegistered();
-    if (!StringUtility.equalsIgnoreNewLines(m_field.getLookupRowFetcher().getLastSearchText(), searchText)) {
-      m_field.doSearch(searchText, false, false);
+    if (!StringUtility.equalsIgnoreNewLines(m_field.getLookupRowFetcher().getLastSearchText(), toSearchText(text))) {
+      m_field.doSearch(text, false, false);
     }
   }
 
   @Override
   public void openProposalChooserFromUI(String text) { // FIXME AWE: (smart-field) ist das nicht immer browse-all? dann brauchen wir den text nie
-    String searchText = IContentAssistField.BROWSE_ALL_TEXT;
-    LOG.debug("openProposalChooserFromUI text=" + searchText);
+    LOG.debug("openProposalChooserFromUI");
     assert !m_field.isProposalChooserRegistered();
     try {
       IProposalChooser<?, LOOKUP_KEY> proposalChooser = m_field.registerProposalChooserInternal();
       proposalChooser.dataFetchedDelegate(m_field.getLookupRowFetcher().getResult(), m_field.getConfiguredBrowseMaxRowCount());
-      m_field.doSearch(searchText, false, false); // FIXME AWE: (smart-field) select current value
+      m_field.doSearch(null, false, false); // FIXME AWE: (smart-field) select current value
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -66,21 +65,14 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
   @Override
   public void acceptProposalFromUI(String text) {
     if (m_field.hasAcceptedProposal()) {
-      LOG.debug("acceptProposalFromUI -> acceptProposal. acceptedProposal=" + m_field.getProposalChooser().getAcceptedProposal());
+      ILookupRow<LOOKUP_KEY> acceptedProposal = m_field.getProposalChooser().getAcceptedProposal();
+      LOG.debug("acceptProposalFromUI -> acceptProposal. acceptedProposal=" + acceptedProposal);
       m_field.setDisplayText(text);
-      m_field.acceptProposal(m_field.getProposalChooser().getAcceptedProposal());
+      m_field.acceptProposal(acceptedProposal);
     }
     else {
-      String searchText = toSearchText(text);
-      LOG.debug("acceptProposalFromUI, no accepted proposalsearchText -> parseValue searchText=" + searchText);
-      /* Covers these cases:
-       * 1. No valid proposal found for text: parseValue sets the error-status of the smart-field when text
-       *    is not a valid value. However, it also sets the display-text to null when the value is invalid,
-       *    that's why we must set the display-text again, when validation fails.
-       */
-      if (!m_field.parseValue(searchText)) {
-        m_field.setDisplayText(text);
-      }
+      LOG.debug("acceptProposalFromUI, no accepted proposal. parseValue text=" + text);
+      m_field.parseValue(text);
     }
     m_field.unregisterProposalChooserInternal();
   }

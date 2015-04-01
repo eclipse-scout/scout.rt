@@ -535,6 +535,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
       setFieldChanging(true);
       setValueParsing(true);
 
+      setDisplayText(text);
       removeErrorStatus(ParsingFailedStatus.class);
       VALUE parsedValue = interceptParseValue(text);
       setValue(parsedValue);
@@ -654,7 +655,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * any further chain elements.
    */
   protected static class LocalValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends AbstractFormField.LocalFormFieldExtension<OWNER>
-      implements IValueFieldExtension<VALUE, OWNER> {
+  implements IValueFieldExtension<VALUE, OWNER> {
 
     public LocalValueFieldExtension(OWNER owner) {
       super(owner);

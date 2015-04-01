@@ -37,7 +37,6 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -127,42 +126,33 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     }
     IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
     ILookupRow<LOOKUP_KEY> acceptedProposalRow = null;
-    if (proposalChooser != null && StringUtility.equalsIgnoreNewLines(proposalChooser.getSearchText(), text)) {
+    if (proposalChooser != null && StringUtility.equalsIgnoreNewLines(proposalChooser.getSearchText(), toSearchText(text))) {
       acceptedProposalRow = proposalChooser.getAcceptedProposal();
     }
     //
     boolean unregister = true;
     try {
-      String oldText = getDisplayText();
-      boolean parsingError = getErrorStatus() != null && getErrorStatus().containsStatus(ParsingFailedStatus.class);
-      if (acceptedProposalRow == null && (!parsingError) && getCurrentLookupRow() != null && StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(oldText))) {
-        // no change
-        return getValue();
+      if (acceptedProposalRow != null) {
+        setCurrentLookupRow(acceptedProposalRow);
+        return interceptConvertKeyToValue(acceptedProposalRow.getKey());
+      }
+      else if (text == null) {
+        setCurrentLookupRow(EMPTY_LOOKUP_ROW);
+        return null;
       }
       else {
-        // changed
+        doSearch(text, false, true);
+        IContentAssistFieldDataFetchResult<LOOKUP_KEY> fetchResult = getLookupRowFetcher().getResult();
+        if (fetchResult != null && fetchResult.getLookupRows() != null && fetchResult.getLookupRows().size() == 1) {
+          acceptedProposalRow = CollectionUtility.firstElement(fetchResult.getLookupRows());
+        }
         if (acceptedProposalRow != null) {
           setCurrentLookupRow(acceptedProposalRow);
           return interceptConvertKeyToValue(acceptedProposalRow.getKey());
         }
-        else if (text == null) {
-          setCurrentLookupRow(EMPTY_LOOKUP_ROW);
-          return null;
-        }
         else {
-          doSearch(text, false, true);
-          IContentAssistFieldDataFetchResult<LOOKUP_KEY> fetchResult = getLookupRowFetcher().getResult();
-          if (fetchResult != null && fetchResult.getLookupRows() != null && fetchResult.getLookupRows().size() == 1) {
-            acceptedProposalRow = CollectionUtility.firstElement(fetchResult.getLookupRows());
-          }
-          if (acceptedProposalRow != null) {
-            setCurrentLookupRow(acceptedProposalRow);
-            return interceptConvertKeyToValue(acceptedProposalRow.getKey());
-          }
-          else {
-            unregister = false;// prevent close in finally
-            throw new VetoException(ScoutTexts.get("SmartFieldCannotComplete", text));
-          }
+          unregister = false; // prevent unregister in finally
+          throw new VetoException(ScoutTexts.get("SmartFieldCannotComplete", text));
         }
       }
     }
