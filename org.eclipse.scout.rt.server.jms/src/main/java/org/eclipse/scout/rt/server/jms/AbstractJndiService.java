@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.server.jms;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -220,18 +217,11 @@ public abstract class AbstractJndiService extends AbstractService {
   }
 
   protected InputStream getJndiPorpertiesInputStream(String propertiesLocation) throws IOException {
-    InputStream jndiProperties;
-    try {
-      // assume URL
-      URL url = new URL(propertiesLocation);
-      URLConnection connection = url.openConnection();
-      connection.setUseCaches(false);
-      jndiProperties = connection.getInputStream();
+    InputStream jndiProperties = getClass().getClassLoader().getResourceAsStream(propertiesLocation);
+    if (jndiProperties != null) {
+      return jndiProperties;
     }
-    catch (MalformedURLException e) {
-      // assume file location
-      jndiProperties = new FileInputStream(propertiesLocation);
-    }
-    return jndiProperties;
+    // assume file location
+    return new FileInputStream(propertiesLocation);
   }
 }

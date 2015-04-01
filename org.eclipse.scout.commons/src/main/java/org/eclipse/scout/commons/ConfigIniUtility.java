@@ -397,7 +397,10 @@ public final class ConfigIniUtility {
     String configIniFile = resolve(System.getProperty(CONFIG_INI));
     if (StringUtility.hasText(configIniFile)) {
       try {
-        return new File(configIniFile).toURI().toURL();
+        File file = new File(configIniFile);
+        if (file.isFile() && file.exists() && file.canRead()) {
+          return file.toURI().toURL();
+        }
       }
       catch (MalformedURLException e) {
         e.printStackTrace();
