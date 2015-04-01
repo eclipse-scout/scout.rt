@@ -327,7 +327,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   protected void initializeJsonClientSession(IClientSession clientSession) {
     m_jsonClientSession = (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
-    JobUtility.runAsModelJobAndAwait(ClientRunContexts.copyCurrent().session(clientSession), new IRunnable() {
+    JobUtility.runModelJobAndAwait(clientSession, new IRunnable() {
       @Override
       public void run() throws Exception {
         m_jsonClientSession.startUp();
@@ -635,7 +635,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   protected JSONObject jsonResponseToJson() {
     // Because the model might be accessed during toJson(), we have to execute it in a model job
-    return JobUtility.runAsModelJobAndAwait(ClientRunContexts.copyCurrent().session(getClientSession()), new ICallable<JSONObject>() {
+    return JobUtility.runModelJobAndAwait(getClientSession(), new ICallable<JSONObject>() {
       @Override
       public JSONObject call() throws Exception {
         return currentJsonResponse().toJson();
@@ -704,7 +704,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
       // Dispose model (if session was not already stopped earlier by itself)
       if (m_clientSession.isActive()) {
-        JobUtility.runAsModelJobAndAwait(ClientRunContexts.copyCurrent().session(m_clientSession), new IRunnable() {
+        JobUtility.runModelJobAndAwait(m_clientSession, new IRunnable() {
 
           @Override
           public void run() throws Exception {

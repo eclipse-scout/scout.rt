@@ -18,9 +18,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.DateUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.ui.html.cache.DefaultHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
@@ -77,13 +80,37 @@ public abstract class AbstractUiServlet extends HttpServletEx {
   public abstract IJsonSession createJsonSession();
 
   @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    m_requestHandlerGet.handleRequest(req, resp);
+  protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    try {
+      ServletRunContexts.empty().servletRequest(req).servletResponse(resp).run(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          m_requestHandlerGet.handleRequest(req, resp);
+        }
+      });
+    }
+    catch (ProcessingException e) {
+      LOG.error("Failed to process HTTP-GET request from UI", e);
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    m_requestHandlerPost.handleRequest(req, resp);
+  protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    try {
+      ServletRunContexts.empty().servletRequest(req).servletResponse(resp).run(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          m_requestHandlerPost.handleRequest(req, resp);
+        }
+      });
+    }
+    catch (ProcessingException e) {
+      LOG.error("Failed to process HTTP-POST request from UI", e);
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**

@@ -8,6 +8,7 @@ import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -65,11 +66,11 @@ public final class JobUtility {
   }
 
   /**
-   * Runs the given job in the model-thread. The calling thread can be the model thread itself, or any other
-   * thread. This method blocks until the job completed, or enters a blocking condition.
+   * Runs the given job in the model thread, and blocks until the job completed or enters a blocking condition. The
+   * calling thread must not be the model thread for the given session.
    *
-   * @param runContext
-   *          RunContext to run the model job on behalf.
+   * @param clientSession
+   *          client session to run the job on behalf
    * @param job
    *          job to be executed
    * @throws JsonException
@@ -77,41 +78,33 @@ public final class JobUtility {
    *           processing exception.
    * @return the job's result.
    */
-  public static <RESULT> RESULT runAsModelJobAndAwait(final ClientRunContext runContext, final IExecutable<RESULT> job) {
-    if (ModelJobs.isModelThread()) {
-      try {
-        return ModelJobs.runNow(job, ModelJobs.newInput(runContext));
-      }
-      catch (final ProcessingException e) {
-        throw new JsonException("Event processing failed [job=%s]", e, job.getClass().getName());
-      }
+  public static <RESULT> RESULT runModelJobAndAwait(final IClientSession clientSession, final IExecutable<RESULT> job) {
+    Assertions.assertFalse(ModelJobs.isModelThread(clientSession), "Wrong thread, must not be the model thread");
+
+    final IFuture<RESULT> future = ModelJobs.schedule(job, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession)));
+    boolean timeout;
+    try {
+      timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().futures(future).notBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
-    else {
-      final IFuture<RESULT> future = ModelJobs.schedule(job, ModelJobs.newInput(runContext));
-      boolean timeout;
-      try {
-        timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().futures(future).notBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-      }
-      catch (final InterruptedException e) {
-        throw new JsonException("Interrupted while waiting for a job to complete. [job=%s, future=%s]", e, job.getClass().getName(), future);
-      }
+    catch (final InterruptedException e) {
+      throw new JsonException("Interrupted while waiting for a job to complete. [job=%s, future=%s]", e, job.getClass().getName(), future);
+    }
 
-      if (timeout) {
-        throw new JsonException("Timeout elapsed while waiting for a job to complete [job=%s, timeout=%ss, future=%s]", new TimeoutException(), job.getClass().getName(), TimeUnit.MILLISECONDS.toSeconds(AWAIT_TIMEOUT), future);
-      }
+    if (timeout) {
+      throw new JsonException("Timeout elapsed while waiting for a job to complete [job=%s, timeout=%ss, future=%s]", new TimeoutException(), job.getClass().getName(), TimeUnit.MILLISECONDS.toSeconds(AWAIT_TIMEOUT), future);
+    }
 
-      // Query the future's 'done-state' to not block anew. That is if the job is waiting for a blocking condition to fall.
-      if (!future.isDone()) {
-        return null;
-      }
+    // Query the future's 'done-state' to not block anew. That is if the job is waiting for a blocking condition to fall.
+    if (!future.isDone()) {
+      return null;
+    }
 
-      // Return the future's result or processing exception.
-      try {
-        return future.awaitDoneAndGet();
-      }
-      catch (final ProcessingException e) {
-        throw new JsonException("Job failed [job=%s]", e, job.getClass().getName());
-      }
+    // Return the future's result or processing exception.
+    try {
+      return future.awaitDoneAndGet();
+    }
+    catch (final ProcessingException e) {
+      throw new JsonException("Job failed [job=%s]", e, job.getClass().getName());
     }
   }
 }
