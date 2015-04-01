@@ -79,14 +79,14 @@ scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
 
 scout.AbstractSmartField.prototype._onClick = function(e) {
   if (!this._$popup) {
-    this._openPopupAndLayout();
+    this._openPopup();
   }
 };
 
 scout.AbstractSmartField.prototype._onIconClick = function(event) {
   scout.AbstractSmartField.parent.prototype._onIconClick.call(this, event);
   if (!this._$popup) {
-    this._openPopupAndLayout();
+    this._openPopup();
   }
 };
 
@@ -108,7 +108,7 @@ scout.AbstractSmartField.prototype._onKeyDown = function(event) {
 
   if (this._isNavigationKey(event)) {
     // ensure popup is opened for following operations
-    if (this._openPopupAndLayout()) {
+    if (this._openPopup()) {
       return;
     }
     switch (event.which) {
@@ -147,7 +147,7 @@ scout.AbstractSmartField.prototype._onKeyUp = function(e) {
   }
 
   // ensure pop-up is opened for following operations
-  if (this._openPopupAndLayout()) {
+  if (this._openPopup()) {
     return;
   }
 
@@ -178,7 +178,7 @@ scout.AbstractSmartField.prototype._onPopupMousedown = function(event) {
  * Returns the bounds of the text-input element. Subclasses may override this method when their
  * text-field is not === this.$field.
  */
-scout.AbstractSmartField.prototype._getInputBounds = function() {
+scout.AbstractSmartField.prototype._fieldBounds = function() {
   return scout.graphics.offsetBounds(this.$field);
 };
 
@@ -213,11 +213,6 @@ scout.AbstractSmartField.prototype._searchText = function() {
   return this.$field.val();
 };
 
-scout.AbstractSmartField.prototype._openPopupAndLayout = function(notifyServer) {
-  this._openPopup(notifyServer);
-  this._resizePopup();
-};
-
 // FIXME AWE: (smart-field) an dieser stelle müssten wir auch die screen-boundaries berücksichtigen
 // und entscheiden, ob das popup gegen unten oder gegen oben geöffnet werden soll.
 /**
@@ -226,10 +221,10 @@ scout.AbstractSmartField.prototype._openPopupAndLayout = function(notifyServer) 
  * size and resize the popup later when proposals are available.
  */
 scout.AbstractSmartField.prototype._openPopup = function(notifyServer) {
-  notifyServer = notifyServer === undefined ? true : notifyServer;
   if (this._$popup) {
     return false;
   } else {
+    notifyServer = notifyServer === undefined ? true : notifyServer;
     if (notifyServer) {
       this.session.send(this.id, 'openProposal', {
         searchText: this._searchText(),
@@ -241,38 +236,42 @@ scout.AbstractSmartField.prototype._openPopup = function(notifyServer) {
       .appendTo($('body'));
 
     var htmlPopup = new scout.HtmlComponent(this._$popup, this.session),
-      popupLayout = new scout.PopupLayout(htmlPopup),
-      fieldBounds = this._getInputBounds();
+      popupLayout = new scout.PopupLayout(htmlPopup);
 
     htmlPopup.validateRoot = true;
+    popupLayout.autoSize = true;
+    popupLayout.adjustAutoSize = function(prefSize) {
+      // must re-evaluate field-bounds, since smart-field is not laid out at this point.
+      return this._popupSize(this._fieldBounds(), prefSize);
+    }.bind(this);
+
     htmlPopup.setLayout(popupLayout);
     return true;
   }
 };
 
-/**
- * This method is called when the PopupLayout is invalidated which happens typically
- * when the proposal table adds or removes rows.
- */
+scout.AbstractSmartField.prototype._popupSize = function(fieldBounds, prefSize) {
+  return new scout.Dimension(
+    Math.max(fieldBounds.width, prefSize.width),
+    Math.min(350, prefSize.height));
+};
+
+scout.AbstractSmartField.prototype._popupBounds = function(fieldBounds, prefSize) {
+  var popupSize = this._popupSize(fieldBounds, prefSize);
+  return new scout.Rectangle(
+      fieldBounds.x,
+      fieldBounds.y + fieldBounds.height,
+      popupSize.width,
+      popupSize.height);
+};
+
 scout.AbstractSmartField.prototype._resizePopup = function() {
   var htmlPopup = scout.HtmlComponent.get(this._$popup),
     popupLayout = htmlPopup.layoutManager,
     prefSize = htmlPopup.getPreferredSize(),
-    inputBounds = this._getInputBounds(),
-    bounds;
-
-  prefSize.width = Math.max(inputBounds.width, prefSize.width);
-  prefSize.height = Math.min(400, prefSize.height);
-  bounds = new scout.Rectangle(
-    inputBounds.x,
-    inputBounds.y + inputBounds.height,
-    prefSize.width,
-    prefSize.height);
+    bounds = this._popupBounds(this._fieldBounds(), prefSize);
   $.log.debug('_resizePopup bounds=' + bounds + ' prefSize=' + prefSize);
-
-  popupLayout.autoSize = false; // FIXME AWE: check autoSize, still required? when?
   htmlPopup.setBounds(bounds);
-  popupLayout.autoSize = true;
 };
 
 /**

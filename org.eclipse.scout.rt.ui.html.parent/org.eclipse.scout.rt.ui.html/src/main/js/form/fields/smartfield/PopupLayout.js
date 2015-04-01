@@ -9,8 +9,6 @@ scout.PopupLayout = function(htmlPopup) {
 scout.inherits(scout.PopupLayout, scout.AbstractLayout);
 
 scout.PopupLayout.prototype.layout = function($container) {
-  $.log.info('PopupLayout#layout autoSize=' + this.autoSize);
-
   // FIXME AWE: (smart-field) ausprobieren, ob es eine gute idee ist, dass das layout seinen
   // container selber resizen darf (normalerweise macht das der parent mit setSize()).
   // verträgt sich einfach nicht so gut, wenn dann jemand wirklich die size vom popup ändern will
@@ -29,7 +27,6 @@ scout.PopupLayout.prototype.layout = function($container) {
 
   if (htmlProposalChooser) {
     size = popupSize.subtract(this._htmlPopup.getInsets());
-    $.log.info('set propal-chooser size to ' + popupSize);
     htmlProposalChooser.invalidate(); // FIXME AWE: warum ist das hier plötzlich notwendig damit der status korrekt dargestellt wird???
     htmlProposalChooser.setSize(size);
   }
@@ -53,7 +50,6 @@ scout.PopupLayout.prototype.preferredLayoutSize = function($container) {
       scout.HtmlEnvironment.formColumnWidth,
       scout.HtmlEnvironment.formRowHeight * 2);
   }
-  $.log.info('YYY popup pref size=' + prefSize);
   return prefSize.add(this._htmlPopup.getInsets());
 };
 
