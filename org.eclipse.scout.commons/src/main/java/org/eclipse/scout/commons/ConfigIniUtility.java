@@ -28,7 +28,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 /**
  * Utility to extract properties stored in the <code>config.ini</code> file of scout applications.
  * <p>
- * The file is located on the classpath, typically in WEB-INF/classes/config.ini
+ * The file is located on the classpath, typically in WEB-INF/classes/config.ini or in development src/main/resources
  * <p>
  * It can also be specified by setting the system property <code>-Dconfig.ini=path-to-config.ini-file</code>
  * <p>
@@ -89,7 +89,7 @@ public final class ConfigIniUtility {
     }
     else {
       // don't log here because the logger needs this class (cyclic dependencies)
-      System.err.println("No config.ini found. Running with empty configuration.");
+      System.err.println(ConfigIniUtility.class.getSimpleName() + ": No config.ini found. Running with empty configuration.");
     }
   }
 
@@ -407,7 +407,7 @@ public final class ConfigIniUtility {
         return null;
       }
     }
-    return ConfigIniUtility.class.getClassLoader().getResource("/" + CONFIG_INI);
+    return ConfigIniUtility.class.getClassLoader().getResource(CONFIG_INI);
   }
 
   protected static void resolveAll() {
