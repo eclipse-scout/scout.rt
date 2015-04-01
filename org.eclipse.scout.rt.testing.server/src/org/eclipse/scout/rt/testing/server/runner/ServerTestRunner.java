@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
 import org.eclipse.scout.rt.testing.server.runner.statement.ProvideServerSessionStatement;
-import org.eclipse.scout.rt.testing.server.runner.statement.ServerRunNowStatement;
+import org.eclipse.scout.rt.testing.server.runner.statement.ServerRunContextStatement;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.ProcessingRuntimeExceptionUnwrappingStatement;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.ProcessingRuntimeExceptionWrappingStatement;
 import org.junit.Test;
@@ -104,7 +104,7 @@ public class ServerTestRunner extends PlatformTestRunner {
     }
 
     final Statement s4 = new ProcessingRuntimeExceptionWrappingStatement(next);
-    final Statement s3 = new ServerRunNowStatement(s4);
+    final Statement s3 = new ServerRunContextStatement(s4);
     final Statement s2 = new ProvideServerSessionStatement(s3, annotation.provider());
     final Statement s1 = new RegisterBeanStatement(s2, annotation.value(), priority);
 

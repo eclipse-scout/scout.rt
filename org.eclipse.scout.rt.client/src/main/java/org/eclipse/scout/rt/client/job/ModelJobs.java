@@ -16,12 +16,11 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -66,32 +65,6 @@ import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
 public final class ModelJobs {
 
   private ModelJobs() {
-  }
-
-  /**
-   * 'Run-now'-style execution will be removed in 5.1.
-   */
-  public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable) throws ProcessingException {
-    return ModelJobs.runNow(executable, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
-  }
-
-  /**
-   * 'Run-now'-style execution will be removed in 5.1.
-   */
-  public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable, final JobInput input) throws ProcessingException {
-    Assertions.assertTrue(isModelThread(), "The current thread must be the model thread");
-    Assertions.assertTrue(executable instanceof IRunnable || executable instanceof ICallable, "Illegal executable provided: must be a '%s' or '%s'", IRunnable.class.getSimpleName(), ICallable.class.getSimpleName());
-    validateInput(input);
-
-    final RunContext runContext = input.runContext();
-
-    if (executable instanceof IRunnable) {
-      runContext.run((IRunnable) executable);
-      return null;
-    }
-    else {
-      return runContext.call((ICallable<RESULT>) executable);
-    }
   }
 
   /**
@@ -193,12 +166,20 @@ public final class ModelJobs {
   }
 
   /**
-   * Returns <code>true</code> if the current thread represents the model thread. At any given time, there is only one
-   * model thread.
+   * Returns <code>true</code> if the current thread represents the model thread for the current client session. At any
+   * given time, there is only one model thread per client session.
    */
   public static boolean isModelThread() {
+    return ModelJobs.isModelThread(ClientSessionProvider.currentSession());
+  }
+
+  /**
+   * Returns <code>true</code> if the current thread represents the model thread for the given client session. At any
+   * given time, there is only one model thread per client session.
+   */
+  public static boolean isModelThread(IClientSession clientSession) {
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
-    return ModelJobs.isModelJob(currentFuture) && ((IFutureTask) currentFuture).isMutexOwner();
+    return ModelJobs.isModelJob(currentFuture) && ((IFutureTask) currentFuture).isMutexOwner() && (IClientSession) currentFuture.getJobInput().mutex() == clientSession;
   }
 
   /**

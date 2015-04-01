@@ -79,7 +79,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
       throw new TransactionRequiredException();
     }
     else {
-      return runNextAndRegisterTxError(callerTransaction);
+      return runNextAndRegisterTxFailureOnError(callerTransaction);
     }
   }
 
@@ -92,7 +92,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
 
     ActiveTransactionRegistry.register(transaction);
     try {
-      return runNextAndRegisterTxError(transaction);
+      return runNextAndRegisterTxFailureOnError(transaction);
     }
     finally {
       endTransactionSafe(transaction);
@@ -109,7 +109,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
     final ITransaction callerTransaction = ITransaction.CURRENT.get();
 
     if (callerTransaction != null) {
-      return runNextAndRegisterTxError(callerTransaction);
+      return runNextAndRegisterTxFailureOnError(callerTransaction);
     }
     else {
       return runRequiresNewTxBoundary();
@@ -121,7 +121,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
    * registers exceptions on the given transaction.
    */
   @Internal
-  protected RESULT runNextAndRegisterTxError(final ITransaction tx) throws Exception {
+  protected RESULT runNextAndRegisterTxFailureOnError(final ITransaction tx) throws Exception {
     RESULT result = null;
     Exception error = null;
 

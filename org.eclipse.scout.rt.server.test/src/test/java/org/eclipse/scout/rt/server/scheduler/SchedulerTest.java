@@ -59,7 +59,7 @@ public class SchedulerTest {
 
   @Test
   public void testRunningJobCount() throws ProcessingException, InterruptedException {
-    IScheduler scheduler = new TestScheduler(m_ticker, m_runContext);
+    IScheduler scheduler = new Scheduler(m_ticker, m_runContext);
     scheduler.addJob(new JobAcceptTick("groupId", "jobIdAccept"));
     scheduler.addJob(new JobDontAcceptTick("groupId", "jobIdDontAccept"));
     assertEquals("JobCount must be 2", 2, scheduler.getJobCount());
@@ -76,25 +76,6 @@ public class SchedulerTest {
     assertEquals("No running job left", 0, scheduler.getRunningJobs(null, null).size());
     assertEquals("jobDontAccept should be in the Scheduler", 1, scheduler.getAllJobs().size());
     assertEquals("jobDontAccept should be in the Scheduler", 1, scheduler.getJobCount());
-  }
-
-  @Test
-  public void testServerJobName() throws ProcessingException {
-    TestScheduler scheduler = new TestScheduler(m_ticker, m_runContext);
-    JobAcceptTick job = new JobAcceptTick("groupId", "jobId");
-    assertEquals("Scheduler.groupId.jobId", scheduler.getJobName(job));
-  }
-}
-
-class TestScheduler extends Scheduler {
-
-  public TestScheduler(Ticker ticker, ServerRunContext runContext) throws ProcessingException {
-    super(ticker, runContext);
-  }
-
-  @Override
-  public String getJobName(ISchedulerJob job) {
-    return super.getJobName(job);
   }
 }
 

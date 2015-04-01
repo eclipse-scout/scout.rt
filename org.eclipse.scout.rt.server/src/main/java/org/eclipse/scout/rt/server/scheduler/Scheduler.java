@@ -12,34 +12,25 @@ package org.eclipse.scout.rt.server.scheduler;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 
 public class Scheduler extends AbstractScheduler implements IScheduler {
 
-  private RunContext m_runContext;
+  private ServerRunContext m_serverRunContext;
 
-  public Scheduler(Ticker ticker, ServerRunContext runContext) throws ProcessingException {
+  public Scheduler(Ticker ticker, ServerRunContext serverRunContext) throws ProcessingException {
     super(ticker);
-    m_runContext = runContext;
+    m_serverRunContext = serverRunContext;
   }
 
   @Override
   public void handleJobExecution(final ISchedulerJob job, final TickSignal signal) throws ProcessingException {
-    Jobs.runNow(new IRunnable() {
+    m_serverRunContext.run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         job.run(Scheduler.this, signal);
       }
-    }, Jobs.newInput(m_runContext).name(getJobName(job)));
-  }
-
-  /**
-   * @return name of the {@link ISchedulerJob}.
-   */
-  protected String getJobName(ISchedulerJob job) {
-    return "Scheduler." + job.getGroupId() + "." + job.getJobId();
+    });
   }
 }

@@ -30,8 +30,6 @@ import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldBrowseNewChain;
@@ -53,6 +51,8 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.platform.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -997,7 +997,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   private IFuture<?> callTextLookupInternal(String text, int maxRowCount, final ILookupCallFetcher<LOOKUP_KEY> fetcher, final boolean background) {
     final ILookupCall<LOOKUP_KEY> call = (getLookupCall() != null ? SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this)) : null);
-    final IClientSession session = ClientSessionProvider.currentSession();
     ILookupCallFetcher<LOOKUP_KEY> internalFetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
       public void dataFetched(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final ProcessingException failed) {
@@ -1020,16 +1019,15 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           }
         };
 
-        ClientRunContext runContext = ClientRunContexts.copyCurrent().session(session);
-        if (background) {
-          ModelJobs.schedule(lookupRunnable, ModelJobs.newInput(runContext).name("Smartfield text lookup"));
+        if (background || !ModelJobs.isModelThread()) {
+          ModelJobs.schedule(lookupRunnable, ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("Smartfield text lookup"));
         }
         else {
           try {
-            ModelJobs.runNow(lookupRunnable, ModelJobs.newInput(runContext).name("Smartfield text lookup"));
+            lookupRunnable.run();
           }
-          catch (ProcessingException e) {
-            fetcher.dataFetched(null, e);
+          catch (Exception e) {
+            fetcher.dataFetched(null, OBJ.get(ExceptionTranslator.class).translate(e));
           }
         }
       }
@@ -1103,7 +1101,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   private IFuture<?> callBrowseLookupInternal(String browseHint, int maxRowCount, TriState activeState, final ILookupCallFetcher<LOOKUP_KEY> fetcher, final boolean background) {
     final ILookupCall<LOOKUP_KEY> call = (getLookupCall() != null ? SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this)) : null);
-    final IClientSession session = ClientSessionProvider.currentSession();
 
     ILookupCallFetcher<LOOKUP_KEY> internalFetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
@@ -1128,16 +1125,15 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           }
         };
 
-        ClientRunContext runContext = ClientRunContexts.copyCurrent().session(session);
-        if (background) {
-          ModelJobs.schedule(lookupRunnable, ModelJobs.newInput(runContext).name("ContentAssistField browse lookup"));
+        if (background || !ModelJobs.isModelThread()) {
+          ModelJobs.schedule(lookupRunnable, ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("ContentAssistField browse lookup"));
         }
         else {
           try {
-            ModelJobs.runNow(lookupRunnable, ModelJobs.newInput(runContext).name("ContentAssistField browse lookup"));
+            lookupRunnable.run();
           }
-          catch (ProcessingException e) {
-            fetcher.dataFetched(null, e);
+          catch (Exception e) {
+            fetcher.dataFetched(null, OBJ.get(ExceptionTranslator.class).translate(e));
           }
         }
       }

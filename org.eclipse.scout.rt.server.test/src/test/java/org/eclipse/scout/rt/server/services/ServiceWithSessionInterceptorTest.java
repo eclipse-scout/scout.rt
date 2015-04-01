@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
@@ -28,33 +27,32 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class ServiceWithSessionInterceptorTest {
 
-  private static TestServerSession serverSession;
+  private static TestServerSession m_serverSession;
 
   @BeforeClass
   public static void setUp() {
-    serverSession = new TestServerSession();
+    m_serverSession = new TestServerSession();
     Platform.get().getBeanContext().registerClass(TestService.class);
   }
 
   @AfterClass
   public static void tearDown() {
-    serverSession = null;
+    m_serverSession = null;
   }
 
   @Test
   public void testService() throws Exception {
-    ServerJobs.runNow(new IRunnable() {
+    ServerRunContexts.empty().session(m_serverSession).run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        runInServerJob();
+        runInServerRunContext();
       }
-    }, ServerJobs.newInput(ServerRunContexts.empty().session(serverSession)).name("test-job"));
+    });
   }
 
-  protected void runInServerJob() {
+  protected void runInServerRunContext() {
     OBJ.get(ITestService.class).doit();
-
   }
 
   public static interface ITestService extends IService {

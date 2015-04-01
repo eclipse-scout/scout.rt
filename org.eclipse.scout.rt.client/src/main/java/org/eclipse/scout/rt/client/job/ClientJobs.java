@@ -16,12 +16,10 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -62,31 +60,6 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 public final class ClientJobs {
 
   private ClientJobs() {
-  }
-
-  /**
-   * 'Run-now'-style execution will be removed in 5.1.
-   */
-  public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable) throws ProcessingException {
-    return ClientJobs.runNow(executable, ClientJobs.newInput(ClientRunContexts.copyCurrent()));
-  }
-
-  /**
-   * 'Run-now'-style execution will be removed in 5.1.
-   */
-  public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable, final JobInput input) throws ProcessingException {
-    Assertions.assertTrue(executable instanceof IRunnable || executable instanceof ICallable, "Illegal executable provided: must be a '%s' or '%s'", IRunnable.class.getSimpleName(), ICallable.class.getSimpleName());
-    validateInput(input);
-
-    final RunContext runContext = input.runContext();
-
-    if (executable instanceof IRunnable) {
-      runContext.run((IRunnable) executable);
-      return null;
-    }
-    else {
-      return runContext.call((ICallable<RESULT>) executable);
-    }
   }
 
   /**

@@ -12,51 +12,44 @@ package org.eclipse.scout.rt.testing.server.runner.statement;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.server.job.ServerJobs;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.junit.runners.model.Statement;
 
 /**
- * Statement to run the following statements within a job.
+ * Statement to run the following statements within a <code>ServerRunContext</code>.
  *
- * @since5.1
+ * @since 5.1
  */
-public class ServerRunNowStatement extends Statement {
+public class ServerRunContextStatement extends Statement {
 
   protected final Statement m_next;
 
   /**
-   * Creates a statement to run the following statements within a job.
+   * Creates a statement to run the following statements within a <code>ServerRunContext</code>.
    *
    * @param next
    *          next {@link Statement} to be executed.
-   * @param jobInput
-   *          {@link JobInput} to be given to the 'runNow' call.
    */
-  public ServerRunNowStatement(final Statement next) {
+  public ServerRunContextStatement(final Statement next) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
   }
 
   @Override
   public void evaluate() throws Throwable {
-    final Holder<Throwable> throwable = new Holder<>();
-
-    ServerJobs.runNow(new IRunnable() {
+    ServerRunContexts.copyCurrent().run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         try {
           m_next.evaluate();
         }
-        catch (final Throwable t) {
-          throwable.setValue(t);
+        catch (final Exception e) {
+          throw e;
+        }
+        catch (final Throwable e) {
+          throw new Error(e);
         }
       }
     });
-
-    if (throwable.getValue() != null) {
-      throw throwable.getValue();
-    }
   }
 }

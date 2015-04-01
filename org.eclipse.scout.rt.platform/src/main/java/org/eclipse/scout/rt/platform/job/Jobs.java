@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform.job;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
@@ -58,31 +57,6 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 public final class Jobs {
 
   private Jobs() {
-  }
-
-  /**
-   * 'Run-now'-style execution will be removed in 5.1.
-   */
-  public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable) throws ProcessingException {
-    return Jobs.runNow(executable, Jobs.newInput(RunContexts.copyCurrent()));
-  }
-
-  /**
-   * 'Run-now'-style execution will be removed in 5.1.
-   */
-  public static <RESULT> RESULT runNow(final IExecutable<RESULT> executable, final JobInput input) throws ProcessingException {
-    Assertions.assertTrue(executable instanceof IRunnable || executable instanceof ICallable, "Illegal executable provided: must be a '%s' or '%s'", IRunnable.class.getSimpleName(), ICallable.class.getSimpleName());
-    validateInput(input);
-
-    final RunContext runContext = input.runContext();
-
-    if (executable instanceof IRunnable) {
-      runContext.run((IRunnable) executable);
-      return null;
-    }
-    else {
-      return runContext.call((ICallable<RESULT>) executable);
-    }
   }
 
   /**

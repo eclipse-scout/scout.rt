@@ -35,7 +35,6 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -271,17 +270,16 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
     getStatusInfoInternal().updateReceiveStatus(message);
 
-    ServerRunContext runContext = ServerRunContexts.empty();
-    runContext.subject(m_subject);
-    runContext.session(OBJ.get(ServerSessionProviderWithCache.class).provide(runContext.copy()));
-
-    ServerJobs.runNow(new IRunnable() {
+    ServerRunContext serverRunContext = ServerRunContexts.empty();
+    serverRunContext.subject(m_subject);
+    serverRunContext.session(OBJ.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
+    serverRunContext.run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         notifyListeners(message);
       }
-    }, ServerJobs.newInput(runContext).name("cluster-sync-receive"));
+    });
   }
 
   @Override

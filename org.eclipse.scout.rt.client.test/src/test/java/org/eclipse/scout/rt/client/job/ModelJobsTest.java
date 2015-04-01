@@ -70,6 +70,38 @@ public class ModelJobsTest {
   }
 
   @Test
+  public void testIsModelThread() throws ProcessingException {
+    final IClientSession clientSession1 = mock(IClientSession.class);
+    final IClientSession clientSession2 = mock(IClientSession.class);
+
+    ModelJobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        // Test model thread for same session (1)
+        assertTrue(ModelJobs.isModelThread());
+
+        // Test model thread for same session (2)
+        ClientRunContexts.copyCurrent().run(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            assertTrue(ModelJobs.isModelThread());
+          }
+        });
+        // Test model thread for other session
+        ClientRunContexts.copyCurrent().session(clientSession2).run(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            assertFalse(ModelJobs.isModelThread());
+          }
+        });
+      }
+    }, ModelJobs.newInput(ClientRunContexts.empty().session(clientSession1))).awaitDoneAndGet();
+  }
+
+  @Test
   public void testScheduleWithoutInput() throws ProcessingException {
     ISession.CURRENT.set(m_clientSession);
 

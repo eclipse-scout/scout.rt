@@ -35,8 +35,8 @@ import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.service.ServiceUtility;
 
 /**
@@ -124,17 +124,18 @@ public class WsseUsernameTokenAuthenticationHandler implements IAuthenticationHa
     if (transactional) {
       final Subject authSubject = createAuthenticatorSubject();
 
-      final ServerRunContext runContext = ServerRunContexts.copyCurrent();
-      runContext.subject(authSubject);
-      runContext.session(lookupServerSession(authSubject));
+      final ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
+      serverRunContext.transactionScope(TransactionScope.REQUIRES_NEW);
+      serverRunContext.subject(authSubject);
+      serverRunContext.session(lookupServerSession(authSubject));
 
-      return ServerJobs.runNow(new ICallable<Boolean>() {
+      return serverRunContext.call(new ICallable<Boolean>() {
 
         @Override
         public Boolean call() throws Exception {
           return authenticator.authenticate(username, password);
         }
-      }, ServerJobs.newInput(runContext).name("JAX-WS authentication"));
+      });
     }
     else {
       return authenticator.authenticate(username, password);
