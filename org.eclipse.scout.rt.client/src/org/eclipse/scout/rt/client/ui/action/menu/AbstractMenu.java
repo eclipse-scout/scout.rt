@@ -92,6 +92,13 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
    * This method is only called for menus without submenus (leafs) on a {@link ITable}, {@link ITree},
    * {@link IValueField}! For all other fields
    * this method will NEVER be called.</b> <br>
+   * The method is only called, if the the current owner value matches the menu type.
+   * If the menu is not visible due to it's type, execOwnerValueChanged is not called: E.g.
+   * <ul>
+   * <li>Menu with type SingleSelection: only called, if the selection is a single selection
+   * <li>Menu with type MultiSelection: only called, if the selection is a multi selection
+   * <li>Menu with type EmptySpace: only called, if the selection is a on empty space
+   * </ul>
    *
    * @param newOwnerValue
    *          depending on the owner the newOwnerValue differs.
