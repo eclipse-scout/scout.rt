@@ -17,38 +17,40 @@ import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 import org.junit.runners.model.Statement;
 
 /**
- * Statement to register a bean-class during the time of executing a statement.
+ * Statement to register a bean during the time of execution.
  *
- * @since5.1
+ * @since 5.1
  */
 public class RegisterBeanStatement extends Statement {
 
   protected final Statement m_next;
   private final Class<?> m_beanClass;
-  private final double m_priority;
+  private final Object m_beanInstance;
 
   /**
-   * Creates a statement to register a bean-class during the time of executing a statement.
-   *
-   * @param next
-   *          next {@link Statement} to be executed.
-   * @param beanClass
-   *          bean-class to be registered.
-   * @param priority
-   *          priority of the bean-class to be registered.
+   * Creates a statement to register a bean during the time of execution.
    */
-  public RegisterBeanStatement(final Statement next, final Class<?> beanClass, final double priority) {
+  public RegisterBeanStatement(final Statement next, final Class<?> beanClass) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
-    m_beanClass = Assertions.assertNotNull(beanClass, "bean-class must not be null");
-    m_priority = priority;
+    m_beanClass = Assertions.assertNotNull(beanClass, "bean class must not be null");
+    m_beanInstance = null;
+  }
+
+  /**
+   * Creates a statement to register an 'application-scoped' bean during the time of execution.
+   */
+  public RegisterBeanStatement(final Statement next, final Object beanInstance) {
+    m_next = Assertions.assertNotNull(next, "next statement must not be null");
+    m_beanInstance = Assertions.assertNotNull(beanInstance, "bean instance must not be null");
+    m_beanClass = beanInstance.getClass();
   }
 
   @Override
   public void evaluate() throws Throwable {
     final BeanImplementor<?> bean = new BeanImplementor<>(m_beanClass);
-    bean.addAnnotation(AnnotationFactory.createPriority(m_priority));
+    bean.addAnnotation(AnnotationFactory.createPriority(Long.MAX_VALUE));
 
-    Platform.get().getBeanContext().registerBean(bean, null);
+    Platform.get().getBeanContext().registerBean(bean, m_beanInstance);
     try {
       m_next.evaluate();
     }

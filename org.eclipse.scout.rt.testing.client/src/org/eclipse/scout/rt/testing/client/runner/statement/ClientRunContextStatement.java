@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.server.runner.statement;
+package org.eclipse.scout.rt.testing.client.runner.statement;
 
 import java.security.AccessController;
 
@@ -16,51 +16,51 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.OBJ;
-import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
-import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.junit.runners.model.Statement;
 
 /**
- * Statement to run the following statements within a <code>ServerRunContext</code>.
+ * Statement to run the following statements within a <code>ClientRunContext</code>.
  *
  * @since 5.1
  */
-public class ServerRunContextStatement extends Statement {
+public class ClientRunContextStatement extends Statement {
 
   private final Statement m_next;
-  private final RunWithServerSession m_serverSessionAnnotation;
+  private final RunWithClientSession m_clientSessionAnnotation;
 
-  public ServerRunContextStatement(final Statement next, final RunWithServerSession serverSessionAnnotation) {
+  public ClientRunContextStatement(final Statement next, final RunWithClientSession clientSessionAnnotation) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
-    m_serverSessionAnnotation = serverSessionAnnotation;
+    m_clientSessionAnnotation = clientSessionAnnotation;
   }
 
   @Override
   public void evaluate() throws Throwable {
-    if (m_serverSessionAnnotation == null) {
+    if (m_clientSessionAnnotation == null) {
       m_next.evaluate();
     }
     else {
-      final Class<? extends ISession> serverSessionClass = m_serverSessionAnnotation.value();
+      final Class<? extends ISession> clientSessionClass = m_clientSessionAnnotation.value();
 
       new RegisterBeanStatement(new Statement() {
 
         @Override
         public void evaluate() throws Throwable {
-          final Class<? extends ServerSessionProvider> serverSessionProvider = m_serverSessionAnnotation.provider();
+          final Class<? extends ClientSessionProvider> clientSessionProvider = m_clientSessionAnnotation.provider();
           final Subject subject = Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "Subject must not be null. Use the annotation '%s' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
 
-          // Obtain the server session. Depending on the session provider, a new session is created or a cached session returned.
-          final IServerSession serverSession = OBJ.get(serverSessionProvider).provide(ServerRunContexts.copyCurrent());
+          // Obtain the client session. Depending on the session provider, a new session is created or a cached session returned.
+          final IClientSession clientSession = OBJ.get(clientSessionProvider).provide(ClientRunContexts.copyCurrent());
 
-          // Run the test in a new ServerRunContext. The subject is set explicitly to not use the one defined on the session.
-          ServerRunContexts.copyCurrent().session(serverSession).subject(subject).run(new IRunnable() {
+          // Run the test in a new ClientRunContext. The subject is set explicitly to not use the one defined on the session.
+          ClientRunContexts.copyCurrent().session(clientSession).subject(subject).run(new IRunnable() {
 
             @Override
             public void run() throws Exception {
@@ -76,7 +76,7 @@ public class ServerRunContextStatement extends Statement {
             }
           });
         }
-      }, serverSessionClass).evaluate();
+      }, clientSessionClass).evaluate();
     }
   }
 }

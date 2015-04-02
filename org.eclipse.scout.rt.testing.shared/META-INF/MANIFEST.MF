@@ -13,7 +13,6 @@ Export-Package: org.eclipse.scout.extension,
  org.eclipse.scout.rt.testing.shared.runner,
  org.eclipse.scout.rt.testing.shared.runner.parameterized,
  org.eclipse.scout.rt.testing.shared.services.common.code,
- org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler,
  org.eclipse.scout.rt.testing.shared.services.lookup
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

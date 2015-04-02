@@ -13,18 +13,20 @@ package org.eclipse.scout.rt.testing.server.runner;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.ReflectionUtility;
-import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.platform.runner.statement.ProcessingRuntimeException;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
-import org.eclipse.scout.rt.testing.server.runner.statement.ProvideServerSessionStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.UnwrapProcessingRuntimeExceptionStatement;
+import org.eclipse.scout.rt.testing.server.runner.statement.ClearServerRunContextStatement;
 import org.eclipse.scout.rt.testing.server.runner.statement.ServerRunContextStatement;
-import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.ProcessingRuntimeExceptionUnwrappingStatement;
-import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.ProcessingRuntimeExceptionWrappingStatement;
+import org.eclipse.scout.service.AbstractService;
 import org.junit.Test;
 import org.junit.Test.None;
-import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
@@ -70,16 +72,12 @@ public class ServerTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptClassLevelStatement(final Statement next, final Class<?> testClass) {
-    final Statement s2 = interceptServerSessionStatement(next, testClass.getAnnotation(RunWithServerSession.class), 1000);
-    final Statement s1 = super.interceptClassLevelStatement(s2, testClass);
+    final Statement s4 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testClass));
+    final Statement s3 = super.interceptClassLevelStatement(s4, testClass);
+    final Statement s2 = new RegisterBeanStatement(s3, new WrapAndThrowExceptionHandler()); // exception handler to not silently swallow exceptions.
+    final Statement s1 = new ClearServerRunContextStatement(s2);
 
     return s1;
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  protected Statement possiblyExpectingExceptions(FrameworkMethod method, Object test, Statement next) {
-    return super.possiblyExpectingExceptions(method, test, new ProcessingRuntimeExceptionUnwrappingStatement(next));
   }
 
   protected boolean expectsException(Test annotation) {
@@ -88,26 +86,26 @@ public class ServerTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
-    final Statement s2 = interceptServerSessionStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testMethod, testClass), 1001);
-    final Statement s1 = super.interceptMethodLevelStatement(s2, testClass, testMethod);
-
+    final Statement s4 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testMethod, testClass));
+    final Statement s3 = super.interceptMethodLevelStatement(s4, testClass, testMethod);
+    final Statement s2 = new RegisterBeanStatement(s3, new WrapAndThrowExceptionHandler()); // exception handler to not silently swallow exceptions.
+    final Statement s1 = new ClearServerRunContextStatement(s2);
     return s1;
   }
 
   /**
-   * Method invoked to create the session context.
+   * <code>ExceptionHandler</code> that wraps <code>ProcessingException</code>s into
+   * <code>ProcessingRuntimeException</code>s. That is to not silently swallow exceptions, but to propagate them to the
+   * test instead. Exceptions of that type are unwrapped by {@link UnwrapProcessingRuntimeExceptionStatement}.
    */
-  @Internal
-  protected Statement interceptServerSessionStatement(final Statement next, final RunWithServerSession annotation, final int priority) {
-    if (annotation == null) {
-      return next;
+  @ApplicationScoped
+  protected class WrapAndThrowExceptionHandler extends AbstractService implements IExceptionHandlerService {
+
+    @Override
+    public void handleException(ProcessingException pe) {
+      if (!pe.isConsumed()) {
+        throw new ProcessingRuntimeException(pe);
+      }
     }
-
-    final Statement s4 = new ProcessingRuntimeExceptionWrappingStatement(next);
-    final Statement s3 = new ServerRunContextStatement(s4);
-    final Statement s2 = new ProvideServerSessionStatement(s3, annotation.provider());
-    final Statement s1 = new RegisterBeanStatement(s2, annotation.value(), priority);
-
-    return s1;
   }
 }

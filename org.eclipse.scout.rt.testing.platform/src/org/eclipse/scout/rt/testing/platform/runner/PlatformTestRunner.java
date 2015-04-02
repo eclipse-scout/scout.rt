@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.ITestExecutionListener;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.UnwrapProcessingRuntimeExceptionStatement;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.notification.RunNotifier;
@@ -149,6 +150,14 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
     return interceptMethodLevelStatement(superStatement, getTestClass().getJavaClass(), method.getMethod());
   }
 
+  protected Statement interceptBeforeClassStatement(Statement beforeClassStatement, Class<?> javaClass) {
+    return interceptClassLevelStatement(beforeClassStatement, javaClass);
+  }
+
+  protected Statement interceptAfterClassStatement(Statement beforeClassStatement, Class<?> javaClass) {
+    return interceptClassLevelStatement(beforeClassStatement, javaClass);
+  }
+
   /**
    * Overwrite this method to contribute some 'class-level' behavior to this Runner.
    * <p/>
@@ -184,14 +193,6 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
     return new SubjectStatement(next, testClass.getAnnotation(RunWithSubject.class));
   }
 
-  protected Statement interceptBeforeClassStatement(Statement beforeClassStatement, Class<?> javaClass) {
-    return interceptClassLevelStatement(beforeClassStatement, javaClass);
-  }
-
-  protected Statement interceptAfterClassStatement(Statement beforeClassStatement, Class<?> javaClass) {
-    return interceptClassLevelStatement(beforeClassStatement, javaClass);
-  }
-
   /**
    * Overwrite this method to contribute some 'method-level' behavior to this Runner.
    * <p/>
@@ -225,5 +226,11 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    */
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
     return new SubjectStatement(next, ReflectionUtility.getAnnotation(RunWithSubject.class, testMethod, testClass));
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
+  protected Statement possiblyExpectingExceptions(FrameworkMethod method, Object test, Statement next) {
+    return super.possiblyExpectingExceptions(method, test, new UnwrapProcessingRuntimeExceptionStatement(next));
   }
 }
