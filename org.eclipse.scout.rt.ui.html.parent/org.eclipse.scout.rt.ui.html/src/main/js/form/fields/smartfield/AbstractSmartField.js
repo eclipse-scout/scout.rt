@@ -46,7 +46,7 @@ scout.AbstractSmartField.prototype._renderProperties = function() {
 scout.AbstractSmartField.prototype._renderProposalChooser = function() {
   $.log.debug('_renderProposalChooser proposalChooser=' + this.proposalChooser);
   if (this.proposalChooser) {
-    this._openPopup(false);
+    this._openPopup(false, true);
     this.proposalChooser.render(this._$popup);
     if (this.rendered) {
       // a.) render after a click (property change), form is completely laid out
@@ -144,11 +144,11 @@ scout.AbstractSmartField.prototype._onKeyUp = function(e) {
     return;
   }
 
-  // filter options
-  this._filterOptions();
+  // update text in field
+  this._proposalTyped();
 };
 
-scout.AbstractSmartField.prototype._filterOptions = function() {
+scout.AbstractSmartField.prototype._proposalTyped = function() {
   var searchText = this._searchText();
   if (this._oldSearchText === searchText) {
     $.log.debug('value of field has not changed - do not filter (oldSearchText=' + this._oldSearchText + ')');
@@ -213,7 +213,7 @@ scout.AbstractSmartField.prototype._searchText = function() {
  * at this point we cannot know what size the popup should have. We have to set a fixed
  * size and resize the popup later when proposals are available.
  */
-scout.AbstractSmartField.prototype._openPopup = function(notifyServer) {
+scout.AbstractSmartField.prototype._openPopup = function(notifyServer, mustRender) {
   if (this._$popup) {
     return false;
   } else {
@@ -224,20 +224,26 @@ scout.AbstractSmartField.prototype._openPopup = function(notifyServer) {
         selectCurrentValue: false});
     }
 
+    // A proposal-field (PF) has a slightly different behavior than a smart-field (SF):
+    // When the typed proposal doesn't match a proposal from the list, the popup
+    // is closed. The smart-field would stay open in that case. The SF also opens the
+    // popup _before_ we send a request to the server (-> more responsive UI)
+    if (this.proposal && !mustRender) {
+      return false;
+    }
+
     this._$popup = $.makeDiv('smart-field-popup')
       .on('mousedown', this._onPopupMousedown.bind(this))
       .appendTo($('body'));
 
     var htmlPopup = new scout.HtmlComponent(this._$popup, this.session),
       popupLayout = new scout.PopupLayout(htmlPopup);
-
     htmlPopup.validateRoot = true;
     popupLayout.autoSize = true;
     popupLayout.adjustAutoSize = function(prefSize) {
-      // must re-evaluate field-bounds, since smart-field is not laid out at this point.
+      // must re-evaluate _fieldBounds() for each call, since smart-field is not laid out at this point.
       return this._popupSize(this._fieldBounds(), prefSize);
     }.bind(this);
-
     htmlPopup.setLayout(popupLayout);
     return true;
   }
