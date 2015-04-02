@@ -21,7 +21,6 @@ import javax.security.auth.Subject;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.LocaleUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -30,7 +29,7 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.UserInterruptedException;
-import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.AbstractApplication;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformException;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
@@ -44,7 +43,7 @@ import org.eclipse.scout.rt.ui.swing.splash.SplashProgressMonitor;
  *
  * @author awe
  */
-abstract class BaseSwingApplication implements IApplication {
+abstract class BaseSwingApplication extends AbstractApplication {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BaseSwingApplication.class);
 
@@ -111,16 +110,6 @@ abstract class BaseSwingApplication implements IApplication {
 
   public final SplashProgressMonitor getProgressMonitor() {
     return m_monitor;
-  }
-
-  @Override
-  public String getName() {
-    return ConfigIniUtility.getProperty(CONFIG_KEY_NAME);
-  }
-
-  @Override
-  public String getVersion() {
-    return ConfigIniUtility.getProperty(CONFIG_KEY_VERSION);
   }
 
   /**
