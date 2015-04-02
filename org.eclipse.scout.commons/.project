@@ -52,10 +52,5 @@
       <type>1</type>
       <locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.parent/.settings/org.eclipse.m2e.core.prefs</locationURI>
     </link>
-    <link>
-      <name>.settings/org.eclipse.pde.core.prefs</name>
-      <type>1</type>
-      <locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.parent/.settings/org.eclipse.pde.core.prefs</locationURI>
-    </link>
   </linkedResources>
 </projectDescription>
