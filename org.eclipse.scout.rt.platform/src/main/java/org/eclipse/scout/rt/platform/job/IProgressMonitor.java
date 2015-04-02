@@ -20,7 +20,25 @@ public interface IProgressMonitor {
   /**
    * The {@link IProgressMonitor} which is currently associated with the current thread.
    */
-  ThreadLocal<IProgressMonitor> CURRENT = new ThreadLocal<>();
+  ThreadLocal<IProgressMonitor> CURRENT = new ThreadLocal<IProgressMonitor>() {
+
+    @Override
+    protected IProgressMonitor initialValue() {
+      // TODO [dwi][imo]: Most likely, IProgressMonitor can be removed without substitution.
+      return new IProgressMonitor() {
+
+        @Override
+        public boolean isCancelled() {
+          return false;
+        }
+
+        @Override
+        public boolean cancel(final boolean interruptIfRunning) {
+          return true;
+        }
+      };
+    }
+  };
 
   /**
    * @return <code>true</code> if this job was cancelled and the job should terminate its work.
