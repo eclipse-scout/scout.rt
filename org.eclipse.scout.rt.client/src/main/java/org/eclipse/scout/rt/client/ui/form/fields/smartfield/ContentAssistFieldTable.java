@@ -156,11 +156,6 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
     }
 
     @Override
-    protected int getConfiguredWidth() {
-      return 100;
-    }
-
-    @Override
     protected boolean getConfiguredVisible() {
       return false;
     }
@@ -192,10 +187,6 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
       decorateCellWithLookupRow(cell, row);
     }
 
-    @Override
-    protected int getConfiguredWidth() {
-      return 200;
-    }
   }
 
 }
