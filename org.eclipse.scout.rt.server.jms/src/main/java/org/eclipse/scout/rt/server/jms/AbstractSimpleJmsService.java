@@ -198,7 +198,13 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
         }
       }
       finally {
-        m_connection.stop();
+        try {
+          m_connection.stop();
+        }
+        catch (Exception e) {
+          LOG.info("Unable to stop connection, possibly because of running in J2EE container: {0}", e.getMessage());
+          LOG.trace("Full Exception:", e);
+        }
         m_session.close(); // only need to close session, producer must then not be closed.
       }
       LOG.info("JMS message consumer stopped.");
