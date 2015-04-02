@@ -1,5 +1,13 @@
 /**
- * The proposal-chooser DIV is not always present.
+ * The popup layout is different from other layouts, since it can determine its own size
+ * when the autoSize flag is set to true. Otherwise it uses the given size, like a regular
+ * layout. The autoSize feature is used, when a child of the PopupLayout invalidates the
+ * tree up to the popup. Since the popup is a validate root it must re-layout itself.
+ * However: the size of the popup dependes on the field it belongs to. That's why we
+ * can inject a function adjustAutoSize() into the PopupLayout, to provide the bounds
+ * of the field, when layout is re-calculated.
+ *
+ *  The proposal-chooser DIV is not always present.
  */
 scout.PopupLayout = function(htmlPopup) {
   scout.PopupLayout.parent.call(this);
@@ -9,10 +17,6 @@ scout.PopupLayout = function(htmlPopup) {
 scout.inherits(scout.PopupLayout, scout.AbstractLayout);
 
 scout.PopupLayout.prototype.layout = function($container) {
-  // FIXME AWE: (smart-field) ausprobieren, ob es eine gute idee ist, dass das layout seinen
-  // container selber resizen darf (normalerweise macht das der parent mit setSize()).
-  // verträgt sich einfach nicht so gut, wenn dann jemand wirklich die size vom popup ändern will
-  // z.B. beim resize, ausserdem sind teile der popup grösse von aussen gesteuert, z.B. die field bounds
   var size, prefSize, popupSize,
     htmlProposalChooser = this._htmlProposalChooser($container);
   if (this.autoSize) {

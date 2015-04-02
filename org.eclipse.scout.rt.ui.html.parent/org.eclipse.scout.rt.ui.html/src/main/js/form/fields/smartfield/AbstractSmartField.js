@@ -214,8 +214,13 @@ scout.AbstractSmartField.prototype._onFieldBlur = function() {
  * onFieldBlur is also executed, but won't do anything, since the $popup is already closed in the UI.
  */
 scout.AbstractSmartField.prototype._acceptProposal = function() {
-  $.log.debug('AbstractSmartField#_acceptProposal');
-  this.session.send(this.id, 'acceptProposal', {searchText: this._searchText()});
+  var searchText = this._searchText();
+  if (this._oldSearchText === searchText) {
+    $.log.debug('value of field has not changed - do not acceptProposal (oldSearchText=' + this._oldSearchText + ')');
+    return;
+  }
+  $.log.debug('AbstractSmartField#_acceptProposal searchText=' + searchText);
+  this.session.send(this.id, 'acceptProposal', {searchText: searchText});
   this._closeProposal(false);
 };
 

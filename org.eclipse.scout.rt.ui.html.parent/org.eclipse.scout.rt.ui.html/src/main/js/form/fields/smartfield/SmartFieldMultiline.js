@@ -19,6 +19,7 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
       addClass('multiline').
       blur(this._onFieldBlur.bind(this)).
       click(this._onClick.bind(this)).
+      focus(this._onFocus.bind(this)).
       keyup(this._onKeyUp.bind(this)).
       keydown(this._onKeyDown.bind(this)).
       appendTo(this.$fieldContainer);
