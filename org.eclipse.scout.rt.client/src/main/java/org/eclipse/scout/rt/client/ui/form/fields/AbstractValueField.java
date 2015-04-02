@@ -546,7 +546,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
       return false;
     }
     catch (Exception e) {
-      LOG.warn("Unexpected Error: ", e);
+      LOG.error("Unexpected Error: ", e);
       ProcessingException pe = new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), e);
       addErrorStatus(new ParsingFailedStatus(pe, text));
       return false;

@@ -134,4 +134,5 @@ public final class MenuUtility {
       return CollectionUtility.hashSet(TreeMenuType.MultiSelection);
     }
   }
+
 }
