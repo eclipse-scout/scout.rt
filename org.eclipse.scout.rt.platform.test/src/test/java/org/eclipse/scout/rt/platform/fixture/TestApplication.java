@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.fixture;
 
-import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.AbstractApplication;
 
 /**
  *
  */
-public class TestApplication implements IApplication {
+public class TestApplication extends AbstractApplication {
 
   private static TestApplication instance;
 
