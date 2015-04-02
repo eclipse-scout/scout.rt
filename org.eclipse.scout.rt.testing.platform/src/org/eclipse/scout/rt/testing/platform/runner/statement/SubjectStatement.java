@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
+import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.runners.model.Statement;
@@ -55,23 +55,26 @@ public class SubjectStatement extends Statement {
   @Override
   public void evaluate() throws Throwable {
     if (m_subject != null) {
-      final Holder<Throwable> throwable = new Holder<>();
-      Subject.doAs(m_subject, new PrivilegedExceptionAction<Void>() {
+      try {
+        Subject.doAs(m_subject, new PrivilegedExceptionAction<Void>() {
 
-        @Override
-        public Void run() throws Exception {
-          try {
-            m_next.evaluate();
+          @Override
+          public Void run() throws Exception {
+            try {
+              m_next.evaluate();
+              return null;
+            }
+            catch (final Exception | Error e) {
+              throw e;
+            }
+            catch (final Throwable e) {
+              throw new Error(e);
+            }
           }
-          catch (final Throwable t) {
-            throwable.setValue(t);
-          }
-          return null;
-        }
-      });
-
-      if (throwable.getValue() != null) {
-        throw throwable.getValue();
+        });
+      }
+      catch (PrivilegedActionException e) {
+        throw e.getCause();
       }
     }
     else {

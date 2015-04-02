@@ -67,7 +67,7 @@ public class ServerRunContextStatement extends Statement {
               try {
                 m_next.evaluate();
               }
-              catch (final Exception e) {
+              catch (final Exception | Error e) {
                 throw e;
               }
               catch (final Throwable e) {
