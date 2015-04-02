@@ -576,6 +576,7 @@ scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
 
   scout.defaultValues.applyTo(cell, 'TreeNode');
   node.text = cell.text;
+  node.cssClass = cell.cssClass;
   node.iconId = cell.iconId;
   node.tooltipText = cell.tooltipText;
   node.foregroundColor = cell.foregroundColor;
@@ -731,12 +732,20 @@ scout.Tree.prototype._$buildNode = function(node, $parent) {
 };
 
 scout.Tree.prototype._decorateNode = function(node) {
-  var $node = node.$node;
+  var formerClasses,
+    $node = node.$node;
   if (!$node) {
     // This node is not yet rendered, nothing to do
     return;
   }
 
+  formerClasses = 'tree-item';
+  if ($node.isSelected()) {
+    formerClasses += ' selected';
+  }
+  $node.removeClass();
+  $node.addClass(formerClasses);
+  $node.addClass(node.cssClass);
   $node.toggleClass('leaf', !! node.leaf);
   $node.toggleClass('expanded', ( !! node.expanded && node.childNodes.length > 0));
 

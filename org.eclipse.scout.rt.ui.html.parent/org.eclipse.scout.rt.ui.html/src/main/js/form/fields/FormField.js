@@ -60,6 +60,7 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderLabel(this.label);
   this._renderLabelVisible(this.labelVisible);
   this._renderStatusVisible(this.statusVisible);
+  this._renderCssClass(this.cssClass);
 };
 
 scout.FormField.prototype._remove = function() {
@@ -170,6 +171,11 @@ scout.FormField.prototype._renderEnabled = function(enabled) {
   if (this.$field) {
     this.$field.setEnabled(enabled);
   }
+};
+
+scout.FormField.prototype._renderCssClass = function(cssClass, oldCssClass) {
+  this.$container.removeClass(oldCssClass);
+  this.$container.addClass(cssClass);
 };
 
 scout.FormField.prototype._renderGridData = function(gridData) {

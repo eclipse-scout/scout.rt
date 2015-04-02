@@ -448,11 +448,11 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     // We deliberately don't use JsonCell here, because most properties are not supported in a tree anyway
     JsonObjectUtility.putProperty(json, "text", cell.getText());
     JsonObjectUtility.putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(cell.getIconId()));
+    JsonObjectUtility.putProperty(json, "cssClass", (cell.getCssClass()));
     JsonObjectUtility.putProperty(json, "tooltipText", cell.getTooltipText());
     JsonObjectUtility.putProperty(json, "foregroundColor", cell.getForegroundColor());
     JsonObjectUtility.putProperty(json, "backgroundColor", cell.getBackgroundColor());
     JsonObjectUtility.putProperty(json, "font", (cell.getFont() == null ? null : cell.getFont().toPattern()));
-    // TODO BSH Tree | Maybe add "cssStyle"?
   }
 
   protected JSONObject treeNodeToJson(ITreeNode node) {

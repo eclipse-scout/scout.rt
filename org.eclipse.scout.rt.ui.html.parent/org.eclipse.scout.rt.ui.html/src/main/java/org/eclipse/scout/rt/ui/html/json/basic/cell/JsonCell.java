@@ -56,6 +56,7 @@ public class JsonCell implements IJsonObject {
     JsonObjectUtility.putProperty(json, "text", m_cellText);
     JsonObjectUtility.putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(m_cell.getIconId()));
     JsonObjectUtility.putProperty(json, "tooltipText", m_cell.getTooltipText());
+    JsonObjectUtility.putProperty(json, "cssClass", m_cell.getCssClass());
     JsonObjectUtility.putProperty(json, "horizontalAlignment", m_cell.getHorizontalAlignment());
     JsonObjectUtility.putProperty(json, "foregroundColor", m_cell.getForegroundColor());
     JsonObjectUtility.putProperty(json, "backgroundColor", m_cell.getBackgroundColor());

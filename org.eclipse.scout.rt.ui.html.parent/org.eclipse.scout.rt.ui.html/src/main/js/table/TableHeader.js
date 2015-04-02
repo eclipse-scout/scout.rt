@@ -19,10 +19,10 @@ scout.TableHeader = function(table, session) {
       .css('max-width', column.width + 'px')
       .on('click', '', onHeaderClick)
       .on('mousedown', '', dragHeader);
+    column.$header = $header;
+    column.filter = [];
 
-    this._applyColumnText($header, column);
-    this._applyColumnSorting($header, column);
-
+    this._decorateHeader(column);
     alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
     if (alignment !== 'left') {
       $header.css('text-align', alignment);
@@ -34,9 +34,6 @@ scout.TableHeader = function(table, session) {
     } else {
       $separator.addClass('fixed');
     }
-
-    column.$header = $header;
-    column.filter = [];
   }
 
   function onHeaderClick(event) {
@@ -295,15 +292,20 @@ scout.TableHeader.prototype.findHeaderItems = function() {
 };
 
 /**
- * Updates the column headers visualization of the text and sorting state
+ * Updates the column headers visualization of the text, sorting and styling state
  */
-scout.TableHeader.prototype.updateHeaders = function(columns) {
-  for (var i = 0; i < columns.length; i++) {
-    var column = columns[i];
-    var $header = columns[i].$header;
-    this._applyColumnText($header, column);
-    this._applyColumnSorting($header, column);
+scout.TableHeader.prototype.updateHeader = function(column, oldColumnState) {
+  this._decorateHeader(column, oldColumnState);
+};
+
+scout.TableHeader.prototype._decorateHeader = function(column, oldColumnState) {
+  var $header = column.$header;
+  if (oldColumnState){
+    $header.removeClass(oldColumnState.headerCssClass);
   }
+  $header.addClass(column.headerCssClass);
+  this._applyColumnText($header, column);
+  this._applyColumnSorting($header, column);
 };
 
 scout.TableHeader.prototype._applyColumnText = function($header, column) {

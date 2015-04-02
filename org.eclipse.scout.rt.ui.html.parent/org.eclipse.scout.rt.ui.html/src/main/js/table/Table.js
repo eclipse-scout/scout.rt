@@ -1705,22 +1705,21 @@ scout.Table.prototype._onColumnOrderChanged = function(columnIds) {
  * @param columns array of columns which were updated.
  */
 scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
-  var column,
-    updatedColumns = [];
+  var column, oldColumnState;
 
   //Update model columns
   for (var i = 0; i < columns.length; i++) {
     scout.defaultValues.applyTo(columns[i], 'Column');
     column = this.columnById(columns[i].id);
+    oldColumnState = $.extend(oldColumnState, column);
     column.text = columns[i].text;
+    column.headerCssClass = columns[i].headerCssClass;
     column.sortActive = columns[i].sortActive;
     column.sortAscending = columns[i].sortAscending;
 
-    updatedColumns.push(column);
-  }
-
-  if (this.rendered && this.header) {
-    this.header.updateHeaders(updatedColumns);
+    if (this.rendered && this.header) {
+      this.header.updateHeader(column, oldColumnState);
+    }
   }
 };
 

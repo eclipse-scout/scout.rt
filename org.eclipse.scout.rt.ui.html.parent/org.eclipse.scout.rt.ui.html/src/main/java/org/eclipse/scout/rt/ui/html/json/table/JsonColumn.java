@@ -66,6 +66,8 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     }
     JsonObjectUtility.putProperty(json, IColumn.PROP_FIXED_WIDTH, getColumn().isFixedWidth());
     JsonObjectUtility.putProperty(json, IColumn.PROP_EDITABLE, getColumn().isEditable());
+    JsonObjectUtility.putProperty(json, IColumn.PROP_CSS_CLASS, getColumn().getCssClass());
+    JsonObjectUtility.putProperty(json, "headerCssClass", getColumn().getHeaderCell().getCssClass());
     // FIXME CGU: complete
     return json;
   }

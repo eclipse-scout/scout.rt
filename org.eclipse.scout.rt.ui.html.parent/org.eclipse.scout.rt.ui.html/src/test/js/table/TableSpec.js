@@ -97,6 +97,49 @@ describe("Table", function() {
       expect($cells1.eq(2).css('text-align')).toBe('right');
     });
 
+    it("considers css class of a column", function() {
+      var model = helper.createModelFixture(3, 2);
+      model.columns[0].cssClass = 'abc';
+
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $headerItems = table.header.$container.find('.header-item');
+      var $headerItem0 = $headerItems.eq(0);
+      var $rows = table.$rows();
+      var $cells0 = $rows.eq(0).find('.table-cell');
+      var $cells1 = $rows.eq(1).find('.table-cell');
+
+      expect($headerItem0).not.toHaveClass('abc');
+      expect($cells0.eq(0)).toHaveClass('abc');
+      expect($cells0.eq(1)).not.toHaveClass('abc');
+      expect($cells1.eq(0)).toHaveClass('abc');
+      expect($cells1.eq(1)).not.toHaveClass('abc');
+    });
+
+    it("considers css class of a cell, if both are set only the cell class is used", function() {
+      var model = helper.createModelFixture(3, 2);
+      model.columns[0].cssClass = 'abc';
+      model.rows[0].cells[0].cssClass = 'custom-cell-0';
+
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $headerItems = table.header.$container.find('.header-item');
+      var $headerItem0 = $headerItems.eq(0);
+      var $rows = table.$rows();
+      var $cells0 = $rows.eq(0).find('.table-cell');
+      var $cells1 = $rows.eq(1).find('.table-cell');
+
+      expect($headerItem0).not.toHaveClass('abc');
+      expect($cells0.eq(0)).not.toHaveClass('abc');
+      expect($cells0.eq(0)).toHaveClass('custom-cell-0');
+      expect($cells0.eq(1)).not.toHaveClass('abc');
+      expect($cells1.eq(0)).toHaveClass('abc');
+      expect($cells1.eq(0)).not.toHaveClass('custom-cell-0');
+      expect($cells1.eq(1)).not.toHaveClass('abc');
+    });
+
   });
 
   describe("checkRow", function() {
@@ -1554,6 +1597,34 @@ describe("Table", function() {
         expect($colHeaders.eq(1).text()).toBe(column1.text);
         expect($colHeaders.eq(1)).toHaveClass('sort-asc');
         expect($colHeaders.eq(2).text()).toBe(column2.text);
+      });
+
+      it("updates the css class of table header nodes", function() {
+        table.render(session.$entryPoint);
+
+        var $colHeaders = table.header.findHeaderItems();
+        expect($colHeaders.eq(1)).not.toHaveClass('custom-header');
+
+        column1 = helper.createModelColumn(column1.id);
+        column1.headerCssClass = 'custom-header';
+        var message = {
+          events: [createColumnHeadersUpdatedEvent(model, [column1])]
+        };
+        session._processSuccessResponse(message);
+
+        $colHeaders = table.header.findHeaderItems();
+        expect($colHeaders.eq(0)).not.toHaveClass('custom-header');
+        expect($colHeaders.eq(1)).toHaveClass('custom-header');
+
+        column1 = helper.createModelColumn(column1.id);
+        message = {
+          events: [createColumnHeadersUpdatedEvent(model, [column1])]
+        };
+        session._processSuccessResponse(message);
+
+        $colHeaders = table.header.findHeaderItems();
+        expect($colHeaders.eq(0)).not.toHaveClass('custom-header');
+        expect($colHeaders.eq(1)).not.toHaveClass('custom-header');
       });
     });
   });

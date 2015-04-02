@@ -1025,6 +1025,45 @@ describe("Tree", function() {
         expect($node0.children('.tree-item-control').length).toBe(1);
       });
 
+      it("updates cssClass of model and html node", function() {
+        tree.selectedNodeIds = [node0.id];
+        tree.render(session.$entryPoint);
+
+        var event = createNodeChangedEvent(model, node0.id);
+        event.cssClass = 'new-css-class';
+        var message = {
+          events: [event]
+        };
+        session._processSuccessResponse(message);
+
+        // Check model
+        expect(node0.cssClass).toBe(event.cssClass);
+
+        // Check gui
+        var $node0 = node0.$node;
+        expect($node0).toHaveClass('new-css-class');
+        // check if other classes are still there
+        expect($node0).toHaveClass('tree-item');
+        expect($node0).toHaveClass('selected');
+
+        // Check if removal works (event does not contain cssClass again)
+        event = createNodeChangedEvent(model, node0.id);
+        message = {
+          events: [event]
+        };
+        session._processSuccessResponse(message);
+
+        // Check model
+        expect(node0.cssClass).toBeFalsy();
+
+        // Check gui
+        $node0 = node0.$node;
+        expect($node0).not.toHaveClass('new-css-class');
+        // check if other classes are still there
+        expect($node0).toHaveClass('tree-item');
+        expect($node0).toHaveClass('selected');
+      });
+
     });
 
     describe("multiple events", function() {

@@ -43,6 +43,18 @@ describe("FormField", function() {
       expect(formField.hasOwnProperty('properties')).toBe(false);
     });
 
+    it("event should update model", function() {
+      formField.render(session.$entryPoint);
+
+      var event = createPropertyChangeEvent(formField, {cssClass: 'custom-class'});
+      formField.onModelPropertyChange(event);
+      expect(formField.$container).toHaveClass('custom-class');
+
+      event = createPropertyChangeEvent(formField, {cssClass: ''});
+      formField.onModelPropertyChange(event);
+      expect(formField.$container).not.toHaveClass('custom-class');
+    });
+
   });
 
 });

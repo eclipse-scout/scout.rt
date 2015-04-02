@@ -79,6 +79,12 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
         return getModel().isStatusVisible();
       }
     });
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_CSS_CLASS, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getCssClass();
+      }
+    });
     putJsonProperty(new JsonProperty<T>(IFormField.PROP_ERROR_STATUS, model) {
       @Override
       protected IStatus modelValue() {

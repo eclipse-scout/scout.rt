@@ -28,6 +28,11 @@ scout.Column.prototype.buildCell = function(row) {
   if (cell.editable) {
     cssClass += ' editable';
   }
+  if (cell.cssClass) {
+    cssClass += ' ' + cell.cssClass;
+  } else if (this.cssClass) {
+    cssClass += ' ' + this.cssClass;
+  }
   alignment = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
   cssClass += ' cell-align-' + alignment;
   tooltipText = this.table.cellTooltipText(this, row);
