@@ -136,7 +136,7 @@ public abstract class AbstractJmsService<T> extends AbstractJndiService {
       con.setClientID(clientId);
     }
     catch (Exception e) {
-      LOG.info("WARNING - Failed to set clientID '{0}' for consumer connection, possibly because of running in application container: {1}", clientId, e.getMessage());
+      LOG.info("Failed to set clientID '{0}' for consumer connection, possibly because of running in J2EE container: {1}", clientId, e.getMessage());
       LOG.trace("Full Exception:", e);
     }
     m_connection = con;
