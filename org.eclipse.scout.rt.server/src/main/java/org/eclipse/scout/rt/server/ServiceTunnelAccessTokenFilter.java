@@ -53,15 +53,20 @@ public class ServiceTunnelAccessTokenFilter implements Filter {
         subject.getPrincipals().add(principal);
         subject.setReadOnly();
         continueChainWithPrincipal(subject, req, res, chain);
+        return;
       }
     }
     catch (Exception e) {
       res.sendError(HttpServletResponse.SC_FORBIDDEN);
+      return;
     }
     chain.doFilter(in, out);
   }
 
   protected Principal verifyToken(String token) {
+    if (m_sharedSecret == null) {
+      return null;
+    }
     if (StringUtility.isNullOrEmpty(token)) {
       return null;
     }

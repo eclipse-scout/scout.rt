@@ -251,7 +251,7 @@ public class ServiceTunnelServlet extends HttpServlet {
    */
   @Internal
   protected String initRequestMinVersion(ServletConfig config) {
-    String version = config.getInitParameter("min-version");
+    String version = config.getInitParameter("min-version");//TODO [nosgi] imo remove version and make config ini param for it
     if (version == null) {
       IApplication app = OBJ.getOptional(IApplication.class);
       if (app != null) {

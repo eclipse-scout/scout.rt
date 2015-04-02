@@ -137,17 +137,17 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    */
   public ProcessingStatus(String messageTitle, String messageBody, Throwable cause, int code, int severity) {
     super(null, checkSeverity(severity), code);
-    setTitle(messageTitle);
-    setBody(messageBody);
-    setException(cause);
+    m_messageTitle = messageTitle;
+    m_messageBody = messageBody;
+    m_exception = cause;
   }
 
   public ProcessingStatus(IStatus s) {
     super(Assertions.assertNotNull(s).getMessage(), checkSeverity(s.getSeverity()), s.getCode());
-    setBody(s.getMessage());
+    m_messageBody = s.getMessage();
     if (s instanceof IProcessingStatus) {
-      setTitle(((IProcessingStatus) s).getTitle());
-      setException(((IProcessingStatus) s).getException());
+      m_messageTitle = ((IProcessingStatus) s).getTitle();
+      m_exception = ((IProcessingStatus) s).getException();
     }
   }
 

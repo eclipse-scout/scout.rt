@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 public interface IServiceTunnel {
   String PROP_TARGET_URL = "org.eclipse.scout.rt.servicetunnel.targetUrl";
   String PROP_SHARED_SECRET = "org.eclipse.scout.rt.servicetunnel.sharedSecret";
-  String PROP_VERSION = "org.eclipse.scout.rt.servicetunnel.version";
   String PROP_MULTI_SESSION_COOKIE_STORE_ENABLED = "org.eclipse.scout.rt.servicetunnel.multiSessionCookieStoreEnabled";
 
   /**

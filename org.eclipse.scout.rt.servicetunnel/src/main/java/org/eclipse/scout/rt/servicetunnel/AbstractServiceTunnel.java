@@ -54,6 +54,7 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
   public AbstractServiceTunnel(T session, String version) {
     m_session = session;
     m_version = getVersion(version);
+    m_sharedSecret = ConfigIniUtility.getProperty(PROP_SHARED_SECRET, ConfigIniUtility.getProperty("scout.ajax.token.key"));
     String url = ConfigIniUtility.getProperty(PROP_TARGET_URL, ConfigIniUtility.getProperty("server.url"));
     if (!StringUtility.isNullOrEmpty(url)) {
       try {
@@ -67,10 +68,6 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
 
   private static String getVersion(String providedVersion) {
     if (providedVersion == null) {
-      String v = ConfigIniUtility.getProperty(PROP_VERSION);
-      if (!StringUtility.isNullOrEmpty(v)) {
-        return v;
-      }
       IApplication app = OBJ.getOptional(IApplication.class);
       if (app != null) {
         String version = app.getVersion();

@@ -59,7 +59,9 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
    */
   public AbstractInternalHttpServiceTunnel(T session, URL url, String version) {
     super(session, version);
-    setServerURL(url);
+    if (url != null) {
+      setServerURL(url);
+    }
   }
 
   /**
