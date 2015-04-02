@@ -122,15 +122,14 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
 
   private void handleUiOpenProposal(JsonEvent event) {
     String searchText = event.getData().optString("searchText");
-    boolean selectCurrentValue = event.getData().optBoolean("selectCurrentValue", false);
-    LOG.debug("handle openProposal -> openProposalFromUI. searchText=" + searchText + " selectCurrentValue=" + selectCurrentValue);
+    LOG.debug("handle openProposal -> openProposalFromUI. searchText=" + searchText);
     getModel().getUIFacade().openProposalChooserFromUI(searchText);
   }
 
   @Override
   protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
     LOG.debug("handle displayText changed -> setTextFromUI. displayText=" + displayText + " whileTyping=" + whileTyping);
-    getModel().getUIFacade().setTextFromUI(displayText); // FIXME AWE: wird das überhaipt noch aufgerufen?
+    getModel().getUIFacade().setTextFromUI(displayText); // FIXME AWE: wird das überhaupt noch aufgerufen?
   }
 
   @Override

@@ -768,9 +768,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleModelRowsSelected(Collection<ITableRow> modelRows) {
-    if (modelRows.isEmpty()) {
-      return;
-    }
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROW_IDS, rowIdsToJson(modelRows));
     addActionEvent(EVENT_ROWS_SELECTED, jsonEvent);

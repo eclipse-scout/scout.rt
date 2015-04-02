@@ -21,6 +21,10 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 public class BinaryResourceUrlUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BinaryResourceUrlUtility.class);
 
+  // FIXME AWE: (font icons) extend syntax for icon-ID so a font-name can be configured
+  // font:[char] --> uses default scoutIcons.ttf (CSS class .font-icon)
+  // font.crm:[char] --> uses crmIcons.ttf (CSS class .crm-font-icon)
+
   /**
    * @return a relative URL for a configured logical icon-name or a font-based icon. For instance:
    *         <ul>
