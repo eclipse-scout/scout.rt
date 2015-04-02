@@ -206,4 +206,11 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
       doOk();
     }
   }
+
+  @Override
+  public void deselect() {
+    m_model.deselectAllRows();
+    System.out.println("deselect!");
+  }
+
 }

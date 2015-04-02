@@ -86,4 +86,9 @@ public interface IProposalChooser<T, LOOKUP_KEY> extends IPropertyObserver {
    */
   void updateActiveFilter(TriState activeState);
 
+  /**
+   * Deselects all items in the proposal chooser (e.g. removes the selected state from table-rows)
+   */
+  void deselect();
+
 }

@@ -39,16 +39,20 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     if (!StringUtility.equalsIgnoreNewLines(m_field.getLookupRowFetcher().getLastSearchText(), toSearchText(text))) {
       m_field.doSearch(text, false, false);
     }
+    if (StringUtility.isNullOrEmpty(text)) {
+      m_field.getProposalChooser().deselect();
+    }
   }
 
   @Override
-  public void openProposalChooserFromUI(String text) { // FIXME AWE: (smart-field) ist das nicht immer browse-all? dann brauchen wir den text nie
+  public void openProposalChooserFromUI(String text) {
     LOG.debug("openProposalChooserFromUI");
     assert !m_field.isProposalChooserRegistered();
     try {
       IProposalChooser<?, LOOKUP_KEY> proposalChooser = m_field.registerProposalChooserInternal();
       proposalChooser.dataFetchedDelegate(m_field.getLookupRowFetcher().getResult(), m_field.getConfiguredBrowseMaxRowCount());
-      m_field.doSearch(null, false, false); // FIXME AWE: (smart-field) select current value
+      boolean selectCurrentValue = StringUtility.isNullOrEmpty(text);
+      m_field.doSearch(text, selectCurrentValue, false);
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);

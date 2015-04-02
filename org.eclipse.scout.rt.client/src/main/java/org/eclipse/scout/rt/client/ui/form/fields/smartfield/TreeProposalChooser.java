@@ -591,4 +591,9 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     doOk();
   }
 
+  @Override
+  public void deselect() {
+    m_model.deselectNode(m_model.getSelectedNode());
+  }
+
 }
