@@ -237,7 +237,9 @@ scout.AbstractSmartField.prototype._openPopup = function(notifyServer, mustRende
       .appendTo($('body'));
 
     var htmlPopup = new scout.HtmlComponent(this._$popup, this.session),
-      popupLayout = new scout.PopupLayout(htmlPopup);
+      popupLayout = new scout.PopupLayout(htmlPopup),
+      fieldBounds = this._fieldBounds(),
+      initialPopupSize = new scout.Dimension(0, scout.HtmlEnvironment.formRowHeight);
     htmlPopup.validateRoot = true;
     popupLayout.autoSize = true;
     popupLayout.adjustAutoSize = function(prefSize) {
@@ -245,6 +247,9 @@ scout.AbstractSmartField.prototype._openPopup = function(notifyServer, mustRende
       return this._popupSize(this._fieldBounds(), prefSize);
     }.bind(this);
     htmlPopup.setLayout(popupLayout);
+    popupLayout.autoSize = false;
+    htmlPopup.setBounds(this._popupBounds(fieldBounds, initialPopupSize));
+    popupLayout.autoSize = true;
     return true;
   }
 };
