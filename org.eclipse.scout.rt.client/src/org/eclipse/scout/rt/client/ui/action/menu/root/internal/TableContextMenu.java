@@ -15,9 +15,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -28,15 +25,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * The invisible root menu node of any table. (internal usage only)
  */
 public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable> implements ITableContextMenu {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableContextMenu.class);
-
   private List<? extends ITableRow> m_currentSelection;
 
   /**
@@ -98,23 +91,8 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
     if (getOwner() != null) {
       final List<ITableRow> ownerValue = getOwner().getSelectedRows();
       m_currentSelection = CollectionUtility.arrayList(ownerValue);
-      acceptVisitor(new IActionVisitor() {
-        @Override
-        public int visit(IAction action) {
-          if (action instanceof IMenu) {
-            IMenu menu = (IMenu) action;
-            try {
-              menu.handleOwnerValueChanged(ownerValue);
-            }
-            catch (ProcessingException ex) {
-              SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
-            }
-          }
-          return CONTINUE;
-        }
-      });
-      // set current menu types
       setCurrentMenuTypes(MenuUtility.getMenuTypesForTableSelection(ownerValue));
+      acceptVisitor(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()));
       calculateLocalVisibility();
       calculateEnableState(ownerValue);
     }

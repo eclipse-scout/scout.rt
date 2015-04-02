@@ -16,9 +16,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -30,15 +27,11 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  *
  */
 public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> implements ITreeContextMenu {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TreeContextMenu.class);
-
   private Set<? extends ITreeNode> m_currentSelection;
 
   /**
@@ -99,23 +92,9 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
     if (getOwner() != null) {
       final Set<ITreeNode> ownerSelection = getOwner().getSelectedNodes();
       m_currentSelection = CollectionUtility.hashSet(ownerSelection);
-      acceptVisitor(new IActionVisitor() {
-        @Override
-        public int visit(IAction action) {
-          if (action instanceof IMenu) {
-            IMenu menu = (IMenu) action;
-            try {
-              menu.handleOwnerValueChanged(ownerSelection);
-            }
-            catch (ProcessingException ex) {
-              SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
-            }
-          }
-          return CONTINUE;
-        }
-      });
-      // update menu types
       setCurrentMenuTypes(MenuUtility.getMenuTypesForTreeSelection(ownerSelection));
+      acceptVisitor(new MenuOwnerChangedVisitor(ownerSelection, getCurrentMenuTypes()));
+      // update menu types
       calculateLocalVisibility();
       calculateEnableState(ownerSelection);
     }
