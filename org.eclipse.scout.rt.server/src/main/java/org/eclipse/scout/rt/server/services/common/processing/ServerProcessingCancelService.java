@@ -10,13 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.processing;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.server.job.ServerJobs;
 import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.service.AbstractService;
@@ -26,14 +20,6 @@ public class ServerProcessingCancelService extends AbstractService implements IS
 
   @Override
   public boolean cancel(final long requestSequence) {
-    final Set<Boolean> success = new HashSet<>(2);
-
-    // Cancel the transaction.
-    success.add(ActiveTransactionRegistry.cancel(requestSequence));
-
-    // Cancel the job.
-    success.add(Jobs.getJobManager().cancel(ServerJobs.newFutureFilter().ids(String.valueOf(requestSequence)).currentSession(), true));
-
-    return Collections.singleton(Boolean.TRUE).equals(success);
+    return ActiveTransactionRegistry.cancel(requestSequence);
   }
 }
