@@ -45,8 +45,8 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TwoPhaseTransactionBoundaryCallable.class);
 
   protected final ICallable<RESULT> m_next;
-  private final long m_transactionId;
-  private final TransactionScope m_transactionScope;
+  protected final long m_transactionId;
+  protected final TransactionScope m_transactionScope;
 
   public TwoPhaseTransactionBoundaryCallable(final ICallable<RESULT> next, final TransactionScope transactionScope, final long transactionId) {
     m_next = Assertions.assertNotNull(next);
@@ -79,7 +79,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
       throw new TransactionRequiredException();
     }
     else {
-      return runNextAndRegisterTxFailureOnError(callerTransaction);
+      return initTxThreadLocalAndContinueChain(callerTransaction);
     }
   }
 
@@ -92,7 +92,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
 
     ActiveTransactionRegistry.register(transaction);
     try {
-      return runNextAndRegisterTxFailureOnError(transaction);
+      return initTxThreadLocalAndContinueChain(transaction);
     }
     finally {
       endTransactionSafe(transaction);
@@ -109,7 +109,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
     final ITransaction callerTransaction = ITransaction.CURRENT.get();
 
     if (callerTransaction != null) {
-      return runNextAndRegisterTxFailureOnError(callerTransaction);
+      return initTxThreadLocalAndContinueChain(callerTransaction);
     }
     else {
       return runRequiresNewTxBoundary();
@@ -121,23 +121,17 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
    * registers exceptions on the given transaction.
    */
   @Internal
-  protected RESULT runNextAndRegisterTxFailureOnError(final ITransaction tx) throws Exception {
-    RESULT result = null;
-    Exception error = null;
-
+  protected RESULT initTxThreadLocalAndContinueChain(final ITransaction tx) throws Exception {
     try {
-      result = new InitThreadLocalCallable<>(m_next, ITransaction.CURRENT, tx).call();
+      return new InitThreadLocalCallable<>(m_next, ITransaction.CURRENT, tx).call();
     }
-    catch (final Exception e) {
-      error = e;
+    catch (final Exception | Error e) {
       tx.addFailure(OBJ.get(ExceptionTranslator.class).translate(e));
+      throw e;
     }
-
-    if (error != null) {
-      throw error;
-    }
-    else {
-      return result;
+    catch (final Throwable t) {
+      tx.addFailure(OBJ.get(ExceptionTranslator.class).translate(t));
+      throw new Error(t);
     }
   }
 

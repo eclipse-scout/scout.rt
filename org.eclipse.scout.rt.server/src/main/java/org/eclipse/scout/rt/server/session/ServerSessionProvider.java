@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
 
@@ -34,14 +35,14 @@ public class ServerSessionProvider {
   /**
    * Provides a new {@link IServerSession} for the {@link Subject} of the given {@link ServerRunContext}.
    *
-   * @param runContext
+   * @param serverRunContext
    *          <code>RunContext</code> initialized with the Subject used to create and load the session.
    * @return {@link IServerSession} created; is never <code>null</code>.
    * @throws ProcessingException
    *           is thrown if the {@link IServerSession} could not be created or initialized.
    */
-  public <SESSION extends IServerSession> SESSION provide(final ServerRunContext runContext) throws ProcessingException {
-    return runContext.copy().call(new ICallable<SESSION>() {
+  public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext) throws ProcessingException {
+    return serverRunContext.copy().transactionId(ITransaction.TX_ZERO_ID).call(new ICallable<SESSION>() {
 
       @Override
       public SESSION call() throws Exception {
@@ -50,7 +51,7 @@ public class ServerSessionProvider {
         serverSession.setIdInternal(String.format("%s-%s", serverSession.getClass().getName(), UUID.randomUUID()));
 
         // 2. Load the session.
-        runContext.copy().session(serverSession).transactionScope(TransactionScope.MANDATORY).run(new IRunnable() {
+        serverRunContext.copy().session(serverSession).transactionScope(TransactionScope.MANDATORY).run(new IRunnable() {
 
           @Override
           public void run() throws Exception {
