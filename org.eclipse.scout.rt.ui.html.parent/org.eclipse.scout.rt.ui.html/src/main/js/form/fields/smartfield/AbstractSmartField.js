@@ -71,6 +71,19 @@ scout.AbstractSmartField.prototype._renderProposalChooser = function() {
   }
 };
 
+scout.AbstractSmartField.prototype._resizePopup = function() {
+  var htmlPopup = scout.HtmlComponent.get(this._$popup),
+    popupLayout = htmlPopup.layoutManager,
+    prefSize = htmlPopup.getPreferredSize(),
+    bounds = this._popupBounds(this._fieldBounds(), prefSize);
+  $.log.debug('_resizePopup bounds=' + bounds + ' prefSize=' + prefSize);
+  // Invalidate is required, when the $popup is already opened and the proposal chooser is rendered later
+  // when the popup size is the same as before, the proposal chooser would not layout its children (like
+  // the table) without invalidate.
+  htmlPopup.invalidate();
+  htmlPopup.setBounds(bounds);
+};
+
 /**
  * This method is called after a valid option has been selected in the proposal chooser.
  */
@@ -277,15 +290,6 @@ scout.AbstractSmartField.prototype._popupBounds = function(fieldBounds, prefSize
       fieldBounds.y + fieldBounds.height,
       popupSize.width,
       popupSize.height);
-};
-
-scout.AbstractSmartField.prototype._resizePopup = function() {
-  var htmlPopup = scout.HtmlComponent.get(this._$popup),
-    popupLayout = htmlPopup.layoutManager,
-    prefSize = htmlPopup.getPreferredSize(),
-    bounds = this._popupBounds(this._fieldBounds(), prefSize);
-  $.log.debug('_resizePopup bounds=' + bounds + ' prefSize=' + prefSize);
-  htmlPopup.setBounds(bounds);
 };
 
 /**

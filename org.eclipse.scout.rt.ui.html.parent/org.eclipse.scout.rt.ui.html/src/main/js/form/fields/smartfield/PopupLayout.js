@@ -13,7 +13,6 @@ scout.PopupLayout.prototype.layout = function($container) {
   // container selber resizen darf (normalerweise macht das der parent mit setSize()).
   // verträgt sich einfach nicht so gut, wenn dann jemand wirklich die size vom popup ändern will
   // z.B. beim resize, ausserdem sind teile der popup grösse von aussen gesteuert, z.B. die field bounds
-
   var size, prefSize, popupSize,
     htmlProposalChooser = this._htmlProposalChooser($container);
   if (this.autoSize) {

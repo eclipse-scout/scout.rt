@@ -38,7 +38,6 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
       _$treeData: null,
       cssSelector: '.tree',
       modifyDom: function($container) {
-        $.log.info('modify DOM');
         this._$tree = $container.find('.tree')
           .css('display', 'inline-block')
           .css('width', 'auto')
@@ -47,7 +46,6 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
           .css('display', 'inline-block');
       },
       restoreDom: function($container) {
-        $.log.info('restore DOM');
         this._$tree
           .css('display', 'block')
           .css('width', '100%')

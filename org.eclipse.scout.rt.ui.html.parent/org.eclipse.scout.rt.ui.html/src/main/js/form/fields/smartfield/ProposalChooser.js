@@ -57,7 +57,7 @@ scout.ProposalChooser.prototype._updateStatus = function() {
 };
 
 /**
- * Replaces an elipsis (...) at the end of the message-text with a CSS animation.
+ * Replaces an ellipsis (...) at the end of the message-text with a CSS animation.
  */
 scout.ProposalChooser.prototype._setStatusMessage = function(message) {
   if (scout.strings.endsWith(message, '...')) {
