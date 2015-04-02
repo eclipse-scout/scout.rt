@@ -18,10 +18,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
-import java.security.Principal;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
@@ -29,12 +26,8 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
-import javax.security.auth.Subject;
-
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.ConfigIniUtility;
-import org.eclipse.scout.commons.EncryptionUtility;
-import org.eclipse.scout.commons.SoapHandlingUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -111,7 +104,6 @@ import org.eclipse.scout.commons.serialization.SerializationUtility;
  * <code>scout.log.level.org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler=4</code>
  * <p>
  */
-@SuppressWarnings("deprecation")
 public class DefaultServiceTunnelContentHandler implements IServiceTunnelContentHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultServiceTunnelContentHandler.class);
   private static final Pattern BEGIN_DATA_TAG = Pattern.compile("[<]([a-zA-Z0-9]+:)?data\\s*>");
@@ -171,14 +163,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     // build soap message without sax (hi-speed)
     boolean compressed = isUseCompression();
     StringBuilder buf = new StringBuilder();
-    String wsse = createWsSecurityElement(msg);
-    if (wsse == null) {
-      wsse = "";
-    }
     buf.append("<soapenv:Envelope soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wsse=\"http://schemas.xmlsoap.org/ws/2002/04/secext\">\n");
-    buf.append("<soapenv:Header>");
-    buf.append(wsse);
-    buf.append("</soapenv:Header>\n");
     buf.append("<soapenv:Body>\n");
     buf.append("  <request version=\"");
     buf.append(msg.getVersion());
@@ -399,75 +384,5 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
       return m_receivedCompressed;
     }
     return true;
-  }
-
-  /**
-   * @return the wsse:Security tag. The subject may be null and may contain no principals
-   *         <p>
-   *         Example WS-Security element for user/pass
-   *
-   *         <pre>
-   * <wsse:Security soapenv:mustUnderstand="1">
-   *   <wsse:UsernameToken>
-   *     <wsse:Username>user</wsse:Username>
-   *     <wsse:Password Type="http://scout.eclipse.org/security#Base64">ertwtrwet3465t4</wsse:Password>
-   *   </wsse:UsernameToken>
-   * </wsse:Security>
-   * </pre>
-   *         <p>
-   *         The default calls
-   *         {@link DefaultServiceTunnelContentHandler#createDefaultWsSecurityElement(IServiceTunnelRequest)}
-   */
-  protected String createWsSecurityElement(IServiceTunnelRequest req) {
-    return DefaultServiceTunnelContentHandler.createDefaultWsSecurityElement(req);
-  }
-
-  private static final byte[] tripleDesKey;
-  static {
-    String key = ConfigIniUtility.getProperty("scout.ajax.token.key");
-    if (key == null) {
-      tripleDesKey = null;
-    }
-    else {
-      tripleDesKey = new byte[24];
-      byte[] keyBytes;
-      try {
-        keyBytes = key.getBytes("UTF-8");
-        System.arraycopy(keyBytes, 0, tripleDesKey, 0, Math.min(keyBytes.length, tripleDesKey.length));
-      }
-      catch (UnsupportedEncodingException e) {
-        LOG.error("reading property 'scout.ajax.token.key'", e);
-      }
-    }
-  }
-
-  /**
-   * @return a soap wsse username token. The username is the principal name of the first pricnipal,
-   *         the password is the triple-des encoding of "${timestamp}:${username}" using the config.ini parameter
-   *         <code>scout.ajax.token.key</code>
-   */
-  public static final String createDefaultWsSecurityElement(IServiceTunnelRequest req) {
-    if (tripleDesKey == null) {
-      return null;
-    }
-    Subject subject = req.getClientSubject();
-    if (subject == null || subject.getPrincipals().size() == 0) {
-      return null;
-    }
-    ArrayList<Principal> list = new ArrayList<Principal>(subject.getPrincipals());
-    String user = (list.size() > 0 ? list.get(0).getName() : null);
-    if (user == null) {
-      user = "";
-    }
-    String msg = "" + System.currentTimeMillis() + ":" + user;
-    try {
-      byte[] token;
-      token = EncryptionUtility.encrypt(msg.getBytes("UTF-8"), tripleDesKey);
-      return SoapHandlingUtility.createWsSecurityUserNameToken(user, token);
-    }
-    catch (UnsupportedEncodingException e) {
-      LOG.error("utf-8 decode failed", e);
-    }
-    return null;
   }
 }

@@ -41,6 +41,7 @@ import org.eclipse.scout.service.SERVICES;
  * Filter to run the ongoing HTTP-request in a server job. Requests targeted to '/process' are not run in a server job
  * because done in {@link ServiceTunnelServlet}.
  */
+//TODO dwi remove?
 public class ServerJobServletFilter implements Filter {
 
   // TODO [dwi][nosgi]: rename this class

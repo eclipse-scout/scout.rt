@@ -107,8 +107,8 @@ public final class EncryptionUtility2 {
    *
    * @param encryptedData
    *          The encrypted data that should be decrypted.
-   * @param key
-   *          The key to use for the decryption. Must not be null or empty.
+   * @param password
+   *          The password to use for the decryption. Must not be null or empty.
    * @param salt
    *          The salt to use for the decryption. This is the same salt that was used to encrypt the data.
    * @param keyLen
@@ -123,8 +123,8 @@ public final class EncryptionUtility2 {
    * @throws IllegalArgumentException
    *           If the salt or key is null or empty or an unsupported keyLen has been provided.
    */
-  public static byte[] decrypt(byte[] encryptedData, String key, byte[] salt, int keyLen) throws ProcessingException {
-    return doCrypt(encryptedData, key, salt, Cipher.DECRYPT_MODE, keyLen);
+  public static byte[] decrypt(byte[] encryptedData, String password, byte[] salt, int keyLen) throws ProcessingException {
+    return doCrypt(encryptedData, password, salt, Cipher.DECRYPT_MODE, keyLen);
   }
 
   /**
@@ -142,8 +142,8 @@ public final class EncryptionUtility2 {
    *
    * @param clearTextData
    *          The data to encrypt.
-   * @param key
-   *          The key to use for the encryption. Must not be null or empty.
+   * @param password
+   *          The password to use for the encryption. Must not be null or empty.
    * @param salt
    *          The salt to use for the encryption. Must not be null or empty. It is important to create a separate random
    *          salt for each key! Salts may not be shared by several keys. Use {@link #createRandomBytes()} to
@@ -161,8 +161,8 @@ public final class EncryptionUtility2 {
    * @throws IllegalArgumentException
    *           If the salt or key is null or empty or an unsupported keyLen has been provided.
    */
-  public static byte[] encrypt(byte[] clearTextData, String key, byte[] salt, int keyLen) throws ProcessingException {
-    return doCrypt(clearTextData, key, salt, Cipher.ENCRYPT_MODE, keyLen);
+  public static byte[] encrypt(byte[] clearTextData, String password, byte[] salt, int keyLen) throws ProcessingException {
+    return doCrypt(clearTextData, password, salt, Cipher.ENCRYPT_MODE, keyLen);
   }
 
   protected static byte[] doCrypt(byte[] input, String password, byte[] salt, int mode, int keyLen) throws ProcessingException {

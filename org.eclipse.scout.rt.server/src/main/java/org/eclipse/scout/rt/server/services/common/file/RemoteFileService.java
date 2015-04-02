@@ -24,9 +24,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.exception.InitializationException;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
@@ -39,43 +37,16 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
 
   @Override
   protected void initializeService() {
-    initConfig();
     super.initializeService();
-  }
-
-  @ConfigProperty(ConfigProperty.STRING)
-  protected String getConfiguredRootPath() {
-    return null;
-  }
-
-  protected void initConfig() {
-    setRootPath(getConfiguredRootPath());
+    m_rootPath = ConfigIniUtility.getProperty(RemoteFileService.class.getName() + "#rootPath");
   }
 
   public String getRootPath() {
     return m_rootPath;
   }
 
-  /**
-   * Supports ${...} variables resolved by {@link BundleContextUtility#resolve(String)}
-   */
-  public void setRootPath(String rootPath) {
-    if (rootPath == null || rootPath.length() == 0) {
-      m_rootPath = null;
-    }
-    else {
-      String tmp = ConfigIniUtility.resolve(rootPath);
-      tmp = tmp.replaceAll("\\\\", "/");
-      tmp = tmp.replaceAll("//", "/");
-      File f = new File(tmp);
-      try {
-        m_rootPath = f.getCanonicalPath();
-      }
-      catch (IOException e) {
-        m_rootPath = null;
-        throw new InitializationException("invalid path for file service: '" + rootPath + "'", e);
-      }
-    }
+  protected void setRootPathInternal(String rootPath) {
+    m_rootPath = rootPath;
   }
 
   @Override

@@ -11,9 +11,12 @@
 package org.eclipse.scout.rt.servicetunnel;
 
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 
+import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -39,20 +42,35 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractServiceTunnel.class);
 
-  private final String m_version;
+  private String m_version;
   private URL m_serverURL;
+  private String m_sharedSecret;
   private final T m_session;
 
   /**
    * If the version parameter is null, the product bundle (e.g. com.bsiag.crm.ui.swing) version is used.
    */
+  //TODO [nosgi] imo no version param, use config.ini servicetunnel.version
   public AbstractServiceTunnel(T session, String version) {
     m_session = session;
     m_version = getVersion(version);
+    String url = ConfigIniUtility.getProperty(PROP_TARGET_URL, ConfigIniUtility.getProperty("server.url"));
+    if (!StringUtility.isNullOrEmpty(url)) {
+      try {
+        m_serverURL = new URL(url);
+      }
+      catch (MalformedURLException e) {
+        throw new IllegalArgumentException("targetUrl: " + url, e);
+      }
+    }
   }
 
   private static String getVersion(String providedVersion) {
     if (providedVersion == null) {
+      String v = ConfigIniUtility.getProperty(PROP_VERSION);
+      if (!StringUtility.isNullOrEmpty(v)) {
+        return v;
+      }
       IApplication app = OBJ.getOptional(IApplication.class);
       if (app != null) {
         String version = app.getVersion();
@@ -76,6 +94,10 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
   @Override
   public void setServerURL(URL url) {
     m_serverURL = url;
+  }
+
+  public String getSharedSecret() {
+    return m_sharedSecret;
   }
 
   protected T getSession() {

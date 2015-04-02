@@ -30,8 +30,8 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
  * @author awe (refactoring)
  */
 public abstract class AbstractHttpServiceTunnel<T extends ISession> extends AbstractInternalHttpServiceTunnel<T> {
-
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.client.http.debug";
+  public static final String TOKEN_AUTH_HTTP_HEADER = "X-ScoutAccessToken";
 
   public AbstractHttpServiceTunnel(T session, URL url) {
     super(session, url);
@@ -47,7 +47,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
    *          the product bundle (for example com.myapp.ui.swing) version is
    *          used
    */
-  public AbstractHttpServiceTunnel(T session, URL url, String version) throws ProcessingException {
+  public AbstractHttpServiceTunnel(T session, URL url, String version) {
     super(session, url, version);
   }
 
@@ -84,6 +84,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
   @Override
   protected void addCustomHeaders(URLConnection urlConn, String method) throws IOException {
     super.addCustomHeaders(urlConn, method);
+    urlConn.setRequestProperty(TOKEN_AUTH_HTTP_HEADER, getSharedSecret() + ":" + getSession().getUserId());//TODO [nosgi] imo add PKI signature using shared secret
   }
 
   /**

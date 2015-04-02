@@ -1,11 +1,14 @@
 package org.eclipse.scout.rt.servicetunnel;
 
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformException;
 import org.eclipse.scout.rt.servicetunnel.http.MultiSessionCookieStoreInstaller;
+import org.eclipse.scout.rt.shared.TierState;
+import org.eclipse.scout.rt.shared.TierState.Tier;
 
 @ApplicationScoped
 public class ServiceTunnelModule implements IPlatformListener {
@@ -13,10 +16,22 @@ public class ServiceTunnelModule implements IPlatformListener {
 
   @Override
   public void stateChanged(PlatformEvent event) throws PlatformException {
+    if (TierState.get() == Tier.BackEnd) {
+      return;
+    }
     if (event.getState() == IPlatform.State.PlatformInit) {
       // Install cookie handler for HTTP based service tunnels
       m_multiSessionCookieStoreInstaller = new MultiSessionCookieStoreInstaller();
-      m_multiSessionCookieStoreInstaller.install();
+      String enabledText = ConfigIniUtility.getProperty(IServiceTunnel.PROP_MULTI_SESSION_COOKIE_STORE_ENABLED);
+      if ("true".equalsIgnoreCase(enabledText)) {
+        m_multiSessionCookieStoreInstaller.install();
+      }
+      else if ("false".equalsIgnoreCase(enabledText)) {
+        //nop
+      }
+      else {
+        m_multiSessionCookieStoreInstaller.check();
+      }
     }
     else if (event.getState() == IPlatform.State.PlatformStopped) {
       m_multiSessionCookieStoreInstaller.uninstall();

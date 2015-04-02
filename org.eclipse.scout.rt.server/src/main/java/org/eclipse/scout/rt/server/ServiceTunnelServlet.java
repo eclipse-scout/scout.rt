@@ -38,7 +38,6 @@ import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -52,9 +51,6 @@ import org.eclipse.scout.service.SERVICES;
 /**
  * Use this Servlet to dispatch scout UI service requests using {@link IServiceTunnelRequest},
  * {@link IServiceTunnelResponse} and any {@link IServiceTunnelContentHandler} implementation.
- * <p/>
- * By default there is a JAAS convenience filter {@link HttpAuthJaasFilter} on /process and a {@link SoapWsseJaasFilter}
- * on /ajax with priority 1000.
  */
 public class ServiceTunnelServlet extends HttpServlet {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.server.http.debug";

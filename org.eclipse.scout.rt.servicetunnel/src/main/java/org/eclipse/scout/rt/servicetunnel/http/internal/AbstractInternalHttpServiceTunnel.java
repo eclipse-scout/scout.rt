@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
  * @author awe (refactoring)
  */
 public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> extends AbstractServiceTunnel<T> {
-
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractInternalHttpServiceTunnel.class);
 
   private IServiceTunnelContentHandler m_contentHandler;

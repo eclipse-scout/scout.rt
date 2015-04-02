@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
-import org.eclipse.scout.rt.servicetunnel.http.internal.AbstractInternalHttpServiceTunnel;
+import org.eclipse.scout.rt.servicetunnel.http.AbstractHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
@@ -43,7 +43,7 @@ import org.eclipse.scout.service.SERVICES;
  *
  * @author awe
  */
-public class InternalClientHttpServiceTunnel extends AbstractInternalHttpServiceTunnel<IClientSession> implements IClientServiceTunnel {
+public class InternalClientHttpServiceTunnel extends AbstractHttpServiceTunnel<IClientSession> implements IClientServiceTunnel {
 
   private IFuture<Void> m_pollingJob;
   private long m_pollInterval = -1L;

@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -154,8 +155,8 @@ public final class ConfigIniUtility {
    * Gets the property with given key. If there is no property with given key, the given default value is returned.<br>
    * The given key is searched in the following order:
    * <ol>
-   * <li>in properties defined in a <code>config.ini</code> or an external <code>config.ini</code>.</li>
    * <li>in the system properties ({@link System#getProperty(String)})</li>
+   * <li>in properties defined in a <code>config.ini</code></li>
    * <li>in the environment variables ({@link System#getenv(String)})</li>
    * </ol>
    *
@@ -169,19 +170,18 @@ public final class ConfigIniUtility {
       return null;
     }
 
-    // 1. App config (config.ini)
-    String value = configProperties.get(key);
+    // system config
+    String value = System.getProperty(key);
+    if (StringUtility.hasText(value)) {
+      return value;
+    }
+    // config.ini
+    value = configProperties.get(key);
     if (StringUtility.hasText(value)) {
       return value;
     }
 
-    // 2. system config
-    value = System.getProperty(key);
-    if (StringUtility.hasText(value)) {
-      return value;
-    }
-
-    // 3. environment config
+    // environment config
     value = System.getenv(key);
     if (StringUtility.hasText(value)) {
       return value;
@@ -339,12 +339,19 @@ public final class ConfigIniUtility {
     if (s == null || s.length() == 0) {
       return s;
     }
+    ArrayList<String> loopDetection = new ArrayList<>();
     String t = s;
+    loopDetection.add(t);
     Matcher m = VARIABLE_PATTERN.matcher(t);
     while (m.find()) {
+      if (loopDetection.size() > 10) {
+        throw new IllegalArgumentException("resolving expression '" + s + "': possible loop detected (more than 10 steps): " + loopDetection);
+      }
       String key = m.group(1);
-
       String value = getProperty(key);
+      if (value != null && value.contains(s)) {
+        throw new IllegalArgumentException("resolving expression '" + s + "': loop detected (the resolved value contains the original expression): " + value);
+      }
       if (!StringUtility.hasText(value)) {
         throw new IllegalArgumentException("resolving expression '" + s + "': variable ${" + key + "} is not defined in the context.");
       }
@@ -358,6 +365,7 @@ public final class ConfigIniUtility {
 
       t = t.substring(0, m.start()) + value + t.substring(m.end());
       // next
+      loopDetection.add(t);
       m = VARIABLE_PATTERN.matcher(t);
     }
 

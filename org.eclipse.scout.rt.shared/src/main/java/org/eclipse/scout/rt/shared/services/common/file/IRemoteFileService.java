@@ -72,7 +72,7 @@ public interface IRemoteFileService extends IService {
    * The destination is not closed after write.
    * <p>
    * Throws an exception if the file does not exist.
-   * 
+   *
    * @see #getRemoteFile(RemoteFile)
    */
   void streamRemoteFile(RemoteFile spec, OutputStream out) throws ProcessingException;
