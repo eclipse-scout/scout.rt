@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IMultiStatus;
 import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
@@ -63,7 +64,7 @@ import org.w3c.dom.Element;
  *
  * @see IForm
  */
-public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdered {
+public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdered, IStyleable {
   /*
    * Properties
    */

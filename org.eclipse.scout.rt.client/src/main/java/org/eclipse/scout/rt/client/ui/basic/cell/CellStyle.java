@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
  */
 public class CellStyle implements ICellSpecialization {
 
+  private String m_cssClass;
   private String m_iconId;
   private String m_backgroundColor;
   private String m_foregroundColor;
@@ -29,6 +30,7 @@ public class CellStyle implements ICellSpecialization {
   }
 
   public CellStyle(CellStyle cell) {
+    setCssClass(cell.getCssClass());
     setIconId(cell.getIconId());
     setBackgroundColor(cell.getBackgroundColor());
     setForegroundColor(cell.getForegroundColor());
@@ -79,6 +81,16 @@ public class CellStyle implements ICellSpecialization {
   @Override
   public ICellSpecialization reconcile(CellStyle cellStyle) {
     return cellStyle;
+  }
+
+  @Override
+  public String getCssClass() {
+    return m_cssClass;
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    m_cssClass = cssClass;
   }
 
   @Override
@@ -155,6 +167,14 @@ public class CellStyle implements ICellSpecialization {
       return false;
     }
     CellStyle other = (CellStyle) obj;
+    if (m_cssClass == null) {
+      if (other.m_cssClass != null) {
+        return false;
+      }
+    }
+    else if (!m_cssClass.equals(other.m_cssClass)) {
+      return false;
+    }
     if (m_backgroundColor == null) {
       if (other.m_backgroundColor != null) {
         return false;

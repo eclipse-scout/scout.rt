@@ -43,6 +43,16 @@ public class CellExtension implements ICellSpecialization {
   }
 
   @Override
+  public String getCssClass() {
+    return m_cellStyle.getCssClass();
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    m_cellStyle.setCssClass(cssClass);
+  }
+
+  @Override
   public String getTooltipText() {
     return m_tooltipText;
   }

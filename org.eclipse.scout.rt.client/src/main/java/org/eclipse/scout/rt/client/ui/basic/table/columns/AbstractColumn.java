@@ -206,6 +206,19 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
+   * Configures the header css class(es) of this column.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return a string containing one or more classes separated by space, or null if no class should be set.
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(110)
+  protected String getConfiguredHeaderCssClass() {
+    return null;
+  }
+
+  /**
    * Configures the color of this column header text. The color is represented by the HEX value (e.g. FFFFFF).
    * <p>
    * Subclasses can override this method. Default is {@code null}.
@@ -329,6 +342,19 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Order(100)
   protected boolean getConfiguredSummary() {
     return false;
+  }
+
+  /**
+   * Configures the css class(es) of this column.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return a string containing one or more classes separated by space, or null if no class should be set.
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(105)
+  protected String getConfiguredCssClass() {
+    return null;
   }
 
   /**
@@ -725,6 +751,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (getConfiguredHeaderTooltipText() != null) {
       m_headerCell.setTooltipText(getConfiguredHeaderTooltipText());
     }
+    m_headerCell.setCssClass(getConfiguredHeaderCssClass());
     if (getConfiguredHeaderForegroundColor() != null) {
       m_headerCell.setForegroundColor((getConfiguredHeaderForegroundColor()));
     }
@@ -754,6 +781,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     setEditable(getConfiguredEditable());
     setMandatory(getConfiguredMandatory());
     setVisibleColumnIndexHint(-1);
+    setCssClass((getConfiguredCssClass()));
     if (getConfiguredForegroundColor() != null) {
       setForegroundColor((getConfiguredForegroundColor()));
     }
@@ -1533,6 +1561,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       }
     }
     return false;
+  }
+
+  @Override
+  public String getCssClass() {
+    return (String) propertySupport.getProperty(PROP_CSS_CLASS);
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    propertySupport.setProperty(PROP_CSS_CLASS, cssClass);
   }
 
   @Override

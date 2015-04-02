@@ -287,6 +287,19 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return null;
   }
 
+  /**
+   * Configures the css class(es) of this field.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return a string containing one or more classes separated by space, or null if no class should be set.
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(55)
+  protected String getConfiguredCssClass() {
+    return null;
+  }
+
   @ConfigProperty(ConfigProperty.COLOR)
   @Order(60)
   protected String getConfiguredForegroundColor() {
@@ -785,6 +798,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     setLabelHorizontalAlignment(getConfiguredLabelHorizontalAlignment());
     setLabelVisible(getConfiguredLabelVisible());
     setStatusVisible(getConfiguredStatusVisible());
+    setCssClass((getConfiguredCssClass()));
     if (getConfiguredBackgroundColor() != null) {
       setBackgroundColor((getConfiguredBackgroundColor()));
     }
@@ -1728,6 +1742,16 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public String getTooltipText() {
     return propertySupport.getPropertyString(PROP_TOOLTIP_TEXT);
+  }
+
+  @Override
+  public String getCssClass() {
+    return (String) propertySupport.getProperty(PROP_CSS_CLASS);
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    propertySupport.setProperty(PROP_CSS_CLASS, cssClass);
   }
 
   @Override

@@ -10,16 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.cell;
 
+import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 /**
  * A cell specialization carries rarely used cell properties as well as style attributes.
  */
-public interface ICellSpecialization {
+public interface ICellSpecialization extends IStyleable {
 
   /**
    * Creates a copy of this object. Subclasses may copy only values shared with other instances of this interface.
-   * 
+   *
    * @return returns a copy of this object.
    */
   ICellSpecialization copy();
@@ -27,7 +28,7 @@ public interface ICellSpecialization {
   /**
    * Reconciles the given cell style with this instance and returns the reconciled result. In general, the resulting
    * object is not the same as the one the method is called on.
-   * 
+   *
    * @param cellStyle
    *          the cell style to reconcile.
    * @return the potentially new object with the reconciled cell style.

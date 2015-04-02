@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
+import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
@@ -30,7 +31,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
  * rarely used properties.
  * </p>
  */
-public class Cell implements ICell {
+public class Cell implements ICell, IStyleable {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(Cell.class);
 
@@ -78,6 +79,7 @@ public class Cell implements ICell {
 
   public void updateFrom(ICell c) throws ProcessingException {
     if (c != null) {
+      setCssClass(c.getCssClass());
       setFont(c.getFont());
       setForegroundColor(c.getForegroundColor());
       setBackgroundColor(c.getBackgroundColor());
@@ -127,6 +129,20 @@ public class Cell implements ICell {
       if (getObserver() != null) {
         getObserver().cellChanged(this, TEXT_BIT);
       }
+    }
+  }
+
+  @Override
+  public String getCssClass() {
+    return m_cellSpecialization.getCssClass();
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    if (CompareUtility.notEquals(m_cellSpecialization.getCssClass(), cssClass)) {
+      ICellSpecialization newStyle = m_cellSpecialization.copy();
+      newStyle.setCssClass(cssClass);
+      setValueInternal(CSS_CLASS_BIT, newStyle);
     }
   }
 

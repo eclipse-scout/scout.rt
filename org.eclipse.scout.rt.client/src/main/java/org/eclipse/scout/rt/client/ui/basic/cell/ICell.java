@@ -26,10 +26,13 @@ public interface ICell {
   int FONT_BIT = 8;
   int ENABLED_BIT = 9;// default true, value Boolean
   int EDITABLE_BIT = 10;// default false, value Boolean
+  int CSS_CLASS_BIT = 11;
 
   Object getValue();
 
   String getText();
+
+  String getCssClass();
 
   String getIconId();
 

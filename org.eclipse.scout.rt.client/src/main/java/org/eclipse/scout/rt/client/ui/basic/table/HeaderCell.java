@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,9 +12,10 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
-public class HeaderCell implements IHeaderCell {
+public class HeaderCell implements IHeaderCell, IStyleable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HeaderCell.class);
 
   private int m_columnIndex = -1;
@@ -26,6 +27,7 @@ public class HeaderCell implements IHeaderCell {
   private String m_text;
   private String m_tooltip;
   private int m_horizontalAlignment = -1;
+  private String m_cssClass;
   private String m_foregroundColor;
   private String m_backgroundColor;
   private FontSpec m_font;
@@ -57,6 +59,16 @@ public class HeaderCell implements IHeaderCell {
 
   public void setSortAscending(boolean b) {
     m_sortAscending = b;
+  }
+
+  @Override
+  public String getCssClass() {
+    return m_cssClass;
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    m_cssClass = cssClass;
   }
 
   @Override
