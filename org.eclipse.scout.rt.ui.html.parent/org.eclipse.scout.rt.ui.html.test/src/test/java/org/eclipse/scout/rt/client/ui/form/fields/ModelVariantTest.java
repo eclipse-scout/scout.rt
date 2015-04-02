@@ -10,19 +10,30 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import static org.junit.Assert.assertTrue;
 
-// TODO AWE: (scout) mit Scout-team besprechen: annotation VS property
+import org.junit.Test;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Inherited
-public @interface ModelVariant {
+public class ModelVariantTest {
 
-  String value();
+  @ModelVariant("foo")
+  static class A {
+
+  }
+
+  static class B extends A {
+
+  }
+
+  /**
+   * This test would fail if the ModelVariant isn't annotated with @Inherited.
+   */
+  @Test
+  public void testInheritance() {
+    A a = new A();
+    B b = new B();
+    assertTrue(a.getClass().isAnnotationPresent(ModelVariant.class));
+    assertTrue(b.getClass().isAnnotationPresent(ModelVariant.class));
+  }
 
 }
