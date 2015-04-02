@@ -210,15 +210,15 @@ scout.AbstractSmartField.prototype._onFieldBlur = function() {
 };
 
 /**
- * This method is called when the user presses the TAB key in the UI.
+ * This method is called when the user presses the TAB or ENTER key in the UI.
  * onFieldBlur is also executed, but won't do anything, since the $popup is already closed in the UI.
  */
 scout.AbstractSmartField.prototype._acceptProposal = function() {
-  var searchText = this._searchText();
-  if (this._oldSearchText === searchText) {
-    $.log.debug('value of field has not changed - do not acceptProposal (oldSearchText=' + this._oldSearchText + ')');
+  if (!this._$popup) {
+    $.log.debug('proposal popup is not opened. do not acceptProposal');
     return;
   }
+  var searchText = this._searchText();
   $.log.debug('AbstractSmartField#_acceptProposal searchText=' + searchText);
   this.session.send(this.id, 'acceptProposal', {searchText: searchText});
   this._closeProposal(false);
