@@ -91,11 +91,13 @@ scout.Calendar.prototype._render = function($parent) {
         $d.addClass('calendar-week-name');
       } else if (w > 0 && d > 0) {
         $d.addClass('calendar-day')
-          .data('day', d).data('week', w)
-          .click(this._onClickDay.bind(this));
+          .data('day', d).data('week', w);
       }
     }
   }
+
+  //click event on all day and children elements
+  $('.calendar-day, .calendar-component', this.$grid).click(this._onClickDay.bind(this));
 
   // should be done by server?
   this.displayMode = this.MONTH;
@@ -179,10 +181,15 @@ scout.Calendar.prototype._onClickList = function(event) {
 };
 
 scout.Calendar.prototype._onClickDay = function(event) {
+  var $clicked = $(event.target);
+  if ($clicked.hasClass('calendar-component')) {
+    $clicked = $clicked.parent();
+  }
+
   // select clicked day
   $('.selected', this.$grid).select(false);
-  $(event.target).select(true);
-  this.selected = $(event.target).data('date');
+  $clicked.select(true);
+  this.selected = $clicked.data('date');
 
   // change selected day in year picker
   this.colorYear();
@@ -602,14 +609,12 @@ scout.Calendar.prototype._onYearHoverOut = function(event) {
 };
 
 
-/* -- components ----------------------------------------------- */
-// TODO: Einträtge nebeneinander
+/* -- components, draw---------------------------------------------- */
 
 scout.Calendar.prototype.layoutComponents = function() {
   $('.calendar-component', this.$grid).remove();
 
   var countTask = 5;
-  $.l(this.components);
 
   for (var i = 0; i < this.components.length; i++) {
     var c = this.components[i],
@@ -631,12 +636,16 @@ scout.Calendar.prototype.layoutComponents = function() {
           continue;
         }
 
-        $component = $day.appendDiv('calendar-component', c.cell.text)
-          .hover(this._onMouseenter.bind(this), this._onMouseleave.bind(this));
+        $.l(c);
+        $component = $day.appendDiv('calendar-component', c.item.subject)
+          .css('background-color', $.ColorOpacity(c.item.color, 0.3))
+          .css('border-left-color', '#' + c.item.color)
+          .data('component', c)
+          .mouseenter(this._onComponentHoverIn.bind(this));
 
         if (this.displayMode !== this.MONTH) {
           $component.addClass('component-day');
-          $component.html('<b>' + $component.html() + '</b><br>' + c.cell.tooltipText);
+          $component.html('<b>' + $component.html() + '</b><br>' + c.item.body);
 
           var fromHours = fromDate.getHours(),
             fromMinutes = fromDate.getMinutes(),
@@ -666,13 +675,6 @@ scout.Calendar.prototype.layoutComponents = function() {
               .css('height', this._dayPosition(12) - this._dayPosition(1) + '%')
               .addClass('component-open-top')
               .html('');
-
-            $component.afterDiv('calendar-component component-day')
-              .css('top',  this._dayPosition(12) + '%')
-              .css('height', this._dayPosition(24) - this._dayPosition(12) + '%')
-              .addClass('component-open-bottom')
-              .hover(this._onMouseenter.bind(this), this._onMouseleave.bind(this));
-
           }
         }
       }
@@ -692,23 +694,64 @@ scout.Calendar.prototype.layoutComponents = function() {
   }
 };
 
-// to do!
-// zeiten oben anzeigen, von bis, nur beim ertsen der zugeöhrigen Termine
-// alle zugehörigen termine anzeigen
-// alle anderen TEmrine etwas heller machen?
-/// wenn zu klein: temrin irgendwei öffnen und anzeigen.
-// TODO: öffnennlinks bei component mitanzeigen
-scout.Calendar.prototype._onMouseenter = function (date) {
-  var $e = $(event.target),
-    $w = $e.parent().parent();
 
+/* -- components, events-------------------------------------------- */
+scout.Calendar.prototype._onComponentHoverIn = function (date) {
+  var $comp = $(event.target),
+    $clone = $comp.clone(),
+    component = $comp.data('component'),
+    $day = $comp.parent(),
+    range,
+    fromDate = scout.dates.parseJsonDate(component.fromDate),
+    toDate = scout.dates.parseJsonDate(component.toDate);
+
+  // should not be possible, but in any case...
+  $('.clone', this.$grid).remove();
+
+  // find time range
+  if (component.fullDay) {
+    range = '';
+  } else if (scout.dates.isSameDay(fromDate, toDate)) {
+    range = 'von ' + this._dateFormat(fromDate, 'HH:mm') + ' bis ' + this._dateFormat(fromDate, 'HH:mm') + '<br>';
+  } else {
+    range = range = 'von ' + this._dateFormat(fromDate, 'EEEE HH:mm ') + ' bis ' + this._dateFormat(toDate, ' EEEE HH:mm') + '<br>';
+  }
+
+
+  // build the perfect clone
+  $clone.html('<b>' + component.item.subject + '</b><br>' + range + component.item.body)
+    .addClass('clone')
+    .css('position', 'absolute')
+    .css('top', $comp.position().top + 'px')
+    .css('left', $comp.position().left + 'px')
+    .css('z-index', 2)
+    .data('component', component)
+    .mouseleave(this._onComponentHoverOut.bind(this))
+    .insertAfter($comp)
+    .animateAVCSD('height', '100px');
+
+  // add element to open component in new tab
+  $clone.appendDiv('component-link', 'öffnen');
+
+  // adjust parent and original div
+  $day.css('overflow', 'visible');
+  $comp.data('clone', $clone);
+
+/*
   $w.appendDiv('calendar-week-axis-over').attr('data-axis-name', $e.attr('data-from')).css('top', $e.css('top'));
 
   $w.appendDiv('calendar-week-axis-over').attr('data-axis-name', $e.attr('data-to')).css('top', parseInt($e.css('top'), 10) + parseInt($e.css('height'), 10));
+
+  */
 };
 
-scout.Calendar.prototype._onMouseleave = function (date) {
-  $('.calendar-week-axis-over', this.$grid).remove();
+scout.Calendar.prototype._onComponentHoverOut = function (date) {
+  var $element = $(event.target),
+    $day = $element.parent();
+
+  $element.animateAVCSD('height', 0, $.removeThis);
+
+  $day.css('overflow', 'hidden');
 };
 
 
