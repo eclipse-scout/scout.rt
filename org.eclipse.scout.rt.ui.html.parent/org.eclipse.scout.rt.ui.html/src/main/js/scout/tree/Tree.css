@@ -49,7 +49,7 @@
   top: auto;
   left: auto;
   margin-top: -2px;
-  margin-left: -@tree-item-checkbox-size - 5px;
+  margin-left: -@tree-item-checkbox-size - 4px;
   width: @tree-item-checkbox-size;
   height: @tree-item-checkbox-size;
 
@@ -153,7 +153,7 @@
   }
 
   &.checkable {
-    margin-left: -@tree-item-control-checkbox-size - 5px;
+    margin-left: -@tree-item-control-checkbox-size - 8px;
   }
 }
 
