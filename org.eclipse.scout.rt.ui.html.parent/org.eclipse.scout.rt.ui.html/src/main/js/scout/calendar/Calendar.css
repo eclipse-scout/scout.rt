@@ -301,8 +301,10 @@
     float: left;
     font-size: 10px;
     line-height: 20px;
+    height: 20px;
     padding-left: 4px;
     .overflow-ellipsis;
+    min-height: 20px;
     margin-left: 32px;
     width: calc(~"100%" - 38px);
     background-color: @palette-orange-background;
@@ -316,7 +318,7 @@
       margin-right: -20px;
     }
 
-    .component-link {
+    & .component-link {
       position: absolute;
       top: 0px;
       right: 6px;
@@ -344,7 +346,7 @@
       border-radius: 100% 50%;
       width: 63%;
       height: 20px;
-      background-color: @palette-orange-background;
+      background-color: inherit;
       right: 0px;
       top: -4px;
     }
@@ -382,7 +384,7 @@
       border-radius: 100% 50%;
       width: 50%;
       height: 16px;
-      background-color: @palette-orange-background;
+      background-color: inherit;
       left: 1px;
       bottom: -4px;
     }

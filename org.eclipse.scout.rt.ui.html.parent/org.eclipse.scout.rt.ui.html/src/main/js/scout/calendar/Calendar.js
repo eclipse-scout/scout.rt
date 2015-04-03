@@ -636,45 +636,64 @@ scout.Calendar.prototype.layoutComponents = function() {
           continue;
         }
 
-        $.l(c);
-        $component = $day.appendDiv('calendar-component', c.item.subject)
+        $component = $day.appendDiv('calendar-component')
+          .html('<b>' + c.item.subject + '</b>')
           .css('background-color', $.ColorOpacity(c.item.color, 0.3))
           .css('border-left-color', '#' + c.item.color)
           .data('component', c)
           .mouseenter(this._onComponentHoverIn.bind(this));
 
         if (this.displayMode !== this.MONTH) {
-          $component.addClass('component-day');
-          $component.html('<b>' + $component.html() + '</b><br>' + c.item.body);
-
           var fromHours = fromDate.getHours(),
             fromMinutes = fromDate.getMinutes(),
             toHours = toDate.getHours(),
             toMinutes = toDate.getMinutes();
 
-          if (c.fullDay) {
-            $component.css('top', 'calc(' + this._dayPosition(-1)  + '% + ' + countTask + 'px)');
-            countTask += 25;
-          } else if (c.coveredDays.length === 1) {
-            $component.css('top',  this._dayPosition(fromHours + fromMinutes / 60) + '%')
-              .css('height', this._dayPosition(toHours + toMinutes / 60) - this._dayPosition(fromHours + fromMinutes / 60) + '%')
-              .attr('data-from', this._dateFormat(fromDate, 'HH:mm'))
-              .attr('data-to', this._dateFormat(toDate, 'HH:mm'));
-          } else if (scout.dates.isSameDay(d, fromDate)) {
-            $component.css('top',  this._dayPosition(fromHours + fromMinutes / 60) + '%')
-              .css('height', this._dayPosition(24) - this._dayPosition(fromHours + fromMinutes / 60) + '%')
-              .addClass('component-open-bottom');
+          $component.addClass('component-day');
 
-          } else if (scout.dates.isSameDay(d, toDate)) {
-            $component.css('top',  this._dayPosition(0) + '%')
-              .css('height', this._dayPosition(fromHours + fromMinutes / 60) - this._dayPosition(0) + '%')
-              .addClass('component-open-top')
-              .html('');
+          if (c.fullDay) {
+            $component
+              .css('top', 'calc(' + this._dayPosition(-1)  + '% + ' + countTask + 'px)');
+            countTask += 25;
           } else {
-            $component.css('top',  this._dayPosition(1) + '%')
-              .css('height', this._dayPosition(12) - this._dayPosition(1) + '%')
-              .addClass('component-open-top')
-              .html('');
+            $component
+              .unbind('mouseenter mouseleave')
+              .mouseenter(this._onComponentDayHoverIn.bind(this))
+              .mouseleave(this._onComponentDayHoverOut.bind(this));
+
+            if ($component.height() > 60) {
+              $component.html($component.html() + '<br>' + c.item.body);
+            }
+
+            if (c.coveredDays.length === 1) {
+              $component.css('top',  this._dayPosition(fromHours + fromMinutes / 60) + '%')
+                .css('height', this._dayPosition(toHours + toMinutes / 60) - this._dayPosition(fromHours + fromMinutes / 60) + '%')
+                .attr('data-from', this._dateFormat(fromDate, 'HH:mm'))
+                .attr('data-to', this._dateFormat(toDate, 'HH:mm'));
+            } else if (scout.dates.isSameDay(d, fromDate)) {
+              $component.css('top',  this._dayPosition(fromHours + fromMinutes / 60) + '%')
+                .css('height', this._dayPosition(24) - this._dayPosition(fromHours + fromMinutes / 60) + '%')
+                .addClass('component-open-bottom');
+
+            } else if (scout.dates.isSameDay(d, toDate)) {
+              $component.css('top',  this._dayPosition(0) + '%')
+                .css('height', this._dayPosition(fromHours + fromMinutes / 60) - this._dayPosition(0) + '%')
+                .addClass('component-open-top')
+                .html('');
+            } else {
+              $component.css('top',  this._dayPosition(1) + '%')
+                .css('height', this._dayPosition(12) - this._dayPosition(1) + '%')
+                .addClass('component-open-top')
+                .html('');
+
+              $component.afterDiv('calendar-component component-day')
+                .css('top',  this._dayPosition(12) + '%')
+                .css('height', this._dayPosition(24) - this._dayPosition(12) + '%')
+                .addClass('component-open-bottom')
+                .css('background-color', $.ColorOpacity(c.item.color, 0.3))
+                .css('border-left-color', '#' + c.item.color);
+
+            }
           }
         }
       }
@@ -717,13 +736,15 @@ scout.Calendar.prototype._onComponentHoverIn = function (date) {
     range = range = 'von ' + this._dateFormat(fromDate, 'EEEE HH:mm ') + ' bis ' + this._dateFormat(toDate, ' EEEE HH:mm') + '<br>';
   }
 
-
   // build the perfect clone
   $clone.html('<b>' + component.item.subject + '</b><br>' + range + component.item.body)
     .addClass('clone')
-    .css('position', 'absolute')
-    .css('top', $comp.position().top + 'px')
-    .css('left', $comp.position().left + 'px')
+    .css('position', 'fixed')
+    .css('top', $comp.offset().top + 'px')
+    .css('left', $comp.offset().left + 'px')
+    .css('height', $comp.outerHeight() + 'px')
+    .css('width', $comp.outerWidth() + 'px')
+    .css('margin', 0)
     .css('z-index', 2)
     .data('component', component)
     .mouseleave(this._onComponentHoverOut.bind(this))
@@ -734,24 +755,62 @@ scout.Calendar.prototype._onComponentHoverIn = function (date) {
   $clone.appendDiv('component-link', 'öffnen');
 
   // adjust parent and original div
-  $day.css('overflow', 'visible');
   $comp.data('clone', $clone);
 
-/*
-  $w.appendDiv('calendar-week-axis-over').attr('data-axis-name', $e.attr('data-from')).css('top', $e.css('top'));
-
-  $w.appendDiv('calendar-week-axis-over').attr('data-axis-name', $e.attr('data-to')).css('top', parseInt($e.css('top'), 10) + parseInt($e.css('height'), 10));
-
-  */
 };
+
+
+scout.Calendar.prototype._onComponentDayHoverIn = function (date) {
+  var $comp = $(event.target),
+    oldHeight = $comp.height(),
+    component = $comp.data('component'),
+    $week = $comp.parent().parent(),
+    fromHour = this._dateFormat(scout.dates.parseJsonDate(component.fromDate), 'HH:mm'),
+    toHour = this._dateFormat(scout.dates.parseJsonDate(component.toDate), 'HH:mm');
+
+  $comp
+    .html('<b>' + component.item.subject + '</b><br>' + component.item.body)
+    .css('height', 'auto')
+    .appendDiv('component-link', 'öffnen');
+
+  var newHeight = $comp.height();
+  if (oldHeight < newHeight) {
+    $comp.css('height', oldHeight + 'px');
+    $comp.animateAVCSD('height', newHeight + 'px');
+  } else {
+    $comp.css('height', oldHeight + 'px');
+  }
+
+  $comp.data('old-height', oldHeight);
+
+  $week.appendDiv('calendar-week-axis-over')
+    .attr('data-axis-name', fromHour)
+    .css('top', this._dayPosition(this._hourToNumber(fromHour)) + '%');
+
+  $week.appendDiv('calendar-week-axis-over')
+    .attr('data-axis-name', toHour)
+    .css('top', this._dayPosition(this._hourToNumber(toHour)) + '%');
+};
+
 
 scout.Calendar.prototype._onComponentHoverOut = function (date) {
   var $element = $(event.target),
     $day = $element.parent();
 
   $element.animateAVCSD('height', 0, $.removeThis);
+};
 
-  $day.css('overflow', 'hidden');
+scout.Calendar.prototype._onComponentDayHoverOut = function (date) {
+  var $comp = $(event.target),
+    component = $comp.data('component');
+
+  $comp
+    .html('<b>' + component.item.subject + '</b>')
+    .animateAVCSD('height', $comp.data('old-height') + 'px');
+
+  $('component-link', $comp).remove();
+
+  $('.calendar-week-axis-over', this.$grid).remove();
 };
 
 
@@ -778,6 +837,11 @@ scout.Calendar.prototype._dayPosition = function(hour) {
   } else if (hour <= 24) {
     return parseInt((hour - 17) / 7 * 10 + 70, 10);
   }
+};
+
+scout.Calendar.prototype._hourToNumber = function(hour) {
+  var splits = hour.split(':');
+  return parseFloat(splits[0]) + parseFloat(splits[1]) / 60;
 };
 
 scout.Calendar.prototype._findDay = function (date) {
