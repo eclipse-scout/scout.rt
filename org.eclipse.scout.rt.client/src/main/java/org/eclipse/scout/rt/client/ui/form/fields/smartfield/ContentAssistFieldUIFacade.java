@@ -85,14 +85,4 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     m_field.unregisterProposalChooserInternal();
   }
 
-  @Override
-  public void setTextFromUI(String text) {
-    // throw new IllegalStateException();
-    // FIXME AWE: check / refactor / remove setTextFromUI
-    String searchText = toSearchText(text);
-    LOG.debug("setTextFromUI searchText=" + searchText);
-    m_field.parseValue(searchText);
-    m_field.unregisterProposalChooserInternal();
-  }
-
 }

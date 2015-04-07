@@ -62,8 +62,6 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
         }
       }
     });
-    // FIXME AWE: (smart-field) check if we must support this method
-    // execDecorateTable(table);
     return table;
   }
 
@@ -198,9 +196,6 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
   @ConfigOperation
   @Order(130)
   protected void execResultTableRowClicked(ITableRow row) throws ProcessingException {
-    // FIXME AWE: (smart-field) ausprobieren: diese methode loswerden und alles UI seitig machen...
-    // das smartfield schcikt dann einen value-change, der wert wird aus der table übernommen (gui seitig)
-    // die tabelle braucht dann keine select/click events mehr an den server zu schicken.
     ILookupRow<LOOKUP_KEY> lrow = m_model.getSelectedLookupRow();
     if (lrow != null && lrow.isEnabled()) {
       doOk();

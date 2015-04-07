@@ -76,11 +76,6 @@ import org.eclipse.scout.service.SERVICES;
 @ScoutSdkIgnore
 public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends AbstractValueField<VALUE> implements IContentAssistField<VALUE, LOOKUP_KEY> {
 
-  // FIXME AWE: (content-assist) filter analog ListBox implementieren - Diskussion mit Hannes/Chris abwarten - danach überlegen ob wir
-  // die filterBox immer mitschicken wollen (= mehr daten bei jedem request) oder ob wir die filterBox nur mitschicken, wenn sie zu
-  // Beginn visible ist oder ob wir den filter neu hartkodiert im UI programmieren wollen (ohne model), dies würde den traffic wieder
-  // kleiner machen.
-
   // FIXME AWE: (content-assist) ausprobieren - anstatt model für proposal zu erzeugen und wieder zu disposen, model einfach behalten
   // danach werden nur noch delete/insertRows events gesendet
 

@@ -44,10 +44,4 @@ public interface IContentAssistFieldUIFacade {
    */
   void acceptProposalFromUI(String text);
 
-  /**
-   * Called when smart-field loses focus, for instance when Tab is pressed.
-   * Proposal chooser may be open but doesn't have to.
-   */
-  void setTextFromUI(String text);
-
 }

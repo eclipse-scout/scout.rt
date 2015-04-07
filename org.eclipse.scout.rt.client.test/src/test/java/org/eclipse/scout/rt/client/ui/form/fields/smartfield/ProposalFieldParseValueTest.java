@@ -81,7 +81,7 @@ public class ProposalFieldParseValueTest {
   @Test
   public void testNoMatch() throws ProcessingException {
     // single match
-    m_proposalField.getUIFacade().setTextFromUI("c");
+    m_proposalField.getUIFacade().acceptProposalFromUI("c");
     assertEquals("c", m_proposalField.getValue());
     assertNull(m_proposalField.getProposalChooser());
 
