@@ -240,7 +240,6 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   protected Statement possiblyExpectingExceptions(FrameworkMethod method, Object test, Statement next) {
     return super.possiblyExpectingExceptions(method, test, new UnwrapProcessingRuntimeExceptionStatement(next));
   }

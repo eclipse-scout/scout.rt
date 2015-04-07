@@ -71,7 +71,7 @@ public class ClientTestRunner extends PlatformTestRunner {
     final Statement s5 = new RunInModelJobStatement(next);
     final Statement s4 = new ClientRunContextStatement(s5, ReflectionUtility.getAnnotation(RunWithClientSession.class, testClass));
     final Statement s3 = super.interceptClassLevelStatement(s4, testClass);
-    final Statement s2 = new RegisterBeanStatement(s3, new WrapAndThrowExceptionHandler()); // exception handler to not silently swallow exceptions.
+    final Statement s2 = new RegisterBeanStatement(s3, WrapAndThrowExceptionHandler.class); // exception handler to not silently swallow exceptions.
     final Statement s1 = new ClearClientRunContextStatement(s2);
     return s1;
   }
@@ -81,7 +81,7 @@ public class ClientTestRunner extends PlatformTestRunner {
     final Statement s5 = new RunInModelJobStatement(next);
     final Statement s4 = new ClientRunContextStatement(s5, ReflectionUtility.getAnnotation(RunWithClientSession.class, testMethod, testClass));
     final Statement s3 = super.interceptMethodLevelStatement(s4, testClass, testMethod);
-    final Statement s2 = new RegisterBeanStatement(s3, new WrapAndThrowExceptionHandler()); // exception handler to not silently swallow exceptions.
+    final Statement s2 = new RegisterBeanStatement(s3, WrapAndThrowExceptionHandler.class); // exception handler to not silently swallow exceptions.
     final Statement s1 = new ClearClientRunContextStatement(s2);
     return s1;
   }
