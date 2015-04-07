@@ -128,12 +128,6 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
   }
 
   @Override
-  protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
-    LOG.debug("handle displayText changed -> setTextFromUI. displayText=" + displayText + " whileTyping=" + whileTyping);
-    getModel().getUIFacade().setTextFromUI(displayText); // FIXME AWE: wird das überhaupt noch aufgerufen?
-  }
-
-  @Override
   public JSONObject toJson() {
     return putProperty(super.toJson(), PROP_PROPOSAL, m_proposal);
   }
