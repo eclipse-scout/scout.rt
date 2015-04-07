@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -303,7 +303,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   protected IClientSession createClientSession(Locale locale, UserAgent userAgent) {
     try {
-      return OBJ.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().locale(locale).userAgent(userAgent));
+      return BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().locale(locale).userAgent(userAgent));
     }
     catch (ProcessingException e) {
       throw new JsonException("Error while creating new client session for clientSessionId=" + m_clientSessionId, e);
