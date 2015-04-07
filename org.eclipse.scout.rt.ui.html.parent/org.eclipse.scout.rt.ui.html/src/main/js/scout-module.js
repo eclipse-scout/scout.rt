@@ -6,6 +6,7 @@ __include("jquery/jquery-scout.js");
 // protects $ and undefined from being redefined by another library
 (function(scout, $, undefined) {
   __include("scout/main.js");
+  __include("scout/objectFactories.js");
   // Basic utilities
   __include("scout/util/arrays.js");
   __include("scout/util/dates.js");
@@ -19,7 +20,6 @@ __include("jquery/jquery-scout.js");
   __include("scout/util/FocusManager.js");
   __include("scout/util/logging.js");
   __include("scout/util/ModelAdapter.js");
-  __include("scout/util/NullAdapter.js");
   __include("scout/util/numbers.js");
   __include("scout/util/ObjectFactory.js");
   __include("scout/util/objects.js");
@@ -30,7 +30,6 @@ __include("jquery/jquery-scout.js");
   __include("scout/session/Locale.js");
   __include("scout/session/Reconnector.js");
   __include("scout/session/Session.js");
-  __include("scout/session/Texts.js");
   __include("scout/session/UserAgent.js");
   // Basic layout
   __include("scout/layout/graphics.js");
@@ -50,6 +49,7 @@ __include("jquery/jquery-scout.js");
   __include("scout/splitter/Splitter.js");
   __include("scout/text/DateFormat.js");
   __include("scout/text/DecimalFormat.js");
+  __include("scout/text/Texts.js");
   __include("scout/tooltip/Tooltip.js");
   __include("scout/action/Action.js");
   __include("scout/action/keystroke/AbstractKeyStrokeAdapter.js");
