@@ -67,7 +67,10 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
             Platform.setDefault();
             Platform.get().start(null);
             //
-            PlatformTestRunner.super.classBlock(notifier);
+            Statement inner = PlatformTestRunner.super.classBlock(notifier);
+            if (inner != null) {
+              inner.evaluate();
+            }
           }
           finally {
             Platform.get().stop();
