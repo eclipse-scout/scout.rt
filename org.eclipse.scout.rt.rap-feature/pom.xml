@@ -56,6 +56,8 @@
               <excludes>
                 <plugin id="org.eclipse.scout.rt.ui.rap.theme.rayo" />
                 <plugin id="org.eclipse.scout.rt.ui.rap.theme.rayo.mobile" />
+                <plugin id="org.apache.commons.io" />
+                <plugin id="org.apache.commons.fileupload" />
               </excludes>
             </configuration>
           </execution>
