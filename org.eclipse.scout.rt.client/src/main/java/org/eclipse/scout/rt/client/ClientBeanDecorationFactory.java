@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
 /**
- * Default client-side {@link IBeanDecorationFactory} used in {@link IPlatform#getBeanContext()}
+ * Default client-side {@link IBeanDecorationFactory} used in {@link IPlatform#getBeanManager()}
  */
 @Replace
 public class ClientBeanDecorationFactory extends SimpleBeanDecorationFactory {

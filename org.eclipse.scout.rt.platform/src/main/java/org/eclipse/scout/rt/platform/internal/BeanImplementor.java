@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BeanCreationException;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
@@ -38,7 +38,7 @@ public class BeanImplementor<T> implements IBean<T> {
   private T m_instance;
 
   @SuppressWarnings("unchecked")
-  public BeanImplementor(BeanData beanData, BeanManagerImplementor beanManager) {
+  public BeanImplementor(BeanMetaData beanData, BeanManagerImplementor beanManager) {
     m_beanClazz = (Class<? extends T>) Assertions.assertNotNull(beanData.getBeanClazz());
     m_beanAnnotations = new HashMap<Class<? extends Annotation>, Annotation>(Assertions.assertNotNull(beanData.getBeanAnnotations()));
     m_initialInstance = (T) beanData.getInitialInstance();

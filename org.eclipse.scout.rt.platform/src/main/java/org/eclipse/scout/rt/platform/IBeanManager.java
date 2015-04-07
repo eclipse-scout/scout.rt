@@ -18,8 +18,7 @@ import org.eclipse.scout.commons.annotations.Replace;
 /**
  * @since 5.2
  */
-//TODO imo rename to IBeanManager
-public interface IBeanContext {
+public interface IBeanManager {
 
   ReentrantReadWriteLock getReadWriteLock();
 
@@ -35,7 +34,7 @@ public interface IBeanContext {
    *         <p>
    *         When B extends A and B has a {@link Replace} then A is removed from the result
    *         <p>
-   *         this is the bean used in {@link IBean#getInstance(Class)} and {@link OBJ#get(Class)}
+   *         this is the bean used in {@link IBean#getInstance(Class)} and {@link BEANS#get(Class)}
    * @throws PlatformException
    *           when multiple beans exist or no bean exists.
    */
@@ -47,7 +46,7 @@ public interface IBeanContext {
    *         <p>
    *         When B extends A and B has a {@link Replace} then A is removed from the result
    *         <p>
-   *         this is the bean used in {@link IBean#getInstance(Class)} and {@link OBJ#getOptional(Class)}
+   *         this is the bean used in {@link IBean#getInstance(Class)} and {@link BEANS#opt(Class)}
    * @throws PlatformException
    *           when multiple beans exist
    */
@@ -64,8 +63,8 @@ public interface IBeanContext {
   <T> List<IBean<T>> getBeans(Class<T> beanClazz);
 
   /**
-   * This is a convenience for {@link #registerBean(BeanData)} and calls {@link #registerBean(BeanData)} with a new
-   * {@link BeanData#BeanData(Class)}
+   * This is a convenience for {@link #registerBean(BeanMetaData)} and calls {@link #registerBean(BeanMetaData)} with a new
+   * {@link BeanMetaData#BeanData(Class)}
    *
    * @param beanClazz
    * @return the registered {@link IBean}
@@ -84,7 +83,7 @@ public interface IBeanContext {
    * @param beanData
    * @return the registered {@link IBean}
    */
-  <T> IBean<T> registerBean(BeanData beanData);
+  <T> IBean<T> registerBean(BeanMetaData beanData);
 
   /**
    * @param bean

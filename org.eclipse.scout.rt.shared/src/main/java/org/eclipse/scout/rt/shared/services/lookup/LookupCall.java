@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -337,7 +337,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      }, Jobs.newInput(OBJ.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByKeyInBackground", getClass().getName()));
+      }, Jobs.newInput(BEANS.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByKeyInBackground", getClass().getName()));
     }
   }
 
@@ -394,7 +394,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      }, Jobs.newInput(OBJ.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByTextInBackground", getClass().getName()));
+      }, Jobs.newInput(BEANS.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByTextInBackground", getClass().getName()));
     }
   }
 
@@ -451,7 +451,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      }, Jobs.newInput(OBJ.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByAllInBackground", getClass().getName()));
+      }, Jobs.newInput(BEANS.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByAllInBackground", getClass().getName()));
     }
   }
 
@@ -507,7 +507,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
             }
           }
         }
-      }, Jobs.newInput(OBJ.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByRecInBackground", getClass().getName()));
+      }, Jobs.newInput(BEANS.get(IRunContextProvider.class).copyCurrent()).name("%s.getDataByRecInBackground", getClass().getName()));
     }
   }
 

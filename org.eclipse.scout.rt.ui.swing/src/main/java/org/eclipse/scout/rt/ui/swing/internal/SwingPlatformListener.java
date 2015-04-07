@@ -20,7 +20,7 @@ public class SwingPlatformListener implements IPlatformListener {
 
   @Override
   public void stateChanged(PlatformEvent event) throws PlatformException {
-    if (event.getState() == IPlatform.State.BeanContextPrepared) {
+    if (event.getState() == IPlatform.State.BeanManagerPrepared) {
       FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.button.IButton.class, org.eclipse.scout.rt.ui.swing.form.fields.button.ButtonFactory.class);
       FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.chartbox.IChartBox.class, org.eclipse.scout.rt.ui.swing.form.fields.chartbox.SwingScoutChartBox.class);
       // Use rayo version for now

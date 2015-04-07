@@ -16,7 +16,7 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -60,7 +60,7 @@ public class BatchNormalizerTest {
 
     m_reg.add(
         TestingUtility.registerBean(
-            new BeanData(IFruitLookupService.class).
+            new BeanMetaData(IFruitLookupService.class).
             initialInstance(m_lookupService).
             applicationScoped(true)
             ));

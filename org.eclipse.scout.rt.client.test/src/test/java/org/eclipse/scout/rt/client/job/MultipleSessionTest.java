@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -51,7 +51,7 @@ public class MultipleSessionTest {
   @Before
   public void before() {
     m_beans = TestingUtility.registerBeans(
-        new BeanData(JobManager.class).
+        new BeanMetaData(JobManager.class).
             applicationScoped(true));
     m_clientSession1 = mock(IClientSession.class);
     m_clientSession2 = mock(IClientSession.class);

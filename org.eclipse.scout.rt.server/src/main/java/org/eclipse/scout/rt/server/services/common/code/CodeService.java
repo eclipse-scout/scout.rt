@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.Server;
 import org.eclipse.scout.rt.server.services.common.clientnotification.AllUserFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -51,7 +51,7 @@ public class CodeService extends AbstractSharedCodeService implements IClusterNo
     SERVICES.getService(IClientNotificationService.class).putNotification(new CodeTypeChangedNotification(codetypeList), new AllUserFilter(AllUserFilter.DEFAULT_TIMEOUT));
 
     // notify clusters:
-    IClusterSynchronizationService s = OBJ.getOptional(IClusterSynchronizationService.class);
+    IClusterSynchronizationService s = BEANS.opt(IClusterSynchronizationService.class);
     if (s != null) {
       s.publishNotification(new UnloadCodeTypeCacheClusterNotification(codetypeList));
     }

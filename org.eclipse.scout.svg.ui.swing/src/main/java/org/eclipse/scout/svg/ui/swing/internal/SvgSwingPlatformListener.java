@@ -23,7 +23,7 @@ public class SvgSwingPlatformListener implements IPlatformListener {
 
   @Override
   public void stateChanged(PlatformEvent event) throws PlatformException {
-    if (event.getState() == IPlatform.State.BeanContextPrepared) {
+    if (event.getState() == IPlatform.State.BeanManagerPrepared) {
       FormFieldExtensions.INSTANCE.put(org.eclipse.scout.svg.client.svgfield.ISvgField.class, org.eclipse.scout.svg.ui.swing.svgfield.SwingScoutSvgField.class);
     }
   }

@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -43,16 +43,16 @@ public class ThreadNameDecoratorTest {
   public void before() {
     m_jobManager = new JobManager();
 
-    BeanData b = new BeanData(JobManager.class, m_jobManager);
+    BeanMetaData b = new BeanMetaData(JobManager.class, m_jobManager);
     b.addAnnotation(AnnotationFactory.createApplicationScoped());
     b.addAnnotation(AnnotationFactory.createOrder(-10000));
-    m_bean = Platform.get().getBeanContext().registerBean(b);
+    m_bean = Platform.get().getBeanManager().registerBean(b);
   }
 
   @After
   public void after() {
     m_jobManager.shutdown();
-    Platform.get().getBeanContext().unregisterBean(m_bean);
+    Platform.get().getBeanManager().unregisterBean(m_bean);
   }
 
   @Test

@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -109,7 +109,7 @@ public final class ModelJobs {
    * @see IJobManager#schedule(IExecutable, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final JobInput input) {
-    return OBJ.get(IJobManager.class).schedule(executable, ModelJobs.validateInput(input));
+    return BEANS.get(IJobManager.class).schedule(executable, ModelJobs.validateInput(input));
   }
 
   /**
@@ -162,7 +162,7 @@ public final class ModelJobs {
    * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit, final JobInput input) {
-    return OBJ.get(IJobManager.class).schedule(executable, delay, delayUnit, ModelJobs.validateInput(input));
+    return BEANS.get(IJobManager.class).schedule(executable, delay, delayUnit, ModelJobs.validateInput(input));
   }
 
   /**
@@ -222,7 +222,7 @@ public final class ModelJobs {
   public static JobInput newInput(final ClientRunContext clientRunContext) {
     Assertions.assertNotNull(clientRunContext, "'RunContext' must not be null for model jobs");
     Assertions.assertNotNull(clientRunContext.session(), "'ClientSession' must not be null for model jobs");
-    return OBJ.get(JobInput.class).threadName("scout-model-thread").runContext(clientRunContext).mutex(clientRunContext.session());
+    return BEANS.get(JobInput.class).threadName("scout-model-thread").runContext(clientRunContext).mutex(clientRunContext.session());
   }
 
   /**
@@ -259,7 +259,7 @@ public final class ModelJobs {
    * Validates the given {@link JobInput} and {@link ClientRunContext}.
    */
   private static JobInput validateInput(final JobInput input) {
-    OBJ.get(ModelJobInputValidator.class).validate(input);
+    BEANS.get(ModelJobInputValidator.class).validate(input);
     return input;
   }
 }

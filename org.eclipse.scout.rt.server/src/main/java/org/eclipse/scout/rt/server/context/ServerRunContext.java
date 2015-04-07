@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.context.PreferredValue;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -208,7 +208,7 @@ public class ServerRunContext extends RunContext {
 
   @Override
   public ServerRunContext copy() {
-    final ServerRunContext copy = OBJ.get(ServerRunContext.class);
+    final ServerRunContext copy = BEANS.get(ServerRunContext.class);
     copy.copyValues(this);
     return copy;
   }

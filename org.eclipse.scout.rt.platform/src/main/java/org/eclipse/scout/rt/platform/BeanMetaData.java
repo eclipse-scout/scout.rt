@@ -19,24 +19,23 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 
-//TODO imo rename to BeanMetaData
-public class BeanData {
+public class BeanMetaData {
   private final Class<?> m_beanClazz;
   private final Map<Class<? extends Annotation>, Annotation> m_beanAnnotations;
   private Object m_initialInstance;
 
-  public BeanData(Class<?> clazz) {
+  public BeanMetaData(Class<?> clazz) {
     this(clazz, null);
   }
 
-  public BeanData(Class<?> clazz, Object initialInstance) {
+  public BeanMetaData(Class<?> clazz, Object initialInstance) {
     m_beanClazz = Assertions.assertNotNull(clazz);
     m_beanAnnotations = new HashMap<>();
     readStaticAnnoations(clazz, false);
     m_initialInstance = initialInstance;
   }
 
-  public BeanData(IBean<?> template) {
+  public BeanMetaData(IBean<?> template) {
     m_beanClazz = Assertions.assertNotNull(template.getBeanClazz());
     m_beanAnnotations = new HashMap<>(template.getBeanAnnotations());
     m_initialInstance = template.getInitialInstance();
@@ -79,7 +78,7 @@ public class BeanData {
    *
    * @return this supporting the fluent api
    */
-  public BeanData initialInstance(Object initialInstance) {
+  public BeanMetaData initialInstance(Object initialInstance) {
     m_initialInstance = initialInstance;
     return this;
   }
@@ -89,7 +88,7 @@ public class BeanData {
    *
    * @return this supporting the fluent api
    */
-  public BeanData replace(boolean set) {
+  public BeanMetaData replace(boolean set) {
     if (set) {
       addAnnotation(AnnotationFactory.createReplace());
     }
@@ -104,7 +103,7 @@ public class BeanData {
    *
    * @return this supporting the fluent api
    */
-  public BeanData order(double order) {
+  public BeanMetaData order(double order) {
     addAnnotation(AnnotationFactory.createOrder(order));
     return this;
   }
@@ -114,7 +113,7 @@ public class BeanData {
    *
    * @return this supporting the fluent api
    */
-  public BeanData applicationScoped(boolean set) {
+  public BeanMetaData applicationScoped(boolean set) {
     if (set) {
       addAnnotation(AnnotationFactory.createApplicationScoped());
     }
@@ -143,7 +142,7 @@ public class BeanData {
    *
    * @return this supporting the fluent api
    */
-  public BeanData addAnnotation(Annotation annotation) {
+  public BeanMetaData addAnnotation(Annotation annotation) {
     m_beanAnnotations.put(annotation.annotationType(), annotation);
     return this;
   }
@@ -153,7 +152,7 @@ public class BeanData {
    *
    * @return this supporting the fluent api
    */
-  public BeanData removeAnnotation(Class<? extends Annotation> annotationType) {
+  public BeanMetaData removeAnnotation(Class<? extends Annotation> annotationType) {
     m_beanAnnotations.remove(annotationType);
     return this;
   }

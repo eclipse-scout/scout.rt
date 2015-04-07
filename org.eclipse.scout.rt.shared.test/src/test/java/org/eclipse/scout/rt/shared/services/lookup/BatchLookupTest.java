@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -61,7 +61,7 @@ public class BatchLookupTest {
 
     m_reg.add(
         TestingUtility.registerBean(
-            new BeanData(IFlowerLookupService.class).
+            new BeanMetaData(IFlowerLookupService.class).
             initialInstance(m_lookupService).
             applicationScoped(true)
             ));

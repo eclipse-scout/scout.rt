@@ -12,7 +12,7 @@ package org.eclipse.scout.service;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * Utility class for querying registered Scout services
@@ -28,14 +28,14 @@ public final class SERVICES {
    * @return the service with the highest ranking or <code>null</code>, if the service is not found.
    */
   public static <T extends Object> T getService(Class<T> serviceClass) {
-    return OBJ.get(serviceClass);
+    return BEANS.get(serviceClass);
   }
 
   /**
    * @return the services ordered by ranking or an empty array, if no services are found.
    */
   public static <T extends Object> List<T> getServices(Class<T> serviceClass) {
-    return OBJ.all(serviceClass);
+    return BEANS.all(serviceClass);
   }
 
 }

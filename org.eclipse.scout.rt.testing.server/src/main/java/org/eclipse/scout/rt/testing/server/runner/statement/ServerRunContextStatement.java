@@ -16,7 +16,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -57,7 +57,7 @@ public class ServerRunContextStatement extends Statement {
           final Subject subject = Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "Subject must not be null. Use the annotation '%s' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
 
           // Obtain the server session. Depending on the session provider, a new session is created or a cached session returned.
-          final IServerSession serverSession = OBJ.get(serverSessionProvider).provide(ServerRunContexts.copyCurrent());
+          final IServerSession serverSession = BEANS.get(serverSessionProvider).provide(ServerRunContexts.copyCurrent());
 
           // Run the test in a new ServerRunContext. The subject is set explicitly to not use the one defined on the session.
           ServerRunContexts.copyCurrent().session(serverSession).subject(subject).run(new IRunnable() {

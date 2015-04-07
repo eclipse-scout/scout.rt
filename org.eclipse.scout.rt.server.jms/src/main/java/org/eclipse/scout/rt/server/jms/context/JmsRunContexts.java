@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.server.jms.context;
 
 import javax.jms.Message;
 
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * Factory methods to create new {@link JmsRunContext} objects to propagate <i>JMS Java Message Service</i> state like
@@ -42,7 +42,7 @@ public final class JmsRunContexts {
    * Creates an empty <code>JmsRunContext</code>.
    */
   public static final JmsRunContext empty() {
-    final JmsRunContext runContext = OBJ.get(JmsRunContext.class);
+    final JmsRunContext runContext = BEANS.get(JmsRunContext.class);
     runContext.fillEmptyValues();
     return runContext;
   }
@@ -51,7 +51,7 @@ public final class JmsRunContexts {
    * Creates a "snapshot" of the current calling <code>JmsRunContext</code>.
    */
   public static JmsRunContext copyCurrent() {
-    final JmsRunContext runContext = OBJ.get(JmsRunContext.class);
+    final JmsRunContext runContext = BEANS.get(JmsRunContext.class);
     runContext.fillCurrentValues();
     return runContext;
   }

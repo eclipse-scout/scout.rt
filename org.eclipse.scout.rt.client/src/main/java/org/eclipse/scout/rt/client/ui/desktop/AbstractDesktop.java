@@ -88,7 +88,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -606,7 +606,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *          a live list can be modified.
    */
   protected void injectDesktopExtensions(List<IDesktopExtension> desktopExtensions) {
-    List<IDesktopExtension> extensions = OBJ.all(IDesktopExtension.class);
+    List<IDesktopExtension> extensions = BEANS.all(IDesktopExtension.class);
     for (IDesktopExtension e : extensions) {
       e.setCoreDesktop(this);
     }

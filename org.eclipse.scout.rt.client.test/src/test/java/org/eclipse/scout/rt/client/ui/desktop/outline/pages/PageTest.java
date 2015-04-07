@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -114,7 +114,7 @@ public class PageTest {
   private IExceptionHandlerService createMockExceptionHandlerService() {
     IExceptionHandlerService svc = Mockito.mock(IExceptionHandlerService.class);
     m_beans.add(TestingUtility.registerBean(
-        new BeanData(IExceptionHandlerService.class).
+        new BeanMetaData(IExceptionHandlerService.class).
             initialInstance(svc).
             applicationScoped(true)
         )

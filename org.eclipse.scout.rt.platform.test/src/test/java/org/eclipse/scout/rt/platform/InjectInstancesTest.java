@@ -35,39 +35,39 @@ public class InjectInstancesTest {
 
   @BeforeClass
   public static void registerBeans() {
-    m_bean01 = Platform.get().getBeanContext().registerClass(Bean01.class);
-    m_bean02 = Platform.get().getBeanContext().registerClass(Bean02.class);
-    m_bean03 = Platform.get().getBeanContext().registerClass(MyBean01.class);
-    m_bean04 = Platform.get().getBeanContext().registerClass(MyBean02.class);
+    m_bean01 = Platform.get().getBeanManager().registerClass(Bean01.class);
+    m_bean02 = Platform.get().getBeanManager().registerClass(Bean02.class);
+    m_bean03 = Platform.get().getBeanManager().registerClass(MyBean01.class);
+    m_bean04 = Platform.get().getBeanManager().registerClass(MyBean02.class);
 
   }
 
   @Test
   public void testFieldInstanceInjection() {
-    MyBean01 myBean = OBJ.get(MyBean01.class);
+    MyBean01 myBean = BEANS.get(MyBean01.class);
     Assert.assertNotNull(myBean);
     List<ITestBean> testBeans = myBean.getTestBeans();
     Assert.assertEquals(testBeans.size(), 2);
-    testBeans.removeAll(CollectionUtility.arrayList(OBJ.get(Bean01.class), OBJ.get(Bean02.class)));
+    testBeans.removeAll(CollectionUtility.arrayList(BEANS.get(Bean01.class), BEANS.get(Bean02.class)));
     Assert.assertEquals(0, testBeans.size());
   }
 
   @Test
   public void testMethodInstanceInjection() {
-    MyBean02 myBean = OBJ.get(MyBean02.class);
+    MyBean02 myBean = BEANS.get(MyBean02.class);
     Assert.assertNotNull(myBean);
     List<ITestBean> testBeans = myBean.getTestBeans();
     Assert.assertEquals(testBeans.size(), 2);
-    testBeans.removeAll(CollectionUtility.arrayList(OBJ.get(Bean01.class), OBJ.get(Bean02.class)));
+    testBeans.removeAll(CollectionUtility.arrayList(BEANS.get(Bean01.class), BEANS.get(Bean02.class)));
     Assert.assertEquals(0, testBeans.size());
   }
 
   @AfterClass
   public static void removeBeans() {
-    Platform.get().getBeanContext().unregisterBean(m_bean01);
-    Platform.get().getBeanContext().unregisterBean(m_bean02);
-    Platform.get().getBeanContext().unregisterBean(m_bean03);
-    Platform.get().getBeanContext().unregisterBean(m_bean04);
+    Platform.get().getBeanManager().unregisterBean(m_bean01);
+    Platform.get().getBeanManager().unregisterBean(m_bean02);
+    Platform.get().getBeanManager().unregisterBean(m_bean03);
+    Platform.get().getBeanManager().unregisterBean(m_bean04);
   }
 
   private static interface ITestBean {
@@ -89,7 +89,7 @@ public class InjectInstancesTest {
 
     protected List<ITestBean> getTestBeans() {
       List<ITestBean> result = new ArrayList<>();
-      Iterator<ITestBean> it = OBJ.all(ITestBean.class).iterator();
+      Iterator<ITestBean> it = BEANS.all(ITestBean.class).iterator();
       while (it.hasNext()) {
         result.add(it.next());
       }
@@ -99,7 +99,7 @@ public class InjectInstancesTest {
 
   @ApplicationScoped
   private static class MyBean02 {
-    private List<ITestBean> testBeans = OBJ.all(ITestBean.class);
+    private List<ITestBean> testBeans = BEANS.all(ITestBean.class);
 
     public List<ITestBean> getTestBeans() {
       return testBeans;

@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -48,9 +48,9 @@ public class SERVICESTest {
   }
 
   private IBean<?> registerService(Class<? extends ITestService> serviceClazz, double order) {
-    BeanData bean = new BeanData(serviceClazz);
+    BeanMetaData bean = new BeanMetaData(serviceClazz);
     bean.addAnnotation(AnnotationFactory.createOrder(order));
-    return Platform.get().getBeanContext().registerBean(bean);
+    return Platform.get().getBeanManager().registerBean(bean);
   }
 
   /**
@@ -58,9 +58,9 @@ public class SERVICESTest {
    */
   @After
   public void unRegisterTestServices() {
-    Platform.get().getBeanContext().unregisterBean(m_ref1);
-    Platform.get().getBeanContext().unregisterBean(m_ref2);
-    Platform.get().getBeanContext().unregisterBean(m_ref3);
+    Platform.get().getBeanManager().unregisterBean(m_ref1);
+    Platform.get().getBeanManager().unregisterBean(m_ref2);
+    Platform.get().getBeanManager().unregisterBean(m_ref3);
   }
 
   /**

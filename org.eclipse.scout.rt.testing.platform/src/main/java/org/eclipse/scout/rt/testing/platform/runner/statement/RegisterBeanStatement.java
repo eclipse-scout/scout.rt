@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.testing.platform.runner.statement;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.junit.runners.model.Statement;
@@ -43,15 +43,15 @@ public class RegisterBeanStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
-    final BeanData bean = new BeanData(m_beanClass);
+    final BeanMetaData bean = new BeanMetaData(m_beanClass);
     bean.addAnnotation(AnnotationFactory.createOrder(-1000));
 
-    IBean reg = Platform.get().getBeanContext().registerBean(bean);
+    IBean reg = Platform.get().getBeanManager().registerBean(bean);
     try {
       m_next.evaluate();
     }
     finally {
-      Platform.get().getBeanContext().unregisterBean(reg);
+      Platform.get().getBeanManager().unregisterBean(reg);
     }
   }
 }

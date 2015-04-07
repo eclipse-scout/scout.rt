@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.ICallable;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionProvider;
@@ -66,7 +66,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
     m_txErrors = new ArrayList<>();
     m_beans = new ArrayList<>();
-    m_beans.add(TestingUtility.registerBean(new BeanData(ITransactionProvider.class).initialInstance(m_transactionProvider).order(-1000)));
+    m_beans.add(TestingUtility.registerBean(new BeanMetaData(ITransactionProvider.class).initialInstance(m_transactionProvider).order(-1000)));
 
     when(m_transactionProvider.provide(anyLong())).thenReturn(m_transaction);
 

@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore;
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore.MethodImplementation;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -53,7 +53,7 @@ public class FormStoredWithVetoTest {
     m_exceptionHandlerService = Mockito.mock(IExceptionHandlerService.class);
     m_registeredServices.add(
         TestingUtility.registerBean(
-            new BeanData(IExceptionHandlerService.class).
+            new BeanMetaData(IExceptionHandlerService.class).
             initialInstance(m_exceptionHandlerService).
             applicationScoped(true)
             )

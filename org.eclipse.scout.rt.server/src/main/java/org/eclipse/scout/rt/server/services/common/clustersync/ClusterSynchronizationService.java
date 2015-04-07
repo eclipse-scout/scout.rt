@@ -32,7 +32,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
@@ -272,7 +272,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
     ServerRunContext serverRunContext = ServerRunContexts.empty();
     serverRunContext.subject(m_subject);
-    serverRunContext.session(OBJ.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
+    serverRunContext.session(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
     serverRunContext.run(new IRunnable() {
 
       @Override

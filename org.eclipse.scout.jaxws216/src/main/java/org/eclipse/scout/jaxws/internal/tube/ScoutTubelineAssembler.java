@@ -32,7 +32,7 @@ import org.eclipse.scout.jaxws.annotation.ScoutWebService;
 import org.eclipse.scout.jaxws.internal.JaxWsHelper;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticator;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 
@@ -198,7 +198,7 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
       return IAuthenticator.AcceptAnyAuthenticator.INSTANCE;
     }
     else {
-      return OBJ.get(authenticatorClass);
+      return BEANS.get(authenticatorClass);
     }
   }
 }

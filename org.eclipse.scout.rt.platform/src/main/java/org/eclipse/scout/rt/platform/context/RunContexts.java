@@ -14,7 +14,7 @@ import java.util.Locale;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * Factory methods to create new {@link RunContext} objects to propagate context like the current {@link Subject} and
@@ -48,7 +48,7 @@ public final class RunContexts {
    * Preferred means, that those values will not be derived from other values, but must be set explicitly instead.
    */
   public static final RunContext empty() {
-    final RunContext runContext = OBJ.get(RunContext.class);
+    final RunContext runContext = BEANS.get(RunContext.class);
     runContext.fillEmptyValues();
     return runContext;
   }
@@ -57,7 +57,7 @@ public final class RunContexts {
    * Creates a "snapshot" of the current calling context.
    */
   public static RunContext copyCurrent() {
-    final RunContext runContext = OBJ.get(RunContext.class);
+    final RunContext runContext = BEANS.get(RunContext.class);
     runContext.fillCurrentValues();
     return runContext;
   }

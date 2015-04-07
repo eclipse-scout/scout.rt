@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.service.SERVICES;
 
@@ -84,7 +84,7 @@ public class Preferences implements IPreferences {
    *           if the session or nodeId is <code>null</code>.
    */
   public static IPreferences get(ISession userScope, String nodeId) throws ProcessingException {
-    IUserPreferencesService service = OBJ.get(IUserPreferencesService.class);
+    IUserPreferencesService service = BEANS.get(IUserPreferencesService.class);
     if (service == null) {
       LOG.warn("No preferences service could be found!");
       return null;

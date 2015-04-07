@@ -39,9 +39,9 @@ import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.commons.cache.ICacheEntry;
@@ -84,18 +84,18 @@ public class ServiceTunnelServletTest {
 
   @Before
   public void before() throws ServletException, InstantiationException, IllegalAccessException {
-    m_serverSessionProviderSpy = spy(OBJ.get(ServerSessionProvider.class));
+    m_serverSessionProviderSpy = spy(BEANS.get(ServerSessionProvider.class));
 
     m_beans = TestingUtility.registerBeans(
-        new BeanData(StickySessionCacheService.class).
+        new BeanMetaData(StickySessionCacheService.class).
             order(TEST_SERVICE_ORDER).
             applicationScoped(true),
-        new BeanData(IAccessControlService.class).
+        new BeanMetaData(IAccessControlService.class).
             initialInstance(new AbstractAccessControlService() {
             }).
             order(TEST_SERVICE_ORDER).
             applicationScoped(true),
-        new BeanData(ServerSessionProvider.class).
+        new BeanMetaData(ServerSessionProvider.class).
             initialInstance(m_serverSessionProviderSpy).
             order(TEST_SERVICE_ORDER).
             applicationScoped(true)

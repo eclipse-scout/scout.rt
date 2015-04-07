@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.server.TestServerSession;
@@ -60,7 +60,7 @@ public class AccessControlServiceTest {
 
     //Register this IAccessControlService with an higher priority than AllAccessControlService registered in CustomServerTestEnvironment
     m_registerServices = TestingUtility.registerBeans(
-        new BeanData(IAccessControlService.class).
+        new BeanMetaData(IAccessControlService.class).
             initialInstance(m_accessControlService).
             applicationScoped(true)
         );

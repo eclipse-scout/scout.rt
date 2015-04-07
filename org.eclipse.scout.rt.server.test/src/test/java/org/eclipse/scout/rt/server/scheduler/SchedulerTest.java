@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -51,7 +51,7 @@ public class SchedulerTest {
 
     m_runContext = ServerRunContexts.empty();
     m_runContext.subject(subject);
-    m_runContext.session(OBJ.get(ServerSessionProvider.class).provide(m_runContext.copy()));
+    m_runContext.session(BEANS.get(ServerSessionProvider.class).provide(m_runContext.copy()));
 
     m_ticker = new Ticker(Calendar.SECOND);
 

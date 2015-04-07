@@ -21,11 +21,11 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanContext;
+import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformException;
@@ -54,7 +54,7 @@ public class PlatformImplementor implements IPlatform {
   }
 
   @Override
-  public IBeanContext getBeanContext() {
+  public IBeanManager getBeanManager() {
     // use lock to ensure the caller waits until the platform has been started completely
     m_stateLock.readLock().lock();
     try {
@@ -74,12 +74,12 @@ public class PlatformImplementor implements IPlatform {
       //now all IPlatformListener are registered and can receive platform events
 
       changeState(State.PlatformInit);
-      changeState(State.BeanContextPrepared);
+      changeState(State.BeanManagerPrepared);
 
       //validateBeanManager();
       initBeanDecorationFactory();
 
-      changeState(State.BeanContextValid);
+      changeState(State.BeanManagerValid);
       startCreateImmediatelyBeans();
     }
     finally {
@@ -119,7 +119,7 @@ public class PlatformImplementor implements IPlatform {
       //collect all service interfaces
       Class<?> serviceClazz = Class.forName("org.eclipse.scout.service.IService");
       HashSet<Class> serviceInterfaces = new HashSet<>();
-      for (IBean bean : getBeanContext().getRegisteredBeans(serviceClazz)) {
+      for (IBean bean : getBeanManager().getRegisteredBeans(serviceClazz)) {
         for (Class<?> i : BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class)) {
           if (serviceClazz.isAssignableFrom(i)) {
             serviceInterfaces.add(i);
@@ -132,7 +132,7 @@ public class PlatformImplementor implements IPlatform {
         }
         try {
           @SuppressWarnings("unchecked")
-          List<IBean<Object>> list = getBeanContext().getBeans(s);
+          List<IBean<Object>> list = getBeanManager().getBeans(s);
           if (list.size() <= 1) {
             continue;
           }
@@ -156,7 +156,7 @@ public class PlatformImplementor implements IPlatform {
   }
 
   protected void startApplication(Class<? extends IApplication> appType) {
-    m_application = OBJ.getOptional(appType);
+    m_application = BEANS.opt(appType);
     if (m_application != null) {
       try {
         m_application.start();
@@ -219,13 +219,13 @@ public class PlatformImplementor implements IPlatform {
     if (oldState == newState) {
       return;
     }
-    else if (oldState == State.PlatformInit && newState == State.BeanContextPrepared) {
+    else if (oldState == State.PlatformInit && newState == State.BeanManagerPrepared) {
       return;
     }
-    else if (oldState == State.BeanContextPrepared && newState == State.BeanContextValid) {
+    else if (oldState == State.BeanManagerPrepared && newState == State.BeanManagerValid) {
       return;
     }
-    else if (oldState == State.BeanContextValid && newState == State.ApplicationStarting) {
+    else if (oldState == State.BeanManagerValid && newState == State.ApplicationStarting) {
       return;
     }
     else if (oldState == State.ApplicationStarting && newState == State.ApplicationStarted) {

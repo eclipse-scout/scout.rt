@@ -16,7 +16,7 @@ import java.util.Map;
 import org.eclipse.scout.commons.annotations.Internal;
 
 /**
- * This is the registration for one {@link IBean} in the {@link IBeanContext}
+ * This is the registration for one {@link IBean} in the {@link IBeanManager}
  */
 public interface IBean<T> {
 
@@ -33,7 +33,7 @@ public interface IBean<T> {
   Class<? extends T> getBeanClazz();
 
   /**
-   * Do not call this method directly, use {@link OBJ#get(Class)} instead!
+   * Do not call this method directly, use {@link BEANS#get(Class)} instead!
    * <p>
    *
    * @return the initial instance of the bean, undecorated, not intercepted, may be null

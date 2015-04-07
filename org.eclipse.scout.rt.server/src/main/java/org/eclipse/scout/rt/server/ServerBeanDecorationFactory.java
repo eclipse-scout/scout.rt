@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 
 /**
- * Default server-side {@link IBeanDecorationFactory} used in {@link IPlatform#getBeanContext()}
+ * Default server-side {@link IBeanDecorationFactory} used in {@link IPlatform#getBeanManager()}
  */
 @Replace
 public class ServerBeanDecorationFactory extends SimpleBeanDecorationFactory {

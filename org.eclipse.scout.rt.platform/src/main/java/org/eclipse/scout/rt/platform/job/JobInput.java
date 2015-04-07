@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 
 /**
@@ -179,7 +179,7 @@ public class JobInput {
    * Creates a copy of <code>this</code> input.
    */
   public JobInput copy() {
-    final JobInput copy = OBJ.get(JobInput.class);
+    final JobInput copy = BEANS.get(JobInput.class);
     copy.id(m_id);
     copy.name(m_name);
     copy.mutex(m_mutexObject);

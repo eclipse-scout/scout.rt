@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -69,7 +69,7 @@ public class PreferencesTest {
     TestingUserPreferencesStorageService svc = new TestingUserPreferencesStorageService();
 
     List<IBean<?>> registerServices = TestingUtility.registerBeans(
-        new BeanData(IUserPreferencesStorageService.class).
+        new BeanMetaData(IUserPreferencesStorageService.class).
         initialInstance(svc).
         applicationScoped(true));
     try {

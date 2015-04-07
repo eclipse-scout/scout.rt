@@ -12,7 +12,7 @@ package org.eclipse.scout.extension;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.extension.ExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
@@ -34,7 +34,7 @@ public abstract class AbstractLocalExtensionTestCase {
   @Before
   public void registerLocalRegistry() {
     m_localServiceRegistrations = TestingUtility.registerBeans(
-        new BeanData(ExtensionRegistry.class).
+        new BeanMetaData(ExtensionRegistry.class).
             applicationScoped(true)
         );
   }

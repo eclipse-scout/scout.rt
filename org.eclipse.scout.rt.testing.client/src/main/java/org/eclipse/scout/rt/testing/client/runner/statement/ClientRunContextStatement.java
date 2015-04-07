@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -57,7 +57,7 @@ public class ClientRunContextStatement extends Statement {
           final Subject subject = Assertions.assertNotNull(Subject.getSubject(AccessController.getContext()), "Subject must not be null. Use the annotation '%s' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
 
           // Obtain the client session. Depending on the session provider, a new session is created or a cached session returned.
-          final IClientSession clientSession = OBJ.get(clientSessionProvider).provide(ClientRunContexts.copyCurrent());
+          final IClientSession clientSession = BEANS.get(clientSessionProvider).provide(ClientRunContexts.copyCurrent());
 
           // Run the test in a new ClientRunContext. The subject is set explicitly to not use the one defined on the session.
           ClientRunContexts.copyCurrent().session(clientSession).subject(subject).run(new IRunnable() {

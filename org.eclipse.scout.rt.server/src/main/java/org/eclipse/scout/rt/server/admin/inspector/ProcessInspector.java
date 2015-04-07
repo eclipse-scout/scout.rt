@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
 
 /**
@@ -26,10 +26,10 @@ import org.eclipse.scout.rt.server.IServerSession;
 public class ProcessInspector {
 
   /**
-   * Convenience for {@link OBJ#get(Class)}
+   * Convenience for {@link BEANS#get(Class)}
    */
   public static ProcessInspector instance() {
-    return OBJ.get(ProcessInspector.class);
+    return BEANS.get(ProcessInspector.class);
   }
 
   /**

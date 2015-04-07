@@ -14,7 +14,7 @@ import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * Factory methods to create new {@link ServletRunContext} objects to propagate {@link Servlet} state like
@@ -44,7 +44,7 @@ public final class ServletRunContexts {
    * Creates an empty {@link ServletRunContext}.
    */
   public static final ServletRunContext empty() {
-    final ServletRunContext runContext = OBJ.get(ServletRunContext.class);
+    final ServletRunContext runContext = BEANS.get(ServletRunContext.class);
     runContext.fillEmptyValues();
     return runContext;
   }
@@ -53,7 +53,7 @@ public final class ServletRunContexts {
    * Creates a "snapshot" of the current calling <code>ServletRunContext</code>.
    */
   public static ServletRunContext copyCurrent() {
-    final ServletRunContext runContext = OBJ.get(ServletRunContext.class);
+    final ServletRunContext runContext = BEANS.get(ServletRunContext.class);
     runContext.fillCurrentValues();
     return runContext;
   }

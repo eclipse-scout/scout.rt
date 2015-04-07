@@ -23,20 +23,19 @@ import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 /**
  * The static accessor to the {@link BeanManagerImplementor}
  */
-//TODO imo rename to BEANS
-public final class OBJ {
+public final class BEANS {
 
-  private OBJ() {
+  private BEANS() {
   }
 
   /**
    * @return the single instance of this type with respect to {@link Priority} and {@link Replace}. See also
-   *         {@link IBeanContext#getBean(Class)}
+   *         {@link IBeanManager#getBean(Class)}
    * @throws AssertionException
    *           when no instance is available or when multiple instances are registered
    */
   public static <T> T get(Class<T> beanClazz) {
-    T instance = getOptional(beanClazz);
+    T instance = opt(beanClazz);
     if (instance != null) {
       return instance;
     }
@@ -51,9 +50,8 @@ public final class OBJ {
    * @throws AssertionException
    *           when multiple instances are registered
    */
-//TODO imo rename to opt
-  public static <T> T getOptional(Class<T> beanClazz) {
-    IBean<T> bean = Platform.get().getBeanContext().optBean(beanClazz);
+  public static <T> T opt(Class<T> beanClazz) {
+    IBean<T> bean = Platform.get().getBeanManager().optBean(beanClazz);
     if (bean != null) {
       return bean.getInstance(beanClazz);
     }
@@ -64,7 +62,7 @@ public final class OBJ {
    * @return all instances of this type ordered by {@link Order}
    */
   public static <T> List<T> all(Class<T> beanClazz) {
-    List<IBean<T>> beans = Platform.get().getBeanContext().getBeans(beanClazz);
+    List<IBean<T>> beans = Platform.get().getBeanManager().getBeans(beanClazz);
     ArrayList<T> instances = new ArrayList<T>(beans.size());
     for (IBean<T> bean : beans) {
       T instance = bean.getInstance(beanClazz);

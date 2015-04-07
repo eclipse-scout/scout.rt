@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.platform.IApplication;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
@@ -173,7 +173,7 @@ public class ScoutInfoForm extends AbstractForm {
   }
 
   protected void createHtmlBody(StringBuffer buf) {
-    IApplication app = OBJ.getOptional(IApplication.class);
+    IApplication app = BEANS.opt(IApplication.class);
     String title = "unknown";
     String version = "0.0.0";
     if (app != null) {

@@ -30,7 +30,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.cache.TestHttpSession;
@@ -118,7 +118,7 @@ public class BasicSecurityFilterTest {
   private <SERVICE> void registerTestService(SERVICE service, Class<? extends SERVICE> clazz) {
     m_registeredServices.add(
         TestingUtility.registerBean(
-            new BeanData(clazz).
+            new BeanMetaData(clazz).
             initialInstance(service).
             applicationScoped(true)
             )

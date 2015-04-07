@@ -23,13 +23,13 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.InitializationException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanContext;
+import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 
-public class BeanManagerImplementor implements IBeanContext {
+public class BeanManagerImplementor implements IBeanManager {
   private final ReentrantReadWriteLock m_lock;
   private final Map<Class<?>, TypeHierarchy> m_typeHierarchies;
   private IBeanDecorationFactory m_beanDecorationFactory;
@@ -93,7 +93,7 @@ public class BeanManagerImplementor implements IBeanContext {
 
   @Override
   public <T> IBean<T> registerClass(Class<T> beanClazz) {
-    return registerBean(new BeanData(beanClazz));
+    return registerBean(new BeanMetaData(beanClazz));
   }
 
   @Override
@@ -107,7 +107,7 @@ public class BeanManagerImplementor implements IBeanContext {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> IBean<T> registerBean(BeanData beanData) {
+  public <T> IBean<T> registerBean(BeanMetaData beanData) {
     m_lock.writeLock().lock();
     try {
       IBean<T> bean = new BeanImplementor<T>(beanData, this);

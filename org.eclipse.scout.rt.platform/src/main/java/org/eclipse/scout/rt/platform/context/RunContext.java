@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.ExceptionTranslator;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 
 /**
@@ -79,7 +79,7 @@ public class RunContext {
       return interceptCallable(callable).call();
     }
     catch (final Exception e) {
-      throw OBJ.get(ExceptionTranslator.class).translate(e);
+      throw BEANS.get(ExceptionTranslator.class).translate(e);
     }
   }
 
@@ -189,7 +189,7 @@ public class RunContext {
    * Creates a copy of <code>this RunContext</code>.
    */
   public RunContext copy() {
-    final RunContext copy = OBJ.get(RunContext.class);
+    final RunContext copy = BEANS.get(RunContext.class);
     copy.copyValues(this);
     return copy;
   }

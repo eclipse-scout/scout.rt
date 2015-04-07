@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
@@ -92,7 +92,7 @@ public class FileServiceTest {
   public void syncRemoteFilesToPath() {
     //register services
     List<IBean<?>> reg = TestingUtility.registerBeans(
-        new BeanData(DummyRemoteFileService.class).
+        new BeanMetaData(DummyRemoteFileService.class).
         initialInstance(new DummyRemoteFileService()).
         applicationScoped(true));
 

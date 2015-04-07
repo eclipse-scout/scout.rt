@@ -25,8 +25,8 @@ public class ApplicationsScopedTest {
 
   @BeforeClass
   public static void registerBeans() {
-    m_bean01 = Platform.get().getBeanContext().registerClass(TestObject.class);
-    m_bean02 = Platform.get().getBeanContext().registerClass(Bean02.class);
+    m_bean01 = Platform.get().getBeanManager().registerClass(TestObject.class);
+    m_bean02 = Platform.get().getBeanManager().registerClass(Bean02.class);
   }
 
   /**
@@ -34,9 +34,9 @@ public class ApplicationsScopedTest {
    */
   @Test
   public void testApplicationScopded() {
-    TestObject i1 = OBJ.get(TestObject.class);
+    TestObject i1 = BEANS.get(TestObject.class);
     Assert.assertNotNull(i1);
-    ITestObject i2 = OBJ.get(TestObject.class);
+    ITestObject i2 = BEANS.get(TestObject.class);
     Assert.assertNotNull(i2);
     Assert.assertEquals(i1, i2);
   }
@@ -46,17 +46,17 @@ public class ApplicationsScopedTest {
    */
   @Test
   public void testInheritedApplicationScopded() {
-    Bean02 i1 = OBJ.get(Bean02.class);
+    Bean02 i1 = BEANS.get(Bean02.class);
     Assert.assertNotNull(i1);
-    Bean02 i2 = OBJ.get(Bean02.class);
+    Bean02 i2 = BEANS.get(Bean02.class);
     Assert.assertNotNull(i2);
     Assert.assertEquals(i1, i2);
   }
 
   @AfterClass
   public static void unregisterBeans() {
-    Platform.get().getBeanContext().unregisterBean(m_bean01);
-    Platform.get().getBeanContext().unregisterBean(m_bean02);
+    Platform.get().getBeanManager().unregisterBean(m_bean01);
+    Platform.get().getBeanManager().unregisterBean(m_bean02);
 
   }
 

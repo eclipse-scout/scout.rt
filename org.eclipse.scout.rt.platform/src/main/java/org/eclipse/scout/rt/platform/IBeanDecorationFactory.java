@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 
 /**
- * Used in {@link IBeanContext}
+ * Used in {@link IBeanManager}
  * <p>
  * Knows how to create an object instance of a {@link IBean} wrapped with a runtime context (multiple interceptors)
  * using all the known {@link BeanInvocationHint} annotations on the beans

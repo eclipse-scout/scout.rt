@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
@@ -125,7 +125,7 @@ public class ServletRunContext extends RunContext {
 
   @Override
   public ServletRunContext copy() {
-    final ServletRunContext copy = OBJ.get(ServletRunContext.class);
+    final ServletRunContext copy = BEANS.get(ServletRunContext.class);
     copy.copyValues(this);
     return copy;
   }

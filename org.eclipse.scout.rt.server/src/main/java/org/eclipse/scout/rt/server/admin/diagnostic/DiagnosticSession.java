@@ -29,7 +29,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.IApplication;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.security.ReadDiagnosticServletPermission;
 import org.eclipse.scout.rt.shared.security.UpdateDiagnosticServletPermission;
@@ -103,7 +103,7 @@ public class DiagnosticSession {
 
     String diagnosticHTML = getDiagnosticItemsHTML(result);
 
-    IApplication app = OBJ.getOptional(IApplication.class);
+    IApplication app = BEANS.opt(IApplication.class);
     String title = "unknown";
     String version = "0.0.0";
     if (app != null) {
@@ -208,7 +208,7 @@ public class DiagnosticSession {
 
     DiagnosticFactory.addDiagnosticItemToList(result, "Version", "", DiagnosticFactory.STATUS_TITLE);
 
-    IApplication app = OBJ.getOptional(IApplication.class);
+    IApplication app = BEANS.opt(IApplication.class);
     String productName = "unknown";
     String application = "unknown";
     String version = "0.0.0";

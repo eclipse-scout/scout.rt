@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * Provider for client sessions. A client session is only created if not contained in the session cache.
@@ -56,7 +56,7 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
     final Set<Principal> principals = subject.getPrincipals();
     Assertions.assertFalse(principals.isEmpty(), "Subject contains no principals");
 
-    SESSION clientSession = getFromCache(principals, OBJ.get(IClientSession.class).getClass());
+    SESSION clientSession = getFromCache(principals, BEANS.get(IClientSession.class).getClass());
     if (clientSession != null) {
       return clientSession;
     }

@@ -13,7 +13,7 @@ package org.eclipse.scout.service;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.service.IServiceInitializer.ServiceInitializerResult;
 
 /**
@@ -30,7 +30,7 @@ public abstract class AbstractService implements IService {
    */
   @PostConstruct
   protected void initializeService() {
-    for (IServiceInitializer i : OBJ.all(IServiceInitializer.class)) {
+    for (IServiceInitializer i : BEANS.all(IServiceInitializer.class)) {
       ServiceInitializerResult res = i.initializeService(this);
       if (ServiceInitializerResult.STOP.equals(res)) {
         break;

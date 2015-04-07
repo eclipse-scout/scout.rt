@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -42,7 +42,7 @@ public class TextsTest {
   @Before
   public void before() throws InterruptedException {
     m_testTextService = TestingUtility.registerBeans(
-        new BeanData(TestTextProviderService.class).
+        new BeanMetaData(TestTextProviderService.class).
         applicationScoped(true)
         );
     ScoutTexts.CURRENT.set(new ScoutTexts(SERVICES.getServices(ITextProviderService.class)));

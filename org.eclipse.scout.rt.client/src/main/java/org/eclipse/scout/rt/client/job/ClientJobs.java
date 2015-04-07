@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -102,7 +102,7 @@ public final class ClientJobs {
    * @see IJobManager#schedule(IExecutable, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final JobInput input) {
-    return OBJ.get(IJobManager.class).schedule(executable, ClientJobs.validateInput(input));
+    return BEANS.get(IJobManager.class).schedule(executable, ClientJobs.validateInput(input));
   }
 
   /**
@@ -153,7 +153,7 @@ public final class ClientJobs {
    * @see IJobManager#schedule(IExecutable, long, TimeUnit, JobInput)
    */
   public static <RESULT> IFuture<RESULT> schedule(final IExecutable<RESULT> executable, final long delay, final TimeUnit delayUnit, final JobInput input) {
-    return OBJ.get(IJobManager.class).schedule(executable, delay, delayUnit, ClientJobs.validateInput(input));
+    return BEANS.get(IJobManager.class).schedule(executable, delay, delayUnit, ClientJobs.validateInput(input));
   }
 
   /**
@@ -178,7 +178,7 @@ public final class ClientJobs {
    * @see IJobManager#scheduleAtFixedRate(IRunnable, long, long, TimeUnit, JobInput)
    */
   public static IFuture<Void> scheduleAtFixedRate(final IRunnable runnable, final long initialDelay, final long period, final TimeUnit unit, final JobInput input) {
-    return OBJ.get(IJobManager.class).scheduleAtFixedRate(runnable, initialDelay, period, unit, ClientJobs.validateInput(input));
+    return BEANS.get(IJobManager.class).scheduleAtFixedRate(runnable, initialDelay, period, unit, ClientJobs.validateInput(input));
   }
 
   /**
@@ -202,7 +202,7 @@ public final class ClientJobs {
    * @see IJobManager#scheduleWithFixedDelay(IRunnable, long, long, TimeUnit, JobInput)
    */
   public static IFuture<Void> scheduleWithFixedDelay(final IRunnable runnable, final long initialDelay, final long delay, final TimeUnit unit, final JobInput input) {
-    return OBJ.get(IJobManager.class).scheduleWithFixedDelay(runnable, initialDelay, delay, unit, ClientJobs.validateInput(input));
+    return BEANS.get(IJobManager.class).scheduleWithFixedDelay(runnable, initialDelay, delay, unit, ClientJobs.validateInput(input));
   }
 
   /**
@@ -251,7 +251,7 @@ public final class ClientJobs {
    */
   public static JobInput newInput(final ClientRunContext clientRunContext) {
     Assertions.assertNotNull(clientRunContext, "'RunContext' must not be null for client jobs");
-    return OBJ.get(JobInput.class).threadName("scout-client-thread").runContext(clientRunContext);
+    return BEANS.get(JobInput.class).threadName("scout-client-thread").runContext(clientRunContext);
   }
 
   /**
@@ -288,7 +288,7 @@ public final class ClientJobs {
    * Validates the given {@link JobInput} and {@link ClientRunContext}.
    */
   private static JobInput validateInput(final JobInput input) {
-    OBJ.get(ClientJobInputValidator.class).validate(input);
+    BEANS.get(ClientJobInputValidator.class).validate(input);
     return input;
   }
 }

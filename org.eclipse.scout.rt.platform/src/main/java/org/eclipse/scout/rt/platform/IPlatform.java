@@ -33,7 +33,7 @@ public interface IPlatform {
      * <p>
      * Next phase is bean context valid
      */
-    BeanContextPrepared, //TODO imo rename to BeanManagerPrepared
+    BeanManagerPrepared,
     /**
      * This event signals that {@link IPlatform#getBeanContext()} is now valid and should not be manipulated anymore
      * <p>
@@ -41,7 +41,7 @@ public interface IPlatform {
      * <p>
      * Next phase is starting the application
      */
-    BeanContextValid, //TODO imo rename to BeanManagerValid
+    BeanManagerValid,
     /**
      * This event signals that the platform is about to start the application, special init code that requires the valid
      * platform may be run now (former Activator.start logic)
@@ -79,8 +79,7 @@ public interface IPlatform {
    */
   State getState();
 
-  //TODO imo rename to getBeanManager
-  IBeanContext getBeanContext();
+  IBeanManager getBeanManager();
 
   void start(Class<? extends IApplication> appType) throws PlatformException;
 

@@ -31,7 +31,7 @@ public class SimpleInstanceTest {
 
   @AfterClass
   public static void unregisterBeans() {
-    Platform.get().getBeanContext().registerClass(TestObject.class);
+    Platform.get().getBeanManager().registerClass(TestObject.class);
   }
 
   @Test

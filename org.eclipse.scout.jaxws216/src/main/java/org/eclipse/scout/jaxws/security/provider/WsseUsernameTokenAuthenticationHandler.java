@@ -31,7 +31,7 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.jaxws.annotation.ScoutTransaction;
 import org.eclipse.scout.jaxws.internal.JaxWsConstants;
 import org.eclipse.scout.jaxws.internal.JaxWsHelper;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -148,7 +148,7 @@ public class WsseUsernameTokenAuthenticationHandler implements IAuthenticationHa
    */
   @Internal
   protected IServerSession lookupServerSession(final Subject subject) throws ProcessingException {
-    return OBJ.get(ServerSessionProviderWithCache.class).provide(ServerRunContexts.copyCurrent().subject(subject));
+    return BEANS.get(ServerSessionProviderWithCache.class).provide(ServerRunContexts.copyCurrent().subject(subject));
   }
 
   /**

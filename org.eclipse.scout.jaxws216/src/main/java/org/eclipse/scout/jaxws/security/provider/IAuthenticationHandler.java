@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.jaxws.internal.JaxWsConstants;
 import org.eclipse.scout.jaxws.internal.JaxWsHelper;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
@@ -80,7 +80,7 @@ public interface IAuthenticationHandler extends SOAPHandler<SOAPMessageContext> 
           subject.getPrincipals().add(new SimplePrincipal(JaxWsConstants.USER_ANONYMOUS));
           subject.setReadOnly();
 
-          final IServerSession serverSession = OBJ.get(ServerSessionProviderWithCache.class).provide(ServerRunContexts.copyCurrent().subject(subject));
+          final IServerSession serverSession = BEANS.get(ServerSessionProviderWithCache.class).provide(ServerRunContexts.copyCurrent().subject(subject));
           JaxWsHelper.setContextSession(context, serverSession);
           return true;
         }

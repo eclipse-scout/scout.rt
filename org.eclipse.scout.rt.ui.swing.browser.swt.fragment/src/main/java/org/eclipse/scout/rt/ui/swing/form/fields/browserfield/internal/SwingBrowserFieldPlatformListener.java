@@ -23,7 +23,7 @@ public class SwingBrowserFieldPlatformListener implements IPlatformListener {
 
   @Override
   public void stateChanged(PlatformEvent event) throws PlatformException {
-    if (event.getState() == IPlatform.State.BeanContextPrepared) {
+    if (event.getState() == IPlatform.State.BeanManagerPrepared) {
       FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField.class, org.eclipse.scout.rt.ui.swing.form.fields.browserfield.internal.SwingScoutBrowserField.class);
     }
   }

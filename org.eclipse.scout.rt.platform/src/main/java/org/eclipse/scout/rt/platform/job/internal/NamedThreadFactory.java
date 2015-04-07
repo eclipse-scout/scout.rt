@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.JobExceptionHandler;
 
 /**
@@ -78,7 +78,7 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
   @Override
   public void uncaughtException(final Thread thread, final Throwable t) {
     try {
-      OBJ.get(JobExceptionHandler.class).handleUncaughtException(thread, t);
+      BEANS.get(JobExceptionHandler.class).handleUncaughtException(thread, t);
     }
     catch (final RuntimeException e) {
       LOG.error(String.format("Failed to handle uncaught exception [thread=%s, cause=%s]", thread.getName(), t), e);

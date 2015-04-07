@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
@@ -76,10 +76,10 @@ public class ClientJobCancelTest {
     MockServiceTunnel tunnel = new MockServiceTunnel(m_session);
     m_session.setServiceTunnel(tunnel);
     m_serviceReg = TestingUtility.registerBeans(
-        new BeanData(MockPingService.class).
+        new BeanMetaData(MockPingService.class).
         initialInstance(new MockPingService()).
         applicationScoped(true),
-        new BeanData(MockServerProcessingCancelService.class).
+        new BeanMetaData(MockServerProcessingCancelService.class).
         initialInstance(new MockServerProcessingCancelService(tunnel)).
         applicationScoped(true)
         );

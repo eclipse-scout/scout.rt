@@ -32,13 +32,13 @@ public class SameBeanOrderTest {
 
   @BeforeClass
   public static void registerBeans() {
-    m_bean01 = Platform.get().getBeanContext().registerClass(ABean.class);
-    m_bean02 = Platform.get().getBeanContext().registerClass(BBean.class);
+    m_bean01 = Platform.get().getBeanManager().registerClass(ABean.class);
+    m_bean02 = Platform.get().getBeanManager().registerClass(BBean.class);
   }
 
   @Test
   public void testOrder() {
-    List<ITestBean> all = OBJ.all(ITestBean.class);
+    List<ITestBean> all = BEANS.all(ITestBean.class);
     Assert.assertEquals(2, all.size());
     Assert.assertEquals(ABean.class, all.get(0).getClass());
     Assert.assertEquals(BBean.class, all.get(1).getClass());
@@ -46,13 +46,13 @@ public class SameBeanOrderTest {
 
   @Test(expected = Assertions.AssertionException.class)
   public void testMultipleException() {
-    Assert.assertEquals(ABean.class, OBJ.get(ITestBean.class).getClass());
+    Assert.assertEquals(ABean.class, BEANS.get(ITestBean.class).getClass());
   }
 
   @AfterClass
   public static void removeBeans() {
-    Platform.get().getBeanContext().unregisterBean(m_bean01);
-    Platform.get().getBeanContext().unregisterBean(m_bean02);
+    Platform.get().getBeanManager().unregisterBean(m_bean01);
+    Platform.get().getBeanManager().unregisterBean(m_bean02);
   }
 
   private static interface ITestBean {

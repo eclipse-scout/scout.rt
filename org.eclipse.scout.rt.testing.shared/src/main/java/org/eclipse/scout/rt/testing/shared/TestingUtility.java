@@ -23,9 +23,9 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanContext;
+import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.Platform;
 import org.mockito.Mockito;
 
@@ -149,33 +149,33 @@ public final class TestingUtility {
   }
 
   /**
-   * Registers the given beans in the {@link IBeanContext} of {@link Platform#get()} with an {@link Order} value of
+   * Registers the given beans in the {@link IBeanManager} of {@link Platform#get()} with an {@link Order} value of
    * {@link #TESTING_BEAN_ORDER} (if none is already set) that overrides all other beans
    * <p>
-   * If registering Mockito mocks, use {@link BeanData#BeanData(Class, Object)}.
+   * If registering Mockito mocks, use {@link BeanMetaData#BeanData(Class, Object)}.
    *
    * @return the registrations
    */
-  public static List<IBean<?>> registerBeans(BeanData... beanDatas) {
+  public static List<IBean<?>> registerBeans(BeanMetaData... beanDatas) {
     if (beanDatas == null) {
       return CollectionUtility.emptyArrayList();
     }
     List<IBean<?>> registeredBeans = new ArrayList<>();
-    for (BeanData beanData : beanDatas) {
+    for (BeanMetaData beanData : beanDatas) {
       registeredBeans.add(registerBean(beanData));
     }
     return registeredBeans;
   }
 
   /**
-   * Registers the given bean in the {@link IBeanContext} of {@link Platform#get()} with an {@link Order} value of
+   * Registers the given bean in the {@link IBeanManager} of {@link Platform#get()} with an {@link Order} value of
    * {@link #TESTING_BEAN_ORDER} (if none is already set) that overrides all other beans
    * <p>
-   * If registering Mockito mocks, use {@link BeanData#BeanData(Class, Object)}.
+   * If registering Mockito mocks, use {@link BeanMetaData#BeanData(Class, Object)}.
    *
    * @return the registration
    */
-  public static IBean<?> registerBean(BeanData beanData) {
+  public static IBean<?> registerBean(BeanMetaData beanData) {
     if (beanData == null) {
       return null;
     }
@@ -183,7 +183,7 @@ public final class TestingUtility {
     if (beanData.getBeanAnnotation(Order.class) == null && beanData.getBeanAnnotation(Priority.class) == null) {
       beanData.order(TESTING_BEAN_ORDER);
     }
-    return Platform.get().getBeanContext().registerBean(beanData);
+    return Platform.get().getBeanManager().registerBean(beanData);
   }
 
   /**
@@ -196,7 +196,7 @@ public final class TestingUtility {
       return;
     }
     for (IBean<?> bean : beans) {
-      Platform.get().getBeanContext().unregisterBean(bean);
+      Platform.get().getBeanManager().unregisterBean(bean);
     }
   }
 

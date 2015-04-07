@@ -3,7 +3,7 @@ package org.eclipse.scout.rt.platform;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 
 /**
- * Default simple {@link IBeanDecorationFactory} used in {@link IPlatform#getBeanContext()}
+ * Default simple {@link IBeanDecorationFactory} used in {@link IPlatform#getBeanManager()}
  */
 public class SimpleBeanDecorationFactory implements IBeanDecorationFactory {
 

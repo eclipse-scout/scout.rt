@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.IApplication;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
@@ -119,7 +119,7 @@ public abstract class AbstractJmsService<T> extends AbstractService {
   protected String createClientId() {
     String serverVersion = null;
     try {
-      IApplication app = OBJ.getOptional(IApplication.class);
+      IApplication app = BEANS.opt(IApplication.class);
       if (app != null) {
         serverVersion = app.getVersion();
       }

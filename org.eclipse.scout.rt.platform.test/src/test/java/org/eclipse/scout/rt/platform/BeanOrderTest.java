@@ -32,8 +32,8 @@ public class BeanOrderTest {
 
   @BeforeClass
   public static void registerBeans() {
-    m_bean01 = Platform.get().getBeanContext().registerClass(TestBean01.class);
-    m_bean02 = Platform.get().getBeanContext().registerClass(TestBean02.class);
+    m_bean01 = Platform.get().getBeanManager().registerClass(TestBean01.class);
+    m_bean02 = Platform.get().getBeanManager().registerClass(TestBean02.class);
   }
 
   /**
@@ -41,7 +41,7 @@ public class BeanOrderTest {
    */
   @Test
   public void testOrder() {
-    List<ITestBean> all = OBJ.all(ITestBean.class);
+    List<ITestBean> all = BEANS.all(ITestBean.class);
     Assert.assertEquals(2, all.size());
     Assert.assertEquals(TestBean01.class, all.get(0).getClass());
     Assert.assertEquals(TestBean02.class, all.get(1).getClass());
@@ -49,13 +49,13 @@ public class BeanOrderTest {
 
   @Test(expected = Assertions.AssertionException.class)
   public void testMutlipleException() {
-    Assert.assertEquals(TestBean01.class, OBJ.get(ITestBean.class).getClass());
+    Assert.assertEquals(TestBean01.class, BEANS.get(ITestBean.class).getClass());
   }
 
   @AfterClass
   public static void removeBeans() {
-    Platform.get().getBeanContext().unregisterBean(m_bean01);
-    Platform.get().getBeanContext().unregisterBean(m_bean02);
+    Platform.get().getBeanManager().unregisterBean(m_bean01);
+    Platform.get().getBeanManager().unregisterBean(m_bean02);
   }
 
   private static interface ITestBean {

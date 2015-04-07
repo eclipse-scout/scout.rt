@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.client.services.common.icon;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * Get access to the current {@link IconLocator} using {@link OBJ#get(Class)}
+ * Get access to the current {@link IconLocator} using {@link BEANS#get(Class)}
  * <p>
  * or use the convenience {@link #instance()} method
  */
@@ -26,7 +26,7 @@ import org.eclipse.scout.service.SERVICES;
 public class IconLocator {
 
   public static IconLocator instance() {
-    return OBJ.get(IconLocator.class);
+    return BEANS.get(IconLocator.class);
   }
 
   public IconSpec getIconSpec(String name) {

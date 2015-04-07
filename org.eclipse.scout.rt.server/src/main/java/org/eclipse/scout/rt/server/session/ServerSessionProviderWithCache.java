@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 
@@ -51,7 +51,7 @@ public class ServerSessionProviderWithCache extends ServerSessionProvider {
     final Set<Principal> principals = subject.getPrincipals();
     Assertions.assertFalse(principals.isEmpty(), "Subject contains no principals");
 
-    SESSION serverSession = getFromCache(principals, OBJ.get(IServerSession.class).getClass());
+    SESSION serverSession = getFromCache(principals, BEANS.get(IServerSession.class).getClass());
     if (serverSession != null) {
       return serverSession;
     }

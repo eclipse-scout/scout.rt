@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -47,7 +47,7 @@ public class ServerSessionProvider {
       @Override
       public SESSION call() throws Exception {
         // 1. Create an empty session instance.
-        final SESSION serverSession = ServerSessionProvider.cast(OBJ.get(IServerSession.class));
+        final SESSION serverSession = ServerSessionProvider.cast(BEANS.get(IServerSession.class));
         serverSession.setIdInternal(String.format("%s-%s", serverSession.getClass().getName(), UUID.randomUUID()));
 
         // 2. Load the session.

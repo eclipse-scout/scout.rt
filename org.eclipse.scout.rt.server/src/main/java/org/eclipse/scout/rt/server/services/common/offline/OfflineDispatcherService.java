@@ -16,7 +16,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -60,7 +60,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
    * Method invoked to provide a new or cached {@link IServerSession} for the current request.
    */
   protected IServerSession provideServerSession(final ServerRunContext serverRunContext) throws ProcessingException {
-    return OBJ.get(ServerSessionProviderWithCache.class).provide(serverRunContext);
+    return BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext);
   }
 
   /**

@@ -27,7 +27,7 @@ import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ExceptionTranslator;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.service.internal.AbstractHolderArgumentVisitor;
 
 /**
@@ -94,7 +94,7 @@ public final class ServiceUtility {
       return serviceClass.getMethod(operation, paramTypes);
     }
     catch (Throwable t) {
-      throw OBJ.get(ExceptionTranslator.class).translate(t);
+      throw BEANS.get(ExceptionTranslator.class).translate(t);
     }
   }
 

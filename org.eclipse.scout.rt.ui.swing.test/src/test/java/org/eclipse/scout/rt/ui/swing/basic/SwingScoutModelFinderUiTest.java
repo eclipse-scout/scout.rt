@@ -87,12 +87,12 @@ public class SwingScoutModelFinderUiTest {
 
   @Before
   public void before() {
-    m_iconLocatorReg = Platform.get().getBeanContext().registerClass(P_NullIconLocator.class);
+    m_iconLocatorReg = Platform.get().getBeanManager().registerClass(P_NullIconLocator.class);
   }
 
   @After
   public void after() {
-    Platform.get().getBeanContext().unregisterBean(m_iconLocatorReg);
+    Platform.get().getBeanManager().unregisterBean(m_iconLocatorReg);
   }
 
   @Test

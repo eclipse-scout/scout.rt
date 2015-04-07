@@ -9,13 +9,13 @@ import java.lang.annotation.Target;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.BeanInvocationHint;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * An object (typically a service implementation) with this annotation creates a client transaction whenever an
  * operationis called.
  * <p>
- * Only valid if the object is obtained using {@link OBJ#get(Class)} with an interface argument
+ * Only valid if the object is obtained using {@link BEANS#get(Class)} with an interface argument
  */
 @Bean
 @BeanInvocationHint

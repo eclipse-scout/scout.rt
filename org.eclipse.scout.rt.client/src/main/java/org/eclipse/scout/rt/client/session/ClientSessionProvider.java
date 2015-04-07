@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
@@ -44,7 +44,7 @@ public class ClientSessionProvider {
       @Override
       public SESSION call() throws Exception {
         // 1. Create an empty session instance.
-        final SESSION clientSession = ClientSessionProvider.cast(OBJ.get(IClientSession.class));
+        final SESSION clientSession = ClientSessionProvider.cast(BEANS.get(IClientSession.class));
 
         // 2. Load the session.
         ModelJobs.schedule(new IRunnable() {

@@ -20,7 +20,7 @@ import java.security.Permissions;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
@@ -47,7 +47,7 @@ public class SharedAccessControlServiceTest {
 
     //Register this IAccessControlService with an higher priority than AllAccessControlService registered in CustomServerTestEnvironment
     m_registerServices = TestingUtility.registerBeans(
-        new BeanData(IAccessControlService.class).
+        new BeanMetaData(IAccessControlService.class).
             initialInstance(m_accessControlService).
             applicationScoped(true)
         );

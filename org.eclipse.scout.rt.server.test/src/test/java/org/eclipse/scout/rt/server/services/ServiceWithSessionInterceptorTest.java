@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.server.services;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -32,7 +32,7 @@ public class ServiceWithSessionInterceptorTest {
   @BeforeClass
   public static void setUp() {
     m_serverSession = new TestServerSession();
-    Platform.get().getBeanContext().registerClass(TestService.class);
+    Platform.get().getBeanManager().registerClass(TestService.class);
   }
 
   @AfterClass
@@ -52,7 +52,7 @@ public class ServiceWithSessionInterceptorTest {
   }
 
   protected void runInServerRunContext() {
-    OBJ.get(ITestService.class).doit();
+    BEANS.get(ITestService.class).doit();
   }
 
   public static interface ITestService extends IService {

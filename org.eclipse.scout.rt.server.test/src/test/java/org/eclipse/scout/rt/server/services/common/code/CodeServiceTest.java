@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BeanData;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.server.TestServerSession;
@@ -60,7 +60,7 @@ public class CodeServiceTest {
 
   private void testImpl(ICodeService testService, boolean testCodeType1Expected, boolean testCodeType2Expected) {
     List<IBean<?>> reg = TestingUtility.registerBeans(
-        new BeanData(ICodeService.class).
+        new BeanMetaData(ICodeService.class).
             initialInstance(testService).
             applicationScoped(true));
     try {
@@ -159,7 +159,7 @@ public class CodeServiceTest {
   public void testReloadCodeType() throws Exception {
     IClientNotificationService clientNotificationService = Mockito.mock(IClientNotificationService.class);
     List<IBean<?>> reg = TestingUtility.registerBeans(
-        new BeanData(IClientNotificationService.class).
+        new BeanMetaData(IClientNotificationService.class).
             initialInstance(clientNotificationService).
             applicationScoped(true));
     try {
@@ -183,7 +183,7 @@ public class CodeServiceTest {
   public void testReloadCodeTypes() throws Exception {
     IClientNotificationService clientNotificationService = Mockito.mock(IClientNotificationService.class);
     List<IBean<?>> reg = TestingUtility.registerBeans(
-        new BeanData(IClientNotificationService.class).
+        new BeanMetaData(IClientNotificationService.class).
             initialInstance(clientNotificationService).
             applicationScoped(true));
     try {

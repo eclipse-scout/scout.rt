@@ -17,7 +17,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 
@@ -100,7 +100,7 @@ public class JmsRunContext extends RunContext {
 
   @Override
   public JmsRunContext copy() {
-    final JmsRunContext copy = OBJ.get(JmsRunContext.class);
+    final JmsRunContext copy = BEANS.get(JmsRunContext.class);
     copy.copyValues(this);
     return copy;
   }

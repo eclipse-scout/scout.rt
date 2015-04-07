@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ExceptionTranslator;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
@@ -55,7 +55,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_input = input;
     m_periodic = periodic;
     m_mutexSemaphores = mutexSemaphores;
-    m_progressMonitor = OBJ.get(ProgressMonitorProvider.class).provide(this);
+    m_progressMonitor = BEANS.get(ProgressMonitorProvider.class).provide(this);
     m_expirationDate = (input.expirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.expirationTimeMillis() : null);
 
     postConstruct();
@@ -176,7 +176,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return get();
     }
     catch (final ExecutionException e) {
-      throw OBJ.get(ExceptionTranslator.class).translate(e.getCause());
+      throw BEANS.get(ExceptionTranslator.class).translate(e.getCause());
     }
     catch (final CancellationException e) {
       return null; // Cancellation does not result in an exception.
@@ -185,7 +185,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       throw JobExecutionException.fromInterruptedException(e, m_input.identifier());
     }
     catch (final RuntimeException e) {
-      throw OBJ.get(ExceptionTranslator.class).translate(e);
+      throw BEANS.get(ExceptionTranslator.class).translate(e);
     }
   }
 
@@ -195,7 +195,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return get(timeout, unit);
     }
     catch (final ExecutionException e) {
-      throw OBJ.get(ExceptionTranslator.class).translate(e.getCause());
+      throw BEANS.get(ExceptionTranslator.class).translate(e.getCause());
     }
     catch (final CancellationException e) {
       return null; // Cancellation does not result in an exception.
@@ -207,7 +207,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       throw JobExecutionException.fromTimeoutException(e, timeout, unit, m_input.identifier());
     }
     catch (final RuntimeException e) {
-      throw OBJ.get(ExceptionTranslator.class).translate(e);
+      throw BEANS.get(ExceptionTranslator.class).translate(e);
     }
   }
 

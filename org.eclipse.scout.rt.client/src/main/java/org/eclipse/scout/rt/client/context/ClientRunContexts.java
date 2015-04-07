@@ -14,7 +14,7 @@ import java.util.Locale;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
@@ -50,7 +50,7 @@ public final class ClientRunContexts {
    * session, but must be set explicitly instead.
    */
   public static final ClientRunContext empty() {
-    final ClientRunContext runContext = OBJ.get(ClientRunContext.class);
+    final ClientRunContext runContext = BEANS.get(ClientRunContext.class);
     runContext.fillEmptyValues();
     return runContext;
   }
@@ -59,7 +59,7 @@ public final class ClientRunContexts {
    * Creates a "snapshot" of the current calling client context.
    */
   public static ClientRunContext copyCurrent() {
-    final ClientRunContext runContext = OBJ.get(ClientRunContext.class);
+    final ClientRunContext runContext = BEANS.get(ClientRunContext.class);
     runContext.fillCurrentValues();
     return runContext;
   }

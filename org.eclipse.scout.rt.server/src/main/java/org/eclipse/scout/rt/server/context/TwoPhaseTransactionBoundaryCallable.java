@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ExceptionTranslator;
-import org.eclipse.scout.rt.platform.OBJ;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -88,7 +88,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
    */
   @Internal
   protected RESULT runRequiresNewTxBoundary() throws Exception {
-    final ITransaction transaction = OBJ.get(ITransactionProvider.class).provide(m_transactionId);
+    final ITransaction transaction = BEANS.get(ITransactionProvider.class).provide(m_transactionId);
 
     ActiveTransactionRegistry.register(transaction);
     try {
@@ -126,11 +126,11 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
       return new InitThreadLocalCallable<>(m_next, ITransaction.CURRENT, tx).call();
     }
     catch (final Exception | Error e) {
-      tx.addFailure(OBJ.get(ExceptionTranslator.class).translate(e));
+      tx.addFailure(BEANS.get(ExceptionTranslator.class).translate(e));
       throw e;
     }
     catch (final Throwable t) {
-      tx.addFailure(OBJ.get(ExceptionTranslator.class).translate(t));
+      tx.addFailure(BEANS.get(ExceptionTranslator.class).translate(t));
       throw new Error(t);
     }
   }
