@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -35,17 +34,11 @@ import org.eclipse.scout.service.AbstractService;
 public class RemoteFileService extends AbstractService implements IRemoteFileService {
   private String m_rootPath;
 
-  @Override
-  protected void initializeService() {
-    super.initializeService();
-    m_rootPath = ConfigIniUtility.getProperty(RemoteFileService.class.getName() + "#rootPath");
-  }
-
   public String getRootPath() {
     return m_rootPath;
   }
 
-  protected void setRootPathInternal(String rootPath) {
+  public void setRootPath(String rootPath) {
     m_rootPath = rootPath;
   }
 
