@@ -44,6 +44,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
 
+<!--
       <build>
         <pluginManagement>
           <plugins>
@@ -51,9 +52,9 @@
               <groupId>org.eclipse.tycho</groupId>
               <artifactId>tycho-surefire-plugin</artifactId>
               <version>${tycho.version}</version>
-              <configuration>
+              <configuration> -->
                 <!-- Convention: tests requiring an UI layer use the suffix *UiTest,
-                  they are excluded with this profile. -->
+                  they are excluded with this profile. --><!--
                 <excludes>
                   <exclude>**/*UiTest.java</exclude>
                 </excludes>
@@ -61,9 +62,9 @@
             </plugin>
           </plugins>
         </pluginManagement>
-      </build>
-    </profile>
+      </build> -->
 
+    </profile>
     <profile>
       <id>include-uitest</id>
       <activation>
