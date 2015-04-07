@@ -26,13 +26,13 @@ public class JandexInventoryBuilder {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JandexInventoryBuilder.class);
   private static final String SCOUT_XML_PATH = "META-INF/scout.xml";
   private static final String JANDEX_INDEX_PATH = "META-INF/jandex.idx";
-  private static final String SYSTEM_PROPERTY_JANDEX_IDX = "jandex.idx";
+  private static final String SYSTEM_PROPERTY_JANDEX_REBUILD = "jandex.rebuild";
 
   private final ArrayList<IndexView> m_indexList = new ArrayList<>();
   private final boolean m_rebuildFolderIndexes;
 
   public JandexInventoryBuilder() {
-    m_rebuildFolderIndexes = ConfigIniUtility.getProperty(SYSTEM_PROPERTY_JANDEX_IDX, "auto").equals("rebuild");
+    m_rebuildFolderIndexes = ConfigIniUtility.getProperty(SYSTEM_PROPERTY_JANDEX_REBUILD, "true").equals("false");
   }
 
   public void scanAllModules() throws PlatformException {
