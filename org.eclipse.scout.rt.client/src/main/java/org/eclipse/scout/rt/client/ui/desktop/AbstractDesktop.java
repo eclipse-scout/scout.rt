@@ -1146,7 +1146,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public <T extends IToolButton> T getToolButton(Class<? extends T> searchType) {
     // ActionFinder performs instance-of checks. Hence the toolbutton replacement mapping is not required
-    return new ActionFinder().findAction(getMenus(), searchType);
+    return new ActionFinder().findAction(getToolButtons(), searchType);
   }
 
   @Override
@@ -1157,7 +1157,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public <T extends IViewButton> T getViewButton(Class<? extends T> searchType) {
     // ActionFinder performs instance-of checks. Hence the viewbutton replacement mapping is not required
-    return new ActionFinder().findAction(getMenus(), searchType);
+    return new ActionFinder().findAction(getViewButtons(), searchType);
   }
 
   @Override
