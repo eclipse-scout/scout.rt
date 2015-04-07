@@ -27,15 +27,17 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.UiHints;
 
 /**
- * Supports the servlet init-params
- * <p>
- * get_min_size = minimum size that is compressed, default {@value #DEFAULT_GET_MIN_SIZE} = 64
- * <p>
- * post_min_size = minimum size that is compressed, default {@link #DEFAULT_POST_MIN_SIZE} = 64
- * <p>
- * get_pattern = regex of pathInfo that is compressed, default {@link #DEFAULT_GET_PATTERN} = '*(html|css|js)'
- * <p>
- * post_pattern = regex of pathInfo that is compressed, default {@link #DEFAULT_POST_PATTERN} = '/json'
+ * Supports the following servlet init-params:
+ * <ul>
+ * <li><b>get_min_size:</b> minimum size in bytes that is compressed for GET requests (default value =
+ * <code>{@value #DEFAULT_GET_MIN_SIZE}</code>)
+ * <li><b>post_min_size:</b> minimum size in bytes that is compressed for POST requests (default value =
+ * {@value #DEFAULT_POST_MIN_SIZE})
+ * <li><b>get_pattern:</b> regex of pathInfo that is compressed for GET requests (default value =
+ * <code>.*\.(html|css|js)</code>, see {@link #DEFAULT_GET_PATTERN})
+ * <li><b>post_pattern:</b> regex of pathInfo that is compressed for POST requests (default value = <code>/json</code>,
+ * see {@link #DEFAULT_POST_PATTERN})
+ * </ul>
  */
 public class GzipServletFilter implements Filter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(GzipServletFilter.class);
@@ -44,8 +46,8 @@ public class GzipServletFilter implements Filter {
   public static final String CONTENT_ENCODING = "Content-Encoding";
   public static final String GZIP = "gzip";
 
-  public static final int DEFAULT_GET_MIN_SIZE = 64;
-  public static final int DEFAULT_POST_MIN_SIZE = 64;
+  public static final int DEFAULT_GET_MIN_SIZE = 256;
+  public static final int DEFAULT_POST_MIN_SIZE = 256;
 
   public static final Pattern DEFAULT_GET_PATTERN = Pattern.compile(".*\\.(html|css|js)", Pattern.CASE_INSENSITIVE);
   public static final Pattern DEFAULT_POST_PATTERN = Pattern.compile(".*/json", Pattern.CASE_INSENSITIVE);
