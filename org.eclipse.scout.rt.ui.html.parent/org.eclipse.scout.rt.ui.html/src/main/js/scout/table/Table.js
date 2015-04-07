@@ -582,7 +582,7 @@ scout.Table.prototype._findHyperLink = function(event) {
   return null;
 };
 
-scout.Table.prototype._filterMenus = function(allowedTypes, onlyVisible) {
+scout.Table.prototype._filterMenus = function(allowedTypes) {
   allowedTypes = allowedTypes || [];
   if (!this.headerVisible) {
     //if no header is visible header menues should not be displayed
@@ -593,7 +593,7 @@ scout.Table.prototype._filterMenus = function(allowedTypes, onlyVisible) {
   } else if (this.selectedRowIds.length > 1) {
     allowedTypes.push('Table.MultiSelection');
   }
-  return scout.menus.filter(this.menus, allowedTypes, onlyVisible);
+  return scout.menus.filter(this.menus, allowedTypes);
 };
 
 scout.Table.prototype._renderMenus = function() {

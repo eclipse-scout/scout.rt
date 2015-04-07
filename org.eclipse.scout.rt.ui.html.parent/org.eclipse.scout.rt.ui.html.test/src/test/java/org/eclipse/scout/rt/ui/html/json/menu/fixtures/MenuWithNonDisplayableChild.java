@@ -8,38 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.table.fixtures;
+package org.eclipse.scout.rt.ui.html.json.menu.fixtures;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 
-public class TableWithNotDisplayableMenu extends AbstractTable {
-
-  @Order(10.0)
-  public class Col1Column extends AbstractStringColumn {
-
-    @Override
-    protected String getConfiguredHeaderText() {
-      return "col1";
-    }
-  }
-
-  @Override
-  protected void addHeaderMenus(OrderedCollection<IMenu> menus) {
-    // don't add additional menus
-  }
+public class MenuWithNonDisplayableChild extends AbstractMenu {
 
   @Order(10.0)
   public class DisplayableMenu extends AbstractMenu {
   }
 
   @Order(20.0)
-  public class NotDisplayableMenu extends AbstractMenu {
+  public class NonDisplayableMenu extends AbstractMenu {
 
     @Override
     protected void execInitAction() throws ProcessingException {

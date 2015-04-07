@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
@@ -67,15 +68,13 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     attachGlobalAdapters(getViews());
     attachGlobalAdapters(getDialogs());
     attachGlobalAdapters(getModel().getMessageBoxStack());
-    attachAdapters(filterModelActions());
+    attachAdapters(filterModelActions(), new DisplayableActionFilter<IAction>());
     attachAdapters(getModel().getAddOns());
-    attachAdapters(getModel().getKeyStrokes());
-    attachAdapters(getModel().getMenus());
+    attachAdapters(getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
     if (!isFormBased()) {
-      attachAdapters(getModel().getToolButtons());
-      attachAdapters(getModel().getViewButtons());
-      attachGlobalAdapter(getModel().getOutline());
-      attachGlobalAdapter(getSearchOutline());
+      attachAdapters(getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
+      attachGlobalAdapter(getModel().getOutline(), new DisplayableOutlineFilter<IOutline>());
+      attachGlobalAdapter(getSearchOutline(), new DisplayableOutlineFilter<IOutline>());
     }
   }
 
@@ -158,16 +157,14 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     putAdapterIdsProperty(json, "views", getViews());
     putAdapterIdsProperty(json, "dialogs", getDialogs());
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxStack());
-    putAdapterIdsProperty(json, "actions", filterModelActions());
+    putAdapterIdsProperty(json, "actions", filterModelActions(), new DisplayableActionFilter<IAction>());
     putAdapterIdsProperty(json, "addOns", getModel().getAddOns());
-    putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes());
-    putAdapterIdsProperty(json, "menus", getModel().getMenus());
+    putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
     if (!isFormBased()) {
       // FIXME CGU: view and tool buttons should be removed from desktop by device transformer
-      putAdapterIdsProperty(json, "toolButtons", getModel().getToolButtons());
-      putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons());
-      putAdapterIdProperty(json, "outline", getModel().getOutline());
-      putAdapterIdProperty(json, "searchOutline", getSearchOutline());
+      putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
+      putAdapterIdProperty(json, "outline", getModel().getOutline(), new DisplayableOutlineFilter<IOutline>());
+      putAdapterIdProperty(json, "searchOutline", getSearchOutline(), new DisplayableOutlineFilter<IOutline>());
     }
     return json;
   }

@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 import org.json.JSONObject;
 
@@ -64,12 +65,12 @@ public class JsonMenu<T extends IMenu> extends JsonAction<T> {
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachAdapters(getModel().getChildActions());
+    attachAdapters(getModel().getChildActions(), new DisplayableActionFilter<IMenu>());
   }
 
   @Override
   public JSONObject toJson() {
-    return putAdapterIdsProperty(super.toJson(), PROP_CHILD_MENUS, getModel().getChildActions());
+    return putAdapterIdsProperty(super.toJson(), PROP_CHILD_MENUS, getModel().getChildActions(), new DisplayableActionFilter<IMenu>());
   }
 
   @Override

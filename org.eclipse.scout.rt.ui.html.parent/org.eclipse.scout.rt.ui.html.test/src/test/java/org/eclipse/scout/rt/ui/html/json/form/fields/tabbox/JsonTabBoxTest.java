@@ -74,29 +74,29 @@ public class JsonTabBoxTest {
   /**
    * Tests whether non displayable groups are sent.
    * <p>
-   * This limits response size and also leverages security because the fields are never visible to the user, not even
+   * This reduces response size and also leverages security because the fields are never visible to the user, not even
    * with the dev tools of the browser
    */
   @Test
-  public void testDontSendNotDisplayableGroups() throws Exception {
-    ITabBox tabBox = new TabBoxWithNotDisplayableGroup();
+  public void testDontSendNonDisplayableGroups() throws Exception {
+    ITabBox tabBox = new TabBoxWithNonDisplayableGroup();
     JsonTestUtility.initField(tabBox);
 
     JsonTabBox<ITabBox> jsonTabBox = m_jsonSession.newJsonAdapter(tabBox, null, null);
-    JsonGroupBox<IGroupBox> jsonDisplayableGroup = m_jsonSession.getJsonAdapter(tabBox.getFieldByClass(TabBoxWithNotDisplayableGroup.DisplayableGroup.class), jsonTabBox);
-    JsonGroupBox<IGroupBox> jsonNotDisplayableGroup = m_jsonSession.getJsonAdapter(tabBox.getFieldByClass(TabBoxWithNotDisplayableGroup.NotDisplayableGroup.class), jsonTabBox);
+    JsonGroupBox<IGroupBox> jsonDisplayableGroup = m_jsonSession.getJsonAdapter(tabBox.getFieldByClass(TabBoxWithNonDisplayableGroup.DisplayableGroup.class), jsonTabBox);
+    JsonGroupBox<IGroupBox> jsonNonDisplayableGroup = m_jsonSession.getJsonAdapter(tabBox.getFieldByClass(TabBoxWithNonDisplayableGroup.NonDisplayableGroup.class), jsonTabBox);
 
-    // Adapter for NotDisplayableField must not exist
-    assertNull(jsonNotDisplayableGroup);
+    // Adapter for NonDisplayableField must not exist
+    assertNull(jsonNonDisplayableGroup);
 
-    // Json response must not contain NotDisplayableField
+    // Json response must not contain NonDisplayableField
     JSONObject json = jsonTabBox.toJson();
     JSONArray jsonGroupBoxes = json.getJSONArray("tabItems");
     assertEquals(1, jsonGroupBoxes.length());
     assertEquals(jsonDisplayableGroup.getId(), jsonGroupBoxes.get(0));
   }
 
-  private class TabBoxWithNotDisplayableGroup extends AbstractTabBox {
+  private class TabBoxWithNonDisplayableGroup extends AbstractTabBox {
 
     @Order(10)
     public class DisplayableGroup extends AbstractGroupBox {
@@ -104,7 +104,7 @@ public class JsonTabBoxTest {
     }
 
     @Order(20)
-    public class NotDisplayableGroup extends AbstractGroupBox {
+    public class NonDisplayableGroup extends AbstractGroupBox {
 
       @Override
       protected void execInitField() throws ProcessingException {

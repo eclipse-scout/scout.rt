@@ -11,16 +11,23 @@
 package org.eclipse.scout.rt.ui.html.json.menu;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.action.ActionFinder;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
+import org.eclipse.scout.rt.ui.html.json.menu.fixtures.MenuWithNonDisplayableChild;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
-import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -29,7 +36,12 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonMenuTest {
 
-  JsonSessionMock m_jsonSession = new JsonSessionMock();
+  private JsonSessionMock m_jsonSession;
+
+  @Before
+  public void setUp() {
+    m_jsonSession = new JsonSessionMock();
+  }
 
   @Test
   public void testInitialVSPropertyChange() throws Exception {
@@ -57,6 +69,32 @@ public class JsonMenuTest {
    */
   private void simulateProcessRequestOnJsonSession() throws Exception {
     JsonTestUtility.endRequest(m_jsonSession);
+  }
+
+  /**
+   * Tests whether non displayable menus are sent.
+   * <p>
+   * This reduces response size and also leverages security because the menus are never visible to the user, not even
+   * with the dev tools of the browser
+   */
+  @Test
+  public void testDontSendNonDisplayableMenus() throws Exception {
+    IMenu menu = new MenuWithNonDisplayableChild();
+    ActionUtility.initActions(CollectionUtility.arrayList(menu));
+
+    JsonMenu<IMenu> jsonMenu = m_jsonSession.newJsonAdapter(menu, null, null);
+
+    JsonMenu<IMenu> jsonDisplayableMenu = jsonMenu.getAdapter(new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.DisplayableMenu.class));
+    JsonMenu<IMenu> jsonNonDisplayableMenu = jsonMenu.getAdapter(new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.NonDisplayableMenu.class));
+
+    // Adapter for NonDisplayableMenu must not exist
+    assertNull(jsonNonDisplayableMenu);
+
+    // Json response must not contain NonDisplayableMenu
+    JSONObject json = jsonMenu.toJson();
+    JSONArray jsonMenus = json.getJSONArray("childMenus");
+    assertEquals(1, jsonMenus.length());
+    assertEquals(jsonDisplayableMenu.getId(), jsonMenus.get(0));
   }
 
 }

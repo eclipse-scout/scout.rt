@@ -18,7 +18,7 @@ scout.Desktop = function() {
    * Auch im zusammenhang mit focus-handling nochmals überdenken.
    */
   this.selectedTool;
-  this._addAdapterProperties(['viewButtons', 'actions', 'views', 'dialogs', 'outline', 'searchOutline', 'messageBoxes', 'addOns', 'keyStrokes', 'menus', 'toolButtons']);
+  this._addAdapterProperties(['viewButtons', 'actions', 'views', 'dialogs', 'outline', 'searchOutline', 'messageBoxes', 'addOns', 'keyStrokes']);
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 

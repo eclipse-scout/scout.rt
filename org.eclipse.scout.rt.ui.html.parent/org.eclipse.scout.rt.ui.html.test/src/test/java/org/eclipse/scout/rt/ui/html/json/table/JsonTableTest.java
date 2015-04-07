@@ -46,9 +46,9 @@ import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableControl;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWith3Cols;
-import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithNotDisplayableMenu;
-import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithNotDisplayableMenu.DisplayableMenu;
-import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithNotDisplayableMenu.NotDisplayableMenu;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithNonDisplayableMenu;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithNonDisplayableMenu.DisplayableMenu;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithNonDisplayableMenu.NonDisplayableMenu;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithoutMenus;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONArray;
@@ -306,23 +306,23 @@ public class JsonTableTest {
   /**
    * Tests whether non displayable menus are sent.
    * <p>
-   * This limits response size and also leverages security because the menus are never visible to the user, not even
+   * This reduces response size and also leverages security because the menus are never visible to the user, not even
    * with the dev tools of the browser
    */
   @Test
-  public void testDontSendNotDisplayableMenus() throws Exception {
-    TableWithNotDisplayableMenu table = new TableWithNotDisplayableMenu();
+  public void testDontSendNonDisplayableMenus() throws Exception {
+    TableWithNonDisplayableMenu table = new TableWithNonDisplayableMenu();
     table.initTable();
 
     JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
     JsonContextMenu<IContextMenu> jsonContextMenu = jsonTable.getAdapter(table.getContextMenu());
-    JsonMenu<IMenu> jsonDisplayableMenu = jsonContextMenu.getAdapter(table.getMenu(TableWithNotDisplayableMenu.DisplayableMenu.class));
-    JsonMenu<IMenu> jsonNotDisplayableMenu = jsonContextMenu.getAdapter(table.getMenu(TableWithNotDisplayableMenu.NotDisplayableMenu.class));
+    JsonMenu<IMenu> jsonDisplayableMenu = jsonContextMenu.getAdapter(table.getMenu(TableWithNonDisplayableMenu.DisplayableMenu.class));
+    JsonMenu<IMenu> jsonNonDisplayableMenu = jsonContextMenu.getAdapter(table.getMenu(TableWithNonDisplayableMenu.NonDisplayableMenu.class));
 
-    // Adapter for NotDisplayableMenu must not exist
-    assertNull(jsonNotDisplayableMenu);
+    // Adapter for NonDisplayableMenu must not exist
+    assertNull(jsonNonDisplayableMenu);
 
-    // Json response must not contain NotDisplayableMenu
+    // Json response must not contain NonDisplayableMenu
     JSONObject json = jsonTable.toJson();
     JSONArray jsonMenus = json.getJSONArray("menus");
     assertEquals(1, jsonMenus.length());
@@ -350,24 +350,24 @@ public class JsonTableTest {
    * Tests whether it is possible to dispose (or replace) menus if at least one menu is not displayable.<br>
    */
   @Test
-  public void testMenuDisposalOnPropertyChangeWithNotDisplayableMenu() throws ProcessingException, JSONException {
-    ITable table = new TableWithNotDisplayableMenu();
+  public void testMenuDisposalOnPropertyChangeWithNonDisplayableMenu() throws ProcessingException, JSONException {
+    ITable table = new TableWithNonDisplayableMenu();
     table.initTable();
 
     JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
     JsonContextMenu<IContextMenu> jsonContextMenu = jsonTable.getAdapter(table.getContextMenu());
 
-    DisplayableMenu displayableMenu = table.getMenu(TableWithNotDisplayableMenu.DisplayableMenu.class);
-    NotDisplayableMenu notDisplayableMenu = table.getMenu(TableWithNotDisplayableMenu.NotDisplayableMenu.class);
-    assertNull(jsonContextMenu.getAdapter(notDisplayableMenu));
+    DisplayableMenu displayableMenu = table.getMenu(TableWithNonDisplayableMenu.DisplayableMenu.class);
+    NonDisplayableMenu NonDisplayableMenu = table.getMenu(TableWithNonDisplayableMenu.NonDisplayableMenu.class);
+    assertNull(jsonContextMenu.getAdapter(NonDisplayableMenu));
     assertNotNull(jsonContextMenu.getAdapter(displayableMenu));
     assertTrue(jsonContextMenu.getAdapter(displayableMenu).isInitialized());
 
-    table.getContextMenu().removeChildAction(notDisplayableMenu);
+    table.getContextMenu().removeChildAction(NonDisplayableMenu);
     table.getContextMenu().removeChildAction(displayableMenu);
     m_jsonSession.flush();
 
-    assertNull(jsonContextMenu.getAdapter(notDisplayableMenu));
+    assertNull(jsonContextMenu.getAdapter(NonDisplayableMenu));
     assertNull(jsonContextMenu.getAdapter(displayableMenu));
   }
 

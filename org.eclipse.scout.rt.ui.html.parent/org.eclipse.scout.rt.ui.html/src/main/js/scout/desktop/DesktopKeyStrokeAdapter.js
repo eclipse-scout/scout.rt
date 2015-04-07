@@ -55,14 +55,9 @@ scout.DesktopKeyStrokeAdapter.prototype.installDesktopModelKeystrokes = function
   } else if (this._desktop.keyStrokes) {
     this.keyStrokes = this._desktop.keyStrokes;
   }
-  if (this.keyStrokes.length > 0 && this._desktop.menus) {
-    this.keyStrokes = this.keyStrokes.concat(this._desktop.menus);
-  } else if (this._desktop.menus) {
-    this.keyStrokes = this._desktop.menus;
-  }
-  if (this.keyStrokes.length > 0 && this._desktop.toolButtons) {
-    this.keyStrokes = this.keyStrokes.concat(this._desktop.toolButtons);
-  } else if (this._desktop.toolButtons) {
-    this.keyStrokes = this._desktop.toolButtons;
+  if (this.keyStrokes.length > 0 && this._desktop.actions) {
+    this.keyStrokes = this.keyStrokes.concat(this._desktop.actions);
+  } else if (this._desktop.actions) {
+    this.keyStrokes = this._desktop.actions;
   }
 };

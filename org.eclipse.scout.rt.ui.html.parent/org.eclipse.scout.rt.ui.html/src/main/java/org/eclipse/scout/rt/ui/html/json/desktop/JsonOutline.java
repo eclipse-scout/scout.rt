@@ -120,7 +120,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   }
 
   protected IJsonAdapter<?> attachDetailTable(IPage page) {
-    IJsonAdapter<?> detailTableAdapter = attachGlobalAdapter(page.getTable(), new P_JsonOutlineTableFactory(page));
+    IJsonAdapter<?> detailTableAdapter = attachGlobalAdapter(page.getTable(), new P_JsonOutlineTableFactory(page), null);
     m_jsonDetailTables.add(detailTableAdapter);
     return detailTableAdapter;
   }

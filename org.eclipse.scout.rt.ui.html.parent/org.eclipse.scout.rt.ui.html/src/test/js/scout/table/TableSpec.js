@@ -926,7 +926,7 @@ describe("Table", function() {
       // register adapter
       helper.menuHelper.createMenu(menuModel);
       helper.menuHelper.createMenu(menuModel2);
-      table.menus = [session.getModelAdapter(menuModel.id, menuModel2.id)];
+      table.menus = [session.getModelAdapter(menuModel.id), session.getModelAdapter(menuModel2.id)];
       var $row0 = table.$data.children('.table-row').eq(0);
       $row0.triggerContextMenu();
 

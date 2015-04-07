@@ -220,20 +220,34 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * <p>
    * Global adapters (like every other) get disposed on session disposal.
    */
-  protected final IJsonAdapter<?> attachGlobalAdapter(Object model) {
-    return attachGlobalAdapter(model, null);
+  protected final <A extends IJsonAdapter<?>, M> A attachGlobalAdapter(M model) {
+    return attachGlobalAdapter(model, null, null);
   }
 
-  protected final IJsonAdapter<?> attachGlobalAdapter(Object model, IJsonObjectFactory objectFactory) {
+  protected final <A extends IJsonAdapter<?>, M> A attachGlobalAdapter(M model, IFilter<M> filter) {
+    return attachGlobalAdapter(model, null, filter);
+  }
+
+  protected final <A extends IJsonAdapter<?>, M> A attachGlobalAdapter(M model, IJsonObjectFactory objectFactory, IFilter<M> filter) {
     if (model == null) {
+      return null;
+    }
+    if (filter != null && !filter.accept(model)) {
       return null;
     }
     return m_jsonSession.getOrCreateJsonAdapter(model, getJsonSession().getRootJsonAdapter(), objectFactory);
   }
 
-  protected final JSONObject putAdapterIdProperty(JSONObject json, String key, Object model) {
+  protected final <M> JSONObject putAdapterIdProperty(JSONObject json, String key, M model) {
+    return putAdapterIdProperty(json, key, model, null);
+  }
+
+  protected final <M> JSONObject putAdapterIdProperty(JSONObject json, String key, M model, IFilter<M> filter) {
     if (model == null) {
       return json;
+    }
+    if (filter != null && !filter.accept(model)) {
+      return null;
     }
     return JsonObjectUtility.putProperty(json, key, JsonAdapterUtility.getAdapterIdForModel(getJsonSession(), model, this));
   }

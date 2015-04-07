@@ -9,11 +9,17 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -21,12 +27,17 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithNonDisplayableActions;
+import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithNonDisplayableOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithOneOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithOutlineForms;
+import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NonDisplayableOutlineWithOneNode;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -38,55 +49,59 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonDesktopTest {
 
-  IDesktop m_desktop;
-  JsonDesktop<IDesktop> m_jsonDesktop;
-  IJsonSession m_session;
+  private IJsonSession m_jsonSession;
 
   @Before
   public void setUp() {
-    setUp(new DesktopWithOutlineForms());
+    m_jsonSession = new JsonSessionMock();
   }
 
-  private void setUp(IDesktop desktop) {
-    m_desktop = desktop;
-    m_session = new JsonSessionMock();
-    m_jsonDesktop = new JsonDesktop<IDesktop>(desktop, m_session, m_session.createUniqueIdFor(null), null);
-    m_jsonDesktop.init();
-  }
-
-  @Test
-  public void testDisposeWithForms() {
-    assertGc();
+  private JsonDesktop<IDesktop> createJsonDesktop(IDesktop desktop) {
+    JsonDesktop<IDesktop> jsonDesktop = new JsonDesktop<IDesktop>(desktop, m_jsonSession, m_jsonSession.createUniqueIdFor(null), null);
+    jsonDesktop.init();
+    return jsonDesktop;
   }
 
   @Test
-  public void testDisposeWithoutForms() {
-    setUp(new DesktopWithOneOutline());
-    assertGc();
+  public void testDisposeWithForms() throws ProcessingException {
+    DesktopWithOutlineForms desktop = new DesktopWithOutlineForms();
+    desktop.initDesktop();
+    testDispose(desktop);
   }
 
-  private void assertGc() {
-    WeakReference<?> ref = new WeakReference<IJsonAdapter>(m_jsonDesktop);
-    m_jsonDesktop.dispose();
-    m_session.flush();
-    m_jsonDesktop = null;
+  @Test
+  public void testDisposeWithoutForms() throws ProcessingException {
+    DesktopWithOneOutline desktop = new DesktopWithOneOutline();
+    desktop.initDesktop();
+    testDispose(desktop);
+  }
+
+  private void testDispose(IDesktop desktop) {
+    JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
+    WeakReference<?> ref = new WeakReference<IJsonAdapter>(jsonDesktop);
+    jsonDesktop.dispose();
+    m_jsonSession.flush();
+    jsonDesktop = null;
     JsonTestUtility.assertGC(ref);
   }
 
   @Test
   public void testFormAddedAndRemoved() throws ProcessingException, JSONException {
+    DesktopWithOneOutline desktop = new DesktopWithOneOutline();
+    desktop.initDesktop();
+    JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     FormWithOneField form = new FormWithOneField();
     form.setAutoAddRemoveOnDesktop(false);
 
-    JsonForm formAdapter = (JsonForm) m_jsonDesktop.getAdapter(form);
+    JsonForm formAdapter = (JsonForm) jsonDesktop.getAdapter(form);
     assertNull(formAdapter);
 
-    m_desktop.addForm(form);
+    desktop.addForm(form);
 
-    formAdapter = (JsonForm) m_jsonDesktop.getAdapter(form);
+    formAdapter = (JsonForm) jsonDesktop.getAdapter(form);
     assertNotNull(formAdapter);
 
-    JsonResponse jsonResp = m_session.currentJsonResponse();
+    JsonResponse jsonResp = m_jsonSession.currentJsonResponse();
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonResp, "formAdded");
     assertTrue(responseEvents.size() == 1);
 
@@ -94,7 +109,7 @@ public class JsonDesktopTest {
     String formId = event.getData().getString("form");
 
     // Add event must contain reference (by ID) to form.
-    assertEquals(m_jsonDesktop.getId(), event.getTarget());
+    assertEquals(jsonDesktop.getId(), event.getTarget());
     assertEquals(formAdapter.getId(), formId);
 
     // adapter-data for form must exist in 'adapterData' property of response
@@ -108,77 +123,161 @@ public class JsonDesktopTest {
     // we could continue to test the reference structure in the JSON response,
     // but for the moment this should be enough...
 
-    m_desktop.removeForm(form);
+    desktop.removeForm(form);
 
-    responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formRemoved");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formRemoved");
     assertTrue(responseEvents.size() == 1);
 
     event = responseEvents.get(0);
     formId = event.getData().getString("form");
 
     // Remove event must only contain the id, no other properties
-    assertEquals(m_jsonDesktop.getId(), event.getTarget());
+    assertEquals(jsonDesktop.getId(), event.getTarget());
     assertEquals(formAdapter.getId(), formId);
   }
 
   @Test
   public void testFormClosedBeforeRemovedInDifferentRequests() throws Exception {
+    DesktopWithOneOutline desktop = new DesktopWithOneOutline();
+    desktop.initDesktop();
+    JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     FormWithOneField form = new FormWithOneField();
     form.setAutoAddRemoveOnDesktop(false);
 
-    JsonForm jsonForm = (JsonForm) m_jsonDesktop.getAdapter(form);
+    JsonForm jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
     assertNull(jsonForm);
 
-    m_desktop.addForm(form);
+    desktop.addForm(form);
 
-    jsonForm = (JsonForm) m_jsonDesktop.getAdapter(form);
+    jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
     assertNotNull(jsonForm);
 
-    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formAdded");
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formAdded");
     assertEquals(1, responseEvents.size());
 
     form.start();
 
-    JsonTestUtility.endRequest(m_session);
+    JsonTestUtility.endRequest(m_jsonSession);
     // -------------------------------
     // New request:
 
     form.doClose();
-    responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formClosed");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formClosed");
     assertEquals(1, responseEvents.size());
 
-    m_desktop.removeForm(form);
-    responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formRemoved");
+    desktop.removeForm(form);
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formRemoved");
     assertEquals(1, responseEvents.size());
   }
 
   @Test
   public void testFormClosedBeforeRemovedInSameRequest() throws ProcessingException, JSONException {
+    DesktopWithOneOutline desktop = new DesktopWithOneOutline();
+    desktop.initDesktop();
+    JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     FormWithOneField form = new FormWithOneField();
     form.setAutoAddRemoveOnDesktop(false);
 
-    JsonForm jsonForm = (JsonForm) m_jsonDesktop.getAdapter(form);
+    JsonForm jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
     assertNull(jsonForm);
 
-    m_desktop.addForm(form);
+    desktop.addForm(form);
 
-    jsonForm = (JsonForm) m_jsonDesktop.getAdapter(form);
+    jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
     assertNotNull(jsonForm);
 
-    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formAdded");
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formAdded");
     assertEquals(1, responseEvents.size());
 
     form.start();
     form.doClose();
-    responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formClosed");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formClosed");
     assertEquals(1, responseEvents.size());
 
-    m_desktop.removeForm(form);
-    responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formRemoved");
+    desktop.removeForm(form);
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formRemoved");
     assertEquals(0, responseEvents.size());
   }
 
+  /**
+   * Tests whether non displayable actions are sent.
+   * <p>
+   * This reduces response size and also leverages security because the menus are never visible to the user, not even
+   * with the dev tools of the browser
+   */
   @Test
-  public void testHandleFormRemoved() throws Exception {
+  public void testDontSendNonDisplayableActions() throws Exception {
+    IDesktop desktop = new DesktopWithNonDisplayableActions();
+    desktop.initDesktop();
+    JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
+
+    JsonMenu<IMenu> jsonDisplayableMenu = jsonDesktop.getAdapter(desktop.getMenu(DesktopWithNonDisplayableActions.DisplayableMenu.class));
+    JsonMenu<IMenu> jsonNonDisplayableMenu = jsonDesktop.getAdapter(desktop.getMenu(DesktopWithNonDisplayableActions.NonDisplayableMenu.class));
+    JsonFormToolButton<IFormToolButton<IForm>> jsonDisplayableToolButton = jsonDesktop.getAdapter(desktop.getToolButton(DesktopWithNonDisplayableActions.DisplayableFormToolButton.class));
+    JsonFormToolButton<IFormToolButton<IForm>> jsonNonDisplayableToolButton = jsonDesktop.getAdapter(desktop.getToolButton(DesktopWithNonDisplayableActions.NonDisplayableFormToolButton.class));
+
+    // Adapter for NonDisplayableMenu/ToolButton must not exist
+    assertNull(jsonNonDisplayableMenu);
+    assertNull(jsonNonDisplayableToolButton);
+
+    // Json response must not contain NonDisplayableMenu/ToolButton
+    JSONObject json = jsonDesktop.toJson();
+    JSONArray jsonActions = json.getJSONArray("actions");
+    assertEquals(2, jsonActions.length());
+    List<String> ids = new ArrayList<String>();
+    ids.add(jsonActions.getString(0));
+    ids.add(jsonActions.getString(1));
+    assertTrue(ids.contains(jsonDisplayableMenu.getId()));
+    assertTrue(ids.contains(jsonDisplayableToolButton.getId()));
   }
+
+  /**
+   * Tests whether non displayable view buttons are sent.
+   * <p>
+   * This reduces response size and also leverages security because the menus are never visible to the user, not even
+   * with the dev tools of the browser
+   */
+  @Test
+  public void testDontSendNonDisplayableViewButtons() throws Exception {
+    IDesktop desktop = new DesktopWithNonDisplayableActions();
+    desktop.initDesktop();
+    JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
+
+    JsonOutlineViewButton<IOutlineViewButton> jsonDisplayableAction = jsonDesktop.getAdapter(desktop.getViewButton(DesktopWithNonDisplayableActions.DisplayableOutlineViewButton.class));
+    JsonOutlineViewButton<IOutlineViewButton> jsonNonDisplayableAction = jsonDesktop.getAdapter(desktop.getViewButton(DesktopWithNonDisplayableActions.NonDisplayableOutlineViewButton.class));
+
+    // Adapter for NonDisplayableMenu must not exist
+    assertNull(jsonNonDisplayableAction);
+
+    // Json response must not contain NonDisplayableAction
+    JSONObject json = jsonDesktop.toJson();
+    JSONArray jsonActions = json.getJSONArray("viewButtons");
+    assertEquals(1, jsonActions.length());
+    assertEquals(jsonDisplayableAction.getId(), jsonActions.get(0));
+  }
+
+  /**
+   * Tests whether non displayable outline is sent.
+   * <p>
+   * This reduces response size and also leverages security because the menus are never visible to the user, not even
+   * with the dev tools of the browser
+   */
+  @Test
+  public void testDontSendNonDisplayableOutline() throws Exception {
+    IDesktop desktop = new DesktopWithNonDisplayableOutline();
+    desktop.initDesktop();
+    desktop.setOutline(NonDisplayableOutlineWithOneNode.class);
+    JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
+
+    JsonOutline<IOutline> jsonNonDisplayableOutline = jsonDesktop.getAdapter(desktop.findOutline(NonDisplayableOutlineWithOneNode.class));
+
+    // Adapter for NonDisplayableMenu must not exist
+    assertNull(jsonNonDisplayableOutline);
+
+    // Json response must not contain outline
+    JSONObject json = jsonDesktop.toJson();
+    String outlineId = json.optString("outline", null);
+    assertNull(outlineId);
+  }
+
 }

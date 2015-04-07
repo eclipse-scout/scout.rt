@@ -58,29 +58,29 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
   /**
    * Tests whether non displayable fields are sent.
    * <p>
-   * This limits response size and also leverages security because the fields are never visible to the user, not even
+   * This reduces response size and also leverages security because the fields are never visible to the user, not even
    * with the dev tools of the browser
    */
   @Test
-  public void testDontSendNotDisplayableFields() throws Exception {
-    IGroupBox groupBox = new GroupBoxWithNotDisplayableField();
+  public void testDontSendNonDisplayableFields() throws Exception {
+    IGroupBox groupBox = new GroupBoxWithNonDisplayableField();
     JsonTestUtility.initField(groupBox);
 
     JsonGroupBox<IGroupBox> jsonGroupBox = m_jsonSession.newJsonAdapter(groupBox, null, null);
-    JsonFormField<IFormField> jsonDisplayableField = m_jsonSession.getJsonAdapter(groupBox.getFieldByClass(GroupBoxWithNotDisplayableField.DisplayableField.class), jsonGroupBox);
-    JsonFormField<IFormField> jsonNotDisplayableField = m_jsonSession.getJsonAdapter(groupBox.getFieldByClass(GroupBoxWithNotDisplayableField.NotDisplayableField.class), jsonGroupBox);
+    JsonFormField<IFormField> jsonDisplayableField = m_jsonSession.getJsonAdapter(groupBox.getFieldByClass(GroupBoxWithNonDisplayableField.DisplayableField.class), jsonGroupBox);
+    JsonFormField<IFormField> jsonNonDisplayableField = m_jsonSession.getJsonAdapter(groupBox.getFieldByClass(GroupBoxWithNonDisplayableField.NonDisplayableField.class), jsonGroupBox);
 
-    // Adapter for NotDisplayableField must not exist
-    assertNull(jsonNotDisplayableField);
+    // Adapter for NonDisplayableField must not exist
+    assertNull(jsonNonDisplayableField);
 
-    // Json response must not contain NotDisplayableField
+    // Json response must not contain NonDisplayableField
     JSONObject json = jsonGroupBox.toJson();
     JSONArray jsonFormFields = json.getJSONArray("fields");
     assertEquals(1, jsonFormFields.length());
     assertEquals(jsonDisplayableField.getId(), jsonFormFields.get(0));
   }
 
-  private class GroupBoxWithNotDisplayableField extends AbstractGroupBox {
+  private class GroupBoxWithNonDisplayableField extends AbstractGroupBox {
 
     @Order(10)
     public class DisplayableField extends AbstractFormField {
@@ -88,7 +88,7 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
     }
 
     @Order(20)
-    public class NotDisplayableField extends AbstractFormField {
+    public class NonDisplayableField extends AbstractFormField {
 
       @Override
       protected void execInitField() throws ProcessingException {

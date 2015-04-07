@@ -7,10 +7,9 @@ scout.menus = {
 
   /**
    * Filters menus that don't match the given types, or in other words: only menus with the given types are returned
-   * from this method. The visible state is only checked if the parameter onlyVisible is set to true. Otherwise invisible items are returned and added to the
-   * menu-bar DOM (invisible, however). They may change their visible state later.
+   * from this method. Invisible items are returned and added to the menu-bar DOM (invisible, however). They may change their visible state later.
    */
-  filter: function(menus, types, onlyVisible) {
+  filter: function(menus, types) {
     if (!menus) {
       return;
     }
@@ -30,10 +29,6 @@ scout.menus = {
         }
       } // Don't check the menu type for a group
       else if (!scout.menus._checkType(menu, types)) {
-        continue;
-      }
-
-      if (onlyVisible && !menu.visible) {
         continue;
       }
 
@@ -82,7 +77,7 @@ scout.menus = {
   },
 
   /**
-   * Appends menu items to the given popup and attaches event-handlers on the appended menu items.
+   * Appends menu items to the given popup and attaches event-handlers on the appended menu items. Invisible items are not appended.
    *
    * @param $parent Parent to which the popup is appended
    * @param menus Menus added to the popup
@@ -101,6 +96,9 @@ scout.menus = {
 
     for (i = 0; i < menus.length; i++) {
       var menu = menus[i];
+      if (!menu.visible) {
+        continue;
+      }
       if (menu.separator) {
         continue;
       }
