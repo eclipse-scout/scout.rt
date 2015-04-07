@@ -213,7 +213,7 @@ public class ClusterNodeStatusInfo {
   }
 
   /**
-   * @deprecated use {@link #updateLastChanged(IClusterNotificationMessage)} Will be removed in the N Release.
+   * @deprecated use {@link #updateLastChanged(String, String)}. Will be removed in the N Release.
    */
   @Deprecated
   public void setLastChangedDate(Date lastChangedDate) {
@@ -223,7 +223,7 @@ public class ClusterNodeStatusInfo {
   }
 
   /**
-   * @deprecated use {@link #updateLastChanged(IClusterNotificationMessage)} Will be removed in the N Release.
+   * @deprecated use {@link #updateLastChanged(String, String)}. Will be removed in the N Release.
    */
   @Deprecated
   public void setLastChangedUserId(String lastChangedUserId) {
@@ -288,7 +288,7 @@ public class ClusterNodeStatusInfo {
   }
 
   /**
-   * @deprecated use {@link #updateLastChanged(IClusterNotificationMessage)} Will be removed in the N Release.
+   * @deprecated use {@link #updateLastChanged(String, String)}. Will be removed in the N Release.
    */
   @Deprecated
   public void setLastChangedOriginNodeId(String originNode) {
