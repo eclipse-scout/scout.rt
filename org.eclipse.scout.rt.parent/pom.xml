@@ -67,6 +67,8 @@
 
     <module>../org.eclipse.scout.rt.platform</module>
     <module>../org.eclipse.scout.rt.platform.test</module>
+
+    <module>../org.eclipse.scout.dev.jetty</module>
   </modules>
 
   <build>
