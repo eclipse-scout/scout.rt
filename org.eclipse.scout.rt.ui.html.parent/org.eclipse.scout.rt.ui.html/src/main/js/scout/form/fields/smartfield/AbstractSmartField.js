@@ -1,5 +1,9 @@
 scout.AbstractSmartField = function() {
   scout.AbstractSmartField.parent.call(this);
+
+  this.BROWSE_ALL = '';
+  this.DEBOUNCE_DELAY = 200;
+
   this._$popup;
   this._$optionsDiv;
   this.options;
@@ -12,7 +16,6 @@ scout.AbstractSmartField = function() {
    * avoid multiple openProposal request.
    */
   this._proposalRequested;
-  this.BROWSE_ALL = '';
 };
 scout.inherits(scout.AbstractSmartField, scout.ValueField);
 
@@ -101,14 +104,14 @@ scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
 
 scout.AbstractSmartField.prototype._onClick = function(e) {
   if (!this._$popup) {
-    this._openProposal(this.BROWSE_ALL);
+    this._openProposal(this.BROWSE_ALL, true);
   }
 };
 
 scout.AbstractSmartField.prototype._onIconClick = function(event) {
   scout.AbstractSmartField.parent.prototype._onIconClick.call(this, event);
   if (!this._$popup) {
-    this._openProposal(this.BROWSE_ALL);
+    this._openProposal(this.BROWSE_ALL, true);
   }
 };
 
@@ -132,7 +135,7 @@ scout.AbstractSmartField.prototype._onKeyDown = function(event) {
     if (this.proposalChooser) {
       this.proposalChooser.delegateEvent(event);
     } else {
-      this._openProposal(this.BROWSE_ALL);
+      this._openProposal(this.BROWSE_ALL, true);
     }
   }
 };
@@ -173,17 +176,23 @@ scout.AbstractSmartField.prototype._onKeyUp = function(e) {
     this._proposalTyped();
   } else if (this._browseOnce) {
     this._browseOnce = false;
-    this._openProposal(this._searchText());
+    this._openProposal(this._searchText(), false);
   }
 };
 
 scout.AbstractSmartField.prototype._proposalTyped = function() {
   var searchText = this._searchText();
   if (this._oldSearchText === searchText) {
-    $.log.debug('value of field has not changed - do not filter (oldSearchText=' + this._oldSearchText + ')');
+    $.log.debug('value of field has not changed - do not send proposalTyped (oldSearchText=' + this._oldSearchText + ')');
     return;
   }
-  this.session.send(this.id, 'proposalTyped', {searchText: searchText});
+
+  // debounce send
+  clearTimeout(this._sendTimeoutId);
+  this._sendTimeoutId = setTimeout(function() {
+    this.session.send(this.id, 'proposalTyped', {searchText: searchText});
+  }.bind(this), this.DEBOUNCE_DELAY);
+
   this._oldSearchText = searchText;
   $.log.debug('updated oldSearchText=' + this._oldSearchText);
 };
@@ -246,7 +255,7 @@ scout.AbstractSmartField.prototype._searchText = function() {
  * at this point we cannot know what size the popup should have. We have to set a fixed
  * size and resize the popup later when proposals are available.
  */
-scout.AbstractSmartField.prototype._openProposal = function(searchText) {
+scout.AbstractSmartField.prototype._openProposal = function(searchText, selectCurrentValue) {
   // A proposal-field (PF) has a slightly different behavior than a smart-field (SF):
   // When the typed proposal doesn't match a proposal from the list, the popup
   // is closed. The smart-field would stay open in that case. The SF also opens the
@@ -256,7 +265,9 @@ scout.AbstractSmartField.prototype._openProposal = function(searchText) {
   }
   if (!this._requestedProposal) {
     this._requestedProposal = true;
-    this.session.send(this.id, 'openProposal', {searchText: searchText});
+    this.session.send(this.id, 'openProposal', {
+      searchText: searchText,
+      selectCurrentValue: selectCurrentValue});
   }
 };
 

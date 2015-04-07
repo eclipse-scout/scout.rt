@@ -31,14 +31,18 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
   this.addStatus();
 };
 
-//@override ValueField.js
+/**
+ * @override ValueField.js
+ */
 scout.SmartFieldMultiline.prototype._renderDisplayText = function(displayText) {
   var tmp = this._splitValue(displayText);
   this.$field.val(tmp.firstLine);
   this._$multilineField.html(tmp.multiLines);
 };
 
-// @override AbstractSmartField.js
+/**
+ * @override AbstractSmartField
+ */
 scout.SmartFieldMultiline.prototype._getInputBounds = function() {
   var fieldBounds = scout.graphics.offsetBounds(this.$fieldContainer),
     textFieldBounds = scout.graphics.offsetBounds(this.$field);
