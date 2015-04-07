@@ -45,13 +45,14 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
   }
 
   @Override
-  public void openProposalChooserFromUI(String text) {
+  public void openProposalChooserFromUI(String text, boolean selectCurrentValue) {
     LOG.debug("openProposalChooserFromUI");
     assert !m_field.isProposalChooserRegistered();
     try {
+      String searchText = toSearchText(text);
       IProposalChooser<?, LOOKUP_KEY> proposalChooser = m_field.registerProposalChooserInternal();
-      proposalChooser.dataFetchedDelegate(m_field.getLookupRowFetcher().getResult(), m_field.getConfiguredBrowseMaxRowCount());
-      boolean selectCurrentValue = StringUtility.isNullOrEmpty(text);
+      IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult = m_field.getLookupRowFetcher().newResult(toSearchText(searchText), selectCurrentValue);
+      proposalChooser.dataFetchedDelegate(newResult, m_field.getConfiguredBrowseMaxRowCount());
       m_field.doSearch(text, selectCurrentValue, false);
     }
     catch (ProcessingException e) {

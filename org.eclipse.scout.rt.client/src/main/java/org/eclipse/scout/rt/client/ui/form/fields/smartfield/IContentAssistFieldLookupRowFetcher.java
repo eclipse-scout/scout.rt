@@ -12,10 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.beans.PropertyChangeListener;
 
-/**
- *
- */
-
 public interface IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
 
   String PROP_SEARCH_RESULT = "searchResult";
@@ -59,8 +55,8 @@ public interface IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
 
   IContentAssistFieldDataFetchResult<LOOKUP_KEY> getResult();
 
-  /**
-   * @return
-   */
+  IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult(String searchText, boolean selectCurrentValue);
+
   String getLastSearchText();
+
 }

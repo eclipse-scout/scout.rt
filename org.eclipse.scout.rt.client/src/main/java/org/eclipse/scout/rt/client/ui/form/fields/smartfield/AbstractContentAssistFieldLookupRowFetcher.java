@@ -77,6 +77,11 @@ public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> imp
     return (IContentAssistFieldDataFetchResult<LOOKUP_KEY>) propertySupport.getProperty(PROP_SEARCH_RESULT);
   }
 
+  @Override
+  public IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult(String searchText, boolean selectCurrentValue) {
+    return new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(null, null, searchText, selectCurrentValue);
+  }
+
   protected void setResult(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
     // Always propagate the event of an executed search to the listeners even if the search result did not change. Thus, the proposal popup is opened for every search.
     propertySupport.setPropertyAlwaysFire(PROP_SEARCH_RESULT, result);
