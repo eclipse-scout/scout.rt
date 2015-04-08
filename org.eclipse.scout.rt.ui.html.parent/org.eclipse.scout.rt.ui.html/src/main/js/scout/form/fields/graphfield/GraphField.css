@@ -1,0 +1,5 @@
+.graph-field > .field {
+  padding-top: @borderless-field-padding-y;
+  padding-bottom: @borderless-field-padding-y;
+  margin-left: @mandatory-indicator-width;
+}

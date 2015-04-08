@@ -284,4 +284,9 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.BeanField();
   }
+}, {
+  objectType: 'GraphField',
+  create: function() {
+    return new scout.GraphField();
+  }
 }];

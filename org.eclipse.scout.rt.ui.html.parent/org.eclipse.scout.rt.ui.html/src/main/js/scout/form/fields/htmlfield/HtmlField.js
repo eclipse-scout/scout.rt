@@ -17,7 +17,6 @@ scout.HtmlField.prototype._renderProperties = function() {
   this._renderScrollToPosition(this.scrollToPosition);
 };
 
-
 /**
  * @override
  */

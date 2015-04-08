@@ -186,6 +186,7 @@
         "CheckBoxField": null,
         "CalendarField": null,
         "DateField": null,
+        "GraphField": null,
         "HtmlField": null,
         "LabelField": null,
         "NumberField": null,

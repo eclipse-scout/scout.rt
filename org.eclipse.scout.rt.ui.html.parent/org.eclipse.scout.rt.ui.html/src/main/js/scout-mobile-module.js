@@ -134,6 +134,7 @@ __include("jquery/jquery-scout.js");
   __include("scout/form/fields/checkbox/CheckBoxField.js");
   __include("scout/form/fields/datefield/DateField.js");
   __include("scout/form/fields/datefield/DatePicker.js");
+  __include("scout/form/fields/graphfield/GraphField.js");
   __include("scout/form/fields/groupbox/GroupBox.js");
   __include("scout/form/fields/groupbox/GroupBoxKeyStrokeAdapter.js");
   __include("scout/form/fields/groupbox/GroupBoxLayout.js");

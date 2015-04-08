@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
+import org.eclipse.scout.rt.client.ui.form.fields.graphfield.IGraphField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
@@ -86,6 +87,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.calendar.JsonCalendarField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.composer.JsonComposerField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.customfield.JsonBeanField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.graphfield.JsonGraphField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield.JsonHtmlField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.imagefield.JsonImageField;
@@ -230,6 +232,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (model instanceof IBeanField) {
       return new JsonBeanField((IBeanField) model, session, id, parent);
+    }
+    if (model instanceof IGraphField) {
+      return new JsonGraphField((IGraphField) model, session, id, parent);
     }
 
     // Fallback for all other form fields (will generate a 'not implemented' placeholder). Note: insert more form fields _before_ this line!
