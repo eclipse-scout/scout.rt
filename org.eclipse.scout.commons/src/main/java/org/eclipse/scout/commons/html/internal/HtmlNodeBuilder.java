@@ -86,23 +86,26 @@ public class HtmlNodeBuilder extends AbstractExpressionBuilder implements IHtmlE
   }
 
   /// GLOBAL ATTRIBUTES
+  @SuppressWarnings("unchecked")
   @Override
-  public IHtmlElement style(CharSequence value) {
+  public <T extends IHtmlElement> T style(CharSequence value) {
     addAttribute("style", value);
-    return this;
+    return (T) this;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public IHtmlElement clazz(CharSequence clazz) {
+  public <T extends IHtmlElement> T clazz(CharSequence clazz) {
     addAttribute("class", clazz);
-    return this;
+    return (T) this;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public IHtmlElement appLink(CharSequence path) {
+  public <T extends IHtmlElement> T appLink(CharSequence path) {
     clazz("hyperlink");
     addAttribute("data-hyperlink", path);
-    return this;
+    return (T) this;
   }
 
 }
