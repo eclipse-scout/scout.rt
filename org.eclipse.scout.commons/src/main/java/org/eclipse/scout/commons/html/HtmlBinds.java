@@ -12,11 +12,12 @@ package org.eclipse.scout.commons.html;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.html.internal.AbstractBinds;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -41,7 +42,7 @@ public class HtmlBinds extends AbstractBinds {
   public String applyBindParameters(List<? extends IHtmlElement> htmls) {
     StringBuilder sb = new StringBuilder();
     for (IHtmlElement html : htmls) {
-      sb.append(replace(html));
+      sb.append(applyBindParameters(html));
     }
     return sb.toString();
   }
@@ -49,16 +50,22 @@ public class HtmlBinds extends AbstractBinds {
   /**
    * Replace bind names with encoded values. Loggs an error, if no bind is found.
    */
-  private String replace(IHtmlElement html) {
-    String res = html.toString();
+  private String applyBindParameters(IHtmlElement html) {
+    return applyBindParameters(html.toString());
+  }
+
+  protected String applyBindParameters(String html) {
+    String res = html;
     List<String> binds = getBindParameters(res);
+    Collections.sort(binds, new ReversedLengthComparator());
     for (String b : binds) {
       Object value = getBindValue(b);
       if (value == null) {
         LOG.error("No bind value found for ", b);
       }
       else {
-        res = res.replaceAll(b, encode(value));
+        final String encode = encode(value);
+        res = res.replaceAll(b, encode);
       }
     }
     return res;
@@ -81,7 +88,16 @@ public class HtmlBinds extends AbstractBinds {
    * @return the encoded bind value.
    */
   protected String encode(Object value) {
-    return HTMLUtility.encodeText(StringUtility.emptyIfNull(value).toString());
+    return StringUtility.htmlEncode(StringUtility.emptyIfNull(value).toString(), false);
+  }
+
+  private static class ReversedLengthComparator implements Comparator<String> {
+
+    @Override
+    public int compare(String o1, String o2) {
+      return o2.length() - o1.length();
+    }
+
   }
 
 }

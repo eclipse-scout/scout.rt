@@ -17,7 +17,7 @@ import static org.eclipse.scout.commons.html.HTML.link;
 import static org.eclipse.scout.commons.html.HTML.row;
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.HTMLUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.commons.html.HtmlBinds;
 import org.eclipse.scout.commons.html.IHtmlElement;
@@ -29,8 +29,8 @@ import org.w3c.dom.html.HTMLElement;
  * Tests for {@link HtmlBinds}
  */
 public class HtmlBindsTest {
-  private static final String BIND_TEXT = "Test Last Name";
-  private static final String ENCODED_BIND_TEXT = "Test&nbsp;Last&nbsp;Name";
+  private static final String BIND_TEXT = "Test Last Name&";
+  private static final String ENCODED_BIND_TEXT = "Test Last Name&amp;";
 
   private static final String TEST_URL = "http://SCOUTBLABLA.com";
 
@@ -100,7 +100,7 @@ public class HtmlBindsTest {
   public void testAppLink() {
     HtmlBinds binds = new HtmlBinds();
     final IHtmlElement html = HTML.span(binds.put("Link Text")).appLink("domain=123&text=456");
-    assertEquals("<span class=\"hyperlink\" data-hyperlink=\"domain=123&text=456\">Link&nbsp;Text</span>", binds.applyBindParameters(html));
+    assertEquals("<span class=\"hyperlink\" data-hyperlink=\"domain=123&text=456\">Link Text</span>", binds.applyBindParameters(html));
   }
 
   @Test
@@ -115,7 +115,7 @@ public class HtmlBindsTest {
     HtmlBinds binds = new HtmlBinds();
     final IHtmlTable table = HTML.table(
         row(
-            cell(binds.put(BIND_TEXT)))
+        cell(binds.put(BIND_TEXT)))
         ).cellspacing(1).cellpadding(2);
 
     final String htmlString = binds.applyBindParameters(table);
@@ -130,11 +130,11 @@ public class HtmlBindsTest {
         binds.put(BIND_TEXT),
         link(binds.put(TEST_URL), binds.put(BIND_TEXT))
         );
-    assertEquals("<b>Test&nbsp;Last&nbsp;Name<a href=\"http://SCOUTBLABLA.com\">Test&nbsp;Last&nbsp;Name</a></b>", binds.applyBindParameters(html));
+    assertEquals("<b>Test Last Name&amp;<a href=\"http://SCOUTBLABLA.com\">Test Last Name&amp;</a></b>", binds.applyBindParameters(html));
   }
 
   private String encode(String text) {
-    return HTMLUtility.encodeText(text);
+    return StringUtility.htmlEncode(text, false);
   }
 
   private void assertEncodedText(String tagName, String actualText) {
