@@ -18,11 +18,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * <h4>Vertical</h4>
- * 
+ *
  * <pre>
  * -------------------------------------------------------
  *    Group01   |   Group01   |   Group05   |   Group05
@@ -34,9 +36,9 @@ import org.junit.Test;
  *    Group04   |   Group04   |             |
  * -------------------------------------------------------
  * </pre>
- * 
+ *
  * <h4>Horizontal</h4>
- * 
+ *
  * <pre>
  * -------------------------------------------------------
  *    Group01   |   Group01   |   Group02   |   Group02
@@ -48,10 +50,11 @@ import org.junit.Test;
  *    Group07   |   Group07   |             |
  * -------------------------------------------------------
  * </pre>
- * 
+ *
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
  */
+@RunWith(PlatformTestRunner.class)
 public class GroupBoxLayout08Test extends AbstractGroupBoxLayoutTest {
 
   @Test

@@ -21,10 +21,13 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.AbstractService;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(PlatformTestRunner.class)
 public class PreferencesTest {
 
   @Test
@@ -70,8 +73,8 @@ public class PreferencesTest {
 
     List<IBean<?>> registerServices = TestingUtility.registerBeans(
         new BeanMetaData(IUserPreferencesStorageService.class).
-        initialInstance(svc).
-        applicationScoped(true));
+            initialInstance(svc).
+            applicationScoped(true));
     try {
       prefs.flush();
     }

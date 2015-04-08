@@ -5,10 +5,13 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.AbstractImageField;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -16,6 +19,8 @@ import org.junit.runner.RunWith;
  * Tests that abstract menus won't be instantiated
  */
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractMenuTest {
 
   @Test

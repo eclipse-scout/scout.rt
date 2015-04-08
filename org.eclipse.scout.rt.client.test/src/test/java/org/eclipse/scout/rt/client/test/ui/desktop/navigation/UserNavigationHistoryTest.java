@@ -25,12 +25,15 @@ import org.eclipse.scout.rt.client.ui.desktop.navigation.internal.UserNavigation
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.NodePageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TablePageState;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link org.eclipse.scout.rt.client.ui.desktop.navigation.internal.UserNavigationHistory
  * UserNavigationHistory}
  */
+@RunWith(PlatformTestRunner.class)
 public class UserNavigationHistoryTest {
 
   /**

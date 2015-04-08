@@ -14,11 +14,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link AbstractPropertyData}
  */
+@RunWith(PlatformTestRunner.class)
 public class FormDataPropertyTest {
 
   @Test

@@ -23,10 +23,13 @@ import java.util.Locale;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +38,8 @@ import org.junit.runner.RunWith;
  *
  */
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractIntegerFieldTest extends AbstractIntegerField {
 
   private NumberFormat m_formatter;

@@ -17,11 +17,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * <h4>Vertical</h4>
- * 
+ *
  * <pre>
  * ---------------------------
  *    Group01   |   Group01
@@ -31,9 +33,9 @@ import org.junit.Test;
  *    Group04   |   Group04
  * ---------------------------
  * </pre>
- * 
+ *
  * <h4>Horizontal</h4>
- * 
+ *
  * <pre>
  * ---------------------------
  *    Group01   |   Group01
@@ -43,10 +45,11 @@ import org.junit.Test;
  *    Group04   |   Group04
  * ---------------------------
  * </pre>
- * 
+ *
  * @author Andreas Hoegger
  * @since 4.0.0 M6 13.03.2014
  */
+@RunWith(PlatformTestRunner.class)
 public class GroupBoxLayout11Test extends AbstractGroupBoxLayoutTest {
 
   @Test

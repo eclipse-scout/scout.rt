@@ -15,11 +15,14 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  *
  */
+@RunWith(PlatformTestRunner.class)
 public class AbstractColumnTest extends AbstractColumn<Object> {
 
   @Test

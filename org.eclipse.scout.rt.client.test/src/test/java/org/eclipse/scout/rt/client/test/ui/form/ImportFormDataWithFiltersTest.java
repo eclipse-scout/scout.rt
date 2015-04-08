@@ -26,17 +26,20 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for
  * {@link org.eclipse.scout.rt.client.ui.form.AbstractForm#importFormData(AbstractFormData, boolean,IPropertyFilter, IFormFieldFilter) }
  */
+@RunWith(PlatformTestRunner.class)
 public class ImportFormDataWithFiltersTest {
 
   /**
    * Tests that field data is imported, if no filter is set.
-   * 
+   *
    * @throws ProcessingException
    *           if form instantiation fails
    */
@@ -53,7 +56,7 @@ public class ImportFormDataWithFiltersTest {
 
   /**
    * Tests that field data not imported, if ExcludeFormFieldFilter is used with this field.
-   * 
+   *
    * @throws ProcessingException
    *           if form instantiation fails
    */
@@ -72,7 +75,7 @@ public class ImportFormDataWithFiltersTest {
   /**
    * Tests that field data not imported, if ExcludeFormFieldFilter is used with this field, if initial value is set
    * explicitly.
-   * 
+   *
    * @throws ProcessingException
    *           if form instantiation fails
    */
@@ -89,7 +92,7 @@ public class ImportFormDataWithFiltersTest {
 
   /**
    * Tests that field data imported, if an empty ExcludeFormFieldFilter is used.
-   * 
+   *
    * @throws ProcessingException
    *           if form instantiation fails
    */

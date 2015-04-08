@@ -14,9 +14,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(PlatformTestRunner.class)
 public class AbstractTableRowDataTest {
 
   private static final String TEST_COLUMN_ID = "testColumnId";

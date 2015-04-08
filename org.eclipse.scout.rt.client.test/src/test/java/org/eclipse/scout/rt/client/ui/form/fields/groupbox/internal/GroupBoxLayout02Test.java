@@ -22,11 +22,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayo
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout02Test.MainBox.Field05;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout02Test.MainBox.Field06;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * <h4>Vertical</h4>
- * 
+ *
  * <pre>
  * -----------------------------------------
  *    Field01   |   Field02   |   Field05
@@ -36,9 +38,9 @@ import org.junit.Test;
  *    Field04   |   Field06   |   Field06
  * -----------------------------------------
  * </pre>
- * 
+ *
  * <h4>Horizontal</h4>
- * 
+ *
  * <pre>
  * -----------------------------------------
  *    Field01   |   Field02   |
@@ -48,10 +50,11 @@ import org.junit.Test;
  *    Field05   |   Field06   |   Field06
  * -----------------------------------------
  * </pre>
- * 
+ *
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
  */
+@RunWith(PlatformTestRunner.class)
 public class GroupBoxLayout02Test extends AbstractGroupBoxLayoutTest {
 
   @Test

@@ -20,6 +20,7 @@ import java.util.List;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.FormFieldInjectionTest.FormFieldInjectionTestForm.MainBox.TopBox;
 import org.eclipse.scout.rt.client.ui.form.FormFieldInjectionTest.FormFieldInjectionTestForm.MainBox.TopBox.StringField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
@@ -27,6 +28,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -34,6 +37,8 @@ import org.junit.runner.RunWith;
  * @since 4.1
  */
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class FormFieldInjectionTest {
 
   @Test

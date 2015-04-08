@@ -24,12 +24,15 @@ import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * JUnit tests for {@link AbstractTableField}
  */
 @SuppressWarnings("unused")
+@RunWith(PlatformTestRunner.class)
 public class TableFieldTest {
 
   /**

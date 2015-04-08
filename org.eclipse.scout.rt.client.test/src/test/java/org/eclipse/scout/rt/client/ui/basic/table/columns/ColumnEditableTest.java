@@ -20,12 +20,15 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests the editable property in a table (model)
  * see {@link AbstractColumn}
  */
+@RunWith(PlatformTestRunner.class)
 public class ColumnEditableTest {
 
   /**
@@ -60,7 +63,7 @@ public class ColumnEditableTest {
 
   /**
    * Tests, if a field in the editable column is valid
-   * 
+   *
    * @throws ProcessingException
    */
   @Test

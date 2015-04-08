@@ -14,13 +14,18 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm;
 import org.eclipse.scout.rt.shared.data.form.fixture.TestFormData;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class FormDataImportWithTemplatesTest {
 
   @Test

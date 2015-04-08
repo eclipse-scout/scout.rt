@@ -33,7 +33,9 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 /**
@@ -41,6 +43,7 @@ import org.mockito.Mockito;
  *
  * @since 3.8.2
  */
+@RunWith(PlatformTestRunner.class)
 public class ActionTest {
   private static final String TEST_ACTION_CLASS_ID = "TEST_CLASS_ID";
 

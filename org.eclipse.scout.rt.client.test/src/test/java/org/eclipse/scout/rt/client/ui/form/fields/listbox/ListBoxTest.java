@@ -24,12 +24,15 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link AbstractListBox}
  */
+@RunWith(PlatformTestRunner.class)
 public class ListBoxTest extends AbstractListBox<Long> {
   private HashSet<Long> m_testValue;
 

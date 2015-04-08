@@ -22,11 +22,11 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(ClientTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class FormWithToolButtonsFormTest {
 
   @Test

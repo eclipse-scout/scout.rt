@@ -12,14 +12,17 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
 
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link AbstractRadioButton}
  *
  * @since 4.0.0-M7
  */
+@RunWith(PlatformTestRunner.class)
 public class AbstractRadioButtonTest {
 
   AbstractRadioButton<Long> m_radioButton;

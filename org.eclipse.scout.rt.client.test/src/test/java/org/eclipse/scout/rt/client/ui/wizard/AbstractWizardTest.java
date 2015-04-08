@@ -13,13 +13,16 @@ package org.eclipse.scout.rt.client.ui.wizard;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link AbstractWizard}
  *
  * @since 4.1.0
  */
+@RunWith(PlatformTestRunner.class)
 public class AbstractWizardTest {
 
   /**

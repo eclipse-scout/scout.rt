@@ -15,15 +15,18 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * JUnit test for {@link ICode#addChildCodeInternal(ICode)}, {@link ICode#removeChildCodeInternal(ICode)},
  * {@link AbstractCodeTypeWithGeneric#addRootCodeInternal(ICode)},
  * {@link AbstractCodeTypeWithGeneric#removeRootCodeInternal(ICode)}
- * 
+ *
  * @since 4.0
  */
+@RunWith(PlatformTestRunner.class)
 public class CodeTypeWithAddRemoveCodeTest {
 
   @Test

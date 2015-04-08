@@ -11,10 +11,10 @@
 package org.eclipse.scout.rt.client.services;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
 import org.junit.AfterClass;
@@ -25,7 +25,7 @@ import org.junit.runner.RunWith;
 /**
  *
  */
-@RunWith(ClientTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class ServiceWithSessionInterceptorTest {
 
   private static IBean<TestService> m_bean01;

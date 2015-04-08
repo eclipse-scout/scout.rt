@@ -19,11 +19,14 @@ import java.util.List;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * JUnit test for {@link AbstractCode}
  */
+@RunWith(PlatformTestRunner.class)
 public class CodeTypeTest {
 
   @Test

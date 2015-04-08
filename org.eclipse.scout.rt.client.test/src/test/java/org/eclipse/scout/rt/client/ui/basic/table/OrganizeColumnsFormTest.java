@@ -19,13 +19,16 @@ import java.util.List;
 
 import org.eclipse.scout.commons.dnd.JavaTransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link OrganizeColumnsForm}
  *
  * @since 4.1.0
  */
+@RunWith(PlatformTestRunner.class)
 public class OrganizeColumnsFormTest {
   @Test
   public void testNoNPEInExecDrop() throws ProcessingException {

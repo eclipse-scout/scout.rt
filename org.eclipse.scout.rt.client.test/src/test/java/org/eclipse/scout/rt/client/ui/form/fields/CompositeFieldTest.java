@@ -21,13 +21,16 @@ import org.eclipse.scout.rt.client.ui.form.fields.P_BadVisitorCompositeField.Fir
 import org.eclipse.scout.rt.client.ui.form.fields.P_BadVisitorCompositeField.SecondGroupBox.SecondField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link AbstractCompositeField}
  *
  * @since 4.0.1
  */
+@RunWith(PlatformTestRunner.class)
 public class CompositeFieldTest {
 
   @Test

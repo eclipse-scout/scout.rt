@@ -14,12 +14,15 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.PlannerFieldTest.PlannerField.ActivityMap;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.PlannerFieldTest.PlannerField.ResourceTable;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField<T, P, RI, AI>}
  */
+@RunWith(PlatformTestRunner.class)
 public class PlannerFieldTest {
   private PlannerField plannerField = null;
 

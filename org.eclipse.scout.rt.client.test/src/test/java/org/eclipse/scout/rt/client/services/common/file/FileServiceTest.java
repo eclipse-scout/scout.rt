@@ -30,14 +30,17 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link FileService}
  */
+@RunWith(PlatformTestRunner.class)
 public class FileServiceTest {
 
   private static final String TEST_DIR_IN = "FileServiceTestIN";
@@ -93,8 +96,8 @@ public class FileServiceTest {
     //register services
     List<IBean<?>> reg = TestingUtility.registerBeans(
         new BeanMetaData(DummyRemoteFileService.class).
-        initialInstance(new DummyRemoteFileService()).
-        applicationScoped(true));
+            initialInstance(new DummyRemoteFileService()).
+            applicationScoped(true));
 
     //start with clean setup
     File outFolder = new File(TEST_DIR_OUT);

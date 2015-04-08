@@ -18,10 +18,13 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(PlatformTestRunner.class)
 public class AbstractTableFieldMoveRowTest extends AbstractTableField<AbstractTableFieldMoveRowTest.Table> {
   private static final String LOREM = "Lorem";
   private static final String IPSUM = "Ipsum";

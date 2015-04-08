@@ -24,13 +24,16 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormTest.WrapperTestFormWithClassId.MainBox.EmbeddedField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * JUnit tests for {@link AbstractForm}
  *
  * @since 3.10.0
  */
+@RunWith(PlatformTestRunner.class)
 public class AbstractFormTest {
   private static final String FORM_TEST_CLASS_ID = "FORM_TEST_CLASS_ID";
   private static final String WRAPPER_FORM_TEST_CLASS_ID = "WRAPPER_FORM_TEST_CLASS_ID";

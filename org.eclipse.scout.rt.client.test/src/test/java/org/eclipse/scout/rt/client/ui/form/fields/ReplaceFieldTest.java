@@ -17,6 +17,7 @@ import static org.junit.Assert.assertSame;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.ReplaceFieldTest.BaseForm.MainBox;
 import org.eclipse.scout.rt.client.ui.form.fields.ReplaceFieldTest.BaseForm.MainBox.FirstField;
@@ -26,6 +27,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.ReplaceFieldTest.TemplateUsage
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,6 +36,8 @@ import org.junit.runner.RunWith;
  * @since 4.0.1
  */
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class ReplaceFieldTest {
 
   @Test

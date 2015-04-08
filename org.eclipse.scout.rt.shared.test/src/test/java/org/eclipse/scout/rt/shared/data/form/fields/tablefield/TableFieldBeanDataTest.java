@@ -14,13 +14,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @since 3.8.3
  */
 @SuppressWarnings("unused")
+@RunWith(PlatformTestRunner.class)
 public class TableFieldBeanDataTest {
 
   private TestingTableData m_table;

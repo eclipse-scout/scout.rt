@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.fixture.OwnerValueCapturingMenu;
@@ -30,6 +31,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +41,8 @@ import org.junit.runner.RunWith;
  * Tests for {@link AbstractTableMenu}
  */
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class TableMenuTest {
 
   private OwnerValueCapturingMenu m_multi;
@@ -56,8 +61,8 @@ public class TableMenuTest {
   }
 
   private static final Object[][] TEST_ROWS = new Object[][]{
-    {"Boss", "Hugo"},
-    {"Meier", "Hans"}
+      {"Boss", "Hugo"},
+      {"Meier", "Hans"}
   };
 
   /**

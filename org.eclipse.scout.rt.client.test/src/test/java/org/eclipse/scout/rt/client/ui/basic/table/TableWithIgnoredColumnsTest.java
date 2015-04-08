@@ -20,9 +20,12 @@ import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @SuppressWarnings("unused")
+@RunWith(PlatformTestRunner.class)
 public class TableWithIgnoredColumnsTest {
 
   private static final int ROW_COUNT = 3;

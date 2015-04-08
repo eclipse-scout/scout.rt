@@ -25,12 +25,15 @@ import java.util.Locale;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest.P_PropertyTracker;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.TestingUtility.NumberStringPercentSuffix;
 import org.junit.Before;
@@ -41,6 +44,8 @@ import org.junit.runner.RunWith;
  * Test for {@link AbstractDecimalField}
  */
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
 
   private static final BigDecimal DEFAULT_MIN_VALUE = new BigDecimal("-999999999999999999999999999999999999999999999999999999999999");

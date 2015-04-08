@@ -31,12 +31,15 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractObjectColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractTimeColumn;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @since 3.9.1
  */
+@RunWith(PlatformTestRunner.class)
 public class TableUtilityTest {
   private static final long DATE_IN_MILLIS = 1372324222000L; // Thu Jun 27 11:10:22 CEST 2013
   private static final long DATE_IN_MILLIS_2 = 1370324222000L; // Tue Jun 04 07:37:02 CEST 2013

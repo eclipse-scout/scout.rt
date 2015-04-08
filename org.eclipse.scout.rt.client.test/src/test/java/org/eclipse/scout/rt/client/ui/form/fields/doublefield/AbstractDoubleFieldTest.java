@@ -25,13 +25,13 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberFieldTest;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@RunWith(ClientTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class AbstractDoubleFieldTest extends AbstractDoubleField {
 
   private NumberFormat m_formatter;

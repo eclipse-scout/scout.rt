@@ -21,14 +21,14 @@ import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * Accessing a nested menu yields null because child menus are not traversed.
  */
-@RunWith(ClientTestRunner.class)
+@RunWith(PlatformTestRunner.class)
 public class NestedMenusTest {
 
   @Test

@@ -17,12 +17,15 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EitherOrNode;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEitherOrNodeData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +34,8 @@ import org.junit.runner.RunWith;
  * @since 3.8.2
  */
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class ComposerFieldTest {
 
   private ComposerField m_composerField;

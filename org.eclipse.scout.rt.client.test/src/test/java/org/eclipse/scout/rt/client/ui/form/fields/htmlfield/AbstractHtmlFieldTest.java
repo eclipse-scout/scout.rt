@@ -19,13 +19,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link AbstractHtmlField}
  *
  * @since 4.1.0
  */
+@RunWith(PlatformTestRunner.class)
 public class AbstractHtmlFieldTest {
   @Test
   public void testExecHyperlinkAction() throws MalformedURLException, ProcessingException {

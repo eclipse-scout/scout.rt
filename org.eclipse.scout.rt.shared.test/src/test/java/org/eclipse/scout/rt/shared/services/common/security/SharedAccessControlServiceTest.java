@@ -24,14 +24,17 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * JUnit test for {@link AbstractSharedAccessControlService}
  */
+@RunWith(PlatformTestRunner.class)
 public class SharedAccessControlServiceTest {
   private static final String TEST_USER = "user372";
   private IAccessControlService m_accessControlService;
@@ -48,8 +51,8 @@ public class SharedAccessControlServiceTest {
     //Register this IAccessControlService with an higher priority than AllAccessControlService registered in CustomServerTestEnvironment
     m_registerServices = TestingUtility.registerBeans(
         new BeanMetaData(IAccessControlService.class).
-            initialInstance(m_accessControlService).
-            applicationScoped(true)
+        initialInstance(m_accessControlService).
+        applicationScoped(true)
         );
   }
 

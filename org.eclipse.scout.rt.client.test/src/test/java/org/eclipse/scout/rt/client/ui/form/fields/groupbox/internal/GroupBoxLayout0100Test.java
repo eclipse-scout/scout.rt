@@ -18,12 +18,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Field01 has a width of 3 columns in a group box of only 2 columns. <br>
  * <h4>Vertical</h4>
- * 
+ *
  * <pre>
  * ---------------------------
  *    Field01   |   Field01       Field01
@@ -31,9 +33,9 @@ import org.junit.Test;
  *    Field02   |   Field03
  * ---------------------------
  * </pre>
- * 
+ *
  * <h4>Horizontal</h4>
- * 
+ *
  * <pre>
  * ---------------------------
  *    Field01   |   Field01       Field01
@@ -41,10 +43,11 @@ import org.junit.Test;
  *    Field02   |   Field03
  * ---------------------------
  * </pre>
- * 
+ *
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
  */
+@RunWith(PlatformTestRunner.class)
 public class GroupBoxLayout0100Test extends AbstractGroupBoxLayoutTest {
 
   @Test

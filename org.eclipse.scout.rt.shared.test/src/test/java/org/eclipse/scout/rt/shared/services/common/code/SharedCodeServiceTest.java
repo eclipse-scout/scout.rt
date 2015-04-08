@@ -21,7 +21,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * JUnit test for {@link AbstractSharedCodeService}.
@@ -29,13 +31,15 @@ import org.junit.Test;
  *
  * @since 4.3.0 (Mars-M5)
  */
+@RunWith(PlatformTestRunner.class)
 public class SharedCodeServiceTest {
   private static final Long ABC_ID = 150L;
   private static final Long ZYX_ID = 550L;
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#getAllCodeTypeClasses(java.lang.String)}.
+   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#getAllCodeTypeClasses(java.lang.String)}
+   * .
    */
   @Test
   public void testGetAllCodeTypeClasses() {
@@ -53,7 +57,8 @@ public class SharedCodeServiceTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#getAllCodeTypes(java.lang.String)}.
+   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#getAllCodeTypes(java.lang.String)}
+   * .
    */
   @Test
   public void testGetAllCodeTypesString() {
@@ -93,7 +98,8 @@ public class SharedCodeServiceTest {
   }
 
   /**
-   * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#getCodeTypes(List)}.
+   * Test method for
+   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#getCodeTypes(List)}.
    */
   @Test
   public void testGetCodeTypesList() {
@@ -130,7 +136,8 @@ public class SharedCodeServiceTest {
   }
 
   /**
-   * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#reloadCodeType(Class)}.
+   * Test method for
+   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#reloadCodeType(Class)}.
    *
    * @throws Exception
    */
@@ -153,7 +160,8 @@ public class SharedCodeServiceTest {
   }
 
   /**
-   * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#reloadCodeTypes(List)}.
+   * Test method for
+   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#reloadCodeTypes(List)}.
    *
    * @throws Exception
    */
@@ -183,8 +191,8 @@ public class SharedCodeServiceTest {
   }
 
   /**
-   * Test method for {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#findCodeTypeById(Object)}
-   * .
+   * Test method for
+   * {@link org.eclipse.scout.rt.shared.services.common.code.AbstractSharedCodeService#findCodeTypeById(Object)} .
    *
    * @throws Exception
    */

@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
@@ -30,6 +31,8 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +43,8 @@ import org.junit.runner.RunWith;
  * @since 4.0.0-M7
  */
 @RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractRadioButtonGroupTest {
 
   private P_StandardRadioButtonGroup m_group;

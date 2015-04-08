@@ -24,12 +24,15 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Bug 349468: Cloning of a form data does not replace the inner synthetic member
  * see {@link AbstractFormData}
  */
+@RunWith(PlatformTestRunner.class)
 public class FormDataCloneTest {
 
   private int m_outCount;

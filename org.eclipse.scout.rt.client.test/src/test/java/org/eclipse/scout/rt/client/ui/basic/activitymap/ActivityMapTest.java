@@ -6,12 +6,15 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Date;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link org.eclipse.scout.rt.client.ui.basic.activitymap.AbstractActivityMap<RI, AI>}
  */
+@RunWith(PlatformTestRunner.class)
 public class ActivityMapTest {
 
   private ActivityMap m_activityMap = null;

@@ -22,13 +22,16 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests if hacking attack can compromise form field data values (invalid type and range)
  * see {@link AbstractFormData}
  */
 @SuppressWarnings("unchecked")
+@RunWith(PlatformTestRunner.class)
 public class FormDataValidationTest {
 
   @Test
