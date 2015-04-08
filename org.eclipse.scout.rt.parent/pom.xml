@@ -109,7 +109,6 @@
           <execution>
             <id>attach-javadocs</id>
             <configuration>
-                <additionalparam>-Xdoclint:none</additionalparam>
                <failOnError>false</failOnError>
             </configuration>
             <goals>
