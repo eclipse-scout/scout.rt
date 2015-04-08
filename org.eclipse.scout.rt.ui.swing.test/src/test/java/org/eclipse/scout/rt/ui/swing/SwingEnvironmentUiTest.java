@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.swing.SwingEnvironmentUiTest.TestForm.MainBox.StringField;
 import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.form.ISwingScoutForm;
@@ -38,6 +39,7 @@ import org.eclipse.scout.rt.ui.swing.icons.CheckboxWithMarginIcon;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for class {@link AbstractSwingEnvironment}.
@@ -45,6 +47,7 @@ import org.junit.Test;
  * @author awe
  * @since 3.10.0-M3
  */
+@RunWith(PlatformTestRunner.class)
 public class SwingEnvironmentUiTest {
 
   private TestForm m_testForm;

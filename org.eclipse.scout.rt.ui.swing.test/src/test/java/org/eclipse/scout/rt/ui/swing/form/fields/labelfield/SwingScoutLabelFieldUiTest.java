@@ -16,18 +16,21 @@ import javax.swing.JTextPane;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.text.HTMLStyledTextCreator;
 import org.eclipse.scout.rt.ui.swing.text.IStyledTextCreator;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link SwingScoutLabelField}
  *
  * @since 3.10.0-M5
  */
+@RunWith(PlatformTestRunner.class)
 public class SwingScoutLabelFieldUiTest {
 
   private static final int LABEL_HORIZONTAL_ALIGNMENT_LEFT = -1;

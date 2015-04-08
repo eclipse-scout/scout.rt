@@ -15,6 +15,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.AbstractScoutTestParameter;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.IScoutTestParameter;
 import org.junit.Test;
@@ -31,6 +34,8 @@ import org.junit.runners.Parameterized.Parameters;
  * @see ParameterizedScoutClientTestRunner
  */
 @RunWith(ParameterizedScoutClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class SampleParameterizedClientTest {
 
   @Parameters

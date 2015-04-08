@@ -75,11 +75,13 @@ import org.eclipse.scout.rt.ui.swing.basic.SwingScoutModelFinderUiTest.AllFields
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Test for {@link SwingScoutModelFinder}. Tests, if the correct scout model is found for a swing component.
  */
+@Ignore
 public class SwingScoutModelFinderUiTest {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutModelFinderUiTest.class);
 

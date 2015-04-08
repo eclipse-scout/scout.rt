@@ -22,17 +22,20 @@ import javax.swing.text.JTextComponent;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link SwingScoutSmartField}
  *
  * @since 4.1.0
  */
+@RunWith(PlatformTestRunner.class)
 public class SwingScoutSmartFieldUiTest {
 
   private P_SwingScoutSmartField m_smartField;

@@ -13,16 +13,19 @@ import java.awt.Color;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link SwingScoutHtmlField}
- * 
+ *
  * @since 4.0.0-M7
  */
+@RunWith(PlatformTestRunner.class)
 public class SwingScoutHtmlFieldUiTest {
 
   private TestSwingScoutHtmlField m_htmlfield;

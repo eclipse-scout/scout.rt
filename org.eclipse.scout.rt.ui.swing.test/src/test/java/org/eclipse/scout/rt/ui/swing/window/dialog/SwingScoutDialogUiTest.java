@@ -19,20 +19,23 @@ import java.awt.Dialog;
 import java.awt.Rectangle;
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.ext.JDialogEx;
 import org.eclipse.scout.rt.ui.swing.ext.JRootPaneEx;
 import org.eclipse.scout.rt.ui.swing.window.AbstractSwingScoutViewTest;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link SwingScoutDialog}
  */
+@RunWith(PlatformTestRunner.class)
 public class SwingScoutDialogUiTest extends AbstractSwingScoutViewTest {
 
   /**
    * Tests that has correct size after a visibility change
-   * 
+   *
    * @throws InvocationTargetException
    * @throws IllegalAccessException
    * @throws NoSuchMethodException
