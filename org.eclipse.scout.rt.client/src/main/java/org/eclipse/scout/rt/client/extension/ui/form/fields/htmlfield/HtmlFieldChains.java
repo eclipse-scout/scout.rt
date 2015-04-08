@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield;
 
-import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -21,20 +20,20 @@ public final class HtmlFieldChains {
     }
   }
 
-  public static class HtmlFieldHyperlinkActionChain extends AbstractHtmlFieldChain {
+  public static class HtmlFieldAppLinkActionChain extends AbstractHtmlFieldChain {
 
-    public HtmlFieldHyperlinkActionChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public HtmlFieldAppLinkActionChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
-    public void execHyperlinkAction(final URL url, final String path, final boolean local) throws ProcessingException {
+    public void execAppLinkAction(final String ref) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IHtmlFieldExtension<? extends AbstractHtmlField> next) throws ProcessingException {
-          next.execHyperlinkAction(HtmlFieldHyperlinkActionChain.this, url, path, local);
+          next.execAppLinkAction(HtmlFieldAppLinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, url, path, local);
+      callChain(methodInvocation, ref);
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }

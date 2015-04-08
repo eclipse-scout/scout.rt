@@ -1,7 +1,6 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield;
 
 import java.io.File;
-import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -28,14 +27,14 @@ public final class MailFieldChains {
       super(extensions);
     }
 
-    public void execHyperlinkAction(final URL url, final String path, final boolean local) throws ProcessingException {
+    public void execHyperlinkAction(final String ref) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IMailFieldExtension<? extends AbstractMailField> next) throws ProcessingException {
-          next.execHyperlinkAction(MailFieldHyperlinkActionChain.this, url, path, local);
+          next.execHyperlinkAction(MailFieldHyperlinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, url, path, local);
+      callChain(methodInvocation, ref);
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }

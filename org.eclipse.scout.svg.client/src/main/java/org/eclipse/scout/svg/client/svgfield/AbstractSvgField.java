@@ -11,7 +11,6 @@
 package org.eclipse.scout.svg.client.svgfield;
 
 import java.io.ByteArrayOutputStream;
-import java.net.URL;
 import java.util.EventListener;
 import java.util.List;
 
@@ -28,8 +27,8 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.svg.client.SVGUtility;
 import org.eclipse.scout.svg.client.extension.svgfield.ISvgFieldExtension;
+import org.eclipse.scout.svg.client.extension.svgfield.SvgFieldChains.SvgFieldAppLinkActionChain;
 import org.eclipse.scout.svg.client.extension.svgfield.SvgFieldChains.SvgFieldClickedChain;
-import org.eclipse.scout.svg.client.extension.svgfield.SvgFieldChains.SvgFieldHyperlinkChain;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
 
@@ -72,10 +71,25 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
 
   /**
    * called when a svg hyperlink was clicked
+   *
+   * @deprecated use {@link #execAppLinkAction(SvgFieldEvent)} instead
    */
   @ConfigOperation
   @Order(20)
+  @Deprecated
   protected void execHyperlink(SvgFieldEvent e) throws ProcessingException {
+  }
+
+  /**
+   * Called when an app link has been clicked.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   */
+  @ConfigOperation
+  @Order(230)
+  protected void execAppLinkAction(SvgFieldEvent e) throws ProcessingException {
+    //FIXME CGU remove this code when execpHyperlinkAction has been removed
+    execHyperlink(e);
   }
 
   @Override
@@ -133,14 +147,14 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
     return m_uiFacade;
   }
 
-  private void fireHyperlink(URL url) {
+  private void doAppLinkAction(String ref) {
     if (!m_actionRunning) {
       try {
         m_actionRunning = true;
-        SvgFieldEvent e = new SvgFieldEvent(this, SvgFieldEvent.TYPE_HYPERLINK, null, url);
+        SvgFieldEvent e = new SvgFieldEvent(this, SvgFieldEvent.TYPE_HYPERLINK, null, ref);
         // single observer
         try {
-          interceptHyperlink(e);
+          interceptAppLinkAction(e);
         }
         catch (ProcessingException pe) {
           SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
@@ -190,11 +204,8 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
 
   private class P_UIFacade implements ISvgFieldUIFacade {
     @Override
-    public void fireHyperlinkFromUI(URL url) {
-      if (url == null) {
-        return;
-      }
-      fireHyperlink(url);
+    public void fireAppLinkActionFromUI(String ref) {
+      doAppLinkAction(ref);
     }
 
     @Override
@@ -213,10 +224,10 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
     chain.execClicked(e);
   }
 
-  protected final void interceptHyperlink(SvgFieldEvent e) throws ProcessingException {
+  protected final void interceptAppLinkAction(SvgFieldEvent e) throws ProcessingException {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    SvgFieldHyperlinkChain chain = new SvgFieldHyperlinkChain(extensions);
-    chain.execHyperlink(e);
+    SvgFieldAppLinkActionChain chain = new SvgFieldAppLinkActionChain(extensions);
+    chain.execAppLinkAction(e);
   }
 
   protected static class LocalSvgFieldExtension<OWNER extends AbstractSvgField> extends LocalFormFieldExtension<OWNER> implements ISvgFieldExtension<OWNER> {
@@ -231,8 +242,8 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
     }
 
     @Override
-    public void execHyperlink(SvgFieldHyperlinkChain chain, SvgFieldEvent e) throws ProcessingException {
-      getOwner().execHyperlink(e);
+    public void execAppLinkAction(SvgFieldAppLinkActionChain chain, SvgFieldEvent e) throws ProcessingException {
+      getOwner().execAppLinkAction(e);
     }
   }
 

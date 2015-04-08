@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
@@ -94,7 +93,7 @@ public interface ITableUIFacade {
 
   boolean fireKeyTypedFromUI(String keyStrokeText, char keyChar);
 
-  void fireHyperlinkActionFromUI(ITableRow row, IColumn<?> column, URL url);
+  void fireAppLinkActionFromUI(String ref);
 
   void fireTableReloadFromUI();
 

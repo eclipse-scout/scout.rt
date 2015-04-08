@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.wizard;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,10 +35,10 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.wizard.IWizardExtension;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardActiveStepChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAnyFieldChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardCancelChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardCreateContainerFormChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardFinishChain;
-import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardHyperlinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardNextStepChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardPreviousStepChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardRefreshButtonPolicyChain;
@@ -360,6 +361,29 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Order(230)
   protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
     LOG.info("execHyperlinkAction " + url + " (in " + getClass().getName() + ")");
+  }
+
+  /**
+   * Called when an app link has been clicked.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   */
+  @ConfigOperation
+  @Order(10)
+  protected void execAppLinkAction(String ref) throws ProcessingException {
+    //FIXME CGU remove this code when execpHyperlinkAction has been removed
+    URL url = null;
+    boolean local = false;
+    if (ref != null) {
+      try {
+        url = new URL(ref);
+        local = "local".equals(url.getHost());
+      }
+      catch (MalformedURLException e) {
+        LOG.error("", e);
+      }
+    }
+    execHyperlinkAction(url, ref, local);
   }
 
   protected final void interceptInitConfig() {
@@ -1199,23 +1223,18 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     }
   }
 
-  /**
-   * This is a delegate methode that is normally called by the wizard status
-   * field (html field) in the {@link IWizardContainerForm} whenever a link is
-   * clicked.
-   *
-   * @param url
-   * @param path
-   *          {@link URL#getPath()}
-   * @param local
-   *          true if the url is not a valid external url but a local model url
-   *          (http://local/...) The default implementation calls
-   *          {@link #interceptHyperlinkAction(URL, String, boolean)}
-   */
+  @SuppressWarnings("deprecation")
   @Override
   public void doHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
     if (isOpen()) {
-      interceptHyperlinkAction(url, path, local);
+      execHyperlinkAction(url, path, local);
+    }
+  }
+
+  @Override
+  public void doAppLinkAction(String ref) throws ProcessingException {
+    if (isOpen()) {
+      interceptAppLinkAction(ref);
     }
   }
 
@@ -1304,8 +1323,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     }
 
     @Override
-    public void execHyperlinkAction(WizardHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException {
-      getOwner().execHyperlinkAction(url, path, local);
+    public void execAppLinkAction(WizardAppLinkActionChain chain, String ref) throws ProcessingException {
+      getOwner().execAppLinkAction(ref);
     }
 
     @Override
@@ -1373,10 +1392,10 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     chain.execReset();
   }
 
-  protected final void interceptHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
-    WizardHyperlinkActionChain chain = new WizardHyperlinkActionChain(extensions);
-    chain.execHyperlinkAction(url, path, local);
+    WizardAppLinkActionChain chain = new WizardAppLinkActionChain(extensions);
+    chain.execAppLinkAction(ref);
   }
 
   protected final void interceptPreviousStep() throws ProcessingException {

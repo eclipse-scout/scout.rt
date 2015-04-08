@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
-import java.net.URL;
 import java.security.Permission;
 import java.util.Collection;
 import java.util.List;
@@ -19,6 +18,7 @@ import java.util.Set;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 
-public interface ITree extends IPropertyObserver, IDNDSupport {
+public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable {
 
   String PROP_TITLE = "title";
   String PROP_ENABLED = "enabled";
@@ -74,13 +74,6 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
    * @since 5.1.0
    */
   AbstractEventBuffer<TreeEvent> createEventBuffer();
-
-  /**
-   * sets the node as selected node and processes the url.
-   * <p>
-   * see {@link #selectNode(ITreeNode)}
-   */
-  void doHyperlinkAction(ITreeNode node, URL url) throws ProcessingException;
 
   void requestFocus();
 

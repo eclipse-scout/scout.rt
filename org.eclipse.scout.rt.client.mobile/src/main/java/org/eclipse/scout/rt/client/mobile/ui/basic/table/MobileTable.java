@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
-import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -194,12 +193,11 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   }
 
   @Override
-  protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  protected void execAppLinkAction(String ref) throws ProcessingException {
     //Delegate to original table
-    ITableRow originalRow = getRowMapColumn().getValue(getSelectedRow());
-    getOriginalTable().getUIFacade().fireHyperlinkActionFromUI(originalRow, null, url);
+    getOriginalTable().getUIFacade().fireAppLinkActionFromUI(ref);
 
-    if (AbstractRowSummaryColumn.isDrillDownButtonUrl(url, path, local)) {
+    if (AbstractRowSummaryColumn.isDrillDownButtonUrl(ref)) {
       execDrillDownButtonAction();
     }
   }

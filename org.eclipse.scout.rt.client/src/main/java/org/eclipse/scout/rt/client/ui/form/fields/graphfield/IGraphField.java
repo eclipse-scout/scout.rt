@@ -10,17 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.graphfield;
 
-import java.net.URL;
-
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
 
-public interface IGraphField extends IValueField<GraphModel> {
+public interface IGraphField extends IValueField<GraphModel>, IAppLinkCapable {
 
   String PROP_LOADING = "loading";
 
   IGraphFieldUIFacade getUIFacade();
-
-  void doHyperlinkAction(URL url) throws ProcessingException;
 }

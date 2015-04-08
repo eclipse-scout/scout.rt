@@ -468,7 +468,8 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().fireHyperlinkActionFromUI(url);
+        String ref = url.toExternalForm();
+        getScoutObject().getUIFacade().fireAppLinkActionFromUI(ref);
       }
     };
 

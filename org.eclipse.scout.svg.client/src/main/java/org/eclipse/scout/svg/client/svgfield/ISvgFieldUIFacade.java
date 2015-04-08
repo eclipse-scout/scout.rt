@@ -10,13 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.svg.client.svgfield;
 
-import java.net.URL;
-
 import org.w3c.dom.svg.SVGPoint;
 
 public interface ISvgFieldUIFacade {
 
-  void fireHyperlinkFromUI(URL url);
+  void fireAppLinkActionFromUI(String ref);
 
   void fireClickFromUI(SVGPoint point);
 

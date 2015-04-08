@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
 
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
@@ -27,7 +28,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.HtmlFieldChains.HtmlFieldHyperlinkActionChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.HtmlFieldChains.HtmlFieldAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.IHtmlFieldExtension;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -92,11 +93,36 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
    * @param local
    *          true if the url is not a valid external url but a local model url
    *          (http://local/...)
+   * @deprecated use {@link #execAppLinkAction(String)} instead
    */
   @ConfigOperation
   @Order(230)
+  @Deprecated
   protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
     LOG.info("execHyperlinkAction " + url + " (in " + getClass().getName() + ")");
+  }
+
+  /**
+   * Called when an app link has been clicked.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   */
+  @ConfigOperation
+  @Order(230)
+  protected void execAppLinkAction(String ref) throws ProcessingException {
+    //FIXME CGU remove this code when execpHyperlinkAction has been removed
+    URL url = null;
+    boolean local = false;
+    if (ref != null) {
+      try {
+        url = new URL(ref);
+        local = "local".equals(url.getHost());
+      }
+      catch (MalformedURLException e) {
+        LOG.error("", e);
+      }
+    }
+    execHyperlinkAction(url, ref, local);
   }
 
   @Override
@@ -128,10 +154,8 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   }
 
   @Override
-  public void doHyperlinkAction(URL url) throws ProcessingException {
-    if (url != null) {
-      interceptHyperlinkAction(url, url.getPath(), "local".equals(url.getHost()));
-    }
+  public void doAppLinkAction(String ref) throws ProcessingException {
+    interceptAppLinkAction(ref);
   }
 
   public void setValueFromURL(URL url, String encoding) throws ProcessingException {
@@ -240,9 +264,9 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     }
 
     @Override
-    public void fireHyperlinkActionFromUI(URL url) {
+    public void fireAppLinkActionFromUI(String ref) {
       try {
-        doHyperlinkAction(url);
+        doAppLinkAction(ref);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -293,10 +317,10 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     m_monitorSpelling = Boolean.valueOf(monitorSpelling);
   }
 
-  protected final void interceptHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    HtmlFieldHyperlinkActionChain chain = new HtmlFieldHyperlinkActionChain(extensions);
-    chain.execHyperlinkAction(url, path, local);
+    HtmlFieldAppLinkActionChain chain = new HtmlFieldAppLinkActionChain(extensions);
+    chain.execAppLinkAction(ref);
   }
 
   protected static class LocalHtmlFieldExtension<OWNER extends AbstractHtmlField> extends LocalValueFieldExtension<String, OWNER> implements IHtmlFieldExtension<OWNER> {
@@ -306,8 +330,8 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     }
 
     @Override
-    public void execHyperlinkAction(HtmlFieldHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException {
-      getOwner().execHyperlinkAction(url, path, local);
+    public void execAppLinkAction(HtmlFieldAppLinkActionChain chain, String ref) throws ProcessingException {
+      getOwner().execAppLinkAction(ref);
     }
   }
 

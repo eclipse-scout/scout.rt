@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
-import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -56,6 +55,6 @@ public interface ITreeUIFacade {
    */
   void fireNodeDropTargetChangedFromUI(ITreeNode node);
 
-  void fireHyperlinkActionFromUI(ITreeNode node, URL url);
+  void fireAppLinkActionFromUI(String ref);
 
 }

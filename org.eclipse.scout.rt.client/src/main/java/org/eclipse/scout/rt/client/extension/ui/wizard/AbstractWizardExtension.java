@@ -10,15 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.wizard;
 
-import java.net.URL;
-
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardActiveStepChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAnyFieldChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardCancelChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardCreateContainerFormChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardFinishChain;
-import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardHyperlinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardNextStepChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardPreviousStepChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardRefreshButtonPolicyChain;
@@ -30,9 +28,6 @@ import org.eclipse.scout.rt.client.ui.wizard.AbstractWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardContainerForm;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
-/**
- *
- */
 public abstract class AbstractWizardExtension<OWNER extends AbstractWizard> extends AbstractExtension<OWNER> implements IWizardExtension<OWNER> {
 
   public AbstractWizardExtension(OWNER owner) {
@@ -80,8 +75,8 @@ public abstract class AbstractWizardExtension<OWNER extends AbstractWizard> exte
   }
 
   @Override
-  public void execHyperlinkAction(WizardHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException {
-    chain.execHyperlinkAction(url, path, local);
+  public void execAppLinkAction(WizardAppLinkActionChain chain, String ref) throws ProcessingException {
+    chain.execAppLinkAction(ref);
   }
 
   @Override

@@ -11,18 +11,22 @@
 package org.eclipse.scout.svg.client.svgfield;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.EventObject;
 
 import org.apache.batik.dom.svg.SVGOMPoint;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.w3c.dom.svg.SVGPoint;
 
 public class SvgFieldEvent extends EventObject {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SvgFieldEvent.class);
   private static final long serialVersionUID = 1L;
 
   private final int m_type;
   private final Point m_point;
-  private final URL m_url;
+  private final String m_appLinkRef;
 
   /**
    * A hyperlink was activated
@@ -33,7 +37,7 @@ public class SvgFieldEvent extends EventObject {
    */
   public static final int TYPE_CLICKED = 20;
 
-  SvgFieldEvent(ISvgField source, int type, SVGPoint point, URL url) {
+  SvgFieldEvent(ISvgField source, int type, SVGPoint point, String appLinkRef) {
     super(source);
     m_type = type;
     if (point != null) {
@@ -43,7 +47,7 @@ public class SvgFieldEvent extends EventObject {
     else {
       m_point = null;
     }
-    m_url = url;
+    m_appLinkRef = appLinkRef;
   }
 
   public int getType() {
@@ -62,8 +66,25 @@ public class SvgFieldEvent extends EventObject {
     return new SVGOMPoint(m_point.getX(), m_point.getY());
   }
 
+  public String getAppLinkRef() {
+    return m_appLinkRef;
+  }
+
+  /**
+   * @deprecated use {@link #getAppLinkRef()} instead
+   */
+  @Deprecated
   public URL getURL() {
-    return m_url;
+    String ref = getAppLinkRef();
+    if (ref != null) {
+      try {
+        return new URL(ref);
+      }
+      catch (MalformedURLException e) {
+        LOG.error("", e);
+      }
+    }
+    return null;
   }
 
   private class Point implements Serializable {

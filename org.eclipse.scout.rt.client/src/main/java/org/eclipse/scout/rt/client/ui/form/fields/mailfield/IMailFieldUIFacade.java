@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields.mailfield;
 
 import java.io.File;
-import java.net.URL;
 
 import javax.mail.internet.MimeMessage;
 
@@ -24,6 +23,6 @@ public interface IMailFieldUIFacade {
 
   void fireAttachementActionFromUI(File file);
 
-  void fireHyperlinkActionFromUI(URL url);
+  void fireAppLinkActionFromUI(String ref);
 
 }

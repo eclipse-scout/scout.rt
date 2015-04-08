@@ -112,9 +112,9 @@ public class HtmlNodeBuilder extends AbstractExpressionBuilder implements IHtmlE
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends IHtmlElement> T appLink(CharSequence path) {
-    cssClass("hyperlink");
-    addAttribute("data-hyperlink", path);
+  public <T extends IHtmlElement> T appLink(CharSequence ref) {
+    cssClass("app-link");
+    addAttribute("data-ref", ref);
     return (T) this;
   }
 

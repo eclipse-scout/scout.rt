@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.basic.table;
 
-import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableContentChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCopyChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTableRowDataMapperChain;
@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDec
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDisposeTableChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDragChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDropChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableHyperlinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableInitTableChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
@@ -41,7 +40,7 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 
 public interface ITableExtension<TABLE extends AbstractTable> extends IExtension<TABLE> {
 
-  void execHyperlinkAction(TableHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException;
+  void execAppLinkAction(TableAppLinkActionChain chain, String ref) throws ProcessingException;
 
   void execRowAction(TableRowActionChain chain, ITableRow row) throws ProcessingException;
 

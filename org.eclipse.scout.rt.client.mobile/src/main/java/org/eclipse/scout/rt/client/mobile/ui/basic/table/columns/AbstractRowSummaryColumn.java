@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.columns;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -111,12 +110,8 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
     return m_initialized;
   }
 
-  public static boolean isDrillDownButtonUrl(URL url, String path, boolean local) {
-    if (!local) {
-      return false;
-    }
-
-    String query = url.getQuery();
+  public static boolean isDrillDownButtonUrl(String ref) {
+    String query = ref;
     if (query == null) {
       return false;
     }

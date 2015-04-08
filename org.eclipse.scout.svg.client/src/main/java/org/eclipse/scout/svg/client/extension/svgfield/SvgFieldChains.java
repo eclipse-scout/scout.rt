@@ -42,17 +42,17 @@ public final class SvgFieldChains {
     }
   }
 
-  public static class SvgFieldHyperlinkChain extends AbstractSvgFieldChain {
+  public static class SvgFieldAppLinkActionChain extends AbstractSvgFieldChain {
 
-    public SvgFieldHyperlinkChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public SvgFieldAppLinkActionChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
-    public void execHyperlink(final SvgFieldEvent e) throws ProcessingException {
+    public void execAppLinkAction(final SvgFieldEvent e) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISvgFieldExtension<? extends AbstractSvgField> next) throws ProcessingException {
-          next.execHyperlink(SvgFieldHyperlinkChain.this, e);
+          next.execAppLinkAction(SvgFieldAppLinkActionChain.this, e);
         }
       };
       callChain(methodInvocation, e);

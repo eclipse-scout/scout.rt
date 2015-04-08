@@ -954,7 +954,8 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            getScoutObject().getUIFacade().fireHyperlinkActionFromUI(scoutNode, url);
+            String ref = url.toExternalForm();
+            getScoutObject().getUIFacade().fireAppLinkActionFromUI(ref);
           }
         };
         getSwingEnvironment().invokeScoutLater(t, 0);

@@ -888,7 +888,11 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            getScoutObject().getUIFacade().fireHyperlinkActionFromUI(scoutRow, scoutCol, url);
+            if (scoutCol != null) {
+              getScoutObject().getUIFacade().setContextColumnFromUI(scoutCol);
+            }
+            String ref = url.toExternalForm();
+            getScoutObject().getUIFacade().fireAppLinkActionFromUI(ref);
           }
         };
 

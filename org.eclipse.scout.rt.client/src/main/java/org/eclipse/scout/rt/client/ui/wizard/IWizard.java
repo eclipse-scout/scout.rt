@@ -17,10 +17,11 @@ import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
+import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public interface IWizard extends IPropertyObserver, ITypeWithClassId {
+public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCapable {
 
   static enum CloseType {
     /**
@@ -345,17 +346,17 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId {
   void doReset() throws ProcessingException;
 
   /**
-   * This is a delegate methode that is normally called by the wizard status
-   * field (html field) in the {@link IWizardContainerForm} whenever a link is
+   * This is a delegate method that is normally called by the wizard status
+   * field in the {@link IWizardContainerForm} whenever a link is
    * clicked.
-   *
-   * @param url
-   * @param path
-   *          {@link URL#getPath()}
-   * @param local
-   *          true if the url is not a valid external url but a local model url
-   *          (http://local/...)
    */
+  @Override
+  void doAppLinkAction(String ref) throws ProcessingException;
+
+  /**
+   * @deprecated use {@link #doAppLinkAction(String)} instead
+   */
+  @Deprecated
   void doHyperlinkAction(URL url, String path, boolean local) throws ProcessingException;
 
   /**

@@ -152,7 +152,8 @@ public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> impl
         ModelJobs.schedule(new IRunnable() {
           @Override
           public void run() throws Exception {
-            getScoutObject().getUIFacade().fireHyperlinkFromUI(url);
+            String ref = url.toExternalForm();
+            getScoutObject().getUIFacade().fireAppLinkActionFromUI(ref);
           }
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
         // end notify

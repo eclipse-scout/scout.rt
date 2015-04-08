@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Permission;
 import java.util.ArrayList;
@@ -347,6 +348,29 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @ConfigOperation
   @Order(18)
   protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  }
+
+  /**
+   * Called when an app link has been clicked.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   */
+  @ConfigOperation
+  @Order(18)
+  protected void execAppLinkAction(String ref) throws ProcessingException {
+    //FIXME CGU remove this code when execpHyperlinkAction has been removed
+    URL url = null;
+    boolean local = false;
+    if (ref != null) {
+      try {
+        url = new URL(ref);
+        local = "local".equals(url.getHost());
+      }
+      catch (MalformedURLException e) {
+        LOG.error("", e);
+      }
+    }
+    execHyperlinkAction(url, ref, local);
   }
 
   /**
@@ -2533,14 +2557,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void doHyperlinkAction(ITreeNode node, URL url) throws ProcessingException {
+  public void doAppLinkAction(String ref) throws ProcessingException {
     if (!m_actionRunning) {
       try {
         m_actionRunning = true;
-        if (node != null) {
-          selectNode(node);
-          interceptHyperlinkAction(url, url.getPath(), url != null && "local".equals(url.getHost()));
-        }
+        interceptAppLinkAction(ref);
       }
       finally {
         m_actionRunning = false;
@@ -2917,15 +2938,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     @Override
-    public void fireHyperlinkActionFromUI(ITreeNode node, URL url) {
+    public void fireAppLinkActionFromUI(String ref) {
       try {
         pushUIProcessor();
-        //
-        node = resolveNode(node);
-        node = resolveVirtualNode(node);
-        if (node != null) {
-          doHyperlinkAction(node, url);
-        }
+        doAppLinkAction(ref);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -2978,8 +2994,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     @Override
-    public void execHyperlinkAction(TreeHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException {
-      getOwner().execHyperlinkAction(url, path, local);
+    public void execAppLinkAction(TreeHyperlinkActionChain chain, String ref) throws ProcessingException {
+      getOwner().execAppLinkAction(ref);
     }
 
     @Override
@@ -3049,10 +3065,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     chain.execNodeClick(node, mouseButton);
   }
 
-  protected final void interceptHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeHyperlinkActionChain chain = new TreeHyperlinkActionChain(extensions);
-    chain.execHyperlinkAction(url, path, local);
+    chain.execHyperlinkAction(ref);
   }
 
   protected final void interceptNodesSelected(TreeEvent e) throws ProcessingException {

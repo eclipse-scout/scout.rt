@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
 
-import java.net.URL;
 import java.util.Collection;
 
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
@@ -21,6 +20,5 @@ public interface IHtmlFieldUIFacade {
 
   void setAttachmentsFromUI(Collection<? extends RemoteFile> attachments);
 
-  void fireHyperlinkActionFromUI(URL url);
-
+  void fireAppLinkActionFromUI(String ref);
 }

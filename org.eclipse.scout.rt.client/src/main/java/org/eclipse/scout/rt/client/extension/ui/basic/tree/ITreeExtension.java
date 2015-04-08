@@ -11,7 +11,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.basic.tree;
 
-import java.net.URL;
 import java.util.Collection;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -55,7 +54,7 @@ public interface ITreeExtension<OWNER extends AbstractTree> extends IExtension<O
 
   void execNodesChecked(TreeNodesCheckedChain chain, Collection<ITreeNode> nodes) throws ProcessingException;
 
-  void execHyperlinkAction(TreeHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException;
+  void execAppLinkAction(TreeHyperlinkActionChain chain, String ref) throws ProcessingException;
 
   void execNodesSelected(TreeNodesSelectedChain chain, TreeEvent e) throws ProcessingException;
 

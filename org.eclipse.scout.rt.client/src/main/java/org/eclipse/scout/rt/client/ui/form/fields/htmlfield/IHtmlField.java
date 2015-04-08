@@ -14,7 +14,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Set;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.documentfield.IDocumentField;
@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
  * See also the {@link IBrowserField} for html viewing and {@link IDocumentField} for html editing (requires a fragment
  * such as microsoft word editor)
  */
-public interface IHtmlField extends IValueField<String> {
+public interface IHtmlField extends IValueField<String>, IAppLinkCapable {
 
   String PROP_MAX_LENGTH = "maxLength";
   String PROP_SCROLLBARS_ENABLED = "scrollBarsEnabled";
@@ -56,8 +56,6 @@ public interface IHtmlField extends IValueField<String> {
    */
 
   IHtmlFieldUIFacade getUIFacade();
-
-  void doHyperlinkAction(URL url) throws ProcessingException;
 
   /**
    * local images and local resources bound to the html text

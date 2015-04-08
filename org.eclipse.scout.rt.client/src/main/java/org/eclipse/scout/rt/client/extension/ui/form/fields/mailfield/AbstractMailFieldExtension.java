@@ -1,7 +1,6 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield;
 
 import java.io.File;
-import java.net.URL;
 
 import javax.mail.internet.MimeMessage;
 
@@ -18,8 +17,8 @@ public abstract class AbstractMailFieldExtension<OWNER extends AbstractMailField
   }
 
   @Override
-  public void execHyperlinkAction(MailFieldHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException {
-    chain.execHyperlinkAction(url, path, local);
+  public void execHyperlinkAction(MailFieldHyperlinkActionChain chain, String ref) throws ProcessingException {
+    chain.execHyperlinkAction(ref);
   }
 
   @Override

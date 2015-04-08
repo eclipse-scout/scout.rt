@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.graphfield;
 
-import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -21,20 +20,20 @@ public final class GraphFieldChains {
     }
   }
 
-  public static class GraphFieldHyperlinkActionChain extends AbstractGraphFieldChain {
+  public static class GraphFieldAppLinkActionChain extends AbstractGraphFieldChain {
 
-    public GraphFieldHyperlinkActionChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public GraphFieldAppLinkActionChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
-    public void execHyperlinkAction(final URL url, final String path, final boolean local) throws ProcessingException {
+    public void execAppLinkAction(final String ref) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IGraphFieldExtension<? extends AbstractGraphField> next) throws ProcessingException {
-          next.execHyperlinkAction(GraphFieldHyperlinkActionChain.this, url, path, local);
+          next.execAppLinkAction(GraphFieldAppLinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, url, path, local);
+      callChain(methodInvocation, ref);
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }

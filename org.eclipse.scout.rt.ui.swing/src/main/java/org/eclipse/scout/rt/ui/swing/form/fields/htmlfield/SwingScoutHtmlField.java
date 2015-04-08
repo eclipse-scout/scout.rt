@@ -19,7 +19,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JPanel;
@@ -96,7 +95,7 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
       @Override
       public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == EventType.ACTIVATED) {
-          fireHyperlinkActionFromSwing(e.getURL());
+          fireHyperlinkActionFromSwing(e.getURL().toExternalForm());
         }
       }
     });
@@ -297,12 +296,12 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     }
   }
 
-  protected void fireHyperlinkActionFromSwing(final URL url) {
+  protected void fireHyperlinkActionFromSwing(final String ref) {
     // notify Scout
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().fireHyperlinkActionFromUI(url);
+        getScoutObject().getUIFacade().fireAppLinkActionFromUI(ref);
       }
     };
 

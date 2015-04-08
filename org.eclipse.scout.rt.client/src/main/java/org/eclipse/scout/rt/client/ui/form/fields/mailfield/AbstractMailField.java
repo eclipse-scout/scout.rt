@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.mailfield;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
@@ -21,6 +22,8 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.IMailFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.MailFieldChains.MailFieldAttachementActionChain;
@@ -36,6 +39,7 @@ import org.eclipse.scout.service.SERVICES;
  */
 @ClassId("35e1fd57-3c86-4c99-92ca-188c3c2dedde")
 public abstract class AbstractMailField extends AbstractValueField<MimeMessage> implements IMailField {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMailField.class);
   private IMailFieldUIFacade m_uiFacade;
   private boolean m_mailEditor;
   private boolean m_scrollBarEnabled;
@@ -126,6 +130,29 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
   protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
   }
 
+  /**
+   * Called when an app link has been clicked.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   */
+  @ConfigOperation
+  @Order(10)
+  protected void execAppLinkAction(String ref) throws ProcessingException {
+    //FIXME CGU remove this code when execpHyperlinkAction has been removed
+    URL url = null;
+    boolean local = false;
+    if (ref != null) {
+      try {
+        url = new URL(ref);
+        local = "local".equals(url.getHost());
+      }
+      catch (MalformedURLException e) {
+        LOG.error("", e);
+      }
+    }
+    execHyperlinkAction(url, ref, local);
+  }
+
   @Override
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
@@ -209,8 +236,9 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
     interceptAttachementAction(file);
   }
 
-  public void doHyperlinkAction(URL url) throws ProcessingException {
-    interceptHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals("local"));
+  @Override
+  public void doAppLinkAction(String ref) throws ProcessingException {
+    interceptAppLinkAction(ref);
   }
 
   private class P_UIFacade implements IMailFieldUIFacade {
@@ -233,9 +261,9 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
     }
 
     @Override
-    public void fireHyperlinkActionFromUI(URL url) {
+    public void fireAppLinkActionFromUI(String ref) {
       try {
-        doHyperlinkAction(url);
+        doAppLinkAction(ref);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -244,10 +272,10 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
 
   }
 
-  protected final void interceptHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     MailFieldHyperlinkActionChain chain = new MailFieldHyperlinkActionChain(extensions);
-    chain.execHyperlinkAction(url, path, local);
+    chain.execHyperlinkAction(ref);
   }
 
   protected final void interceptAttachementAction(File file) throws ProcessingException {
@@ -263,8 +291,8 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
     }
 
     @Override
-    public void execHyperlinkAction(MailFieldHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException {
-      getOwner().execHyperlinkAction(url, path, local);
+    public void execHyperlinkAction(MailFieldHyperlinkActionChain chain, String ref) throws ProcessingException {
+      getOwner().execAppLinkAction(ref);
     }
 
     @Override

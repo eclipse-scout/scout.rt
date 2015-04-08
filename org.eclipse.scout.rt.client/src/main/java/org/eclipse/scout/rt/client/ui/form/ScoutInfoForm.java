@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form;
 
 import java.io.ByteArrayInputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -30,12 +29,11 @@ import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.GroupBox.HtmlFi
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
-import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
-import org.eclipse.scout.rt.shared.services.common.shell.IShellService;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
 
@@ -134,12 +132,6 @@ public class ScoutInfoForm extends AbstractForm {
           return UserAgentUtility.isWebClient() ? 12 : 20;
         }
 
-        @Override
-        protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
-          if (!local) {
-            SERVICES.getService(IShellService.class).shellOpen(url.toExternalForm());
-          }
-        }
       }
     }
 

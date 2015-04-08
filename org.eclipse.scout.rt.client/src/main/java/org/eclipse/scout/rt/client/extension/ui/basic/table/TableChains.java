@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.basic.table;
 
-import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -26,20 +25,20 @@ public final class TableChains {
     }
   }
 
-  public static class TableHyperlinkActionChain extends AbstractTableChain {
+  public static class TableAppLinkActionChain extends AbstractTableChain {
 
-    public TableHyperlinkActionChain(List<? extends ITableExtension<? extends AbstractTable>> extensions) {
+    public TableAppLinkActionChain(List<? extends ITableExtension<? extends AbstractTable>> extensions) {
       super(extensions);
     }
 
-    public void execHyperlinkAction(final URL url, final String path, final boolean local) throws ProcessingException {
+    public void execAppLinkAction(final String ref) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
-          next.execHyperlinkAction(TableHyperlinkActionChain.this, url, path, local);
+          next.execAppLinkAction(TableAppLinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, url, path, local);
+      callChain(methodInvocation, ref);
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }

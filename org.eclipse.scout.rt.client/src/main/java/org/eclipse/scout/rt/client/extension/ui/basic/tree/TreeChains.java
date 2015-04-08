@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.basic.tree;
 
-import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
@@ -199,14 +198,14 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execHyperlinkAction(final URL url, final String path, final boolean local) throws ProcessingException {
+    public void execHyperlinkAction(final String ref) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
-          next.execHyperlinkAction(TreeHyperlinkActionChain.this, url, path, local);
+          next.execAppLinkAction(TreeHyperlinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, url, path, local);
+      callChain(methodInvocation, ref);
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }

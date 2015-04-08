@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.client.extension.ui.wizard;
 
-import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -189,20 +188,20 @@ public final class WizardChains {
     }
   }
 
-  public static class WizardHyperlinkActionChain extends AbstractWizardChain {
+  public static class WizardAppLinkActionChain extends AbstractWizardChain {
 
-    public WizardHyperlinkActionChain(List<? extends IWizardExtension<? extends AbstractWizard>> extensions) {
+    public WizardAppLinkActionChain(List<? extends IWizardExtension<? extends AbstractWizard>> extensions) {
       super(extensions);
     }
 
-    public void execHyperlinkAction(final URL url, final String path, final boolean local) throws ProcessingException {
+    public void execAppLinkAction(final String ref) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IWizardExtension<? extends AbstractWizard> next) throws ProcessingException {
-          next.execHyperlinkAction(WizardHyperlinkActionChain.this, url, path, local);
+          next.execAppLinkAction(WizardAppLinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, url, path, local);
+      callChain(methodInvocation, ref);
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }

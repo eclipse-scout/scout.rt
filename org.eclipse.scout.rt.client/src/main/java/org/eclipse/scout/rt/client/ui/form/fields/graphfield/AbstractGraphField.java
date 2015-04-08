@@ -11,7 +11,7 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.graphfield.GraphFieldChains.GraphFieldHyperlinkActionChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.graphfield.GraphFieldChains.GraphFieldAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.graphfield.IGraphFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -39,7 +39,7 @@ public class AbstractGraphField extends AbstractValueField<GraphModel> implement
    */
   @ConfigOperation
   @Order(230)
-  protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  protected void execAppLinkAction(String ref) throws ProcessingException {
   }
 
   public boolean isLoading() {
@@ -56,18 +56,16 @@ public class AbstractGraphField extends AbstractValueField<GraphModel> implement
   }
 
   @Override
-  public void doHyperlinkAction(URL url) throws ProcessingException {
-    if (url != null) {
-      interceptHyperlinkAction(url, url.getPath(), "local".equals(url.getHost()));
-    }
+  public void doAppLinkAction(String ref) throws ProcessingException {
+    interceptAppLinkAction(ref);
   }
 
   private class P_UIFacade implements IGraphFieldUIFacade {
 
     @Override
-    public void fireHyperlinkActionFromUI(URL url) {
+    public void fireAppLinkActionFromUI(String ref) {
       try {
-        doHyperlinkAction(url);
+        doAppLinkAction(ref);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -75,10 +73,10 @@ public class AbstractGraphField extends AbstractValueField<GraphModel> implement
     }
   }
 
-  protected final void interceptHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    GraphFieldHyperlinkActionChain chain = new GraphFieldHyperlinkActionChain(extensions);
-    chain.execHyperlinkAction(url, path, local);
+    GraphFieldAppLinkActionChain chain = new GraphFieldAppLinkActionChain(extensions);
+    chain.execAppLinkAction(ref);
   }
 
   protected static class LocalGraphFieldExtension<OWNER extends AbstractGraphField> extends LocalValueFieldExtension<GraphModel, OWNER> implements IGraphFieldExtension<OWNER> {
@@ -88,8 +86,8 @@ public class AbstractGraphField extends AbstractValueField<GraphModel> implement
     }
 
     @Override
-    public void execHyperlinkAction(GraphFieldHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException {
-      getOwner().execHyperlinkAction(url, path, local);
+    public void execAppLinkAction(GraphFieldAppLinkActionChain chain, String ref) throws ProcessingException {
+      getOwner().execAppLinkAction(ref);
     }
   }
 

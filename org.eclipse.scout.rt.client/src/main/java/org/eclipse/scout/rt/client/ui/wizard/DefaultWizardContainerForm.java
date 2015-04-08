@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.wizard;
 
-import java.net.URL;
-
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -218,12 +216,12 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
           }
 
           @Override
-          protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+          protected void execAppLinkAction(String ref) throws ProcessingException {
             if (DefaultWizardContainerForm.this.getWizard() != null) {
-              DefaultWizardContainerForm.this.getWizard().doHyperlinkAction(url, path, local);
+              DefaultWizardContainerForm.this.getWizard().doAppLinkAction(ref);
             }
             else {
-              super.execHyperlinkAction(url, path, local);
+              super.execAppLinkAction(ref);
             }
           }
         }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.basic.tree;
 
-import java.net.URL;
 import java.util.Collection;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
@@ -73,8 +72,8 @@ public abstract class AbstractTreeExtension<OWNER extends AbstractTree> extends 
   }
 
   @Override
-  public void execHyperlinkAction(TreeHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException {
-    chain.execHyperlinkAction(url, path, local);
+  public void execAppLinkAction(TreeHyperlinkActionChain chain, String ref) throws ProcessingException {
+    chain.execHyperlinkAction(ref);
   }
 
   @Override

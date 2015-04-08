@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +52,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.ITableExtension;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableContentChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCopyChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTableRowDataMapperChain;
@@ -59,7 +61,6 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDec
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDisposeTableChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDragChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDropChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableHyperlinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableInitTableChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
@@ -761,10 +762,35 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * @param local
    *          {@code true} if the url is not a valid external url but a local model url (http://local/...)
    * @throws ProcessingException
+   * @{@link Deprecated} use {@link #execAppLinkAction(String)} instead
    */
   @ConfigOperation
   @Order(120)
+  @Deprecated
   protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  }
+
+  /**
+   * Called when an app link has been clicked.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   */
+  @ConfigOperation
+  @Order(120)
+  protected void execAppLinkAction(String ref) throws ProcessingException {
+    //FIXME CGU remove this code when execpHyperlinkAction has been removed
+    URL url = null;
+    boolean local = false;
+    if (ref != null) {
+      try {
+        url = new URL(ref);
+        local = "local".equals(url.getHost());
+      }
+      catch (MalformedURLException e) {
+        LOG.error("", e);
+      }
+    }
+    execHyperlinkAction(url, ref, local);
   }
 
   /**
@@ -1214,17 +1240,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public void doHyperlinkAction(ITableRow row, IColumn<?> col, URL url) throws ProcessingException {
+  public void doAppLinkAction(String ref) throws ProcessingException {
     if (!m_actionRunning) {
       try {
         m_actionRunning = true;
-        if (row != null) {
-          selectRow(row);
-        }
-        if (col != null) {
-          setContextColumn(col);
-        }
-        interceptHyperlinkAction(url, url.getPath(), LOCAL_URL_HOST.equals(url.getHost()));
+        interceptAppLinkAction(ref);
       }
       finally {
         m_actionRunning = false;
@@ -4417,11 +4437,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     @Override
-    public void fireHyperlinkActionFromUI(ITableRow row, IColumn<?> col, URL url) {
+    public void fireAppLinkActionFromUI(String ref) {
       try {
         pushUIProcessor();
         //
-        doHyperlinkAction(resolveRow(row), col, url);
+        doAppLinkAction(ref);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -4625,8 +4645,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     @Override
-    public void execHyperlinkAction(TableHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException {
-      getOwner().execHyperlinkAction(url, path, local);
+    public void execAppLinkAction(TableAppLinkActionChain chain, String ref) throws ProcessingException {
+      getOwner().execAppLinkAction(ref);
     }
 
     @Override
@@ -4700,10 +4720,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  protected final void interceptHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
     List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
-    TableHyperlinkActionChain chain = new TableHyperlinkActionChain(extensions);
-    chain.execHyperlinkAction(url, path, local);
+    TableAppLinkActionChain chain = new TableAppLinkActionChain(extensions);
+    chain.execAppLinkAction(ref);
   }
 
   protected final void interceptRowAction(ITableRow row) throws ProcessingException {

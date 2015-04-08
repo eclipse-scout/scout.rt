@@ -12,12 +12,13 @@ package org.eclipse.scout.rt.client.ui.form.fields.mailfield;
 
 import javax.mail.internet.MimeMessage;
 
+import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 /**
  * @version 3.x
  */
-public interface IMailField extends IValueField<MimeMessage> {
+public interface IMailField extends IValueField<MimeMessage>, IAppLinkCapable {
   String PROP_LABEL_FROM = "labelFrom";
   String PROP_LABEL_TO = "labelTo";
   String PROP_LABEL_CC = "labelCC";

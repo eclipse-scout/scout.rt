@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
+import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -44,10 +45,10 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
  * You can write html into the table cells.
  * <p>
  * You can use local urls that call back to the table itself and can be handled by overriding
- * {@link AbstractTable#execHyperlinkAction(URL, String, boolean)}. A local URL is one of the form http://local/...
+ * {@link AbstractTable#execAppLinkAction(URL, String, boolean)}. A local URL is one of the form http://local/...
  * <p>
  */
-public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId {
+public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId, IAppLinkCapable {
 
   /**
    * String
@@ -129,17 +130,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @since 4.0.0 {@link IContextMenu}
    */
   String PROP_CONTEXT_MENU = "contextMenus";
-  /**
-   * Host for local urls that call back to the table itself and can be handled by overriding
-   * {@link AbstractTable#execHyperlinkAction(URL, String, boolean)}.
-   */
-  String LOCAL_URL_HOST = "local";
-
-  /**
-   * Prefix for local urls that call back to the table itself and can be handled by overriding
-   * {@link AbstractTable#execHyperlinkAction(URL, String, boolean)}.
-   */
-  String LOCAL_URL_PREFIX = "http://" + LOCAL_URL_HOST + "/";
 
   /**
    * {@link ITableCustomizer}
@@ -168,13 +158,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @since 5.1.0
    */
   AbstractEventBuffer<TableEvent> createEventBuffer();
-
-  /**
-   * set the context column and processes the url.
-   * <p>
-   * see {@link #setContextColumn(IColumn)}
-   */
-  void doHyperlinkAction(ITableRow row, IColumn<?> col, URL url) throws ProcessingException;
 
   List<ITableRowFilter> getRowFilters();
 
