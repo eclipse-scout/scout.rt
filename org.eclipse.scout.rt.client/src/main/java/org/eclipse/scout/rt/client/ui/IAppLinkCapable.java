@@ -8,11 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.beanfield;
+package org.eclipse.scout.rt.client.ui;
 
-import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.commons.exception.ProcessingException;
 
-public interface IBeanField<VALUE> extends IValueField<VALUE>, IAppLinkCapable {
-  IBeanFieldUIFacade getUIFacade();
+/**
+ * @since 5.1
+ */
+public interface IAppLinkCapable {
+
+  void doAppLinkAction(String ref) throws ProcessingException;
+
 }
