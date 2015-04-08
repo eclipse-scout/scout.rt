@@ -93,17 +93,27 @@ public class HtmlNodeBuilder extends AbstractExpressionBuilder implements IHtmlE
     return (T) this;
   }
 
+  /**
+   * @deprecated use {@link #cssClass(CharSequence)}
+   */
+  @SuppressWarnings("deprecation")
+  @Override
+  @Deprecated
+  public <T extends IHtmlElement> T clazz(CharSequence clazz) {
+    return cssClass(clazz);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends IHtmlElement> T clazz(CharSequence clazz) {
-    addAttribute("class", clazz);
+  public <T extends IHtmlElement> T cssClass(CharSequence cssClass) {
+    addAttribute("class", cssClass);
     return (T) this;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T extends IHtmlElement> T appLink(CharSequence path) {
-    clazz("hyperlink");
+    cssClass("hyperlink");
     addAttribute("data-hyperlink", path);
     return (T) this;
   }

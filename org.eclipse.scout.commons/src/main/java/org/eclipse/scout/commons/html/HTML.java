@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.html.internal.HtmlTableRowBuilder;
  * Convenience for building a html document or parts of it with encoded binds. <br>
  * Only the most common cases are supported, not intended to be complete.
  */
-public class HTML {
+public final class HTML {
 
   /**
    * Utility class
@@ -207,6 +207,18 @@ public class HTML {
    */
   public static IHtmlTable table(List<IHtmlTableRow> rows) {
     return new HtmlTableBuilder(rows);
+  }
+
+  /**
+   * Creates an application local link
+   *
+   * @param path
+   *          path to identify what is the link referring to.
+   * @param text
+   *          the link text
+   */
+  public static IHtmlElement appLink(CharSequence path, IHtmlContent text) {
+    return span(text).appLink(path);
   }
 
 }

@@ -17,8 +17,16 @@ public interface IHtmlElement extends CharSequence, IHtmlContent {
 
   /**
    * Add a css class
+   *
+   * @deprecated use cssClass.
    */
+  @Deprecated
   <T extends IHtmlElement> T clazz(CharSequence clazz);
+
+  /**
+   * Add a css class
+   */
+  <T extends IHtmlElement> T cssClass(CharSequence cssClass);
 
   /**
    * Add a css style

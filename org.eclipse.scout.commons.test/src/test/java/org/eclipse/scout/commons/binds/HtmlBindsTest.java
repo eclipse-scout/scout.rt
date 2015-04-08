@@ -99,7 +99,7 @@ public class HtmlBindsTest {
   @Test
   public void testAppLink() {
     HtmlBinds binds = new HtmlBinds();
-    final IHtmlElement html = HTML.span(binds.put("Link Text")).appLink("domain=123&text=456");
+    final IHtmlElement html = HTML.appLink("domain=123&text=456", binds.put("Link Text"));
     assertEquals("<span class=\"hyperlink\" data-hyperlink=\"domain=123&text=456\">Link Text</span>", binds.applyBindParameters(html));
   }
 
@@ -115,7 +115,7 @@ public class HtmlBindsTest {
     HtmlBinds binds = new HtmlBinds();
     final IHtmlTable table = HTML.table(
         row(
-        cell(binds.put(BIND_TEXT)))
+            cell(binds.put(BIND_TEXT)))
         ).cellspacing(1).cellpadding(2);
 
     final String htmlString = binds.applyBindParameters(table);
