@@ -358,6 +358,20 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
+   * Configures, if HTML rendering is enabled for this column.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}. Make sure that any user input (or other insecure
+   * input) is encoded (security), if this property is enabled.
+   *
+   * @return {@code true}, if HTML rendering is enabled for this column.{@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(105)
+  protected boolean getConfiguredHtmlEnabled() {
+    return false;
+  }
+
+  /**
    * Configures the color of this column text (except color of header text, see
    * {@link #getConfiguredHeaderForegroundColor()}). The color is represented by the HEX value (e.g. FFFFFF).
    * <p>
@@ -791,6 +805,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (getConfiguredFont() != null) {
       setFont(FontSpec.parse(getConfiguredFont()));
     }
+    setHtmlEnabled(getConfiguredHtmlEnabled());
   }
 
   /**
@@ -1376,10 +1391,10 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       interceptDecorateCell(cell, row);
     }
     catch (ProcessingException e) {
-      LOG.warn(null, e);
+      LOG.warn("Exception decorating cell", e);
     }
-    catch (Throwable t) {
-      LOG.warn(null, t);
+    catch (Exception e) {
+      LOG.error("Unexpected exception decorating cell ", e);
     }
   }
 
@@ -1396,8 +1411,13 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (getFont() != null) {
       cell.setFont(getFont());
     }
+    if (getCssClass() != null) {
+      cell.setCssClass(getCssClass());
+    }
+
     cell.setHorizontalAlignment(getHorizontalAlignment());
     cell.setEditableInternal(isCellEditable(row));
+    cell.setHtmlEnabled(isHtmlEnabled());
   }
 
   @Override
@@ -1618,6 +1638,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setAutoOptimizeWidth(boolean optimize) {
     propertySupport.setPropertyBool(PROP_AUTO_OPTIMIZE_WIDTH, optimize);
+  }
+
+  @Override
+  public void setHtmlEnabled(boolean enabled) {
+    propertySupport.setProperty(PROP_HTML_ENABLED, enabled);
+  }
+
+  @Override
+  public boolean isHtmlEnabled() {
+    return (boolean) propertySupport.getProperty(PROP_HTML_ENABLED);
   }
 
   @Override

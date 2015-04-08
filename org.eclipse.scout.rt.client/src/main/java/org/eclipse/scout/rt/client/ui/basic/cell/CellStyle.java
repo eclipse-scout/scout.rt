@@ -59,6 +59,11 @@ public class CellStyle implements ICellSpecialization {
   }
 
   @Override
+  public void setHtmlEnabled(boolean enabled) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public String getTooltipText() {
     return null;
   }
@@ -70,6 +75,11 @@ public class CellStyle implements ICellSpecialization {
 
   @Override
   public boolean isEditable() {
+    return false;
+  }
+
+  @Override
+  public boolean isHtmlEnabled() {
     return false;
   }
 
@@ -212,4 +222,5 @@ public class CellStyle implements ICellSpecialization {
     }
     return true;
   }
+
 }

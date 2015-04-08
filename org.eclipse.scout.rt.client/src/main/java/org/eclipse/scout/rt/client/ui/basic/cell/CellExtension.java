@@ -23,6 +23,7 @@ public class CellExtension implements ICellSpecialization {
   private String m_tooltipText;
   private boolean m_enabled;
   private boolean m_editable;
+  private boolean m_htmlEnabled;
   private CellStyle m_cellStyle;
 
   public CellExtension(ICellSpecialization specialization) {
@@ -140,4 +141,15 @@ public class CellExtension implements ICellSpecialization {
   public void setIconId(String iconId) {
     m_cellStyle.setIconId(iconId);
   }
+
+  @Override
+  public void setHtmlEnabled(boolean enabled) {
+    m_htmlEnabled = enabled;
+  }
+
+  @Override
+  public boolean isHtmlEnabled() {
+    return m_htmlEnabled;
+  }
+
 }

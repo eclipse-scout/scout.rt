@@ -27,6 +27,7 @@ public interface ICell {
   int ENABLED_BIT = 9;// default true, value Boolean
   int EDITABLE_BIT = 10;// default false, value Boolean
   int CSS_CLASS_BIT = 11;
+  int HTML_ENABLED_BIT = 12; //default false, value Boolean
 
   Object getValue();
 
@@ -54,6 +55,11 @@ public interface ICell {
    *         To check for effective editable use {@link ITable#isCellEditable(int, int)} inside a model thread.
    */
   boolean isEditable();
+
+  /**
+   * @return true, if the cell may contain html that needs to be rendered. false otherwise.
+   */
+  boolean isHtmlEnabled();
 
   ICellObserver getObserver();
 

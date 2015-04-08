@@ -15,6 +15,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
@@ -41,6 +44,8 @@ public class CellTest {
     assertNull(c.getFont());
     assertTrue(c.isEnabled());
     assertNull(c.getObserver());
+    assertFalse(c.isHtmlEnabled());
+    assertNull(c.getCssClass());
   }
 
   @Test
@@ -51,6 +56,7 @@ public class CellTest {
     String tooltipText = "Tooltip";
     String bgColor = "eeeeee";
     String fgColor = "ff0000";
+    String cssClass = "myClass";
     FontSpec font = FontSpec.parse("Arial-bold-italic-16");
     ICellObserver observer = Mockito.mock(ICellObserver.class);
 
@@ -64,6 +70,8 @@ public class CellTest {
     c.setForegroundColor(fgColor);
     c.setFont(font);
     c.setEnabled(true);
+    c.setHtmlEnabled(true);
+    c.setCssClass(cssClass);
     c.setObserver(observer);
 
     Cell copy = new Cell(c);
@@ -71,13 +79,19 @@ public class CellTest {
     assertEquals(text, copy.getText());
     assertEquals(iconId, copy.getIconId());
     assertEquals(tooltipText, copy.getTooltipText());
+    assertEquals(cssClass, copy.getCssClass());
+    assertTrue(copy.isHtmlEnabled());
+
     assertEquals(100, c.getHorizontalAlignment());
     assertEquals(bgColor, c.getBackgroundColor());
     assertEquals(fgColor, c.getForegroundColor());
+    assertEquals(cssClass, c.getCssClass());
     assertEquals(font.toPattern(), c.getFont().toPattern());
     assertTrue(c.isEnabled());
+    assertTrue(c.isHtmlEnabled());
+
     assertSame(observer, c.getObserver());
-    Mockito.verifyZeroInteractions(observer);
+    verifyZeroInteractions(observer);
   }
 
   @Test
@@ -94,8 +108,9 @@ public class CellTest {
     assertNull(c.getForegroundColor());
     assertNull(c.getFont());
     assertTrue(c.isEnabled());
+    assertFalse(c.isHtmlEnabled());
     assertSame(observer, c.getObserver());
-    Mockito.verifyZeroInteractions(observer);
+    verifyZeroInteractions(observer);
   }
 
   @Test
@@ -103,7 +118,7 @@ public class CellTest {
     Cell c = new Cell();
     Object value = new Object();
 
-    ICellObserver observer = Mockito.mock(ICellObserver.class);
+    ICellObserver observer = mock(ICellObserver.class);
     Mockito.when(observer.validateValue(c, value)).thenReturn(value);
 
     c.setObserver(observer);
@@ -111,7 +126,7 @@ public class CellTest {
     boolean changed = c.setValue(value);
     assertTrue(changed);
     assertSame(value, c.getValue());
-    Mockito.verify(observer).cellChanged(c, ICell.VALUE_BIT);
+    verify(observer).cellChanged(c, ICell.VALUE_BIT);
   }
 
   @Test
@@ -168,7 +183,7 @@ public class CellTest {
   @Test
   public void testSetText() {
     Cell c = new Cell();
-    ICellObserver observer = installMockObserver(c, ICell.TEXT_BIT);
+    ICellObserver observer = installMockObserver(c);
     String text = "text";
     c.setText(text);
     assertEquals(text, c.getText());
@@ -178,7 +193,7 @@ public class CellTest {
   @Test
   public void testSetIconId() {
     Cell c = new Cell();
-    ICellObserver observer = installMockObserver(c, ICell.ICON_ID_BIT);
+    ICellObserver observer = installMockObserver(c);
     String iconId = "iconId";
     c.setIconId(iconId);
     assertEquals(iconId, c.getIconId());
@@ -188,61 +203,79 @@ public class CellTest {
   @Test
   public void testSetTooltipText_notNull() {
     Cell c = new Cell();
-    ICellObserver observer = installMockObserver(c, ICell.TOOLTIP_BIT);
+    ICellObserver observer = installMockObserver(c);
     String tooltip = "tooltip";
     c.setTooltipText(tooltip);
     assertEquals(tooltip, c.getTooltipText());
-    Mockito.verify(observer).cellChanged(c, ICell.TOOLTIP_BIT);
+    verify(observer).cellChanged(c, ICell.TOOLTIP_BIT);
+  }
+
+  @Test
+  public void testSetCssClass_notNull() {
+    Cell c = new Cell();
+    ICellObserver observer = installMockObserver(c);
+    String cssClass = "cssClass";
+    c.setCssClass(cssClass);
+    assertEquals(cssClass, c.getCssClass());
+    verify(observer).cellChanged(c, ICell.CSS_CLASS_BIT);
   }
 
   @Test
   public void testSetTooltipText_null() {
     Cell c = new Cell();
-    ICellObserver observer = Mockito.mock(ICellObserver.class);
-    c.setObserver(observer);
+    ICellObserver observer = installMockObserver(c);
     c.setTooltipText(null);
     assertNull(c.getTooltipText());
-    Mockito.verifyZeroInteractions(observer);
+    verifyZeroInteractions(observer);
   }
 
   @Test
   public void testSetHorizontalAlignment() {
     Cell c = new Cell();
-    ICellObserver observer = installMockObserver(c, ICell.H_ALIGN_BIT);
+    ICellObserver observer = installMockObserver(c);
     int hAlignment = 100;
     c.setHorizontalAlignment(hAlignment);
     assertEquals(hAlignment, c.getHorizontalAlignment());
-    Mockito.verify(observer).cellChanged(c, ICell.H_ALIGN_BIT);
+    verify(observer).cellChanged(c, ICell.H_ALIGN_BIT);
   }
 
   @Test
   public void testSetBackgroundColor() {
     Cell c = new Cell();
-    ICellObserver observer = installMockObserver(c, ICell.BG_COLOR_BIT);
+    ICellObserver observer = installMockObserver(c);
     String bgColor = "eeeeee";
     c.setBackgroundColor(bgColor);
     assertEquals(bgColor, c.getBackgroundColor());
-    Mockito.verify(observer).cellChanged(c, ICell.BG_COLOR_BIT);
+    verify(observer).cellChanged(c, ICell.BG_COLOR_BIT);
   }
 
   @Test
   public void testSetForegroundColor() {
     Cell c = new Cell();
-    ICellObserver observer = installMockObserver(c, ICell.FG_COLOR_BIT);
+    ICellObserver observer = installMockObserver(c);
     String fgColor = "ff0000";
     c.setForegroundColor(fgColor);
     assertEquals(fgColor, c.getForegroundColor());
-    Mockito.verify(observer).cellChanged(c, ICell.FG_COLOR_BIT);
+    verify(observer).cellChanged(c, ICell.FG_COLOR_BIT);
   }
 
   @Test
   public void testSetFont() {
     Cell c = new Cell();
-    ICellObserver observer = installMockObserver(c, ICell.FONT_BIT);
+    ICellObserver observer = installMockObserver(c);
     FontSpec font = FontSpec.parse("Arial-bold-italic-13");
     c.setFont(font);
     assertEquals(font.toPattern(), c.getFont().toPattern());
-    Mockito.verify(observer).cellChanged(c, ICell.FONT_BIT);
+    verify(observer).cellChanged(c, ICell.FONT_BIT);
+  }
+
+  @Test
+  public void testSetHtmlEnabled() {
+    Cell c = new Cell();
+    ICellObserver observer = installMockObserver(c);
+    c.setHtmlEnabled(true);
+    assertTrue(c.isHtmlEnabled());
+    verify(observer).cellChanged(c, ICell.HTML_ENABLED_BIT);
   }
 
   @Test
@@ -268,8 +301,8 @@ public class CellTest {
     Mockito.verifyZeroInteractions(observer);
   }
 
-  private ICellObserver installMockObserver(Cell c, int changedBit) {
-    ICellObserver observer = Mockito.mock(ICellObserver.class);
+  private ICellObserver installMockObserver(Cell c) {
+    ICellObserver observer = mock(ICellObserver.class);
     c.setObserver(observer);
     return observer;
   }

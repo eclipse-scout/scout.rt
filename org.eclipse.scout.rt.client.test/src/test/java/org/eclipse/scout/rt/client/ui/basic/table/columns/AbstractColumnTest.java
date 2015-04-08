@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- *
+ * Tests for {@link AbstractColumn}
  */
 @RunWith(PlatformTestRunner.class)
 public class AbstractColumnTest extends AbstractColumn<Object> {
