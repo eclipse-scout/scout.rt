@@ -76,7 +76,7 @@ public class SharedCodeServiceTest {
 
     List<ICodeType<?, ?>> codeTypes2 = service.getAllCodeTypes("");
     assertEquals("size", 1, codeTypes2.size());
-    assertEquals("codeType 2 (0)", AbcCodeType.class, codeTypes1.get(0).getClass());
+    assertEquals("codeType 2 (0)", AbcCodeType.class, codeTypes2.get(0).getClass());
   }
 
   /**
