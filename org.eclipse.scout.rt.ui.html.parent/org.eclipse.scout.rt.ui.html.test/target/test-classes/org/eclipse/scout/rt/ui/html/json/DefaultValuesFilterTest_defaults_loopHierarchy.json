@@ -1,9 +1,0 @@
-{
-  "defaults": {
-  },
-  "objectTypeHierarchy": {
-    "FormField": {
-      "FormField": null
-    }
-  }
-}
