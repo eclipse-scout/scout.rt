@@ -1,0 +1,43 @@
+package org.eclipse.scout.rt.client.extension.ui.form.fields.graphfield;
+
+import java.net.URL;
+import java.util.List;
+
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.graphfield.AbstractGraphField;
+import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
+
+public final class GraphFieldChains {
+
+  private GraphFieldChains() {
+  }
+
+  protected abstract static class AbstractGraphFieldChain extends AbstractExtensionChain<IGraphFieldExtension<? extends AbstractGraphField>> {
+
+    public AbstractGraphFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IGraphFieldExtension.class);
+    }
+  }
+
+  public static class GraphFieldHyperlinkActionChain extends AbstractGraphFieldChain {
+
+    public GraphFieldHyperlinkActionChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions);
+    }
+
+    public void execHyperlinkAction(final URL url, final String path, final boolean local) throws ProcessingException {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IGraphFieldExtension<? extends AbstractGraphField> next) throws ProcessingException {
+          next.execHyperlinkAction(GraphFieldHyperlinkActionChain.this, url, path, local);
+        }
+      };
+      callChain(methodInvocation, url, path, local);
+      if (methodInvocation.getException() instanceof ProcessingException) {
+        throw (ProcessingException) methodInvocation.getException();
+      }
+    }
+  }
+}
