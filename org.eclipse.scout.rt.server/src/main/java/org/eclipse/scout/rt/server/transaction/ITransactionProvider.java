@@ -10,13 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.transaction;
 
-import org.eclipse.scout.rt.platform.Bean;
-
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
  * Objects of this type can provide a {@link ITransaction}.
  */
-@Bean
+@ApplicationScoped
 public class ITransactionProvider {
 
   public ITransaction provide(final long transactionId) {

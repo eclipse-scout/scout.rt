@@ -65,8 +65,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
     MockitoAnnotations.initMocks(this);
 
     m_txErrors = new ArrayList<>();
-    m_beans = new ArrayList<>();
-    m_beans.add(TestingUtility.registerBean(new BeanMetaData(ITransactionProvider.class).initialInstance(m_transactionProvider).order(-1000)));
+    m_beans = TestingUtility.registerBeans(new BeanMetaData(ITransactionProvider.class).initialInstance(m_transactionProvider).order(-1000));
 
     when(m_transactionProvider.provide(anyLong())).thenReturn(m_transaction);
 
