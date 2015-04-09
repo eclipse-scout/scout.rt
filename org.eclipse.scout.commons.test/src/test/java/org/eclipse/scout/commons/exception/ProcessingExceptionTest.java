@@ -74,8 +74,8 @@ public class ProcessingExceptionTest {
   public void testToStringWithCause() {
     final VetoException cause = new VetoException(m_title, m_body);
     ProcessingException p = new ProcessingException(m_body, cause);
-    final String context = "context";
-    p.addContextMessage(context);
+    p.addContextMessage("context1");
+    p.addContextMessage("context2");
     p.consume();
     final String exText = p.toString();
     assertContainsExceptionAttributes(exText);
@@ -83,7 +83,7 @@ public class ProcessingExceptionTest {
     assertTrue(exText.contains(m_body));
     assertTrue(exText.contains("VetoException"));
     assertTrue(exText.contains("consumed"));
-    assertTrue(exText.contains(context));
+    assertTrue(exText.contains("[context2,context1]"));
   }
 
   @Test

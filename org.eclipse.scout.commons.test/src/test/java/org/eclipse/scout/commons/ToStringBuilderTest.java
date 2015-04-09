@@ -13,6 +13,9 @@ package org.eclipse.scout.commons;
 import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Test;
 
@@ -51,10 +54,48 @@ public class ToStringBuilderTest {
 
     ToStringBuilder builder = new ToStringBuilder(instance);
     builder.attr("attr1", (Object) null);
-    builder.attr("attr2", null, true);
-    builder.attr("attr3", null, false);
+    builder.attr("attr2", (Object) null, true);
+    builder.attr("attr3", (Object) null, false);
 
     assertEquals("Instance@7b[attr1=null, attr2=null]", builder.toString());
+  }
+
+  @Test
+  public void testCollectionAttribute1() {
+    Instance instance = new Instance(123 /* HashCode */);
+
+    ToStringBuilder builder = new ToStringBuilder(instance);
+    builder.attr("c1", Arrays.asList(1, 2, null, 3));
+    builder.attr("c2", (Collection) null);
+    builder.attr("c3", new ArrayList<>(0));
+    builder.attr("c4", Arrays.asList((String) null));
+
+    assertEquals("Instance@7b[c1=[1,2,3], c2=[], c3=[], c4=[]]", builder.toString());
+  }
+
+  @Test
+  public void testCollectionAttribute2() {
+    Instance instance = new Instance(123 /* HashCode */);
+
+    ToStringBuilder builder = new ToStringBuilder(instance);
+    builder.attr("c1", Arrays.asList(1, 2, null, 3), false);
+    builder.attr("c2", (Collection) null, false);
+    builder.attr("c3", new ArrayList<>(0), false);
+    builder.attr("c4", Arrays.asList((String) null), false);
+
+    assertEquals("Instance@7b[c1=[1,2,3]]", builder.toString());
+  }
+
+  @Test
+  public void testVarArgAttribute1() {
+    Instance instance = new Instance(123 /* HashCode */);
+
+    ToStringBuilder builder = new ToStringBuilder(instance);
+    builder.attr("c1", 1, 2, null, 3);
+    builder.attr("c2", (Object[]) null);
+    builder.attr("c3", new Object[0]);
+
+    assertEquals("Instance@7b[c1=[1,2,3], c2=[], c3=[]]", builder.toString());
   }
 
   @Test

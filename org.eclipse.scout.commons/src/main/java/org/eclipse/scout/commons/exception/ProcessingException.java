@@ -14,7 +14,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
 
 /**
@@ -133,7 +132,7 @@ public class ProcessingException extends Exception implements Serializable {
     if (m_status != null && m_status.getException() == this) { // to omit recursion
       builder.attr("severity", m_status.getSeverityName());
       builder.attr("code", m_status.getCode());
-      builder.attr("context", StringUtility.join(",", m_status.getContextMessages()), false);
+      builder.attr("context", m_status.getContextMessages(), false);
     }
     else {
       builder.attr("status", m_status, false);

@@ -13,6 +13,8 @@ package org.eclipse.scout.commons;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -143,12 +145,39 @@ public class ToStringBuilder {
   }
 
   /**
-   * Appends the given {@code varArg} values separated by comma.
+   * Appends the given {@code varArg} values; <code>null</code> values are filtered; multiple values are separated
+   * by comma.
    *
    * @return <code>this</code> supporting the fluent API
    */
   public ToStringBuilder attr(final String name, final Object... values) {
-    attr(name, Arrays.asList(values));
+    final Collection<?> collection = (values == null ? Collections.emptyList() : Arrays.asList(values));
+    attr(name, collection, true);
+    return this;
+  }
+
+  /**
+   * Appends the given {@code Collection} values; <code>null</code> values are filtered; multiple values are separated
+   * by comma.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
+  public ToStringBuilder attr(final String name, final Collection<?> values) {
+    attr(name, values, true);
+    return this;
+  }
+
+  /**
+   * Appends the given {@code Collection} values; <code>null</code> values are filtered; multiple values are separated
+   * by comma; if empty, the collection is only appended if <code>appendIfEmpty</code> is set to <code>true</code>.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
+  public ToStringBuilder attr(final String name, final Collection<?> values, final boolean appendIfEmpty) {
+    final String value = StringUtility.join(",", values);
+    if (StringUtility.hasText(value) || appendIfEmpty) {
+      m_builder.add(new SimpleEntry<>(name, String.format("[%s]", value)));
+    }
     return this;
   }
 
