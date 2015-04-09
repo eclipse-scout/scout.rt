@@ -23,7 +23,7 @@ import org.junit.Test;
 public class ConfigIniUtilityTest {
 
   private static final String USER_HOME_KEY = "user.home";
-  private static final String USER_HOME_VALUE = "C:/user/home";
+  private static final String USER_HOME_VALUE = System.getProperty(USER_HOME_KEY);
 
   private static final String OTHER_PROP_KEY = "otherProp";
   private static final String OTHER_PROP_VALUE = "otherVal";
