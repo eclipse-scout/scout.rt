@@ -28,56 +28,147 @@ public class ToStringBuilder {
     m_identifier = createIdentifier(instance);
   }
 
+  /**
+   * Appends the given {@code Object} value, even if <code>null</code>.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
   public ToStringBuilder attr(final String name, final Object value) {
-    m_builder.add(new SimpleEntry<>(name, value));
+    attr(name, value, true);
     return this;
   }
 
+  /**
+   * Appends the given {@code Object} value depending on the given <code>appendIfNull</code> argument.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
+  public ToStringBuilder attr(final String name, final Object value, final boolean appendIfNull) {
+    if (value != null || appendIfNull) {
+      m_builder.add(new SimpleEntry<>(name, value));
+    }
+    return this;
+  }
+
+  /**
+   * Appends the given {@code String} value, even if <code>null</code>.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
+  public ToStringBuilder attr(final String name, final String value) {
+    attr(name, value, true);
+    return this;
+  }
+
+  /**
+   * Appends the given {@code String} value depending on the given <code>appendIfNullOrEmpty</code> argument.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
+  public ToStringBuilder attr(final String name, final String value, final boolean appendIfNullOrEmpty) {
+    if (!StringUtility.isNullOrEmpty(value) || appendIfNullOrEmpty) {
+      m_builder.add(new SimpleEntry<>(name, value));
+    }
+    return this;
+  }
+
+  /**
+   * Appends the given {@code boolean} value.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
   public ToStringBuilder attr(final String name, final boolean value) {
     attr(name, (Object) value);
     return this;
   }
 
+  /**
+   * Appends the given {@code char} value.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
   public ToStringBuilder attr(final String name, final char value) {
     attr(name, (Object) value);
     return this;
   }
 
+  /**
+   * Appends the given {@code short} value.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
   public ToStringBuilder attr(final String name, final short value) {
     attr(name, (Object) value);
     return this;
   }
 
+  /**
+   * Appends the given {@code int} value.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
   public ToStringBuilder attr(final String name, final int value) {
     attr(name, (Object) value);
     return this;
   }
 
+  /**
+   * Appends the given {@code long} value.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
   public ToStringBuilder attr(final String name, final long value) {
     attr(name, (Object) value);
     return this;
   }
 
+  /**
+   * Appends the given {@code float} value.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
   public ToStringBuilder attr(final String name, final float value) {
     attr(name, (Object) value);
     return this;
   }
 
+  /**
+   * Appends the given {@code double} value.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
   public ToStringBuilder attr(final String name, final double value) {
     attr(name, (Object) value);
     return this;
   }
 
+  /**
+   * Appends the given {@code varArg} values separated by comma.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
   public ToStringBuilder attr(final String name, final Object... values) {
     attr(name, Arrays.asList(values));
     return this;
   }
 
+  /**
+   * Appends the given {@code Object} value, but only if not <code>null</code>.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
   public ToStringBuilder attr(final Object value) {
-    m_builder.add(value);
+    if (value != null) {
+      m_builder.add(value);
+    }
     return this;
   }
 
+  /**
+   * Appends the given {@code Object} reference, or 'null' if <code>null</code>.
+   *
+   * @return <code>this</code> supporting the fluent API
+   */
   public ToStringBuilder ref(final String name, final Object obj) {
     attr(name, createIdentifier(obj));
     return this;

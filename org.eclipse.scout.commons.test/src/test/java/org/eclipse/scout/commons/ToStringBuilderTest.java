@@ -18,6 +18,130 @@ import org.junit.Test;
 
 public class ToStringBuilderTest {
 
+  @Test
+  public void testInstanceClass() {
+    Instance instance = new Instance(123 /* HashCode */);
+
+    ToStringBuilder builder = new ToStringBuilder(instance);
+    builder.attr("string", "blubber");
+    builder.attr("int", 1);
+    builder.attr("long", 2L);
+    builder.attr("short", (short) 3);
+    builder.attr("float", (float) 4);
+    builder.attr("double", (double) 5.0);
+    builder.ref("ref", REF);
+    builder.attr("obj", REF);
+
+    assertEquals("Instance@7b[string=blubber, int=1, long=2, short=3, float=4.0, double=5.0, ref=Object@1c8, obj=OBJ]", builder.toString());
+  }
+
+  @Test
+  public void testNullValue() {
+    Instance instance = new Instance(123 /* HashCode */);
+
+    ToStringBuilder builder = new ToStringBuilder(instance);
+    builder.attr(null);
+
+    assertEquals("Instance@7b[]", builder.toString());
+  }
+
+  @Test
+  public void testNullAttribute() {
+    Instance instance = new Instance(123 /* HashCode */);
+
+    ToStringBuilder builder = new ToStringBuilder(instance);
+    builder.attr("attr1", (Object) null);
+    builder.attr("attr2", null, true);
+    builder.attr("attr3", null, false);
+
+    assertEquals("Instance@7b[attr1=null, attr2=null]", builder.toString());
+  }
+
+  @Test
+  public void testNullStringAttribute() {
+    Instance instance = new Instance(123 /* HashCode */);
+
+    ToStringBuilder builder = new ToStringBuilder(instance);
+    builder.attr("attr1", (String) null);
+    builder.attr("attr2", (String) null, true);
+    builder.attr("attr3", (String) null, false);
+
+    assertEquals("Instance@7b[attr1=null, attr2=null]", builder.toString());
+  }
+
+  @Test
+  public void testEmptyStringAttribute() {
+    Instance instance = new Instance(123 /* HashCode */);
+
+    ToStringBuilder builder = new ToStringBuilder(instance);
+    builder.attr("attr1", "");
+    builder.attr("attr2", "", true);
+    builder.attr("attr3", "", false);
+
+    assertEquals("Instance@7b[attr1=, attr2=]", builder.toString());
+  }
+
+  @Test
+  public void testAnonymousClass1() {
+    ToStringBuilder builder = new ToStringBuilder(new Instance(123) {
+
+      @Override
+      public int hashCode() {
+        return 123;
+      }
+    });
+
+    builder.attr("string", "blubber");
+    builder.attr("int", 1);
+    builder.attr("long", 2L);
+    builder.attr("short", (short) 3);
+    builder.attr("float", (float) 4);
+    builder.attr("double", (double) 5.0);
+    builder.ref("ref", REF);
+    builder.attr("obj", REF);
+
+    assertEquals("Instance@7b[string=blubber, int=1, long=2, short=3, float=4.0, double=5.0, ref=Object@1c8, obj=OBJ]", builder.toString());
+  }
+
+  @Test
+  public void testAnonymousClass2() {
+    ToStringBuilder builder = new ToStringBuilder(new Serializable() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public int hashCode() {
+        return 123;
+      }
+    });
+
+    builder.attr("string", "blubber");
+    builder.attr("int", 1);
+    builder.attr("long", 2L);
+    builder.attr("short", (short) 3);
+    builder.attr("float", (float) 4);
+    builder.attr("double", (double) 5.0);
+    builder.ref("ref", REF);
+    builder.attr("obj", REF);
+
+    assertEquals("Serializable@7b[string=blubber, int=1, long=2, short=3, float=4.0, double=5.0, ref=Object@1c8, obj=OBJ]", builder.toString());
+  }
+
+  // === Test classes ===
+
+  private static class Instance {
+
+    private int m_hashCode;
+
+    public Instance(int hashCode) {
+      m_hashCode = hashCode;
+    }
+
+    @Override
+    public int hashCode() {
+      return m_hashCode;
+    }
+  }
+
   private static final Object REF = new Object() {
 
     @Override
@@ -30,72 +154,4 @@ public class ToStringBuilderTest {
       return "OBJ";
     }
   };
-
-  @Test
-  public void testInstanceClass() {
-    Testee testee = new Testee();
-    assertEquals("Testee@7b[string=blubber, int=1, long=2, short=3, float=4.0, double=5.0, ref=Object@1c8, obj=OBJ]", testee.toString());
-  }
-
-  @Test
-  public void testAnonymousClass1() {
-    Testee testee = new Testee() {
-
-      @Override
-      public String toString() {
-        return toTestString(this);
-      }
-
-      @Override
-      public int hashCode() {
-        return 123;
-      }
-    };
-    assertEquals("Testee@7b[string=blubber, int=1, long=2, short=3, float=4.0, double=5.0, ref=Object@1c8, obj=OBJ]", testee.toString());
-  }
-
-  @Test
-  public void testAnonymousClass2() {
-    Serializable testee = new Serializable() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public String toString() {
-        return toTestString(this);
-      }
-
-      @Override
-      public int hashCode() {
-        return 123;
-      }
-    };
-    assertEquals("Serializable@7b[string=blubber, int=1, long=2, short=3, float=4.0, double=5.0, ref=Object@1c8, obj=OBJ]", testee.toString());
-  }
-
-  private static class Testee {
-
-    @Override
-    public String toString() {
-      return toTestString(this);
-    }
-
-    @Override
-    public int hashCode() {
-      return 123;
-    }
-  }
-
-  private static String toTestString(Object instance) {
-    ToStringBuilder builder = new ToStringBuilder(instance);
-    builder.attr("string", "blubber");
-    builder.attr("int", 1);
-    builder.attr("long", 2L);
-    builder.attr("short", (short) 3);
-    builder.attr("float", (float) 4);
-    builder.attr("double", (double) 5.0);
-    builder.ref("ref", REF);
-    builder.attr("obj", REF);
-
-    return builder.toString();
-  }
 }
