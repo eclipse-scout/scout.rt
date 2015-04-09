@@ -52,7 +52,6 @@ public class JandexClassInventoryTest {
     expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.class);
     expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S1.class);
     expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S1Sub1.class);
-    expected.add(Class.forName(TestingBean.class.getName() + "$S2"));
 
     Assert.assertEquals(expected, actual);
   }

@@ -11,20 +11,24 @@
 package org.eclipse.scout.rt.platform;
 
 import org.eclipse.scout.rt.platform.fixture.TestApplication;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-/**
- *
- */
-@RunWith(PlatformTestRunner.class)
 public class ApplicationTest {
 
   @Test
   public void test() {
-    Assert.assertNotNull(TestApplication.getInstance());
+    IPlatform p = Platform.get();
+    try {
+      Platform.setDefault();
+      Platform.get().start(TestApplication.class);
+
+      Assert.assertEquals(TestApplication.getInstance().getClass(), TestApplication.class);
+    }
+    finally {
+      Platform.get().stop();
+    }
+    Assert.assertSame(Platform.get(), p);
   }
 
 }
