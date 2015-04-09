@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield;
 
+// FIXME AWE: change package name to colorfield
+
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 
 public interface IColorField extends IBasicField<String> {
