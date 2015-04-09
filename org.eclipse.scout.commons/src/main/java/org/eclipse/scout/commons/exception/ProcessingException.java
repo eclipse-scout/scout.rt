@@ -14,7 +14,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.ToStringBuilder;
 
 /**
  * Core exception in Scout.
@@ -127,30 +128,18 @@ public class ProcessingException extends Exception implements Serializable {
 
   @Override
   public String toString() {
-    Assertions.assertNotNull(m_status);
-    StringBuilder sb = new StringBuilder();
-    sb.append("[");
-    sb.append(super.toString());
-    if (m_status.getException() == this) {
-      sb.append(" severity=" + m_status.getSeverityName());
-      sb.append(" code=" + m_status.getCode());
-      if (m_status.getContextMessages().size() > 0) {
-        for (String s : m_status.getContextMessages()) {
-          sb.append(" ");
-          sb.append(s);
-          sb.append(" /");
-        }
-        sb.append(" ");
-      }
+    ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("message", getLocalizedMessage(), false);
+    if (m_status != null && m_status.getException() == this) { // to omit recursion
+      builder.attr("severity", m_status.getSeverityName());
+      builder.attr("code", m_status.getCode());
+      builder.attr("context", StringUtility.join(",", m_status.getContextMessages()), false);
     }
     else {
-      sb.append(m_status.toString());
+      builder.attr("status", m_status, false);
     }
-    if (isConsumed()) {
-      sb.append(" consumed");
-    }
-    sb.append("]");
-    return sb.toString();
+    builder.attr("consumed", isConsumed());
+    return builder.toString();
   }
 
   /**

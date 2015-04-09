@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
 
@@ -265,27 +267,14 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    */
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName() + "["); //$NON-NLS-1$
-    sb.append(" severity=" + getSeverityName());
-    sb.append(" code=" + getCode()); //$NON-NLS-1$
-    if (m_contextMessages != null) {
-      for (String s : m_contextMessages) {
-        sb.append(" ");
-        sb.append(s);
-        sb.append(" /");
-      }
-    }
-    sb.append(" ");
-    sb.append(getTitle());
-    sb.append(" ");
-    sb.append(getBody());
-    if (m_exception != null) {
-      sb.append(" ");
-      sb.append(m_exception.toString());
-    }
-    sb.append("]"); //$NON-NLS-1$
-    return sb.toString();
+    ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("severity", getSeverityName());
+    builder.attr("code", getCode());
+    builder.attr("context", StringUtility.join(",", getContextMessages()), false);
+    builder.attr("title", getTitle(), false);
+    builder.attr("body", getBody(), false);
+    builder.attr("exception", m_exception, false);
+    return builder.toString();
   }
 
   /**
