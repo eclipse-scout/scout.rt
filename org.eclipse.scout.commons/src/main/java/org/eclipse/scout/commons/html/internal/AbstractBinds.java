@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.html.HtmlBind;
 import org.eclipse.scout.commons.html.IHtmlContent;
 
 /**
@@ -56,7 +55,7 @@ public abstract class AbstractBinds {
   public IHtmlContent putString(String value) {
     String qualifiedName = nextBindName();
     m_bindMap.put(qualifiedName, value);
-    return new HtmlBind(qualifiedName);
+    return new Bind(qualifiedName);
   }
 
   /**
@@ -105,6 +104,36 @@ public abstract class AbstractBinds {
 
   protected void putAll(AbstractBinds binds) {
     m_bindMap.putAll(binds.getBindMap());
+  }
+
+  class Bind implements IHtmlContent {
+
+    private final String m_name;
+
+    public Bind(String name) {
+      m_name = name;
+    }
+
+    @Override
+    public int length() {
+      return m_name.length();
+    }
+
+    @Override
+    public char charAt(int index) {
+      return m_name.charAt(index);
+    }
+
+    @Override
+    public CharSequence subSequence(int start, int end) {
+      return m_name.subSequence(end, end);
+    }
+
+    @Override
+    public String toString() {
+      return m_name;
+    }
+
   }
 
 }

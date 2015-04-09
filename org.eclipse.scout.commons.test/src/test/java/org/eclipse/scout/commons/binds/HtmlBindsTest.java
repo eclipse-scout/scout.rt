@@ -136,7 +136,7 @@ public class HtmlBindsTest {
   public void testAppLink() {
     HtmlBinds binds = new HtmlBinds();
     final IHtmlElement html = HTML.appLink("domain=123&text=456", binds.put("Link Text"));
-    assertEquals("<span class=\"hyperlink\" data-hyperlink=\"domain=123&text=456\">Link Text</span>", binds.applyBindParameters(html));
+    assertEquals("<span class=\"app-link\" data-ref=\"domain=123&text=456\">Link Text</span>", binds.applyBindParameters(html));
   }
 
   /**
@@ -145,7 +145,7 @@ public class HtmlBindsTest {
   @Test
   public void testAppLinkNoBinds() {
     final IHtmlElement html = HTML.appLink("domain=123&text=456", "Link Text&");
-    assertEquals("<span class=\"hyperlink\" data-hyperlink=\"domain=123&text=456\">Link Text&amp;</span>", html.toEncodedHtml());
+    assertEquals("<span class=\"app-link\" data-ref=\"domain=123&text=456\">Link Text&amp;</span>", html.toEncodedHtml());
   }
 
   @Test
@@ -166,7 +166,7 @@ public class HtmlBindsTest {
     HtmlBinds binds = new HtmlBinds();
     final IHtmlTable table = HTML.table(
         row(
-            cell(binds.put(BIND_TEXT)))
+        cell(binds.put(BIND_TEXT)))
         ).cellspacing(1).cellpadding(2);
 
     final String htmlString = binds.applyBindParameters(table);
@@ -178,7 +178,7 @@ public class HtmlBindsTest {
   public void testTableAttributesNoBinds() {
     final IHtmlTable table = HTML.table(
         row(
-            cell(BIND_TEXT))
+        cell(BIND_TEXT))
         ).cellspacing(1).cellpadding(2);
 
     assertEquals("<table cellspacing=\"1\" cellpadding=\"2\"><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", table.toEncodedHtml());

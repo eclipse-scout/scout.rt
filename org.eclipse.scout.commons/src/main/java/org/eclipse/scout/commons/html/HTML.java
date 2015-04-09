@@ -37,9 +37,7 @@ public final class HTML {
    * Create a html element with encoded text for &lt;b&gt;text&lt;/b&gt;.
    * <p>
    * Example:<br>
-   * HtmlBinds binds = new HtmlBinds(); <br>
-   * IHtmlElement boldHtml = HTML.bold(binds.put(bindText)); <br>
-   * String html = binds.applyBindParameters(boldHtml);
+   * String encodedHtml = HTML.bold("text").toEncodedHtml(); <br>
    * </p>
    *
    * @param text
@@ -51,6 +49,10 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for &lt;p&gt;text&lt;/p&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.p("text").toEncodedHtml(); <br>
+   * </p>
    *
    * @param text
    *          text as bind
@@ -61,6 +63,10 @@ public final class HTML {
 
   /**
    * Create a html element for &lt;br&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.br().toEncodedHtml(); <br>
+   * </p>
    */
   public static IHtmlElement br() {
     return new HtmlNodeBuilder("br");
@@ -68,6 +74,10 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for &lt;h1&gt;text&lt;/h1&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.h1("text").toEncodedHtml(); <br>
+   * </p>
    *
    * @param text
    *          text as bind
@@ -78,6 +88,10 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for &lt;h2&gt;text&lt;/h2&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.h2("text").toEncodedHtml(); <br>
+   * </p>
    *
    * @param text
    *          text as bind
@@ -88,6 +102,10 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for &lt;h3&gt;text&lt;/h3&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.h3("text").toEncodedHtml(); <br>
+   * </p>
    *
    * @param text
    *          text as bind
@@ -98,6 +116,10 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for &lt;h4&gt;text&lt;/h4&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.h4("text").toEncodedHtml(); <br>
+   * </p>
    *
    * @param text
    *          text as bind
@@ -108,6 +130,10 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for &lt;h5&gt;text&lt;/h5&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.h5("text").toEncodedHtml(); <br>
+   * </p>
    *
    * @param text
    *          text as bind
@@ -118,6 +144,10 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for &lt;h6&gt;text&lt;/h6&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.h6("text").toEncodedHtml(); <br>
+   * </p>
    *
    * @param text
    *          text as bind
@@ -128,6 +158,10 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for &lt;div&gt;content&lt;/div&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.div("text").toEncodedHtml(); <br>
+   * </p>
    *
    * @param content
    *          content as bind
@@ -148,6 +182,10 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for &lt;span&gt;content&lt;/span&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.span("text").toEncodedHtml(); <br>
+   * </p>
    *
    * @param text
    *          text as bind
@@ -158,6 +196,10 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for a link &lt;a href="url"&gt;text&lt;/a&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.link("http://xyz.com","text").toEncodedHtml(); <br>
+   * </p>
    *
    * @param text
    *          text as bind
@@ -168,6 +210,10 @@ public final class HTML {
 
   /**
    * Create a html element for an image: &lt;img src="path"&gt;&lt;/img&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.img("image.png").toEncodedHtml(); <br>
+   * </p>
    *
    * @param src
    *          image source path as bind
@@ -178,6 +224,21 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for table data: &lt;td&gt;text&lt;/td&gt;.
+   * <p>
+   * Example:<br>
+   * <code>
+   * HTML.table(<br>
+        &nbsp;HTML.row(<br>
+        &nbsp;&nbsp;HTML.cell("cell1"),<br>
+        &nbsp;&nbsp;HTML.cell("cell2")<br>
+        &nbsp;),<br>
+        &nbsp;HTML.row(<br>
+        &nbsp;&nbsp;HTML.cell("cell3"),<br>
+        &nbsp;&nbsp;HTML.cell("cell4")<br>
+        )<br>
+        ).cellspacing(1).cellpadding(2)<br>
+   * </p>
+   * </code>
    *
    * @param text
    *          text with binds
@@ -188,6 +249,20 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for a table row: &lt;tr&gt;...&lt;/tr&gt;.
+   * Example:<br>
+   * <code>
+   * HTML.table(<br>
+        &nbsp;HTML.row(<br>
+        &nbsp;&nbsp;HTML.cell("cell1"),<br>
+        &nbsp;&nbsp;HTML.cell("cell2")<br>
+        &nbsp;),<br>
+        &nbsp;HTML.row(<br>
+        &nbsp;&nbsp;HTML.cell("cell3"),<br>
+        &nbsp;&nbsp;HTML.cell("cell4")<br>
+        )<br>
+        ).cellspacing(1).cellpadding(2)<br>
+   * </p>
+   * </code>
    *
    * @param td
    *          table data within row
@@ -198,6 +273,20 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for a table.
+   * Example:<br>
+   * <code>
+   * HTML.table(<br>
+        &nbsp;HTML.row(<br>
+        &nbsp;&nbsp;HTML.cell("cell1"),<br>
+        &nbsp;&nbsp;HTML.cell("cell2")<br>
+        &nbsp;),<br>
+        &nbsp;HTML.row(<br>
+        &nbsp;&nbsp;HTML.cell("cell3"),<br>
+        &nbsp;&nbsp;HTML.cell("cell4")<br>
+        )<br>
+        ).cellspacing(1).cellpadding(2)<br>
+   * </p>
+   * </code>
    */
   public static IHtmlTable table(IHtmlTableRow... rows) {
     return new HtmlTableBuilder(Arrays.asList(rows));
@@ -205,6 +294,20 @@ public final class HTML {
 
   /**
    * Create a html element with encoded text for a table.
+   * Example:<br>
+   * <code>
+   * HTML.table(<br>
+        &nbsp;HTML.row(<br>
+        &nbsp;&nbsp;HTML.cell("cell1"),<br>
+        &nbsp;&nbsp;HTML.cell("cell2")<br>
+        &nbsp;),<br>
+        &nbsp;HTML.row(<br>
+        &nbsp;&nbsp;HTML.cell("cell3"),<br>
+        &nbsp;&nbsp;HTML.cell("cell4")<br>
+        )<br>
+        ).cellspacing(1).cellpadding(2)<br>
+   * </p>
+   * </code>
    */
   public static IHtmlTable table(List<IHtmlTableRow> rows) {
     return new HtmlTableBuilder(rows);
@@ -212,6 +315,7 @@ public final class HTML {
 
   /**
    * Creates an application local link
+   * String encodedHtml = HTML.appLink("path","text").toEncodedHtml(); <br>
    *
    * @param path
    *          path to identify what is the link referring to.
