@@ -13,26 +13,15 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -47,12 +36,6 @@ import org.mockito.Mockito;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class PageTest {
   private static final String TEST_PAGE_CLASS_ID = "TEST_CLASS_ID";
-  private List<IBean<?>> m_beans = new ArrayList<>();
-
-  @After
-  public void after() {
-    TestingUtility.unregisterBeans(m_beans);
-  }
 
   @Test
   public void testClassIdAnnotatedPage() {
@@ -70,56 +53,37 @@ public class PageTest {
   /**
    * {@link AbstractPage#execPageActivated()}, if a ProcessingExeption is thrown
    */
-  @Test
+  @Test(expected = ProcessingException.class)
   public void testPageActivatedProcessingException() {
-    IExceptionHandlerService service = createMockExceptionHandlerService();
     final IPage<?> testPage = new PageExceptionOnActivated();
     testPage.pageActivatedNotify();
-    verify(service, times(1)).handleException(any(ProcessingException.class));
   }
 
   /**
    * {@link AbstractPage#execPageActivated()} , if a Exeption is thrown
    */
-  @Test
+  @Test(expected = ProcessingException.class)
   public void testPageActivatedException() {
-    IExceptionHandlerService service = createMockExceptionHandlerService();
     final IPage<?> testPage = new PageRuntimeExceptionOnActivated();
     testPage.pageActivatedNotify();
-    verify(service, times(1)).handleException(any(ProcessingException.class));
   }
 
   /**
    * {@link AbstractPage#execPageDeactivated()}, if a ProcessingExeption is thrown
    */
-  @Test
+  @Test(expected = ProcessingException.class)
   public void testPageDeactivatedProcessingException() {
-    IExceptionHandlerService service = createMockExceptionHandlerService();
     final IPage<?> testPage = new PageExceptionOnDeactivated();
     testPage.pageDeactivatedNotify();
-    verify(service, times(1)).handleException(any(ProcessingException.class));
   }
 
   /**
    * {@link AbstractPage#execPageDeactivated()}, if a Exeption is thrown
    */
-  @Test
+  @Test(expected = ProcessingException.class)
   public void testPageDeactivatedException() {
-    IExceptionHandlerService service = createMockExceptionHandlerService();
     final IPage<?> testPage = new PageRuntimeExceptionOnDeactivated();
     testPage.pageDeactivatedNotify();
-    verify(service, times(1)).handleException(any(ProcessingException.class));
-  }
-
-  private IExceptionHandlerService createMockExceptionHandlerService() {
-    IExceptionHandlerService svc = Mockito.mock(IExceptionHandlerService.class);
-    m_beans.add(TestingUtility.registerBean(
-        new BeanMetaData(IExceptionHandlerService.class).
-            initialInstance(svc).
-            applicationScoped(true)
-        )
-        );
-    return svc;
   }
 
   @Test

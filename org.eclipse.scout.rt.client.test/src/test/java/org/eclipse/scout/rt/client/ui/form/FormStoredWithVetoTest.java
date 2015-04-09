@@ -11,28 +11,22 @@
 package org.eclipse.scout.rt.client.ui.form;
 
 import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore;
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore.MethodImplementation;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.junit.After;
-import org.junit.Before;
+import org.eclipse.scout.rt.testing.platform.runner.statement.ExceptionHandlerException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 /**
  * Unit test for {@link AbstractForm} where {@link AbstractFormHandler#execStore()} or {@link AbstractForm#execStored()}
@@ -45,26 +39,6 @@ import org.mockito.Mockito;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class FormStoredWithVetoTest {
 
-  private List<IBean<?>> m_registeredServices = new ArrayList<>();
-  private IExceptionHandlerService m_exceptionHandlerService;
-
-  @Before
-  public void setup() {
-    m_exceptionHandlerService = Mockito.mock(IExceptionHandlerService.class);
-    m_registeredServices.add(
-        TestingUtility.registerBean(
-            new BeanMetaData(IExceptionHandlerService.class).
-            initialInstance(m_exceptionHandlerService).
-            applicationScoped(true)
-            )
-        );
-  }
-
-  @After
-  public void teardown() {
-    TestingUtility.unregisterBeans(m_registeredServices);
-  }
-
   @Test
   public void testVetoHandlerSave() throws Exception {
     FormToStore f = new FormToStore();
@@ -72,9 +46,15 @@ public class FormStoredWithVetoTest {
     f.startModify();
     f.touch();
     assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
-    f.clickSave();
-    assertException();
-    f.assertStoreInterrupted();
+
+    try {
+      f.clickSave();
+      fail("VetoException excepted to be handled in ExceptionHandler");
+    }
+    catch (ExceptionHandlerException e) {
+      assertVetoException(e.getCause());
+      f.assertStoreInterrupted();
+    }
   }
 
   @Test
@@ -84,9 +64,15 @@ public class FormStoredWithVetoTest {
     f.startModify();
     f.touch();
     assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
-    f.clickOk();
-    assertException();
-    f.assertStoreInterrupted();
+
+    try {
+      f.clickOk();
+      fail("VetoException excepted to be handled in ExceptionHandler");
+    }
+    catch (ExceptionHandlerException e) {
+      assertVetoException(e.getCause());
+      f.assertStoreInterrupted();
+    }
   }
 
   @Test
@@ -96,9 +82,15 @@ public class FormStoredWithVetoTest {
     f.startModify();
     f.touch();
     assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
-    f.clickSave();
-    assertException();
-    f.assertStoreInterrupted();
+
+    try {
+      f.clickSave();
+      fail("VetoException excepted to be handled in ExceptionHandler");
+    }
+    catch (ExceptionHandlerException e) {
+      assertVetoException(e.getCause());
+      f.assertStoreInterrupted();
+    }
   }
 
   @Test
@@ -108,9 +100,15 @@ public class FormStoredWithVetoTest {
     f.startModify();
     f.touch();
     assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
-    f.clickOk();
-    assertException();
-    f.assertStoreInterrupted();
+
+    try {
+      f.clickOk();
+      fail("VetoException excepted to be handled in ExceptionHandler");
+    }
+    catch (ExceptionHandlerException e) {
+      assertVetoException(e.getCause());
+      f.assertStoreInterrupted();
+    }
   }
 
   @Test
@@ -121,9 +119,15 @@ public class FormStoredWithVetoTest {
     f.startModify();
     f.touch();
     assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
-    f.clickSave();
-    assertException();
-    f.assertStoreInterrupted();
+
+    try {
+      f.clickSave();
+      fail("VetoException excepted to be handled in ExceptionHandler");
+    }
+    catch (ExceptionHandlerException e) {
+      assertVetoException(e.getCause());
+      f.assertStoreInterrupted();
+    }
   }
 
   @Test
@@ -134,15 +138,20 @@ public class FormStoredWithVetoTest {
     f.startModify();
     f.touch();
     assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
-    f.clickOk();
-    assertException();
-    f.assertStoreInterrupted();
+
+    try {
+      f.clickOk();
+      fail("VetoException excepted to be handled in ExceptionHandler");
+    }
+    catch (ExceptionHandlerException e) {
+      assertVetoException(e.getCause());
+      f.assertStoreInterrupted();
+    }
   }
 
-  private void assertException() {
-    ArgumentCaptor<ProcessingException> argument = ArgumentCaptor.forClass(ProcessingException.class);
-    Mockito.verify(m_exceptionHandlerService).handleException(argument.capture());
-    assertEquals("exception.isConsumed()", false, argument.getValue().isConsumed());
-    assertEquals("exception.getMessage()", FormToStore.VETO_EXCEPTION_TEXT, argument.getValue().getMessage());
+  private void assertVetoException(ProcessingException e) {
+    assertTrue("VetoException expected [actual=" + e.getClass() + "]", e instanceof VetoException);
+    assertFalse("exception.isConsumed()", e.isConsumed());
+    assertEquals("exception.getMessage()", FormToStore.VETO_EXCEPTION_TEXT, e.getMessage());
   }
 }
