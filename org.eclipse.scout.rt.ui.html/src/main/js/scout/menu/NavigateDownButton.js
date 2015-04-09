@@ -19,7 +19,22 @@ scout.NavigateDownButton.prototype._toggleDetail = function() {
 };
 
 scout.NavigateDownButton.prototype._buttonEnabled = function() {
-  return !this.node.leaf;
+  if (this.node.leaf) {
+    return false;
+  }
+
+
+  if (this._isDetail()) {
+    return true;
+  }
+
+  // when it's not a leaf and not a detail - the button is only enabled when a single row is selected
+  var table = this.node.detailTable;
+  if (table) {
+    return table.selectedRowIds.length === 1;
+  } else {
+    return true;
+  }
 };
 
 scout.NavigateDownButton.prototype._drill = function() {

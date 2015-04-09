@@ -16,7 +16,9 @@ scout.AbstractNavigationButton = function(outline, node) {
 };
 scout.inherits(scout.AbstractNavigationButton, scout.Button);
 
-// @override
+/**
+ * @override
+ */
 scout.AbstractNavigationButton.prototype._render = function($parent) {
   if (this._isDetail()) {
     this._onClickFunc = this._setDetailVisible.bind(this);
@@ -41,6 +43,16 @@ scout.AbstractNavigationButton.prototype.doAction = function() {
 };
 
 /**
+ * Called when enabled state must be re-calculated and probably rendered.
+ */
+scout.AbstractNavigationButton.prototype.updateEnabled = function() {
+  this.enabled = this._buttonEnabled();
+  if (this.rendered) {
+    this._renderEnabled();
+  }
+};
+
+/**
  * @override
  */
 scout.AbstractNavigationButton.prototype._registerButtonKeyStroke = function() {
@@ -48,7 +60,7 @@ scout.AbstractNavigationButton.prototype._registerButtonKeyStroke = function() {
     this._unregisterButtonKeyStroke();
   }
   if (this.keyStroke) {
-    //register buttons key stroke on root Groupbox
+    // register buttons key stroke on root group-box
     this.defaultKeyStroke = new scout.ButtonKeyStroke(this, this.keyStroke);
     this.outline.keyStrokeAdapter.registerKeyStroke(this.defaultKeyStroke);
   }
@@ -58,7 +70,7 @@ scout.AbstractNavigationButton.prototype._registerButtonKeyStroke = function() {
  * @override
  */
 scout.AbstractNavigationButton.prototype._unregisterButtonKeyStroke = function() {
-  //unregister buttons key stroke on root Groupbox
+  // unregister buttons key stroke on root group-box
   if (this.defaultKeyStroke) {
     this.outline.keyStrokeAdapter.unregisterKeyStroke(this.defaultKeyStroke);
   }

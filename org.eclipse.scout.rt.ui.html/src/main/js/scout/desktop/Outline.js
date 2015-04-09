@@ -5,6 +5,7 @@ scout.Outline = function() {
   this.containerClasses += ' outline';
   this._treeItemPaddingLeft = 37;
   this._treeItemPaddingLevel = 20;
+  this._tableSelectionListener;
 };
 scout.inherits(scout.Outline, scout.Tree);
 
@@ -54,7 +55,6 @@ scout.Outline.prototype._initTreeNode = function(parentNode, node) {
 };
 
 scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, node) {
-  // FIXME AWE: soll node (=page) eine outline property bekommen? Dann müssten wir nicht node + outline übergeben
   var menus = scout.arrays.ensure(formOrTable.staticMenus);
   if (!this._hasButton(menus, scout.NavigateUpButton)) {
     var upButton = new scout.NavigateUpButton(this, node);
@@ -64,26 +64,36 @@ scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, nod
     var downButton = new scout.NavigateDownButton(this, node);
     menus.push(downButton);
   }
-
   if (formOrTable instanceof scout.Form) {
     formOrTable.rootGroupBox.staticMenus = menus;
   } else {
-    formOrTable.staticMenus = menus;
+    var table = formOrTable,
+      button = this._getButton(menus, scout.NavigateDownButton);
+    table.staticMenus = menus;
+    this._tableSelectionListener = table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
+      button.updateEnabled();
+    });
   }
 };
 
-scout.Outline.prototype._hasButton = function(menus, buttonClass) {
+scout.Outline.prototype._getButton = function(menus, buttonClass) {
   for (var i = 0; i < menus.length; i++) {
     if (menus[i] instanceof buttonClass) {
-      return true;
+      return menus[i];
     }
   }
-  return false;
+  return null;
+};
+
+
+scout.Outline.prototype._hasButton = function(menus, buttonClass) {
+  return this._getButton(menus, buttonClass) !== null;
 };
 
 scout.Outline.prototype._onNodeDeleted = function(node) {
   // Destroy table, which is attached at the root adapter. Form gets destroyed by form close event
   if (node.detailTable) {
+    node.detailTable.events.off(this._tableSelectionListener);
     node.detailTable.destroy();
     node.detailTable = null;
   }

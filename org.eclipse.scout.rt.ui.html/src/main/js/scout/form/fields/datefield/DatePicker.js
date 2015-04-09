@@ -56,7 +56,7 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
 
   var $box = this._createDateBox();
   $box.find('.date-box-day').click(this._onDayClick.bind(this));
-  $box[0].addEventListener("mousewheel", this._onMouseWheel.bind(this), false);
+  $box[0].addEventListener('mousewheel', this._onMouseWheel.bind(this), false);
 
   if (animated && this.$currentBox && viewDateDiff) {
     this._appendAnimated(viewDateDiff, $box);

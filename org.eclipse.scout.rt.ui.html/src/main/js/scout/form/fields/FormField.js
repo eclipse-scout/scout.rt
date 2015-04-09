@@ -166,10 +166,10 @@ scout.FormField.prototype._renderLabelPosition = function(position) {
   this._renderLabel(this.label);
 };
 
-scout.FormField.prototype._renderEnabled = function(enabled) {
-  this.$container.setEnabled(enabled);
+scout.FormField.prototype._renderEnabled = function() {
+  this.$container.setEnabled(this.enabled);
   if (this.$field) {
-    this.$field.setEnabled(enabled);
+    this.$field.setEnabled(this.enabled);
   }
 };
 

@@ -327,7 +327,16 @@ scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldPro
       var funcTarget = this.ui || this;
       if (!funcTarget[renderFuncName]) {
         throw new Error('Render function ' + renderFuncName + ' does not exist in ' + (funcTarget === this ? 'model adapter' : 'UI'));
-      } //TODO value and oldValue should be switched to conform with other functions. Or better create remove function as it is done with adapters? currently only "necessary" for AnalysisTableControl
+      } // FIXME AWE/CGU: value and oldValue should be switched to conform with other functions.
+        // Or better create remove function as it is done with adapters? currently only "necessary" for AnalysisTableControl
+        // Input von 08.04.15: z.Z. wird die _renderXxx Methode sehr uneinheitlich verwendet. Manche mit ohne Parameter, andere mit
+        // 1 oder 2 Parameter. Dann gibt es noch Fälle (DateField.js) bei denen es nötig ist, render aufzurufen, aber mit einem
+        // anderen Wert für xxx als this.xxx. Nur wenige benötigen den 2. Parameter für old-value (FormField#_renderCssClass).
+        // Vorgeschlagene Lösung:
+        // - renderXxx() ist grundsätzlich Parameterlos und verwendet this.xxx
+        // - wenn jemand den old-value von this.xxx braucht, muss er sich diesen selber auf dem adapter merken
+        // - wenn jemand die render methode mit anderen werten als this.xxx aufrufen können muss, implementiert er für
+        //   diesen speziellen fall: function renderXxx(xxx) { xxx = xxx || this.xxx; ...
       funcTarget[renderFuncName](value, oldValue);
     }
   }.bind(this));
