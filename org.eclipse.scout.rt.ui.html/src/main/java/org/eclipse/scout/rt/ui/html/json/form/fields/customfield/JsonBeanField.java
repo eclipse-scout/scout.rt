@@ -11,12 +11,16 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.customfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.beanfield.IBeanField;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
-public class JsonBeanField<T extends IValueField<?>> extends JsonValueField<T> {
+public class JsonBeanField<T extends IBeanField<?>> extends JsonValueField<T> {
+  public static final String EVENT_APP_LINK_ACTION = "appLinkAction";
 
   public JsonBeanField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -41,5 +45,20 @@ public class JsonBeanField<T extends IValueField<?>> extends JsonValueField<T> {
         return getJsonSession().getJsonObjectFactory().createJsonObject(value).toJson();
       }
     });
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    if (EVENT_APP_LINK_ACTION.equals(event.getType())) {
+      handleUiAppLinkAction(event);
+    }
+    else {
+      super.handleUiEvent(event);
+    }
+  }
+
+  protected void handleUiAppLinkAction(JsonEvent event) {
+    String ref = JsonObjectUtility.optString(event.getData(), "ref");
+    getModel().getUIFacade().fireAppLinkActionFromUI(ref);
   }
 }

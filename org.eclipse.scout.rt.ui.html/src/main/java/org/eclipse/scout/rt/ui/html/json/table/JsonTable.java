@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,7 +57,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
-  public static final String EVENT_HYPERLINK_ACTION = "hyperlinkAction";
+  public static final String EVENT_APP_LINK_ACTION = "appLinkAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
   public static final String EVENT_ROWS_INSERTED = "rowsInserted";
   public static final String EVENT_ROWS_UPDATED = "rowsUpdated";
@@ -303,8 +301,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     else if (EVENT_COLUMN_RESIZED.equals(event.getType())) {
       handleUiColumnResized(event);
     }
-    else if (EVENT_HYPERLINK_ACTION.equals(event.getType())) {
-      handleUiHyperlinkAction(event);
+    else if (EVENT_APP_LINK_ACTION.equals(event.getType())) {
+      handleUiAppLinkAction(event);
     }
     else if (EVENT_ROWS_CHECKED.equals(event.getType())) {
       handleUiRowChecked(event);
@@ -434,20 +432,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     getModel().getUIFacade().fireRowActionFromUI(tableRow);
   }
 
-  protected void handleUiHyperlinkAction(JsonEvent event) {
-    ITableRow row = extractTableRow(event.getData());
+  protected void handleUiAppLinkAction(JsonEvent event) {
     IColumn column = extractColumn(event.getData());
-    URL url = null;
-    try {
-      url = new URL("http://local/" + JsonObjectUtility.getString(event.getData(), "hyperlink"));
+    String ref = JsonObjectUtility.optString(event.getData(), "ref");
+    if (column != null) {
+      getModel().getUIFacade().setContextColumnFromUI(column);
     }
-    catch (MalformedURLException e) {
-      //TODO [15.0] imo change in scout and only send the path, not the complete url, also ignore the column! hyperlinks are per row only and use a path only [a href='path']text[/a]
-      LOG.error("", e);
-    }
-    if (row != null && column != null && url != null) {
-      getModel().getUIFacade().fireHyperlinkActionFromUI(row, column, url);
-    }
+    getModel().getUIFacade().fireAppLinkActionFromUI(ref);
   }
 
   protected void handleUiPrepareCellEdit(JsonEvent event) {
@@ -518,7 +509,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     ICell cell = row.getCell(column);
     JsonColumn<?> jsonColumn = m_jsonColumns.get(column);
     ICellValueReader reader = new TableCellValueReader(jsonColumn, cell);
-    return new JsonCell(getJsonSession(), cell, reader).toJsonOrString();
+    return new JsonCell(cell, reader).toJsonOrString();
   }
 
   protected JSONArray columnsToJson(Collection<IColumn<?>> columns) {

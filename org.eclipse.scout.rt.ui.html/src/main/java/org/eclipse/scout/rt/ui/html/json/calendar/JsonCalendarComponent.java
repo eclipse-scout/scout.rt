@@ -26,7 +26,7 @@ public class JsonCalendarComponent<T extends CalendarComponent> extends Abstract
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     JsonObjectUtility.putProperty(json, "item", new JsonCalendarItem(getModel().getItem()).toJson());
-    JsonObjectUtility.putProperty(json, "cell", new JsonCell(getJsonSession(), getModel().getCell()).toJson());
+    JsonObjectUtility.putProperty(json, "cell", new JsonCell(getModel().getCell()).toJson());
     JsonObjectUtility.putProperty(json, "fromDate", new JsonDate(getModel().getFromDate()).asJsonString());
     JsonObjectUtility.putProperty(json, "toDate", new JsonDate(getModel().getToDate()).asJsonString());
     if (getModel().getCoveredDays() != null) {

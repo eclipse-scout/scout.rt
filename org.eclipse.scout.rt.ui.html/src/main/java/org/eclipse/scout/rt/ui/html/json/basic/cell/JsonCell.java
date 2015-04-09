@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.json.basic.cell;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
@@ -22,13 +21,13 @@ public class JsonCell implements IJsonObject {
   private final String m_cellText;
   private Object m_cellValue;
 
-  public JsonCell(IJsonSession session, ICell cell) {
-    this(session, cell, null);
+  public JsonCell(ICell cell) {
+    this(cell, null);
   }
 
-  public JsonCell(IJsonSession session, ICell cell, ICellValueReader cellValueReader) {
+  public JsonCell(ICell cell, ICellValueReader cellValueReader) {
     m_cell = cell;
-    m_cellText = session.getCustomHtmlRenderer().convert(cell.getText(), true);
+    m_cellText = cell.getText();
     if (cellValueReader != null) {
       m_cellValue = cellValueReader.read();
     }

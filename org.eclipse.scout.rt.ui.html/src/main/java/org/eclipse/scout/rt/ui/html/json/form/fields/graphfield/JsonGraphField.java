@@ -1,7 +1,5 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.graphfield;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +24,7 @@ public class JsonGraphField extends JsonValueField<IGraphField> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonGraphField.class);
 
   // from UI
-  public static final String EVENT_HYPERLINK_ACTION = "hyperlinkAction";
+  public static final String EVENT_APP_LINK_ACTION = "appLinkAction";
 
   public JsonGraphField(IGraphField model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -144,25 +142,16 @@ public class JsonGraphField extends JsonValueField<IGraphField> {
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_HYPERLINK_ACTION.equals(event.getType())) {
-      handleUiHyperlinkAction(event);
+    if (EVENT_APP_LINK_ACTION.equals(event.getType())) {
+      handleUiAppLinkAction(event);
     }
     else {
       super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiHyperlinkAction(JsonEvent event) {
-    URL url = null;
-    try {
-      url = new URL("http://local/" + JsonObjectUtility.getString(event.getData(), "hyperlink"));
-    }
-    catch (MalformedURLException e) {
-      //TODO [15.0] imo change in scout and only send the path, not the complete url, also ignore the column! hyperlinks are per row only and use a path only [a href='path']text[/a]
-      LOG.error("", e);
-    }
-    if (url != null) {
-      getModel().getUIFacade().fireHyperlinkActionFromUI(url);
-    }
+  protected void handleUiAppLinkAction(JsonEvent event) {
+    String ref = JsonObjectUtility.optString(event.getData(), "ref");
+    getModel().getUIFacade().fireAppLinkActionFromUI(ref);
   }
 }

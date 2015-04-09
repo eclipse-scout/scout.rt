@@ -117,4 +117,4 @@
 @text-disabled-color: @palette-gray-4;
 @text-field-icon-color: @palette-gray-5;
 @title-color: @palette-gray-2;
-@hyperlink-color: @palette-bsi-normal;
+@applink-color: @palette-bsi-normal;

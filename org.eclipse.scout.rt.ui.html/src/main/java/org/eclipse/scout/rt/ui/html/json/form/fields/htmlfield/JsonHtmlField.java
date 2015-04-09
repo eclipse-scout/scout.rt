@@ -10,12 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.eclipse.scout.commons.HTMLUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -29,10 +23,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
  * This class creates JSON output for an <code>IHtmlField</code>.
  */
 public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonHtmlField.class);
-
-  // from UI
-  public static final String EVENT_HYPERLINK_ACTION = "hyperlinkAction";
+  public static final String EVENT_APP_LINK_ACTION = "appLinkAction";
 
   public JsonHtmlField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -53,11 +44,6 @@ public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> {
       @Override
       protected String modelValue() {
         return getModel().getDisplayText();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        return cleanHtmlValue((String) value);
       }
     });
 
@@ -81,35 +67,18 @@ public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> {
     });
   }
 
-  protected String cleanHtmlValue(String html) {
-    if (html == null) {
-      return null;
-    }
-    String cleanHtml = HTMLUtility.cleanupHtml(html, false, true, null, null);
-    return getJsonSession().getCustomHtmlRenderer().convert(cleanHtml, true);
-  }
-
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_HYPERLINK_ACTION.equals(event.getType())) {
-      handleUiHyperlinkAction(event);
+    if (EVENT_APP_LINK_ACTION.equals(event.getType())) {
+      handleUiAppLinkAction(event);
     }
     else {
       super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiHyperlinkAction(JsonEvent event) {
-    URL url = null;
-    try {
-      url = new URL("http://local/" + JsonObjectUtility.getString(event.getData(), "hyperlink"));
-    }
-    catch (MalformedURLException e) {
-      //TODO [15.0] imo change in scout and only send the path, not the complete url, also ignore the column! hyperlinks are per row only and use a path only [a href='path']text[/a]
-      LOG.error("", e);
-    }
-    if (url != null) {
-      getModel().getUIFacade().fireHyperlinkActionFromUI(url);
-    }
+  protected void handleUiAppLinkAction(JsonEvent event) {
+    String ref = JsonObjectUtility.optString(event.getData(), "ref");
+    getModel().getUIFacade().fireAppLinkActionFromUI(ref);
   }
 }

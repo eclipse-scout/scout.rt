@@ -49,8 +49,6 @@ public interface IJsonSession {
 
   JSONObject processRequest(HttpServletRequest httpReq, JsonRequest jsonReq);
 
-  ICustomHtmlRenderer getCustomHtmlRenderer();
-
   /**
    * Performs clean-up operations on the current session, after a request has been processed.
    */

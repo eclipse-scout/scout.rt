@@ -22,9 +22,21 @@ scout.BeanField.prototype._renderProperties = function() {
  * @override
  */
 scout.BeanField.prototype._renderDisplayText = function() {
- // nop
+  // nop
 };
 
 scout.BeanField.prototype._renderValue = function() {
   // to be implemented by the subclass
+};
+
+scout.BeanField.prototype._sendAppLinkAction = function(ref) {
+  this.session.send(this.id, 'appLinkAction', {
+    ref: ref
+  });
+};
+
+scout.BeanField.prototype._onAppLinkAction = function(event) {
+  var $target = $(event.target);
+  var ref = $target.data('ref');
+  this._sendAppLinkAction(ref);
 };

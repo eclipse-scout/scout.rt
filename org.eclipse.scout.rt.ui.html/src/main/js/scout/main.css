@@ -181,3 +181,10 @@ button::-moz-focus-inner {
 
   .animation(rotate-x 5s infinite linear);
 }
+
+/* Links calling back to the server, for example Table#execAppLinkAction */
+.app-link {
+  color: @applink-color;
+  text-decoration: underline;
+  cursor: pointer;
+}

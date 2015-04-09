@@ -1,8 +1,0 @@
-/* (c) Copyright 2013-2014, BSI Business Systems Integration AG */
-/* hyperlinks calling back to scout app, for example scout Table#execHyperlinkAction
- */
-.hyperlink {
-  color: @hyperlink-color;
-  text-decoration: underline;
-  cursor: pointer;
-}

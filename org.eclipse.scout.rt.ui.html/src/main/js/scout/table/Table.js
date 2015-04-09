@@ -486,9 +486,9 @@ scout.Table.prototype._installRows = function($rows) {
     var column = that._columnAtX(event.pageX);
     column.onMouseUp(event, $row);
 
-    var hyperLink = that._findHyperLink(event);
-    if (hyperLink) {
-      that.sendHyperlinkAction($row.data('row').id, column.id, hyperLink);
+    var $appLink = that._find$AppLink(event);
+    if ($appLink) {
+      that.sendAppLinkAction(column.id, $appLink.data('ref'));
     } else if (column.guiOnlyCheckBoxColumn) {
       that.sendRowClicked($row);
     } else {
@@ -564,15 +564,14 @@ scout.Table.prototype._columnAtX = function(x) {
   });
 };
 
-scout.Table.prototype._findHyperLink = function(event) {
-  //bubble up from target to delegateTarget
+scout.Table.prototype._find$AppLink = function(event) {
+  // bubble up from target to delegateTarget
   var $elem = $(event.target);
   var $stop = $(event.delegateTarget);
-  var hyperLink;
+  var appLink;
   while ($elem.length > 0) {
-    hyperLink = $elem.data('hyperlink');
-    if (hyperLink) {
-      return hyperLink;
+    if ($elem.hasClass('app-link')) {
+      return $elem;
     }
     if ($elem[0] === $stop[0]) {
       return null;
@@ -688,11 +687,10 @@ scout.Table.prototype.sendRowAction = function($row, columnId) {
   });
 };
 
-scout.Table.prototype.sendHyperlinkAction = function(rowId, columnId, hyperlink) {
-  this.session.send(this.id, 'hyperlinkAction', {
-    rowId: rowId,
+scout.Table.prototype.sendAppLinkAction = function(columnId, ref) {
+  this.session.send(this.id, 'appLinkAction', {
     columnId: columnId,
-    hyperlink: hyperlink
+    ref: ref
   });
 };
 

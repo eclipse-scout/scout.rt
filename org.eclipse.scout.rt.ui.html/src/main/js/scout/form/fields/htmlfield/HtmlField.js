@@ -22,17 +22,24 @@ scout.HtmlField.prototype._renderProperties = function() {
  */
 scout.HtmlField.prototype._renderDisplayText = function(displayText) {
   this.$field.html(displayText);
+  //FIXME find elements with class app links and add listener which uses sendAppLinkAction
 };
 
 scout.HtmlField.prototype._renderScrollBarsEnabled = function(scrollBarsEnabled) {
   // XXX
 };
 
-// Not called in _renderProperties() because this is not really property (more like an event)
+// Not called in _renderProperties() because this is not really a property (more like an event)
 scout.HtmlField.prototype._renderScrollToEnd = function() {
   // XXX
 };
 
 scout.HtmlField.prototype._renderScrollToPosition = function(scrollToPosition) {
   // XXX
+};
+
+scout.BeanField.prototype.sendAppLinkAction = function(ref) {
+  this.session.send(this.id, 'appLinkAction', {
+    ref: ref
+  });
 };

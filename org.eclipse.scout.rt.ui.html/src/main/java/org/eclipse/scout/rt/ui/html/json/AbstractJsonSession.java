@@ -70,7 +70,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private final IJsonObjectFactory m_jsonObjectFactory;
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final Set<String> m_unregisterAdapterSet = new HashSet<String>();
-  private final ICustomHtmlRenderer m_customHtmlRenderer;
   private final P_RootAdapter m_rootJsonAdapter;
 
   private boolean m_initialized;
@@ -95,7 +94,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_jsonObjectFactory = createJsonObjectFactory();
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
     m_rootJsonAdapter = new P_RootAdapter(this);
-    m_customHtmlRenderer = createCustomHtmlRenderer();
     m_jsonEventProcessor = createJsonEventProcessor();
 
     Jobs.getJobManager().addListener(ModelJobs.newEventFilter().eventTypes(JobEventType.DONE).andFilter(new IFilter<JobEvent>() {
@@ -122,10 +120,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   protected JsonAdapterRegistry createJsonAdapterRegistry() {
     return new JsonAdapterRegistry();
-  }
-
-  protected ICustomHtmlRenderer createCustomHtmlRenderer() {
-    return new CustomHtmlRenderer();
   }
 
   protected JsonEventProcessor createJsonEventProcessor() {
@@ -434,11 +428,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   public long getJsonAdapterSeq() {
     return m_jsonAdapterSeq;
-  }
-
-  @Override
-  public ICustomHtmlRenderer getCustomHtmlRenderer() {
-    return m_customHtmlRenderer;
   }
 
   @Override
