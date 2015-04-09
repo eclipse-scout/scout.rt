@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.annotations.Replace;
@@ -31,15 +30,11 @@ public final class BEANS {
   /**
    * @return the single instance of this type with respect to {@link Priority} and {@link Replace}. See also
    *         {@link IBeanManager#getBean(Class)}
-   * @throws AssertionException
+   * @throws AssertionError
    *           when no instance is available or when multiple instances are registered
    */
   public static <T> T get(Class<T> beanClazz) {
-    T instance = opt(beanClazz);
-    if (instance != null) {
-      return instance;
-    }
-    throw new Assertions.AssertionException("no instance found for query: " + beanClazz);
+    return Assertions.assertNotNull(opt(beanClazz), "no instance found for query: %s", beanClazz);
   }
 
   /**

@@ -19,7 +19,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -130,7 +129,7 @@ public class ModelJobsTest {
     assertFalse(ClientJobs.isClientJob(actualFuture));
   }
 
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void testScheduleWithoutInputWithoutSession() throws ProcessingException {
     ISession.CURRENT.set(null);
     ModelJobs.schedule(mock(IRunnable.class));
@@ -145,12 +144,12 @@ public class ModelJobsTest {
     assertSame(m_clientSession, ModelJobs.newInput(runContext).mutex());
   }
 
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void testNewInputNullInput() {
     ModelJobs.newInput(null);
   }
 
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void testNewInputNullSession() {
     ModelJobs.newInput(ClientRunContexts.empty().session(null));
   }

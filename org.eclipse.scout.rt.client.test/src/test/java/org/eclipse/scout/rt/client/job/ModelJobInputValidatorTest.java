@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.job;
 
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -40,32 +39,32 @@ public class ModelJobInputValidatorTest {
     assertTrue(true);
   }
 
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void testNullClientRunContext() {
     new ModelJobInputValidator().validate(new JobInput());
   }
 
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void testWrongRunContext() {
     new ModelJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty()));
   }
 
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void testNullSession() {
     new ModelJobInputValidator().validate(new JobInput().mutex(null).runContext(ClientRunContexts.empty().session(null)));
   }
 
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void testWrongMutex() {
     new ModelJobInputValidator().validate(new JobInput().mutex(new Object()).runContext(ClientRunContexts.empty().session(m_clientSession)));
   }
 
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void testNullClientSession1() {
     new ModelJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty()));
   }
 
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void testNullClientSession2() {
     new ModelJobInputValidator().validate(new JobInput().runContext(ClientRunContexts.empty().session(null)));
   }

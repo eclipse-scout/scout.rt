@@ -164,7 +164,7 @@ public class MultiStatusTest {
     assertFalse(multiStatus.containsStatus(TestStatus.class));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test(expected = AssertionError.class)
   public void testThrowsOnNullStatus() {
     MultiStatus multiStatus = new MultiStatus();
     multiStatus.containsStatus(null);

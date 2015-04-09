@@ -20,7 +20,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
@@ -58,7 +57,7 @@ public class CallablesTest {
     assertSame(origin, callable);
   }
 
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   @SuppressWarnings("unchecked")
   public void testCallableFromIExecutable() throws Exception {
     ICallable<String> callable = Callables.callable(mock(IExecutable.class));

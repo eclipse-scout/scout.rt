@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -87,7 +86,7 @@ public class SERVICESTest {
   /**
    * Test for {@link SERVICES#getService(Class)} for a service that was not registered.
    */
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void testGetServiceNull() {
     IUnregisteredTestService service = SERVICES.getService(IUnregisteredTestService.class);
     assertNull("No service should be found. ", service);

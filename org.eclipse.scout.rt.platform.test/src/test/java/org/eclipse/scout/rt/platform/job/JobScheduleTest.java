@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
@@ -498,7 +497,7 @@ public class JobScheduleTest {
       }, null);
       fail();
     }
-    catch (AssertionException e) {
+    catch (AssertionError e) {
       assertFalse(running.get());
       assertNull(future);
     }

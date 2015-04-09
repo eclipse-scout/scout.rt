@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -35,7 +34,7 @@ public class AndFilterTest {
     MockitoAnnotations.initMocks(this);
   }
 
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void test1() {
     new AndFilter<>(new AndFilter<>()).accept(new Object());
   }

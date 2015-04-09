@@ -27,7 +27,7 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @return the given value if <code>null</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if the given value is not <code>null</code>.
    */
   public static <T> T assertNull(final T value) {
@@ -40,11 +40,11 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return the given value if <code>null</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if the given value is not <code>null</code>.
    */
   public static <T> T assertNull(final T value, final String msg, final Object... msgArgs) {
@@ -60,7 +60,7 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @return the given value if not <code>null</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if the given value is <code>null</code>.
    */
   public static <T> T assertNotNull(final T value) {
@@ -73,11 +73,11 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return the given value if not <code>null</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if the given value is <code>null</code>.
    */
   public static <T> T assertNotNull(final T value, final String msg, final Object... msgArgs) {
@@ -93,7 +93,7 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @return the given value if not <code>null</code> or <code>empty</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if the given value is <code>null</code> or <code>empty</code>.
    */
   public static String assertNotNullOrEmpty(final String value) {
@@ -112,11 +112,11 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return the given value if not <code>null</code> or <code>empty</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if the given value is <code>null</code> or <code>empty</code>.
    */
   public static String assertNotNullOrEmpty(final String value, final String msg, final Object... msgArgs) {
@@ -132,7 +132,7 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @return always <code>true</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if the given value is <code>false</code>.
    */
   public static boolean assertTrue(final boolean value) {
@@ -145,11 +145,11 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return always <code>true</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if the given value is <code>false</code>.
    */
   public static boolean assertTrue(final boolean value, final String msg, final Object... msgArgs) {
@@ -165,7 +165,7 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @return always <code>false</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if the given value is <code>true</code>.
    */
   public static boolean assertFalse(final boolean value) {
@@ -178,11 +178,11 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return always <code>false</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if the given value is <code>true</code>.
    */
   public static boolean assertFalse(final boolean value, final String msg, final Object... msgArgs) {
@@ -200,10 +200,10 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @return <code>value1</code> if equals with <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not equals with <code>value2</code>.
    */
-  public static <T> T assertEquals(final T value1, Object value2) {
+  public static <T> T assertEquals(final T value1, final Object value2) {
     return assertEquals(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
   }
 
@@ -215,14 +215,14 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return <code>value1</code> if equals with <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not equals with <code>value2</code>.
    */
-  public static <T> T assertEquals(final T value1, Object value2, final String msg, final Object... msgArgs) {
+  public static <T> T assertEquals(final T value1, final Object value2, final String msg, final Object... msgArgs) {
     if (!CompareUtility.equals(value1, value2)) {
       fail(msg, msgArgs);
     }
@@ -237,10 +237,10 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @return <code>value1</code> if not equals with <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is equals with <code>value2</code>.
    */
-  public static <T> T assertNotEquals(final T value1, Object value2) {
+  public static <T> T assertNotEquals(final T value1, final Object value2) {
     return assertNotEquals(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
   }
 
@@ -252,14 +252,14 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return <code>value1</code> if not equals with <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is equals with <code>value2</code>.
    */
-  public static <T> T assertNotEquals(final T value1, Object value2, final String msg, final Object... msgArgs) {
+  public static <T> T assertNotEquals(final T value1, final Object value2, final String msg, final Object... msgArgs) {
     if (CompareUtility.equals(value1, value2)) {
       fail(msg, msgArgs);
     }
@@ -274,10 +274,10 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @return <code>value1</code> if same as <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not same as <code>value2</code>.
    */
-  public static <T> T assertSame(final T value1, Object value2) {
+  public static <T> T assertSame(final T value1, final Object value2) {
     return assertSame(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
   }
 
@@ -289,14 +289,14 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return <code>value1</code> if same as <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not same as <code>value2</code>.
    */
-  public static <T> T assertSame(final T value1, Object value2, final String msg, final Object... msgArgs) {
+  public static <T> T assertSame(final T value1, final Object value2, final String msg, final Object... msgArgs) {
     if (value1 != value2) {
       fail(msg, msgArgs);
     }
@@ -311,10 +311,10 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @return <code>value1</code> if not same as <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is same as <code>value2</code>.
    */
-  public static <T> T assertNotSame(final T value1, Object value2) {
+  public static <T> T assertNotSame(final T value1, final Object value2) {
     return assertNotSame(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
   }
 
@@ -326,14 +326,14 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return <code>value1</code> if not same as <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is same as <code>value2</code>.
    */
-  public static <T> T assertNotSame(final T value1, Object value2, final String msg, final Object... msgArgs) {
+  public static <T> T assertNotSame(final T value1, final Object value2, final String msg, final Object... msgArgs) {
     if (value1 == value2) {
       fail(msg, msgArgs);
     }
@@ -348,10 +348,10 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @return <code>value1</code> if equal <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not equal <code>value2</code>.
    */
-  public static <T extends Comparable<T>> T assertEqual(final T value1, T value2) {
+  public static <T extends Comparable<T>> T assertEqual(final T value1, final T value2) {
     return assertEqual(value1, value2, "expected value1 to be equals with value2 [value1=%s, value2=%s]", value1, value2);
   }
 
@@ -363,14 +363,14 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return <code>value1</code> if equal <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not equal <code>value2</code>.
    */
-  public static <T extends Comparable<T>> T assertEqual(final T value1, T value2, final String msg, final Object... msgArgs) {
+  public static <T extends Comparable<T>> T assertEqual(final T value1, final T value2, final String msg, final Object... msgArgs) {
     if (value1.compareTo(value2) != 0) {
       fail(msg, msgArgs);
     }
@@ -385,10 +385,10 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @return <code>value1</code> if greater <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not greater <code>value2</code>.
    */
-  public static <T extends Comparable<T>> T assertGreater(final T value1, T value2) {
+  public static <T extends Comparable<T>> T assertGreater(final T value1, final T value2) {
     return assertGreater(value1, value2, "expected value1 to be '>' value2 [value1=%s, value2=%s]", value1, value2);
   }
 
@@ -400,14 +400,14 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return <code>value1</code> if greater <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not greater <code>value2</code>.
    */
-  public static <T extends Comparable<T>> T assertGreater(final T value1, T value2, final String msg, final Object... msgArgs) {
+  public static <T extends Comparable<T>> T assertGreater(final T value1, final T value2, final String msg, final Object... msgArgs) {
     if (value1.compareTo(value2) <= 0) {
       fail(msg, msgArgs);
     }
@@ -422,10 +422,10 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @return <code>value1</code> if greater or equal <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not greater or equals <code>value2</code>.
    */
-  public static <T extends Comparable<T>> T assertGreaterOrEqual(final T value1, T value2) {
+  public static <T extends Comparable<T>> T assertGreaterOrEqual(final T value1, final T value2) {
     return assertGreaterOrEqual(value1, value2, "expected value1 to be '>=' value2 [value1=%s, value2=%s]", value1, value2);
   }
 
@@ -437,14 +437,14 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return <code>value1</code> if greater or equal <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not greater or equal <code>value2</code>.
    */
-  public static <T extends Comparable<T>> T assertGreaterOrEqual(final T value1, T value2, final String msg, final Object... msgArgs) {
+  public static <T extends Comparable<T>> T assertGreaterOrEqual(final T value1, final T value2, final String msg, final Object... msgArgs) {
     if (value1.compareTo(value2) < 0) {
       fail(msg, msgArgs);
     }
@@ -459,10 +459,10 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @return <code>value1</code> if less <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not less <code>value2</code>.
    */
-  public static <T extends Comparable<T>> T assertLess(final T value1, T value2) {
+  public static <T extends Comparable<T>> T assertLess(final T value1, final T value2) {
     return assertLess(value1, value2, "expected value1 to be '<' value2 [value1=%s, value2=%s]", value1, value2);
   }
 
@@ -474,14 +474,14 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return <code>value1</code> if less <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not less <code>value2</code>.
    */
-  public static <T extends Comparable<T>> T assertLess(final T value1, T value2, final String msg, final Object... msgArgs) {
+  public static <T extends Comparable<T>> T assertLess(final T value1, final T value2, final String msg, final Object... msgArgs) {
     if (value1.compareTo(value2) >= 0) {
       fail(msg, msgArgs);
     }
@@ -496,10 +496,10 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @return <code>value1</code> if less or equal <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not less or equal <code>value2</code>.
    */
-  public static <T extends Comparable<T>> T assertLessOrEqual(final T value1, T value2) {
+  public static <T extends Comparable<T>> T assertLessOrEqual(final T value1, final T value2) {
     return assertLessOrEqual(value1, value2, "expected value1 to be '<=' value2 [value1=%s, value2=%s]", value1, value2);
   }
 
@@ -511,14 +511,14 @@ public final class Assertions {
    * @param value2
    *          the value to be tested against.
    * @param msg
-   *          message contained in the {@link AssertionException} in case of an assertion error.
+   *          message contained in the {@link AssertionError} in case of an assertion error.
    * @param msgArgs
    *          arguments to be used in the message.
    * @return <code>value1</code> if less or equal <code>value2</code>.
-   * @throws AssertionException
+   * @throws AssertionError
    *           if <code>value1</code> is not less or equal <code>value2</code>.
    */
-  public static <T extends Comparable<T>> T assertLessOrEqual(final T value1, T value2, final String msg, final Object... msgArgs) {
+  public static <T extends Comparable<T>> T assertLessOrEqual(final T value1, final T value2, final String msg, final Object... msgArgs) {
     if (value1.compareTo(value2) > 0) {
       fail(msg, msgArgs);
     }
@@ -526,26 +526,15 @@ public final class Assertions {
   }
 
   /**
-   * To always throw an assertion exception.
+   * To always throw an {@code AssertionError}.
    *
    * @param msg
    *          the message describing the assertion.
    * @param msgArgs
    *          message arguments to be referenced in the given message by <code>%s</code>.
    */
-  public static void fail(final String msg, final Object... msgArgs) {
-    throw new AssertionException("Assertion error: %s", String.format(msg, msgArgs));
-  }
-
-  /**
-   * Indicates an assertion error about the application's assumptions about expected values.
-   */
-  public static class AssertionException extends RuntimeException {
-
-    private static final long serialVersionUID = 1L;
-
-    public AssertionException(final String msg, final Object... msgArgs) {
-      super(String.format(msg, msgArgs));
-    }
+  public static <T> T fail(final String msg, final Object... msgArgs) {
+    final String message = (msg != null ? String.format(msg, msgArgs) : "n/a");
+    throw new AssertionError(String.format("Assertion error: %s", message));
   }
 }

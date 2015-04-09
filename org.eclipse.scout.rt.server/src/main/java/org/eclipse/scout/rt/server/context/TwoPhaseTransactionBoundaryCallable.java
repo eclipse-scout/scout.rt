@@ -11,15 +11,14 @@
 package org.eclipse.scout.rt.server.context;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.context.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -64,7 +63,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
       case REQUIRED:
         return runRequiredTxBoundary();
       default:
-        throw new AssertionException("Unsupported transaction scope [%s]", m_transactionScope);
+        return Assertions.fail("Unsupported transaction scope [%s]", m_transactionScope);
     }
   }
 

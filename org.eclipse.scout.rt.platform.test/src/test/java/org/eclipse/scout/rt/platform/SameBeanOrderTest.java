@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
@@ -44,7 +43,7 @@ public class SameBeanOrderTest {
     Assert.assertEquals(BBean.class, all.get(1).getClass());
   }
 
-  @Test(expected = Assertions.AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void testMultipleException() {
     Assert.assertEquals(ABean.class, BEANS.get(ITestBean.class).getClass());
   }

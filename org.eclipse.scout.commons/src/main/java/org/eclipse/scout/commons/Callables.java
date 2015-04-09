@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.annotations.Internal;
 
 /**
@@ -28,7 +27,7 @@ public final class Callables {
   /**
    * Returns a callable object that represents the given {@link IExecutable}.
    *
-   * @throws AssertionException
+   * @throws AssertionError
    *           is thrown if the given {@link IExecutable} is not of the type {@link IRunnable} or {@link ICallable}.
    */
   public static <RESULT> ICallable<RESULT> callable(final IExecutable<RESULT> executable) {
@@ -46,7 +45,7 @@ public final class Callables {
       };
     }
     else {
-      throw new AssertionException("Illegal executable provided: must be a '%s' or '%s'", IRunnable.class.getSimpleName(), ICallable.class.getSimpleName());
+      return Assertions.fail("Illegal executable provided: must be a '%s' or '%s'", IRunnable.class.getSimpleName(), ICallable.class.getSimpleName());
     }
   }
 

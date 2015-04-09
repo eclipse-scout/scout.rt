@@ -26,8 +26,8 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
+import org.eclipse.scout.rt.platform.IBeanManager;
 
 public class BeanManagerImplementor implements IBeanManager {
   private final ReentrantReadWriteLock m_lock;
@@ -170,9 +170,11 @@ public class BeanManagerImplementor implements IBeanManager {
       return list.get(0);
     }
     if (list.size() == 0) {
-      throw new Assertions.AssertionException("no instances found for query: " + beanClazz + " " + list);
+      return Assertions.fail("no instances found for query: %s %s", beanClazz, list);
     }
-    throw new Assertions.AssertionException("multiple instances found for query: " + beanClazz + " " + list);
+    else {
+      return Assertions.fail("multiple instances found for query: %s %s", beanClazz, list);
+    }
   }
 
   @Override
@@ -181,10 +183,13 @@ public class BeanManagerImplementor implements IBeanManager {
     if (list.size() == 1) {
       return list.get(0);
     }
+
     if (list.size() == 0) {
       return null;
     }
-    throw new Assertions.AssertionException("multiple instances found for query: " + beanClazz + " " + list);
+    else {
+      return Assertions.fail("multiple instances found for query: %s %s", beanClazz, list);
+    }
   }
 
   @Override

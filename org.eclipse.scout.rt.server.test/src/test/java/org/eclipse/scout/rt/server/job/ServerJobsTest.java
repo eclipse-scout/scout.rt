@@ -19,7 +19,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -126,7 +125,7 @@ public class ServerJobsTest {
     assertTrue(ServerJobs.isServerJob(actualFutureHolder.getValue()));
   }
 
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void testScheduleWithoutInputWithoutSession() throws ProcessingException {
     ISession.CURRENT.set(null);
     ServerJobs.schedule(mock(IRunnable.class));
@@ -140,7 +139,7 @@ public class ServerJobsTest {
     assertEquals("scout-server-thread", ServerJobs.newInput(runContext).threadName());
   }
 
-  @Test(expected = AssertionException.class)
+  @Test(expected = AssertionError.class)
   public void testNewInputNullInput() {
     ServerJobs.newInput(null);
   }
