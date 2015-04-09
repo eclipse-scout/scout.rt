@@ -13,14 +13,22 @@ package org.eclipse.scout.rt.testing.platform.runner.statement;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
- * Exception that wraps a {@link ProcessingException} into a {@link RuntimeException}.
- * TODO [dwi][abr]: to be removed once ProcessingException is a RuntimeException.
+ * {@code RuntimeException} thrown by {@code IExceptionHandler} installed in JUnit tests to not silently swallow
+ * exceptions. This exception's cause is the swallowed {@code ProcessingException}, which is never <code>null</code>.
  */
-public class ProcessingRuntimeException extends RuntimeException {
+public class ExceptionHandlerException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  public ProcessingRuntimeException(final ProcessingException cause) {
+  public ExceptionHandlerException(final ProcessingException cause) {
     super(cause);
+  }
+
+  /**
+   * Swallowed {@code ProcessingException}; is never <code>null</code>.
+   */
+  @Override
+  public synchronized ProcessingException getCause() {
+    return (ProcessingException) super.getCause();
   }
 }

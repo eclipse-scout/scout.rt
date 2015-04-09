@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
-import org.eclipse.scout.rt.testing.platform.runner.statement.UnwrapProcessingRuntimeExceptionStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowExceptionHandlerCauseStatement;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.notification.RunNotifier;
@@ -241,6 +241,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement possiblyExpectingExceptions(FrameworkMethod method, Object test, Statement next) {
-    return super.possiblyExpectingExceptions(method, test, new UnwrapProcessingRuntimeExceptionStatement(next));
+    // install statement to re-throw exceptions caught by JUnitExceptionHandler.
+    return super.possiblyExpectingExceptions(method, test, new ThrowExceptionHandlerCauseStatement(next));
   }
 }

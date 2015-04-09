@@ -10,17 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.junit.runners.model.Statement;
 
 /**
- * Statement to unpack {@link ProcessingRuntimeException}s into {@link ProcessingException}.
+ * Statement to re-throw a potential {@link ExceptionHandlerException}'s cause. That is an exception handled by the
+ * {@code IExceptionHandler} installed in JUnit tests.
+ *
+ * @see ExceptionHandlerException
+ * @see {@code IExceptionHandler} used in JUnit tests
  */
-public class UnwrapProcessingRuntimeExceptionStatement extends Statement {
+public class ThrowExceptionHandlerCauseStatement extends Statement {
 
   private final Statement m_delegate;
 
-  public UnwrapProcessingRuntimeExceptionStatement(final Statement delegate) {
+  public ThrowExceptionHandlerCauseStatement(final Statement delegate) {
     m_delegate = delegate;
   }
 
@@ -29,7 +32,7 @@ public class UnwrapProcessingRuntimeExceptionStatement extends Statement {
     try {
       m_delegate.evaluate();
     }
-    catch (final ProcessingRuntimeException e) {
+    catch (final ExceptionHandlerException e) {
       throw e.getCause();
     }
   }
