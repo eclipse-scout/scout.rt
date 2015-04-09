@@ -22,6 +22,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -69,13 +70,24 @@ public class ExceptionTranslator {
    * current user's identity and the current executing job to the exception's context message.
    */
   protected ProcessingException intercept(final ProcessingException pe) {
+    final IProcessingStatus status = pe.getStatus();
+    if (status == null) {
+      return pe;
+    }
+
     // Add the current user to the context message.
-    pe.addContextMessage("identity=%s", getCurrentIdentity());
+    final String user = "user=" + getCurrentUserIdentity();
+    if (!status.getContextMessages().contains(user)) {
+      pe.addContextMessage(user);
+    }
 
     // Add the current job to the context message.
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
     if (currentFuture != null && !JobInput.N_A.equals(currentFuture.getJobInput().identifier())) {
-      pe.addContextMessage("job=%s", currentFuture.getJobInput().identifier());
+      final String job = "job=" + currentFuture.getJobInput().identifier();
+      if (!status.getContextMessages().contains(job)) {
+        pe.addContextMessage(job);
+      }
     }
 
     return pe;
@@ -86,7 +98,7 @@ public class ExceptionTranslator {
    *         Principal is associated with that Subject. Multiple Principals are separated by comma.
    */
   @Internal
-  protected String getCurrentIdentity() {
+  protected String getCurrentUserIdentity() {
     Subject subject = null;
     try {
       subject = Subject.getSubject(AccessController.getContext());

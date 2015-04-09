@@ -127,7 +127,7 @@ public class ExceptionTranslatorTest {
         return exceptionTranslator.translate(new ProcessingException());
       }
     });
-    assertEquals(CollectionUtility.hashSet("identity=anonymous"), new HashSet<>(pe.getStatus().getContextMessages()));
+    assertEquals(CollectionUtility.hashSet("user=anonymous"), new HashSet<>(pe.getStatus().getContextMessages()));
 
     // test context message with 'anonymous job' and 'no subject'
     IFuture future = mock(IFuture.class);
@@ -140,7 +140,7 @@ public class ExceptionTranslatorTest {
         return exceptionTranslator.translate(new ProcessingException());
       }
     });
-    assertEquals(CollectionUtility.hashSet("identity=anonymous"), new HashSet<>(pe.getStatus().getContextMessages()));
+    assertEquals(CollectionUtility.hashSet("user=anonymous"), new HashSet<>(pe.getStatus().getContextMessages()));
 
     // test context message with 'job' and 'no subject'
     future = mock(IFuture.class);
@@ -153,7 +153,7 @@ public class ExceptionTranslatorTest {
         return exceptionTranslator.translate(new ProcessingException());
       }
     });
-    assertEquals(CollectionUtility.hashSet("job=do-something", "identity=anonymous"), new HashSet<>(pe.getStatus().getContextMessages()));
+    assertEquals(CollectionUtility.hashSet("job=do-something", "user=anonymous"), new HashSet<>(pe.getStatus().getContextMessages()));
 
     // test context message with 'job' and 'subject'
     future = mock(IFuture.class);
@@ -170,6 +170,55 @@ public class ExceptionTranslatorTest {
         return exceptionTranslator.translate(new ProcessingException());
       }
     });
-    assertEquals(CollectionUtility.hashSet("job=7:do-something", "identity=anna, john"), new HashSet<>(pe.getStatus().getContextMessages()));
+    assertEquals(CollectionUtility.hashSet("job=7:do-something", "user=anna, john"), new HashSet<>(pe.getStatus().getContextMessages()));
+  }
+
+  @Test
+  public void testJobContextMessageWithSameJob() {
+    final ExceptionTranslator exceptionTranslator = new ExceptionTranslator();
+
+    // test context message that already contains job
+    IFuture future = mock(IFuture.class);
+    IFuture.CURRENT.set(future);
+    Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal("anna"));
+
+    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).id("7").name("do-something"));
+    ProcessingException actualException = Subject.doAs(subject, new PrivilegedAction<ProcessingException>() {
+
+      @Override
+      public ProcessingException run() {
+        ProcessingException cause = new ProcessingException();
+        cause.addContextMessage("user=anna");
+        return exceptionTranslator.translate(cause);
+      }
+    });
+
+    assertEquals(2, actualException.getStatus().getContextMessages().size()); // not 3 entries
+    assertEquals(CollectionUtility.hashSet("job=7:do-something", "user=anna"), new HashSet<>(actualException.getStatus().getContextMessages()));
+  }
+
+  @Test
+  public void testJobContextMessageWithSameUser() {
+    final ExceptionTranslator exceptionTranslator = new ExceptionTranslator();
+
+    // test context message that already contains job
+    IFuture future = mock(IFuture.class);
+    IFuture.CURRENT.set(future);
+    Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal("anna"));
+
+    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).id("7").name("do-something"));
+    ProcessingException actualException = Subject.doAs(subject, new PrivilegedAction<ProcessingException>() {
+
+      @Override
+      public ProcessingException run() {
+        ProcessingException cause = new ProcessingException();
+        cause.addContextMessage("job=7:do-something");
+        return exceptionTranslator.translate(cause);
+      }
+    });
+    assertEquals(2, actualException.getStatus().getContextMessages().size()); // not 3 entries
+    assertEquals(CollectionUtility.hashSet("job=7:do-something", "user=anna"), new HashSet<>(actualException.getStatus().getContextMessages()));
   }
 }
