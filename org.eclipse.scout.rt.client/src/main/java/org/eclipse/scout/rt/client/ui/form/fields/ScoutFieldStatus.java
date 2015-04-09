@@ -53,6 +53,8 @@ public class ScoutFieldStatus extends Status implements IFieldStatus {
     }
   }
 
+  // FIXME AWE: (post-swing) delete this method after Swing has been removed (probably also m_iconId,
+  // since the icon ID can be derived from the severity property).
   public static String getIconIdFromSeverity(int severity) {
     if (severity >= IStatus.ERROR) {
       return AbstractIcons.StatusError;
