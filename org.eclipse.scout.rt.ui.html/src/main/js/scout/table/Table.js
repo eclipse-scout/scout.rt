@@ -441,7 +441,8 @@ scout.Table.prototype._drawData = function(startRow) {
  * are expected to be linked with the corresponding 'rows' (row.$row and $row.data('row')).
  */
 scout.Table.prototype._installRows = function($rows) {
-  var that = this;
+  var $selectedRows,
+    that = this;
 
   // Attach listeners
   $rows.each(function() {
@@ -454,7 +455,8 @@ scout.Table.prototype._installRows = function($rows) {
 
   // update info and scrollbar
   this._triggerRowsDrawn($rows);
-  this.selectionHandler.dataDrawn();
+  $selectedRows = this.selectionHandler.dataDrawn();
+  this._triggerRowsSelected($selectedRows);
   this.updateScrollbar();
 
   // update grouping if data was grouped
@@ -601,10 +603,8 @@ scout.Table.prototype._renderMenus = function() {
   this.menuBar.updateItems(menuItems);
 };
 
-scout.Table.prototype.onRowsSelected = function($selectedRows) {
+scout.Table.prototype.notifyRowsSelected = function($selectedRows, whileSelecting) {
   var rowIds = [];
-  this.triggerRowsSelected($selectedRows);
-
   if ($selectedRows) {
     $selectedRows.each(function() {
       rowIds.push($(this).attr('id'));
@@ -613,12 +613,14 @@ scout.Table.prototype.onRowsSelected = function($selectedRows) {
 
   if (!scout.arrays.equalsIgnoreOrder(rowIds, this.selectedRowIds)) {
     this.selectedRowIds = rowIds;
-    if (!this.session.processingEvents) {
-      this.session.send(this.id, 'rowsSelected', {
-        rowIds: rowIds
-      });
-    }
+    this._sendRowsPending = true;
   }
+  // Don't send event if user is still selecting (using mouse move selection)
+  if (!whileSelecting && this._sendRowsPending) {
+    this.sendRowsSelected(rowIds);
+    this._sendRowsPending = false;
+  }
+  this._triggerRowsSelected($selectedRows);
   this._renderMenus();
 };
 
@@ -678,6 +680,12 @@ scout.Table.prototype.sendRowsChecked = function(rows) {
   }
 
   this.session.send(this.id, 'rowsChecked', data);
+};
+
+scout.Table.prototype.sendRowsSelected = function(rowIds) {
+  this.session.send(this.id, 'rowsSelected', {
+    rowIds: rowIds
+  });
 };
 
 scout.Table.prototype.sendRowAction = function($row, columnId) {
@@ -984,10 +992,12 @@ scout.Table.prototype.colorData = function(column, mode) {
 };
 
 scout.Table.prototype._onRowsSelected = function(rowIds) {
+  var $selectedRows;
   this.selectedRowIds = rowIds;
 
   if (this.rendered) {
-    this.selectionHandler.drawSelection();
+    $selectedRows = this.selectionHandler.renderSelection();
+    this._triggerRowsSelected($selectedRows);
   }
 };
 
@@ -1128,15 +1138,15 @@ scout.Table.prototype.rowById = function(id) {
 };
 
 scout.Table.prototype.selectRowsByIds = function(rowIds) {
+  var $selectedRows;
   if (!scout.arrays.equalsIgnoreOrder(rowIds, this.selectedRowIds)) {
     this.selectedRowIds = rowIds;
-
-    this.session.send(this.id, 'rowsSelected', {
-      rowIds: rowIds
-    });
+    // FIXME CGU send delayed in case of key navigation
+    this.sendRowsSelected(rowIds);
   }
 
-  this.selectionHandler.drawSelection();
+  $selectedRows = this.selectionHandler.renderSelection();
+  this._triggerRowsSelected($selectedRows);
 };
 
 scout.Table.prototype.$selectedRows = function() {
@@ -1514,8 +1524,7 @@ scout.Table.prototype._triggerRowsDrawn = function($rows) {
   this.events.trigger(type, event);
 };
 
-// FIXME CGU: bei Table/TableSelectionHandler dafür sorgen, dass die selectedRowIds bereits gesetzt sind
-scout.Table.prototype.triggerRowsSelected = function($rows) {
+scout.Table.prototype._triggerRowsSelected = function($rows) {
   var rowCount = this.rows.length,
     allSelected = false;
 

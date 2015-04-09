@@ -53,6 +53,7 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event, $row) {
       var $row = $(event.delegateTarget);
       toIndex = this._$allRows.index($row);
       this._selectRange(fromIndex, toIndex, select);
+      this.table.notifyRowsSelected(this._$selectedRows, true);
     }.bind(this));
 
     // This additionally window listener is necessary to track the clicks outside of a table row.
@@ -76,8 +77,7 @@ scout.TableSelectionHandler.prototype._selectRange = function(fromIndex, toIndex
 
   this._$selectedRows = this.table.$selectedRows();
   this._clearSelectionBorder(this._$selectedRows);
-  this._drawSelectionBorder(this._$selectedRows);
-  this.table.triggerRowsSelected(this._$selectedRows);
+  this._renderSelectionBorder(this._$selectedRows);
 };
 
 scout.TableSelectionHandler.prototype.onMouseUp = function(event) {
@@ -86,7 +86,7 @@ scout.TableSelectionHandler.prototype.onMouseUp = function(event) {
     return;
   }
   this._mouseDown = false;
-  this.table.onRowsSelected(this._$selectedRows);
+  this.table.notifyRowsSelected(this._$selectedRows);
 
   // TODO BSH Table Selection | This is way too inefficient for many rows!
   this._$allRows.off('mousemove.selectionHandler');
@@ -94,7 +94,7 @@ scout.TableSelectionHandler.prototype.onMouseUp = function(event) {
   this._$selectedRows = null;
 };
 
-scout.TableSelectionHandler.prototype.drawSelection = function() {
+scout.TableSelectionHandler.prototype.renderSelection = function() {
   this.clearSelection(true);
   var rowIds = this.table.selectedRowIds;
   var selectedRows = [];
@@ -106,9 +106,8 @@ scout.TableSelectionHandler.prototype.drawSelection = function() {
   }
 
   var $selectedRows = $(selectedRows);
-  this._drawSelectionBorder($selectedRows);
-
-  this.table.onRowsSelected($selectedRows);
+  this._renderSelectionBorder($selectedRows);
+  return $selectedRows;
 };
 
 scout.TableSelectionHandler.prototype.clearSelection = function(dontFire) {
@@ -117,22 +116,25 @@ scout.TableSelectionHandler.prototype.clearSelection = function(dontFire) {
   this._clearSelectionBorder($selectedRows);
 
   if (!dontFire) {
-    this.table.onRowsSelected();
+    this.table.notifyRowsSelected();
   }
 };
 
+/**
+ * Just renders selection border because the css class "selected" was already set by Table._buildRowDiv
+ */
 scout.TableSelectionHandler.prototype.dataDrawn = function() {
   var $selectedRows = this.table.$selectedRows();
 
   this._clearSelectionBorder($selectedRows);
-  this._drawSelectionBorder($selectedRows);
-  this.table.onRowsSelected($selectedRows);
+  this._renderSelectionBorder($selectedRows);
+  return $selectedRows;
 };
 
 /**
  * Adds the css classes for the selection border based on the selected rows.
  */
-scout.TableSelectionHandler.prototype._drawSelectionBorder = function($selectedRows) {
+scout.TableSelectionHandler.prototype._renderSelectionBorder = function($selectedRows) {
   var that = this;
   $selectedRows.each(function() {
     var $row = $(this);
@@ -168,8 +170,8 @@ scout.TableSelectionHandler.prototype.selectAll = function() {
   var $rows = this.table.$rows();
   $rows.select(true);
 
-  this._drawSelectionBorder($rows);
-  this.table.onRowsSelected($rows);
+  this._renderSelectionBorder($rows);
+  this.table.notifyRowsSelected($rows);
 };
 
 scout.TableSelectionHandler.prototype.toggleSelection = function() {
