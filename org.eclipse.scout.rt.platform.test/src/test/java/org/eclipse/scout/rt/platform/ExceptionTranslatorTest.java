@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,9 +47,31 @@ public class ExceptionTranslatorTest {
 
     // test 'normal cases'
     assertSame(pe1, exceptionTranslator.translate(pe1));
+    assertSame(pe1, exceptionTranslator.translate(pe1));
     assertSame(pe1, exceptionTranslator.translate(reWithPe));
     assertSame(e1, exceptionTranslator.translate(e1).getCause());
     assertSame(re1, exceptionTranslator.translate(re1).getCause());
+
+    // test 'Error' (1)
+    Error error = new Error();
+    try {
+      exceptionTranslator.translate(error);
+      fail("Error's should not be translated but re-throw instead");
+    }
+    catch (Throwable t) {
+      assertSame(error, t);
+    }
+
+    // test 'Error' (2)
+    AssertionError assertError = new AssertionError();
+    try {
+      exceptionTranslator.translate(assertError);
+      fail("Error's should not be translated but re-throw instead");
+    }
+    catch (Throwable t) {
+      assertSame(assertError, t);
+
+    }
 
     // test 'UndeclaredThrowableException'
     UndeclaredThrowableException ute1 = new UndeclaredThrowableException(null);

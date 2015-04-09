@@ -27,17 +27,21 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
- * Translator for exceptions to {@link ProcessingException}s.
+ * Translator for exceptions into {@link ProcessingException}s.
  */
 @ApplicationScoped
 @Priority(-1)
 public class ExceptionTranslator {
 
   /**
-   * Translates the given {@link Throwable} to a {@link ProcessingException}.
+   * Translates the given {@link Throwable} into a {@link ProcessingException}. Solely, an {@link Error} is not
+   * translated but re-throw instead. That is because an Error indicates a serious problem due to a abnormal condition.
    */
   public ProcessingException translate(final Throwable t) {
-    if (t instanceof UndeclaredThrowableException && t.getCause() != null) {
+    if (t instanceof Error) {
+      throw (Error) t;
+    }
+    else if (t instanceof UndeclaredThrowableException && t.getCause() != null) {
       return translate(t.getCause());
     }
     else if (t instanceof InvocationTargetException && t.getCause() != null) {
