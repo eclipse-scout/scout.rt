@@ -32,16 +32,16 @@ public class HtmlBinds extends AbstractBinds {
   /**
    * Replace bind names with encoded values.
    */
-  public String applyBindParameters(IHtmlElement... htmls) {
+  public String applyBindParameters(IHtmlContent... htmls) {
     return applyBindParameters(Arrays.asList(htmls));
   }
 
   /**
    * Replace bind names with encoded values.
    */
-  public String applyBindParameters(List<? extends IHtmlElement> htmls) {
+  public String applyBindParameters(List<? extends IHtmlContent> htmls) {
     StringBuilder sb = new StringBuilder();
-    for (IHtmlElement html : htmls) {
+    for (IHtmlContent html : htmls) {
       sb.append(applyBindParameters(html));
     }
     return sb.toString();
@@ -50,7 +50,7 @@ public class HtmlBinds extends AbstractBinds {
   /**
    * Replace bind names with encoded values. Loggs an error, if no bind is found.
    */
-  private String applyBindParameters(IHtmlElement html) {
+  private String applyBindParameters(IHtmlContent html) {
     return applyBindParameters(html.toString());
   }
 

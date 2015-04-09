@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.commons.html.HtmlBinds;
+import org.eclipse.scout.commons.html.IHtmlContent;
 import org.eclipse.scout.commons.html.IHtmlElement;
 import org.eclipse.scout.commons.html.IHtmlTable;
 import org.junit.Test;
@@ -115,7 +116,7 @@ public class HtmlBindsTest {
     HtmlBinds binds = new HtmlBinds();
     final IHtmlTable table = HTML.table(
         row(
-            cell(binds.put(BIND_TEXT)))
+        cell(binds.put(BIND_TEXT)))
         ).cellspacing(1).cellpadding(2);
 
     final String htmlString = binds.applyBindParameters(table);
@@ -139,5 +140,12 @@ public class HtmlBindsTest {
 
   private void assertEncodedText(String tagName, String actualText) {
     assertEquals("<" + tagName + ">" + ENCODED_BIND_TEXT + "</" + tagName + ">", actualText);
+  }
+
+  @Test
+  public void testFragment() {
+    HtmlBinds binds = new HtmlBinds();
+    final IHtmlContent fragment = HTML.fragment(HTML.div(binds.put(BIND_TEXT)), HTML.div(binds.put(BIND_TEXT)));
+    assertEquals("<div>" + ENCODED_BIND_TEXT + "</div>" + "<div>" + ENCODED_BIND_TEXT + "</div>", binds.applyBindParameters(fragment));
   }
 }

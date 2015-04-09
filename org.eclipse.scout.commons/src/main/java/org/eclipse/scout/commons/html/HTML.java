@@ -13,6 +13,7 @@ package org.eclipse.scout.commons.html;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.commons.html.internal.EmptyNodeBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlImageBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlLinkBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlNodeBuilder;
@@ -219,6 +220,13 @@ public final class HTML {
    */
   public static IHtmlElement appLink(CharSequence path, IHtmlContent text) {
     return span(text).appLink(path);
+  }
+
+  /**
+   * Creates HTML content from multiple elements. e.g. <b>Bold Text</b> Text <b> More bold text </b>
+   */
+  public static IHtmlContent fragment(IHtmlElement... elements) {
+    return new EmptyNodeBuilder(elements);
   }
 
 }
