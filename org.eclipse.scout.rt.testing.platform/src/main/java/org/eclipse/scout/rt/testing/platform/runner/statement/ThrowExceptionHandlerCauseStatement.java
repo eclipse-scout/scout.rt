@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.testing.platform.runner.statement;
 import org.junit.runners.model.Statement;
 
 /**
- * Statement to re-throw a potential {@link ExceptionHandlerException}'s cause. That is an exception handled by the
- * {@code IExceptionHandler} installed in JUnit tests.
+ * Statement to re-throw a potential {@link ExceptionHandlerError}'s cause which represents a
+ * {@code ProcessingException} handled by the {@code IExceptionHandler} installed in JUnit tests.
  *
- * @see ExceptionHandlerException
+ * @see ExceptionHandlerError
  * @see {@code IExceptionHandler} used in JUnit tests
  */
 public class ThrowExceptionHandlerCauseStatement extends Statement {
@@ -32,7 +32,7 @@ public class ThrowExceptionHandlerCauseStatement extends Statement {
     try {
       m_delegate.evaluate();
     }
-    catch (final ExceptionHandlerException e) {
+    catch (final ExceptionHandlerError e) {
       throw e.getCause();
     }
   }

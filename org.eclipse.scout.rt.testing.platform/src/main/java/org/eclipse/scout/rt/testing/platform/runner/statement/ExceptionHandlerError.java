@@ -11,16 +11,20 @@
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.ExceptionTranslator;
 
 /**
- * {@code RuntimeException} thrown by {@code IExceptionHandler} installed in JUnit tests to not silently swallow
- * exceptions. This exception's cause is the swallowed {@code ProcessingException}, which is never <code>null</code>.
+ * {@code Error} thrown by {@code IExceptionHandler} installed in JUnit tests to not silently swallow
+ * exceptions. This erros's cause is the swallowed {@code ProcessingException}, which is never <code>null</code>.
+ * <p/>
+ * This class is of type {@code Error} to not being translated by {@link ExceptionTranslator} (similar to
+ * AssertionError)
  */
-public class ExceptionHandlerException extends RuntimeException {
+public class ExceptionHandlerError extends Error {
 
   private static final long serialVersionUID = 1L;
 
-  public ExceptionHandlerException(final ProcessingException cause) {
+  public ExceptionHandlerError(final ProcessingException cause) {
     super(cause);
   }
 

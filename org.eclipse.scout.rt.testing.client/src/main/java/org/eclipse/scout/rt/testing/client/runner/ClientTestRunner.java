@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.testing.client.runner.statement.ClientRunContextStat
 import org.eclipse.scout.rt.testing.client.runner.statement.RunInModelJobStatement;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.platform.runner.statement.ExceptionHandlerException;
+import org.eclipse.scout.rt.testing.platform.runner.statement.ExceptionHandlerError;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowExceptionHandlerCauseStatement;
 import org.eclipse.scout.service.AbstractService;
@@ -95,7 +95,7 @@ public class ClientTestRunner extends PlatformTestRunner {
     @Override
     public void handleException(final ProcessingException pe) {
       if (!pe.isConsumed()) {
-        throw new ExceptionHandlerException(pe);
+        throw new ExceptionHandlerError(pe);
       }
     }
   }

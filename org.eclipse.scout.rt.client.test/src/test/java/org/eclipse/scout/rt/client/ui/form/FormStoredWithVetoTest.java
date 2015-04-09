@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.platform.runner.statement.ExceptionHandlerException;
+import org.eclipse.scout.rt.testing.platform.runner.statement.ExceptionHandlerError;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -51,7 +51,7 @@ public class FormStoredWithVetoTest {
       f.clickSave();
       fail("VetoException excepted to be handled in ExceptionHandler");
     }
-    catch (ExceptionHandlerException e) {
+    catch (ExceptionHandlerError e) {
       assertVetoException(e.getCause());
       f.assertStoreInterrupted();
     }
@@ -69,7 +69,7 @@ public class FormStoredWithVetoTest {
       f.clickOk();
       fail("VetoException excepted to be handled in ExceptionHandler");
     }
-    catch (ExceptionHandlerException e) {
+    catch (ExceptionHandlerError e) {
       assertVetoException(e.getCause());
       f.assertStoreInterrupted();
     }
@@ -87,7 +87,7 @@ public class FormStoredWithVetoTest {
       f.clickSave();
       fail("VetoException excepted to be handled in ExceptionHandler");
     }
-    catch (ExceptionHandlerException e) {
+    catch (ExceptionHandlerError e) {
       assertVetoException(e.getCause());
       f.assertStoreInterrupted();
     }
@@ -105,7 +105,7 @@ public class FormStoredWithVetoTest {
       f.clickOk();
       fail("VetoException excepted to be handled in ExceptionHandler");
     }
-    catch (ExceptionHandlerException e) {
+    catch (ExceptionHandlerError e) {
       assertVetoException(e.getCause());
       f.assertStoreInterrupted();
     }
@@ -124,7 +124,7 @@ public class FormStoredWithVetoTest {
       f.clickSave();
       fail("VetoException excepted to be handled in ExceptionHandler");
     }
-    catch (ExceptionHandlerException e) {
+    catch (ExceptionHandlerError e) {
       assertVetoException(e.getCause());
       f.assertStoreInterrupted();
     }
@@ -143,7 +143,7 @@ public class FormStoredWithVetoTest {
       f.clickOk();
       fail("VetoException excepted to be handled in ExceptionHandler");
     }
-    catch (ExceptionHandlerException e) {
+    catch (ExceptionHandlerError e) {
       assertVetoException(e.getCause());
       f.assertStoreInterrupted();
     }
