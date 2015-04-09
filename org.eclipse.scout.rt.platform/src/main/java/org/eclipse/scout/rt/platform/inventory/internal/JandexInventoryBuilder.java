@@ -32,6 +32,7 @@ public class JandexInventoryBuilder {
   private final boolean m_rebuildFolderIndexes;
 
   public JandexInventoryBuilder() {
+    // TODO IMO ist das true false nicht falsch herum???? (ask aho)
     m_rebuildFolderIndexes = ConfigIniUtility.getProperty(SYSTEM_PROPERTY_JANDEX_REBUILD, "true").equals("false");
   }
 
