@@ -64,6 +64,21 @@ public class HtmlBindsTest {
     assertEncodedText("span", binds.applyBindParameters(HTML.span(binds.put(BIND_TEXT))));
   }
 
+  @Test
+  public void testHtmlNoBinds() {
+    assertEncodedText("h1", HTML.h1(BIND_TEXT).toEncodedHtml());
+    assertEncodedText("h2", HTML.h2(BIND_TEXT).toEncodedHtml());
+    assertEncodedText("h3", HTML.h3(BIND_TEXT).toEncodedHtml());
+    assertEncodedText("h4", HTML.h4(BIND_TEXT).toEncodedHtml());
+    assertEncodedText("h5", HTML.h5(BIND_TEXT).toEncodedHtml());
+    assertEncodedText("h6", HTML.h6(BIND_TEXT).toEncodedHtml());
+    assertEncodedText("b", bold(BIND_TEXT).toEncodedHtml());
+    assertEncodedText("td", cell(BIND_TEXT).toEncodedHtml());
+    assertEncodedText("div", div(BIND_TEXT).toEncodedHtml());
+    assertEncodedText("p", HTML.p(BIND_TEXT).toEncodedHtml());
+    assertEncodedText("span", HTML.span(BIND_TEXT).toEncodedHtml());
+  }
+
   /**
    * Tests a link with URL and encoded text.
    */
@@ -73,6 +88,24 @@ public class HtmlBindsTest {
     IHtmlElement link = HTML.link(binds.put(TEST_URL), binds.put(BIND_TEXT));
     String html = binds.applyBindParameters(link);
     assertEquals("<a href=\"" + TEST_URL + "\">" + encode(BIND_TEXT) + "</a>", html);
+  }
+
+  /**
+   * Tests a link with URL and encoded text.
+   */
+  @Test
+  public void testLinkNoBinds() {
+    String html = HTML.link(TEST_URL, BIND_TEXT).toEncodedHtml();
+    assertEquals("<a href=\"" + TEST_URL + "\">" + encode(BIND_TEXT) + "</a>", html);
+  }
+
+  /**
+   * Tests an image encoded source.
+   */
+  @Test
+  public void testImageNoBinds() {
+    String html = HTML.img("logo.png").toEncodedHtml();
+    assertEquals("<img src=\"logo.png\">", html);
   }
 
   /**
@@ -92,6 +125,8 @@ public class HtmlBindsTest {
     HtmlBinds binds = new HtmlBinds();
     IHtmlElement br = HTML.br();
     assertEquals("<br>", binds.applyBindParameters(br));
+    assertEquals("<br>", br.toEncodedHtml());
+
   }
 
   /**
@@ -104,6 +139,15 @@ public class HtmlBindsTest {
     assertEquals("<span class=\"hyperlink\" data-hyperlink=\"domain=123&text=456\">Link Text</span>", binds.applyBindParameters(html));
   }
 
+  /**
+   * Test for {@link IHtmlElement#appLink(CharSequence)}
+   */
+  @Test
+  public void testAppLinkNoBinds() {
+    final IHtmlElement html = HTML.appLink("domain=123&text=456", "Link Text&");
+    assertEquals("<span class=\"hyperlink\" data-hyperlink=\"domain=123&text=456\">Link Text&amp;</span>", html.toEncodedHtml());
+  }
+
   @Test
   public void testTable() {
     HtmlBinds binds = new HtmlBinds();
@@ -112,16 +156,32 @@ public class HtmlBindsTest {
   }
 
   @Test
+  public void testTableNoBinds() {
+    String html = HTML.table(row(cell(BIND_TEXT))).toEncodedHtml();
+    assertEquals("<table><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", html);
+  }
+
+  @Test
   public void testTableAttributes() {
     HtmlBinds binds = new HtmlBinds();
     final IHtmlTable table = HTML.table(
         row(
-        cell(binds.put(BIND_TEXT)))
+            cell(binds.put(BIND_TEXT)))
         ).cellspacing(1).cellpadding(2);
 
     final String htmlString = binds.applyBindParameters(table);
 
     assertEquals("<table cellspacing=\"1\" cellpadding=\"2\"><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", htmlString);
+  }
+
+  @Test
+  public void testTableAttributesNoBinds() {
+    final IHtmlTable table = HTML.table(
+        row(
+            cell(BIND_TEXT))
+        ).cellspacing(1).cellpadding(2);
+
+    assertEquals("<table cellspacing=\"1\" cellpadding=\"2\"><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", table.toEncodedHtml());
   }
 
   @Test
@@ -132,6 +192,16 @@ public class HtmlBindsTest {
         link(binds.put(TEST_URL), binds.put(BIND_TEXT))
         );
     assertEquals("<b>Test Last Name&amp;<a href=\"http://SCOUTBLABLA.com\">Test Last Name&amp;</a></b>", binds.applyBindParameters(html));
+  }
+
+  @Test
+  public void testLinkWithBoldNoBinds() throws Exception {
+    final IHtmlElement html = HTML.bold(
+        BIND_TEXT,
+        link(TEST_URL, BIND_TEXT)
+        );
+    assertEquals("<b>Test Last Name&amp;<a href=\"http://SCOUTBLABLA.com\">Test Last Name&amp;</a></b>", html.toEncodedHtml());
+
   }
 
   private String encode(String text) {

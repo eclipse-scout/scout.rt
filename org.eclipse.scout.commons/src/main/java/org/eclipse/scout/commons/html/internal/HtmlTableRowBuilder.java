@@ -12,6 +12,7 @@ package org.eclipse.scout.commons.html.internal;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.html.IHtmlTableCell;
 import org.eclipse.scout.commons.html.IHtmlTableRow;
 
 /**
@@ -19,7 +20,7 @@ import org.eclipse.scout.commons.html.IHtmlTableRow;
  */
 public class HtmlTableRowBuilder extends HtmlNodeBuilder implements IHtmlTableRow {
 
-  public HtmlTableRowBuilder(List<? extends CharSequence> text) {
+  public HtmlTableRowBuilder(List<? extends IHtmlTableCell> text) {
     super("tr", text);
   }
 

@@ -13,6 +13,7 @@ package org.eclipse.scout.commons.html.internal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.html.HtmlBind;
 import org.eclipse.scout.commons.html.IHtmlContent;
@@ -96,6 +97,14 @@ public abstract class AbstractBinds {
    */
   protected String getPrefix() {
     return m_prefix;
+  }
+
+  protected Map<String, Object> getBindMap() {
+    return CollectionUtility.copyMap(m_bindMap);
+  }
+
+  protected void putAll(AbstractBinds binds) {
+    m_bindMap.putAll(binds.getBindMap());
   }
 
 }

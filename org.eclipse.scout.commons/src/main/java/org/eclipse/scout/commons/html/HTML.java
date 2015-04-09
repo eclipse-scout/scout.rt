@@ -45,7 +45,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement bold(IHtmlContent... text) {
+  public static IHtmlElement bold(CharSequence... text) {
     return new HtmlNodeBuilder("b", text);
   }
 
@@ -55,7 +55,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement p(IHtmlContent text) {
+  public static IHtmlElement p(CharSequence text) {
     return new HtmlNodeBuilder("p", text);
   }
 
@@ -72,7 +72,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement h1(IHtmlContent text) {
+  public static IHtmlElement h1(CharSequence text) {
     return new HtmlNodeBuilder("h1", text);
   }
 
@@ -82,7 +82,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement h2(IHtmlContent text) {
+  public static IHtmlElement h2(CharSequence text) {
     return new HtmlNodeBuilder("h2", text);
   }
 
@@ -92,7 +92,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement h3(IHtmlContent text) {
+  public static IHtmlElement h3(CharSequence text) {
     return new HtmlNodeBuilder("h3", text);
   }
 
@@ -102,7 +102,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement h4(IHtmlContent text) {
+  public static IHtmlElement h4(CharSequence text) {
     return new HtmlNodeBuilder("h4", text);
   }
 
@@ -112,7 +112,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement h5(IHtmlContent text) {
+  public static IHtmlElement h5(CharSequence text) {
     return new HtmlNodeBuilder("h5", text);
   }
 
@@ -122,7 +122,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement h6(IHtmlContent text) {
+  public static IHtmlElement h6(CharSequence text) {
     return new HtmlNodeBuilder("h6", text);
   }
 
@@ -132,8 +132,8 @@ public final class HTML {
    * @param content
    *          content as bind
    */
-  public static IHtmlElement div(IHtmlContent... content) {
-    return div(Arrays.asList(content));
+  public static IHtmlElement div(CharSequence... content) {
+    return new HtmlNodeBuilder("div", Arrays.asList(content));
   }
 
   /**
@@ -142,7 +142,7 @@ public final class HTML {
    * @param content
    *          content as bind
    */
-  public static IHtmlElement div(List<IHtmlContent> contents) {
+  public static IHtmlElement div(List<CharSequence> contents) {
     return new HtmlNodeBuilder("div", contents);
   }
 
@@ -152,7 +152,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement span(IHtmlContent text) {
+  public static IHtmlElement span(CharSequence text) {
     return new HtmlNodeBuilder("span", text);
   }
 
@@ -182,7 +182,7 @@ public final class HTML {
    * @param text
    *          text with binds
    */
-  public static IHtmlTableCell cell(IHtmlContent... text) {
+  public static IHtmlTableCell cell(CharSequence... text) {
     return new HtmlTableDataBuilder(Arrays.asList(text));
   }
 
@@ -218,7 +218,7 @@ public final class HTML {
    * @param text
    *          the link text
    */
-  public static IHtmlElement appLink(CharSequence path, IHtmlContent text) {
+  public static IHtmlElement appLink(CharSequence path, CharSequence text) {
     return span(text).appLink(path);
   }
 

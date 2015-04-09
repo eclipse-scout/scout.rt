@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.html.HtmlBinds;
+import org.eclipse.scout.commons.html.IHtmlContent;
 import org.eclipse.scout.commons.html.IHtmlElement;
 
 /**
@@ -24,6 +26,7 @@ public class HtmlNodeBuilder extends AbstractExpressionBuilder implements IHtmlE
   private final List<? extends CharSequence> m_texts;
   private final List<String> m_attributes = new ArrayList<>();
   private String m_tag;
+  private final HtmlBinds m_binds = new HtmlBinds();
 
   protected String getTag() {
     return m_tag;
@@ -39,7 +42,20 @@ public class HtmlNodeBuilder extends AbstractExpressionBuilder implements IHtmlE
 
   public HtmlNodeBuilder(String tag, List<? extends CharSequence> texts) {
     m_tag = tag;
-    m_texts = texts;
+
+    ArrayList<IHtmlContent> bindTexts = new ArrayList<IHtmlContent>();
+    for (CharSequence text : texts) {
+      if (text instanceof IHtmlElement) {
+        m_binds.putAll(((IHtmlElement) text).getBinds());
+      }
+      if (text instanceof IHtmlContent) {
+        bindTexts.add((IHtmlContent) text);
+      }
+      else {
+        bindTexts.add(m_binds.put(text));
+      }
+    }
+    m_texts = bindTexts;
   }
 
   @Override
@@ -85,7 +101,7 @@ public class HtmlNodeBuilder extends AbstractExpressionBuilder implements IHtmlE
     m_attributes.add(name + "=\"" + value + "\"");
   }
 
-  /// GLOBAL ATTRIBUTES
+/// GLOBAL ATTRIBUTES
   @SuppressWarnings("unchecked")
   @Override
   public <T extends IHtmlElement> T style(CharSequence value) {
@@ -116,6 +132,16 @@ public class HtmlNodeBuilder extends AbstractExpressionBuilder implements IHtmlE
     cssClass("app-link");
     addAttribute("data-ref", ref);
     return (T) this;
+  }
+
+  @Override
+  public String toEncodedHtml() {
+    return m_binds.applyBindParameters(this);
+  }
+
+  @Override
+  public HtmlBinds getBinds() {
+    return m_binds;
   }
 
 }
