@@ -21,8 +21,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.json.JSONObject;
 
-// TODO AWE: [P2] make JsonFormField abstract (later), direktes instanzieren soll nicht mehr möglich sein
-public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObserver<T> {
+public abstract class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObserver<T> {
 
   public JsonFormField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);

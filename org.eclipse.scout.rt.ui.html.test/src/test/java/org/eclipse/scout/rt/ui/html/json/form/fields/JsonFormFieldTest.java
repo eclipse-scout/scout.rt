@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.json.JSONException;
@@ -26,7 +27,8 @@ public class JsonFormFieldTest extends BaseFormFieldTest {
   AbstractGroupBox m_model = new AbstractGroupBox() {
   };
 
-  JsonFormField m_formField = new JsonFormField<>(m_model, m_session, m_session.createUniqueIdFor(null), null);
+  JsonFormField m_formField = new JsonFormField<IFormField>(m_model, m_session, m_session.createUniqueIdFor(null), null) {
+  };
 
   @Before
   public void setUp() {

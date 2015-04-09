@@ -2,30 +2,26 @@ describe("AbstractSmartField", function() {
 
   var smartField = new scout.AbstractSmartField();
 
-  function create$Option() {
-    return $('<p>').text('FooBar');
-  }
-
   describe("_onKeyUp", function() {
 
-    it("doesn't call _openPopup() when TAB has been pressed", function() {
-      smartField._openPopup = function() {};
+    it("doesn't call _openProposal() when TAB has been pressed", function() {
+      smartField._openProposal = function(searchText, selectCurrentValue) {};
       var event = {
         which: scout.keys.TAB
       };
-      spyOn(smartField, '_openPopup');
+      spyOn(smartField, '_openProposal');
       smartField._onKeyUp(event);
-      expect(smartField._openPopup).not.toHaveBeenCalled();
+      expect(smartField._openProposal).not.toHaveBeenCalled();
     });
 
-    it("calls _openPopup() when a character key has been pressed", function() {
-      smartField._openPopup = function() { return true; };
+    it("calls _openProposal() when a character key has been pressed", function() {
+      smartField._openProposal = function(searchText, selectCurrentValue) {};
       var event = {
         which: scout.keys.A
       };
-      spyOn(smartField, '_openPopup').and.callThrough();
+      spyOn(smartField, '_openProposal').and.callThrough();
       smartField._onKeyUp(event);
-      expect(smartField._openPopup).toHaveBeenCalled();
+      expect(smartField._openProposal).toHaveBeenCalled();
     });
 
   });

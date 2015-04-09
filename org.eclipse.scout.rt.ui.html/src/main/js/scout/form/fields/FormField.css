@@ -15,14 +15,6 @@
     position: absolute;
   }
 
-  & > .field.not-implemented {
-    border: 1px dashed @border-color;
-    border-radius: @border-radius;
-    padding: 6px @text-field-padding;
-    color: @disabled-color;
-    .overflow-ellipsis;
-  }
-
   & > .mandatory-indicator {
     position: absolute;
     visibility: hidden;
@@ -79,4 +71,12 @@
       color: @error-color;
     }
   }
+}
+
+.not-implemented {
+  border: 1px dashed @border-color;
+  border-radius: @border-radius;
+  padding: 6px @text-field-padding;
+  color: @disabled-color;
+  .overflow-ellipsis;
 }

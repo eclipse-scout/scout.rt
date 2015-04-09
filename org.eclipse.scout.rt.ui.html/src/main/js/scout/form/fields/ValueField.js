@@ -1,5 +1,6 @@
 /**
  * ValueField assumes $field has a .val() method which returns the value of that field.
+ * @abstract
  */
 scout.ValueField = function() {
   scout.ValueField.parent.call(this);

@@ -40,17 +40,21 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.beanfield.IBeanField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
+import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
+import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
+import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.client.ui.form.fields.graphfield.IGraphField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
+import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
@@ -81,18 +85,21 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineViewButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonDateField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.browserfield.JsonBrowserField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.calendar.JsonCalendarField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.colorpickerfield.JsonColorField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.composer.JsonComposerField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.customfield.JsonBeanField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.filechooserfield.JsonFileChooserField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.graphfield.JsonGraphField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield.JsonHtmlField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.imagefield.JsonImageField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.labelfield.JsonLabelField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.listbox.JsonListBox;
+import org.eclipse.scout.rt.ui.html.json.form.fields.mailfield.JsonMailField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.numberfield.JsonNumberField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.placeholder.JsonPlaceholderField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.plannerfield.JsonPlannerField;
@@ -236,10 +243,21 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     if (model instanceof IGraphField) {
       return new JsonGraphField((IGraphField) model, session, id, parent);
     }
-
+    if (model instanceof IFileChooserField) {
+      return new JsonFileChooserField((IFileChooserField) model, session, id, parent);
+    }
+    if (model instanceof IColorField) {
+      return new JsonColorField((IColorField) model, session, id, parent);
+    }
+    if (model instanceof IMailField) {
+      return new JsonMailField((IMailField) model, session, id, parent);
+    }
+    if (model instanceof IBrowserField) {
+      return new JsonBrowserField((IBrowserField) model, session, id, parent);
+    }
     // Fallback for all other form fields (will generate a 'not implemented' placeholder). Note: insert more form fields _before_ this line!
     if (model instanceof IFormField) {
-      return new JsonFormField((IFormField) model, session, id, parent);
+      throw new IllegalArgumentException("JsonObjectFactory cannot produce a JsonAdapter instance for model class=" + model);
     }
 
     // --- other model objects ---

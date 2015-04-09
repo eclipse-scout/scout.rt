@@ -43,11 +43,32 @@ describe("NavigateDownButton", function() {
     expect(menu._isDetail()).toBe(false);
   });
 
-  it("_buttonEnabled is true when node is not a leaf", function() {
-    node.leaf = true;
-    expect(menu._buttonEnabled()).toBe(false);
-    node.leaf = false;
-    expect(menu._buttonEnabled()).toBe(true);
+  describe("_buttonEnabled", function() {
+
+    it("is disabled when node is a leaf", function() {
+      node.leaf = true; // node is a leaf
+      expect(menu._buttonEnabled()).toBe(false);
+    });
+
+    it("is enabled when node is not a leaf and we're currently displaying the detail", function() {
+      node.leaf = false;  // node is not a leaf
+      menu._isDetail = function() { // currently we're displaying the detail-form
+        return true;
+      };
+      expect(menu._buttonEnabled()).toBe(true);
+    });
+
+    it("is only enabled when detail-table has exactly one selected row", function() {
+      node.leaf = false; // node is not a leaf
+      menu._isDetail = function() { // currently we're not displaying the detail-form
+        return false;
+      };
+      node.detailTable = {selectedRowIds: []};
+      expect(menu._buttonEnabled()).toBe(false);
+
+      node.detailTable.selectedRowIds = [1];
+      expect(menu._buttonEnabled()).toBe(true);
+    });
   });
 
   it("_drill drills down to first selected row in the detail table", function() {

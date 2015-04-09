@@ -25,7 +25,7 @@ public class JsonFormToolButton<T extends IFormToolButton<IForm>> extends JsonAc
 
   @Override
   public String getObjectType() {
-    return "ToolButton";
+    return "FormToolButton";
   }
 
   @Override

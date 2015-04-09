@@ -1,3 +1,7 @@
+/**
+ * Abstract class for all form-fields.
+ * @abstract
+ */
 scout.FormField = function() {
   scout.FormField.parent.call(this);
   this.$label;
@@ -39,16 +43,21 @@ scout.FormField.prototype._createKeyStrokeAdapter = function() {
   return new scout.FormFieldKeyStrokeAdapter(this);
 };
 
+/**
+ * All sub-classes of scout.FormField must implement a _render method. The default implementation
+ * will throw an Error when _render is called. The _render method should call the various add*
+ * methods provided by the FormField class. A possible _render implementation could look like this.
+ *
+ * <pre>
+ * this.addContainer($parent, 'form-field');
+ * this.addLabel();
+ * this.addField($('&lt;div&gt;').text('foo'));
+ * this.addMandatoryIndicator();
+ * this.addStatus();
+ * </pre>
+ */
 scout.FormField.prototype._render = function($parent) {
-  // TODO AWE: [P2] remove this code when FormField is "abstract". There should be no reason to instantiate a
-  // FormField directly. Currently this is required as a placeholder for un-implemented form-fields.
-  this.addContainer($parent, 'form-field');
-  this.addLabel();
-  this.addField($('<div>')
-    .text('not implemented yet')
-    .addClass('not-implemented'));
-  this.addMandatoryIndicator();
-  this.addStatus();
+  throw new Error('sub-classes of scout.FormField must implement a _render method');
 };
 
 scout.FormField.prototype._renderProperties = function() {

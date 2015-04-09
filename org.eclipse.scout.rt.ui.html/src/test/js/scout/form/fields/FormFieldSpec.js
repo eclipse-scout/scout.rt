@@ -44,6 +44,9 @@ describe("FormField", function() {
     });
 
     it("event should update model", function() {
+      formField._render = function($parent) {
+        this.addContainer($parent, 'form-field');
+      };
       formField.render(session.$entryPoint);
 
       var event = createPropertyChangeEvent(formField, {cssClass: 'custom-class'});

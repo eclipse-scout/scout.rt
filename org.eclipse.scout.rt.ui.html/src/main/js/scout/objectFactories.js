@@ -1,3 +1,6 @@
+// FIXME AWE/CGU: (object-factories) refactoren, so dass alles per "reflection" funktioniert
+// für Object-Type "Desktop" wird automagisch scout.Desktop instanziert. Es muss aber noch die
+// Möglichkeit angeboten werden, das Default-Verhalten zu übersteuern.
 scout.defaultObjectFactories = [{
   objectType: 'Desktop',
   create: function() {
@@ -19,7 +22,7 @@ scout.defaultObjectFactories = [{
     return new scout.OutlineViewButton();
   }
 }, {
-  objectType: 'ToolButton',
+  objectType: 'FormToolButton',
   create: function() {
     return new scout.FormToolButton();
   }
@@ -104,9 +107,24 @@ scout.defaultObjectFactories = [{
     return new scout.Menu();
   }
 }, {
-  objectType: 'FormField',
+  objectType: 'FileChooserField',
   create: function() {
-    return new scout.FormField();
+    return new scout.FileChooserField();
+  }
+}, {
+  objectType: 'BrowserField',
+  create: function() {
+    return new scout.BrowserField();
+  }
+}, {
+  objectType: 'MailField',
+  create: function() {
+    return new scout.MailField();
+  }
+}, {
+  objectType: 'ColorField',
+  create: function() {
+    return new scout.ColorField();
   }
 }, {
   objectType: 'Button',

@@ -19,7 +19,7 @@ FormSpecHelper.prototype.createFormModel = function() {
 };
 
 FormSpecHelper.prototype.createFieldModel = function(objectType) {
-  var model = createSimpleModel(objectType || 'FormField');
+  var model = createSimpleModel(objectType || 'StringField');
   $.extend(model, {
     'enabled': true,
     'visible': true
