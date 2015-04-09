@@ -34,6 +34,16 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>.settings/.jsdtscope</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/.jsdtscope</locationURI>
+		</link>
+		<link>
+			<name>.settings/com.eclipsesource.jshint.ui.prefs</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/com.eclipsesource.jshint.ui.prefs</locationURI>
+		</link>
+		<link>
 			<name>.settings/de.loskutov.anyedit.AnyEditTools.prefs</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/de.loskutov.anyedit.AnyEditTools.prefs</locationURI>
@@ -62,6 +72,31 @@
 			<name>.settings/org.eclipse.m2e.core.prefs</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.eclipse.m2e.core.prefs</locationURI>
+		</link>
+		<link>
+			<name>.settings/org.eclipse.wst.jsdt.core.prefs</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.eclipse.wst.jsdt.core.prefs</locationURI>
+		</link>
+		<link>
+			<name>.settings/org.eclipse.wst.jsdt.ui.prefs</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.eclipse.wst.jsdt.ui.prefs</locationURI>
+		</link>
+		<link>
+			<name>.settings/org.eclipse.wst.jsdt.ui.superType.container</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.eclipse.wst.jsdt.ui.superType.container</locationURI>
+		</link>
+		<link>
+			<name>.settings/org.eclipse.wst.jsdt.ui.superType.name</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.eclipse.wst.jsdt.ui.superType.name</locationURI>
+		</link>
+		<link>
+			<name>.settings/org.sonar.ide.eclipse.core.prefs</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.sonar.ide.eclipse.core.prefs</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
