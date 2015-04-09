@@ -11,47 +11,45 @@
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.Platform;
 import org.junit.runners.model.Statement;
 
 /**
- * Statement to register a bean during the time of execution.
+ * Statement to register a bean during the time of executing subsequent statements.
  *
  * @since 5.1
  */
 public class RegisterBeanStatement extends Statement {
 
   protected final Statement m_next;
-  private final Class<?> m_beanClass;
+  protected final BeanMetaData m_beanMetaData;
 
   /**
-   * Creates a statement to register a bean-class during the time of executing a statement.
+   * Creates a statement to register a bean during the time of executing subsequent statements.
    *
    * @param next
    *          next {@link Statement} to be executed.
-   * @param beanClass
-   *          bean-class to be registered.
-   *          order of the bean-class to be registered. Lowest value is first in result list (preferred).
+   * @param beanMetaData
+   *          describes the bean to be registered.
    */
-  public RegisterBeanStatement(final Statement next, final Class<?> beanClass) {
+  public RegisterBeanStatement(final Statement next, final BeanMetaData beanMetaData) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
-    m_beanClass = Assertions.assertNotNull(beanClass, "bean-class must not be null");
+    m_beanMetaData = Assertions.assertNotNull(beanMetaData, "BeanMetaData must not be null");
   }
 
   @Override
   public void evaluate() throws Throwable {
-    final BeanMetaData bean = new BeanMetaData(m_beanClass);
-    bean.addAnnotation(AnnotationFactory.createOrder(-1000));
+    final IBeanManager beanManager = Platform.get().getBeanManager();
 
-    IBean reg = Platform.get().getBeanManager().registerBean(bean);
+    final IBean bean = beanManager.registerBean(m_beanMetaData.order(-Long.MAX_VALUE));
     try {
       m_next.evaluate();
     }
     finally {
-      Platform.get().getBeanManager().unregisterBean(reg);
+      beanManager.unregisterBean(bean);
     }
   }
 }

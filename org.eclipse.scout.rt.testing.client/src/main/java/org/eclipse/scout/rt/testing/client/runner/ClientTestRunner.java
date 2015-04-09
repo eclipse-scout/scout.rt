@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.client.runner.statement.ClearClientRunContextStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.ClientRunContextStatement;
@@ -71,7 +71,7 @@ public class ClientTestRunner extends PlatformTestRunner {
     final Statement s5 = new RunInModelJobStatement(next);
     final Statement s4 = new ClientRunContextStatement(s5, ReflectionUtility.getAnnotation(RunWithClientSession.class, testClass));
     final Statement s3 = super.interceptClassLevelStatement(s4, testClass);
-    final Statement s2 = new RegisterBeanStatement(s3, WrapAndThrowExceptionHandler.class); // exception handler to not silently swallow exceptions.
+    final Statement s2 = new RegisterBeanStatement(s3, new BeanMetaData(IExceptionHandlerService.class, new WrapAndThrowExceptionHandler())); // exception handler to not silently swallow exceptions.
     final Statement s1 = new ClearClientRunContextStatement(s2);
     return s1;
   }
@@ -81,7 +81,7 @@ public class ClientTestRunner extends PlatformTestRunner {
     final Statement s5 = new RunInModelJobStatement(next);
     final Statement s4 = new ClientRunContextStatement(s5, ReflectionUtility.getAnnotation(RunWithClientSession.class, testMethod, testClass));
     final Statement s3 = super.interceptMethodLevelStatement(s4, testClass, testMethod);
-    final Statement s2 = new RegisterBeanStatement(s3, WrapAndThrowExceptionHandler.class); // exception handler to not silently swallow exceptions.
+    final Statement s2 = new RegisterBeanStatement(s3, new BeanMetaData(IExceptionHandlerService.class, new WrapAndThrowExceptionHandler())); // exception handler to not silently swallow exceptions.
     final Statement s1 = new ClearClientRunContextStatement(s2);
     return s1;
   }
@@ -91,7 +91,6 @@ public class ClientTestRunner extends PlatformTestRunner {
    * <code>ProcessingRuntimeException</code>s. That is to not silently swallow exceptions, but to propagate them to the
    * test instead. Exceptions of that type are unwrapped by {@link UnwrapProcessingRuntimeExceptionStatement}.
    */
-  @ApplicationScoped
   protected class WrapAndThrowExceptionHandler extends AbstractService implements IExceptionHandlerService {
 
     @Override

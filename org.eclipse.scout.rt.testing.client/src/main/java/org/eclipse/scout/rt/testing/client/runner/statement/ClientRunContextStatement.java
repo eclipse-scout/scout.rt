@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -76,7 +77,7 @@ public class ClientRunContextStatement extends Statement {
             }
           });
         }
-      }, clientSessionClass).evaluate();
+      }, new BeanMetaData(clientSessionClass)).evaluate();
     }
   }
 }
