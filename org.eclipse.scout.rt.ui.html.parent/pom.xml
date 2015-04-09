@@ -31,11 +31,11 @@
   </properties>
 
   <modules>
-    <module>org.eclipse.scout.rt.ui.html</module>
-    <module>org.eclipse.scout.rt.ui.html.test</module>
-    <module>org.eclipse.scout.rt.ui.html.scriptprocessor</module>
-    <module>org.eclipse.scout.rt.ui.html.client.ext</module>
-    <module>../com.bsiag.tools.rt.parent/org.eclipse.scout.rt.office.parent</module>
+    <module>../org.eclipse.scout.rt.ui.html</module>
+    <module>../org.eclipse.scout.rt.ui.html.test</module>
+    <module>../org.eclipse.scout.rt.ui.html.scriptprocessor</module>
+    <module>../org.eclipse.scout.rt.ui.html.client.ext</module>
+    <module>../org.eclipse.scout.rt.office.parent</module>
   </modules>
 
   <build>
@@ -57,7 +57,7 @@
       <id>jacoco</id>
       <properties>
         <!-- Points to the target folder of the global parent project -->
-        <sonar.jacoco.reportPath>${project.basedir}/../../target/jacoco.exec</sonar.jacoco.reportPath>
+        <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
       </properties>
     </profile>
   </profiles>
