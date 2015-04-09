@@ -44,7 +44,7 @@ public class RegisterBeanStatement extends Statement {
   public void evaluate() throws Throwable {
     final IBeanManager beanManager = Platform.get().getBeanManager();
 
-    final IBean bean = beanManager.registerBean(m_beanMetaData.order(-Long.MAX_VALUE));
+    final IBean bean = beanManager.registerBean(m_beanMetaData);
     try {
       m_next.evaluate();
     }

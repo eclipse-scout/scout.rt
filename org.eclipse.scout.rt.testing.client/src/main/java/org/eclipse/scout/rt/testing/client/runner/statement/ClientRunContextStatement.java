@@ -77,7 +77,7 @@ public class ClientRunContextStatement extends Statement {
             }
           });
         }
-      }, new BeanMetaData(clientSessionClass)).evaluate();
+      }, new BeanMetaData(clientSessionClass).order(-Long.MAX_VALUE)).evaluate();
     }
   }
 }
