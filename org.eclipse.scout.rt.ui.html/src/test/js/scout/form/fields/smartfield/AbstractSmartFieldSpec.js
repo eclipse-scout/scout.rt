@@ -15,7 +15,9 @@ describe("AbstractSmartField", function() {
     });
 
     it("calls _openProposal() when a character key has been pressed", function() {
+      smartField._browseOnce = true;
       smartField._openProposal = function(searchText, selectCurrentValue) {};
+      smartField.$field = $('<input>');
       var event = {
         which: scout.keys.A
       };
