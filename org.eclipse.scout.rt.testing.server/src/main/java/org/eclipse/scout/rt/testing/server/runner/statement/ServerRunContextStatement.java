@@ -17,6 +17,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -76,7 +77,7 @@ public class ServerRunContextStatement extends Statement {
             }
           });
         }
-      }, serverSessionClass).evaluate();
+      }, new BeanMetaData(serverSessionClass)).evaluate();
     }
   }
 }
