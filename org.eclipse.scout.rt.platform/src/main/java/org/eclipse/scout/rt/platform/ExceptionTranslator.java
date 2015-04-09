@@ -76,7 +76,8 @@ public class ExceptionTranslator {
   }
 
   /**
-   * @return the current subject's principals.
+   * @return Principal of the current Subject, or <i>anonymous</i> if not running on behalf of a Subject or if no
+   *         Principal is associated with that Subject. Multiple Principals are separated by comma.
    */
   @Internal
   protected String getCurrentIdentity() {
