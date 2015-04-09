@@ -93,10 +93,5 @@
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.eclipse.wst.jsdt.ui.superType.name</locationURI>
 		</link>
-		<link>
-			<name>.settings/org.sonar.ide.eclipse.core.prefs</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.sonar.ide.eclipse.core.prefs</locationURI>
-		</link>
 	</linkedResources>
 </projectDescription>
