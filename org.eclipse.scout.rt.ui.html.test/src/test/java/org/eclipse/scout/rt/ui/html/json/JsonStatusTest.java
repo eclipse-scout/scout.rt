@@ -10,30 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.Status;
 import org.json.JSONObject;
+import org.junit.Test;
 
-public class JsonStatus implements IJsonObject {
+public class JsonStatusTest {
 
-  private final IStatus m_status;
-
-  public JsonStatus(IStatus status) {
-    m_status = status;
+  @Test
+  public void testToJson() {
+    assertEquals("", JsonStatus.toJson(null));
+    Status status = new Status("foo", IStatus.INFO);
+    JSONObject json = (JSONObject) JsonStatus.toJson(status);
+    assertEquals("foo", json.getString("message"));
+    assertEquals(IStatus.INFO, json.getInt("severity"));
   }
 
-  public IStatus getStatus() {
-    return m_status;
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = new JSONObject();
-    JsonObjectUtility.putProperty(json, "message", m_status.getMessage());
-    JsonObjectUtility.putProperty(json, "severity", m_status.getSeverity());
-    return json;
-  }
-
-  public static Object toJson(IStatus status) {
-    return status == null ? "" : new JsonStatus(status).toJson();
-  }
 }
