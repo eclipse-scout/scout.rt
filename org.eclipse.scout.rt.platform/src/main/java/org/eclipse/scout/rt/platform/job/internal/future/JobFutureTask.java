@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.job.internal.future;
 
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -22,8 +21,8 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
@@ -175,17 +174,14 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     try {
       return get();
     }
-    catch (final ExecutionException e) {
-      throw BEANS.get(ExceptionTranslator.class).translate(e.getCause());
-    }
     catch (final CancellationException e) {
       return null; // Cancellation does not result in an exception.
     }
     catch (final InterruptedException e) {
       throw JobExecutionException.fromInterruptedException(e, m_input.identifier());
     }
-    catch (final RuntimeException e) {
-      throw BEANS.get(ExceptionTranslator.class).translate(e);
+    catch (final Throwable t) {
+      throw BEANS.get(ExceptionTranslator.class).translate(t);
     }
   }
 
@@ -193,9 +189,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   public RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit) throws ProcessingException {
     try {
       return get(timeout, unit);
-    }
-    catch (final ExecutionException e) {
-      throw BEANS.get(ExceptionTranslator.class).translate(e.getCause());
     }
     catch (final CancellationException e) {
       return null; // Cancellation does not result in an exception.
@@ -206,8 +199,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     catch (final TimeoutException e) {
       throw JobExecutionException.fromTimeoutException(e, timeout, unit, m_input.identifier());
     }
-    catch (final RuntimeException e) {
-      throw BEANS.get(ExceptionTranslator.class).translate(e);
+    catch (final Throwable t) {
+      throw BEANS.get(ExceptionTranslator.class).translate(t);
     }
   }
 

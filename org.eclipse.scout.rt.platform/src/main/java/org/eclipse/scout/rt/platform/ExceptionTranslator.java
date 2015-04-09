@@ -16,6 +16,7 @@ import java.security.AccessController;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.security.auth.Subject;
 
@@ -45,6 +46,9 @@ public class ExceptionTranslator {
       return translate(t.getCause());
     }
     else if (t instanceof InvocationTargetException && t.getCause() != null) {
+      return translate(t.getCause());
+    }
+    else if (t instanceof ExecutionException && t.getCause() != null) {
       return translate(t.getCause());
     }
     else {

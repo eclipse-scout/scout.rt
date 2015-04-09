@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.security.PrivilegedAction;
 import java.util.HashSet;
+import java.util.concurrent.ExecutionException;
 
 import javax.security.auth.Subject;
 
@@ -98,6 +99,19 @@ public class ExceptionTranslatorTest {
 
     InvocationTargetException ite4 = new InvocationTargetException(reWithPe);
     assertSame(reWithPe.getCause(), exceptionTranslator.translate(ite4));
+
+    // test 'ExecutionException'
+    ExecutionException ee1 = new ExecutionException(null);
+    assertSame(ee1, exceptionTranslator.translate(ee1).getCause());
+
+    ExecutionException ee2 = new ExecutionException(e1);
+    assertSame(e1, exceptionTranslator.translate(ee2).getCause());
+
+    ExecutionException ee3 = new ExecutionException(re1);
+    assertSame(re1, exceptionTranslator.translate(ee3).getCause());
+
+    ExecutionException ee4 = new ExecutionException(reWithPe);
+    assertSame(reWithPe.getCause(), exceptionTranslator.translate(ee4));
   }
 
   @Test
