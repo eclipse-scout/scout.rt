@@ -22,7 +22,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
@@ -31,7 +30,6 @@ import org.eclipse.scout.rt.platform.job.JobInput;
  * Translator for exceptions into {@link ProcessingException}s.
  */
 @ApplicationScoped
-@Priority(-1)
 public class ExceptionTranslator {
 
   /**
