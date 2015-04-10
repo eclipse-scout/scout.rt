@@ -17,7 +17,8 @@ public enum JsonEventType {
 
   CLICKED("clicked"),
   PROPERTY("property"),
-  SELECTED("selected");
+  SELECTED("selected"),
+  APP_LINK("appLink");
 
   private String m_eventType;
 
