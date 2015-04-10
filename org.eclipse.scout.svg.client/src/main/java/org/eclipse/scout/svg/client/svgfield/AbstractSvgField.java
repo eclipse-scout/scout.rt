@@ -147,7 +147,8 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
     return m_uiFacade;
   }
 
-  private void doAppLinkAction(String ref) {
+  @Override
+  public void doAppLinkAction(String ref) {
     if (!m_actionRunning) {
       try {
         m_actionRunning = true;

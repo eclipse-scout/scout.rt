@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.svg.client.svgfield;
 
+import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
@@ -17,7 +18,7 @@ import org.w3c.dom.svg.SVGPoint;
 /**
  * The field supports for official SVG standard documents rendering and interaction.
  */
-public interface ISvgField extends IFormField {
+public interface ISvgField extends IFormField, IAppLinkCapable {
   /**
    * type {@link SVGDocument}
    */
