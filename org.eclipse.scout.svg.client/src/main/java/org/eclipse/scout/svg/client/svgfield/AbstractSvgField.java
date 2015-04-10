@@ -70,7 +70,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
   }
 
   /**
-   * called when a svg hyperlink was clicked
+   * Called when a SVG hyperlink was clicked.
    *
    * @deprecated use {@link #execAppLinkAction(SvgFieldEvent)} instead
    */
@@ -87,9 +87,9 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
    */
   @ConfigOperation
   @Order(230)
-  protected void execAppLinkAction(SvgFieldEvent e) throws ProcessingException {
-    //FIXME CGU remove this code when execpHyperlinkAction has been removed
-    execHyperlink(e);
+  protected void execAppLinkAction(String ref) throws ProcessingException {
+    // FIXME CGU: remove this code when execpHyperlink() has been removed
+    execHyperlink(new SvgFieldEvent(this, SvgFieldEvent.TYPE_HYPERLINK, null, ref));
   }
 
   @Override
@@ -155,7 +155,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
         SvgFieldEvent e = new SvgFieldEvent(this, SvgFieldEvent.TYPE_HYPERLINK, null, ref);
         // single observer
         try {
-          interceptAppLinkAction(e);
+          interceptAppLinkAction(ref);
         }
         catch (ProcessingException pe) {
           SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
@@ -225,10 +225,10 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
     chain.execClicked(e);
   }
 
-  protected final void interceptAppLinkAction(SvgFieldEvent e) throws ProcessingException {
+  protected final void interceptAppLinkAction(String ref) throws ProcessingException {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     SvgFieldAppLinkActionChain chain = new SvgFieldAppLinkActionChain(extensions);
-    chain.execAppLinkAction(e);
+    chain.execAppLinkAction(ref);
   }
 
   protected static class LocalSvgFieldExtension<OWNER extends AbstractSvgField> extends LocalFormFieldExtension<OWNER> implements ISvgFieldExtension<OWNER> {
@@ -243,8 +243,8 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
     }
 
     @Override
-    public void execAppLinkAction(SvgFieldAppLinkActionChain chain, SvgFieldEvent e) throws ProcessingException {
-      getOwner().execAppLinkAction(e);
+    public void execAppLinkAction(SvgFieldAppLinkActionChain chain, String ref) throws ProcessingException {
+      getOwner().execAppLinkAction(ref);
     }
   }
 

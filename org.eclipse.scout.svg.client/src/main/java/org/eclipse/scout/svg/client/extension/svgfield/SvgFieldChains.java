@@ -48,14 +48,14 @@ public final class SvgFieldChains {
       super(extensions);
     }
 
-    public void execAppLinkAction(final SvgFieldEvent e) throws ProcessingException {
+    public void execAppLinkAction(final String ref) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISvgFieldExtension<? extends AbstractSvgField> next) throws ProcessingException {
-          next.execAppLinkAction(SvgFieldAppLinkActionChain.this, e);
+          next.execAppLinkAction(SvgFieldAppLinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, e);
+      callChain(methodInvocation, ref);
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }
