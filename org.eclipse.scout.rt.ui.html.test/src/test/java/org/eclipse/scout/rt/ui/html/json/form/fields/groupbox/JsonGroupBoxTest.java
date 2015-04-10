@@ -15,10 +15,10 @@ import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fields.BaseFormFieldTest;
@@ -83,12 +83,12 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
   private class GroupBoxWithNonDisplayableField extends AbstractGroupBox {
 
     @Order(10)
-    public class DisplayableField extends AbstractFormField {
+    public class DisplayableField extends AbstractStringField {
 
     }
 
     @Order(20)
-    public class NonDisplayableField extends AbstractFormField {
+    public class NonDisplayableField extends AbstractStringField {
 
       @Override
       protected void execInitField() throws ProcessingException {

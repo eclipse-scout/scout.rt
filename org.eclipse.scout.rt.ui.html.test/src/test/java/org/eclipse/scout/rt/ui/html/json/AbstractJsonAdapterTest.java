@@ -13,16 +13,23 @@ package org.eclipse.scout.rt.ui.html.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.json.JSONObject;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractJsonAdapterTest {
 
   @ModelVariant("Bar")
   static class P_ModelVariant {
-
   }
 
   @Test
