@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.svg.client.svgfield;
+package org.eclipse.scout.rt.svg.client.svgfield;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;

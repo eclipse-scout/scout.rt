@@ -1,11 +1,11 @@
-package org.eclipse.scout.svg.client.extension.svgfield;
+package org.eclipse.scout.rt.svg.client.extension.svgfield;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractFormFieldExtension;
-import org.eclipse.scout.svg.client.extension.svgfield.SvgFieldChains.SvgFieldAppLinkActionChain;
-import org.eclipse.scout.svg.client.extension.svgfield.SvgFieldChains.SvgFieldClickedChain;
-import org.eclipse.scout.svg.client.svgfield.AbstractSvgField;
-import org.eclipse.scout.svg.client.svgfield.SvgFieldEvent;
+import org.eclipse.scout.rt.svg.client.extension.svgfield.SvgFieldChains.SvgFieldAppLinkActionChain;
+import org.eclipse.scout.rt.svg.client.extension.svgfield.SvgFieldChains.SvgFieldClickedChain;
+import org.eclipse.scout.rt.svg.client.svgfield.AbstractSvgField;
+import org.eclipse.scout.rt.svg.client.svgfield.SvgFieldEvent;
 
 public abstract class AbstractSvgFieldExtension<OWNER extends AbstractSvgField> extends AbstractFormFieldExtension<OWNER> implements ISvgFieldExtension<OWNER> {
 

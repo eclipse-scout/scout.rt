@@ -40,8 +40,8 @@
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.swing.test"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.service"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.service.test"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.svg.client"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.svg.ui.swing"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.svg.client"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.svg.ui.swing"/>
 </provider>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375705155466_3" label="scout.rt" name="scout.rt">
 <item elementID="=org.eclipse.scout.jaxws216.jre18.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -71,10 +71,10 @@
 <item elementID="=org.eclipse.scout.rt.ui.swing.browser.swt.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.ui.swing" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.svg.ui.swing" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.svg.ui.swing" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.client.testenvironment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.client.mobile.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.svg.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.svg.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.client.mobile" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1413457585056_7" label="scout.rt.releng" name="scout.rt.releng">

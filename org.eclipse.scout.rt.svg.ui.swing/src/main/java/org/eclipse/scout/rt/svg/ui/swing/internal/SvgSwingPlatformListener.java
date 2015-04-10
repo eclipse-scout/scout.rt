@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.svg.ui.swing.internal;
+package org.eclipse.scout.rt.svg.ui.swing.internal;
 
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
@@ -24,7 +24,7 @@ public class SvgSwingPlatformListener implements IPlatformListener {
   @Override
   public void stateChanged(PlatformEvent event) throws PlatformException {
     if (event.getState() == IPlatform.State.BeanManagerPrepared) {
-      FormFieldExtensions.INSTANCE.put(org.eclipse.scout.svg.client.svgfield.ISvgField.class, org.eclipse.scout.svg.ui.swing.svgfield.SwingScoutSvgField.class);
+      FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.svg.client.svgfield.ISvgField.class, org.eclipse.scout.rt.svg.ui.swing.svgfield.SwingScoutSvgField.class);
     }
   }
 

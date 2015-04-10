@@ -8,15 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.svg.ui.swing.svgfield;
+package org.eclipse.scout.rt.svg.client.svgfield;
 
-import org.apache.batik.swing.JSVGCanvas;
-import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
-import org.eclipse.scout.svg.client.svgfield.ISvgField;
+import java.util.EventListener;
 
-public interface ISwingScoutSvgField extends ISwingScoutFormField<ISvgField> {
+public interface ISvgFieldListener extends EventListener {
 
-  @Override
-  JSVGCanvas getSwingField();
+  void handleSvgFieldEvent(SvgFieldEvent e);
 
 }

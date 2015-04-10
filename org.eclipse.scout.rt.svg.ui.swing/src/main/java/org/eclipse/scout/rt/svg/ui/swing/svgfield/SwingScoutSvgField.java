@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.svg.ui.swing.svgfield;
+package org.eclipse.scout.rt.svg.ui.swing.svgfield;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -24,14 +24,14 @@ import org.apache.batik.swing.svg.SVGUserAgent;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.svg.client.JSVGCanvasEx;
+import org.eclipse.scout.rt.svg.client.SilentSVGUserAgentAdapter;
+import org.eclipse.scout.rt.svg.client.svgfield.ISvgField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
-import org.eclipse.scout.svg.client.JSVGCanvasEx;
-import org.eclipse.scout.svg.client.SilentSVGUserAgentAdapter;
-import org.eclipse.scout.svg.client.svgfield.ISvgField;
 import org.w3c.dom.svg.SVGDocument;
 
 public class SwingScoutSvgField extends SwingScoutFieldComposite<ISvgField> implements ISwingScoutSvgField {

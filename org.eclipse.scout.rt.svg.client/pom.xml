@@ -17,7 +17,7 @@
     <relativePath>../org.eclipse.scout.rt.parent</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.scout.svg.client</artifactId>
+  <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
   <packaging>jar</packaging>
 
   <dependencies>

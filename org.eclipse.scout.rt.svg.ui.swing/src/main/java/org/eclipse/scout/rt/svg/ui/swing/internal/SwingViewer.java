@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.svg.ui.swing.internal;
+package org.eclipse.scout.rt.svg.ui.swing.internal;
 
 import java.awt.BorderLayout;
 
@@ -21,8 +21,8 @@ import org.apache.batik.swing.svg.SVGUserAgentGUIAdapter;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.svg.client.JSVGCanvasEx;
-import org.eclipse.scout.svg.client.SVGUtility;
+import org.eclipse.scout.rt.svg.client.JSVGCanvasEx;
+import org.eclipse.scout.rt.svg.client.SVGUtility;
 import org.w3c.dom.svg.SVGDocument;
 
 public class SwingViewer {

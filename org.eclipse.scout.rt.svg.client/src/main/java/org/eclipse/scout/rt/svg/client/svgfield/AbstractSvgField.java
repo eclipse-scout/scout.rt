@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.svg.client.svgfield;
+package org.eclipse.scout.rt.svg.client.svgfield;
 
 import java.io.ByteArrayOutputStream;
 import java.util.EventListener;
@@ -24,11 +24,11 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.svg.client.SVGUtility;
+import org.eclipse.scout.rt.svg.client.extension.svgfield.ISvgFieldExtension;
+import org.eclipse.scout.rt.svg.client.extension.svgfield.SvgFieldChains.SvgFieldAppLinkActionChain;
+import org.eclipse.scout.rt.svg.client.extension.svgfield.SvgFieldChains.SvgFieldClickedChain;
 import org.eclipse.scout.service.SERVICES;
-import org.eclipse.scout.svg.client.SVGUtility;
-import org.eclipse.scout.svg.client.extension.svgfield.ISvgFieldExtension;
-import org.eclipse.scout.svg.client.extension.svgfield.SvgFieldChains.SvgFieldAppLinkActionChain;
-import org.eclipse.scout.svg.client.extension.svgfield.SvgFieldChains.SvgFieldClickedChain;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
 

@@ -8,12 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.svg.client.svgfield;
+package org.eclipse.scout.rt.svg.client.svgfield;
 
-import java.util.EventListener;
+import org.w3c.dom.svg.SVGPoint;
 
-public interface ISvgFieldListener extends EventListener {
+public interface ISvgFieldUIFacade {
 
-  void handleSvgFieldEvent(SvgFieldEvent e);
+  void fireAppLinkActionFromUI(String ref);
+
+  void fireClickFromUI(SVGPoint point);
 
 }

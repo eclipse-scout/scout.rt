@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.svg.client.svgfield;
+package org.eclipse.scout.rt.svg.client.svgfield;
 
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -40,7 +40,7 @@ public interface ISvgField extends IFormField, IAppLinkCapable {
 
   /**
    * @return the point of the selection. This is set by the ui facade when a click or hyperlink occurs. Use
-   *         {@link org.eclipse.scout.svg.client.SVGUtility#getElementsAt(org.w3c.dom.svg.SVGDocument, org.w3c.dom.svg.SVGPoint)}
+   *         {@link org.eclipse.scout.rt.svg.client.SVGUtility#getElementsAt(org.w3c.dom.svg.SVGDocument, org.w3c.dom.svg.SVGPoint)}
    *         to find affected
    *         elements
    */
@@ -48,7 +48,7 @@ public interface ISvgField extends IFormField, IAppLinkCapable {
 
   /**
    * set the selected point. Use
-   * {@link org.eclipse.scout.svg.client.SVGUtility#getElementsAt(org.w3c.dom.svg.SVGDocument, org.w3c.dom.svg.SVGPoint)}
+   * {@link org.eclipse.scout.rt.svg.client.SVGUtility#getElementsAt(org.w3c.dom.svg.SVGDocument, org.w3c.dom.svg.SVGPoint)}
    * to find affected elements
    */
   void setSelection(SVGPoint point);

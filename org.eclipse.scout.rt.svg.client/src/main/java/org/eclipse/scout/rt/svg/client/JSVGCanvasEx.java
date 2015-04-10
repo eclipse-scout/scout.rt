@@ -1,4 +1,4 @@
-package org.eclipse.scout.svg.client;
+package org.eclipse.scout.rt.svg.client;
 
 import java.awt.EventQueue;
 

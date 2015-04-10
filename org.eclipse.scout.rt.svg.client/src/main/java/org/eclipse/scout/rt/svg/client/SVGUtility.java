@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.svg.client;
+package org.eclipse.scout.rt.svg.client;
 
 import java.io.InputStream;
 import java.io.OutputStream;

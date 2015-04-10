@@ -1,4 +1,4 @@
-package org.eclipse.scout.svg.client.extension.svgfield;
+package org.eclipse.scout.rt.svg.client.extension.svgfield;
 
 import java.util.List;
 
@@ -6,8 +6,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
-import org.eclipse.scout.svg.client.svgfield.AbstractSvgField;
-import org.eclipse.scout.svg.client.svgfield.SvgFieldEvent;
+import org.eclipse.scout.rt.svg.client.svgfield.AbstractSvgField;
+import org.eclipse.scout.rt.svg.client.svgfield.SvgFieldEvent;
 
 public final class SvgFieldChains {
 

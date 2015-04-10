@@ -21,7 +21,7 @@
     <relativePath>../org.eclipse.scout.rt.parent</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.scout.svg.ui.swing</artifactId>
+  <artifactId>org.eclipse.scout.rt.svg.ui.swing</artifactId>
   <packaging>jar</packaging>
 
   <dependencies>
@@ -31,7 +31,7 @@
       <version>5.1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <artifactId>org.eclipse.scout.svg.client</artifactId>
+      <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
       <groupId>org.eclipse.scout.rt</groupId>
       <version>5.1.0-SNAPSHOT</version>
     </dependency>

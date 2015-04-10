@@ -8,34 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.svg.client;
+package org.eclipse.scout.rt.svg.ui.swing.svgfield;
 
-import org.apache.batik.swing.svg.SVGUserAgentAdapter;
+import org.apache.batik.swing.JSVGCanvas;
+import org.eclipse.scout.rt.svg.client.svgfield.ISvgField;
+import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 
-public class SilentSVGUserAgentAdapter extends SVGUserAgentAdapter {
-  @Override
-  public void displayMessage(String message) {
-  }
-
-  @Override
-  public void displayError(String message) {
-  }
+public interface ISwingScoutSvgField extends ISwingScoutFormField<ISvgField> {
 
   @Override
-  public void displayError(Exception ex) {
-  }
+  JSVGCanvas getSwingField();
 
-  @Override
-  public void showAlert(String message) {
-  }
-
-  @Override
-  public String showPrompt(String message) {
-    return null;
-  }
-
-  @Override
-  public String showPrompt(String message, String defaultValue) {
-    return null;
-  }
 }
