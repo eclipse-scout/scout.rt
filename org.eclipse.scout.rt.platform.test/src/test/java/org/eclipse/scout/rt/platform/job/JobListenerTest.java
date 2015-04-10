@@ -16,12 +16,14 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.job.internal.JobListeners;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -40,7 +42,12 @@ public class JobListenerTest {
 
   @Before
   public void before() {
-    m_jobManager = new JobManager();
+    m_jobManager = new JobManager() {
+      @Override
+      protected JobListeners createJobListeners(ExecutorService executor) {
+        return new JobListeners(null); // null to notify synchronously.
+      }
+    };
   }
 
   @After

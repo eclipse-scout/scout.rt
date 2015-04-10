@@ -15,6 +15,7 @@ import java.io.StringWriter;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -45,13 +46,12 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
 
   @Override
   public Thread newThread(final Runnable runnable) {
-    final ThreadInfo threadInfo = new ThreadInfo(m_threadName, m_sequence.incrementAndGet());
-
-    final Thread thread = new Thread(m_group, runnable, threadInfo.buildThreadName(), 0) {
+    final AtomicReference<ThreadInfo> threadInfoRef = new AtomicReference<>();
+    final Thread thread = new Thread(m_group, runnable, m_threadName, 0) {
 
       @Override
       public void run() {
-        ThreadInfo.CURRENT.set(threadInfo);
+        ThreadInfo.CURRENT.set(threadInfoRef.get());
         try {
           super.run();
         }
@@ -60,6 +60,7 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
         }
       }
     };
+    threadInfoRef.set(new ThreadInfo(thread, m_threadName, m_sequence.incrementAndGet()));
 
     if (thread.isDaemon()) {
       thread.setDaemon(false);
@@ -95,6 +96,8 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
      */
     public static final ThreadLocal<ThreadInfo> CURRENT = new ThreadLocal<>();
 
+    private final Thread m_thread;
+
     private final String m_originalThreadName;
     private final long m_sequence;
 
@@ -103,10 +106,13 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
     private volatile JobState m_currentJobState;
     private volatile String m_currentJobStateInfo;
 
-    public ThreadInfo(final String threadName, final long sequence) {
+    public ThreadInfo(final Thread thread, final String threadName, final long sequence) {
+      m_thread = thread;
       m_originalThreadName = threadName;
       m_sequence = sequence;
       m_currentJobState = JobState.Idle;
+
+      m_thread.setName(buildThreadName());
     }
 
     /**
@@ -120,7 +126,7 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
     public void updateState(final JobState jobState, final String jobStateInfo) {
       m_currentJobStateInfo = jobStateInfo;
       m_currentJobState = jobState;
-      Thread.currentThread().setName(buildThreadName());
+      m_thread.setName(buildThreadName());
     }
 
     /**
@@ -138,7 +144,7 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
       m_currentJobName = jobName;
       m_currentJobState = state;
       m_currentJobStateInfo = null;
-      Thread.currentThread().setName(buildThreadName());
+      m_thread.setName(buildThreadName());
     }
 
     private String buildThreadName() {

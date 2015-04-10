@@ -11,12 +11,16 @@
 package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.filter.Filters;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -29,16 +33,25 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
  *
  * @since 5.1
  */
-class JobListeners {
+@Internal
+public class JobListeners {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobListeners.class);
 
   private final Map<IJobListener, IFilter<JobEvent>> m_listenerMap;
 
+  private final ExecutorService m_executor;
+
   private final ReadLock m_readLock;
   private final WriteLock m_writeLock;
 
-  JobListeners() {
+  /**
+   * @param executor
+   *          Executor to be used to notify listeners about job lifecycle events; use <code>null</code> to not notify
+   *          asynchronously, e.g. for testing purpose.
+   */
+  public JobListeners(final ExecutorService executor) {
+    m_executor = executor;
     m_listenerMap = new HashMap<>();
 
     final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -88,12 +101,14 @@ class JobListeners {
   }
 
   /**
-   * Notifies all listener about an event, unless not accept by the filter.
+   * Notifies all listener about an event, unless not accept by the filter. This method never throws an exception and
+   * notifies the listeners asynchronously.
    *
    * @param eventToFire
    *          The event to fire.
    */
   void fireEvent(final JobEvent eventToFire) {
+    // Copy listener map to immediately release the monitor.
     final Map<IJobListener, IFilter<JobEvent>> listeners;
     m_readLock.lock();
     try {
@@ -103,15 +118,45 @@ class JobListeners {
       m_readLock.unlock();
     }
 
+    // Identify the listeners to be notified.
+    final Set<IJobListener> acceptedListeners = new HashSet<>();
     for (final IJobListener listener : listeners.keySet()) {
       try {
         if (listeners.get(listener).accept(eventToFire)) {
-          listener.changed(eventToFire);
+          acceptedListeners.add(listener);
         }
       }
-      catch (final RuntimeException e) {
-        LOG.error(String.format("Failed to notify listener about lifecycle event [listener=%s, event=%s]", listener.getClass().getName(), eventToFire), e);
+      catch (final Throwable t) {
+        LOG.error(String.format("Listener threw exception while accepting job lifecycle event [listener=%s, event=%s]", listener.getClass().getName(), eventToFire), t);
       }
+    }
+
+    // Notify the listeners.
+    for (final IJobListener listener : acceptedListeners) {
+      if (m_executor == null || m_executor.isShutdown()) { // executor is null e.g. for testing purpose
+        notifyListenerSafe(listener, eventToFire);
+      }
+      else {
+        m_executor.execute(new Runnable() {
+
+          @Override
+          public void run() {
+            notifyListenerSafe(listener, eventToFire);
+          }
+        });
+      }
+    }
+  }
+
+  /**
+   * Notifies the given listener about the given job lifecycle event.
+   */
+  private void notifyListenerSafe(final IJobListener listener, final JobEvent eventToFire) {
+    try {
+      listener.changed(eventToFire);
+    }
+    catch (final Throwable t) {
+      LOG.error(String.format("Listener threw exception while being notified about job lifecycle event [listener=%s, event=%s]", listener.getClass().getName(), eventToFire), t);
     }
   }
 }

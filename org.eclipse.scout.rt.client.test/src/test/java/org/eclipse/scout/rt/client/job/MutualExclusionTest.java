@@ -94,8 +94,8 @@ public class MutualExclusionTest {
     m_jobManager = new P_JobManager();
     m_beans = TestingUtility.registerBeans(
         new BeanMetaData(JobManager.class).
-        initialInstance(m_jobManager).
-        applicationScoped(true));
+            initialInstance(m_jobManager).
+            applicationScoped(true));
 
     ISession.CURRENT.set(m_clientSession);
   }
@@ -598,9 +598,9 @@ public class MutualExclusionTest {
     final TestJobManager jobManager = new TestJobManager();
     m_beans.addAll(TestingUtility.registerBeans(
         new BeanMetaData(IJobManager.class).
-            order(-1000).
-            initialInstance(jobManager).
-            applicationScoped(true)));
+        order(-1000).
+        initialInstance(jobManager).
+        applicationScoped(true)));
 
     final BlockingCountDownLatch jobsScheduledLatch = new BlockingCountDownLatch(1);
 
@@ -610,48 +610,54 @@ public class MutualExclusionTest {
 
       @Override
       public Future answer(InvocationOnMock invocation) throws Throwable {
-        final IFutureTask<?> futureTask = (IFutureTask) invocation.getArguments()[0];
+        Runnable runnable = (Runnable) invocation.getArguments()[0];
+        if (runnable instanceof IFutureTask<?>) {
+          final IFutureTask<?> futureTask = (IFutureTask) invocation.getArguments()[0];
 
-        switch (count.incrementAndGet()) {
-          case 1: // job-1: RUN
-            s_executor.execute(new Runnable() {
+          switch (count.incrementAndGet()) {
+            case 1: // job-1: RUN
+              s_executor.execute(new Runnable() {
 
-              @Override
-              public void run() {
-                try {
-                  jobsScheduledLatch.await(); // wait for all jobs to be scheduled.
-                  ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo("mock-thread", 0));
+                @Override
+                public void run() {
                   try {
-                    futureTask.run(); // let job1 run
+                    jobsScheduledLatch.await(); // wait for all jobs to be scheduled.
+                    ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo(Thread.currentThread(), "mock-thread", 0));
+                    try {
+                      futureTask.run(); // let job1 run
+                    }
+                    finally {
+                      ThreadInfo.CURRENT.remove();
+                    }
+                  }
+                  catch (InterruptedException e) {
+                    // NOOP
+                  }
+                }
+              });
+              break;
+            case 2: // job-2: REJECT
+              futureTask.reject();
+              break;
+            case 3: // job-3: RUN
+              s_executor.execute(new Runnable() {
+
+                @Override
+                public void run() {
+                  ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo(Thread.currentThread(), "mock-thread", 0));
+                  try {
+                    futureTask.run();
                   }
                   finally {
                     ThreadInfo.CURRENT.remove();
                   }
                 }
-                catch (InterruptedException e) {
-                  // NOOP
-                }
-              }
-            });
-            break;
-          case 2: // job-2: REJECT
-            futureTask.reject();
-            break;
-          case 3: // job-3: RUN
-            s_executor.execute(new Runnable() {
-
-              @Override
-              public void run() {
-                ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo("mock-thread", 0));
-                try {
-                  futureTask.run();
-                }
-                finally {
-                  ThreadInfo.CURRENT.remove();
-                }
-              }
-            });
-            break;
+              });
+              break;
+          }
+        }
+        else {
+          s_executor.execute(runnable);
         }
         return null;
       }
@@ -715,9 +721,9 @@ public class MutualExclusionTest {
 
     m_beans.addAll(TestingUtility.registerBeans(
         new BeanMetaData(IJobManager.class).
-        order(-1000).
-        initialInstance(jobManager).
-        applicationScoped(true)));
+            order(-1000).
+            initialInstance(jobManager).
+            applicationScoped(true)));
 
     final BlockingCountDownLatch jobsScheduledLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch job3RunningLatch = new BlockingCountDownLatch(1);
@@ -728,18 +734,41 @@ public class MutualExclusionTest {
 
       @Override
       public Future answer(InvocationOnMock invocation) throws Throwable {
-        final IFutureTask<?> futureTask = (IFutureTask) invocation.getArguments()[0];
+        Runnable runnable = (Runnable) invocation.getArguments()[0];
+        if (runnable instanceof IFutureTask<?>) {
+          final IFutureTask<?> futureTask = (IFutureTask) runnable;
 
-        switch (count.incrementAndGet()) {
-          case 1: // job-1: RUN
-            s_executor.execute(new Runnable() {
+          switch (count.incrementAndGet()) {
+            case 1: // job-1: RUN
+              s_executor.execute(new Runnable() {
 
-              @Override
-              public void run() {
-                try {
-                  jobsScheduledLatch.await(); // wait for all jobs to be scheduled.
+                @Override
+                public void run() {
+                  try {
+                    jobsScheduledLatch.await(); // wait for all jobs to be scheduled.
 
-                  ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo("mock-thread", 0));
+                    ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo(Thread.currentThread(), "mock-thread", 0));
+                    try {
+                      futureTask.run();
+                    }
+                    finally {
+                      ThreadInfo.CURRENT.remove();
+                    }
+                  }
+                  catch (InterruptedException e) {
+                    // NOOP
+                  }
+                }
+              });
+              break;
+            case 2: // job-2: RUN after job1 enters blocking condition
+            case 4: // job-3: gets scheduled
+            case 5: // job-4: gets scheduled
+              s_executor.execute(new Runnable() {
+
+                @Override
+                public void run() {
+                  ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo(Thread.currentThread(), "mock-thread", 0));
                   try {
                     futureTask.run();
                   }
@@ -747,32 +776,15 @@ public class MutualExclusionTest {
                     ThreadInfo.CURRENT.remove();
                   }
                 }
-                catch (InterruptedException e) {
-                  // NOOP
-                }
-              }
-            });
-            break;
-          case 2: // job-2: RUN after job1 enters blocking condition
-          case 4: // job-3: gets scheduled
-          case 5: // job-4: gets scheduled
-            s_executor.execute(new Runnable() {
-
-              @Override
-              public void run() {
-                ThreadInfo.CURRENT.set(new NamedThreadFactory.ThreadInfo("mock-thread", 0));
-                try {
-                  futureTask.run();
-                }
-                finally {
-                  ThreadInfo.CURRENT.remove();
-                }
-              }
-            });
-            break;
-          case 3: // job-1:  re-acquires the mutex after being released from the blocking condition
-            futureTask.reject();
-            break;
+              });
+              break;
+            case 3: // job-1:  re-acquires the mutex after being released from the blocking condition
+              futureTask.reject();
+              break;
+          }
+        }
+        else {
+          s_executor.execute(runnable);
         }
         return null;
       }

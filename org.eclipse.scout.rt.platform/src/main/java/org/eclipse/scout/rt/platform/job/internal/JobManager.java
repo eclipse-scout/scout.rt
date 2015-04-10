@@ -93,7 +93,7 @@ public class JobManager implements IJobManager {
     m_executor = Assertions.assertNotNull(createExecutor());
     m_futures = new FutureSet();
     m_mutexSemaphores = Assertions.assertNotNull(createMutexSemaphores(m_executor));
-    m_listeners = new JobListeners();
+    m_listeners = Assertions.assertNotNull(createJobListeners(m_executor));
     m_delayedExecutor = new DelayedExecutor(m_executor, "internal-dispatcher", ConfigIniUtility.getPropertyInt(PROP_DISPATCHER_THREAD_COUNT, DEFAULT_DISPATCHER_THREAD_COUNT));
 
     addListener(Jobs.newEventFilter().eventTypes(JobEventType.SCHEDULED, JobEventType.DONE, JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.SHUTDOWN), m_futures);
@@ -301,6 +301,14 @@ public class JobManager implements IJobManager {
     final ThreadPoolExecutor executor = new ThreadPoolExecutor(corePoolSize + dispatcherThreadCount, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), new NamedThreadFactory("scout-thread"), rejectHandler);
     executor.allowCoreThreadTimeOut(allowCoreThreadTimeOut);
     return executor;
+  }
+
+  /**
+   * Method invoked to create the manager to register and notify job listeners.
+   */
+  @Internal
+  protected JobListeners createJobListeners(final ExecutorService executor) {
+    return new JobListeners(executor);
   }
 
   /**

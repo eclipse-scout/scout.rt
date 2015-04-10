@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.IRunnable;
@@ -29,6 +30,7 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.internal.JobListeners;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -183,6 +185,11 @@ public class JobListenerBlockedFutureTest {
         }
         Thread.sleep(10);
       }
+    }
+
+    @Override
+    protected JobListeners createJobListeners(ExecutorService executor) {
+      return new JobListeners(null); // null to notify synchronously.
     }
   }
 }

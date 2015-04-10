@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.platform.job.internal.callable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.holders.Holder;
@@ -70,7 +73,7 @@ public class ThreadNameDecoratorTest {
 
     JobInput input = Jobs.newInput(RunContexts.empty()).id("123").name("job1");
 
-    ThreadInfo.CURRENT.set(new ThreadInfo("scout-thread", 5));
+    ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
     new ThreadNameDecorator<Void>(next, "scout-client-thread", input.identifier()).call();
     assertEquals("scout-client-thread-5 [Running] 123:job1", threadName.getValue());
     assertEquals("scout-thread-5 [Idle]", Thread.currentThread().getName());
@@ -92,7 +95,7 @@ public class ThreadNameDecoratorTest {
 
     JobInput input = Jobs.newInput(RunContexts.empty());
 
-    ThreadInfo.CURRENT.set(new ThreadInfo("scout-thread", 5));
+    ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
     new ThreadNameDecorator<Void>(next, "scout-client-thread", input.identifier()).call();
     assertEquals("scout-client-thread-5 [Running]", threadName.getValue());
     assertEquals("scout-thread-5 [Idle]", Thread.currentThread().getName());
@@ -118,8 +121,14 @@ public class ThreadNameDecoratorTest {
         // Start blocking
         BC.waitFor();
 
-        currentThreadName = Thread.currentThread().getName();
-        assertTrue(currentThreadName, currentThreadName.matches("scout-thread-\\d+ \\[Running\\] job-1"));
+        // Wait for event to be processed because being fired asynchronously. (max 30s)
+        waitForCondition(new ICondition() {
+
+          @Override
+          public boolean evaluate() {
+            return Thread.currentThread().getName().matches("scout-thread-\\d+ \\[Running\\] job-1");
+          }
+        });
         return true;
       }
     }, Jobs.newInput(RunContexts.copyCurrent()).name("job-1").mutex(mutexObject));
@@ -129,9 +138,14 @@ public class ThreadNameDecoratorTest {
 
       @Override
       public Boolean call() throws Exception {
-        String threadNameJob1 = threadJob1.getValue().getName();
+        // Wait for event to be processed because being fired asynchronously. (max 30s)
+        waitForCondition(new ICondition() {
 
-        assertTrue(threadNameJob1, threadJob1.getValue().getName().matches("scout-thread-\\d+ \\[Blocked 'blocking-condition'\\] job-1"));
+          @Override
+          public boolean evaluate() {
+            return threadJob1.getValue().getName().matches("scout-thread-\\d+ \\[Blocked 'blocking-condition'\\] job-1");
+          }
+        });
 
         // Release job-1
         BC.setBlocking(false);
@@ -142,5 +156,21 @@ public class ThreadNameDecoratorTest {
 
     assertTrue(future2.awaitDoneAndGet());
     assertTrue(future1.awaitDoneAndGet());
+  }
+
+  public static void waitForCondition(ICondition condition) throws InterruptedException {
+    long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
+
+    // Wait until the other jobs tried to re-acquire the mutex.
+    while (!condition.evaluate()) {
+      if (System.currentTimeMillis() > deadline) {
+        fail(String.format("Timeout elapsed while waiting for the condition to be met. [condition=%s]", condition));
+      }
+      Thread.sleep(10);
+    }
+  }
+
+  private interface ICondition {
+    boolean evaluate();
   }
 }
