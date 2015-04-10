@@ -167,3 +167,24 @@ NBU 19.3.2015
 Key Stroke fixes -> consistent naming KeyStroke in camelcase.
 Menus should not be treated in delegate of a new KeyStroke. They have all keyStroke abilities from the superclass AbstractAction.
 Removed ContributedKeyStroke Method from all FormField classes because this are only the menues which are added on the field.-> use getMenus() instead.
+
+CGU 31.03.2015
+Added bean field and bean column.
+See AbstractBeanField, AbstractBeanColumn for details
+
+CGU 01.04.2015
+Menus of a page are now added to the detail form.
+This was necessary because the outline tree does not show any menus anymore.
+See also method AbstractPageWithNodes#enhanceDetailFormWithPageMenus.
+
+CGU 02.4.2015
+Added cssClass property to formField, column and cell for custom css styling. See also interface IStyleable.
+
+CGU 10.4.2015
+Refactored execHyperlinkAction
+- Removed parameter url and local and renamed path to ref.
+- Renamed to execAppLinkAction
+With the new html ui real hyperlinks are handled by the browser. Other
+links (formerly local links) are now called app links. The new method
+execAppLinkAction is only called for app links, hence the parameters url
+and local are not necessary anymore.
