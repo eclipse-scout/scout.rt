@@ -70,17 +70,17 @@ public class PlatformImplementor implements IPlatform {
   public synchronized void start(Class<? extends IApplication> appType) {
     m_stateLock.writeLock().lock();
     try {
-      changeState(State.PlatformStopped);
+      changeState(State.PlatformStopped, true);
       m_beanContext = createBeanManager();
       //now all IPlatformListener are registered and can receive platform events
 
-      changeState(State.PlatformInit);
-      changeState(State.BeanManagerPrepared);
+      changeState(State.PlatformInit, true);
+      changeState(State.BeanManagerPrepared, true);
 
       //validateBeanManager();
       initBeanDecorationFactory();
 
-      changeState(State.BeanManagerValid);
+      changeState(State.BeanManagerValid, true);
       startCreateImmediatelyBeans();
     }
     finally {
@@ -88,9 +88,9 @@ public class PlatformImplementor implements IPlatform {
     }
 
     // start of application not part of the lock to allow the application to use the bean context and the inventory
-    changeState(State.ApplicationStarting);
+    changeState(State.ApplicationStarting, true);
     startApplication(appType);
-    changeState(State.ApplicationStarted);
+    changeState(State.ApplicationStarted, true);
   }
 
   protected BeanManagerImplementor createBeanManager() {
@@ -174,14 +174,14 @@ public class PlatformImplementor implements IPlatform {
   public synchronized void stop() {
     m_stateLock.writeLock().lock();
     try {
-      changeState(State.ApplicationStopping);
+      changeState(State.ApplicationStopping, false);
       stopApplication();
-      changeState(State.ApplicationStopped);
+      changeState(State.ApplicationStopped, false);
       if (Platform.get() == this) {
         Platform.set(null);
       }
-      changeState(State.PlatformStopped);
       destroyBeanManager();
+      changeState(State.PlatformStopped, false);
     }
     finally {
       m_stateLock.writeLock().unlock();
@@ -206,8 +206,10 @@ public class PlatformImplementor implements IPlatform {
     m_beanContext = null;
   }
 
-  protected void changeState(State newState) {
-    verifyStateChange(m_state, newState);
+  protected void changeState(State newState, boolean verify) {
+    if (verify) {
+      verifyStateChange(m_state, newState);
+    }
     if (m_state == newState) {
       return;
     }
@@ -247,15 +249,20 @@ public class PlatformImplementor implements IPlatform {
   }
 
   protected void fireStateEvent(State newState) {
-    PlatformEvent e = new PlatformEvent(this, newState);
-    for (IBean<IPlatformListener> bean : m_beanContext.getBeans(IPlatformListener.class)) {
-      try {
-        IPlatformListener listener = bean.getInstance(IPlatformListener.class);
-        listener.stateChanged(e);
+    try {
+      PlatformEvent e = new PlatformEvent(this, newState);
+      for (IBean<IPlatformListener> bean : m_beanContext.getBeans(IPlatformListener.class)) {
+        try {
+          IPlatformListener listener = bean.getInstance(IPlatformListener.class);
+          listener.stateChanged(e);
+        }
+        catch (Throwable t) {
+          LOG.warn(IPlatformListener.class.getSimpleName() + " " + bean.getBeanClazz(), t);
+        }
       }
-      catch (Throwable t) {
-        LOG.warn(IPlatformListener.class.getSimpleName() + " " + bean.getBeanClazz(), t);
-      }
+    }
+    catch (Throwable t) {
+      LOG.warn("state " + newState, t);
     }
   }
 
