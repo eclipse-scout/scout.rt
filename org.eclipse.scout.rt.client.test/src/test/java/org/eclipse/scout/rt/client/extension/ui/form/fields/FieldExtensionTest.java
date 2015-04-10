@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -38,8 +38,8 @@ public class FieldExtensionTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testFieldExtension() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(PrenameField.class, MyForm.MainBox.class);
-    SERVICES.getService(IExtensionRegistry.class).register(FirstField.class, MyForm.MainBox.class);
+    BEANS.get(IExtensionRegistry.class).register(PrenameField.class, MyForm.MainBox.class);
+    BEANS.get(IExtensionRegistry.class).register(FirstField.class, MyForm.MainBox.class);
 
     MyForm myForm = new MyForm();
     myForm.start();

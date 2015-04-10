@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.PlatformException;
 import org.eclipse.scout.rt.platform.job.IJobManager;

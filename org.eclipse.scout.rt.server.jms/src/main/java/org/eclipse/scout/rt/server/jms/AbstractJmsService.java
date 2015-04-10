@@ -25,10 +25,9 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 
 /**
@@ -132,7 +131,7 @@ public abstract class AbstractJmsService<T> extends AbstractService {
     if (serverVersion != null) {
       sb.append(serverVersion).append(" ");
     }
-    sb.append("nodeId=").append(SERVICES.getService(IClusterSynchronizationService.class).getNodeId()).append(" ");
+    sb.append("nodeId=").append(BEANS.get(IClusterSynchronizationService.class).getNodeId()).append(" ");
     sb.append("registered at ");
     sb.append(DateUtility.format(new Date(), "yyyy-MM-dd HH:mm:ss,SSS"));
     return sb.toString();

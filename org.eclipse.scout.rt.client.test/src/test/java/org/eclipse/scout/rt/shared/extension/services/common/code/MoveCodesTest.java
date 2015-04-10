@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IMoveModelObjectToRootMarker;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
@@ -48,25 +48,25 @@ public class MoveCodesTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveTopLevelCode() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Top2Code.class, 5);
+    BEANS.get(IExtensionRegistry.class).registerMove(Top2Code.class, 5);
     doTestMoveTopLevelCode();
   }
 
   @Test
   public void testMoveTopLevelCodeMoveToRoot() {
-    SERVICES.getService(IExtensionRegistry.class).registerMoveToRoot(Top2Code.class, 5d);
+    BEANS.get(IExtensionRegistry.class).registerMoveToRoot(Top2Code.class, 5d);
     doTestMoveTopLevelCode();
   }
 
   @Test
   public void testMoveTopLevelCodeMoveWithIMoveModelObjectToRootMarker() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Top2Code.class, 5d, IMoveModelObjectToRootMarker.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Top2Code.class, 5d, IMoveModelObjectToRootMarker.class);
     doTestMoveTopLevelCode();
   }
 
   @Test
   public void testMoveTopLevelCodeMoveExplicitNullParent() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Top2Code.class, 5d, null);
+    BEANS.get(IExtensionRegistry.class).registerMove(Top2Code.class, 5d, null);
     doTestMoveTopLevelCode();
   }
 
@@ -81,19 +81,19 @@ public class MoveCodesTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveSubCodeWithinSameParent() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Code.class, 30);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Code.class, 30);
     doTestMoveSubCodeWithinSameParent();
   }
 
   @Test
   public void testMoveSubCodeWithinSameParentExplicitNullParent() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Code.class, 30d, null);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Code.class, 30d, null);
     doTestMoveSubCodeWithinSameParent();
   }
 
   @Test
   public void testMoveSubCodeWithinSameParentExplicitParentClass() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Code.class, 30d, Top1Code.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Code.class, 30d, Top1Code.class);
     doTestMoveSubCodeWithinSameParent();
   }
 
@@ -108,13 +108,13 @@ public class MoveCodesTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveSubCodeToRoot() {
-    SERVICES.getService(IExtensionRegistry.class).registerMoveToRoot(Sub1Top1Code.class, 15d);
+    BEANS.get(IExtensionRegistry.class).registerMoveToRoot(Sub1Top1Code.class, 15d);
     doTestMoveSubCodeToRoot();
   }
 
   @Test
   public void testMoveSubCodeToRootWithIMoveModelObjectToRootMarker() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Code.class, 15d, IMoveModelObjectToRootMarker.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Code.class, 15d, IMoveModelObjectToRootMarker.class);
     doTestMoveSubCodeToRoot();
   }
 
@@ -129,7 +129,7 @@ public class MoveCodesTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveRootCodeToSubCode() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Top1Code.class, 15d, Top2Code.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Top1Code.class, 15d, Top2Code.class);
 
     MoveCodesCodeType codeType = new MoveCodesCodeType();
     List<? extends AbstractCode<String>> rootCodes = codeType.getCodes();
@@ -141,7 +141,7 @@ public class MoveCodesTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveCodeToAnotherCodeWithouChangingOrder() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Code.class, null, Top2Code.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Code.class, null, Top2Code.class);
 
     MoveCodesCodeType codeType = new MoveCodesCodeType();
     List<? extends AbstractCode<String>> rootCodes = codeType.getCodes();
@@ -153,13 +153,13 @@ public class MoveCodesTest extends AbstractLocalExtensionTestCase {
 
   @Test(expected = IllegalExtensionException.class)
   public void testMoveCodeToItselfExceptionOnRegisterMove() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Top1Code.class, null, Top1Code.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Top1Code.class, null, Top1Code.class);
     new MoveCodesCodeType();
   }
 
   @Test(expected = IllegalExtensionException.class)
   public void testMoveCodeToOtherCodeClass() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Top1Code.class, null, Top1Code.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Top1Code.class, null, Top1Code.class);
     new MoveCodesCodeType();
     Assert.fail();
   }

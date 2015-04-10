@@ -48,7 +48,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.internal.RadioButtonGroupGrid;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -155,7 +155,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
         setLookupCall(call);
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + lookupCallClass.getName() + "'.", e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + lookupCallClass.getName() + "'.", e));
       }
     }
     // add fields
@@ -167,7 +167,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
         fields.addOrdered(ConfigurationUtility.newInnerInstance(this, fieldClazz));
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
       }
     }
     fields.addAllOrdered(contributedFields);
@@ -238,7 +238,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
         }
       }
       catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
       }
     }
   }
@@ -319,7 +319,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     ILookupCall<T> call = getLookupCall();
     // Get the data
     if (call != null) {
-      call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractRadioButtonGroup.this));
+      call = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractRadioButtonGroup.this));
       prepareLookupCall(call);
       data = CollectionUtility.arrayList(call.getDataByAll());
     }

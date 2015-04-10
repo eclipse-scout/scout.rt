@@ -62,7 +62,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
@@ -757,7 +757,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * override this method to apply new default handling
    */
   protected void applySearchInternal(final SearchFilter search) {
-    ISearchFilterService sfs = SERVICES.getService(ISearchFilterService.class);
+    ISearchFilterService sfs = BEANS.get(ISearchFilterService.class);
     if (sfs != null) {
       sfs.applySearchDelegate(this, search, true);
     }
@@ -1374,7 +1374,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     m_enabledPermission = p;
     boolean b;
     if (p != null) {
-      b = SERVICES.getService(IAccessControlService.class).checkPermission(p);
+      b = BEANS.get(IAccessControlService.class).checkPermission(p);
     }
     else {
       /*
@@ -1466,7 +1466,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     m_visiblePermission = p;
     boolean b;
     if (p != null) {
-      b = SERVICES.getService(IAccessControlService.class).checkPermission(p);
+      b = BEANS.get(IAccessControlService.class).checkPermission(p);
     }
     else {
       /*
@@ -1504,7 +1504,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         propertySupport.setPropertyBool(PROP_SAVE_NEEDED, m_touched || interceptIsSaveNeeded());
       }
       catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(IExceptionHandlerService.class).handleException(e);
       }
     }
   }
@@ -1526,7 +1526,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       checkSaveNeeded();
     }
     catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(IExceptionHandlerService.class).handleException(e);
     }
   }
 
@@ -1546,7 +1546,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         propertySupport.setPropertyBool(PROP_EMPTY, interceptIsEmpty());
       }
       catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(IExceptionHandlerService.class).handleException(e);
       }
     }
   }
@@ -1923,7 +1923,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", t));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", t));
       }
     }
 
@@ -1933,7 +1933,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error initializing key stroke '" + ks.getClass().getName() + "'.", t));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error initializing key stroke '" + ks.getClass().getName() + "'.", t));
       }
     }
     return CollectionUtility.arrayList(ksMap.values());
@@ -1965,7 +1965,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
           interceptChangedMasterValue(newMasterValue);
         }
         catch (ProcessingException e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+          BEANS.get(IExceptionHandlerService.class).handleException(e);
         }
       }
     }

@@ -51,7 +51,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.CalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -237,7 +237,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         menus.addOrdered(menu);
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
@@ -256,7 +256,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         menus.addAllOrdered(ActionUtility.getActions(provider.getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(CalendarMenuType.EmptySpace), false)));
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + itemProviderClazz.getName() + "'.", e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + itemProviderClazz.getName() + "'.", e));
       }
     }
     producerList.addAll(contributedProducers);
@@ -830,7 +830,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         comp.getProvider().onItemAction(comp.getItem());
       }
       catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(IExceptionHandlerService.class).handleException(e);
       }
       fireCalendarEventInternal(new CalendarEvent(this, CalendarEvent.TYPE_COMPONENT_ACTION, comp));
     }
@@ -956,10 +956,10 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
             comp.getProvider().onItemMoved(comp.getItem(), newDate);
           }
           catch (ProcessingException e) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+            BEANS.get(IExceptionHandlerService.class).handleException(e);
           }
           catch (Throwable e) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", e));
+            BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", e));
           }
         }
         fireCalendarComponentAction();

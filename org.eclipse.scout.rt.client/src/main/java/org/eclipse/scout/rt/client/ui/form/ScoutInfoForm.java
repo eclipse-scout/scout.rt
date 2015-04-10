@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IApplication;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
@@ -221,7 +220,7 @@ public class ScoutInfoForm extends AbstractForm {
       buf.append("<tr><td>" + ScoutTexts.get("OSVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("os.name") + " " + System.getProperty("os.version") + "</td></tr>");
       buf.append("<tr><td>" + ScoutTexts.get("OSUser") + ":</td><td>&nbsp;</td><td>" + System.getProperty("user.name") + "</td></tr>");
       buf.append("<tr><td>" + ScoutTexts.get("MemoryStatus") + ":</td><td>&nbsp;</td><td>" + memUsed + "MB (total " + memTotal + "MB / max " + memMax + "MB)</td></tr>");
-      IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
+      IPerformanceAnalyzerService perf = BEANS.get(IPerformanceAnalyzerService.class);
       if (perf != null) {
         buf.append("<tr><td>" + ScoutTexts.get("NetworkLatency") + ":</td><td>&nbsp;</td><td>" + perf.getNetworkLatency() + " ms</td></tr>");
         buf.append("<tr><td>" + ScoutTexts.get("ExecutionTime") + ":</td><td>&nbsp;</td><td>" + perf.getServerExecutionTime() + " ms</td></tr>");

@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.UpdateUserBookmarkPermission;
@@ -103,7 +103,7 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
    */
   private BookmarkFolder readBookmarkFolder(String filename) throws ProcessingException {
     RemoteFile spec = new RemoteFile("bookmarks", filename, 0);
-    RemoteFile f = SERVICES.getService(IRemoteFileService.class).getRemoteFile(spec);
+    RemoteFile f = BEANS.get(IRemoteFileService.class).getRemoteFile(spec);
     if (f.exists()) {
       try {
         byte[] bytes = f.extractData();
@@ -128,7 +128,7 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
         //
         RemoteFile spec = new RemoteFile("bookmarks", filename, 0);
         spec.readData(new ByteArrayInputStream(bytes));
-        SERVICES.getService(IRemoteFileService.class).putRemoteFile(spec);
+        BEANS.get(IRemoteFileService.class).putRemoteFile(spec);
       }
     }
     catch (ProcessingException e) {

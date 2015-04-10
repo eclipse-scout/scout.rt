@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  *
@@ -37,7 +37,7 @@ public abstract class AbstractContributionComposite implements IContributionOwne
   }
 
   protected AbstractContributionComposite(Object o, boolean useScope) {
-    IInternalExtensionRegistry extensionRegistry = SERVICES.getService(IInternalExtensionRegistry.class);
+    IInternalExtensionRegistry extensionRegistry = BEANS.get(IInternalExtensionRegistry.class);
     try {
       if (useScope) {
         extensionRegistry.pushScope(getClass());
@@ -74,7 +74,7 @@ public abstract class AbstractContributionComposite implements IContributionOwne
     s.defaultReadObject();
     if (m_contributionsByClass == null || m_contributionsByType == null) {
       // ensure that the contributions have been initialized
-      IInternalExtensionRegistry extensionRegistry = SERVICES.getService(IInternalExtensionRegistry.class);
+      IInternalExtensionRegistry extensionRegistry = BEANS.get(IInternalExtensionRegistry.class);
       initContributionsMap(null, extensionRegistry);
     }
   }

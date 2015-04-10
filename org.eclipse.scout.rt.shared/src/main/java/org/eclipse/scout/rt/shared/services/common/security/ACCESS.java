@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.security;
 
 import java.security.Permission;
 
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * Helper class for checking permissions.
@@ -30,7 +30,7 @@ public final class ACCESS {
    * CompanyReadPermission(CompanyReadPermission.OWNED)) -> true
    */
   public static boolean check(Permission p) {
-    return SERVICES.getService(IAccessControlService.class).checkPermission(p);
+    return BEANS.get(IAccessControlService.class).checkPermission(p);
   }
 
   /**
@@ -38,7 +38,7 @@ public final class ACCESS {
    * ACCESS.getLevel(new CompanyReadPermission()) -> CompanyReadPermission.ALL
    */
   public static int getLevel(Permission p) {
-    return SERVICES.getService(IAccessControlService.class).getPermissionLevel(p);
+    return BEANS.get(IAccessControlService.class).getPermissionLevel(p);
   }
 
 }

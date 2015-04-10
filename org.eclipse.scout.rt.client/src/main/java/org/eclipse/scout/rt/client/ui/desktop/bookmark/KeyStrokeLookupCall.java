@@ -18,7 +18,7 @@ import java.util.TreeSet;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
@@ -47,7 +47,7 @@ public class KeyStrokeLookupCall extends LocalLookupCall<String> {
       keyStrokesUpper.put("SHIFT-F" + i, Integer.valueOf(i));
     }
     //remove used keyStrokes
-    IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+    IBookmarkService service = BEANS.get(IBookmarkService.class);
     IBookmarkVisitor v = new IBookmarkVisitor() {
       @Override
       public boolean visitFolder(List<BookmarkFolder> path) {

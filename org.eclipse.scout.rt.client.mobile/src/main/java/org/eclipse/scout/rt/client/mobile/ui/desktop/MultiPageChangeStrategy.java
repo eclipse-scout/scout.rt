@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.DefaultPageChangeStrategy;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IPageChangeStrategy;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 /**
@@ -91,7 +91,7 @@ public class MultiPageChangeStrategy implements IPageChangeStrategy {
         m_subPage.ensureChildrenLoaded();
       }
       catch (ProcessingException e1) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e1);
+        BEANS.get(IExceptionHandlerService.class).handleException(e1);
       }
 
       LOG.debug("Sub page activated: " + selectedPage);

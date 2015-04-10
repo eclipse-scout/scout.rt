@@ -52,9 +52,9 @@ import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -244,7 +244,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     m_virtualDesktop = new VirtualDesktop();
     setMemoryPolicy(new LargeMemoryPolicy());
     // add client notification listener
-    IClientNotificationConsumerService clientNotificationConsumerService = SERVICES.getService(IClientNotificationConsumerService.class);
+    IClientNotificationConsumerService clientNotificationConsumerService = BEANS.get(IClientNotificationConsumerService.class);
     if (clientNotificationConsumerService != null) {
       clientNotificationConsumerService.addClientNotificationConsumerListener(this, new IClientNotificationConsumerListener() {
         @Override
@@ -469,7 +469,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
 
     if (getServiceTunnel() != null) {
       try {
-        SERVICES.getService(ILogoutService.class).logout();
+        BEANS.get(ILogoutService.class).logout();
       }
       catch (Throwable e) {
         LOG.info("Failed to logout from server.", e);

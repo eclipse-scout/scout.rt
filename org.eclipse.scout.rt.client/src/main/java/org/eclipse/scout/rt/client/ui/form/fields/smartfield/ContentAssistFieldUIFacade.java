@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
@@ -56,7 +56,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
       m_field.doSearch(text, selectCurrentValue, false);
     }
     catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(IExceptionHandlerService.class).handleException(e);
     }
   }
 

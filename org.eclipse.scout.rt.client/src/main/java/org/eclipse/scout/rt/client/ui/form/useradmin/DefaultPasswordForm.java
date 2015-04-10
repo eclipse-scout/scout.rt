@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox.GroupBox.OldPasswordField;
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox.GroupBox.RepeatPasswordField;
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox.OkButton;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 
@@ -172,7 +172,7 @@ public class DefaultPasswordForm extends AbstractForm {
       if (getNewPasswordField().getValue() != null && !getNewPasswordField().getValue().equals(getRepeatPasswordField().getValue())) {
         throw new VetoException(ScoutTexts.get("PasswordsDoNotMatch"));
       }
-      IPasswordManagementService svc = SERVICES.getService(IPasswordManagementService.class);
+      IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
       svc.resetPassword(getUserId(), getNewPasswordField().getValue());
     }
   }
@@ -189,7 +189,7 @@ public class DefaultPasswordForm extends AbstractForm {
       if (getNewPasswordField().getValue() != null && !getNewPasswordField().getValue().equals(getRepeatPasswordField().getValue())) {
         throw new VetoException(ScoutTexts.get("PasswordsDoNotMatch"));
       }
-      IPasswordManagementService svc = SERVICES.getService(IPasswordManagementService.class);
+      IPasswordManagementService svc = BEANS.get(IPasswordManagementService.class);
       svc.changePassword(getUserId(), getOldPasswordField().getValue(), getNewPasswordField().getValue());
     }
   }

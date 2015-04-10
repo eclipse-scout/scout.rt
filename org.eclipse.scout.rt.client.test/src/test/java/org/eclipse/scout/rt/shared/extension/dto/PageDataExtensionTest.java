@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.MultiColumnExtension;
@@ -38,8 +38,8 @@ public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
   public void testPageDataSingleExtensionExplicit() throws Exception {
     setupSession();
     try {
-      SERVICES.getService(IExtensionRegistry.class).register(ThirdIntegerColumn.class, OrigPageWithTable.Table.class);
-      SERVICES.getService(IExtensionRegistry.class).register(ThirdIntegerColumnData.class, OrigPageWithTableRowData.class);
+      BEANS.get(IExtensionRegistry.class).register(ThirdIntegerColumn.class, OrigPageWithTable.Table.class);
+      BEANS.get(IExtensionRegistry.class).register(ThirdIntegerColumnData.class, OrigPageWithTableRowData.class);
       doTestSingle();
     }
     finally {
@@ -52,8 +52,8 @@ public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
   public void testPageDataMultipleExtensionAnnotation() throws Exception {
     setupSession();
     try {
-      SERVICES.getService(IExtensionRegistry.class).register(MultiColumnExtension.class);
-      SERVICES.getService(IExtensionRegistry.class).register(MultiColumnExtensionData.class);
+      BEANS.get(IExtensionRegistry.class).register(MultiColumnExtension.class);
+      BEANS.get(IExtensionRegistry.class).register(MultiColumnExtensionData.class);
       doTestMulti();
     }
     finally {

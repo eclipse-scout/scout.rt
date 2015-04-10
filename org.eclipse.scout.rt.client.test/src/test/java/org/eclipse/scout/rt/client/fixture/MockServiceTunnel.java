@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.UriUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.http.ClientHttpServiceTunnel;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -60,7 +60,7 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
       Class<?> serviceInterface = Class.forName(req.getServiceInterfaceClassName());
       Method serviceOperation = ServiceUtility.getServiceOperation(serviceInterface, req.getOperation(), req.getParameterTypes());
       Object service = null;
-      for (Object t : SERVICES.getServices(serviceInterface)) {
+      for (Object t : BEANS.all(serviceInterface)) {
         if (Proxy.isProxyClass(t.getClass())) {
           continue;
         }

@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.MultiTemplateUsageF
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.TemplateStringFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.junit.Test;
 
@@ -61,7 +61,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testContributeToAllTemplateUsages() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(ContributedTestField.class, AbstractTemplateFieldsBox.class);
+    BEANS.get(IExtensionRegistry.class).register(ContributedTestField.class, AbstractTemplateFieldsBox.class);
 
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
     assertTypes(form.getMainBox().getFields(), FirstTemplateBox.class, SecondTemplateBox.class, MainBoxStringField.class);
@@ -81,7 +81,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testContributeOnlyToOneTemplateUsage() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(ContributedTestField.class, new ClassIdentifier(TopFieldsBox.class, AbstractTemplateFieldsBox.class), null);
+    BEANS.get(IExtensionRegistry.class).register(ContributedTestField.class, new ClassIdentifier(TopFieldsBox.class, AbstractTemplateFieldsBox.class), null);
 
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
     assertTypes(form.getMainBox().getFields(), FirstTemplateBox.class, SecondTemplateBox.class, MainBoxStringField.class);
@@ -101,7 +101,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testContributeOnlyToOneNestedTemplateUsage() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(ContributedTestField.class, new ClassIdentifier(FirstTemplateBox.class, TopFieldsBox.class, AbstractTemplateFieldsBox.class), null);
+    BEANS.get(IExtensionRegistry.class).register(ContributedTestField.class, new ClassIdentifier(FirstTemplateBox.class, TopFieldsBox.class, AbstractTemplateFieldsBox.class), null);
 
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
     assertTypes(form.getMainBox().getFields(), FirstTemplateBox.class, SecondTemplateBox.class, MainBoxStringField.class);
@@ -121,7 +121,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testContributeOnlyToOneNestedTemplateUsageOverSpecified() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(ContributedTestField.class, new ClassIdentifier(MultiTemplateUsageForm.class, MultiTemplateUsageForm.MainBox.class, FirstTemplateBox.class, TopFieldsBox.class, AbstractTemplateFieldsBox.class), null);
+    BEANS.get(IExtensionRegistry.class).register(ContributedTestField.class, new ClassIdentifier(MultiTemplateUsageForm.class, MultiTemplateUsageForm.MainBox.class, FirstTemplateBox.class, TopFieldsBox.class, AbstractTemplateFieldsBox.class), null);
 
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
     assertTypes(form.getMainBox().getFields(), FirstTemplateBox.class, SecondTemplateBox.class, MainBoxStringField.class);
@@ -141,7 +141,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testExtendAllStringFields() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(TemplateStringFieldExtension.class, AbstractStringField.class);
+    BEANS.get(IExtensionRegistry.class).register(TemplateStringFieldExtension.class, AbstractStringField.class);
 
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
     form.initForm();
@@ -174,7 +174,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testExtendOnlyToOneTemplateUses() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(TemplateStringFieldExtension.class, new ClassIdentifier(TopFieldsBox.class, AbstractStringField.class), null);
+    BEANS.get(IExtensionRegistry.class).register(TemplateStringFieldExtension.class, new ClassIdentifier(TopFieldsBox.class, AbstractStringField.class), null);
 
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
     form.initForm();
@@ -207,7 +207,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testExtendOnlyToOneTemplateUsesOverSpecified() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(TemplateStringFieldExtension.class, new ClassIdentifier(MultiTemplateUsageForm.class, TopFieldsBox.class, AbstractStringField.class), null);
+    BEANS.get(IExtensionRegistry.class).register(TemplateStringFieldExtension.class, new ClassIdentifier(MultiTemplateUsageForm.class, TopFieldsBox.class, AbstractStringField.class), null);
 
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
     form.initForm();
@@ -240,7 +240,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testExtendTemplate() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(TemplateStringFieldExtension.class, new ClassIdentifier(AbstractTemplateFieldsBox.class, AbstractStringField.class), null);
+    BEANS.get(IExtensionRegistry.class).register(TemplateStringFieldExtension.class, new ClassIdentifier(AbstractTemplateFieldsBox.class, AbstractStringField.class), null);
 
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
     form.initForm();
@@ -273,7 +273,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testDeepLinkingWithExtendsAnnotationOrigForm() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(ExtendedFormExtension.class);
+    BEANS.get(IExtensionRegistry.class).register(ExtendedFormExtension.class);
 
     OrigForm form = new OrigForm();
     form.initForm();
@@ -283,7 +283,7 @@ public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testDeepLinkingWithExtendsAnnotationExtendedForm() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(ExtendedFormExtension.class);
+    BEANS.get(IExtensionRegistry.class).register(ExtendedFormExtension.class);
 
     ExtendedForm form = new ExtendedForm();
     form.initForm();

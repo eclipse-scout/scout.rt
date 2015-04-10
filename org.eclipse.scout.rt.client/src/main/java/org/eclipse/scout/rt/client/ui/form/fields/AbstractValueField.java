@@ -48,7 +48,7 @@ import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.ValueFieldContextMenu;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -120,7 +120,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
         menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
 
@@ -368,7 +368,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
             interceptChangedValue();
           }
           catch (ProcessingException ex) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+            BEANS.get(IExceptionHandlerService.class).handleException(ex);
           }
         }
       }
@@ -461,7 +461,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
         interceptChangedValue();
       }
       catch (ProcessingException ex) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+        BEANS.get(IExceptionHandlerService.class).handleException(ex);
       }
       fireMasterChanged();
     }

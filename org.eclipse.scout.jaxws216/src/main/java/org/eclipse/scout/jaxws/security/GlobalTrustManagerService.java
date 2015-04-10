@@ -36,8 +36,8 @@ import javax.net.ssl.X509TrustManager;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
@@ -100,7 +100,7 @@ public class GlobalTrustManagerService extends AbstractService {
     };
 
     try {
-      RemoteFile[] certRemoteFiles = SERVICES.getService(IRemoteFileService.class).getRemoteFiles(PATH_CERTS, certFilter, null);
+      RemoteFile[] certRemoteFiles = BEANS.get(IRemoteFileService.class).getRemoteFiles(PATH_CERTS, certFilter, null);
       if (certRemoteFiles.length == 0) {
         LOG.warn("No certificates to trust in folder '" + PATH_CERTS + "' could be found.");
       }

@@ -27,7 +27,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
@@ -98,7 +97,7 @@ public class ServerJobServletFilter implements Filter {
     final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
     //external request: apply locking, this is the session initialization phase
-    IHttpSessionCacheService cacheService = SERVICES.getService(IHttpSessionCacheService.class);
+    IHttpSessionCacheService cacheService = BEANS.get(IHttpSessionCacheService.class);
     IServerSession serverSession = (IServerSession) cacheService.getAndTouch(IServerSession.class.getName(), servletRequest, servletResponse);
     if (serverSession == null) {
       synchronized (servletRequest.getSession()) {
@@ -120,7 +119,7 @@ public class ServerJobServletFilter implements Filter {
     final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
     final IServerSession serverSession = BEANS.get(ServerSessionProvider.class).provide(ServerRunContexts.copyCurrent());
-    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(servletRequest, servletResponse));
+    serverSession.setIdInternal(BEANS.get(IClientIdentificationService.class).getClientId(servletRequest, servletResponse));
     return serverSession;
   }
 
@@ -132,7 +131,7 @@ public class ServerJobServletFilter implements Filter {
 
     pe.addContextMessage("Client=%s@%s/%s", servletRequest.getRemoteUser(), servletRequest.getRemoteAddr(), servletRequest.getRemoteHost());
     try {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
+      BEANS.get(IExceptionHandlerService.class).handleException(pe);
     }
     catch (RuntimeException e) {
       LOG.warn("Failed to handle request exception", e);

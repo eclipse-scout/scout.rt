@@ -64,7 +64,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
@@ -210,7 +210,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     List<? extends ILookupRow<KEY>> data;
     // (1) get data by service
     if (getLookupCall() != null) {
-      ILookupCall<KEY> call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractListBox.this));
+      ILookupCall<KEY> call = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractListBox.this));
       prepareLookupCall(call);
       data = call.getDataByAll();
       data = filterLookupResult(call, data);
@@ -334,7 +334,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       }
     }
     catch (Exception e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredTable().getName() + "'.", e));
+      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredTable().getName() + "'.", e));
     }
     // lookup call
     if (getConfiguredLookupCall() != null) {
@@ -343,7 +343,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
         setLookupCall(call);
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredLookupCall().getName() + "'.", e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredLookupCall().getName() + "'.", e));
       }
     }
     // code type
@@ -379,7 +379,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
         fieldList.add(f);
       }// end try
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
       }
     }
     fieldList.addAll(contributedFields);

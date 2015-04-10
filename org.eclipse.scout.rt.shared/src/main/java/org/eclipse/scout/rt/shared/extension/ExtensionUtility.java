@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.shared.extension;
 
 import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 
 public final class ExtensionUtility {
 
@@ -25,7 +25,7 @@ public final class ExtensionUtility {
    * <b>Important</b>: The given {@link Iterable} is not sorted by this method.
    */
   public static void moveModelObjects(Iterable<? extends IOrdered> modelObjects) {
-    IInternalExtensionRegistry extensionRegistry = SERVICES.getService(IInternalExtensionRegistry.class);
+    IInternalExtensionRegistry extensionRegistry = BEANS.get(IInternalExtensionRegistry.class);
     for (IOrdered m : modelObjects) {
       MoveDescriptor<IOrdered> moveDesc = extensionRegistry.createModelMoveDescriptorFor(m, null);
       if (moveDesc != null && moveDesc.getNewOrder() != null) {

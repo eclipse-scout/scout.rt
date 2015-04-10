@@ -29,7 +29,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.JaxWs216Module;
 import org.eclipse.scout.jaxws.service.IJaxWsEndpointService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 
 import com.sun.xml.internal.ws.transport.http.HttpAdapter;
 
@@ -79,7 +79,7 @@ public abstract class EndpointServlet extends HttpServlet {
     if (adapter == null) {
       // No webservice endpoint found: return status page if installed.
       if (StringUtility.equalsIgnoreCase(request.getMethod(), "GET") && m_publishStatusPage) {
-        IJaxWsEndpointService endpointService = SERVICES.getService(IJaxWsEndpointService.class);
+        IJaxWsEndpointService endpointService = BEANS.get(IJaxWsEndpointService.class);
         Collection<ServletAdapter> servletAdapters = m_urlAdapterMap.values();
         try {
           endpointService.onGetRequest(request, response, servletAdapters.toArray(new ServletAdapter[servletAdapters.size()]));
@@ -108,7 +108,7 @@ public abstract class EndpointServlet extends HttpServlet {
   }
 
   protected void installServletAdapters() {
-    IJaxWsEndpointService endpointService = SERVICES.getService(IJaxWsEndpointService.class);
+    IJaxWsEndpointService endpointService = BEANS.get(IJaxWsEndpointService.class);
     for (ServletAdapter servletAdapter : endpointService.getServletAdapters()) {
       String urlPattern = servletAdapter.getValidPath();
       if (urlPattern.contains("*.")) {

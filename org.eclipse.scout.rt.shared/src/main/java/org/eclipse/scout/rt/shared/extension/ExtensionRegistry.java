@@ -34,8 +34,8 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 
 @Priority(-50)
 public class ExtensionRegistry extends AbstractService implements IInternalExtensionRegistry {
@@ -230,7 +230,7 @@ public class ExtensionRegistry extends AbstractService implements IInternalExten
   }
 
   protected boolean isValidContribution(Class<?> contribution, Class<?> container) {
-    for (IExtensionRegistrationValidatorService validator : SERVICES.getServices(IExtensionRegistrationValidatorService.class)) {
+    for (IExtensionRegistrationValidatorService validator : BEANS.all(IExtensionRegistrationValidatorService.class)) {
       if (validator.isValidContribution(contribution, container)) {
         return true;
       }
@@ -370,7 +370,7 @@ public class ExtensionRegistry extends AbstractService implements IInternalExten
   }
 
   protected boolean isValidMove(Class<? extends IOrdered> modelClass, Class<? extends IOrdered> newContainerClass) {
-    for (IExtensionRegistrationValidatorService validator : SERVICES.getServices(IExtensionRegistrationValidatorService.class)) {
+    for (IExtensionRegistrationValidatorService validator : BEANS.all(IExtensionRegistrationValidatorService.class)) {
       if (validator.isValidMove(modelClass, newContainerClass)) {
         return true;
       }

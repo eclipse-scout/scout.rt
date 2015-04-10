@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.extension.ui.action.tree.fixture.TestMenus.To
 import org.eclipse.scout.rt.client.extension.ui.action.tree.fixture.TestMenus.Top2Menu.Sub1Top2Menu;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.fixture.TestMenus.Top2Menu.Sub2Top2Menu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IMoveModelObjectToRootMarker;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
@@ -46,25 +46,25 @@ public class MoveActionNodeTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveTopLevelMenu() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Top2Menu.class, 5);
+    BEANS.get(IExtensionRegistry.class).registerMove(Top2Menu.class, 5);
     doTestMoveTopLevelMenu();
   }
 
   @Test
   public void testMoveTopLevelMenuMoveToRoot() {
-    SERVICES.getService(IExtensionRegistry.class).registerMoveToRoot(Top2Menu.class, 5d);
+    BEANS.get(IExtensionRegistry.class).registerMoveToRoot(Top2Menu.class, 5d);
     doTestMoveTopLevelMenu();
   }
 
   @Test
   public void testMoveTopLevelMenuMoveWithIMoveModelObjectToRootMarker() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Top2Menu.class, 5d, IMoveModelObjectToRootMarker.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Top2Menu.class, 5d, IMoveModelObjectToRootMarker.class);
     doTestMoveTopLevelMenu();
   }
 
   @Test
   public void testMoveTopLevelMenuMoveExplicitNullParent() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Top2Menu.class, 5d, null);
+    BEANS.get(IExtensionRegistry.class).registerMove(Top2Menu.class, 5d, null);
     doTestMoveTopLevelMenu();
   }
 
@@ -79,19 +79,19 @@ public class MoveActionNodeTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveSubMenuWithinSameParent() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Menu.class, 30);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Menu.class, 30);
     doTestMoveSubMenuWithinSameParent();
   }
 
   @Test
   public void testMoveSubMenuWithinSameParentExplicitNullParent() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Menu.class, 30d, null);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Menu.class, 30d, null);
     doTestMoveSubMenuWithinSameParent();
   }
 
   @Test
   public void testMoveSubMenuWithinSameParentExplicitParentClass() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Menu.class, 30d, Top1Menu.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Menu.class, 30d, Top1Menu.class);
     doTestMoveSubMenuWithinSameParent();
   }
 
@@ -106,13 +106,13 @@ public class MoveActionNodeTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveSubMenuToRoot() {
-    SERVICES.getService(IExtensionRegistry.class).registerMoveToRoot(Sub1Top1Menu.class, 15d);
+    BEANS.get(IExtensionRegistry.class).registerMoveToRoot(Sub1Top1Menu.class, 15d);
     doTestMoveSubMenuToRoot();
   }
 
   @Test
   public void testMoveSubMenuToRootWithIMoveModelObjectToRootMarker() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Menu.class, 15d, IMoveModelObjectToRootMarker.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Menu.class, 15d, IMoveModelObjectToRootMarker.class);
     doTestMoveSubMenuToRoot();
   }
 
@@ -127,7 +127,7 @@ public class MoveActionNodeTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveRootMenuToSubMenu() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Top1Menu.class, 15d, Top2Menu.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Top1Menu.class, 15d, Top2Menu.class);
 
     TestMenus menus = new TestMenus();
     List<IMenu> topLevelMenu = menus.getMenus();
@@ -139,7 +139,7 @@ public class MoveActionNodeTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveMenuToAnotherMenuWithouChangingOrder() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Menu.class, null, Top2Menu.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Menu.class, null, Top2Menu.class);
 
     TestMenus menus = new TestMenus();
     List<IMenu> topLevelMenu = menus.getMenus();
@@ -151,7 +151,7 @@ public class MoveActionNodeTest extends AbstractLocalExtensionTestCase {
 
   @Test(expected = IllegalExtensionException.class)
   public void testMoveMenuToItselfExceptionOnRegisterMove() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Top1Menu.class, null, Top1Menu.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Top1Menu.class, null, Top1Menu.class);
     new TestMenus();
   }
 

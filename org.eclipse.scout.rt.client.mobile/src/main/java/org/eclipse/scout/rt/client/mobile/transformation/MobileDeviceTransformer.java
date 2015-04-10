@@ -50,7 +50,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * @since 3.9.0
@@ -78,7 +78,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
     m_toolFormHandler = createToolFormHandler(desktop);
 
-    IBreadCrumbsNavigation breadCrumbsNavigation = SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation();
+    IBreadCrumbsNavigation breadCrumbsNavigation = BEANS.get(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation();
     if (breadCrumbsNavigation != null) {
       breadCrumbsNavigation.trackDisplayViewId(IForm.VIEW_ID_CENTER);
     }

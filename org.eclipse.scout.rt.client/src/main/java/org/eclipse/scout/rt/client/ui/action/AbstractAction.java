@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -511,7 +511,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
         interceptSelectionChanged(b);
       }
       catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(IExceptionHandlerService.class).handleException(e);
       }
     }
   }
@@ -588,7 +588,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   public void setEnabledPermission(Permission p) {
     boolean b;
     if (p != null) {
-      b = SERVICES.getService(IAccessControlService.class).checkPermission(p);
+      b = BEANS.get(IAccessControlService.class).checkPermission(p);
     }
     else {
       b = true;
@@ -630,7 +630,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   public void setVisiblePermission(Permission p) {
     boolean b;
     if (p != null) {
-      b = SERVICES.getService(IAccessControlService.class).checkPermission(p);
+      b = BEANS.get(IAccessControlService.class).checkPermission(p);
     }
     else {
       b = true;
@@ -737,10 +737,10 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
         }
       }
       catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(IExceptionHandlerService.class).handleException(e);
       }
       catch (Throwable e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected exception", e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected exception", e));
       }
     }
 

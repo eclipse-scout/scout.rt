@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.SQL;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -116,7 +116,7 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
     // change wildcards * in text to db specific wildcards
     if (call.getText() != null) {
       String s = call.getText();
-      String sqlWildcard = SERVICES.getService(ISqlService.class).getSqlStyle().getLikeWildcard();
+      String sqlWildcard = BEANS.get(ISqlService.class).getSqlStyle().getLikeWildcard();
       call.setText(s.replaceAll("[*]", sqlWildcard));
     }
     String sql = getConfiguredSqlSelect();

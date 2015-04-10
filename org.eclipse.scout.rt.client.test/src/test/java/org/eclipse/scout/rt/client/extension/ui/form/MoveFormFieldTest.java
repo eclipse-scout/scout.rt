@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.To
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.TopBox.NameField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.SingleTemplateUsageForm;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -56,7 +56,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveField() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(NameField.class, 20d, BottomBox.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(NameField.class, 20d, BottomBox.class);
     OrigForm form = new OrigForm();
 
     assertEquals(1, form.getTopBox().getFieldCount());
@@ -83,8 +83,8 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testDeregisterMove() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(NameField.class, 20d, BottomBox.class);
-    boolean changed = SERVICES.getService(IExtensionRegistry.class).deregisterMove(NameField.class, 20d, BottomBox.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(NameField.class, 20d, BottomBox.class);
+    boolean changed = BEANS.get(IExtensionRegistry.class).deregisterMove(NameField.class, 20d, BottomBox.class);
     assertTrue(changed);
 
     OrigForm form = new OrigForm();
@@ -94,8 +94,8 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveFieldMultipleTimes() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(NameField.class, 20d, BottomBox.class);
-    SERVICES.getService(IExtensionRegistry.class).registerMove(NameField.class, 10d, TopBox.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(NameField.class, 20d, BottomBox.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(NameField.class, 10d, TopBox.class);
     OrigForm form = new OrigForm();
 
     assertEquals(2, form.getTopBox().getFieldCount());
@@ -122,7 +122,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveFieldToRoot() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMoveToRoot(NameField.class, 30d);
+    BEANS.get(IExtensionRegistry.class).registerMoveToRoot(NameField.class, 30d);
     OrigForm form = new OrigForm();
 
     assertEquals(1, form.getTopBox().getFieldCount());
@@ -139,13 +139,13 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveFieldOrderOnlyReparentMethod() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(NameField.class, -5d, null);
+    BEANS.get(IExtensionRegistry.class).registerMove(NameField.class, -5d, null);
     doTestMoveFieldOrderOnly();
   }
 
   @Test
   public void testMoveFieldOrderOnlyMoveMethod() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(NameField.class, -5d);
+    BEANS.get(IExtensionRegistry.class).registerMove(NameField.class, -5d);
     doTestMoveFieldOrderOnly();
   }
 
@@ -173,7 +173,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveFieldContainerOnly() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(NameField.class, null, BottomBox.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(NameField.class, null, BottomBox.class);
     OrigForm form = new OrigForm();
 
     assertEquals(1, form.getTopBox().getFieldCount());
@@ -206,7 +206,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testSingleTemplateUsageFormMoveFieldInTemplate() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, null);
+    BEANS.get(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, null);
     SingleTemplateUsageForm form = new SingleTemplateUsageForm();
 
     assertEquals(1, form.getMainBox().getFieldCount());
@@ -216,7 +216,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testSingleTemplateUsageFormMoveFieldInTemplateExplicitCotnainer() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, SingleTemplateUsageForm.MainBox.TemplateUsageBox.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, SingleTemplateUsageForm.MainBox.TemplateUsageBox.class);
     SingleTemplateUsageForm form = new SingleTemplateUsageForm();
 
     assertEquals(1, form.getMainBox().getFieldCount());
@@ -226,7 +226,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test(expected = IllegalArgumentException.class)
   public void testSingleTemplateUsageFormMoveTemplateFieldOutOfTemplate() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, SingleTemplateUsageForm.MainBox.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, SingleTemplateUsageForm.MainBox.class);
     new SingleTemplateUsageForm();
   }
 
@@ -263,7 +263,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMultiTemplateUsageFormMoveTopStringField() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, null);
+    BEANS.get(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, null);
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
 
     assertEquals(3, form.getMainBox().getFieldCount());
@@ -295,8 +295,8 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMultiTemplateUsageFormMoveFirstBoxAndTopStringField() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, null);
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AbstractTemplateGroupsBox.TopFieldsBox.class, 30d, null);
+    BEANS.get(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, null);
+    BEANS.get(IExtensionRegistry.class).registerMove(AbstractTemplateGroupsBox.TopFieldsBox.class, 30d, null);
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
 
     assertEquals(3, form.getMainBox().getFieldCount());
@@ -329,7 +329,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
   @Test
   public void testMultiTemplateUsageFormMoveTopStringFieldInFirstTemplateBoxUsingClassIdentifier() throws Exception {
     // XXX abr overload method
-    SERVICES.getService(IExtensionRegistry.class).registerMove(new ClassIdentifier(FirstTemplateBox.class, TopStringField.class), 30d);
+    BEANS.get(IExtensionRegistry.class).registerMove(new ClassIdentifier(FirstTemplateBox.class, TopStringField.class), 30d);
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
 
     assertEquals(3, form.getMainBox().getFieldCount());
@@ -361,7 +361,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMultiTemplateUsageFormMoveTopStringFieldInFirstTemplateBoxUsingOverspecifiedClassIdentifier() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(new ClassIdentifier(MultiTemplateUsageForm.class, MultiTemplateUsageForm.MainBox.class, FirstTemplateBox.class, TopStringField.class), 30d);
+    BEANS.get(IExtensionRegistry.class).registerMove(new ClassIdentifier(MultiTemplateUsageForm.class, MultiTemplateUsageForm.MainBox.class, FirstTemplateBox.class, TopStringField.class), 30d);
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
 
     assertEquals(3, form.getMainBox().getFieldCount());
@@ -393,7 +393,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMultiTemplateUsageFormMoveWithDeepLinkedTarget() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(new ClassIdentifier(MainBoxStringField.class), 15d, new ClassIdentifier(SecondTemplateBox.class, TopFieldsBox.class));
+    BEANS.get(IExtensionRegistry.class).registerMove(new ClassIdentifier(MainBoxStringField.class), 15d, new ClassIdentifier(SecondTemplateBox.class, TopFieldsBox.class));
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
 
     assertClasses(form.getMainBox().getFields(), FirstTemplateBox.class, SecondTemplateBox.class);
@@ -413,7 +413,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMultiTemplateUsageFormMoveWithDeepLinkedTargetOverspecified() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(new ClassIdentifier(MainBoxStringField.class), 15d, new ClassIdentifier(MultiTemplateUsageForm.class, MultiTemplateUsageForm.MainBox.class, SecondTemplateBox.class, TopFieldsBox.class));
+    BEANS.get(IExtensionRegistry.class).registerMove(new ClassIdentifier(MainBoxStringField.class), 15d, new ClassIdentifier(MultiTemplateUsageForm.class, MultiTemplateUsageForm.MainBox.class, SecondTemplateBox.class, TopFieldsBox.class));
     MultiTemplateUsageForm form = new MultiTemplateUsageForm();
 
     assertClasses(form.getMainBox().getFields(), FirstTemplateBox.class, SecondTemplateBox.class);
@@ -433,13 +433,13 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
 
   @Test(expected = IllegalArgumentException.class)
   public void testMultiTemplateUsageFormMoveTopStringFieldOutOfContainer() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, MultiTemplateUsageForm.MainBox.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(AbstractTemplateFieldsBox.TopStringField.class, 30d, MultiTemplateUsageForm.MainBox.class);
     new MultiTemplateUsageForm();
   }
 
   @Test
   public void testMoveFormFieldStackOverflow() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(MoveFormFieldStackOverflowForm.MainBox.TopBox.NameField.class, 30d, MoveFormFieldStackOverflowForm.MainBox.BottomBox.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(MoveFormFieldStackOverflowForm.MainBox.TopBox.NameField.class, 30d, MoveFormFieldStackOverflowForm.MainBox.BottomBox.class);
     new MoveFormFieldStackOverflowForm();
   }
 
@@ -485,7 +485,7 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
   }
 
   private MoveFieldsTestForm setupTestMoveFormFieldGetByOnAnyLevel() throws ProcessingException {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(MoveFieldsTestForm.MainBox.TopBox.SubBox.StringField.class, null, MoveFieldsTestForm.MainBox.BottomBox.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(MoveFieldsTestForm.MainBox.TopBox.SubBox.StringField.class, null, MoveFieldsTestForm.MainBox.BottomBox.class);
 
     MoveFieldsTestForm form = new MoveFieldsTestForm();
     // check setup

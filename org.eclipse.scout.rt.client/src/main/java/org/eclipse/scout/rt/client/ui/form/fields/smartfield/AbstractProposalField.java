@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -181,7 +181,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
           proposalChooser.dataFetchedDelegate(result, getBrowseMaxRowCount());
         }
         catch (ProcessingException e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+          BEANS.get(IExceptionHandlerService.class).handleException(e);
         }
       }
     }
@@ -274,7 +274,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
         }
       }
       catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(IExceptionHandlerService.class).handleException(e);
       }
       return false;
     }

@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.fixture.TestWizard.Second
 import org.eclipse.scout.rt.client.extension.ui.wizard.fixture.TestWizard.ThirdWizardStep;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class MoveWizardStepTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveWizardStep() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(FirstWizardStep.class, 40);
+    BEANS.get(IExtensionRegistry.class).registerMove(FirstWizardStep.class, 40);
 
     TestWizard wizard = new TestWizard();
     assertWizardSteps(wizard, SecondWizardStep.class, ThirdWizardStep.class, FirstWizardStep.class);
@@ -45,8 +45,8 @@ public class MoveWizardStepTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveWizardSteps() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(FirstWizardStep.class, 40);
-    SERVICES.getService(IExtensionRegistry.class).registerMove(ThirdWizardStep.class, 5);
+    BEANS.get(IExtensionRegistry.class).registerMove(FirstWizardStep.class, 40);
+    BEANS.get(IExtensionRegistry.class).registerMove(ThirdWizardStep.class, 5);
 
     TestWizard wizard = new TestWizard();
     assertWizardSteps(wizard, ThirdWizardStep.class, SecondWizardStep.class, FirstWizardStep.class);
@@ -54,8 +54,8 @@ public class MoveWizardStepTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveWizardStepMultipleTimes() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(FirstWizardStep.class, 15);
-    SERVICES.getService(IExtensionRegistry.class).registerMove(FirstWizardStep.class, 25);
+    BEANS.get(IExtensionRegistry.class).registerMove(FirstWizardStep.class, 15);
+    BEANS.get(IExtensionRegistry.class).registerMove(FirstWizardStep.class, 25);
 
     TestWizard wizard = new TestWizard();
     assertWizardSteps(wizard, SecondWizardStep.class, FirstWizardStep.class, ThirdWizardStep.class);
@@ -63,7 +63,7 @@ public class MoveWizardStepTest extends AbstractLocalExtensionTestCase {
 
   @Test(expected = IllegalExtensionException.class)
   public void testMoveWizardStepToRoot() {
-    SERVICES.getService(IExtensionRegistry.class).registerMoveToRoot(FirstWizardStep.class, 15d);
+    BEANS.get(IExtensionRegistry.class).registerMoveToRoot(FirstWizardStep.class, 15d);
   }
 
   protected static void assertWizardSteps(TestWizard wizard, Class<?>... expectedWizardStepClasses) {

@@ -18,8 +18,8 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.Server;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
@@ -36,8 +36,8 @@ public class LogoutService extends AbstractService implements ILogoutService {
     HttpServletRequest httpRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
     HttpServletResponse httpResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
-    SERVICES.getService(IHttpSessionCacheService.class).remove(IServerSession.class.getName(), httpRequest, httpResponse);
-    SERVICES.getService(IHttpSessionCacheService.class).remove(Subject.class.getName(), httpRequest, httpResponse);
+    BEANS.get(IHttpSessionCacheService.class).remove(IServerSession.class.getName(), httpRequest, httpResponse);
+    BEANS.get(IHttpSessionCacheService.class).remove(Subject.class.getName(), httpRequest, httpResponse);
     try {
       HttpSession session = httpRequest.getSession();
       session.invalidate();

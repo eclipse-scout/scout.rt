@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.To
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.TopBox.SalutationField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigFormStringFieldContribution;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigFormStringFieldExtension;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.junit.Test;
 
@@ -51,7 +51,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    */
   @Test
   public void testOrigFormWithExtensionOnOrigForm() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, SalutationField.class);
+    BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, SalutationField.class);
 
     OrigForm form = new OrigForm();
     form.getSalutationField().setValue("test");
@@ -66,7 +66,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    */
   @Test
   public void testOrigFormWithExtensionOnExtendedForm() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, SalutationFieldEx.class);
+    BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, SalutationFieldEx.class);
 
     OrigForm form = new OrigForm();
     form.getSalutationField().setValue("test");
@@ -80,7 +80,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    */
   @Test
   public void testOrigFormWithContributionOnOrigForm() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(OrigFormStringFieldContribution.class, TopBox.class);
+    BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldContribution.class, TopBox.class);
 
     OrigForm form = new OrigForm();
     form.getFieldByClass(OrigFormStringFieldContribution.class).setValue("test");
@@ -107,7 +107,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    */
   @Test
   public void testExtendedFormReplaceWithExtensionOnOrigForm() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, SalutationField.class);
+    BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, SalutationField.class);
 
     ExtendedForm form = new ExtendedForm();
     form.getSalutationField().setValue("test");
@@ -123,7 +123,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    */
   @Test
   public void testExtendedFormReplaceWithExtensionOnExtendedForm() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, SalutationFieldEx.class);
+    BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, SalutationFieldEx.class);
 
     ExtendedForm form = new ExtendedForm();
     form.getSalutationField().setValue("test");
@@ -151,7 +151,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    */
   @Test
   public void testExtededFormInjectWithExtension() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, CountryField.class);
+    BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, CountryField.class);
 
     ExtendedForm form = new ExtendedForm();
     form.getCountryField().setValue("test");
@@ -178,7 +178,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    */
   @Test
   public void testExtededFormInjectContainerWithExtension() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, BottomDetailBoxField.class);
+    BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldExtension.class, BottomDetailBoxField.class);
 
     ExtendedForm form = new ExtendedForm();
     form.getBottomDetailBoxField().setValue("test");
@@ -193,7 +193,7 @@ public class InjectAndReplaceFormExtensionTest extends AbstractLocalExtensionTes
    */
   @Test
   public void testExtededFormInjectContainerWithContribution() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(OrigFormStringFieldContribution.class, BottomDetailBox.class);
+    BEANS.get(IExtensionRegistry.class).register(OrigFormStringFieldContribution.class, BottomDetailBox.class);
 
     ExtendedForm form = new ExtendedForm();
     form.getFieldByClass(OrigFormStringFieldContribution.class).setValue("test");

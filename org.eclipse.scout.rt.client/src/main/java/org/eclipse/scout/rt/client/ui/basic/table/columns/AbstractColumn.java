@@ -66,7 +66,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -916,7 +916,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   public void setVisiblePermission(Permission p) {
     boolean b;
     if (p != null) {
-      b = SERVICES.getService(IAccessControlService.class).checkPermission(p);
+      b = BEANS.get(IAccessControlService.class).checkPermission(p);
     }
     else {
       b = true;

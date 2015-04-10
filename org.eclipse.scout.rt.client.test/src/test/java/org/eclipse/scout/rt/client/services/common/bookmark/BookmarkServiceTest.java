@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -56,7 +56,7 @@ public class BookmarkServiceTest {
     Bookmark bookmark = new Bookmark();
     bookmark.setText("My Bookmark Text");
     Mockito.when(m_mockDesktop.createBookmark()).thenReturn(bookmark);
-    IBookmarkService s = SERVICES.getService(IBookmarkService.class);
+    IBookmarkService s = BEANS.get(IBookmarkService.class);
     Assert.assertNotNull(s);
     s.setStartBookmark();
 
@@ -71,7 +71,7 @@ public class BookmarkServiceTest {
     Bookmark bookmark = new Bookmark();
     bookmark.setText("My Bookmark Text");
     Mockito.when(m_mockDesktop.createBookmark()).thenReturn(bookmark);
-    IBookmarkService s = SERVICES.getService(IBookmarkService.class);
+    IBookmarkService s = BEANS.get(IBookmarkService.class);
     Assert.assertNotNull(s);
     s.setStartBookmark();
 

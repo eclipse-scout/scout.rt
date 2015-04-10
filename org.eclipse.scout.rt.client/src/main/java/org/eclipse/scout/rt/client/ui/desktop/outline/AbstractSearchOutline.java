@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeUIFacade;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
@@ -78,7 +78,7 @@ public class AbstractSearchOutline extends AbstractOutline implements ISearchOut
         AbstractSearchOutline.this.search();
       }
       catch (ProcessingException se) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(se);
+        BEANS.get(IExceptionHandlerService.class).handleException(se);
       }
       finally {
         popUIProcessor();

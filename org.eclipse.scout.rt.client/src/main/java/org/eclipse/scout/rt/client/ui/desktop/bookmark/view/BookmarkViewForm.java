@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractLinkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.CreateUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.DeleteUserBookmarkPermission;
@@ -227,7 +227,7 @@ public class BookmarkViewForm extends AbstractForm {
                   form = getConfiguredBookmarkForm().newInstance();
                 }
                 catch (Exception e) {
-                  SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredBookmarkForm().getName() + "'.", e));
+                  BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredBookmarkForm().getName() + "'.", e));
                 }
               }
               if (form == null) {
@@ -248,7 +248,7 @@ public class BookmarkViewForm extends AbstractForm {
                   folder = form.getBookmarkRootFolder();
                 }
                 folder.getBookmarks().add(b);
-                IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+                IBookmarkService service = BEANS.get(IBookmarkService.class);
                 service.storeBookmarks();
               }
             }
@@ -274,7 +274,7 @@ public class BookmarkViewForm extends AbstractForm {
 
           @Override
           protected void execClickAction() throws ProcessingException {
-            IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+            IBookmarkService service = BEANS.get(IBookmarkService.class);
             service.setStartBookmark();
             service.storeBookmarks();
           }
@@ -299,7 +299,7 @@ public class BookmarkViewForm extends AbstractForm {
 
           @Override
           protected void execClickAction() throws ProcessingException {
-            IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+            IBookmarkService service = BEANS.get(IBookmarkService.class);
             service.deleteStartBookmark();
             service.storeBookmarks();
           }
@@ -309,7 +309,7 @@ public class BookmarkViewForm extends AbstractForm {
   }
 
   private void refreshFormState() {
-    IBookmarkService bmService = SERVICES.getService(IBookmarkService.class);
+    IBookmarkService bmService = BEANS.get(IBookmarkService.class);
     getUserBookmarkTreeField().setBookmarkRootFolder(bmService.getBookmarkData().getUserBookmarks());
     getUserBookmarkTreeField().populateTree();
   }
@@ -324,7 +324,7 @@ public class BookmarkViewForm extends AbstractForm {
           ModelJobs.schedule(new IRunnable() {
             @Override
             public void run() throws Exception {
-              SERVICES.getService(IBookmarkService.class).loadBookmarks();
+              BEANS.get(IBookmarkService.class).loadBookmarks();
             }
           });
         }
@@ -346,12 +346,12 @@ public class BookmarkViewForm extends AbstractForm {
     @Override
     protected void execLoad() throws ProcessingException {
       //add listeners
-      IClientNotificationConsumerService cncService = SERVICES.getService(IClientNotificationConsumerService.class);
+      IClientNotificationConsumerService cncService = BEANS.get(IClientNotificationConsumerService.class);
       if (cncService != null) {
         cncService.removeClientNotificationConsumerListener(ClientSessionProvider.currentSession(), m_cncListener);
         cncService.addClientNotificationConsumerListener(ClientSessionProvider.currentSession(), m_cncListener);
       }
-      IBookmarkService bmService = SERVICES.getService(IBookmarkService.class);
+      IBookmarkService bmService = BEANS.get(IBookmarkService.class);
       if (bmService != null) {
         bmService.removeBookmarkServiceListener(m_bmListener);
         bmService.addBookmarkServiceListener(m_bmListener);
@@ -361,8 +361,8 @@ public class BookmarkViewForm extends AbstractForm {
 
     @Override
     protected void execFinally() throws ProcessingException {
-      IBookmarkService bmService = SERVICES.getService(IBookmarkService.class);
-      IClientNotificationConsumerService cncService = SERVICES.getService(IClientNotificationConsumerService.class);
+      IBookmarkService bmService = BEANS.get(IBookmarkService.class);
+      IClientNotificationConsumerService cncService = BEANS.get(IClientNotificationConsumerService.class);
       if (bmService != null) {
         bmService.removeBookmarkServiceListener(m_bmListener);
       }

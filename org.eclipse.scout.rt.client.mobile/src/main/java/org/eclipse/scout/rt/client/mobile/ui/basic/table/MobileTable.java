@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 /**
@@ -69,7 +69,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
       getOriginalTable().addUITableListener(m_tableListener);
     }
     catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(IExceptionHandlerService.class).handleException(e);
     }
   }
 
@@ -295,7 +295,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
         getContentColumn().updateValue(row, insertedRow, getDrillDownStyleMap());
       }
       catch (ProcessingException exception) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(exception);
+        BEANS.get(IExceptionHandlerService.class).handleException(exception);
       }
     }
   }
@@ -325,7 +325,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
 
       }
       catch (ProcessingException exception) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(exception);
+        BEANS.get(IExceptionHandlerService.class).handleException(exception);
       }
     }
     finally {

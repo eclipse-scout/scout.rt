@@ -14,8 +14,8 @@ import java.util.ArrayList;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.workflow.AbstractWorkflowData;
 import org.eclipse.scout.rt.shared.services.common.workflow.IWorkflowProviderService;
@@ -26,7 +26,7 @@ public class WorkflowProviderService extends AbstractService implements IWorkflo
   @Override
   public AbstractWorkflowData[] getAvailableWorkflowTypes(SearchFilter filter) throws ProcessingException {
     ArrayList<AbstractWorkflowData> list = new ArrayList<AbstractWorkflowData>();
-    for (IWorkflowService s : SERVICES.getServices(IWorkflowService.class)) {
+    for (IWorkflowService s : BEANS.all(IWorkflowService.class)) {
       for (AbstractWorkflowData data : s.getAvailableWorkflowTypes(filter)) {
         list.add(data);
       }
@@ -37,7 +37,7 @@ public class WorkflowProviderService extends AbstractService implements IWorkflo
   @Override
   public AbstractWorkflowData[] getFilteredWorkflows(SearchFilter filter) throws ProcessingException {
     ArrayList<AbstractWorkflowData> list = new ArrayList<AbstractWorkflowData>();
-    for (IWorkflowService s : SERVICES.getServices(IWorkflowService.class)) {
+    for (IWorkflowService s : BEANS.all(IWorkflowService.class)) {
       for (AbstractWorkflowData data : s.getFilteredWorkflows(filter)) {
         list.add(data);
       }
@@ -79,7 +79,7 @@ public class WorkflowProviderService extends AbstractService implements IWorkflo
   private <T extends AbstractWorkflowData> IWorkflowService<T> findWorkflowService(T spec) throws ProcessingException {
     String className = spec.getDefinitionServiceClass();
     if (className != null) {
-      for (IWorkflowService s : SERVICES.getServices(IWorkflowService.class)) {
+      for (IWorkflowService s : BEANS.all(IWorkflowService.class)) {
         if (s.getClass().getName().equals(className)) {
           return s;
         }

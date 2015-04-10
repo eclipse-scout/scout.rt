@@ -30,10 +30,9 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
@@ -154,10 +153,10 @@ public class ServiceTunnelServlet extends HttpServlet {
         final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
         final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
-        AdminSession adminSession = (AdminSession) SERVICES.getService(IHttpSessionCacheService.class).getAndTouch(ADMIN_SESSION_KEY, servletRequest, servletResponse);
+        AdminSession adminSession = (AdminSession) BEANS.get(IHttpSessionCacheService.class).getAndTouch(ADMIN_SESSION_KEY, servletRequest, servletResponse);
         if (adminSession == null) {
           adminSession = new AdminSession();
-          SERVICES.getService(IHttpSessionCacheService.class).put(ADMIN_SESSION_KEY, adminSession, servletRequest, servletResponse);
+          BEANS.get(IHttpSessionCacheService.class).put(ADMIN_SESSION_KEY, adminSession, servletRequest, servletResponse);
         }
         adminSession.serviceRequest(servletRequest, servletResponse);
       }
@@ -280,7 +279,7 @@ public class ServiceTunnelServlet extends HttpServlet {
     final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
     //external request: apply locking, this is the session initialization phase
-    IHttpSessionCacheService cacheService = SERVICES.getService(IHttpSessionCacheService.class);
+    IHttpSessionCacheService cacheService = BEANS.get(IHttpSessionCacheService.class);
     IServerSession serverSession = (IServerSession) cacheService.getAndTouch(IServerSession.class.getName(), servletRequest, servletResponse);
     if (serverSession == null) {
       synchronized (servletRequest.getSession()) {
@@ -306,7 +305,7 @@ public class ServiceTunnelServlet extends HttpServlet {
     final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
     final IServerSession serverSession = BEANS.get(ServerSessionProvider.class).provide(serverRunContext);
-    serverSession.setIdInternal(SERVICES.getService(IClientIdentificationService.class).getClientId(servletRequest, servletResponse));
+    serverSession.setIdInternal(BEANS.get(IClientIdentificationService.class).getClientId(servletRequest, servletResponse));
     return serverSession;
   }
 

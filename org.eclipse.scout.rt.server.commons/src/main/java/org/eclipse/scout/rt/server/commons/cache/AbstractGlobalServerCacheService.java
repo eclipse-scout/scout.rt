@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.commons.cache;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  *
@@ -63,7 +63,7 @@ public abstract class AbstractGlobalServerCacheService extends AbstractHttpSessi
   public abstract void touch(String key, Long expiration);
 
   protected String getKeyWithId(String key, HttpServletRequest req, HttpServletResponse res) {
-    String sessionId = SERVICES.getService(IClientIdentificationService.class).getClientId(req, res);
+    String sessionId = BEANS.get(IClientIdentificationService.class).getClientId(req, res);
     return sessionId + "_" + key;
   }
 

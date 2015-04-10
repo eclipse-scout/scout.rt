@@ -16,10 +16,10 @@ import static org.junit.Assert.assertNull;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.AnnotationFactory;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -68,7 +68,7 @@ public class SERVICESTest {
    */
   @Test
   public void testGetServiceHighestRanking() {
-    ITestService service = SERVICES.getService(ITestService.class);
+    ITestService service = BEANS.get(ITestService.class);
     assertEquals("Service with highest ranking expected.", TestService3.class, service.getClass());
   }
 
@@ -77,7 +77,7 @@ public class SERVICESTest {
    */
   @Test
   public void testGetServicesOrderedByRanking() {
-    List<ITestService> services = SERVICES.getServices(ITestService.class);
+    List<ITestService> services = BEANS.all(ITestService.class);
     assertEquals("3 services should be registered ", 3, services.size());
     assertEquals("Services should be ordered ", TestService3.class, services.get(0).getClass());
     assertEquals("Services should be ordered ", TestService2.class, services.get(1).getClass());
@@ -89,7 +89,7 @@ public class SERVICESTest {
    */
   @Test(expected = AssertionError.class)
   public void testGetServiceNull() {
-    IUnregisteredTestService service = SERVICES.getService(IUnregisteredTestService.class);
+    IUnregisteredTestService service = BEANS.get(IUnregisteredTestService.class);
     assertNull("No service should be found. ", service);
   }
 
@@ -98,7 +98,7 @@ public class SERVICESTest {
    */
   @Test
   public void testGetServicesNull() {
-    List<IUnregisteredTestService> services = SERVICES.getServices(IUnregisteredTestService.class);
+    List<IUnregisteredTestService> services = BEANS.all(IUnregisteredTestService.class);
     assertEquals("No services should be found. ", 0, services.size());
   }
 

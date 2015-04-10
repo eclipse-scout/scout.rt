@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 /**
@@ -162,7 +162,7 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
       doClose();
     }
     catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(IExceptionHandlerService.class).handleException(e);
     }
   }
 
@@ -193,7 +193,7 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
         }
       }
       catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(IExceptionHandlerService.class).handleException(e);
       }
     }
 

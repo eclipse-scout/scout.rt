@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.AbstractPers
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.AllPersonTable;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.OtherPersonTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ public class TableMoveColumnsTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveColumn() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AllPersonTable.CityColumn.class, 30);
+    BEANS.get(IExtensionRegistry.class).registerMove(AllPersonTable.CityColumn.class, 30);
 
     AllPersonTable table = new AllPersonTable();
     assertEquals(Arrays.<IColumn<?>> asList(table.getNameColumn(), table.getAgeColumn(), table.getCityColumn()), table.getColumnSet().getColumns());
@@ -36,9 +36,9 @@ public class TableMoveColumnsTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveColumns() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AllPersonTable.CityColumn.class, 5);
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AbstractPersonTable.AgeColumn.class, 10);
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AbstractPersonTable.NameColumn.class, 20);
+    BEANS.get(IExtensionRegistry.class).registerMove(AllPersonTable.CityColumn.class, 5);
+    BEANS.get(IExtensionRegistry.class).registerMove(AbstractPersonTable.AgeColumn.class, 10);
+    BEANS.get(IExtensionRegistry.class).registerMove(AbstractPersonTable.NameColumn.class, 20);
 
     AllPersonTable table = new AllPersonTable();
     assertEquals(Arrays.<IColumn<?>> asList(table.getCityColumn(), table.getAgeColumn(), table.getNameColumn()), table.getColumnSet().getColumns());
@@ -49,8 +49,8 @@ public class TableMoveColumnsTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveColumnMultipleTimes() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AllPersonTable.CityColumn.class, 30);
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AllPersonTable.CityColumn.class, 5);
+    BEANS.get(IExtensionRegistry.class).registerMove(AllPersonTable.CityColumn.class, 30);
+    BEANS.get(IExtensionRegistry.class).registerMove(AllPersonTable.CityColumn.class, 5);
 
     AllPersonTable table = new AllPersonTable();
     assertEquals(Arrays.<IColumn<?>> asList(table.getCityColumn(), table.getNameColumn(), table.getAgeColumn()), table.getColumnSet().getColumns());
@@ -59,7 +59,7 @@ public class TableMoveColumnsTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveColumnInAbstractTable() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(AbstractPersonTable.AgeColumn.class, 5);
+    BEANS.get(IExtensionRegistry.class).registerMove(AbstractPersonTable.AgeColumn.class, 5);
 
     AllPersonTable allTable = new AllPersonTable();
     assertEquals(Arrays.<IColumn<?>> asList(allTable.getAgeColumn(), allTable.getNameColumn(), allTable.getCityColumn()), allTable.getColumnSet().getColumns());

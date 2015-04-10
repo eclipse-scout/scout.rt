@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -74,7 +74,7 @@ public final class TableUtility {
       }
     }
     catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(IExceptionHandlerService.class).handleException(e);
     }
   }
 

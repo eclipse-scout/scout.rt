@@ -22,8 +22,8 @@ import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
@@ -152,7 +152,7 @@ public class DefaultTransactionDelegate {
     }
     Set<String> consumedNotifications = serviceReq.getConsumedNotifications();
     if (consumedNotifications != null && consumedNotifications.size() > 0) {
-      IClientNotificationService notificationService = SERVICES.getService(IClientNotificationService.class);
+      IClientNotificationService notificationService = BEANS.get(IClientNotificationService.class);
       notificationService.ackNotifications(consumedNotifications);
     }
     CallInspector callInspector = null;
@@ -168,7 +168,7 @@ public class DefaultTransactionDelegate {
       Method serviceOp = ServiceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
       checkRemoteServiceAccessByInterface(serviceInterfaceClass, serviceOp, serviceReq.getArgs());
       //check access: service impl exists
-      Object service = SERVICES.getService(serviceInterfaceClass);
+      Object service = BEANS.get(serviceInterfaceClass);
       if (service == null) {
         throw new SecurityException("service registry does not contain a service of type " + serviceReq.getServiceInterfaceClassName());
       }
@@ -497,7 +497,7 @@ public class DefaultTransactionDelegate {
     if (t instanceof ProcessingException) {
       ProcessingException pe = (ProcessingException) t;
       pe.addContextMessage(serviceOperation);
-      SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
+      BEANS.get(IExceptionHandlerService.class).handleException(pe);
     }
     else {
       LOG.error(String.format("Unexpected error while invoking service operation [%s]", serviceOperation), t);
@@ -540,7 +540,7 @@ public class DefaultTransactionDelegate {
 
     @Override
     public void release() {
-      Set<IClientNotification> nextNotifications = SERVICES.getService(IClientNotificationService.class).getNextNotifications(0);
+      Set<IClientNotification> nextNotifications = BEANS.get(IClientNotificationService.class).getNextNotifications(0);
       m_serviceTunnelResponse.setClientNotifications(nextNotifications);
     }
 

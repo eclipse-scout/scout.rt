@@ -51,9 +51,9 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -420,7 +420,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         steps.addOrdered(step);
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + element.getName() + "'.", e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + element.getName() + "'.", e));
       }
     }
     for (IWizardStep step : contributedSteps) {
@@ -815,10 +815,10 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
           interceptActiveStepChanged();
         }
         catch (ProcessingException e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+          BEANS.get(IExceptionHandlerService.class).handleException(e);
         }
         catch (Throwable t) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
         }
       }
       finally {
@@ -834,10 +834,10 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       interceptRefreshButtonPolicy();
     }
     catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(IExceptionHandlerService.class).handleException(e);
     }
     catch (Throwable t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
     }
   }
 

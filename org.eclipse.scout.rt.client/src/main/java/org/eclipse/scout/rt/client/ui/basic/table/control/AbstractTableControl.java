@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 /**
@@ -77,7 +77,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
       return getConfiguredForm().newInstance();
     }
     catch (Exception e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredForm().getName() + "'.", e));
+      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredForm().getName() + "'.", e));
     }
     return null;
   }

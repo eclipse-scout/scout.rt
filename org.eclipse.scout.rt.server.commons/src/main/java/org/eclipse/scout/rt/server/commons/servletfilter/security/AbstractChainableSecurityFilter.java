@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
 
@@ -200,13 +200,13 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
 
   protected void cacheSubject(final HttpServletRequest req, final HttpServletResponse res, Subject subject) {
     synchronized (req.getSession()) {
-      SERVICES.getService(IHttpSessionCacheService.class).put(PROP_SUBJECT, subject, req, res);
+      BEANS.get(IHttpSessionCacheService.class).put(PROP_SUBJECT, subject, req, res);
     }
   }
 
   protected Subject getCachedSubject(final HttpServletRequest req, final HttpServletResponse res) {
     synchronized (req.getSession()) {
-      Object s = SERVICES.getService(IHttpSessionCacheService.class).getAndTouch(PROP_SUBJECT, req, res);
+      Object s = BEANS.get(IHttpSessionCacheService.class).getAndTouch(PROP_SUBJECT, req, res);
       if (s instanceof Subject) {
         return (Subject) s;
       }

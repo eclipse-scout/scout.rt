@@ -55,7 +55,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.node.AttributeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EitherOrNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EntityNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.RootNode;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerData;
@@ -366,7 +366,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       }
     }
     catch (Exception e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating tree for composer field '" + getClass().getName() + "'.", e));
+      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating tree for composer field '" + getClass().getName() + "'.", e));
     }
   }
 

@@ -35,9 +35,9 @@ import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNoti
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
@@ -94,7 +94,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
   public void initializeService() {
     super.initializeService();
     // add client notification listener
-    SERVICES.getService(IClientNotificationConsumerService.class).addGlobalClientNotificationConsumerListener(new IClientNotificationConsumerListener() {
+    BEANS.get(IClientNotificationConsumerService.class).addGlobalClientNotificationConsumerListener(new IClientNotificationConsumerListener() {
       @Override
       public void handleEvent(final ClientNotificationConsumerEvent e, boolean sync) {
         if (e.getClientNotification().getClass() == CodeTypeChangedNotification.class) {

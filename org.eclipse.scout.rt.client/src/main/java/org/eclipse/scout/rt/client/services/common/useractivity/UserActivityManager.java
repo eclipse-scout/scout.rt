@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.useractivity.IUserActivityProvider;
 import org.eclipse.scout.rt.shared.services.common.useractivity.IUserActivityStateService;
 import org.eclipse.scout.rt.shared.services.common.useractivity.UserActivityClientNotification;
@@ -75,7 +75,7 @@ public class UserActivityManager {
     }
     m_started = true;
     // initial state
-    for (IUserActivityStateService s : SERVICES.getServices(IUserActivityStateService.class)) {
+    for (IUserActivityStateService s : BEANS.all(IUserActivityStateService.class)) {
       try {
         updateCache(s.getUserStatusMap());
       }
@@ -84,10 +84,10 @@ public class UserActivityManager {
       }
     }
     // add client notification listener
-    SERVICES.getService(IClientNotificationConsumerService.class).addClientNotificationConsumerListener(m_clientSession, m_clientNotificationConsumerListener);
+    BEANS.get(IClientNotificationConsumerService.class).addClientNotificationConsumerListener(m_clientSession, m_clientNotificationConsumerListener);
     // add provider listener
     try {
-      m_provider = SERVICES.getService(IUserActivityProvider.class);
+      m_provider = BEANS.get(IUserActivityProvider.class);
       if (m_provider != null) {
         m_provider.addPropertyChangeListener(IUserActivityProvider.PROP_ACTIVE, m_userActivityProviderListener);
       }
@@ -105,7 +105,7 @@ public class UserActivityManager {
     }
     m_started = false;
     // detach
-    SERVICES.getService(IClientNotificationConsumerService.class).removeClientNotificationConsumerListener(m_clientSession, m_clientNotificationConsumerListener);
+    BEANS.get(IClientNotificationConsumerService.class).removeClientNotificationConsumerListener(m_clientSession, m_clientNotificationConsumerListener);
     if (m_provider != null) {
       m_provider.removePropertyChangeListener(IUserActivityProvider.PROP_ACTIVE, m_userActivityProviderListener);
     }
@@ -140,7 +140,7 @@ public class UserActivityManager {
       ClientJobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
-          for (IUserActivityStateService s : SERVICES.getServices(IUserActivityStateService.class)) {
+          for (IUserActivityStateService s : BEANS.all(IUserActivityStateService.class)) {
             try {
               s.setStatus(newStatus);
             }

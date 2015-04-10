@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.client.IFieldStatus;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -193,7 +193,7 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
           }
         }
       };
-      IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
+      IPerformanceAnalyzerService perf = BEANS.get(IPerformanceAnalyzerService.class);
       if (perf != null) {
         perf.addPropertyChangeListener(m_perfListener);
       }
@@ -212,7 +212,7 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
       m_progressListener = null;
     }
     if (m_perfListener != null) {
-      IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
+      IPerformanceAnalyzerService perf = BEANS.get(IPerformanceAnalyzerService.class);
       if (perf != null) {
         perf.removePropertyChangeListener(m_perfListener);
       }

@@ -17,7 +17,7 @@ import java.util.HashMap;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 
 /**
@@ -38,7 +38,7 @@ public final class AccessControlUtility {
    */
   public static Permissions createPermissions(Object[][] permissionData) {
     HashMap<String, Class<? extends Permission>> permissionNameToBundleClassDesc = new HashMap<>();
-    IPermissionService psvc = SERVICES.getService(IPermissionService.class);
+    IPermissionService psvc = BEANS.get(IPermissionService.class);
     if (psvc != null) {
       for (Class<? extends Permission> d : psvc.getAllPermissionClasses()) {
         permissionNameToBundleClassDesc.put(d.getSimpleName(), d);

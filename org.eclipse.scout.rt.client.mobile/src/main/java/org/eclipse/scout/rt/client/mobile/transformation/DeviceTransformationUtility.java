@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * @since 3.9.0
@@ -21,7 +21,7 @@ public class DeviceTransformationUtility {
    * @return a reference to the active device transformation configuration.
    */
   public static DeviceTransformationConfig getDeviceTransformationConfig() {
-    IDeviceTransformationService service = SERVICES.getService(IDeviceTransformationService.class);
+    IDeviceTransformationService service = BEANS.get(IDeviceTransformationService.class);
     if (service != null && service.getDeviceTransformer() != null) {
       return service.getDeviceTransformer().getDeviceTransformationConfig();
     }

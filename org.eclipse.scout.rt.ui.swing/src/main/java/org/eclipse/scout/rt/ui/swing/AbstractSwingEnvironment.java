@@ -75,8 +75,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
@@ -485,7 +485,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   }
 
   protected SwingBusyHandler attachBusyHandler() {
-    IBusyManagerService service = SERVICES.getService(IBusyManagerService.class);
+    IBusyManagerService service = BEANS.get(IBusyManagerService.class);
     if (service == null) {
       return null;
     }
@@ -568,7 +568,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       }
     }
     if (hWnd != 0) {
-      IEmbeddedFrameProviderService es = SERVICES.getService(IEmbeddedFrameProviderService.class);
+      IEmbeddedFrameProviderService es = BEANS.get(IEmbeddedFrameProviderService.class);
       if (es != null) {
         try {
           rootFrame = es.createEmbeddedFrame(hWnd);

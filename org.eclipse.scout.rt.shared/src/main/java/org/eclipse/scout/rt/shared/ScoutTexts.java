@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
 
 /**
@@ -40,7 +40,7 @@ public class ScoutTexts {
   private final List<? extends ITextProviderService> m_textProviders;
 
   public ScoutTexts() {
-    this(SERVICES.getServices(ITextProviderService.class));
+    this(BEANS.all(ITextProviderService.class));
   }
 
   public ScoutTexts(List<? extends ITextProviderService> textProviders) {

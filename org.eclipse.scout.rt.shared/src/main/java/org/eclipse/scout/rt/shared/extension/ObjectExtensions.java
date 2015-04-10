@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 
 public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNER>> implements IExtensibleObject, Serializable {
   private static final long serialVersionUID = 1L;
@@ -54,7 +54,7 @@ public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNE
     if (m_extensions != null) {
       throw new IllegalStateException("The model object is already initialized: " + m_owner + ".");
     }
-    IInternalExtensionRegistry extensionRegistry = SERVICES.getService(IInternalExtensionRegistry.class);
+    IInternalExtensionRegistry extensionRegistry = BEANS.get(IInternalExtensionRegistry.class);
     if (extensionRegistry == null) {
       return;
     }
@@ -77,7 +77,7 @@ public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNE
   }
 
   private List<EXTENSION> loadExtensions(EXTENSION localExtension) {
-    List<EXTENSION> extensions = SERVICES.getService(IInternalExtensionRegistry.class).createExtensionsFor(m_owner);
+    List<EXTENSION> extensions = BEANS.get(IInternalExtensionRegistry.class).createExtensionsFor(m_owner);
     extensions.add(localExtension);
     return Collections.unmodifiableList(extensions);
   }

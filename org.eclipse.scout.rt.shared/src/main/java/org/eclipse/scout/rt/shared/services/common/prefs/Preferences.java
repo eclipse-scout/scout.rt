@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.ISession;
 
 /**
@@ -99,7 +98,7 @@ public class Preferences implements IPreferences {
       return false;
     }
 
-    IUserPreferencesStorageService service = SERVICES.getService(IUserPreferencesStorageService.class);
+    IUserPreferencesStorageService service = BEANS.get(IUserPreferencesStorageService.class);
     if (service == null) {
       LOG.warn("No preferences storage service could be found!");
       return false;

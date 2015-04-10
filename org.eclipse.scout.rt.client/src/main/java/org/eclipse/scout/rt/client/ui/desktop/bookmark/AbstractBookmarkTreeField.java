@@ -49,7 +49,7 @@ import org.eclipse.scout.rt.client.ui.desktop.bookmark.view.IPublishBookmarkComm
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -280,7 +280,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
     });
     //save
-    SERVICES.getService(IBookmarkService.class).storeBookmarks();
+    BEANS.get(IBookmarkService.class).storeBookmarks();
   }
 
   /**
@@ -315,7 +315,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
     });
     //save
-    SERVICES.getService(IBookmarkService.class).storeBookmarks();
+    BEANS.get(IBookmarkService.class).storeBookmarks();
   }
 
   @Order(10)
@@ -755,7 +755,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
             form = getConfiguredBookmarkForm().newInstance();
           }
           catch (Exception e) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredBookmarkForm().getName() + "'.", e));
+            BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredBookmarkForm().getName() + "'.", e));
           }
         }
         if (form == null) {
@@ -832,7 +832,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
         ITreeNode node = BookmarkNode.this;
         Bookmark bm = (Bookmark) node.getCell().getValue();
 
-        IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+        IBookmarkService service = BEANS.get(IBookmarkService.class);
         service.updateBookmark(bm);
         service.storeBookmarks();
       }

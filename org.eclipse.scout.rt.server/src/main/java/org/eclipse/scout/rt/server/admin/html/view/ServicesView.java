@@ -24,8 +24,8 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
@@ -57,7 +57,7 @@ public class ServicesView extends DefaultView {
     m_serviceInspectors = null;
     try {
       ArrayList<ServiceInspector> list = new ArrayList<ServiceInspector>();
-      for (IService service : SERVICES.getServices(IService.class)) {
+      for (IService service : BEANS.all(IService.class)) {
         list.add(new ServiceInspector(service));
       }
       m_serviceInspectors = list.toArray(new ServiceInspector[list.size()]);

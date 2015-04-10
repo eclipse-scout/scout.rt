@@ -21,8 +21,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.services.common.calendar.HolidayCalendarItemParser;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.shared.services.common.calendar.IHolidayCalendarService;
@@ -50,7 +50,7 @@ public class HolidayCalendarService extends AbstractService implements IHolidayC
       else {
         RemoteFile f = null;
         try {
-          f = SERVICES.getService(IRemoteFileService.class).getRemoteFile(spec);
+          f = BEANS.get(IRemoteFileService.class).getRemoteFile(spec);
           if (f != null) {
             p = new HolidayCalendarItemParser(f.getDecompressedInputStream(), spec.getPath());
             m_holidayXmlCache.put(key, p);

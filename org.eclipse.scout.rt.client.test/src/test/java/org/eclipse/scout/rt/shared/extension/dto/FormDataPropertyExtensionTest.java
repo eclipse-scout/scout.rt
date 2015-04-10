@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.shared.extension.dto;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.FormPropertyExtension;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.MainBoxPropertyExtension;
@@ -33,34 +33,34 @@ import org.junit.Test;
 public class FormDataPropertyExtensionTest extends AbstractLocalExtensionTestCase {
   @Test
   public void testPropertyExtensionFormFieldExplicit() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(MainBoxPropertyExtension.class, MainBox.class);
-    SERVICES.getService(IExtensionRegistry.class).register(PropertyExtensionData.class, OrigFormData.class);
+    BEANS.get(IExtensionRegistry.class).register(MainBoxPropertyExtension.class, MainBox.class);
+    BEANS.get(IExtensionRegistry.class).register(PropertyExtensionData.class, OrigFormData.class);
     doFormFieldTest();
   }
 
   @Test
   public void testPropertyExtensionFormFieldAnnotation() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(MainBoxPropertyExtension.class);
-    SERVICES.getService(IExtensionRegistry.class).register(PropertyExtensionData.class);
+    BEANS.get(IExtensionRegistry.class).register(MainBoxPropertyExtension.class);
+    BEANS.get(IExtensionRegistry.class).register(PropertyExtensionData.class);
     doFormFieldTest();
   }
 
   @Test
   public void testPropertyExtensionFormExplicit() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(FormPropertyExtension.class, OrigForm.class);
-    SERVICES.getService(IExtensionRegistry.class).register(PropertyExtensionData.class, OrigFormData.class);
+    BEANS.get(IExtensionRegistry.class).register(FormPropertyExtension.class, OrigForm.class);
+    BEANS.get(IExtensionRegistry.class).register(PropertyExtensionData.class, OrigFormData.class);
     doFormTest();
   }
 
   @Test
   public void testPropertyExtensionToFormFieldContribution() throws Exception {
     // contribute a new field to the second template use in the form
-    SERVICES.getService(IExtensionRegistry.class).register(TreeBoxToTemplateField.class, org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox.SecondUseOfTemplateBox.class);
-    SERVICES.getService(IExtensionRegistry.class).register(TreeBoxToTemplateFieldData.class, SecondUseOfTemplateBox.class);
+    BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateField.class, org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox.SecondUseOfTemplateBox.class);
+    BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateFieldData.class, SecondUseOfTemplateBox.class);
 
     // add a property to the contribution from above
-    SERVICES.getService(IExtensionRegistry.class).register(TreeBoxPropertyExtension.class, TreeBoxToTemplateField.class);
-    SERVICES.getService(IExtensionRegistry.class).register(TreeBoxPropertyExtensionData.class, TreeBoxToTemplateFieldData.class);
+    BEANS.get(IExtensionRegistry.class).register(TreeBoxPropertyExtension.class, TreeBoxToTemplateField.class);
+    BEANS.get(IExtensionRegistry.class).register(TreeBoxPropertyExtensionData.class, TreeBoxToTemplateFieldData.class);
 
     doExtensionOfContributionTest();
   }

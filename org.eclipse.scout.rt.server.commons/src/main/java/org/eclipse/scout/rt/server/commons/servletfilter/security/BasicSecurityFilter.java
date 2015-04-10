@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
 
@@ -93,7 +93,7 @@ public class BasicSecurityFilter extends AbstractChainableSecurityFilter {
 
   private int getBasicAttempt(HttpServletRequest req, HttpServletResponse res) {
     int basicAtttempt = 0;
-    Object attribute = SERVICES.getService(IHttpSessionCacheService.class).getAndTouch(PROP_BASIC_ATTEMPT, req, res);
+    Object attribute = BEANS.get(IHttpSessionCacheService.class).getAndTouch(PROP_BASIC_ATTEMPT, req, res);
     if (attribute instanceof Integer) {
       basicAtttempt = ((Integer) attribute).intValue();
     }
@@ -101,7 +101,7 @@ public class BasicSecurityFilter extends AbstractChainableSecurityFilter {
   }
 
   private void setBasicAttept(HttpServletRequest req, HttpServletResponse res, int attempts) {
-    SERVICES.getService(IHttpSessionCacheService.class).put(PROP_BASIC_ATTEMPT, attempts, req, res);
+    BEANS.get(IHttpSessionCacheService.class).put(PROP_BASIC_ATTEMPT, attempts, req, res);
   }
 
 }

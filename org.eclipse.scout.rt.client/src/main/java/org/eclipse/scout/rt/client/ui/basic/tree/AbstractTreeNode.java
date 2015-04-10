@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -203,7 +203,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
         menus.addOrdered(menu);
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
 
@@ -522,7 +522,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   public void setVisiblePermissionInternal(Permission p) {
     boolean b;
     if (p != null) {
-      b = SERVICES.getService(IAccessControlService.class).checkPermission(p);
+      b = BEANS.get(IAccessControlService.class).checkPermission(p);
     }
     else {
       b = true;
@@ -590,7 +590,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   public void setEnabledPermissionInternal(Permission p) {
     boolean b;
     if (p != null) {
-      b = SERVICES.getService(IAccessControlService.class).checkPermission(p);
+      b = BEANS.get(IAccessControlService.class).checkPermission(p);
     }
     else {
       b = true;

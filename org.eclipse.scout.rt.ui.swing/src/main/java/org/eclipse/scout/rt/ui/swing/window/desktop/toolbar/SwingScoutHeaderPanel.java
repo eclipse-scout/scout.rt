@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
@@ -227,7 +227,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
               handleNavigationChangedFromScout();
             }
           };
-          SERVICES.getService(INavigationHistoryService.class).addNavigationHistoryListener(m_scoutNavListener);
+          BEANS.get(INavigationHistoryService.class).addNavigationHistoryListener(m_scoutNavListener);
           handleNavigationChangedFromScout();
         }
       }
@@ -242,7 +242,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
       @Override
       public void run() throws Exception {
         if (m_scoutNavListener != null) {
-          INavigationHistoryService nav = SERVICES.getService(INavigationHistoryService.class);
+          INavigationHistoryService nav = BEANS.get(INavigationHistoryService.class);
           if (nav != null) {
             nav.removeNavigationHistoryListener(m_scoutNavListener);
           }
@@ -266,7 +266,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
       @Override
       public void run() {
         try {
-          SERVICES.getService(INavigationHistoryService.class).stepBackward();
+          BEANS.get(INavigationHistoryService.class).stepBackward();
         }
         catch (ProcessingException e) {
           //nop
@@ -287,7 +287,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
       @Override
       public void run() {
         try {
-          SERVICES.getService(INavigationHistoryService.class).stepForward();
+          BEANS.get(INavigationHistoryService.class).stepForward();
         }
         catch (ProcessingException e) {
           //nop
@@ -307,7 +307,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        List<IMenu> scoutMenus = SERVICES.getService(INavigationHistoryService.class).getMenus();
+        List<IMenu> scoutMenus = BEANS.get(INavigationHistoryService.class).getMenus();
         // call swing menu
         new SwingPopupWorker(getSwingEnvironment(), m_navigationPanel, m_navigationPanel.getHistoryMenuLocation(), scoutMenus).enqueue();
       }
@@ -320,7 +320,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
    * runs in scout job (thread)
    */
   protected void handleNavigationChangedFromScout() {
-    INavigationHistoryService service = SERVICES.getService(INavigationHistoryService.class);
+    INavigationHistoryService service = BEANS.get(INavigationHistoryService.class);
     final boolean backEnabled = service.hasBackwardBookmarks();
     final boolean forewardEnabled = service.hasForwardBookmarks();
     final boolean menuEnabled = backEnabled || forewardEnabled;

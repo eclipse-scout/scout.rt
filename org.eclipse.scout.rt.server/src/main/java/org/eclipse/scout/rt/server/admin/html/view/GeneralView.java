@@ -21,9 +21,8 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -89,7 +88,7 @@ public class GeneralView extends DefaultView {
       p.print("There is no Session found");
     }
 
-    String sessionID = SERVICES.getService(IClientIdentificationService.class).getClientId(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get(), IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
+    String sessionID = BEANS.get(IClientIdentificationService.class).getClientId(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get(), IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
     p.br();
     p.print("Session ID (IClientIdentificationService): " + sessionID);
     p.p();

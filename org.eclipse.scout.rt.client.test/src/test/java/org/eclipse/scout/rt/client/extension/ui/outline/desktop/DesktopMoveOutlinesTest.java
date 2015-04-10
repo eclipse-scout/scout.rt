@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.extension.ui.outline.desktop.fixture.FirstOut
 import org.eclipse.scout.rt.client.extension.ui.outline.desktop.fixture.SecondOutline;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -42,7 +42,7 @@ public class DesktopMoveOutlinesTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveOutline() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(FirstOutline.class, 30);
+    BEANS.get(IExtensionRegistry.class).registerMove(FirstOutline.class, 30);
 
     ExtensionTestDesktop desktop = new ExtensionTestDesktop();
     assertOutlines(desktop, SecondOutline.class, FirstOutline.class);
@@ -51,8 +51,8 @@ public class DesktopMoveOutlinesTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMoveOutlineMultipleTimes() {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(FirstOutline.class, 30);
-    SERVICES.getService(IExtensionRegistry.class).registerMove(FirstOutline.class, 50);
+    BEANS.get(IExtensionRegistry.class).registerMove(FirstOutline.class, 30);
+    BEANS.get(IExtensionRegistry.class).registerMove(FirstOutline.class, 50);
 
     ExtensionTestDesktop desktop = new ExtensionTestDesktop();
     assertOutlines(desktop, SecondOutline.class, FirstOutline.class);

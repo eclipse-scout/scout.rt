@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  * <h2>Simple example</h2>
  *
  * <pre>
- * ISqlService service = SERVICES.getService(ISqlService.class);
+ * ISqlService service = BEANS.get(ISqlService.class);
  * String sql = &quot;SELECT PERSON_NR, PERSON_NAME FROM PERSON WHERE COMPANY_NR = :companyNr&quot;;
  * Object[][] queryResult = service.select(sql,
  *     new NVPair(&quot;companyNr&quot;, companyNr));

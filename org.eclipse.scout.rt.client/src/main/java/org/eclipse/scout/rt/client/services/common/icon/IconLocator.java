@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 
 /**
@@ -33,7 +32,7 @@ public class IconLocator {
     if (name == null || AbstractIcons.Null.equals(name)) {
       return null;
     }
-    List<IIconProviderService> iconProviderServices = SERVICES.getServices(IIconProviderService.class);
+    List<IIconProviderService> iconProviderServices = BEANS.all(IIconProviderService.class);
     IconSpec spec = null;
     for (IIconProviderService service : iconProviderServices) {
       spec = service.getIconSpec(name);

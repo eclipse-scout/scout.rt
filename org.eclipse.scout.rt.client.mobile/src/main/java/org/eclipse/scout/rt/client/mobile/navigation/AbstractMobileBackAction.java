@@ -4,7 +4,7 @@ import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 
 public abstract class AbstractMobileBackAction extends AbstractMenu {
   private P_BreadCrumbsListener m_breadCrumbsListener;
@@ -16,7 +16,7 @@ public abstract class AbstractMobileBackAction extends AbstractMenu {
 
   @Override
   protected void execInitAction() throws ProcessingException {
-    IBreadCrumbsNavigation breadCrumbsNavigation = SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation();
+    IBreadCrumbsNavigation breadCrumbsNavigation = BEANS.get(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation();
     if (m_breadCrumbsListener == null) {
       m_breadCrumbsListener = new P_BreadCrumbsListener();
       breadCrumbsNavigation.addBreadCrumbsListener(m_breadCrumbsListener);
@@ -31,7 +31,7 @@ public abstract class AbstractMobileBackAction extends AbstractMenu {
 
   @Override
   protected void execAction() throws ProcessingException {
-    SERVICES.getService(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation().stepBack();
+    BEANS.get(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation().stepBack();
   }
 
   private class P_BreadCrumbsListener implements BreadCrumbsListener, WeakEventListener {

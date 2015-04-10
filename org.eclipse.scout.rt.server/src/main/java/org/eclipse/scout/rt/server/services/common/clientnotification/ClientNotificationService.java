@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueue;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueueElement;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ConsumableClientNotificationQueueElement;
@@ -56,7 +55,7 @@ public class ClientNotificationService extends AbstractService implements IClien
     tryPutNotification(new ConsumableClientNotificationQueueElement(notification, filter));
 
     // TODO [dwi/jgu]
-//    Subject serverJobSubject = SERVICES.getService(IServerJobService.class).getServerSubject();
+//    Subject serverJobSubject = BEANS.get(IServerJobService.class).getServerSubject();
 //    Subject contextSubject = Subject.getSubject(AccessController.getContext());
 //    if (CompareUtility.notEquals(serverJobSubject, contextSubject)) {
 //      // send cluster notification to other nodes right away since cluster notification is also transactional
@@ -208,7 +207,7 @@ public class ClientNotificationService extends AbstractService implements IClien
       public void onNotification(IClusterNotificationMessage message) throws ProcessingException {
         if (accept(message.getNotification())) {
           ClientNotificationClusterNotification n = (ClientNotificationClusterNotification) message.getNotification();
-          SERVICES.getService(IClientNotificationService.class).putNonClusterDistributedNotification(n.getQueueElement().getNotification(), n.getQueueElement().getFilter());
+          BEANS.get(IClientNotificationService.class).putNonClusterDistributedNotification(n.getQueueElement().getNotification(), n.getQueueElement().getFilter());
         }
       }
     };

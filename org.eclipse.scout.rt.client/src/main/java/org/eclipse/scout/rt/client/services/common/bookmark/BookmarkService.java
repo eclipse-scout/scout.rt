@@ -25,8 +25,8 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.ActivateBookmarkKeyStroke;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkData;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
@@ -123,14 +123,14 @@ public class BookmarkService extends AbstractService implements IBookmarkService
 
   @Override
   public void loadBookmarks() throws ProcessingException {
-    IBookmarkStorageService storageService = SERVICES.getService(IBookmarkStorageService.class);
+    IBookmarkStorageService storageService = BEANS.get(IBookmarkStorageService.class);
     importBookmarks(storageService.getBookmarkData());
   }
 
   @Override
   public void storeBookmarks() throws ProcessingException {
     ServiceState state = getServiceState();
-    IBookmarkStorageService storageService = SERVICES.getService(IBookmarkStorageService.class);
+    IBookmarkStorageService storageService = BEANS.get(IBookmarkStorageService.class);
     importBookmarks(storageService.storeBookmarkData(state.m_model));
   }
 

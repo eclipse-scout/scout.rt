@@ -24,8 +24,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
  * List<ServiceRegistration> reg = TestingUtility.registerServices( 1000, new TestingCodeService(new MyCodeType()));
  * CODES.getCodeType(MyCodeType.class);
  * [...]
- * SERVICES.getService(TestingCodeService.class).addCodeTypes(new OtherCodeType());
+ * BEANS.get(TestingCodeService.class).addCodeTypes(new OtherCodeType());
  * [..]
  * TestingUtility.unregisterServices(reg);
  * </pre>
@@ -154,7 +154,7 @@ public class TestingCodeService extends AbstractService implements ICodeService 
           declaringCodeTypeClass = type.newInstance().getCodeType().getClass();
         }
         catch (Throwable t) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + type.getName() + "'.", t));
+          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + type.getName() + "'.", t));
         }
       }
       ICodeType<?, CODE_ID_TYPE> codeType = getCodeType(declaringCodeTypeClass);

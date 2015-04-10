@@ -28,7 +28,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 /**
@@ -229,7 +229,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
       fields.addOrdered(f);
     }
     catch (Exception e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("exception while injecting field '" + fieldClass.getName() + "'.", e));
+      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("exception while injecting field '" + fieldClass.getName() + "'.", e));
     }
   }
 

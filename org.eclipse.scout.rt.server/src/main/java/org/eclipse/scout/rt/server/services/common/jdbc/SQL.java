@@ -14,7 +14,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 
 /**
@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
  * Without this class the necessary code would look like this
  * 
  * <pre>
- * ISqlService service = SERVICES.getService(ISqlService.class);
+ * ISqlService service = BEANS.get(ISqlService.class);
  * Object[][] queryResult = service.select(&quot;SELECT PERSON_NR, PERSON_NAME FROM PERSON&quot;);
  * Long firstPersonNr = queryResult[0][0];
  * Long thirdPersonName = queryResult[2][1];
@@ -84,12 +84,12 @@ public final class SQL {
    * @throws ProcessingException
    */
   public static Connection getConnection() throws ProcessingException {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     return service.getConnection();
   }
 
   public static ISqlStyle getSqlStyle() {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     return service.getSqlStyle();
   }
 
@@ -97,7 +97,7 @@ public final class SQL {
    * @see ISqlService#select(String, Object...)
    */
   public static Object[][] select(String s, Object... bindBases) throws ProcessingException {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     return service.select(s, bindBases);
   }
 
@@ -105,7 +105,7 @@ public final class SQL {
    * @see ISqlService#selectLimited(String, int, Object...)
    */
   public static Object[][] selectLimited(String s, int maxRowCount, Object... bindBases) throws ProcessingException {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     return service.selectLimited(s, maxRowCount, bindBases);
   }
 
@@ -113,7 +113,7 @@ public final class SQL {
    * @see ISqlService#selectInto(String, Object...)
    */
   public static void selectInto(String s, Object... bindBases) throws ProcessingException {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     service.selectInto(s, bindBases);
   }
 
@@ -121,7 +121,7 @@ public final class SQL {
    * @see ISqlService#selectIntoLimited(String, int, Object...)
    */
   public static void selectIntoLimited(String s, int maxRowCount, Object... bindBases) throws ProcessingException {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     service.selectIntoLimited(s, maxRowCount, bindBases);
   }
 
@@ -129,7 +129,7 @@ public final class SQL {
    * @see ISqlService#insert(String, Object...)
    */
   public static int insert(String s, Object... bindBases) throws ProcessingException {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     return service.insert(s, bindBases);
   }
 
@@ -137,7 +137,7 @@ public final class SQL {
    * @see ISqlService#update(String, Object...)
    */
   public static int update(String s, Object... bindBases) throws ProcessingException {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     return service.update(s, bindBases);
   }
 
@@ -145,7 +145,7 @@ public final class SQL {
    * @see ISqlService#delete(String, Object...)
    */
   public static int delete(String s, Object... bindBases) throws ProcessingException {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     return service.delete(s, bindBases);
   }
 
@@ -153,7 +153,7 @@ public final class SQL {
    * @see ISqlService#callStoredProcedure(String, Object...)
    */
   public static boolean callStoredProcedure(String s, Object... bindBases) throws ProcessingException {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     return service.callStoredProcedure(s, bindBases);
   }
 
@@ -161,7 +161,7 @@ public final class SQL {
    * @see ISqlService#createPlainText(String, Object...)
    */
   public static String createPlainText(String s, Object... bindBases) throws ProcessingException {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     return service.createPlainText(s, bindBases);
   }
 
@@ -169,7 +169,7 @@ public final class SQL {
    * @see ISqlService#commit()
    */
   public static void commit() throws ProcessingException {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     service.commit();
   }
 
@@ -177,7 +177,7 @@ public final class SQL {
    * @see ISqlService#rollback()
    */
   public static void rollback() throws ProcessingException {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     service.rollback();
   }
 
@@ -185,7 +185,7 @@ public final class SQL {
    * @see ISqlService#getSequenceNextval(String)
    */
   public static Long getSequenceNextval(String sequenceName) throws ProcessingException {
-    ISqlService service = SERVICES.getService(usedServiceType);
+    ISqlService service = BEANS.get(usedServiceType);
     return service.getSequenceNextval(sequenceName);
   }
 

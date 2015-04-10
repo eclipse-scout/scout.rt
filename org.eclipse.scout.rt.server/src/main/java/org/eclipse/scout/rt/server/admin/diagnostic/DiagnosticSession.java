@@ -28,9 +28,8 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.security.ReadDiagnosticServletPermission;
 import org.eclipse.scout.rt.shared.security.UpdateDiagnosticServletPermission;
@@ -46,7 +45,7 @@ public class DiagnosticSession {
         Object value = next.getValue();
         IDiagnostic diagnosticProvider = DiagnosticFactory.getDiagnosticProvider(action);
         if (diagnosticProvider != null && value instanceof Object[]) {
-          boolean hasUpdateDiagnosticsServletPermission = SERVICES.getService(IAccessControlService.class).checkPermission(new UpdateDiagnosticServletPermission());
+          boolean hasUpdateDiagnosticsServletPermission = BEANS.get(IAccessControlService.class).checkPermission(new UpdateDiagnosticServletPermission());
           if (hasUpdateDiagnosticsServletPermission) {
             diagnosticProvider.call(action, (Object[]) value);
           }
@@ -76,8 +75,8 @@ public class DiagnosticSession {
   }
 
   private void doHtmlResponse(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    boolean hasReadDiagnosticsServletPermission = SERVICES.getService(IAccessControlService.class).checkPermission(new ReadDiagnosticServletPermission());
-    boolean hasUpdateDiagnosticsServletPermission = SERVICES.getService(IAccessControlService.class).checkPermission(new UpdateDiagnosticServletPermission());
+    boolean hasReadDiagnosticsServletPermission = BEANS.get(IAccessControlService.class).checkPermission(new ReadDiagnosticServletPermission());
+    boolean hasUpdateDiagnosticsServletPermission = BEANS.get(IAccessControlService.class).checkPermission(new UpdateDiagnosticServletPermission());
 
     String errorMsg = "";
 

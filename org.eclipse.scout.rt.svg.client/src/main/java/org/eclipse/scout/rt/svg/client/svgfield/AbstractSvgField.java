@@ -23,12 +23,12 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.svg.client.SVGUtility;
 import org.eclipse.scout.rt.svg.client.extension.svgfield.ISvgFieldExtension;
 import org.eclipse.scout.rt.svg.client.extension.svgfield.SvgFieldChains.SvgFieldAppLinkActionChain;
 import org.eclipse.scout.rt.svg.client.extension.svgfield.SvgFieldChains.SvgFieldClickedChain;
-import org.eclipse.scout.service.SERVICES;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
 
@@ -158,10 +158,10 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
           interceptAppLinkAction(ref);
         }
         catch (ProcessingException pe) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
+          BEANS.get(IExceptionHandlerService.class).handleException(pe);
         }
         catch (Throwable t) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
         }
         fireSvgFieldEventInternal(e);
       }
@@ -181,10 +181,10 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
           interceptClicked(e);
         }
         catch (ProcessingException pe) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
+          BEANS.get(IExceptionHandlerService.class).handleException(pe);
         }
         catch (Throwable t) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
         }
         fireSvgFieldEventInternal(e);
       }

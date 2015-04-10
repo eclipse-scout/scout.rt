@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
@@ -126,7 +126,7 @@ public class RemoteFileServlet extends HttpServlet {
   }
 
   private boolean writeResource(final HttpServletRequest req, final HttpServletResponse resp, final String resourcePath) throws ProcessingException, IOException {
-    IRemoteFileService rfs = SERVICES.getService(IRemoteFileService.class);
+    IRemoteFileService rfs = BEANS.get(IRemoteFileService.class);
     RemoteFile spec = new RemoteFile((resourcePath == null) ? null : m_folder + resourcePath, -1);
     RemoteFile remoteFile = rfs.getRemoteFileHeader(spec);
     if (!remoteFile.exists()) {

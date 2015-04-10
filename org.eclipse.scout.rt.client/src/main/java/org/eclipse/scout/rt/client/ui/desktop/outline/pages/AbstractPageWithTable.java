@@ -55,7 +55,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
@@ -417,7 +417,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       }
     }
     catch (Exception e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating inner table of class '" + getClass().getName() + "'.", e));
+      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating inner table of class '" + getClass().getName() + "'.", e));
     }
     return table;
   }
@@ -453,7 +453,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       return configuredSearchForm.newInstance();
     }
     catch (Exception e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + configuredSearchForm.getName() + "'.", e));
+      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + configuredSearchForm.getName() + "'.", e));
     }
     return null;
   }
@@ -503,14 +503,14 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
             IPage<?> page = AbstractPageWithTable.this;
             if (desktop != null && desktop.getOutline() != null && desktop.getOutline().getActivePage() == page) {
-              SERVICES.getService(INavigationHistoryService.class).addStep(0, page);
+              BEANS.get(INavigationHistoryService.class).addStep(0, page);
             }
             // do page reload to execute search
             try {
               reloadPage();
             }
             catch (ProcessingException ex) {
-              SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+              BEANS.get(IExceptionHandlerService.class).handleException(ex);
             }
             break;
           }
@@ -637,7 +637,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       return getSearchFormInternal().getSearchFilter();
     }
     else {
-      ISearchFilterService sfs = SERVICES.getService(ISearchFilterService.class);
+      ISearchFilterService sfs = BEANS.get(ISearchFilterService.class);
       if (sfs != null) {
         return sfs.createNewSearchFilter();
       }
@@ -704,7 +704,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       super.nodeRemovedNotify();
     }
     catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(IExceptionHandlerService.class).handleException(e);
     }
   }
 
@@ -903,7 +903,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       }
     }
     catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(IExceptionHandlerService.class).handleException(e);
     }
     return result;
   }
@@ -963,10 +963,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
                 }
               }
               catch (ProcessingException ex) {
-                SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+                BEANS.get(IExceptionHandlerService.class).handleException(ex);
               }
               catch (Throwable t) {
-                SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Page " + element, t));
+                BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Page " + element, t));
               }
             }
 

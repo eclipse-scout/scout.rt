@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
@@ -80,12 +80,12 @@ public class CopyWidthsOfColumnsMenu extends AbstractMenu {
       }
 
       // calling the service to write the buffer to the clipboard
-      IClipboardService svc = SERVICES.getService(IClipboardService.class);
+      IClipboardService svc = BEANS.get(IClipboardService.class);
       svc.setTextContents(buf.toString());
     }
     catch (ProcessingException se) {
       se.addContextMessage(getText());
-      SERVICES.getService(IExceptionHandlerService.class).handleException(se);
+      BEANS.get(IExceptionHandlerService.class).handleException(se);
     }
   }
 

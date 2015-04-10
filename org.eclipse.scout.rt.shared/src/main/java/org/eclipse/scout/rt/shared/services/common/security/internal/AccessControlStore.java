@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TTLCache;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 /**
@@ -49,7 +49,7 @@ public class AccessControlStore {
    * @return the permission collection that is associated with the current subject
    */
   public Permissions getPermissionsOfCurrentSubject() {
-    String userId = SERVICES.getService(IAccessControlService.class).getUserIdOfCurrentSubject();
+    String userId = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
     if (userId == null) {
       return null;
     }
@@ -63,7 +63,7 @@ public class AccessControlStore {
    *          permission collection
    */
   public void setPermissionsOfCurrentSubject(Permissions p) {
-    String userId = SERVICES.getService(IAccessControlService.class).getUserIdOfCurrentSubject();
+    String userId = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
     if (userId == null) {
       throw new SecurityException("userId is null");
     }

@@ -31,9 +31,9 @@ import org.eclipse.scout.commons.holders.LongHolder;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.IServiceInventory;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.PreparedStatementCache;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.StatementProcessor;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.pool.SqlConnectionBuilder;
@@ -84,7 +84,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
 
     // load code and permission names
     m_permissionNameToDescriptor = new HashMap<String, List<Class<?>>>();
-    IPermissionService psvc = SERVICES.getService(IPermissionService.class);
+    IPermissionService psvc = BEANS.get(IPermissionService.class);
     if (psvc != null) {
       for (Class<? extends Permission> d : psvc.getAllPermissionClasses()) {
         List<Class<?>> list = m_permissionNameToDescriptor.get(d.getSimpleName());
@@ -103,7 +103,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
       }
     }
     m_codeNameToDescriptor = new HashMap<String, List<Class<?>>>();
-    ICodeService csvc = SERVICES.getService(ICodeService.class);
+    ICodeService csvc = BEANS.get(ICodeService.class);
     if (csvc != null) {
       for (Class<?> d : csvc.getAllCodeTypeClasses("")) {
         List<Class<?>> list = m_codeNameToDescriptor.get(d.getSimpleName());
@@ -301,7 +301,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
         permissionClassName = permissionClassName.substring(0, levelDot);
       }
       Class permissionClass = loadBundleClassLenient(m_permissionNameToDescriptor, permissionClassName);
-      IAccessControlService accessControlService = SERVICES.getService(IAccessControlService.class);
+      IAccessControlService accessControlService = BEANS.get(IAccessControlService.class);
       Object ret = tryGetPermissionLevel(permissionClass, levelField, accessControlService);
       return ret != null ? ret : new LongHolder();
     }
@@ -402,7 +402,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
         setSqlStyle(styleClass.newInstance());
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + styleClass.getName() + "'.", e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + styleClass.getName() + "'.", e));
       }
     }
     else {

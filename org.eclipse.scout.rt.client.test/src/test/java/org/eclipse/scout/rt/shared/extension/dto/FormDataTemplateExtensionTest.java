@@ -18,7 +18,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.AbstractTemplateBox.GroupBoxInTemplateField;
@@ -39,29 +39,29 @@ public class FormDataTemplateExtensionTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testFormDataTemplateExtensionFromAnnotation() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(TreeBoxToTemplateField.class);
-    SERVICES.getService(IExtensionRegistry.class).register(TreeBoxToTemplateFieldData.class);
+    BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateField.class);
+    BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateFieldData.class);
     doTestAllTemplateUses();
   }
 
   @Test
   public void testFormDataTemplateExtensionExplicit() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(TreeBoxToTemplateField.class, GroupBoxInTemplateField.class);
-    SERVICES.getService(IExtensionRegistry.class).register(TreeBoxToTemplateFieldData.class, AbstractTemplateBoxData.class);
+    BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateField.class, GroupBoxInTemplateField.class);
+    BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateFieldData.class, AbstractTemplateBoxData.class);
     doTestAllTemplateUses();
   }
 
   @Test
   public void testFormDataTemplateExtensionExplicitOnlyOneTemplateUse() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(TreeBoxToTemplateField.class, org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox.SecondUseOfTemplateBox.class);
-    SERVICES.getService(IExtensionRegistry.class).register(TreeBoxToTemplateFieldData.class, SecondUseOfTemplateBox.class);
+    BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateField.class, org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox.SecondUseOfTemplateBox.class);
+    BEANS.get(IExtensionRegistry.class).register(TreeBoxToTemplateFieldData.class, SecondUseOfTemplateBox.class);
     doTestOnlyInOneTemplateUse();
   }
 
   @Test
   public void testFormDataValueFieldTemplate() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(SpecialStringField.class);
-    SERVICES.getService(IExtensionRegistry.class).register(SpecialStringFieldData.class);
+    BEANS.get(IExtensionRegistry.class).register(SpecialStringField.class);
+    BEANS.get(IExtensionRegistry.class).register(SpecialStringFieldData.class);
     doValueFieldTemplateTest();
   }
 

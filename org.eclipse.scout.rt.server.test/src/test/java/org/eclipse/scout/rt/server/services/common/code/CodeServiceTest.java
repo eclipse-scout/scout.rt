@@ -21,10 +21,10 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -64,7 +64,7 @@ public class CodeServiceTest {
             initialInstance(testService).
             applicationScoped(true));
     try {
-      ICodeService service = SERVICES.getService(ICodeService.class);
+      ICodeService service = BEANS.get(ICodeService.class);
       assertSame(testService, service);
       //
       Set<Class<? extends ICodeType<?, ?>>> result = service.getAllCodeTypeClasses("");

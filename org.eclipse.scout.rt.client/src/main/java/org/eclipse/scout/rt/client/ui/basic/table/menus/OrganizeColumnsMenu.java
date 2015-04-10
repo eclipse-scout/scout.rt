@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
@@ -54,7 +54,7 @@ public class OrganizeColumnsMenu extends AbstractMenu {
     }
     catch (ProcessingException se) {
       se.addContextMessage(getText());
-      SERVICES.getService(IExceptionHandlerService.class).handleException(se);
+      BEANS.get(IExceptionHandlerService.class).handleException(se);
     }
   }
 

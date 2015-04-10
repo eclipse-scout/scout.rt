@@ -40,7 +40,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -144,7 +144,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
       loadRootNode();
     }
     catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(IExceptionHandlerService.class).handleException(e);
     }
   }
 
@@ -161,7 +161,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
           tree = ConfigurationUtility.newInnerInstance(this, configuredTree);
         }
         catch (Exception e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + configuredTree.getName() + "'.", e));
+          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + configuredTree.getName() + "'.", e));
         }
       }
     }

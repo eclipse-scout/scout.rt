@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * Convenience accessor for service ICodeService
@@ -26,7 +26,7 @@ public final class CODES {
   }
 
   public static <T extends ICodeType<?, ?>> T getCodeType(Class<T> type) {
-    return SERVICES.getService(ICodeService.class).getCodeType(type);
+    return BEANS.get(ICodeService.class).getCodeType(type);
   }
 
   /**
@@ -36,7 +36,7 @@ public final class CODES {
    *         service using {@link #getAllCodeTypes(String)}, {@link #getCodeType(Class)} etc.
    */
   public static <T> ICodeType<T, ?> findCodeTypeById(T id) {
-    return SERVICES.getService(ICodeService.class).findCodeTypeById(id);
+    return BEANS.get(ICodeService.class).findCodeTypeById(id);
   }
 
   /**
@@ -46,7 +46,7 @@ public final class CODES {
    *         service using {@link #getAllCodeTypes(String)}, {@link #getCodeType(Class)} etc.
    */
   public static <T> ICodeType<T, ?> findCodeTypeById(Long partitionId, T codeTypeId) {
-    return SERVICES.getService(ICodeService.class).findCodeTypeById(partitionId, codeTypeId);
+    return BEANS.get(ICodeService.class).findCodeTypeById(partitionId, codeTypeId);
   }
 
   @SuppressWarnings("unchecked")
@@ -60,19 +60,19 @@ public final class CODES {
         typeList.add((Class<? extends ICodeType<?, ?>>) t);
       }
     }
-    return SERVICES.getService(ICodeService.class).getCodeTypes(typeList);
+    return BEANS.get(ICodeService.class).getCodeTypes(typeList);
   }
 
   public static List<ICodeType<?, ?>> getCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
-    return SERVICES.getService(ICodeService.class).getCodeTypes(types);
+    return BEANS.get(ICodeService.class).getCodeTypes(types);
   }
 
   public static <CODE_ID_TYPE, CODE extends ICode<CODE_ID_TYPE>> CODE getCode(Class<CODE> type) {
-    return SERVICES.getService(ICodeService.class).getCode(type);
+    return BEANS.get(ICodeService.class).getCode(type);
   }
 
   public static <T extends ICodeType> T reloadCodeType(Class<T> type) throws ProcessingException {
-    return SERVICES.getService(ICodeService.class).reloadCodeType(type);
+    return BEANS.get(ICodeService.class).reloadCodeType(type);
   }
 
   @SuppressWarnings("unchecked")
@@ -86,14 +86,14 @@ public final class CODES {
         typeList.add((Class<? extends ICodeType<?, ?>>) t);
       }
     }
-    return SERVICES.getService(ICodeService.class).reloadCodeTypes(typeList);
+    return BEANS.get(ICodeService.class).reloadCodeTypes(typeList);
   }
 
   public static List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
-    return SERVICES.getService(ICodeService.class).reloadCodeTypes(types);
+    return BEANS.get(ICodeService.class).reloadCodeTypes(types);
   }
 
   public static List<ICodeType<?, ?>> getAllCodeTypes(String classPrefix) {
-    return SERVICES.getService(ICodeService.class).getAllCodeTypes(classPrefix);
+    return BEANS.get(ICodeService.class).getAllCodeTypes(classPrefix);
   }
 }

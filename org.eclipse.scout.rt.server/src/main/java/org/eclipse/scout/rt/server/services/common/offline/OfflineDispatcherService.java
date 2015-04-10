@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
@@ -72,7 +71,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
       @Override
       public IServiceTunnelResponse call() throws Exception {
         final Class<?> serviceClass = SerializationUtility.getClassLoader().loadClass(serviceTunnelRequest.getServiceInterfaceClassName());
-        final Object service = Assertions.assertNotNull(SERVICES.getService(serviceClass), "service not found in service registry: %s", serviceClass);
+        final Object service = Assertions.assertNotNull(BEANS.get(serviceClass), "service not found in service registry: %s", serviceClass);
         final Method serviceOperation = ServiceUtility.getServiceOperation(serviceClass, serviceTunnelRequest.getOperation(), serviceTunnelRequest.getParameterTypes());
 
         final Object[] serviceArgs = serviceTunnelRequest.getArgs();
@@ -82,7 +81,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
         final ServiceTunnelResponse serviceResponse = new ServiceTunnelResponse(result, outParams, null);
 
         // add accumulated client notifications as side-payload
-        serviceResponse.setClientNotifications(SERVICES.getService(IClientNotificationService.class).getNextNotifications(0));
+        serviceResponse.setClientNotifications(BEANS.get(IClientNotificationService.class).getNextNotifications(0));
         return serviceResponse;
       }
     });

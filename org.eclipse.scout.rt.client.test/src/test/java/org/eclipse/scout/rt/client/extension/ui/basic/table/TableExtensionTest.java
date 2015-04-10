@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.AllPersonTab
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.FirstNameColumn;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.OtherPersonTable;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.PersonTableExtension;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.junit.Test;
 
@@ -28,13 +28,13 @@ public class TableExtensionTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testExtendAbstractPersonTableAddFirstNameColumnExplicit() {
-    SERVICES.getService(IExtensionRegistry.class).register(FirstNameColumn.class, AbstractPersonTable.class);
+    BEANS.get(IExtensionRegistry.class).register(FirstNameColumn.class, AbstractPersonTable.class);
     doTestAddFirstnameField();
   }
 
   @Test
   public void testExtendAbstractPersonTableAddFirstNameColumnAnnotation() {
-    SERVICES.getService(IExtensionRegistry.class).register(FirstNameColumn.class);
+    BEANS.get(IExtensionRegistry.class).register(FirstNameColumn.class);
     doTestAddFirstnameField();
   }
 
@@ -56,13 +56,13 @@ public class TableExtensionTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testExtendAbstractPersonTablePersonTableExtensionExplicit() {
-    SERVICES.getService(IExtensionRegistry.class).register(PersonTableExtension.class, AbstractPersonTable.class);
+    BEANS.get(IExtensionRegistry.class).register(PersonTableExtension.class, AbstractPersonTable.class);
     doTestPersonTableExtension();
   }
 
   @Test
   public void testExtendAbstractPersonTablePersonTableExtensionAnnotation() {
-    SERVICES.getService(IExtensionRegistry.class).register(PersonTableExtension.class);
+    BEANS.get(IExtensionRegistry.class).register(PersonTableExtension.class);
     doTestPersonTableExtension();
   }
 

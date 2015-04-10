@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.DeleteGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.DeleteUserBookmarkPermission;
@@ -176,7 +176,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
 
     @Override
     protected void execLoad() throws ProcessingException {
-      IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+      IBookmarkService service = BEANS.get(IBookmarkService.class);
       //get notified about changes
       service.addBookmarkServiceListener(ManageBookmarksForm.this);
       service.loadBookmarks();//load most recent state
@@ -193,18 +193,18 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
 
     @Override
     protected void execStore() throws ProcessingException {
-      SERVICES.getService(IBookmarkService.class).storeBookmarks();
+      BEANS.get(IBookmarkService.class).storeBookmarks();
     }
 
     @Override
     protected void execDiscard() throws ProcessingException {
       //revert all changes
-      SERVICES.getService(IBookmarkService.class).loadBookmarks();
+      BEANS.get(IBookmarkService.class).loadBookmarks();
     }
 
     @Override
     protected void execFinally() throws ProcessingException {
-      IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+      IBookmarkService service = BEANS.get(IBookmarkService.class);
       service.removeBookmarkServiceListener(ManageBookmarksForm.this);
     }
   }

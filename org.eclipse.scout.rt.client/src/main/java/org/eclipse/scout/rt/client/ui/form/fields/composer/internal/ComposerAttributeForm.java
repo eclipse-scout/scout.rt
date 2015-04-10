@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttr
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
@@ -253,7 +253,7 @@ public class ComposerAttributeForm extends AbstractForm {
             }
           }
           catch (ProcessingException e) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+            BEANS.get(IExceptionHandlerService.class).handleException(e);
           }
           // activate corresponding data field
           activateValueField();

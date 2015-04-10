@@ -28,7 +28,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
@@ -62,7 +62,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
     for (FastPropertyDescriptor desc : BeanUtility.getFastPropertyDescriptors(rowType, AbstractTableRowData.class, filter)) {
       props.add(desc);
     }
-    Set<Class<?>> contributions = SERVICES.getService(IInternalExtensionRegistry.class).getContributionsFor(rowType);
+    Set<Class<?>> contributions = BEANS.get(IInternalExtensionRegistry.class).getContributionsFor(rowType);
     for (Class<?> contribution : contributions) {
       for (FastPropertyDescriptor desc : BeanUtility.getFastPropertyDescriptors(contribution, Object.class, filter)) {
         props.add(desc);

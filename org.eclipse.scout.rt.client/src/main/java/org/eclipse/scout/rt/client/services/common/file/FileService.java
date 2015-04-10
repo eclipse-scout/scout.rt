@@ -23,8 +23,8 @@ import java.util.Locale;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.Client;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
@@ -81,7 +81,7 @@ public class FileService extends AbstractService implements IFileService {
     }
     //
     if (checkCache && OfflineState.isOnlineInCurrentThread()) {
-      IRemoteFileService svc = SERVICES.getService(IRemoteFileService.class);
+      IRemoteFileService svc = BEANS.get(IRemoteFileService.class);
       spec = svc.getRemoteFile(spec);
       try {
         if (spec.getName() != null && !spec.getName().equalsIgnoreCase(f.getName())) {
@@ -152,7 +152,7 @@ public class FileService extends AbstractService implements IFileService {
   }
 
   private void syncRemoteFilesInternal(String serverFolderPath, FilenameFilter filter, boolean useServerFolderStructureOnClient) throws ProcessingException {
-    IRemoteFileService svc = SERVICES.getService(IRemoteFileService.class);
+    IRemoteFileService svc = BEANS.get(IRemoteFileService.class);
     String[][] realFiles = getFiles(serverFolderPath, filter, useServerFolderStructureOnClient);
     RemoteFile[] existingFileInfoOnClient = new RemoteFile[realFiles.length];
     for (int i = 0; i < realFiles.length; i++) {

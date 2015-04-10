@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
@@ -45,7 +45,7 @@ public class PasswordPolicyVerifier {
    *         quits.
    */
   public boolean verify(String userId, int warnInAdvanceDays) {
-    IPasswordManagementService service = SERVICES.getService(IPasswordManagementService.class);
+    IPasswordManagementService service = BEANS.get(IPasswordManagementService.class);
     if (service == null) {
       LOG.error("missing client service proxy for " + IPasswordManagementService.class.getName() + "; check plugin extensions");
       return false;
@@ -96,7 +96,7 @@ public class PasswordPolicyVerifier {
     }
     catch (Throwable t) {
       ProcessingException pe = (t instanceof ProcessingException ? (ProcessingException) t : new ProcessingException("Unexpected", t));
-      SERVICES.getService(IExceptionHandlerService.class).handleException(pe);
+      BEANS.get(IExceptionHandlerService.class).handleException(pe);
       return false;
     }
   }

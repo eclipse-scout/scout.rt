@@ -29,7 +29,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
@@ -207,7 +207,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
         attributes.addOrdered(ConfigurationUtility.newInnerInstance(this, c));
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", e));
       }
     }
 
@@ -290,7 +290,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     setVisiblePermissionInternal(p);
     boolean b;
     if (p != null) {
-      b = SERVICES.getService(IAccessControlService.class).checkPermission(p);
+      b = BEANS.get(IAccessControlService.class).checkPermission(p);
     }
     else {
       b = true;
@@ -441,7 +441,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
           entities.addOrdered(e);
         }
         catch (Exception ex) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", ex));
+          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", ex));
         }
       }
       newConfiguredInstances.addAll(contributedEntities);

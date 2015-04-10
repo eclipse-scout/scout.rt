@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.service;
 
-import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.IService;
 import org.junit.Test;
 
 /**
@@ -27,11 +25,11 @@ public class ServiceRegistrationTest {
 //    ref.setService(TestLowPrioService.class);
 //    SERVICES.registerService(ref);
 //
-//    Assert.assertTrue(SERVICES.getService(ITestService.class) instanceof TestLowPrioService);
+//    Assert.assertTrue(BEANS.get(ITestService.class) instanceof TestLowPrioService);
 //
 //    SERVICES.unregister(ref);
 //
-//    ITestService[] services = SERVICES.getServices(ITestService.class);
+//    ITestService[] services = BEANS.all(ITestService.class);
 //    Assert.assertEquals(0, services.length);
 
   }

@@ -17,10 +17,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNotificationQueueEvent;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
@@ -66,7 +66,7 @@ public class AccessControlServiceTest {
         );
 
     m_listener = new TestClientNotificationQueueListener();
-    SERVICES.getService(IClientNotificationService.class).addClientNotificationQueueListener(m_listener);
+    BEANS.get(IClientNotificationService.class).addClientNotificationQueueListener(m_listener);
   }
 
   @After

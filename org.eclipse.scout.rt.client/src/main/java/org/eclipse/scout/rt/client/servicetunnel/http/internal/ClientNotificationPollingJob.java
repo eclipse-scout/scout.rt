@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.servicetunnel.http.internal;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 
 public class ClientNotificationPollingJob implements IRunnable {
@@ -26,7 +26,7 @@ public class ClientNotificationPollingJob implements IRunnable {
       return;
     }
 
-    IPingService pingService = SERVICES.getService(IPingService.class);
+    IPingService pingService = BEANS.get(IPingService.class);
     try {
       // side-effect of every service call (whether ping or any other) is to get client notifications
       pingService.ping("GetClientNotifications");

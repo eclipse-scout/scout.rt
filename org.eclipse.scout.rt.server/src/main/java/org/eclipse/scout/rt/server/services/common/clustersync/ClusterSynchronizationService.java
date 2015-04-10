@@ -35,7 +35,6 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
@@ -175,8 +174,8 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   protected void contributeListeners() throws ProcessingException {
     Set<IClusterNotificationListener> currentListeners = new HashSet<IClusterNotificationListener>(Arrays.asList(getListeners()));
 
-    for (IClusterNotificationListenerService contributingService : SERVICES.getServices(IClusterNotificationListenerService.class)) {
-      IService definingService = SERVICES.getService(contributingService.getDefiningServiceInterface());
+    for (IClusterNotificationListenerService contributingService : BEANS.all(IClusterNotificationListenerService.class)) {
+      IService definingService = BEANS.get(contributingService.getDefiningServiceInterface());
       if (contributingService == definingService) {
         if (!currentListeners.contains(contributingService)) {
           addListener(contributingService.getClusterNotificationListener());
@@ -199,7 +198,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
       LOG.error("Clustersync could not be enabled. No cluster nodeId could be determined.");
       return false;
     }
-    IPublishSubscribeMessageService messageService = SERVICES.getService(IPublishSubscribeMessageService.class);
+    IPublishSubscribeMessageService messageService = BEANS.get(IPublishSubscribeMessageService.class);
     if (messageService == null) {
       LOG.error("Clustersync could not be enabled. No MessageService found.");
       return false;

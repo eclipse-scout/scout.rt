@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
@@ -51,7 +51,7 @@ public class MoveDataModelEntitiyAndAttributeTest extends AbstractLocalExtension
 
   @Test
   public void testMoveTopLevelEntity() throws ProcessingException {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Top1Entity.class, 40);
+    BEANS.get(IExtensionRegistry.class).registerMove(Top1Entity.class, 40);
 
     TestDataModel dataModel = new TestDataModel();
     assertDataModelElements(dataModel.getEntities(), Top2Entity.class, Top3Entity.class, Top1Entity.class);
@@ -63,7 +63,7 @@ public class MoveDataModelEntitiyAndAttributeTest extends AbstractLocalExtension
 
   @Test
   public void testMoveTopLevelAttribute() throws ProcessingException {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Top1Attribute.class, 40);
+    BEANS.get(IExtensionRegistry.class).registerMove(Top1Attribute.class, 40);
 
     TestDataModel dataModel = new TestDataModel();
     assertDataModelElements(dataModel.getEntities(), Top1Entity.class, Top2Entity.class, Top3Entity.class);
@@ -76,7 +76,7 @@ public class MoveDataModelEntitiyAndAttributeTest extends AbstractLocalExtension
 
   @Test
   public void testMoveSubLevelEntity() throws ProcessingException {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Entity.class, 40);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Entity.class, 40);
 
     TestDataModel dataModel = new TestDataModel();
     assertDataModelElements(dataModel.getEntities(), Top1Entity.class, Top2Entity.class, Top3Entity.class);
@@ -88,7 +88,7 @@ public class MoveDataModelEntitiyAndAttributeTest extends AbstractLocalExtension
 
   @Test
   public void testMoveSubLevelAttribute() throws ProcessingException {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Attribute.class, 40);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Attribute.class, 40);
 
     TestDataModel dataModel = new TestDataModel();
     assertDataModelElements(dataModel.getEntities(), Top1Entity.class, Top2Entity.class, Top3Entity.class);
@@ -101,22 +101,22 @@ public class MoveDataModelEntitiyAndAttributeTest extends AbstractLocalExtension
 
   @Test(expected = IllegalExtensionException.class)
   public void testMoveSubLevelEntityToRoot() throws ProcessingException {
-    SERVICES.getService(IExtensionRegistry.class).registerMoveToRoot(Sub1Top1Entity.class, 40d);
+    BEANS.get(IExtensionRegistry.class).registerMoveToRoot(Sub1Top1Entity.class, 40d);
   }
 
   @Test(expected = IllegalExtensionException.class)
   public void testMoveSubLevelAttributeToRoot() throws ProcessingException {
-    SERVICES.getService(IExtensionRegistry.class).registerMoveToRoot(Sub1Top1Attribute.class, 40d);
+    BEANS.get(IExtensionRegistry.class).registerMoveToRoot(Sub1Top1Attribute.class, 40d);
   }
 
   @Test(expected = IllegalExtensionException.class)
   public void testMoveEntityToAnotherEntity() throws ProcessingException {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Entity.class, 40d, Top2Entity.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Entity.class, 40d, Top2Entity.class);
   }
 
   @Test(expected = IllegalExtensionException.class)
   public void testMoveAttributeToAnotherEntity() throws ProcessingException {
-    SERVICES.getService(IExtensionRegistry.class).registerMove(Sub1Top1Attribute.class, 40d, Top2Entity.class);
+    BEANS.get(IExtensionRegistry.class).registerMove(Sub1Top1Attribute.class, 40d, Top2Entity.class);
   }
 
   protected static void assertDataModelElements(List<?> list, Class<?>... expectedWizardStepClasses) {

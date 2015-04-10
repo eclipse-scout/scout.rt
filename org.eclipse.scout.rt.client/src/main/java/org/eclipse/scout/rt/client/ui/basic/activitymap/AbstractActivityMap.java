@@ -55,7 +55,7 @@ import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IActivityMapContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.ActivityMapContextMenu;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
@@ -285,7 +285,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
         menus.addOrdered(menu);
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
     m_contributionHolder = new ContributionComposite(this);
@@ -344,10 +344,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
               interceptActivityCellSelected(cell);
             }
             catch (ProcessingException t) {
-              SERVICES.getService(IExceptionHandlerService.class).handleException(t);
+              BEANS.get(IExceptionHandlerService.class).handleException(t);
             }
             catch (Throwable t) {
-              SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+              BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
             }
           }
         }
@@ -432,10 +432,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       setTimeScale(scale);
     }
     catch (ProcessingException t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(t);
+      BEANS.get(IExceptionHandlerService.class).handleException(t);
     }
     catch (Throwable t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
     }
   }
 
@@ -729,10 +729,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       interceptCellAction(resourceId, column, activityCell);
     }
     catch (ProcessingException t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(t);
+      BEANS.get(IExceptionHandlerService.class).handleException(t);
     }
     catch (Throwable t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
     }
     ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_CELL_ACTION, resourceId, column, activityCell);
     fireActivityMapEventInternal(e);
@@ -1164,10 +1164,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       interceptDecorateActivityCell(cell);
     }
     catch (ProcessingException t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(t);
+      BEANS.get(IExceptionHandlerService.class).handleException(t);
     }
     catch (Throwable t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
     }
     finally {
       cell.setObserver(m_cellObserver);

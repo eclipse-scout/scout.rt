@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.job.IRunContextProvider;
 import org.eclipse.scout.rt.shared.validate.annotations.MaxLength;
 
@@ -113,7 +112,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
   protected ILookupService<KEY_TYPE> createLookupService() {
     ILookupService<KEY_TYPE> s = null;
     if (getConfiguredService() != null) {
-      s = SERVICES.getService(getConfiguredService());
+      s = BEANS.get(getConfiguredService());
       if (s == null) {
         throw new IllegalArgumentException("service " + getConfiguredService().getName() + " is either not registered in the clientProxy extension in the plugin.xml or this constructor is called outside the model thread");
       }

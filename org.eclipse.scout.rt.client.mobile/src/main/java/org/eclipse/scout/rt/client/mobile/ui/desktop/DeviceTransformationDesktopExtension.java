@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
@@ -54,14 +54,14 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
     super.setCoreDesktop(desktop);
 
     if (isActive()) {
-      SERVICES.getService(IBreadCrumbsNavigationService.class).install(getCoreDesktop());
-      SERVICES.getService(IDeviceTransformationService.class).install(getCoreDesktop());
+      BEANS.get(IBreadCrumbsNavigationService.class).install(getCoreDesktop());
+      BEANS.get(IDeviceTransformationService.class).install(getCoreDesktop());
     }
   }
 
   public IDeviceTransformer getDeviceTransformer() {
     if (m_deviceTransformer == null) {
-      m_deviceTransformer = SERVICES.getService(IDeviceTransformationService.class).getDeviceTransformer();
+      m_deviceTransformer = BEANS.get(IDeviceTransformationService.class).getDeviceTransformer();
     }
 
     return m_deviceTransformer;
@@ -143,7 +143,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
       getDeviceTransformer().transformForm(form);
     }
     catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(IExceptionHandlerService.class).handleException(e);
     }
 
     if (!getDeviceTransformer().acceptFormAddingToDesktop(form)) {

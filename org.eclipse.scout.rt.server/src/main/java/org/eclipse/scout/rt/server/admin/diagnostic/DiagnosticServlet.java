@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
@@ -78,10 +78,10 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
         final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
         final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
-        DiagnosticSession diagnosticSession = (DiagnosticSession) SERVICES.getService(IHttpSessionCacheService.class).getAndTouch(DIAGNOSTIC_SESSION_KEY, servletRequest, servletResponse);
+        DiagnosticSession diagnosticSession = (DiagnosticSession) BEANS.get(IHttpSessionCacheService.class).getAndTouch(DIAGNOSTIC_SESSION_KEY, servletRequest, servletResponse);
         if (diagnosticSession == null) {
           diagnosticSession = new DiagnosticSession();
-          SERVICES.getService(IHttpSessionCacheService.class).put(DIAGNOSTIC_SESSION_KEY, diagnosticSession, servletRequest, servletResponse);
+          BEANS.get(IHttpSessionCacheService.class).put(DIAGNOSTIC_SESSION_KEY, diagnosticSession, servletRequest, servletResponse);
         }
         diagnosticSession.serviceRequest(servletRequest, servletResponse);
       }

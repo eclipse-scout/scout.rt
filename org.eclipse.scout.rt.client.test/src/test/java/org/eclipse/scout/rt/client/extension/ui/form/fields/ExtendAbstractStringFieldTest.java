@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -44,7 +44,7 @@ public class ExtendAbstractStringFieldTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testOwnerFromGeneric() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(AllStringFieldExtension.class);
+    BEANS.get(IExtensionRegistry.class).register(AllStringFieldExtension.class);
     // testcode
     MyForm form = new MyForm();
     form.start();

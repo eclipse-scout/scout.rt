@@ -27,8 +27,8 @@ import javax.swing.JLabel;
 import javax.swing.RootPaneContainer;
 import javax.swing.UIManager;
 
-import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
 

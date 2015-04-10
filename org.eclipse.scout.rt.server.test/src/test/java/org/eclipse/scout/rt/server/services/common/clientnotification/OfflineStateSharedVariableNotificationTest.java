@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
@@ -79,7 +79,7 @@ public class OfflineStateSharedVariableNotificationTest {
    */
   @Test
   public void testDefaultOffline() {
-    IClientNotificationService svc = SERVICES.getService(IClientNotificationService.class);
+    IClientNotificationService svc = BEANS.get(IClientNotificationService.class);
 
     assertNull("No existing shared variable expected.", m_serverSession.getMySharedVariable());
     assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
@@ -102,7 +102,7 @@ public class OfflineStateSharedVariableNotificationTest {
    */
   @Test
   public void testDefaultOfflineThreadOffline() {
-    IClientNotificationService svc = SERVICES.getService(IClientNotificationService.class);
+    IClientNotificationService svc = BEANS.get(IClientNotificationService.class);
 
     assertNull("No existing shared variable expected.", m_serverSession.getMySharedVariable());
     assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
@@ -125,7 +125,7 @@ public class OfflineStateSharedVariableNotificationTest {
    */
   @Test
   public void testDefaultOfflineThreadOnline() {
-    IClientNotificationService svc = SERVICES.getService(IClientNotificationService.class);
+    IClientNotificationService svc = BEANS.get(IClientNotificationService.class);
 
     assertNull("No existing shared variable expected.", m_serverSession.getMySharedVariable());
     assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
@@ -148,7 +148,7 @@ public class OfflineStateSharedVariableNotificationTest {
    */
   @Test
   public void testDefaultOnline() {
-    IClientNotificationService svc = SERVICES.getService(IClientNotificationService.class);
+    IClientNotificationService svc = BEANS.get(IClientNotificationService.class);
 
     assertNull("No existing shared variable expected.", m_serverSession.getMySharedVariable());
     assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
@@ -171,7 +171,7 @@ public class OfflineStateSharedVariableNotificationTest {
    */
   @Test
   public void testDefaultOnlineThreadOnline() {
-    IClientNotificationService svc = SERVICES.getService(IClientNotificationService.class);
+    IClientNotificationService svc = BEANS.get(IClientNotificationService.class);
 
     assertNull("No existing shared variable expected.", m_serverSession.getMySharedVariable());
     assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());
@@ -194,7 +194,7 @@ public class OfflineStateSharedVariableNotificationTest {
    */
   @Test
   public void testDefaultOnlineThreadOffline() {
-    IClientNotificationService svc = SERVICES.getService(IClientNotificationService.class);
+    IClientNotificationService svc = BEANS.get(IClientNotificationService.class);
 
     assertNull("No existing shared variable expected.", m_serverSession.getMySharedVariable());
     assertTrue("No existing client notifications expected.", svc.getNextNotifications(0).isEmpty());

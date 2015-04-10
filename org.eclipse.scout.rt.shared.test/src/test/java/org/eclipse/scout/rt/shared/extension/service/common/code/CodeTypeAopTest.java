@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.services.common.code.AbstractCodeTypeExtension;
@@ -37,7 +37,7 @@ public class CodeTypeAopTest extends AbstractLocalExtensionTestCase {
   @Test
   public void testExecValidate() throws Exception {
 
-    SERVICES.getService(IExtensionRegistry.class).register(CodeTypeExtension.class);
+    BEANS.get(IExtensionRegistry.class).register(CodeTypeExtension.class);
 
     CountryCodeType ct = new CountryCodeType();
     Assert.assertNotNull(ct.getCode(Long.valueOf(42)));

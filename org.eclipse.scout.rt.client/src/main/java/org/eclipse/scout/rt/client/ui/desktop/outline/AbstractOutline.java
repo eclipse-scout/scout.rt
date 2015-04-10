@@ -51,7 +51,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
@@ -207,7 +207,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       ensureDefaultDetailFormStarted();
     }
     catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(IExceptionHandlerService.class).handleException(e);
     }
   }
 
@@ -311,7 +311,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
             unloadNode(page);
           }
           catch (ProcessingException e) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+            BEANS.get(IExceptionHandlerService.class).handleException(e);
           }
         }
         return true;
@@ -364,7 +364,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   public void setVisiblePermission(Permission p) {
     boolean b;
     if (p != null) {
-      b = SERVICES.getService(IAccessControlService.class).checkPermission(p);
+      b = BEANS.get(IAccessControlService.class).checkPermission(p);
     }
     else {
       b = true;
@@ -673,7 +673,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       return getConfiguredDefaultDetailForm().newInstance();
     }
     catch (Exception e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredDefaultDetailForm().getName() + "'.", e));
+      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredDefaultDetailForm().getName() + "'.", e));
     }
     return null;
   }

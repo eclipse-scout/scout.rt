@@ -8,7 +8,7 @@ import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * The top level list is expected to be sorted by the caller.
@@ -22,7 +22,7 @@ public abstract class AbstractMoveModelObjectHandler<ORDERED extends IOrdered> {
   public AbstractMoveModelObjectHandler(String modelObjectTypeName, OrderedCollection<ORDERED> rootModelObjects) {
     m_rootModelObjects = rootModelObjects;
     m_modelObjectTypeName = modelObjectTypeName;
-    m_extensionRegistry = SERVICES.getService(IInternalExtensionRegistry.class);
+    m_extensionRegistry = BEANS.get(IInternalExtensionRegistry.class);
   }
 
   protected abstract ORDERED getParent(ORDERED child);

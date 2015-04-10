@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -37,7 +37,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    * Helper method to create a lookup call from a codetype using the {@link ICodeLookupCallFactoryService}.
    */
   public static <T> CodeLookupCall<T> newInstanceByService(Class<? extends ICodeType<?, T>> codeTypeClass) {
-    return SERVICES.getService(ICodeLookupCallFactoryService.class).newInstance(codeTypeClass);
+    return BEANS.get(ICodeLookupCallFactoryService.class).newInstance(codeTypeClass);
   }
 
   private Class<? extends ICodeType<?, CODE_ID>> m_codeTypeClass;

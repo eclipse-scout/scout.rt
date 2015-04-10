@@ -19,8 +19,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.commons.BeanUtility;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
@@ -48,7 +48,7 @@ public abstract class AbstractInputValidationStrategyTest {
   @Test
   public void validateServices() throws Exception {
     Set<Method> collector = new HashSet<Method>();
-    for (IService service : SERVICES.getServices(IService.class)) {
+    for (IService service : BEANS.all(IService.class)) {
       if (service == null) {
         throw new Exception("Service is null. Test started too early or some services failed to initialize.");
       }

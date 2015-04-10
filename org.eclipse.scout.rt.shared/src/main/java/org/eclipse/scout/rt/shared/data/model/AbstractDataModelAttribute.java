@@ -30,7 +30,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -239,7 +239,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
         setLookupCall(call);
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + lsCls.getName() + "'.", e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + lsCls.getName() + "'.", e));
       }
     }
     injectOperators();
@@ -401,7 +401,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     // create lookup service call
     m_lookupCall = null;
     if (m_codeTypeClass != null) {
-      m_lookupCall = SERVICES.getService(ICodeLookupCallFactoryService.class).newInstance((Class<? extends ICodeType<?, Object>>) m_codeTypeClass);
+      m_lookupCall = BEANS.get(ICodeLookupCallFactoryService.class).newInstance((Class<? extends ICodeType<?, Object>>) m_codeTypeClass);
     }
   }
 
@@ -426,7 +426,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     setVisiblePermissionInternal(p);
     boolean b;
     if (p != null) {
-      b = SERVICES.getService(IAccessControlService.class).checkPermission(p);
+      b = BEANS.get(IAccessControlService.class).checkPermission(p);
     }
     else {
       b = true;
@@ -705,7 +705,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
     ILookupCall<Object> call;
     if (codeTypeClass != null) {
-      call = SERVICES.getService(ICodeLookupCallFactoryService.class).newInstance((Class<? extends ICodeType<?, Object>>) codeTypeClass);
+      call = BEANS.get(ICodeLookupCallFactoryService.class).newInstance((Class<? extends ICodeType<?, Object>>) codeTypeClass);
     }
     else if (lookupCall instanceof LookupCall<?>) {
       call = (ILookupCall<Object>) ((LookupCall<Object>) lookupCall).clone();

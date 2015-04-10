@@ -29,7 +29,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * LookupCall[] callArray=...;
  * BatchLookupNormalizer normalizer=new BatchLookupNormalizer();
  * LookupCall[] normArray=normalizer.normalizeCalls(callArray);
- * LookupRow[][] normResultArray=SERVICES.getService(IBatchLookupService.class).getBatchByKey(normArray);
+ * LookupRow[][] normResultArray=BEANS.get(IBatchLookupService.class).getBatchByKey(normArray);
  * LookupRow[][] resultArray=normalizer.denormalizeResults(normResultArray);
  * </pre>
  */

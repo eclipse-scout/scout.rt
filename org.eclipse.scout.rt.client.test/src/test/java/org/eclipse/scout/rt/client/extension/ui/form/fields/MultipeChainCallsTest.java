@@ -17,7 +17,7 @@ import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldExecValidateChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.AbstractStringFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class MultipeChainCallsTest extends AbstractLocalExtensionTestCase {
 
   @Test
   public void testMultipeChainCalls() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(NameFieldExt.class);
+    BEANS.get(IExtensionRegistry.class).register(NameFieldExt.class);
 
     NameField field = new NameField();
     field.getUIFacade().setTextFromUI("abc", false);

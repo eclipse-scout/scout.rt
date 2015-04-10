@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.server.services.common.useractivity;
 
 import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.services.common.clientnotification.AllUserFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.services.common.useractivity.IUserActivityStateService;
@@ -46,7 +46,7 @@ public abstract class AbstractUserActivityStateService extends AbstractService i
       m_users.put(userId, status);
       if (oldStatus != status) {
         UserStatusMap map = getUserStatusMap();
-        SERVICES.getService(IClientNotificationService.class).putNotification(new UserActivityClientNotification(map), new AllUserFilter(AllUserFilter.DEFAULT_TIMEOUT));
+        BEANS.get(IClientNotificationService.class).putNotification(new UserActivityClientNotification(map), new AllUserFilter(AllUserFilter.DEFAULT_TIMEOUT));
       }
     }
   }

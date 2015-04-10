@@ -25,10 +25,10 @@ import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.servicetunnel.http.AbstractHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -93,7 +93,7 @@ public class InternalClientHttpServiceTunnel extends AbstractHttpServiceTunnel<I
 
   @Override
   protected void decorateServiceRequest(IServiceTunnelRequest call) {
-    IClientNotificationConsumerService cns = SERVICES.getService(IClientNotificationConsumerService.class);
+    IClientNotificationConsumerService cns = BEANS.get(IClientNotificationConsumerService.class);
     if (call instanceof ServiceTunnelRequest && cns != null) {
       ((ServiceTunnelRequest) call).setConsumedNotifications(cns.getConsumedNotificationIds(getSession()));
     }
@@ -103,7 +103,7 @@ public class InternalClientHttpServiceTunnel extends AbstractHttpServiceTunnel<I
   protected void onInvokeService(long t0, IServiceTunnelResponse response) {
     if (isAnalyzeNetworkLatency()) {
       // performance analyzer
-      IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
+      IPerformanceAnalyzerService perf = BEANS.get(IPerformanceAnalyzerService.class);
       if (perf != null) {
         long totalMillis = (System.nanoTime() - t0) / 1000000L;
         Long execMillis = response.getProcessingDuration();
@@ -118,7 +118,7 @@ public class InternalClientHttpServiceTunnel extends AbstractHttpServiceTunnel<I
     }
 
     // client notification handler
-    IClientNotificationConsumerService cns = SERVICES.getService(IClientNotificationConsumerService.class);
+    IClientNotificationConsumerService cns = BEANS.get(IClientNotificationConsumerService.class);
     if (cns != null) {
       cns.dispatchClientNotifications(response.getClientNotifications(), getSession());
     }
@@ -170,13 +170,13 @@ public class InternalClientHttpServiceTunnel extends AbstractHttpServiceTunnel<I
       Object response = Subject.doAs(clientSession.getOfflineSubject(), new PrivilegedAction<IServiceTunnelResponse>() {
         @Override
         public IServiceTunnelResponse run() {
-          return SERVICES.getService(IOfflineDispatcherService.class).dispatch(call);
+          return BEANS.get(IOfflineDispatcherService.class).dispatch(call);
         }
       });
       return (IServiceTunnelResponse) response;
     }
     else {
-      return SERVICES.getService(IOfflineDispatcherService.class).dispatch(call);
+      return BEANS.get(IOfflineDispatcherService.class).dispatch(call);
     }
   }
 

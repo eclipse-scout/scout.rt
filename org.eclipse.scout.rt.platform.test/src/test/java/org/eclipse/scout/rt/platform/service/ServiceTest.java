@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.service;
 
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.internal.ITestService;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
@@ -22,7 +22,7 @@ public class ServiceTest {
 
   @Test
   public void testFragmentRegisteredService() throws Exception {
-    ITestService service = SERVICES.getService(ITestService.class);
+    ITestService service = BEANS.get(ITestService.class);
     Assert.assertNotNull(service);
   }
 }

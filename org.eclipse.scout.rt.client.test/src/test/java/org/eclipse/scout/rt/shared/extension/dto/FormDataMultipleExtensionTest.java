@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.MultipleExtGroupBoxExtension;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.MultipleExtGroupBoxExtension.SecondDoubleField;
@@ -32,15 +32,15 @@ public class FormDataMultipleExtensionTest extends AbstractLocalExtensionTestCas
 
   @Test
   public void testFormDataMultipleExtensionsExplicit() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(MultipleExtGroupBoxExtension.class, MainBox.class);
-    SERVICES.getService(IExtensionRegistry.class).register(MultipleExtGroupBoxExtensionData.class, OrigFormData.class);
+    BEANS.get(IExtensionRegistry.class).register(MultipleExtGroupBoxExtension.class, MainBox.class);
+    BEANS.get(IExtensionRegistry.class).register(MultipleExtGroupBoxExtensionData.class, OrigFormData.class);
     doTest();
   }
 
   @Test
   public void testFormDataMultipleExtensionsFromAnnotation() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(MultipleExtGroupBoxExtension.class);
-    SERVICES.getService(IExtensionRegistry.class).register(MultipleExtGroupBoxExtensionData.class);
+    BEANS.get(IExtensionRegistry.class).register(MultipleExtGroupBoxExtension.class);
+    BEANS.get(IExtensionRegistry.class).register(MultipleExtGroupBoxExtensionData.class);
     doTest();
   }
 

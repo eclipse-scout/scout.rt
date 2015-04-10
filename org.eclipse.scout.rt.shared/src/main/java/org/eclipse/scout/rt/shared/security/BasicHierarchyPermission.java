@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 public abstract class BasicHierarchyPermission extends BasicPermission {
@@ -169,7 +169,7 @@ public abstract class BasicHierarchyPermission extends BasicPermission {
   @SuppressWarnings("boxing")
   private boolean checkLevel(BasicHierarchyPermission other, int level) {
     // check if we are in the backend
-    if (SERVICES.getService(IAccessControlService.class).isProxyService()) {
+    if (BEANS.get(IAccessControlService.class).isProxyService()) {
       throw new FineGrainedAccessCheckRequiredException();
     }
     try {

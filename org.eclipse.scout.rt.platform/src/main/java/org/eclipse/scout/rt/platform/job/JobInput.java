@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
-import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
 
 /**

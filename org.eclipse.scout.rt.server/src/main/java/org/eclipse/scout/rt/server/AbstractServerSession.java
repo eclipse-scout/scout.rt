@@ -27,7 +27,7 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -103,7 +103,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   private void assignUserId() {
-    String userId = SERVICES.getService(IAccessControlService.class).getUserIdOfCurrentSubject();
+    String userId = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
     setUserIdInternal(userId);
   }
 
@@ -166,7 +166,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
       public void propertyChange(PropertyChangeEvent e) {
         if (OfflineState.isOfflineDefault() == OfflineState.isOfflineInCurrentThread()) {
           // notify this session
-          SERVICES.getService(IClientNotificationService.class).putNotification(new SharedContextChangedNotification(new SharedVariableMap(m_sharedVariableMap)), new SessionFilter(AbstractServerSession.this, 60000L));
+          BEANS.get(IClientNotificationService.class).putNotification(new SharedContextChangedNotification(new SharedVariableMap(m_sharedVariableMap)), new SessionFilter(AbstractServerSession.this, 60000L));
         }
       }
     });

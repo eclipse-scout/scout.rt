@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.extension.dto;
 
 import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.AbstractTemplateBoxData.SecondStringInTemplate;
@@ -28,7 +28,7 @@ import org.junit.Test;
 public class ContributionOnlyOneTemplateTest extends AbstractLocalExtensionTestCase {
   @Test
   public void testContributeToDtoInOnlyOneTemplate() throws Exception {
-    IExtensionRegistry extensionRegistry = SERVICES.getService(IExtensionRegistry.class);
+    IExtensionRegistry extensionRegistry = BEANS.get(IExtensionRegistry.class);
     extensionRegistry.register(PropertyExtensionData.class, new ClassIdentifier(SecondUseOfTemplateBox.class, SecondStringInTemplate.class));
     doTest();
   }

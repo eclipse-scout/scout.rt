@@ -89,7 +89,6 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -801,7 +800,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
     catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(IExceptionHandlerService.class).handleException(e);
     }
     return forms;
   }
@@ -836,11 +835,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
       catch (ProcessingException e) {
         formHolder.setValue(form);
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(IExceptionHandlerService.class).handleException(e);
       }
       catch (Throwable t) {
         formHolder.setValue(form);
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Formmodification error: " + form, t));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Formmodification error: " + form, t));
       }
     }
     form = formHolder.getValue();
@@ -967,7 +966,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         if (m_outline != null) {
           IPage<?> oldActivePage = m_outline.getActivePage();
           if (oldActivePage != null) {
-            SERVICES.getService(INavigationHistoryService.class).addStep(0, oldActivePage);
+            BEANS.get(INavigationHistoryService.class).addStep(0, oldActivePage);
           }
         }
         //
@@ -1008,7 +1007,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
               m_outline.getActivePage().ensureChildrenLoaded();
             }
             catch (ProcessingException e) {
-              SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+              BEANS.get(IExceptionHandlerService.class).handleException(e);
             }
           }
           m_outline.setNodeExpanded(m_outline.getRootNode(), true);
@@ -1023,7 +1022,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
             newActivePage = m_outline.getActivePage();
           }
           if (newActivePage != null) {
-            SERVICES.getService(INavigationHistoryService.class).addStep(0, newActivePage);
+            BEANS.get(INavigationHistoryService.class).addStep(0, newActivePage);
           }
         }
       }
@@ -1343,7 +1342,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
     catch (ProcessingException e) {
       e.addContextMessage(ScoutTexts.get("FormPrint") + " " + getTitle());
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(IExceptionHandlerService.class).handleException(e);
     }
   }
 
@@ -1361,10 +1360,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   public void openUrlInBrowser(String url, IUrlTarget target) {
     if (!UserAgentUtility.isWebClient()) {
       try {
-        SERVICES.getService(IShellService.class).shellOpen(url);
+        BEANS.get(IShellService.class).shellOpen(url);
       }
       catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(IExceptionHandlerService.class).handleException(e);
       }
     }
     else {
@@ -1598,10 +1597,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           }
         }
         catch (ProcessingException e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+          BEANS.get(IExceptionHandlerService.class).handleException(e);
         }
         catch (Throwable t) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(oldOutline + " -> " + newOutline, t));
+          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException(oldOutline + " -> " + newOutline, t));
         }
       }
     }
@@ -1700,7 +1699,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
     catch (Throwable t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
     }
   }
 
@@ -1833,10 +1832,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
       }
       catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(IExceptionHandlerService.class).handleException(e);
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
       }
     }
   }
@@ -1856,10 +1855,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
       }
       catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(IExceptionHandlerService.class).handleException(e);
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
       }
     }
   }
@@ -1941,7 +1940,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
             outlines.addOrdered(o);
           }
           catch (Throwable t) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + element.getName() + "'.", t));
+            BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + element.getName() + "'.", t));
           }
         }
       }
@@ -1954,7 +1953,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           actions.add(ConfigurationUtility.newInnerInstance(AbstractDesktop.this, actionClazz));
         }
         catch (Exception e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + actionClazz.getName() + "'.", e));
+          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + actionClazz.getName() + "'.", e));
         }
       }
     }
@@ -2061,10 +2060,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           }
         }
         catch (ProcessingException e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+          BEANS.get(IExceptionHandlerService.class).handleException(e);
         }
         catch (Throwable t) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
+          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected by " + ext, t));
         }
       }
     }
@@ -2098,14 +2097,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         case TreeEvent.TYPE_BEFORE_NODES_SELECTED: {
           if (e.getDeselectedNode() instanceof IPage) {
             IPage<?> deselectedPage = (IPage) e.getDeselectedNode();
-            SERVICES.getService(INavigationHistoryService.class).addStep(0, deselectedPage);
+            BEANS.get(INavigationHistoryService.class).addStep(0, deselectedPage);
           }
           break;
         }
         case TreeEvent.TYPE_NODES_SELECTED: {
           IPage<?> page = m_outline.getActivePage();
           if (page != null) {
-            SERVICES.getService(INavigationHistoryService.class).addStep(0, page);
+            BEANS.get(INavigationHistoryService.class).addStep(0, page);
           }
           try {
             ClientSessionProvider.currentSession().getMemoryPolicy().afterOutlineSelectionChanged(AbstractDesktop.this);
@@ -2206,10 +2205,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           continueClosing = false;
         }
         catch (ProcessingException e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+          BEANS.get(IExceptionHandlerService.class).handleException(e);
         }
         catch (Throwable t) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Desktop before closing error", t));
+          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Desktop before closing error", t));
         }
       }
     }

@@ -56,7 +56,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -353,7 +353,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       }
     }
     catch (Exception e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredTree().getName() + "'.", e));
+      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredTree().getName() + "'.", e));
     }
     getTree().setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
     if (getConfiguredLookupCall() != null) {
@@ -362,7 +362,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
         setLookupCall(call);
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredLookupCall().getName() + "'.", e));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredLookupCall().getName() + "'.", e));
       }
     }
     // code type
@@ -398,7 +398,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
         fieldList.add(ConfigurationUtility.newInnerInstance(this, fieldClazz));
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
+        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
       }
     }
     fieldList.addAll(contributedFields);
@@ -563,7 +563,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     List<? extends ILookupRow<T>> data = null;
     ILookupCall<T> call = getLookupCall();
     if (call != null) {
-      call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractTreeBox.this));
+      call = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractTreeBox.this));
       prepareLookupCall(call, parentNode);
       data = call.getDataByRec();
       data = filterLookupResult(call, data);
@@ -581,7 +581,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     List<? extends ILookupRow<T>> data = null;
     ILookupCall<T> call = getLookupCall();
     if (call != null) {
-      call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractTreeBox.this));
+      call = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractTreeBox.this));
       prepareLookupCall(call, null);
       data = call.getDataByAll();
       data = filterLookupResult(call, data);

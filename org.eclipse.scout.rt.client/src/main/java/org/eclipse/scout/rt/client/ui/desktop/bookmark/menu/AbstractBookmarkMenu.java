@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.IBookmarkForm;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.internal.ManageBookmarksForm;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.CreateGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.CreateUserBookmarkPermission;
@@ -63,7 +63,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   @ConfigOperation
   @Order(10)
   protected void execInitAction() {
-    SERVICES.getService(IBookmarkService.class).addBookmarkServiceListener(
+    BEANS.get(IBookmarkService.class).addBookmarkServiceListener(
         new BookmarkServiceListener() {
           @Override
           public void bookmarksChanged(BookmarkServiceEvent e) {
@@ -83,7 +83,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   private void createNewBookmark(int kind) throws ProcessingException {
     Bookmark b = ClientSessionProvider.currentSession().getDesktop().createBookmark();
     if (b != null) {
-      IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+      IBookmarkService service = BEANS.get(IBookmarkService.class);
       b.setKind(kind);
       IBookmarkForm form = null;
       if (getConfiguredBookmarkForm() != null) {
@@ -91,7 +91,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
           form = getConfiguredBookmarkForm().newInstance();
         }
         catch (Exception e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredBookmarkForm().getName() + "'.", e));
+          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredBookmarkForm().getName() + "'.", e));
         }
       }
       if (form == null) {
@@ -120,7 +120,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   }
 
   private void handleBookmarksChanged() {
-    IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+    IBookmarkService service = BEANS.get(IBookmarkService.class);
     List<IMenu> oldList = getChildActions();
     List<IMenu> newList = new ArrayList<IMenu>();
     for (IMenu m : oldList) {
@@ -185,7 +185,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
 
     @Override
     protected void execAction() throws ProcessingException {
-      SERVICES.getService(IBookmarkService.class).loadBookmarks();
+      BEANS.get(IBookmarkService.class).loadBookmarks();
       createNewBookmark(Bookmark.GLOBAL_BOOKMARK);
     }
   }
@@ -220,7 +220,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
 
       @Override
       protected void execAction() throws ProcessingException {
-        IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+        IBookmarkService service = BEANS.get(IBookmarkService.class);
         Bookmark b = service.getStartBookmark();
         if (b != null) {
           try {
@@ -250,7 +250,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
 
       @Override
       protected void execAction() throws ProcessingException {
-        IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+        IBookmarkService service = BEANS.get(IBookmarkService.class);
         service.setStartBookmark();
         service.storeBookmarks();
       }
@@ -265,7 +265,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
 
       @Override
       protected void execAction() throws ProcessingException {
-        IBookmarkService service = SERVICES.getService(IBookmarkService.class);
+        IBookmarkService service = BEANS.get(IBookmarkService.class);
         service.deleteStartBookmark();
         service.storeBookmarks();
       }

@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clientnotification.SingleUserFilter;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
@@ -42,8 +41,8 @@ public abstract class AbstractAccessControlService extends AbstractSharedAccessC
   @Override
   protected void notifySetPermisions(Permissions p) {
     // notify clients:
-    String userId = SERVICES.getService(IAccessControlService.class).getUserIdOfCurrentSubject();
-    SERVICES.getService(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(p), new SingleUserFilter(userId, 120000L));
+    String userId = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
+    BEANS.get(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(p), new SingleUserFilter(userId, 120000L));
   }
 
   @Override
@@ -51,7 +50,7 @@ public abstract class AbstractAccessControlService extends AbstractSharedAccessC
     clearCacheNoFire();
 
     //notify clients with a filter, that will be accepted nowhere:
-    SERVICES.getService(IClientNotificationService.class).putNotification(new ResetAccessControlChangedNotification(), new SingleUserFilter(null, 0L));
+    BEANS.get(IClientNotificationService.class).putNotification(new ResetAccessControlChangedNotification(), new SingleUserFilter(null, 0L));
 
     //notify clusters:
     try {
@@ -83,7 +82,7 @@ public abstract class AbstractAccessControlService extends AbstractSharedAccessC
     //notify clients:
     for (String userId : userIds) {
       if (userId != null) {
-        SERVICES.getService(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(null), new SingleUserFilter(userId, 120000L));
+        BEANS.get(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(null), new SingleUserFilter(userId, 120000L));
       }
     }
   }
