@@ -25,11 +25,8 @@ import org.eclipse.scout.rt.server.services.common.ping.PingService;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
-import org.junit.Ignore;
 import org.junit.Test;
 
-// TODO NoOsgi
-@Ignore
 public class RemoteServiceAccessTest {
 
   @Test

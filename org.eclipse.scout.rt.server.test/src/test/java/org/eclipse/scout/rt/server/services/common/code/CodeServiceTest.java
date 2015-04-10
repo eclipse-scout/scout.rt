@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -38,7 +39,6 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -47,11 +47,9 @@ import org.mockito.Mockito;
 /**
  * Test for {@link ICodeService}
  */
-//FIXME permission lookup not working anymore with nOSGi
 @RunWith(ServerTestRunner.class)
 @RunWithServerSession(TestServerSession.class)
 @RunWithSubject("john")
-@Ignore
 public class CodeServiceTest {
 
   /* ---------------------------------------------------------------------------------------------- */
@@ -59,10 +57,7 @@ public class CodeServiceTest {
   /* ---------------------------------------------------------------------------------------------- */
 
   private void testImpl(ICodeService testService, boolean testCodeType1Expected, boolean testCodeType2Expected) {
-    List<IBean<?>> reg = TestingUtility.registerBeans(
-        new BeanMetaData(ICodeService.class).
-            initialInstance(testService).
-            applicationScoped(true));
+    List<IBean<?>> reg = TestingUtility.registerBeans(new BeanMetaData(ICodeService.class).initialInstance(testService).applicationScoped(true).addAnnotation(AnnotationFactory.createOrder(-1000)));
     try {
       ICodeService service = BEANS.get(ICodeService.class);
       assertSame(testService, service);
