@@ -153,7 +153,7 @@ public class UserNavigationHistory {
    * the same as the last element.
    * <p>
    * Removes all elements newer than the currently active element, if the next element in the history is not the same as
-   * the element to add. TODO check, if this is really intended.
+   * the element to add.
    * <p>
    * </p>
    * Truncates the history to the maximum number of elements.

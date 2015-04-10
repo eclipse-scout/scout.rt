@@ -40,9 +40,6 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
-/**
- * TODO imo these methods are from AbstractTable, move them over here in release jun/2011.
- */
 public final class TableUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableUtility.class);
 
