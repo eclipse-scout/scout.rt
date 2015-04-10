@@ -31,6 +31,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
@@ -43,8 +45,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonUtility;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
-import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * This interceptor contributes to the {@link AbstractUiServlet} as the default GET handler for

@@ -27,13 +27,13 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.ui.html.cache.DefaultHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.res.StaticResourceRequestInterceptor;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * Instances of this class must be registered as servlet root path "/"

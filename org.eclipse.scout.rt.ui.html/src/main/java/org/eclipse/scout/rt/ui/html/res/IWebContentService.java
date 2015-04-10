@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.html.res;
 
 import java.net.URL;
 
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * Locate script and other web resources on the classpath

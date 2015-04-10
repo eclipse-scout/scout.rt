@@ -16,7 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * This interceptor contributes to the {@link AbstractUiServlet}

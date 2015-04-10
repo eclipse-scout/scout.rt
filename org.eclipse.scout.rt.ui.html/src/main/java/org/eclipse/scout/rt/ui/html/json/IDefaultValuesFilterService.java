@@ -1,6 +1,6 @@
 package org.eclipse.scout.rt.ui.html.json;
 
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.json.JSONObject;
 
 public interface IDefaultValuesFilterService extends IService {

@@ -23,9 +23,9 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
-import org.eclipse.scout.service.AbstractService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
