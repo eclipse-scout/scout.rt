@@ -260,4 +260,21 @@ describe("scout.arrays", function() {
 
   });
 
+  describe("formatEncoded", function() {
+
+    it("encodes the html of each array element", function() {
+      var arr = ['<span>a</span>', 'b', 'c<p>', '<script>d</script>'];
+      expect(scout.arrays.formatEncoded(arr, '<br>')).toBe('&lt;span&gt;a&lt;/span&gt;<br>b<br>c&lt;p&gt;<br>&lt;script&gt;d&lt;/script&gt;');
+
+      arr = ['abc', '<script>def'];
+      expect(scout.arrays.formatEncoded(arr)).toBe('abc&lt;script&gt;def');
+      expect(scout.arrays.formatEncoded(arr, '<br>')).toBe('abc<br>&lt;script&gt;def');
+
+      arr = ['<p>abc'];
+      expect(scout.arrays.formatEncoded(arr)).toBe('&lt;p&gt;abc');
+      expect(scout.arrays.formatEncoded(arr, '<br>')).toBe('&lt;p&gt;abc');
+    });
+
+  });
+
 });

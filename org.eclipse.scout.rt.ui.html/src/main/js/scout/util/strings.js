@@ -1,8 +1,16 @@
 scout.strings = {
 
-  nl2br: function(text) {
+  /**
+   * @param text
+   * @param encodeHtml defaults to true
+   */
+  nl2br: function(text, encodeHtml) {
     if (!text) {
       return text;
+    }
+    encodeHtml = encodeHtml !== undefined ? encodeHtml : true;
+    if (encodeHtml) {
+      text = scout.strings.encode(text);
     }
     return text.replace(/\n/g, '<br>');
   },
@@ -85,6 +93,16 @@ scout.strings = {
       return 0;
     }
     return string.split(separator).length - 1;
-  }
+  },
 
+  /**
+   * Encodes the html of the given string.
+   */
+  encode: function(string) {
+    if (!string) {
+      return string;
+    }
+    var $div = $('<div>');
+    return $div.text(string).html();
+  }
 };

@@ -43,7 +43,7 @@ describe("FormField", function() {
       expect(formField.hasOwnProperty('properties')).toBe(false);
     });
 
-    it("event should update model", function() {
+    it("considers custom css class", function() {
       formField._render = function($parent) {
         this.addContainer($parent, 'form-field');
       };

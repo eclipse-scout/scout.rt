@@ -9,8 +9,12 @@ describe("scout.strings", function() {
       expect(scout.strings.nl2br('Hello\nGoodbye')).toBe('Hello<br>Goodbye');
       expect(scout.strings.nl2br('Hello\nGoodbye\n')).toBe('Hello<br>Goodbye<br>');
       expect(scout.strings.nl2br('Hello\n\nGoodbye')).toBe('Hello<br><br>Goodbye');
-      expect(scout.strings.nl2br('Hello\n<br>\nGoodbye')).toBe('Hello<br><br><br>Goodbye');
       expect(scout.strings.nl2br('Hello\n\r\nGoodbye')).toBe('Hello<br>\r<br>Goodbye');
+    });
+
+    it("encodes html, if the parameter is set to true (default)", function() {
+      expect(scout.strings.nl2br('<b>Hello</b>\nGoodbye')).toBe('&lt;b&gt;Hello&lt;/b&gt;<br>Goodbye');
+      expect(scout.strings.nl2br('Hello\n<br>\nGoodbye')).toBe('Hello<br>&lt;br&gt;<br>Goodbye');
     });
 
   });
@@ -143,6 +147,16 @@ describe("scout.strings", function() {
       expect(scout.strings.count('{"validJson": true, "example": "ümlauts"}', 'ü')).toBe(1);
       expect(scout.strings.count('{"validJson": true, "example": "ümlauts"}', '"')).toBe(6);
       expect(scout.strings.count('the bird is the word', 'rd')).toBe(2);
+    });
+
+  });
+
+  describe("encode", function() {
+
+    it("encodes html", function() {
+      expect(scout.strings.encode()).toBeUndefined();
+      expect(scout.strings.encode('hello')).toBe('hello');
+      expect(scout.strings.encode('<b>hello</b>')).toBe('&lt;b&gt;hello&lt;/b&gt;');
     });
 
   });

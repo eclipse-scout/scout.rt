@@ -149,7 +149,10 @@ scout.arrays = {
     }
   },
 
-  format: function(arr, delimiter) {
+  /**
+   * @param encoded defaults to false
+   */
+  format: function(arr, delimiter, encodeHtml) {
     if (!arr || arr.length === 0) {
       return '';
     }
@@ -160,9 +163,16 @@ scout.arrays = {
       if (delimiter && i > 0 && i < arr.length) {
         output += delimiter;
       }
+      if (encodeHtml) {
+        element = scout.strings.encode(element);
+      }
       output += element;
     }
     return output;
+  },
+
+  formatEncoded: function(arr, delimiter) {
+    return scout.arrays.format(arr, delimiter, true);
   },
 
   //

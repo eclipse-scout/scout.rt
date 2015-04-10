@@ -1025,7 +1025,7 @@ describe("Tree", function() {
         expect($node0.children('.tree-item-control').length).toBe(1);
       });
 
-      it("updates cssClass of model and html node", function() {
+      it("updates custom cssClass of model and html node", function() {
         tree.selectedNodeIds = [node0.id];
         tree.render(session.$entryPoint);
 

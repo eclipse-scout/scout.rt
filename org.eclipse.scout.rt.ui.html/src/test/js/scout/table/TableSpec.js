@@ -97,7 +97,7 @@ describe("Table", function() {
       expect($cells1.eq(2).css('text-align')).toBe('right');
     });
 
-    it("considers css class of a column", function() {
+    it("considers custom css class of a column", function() {
       var model = helper.createModelFixture(3, 2);
       model.columns[0].cssClass = 'abc';
 
@@ -117,7 +117,7 @@ describe("Table", function() {
       expect($cells1.eq(1)).not.toHaveClass('abc');
     });
 
-    it("considers css class of a cell, if both are set only the cell class is used", function() {
+    it("considers custom css class of a cell, if both are set only the cell class is used", function() {
       var model = helper.createModelFixture(3, 2);
       model.columns[0].cssClass = 'abc';
       model.rows[0].cells[0].cssClass = 'custom-cell-0';
@@ -1599,7 +1599,7 @@ describe("Table", function() {
         expect($colHeaders.eq(2).text()).toBe(column2.text);
       });
 
-      it("updates the css class of table header nodes", function() {
+      it("updates the custom css class of table header nodes", function() {
         table.render(session.$entryPoint);
 
         var $colHeaders = table.header.findHeaderItems();
