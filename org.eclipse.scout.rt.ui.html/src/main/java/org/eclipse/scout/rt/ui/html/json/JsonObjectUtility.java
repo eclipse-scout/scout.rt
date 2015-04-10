@@ -205,7 +205,18 @@ public final class JsonObjectUtility {
   }
 
   public static JSONObject newOrderedJSONObject() {
-    return new JSONObject(new LinkedHashMap<>());
+    JSONObject o = new JSONObject();
+    // Try to replace the internal hash map by a LinkedHashMap. Unfortunately, there is no API for that...
+    // LinkedHashMap preserves the insertion order of properties, which is helpful while debugging purposes.
+    try {
+      Field field = o.getClass().getDeclaredField("map");
+      field.setAccessible(true);
+      field.set(o, new LinkedHashMap<>());
+    }
+    catch (Exception e) {
+      // nop
+    }
+    return o;
   }
 
   public static JSONObject newJSONObject(String source) {
