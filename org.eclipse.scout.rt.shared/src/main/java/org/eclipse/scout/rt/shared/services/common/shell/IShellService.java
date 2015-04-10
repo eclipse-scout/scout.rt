@@ -24,6 +24,8 @@ import org.eclipse.scout.service.IService;
 @InputValidation(IValidationStrategy.PROCESS.class)
 public interface IShellService extends IService {
 
+  // FIXME AWE: Deprecaten, und convenience methode auf Desktop anbieten openBinaryResource(binaryRes, validUntil)
+
   /**
    * Open the resource at the specified path with the typical application
    * Examples: open URLs in the browser, word documents in Word, mail addresses
