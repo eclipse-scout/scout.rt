@@ -53,7 +53,6 @@
     <module>../org.eclipse.scout.rt.server.testenvironment</module>
     <module>../org.eclipse.scout.rt.shared.test</module>
     <module>../org.eclipse.scout.rt.ui.swing.test</module>
-    <module>../org.eclipse.scout.service.test</module>
     <module>../org.eclipse.scout.rt.testing.client</module>
     <module>../org.eclipse.scout.rt.testing.client.test</module>
     <module>../org.eclipse.scout.rt.testing.commons</module>
