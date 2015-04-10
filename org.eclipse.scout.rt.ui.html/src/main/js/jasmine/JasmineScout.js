@@ -261,12 +261,9 @@ $.fn.triggerRightClick = function() {
 $.fn.triggerKeyDown = function(key, modifier) {
   var event = jQuery.Event("keydown");
   event.which = key;
-  if (modifier === 'ctrl') {
-    event.ctrlKey = true;
-  }
-  if (modifier === 'shift') {
-    event.shiftKey = true;
-  }
+  event.altKey = modifier === 'alt';
+  event.ctrlKey = modifier === 'ctrl';
+  event.shiftKey = modifier === 'shift';
   (this).trigger(event);
 };
 
