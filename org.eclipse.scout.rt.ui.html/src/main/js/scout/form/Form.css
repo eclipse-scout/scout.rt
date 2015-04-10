@@ -22,6 +22,7 @@
   border-top-left-radius: @border-radius;
   border-top-right-radius: @border-radius;
   .drop-shadow;
+  margin: 10px;
 
   &.shown {
     .animation(fadeIn ease-in 1);

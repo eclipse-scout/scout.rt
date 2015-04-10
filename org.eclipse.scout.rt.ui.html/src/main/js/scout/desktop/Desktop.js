@@ -233,18 +233,23 @@ scout.Desktop.prototype._renderDialog = function(dialog) {
   dialog.htmlComp.pixelBasedSizing = true;
 
   var prefSize = dialog.htmlComp.getPreferredSize(),
+    dialogMargins = dialog.htmlComp.getMargins(),
     documentSize = new scout.Dimension($(document).width(), $(document).height()),
-    dialogSize = new scout.Dimension(),
-    marginLeft, marginTop, opticalMiddleOffset;
+    dialogSize = new scout.Dimension();
 
-  dialogSize.width = Math.min(documentSize.width, prefSize.width);
-  dialogSize.height = Math.min(documentSize.height, prefSize.height);
+  // class .dialog may specify a margin
+  var maxWidth = (documentSize.width - dialogMargins.left - dialogMargins.right);
+  var maxHeight = (documentSize.height - dialogMargins.top - dialogMargins.bottom);
 
-  marginLeft = (documentSize.width - dialogSize.width) / 2;
-  marginTop = (documentSize.height - dialogSize.height) / 2;
+  // Ensure the dialog is not larger than viewport
+  dialogSize.width = Math.min(maxWidth, prefSize.width);
+  dialogSize.height = Math.min(maxHeight, prefSize.height);
+
+  var marginLeft = (documentSize.width - dialogSize.width) / 2;
+  var marginTop = (documentSize.height - dialogSize.height) / 2;
 
   // optical middle
-  opticalMiddleOffset = Math.min(marginTop / 5, 10);
+  var opticalMiddleOffset = Math.min(marginTop / 5, 10);
   marginTop -= opticalMiddleOffset;
 
   dialog.htmlComp.setSize(dialogSize);
