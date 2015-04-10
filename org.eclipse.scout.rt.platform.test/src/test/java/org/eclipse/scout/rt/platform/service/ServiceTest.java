@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.service;
+package org.eclipse.scout.rt.platform.service;
 
 import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.service.internal.ITestService;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.service.internal.ITestService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

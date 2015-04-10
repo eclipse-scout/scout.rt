@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.service.internal;
+package org.eclipse.scout.rt.platform.service.internal;
 
-import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 
 /**
  *
  */
-public interface ITestService extends IService {
+public class TestService extends AbstractService implements ITestService {
 
 }
