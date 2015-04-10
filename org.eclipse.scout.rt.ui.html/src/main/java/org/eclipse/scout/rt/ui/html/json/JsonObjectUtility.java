@@ -23,7 +23,7 @@ import java.util.NoSuchElementException;
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.beans.FastBeanInfo;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
-import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -546,7 +546,7 @@ public final class JsonObjectUtility {
     if (json == null) {
       return;
     }
-    IDefaultValuesFilterService filterSvc = SERVICES.getService(IDefaultValuesFilterService.class);
+    IDefaultValuesFilterService filterSvc = BEANS.get(IDefaultValuesFilterService.class);
     if (filterSvc != null) {
       filterSvc.filter(json);
     }
@@ -556,7 +556,7 @@ public final class JsonObjectUtility {
     if (json == null) {
       return;
     }
-    IDefaultValuesFilterService filterSvc = SERVICES.getService(IDefaultValuesFilterService.class);
+    IDefaultValuesFilterService filterSvc = BEANS.get(IDefaultValuesFilterService.class);
     if (filterSvc != null) {
       filterSvc.filter(json, objectType);
     }

@@ -25,9 +25,9 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.ui.html.cache.DefaultHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
@@ -159,7 +159,7 @@ public abstract class AbstractUiServlet extends HttpServlet {
         LOG.debug(m_requestType + " request " + req.getRequestURI() + " started");
       }
       try {
-        List<IServletRequestInterceptor> interceptors = SERVICES.getServices(IServletRequestInterceptor.class);
+        List<IServletRequestInterceptor> interceptors = BEANS.all(IServletRequestInterceptor.class);
         for (IServletRequestInterceptor interceptor : interceptors) {
           if (intercept(interceptor, req, resp)) {
             return;

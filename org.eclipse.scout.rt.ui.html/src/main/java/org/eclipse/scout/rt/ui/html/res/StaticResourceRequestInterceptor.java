@@ -31,8 +31,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
@@ -213,7 +213,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    * js, css
    */
   protected HttpCacheObject loadScriptFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
-    ScriptFileBuilder builder = new ScriptFileBuilder(SERVICES.getService(IWebContentService.class), getSharedScriptProcessor());
+    ScriptFileBuilder builder = new ScriptFileBuilder(BEANS.get(IWebContentService.class), getSharedScriptProcessor());
     builder.setMinifyEnabled(UiHints.isMinifyHint(req));
     ScriptOutput out = builder.buildScript(pathInfo);
     if (out != null) {
@@ -228,7 +228,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    * html
    */
   protected HttpCacheObject loadHtmlFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
-    URL url = SERVICES.getService(IWebContentService.class).getWebContentResource(pathInfo);
+    URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
     if (url == null) {
       //not handled here
       return null;
@@ -244,7 +244,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    * json
    */
   protected HttpCacheObject loadJsonFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
-    URL url = SERVICES.getService(IWebContentService.class).getWebContentResource(pathInfo);
+    URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
     if (url == null) {
       //not handled here
       return null;
@@ -301,7 +301,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    * Static binary file png, jpg, woff, pdf, docx
    */
   protected HttpCacheObject loadBinaryFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
-    URL url = SERVICES.getService(IWebContentService.class).getWebContentResource(pathInfo);
+    URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
     if (url == null) {
       //not handled here
       return null;

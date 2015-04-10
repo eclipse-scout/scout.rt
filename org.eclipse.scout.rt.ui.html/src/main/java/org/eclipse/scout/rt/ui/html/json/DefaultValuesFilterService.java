@@ -17,9 +17,9 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,7 +66,7 @@ public class DefaultValuesFilterService extends AbstractService implements IDefa
   }
 
   protected URL getDefaultValuesJsonUrl() {
-    return SERVICES.getService(IWebContentService.class).getWebContentResource("res/defaultValues.json");
+    return BEANS.get(IWebContentService.class).getWebContentResource("res/defaultValues.json");
   }
 
   protected DefaultValuesFilter createDefaultValuesFilter(long lastModified, JSONObject defaultValuesConfig) throws JSONException {
