@@ -17,18 +17,22 @@ scout.SvgField.prototype._renderProperties = function() {
 };
 
 scout.SvgField.prototype._renderSvgDocument = function() {
-  if (this.svgDocument) {
-  var that = this;
-    this.$field.html(this.svgDocument);
-    this.$field.find('.app-link').on('click', function(event) {
-      var dataRef = $(this).attr('data-ref');
-      that._appLinkClicked(dataRef);
-    });
-  } else {
+  if (!this.svgDocument) {
     this.$field.empty();
+    return;
   }
+  this.$field.html(this.svgDocument);
+  this.$field.find('.app-link').on('click', this._onAppLinkAction.bind(this));
 };
 
-scout.SvgField.prototype._appLinkClicked = function(ref) {
-  this.session.send(this.id, 'appLink', {ref: ref});
+scout.SvgField.prototype._onAppLinkAction = function(event) {
+  var $target = $(event.target);
+  var ref = $target.data('ref');
+  this._sendAppLinkAction(ref);
+};
+
+scout.SvgField.prototype._sendAppLinkAction = function(ref) {
+  this.session.send(this.id, 'appLinkAction', {
+    ref: ref
+  });
 };

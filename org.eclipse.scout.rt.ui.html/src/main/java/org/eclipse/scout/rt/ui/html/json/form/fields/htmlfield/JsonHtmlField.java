@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
@@ -23,7 +24,6 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
  * This class creates JSON output for an <code>IHtmlField</code>.
  */
 public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> {
-  public static final String EVENT_APP_LINK_ACTION = "appLinkAction";
 
   public JsonHtmlField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -69,7 +69,7 @@ public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> {
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_APP_LINK_ACTION.equals(event.getType())) {
+    if (JsonEventType.APP_LINK_ACTION.matches(event.getType())) {
       handleUiAppLinkAction(event);
     }
     else {

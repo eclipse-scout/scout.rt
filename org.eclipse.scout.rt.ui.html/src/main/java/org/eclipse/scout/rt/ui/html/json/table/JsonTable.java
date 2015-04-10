@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -57,7 +58,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
-  public static final String EVENT_APP_LINK_ACTION = "appLinkAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
   public static final String EVENT_ROWS_INSERTED = "rowsInserted";
   public static final String EVENT_ROWS_UPDATED = "rowsUpdated";
@@ -301,7 +301,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     else if (EVENT_COLUMN_RESIZED.equals(event.getType())) {
       handleUiColumnResized(event);
     }
-    else if (EVENT_APP_LINK_ACTION.equals(event.getType())) {
+    else if (JsonEventType.APP_LINK_ACTION.matches(event.getType())) {
       handleUiAppLinkAction(event);
     }
     else if (EVENT_ROWS_CHECKED.equals(event.getType())) {

@@ -20,9 +20,13 @@ scout.HtmlField.prototype._renderProperties = function() {
 /**
  * @override
  */
-scout.HtmlField.prototype._renderDisplayText = function(displayText) {
-  this.$field.html(displayText);
-  //FIXME find elements with class app links and add listener which uses sendAppLinkAction
+scout.HtmlField.prototype._renderDisplayText = function() {
+  if (!this.displayText) {
+    this.$field.empty();
+    return;
+  }
+  this.$field.html(this.displayText);
+  this.$field.find('.app-link').on('click', this._onAppLinkAction.bind(this));
 };
 
 scout.HtmlField.prototype._renderScrollBarsEnabled = function(scrollBarsEnabled) {
@@ -38,7 +42,13 @@ scout.HtmlField.prototype._renderScrollToPosition = function(scrollToPosition) {
   // XXX
 };
 
-scout.BeanField.prototype.sendAppLinkAction = function(ref) {
+scout.HtmlField.prototype._onAppLinkAction = function(event) {
+  var $target = $(event.target);
+  var ref = $target.data('ref');
+  this._sendAppLinkAction(ref);
+};
+
+scout.HtmlField.prototype._sendAppLinkAction = function(ref) {
   this.session.send(this.id, 'appLinkAction', {
     ref: ref
   });

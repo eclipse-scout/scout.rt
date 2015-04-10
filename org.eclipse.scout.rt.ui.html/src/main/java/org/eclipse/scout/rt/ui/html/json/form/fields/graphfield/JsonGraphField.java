@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.shared.data.basic.graph.GraphShape;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
@@ -22,9 +23,6 @@ import org.json.JSONObject;
 
 public class JsonGraphField extends JsonValueField<IGraphField> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonGraphField.class);
-
-  // from UI
-  public static final String EVENT_APP_LINK_ACTION = "appLinkAction";
 
   public JsonGraphField(IGraphField model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -142,7 +140,7 @@ public class JsonGraphField extends JsonValueField<IGraphField> {
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_APP_LINK_ACTION.equals(event.getType())) {
+    if (JsonEventType.APP_LINK_ACTION.matches(event.getType())) {
       handleUiAppLinkAction(event);
     }
     else {
