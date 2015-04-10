@@ -1,9 +1,11 @@
-package org.eclipse.scout.svg.client.svgfield;
+package org.eclipse.scout.rt.svg.client.svgfield;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.svg.client.SVGUtility;
+import org.eclipse.scout.rt.svg.client.svgfield.ISvgField;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -11,7 +13,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.eclipse.scout.svg.client.SVGUtility;
 import org.w3c.dom.svg.SVGDocument;
 
 public class JsonSvgField extends JsonFormField<ISvgField> {

@@ -36,6 +36,7 @@
     <module>../org.eclipse.scout.rt.ui.html.scriptprocessor</module>
     <module>../org.eclipse.scout.rt.ui.html.client.ext</module>
     <module>../org.eclipse.scout.rt.office.parent</module>
+    <module>../org.eclipse.scout.rt.svg.ui.html</module>
   </modules>
 
   <build>

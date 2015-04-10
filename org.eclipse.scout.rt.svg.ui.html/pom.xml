@@ -12,9 +12,10 @@
     <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
     <artifactId>org.eclipse.scout.rt.ui.html.parent</artifactId>
     <version>5.1.0-SNAPSHOT</version>
+    <relativePath>../org.eclipse.scout.rt.ui.html.parent</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.scout.svg.ui.html</artifactId>
+  <artifactId>org.eclipse.scout.rt.svg.ui.html</artifactId>
   <packaging>jar</packaging>
 
   <properties>
@@ -23,7 +24,7 @@
 
   <dependencies>
     <dependency>
-      <artifactId>org.eclipse.scout.svg.client</artifactId>
+      <artifactId>org.eclipse.scout.rt.svg.client</artifactId>
       <groupId>org.eclipse.scout.rt</groupId>
       <version>5.1.0-SNAPSHOT</version>
     </dependency>
