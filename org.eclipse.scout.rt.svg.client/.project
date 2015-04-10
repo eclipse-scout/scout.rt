@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.scout.svg.ui.swing</name>
+	<name>org.eclipse.scout.rt.svg.client</name>
 	<comment></comment>
 	<projects>
 	</projects>
