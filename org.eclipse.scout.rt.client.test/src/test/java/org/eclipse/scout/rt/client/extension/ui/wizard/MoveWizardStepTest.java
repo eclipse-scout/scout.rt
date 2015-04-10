@@ -22,9 +22,9 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.fixture.TestWizard.Second
 import org.eclipse.scout.rt.client.extension.ui.wizard.fixture.TestWizard.ThirdWizardStep;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 
 public class MoveWizardStepTest extends AbstractLocalExtensionTestCase {

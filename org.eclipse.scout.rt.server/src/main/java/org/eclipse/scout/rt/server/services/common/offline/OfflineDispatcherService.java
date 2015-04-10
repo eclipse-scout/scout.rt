@@ -17,6 +17,9 @@ import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -27,9 +30,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.service.SERVICES;
-import org.eclipse.scout.service.ServiceUtility;
 
 public class OfflineDispatcherService extends AbstractService implements IOfflineDispatcherService {
 

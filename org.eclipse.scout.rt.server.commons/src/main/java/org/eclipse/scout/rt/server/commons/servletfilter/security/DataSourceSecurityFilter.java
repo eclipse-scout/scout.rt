@@ -33,9 +33,9 @@ import org.eclipse.scout.commons.EncryptionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * <h4>DataSourceSecurityFilter</h4> The following properties can be set in the <code>config.ini</code> file:

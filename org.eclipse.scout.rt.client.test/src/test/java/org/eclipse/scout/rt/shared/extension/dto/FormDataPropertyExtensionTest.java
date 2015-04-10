@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.extension.dto;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.FormPropertyExtension;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.MainBoxPropertyExtension;
@@ -23,7 +24,6 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.TreeBoxPropertyExtensio
 import org.eclipse.scout.rt.shared.extension.dto.fixture.TreeBoxPropertyExtensionData;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.TreeBoxToTemplateField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.TreeBoxToTemplateFieldData;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.Assert;
 import org.junit.Test;
 

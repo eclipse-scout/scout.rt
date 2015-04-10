@@ -15,7 +15,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.mail.MailUtility;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * <h3>ISMTPService</h3> The service to send messages over the smtp protocol. <br>

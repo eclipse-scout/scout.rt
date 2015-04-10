@@ -5,7 +5,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
-import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 
 @Order(20)
 public abstract class AbstractMobileHomeAction extends AbstractMenu {

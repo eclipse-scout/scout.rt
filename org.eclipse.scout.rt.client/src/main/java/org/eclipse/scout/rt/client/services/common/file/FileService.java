@@ -23,11 +23,11 @@ import java.util.Locale;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.Client;
+import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
-import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.service.SERVICES;
 
 @Priority(-1)
 @Client

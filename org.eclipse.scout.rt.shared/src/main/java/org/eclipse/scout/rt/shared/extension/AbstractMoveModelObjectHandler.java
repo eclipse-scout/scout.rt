@@ -8,7 +8,7 @@ import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 
 /**
  * The top level list is expected to be sorted by the caller.

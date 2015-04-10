@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.shared.extension;
 
 import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 
 public final class ExtensionUtility {
 

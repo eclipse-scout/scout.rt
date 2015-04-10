@@ -19,8 +19,8 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.AbstractPers
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.AllPersonTable;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.OtherPersonTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 
 public class TableMoveColumnsTest extends AbstractLocalExtensionTestCase {

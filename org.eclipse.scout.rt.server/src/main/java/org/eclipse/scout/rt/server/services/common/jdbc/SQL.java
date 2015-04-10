@@ -14,8 +14,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * <p>

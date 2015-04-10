@@ -15,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm;
@@ -23,7 +24,6 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigFormData;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.SingleFormExtension;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.SingleFormExtension.SecondBigDecimalField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.SingleFormExtensionData;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 
 /**

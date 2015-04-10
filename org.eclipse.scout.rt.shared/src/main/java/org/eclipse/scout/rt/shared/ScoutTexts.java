@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * This is the base class for translations access in scout applications.<br>

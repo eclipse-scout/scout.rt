@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.AllPersonTab
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.FirstNameColumn;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.OtherPersonTable;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.PersonTableExtension;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 
 public class TableExtensionTest extends AbstractLocalExtensionTestCase {

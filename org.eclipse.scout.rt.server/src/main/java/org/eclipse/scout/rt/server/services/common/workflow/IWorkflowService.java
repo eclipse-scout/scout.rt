@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.server.services.common.workflow;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.workflow.AbstractWorkflowData;
-import org.eclipse.scout.service.IService;
 
 /**
  * A Workflow is a stateless(!) processor of workflow state machine

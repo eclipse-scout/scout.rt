@@ -22,14 +22,14 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.workflow.AbstractWorkflowData;
 import org.eclipse.scout.rt.shared.services.common.workflow.AbstractWorkflowStepData;
-import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> extends AbstractService implements IWorkflowService<T>, IContributionOwner {
   private List<IWorkflowStep> m_stepList;

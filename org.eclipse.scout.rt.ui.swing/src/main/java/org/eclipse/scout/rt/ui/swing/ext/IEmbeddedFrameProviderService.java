@@ -15,7 +15,7 @@ import java.awt.Frame;
 import javax.swing.RootPaneContainer;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * Support for in-browser application using a window handle to create an

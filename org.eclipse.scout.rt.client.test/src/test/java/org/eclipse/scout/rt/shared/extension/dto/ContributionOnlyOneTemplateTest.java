@@ -12,13 +12,13 @@ package org.eclipse.scout.rt.shared.extension.dto;
 
 import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.AbstractTemplateBoxData.SecondStringInTemplate;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigFormData;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigFormData.SecondUseOfTemplateBox;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.PropertyExtensionData;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.Assert;
 import org.junit.Test;
 

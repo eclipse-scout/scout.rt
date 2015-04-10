@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.service;
+package org.eclipse.scout.rt.platform.service;
 
 import java.util.List;
 

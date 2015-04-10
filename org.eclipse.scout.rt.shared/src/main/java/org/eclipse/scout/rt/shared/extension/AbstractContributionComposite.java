@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 
 /**
  *

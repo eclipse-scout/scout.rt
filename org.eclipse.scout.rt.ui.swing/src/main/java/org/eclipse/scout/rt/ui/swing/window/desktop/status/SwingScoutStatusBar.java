@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.client.IFieldStatus;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -47,7 +48,6 @@ import org.eclipse.scout.rt.ui.swing.ext.FlowLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.ext.busy.SwingBusyIndicator;
 import org.eclipse.scout.rt.ui.swing.ext.job.SwingProgressHandler;
-import org.eclipse.scout.service.SERVICES;
 
 public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
 

@@ -29,7 +29,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.JaxWs216Module;
 import org.eclipse.scout.jaxws.service.IJaxWsEndpointService;
-import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 
 import com.sun.xml.internal.ws.transport.http.HttpAdapter;
 

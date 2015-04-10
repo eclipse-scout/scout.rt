@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.shared.services.lookup;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.service.AbstractService;
 
 /**
  * @since 3.8.1

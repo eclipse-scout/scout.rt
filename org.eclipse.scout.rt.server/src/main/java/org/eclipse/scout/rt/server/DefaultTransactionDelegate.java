@@ -22,6 +22,9 @@ import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.service.SERVICES;
+import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
@@ -45,9 +48,6 @@ import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.IValidator;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.rt.shared.validate.OutputValidation;
-import org.eclipse.scout.service.IService;
-import org.eclipse.scout.service.SERVICES;
-import org.eclipse.scout.service.ServiceUtility;
 
 /**
  * Delegate for scout dynamic business op invocation

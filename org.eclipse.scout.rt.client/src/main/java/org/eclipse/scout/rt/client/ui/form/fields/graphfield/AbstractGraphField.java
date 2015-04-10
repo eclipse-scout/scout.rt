@@ -15,9 +15,9 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.graphfield.GraphFiel
 import org.eclipse.scout.rt.client.extension.ui.form.fields.graphfield.IGraphFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.service.SERVICES;
 
 public class AbstractGraphField extends AbstractValueField<GraphModel> implements IGraphField {
 

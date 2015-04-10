@@ -28,14 +28,14 @@ import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.CreateImmediately;
+import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.security.FineGrainedAccessCheckRequiredException;
 import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
-import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * Access control permissions received from backend (JAAS permissions), cached for convenience and performance.

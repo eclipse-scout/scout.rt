@@ -11,8 +11,8 @@
 package org.eclipse.scout.testing.client;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.service.IService;
 
 /**
  * This interface is used to support gui testing with an abstraction layer.

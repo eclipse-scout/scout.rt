@@ -24,9 +24,9 @@ import java.util.regex.Pattern;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.services.common.security.internal.AccessControlStore;
-import org.eclipse.scout.service.AbstractService;
 
 /**
  * Common logic for {@link IAccessControlService} implementations.

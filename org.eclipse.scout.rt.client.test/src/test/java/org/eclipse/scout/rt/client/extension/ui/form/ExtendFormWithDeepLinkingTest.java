@@ -35,8 +35,8 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.MultiTemplateUsageF
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.TemplateStringFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 
 public class ExtendFormWithDeepLinkingTest extends AbstractLocalExtensionTestCase {

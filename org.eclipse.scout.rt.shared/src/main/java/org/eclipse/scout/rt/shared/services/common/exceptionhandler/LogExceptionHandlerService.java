@@ -16,7 +16,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 
 @Priority(-2)
 public class LogExceptionHandlerService extends AbstractService implements IExceptionHandlerService {

@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.MultipleExtGroupBoxExtension;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.MultipleExtGroupBoxExtension.SecondDoubleField;
@@ -25,7 +26,6 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.MultipleExtGroupBoxExte
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigFormData;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 
 public class FormDataMultipleExtensionTest extends AbstractLocalExtensionTestCase {

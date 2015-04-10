@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.platform;
 
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 //TODO imo remove together with ISession.getBundle
 public interface IPlatformService extends IService {

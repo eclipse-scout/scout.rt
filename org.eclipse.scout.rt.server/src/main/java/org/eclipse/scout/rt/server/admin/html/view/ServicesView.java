@@ -24,6 +24,8 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
@@ -31,8 +33,6 @@ import org.eclipse.scout.rt.server.admin.inspector.ReflectServiceInventory;
 import org.eclipse.scout.rt.server.admin.inspector.ServiceInspector;
 import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
-import org.eclipse.scout.service.IService;
-import org.eclipse.scout.service.SERVICES;
 
 public class ServicesView extends DefaultView {
   private static final long serialVersionUID = -3977567784149624349L;

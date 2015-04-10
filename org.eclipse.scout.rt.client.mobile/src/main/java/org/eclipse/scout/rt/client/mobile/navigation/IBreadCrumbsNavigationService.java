@@ -1,7 +1,7 @@
 package org.eclipse.scout.rt.client.mobile.navigation;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /*******************************************************************************
  * Copyright (c) 2010 BSI Business Systems Integration AG.

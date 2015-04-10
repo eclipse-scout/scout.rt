@@ -12,7 +12,7 @@ package org.eclipse.scout.jaxws.service;
 
 import java.net.URL;
 
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 public interface IWebServiceClient extends IService {
 

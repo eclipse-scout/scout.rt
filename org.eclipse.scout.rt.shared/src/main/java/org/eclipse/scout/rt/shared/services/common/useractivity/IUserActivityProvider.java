@@ -14,7 +14,7 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * The implementation of this provider is os specific and provided as a fragment

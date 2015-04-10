@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -24,7 +25,6 @@ import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatem
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowExceptionHandlerCauseStatement;
 import org.eclipse.scout.rt.testing.server.runner.statement.ClearServerRunContextStatement;
 import org.eclipse.scout.rt.testing.server.runner.statement.ServerRunContextStatement;
-import org.eclipse.scout.service.AbstractService;
 import org.junit.Test;
 import org.junit.Test.None;
 import org.junit.runners.model.InitializationError;

@@ -15,8 +15,8 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.service.AbstractService;
 
 /**
  * Abstract implementation to store the preferences on the session.

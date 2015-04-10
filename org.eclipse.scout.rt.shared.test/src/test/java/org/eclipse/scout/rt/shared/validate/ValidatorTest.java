@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
+import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -29,8 +31,6 @@ import org.eclipse.scout.rt.shared.validate.annotations.MinValue;
 import org.eclipse.scout.rt.shared.validate.annotations.RegexMatch;
 import org.eclipse.scout.rt.shared.validate.annotations.Treat0AsNull;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.service.IService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

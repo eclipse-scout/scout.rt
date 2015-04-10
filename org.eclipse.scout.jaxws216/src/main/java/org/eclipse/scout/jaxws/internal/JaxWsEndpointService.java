@@ -40,7 +40,7 @@ import org.eclipse.scout.jaxws.internal.servlet.ServletContainer;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
 import org.eclipse.scout.jaxws.service.IJaxWsEndpointService;
 import org.eclipse.scout.rt.platform.CreateImmediately;
-import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 
 import com.sun.xml.internal.ws.api.server.Container;
 import com.sun.xml.internal.ws.resources.WsservletMessages;

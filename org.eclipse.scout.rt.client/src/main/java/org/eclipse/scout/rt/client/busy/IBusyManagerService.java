@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.client.busy;
 
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * The busy manager service is global and is the primary place to register/unregister {@link IBusyHandler}s per

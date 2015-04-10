@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.shared.services.common.text;
 import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * Interface for Scout Text Providers.

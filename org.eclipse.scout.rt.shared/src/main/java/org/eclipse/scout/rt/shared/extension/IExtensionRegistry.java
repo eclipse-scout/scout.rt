@@ -14,9 +14,9 @@ import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.commons.annotations.Extends;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.service.IService;
 
 /**
  * The Scout Extension Registry interface used to hold all extensions, contributions and moves within a scout

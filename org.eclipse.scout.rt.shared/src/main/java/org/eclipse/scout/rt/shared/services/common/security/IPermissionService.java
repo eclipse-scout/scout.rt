@@ -14,7 +14,7 @@ import java.security.Permission;
 import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * Support service for querying all Permission types available in any Plug-Ins class set.

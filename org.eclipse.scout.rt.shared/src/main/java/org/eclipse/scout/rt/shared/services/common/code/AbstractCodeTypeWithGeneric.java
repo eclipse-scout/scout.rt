@@ -31,6 +31,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -45,7 +46,6 @@ import org.eclipse.scout.rt.shared.extension.services.common.code.CodeTypeWithGe
 import org.eclipse.scout.rt.shared.extension.services.common.code.ICodeTypeExtension;
 import org.eclipse.scout.rt.shared.extension.services.common.code.MoveCodesHandler;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE extends ICode<CODE_ID>> implements ICodeType<CODE_TYPE_ID, CODE_ID>, IContributionOwner, IExtensibleObject, Serializable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCodeTypeWithGeneric.class);

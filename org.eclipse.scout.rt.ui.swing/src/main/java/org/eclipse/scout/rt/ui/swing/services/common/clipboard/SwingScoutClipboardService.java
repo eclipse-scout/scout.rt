@@ -42,8 +42,8 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardConsumer;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
-import org.eclipse.scout.service.AbstractService;
 
 @Priority(-2)
 @Client

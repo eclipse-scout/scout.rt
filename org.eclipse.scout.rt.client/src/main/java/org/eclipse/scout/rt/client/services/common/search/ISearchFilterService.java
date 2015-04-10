@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.client.services.common.search;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
-import org.eclipse.scout.service.IService;
 
 /**
  * Provides an implementation for new search filters

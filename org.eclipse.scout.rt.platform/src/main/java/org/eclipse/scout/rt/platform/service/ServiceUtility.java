@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.service;
+package org.eclipse.scout.rt.platform.service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -28,7 +28,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.service.internal.AbstractHolderArgumentVisitor;
+import org.eclipse.scout.rt.platform.service.internal.AbstractHolderArgumentVisitor;
 
 /**
  * Handle calls directly on current session (no remoting)

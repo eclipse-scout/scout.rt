@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * <h4>BasicSecurityFilter</h4> A simple security filter using username,password

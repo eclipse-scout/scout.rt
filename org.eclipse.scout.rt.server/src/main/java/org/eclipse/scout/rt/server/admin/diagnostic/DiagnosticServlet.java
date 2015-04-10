@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
@@ -29,7 +30,6 @@ import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.service.SERVICES;
 
 public class DiagnosticServlet extends ServiceTunnelServlet {
   private static final long serialVersionUID = 1L;

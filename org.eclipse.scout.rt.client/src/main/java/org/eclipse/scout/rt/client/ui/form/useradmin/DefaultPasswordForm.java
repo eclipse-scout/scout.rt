@@ -24,9 +24,9 @@ import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox.GroupBox.OldPasswordField;
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox.GroupBox.RepeatPasswordField;
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox.OkButton;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
-import org.eclipse.scout.service.SERVICES;
 
 public class DefaultPasswordForm extends AbstractForm {
   private String m_userId;

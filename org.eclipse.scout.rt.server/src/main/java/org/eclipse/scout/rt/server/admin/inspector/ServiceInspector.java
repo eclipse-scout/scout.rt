@@ -14,8 +14,8 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.service.IService;
-import org.eclipse.scout.service.IServiceInventory;
+import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.service.IServiceInventory;
 
 public class ServiceInspector {
 

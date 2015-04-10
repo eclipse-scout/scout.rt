@@ -17,7 +17,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 
 /**
  *

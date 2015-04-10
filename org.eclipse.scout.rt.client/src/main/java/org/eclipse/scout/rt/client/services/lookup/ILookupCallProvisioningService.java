@@ -15,8 +15,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
-import org.eclipse.scout.service.IService;
 
 /**
  * This service creates lookup call instances from lookup call templates.

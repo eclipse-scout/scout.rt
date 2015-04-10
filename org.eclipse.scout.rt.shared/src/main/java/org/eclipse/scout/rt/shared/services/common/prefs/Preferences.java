@@ -22,8 +22,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * Default implementation for the preferences using a simple hash map and {@link String} key-value pairs.

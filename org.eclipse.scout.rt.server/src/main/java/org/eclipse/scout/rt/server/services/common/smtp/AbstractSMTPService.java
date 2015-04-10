@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 
 public abstract class AbstractSMTPService extends AbstractService implements ISMTPService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSMTPService.class);

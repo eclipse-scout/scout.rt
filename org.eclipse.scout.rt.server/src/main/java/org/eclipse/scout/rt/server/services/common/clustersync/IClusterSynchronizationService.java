@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * Service for synchronizing server nodes by sending messages and receiving messages.

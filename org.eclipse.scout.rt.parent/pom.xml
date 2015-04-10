@@ -20,7 +20,6 @@
 
   <modules>
     <module>../org.eclipse.scout.commons</module>
-    <module>../org.eclipse.scout.service</module>
     <module>../org.eclipse.scout.rt.server.commons</module>
     <module>../org.eclipse.scout.jaxws216</module>
     <!-- FIXME abr the two modules depend on a particular java rt.jar. -->

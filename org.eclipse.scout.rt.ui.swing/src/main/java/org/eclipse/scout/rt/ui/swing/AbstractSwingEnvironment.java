@@ -76,6 +76,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
@@ -120,7 +121,6 @@ import org.eclipse.scout.rt.ui.swing.window.internalframe.SwingScoutInternalFram
 import org.eclipse.scout.rt.ui.swing.window.messagebox.ISwingScoutMessageBox;
 import org.eclipse.scout.rt.ui.swing.window.messagebox.SwingScoutMessageBox;
 import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutPopup;
-import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwingEnvironment.class);

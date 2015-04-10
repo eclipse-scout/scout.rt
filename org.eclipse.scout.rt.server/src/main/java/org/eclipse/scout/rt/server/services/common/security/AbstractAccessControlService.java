@@ -18,6 +18,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clientnotification.SingleUserFilter;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
@@ -29,8 +31,6 @@ import org.eclipse.scout.rt.shared.services.common.security.AbstractSharedAccess
 import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
-import org.eclipse.scout.service.IService;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * Implementations should override {@link #execLoadPermissions()}

@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 
 /**
  * Implementation of {@link IBatchLookupService} that can be used in a server or in a client-only application.

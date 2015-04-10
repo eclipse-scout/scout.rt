@@ -14,7 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.scout.commons.nls.DynamicNls;
-import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 
 public abstract class AbstractDynamicNlsTextProviderService extends AbstractService implements ITextProviderService {
 

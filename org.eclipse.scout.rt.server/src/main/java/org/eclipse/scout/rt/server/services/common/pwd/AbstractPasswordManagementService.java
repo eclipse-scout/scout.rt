@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.server.services.common.pwd;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
-import org.eclipse.scout.service.AbstractService;
 
 /**
  * This is an abstract implementation of the {@link IPasswordManagementService} using a common password policy.

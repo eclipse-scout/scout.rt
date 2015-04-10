@@ -15,13 +15,13 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.extension.fixture.BasicForm;
 import org.eclipse.scout.rt.shared.extension.fixture.BasicFormExtension;
 import org.eclipse.scout.rt.shared.extension.fixture.NameFieldExtension;
 import org.eclipse.scout.rt.shared.extension.fixture.NameFieldExtension02;
 import org.eclipse.scout.rt.shared.extension.fixture.NestedBasicFormExtension;
 import org.eclipse.scout.rt.shared.extension.fixture.StaticPojoContainerExtension;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 
 public class ExtensionRegistryInstantiationTest extends AbstractLocalExtensionTestCase {

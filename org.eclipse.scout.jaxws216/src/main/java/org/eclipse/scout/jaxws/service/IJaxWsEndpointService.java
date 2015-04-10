@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.jaxws.internal.servlet.ServletAdapter;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * Service to access installed JAX-WS endpoints and intercept HTTP-GET request that are not target to a JAX-WS endpoint.

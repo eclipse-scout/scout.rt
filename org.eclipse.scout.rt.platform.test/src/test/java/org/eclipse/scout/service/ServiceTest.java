@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.service;
 
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.service.internal.ITestService;
 import org.junit.Assert;

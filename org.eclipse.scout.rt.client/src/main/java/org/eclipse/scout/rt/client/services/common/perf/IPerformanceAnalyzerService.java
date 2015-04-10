@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.services.common.perf;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 @Priority(-3)
 public interface IPerformanceAnalyzerService extends IService, IPropertyObserver {

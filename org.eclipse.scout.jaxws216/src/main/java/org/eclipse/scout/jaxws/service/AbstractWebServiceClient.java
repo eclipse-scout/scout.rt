@@ -38,8 +38,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.annotation.ScoutWebServiceClient;
 import org.eclipse.scout.jaxws.security.consumer.IAuthenticationHandler;
-import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 import com.sun.xml.internal.ws.client.BindingProviderProperties;
 

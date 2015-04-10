@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.shared.services.common.calendar;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * This interface is simply a marker interface for grouping calendar realated

@@ -49,6 +49,7 @@ import org.eclipse.scout.rt.client.ui.desktop.bookmark.view.IPublishBookmarkComm
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -59,7 +60,6 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TablePageState;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
-import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBookmarkTreeField.class);

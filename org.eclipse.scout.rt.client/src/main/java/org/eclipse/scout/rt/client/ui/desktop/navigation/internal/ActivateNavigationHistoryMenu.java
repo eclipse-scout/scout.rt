@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.ui.desktop.navigation.internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
-import org.eclipse.scout.service.SERVICES;
 
 public class ActivateNavigationHistoryMenu extends AbstractMenu {
   private final Bookmark m_bookmark;

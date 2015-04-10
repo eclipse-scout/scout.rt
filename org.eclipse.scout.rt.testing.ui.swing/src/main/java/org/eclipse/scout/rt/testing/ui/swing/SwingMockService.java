@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.testing.ui.swing;
 import java.awt.Robot;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.testing.client.IGuiMock;
 import org.eclipse.scout.testing.client.IGuiMockService;
 

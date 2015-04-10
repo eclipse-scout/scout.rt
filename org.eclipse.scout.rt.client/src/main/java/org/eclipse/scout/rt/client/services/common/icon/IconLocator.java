@@ -14,8 +14,8 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * Get access to the current {@link IconLocator} using {@link BEANS#get(Class)}

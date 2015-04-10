@@ -11,18 +11,15 @@
 package org.eclipse.scout.rt.shared.services.common.offline;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
-import org.eclipse.scout.service.IService;
 
 /**
  * This service is representing a local server on the frontend used to process
- * server logic similiar to the backend in transactions and with xa support. <br>
- * Normally an implementation of this service such as OfflineDispatcherService
- * is registered in the ...server.offline plugin's plugin.xml in the
- * org.eclipse.scout.services extension.
+ * server logic similiar to the backend in transactions and with transaction support. <br>
  */
 @Priority(-3)
 @InputValidation(IValidationStrategy.PROCESS.class)

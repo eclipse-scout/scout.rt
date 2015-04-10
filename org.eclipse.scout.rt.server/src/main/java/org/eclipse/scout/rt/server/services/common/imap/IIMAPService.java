@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.services.common.imap;
 import javax.mail.Message;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * This service is normally registered as a scout server service extension, so

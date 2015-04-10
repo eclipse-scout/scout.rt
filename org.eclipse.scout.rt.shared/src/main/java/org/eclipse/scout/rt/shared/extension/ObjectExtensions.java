@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 
 public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNER>> implements IExtensibleObject, Serializable {
   private static final long serialVersionUID = 1L;

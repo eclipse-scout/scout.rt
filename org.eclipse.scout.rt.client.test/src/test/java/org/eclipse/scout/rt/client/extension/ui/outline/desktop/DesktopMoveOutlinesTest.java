@@ -21,11 +21,11 @@ import org.eclipse.scout.rt.client.extension.ui.outline.desktop.fixture.FirstOut
 import org.eclipse.scout.rt.client.extension.ui.outline.desktop.fixture.SecondOutline;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

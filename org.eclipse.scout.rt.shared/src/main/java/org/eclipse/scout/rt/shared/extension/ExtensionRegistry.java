@@ -34,8 +34,8 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 
 @Priority(-50)
 public class ExtensionRegistry extends AbstractService implements IInternalExtensionRegistry {

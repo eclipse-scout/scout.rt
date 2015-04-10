@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.service.internal;
 
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  *

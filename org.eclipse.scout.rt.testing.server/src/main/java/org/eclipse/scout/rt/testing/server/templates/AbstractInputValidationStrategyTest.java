@@ -19,13 +19,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.commons.BeanUtility;
+import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.service.IService;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

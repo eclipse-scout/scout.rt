@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.fixture;
 
+import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
-import org.eclipse.scout.service.AbstractService;
 
 public class MockServerProcessingCancelService extends AbstractService implements IServerProcessingCancelService {
   private MockServiceTunnel m_tunnel;

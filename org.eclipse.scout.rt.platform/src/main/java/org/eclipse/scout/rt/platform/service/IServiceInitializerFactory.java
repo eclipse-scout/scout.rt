@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.service;
+package org.eclipse.scout.rt.platform.service;
 
 /**
  * Factory interface to create a service initializer. Classes implementing this interface

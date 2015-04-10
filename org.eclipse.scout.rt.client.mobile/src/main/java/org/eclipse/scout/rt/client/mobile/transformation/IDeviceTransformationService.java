@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.client.mobile.transformation;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * @since 3.9.0

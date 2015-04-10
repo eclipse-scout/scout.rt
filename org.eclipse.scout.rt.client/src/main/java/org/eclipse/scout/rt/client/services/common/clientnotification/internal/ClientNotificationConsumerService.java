@@ -28,8 +28,8 @@ import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNoti
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
-import org.eclipse.scout.service.AbstractService;
 
 /**
  * * A service to dispatch incoming client notifications (from the server) to

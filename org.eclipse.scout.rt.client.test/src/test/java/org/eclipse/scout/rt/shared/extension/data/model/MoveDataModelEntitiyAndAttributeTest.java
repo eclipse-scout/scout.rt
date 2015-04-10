@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
@@ -33,7 +34,6 @@ import org.eclipse.scout.rt.shared.extension.data.model.fixture.TestDataModel.To
 import org.eclipse.scout.rt.shared.extension.data.model.fixture.TestDataModel.Top2Entity;
 import org.eclipse.scout.rt.shared.extension.data.model.fixture.TestDataModel.Top3Attribute;
 import org.eclipse.scout.rt.shared.extension.data.model.fixture.TestDataModel.Top3Entity;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 
 public class MoveDataModelEntitiyAndAttributeTest extends AbstractLocalExtensionTestCase {

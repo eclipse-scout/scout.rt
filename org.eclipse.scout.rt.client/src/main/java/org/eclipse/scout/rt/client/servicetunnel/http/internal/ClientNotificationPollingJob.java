@@ -14,8 +14,8 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
-import org.eclipse.scout.service.SERVICES;
 
 public class ClientNotificationPollingJob implements IRunnable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationPollingJob.class);

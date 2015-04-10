@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.service;
 
+import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.junit.Test;
 
 /**

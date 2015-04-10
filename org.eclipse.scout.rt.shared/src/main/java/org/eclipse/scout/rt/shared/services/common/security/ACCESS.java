@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.security;
 
 import java.security.Permission;
 
-import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 
 /**
  * Helper class for checking permissions.

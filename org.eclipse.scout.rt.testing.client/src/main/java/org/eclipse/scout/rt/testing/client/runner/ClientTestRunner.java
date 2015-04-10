@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.client.runner.statement.ClearClientRunContextStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.ClientRunContextStatement;
@@ -25,7 +26,6 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ExceptionHandlerError;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowExceptionHandlerCauseStatement;
-import org.eclipse.scout.service.AbstractService;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 

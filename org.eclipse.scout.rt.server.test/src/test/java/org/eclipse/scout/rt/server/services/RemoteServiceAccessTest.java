@@ -16,6 +16,8 @@ import java.lang.reflect.Method;
 import java.security.Permissions;
 
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.ISqlService;
@@ -23,8 +25,6 @@ import org.eclipse.scout.rt.server.services.common.ping.PingService;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
-import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.service.IService;
 import org.junit.Ignore;
 import org.junit.Test;
 

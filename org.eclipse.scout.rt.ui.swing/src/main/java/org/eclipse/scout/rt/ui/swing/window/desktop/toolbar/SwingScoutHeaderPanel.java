@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryEvent;
 import org.eclipse.scout.rt.client.ui.desktop.navigation.NavigationHistoryListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.ui.swing.SwingPopupWorker;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
@@ -46,7 +47,6 @@ import org.eclipse.scout.rt.ui.swing.ext.job.SwingProgressHandler;
 import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JNavigationPanel;
 import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JToolTabsBar;
 import org.eclipse.scout.rt.ui.swing.window.desktop.toolbar.internal.JViewTabsBar;
-import org.eclipse.scout.service.SERVICES;
 
 public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
 

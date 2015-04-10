@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.beanfield.BeanFieldC
 import org.eclipse.scout.rt.client.extension.ui.form.fields.beanfield.IBeanFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * This field may be used if the value is relevant for the gui, and not just the display text.

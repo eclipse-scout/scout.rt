@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.shared.services.common.shell;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
-import org.eclipse.scout.service.IService;
 
 /**
  * Currently known implementations are {@link org.eclipse.scout.rt.shared.win32.x86.service.internal.WindowsService} and

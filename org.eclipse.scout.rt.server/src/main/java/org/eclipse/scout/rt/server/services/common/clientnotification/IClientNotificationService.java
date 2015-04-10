@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.server.services.common.clientnotification;
 
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
-import org.eclipse.scout.service.IService;
 
 public interface IClientNotificationService extends IService {
 

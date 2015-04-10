@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.shared.extension;
 
 import org.eclipse.scout.commons.annotations.IOrdered;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * Validator service used by the {@link IExtensionRegistry} to check if a contribution or move is allowed.<br>

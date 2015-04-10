@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.shared.services.common.prefs;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
-import org.eclipse.scout.service.IService;
 
 /**
  * Service capable to get user preferences.

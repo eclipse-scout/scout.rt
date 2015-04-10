@@ -21,8 +21,8 @@ import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.client.ui.wizard.WizardEvent;
 import org.eclipse.scout.rt.client.ui.wizard.WizardListener;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.service.SERVICES;
 
 public class AbstractWizardProgressField extends AbstractFormField implements IWizardProgressField {
 

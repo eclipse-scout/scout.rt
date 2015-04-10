@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IMoveModelObjectToRootMarker;
 import org.eclipse.scout.rt.shared.extension.IllegalExtensionException;
@@ -30,7 +31,6 @@ import org.eclipse.scout.rt.shared.extension.services.common.code.fixture.MoveCo
 import org.eclipse.scout.rt.shared.extension.services.common.code.fixture.MoveCodesCodeType.Top2Code.Sub2Top2Code;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
-import org.eclipse.scout.service.SERVICES;
 import org.junit.Assert;
 import org.junit.Test;
 

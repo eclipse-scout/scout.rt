@@ -23,8 +23,8 @@ import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.service.AbstractService;
 
 @Priority(-1)
 @Client

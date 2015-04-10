@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.dnd.TransferObjectRequest;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.service.IService;
+import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * This service provides access to the system clipboard and therefore to exchange

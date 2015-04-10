@@ -14,11 +14,11 @@ import java.util.ArrayList;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.platform.service.SERVICES;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.workflow.AbstractWorkflowData;
 import org.eclipse.scout.rt.shared.services.common.workflow.IWorkflowProviderService;
-import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.service.SERVICES;
 
 @Priority(-1)
 public class WorkflowProviderService extends AbstractService implements IWorkflowProviderService {
