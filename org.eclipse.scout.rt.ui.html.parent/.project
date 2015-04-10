@@ -8,4 +8,18 @@
 	</buildSpec>
 	<natures>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>.settings/org.eclipse.core.resources.prefs</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.eclipse.core.resources.prefs
+			</locationURI>
+		</link>
+		<link>
+			<name>.settings/org.eclipse.m2e.core.prefs</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/com.bsiag.tools.rt.parent/.settings/org.eclipse.m2e.core.prefs
+			</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>
