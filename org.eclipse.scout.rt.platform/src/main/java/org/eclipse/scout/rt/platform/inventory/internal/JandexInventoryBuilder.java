@@ -29,11 +29,10 @@ public class JandexInventoryBuilder {
   private static final String SYSTEM_PROPERTY_JANDEX_REBUILD = "jandex.rebuild";
 
   private final ArrayList<IndexView> m_indexList = new ArrayList<>();
-  private final boolean m_rebuildFolderIndexes;
+  private final boolean m_forceRebuildFolderIndexes;
 
   public JandexInventoryBuilder() {
-    // TODO IMO ist das true false nicht falsch herum???? (ask aho)
-    m_rebuildFolderIndexes = ConfigIniUtility.getProperty(SYSTEM_PROPERTY_JANDEX_REBUILD, "true").equals("false");
+    m_forceRebuildFolderIndexes = ConfigIniUtility.getProperty(SYSTEM_PROPERTY_JANDEX_REBUILD, "false").equals("true");
   }
 
   public void scanAllModules() throws PlatformException {
@@ -52,13 +51,13 @@ public class JandexInventoryBuilder {
     String urlText = url.toExternalForm();
     URI indexUri;
     try {
-      indexUri = new URI(urlText + "/../../" + JANDEX_INDEX_PATH).normalize();
+      indexUri = new URI(urlText.substring(0, urlText.length() - SCOUT_XML_PATH.length()) + JANDEX_INDEX_PATH);
     }
     catch (URISyntaxException ex) {
       throw new PlatformException("create URI from: " + urlText + "/../../" + JANDEX_INDEX_PATH, ex);
     }
     //check for prepared index
-    if (!m_rebuildFolderIndexes || !urlText.startsWith("file:")) {
+    if (!(m_forceRebuildFolderIndexes && urlText.startsWith("file:"))) {
       try (InputStream in = indexUri.toURL().openStream()) {
         Index index = new IndexReader(in).read();
         m_indexList.add(index);
