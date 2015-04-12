@@ -180,8 +180,8 @@ public class PlatformImplementor implements IPlatform {
       if (Platform.get() == this) {
         Platform.set(null);
       }
-      destroyBeanManager();
       changeState(State.PlatformStopped, false);
+      destroyBeanManager();
     }
     finally {
       m_stateLock.writeLock().unlock();

@@ -10,30 +10,45 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}).
  * Methods under test {@link ISqlService#selectInto(String, Object...)}.
  */
+@RunWith(PlatformTestRunner.class)
 public class SelectIntoTest {
 
-  private SqlServiceMock m_sqlService;
+  private List<IBean<?>> m_beans;
 
   @Before
   public void setup() throws Exception {
-    m_sqlService = new SqlServiceMock();
-    m_sqlService.setSqlStyle(new OracleSqlStyle());
+    SqlServiceMock sqlService = new SqlServiceMock();
+    sqlService.setSqlStyle(new OracleSqlStyle());
+    m_beans = TestingUtility.registerBeans(new BeanMetaData(ISqlService.class).initialInstance(sqlService).applicationScoped(true));
+  }
+
+  @After
+  public void after() {
+    TestingUtility.unregisterBeans(m_beans);
   }
 
   @Test(expected = ProcessingException.class)
   public void testMissingOutputBind() throws Exception {
-    m_sqlService.clearProtocol();
-    m_sqlService.selectInto("SELECT A FROM T WHERE A = :a INTO :b", new NVPair("a", 1));
+    BEANS.get(ISqlService.class).selectInto("SELECT A FROM T WHERE A = :a INTO :b", new NVPair("a", 1));
   }
 }
