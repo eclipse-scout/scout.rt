@@ -69,7 +69,6 @@
 			<activation>
 				<file>
 					<exists>${basedir}/target/classes/META-INF/scout.xml</exists>
-					<missing>${basedir}/target/classes/META-INF/jandex.idx</missing>
 				</file>
 			</activation>
 			<build>
