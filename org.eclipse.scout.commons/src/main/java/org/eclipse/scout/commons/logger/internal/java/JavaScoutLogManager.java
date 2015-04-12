@@ -18,7 +18,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogManager;
@@ -52,28 +51,11 @@ public class JavaScoutLogManager implements IScoutLogManager {
   }
 
   /**
-   * Redirect eclipse log to java log
-   * <p>
-   * Make two enhancements
-   * <ol>
-   * <li>set default log level for root to WARNING if there is no custom config. INFO is insane as a default-default</li>
-   * <li>install "better" simple log formatter when SimpleFormatter is used</li>
-   * </ol>
+   * install "better" simple log formatter when SimpleFormatter is used
    */
   @Override
   public void initialize() {
     Logger root = Logger.getLogger("");
-    if (root.getLevel() == Level.INFO) {
-      if (ConfigIniUtility.getProperty("java.util.logging.config.class") == null && ConfigIniUtility.getProperty("java.util.logging.config.file") == null) {
-        String level = ConfigIniUtility.getProperty("org.eclipse.scout.log.level");
-        if (level == null) {
-          root.setLevel(Level.WARNING);
-        }
-        else {
-          root.setLevel(JavaLogUtility.scoutToJavaLevel(JavaLogUtility.toScoutLevel(level)));
-        }
-      }
-    }
 
     for (Handler h : root.getHandlers()) {
       if (h.getFormatter() instanceof SimpleFormatter) {
