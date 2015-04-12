@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 
 import org.eclipse.scout.commons.annotations.Internal;
 
@@ -51,6 +50,6 @@ public interface IBean<T> {
    */
   T getInstance(Class<T> queryType);
 
-  Semaphore getInstanceLock();
+  IBeanInstanceProducer<T> getBeanInstanceProducer();
 
 }

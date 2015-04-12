@@ -13,34 +13,38 @@ package org.eclipse.scout.rt.platform.internal;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
+import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 import org.eclipse.scout.rt.platform.interceptor.internal.BeanProxyImplementor;
 
 public class BeanImplementor<T> implements IBean<T> {
-  private final Semaphore m_instanceLock = new Semaphore(1, true);
   private final Class<? extends T> m_beanClazz;
   private final Map<Class<? extends Annotation>, Annotation> m_beanAnnotations;
   private final T m_initialInstance;
+  private IBeanInstanceProducer<T> m_producer;
   private BeanManagerImplementor m_beanManager;
-  private T m_undecoratedApplicationScopedInstance;
 
   @SuppressWarnings("unchecked")
   public BeanImplementor(BeanMetaData beanData, BeanManagerImplementor beanManager) {
+    m_beanManager = beanManager;
     m_beanClazz = (Class<? extends T>) Assertions.assertNotNull(beanData.getBeanClazz());
     m_beanAnnotations = new HashMap<Class<? extends Annotation>, Annotation>(Assertions.assertNotNull(beanData.getBeanAnnotations()));
     m_initialInstance = (T) beanData.getInitialInstance();
     if (m_initialInstance != null && getBeanAnnotation(ApplicationScoped.class) == null) {
       throw new IllegalArgumentException(String.format("Instance constructor only allows application scoped instances. Class '%s' does not have the '%s' annotation.", getBeanClazz().getName(), ApplicationScoped.class.getName()));
     }
-    m_undecoratedApplicationScopedInstance = m_initialInstance;
-    m_beanManager = beanManager;
+    if (beanData.getProducer() != null) {
+      m_producer = (IBeanInstanceProducer<T>) beanData.getProducer();
+    }
+    else if (!m_beanClazz.isInterface()) {
+      m_producer = new DefaultBeanInstanceProducer<T>();
+    }
   }
 
   @Override
@@ -67,13 +71,7 @@ public class BeanImplementor<T> implements IBean<T> {
   @Override
   public T getInstance(Class<T> queryType) {
     //produce
-    if (m_undecoratedApplicationScopedInstance != null) {
-      return m_undecoratedApplicationScopedInstance;
-    }
-    T instance = m_beanManager.produceInstance(this);
-    if (BeanManagerImplementor.isApplicationScoped(this)) {
-      m_undecoratedApplicationScopedInstance = instance;
-    }
+    T instance = m_initialInstance != null ? m_initialInstance : m_producer != null ? m_producer.produce(this) : null;
     //decorate
     IBeanDecorationFactory deco = m_beanManager.getBeanDecorationFactory();
     if (deco != null && queryType.isInterface()) {
@@ -86,12 +84,12 @@ public class BeanImplementor<T> implements IBean<T> {
   }
 
   @Override
-  public Semaphore getInstanceLock() {
-    return m_instanceLock;
+  public IBeanInstanceProducer<T> getBeanInstanceProducer() {
+    return m_producer;
   }
 
   protected void dispose() {
-    m_undecoratedApplicationScopedInstance = null;
+    m_producer = null;
     m_beanManager = null;
   }
 

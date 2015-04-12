@@ -12,21 +12,27 @@ package org.eclipse.scout.rt.platform.internal;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.concurrent.Semaphore;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.BeanCreationException;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 
-@Order(1000)
-public class DefaultBeanInstanceProducer implements IBeanInstanceProducer<Object> {
+public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> {
   private static final ThreadLocal<Deque<String>> INSTANTIATION_STACK = new ThreadLocal<>();
 
+  private final Semaphore m_instanceLock;
+  private T m_applicationScopedInstance;
+
+  public DefaultBeanInstanceProducer() {
+    m_instanceLock = new Semaphore(1, true);
+  }
+
   @Override
-  public <SUB> SUB produceInstance(IBean<SUB> bean) {
-    if (bean.getBeanClazz().isInterface()) {
-      return null;
+  public T produce(IBean<T> bean) {
+    if (m_applicationScopedInstance != null) {
+      return m_applicationScopedInstance;
     }
 
     Deque<String> stack = INSTANTIATION_STACK.get();
@@ -37,22 +43,22 @@ public class DefaultBeanInstanceProducer implements IBeanInstanceProducer<Object
     }
 
     if (BeanManagerImplementor.isApplicationScoped(bean)) {
-      bean.getInstanceLock().acquireUninterruptibly();
+      m_instanceLock.acquireUninterruptibly();
       try {
-        return createNewInstance(bean);
+        m_applicationScopedInstance = createNewInstance(bean.getBeanClazz());
+        return m_applicationScopedInstance;
       }
       finally {
-        bean.getInstanceLock().release();
+        m_instanceLock.release();
       }
     }
-    return createNewInstance(bean);
+    return createNewInstance(bean.getBeanClazz());
   }
 
   /**
    * @returns a new instance of the bean
    */
-  protected <SUB> SUB createNewInstance(final IBean<SUB> bean) {
-    Class<? extends SUB> beanClass = bean.getBeanClazz();
+  protected T createNewInstance(Class<? extends T> beanClass) {
     Deque<String> stack = INSTANTIATION_STACK.get();
     boolean removeStack = false;
     if (stack == null) {

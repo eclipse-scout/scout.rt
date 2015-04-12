@@ -18,11 +18,13 @@ import java.util.Map;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
 
 public class BeanMetaData {
   private final Class<?> m_beanClazz;
   private final Map<Class<? extends Annotation>, Annotation> m_beanAnnotations;
   private Object m_initialInstance;
+  private IBeanInstanceProducer<?> m_producer;
 
   public BeanMetaData(Class<?> clazz) {
     this(clazz, null);
@@ -39,6 +41,7 @@ public class BeanMetaData {
     m_beanClazz = Assertions.assertNotNull(template.getBeanClazz());
     m_beanAnnotations = new HashMap<>(template.getBeanAnnotations());
     m_initialInstance = template.getInitialInstance();
+    m_producer = template.getBeanInstanceProducer();
   }
 
   /**
@@ -81,6 +84,20 @@ public class BeanMetaData {
   public BeanMetaData initialInstance(Object initialInstance) {
     m_initialInstance = initialInstance;
     return this;
+  }
+
+  /**
+   * set the instance producer if a special handling is needed. Default is {@link DefaultBeanInstanceProducer}
+   *
+   * @return this supporting the fluent api
+   */
+  public BeanMetaData producer(IBeanInstanceProducer<?> producer) {
+    m_producer = producer;
+    return this;
+  }
+
+  public IBeanInstanceProducer<?> getProducer() {
+    return m_producer;
   }
 
   /**

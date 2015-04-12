@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.platform.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -21,7 +20,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.InitializationException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -29,14 +27,11 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
-import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.IBeanManager;
 
 public class BeanManagerImplementor implements IBeanManager {
   private final ReentrantReadWriteLock m_lock;
   private final Map<Class<?>, TypeHierarchy> m_beanHierarchies;
-  private final Map<IBean<?>, IBeanInstanceProducer<?>> m_beanToProducerCache;
-  private LinkedHashMap<Class<?>, IBeanInstanceProducer<?>> m_producerCache;
   private IBeanDecorationFactory m_beanDecorationFactory;
 
   public BeanManagerImplementor() {
@@ -46,7 +41,6 @@ public class BeanManagerImplementor implements IBeanManager {
   public BeanManagerImplementor(IBeanDecorationFactory f) {
     m_lock = new ReentrantReadWriteLock(true);
     m_beanHierarchies = new HashMap<>();
-    m_beanToProducerCache = new LinkedHashMap<>();
     m_beanDecorationFactory = f;
   }
 
@@ -82,62 +76,6 @@ public class BeanManagerImplementor implements IBeanManager {
     finally {
       m_lock.readLock().unlock();
     }
-  }
-
-  @SuppressWarnings({"unchecked", "null"})
-  @Internal
-  protected <T> T produceInstance(IBean<T> bean) {
-    if (m_producerCache == null) {
-      m_lock.writeLock().lock();
-      try {
-        LinkedHashMap<Class<?>, IBeanInstanceProducer<?>> tmp = new LinkedHashMap<>();
-        DefaultBeanInstanceProducer defaultProducer = new DefaultBeanInstanceProducer();
-        for (IBean<IBeanInstanceProducer> producerBean : getBeans(IBeanInstanceProducer.class)) {
-          IBeanInstanceProducer producer = defaultProducer.produceInstance(producerBean);
-          Class<?> producedType = TypeCastUtility.getGenericsParameterClass(producerBean.getBeanClazz(), IBeanInstanceProducer.class, 0);
-          if (!tmp.containsKey(producedType)) {
-            tmp.put(producedType, producer);
-          }
-        }
-        if (!tmp.containsKey(Object.class)) {
-          tmp.put(Object.class, defaultProducer);
-        }
-        m_producerCache = tmp;
-      }
-      finally {
-        m_lock.writeLock().unlock();
-      }
-    }
-
-    IBeanInstanceProducer<T> producer = null;
-    m_lock.readLock().lock();
-    try {
-      producer = (IBeanInstanceProducer<T>) m_beanToProducerCache.get(bean);
-      if (producer != null) {
-        return producer.produceInstance(bean);
-      }
-    }
-    finally {
-      m_lock.readLock().unlock();
-    }
-
-    if (!m_beanToProducerCache.containsKey(bean)) {
-      m_lock.writeLock().lock();
-      try {
-        for (Map.Entry<Class<?>, IBeanInstanceProducer<?>> e : m_producerCache.entrySet()) {
-          Class<?> producedType = e.getKey();
-          if (producedType.isAssignableFrom(bean.getBeanClazz())) {
-            producer = (IBeanInstanceProducer<T>) e.getValue();
-            m_beanToProducerCache.put(bean, producer);
-            break;
-          }
-        }
-      }
-      finally {
-        m_lock.writeLock().unlock();
-      }
-    }
-    return producer.produceInstance(bean);
   }
 
   protected List<Class<?>> listImplementedTypes(IBean<?> bean) {
@@ -181,10 +119,6 @@ public class BeanManagerImplementor implements IBeanManager {
         }
         h.addBean(bean);
       }
-      if (IBeanInstanceProducer.class.isAssignableFrom(bean.getBeanClazz())) {
-        m_producerCache = null;
-        m_beanToProducerCache.clear();
-      }
       return bean;
     }
     finally {
@@ -198,11 +132,6 @@ public class BeanManagerImplementor implements IBeanManager {
     m_lock.writeLock().lock();
     try {
       Assertions.assertNotNull(bean);
-      if (IBeanInstanceProducer.class.isAssignableFrom(bean.getBeanClazz())) {
-        m_producerCache = null;
-        m_beanToProducerCache.clear();
-      }
-      m_beanToProducerCache.remove(bean);
       for (Class<?> type : listImplementedTypes(bean)) {
         TypeHierarchy h = m_beanHierarchies.get(type);
         if (h != null) {
