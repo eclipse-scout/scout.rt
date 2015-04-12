@@ -280,26 +280,20 @@ public class BeanManagerImplementor implements IBeanManager {
 
   @SuppressWarnings("unchecked")
   public void startCreateImmediatelyBeans() {
-    m_lock.readLock().lock();
-    try {
-      for (IBean bean : getBeans(Object.class)) {
-        if (BeanManagerImplementor.isCreateImmediately(bean)) {
-          if (BeanManagerImplementor.isApplicationScoped(bean)) {
-            bean.getInstance(Object.class);
-          }
-          else {
-            throw new InitializationException(String.format(
-                "Bean '%s' is marked with @%s and is not application scoped (@%s) - unexpected configuration! ",
-                bean.getBeanClazz(),
-                CreateImmediately.class.getSimpleName(),
-                ApplicationScoped.class.getSimpleName()
-                ));
-          }
+    for (IBean bean : getBeans(Object.class)) {
+      if (BeanManagerImplementor.isCreateImmediately(bean)) {
+        if (BeanManagerImplementor.isApplicationScoped(bean)) {
+          bean.getInstance(Object.class);
+        }
+        else {
+          throw new InitializationException(String.format(
+              "Bean '%s' is marked with @%s and is not application scoped (@%s) - unexpected configuration! ",
+              bean.getBeanClazz(),
+              CreateImmediately.class.getSimpleName(),
+              ApplicationScoped.class.getSimpleName()
+              ));
         }
       }
-    }
-    finally {
-      m_lock.readLock().unlock();
     }
   }
 
