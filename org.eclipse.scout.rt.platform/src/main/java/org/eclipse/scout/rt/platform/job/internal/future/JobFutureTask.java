@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.JobExecutionException;
@@ -48,9 +49,11 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   private final boolean m_periodic;
 
   private final MutexSemaphores m_mutexSemaphores;
+  private final FutureDoneListener<RESULT> m_futureListener;
 
   public JobFutureTask(final JobInput input, final boolean periodic, final MutexSemaphores mutexSemaphores, final ICallable<RESULT> callable) {
     super(callable);
+    m_futureListener = new FutureDoneListener<>(this);
     m_input = input;
     m_periodic = periodic;
     m_mutexSemaphores = mutexSemaphores;
@@ -202,6 +205,11 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     catch (final Throwable t) {
       throw BEANS.get(ExceptionTranslator.class).translate(t);
     }
+  }
+
+  @Override
+  public void whenDone(final IDoneCallback<RESULT> callback) {
+    m_futureListener.whenDone(callback);
   }
 
   @Override

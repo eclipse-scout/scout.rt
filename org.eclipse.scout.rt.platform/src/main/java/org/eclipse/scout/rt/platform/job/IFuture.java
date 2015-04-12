@@ -107,4 +107,34 @@ public interface IFuture<RESULT> {
    *           </ul>
    */
   RESULT awaitDoneAndGet(long timeout, TimeUnit unit) throws ProcessingException;
+
+  /**
+   * Registers the given <code>callback</code> to be notified once the Future enters 'done' state. That is once the
+   * associated job completes successfully or with an exception, or was cancelled.
+   * <p/>
+   * If the job is already in 'done' state when the callback is registered, the callback is invoked immediately.
+   * However, the callback is invoked in any thread with no {@code RunContext} set.
+   * <p/>
+   * The following code snippet illustrates its usage:
+   *
+   * <pre>
+   * <code>
+   * Jobs.schedule(new IRunnable() {
+   * 
+   *   &#064;Override
+   *   public void run() throws Exception {
+   *     // do some work
+   *   }
+   * })<strong>
+   * .whenDone(new IDoneCallback&lt;Void&gt;() {
+   * 
+   *   &#064;Override
+   *   public void onDone(DoneEvent&lt;Void&gt; event) {
+   *     // invoked once the job completes
+   *   }
+   * })</strong>;
+   * </code>
+   * </pre>
+   */
+  void whenDone(IDoneCallback<RESULT> callback);
 }
