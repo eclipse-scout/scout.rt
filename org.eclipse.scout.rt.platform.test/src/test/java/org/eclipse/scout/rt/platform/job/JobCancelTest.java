@@ -112,7 +112,7 @@ public class JobCancelTest {
       assertNull(future.awaitDoneAndGet(1, TimeUnit.SECONDS));
       assertTrue(future.isCancelled());
     }
-    catch (JobExecutionException e) {
+    catch (JobException e) {
       fail();
     }
   }
@@ -161,7 +161,7 @@ public class JobCancelTest {
       assertNull(future.awaitDoneAndGet(5, TimeUnit.SECONDS));
       assertTrue(future.isCancelled());
     }
-    catch (JobExecutionException e) {
+    catch (JobException e) {
       fail();
     }
   }
@@ -190,7 +190,7 @@ public class JobCancelTest {
       assertNull(future.awaitDoneAndGet(10, TimeUnit.SECONDS));
       assertTrue(future.isCancelled());
     }
-    catch (JobExecutionException e) {
+    catch (JobException e) {
       fail();
     }
   }
@@ -228,7 +228,7 @@ public class JobCancelTest {
       assertNull(future.awaitDoneAndGet(10, TimeUnit.SECONDS));
       assertTrue(future.isCancelled());
     }
-    catch (JobExecutionException e) {
+    catch (JobException e) {
       fail();
     }
   }
@@ -303,7 +303,7 @@ public class JobCancelTest {
       assertNull(future2.awaitDoneAndGet(1, TimeUnit.SECONDS));
       assertTrue(future2.isCancelled());
     }
-    catch (JobExecutionException e) {
+    catch (JobException e) {
       fail();
     }
   }

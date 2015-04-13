@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
-import org.eclipse.scout.rt.platform.job.JobExecutionException;
+import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.ProgressMonitorProvider;
 import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
@@ -181,7 +181,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return null; // Cancellation does not result in an exception.
     }
     catch (final InterruptedException e) {
-      throw JobExecutionException.fromInterruptedException(e, m_input.identifier());
+      throw new JobException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.identifier()), e);
     }
     catch (final Throwable t) {
       throw BEANS.get(ExceptionTranslator.class).translate(t);
@@ -197,10 +197,10 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return null; // Cancellation does not result in an exception.
     }
     catch (final InterruptedException e) {
-      throw JobExecutionException.fromInterruptedException(e, m_input.identifier());
+      throw new JobException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.identifier()), e);
     }
     catch (final TimeoutException e) {
-      throw JobExecutionException.fromTimeoutException(e, timeout, unit, m_input.identifier());
+      throw new JobException(String.format("Failed to wait for the job to complete because it took longer than %sms [job=%s]", unit.toMillis(timeout), m_input.identifier()), e);
     }
     catch (final Throwable t) {
       throw BEANS.get(ExceptionTranslator.class).translate(t);

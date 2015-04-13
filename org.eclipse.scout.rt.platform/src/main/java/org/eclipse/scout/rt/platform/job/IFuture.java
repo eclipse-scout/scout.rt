@@ -16,8 +16,9 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
- * Represents a {@link Future} that translates exceptions that might occur while waiting for a job
- * to complete into {@link JobExecutionException}s.
+ * Represents a {@link Future} to interact with the associated job or to wait for the job to complete and to query it's
+ * computation result. Exceptions thrown during the job's execution are propagated in the form of a
+ * {@link ProcessingException}, technical exceptions like timeout or interruption in the form of a {@link JobException}.
  *
  * @see Future
  * @since 5.1
@@ -75,20 +76,22 @@ public interface IFuture<RESULT> {
 
   /**
    * Blocks the calling thread until the job gets cancelled or completed to return its execution result. This call
-   * returns immediately if the job is not running anymore or was cancelled.
+   * returns immediately if the job is not running anymore or was cancelled. Use {@link #isCancelled()} to query the
+   * job's cancellation status.
    *
    * @return the computed result.
    * @throws ProcessingException
    *           is thrown if an exception is thrown during the job's execution.
-   * @throws JobExecutionException
+   * @throws JobException
    *           is thrown if this thread was interrupted while waiting for the job to complete; see
-   *           {@link JobExecutionException#isInterruption()};</li>
+   *           {@link JobException#isInterruption()}
    */
   RESULT awaitDoneAndGet() throws ProcessingException;
 
   /**
    * Blocks the calling thread until the job gets cancelled or completed to return its execution result. This call
-   * returns immediately if the job is not running anymore or was cancelled.
+   * returns immediately if the job is not running anymore or was cancelled. Use {@link #isCancelled()} to query the
+   * job's cancellation status.
    *
    * @param timeout
    *          the maximal time to wait for the job to complete.
@@ -97,13 +100,13 @@ public interface IFuture<RESULT> {
    * @return the computed result.
    * @throws ProcessingException
    *           is thrown if an exception is thrown during the job's execution.
-   * @throws JobExecutionException
+   * @throws JobException
    *           is thrown in the following cases:
    *           <ul>
    *           <li>this thread was interrupted while waiting for the job to complete;<br/>
-   *           see {@link JobExecutionException#isInterruption()};</li>
+   *           see {@link JobException#isInterruption()};</li>
    *           <li>the job did not return within the timeout specified;<br/>
-   *           see {@link JobExecutionException#isTimeout()};</li>
+   *           see {@link JobException#isTimeout()};</li>
    *           </ul>
    */
   RESULT awaitDoneAndGet(long timeout, TimeUnit unit) throws ProcessingException;

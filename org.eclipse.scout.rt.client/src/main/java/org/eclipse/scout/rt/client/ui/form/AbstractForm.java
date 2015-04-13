@@ -110,7 +110,7 @@ import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobExecutionException;
+import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -969,8 +969,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       m_blockingCondition.waitFor();
     }
-    catch (ProcessingException e) {
-      throw new ProcessingException(ScoutTexts.get("UserInterrupted"), e);
+    catch (JobException e) {
+      if (e.isInterruption()) {
+        throw new ProcessingException(ScoutTexts.get("UserInterrupted"), e.getCause());
+      }
+      else {
+        throw new ProcessingException("Failed to wait for the Form to close", e);
+      }
     }
   }
 
@@ -1714,13 +1719,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   public void setTimer(String timerId, int seconds) {
     removeTimer(timerId);
     if (seconds > 0) {
-      try {
-        IFuture<Void> future = startTimer(seconds, timerId);
-        m_timerFutureMap.put(timerId, future);
-      }
-      catch (JobExecutionException e) {
-        LOG.error("Failed to start timer");
-      }
+      IFuture<Void> future = startTimer(seconds, timerId);
+      m_timerFutureMap.put(timerId, future);
     }
   }
 
@@ -2897,7 +2897,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   /**
    * Starts the timer that periodically invokes {@link AbstractForm#interceptTimer(String).
    */
-  protected IFuture<Void> startTimer(long intervalSeconds, final String timerId) throws JobExecutionException {
+  protected IFuture<Void> startTimer(long intervalSeconds, final String timerId) {
     return ClientJobs.scheduleAtFixedRate(new IRunnable() {
 
       @Override

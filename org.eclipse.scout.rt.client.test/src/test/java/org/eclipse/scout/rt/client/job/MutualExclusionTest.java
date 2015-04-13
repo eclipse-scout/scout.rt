@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.JobExecutionException;
+import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
@@ -186,7 +186,7 @@ public class MutualExclusionTest {
             try {
               future.awaitDoneAndGet(1, TimeUnit.SECONDS);
             }
-            catch (JobExecutionException e) {
+            catch (JobException e) {
               if (e.isTimeout()) {
                 protocol.add(5);
               }
@@ -249,7 +249,7 @@ public class MutualExclusionTest {
         try {
           future.awaitDoneAndGet(1, TimeUnit.SECONDS);
         }
-        catch (JobExecutionException e) {
+        catch (JobException e) {
           protocol.add(2);
           if (e.isTimeout()) {
             protocol.add(3);
@@ -386,7 +386,7 @@ public class MutualExclusionTest {
    * is interrupted, job3 must not be scheduled because the mutex-owner is still job2.
    */
   @Test
-  public void testBlockingCondition_InterruptedWhileBeingBlocked() throws JobExecutionException, InterruptedException {
+  public void testBlockingCondition_InterruptedWhileBeingBlocked() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc", true);
 
@@ -402,7 +402,7 @@ public class MutualExclusionTest {
         try {
           BC.waitFor();
         }
-        catch (ProcessingException e) {
+        catch (JobException e) {
           if (e.isInterruption()) {
             protocol.add("interrupted-1");
           }
@@ -471,8 +471,8 @@ public class MutualExclusionTest {
           BC.waitFor();
           protocol.add("not-interrupted-1");
         }
-        catch (JobExecutionException e) {
-          protocol.add("jobExecutionException-1");
+        catch (JobException e) {
+          protocol.add("jobException-1");
           if (e.isInterruption()) {
             protocol.add("interrupted-1");
           }
@@ -516,7 +516,7 @@ public class MutualExclusionTest {
     expectedProtocol.add("before-blocking-1");
     expectedProtocol.add("running-2a");
     expectedProtocol.add("before-cancel-job1-2");
-    expectedProtocol.add("jobExecutionException-1");
+    expectedProtocol.add("jobException-1");
     expectedProtocol.add("interrupted-1");
     expectedProtocol.add("not-model-thread-1");
     expectedProtocol.add("done-1");
@@ -533,7 +533,7 @@ public class MutualExclusionTest {
       assertNull(future1.awaitDoneAndGet(0, TimeUnit.MILLISECONDS));
       assertTrue(future1.isCancelled());
     }
-    catch (JobExecutionException e) {
+    catch (JobException e) {
       fail();
     }
 
@@ -542,7 +542,7 @@ public class MutualExclusionTest {
       future2.awaitDoneAndGet(0, TimeUnit.MILLISECONDS);
       fail();
     }
-    catch (JobExecutionException e) {
+    catch (JobException e) {
       assertTrue(e.isTimeout());
     }
 
@@ -551,7 +551,7 @@ public class MutualExclusionTest {
       future3.awaitDoneAndGet(0, TimeUnit.MILLISECONDS);
       fail();
     }
-    catch (JobExecutionException e) {
+    catch (JobException e) {
       assertTrue(e.isTimeout());
     }
 
@@ -565,14 +565,14 @@ public class MutualExclusionTest {
     try {
       assertNull(future2.awaitDoneAndGet(0, TimeUnit.MILLISECONDS));
     }
-    catch (JobExecutionException e) {
+    catch (JobException e) {
       fail();
     }
 
     try {
       assertNull(future3.awaitDoneAndGet(0, TimeUnit.MILLISECONDS));
     }
-    catch (JobExecutionException e) {
+    catch (JobException e) {
       fail();
     }
   }
@@ -582,7 +582,7 @@ public class MutualExclusionTest {
    * job2 gets scheduled, it is rejected by the executor. This test verifies, that job3 still gets scheduled.
    */
   @Test
-  public void testRejection() throws InterruptedException, JobExecutionException {
+  public void testRejection() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final ExecutorService executorMock = mock(ExecutorService.class);
@@ -801,8 +801,8 @@ public class MutualExclusionTest {
           BC.waitFor();
           protocol.add("running-job-1 (b)");
         }
-        catch (JobExecutionException e) {
-          protocol.add("jobExecutionException");
+        catch (JobException e) {
+          protocol.add("jobException");
         }
 
         if (ModelJobs.isModelThread()) {
@@ -998,7 +998,7 @@ public class MutualExclusionTest {
     assertEquals(expected, protocol);
   }
 
-  private void runTestBlockingCondition(final IBlockingCondition BC) throws InterruptedException, JobExecutionException {
+  private void runTestBlockingCondition(final IBlockingCondition BC) throws InterruptedException {
     BC.setBlocking(true);
 
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
@@ -1256,7 +1256,7 @@ public class MutualExclusionTest {
       expected.add("2: running");
       assertEquals(expected, protocol);
     }
-    catch (JobExecutionException e) {
+    catch (JobException e) {
       fail();
     }
   }

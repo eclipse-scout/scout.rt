@@ -148,10 +148,10 @@ public interface IJobManager {
    * @param unit
    *          unit of the given timeout.
    * @return <code>false</code> if the deadline has elapsed upon return, else <code>true</code>.
-   * @throws InterruptedException
-   *           if the current thread is interrupted while waiting.
+   * @throws JobException
+   *           is thrown if this thread was interrupted while waiting for the job to complete.
    */
-  boolean awaitDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit) throws InterruptedException;
+  boolean awaitDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit);
 
   /**
    * Visits all Futures that are accepted by the given Filter and are not in 'done-state'.

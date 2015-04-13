@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IApplication;
-import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
@@ -193,5 +192,5 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
   protected void onInvokeService(long t0, IServiceTunnelResponse response) {
   }
 
-  protected abstract IServiceTunnelResponse tunnel(final IServiceTunnelRequest call) throws JobExecutionException;
+  protected abstract IServiceTunnelResponse tunnel(final IServiceTunnelRequest call);
 }

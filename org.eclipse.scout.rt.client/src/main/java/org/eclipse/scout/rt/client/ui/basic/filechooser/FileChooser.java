@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
@@ -174,8 +175,13 @@ public class FileChooser implements IFileChooser {
     try {
       m_blockingCondition.waitFor();
     }
-    catch (ProcessingException e) {
-      throw new ProcessingException(ScoutTexts.get("UserInterrupted"), e);
+    catch (JobException e) {
+      if (e.isInterruption()) {
+        throw new ProcessingException(ScoutTexts.get("UserInterrupted"), e.getCause());
+      }
+      else {
+        throw new ProcessingException("Failed to wait for the FileChooser to close", e);
+      }
     }
   }
 }

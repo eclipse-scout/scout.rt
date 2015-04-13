@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
-import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.servicetunnel.http.AbstractHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -143,7 +142,7 @@ public class InternalClientHttpServiceTunnel extends AbstractHttpServiceTunnel<I
   }
 
   @Override
-  protected IServiceTunnelResponse tunnel(IServiceTunnelRequest call) throws JobExecutionException {
+  protected IServiceTunnelResponse tunnel(IServiceTunnelRequest call) {
     boolean offline = OfflineState.isOfflineInCurrentThread();
     //
     if (offline) {
@@ -154,7 +153,7 @@ public class InternalClientHttpServiceTunnel extends AbstractHttpServiceTunnel<I
     }
   }
 
-  protected IServiceTunnelResponse tunnelOnline(final IServiceTunnelRequest req) throws JobExecutionException {
+  protected IServiceTunnelResponse tunnelOnline(final IServiceTunnelRequest req) {
     if (IProgressMonitor.CURRENT.get().isCancelled()) {
       return new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted")));
     }
@@ -181,7 +180,7 @@ public class InternalClientHttpServiceTunnel extends AbstractHttpServiceTunnel<I
   }
 
   @Override
-  protected IFuture<?> schedule(IRunnable runnable, IServiceTunnelRequest req) throws JobExecutionException {
+  protected IFuture<?> schedule(IRunnable runnable, IServiceTunnelRequest req) {
     return ClientJobs.schedule(runnable, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(getSession())));
   }
 }

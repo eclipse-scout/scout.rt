@@ -383,7 +383,7 @@ public class JobScheduleTest {
       assertTrue(future.isCancelled());
       assertFalse(executed.get());
     }
-    catch (JobExecutionException e) {
+    catch (JobException e) {
       fail();
     }
   }
@@ -475,7 +475,7 @@ public class JobScheduleTest {
       assertEquals("job-2", future2.awaitDoneAndGet(2, TimeUnit.SECONDS));
       fail();
     }
-    catch (JobExecutionException e) {
+    catch (JobException e) {
       assertTrue(e.isTimeout());
     }
 
@@ -483,7 +483,7 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testMissingJobInput() throws JobExecutionException {
+  public void testMissingJobInput() {
     final AtomicReference<Boolean> running = new AtomicReference<Boolean>(false);
 
     IFuture<Void> future = null;

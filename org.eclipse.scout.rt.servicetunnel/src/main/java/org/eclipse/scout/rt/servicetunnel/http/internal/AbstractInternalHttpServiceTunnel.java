@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -133,7 +132,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
   }
 
   @Override
-  protected IServiceTunnelResponse tunnel(final IServiceTunnelRequest req) throws JobExecutionException {
+  protected IServiceTunnelResponse tunnel(final IServiceTunnelRequest req) {
     final Object backgroundLock = new Object();
     IHttpBackgroundExecutable executor = createHttpBackgroundExecutor(req, backgroundLock);
 
@@ -210,7 +209,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
     }
   }
 
-  protected abstract IFuture<?> schedule(IRunnable runnable, IServiceTunnelRequest req) throws JobExecutionException;
+  protected abstract IFuture<?> schedule(IRunnable runnable, IServiceTunnelRequest req);
 
   protected IHttpBackgroundExecutable createHttpBackgroundExecutor(IServiceTunnelRequest request, Object lock) {
     return new HttpBackgroundExecutable(request, lock, this);

@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -247,30 +246,6 @@ public final class Jobs {
    */
   public static JobEventFilters.Filter newEventFilter() {
     return new JobEventFilters.Filter();
-  }
-
-  /**
-   * Returns <code>true</code> if the given {@link ProcessingException} describes a job timeout.
-   */
-  public static boolean isTimeout(final ProcessingException e) {
-    if (e instanceof JobExecutionException) {
-      return ((JobExecutionException) e).isTimeout();
-    }
-    else {
-      return false;
-    }
-  }
-
-  /**
-   * Returns <code>true</code> if the given {@link ProcessingException} describes a job cancellation.
-   */
-  public static boolean isCancellation(final ProcessingException e) {
-    if (e instanceof JobExecutionException) {
-      return ((JobExecutionException) e).isCancellation();
-    }
-    else {
-      return false;
-    }
   }
 
   /**

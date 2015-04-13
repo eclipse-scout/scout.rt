@@ -37,12 +37,12 @@ public interface IBlockingCondition {
    * blocking-state is changed to <code>false</code>, or if the thread is {@link Thread#interrupt() interrupted}.
    * Thereby, the current thread becomes disabled for thread scheduling purposes and lies dormant.
    *
-   * @throws JobExecutionException
+   * @throws JobException
    *           is thrown if the current thread is interrupted while waiting for the blocking condition to fall, or if
    *           being a mutex job and the mutex cannot be acquired anew. However, the current thread is not synchronized
    *           with the mutex anymore and should terminate its work.
    */
-  void waitFor() throws JobExecutionException;
+  void waitFor();
 
   /**
    * @return the name of this blocking condition.

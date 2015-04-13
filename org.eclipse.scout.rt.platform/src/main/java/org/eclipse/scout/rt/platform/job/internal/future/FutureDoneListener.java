@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -44,11 +45,12 @@ class FutureDoneListener<RESULT> {
     m_lock = new ReentrantReadWriteLock();
     m_callbacks = new ArrayList<>();
 
-    Jobs.getJobManager().addListener(Jobs.newEventFilter().futures(future).eventTypes(JobEventType.DONE), new IJobListener() {
+    final IJobManager jobManager = Jobs.getJobManager();
+    jobManager.addListener(Jobs.newEventFilter().futures(future).eventTypes(JobEventType.DONE), new IJobListener() {
 
       @Override
       public void changed(final JobEvent event) {
-        Jobs.getJobManager().removeListener(this);
+        jobManager.removeListener(this);
         onDone(future);
       }
     });

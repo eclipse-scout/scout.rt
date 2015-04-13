@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
-import org.eclipse.scout.rt.platform.job.JobExecutionException;
+import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.callable.HandleExceptionCallable;
@@ -153,8 +153,13 @@ public class JobManager implements IJobManager {
   }
 
   @Override
-  public boolean awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException {
-    return m_futures.awaitDone(filter, timeout, unit);
+  public boolean awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) {
+    try {
+      return m_futures.awaitDone(filter, timeout, unit);
+    }
+    catch (final InterruptedException e) {
+      throw new JobException("Interrupted while waiting for jobs to complete", e);
+    }
   }
 
   @Override
@@ -285,11 +290,11 @@ public class JobManager implements IJobManager {
 
       @Override
       public void rejectedExecution(final Runnable runnable, final ThreadPoolExecutor executor) {
-        if (m_executor.isShutdown()) {
+        if (executor.isShutdown()) {
           LOG.debug("Job rejected because the job manager is shutdown.");
         }
         else {
-          LOG.error("Job rejected because no more threads or queue slots available.");
+          LOG.error("Job rejected because no more threads or queue slots available. [runnable={}]", runnable);
         }
 
         if (runnable instanceof IFutureTask) {
@@ -408,7 +413,7 @@ public class JobManager implements IJobManager {
     }
 
     @Override
-    public void waitFor() throws JobExecutionException {
+    public void waitFor() {
       // Get the current FutureTask. If not available, this blocking condition is used from a thread not managed by this job manager.
       final JobFutureTask<?> currentTask = (JobFutureTask<?>) (IFuture.CURRENT.get() != null ? IFuture.CURRENT.get() : null);
 
@@ -436,7 +441,7 @@ public class JobManager implements IJobManager {
             }
             catch (final InterruptedException e) {
               Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
-              throw new JobExecutionException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
+              throw new JobException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
             }
           }
         }

@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobExecutionException;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
@@ -63,7 +62,7 @@ public class MultipleSessionTest {
   }
 
   @Test
-  public void testMutalExclusion() throws JobExecutionException, InterruptedException {
+  public void testMutalExclusion() throws InterruptedException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch latch1 = new BlockingCountDownLatch(2);
@@ -117,7 +116,7 @@ public class MultipleSessionTest {
   }
 
   @Test
-  public void testCancel() throws JobExecutionException, InterruptedException {
+  public void testCancel() throws InterruptedException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch latch1 = new BlockingCountDownLatch(2);

@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.job.JobExecutionException;
+import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
 import org.eclipse.scout.rt.platform.job.internal.future.MutexAcquisitionFutureTask;
 
@@ -112,17 +112,17 @@ public class MutexSemaphores {
    *
    * @param task
    *          the task to acquire the mutex; must be a mutex task.
-   * @throws JobExecutionException
-   *           is thrown if the current thread is interrupted while waiting for the mutex to become available, or the
-   *           executor is shutdown.
+   * @throws JobException
+   *           is thrown if the current thread is interrupted while waiting for the mutex to become available, or upon
+   *           shutdown of the job manager.
    */
-  public void acquire(final IFutureTask<?> task) throws JobExecutionException {
+  public void acquire(final IFutureTask<?> task) {
     Assertions.assertTrue(task.isMutexTask(), "Task must be a mutex task [task=%s]", task);
     final Object mutexObject = task.getMutexObject();
 
     if (m_executor.isShutdown()) {
       task.cancel(true);
-      throw new JobExecutionException(String.format("Failed to acquire mutex because job manager is shutdown [task=%s]", task));
+      throw new JobException(String.format("Failed to acquire mutex because job manager is shutdown [task=%s]", task));
     }
 
     // Create the task to re-acquire the mutex. This task is called if having to wait for the mutex to become available.
@@ -161,7 +161,7 @@ public class MutexSemaphores {
             mutexAcquisitionTask.stopAwaitMutex();
 
             Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
-            throw new JobExecutionException(String.format("Interrupted while re-acquiring the mutex [%s]", task), e);
+            throw new JobException(String.format("Interrupted while re-acquiring the mutex [%s]", task), e);
           }
         }
       }
@@ -209,12 +209,17 @@ public class MutexSemaphores {
 
   /**
    * Use this method to pass the mutex to the next task in the queue. If applicable, the task is scheduled for
-   * execution.
+   * execution. This method never throws an exception.
    */
   public void passMutexToNextTask(final IFutureTask<?> currentMutexOwner) {
     final IFutureTask<?> nextTask = releaseAndPoll(currentMutexOwner);
     if (nextTask != null) {
-      m_executor.execute(nextTask);
+      try {
+        m_executor.execute(nextTask);
+      }
+      catch (final Throwable t) {
+        LOG.error(String.format("Failed to execute mutex task [task=%s]", nextTask), t);
+      }
     }
   }
 
