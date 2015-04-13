@@ -7,14 +7,14 @@ scout.Device = function(userAgent) {
   this.system;
   this.features = {};
   this.device;
-  this._userAgentParsed = false;
   this.unselectableAttribute = ''; // see initUnselectableAttribute()
+  this.parseUserAgent(this.userAgent);
 };
 
 scout.Device.vendorPrefixes = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
 
 scout.Device.prototype.isIos = function() {
-  return this.getSystem() === scout.Device.SYSTEM_IOS;
+  return this.system === scout.Device.SYSTEM_IOS;
 };
 
 scout.Device.prototype.supportsTouch = function() {
@@ -75,13 +75,6 @@ scout.Device.prototype.initUnselectableAttribute = function() {
   }
 };
 
-scout.Device.prototype.getSystem = function() {
-  if (this.userAgent && !this._userAgentParsed) {
-    this.parseUserAgent(this.userAgent);
-  }
-  return this.system;
-};
-
 scout.Device.prototype.parseUserAgent = function(userAgent) {
   if (!userAgent) {
     return;
@@ -94,8 +87,6 @@ scout.Device.prototype.parseUserAgent = function(userAgent) {
       this.system = scout.Device.SYSTEM_IOS;
     }
   }
-
-  this._userAgentParsed = true;
 };
 
 scout.Device.SYSTEM_IOS = 'IOS';
