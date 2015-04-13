@@ -12,11 +12,23 @@ package org.eclipse.scout.commons;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -31,7 +43,11 @@ import javax.crypto.spec.SecretKeySpec;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
- * Utility class for secure encryption/decryption, hashing and random number generation.
+ * Utility class for encryption/decryption, hashing, random number generation and digital signatures.<br>
+ * Please note that this class requires the following providers to be available and authenticated in the running JRE:
+ * SUN, SunJCE, SunEC. See <a
+ * href="http://docs.oracle.com/javase/8/docs/technotes/guides/security/SunProviders.html#SunJCEProvider">Java
+ * Cryptography Architecture Oracle Providers Documentation for JDK 8</a>.
  *
  * @since 5.1
  * @see Base64Utility
@@ -41,22 +57,62 @@ public final class EncryptionUtility2 {
   /**
    * Specifies the iteration count for hashing and encryption/decryption.
    */
-  public static int CYCLES = 3557;
+  private static final int DEFAULT_CYCLES = 3557;
 
   /**
    * Number of random bytes to be created by default.
    */
-  public static int DEFAULT_RANDOM_SIZE = 16;
+  private static final int DEFAULT_RANDOM_SIZE = 16;
 
-  //
-  //
-  // encryption/decryption configuration:
+  /**
+   * The Elliptic Curve Digital Signature Algorithm as defined in ANSI X9.62.
+   */
+  private static final String SIGNATURE_ALGORITHM = "SHA512withECDSA";
+
+  /**
+   * Generates keypairs for the Elliptic Curve algorithm.
+   */
+  private static final String ASYMMETRIC_KEY_ALGORITHM = "EC";
+
+  /**
+   * Koblitz curve secp256k1 as recommended by <a href="http://www.secg.org/sec2-v2.pdf">Standards for Efficient
+   * Cryptography Group</a>.
+   */
+  private static final String ELLIPTIC_CURVE_NAME = "secp256k1";
+
+  /**
+   * SHA-512 hash algorithms defined in the <a
+   * href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">FIPS PUB 180-4</a>.
+   */
+  private static final String MESSAGE_DIGEST_ALGORITHM = "SHA-512";
+
+  /**
+   * This algorithm uses SHA-1 as the foundation of the PRNG. It computes the SHA-1 hash over a true-random seed value
+   * concatenated with a 64-bit counter which is incremented by 1 for each operation. From the 160-bit SHA-1 output,
+   * only 64 bits are used.
+   */
+  private static final String SECURE_RANDOM_ALGORITHM = "SHA1PRNG";
 
   /**
    * Password-based key-derivation algorithm (<a href="http://tools.ietf.org/search/rfc2898">PKCS #5 2.0</a>) using
    * The HmacSHA algorithm (<a href="http://www.ietf.org/rfc/rfc2104.txt">RFC 2104</a>) as pseudo-random function.
    */
   private static final String SECRET_ALGORITHM = "PBKDF2WithHmacSHA256";
+
+  /**
+   * Java Cryptographic Extension Provider Name
+   */
+  private static final String JCE_PROVIDER = "SunJCE";
+
+  /**
+   * Sun provider for cipher instances
+   */
+  private static final String SUN_PROVIDER = "SUN";
+
+  /**
+   * Provider for the Elliptic Curve algorithm
+   */
+  private static final String EC_ALGORITHM_PROVIDER = "SunEC";
 
   /**
    * Advanced Encryption Standard as specified by <a
@@ -180,8 +236,8 @@ public final class EncryptionUtility2 {
     }
 
     try {
-      SecretKeyFactory factory = SecretKeyFactory.getInstance(SECRET_ALGORITHM);
-      KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, CYCLES, keyLen + (GCM_INITIALIZATION_VECTOR_LEN * 8));
+      SecretKeyFactory factory = SecretKeyFactory.getInstance(SECRET_ALGORITHM, JCE_PROVIDER);
+      KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, DEFAULT_CYCLES, keyLen + (GCM_INITIALIZATION_VECTOR_LEN * 8));
       SecretKey tmp = factory.generateSecret(spec);
 
       // derive Key and Initialization Vector
@@ -194,7 +250,7 @@ public final class EncryptionUtility2 {
       SecretKey secret = new SecretKeySpec(key, CIPHER_ALGORITHM);
       GCMParameterSpec parameters = new GCMParameterSpec(GCM_AUTH_TAG_BIT_LEN, iv);
 
-      Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM + "/" + CIPHER_ALGORITHM_MODE + "/" + CIPHER_ALGORITHM_PADDING);
+      Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM + "/" + CIPHER_ALGORITHM_MODE + "/" + CIPHER_ALGORITHM_PADDING, JCE_PROVIDER);
       cipher.init(mode, secret, parameters);
 
       return cipher.doFinal(input);
@@ -202,7 +258,7 @@ public final class EncryptionUtility2 {
     catch (NoSuchAlgorithmException e) {
       throw new ProcessingException("Unable to crypt data. Algorithm could not be found. Make sure to use JRE 1.8.0_20 or newer.", e);
     }
-    catch (InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException e) {
+    catch (InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException | NoSuchProviderException e) {
       throw new ProcessingException("Unable to crypt data.", e);
     }
   }
@@ -238,12 +294,12 @@ public final class EncryptionUtility2 {
       throw new IllegalArgumentException(size + " is not a valid number for random bytes.");
     }
     try {
-      SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+      SecureRandom random = SecureRandom.getInstance(SECURE_RANDOM_ALGORITHM, SUN_PROVIDER);
       byte[] rnd = new byte[size];
       random.nextBytes(rnd);
       return rnd;
     }
-    catch (NoSuchAlgorithmException e) {
+    catch (NoSuchAlgorithmException | NoSuchProviderException e) {
       throw new ProcessingException("Unable to create random number.", e);
     }
   }
@@ -261,7 +317,7 @@ public final class EncryptionUtility2 {
    * @see <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">FIPS PUB 180-4</a>
    */
   public static byte[] hash(byte[] data, byte[] salt) throws ProcessingException {
-    return hash(data, salt, CYCLES);
+    return hash(data, salt, DEFAULT_CYCLES);
   }
 
   /**
@@ -285,7 +341,7 @@ public final class EncryptionUtility2 {
       throw new IllegalArgumentException("no data provided");
     }
     try {
-      MessageDigest digest = MessageDigest.getInstance("SHA-512");
+      MessageDigest digest = MessageDigest.getInstance(MESSAGE_DIGEST_ALGORITHM, SUN_PROVIDER);
       digest.reset();
       if (salt != null && salt.length > 0) {
         digest.update(salt);
@@ -298,8 +354,159 @@ public final class EncryptionUtility2 {
       }
       return key;
     }
-    catch (NoSuchAlgorithmException e) {
+    catch (NoSuchAlgorithmException | NoSuchProviderException e) {
       throw new ProcessingException("Unable to hash.", e);
+    }
+  }
+
+  /**
+   * Creates a new key pair (private and public key).
+   *
+   * @return The new {@link KeyPairBytes}.
+   * @throws ProcessingException
+   *           When there is an error generating the new keys.
+   */
+  public static KeyPairBytes generateKeyPair() throws ProcessingException {
+    try {
+      KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ASYMMETRIC_KEY_ALGORITHM, EC_ALGORITHM_PROVIDER);
+      SecureRandom random = SecureRandom.getInstance(SECURE_RANDOM_ALGORITHM, SUN_PROVIDER);
+      ECGenParameterSpec spec = new ECGenParameterSpec(ELLIPTIC_CURVE_NAME);
+      keyGen.initialize(spec, random);
+      KeyPair keyPair = keyGen.generateKeyPair();
+
+      X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyPair.getPublic().getEncoded());
+      PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyPair.getPrivate().getEncoded());
+
+      return new KeyPairBytes(pkcs8EncodedKeySpec.getEncoded(), x509EncodedKeySpec.getEncoded());
+    }
+    catch (NoSuchProviderException | InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
+      throw new ProcessingException("unable to create a new key-pair", e);
+    }
+  }
+
+  /**
+   * Creates a signature for the given data using the given private key.<br>
+   * Compatible keys can be generated using {@link #generateKeyPair()}.
+   *
+   * @param privateKey
+   *          The private key bytes in PKCS#8 encoding.
+   * @param data
+   *          The data for which the signature should be created.
+   * @return The signature bytes.
+   * @throws ProcessingException
+   *           When there is an error creating the signature.
+   */
+  public static byte[] createSignature(byte[] privateKey, byte[] data) throws ProcessingException {
+    try {
+      // create private key from bytes
+      KeyFactory keyFactory = KeyFactory.getInstance(ASYMMETRIC_KEY_ALGORITHM, EC_ALGORITHM_PROVIDER);
+      PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKey);
+      PrivateKey priv = keyFactory.generatePrivate(privateKeySpec);
+
+      // create signature
+      Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM, EC_ALGORITHM_PROVIDER);
+      SecureRandom random = SecureRandom.getInstance(SECURE_RANDOM_ALGORITHM, SUN_PROVIDER);
+      sig.initSign(priv, random);
+      sig.update(data);
+      return sig.sign();
+    }
+    catch (NoSuchProviderException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException e) {
+      throw new ProcessingException("unable to create signature.", e);
+    }
+  }
+
+  /**
+   * Verifies the given signature for the given data and public key.<br>
+   * Compatible public keys can be generated using {@link #generateKeyPair()}.
+   *
+   * @param publicKey
+   *          The public key bytes as defined in the X.509 standard.
+   * @param data
+   *          The data for which the signature should be validated.
+   * @param signatureToVerify
+   *          The signature that should be verified against.
+   * @return <code>true</code> if the given signature is valid for the given data and public key. <code>false</code>
+   *         otherwise.
+   * @throws ProcessingException
+   *           When there is an error validating the signature.
+   */
+  public static boolean verifySignature(byte[] publicKey, byte[] data, byte[] signatureToVerify) throws ProcessingException {
+    try {
+      // create public key from bytes
+      KeyFactory keyFactory = KeyFactory.getInstance(ASYMMETRIC_KEY_ALGORITHM, EC_ALGORITHM_PROVIDER);
+      X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(publicKey);
+      PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
+
+      // verify signature
+      Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM, EC_ALGORITHM_PROVIDER);
+      sig.initVerify(pubKey);
+      sig.update(data);
+      return sig.verify(signatureToVerify);
+    }
+    catch (NoSuchProviderException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException e) {
+      throw new ProcessingException("unable to verify signature", e);
+    }
+  }
+
+  /**
+   * Public and private key bytes.
+   */
+  public static final class KeyPairBytes {
+
+    private final byte[] m_privateKey;
+    private final byte[] m_publicKey;
+
+    private KeyPairBytes(byte[] priv, byte[] pub) {
+      m_privateKey = priv;
+      m_publicKey = pub;
+    }
+
+    /**
+     * Gets the private key bytes in PKCS#8 encoding.
+     *
+     * @return The private key.
+     */
+    public byte[] getPrivateKey() {
+      return Arrays.copyOf(m_privateKey, m_privateKey.length);
+    }
+
+    /**
+     * Gets the public key bytes as defined in the X.509 standard.
+     *
+     * @return The public key.
+     */
+    public byte[] getPublicKey() {
+      return Arrays.copyOf(m_publicKey, m_publicKey.length);
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + Arrays.hashCode(m_privateKey);
+      result = prime * result + Arrays.hashCode(m_publicKey);
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (!(obj instanceof KeyPairBytes)) {
+        return false;
+      }
+      KeyPairBytes other = (KeyPairBytes) obj;
+      if (!Arrays.equals(m_privateKey, other.m_privateKey)) {
+        return false;
+      }
+      if (!Arrays.equals(m_publicKey, other.m_publicKey)) {
+        return false;
+      }
+      return true;
     }
   }
 }
