@@ -12,6 +12,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 
@@ -43,7 +44,7 @@ public final class JobUtility {
     try {
       timeout = !Jobs.getJobManager().awaitDone(ModelJobs.newFutureFilter().session(session).notBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
-    catch (final InterruptedException e) {
+    catch (final JobException e) {
       throw new JsonException("Interrupted while waiting for all events to be processed. [future=%s]", e, future);
     }
 
@@ -86,7 +87,7 @@ public final class JobUtility {
     try {
       timeout = !Jobs.getJobManager().awaitDone(Jobs.newFutureFilter().futures(future).notBlocked(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
     }
-    catch (final InterruptedException e) {
+    catch (final JobException e) {
       throw new JsonException("Interrupted while waiting for a job to complete. [job=%s, future=%s]", e, job.getClass().getName(), future);
     }
 
