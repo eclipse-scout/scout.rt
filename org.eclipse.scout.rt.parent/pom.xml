@@ -36,8 +36,6 @@
     <module>../org.eclipse.scout.rt.server</module>
     <module>../org.eclipse.scout.rt.server.jms</module>
 
-    <module>../org.eclipse.scout.rt.jdbc.derby10</module>
-
     <module>../org.eclipse.scout.rt.ui.swing</module>
     <module>../org.eclipse.scout.rt.ui.swing.browser.swt.fragment</module>
     <module>../org.eclipse.scout.rt.svg.ui.swing</module>

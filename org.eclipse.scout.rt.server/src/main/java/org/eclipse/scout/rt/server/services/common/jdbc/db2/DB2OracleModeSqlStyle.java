@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.common.jdbc.style;
+package org.eclipse.scout.rt.server.services.common.jdbc.db2;
 
 import java.sql.Connection;
 import java.sql.SQLException;

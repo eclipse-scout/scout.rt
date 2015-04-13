@@ -8,13 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.services.common.jdbc;
+package org.eclipse.scout.rt.server.services.common.jdbc.derby;
 
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
-import org.eclipse.scout.rt.services.common.jdbc.style.DerbySqlStyle;
 
 /**
  * Cause Derby supports no sequences, we model this behavior with a table
@@ -23,7 +22,7 @@ import org.eclipse.scout.rt.services.common.jdbc.style.DerbySqlStyle;
  * column name is "LAST_VAL". With the method {@link AbstractDerbySqlService#getConfiguredSequenceColumnName()} one can
  * customize the name of this column.
  * NOTE: With "CREATE SYNONYM DUAL FOR SYSIBM.SYSDUMMY1" one can better reuse
- * Oracle styled SQL
+ * Oracle styled SQL.
  */
 public abstract class AbstractDerbySqlService extends AbstractSqlService {
 

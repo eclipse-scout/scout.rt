@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatementBuilder.AttributeStrategy;
 import org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatementBuilder.EntityStrategy;
-import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
+import org.eclipse.scout.rt.server.services.common.jdbc.oracle.OracleSqlStyle;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerAttributeNodeData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEntityNodeData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;

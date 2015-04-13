@@ -8,20 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.common.jdbc.style;
+package org.eclipse.scout.rt.server.services.common.jdbc.db2;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-/**
- * @since Build 206
- */
-public class MSSQLSqlStyle extends AbstractSqlStyle {
+import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
+import org.eclipse.scout.rt.server.services.common.jdbc.style.AbstractSqlStyle;
+
+public class DB2SqlStyle extends AbstractSqlStyle {
+
   private static final long serialVersionUID = 1L;
 
   @Override
   public String getConcatOp() {
-    return "+";
+    return "||";
   }
 
   @Override
@@ -50,17 +52,16 @@ public class MSSQLSqlStyle extends AbstractSqlStyle {
   }
 
   @Override
-  public String createDateTimeIsNow(String attribute) {
-    return "TRUNC(" + attribute + ", 'MI')=TRUNC(SYSDATE, 'MI')";
-  }
-
-  @Override
-  public String createDateTimeIsNotNow(String attribute) {
-    return "TRUNC(" + attribute + ", 'MI')!=TRUNC(SYSDATE, 'MI')";
-  }
-
-  @Override
   public void testConnection(Connection conn) throws SQLException {
-    //TODO what is the name of a dummy table or typical check statement to run as a test?
+  }
+
+  @Override
+  public void writeBind(PreparedStatement ps, int jdbcBindIndex, SqlBind bind) throws SQLException {
+    super.writeBind(ps, jdbcBindIndex, bind);
+  }
+
+  @Override
+  protected String adaptBindNameTimeDateOp(String bindName) {
+    return " TO_NUMBER(" + adaptBindName(bindName) + ") ";
   }
 }

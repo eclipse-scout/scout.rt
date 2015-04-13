@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
-import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
+import org.eclipse.scout.rt.server.services.common.jdbc.oracle.OracleSqlStyle;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;

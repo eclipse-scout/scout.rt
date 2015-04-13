@@ -38,9 +38,8 @@ import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.PreparedSt
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.StatementProcessor;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.pool.SqlConnectionBuilder;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.pool.SqlConnectionPool;
+import org.eclipse.scout.rt.server.services.common.jdbc.oracle.OracleSqlStyle;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
-import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle2;
-import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -747,8 +746,8 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     try {
       getTransaction().commit();
       ISqlStyle style = getSqlStyle();
-      if (style instanceof ISqlStyle2) {
-        ((ISqlStyle2) style).commit();
+      if (style != null) {
+        style.commit();
       }
     }
     catch (SQLException e) {
@@ -776,8 +775,8 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     try {
       getTransaction().rollback();
       ISqlStyle style = getSqlStyle();
-      if (style instanceof ISqlStyle2) {
-        ((ISqlStyle2) style).rollback();
+      if (style != null) {
+        style.rollback();
       }
     }
     catch (SQLException e) {

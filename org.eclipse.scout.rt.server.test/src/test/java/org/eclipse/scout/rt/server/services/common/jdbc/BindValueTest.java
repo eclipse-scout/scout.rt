@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.holders.LongHolder;
 import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.VerboseMock;
-import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
+import org.eclipse.scout.rt.server.services.common.jdbc.oracle.OracleSqlStyle;
 import org.junit.Test;
 
 /**

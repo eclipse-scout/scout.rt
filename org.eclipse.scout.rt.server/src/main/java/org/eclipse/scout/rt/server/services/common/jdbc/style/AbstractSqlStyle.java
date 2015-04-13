@@ -38,7 +38,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.SqlBind;
 
-public abstract class AbstractSqlStyle implements ISqlStyle, ISqlStyle2 {
+public abstract class AbstractSqlStyle implements ISqlStyle {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlStyle.class);
 
@@ -412,7 +412,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle, ISqlStyle2 {
   public Object readBind(ResultSet rs, ResultSetMetaData meta, int type, int jdbcBindIndex) throws SQLException {
     Object o = null;
     switch (type) {
-    // General Number
+      // General Number
       case Types.DECIMAL:
       case Types.NUMERIC: {
         o = getConfiguredDecimalConversionStrategy().convertDecimalType(rs.getBigDecimal(jdbcBindIndex));
@@ -1059,7 +1059,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle, ISqlStyle2 {
    * that the old implementation (prior to Scout 3.10.0-M2) will be used: Numeric / decimal types without a scale are
    * converted to <code>java.lang.Long</code>, with a scale they are converted to <code>java.lang.Double</code>.
    * By default <code>DecimalConversion.NONE</code> will be returned.
-   * 
+   *
    * @since 3.10.0-M2
    * @return strategy for the decimal conversion
    */
