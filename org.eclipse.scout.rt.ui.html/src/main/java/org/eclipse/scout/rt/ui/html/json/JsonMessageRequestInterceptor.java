@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.io.IOException;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -116,8 +117,11 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     String jsonSessionAttributeName = IJsonSession.HTTP_SESSION_ATTRIBUTE_PREFIX + jsonReq.getJsonSessionId();
     HttpSession httpSession = req.getSession();
 
-    // FIXME cgu really synchronize on this? blocks every call, maybe introduce a lock object saved on httpSession or even better use java.util.concurrent.locks.ReadWriteLock
-    synchronized (httpSession) {
+    // Because the appserver might keep or request locks on the httpSession object, we don't synchronize directly
+    // on httpSession, but use a dedicated session lock object instead.
+    ReentrantLock httpSessionLock = httpSessionLock(httpSession);
+    httpSessionLock.lock();
+    try {
       IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(jsonSessionAttributeName);
 
       if (jsonReq.isUnloadRequest()) {
@@ -157,6 +161,21 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
         throw new IllegalStateException("Startup requested for existing JSON session with ID " + jsonReq.getJsonSessionId());
       }
       return jsonSession;
+    }
+    finally {
+      httpSessionLock.unlock();
+    }
+  }
+
+  protected ReentrantLock httpSessionLock(HttpSession httpSession) {
+    synchronized (httpSession) {
+      String lockAttributeName = "scout.htmlui.httpSessionLock";
+      ReentrantLock lock = (ReentrantLock) httpSession.getAttribute(lockAttributeName);
+      if (lock == null) {
+        lock = new ReentrantLock();
+        httpSession.setAttribute(lockAttributeName, lock);
+      }
+      return lock;
     }
   }
 
