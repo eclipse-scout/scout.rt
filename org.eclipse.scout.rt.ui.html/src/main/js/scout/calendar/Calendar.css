@@ -330,7 +330,8 @@
     }
   }
 
-  & .component-day {
+  & .component-day,
+  & .component-task {
     position: absolute;
     left: 7px;
     margin-left: 0px;
@@ -339,6 +340,12 @@
    }
 
   & .component-open-top {
+    padding-top: 10px;
+
+    & .component-link {
+      top: 10px;
+    };
+
     &:before {
       content: "";
       display: block;
