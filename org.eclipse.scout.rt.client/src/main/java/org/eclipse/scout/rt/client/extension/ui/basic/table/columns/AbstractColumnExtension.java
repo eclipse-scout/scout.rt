@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateHeaderCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDisposeColumnChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnInitColumnChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnIsEditableChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnParseValueChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnPrepareEditChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnValidateValueChain;
@@ -49,11 +48,6 @@ public abstract class AbstractColumnExtension<VALUE, OWNER extends AbstractColum
   @Override
   public VALUE execParseValue(ColumnParseValueChain<VALUE> chain, ITableRow row, Object rawValue) throws ProcessingException {
     return chain.execParseValue(row, rawValue);
-  }
-
-  @Override
-  public boolean execIsEditable(ColumnIsEditableChain<VALUE> chain, ITableRow row) throws ProcessingException {
-    return chain.execIsEditable(row);
   }
 
   @Override

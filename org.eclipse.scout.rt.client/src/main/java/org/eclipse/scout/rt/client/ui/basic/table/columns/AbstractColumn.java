@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,7 +40,6 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateHeaderCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDisposeColumnChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnInitColumnChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnIsEditableChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnParseValueChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnPrepareEditChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnValidateValueChain;
@@ -74,6 +71,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 @ClassId("ebe15e4d-017b-4ac0-9a5a-2c9e07c8ad6f")
@@ -87,6 +85,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private boolean m_primaryKey;
   private boolean m_summary;
   private boolean m_isValidating;
+  private boolean m_initialized;
   /**
    * A column is presented to the user when it is displayable AND visible this
    * column is visible to the user only used when displayable=true
@@ -110,31 +109,23 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     this(true);
   }
 
-  // FIXME CGU: (table) remove PropertyChangeListener in AbstractColumn constructor -> generates a lot of unnecessary events
   public AbstractColumn(boolean callInitializer) {
     m_headerCell = new HeaderCell();
     m_objectExtensions = new ObjectExtensions<AbstractColumn<VALUE>, IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>>(this);
     if (callInitializer) {
       callInitializer();
     }
-    propertySupport.addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (!CompareUtility.isOneOf(evt.getPropertyName(), IColumn.PROP_EDITABLE, IColumn.PROP_VISIBLE /* includes PROP_DISPLAYABLE */)) {
-          return;
-        }
-        // force decoration of rows on property change.
-        // This is important to recalculate editability of editable cells.
-        ITable table = getTable();
-        if (table != null) {
-          table.updateAllRows();
-        }
-      }
-    });
   }
 
   protected final void callInitializer() {
-    interceptInitConfig();
+    if (!m_initialized) {
+      interceptInitConfig();
+      m_initialized = true;
+    }
+  }
+
+  protected boolean isInitialized() {
+    return m_initialized;
   }
 
   public final void clearValidatedValues() {
@@ -628,23 +619,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
-   * Only called if {@link #getConfiguredEditable()} is true and cell, row and table are enabled. Use this method only
-   * for dynamic checks of editablility, otherwise use {@link #getConfiguredEditable()}.
-   * <p>
-   * Subclasses can override this method. Default is {@code true}.
-   *
-   * @param row
-   *          for which to determine editability dynamically.
-   * @return {@code true} if the cell (row, column) is editable, {@code false} otherwise.
-   * @throws ProcessingException
-   */
-  @ConfigOperation
-  @Order(60)
-  protected boolean execIsEditable(ITableRow row) throws ProcessingException {
-    return true;
-  }
-
-  /**
    * Prepares the editing of a cell in the table.
    * <p>
    * Cell editing is canceled (normally by typing escape) or saved (normally by clicking another cell, typing enter).
@@ -846,6 +820,37 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void disposeColumn() throws ProcessingException {
     interceptDisposeColumn();
+  }
+
+  public void initCell(ITableRow row) throws ProcessingException {
+    Cell cell = row.getCellForUpdate(this);
+    if (getForegroundColor() != null) {
+      cell.setForegroundColor(getForegroundColor());
+    }
+    if (getBackgroundColor() != null) {
+      cell.setBackgroundColor(getBackgroundColor());
+    }
+    if (getFont() != null) {
+      cell.setFont(getFont());
+    }
+    if (getCssClass() != null) {
+      cell.setCssClass(getCssClass());
+    }
+
+    cell.setHorizontalAlignment(getHorizontalAlignment());
+    cell.setEditable(isEditable());
+    cell.setHtmlEnabled(isHtmlEnabled());
+  }
+
+  protected void reinitCells() {
+    for (ITableRow row : getTable().getRows()) {
+      try {
+        initCell(row);
+      }
+      catch (ProcessingException e) {
+        BEANS.get(IExceptionHandlerService.class).handleException(e);
+      }
+    }
   }
 
   @Override
@@ -1336,7 +1341,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public final IFormField prepareEdit(ITableRow row) throws ProcessingException {
     ITable table = getTable();
-    if (table == null || !this.isCellEditable(row)) {
+    if (table == null) {
       return null;
     }
     IFormField f = interceptPrepareEdit(row);
@@ -1402,22 +1407,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * do not use or override this internal method
    */
   protected void decorateCellInternal(Cell cell, ITableRow row) {
-    if (getForegroundColor() != null) {
-      cell.setForegroundColor(getForegroundColor());
-    }
-    if (getBackgroundColor() != null) {
-      cell.setBackgroundColor(getBackgroundColor());
-    }
-    if (getFont() != null) {
-      cell.setFont(getFont());
-    }
-    if (getCssClass() != null) {
-      cell.setCssClass(getCssClass());
-    }
-
-    cell.setHorizontalAlignment(getHorizontalAlignment());
-    cell.setEditableInternal(isCellEditable(row));
-    cell.setHtmlEnabled(isHtmlEnabled());
   }
 
   @Override
@@ -1511,6 +1500,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setHorizontalAlignment(int hAglin) {
     propertySupport.setPropertyInt(PROP_HORIZONTAL_ALIGNMENT, hAglin);
+    if (isInitialized()) {
+      reinitCells();
+    }
   }
 
   @Override
@@ -1567,20 +1559,14 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setEditable(boolean b) {
     propertySupport.setPropertyBool(PROP_EDITABLE, b);
+    if (isInitialized()) {
+      reinitCells();
+    }
   }
 
   @Override
   public boolean isCellEditable(ITableRow row) {
-    if (getTable() != null && getTable().isEnabled() && this.isEditable() && row != null && row.isEnabled() && row.getCell(this).isEnabled()) {
-      try {
-        return interceptIsEditable(row);
-      }
-      catch (Throwable t) {
-        LOG.error("checking row " + row, t);
-        return false;
-      }
-    }
-    return false;
+    return row.getCell(this).isEditable();
   }
 
   @Override
@@ -1591,6 +1577,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setCssClass(String cssClass) {
     propertySupport.setProperty(PROP_CSS_CLASS, cssClass);
+    if (isInitialized()) {
+      reinitCells();
+    }
   }
 
   @Override
@@ -1601,6 +1590,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setForegroundColor(String c) {
     propertySupport.setProperty(PROP_FOREGROUND_COLOR, c);
+    if (isInitialized()) {
+      reinitCells();
+    }
   }
 
   @Override
@@ -1611,6 +1603,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setBackgroundColor(String c) {
     propertySupport.setProperty(PROP_BACKGROUND_COLOR, c);
+    if (isInitialized()) {
+      reinitCells();
+    }
   }
 
   @Override
@@ -1621,6 +1616,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setFont(FontSpec f) {
     propertySupport.setProperty(PROP_FONT, f);
+    if (isInitialized()) {
+      reinitCells();
+    }
   }
 
   /**
@@ -1643,6 +1641,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setHtmlEnabled(boolean enabled) {
     propertySupport.setProperty(PROP_HTML_ENABLED, enabled);
+    if (isInitialized()) {
+      reinitCells();
+    }
   }
 
   @Override
@@ -1810,11 +1811,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     }
 
     @Override
-    public boolean execIsEditable(ColumnIsEditableChain<VALUE> chain, ITableRow row) throws ProcessingException {
-      return getOwner().execIsEditable(row);
-    }
-
-    @Override
     public VALUE execValidateValue(ColumnValidateValueChain<VALUE> chain, ITableRow row, VALUE rawValue) throws ProcessingException {
       return getOwner().execValidateValue(row, rawValue);
     }
@@ -1857,12 +1853,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
     ColumnParseValueChain<VALUE> chain = new ColumnParseValueChain<VALUE>(extensions);
     return chain.execParseValue(row, rawValue);
-  }
-
-  protected final boolean interceptIsEditable(ITableRow row) throws ProcessingException {
-    List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
-    ColumnIsEditableChain<VALUE> chain = new ColumnIsEditableChain<VALUE>(extensions);
-    return chain.execIsEditable(row);
   }
 
   protected final VALUE interceptValidateValue(ITableRow row, VALUE rawValue) throws ProcessingException {

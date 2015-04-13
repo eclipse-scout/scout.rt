@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -153,8 +154,9 @@ public class ColumnEditableTest {
       }
 
       @Override
-      protected boolean execIsEditable(ITableRow row) throws ProcessingException {
-        return row.getRowIndex() == 0;
+      protected void execDecorateCell(Cell cell, ITableRow row) throws ProcessingException {
+        super.execDecorateCell(cell, row);
+        cell.setEditable(row.getRowIndex() == 0);
       }
 
     }

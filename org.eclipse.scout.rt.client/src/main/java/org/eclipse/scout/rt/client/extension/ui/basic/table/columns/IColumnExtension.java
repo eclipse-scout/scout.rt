@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateHeaderCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDisposeColumnChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnInitColumnChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnIsEditableChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnParseValueChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnPrepareEditChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnValidateValueChain;
@@ -37,8 +36,6 @@ public interface IColumnExtension<VALUE, OWNER extends AbstractColumn<VALUE>> ex
   void execInitColumn(ColumnInitColumnChain<VALUE> chain) throws ProcessingException;
 
   VALUE execParseValue(ColumnParseValueChain<VALUE> chain, ITableRow row, Object rawValue) throws ProcessingException;
-
-  boolean execIsEditable(ColumnIsEditableChain<VALUE> chain, ITableRow row) throws ProcessingException;
 
   VALUE execValidateValue(ColumnValidateValueChain<VALUE> chain, ITableRow row, VALUE rawValue) throws ProcessingException;
 

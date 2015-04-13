@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.IStyleable;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 /**
@@ -263,11 +262,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     return m_cellSpecialization.isEditable();
   }
 
-  /**
-   * do not use or override this internal method. Use {@link AbstractColumn#execIsEditable()} instead which covers
-   * various other checks. Refer to its JavaDoc for more detail.
-   */
-  public void setEditableInternal(boolean b) {
+  public void setEditable(boolean b) {
     if (m_cellSpecialization instanceof CellStyle) {
       if (b) {
         ICellSpecialization newStyle = new CellExtension(m_cellSpecialization);

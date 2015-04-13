@@ -1446,28 +1446,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return row.getCell(col.getColumnIndex());
   }
 
-  /**
-   * Note that this is not a java bean method and thus not thread-safe
-   */
   @Override
   public boolean isCellEditable(int rowIndex, int columnIndex) {
     return isCellEditable(getRow(rowIndex), getColumnSet().getColumn(columnIndex));
   }
 
-  /**
-   * Note that this is not a java bean method and thus not thread-safe
-   */
-  @Override
-  public boolean isCellEditable(ITableRow row, int visibleColumnIndex) {
-    return isCellEditable(row, getColumnSet().getVisibleColumn(visibleColumnIndex));
-  }
-
-  /**
-   * Note that this is not a java bean method and thus not thread-safe
-   */
   @Override
   public boolean isCellEditable(ITableRow row, IColumn<?> column) {
-    return row != null && column != null && column.isVisible() && column.isCellEditable(row);
+    return row != null && column != null && column.isCellEditable(row);
   }
 
   @Override
@@ -2891,6 +2877,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     for (IColumn<?> col : getColumns()) {
       if (col instanceof AbstractColumn<?>) {
         ((AbstractColumn<?>) col).validateColumnValue(newIRow);
+        ((AbstractColumn<?>) col).initCell(newIRow);
       }
     }
     wasEverValid(newIRow);

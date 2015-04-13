@@ -85,27 +85,6 @@ public final class ColumnChains {
     }
   }
 
-  public static class ColumnIsEditableChain<VALUE> extends AbstractColumnChain<VALUE> {
-
-    public ColumnIsEditableChain(List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions) {
-      super(extensions);
-    }
-
-    public boolean execIsEditable(final ITableRow row) throws ProcessingException {
-      MethodInvocation<Boolean> methodInvocation = new MethodInvocation<Boolean>() {
-        @Override
-        protected void callMethod(IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>> next) throws ProcessingException {
-          setReturnValue(next.execIsEditable(ColumnIsEditableChain.this, row));
-        }
-      };
-      callChain(methodInvocation, row);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-      return methodInvocation.getReturnValue();
-    }
-  }
-
   public static class ColumnValidateValueChain<VALUE> extends AbstractColumnChain<VALUE> {
 
     public ColumnValidateValueChain(List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions) {

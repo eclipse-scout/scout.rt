@@ -393,29 +393,12 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   ICell getSummaryCell(ITableRow row);
 
   /**
-   * @return the effective live editable state ( {@link IColumn#isCellEditable(ITableRow)} and
-   *         {@link IColumn#isVisible()} )
-   *         <p>
-   *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside the
-   *         scout model thread.
+   * Convenience for {@link ICell#isEditable()}
    */
   boolean isCellEditable(int rowIndex, int columnIndex);
 
   /**
-   * @return the effective live editable state ( {@link IColumn#isCellEditable(ITableRow)} and
-   *         {@link IColumn#isVisible()} )
-   *         <p>
-   *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside the
-   *         scout model thread.
-   */
-  boolean isCellEditable(ITableRow row, int visibleColumnIndex);
-
-  /**
-   * @return the effective live editable state ( {@link IColumn#isCellEditable(ITableRow)} and
-   *         {@link IColumn#isVisible()} )
-   *         <p>
-   *         Note that this is not a java bean getter and thus not thread-safe. Calls to this method must be inside the
-   *         scout model thread.
+   * Convenience for {@link ICell#isEditable()}
    */
   boolean isCellEditable(ITableRow row, IColumn<?> column);
 
