@@ -68,7 +68,7 @@
 			<id>jandex-idx</id>
 			<activation>
 				<file>
-					<exists>${basedir}/target/classes/META-INF/scout.xml</exists>
+					<exists>${basedir}/src/main/resources/META-INF/scout.xml</exists>
 				</file>
 			</activation>
 			<build>
