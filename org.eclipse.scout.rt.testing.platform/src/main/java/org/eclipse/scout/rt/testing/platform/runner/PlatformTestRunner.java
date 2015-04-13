@@ -63,8 +63,8 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
       public void evaluate() throws Throwable {
         try {
           m_platformBackup = Platform.get();
+          Platform.setDefault();
           try {
-            Platform.setDefault();
             Platform.get().start(null);
             //
             Statement inner = PlatformTestRunner.super.classBlock(notifier);
