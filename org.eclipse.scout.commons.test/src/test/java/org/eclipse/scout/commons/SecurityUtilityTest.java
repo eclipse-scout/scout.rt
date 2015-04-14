@@ -12,11 +12,11 @@ package org.eclipse.scout.commons;
 
 import java.util.Arrays;
 
-import org.eclipse.scout.commons.EncryptionUtility2.KeyPairBytes;
+import org.eclipse.scout.commons.SecurityUtility.KeyPairBytes;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class EncryptionUtility2Test {
+public class SecurityUtilityTest {
 
   private static final boolean IS_JAVA_18_OR_NEWER = CompareUtility.compareTo(System.getProperty("java.version"), "1.8") >= 0;
   private static final int KEY_LEN = 128;
@@ -31,50 +31,50 @@ public class EncryptionUtility2Test {
     }
 
     final String origData = "origData";
-    final byte[] salt = EncryptionUtility2.createRandomBytes();
+    final byte[] salt = SecurityUtility.createRandomBytes();
     final byte[] inputBytes = origData.getBytes(ENCODING);
 
-    byte[] encryptData = EncryptionUtility2.encrypt(inputBytes, PASSWORD, salt, KEY_LEN);
+    byte[] encryptData = SecurityUtility.encrypt(inputBytes, PASSWORD, salt, KEY_LEN);
     Assert.assertFalse(Arrays.equals(encryptData, inputBytes));
 
-    byte[] encryptData2 = EncryptionUtility2.encrypt(null, PASSWORD, salt, KEY_LEN);
+    byte[] encryptData2 = SecurityUtility.encrypt(null, PASSWORD, salt, KEY_LEN);
     Assert.assertNull(encryptData2);
 
-    byte[] encryptData3 = EncryptionUtility2.encrypt(new byte[]{}, PASSWORD, salt, KEY_LEN);
+    byte[] encryptData3 = SecurityUtility.encrypt(new byte[]{}, PASSWORD, salt, KEY_LEN);
     Assert.assertTrue(Arrays.equals(encryptData3, new byte[]{}));
 
-    String decryptedString = new String(EncryptionUtility2.decrypt(encryptData, PASSWORD, salt, KEY_LEN), ENCODING);
+    String decryptedString = new String(SecurityUtility.decrypt(encryptData, PASSWORD, salt, KEY_LEN), ENCODING);
     Assert.assertEquals(origData, decryptedString);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testEncryptNoSalt() throws Exception {
-    EncryptionUtility2.encrypt("test".getBytes(ENCODING), "pass", null, KEY_LEN);
+    SecurityUtility.encrypt("test".getBytes(ENCODING), "pass", null, KEY_LEN);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testEncryptNoKey() throws Exception {
-    final byte[] salt = EncryptionUtility2.createRandomBytes();
-    EncryptionUtility2.encrypt("test".getBytes(ENCODING), null, salt, KEY_LEN);
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    SecurityUtility.encrypt("test".getBytes(ENCODING), null, salt, KEY_LEN);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testEncryptWrongKeyLen() throws Exception {
-    final byte[] salt = EncryptionUtility2.createRandomBytes();
-    EncryptionUtility2.encrypt("test".getBytes(ENCODING), "pass", salt, 4);
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    SecurityUtility.encrypt("test".getBytes(ENCODING), "pass", salt, 4);
   }
 
   @Test
   public void testRandomBytes() throws Exception {
-    byte[] createRandomBytes = EncryptionUtility2.createRandomBytes();
-    byte[] createRandomBytes2 = EncryptionUtility2.createRandomBytes();
-    EncryptionUtility2.createRandomBytes(4);
+    byte[] createRandomBytes = SecurityUtility.createRandomBytes();
+    byte[] createRandomBytes2 = SecurityUtility.createRandomBytes();
+    SecurityUtility.createRandomBytes(4);
     Assert.assertFalse(Arrays.equals(createRandomBytes, createRandomBytes2));
 
     // ensure wrong input generates exception
     boolean illegalExc = false;
     try {
-      EncryptionUtility2.createRandomBytes(0);
+      SecurityUtility.createRandomBytes(0);
     }
     catch (IllegalArgumentException e) {
       illegalExc = true;
@@ -85,21 +85,21 @@ public class EncryptionUtility2Test {
   @Test
   public void testHash() throws Exception {
     final byte[] data = "testdata".getBytes("UTF-8");
-    final byte[] salt = EncryptionUtility2.createRandomBytes();
-    final byte[] salt2 = EncryptionUtility2.createRandomBytes();
-    byte[] hash = EncryptionUtility2.hash(data, salt, 1);
-    byte[] hash2 = EncryptionUtility2.hash(data, salt);
-    byte[] hash3 = EncryptionUtility2.hash(data, salt2, 1);
-    byte[] hash4 = EncryptionUtility2.hash(data, null, 1);
-    byte[] hash5 = EncryptionUtility2.hash(data, null, 1);
-    byte[] hash6 = EncryptionUtility2.hash(data, null);
-    byte[] hash7 = EncryptionUtility2.hash(data, salt);
-    byte[] hash8 = EncryptionUtility2.hash(new byte[]{}, salt);
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    final byte[] salt2 = SecurityUtility.createRandomBytes();
+    byte[] hash = SecurityUtility.hash(data, salt, 1);
+    byte[] hash2 = SecurityUtility.hash(data, salt);
+    byte[] hash3 = SecurityUtility.hash(data, salt2, 1);
+    byte[] hash4 = SecurityUtility.hash(data, null, 1);
+    byte[] hash5 = SecurityUtility.hash(data, null, 1);
+    byte[] hash6 = SecurityUtility.hash(data, null);
+    byte[] hash7 = SecurityUtility.hash(data, salt);
+    byte[] hash8 = SecurityUtility.hash(new byte[]{}, salt);
 
     // ensure null input throws exception
     boolean nullNotAllowed = false;
     try {
-      EncryptionUtility2.hash(null, salt);
+      SecurityUtility.hash(null, salt);
     }
     catch (IllegalArgumentException e) {
       nullNotAllowed = true;
@@ -128,8 +128,8 @@ public class EncryptionUtility2Test {
 
   @Test
   public void testGenerateKeyPair() throws Exception {
-    KeyPairBytes generateKeyPair1 = EncryptionUtility2.generateKeyPair();
-    KeyPairBytes generateKeyPair2 = EncryptionUtility2.generateKeyPair();
+    KeyPairBytes generateKeyPair1 = SecurityUtility.generateKeyPair();
+    KeyPairBytes generateKeyPair2 = SecurityUtility.generateKeyPair();
 
     Assert.assertFalse(Arrays.equals(generateKeyPair1.getPrivateKey(), generateKeyPair2.getPrivateKey()));
     Assert.assertFalse(Arrays.equals(generateKeyPair1.getPublicKey(), generateKeyPair2.getPublicKey()));
@@ -144,12 +144,12 @@ public class EncryptionUtility2Test {
 
   @Test
   public void testSignature() throws Exception {
-    KeyPairBytes keyPair = EncryptionUtility2.generateKeyPair();
+    KeyPairBytes keyPair = SecurityUtility.generateKeyPair();
     final byte[] data = "original test data".getBytes(ENCODING);
 
-    byte[] signature = EncryptionUtility2.createSignature(keyPair.getPrivateKey(), data);
+    byte[] signature = SecurityUtility.createSignature(keyPair.getPrivateKey(), data);
     Assert.assertTrue(signature.length > 0);
-    boolean valid = EncryptionUtility2.verifySignature(keyPair.getPublicKey(), data, signature);
+    boolean valid = SecurityUtility.verifySignature(keyPair.getPublicKey(), data, signature);
     Assert.assertTrue(valid);
   }
 
@@ -158,7 +158,7 @@ public class EncryptionUtility2Test {
     final byte[] data = "myTestData".getBytes(ENCODING);
     final byte[] sig = Base64Utility.decode("MEUCIE+t3/ngQ65qql7bTFCPPGVbj2z0BIiwNzjaC6wMV93VAiEAxBTA6FWTCBVDSAMvk7FXZcUeF/i4lNc/fW4a2G63O64=");
     final byte[] pubKey = Base64Utility.decode("MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEJX6uq87Qz1Xyk85+8NG5dnYDV1ZBSt/W3/H4nvY7h4o7JNM0AYxgX5/4Dizb5iD9iVX2uuv1BO7J9H/hze7Cag==");
-    Assert.assertTrue(EncryptionUtility2.verifySignature(pubKey, data, sig));
+    Assert.assertTrue(SecurityUtility.verifySignature(pubKey, data, sig));
   }
 
   @Test
@@ -170,6 +170,6 @@ public class EncryptionUtility2Test {
 
     final byte[] encrypted = Base64Utility.decode("43aysPcKhTvyzZIWa6d1wwntGobQOXT38VU=");
     final byte[] salt = Base64Utility.decode("iPENJpMTU8MxarL8ZMHxXw==");
-    Assert.assertEquals("myTestData", new String(EncryptionUtility2.decrypt(encrypted, PASSWORD, salt, 128), ENCODING));
+    Assert.assertEquals("myTestData", new String(SecurityUtility.decrypt(encrypted, PASSWORD, salt, 128), ENCODING));
   }
 }

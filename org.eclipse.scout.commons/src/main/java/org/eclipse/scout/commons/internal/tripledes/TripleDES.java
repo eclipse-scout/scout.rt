@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.internal.tripledes;
 
-import org.eclipse.scout.commons.EncryptionUtility2;
+import org.eclipse.scout.commons.SecurityUtility;
 
 /**
  * Uses 3 x 64 = 192 bit key DES
  *
  * @deprecated This class in insecure and should no longer be used. Will be removed in Scout 7.0. Use
- *             {@link EncryptionUtility2} instead.
+ *             {@link SecurityUtility} instead.
  */
 @Deprecated
 public final class TripleDES {

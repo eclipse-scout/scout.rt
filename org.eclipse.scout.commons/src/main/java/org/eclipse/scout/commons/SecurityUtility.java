@@ -52,7 +52,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * @since 5.1
  * @see Base64Utility
  */
-public final class EncryptionUtility2 {
+public final class SecurityUtility {
 
   /**
    * Specifies the iteration count for hashing and encryption/decryption.
@@ -144,7 +144,7 @@ public final class EncryptionUtility2 {
    */
   private static final int GCM_AUTH_TAG_BIT_LEN = 128;
 
-  private EncryptionUtility2() {
+  private SecurityUtility() {
   }
 
   /**

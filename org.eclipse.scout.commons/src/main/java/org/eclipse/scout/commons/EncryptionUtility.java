@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.internal.tripledes.TripleDES;
 
 /**
  * @deprecated This class in insecure and should no longer be used. Will be removed in Scout 7.0. Use
- *             {@link EncryptionUtility2} instead.
+ *             {@link SecurityUtility} instead.
  */
 @Deprecated
 @SuppressWarnings("deprecation")

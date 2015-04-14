@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,6 +23,12 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+/**
+ * @deprecated Use {@link SecurityUtility#createSignature(byte[], byte[])} and
+ *             {@link SecurityUtility#verifySignature(byte[], byte[], byte[])} instead. Please note that existing
+ *             signatures are not compatible with the new verification.
+ */
+@Deprecated
 public final class PublicKeyUtility {
 
   private PublicKeyUtility() {
