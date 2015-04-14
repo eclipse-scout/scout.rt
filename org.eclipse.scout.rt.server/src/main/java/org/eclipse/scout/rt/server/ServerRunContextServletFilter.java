@@ -33,19 +33,17 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 
 /**
- * Filter to run the ongoing HTTP-request in a server job. Requests targeted to '/process' are not run in a server job
+ * Filter to run the ongoing HTTP-request in a {@link ServerRunContext}. Requests targeted to '/process' are ignored
  * because done in {@link ServiceTunnelServlet}.
  */
-//TODO dwi remove?
-public class ServerJobServletFilter implements Filter {
+public class ServerRunContextServletFilter implements Filter {
 
-  // TODO [dwi][nosgi]: rename this class
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerJobServletFilter.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerRunContextServletFilter.class);
 
   private FilterConfigInjection m_injection;
 
