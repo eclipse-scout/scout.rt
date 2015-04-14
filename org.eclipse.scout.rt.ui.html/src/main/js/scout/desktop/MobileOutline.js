@@ -38,7 +38,7 @@ scout.MobileOutline.prototype._updateOutlineTab = function(node) {
     this._currentDetailForm = null;
   }
 
-  if (node.detailForm && node.detailFormVisible && !node.detailFormHiddenByUi) {
+  if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
     node.detailForm.render(node.$node);
     node.detailForm.htmlComp.pixelBasedSizing = true;
     prefSize = node.detailForm.htmlComp.getPreferredSize();

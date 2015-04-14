@@ -111,7 +111,6 @@ scout.Outline.prototype._renderSelection = function() {
   }
 };
 
-// FIXME AWE: (page) unit-test setNodesSelected
 scout.Outline.prototype.setNodesSelected = function(nodes) {
   scout.Outline.parent.prototype.setNodesSelected.call(this, nodes);
   if (this.navigateUpInProgress) {
@@ -120,7 +119,7 @@ scout.Outline.prototype.setNodesSelected = function(nodes) {
     nodes = scout.arrays.ensure(nodes);
     if (nodes.length === 1) {
       // When a node is selected, the detail form should never be hidden
-      nodes[0].detailFormHiddenByUi = false;
+      nodes[0].detailFormVisibleByUi = true;
     }
   }
 };
@@ -151,7 +150,7 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
     node.detailForm = null;
   }
 
-  if (node.detailForm && node.detailFormVisible && !node.detailFormHiddenByUi) {
+  if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
     content = node.detailForm;
   } else if (node.detailTable && node.detailTableVisible) {
     content = node.detailTable;

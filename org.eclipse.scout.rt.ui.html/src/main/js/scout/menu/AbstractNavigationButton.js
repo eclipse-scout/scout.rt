@@ -34,7 +34,7 @@ scout.AbstractNavigationButton.prototype._render = function($parent) {
 scout.AbstractNavigationButton.prototype._setDetailVisible = function() {
   var detailVisible = this._toggleDetail();
   $.log.debug('show detail-' + detailVisible ? 'form' : 'table');
-  this.node.detailFormHiddenByUi = !detailVisible;
+  this.node.detailFormVisibleByUi = detailVisible;
   this.outline._updateOutlineTab(this.node);
 };
 

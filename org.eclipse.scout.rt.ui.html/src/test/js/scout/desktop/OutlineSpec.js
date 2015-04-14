@@ -87,11 +87,7 @@ describe("Outline", function() {
   }
 
   describe("dispose", function() {
-    var model;
-    var tree;
-    var node0;
-    var node1;
-    var node2;
+    var model, tree, node0, node1, node2;
 
     beforeEach(function() {
       // A large tree is used to properly test recursion
@@ -128,11 +124,7 @@ describe("Outline", function() {
   describe("onModelAction", function() {
 
     describe("nodesDeleted event", function() {
-      var model;
-      var tree;
-      var node0;
-      var node1;
-      var node2;
+      var model, tree, node0, node1, node2;
 
       beforeEach(function() {
         // A large tree is used to properly test recursion
@@ -157,11 +149,7 @@ describe("Outline", function() {
     });
 
     describe("allNodesDeleted event", function() {
-      var model;
-      var tree;
-      var node0;
-      var node1;
-      var node2;
+      var model, tree, node0, node1, node2;
 
       beforeEach(function() {
         // A large tree is used to properly test recursion
@@ -185,5 +173,39 @@ describe("Outline", function() {
       });
 
     });
+
+    describe("setNodesSelected", function() {
+      var model, outline, node;
+
+      beforeEach(function() {
+        model = createModelFixture(3, 2, true);
+        outline = createOutline(model);
+        node = model.nodes[0];
+      });
+
+      it("handle navigateUp only once", function() {
+        outline.navigateUpInProgress = true;
+        outline.setNodesSelected([]);
+        expect(outline.navigateUpInProgress).toBe(false);
+      });
+
+      // we must override the _render* methods for this test-case, since we had to
+      // implement a lot more of set-up code to make these methods work.
+      it("otherwise handle single selection (or do nothing when selection is != 1 node)", function() {
+        node.detailFormVisibleByUi = false;
+        outline.navigateUpInProgress = false;
+        outline._renderSelection = function() {};
+        outline._renderMenus = function() {};
+
+        // don't change the visibleByUi flag when selection is != 1
+        outline.setNodesSelected([]);
+        expect(node.detailFormVisibleByUi).toBe(false);
+
+        // set the visibleByUi flag to true when selection is exactly 1
+        outline.setNodesSelected([node]);
+        expect(node.detailFormVisibleByUi).toBe(true);
+      });
+    });
+
   });
 });

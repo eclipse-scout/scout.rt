@@ -11,7 +11,7 @@ scout.NavigateUpButton.prototype._isDetail = function() {
   // Button is in "detail mode" if there are both detail form and detail table visible and detail form _is_ hidden.
   return !!(this.node.detailFormVisible && this.node.detailForm &&
     this.node.detailTableVisible && this.node.detailTable &&
-    this.node.detailFormHiddenByUi);
+    !this.node.detailFormVisibleByUi);
 };
 
 scout.NavigateUpButton.prototype._toggleDetail = function() {

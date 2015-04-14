@@ -16,6 +16,7 @@ describe("NavigateDownButton", function() {
     // true when both detailForm and detailTable are visible
     node.detailForm = {};
     node.detailFormVisible = true;
+    node.detailFormVisibleByUi = true;
     node.detailTable = {};
     node.detailTableVisible = true;
     expect(menu._isDetail()).toBe(true);
@@ -31,9 +32,9 @@ describe("NavigateDownButton", function() {
     node.detailTable = {};
 
     // false when hidden by UI
-    node.detailFormHiddenByUi = true;
+    node.detailFormVisibleByUi = false;
     expect(menu._isDetail()).toBe(false);
-    node.detailFormHiddenByUi = false;
+    node.detailFormVisibleByUi = true;
 
     // false when property says to
     node.detailFormVisible = false;
