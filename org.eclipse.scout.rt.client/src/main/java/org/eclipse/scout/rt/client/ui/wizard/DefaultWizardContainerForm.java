@@ -116,13 +116,18 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
   }
 
   @Override
-  protected final IForm getInnerWizardForm() {
+  protected IForm getInnerWizardForm() {
     return getWrappedWizardForm().getInnerForm();
   }
 
   @Override
-  protected final void setInnerWizardForm(IForm form) {
+  protected void setInnerWizardForm(IForm form) {
     getWrappedWizardForm().setInnerForm(form);
+  }
+
+  @Override
+  public void startWizard() throws ProcessingException {
+    startInternal(new WizardHandler());
   }
 
   @Order(10.0f)
@@ -228,93 +233,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       }
     }
 
-    @Order(10.0)
-    public class WizardCancelButton extends AbstractButton implements IButton {
-
-      @Override
-      protected String getConfiguredLabel() {
-        return ScoutTexts.get("WizardCancelButton");
-      }
-
-      @Override
-      protected String getConfiguredTooltipText() {
-        return ScoutTexts.get("WizardCancelButtonTooltip");
-      }
-
-      @Override
-      protected boolean getConfiguredVisible() {
-        return false;
-      }
-
-      @Override
-      protected int getConfiguredHorizontalAlignment() {
-        return -1;
-      }
-
-      @Override
-      protected void execClickAction() throws ProcessingException {
-        getWizard().doCancel();
-      }
-    }
-
-    @Order(20.0)
-    public class WizardSuspendButton extends AbstractButton {
-
-      @Override
-      protected String getConfiguredLabel() {
-        return ScoutTexts.get("WizardSuspendButton");
-      }
-
-      @Override
-      protected String getConfiguredTooltipText() {
-        return ScoutTexts.get("WizardSuspendButtonTooltip");
-      }
-
-      @Override
-      protected boolean getConfiguredVisible() {
-        return false;
-      }
-
-      @Override
-      protected int getConfiguredHorizontalAlignment() {
-        return -1;
-      }
-
-      @Override
-      protected void execClickAction() throws ProcessingException {
-        getWizard().doSuspend();
-      }
-    }
-
-    @Order(25.0)
-    public class WizardResetButton extends AbstractButton implements IButton {
-
-      @Override
-      protected String getConfiguredLabel() {
-        return ScoutTexts.get("ResetButton");
-      }
-
-      @Override
-      protected String getConfiguredTooltipText() {
-        return ScoutTexts.get("ResetButtonTooltip");
-      }
-
-      @Override
-      protected boolean getConfiguredVisible() {
-        return false;
-      }
-
-      @Override
-      protected int getConfiguredHorizontalAlignment() {
-        return -1;
-      }
-
-      @Override
-      protected void execClickAction() throws ProcessingException {
-        getWizard().doReset();
-      }
-    }
-
     @Order(30.0)
     public class WizardPreviousStepButton extends AbstractButton {
 
@@ -397,19 +315,95 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
       }
     }
 
-    public class EscapeKeyStroke extends AbstractKeyStroke {
+    @Order(60.0)
+    public class WizardCancelButton extends AbstractButton implements IButton {
+
       @Override
-      protected String getConfiguredKeyStroke() {
-        return "escape";
+      protected String getConfiguredLabel() {
+        return ScoutTexts.get("WizardCancelButton");
       }
 
       @Override
-      protected void execAction() throws ProcessingException {
-        handleEscapeKey(false);
+      protected String getConfiguredTooltipText() {
+        return ScoutTexts.get("WizardCancelButtonTooltip");
+      }
+
+      @Override
+      protected boolean getConfiguredVisible() {
+        return false;
+      }
+
+      @Override
+      protected int getConfiguredHorizontalAlignment() {
+        return -1;
+      }
+
+      @Override
+      protected void execClickAction() throws ProcessingException {
+        getWizard().doCancel();
+      }
+    }
+
+    @Order(70.0)
+    public class WizardSuspendButton extends AbstractButton {
+
+      @Override
+      protected String getConfiguredLabel() {
+        return ScoutTexts.get("WizardSuspendButton");
+      }
+
+      @Override
+      protected String getConfiguredTooltipText() {
+        return ScoutTexts.get("WizardSuspendButtonTooltip");
+      }
+
+      @Override
+      protected boolean getConfiguredVisible() {
+        return false;
+      }
+
+      @Override
+      protected int getConfiguredHorizontalAlignment() {
+        return -1;
+      }
+
+      @Override
+      protected void execClickAction() throws ProcessingException {
+        getWizard().doSuspend();
+      }
+    }
+
+    @Order(80.0)
+    public class WizardResetButton extends AbstractButton implements IButton {
+
+      @Override
+      protected String getConfiguredLabel() {
+        return ScoutTexts.get("ResetButton");
+      }
+
+      @Override
+      protected String getConfiguredTooltipText() {
+        return ScoutTexts.get("ResetButtonTooltip");
+      }
+
+      @Override
+      protected boolean getConfiguredVisible() {
+        return false;
+      }
+
+      @Override
+      protected int getConfiguredHorizontalAlignment() {
+        return -1;
+      }
+
+      @Override
+      protected void execClickAction() throws ProcessingException {
+        getWizard().doReset();
       }
     }
 
     public class EnterKeyStroke extends AbstractKeyStroke {
+
       @Override
       protected String getConfiguredKeyStroke() {
         return "enter";
@@ -420,23 +414,26 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm impl
         handleEnterKey();
       }
     }
-  }
 
-  @Override
-  public void startWizard() throws ProcessingException {
-    startInternal(new WizardHandler());
+    public class EscapeKeyStroke extends AbstractKeyStroke {
+
+      @Override
+      protected String getConfiguredKeyStroke() {
+        return "escape";
+      }
+
+      @Override
+      protected void execAction() throws ProcessingException {
+        handleEscapeKey(false);
+      }
+    }
   }
 
   public class WizardHandler extends AbstractFormHandler {
 
     @Override
     protected void execLoad() throws ProcessingException {
-      if (getWizard() != null) {
-        setInnerWizardForm(getWizard().getWizardForm());
-      }
-      else {
-        setInnerWizardForm(null);
-      }
+      setInnerWizardForm(getWizard() == null ? null : getWizard().getWizardForm());
     }
   }
 }
