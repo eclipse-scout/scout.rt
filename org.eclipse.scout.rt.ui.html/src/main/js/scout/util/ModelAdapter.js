@@ -319,10 +319,11 @@ scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldPro
   this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
     var renderFuncName = '_render' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName);
     var oldValue = oldProperties[propertyName];
+    var newValue = this[propertyName];
     $.log.debug('call ' + renderFuncName + '(' + value + ')');
     // Call the render function for regular properties, for adapters see onChildAdapterChange
     if (isAdapterProp) {
-      this.onChildAdapterChange(propertyName, oldValue, value);
+      this.onChildAdapterChange(propertyName, oldValue, newValue);
     } else {
       var funcTarget = this.ui || this;
       if (!funcTarget[renderFuncName]) {
@@ -337,7 +338,7 @@ scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldPro
         // - wenn jemand den old-value von this.xxx braucht, muss er sich diesen selber auf dem adapter merken
         // - wenn jemand die render methode mit anderen werten als this.xxx aufrufen können muss, implementiert er für
         //   diesen speziellen fall: function renderXxx(xxx) { xxx = xxx || this.xxx; ...
-      funcTarget[renderFuncName](value, oldValue);
+      funcTarget[renderFuncName](newValue, oldValue);
     }
   }.bind(this));
 };
@@ -372,8 +373,8 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldVa
   if (newValue) {
     var $container = this.$container || (this.ui ? this.ui.$container : undefined);
     if (!funcTarget[renderFuncName] && $container) {
-      if (Array.isArray(oldValue)) {
-        for (i = 0; i < oldValue.length; i++) {
+      if (Array.isArray(newValue)) {
+        for (i = 0; i < newValue.length; i++) {
           newValue[i].render($container);
         }
       } else {

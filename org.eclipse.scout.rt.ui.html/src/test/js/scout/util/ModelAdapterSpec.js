@@ -137,6 +137,7 @@ describe("ModelAdapter", function() {
       adapter._renderFoo = function(value) {
         $div.text(value);
       };
+      adapter._syncPropertiesOnPropertyChange({}, {foo: 'bar'});
       adapter._renderPropertiesOnPropertyChange({}, {foo: 'bar'});
       expect($div.text()).toBe('bar');
     });
