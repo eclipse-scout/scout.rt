@@ -18,6 +18,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.PreferredValue;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;

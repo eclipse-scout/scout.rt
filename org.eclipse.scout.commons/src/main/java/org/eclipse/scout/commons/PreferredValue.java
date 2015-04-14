@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.context;
+package org.eclipse.scout.commons;
 
 /**
  * Represents a value which can be marked as preferred value, meaning that it can only be overwritten by respective
