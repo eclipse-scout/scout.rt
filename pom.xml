@@ -25,7 +25,9 @@
 
 	<properties>
 		<tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git</tycho.scmUrl>
+    <maven.build.timestamp.format>yyyyMMdd-HHmmss</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<scout.base.version>5.1.0</scout.base.version>
 	</properties>
 
 	<repositories>
@@ -94,6 +96,39 @@
 				</plugins>
 			</build>
 		</profile>
+
+    <profile>
+      <id>prepare-release</id>
+      <properties>
+        <milestone.version>I</milestone.version>
+        <newVersion>${scout.base.version}.${maven.build.timestamp}-${milestone.version}</newVersion>
+      </properties>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <defaultGoal>org.codehaus.mojo:versions-maven-plugin:set</defaultGoal>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>versions-maven-plugin</artifactId>
+            <version>2.1</version>
+            <executions>
+              <execution>
+                <id>set</id>
+                <goals>
+                  <goal>set</goal>
+                </goals>
+                <configuration>
+                  <newVersion>${newVersion}</newVersion>
+                </configuration>
+                <phase>validate</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
 	</profiles>
 
 	<build>
