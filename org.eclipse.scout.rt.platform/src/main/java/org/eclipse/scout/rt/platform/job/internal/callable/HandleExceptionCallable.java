@@ -16,7 +16,7 @@ import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.JobExceptionHandler;
 import org.eclipse.scout.rt.platform.job.JobInput;
 
