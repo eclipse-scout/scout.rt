@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.commons.html.internal.EmptyNodeBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlImageBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlLinkBuilder;
+import org.eclipse.scout.commons.html.internal.HtmlListElement;
 import org.eclipse.scout.commons.html.internal.HtmlNodeBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlTableBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlTableDataBuilder;
@@ -220,6 +221,39 @@ public final class HTML {
    */
   public static IHtmlElement img(CharSequence src) {
     return new HtmlImageBuilder(src);
+  }
+
+  /**
+   * Create a html list element with encoded text: &lt;li&gt;text&lt;/li&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.li("text").toEncodedHtml(); <br>
+   * </p>
+   */
+  public static IHtmlListElement li(String text) {
+    return new HtmlListElement(text);
+  }
+
+  /**
+   * Create an unordered html list element with encoded text: &lt;ul&gt;...&lt;/ul&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.ul(HTML.li("text"),...).toEncodedHtml(); <br>
+   * </p>
+   */
+  public static IHtmlElement ul(IHtmlListElement... li) {
+    return new HtmlNodeBuilder("ul", li);
+  }
+
+  /**
+   * Create an ordered html list element with encoded text: &lt;ul&gt;...&lt;/ul&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.ol(HTML.li("text"),...).toEncodedHtml(); <br>
+   * </p>
+   */
+  public static IHtmlContent ol(IHtmlListElement... li) {
+    return new HtmlNodeBuilder("ol", li);
   }
 
   /**

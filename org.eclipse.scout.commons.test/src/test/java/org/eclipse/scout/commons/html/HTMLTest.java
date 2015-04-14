@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.binds;
+package org.eclipse.scout.commons.html;
 
 import static org.eclipse.scout.commons.html.HTML.bold;
 import static org.eclipse.scout.commons.html.HTML.cell;
@@ -30,7 +30,7 @@ import org.w3c.dom.html.HTMLElement;
 /**
  * Tests for {@link HtmlBinds}
  */
-public class HtmlBindsTest {
+public class HTMLTest {
   private static final String BIND_TEXT = "Test Last Name&";
   private static final String ENCODED_BIND_TEXT = "Test Last Name&amp;";
 
@@ -78,6 +78,7 @@ public class HtmlBindsTest {
     assertEncodedText("div", div(BIND_TEXT).toEncodedHtml());
     assertEncodedText("p", HTML.p(BIND_TEXT).toEncodedHtml());
     assertEncodedText("span", HTML.span(BIND_TEXT).toEncodedHtml());
+    assertEncodedText("li", HTML.li(BIND_TEXT).toEncodedHtml());
   }
 
   /**
@@ -229,13 +230,13 @@ public class HtmlBindsTest {
   }
 
   @Test
-  public void testMultipleCellsNoBinds() throws Exception {
+  public void testMultipleCellsNoBinds() {
     IHtmlTableRow row1 = HTML.row(HTML.cell("p1"), HTML.cell("p2"));
     assertEquals("<tr><td>:b__0</td><td>:b__1</td></tr>", row1.toString());
   }
 
   @Test
-  public void testMultipleRowsNoBinds() throws Exception {
+  public void testMultipleRowsNoBinds() {
     IHtmlTableRow row1 = HTML.row(HTML.cell("p1"), HTML.cell("p2"));
     IHtmlTableRow row2 = HTML.row(HTML.cell("p3"), HTML.cell("p4"));
     String row1String = "<tr><td>p1</td><td>p2</td></tr>";
@@ -246,7 +247,7 @@ public class HtmlBindsTest {
   }
 
   @Test
-  public void testComplexHtml() throws Exception {
+  public void testComplexHtml() {
     final IHtmlElement html = HTML.div(
         link(TEST_URL, BIND_TEXT),
         HTML.table(row(cell(BIND_TEXT), cell(BIND_TEXT), cell(BIND_TEXT)))
@@ -254,4 +255,23 @@ public class HtmlBindsTest {
     String expected = "<div><a href=\"http://SCOUTBLABLA.com\">Test Last Name&amp;</a><table><tr><td>Test Last Name&amp;</td><td>Test Last Name&amp;</td><td>Test Last Name&amp;</td></tr></table></div>";
     assertEquals(expected, html.toEncodedHtml());
   }
+
+  @Test
+  public void testUl() {
+    String html = HTML.ul(HTML.li(BIND_TEXT)).toEncodedHtml();
+    assertEquals("<ul><li>" + ENCODED_BIND_TEXT + "</li></ul>", html);
+  }
+
+  @Test
+  public void testMultipleUl() {
+    String html = HTML.ul(HTML.li(BIND_TEXT), HTML.li("2")).toEncodedHtml();
+    assertEquals("<ul><li>" + ENCODED_BIND_TEXT + "</li><li>2</li></ul>", html);
+  }
+
+  @Test
+  public void testMultipleOl() {
+    String html = HTML.ol(HTML.li(BIND_TEXT), HTML.li("2")).toEncodedHtml();
+    assertEquals("<ol><li>" + ENCODED_BIND_TEXT + "</li><li>2</li></ol>", html);
+  }
+
 }
