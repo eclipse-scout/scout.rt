@@ -102,6 +102,8 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     m_userAgent = UserAgent.get();
     m_subject = Subject.getSubject(AccessController.getContext());
     m_objectExtensions = new ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>>(this);
+    m_scoutTexts = new ScoutTexts();
+
     if (autoInitConfig) {
       interceptInitConfig();
     }
@@ -145,12 +147,9 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   }
 
   /**
-   * <p>
    * Returns the {@link ScoutTexts} instance assigned to the type (class) of the current ClientSession.
-   * </p>
-   * <p>
+   * <p/>
    * Override this method to set the application specific texts implementation
-   * </p>
    */
   @Override
   public ScoutTexts getTexts() {
@@ -297,9 +296,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
       else if ("medium".equals(policy)) {
         setMemoryPolicy(new MediumMemoryPolicy());
       }
-      m_scoutTexts = new ScoutTexts();
-      // explicitly set the just created instance to the ThreadLocal because it was not available yet, when the job was started.
-      ScoutTexts.CURRENT.set(m_scoutTexts); // TODO [dwi][nosgi]: to be set in ClientSessionRegistryService before startup
+
       interceptLoadSession();
       setActive(true);
     }

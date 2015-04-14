@@ -61,6 +61,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_attributes = new HashMap<>();
     m_sharedVariableMap = new SharedVariableMap();
     m_objectExtensions = new ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>>(this);
+    m_scoutTexts = new ScoutTexts();
     if (autoInitConfig) {
       interceptInitConfig();
     }
@@ -73,7 +74,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     ois.defaultReadObject();
     if (m_scoutTexts == null) {
       m_scoutTexts = new ScoutTexts();
-      ScoutTexts.CURRENT.set(m_scoutTexts);
     }
 
     if (m_attributesLock == null) {
@@ -194,9 +194,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   public final void loadSession() throws ProcessingException {
     Assertions.assertFalse(isActive(), "Session already started");
     m_active = true;
-    m_scoutTexts = new ScoutTexts();
-    // explicitly set the just created instance to the ThreadLocal because it was not available yet, when the job was started.
-    ScoutTexts.CURRENT.set(m_scoutTexts); // TODO [dwi][nosgi]: to be set in ClientSessionRegistryService before startup
     assignUserId();
     interceptLoadSession();
   }
