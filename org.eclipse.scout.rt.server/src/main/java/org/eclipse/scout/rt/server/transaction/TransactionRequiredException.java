@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.transaction;
 
-import org.eclipse.scout.rt.platform.PlatformException;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 
 /**

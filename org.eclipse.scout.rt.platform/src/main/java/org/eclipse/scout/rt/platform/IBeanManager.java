@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.annotations.Replace;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  * @since 5.2

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+
 /**
  * All instances of IPlatformListener receive event notifications from the platform
  */

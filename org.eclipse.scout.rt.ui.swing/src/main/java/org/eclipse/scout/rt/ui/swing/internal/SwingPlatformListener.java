@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.swing.internal;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
-import org.eclipse.scout.rt.platform.PlatformException;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.ui.swing.extension.FormFieldExtensions;
 
 public class SwingPlatformListener implements IPlatformListener {

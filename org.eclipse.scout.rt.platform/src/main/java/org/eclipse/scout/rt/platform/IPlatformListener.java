@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.EventListener;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+
 /**
  * @since 5.2
  */

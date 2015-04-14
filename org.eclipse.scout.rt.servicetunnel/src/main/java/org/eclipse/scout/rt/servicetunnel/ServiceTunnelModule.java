@@ -5,7 +5,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
-import org.eclipse.scout.rt.platform.PlatformException;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.servicetunnel.http.MultiSessionCookieStoreInstaller;
 import org.eclipse.scout.rt.shared.TierState;
 import org.eclipse.scout.rt.shared.TierState.Tier;

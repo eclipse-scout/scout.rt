@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.JobExceptionHandler;
 import org.eclipse.scout.rt.platform.job.NullJobExceptionHandler;
 

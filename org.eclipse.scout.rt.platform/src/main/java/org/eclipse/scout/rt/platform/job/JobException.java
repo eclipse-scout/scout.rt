@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.job;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.commons.ToStringBuilder;
-import org.eclipse.scout.rt.platform.PlatformException;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  * Technical exception thrown if interacting with jobs.

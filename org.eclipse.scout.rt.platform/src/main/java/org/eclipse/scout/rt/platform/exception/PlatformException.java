@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.platform;
+package org.eclipse.scout.rt.platform.exception;
 
 import java.io.Serializable;
 
