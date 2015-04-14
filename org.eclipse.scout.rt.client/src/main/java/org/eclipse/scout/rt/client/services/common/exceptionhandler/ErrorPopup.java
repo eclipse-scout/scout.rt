@@ -20,57 +20,38 @@ import java.net.NoRouteToHostException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.VersionMismatchException;
 
-public class ErrorHandler {
-  private String m_title;
-  private String m_text;
-  private String m_detail;
-  private String m_acceptText;
-  private String m_copyPasteText;
-  private ProcessingException m_cause;
+/**
+ * Popup to visualize an error.
+ */
+@Bean
+public class ErrorPopup {
 
-  public ErrorHandler(Throwable t) {
-    parse(t);
-  }
+  private final AtomicBoolean m_parsed = new AtomicBoolean();
+  protected String m_title;
+  protected String m_text;
+  protected String m_detail;
+  protected String m_acceptText;
+  protected String m_copyPasteText;
+  protected ProcessingException m_cause;
 
-  public String getTitle() {
-    return m_title;
-  }
+  /**
+   * Opens the popup to desribe the error.
+   */
+  public void showMessageBox(Throwable error) {
+    ensureErrorParsed(error);
 
-  public String getText() {
-    return m_text;
-  }
-
-  public String getDetail() {
-    return m_detail;
-  }
-
-  public String getCopyPasteText() {
-    return m_copyPasteText;
-  }
-
-  public String getAcceptText() {
-    return m_acceptText;
-  }
-
-  public ProcessingException getCause() {
-    return m_cause;
-  }
-
-  public IProcessingStatus getStatus() {
-    return m_cause.getStatus();
-  }
-
-  public void showMessageBox() {
     MessageBox mbox = new MessageBox(
         m_title,
         m_text,
@@ -85,11 +66,15 @@ public class ErrorHandler {
     mbox.startMessageBox();
   }
 
-  private void parse(Throwable exception) {
+  @Internal
+  protected void ensureErrorParsed(Throwable exception) {
+    if (!m_parsed.compareAndSet(false, true)) {
+      return;
+    }
+
     if (exception instanceof UndeclaredThrowableException) {
       exception = ((UndeclaredThrowableException) exception).getCause();
     }
-    //
     if (exception instanceof ProcessingException) {
       m_cause = (ProcessingException) exception;
     }

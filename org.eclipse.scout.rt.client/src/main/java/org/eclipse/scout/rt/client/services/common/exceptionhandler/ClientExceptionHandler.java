@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
@@ -92,7 +93,7 @@ public class ClientExceptionHandler extends ExceptionHandler {
    * Method invoked to visualize the exception. This method is called in the model thread.
    */
   protected void showExceptionInUI(final ProcessingException pe) {
-    new ErrorHandler(pe).showMessageBox();
+    BEANS.get(ErrorPopup.class).showMessageBox(pe);
   }
 
   @Internal

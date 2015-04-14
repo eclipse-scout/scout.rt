@@ -30,7 +30,7 @@ public class ExceptionHandler {
    * Method invoked to handle the given exception. This method must not throw an exception.
    */
   public void handle(final Exception e) {
-    final Throwable rootCause = getRootCause(e);
+    final Throwable rootCause = ExceptionHandler.getRootCause(e);
     if (rootCause instanceof InterruptedException) {
       handleInterruptedException((InterruptedException) rootCause);
     }
@@ -97,9 +97,9 @@ public class ExceptionHandler {
   /**
    * Helper method to get the exception's root cause.
    */
-  protected Throwable getRootCause(final Throwable e) {
+  public static Throwable getRootCause(final Throwable e) {
     if (e.getCause() != null) {
-      return getRootCause(e.getCause());
+      return ExceptionHandler.getRootCause(e.getCause());
     }
     return e;
   }

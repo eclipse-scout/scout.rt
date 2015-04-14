@@ -22,16 +22,16 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.eclipse.scout.commons.LocaleUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.UserInterruptedException;
 import org.eclipse.scout.rt.platform.AbstractApplication;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformException;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -187,12 +187,13 @@ abstract class BaseSwingApplication extends AbstractApplication {
   }
 
   protected void showLoadError(Throwable error) {
-    ErrorHandler handler = new ErrorHandler(error);
-    if (!(handler.getText().indexOf(UserInterruptedException.class.getSimpleName()) >= 0)) {
+    Throwable rootCause = ExceptionHandler.getRootCause(error);
+
+    if (!(rootCause instanceof UserInterruptedException)) {
       SwingUtility.showMessageDialogSynthCapable(
           null,
-          StringUtility.join("\n\n", handler.getText(), handler.getDetail()),
-          handler.getTitle(),
+          error.getLocalizedMessage(),
+          ScoutTexts.get("Error"),
           JOptionPane.ERROR_MESSAGE
           );
     }
