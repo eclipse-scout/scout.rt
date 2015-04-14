@@ -32,19 +32,19 @@ public class JUnitExceptionHandler extends ExceptionHandler {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JUnitExceptionHandler.class);
 
-  private final AtomicReference<Exception> m_error = new AtomicReference<>(null);
+  private final AtomicReference<Throwable> m_error = new AtomicReference<>(null);
 
   @Override
-  public void handle(final Exception e) {
-    if (e instanceof ProcessingException && ((ProcessingException) e).isConsumed()) {
-      LOG.info("Exception will not be re-thrown for JUnit assertion because already consumed. [exception={}]", e.getMessage());
+  public void handle(final Throwable t) {
+    if (t instanceof ProcessingException && ((ProcessingException) t).isConsumed()) {
+      LOG.info("Exception will not be re-thrown for JUnit assertion because already consumed. [exception={}]", t.getMessage());
     }
     else {
-      if (m_error.compareAndSet(null, e)) {
-        LOG.info("Exception will be re-thrown for JUnit assertion. [exception={}]", e.getMessage());
+      if (m_error.compareAndSet(null, t)) {
+        LOG.info("Exception will be re-thrown for JUnit assertion. [exception={}]", t.getMessage());
       }
       else {
-        LOG.info("Exception will not be re-thrown for JUnit assertion because another exception was already handled. [current exception={}, other exception={}]", e, m_error.get().getMessage());
+        LOG.info("Exception will not be re-thrown for JUnit assertion because another exception was already handled. [current exception={}, other exception={}]", t, m_error.get().getMessage());
       }
     }
   }
@@ -53,10 +53,10 @@ public class JUnitExceptionHandler extends ExceptionHandler {
    * Throws the first exception handled by this {@code ExceptionHandler} and resets this handler.<br/>
    * This method call has no effect if no exception was handled.
    */
-  public void throwOnError() throws Exception {
-    final Exception exception = m_error.getAndSet(null); // clear the exception.
-    if (exception != null) {
-      throw exception;
+  public void throwOnError() throws Throwable {
+    final Throwable throwable = m_error.getAndSet(null); // clear the exception.
+    if (throwable != null) {
+      throw throwable;
     }
   }
 }

@@ -137,7 +137,7 @@ public class FormStoredWithVetoTest {
       exceptionHandler.throwOnError();
       fail("VetoException excepted to be handled in 'JUnitExceptionHandler'");
     }
-    catch (Exception e) {
+    catch (Throwable e) {
       assertTrue("VetoException expected [actual=" + e.getClass() + "]", e instanceof VetoException);
       assertFalse("exception.isConsumed()", ((VetoException) e).isConsumed());
       assertEquals("exception.getMessage()", FormToStore.VETO_EXCEPTION_TEXT, e.getMessage());

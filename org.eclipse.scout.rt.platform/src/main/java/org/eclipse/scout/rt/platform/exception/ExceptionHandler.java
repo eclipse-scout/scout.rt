@@ -27,15 +27,15 @@ public class ExceptionHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ExceptionHandler.class);
 
   /**
-   * Method invoked to handle the given exception. This method must not throw an exception.
+   * Method invoked to handle the given {@code Throwable}. This method must not throw an exception.
    */
-  public void handle(final Exception e) {
-    final Throwable rootCause = ExceptionHandler.getRootCause(e);
+  public void handle(final Throwable t) {
+    final Throwable rootCause = ExceptionHandler.getRootCause(t);
     if (rootCause instanceof InterruptedException) {
       handleInterruptedException((InterruptedException) rootCause);
     }
-    else if (e instanceof ProcessingException) {
-      final ProcessingException pe = (ProcessingException) e;
+    else if (t instanceof ProcessingException) {
+      final ProcessingException pe = (ProcessingException) t;
       if (!pe.isConsumed()) {
         try {
           handleProcessingException(pe);
@@ -46,7 +46,7 @@ public class ExceptionHandler {
       }
     }
     else {
-      handleException(e);
+      handleThrowable(t);
     }
   }
 
@@ -86,12 +86,13 @@ public class ExceptionHandler {
   }
 
   /**
-   * Method invoked to handle an {@code Exception}.<br/>
-   * The default implementation logs the exception as <code>ERROR</code>.
+   * Method invoked to handle a {@code Throwable} which is not of the type {@code ProcessingException} or
+   * {@code InterruptedException}.<br/>
+   * The default implementation logs the throwable as <code>ERROR</code>.
    */
-  protected void handleException(final Exception e) {
-    final String message = String.format("%s:%s", e.getClass().getSimpleName(), StringUtility.nvl(e.getMessage(), "n/a"));
-    LOG.error(message, e);
+  protected void handleThrowable(final Throwable t) {
+    final String message = String.format("%s:%s", t.getClass().getSimpleName(), StringUtility.nvl(t.getMessage(), "n/a"));
+    LOG.error(message, t);
   }
 
   /**
