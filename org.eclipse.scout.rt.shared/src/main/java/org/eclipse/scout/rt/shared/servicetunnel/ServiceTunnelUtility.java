@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.servicetunnel;
+package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;

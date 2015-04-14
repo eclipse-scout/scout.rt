@@ -25,13 +25,12 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
   private static final long serialVersionUID = 0L;
   private static final AtomicLong requestSequenceGenerator = new AtomicLong();
 
-  private String m_serviceInterfaceClassName;
-  private String m_operation;
-  private Class[] m_parameterTypes;
-  private Object[] m_args;
-  private Locale m_locale;
+  private final String m_serviceInterfaceClassName;
+  private final String m_operation;
+  private final Class[] m_parameterTypes;
+  private final Object[] m_args;
+  private final Locale m_locale;
   private String m_userAgent;
-  private String m_version;
   private Set<String> m_consumedNotificationIds;
   /**
    * @since 3.8
@@ -42,13 +41,7 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
    */
   private transient Subject m_clientSubject;
 
-  // for serialization
-  @SuppressWarnings("unused")
-  private ServiceTunnelRequest() {
-  }
-
-  public ServiceTunnelRequest(String version, String serviceInterfaceName, String op, Class[] parameterTypes, Object[] args) {
-    m_version = version;
+  public ServiceTunnelRequest(String serviceInterfaceName, String op, Class[] parameterTypes, Object[] args) {
     m_serviceInterfaceClassName = serviceInterfaceName;
     m_operation = op;
     m_parameterTypes = parameterTypes;
@@ -73,11 +66,6 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
   @Override
   public String getServiceInterfaceClassName() {
     return m_serviceInterfaceClassName;
-  }
-
-  @Override
-  public String getVersion() {
-    return m_version;
   }
 
   @Override

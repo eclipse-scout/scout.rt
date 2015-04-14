@@ -10,13 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.servicetunnel.http;
 
-import org.eclipse.scout.rt.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 
 /**
  * Interface for a client side service tunnel used to invoke a service.
- *
- * @author awe (refactoring)
  */
 public interface IClientServiceTunnel extends IServiceTunnel {
 

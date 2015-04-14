@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.servicetunnel.http;
+package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.net.CookieManager;
 import java.net.CookieStore;

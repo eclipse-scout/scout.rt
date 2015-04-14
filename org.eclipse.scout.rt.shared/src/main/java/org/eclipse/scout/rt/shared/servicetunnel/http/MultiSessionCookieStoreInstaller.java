@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.servicetunnel.http;
+package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -17,12 +17,13 @@ import java.net.CookieStore;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.servicetunnel.IServiceTunnel;
 
 /**
  * Install and uninstall {@link MultiSessionCookieStore}
  */
 public class MultiSessionCookieStoreInstaller {
+  public static final String PROP_MULTI_SESSION_COOKIE_STORE_ENABLED = "org.eclipse.scout.rt.servicetunnel.multiSessionCookieStoreEnabled";
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MultiSessionCookieStoreInstaller.class);
 
   private CookieHandler m_oldCookieHandler;
@@ -30,7 +31,7 @@ public class MultiSessionCookieStoreInstaller {
 
   public void install() {
     CookieHandler cookieHandler = CookieHandler.getDefault();
-      // Install MultiSessionCookieStore
+    // Install MultiSessionCookieStore
     if (cookieHandler != null) {
       LOG.warn("Overriding pre-installed cookie handler: " + cookieHandlerToString(cookieHandler));
     }
@@ -46,7 +47,7 @@ public class MultiSessionCookieStoreInstaller {
       LOG.info("Using pre-installed cookie handler: " + cookieHandlerToString(cookieHandler));
     }
     else {
-      LOG.warn("No cookie handler is installed. This will result in the creation of a new HTTP session for every request. Please check the value of the property " + IServiceTunnel.PROP_MULTI_SESSION_COOKIE_STORE_ENABLED + ".");
+      LOG.warn("No cookie handler is installed. This will result in the creation of a new HTTP session for every request. Please check the value of the property " + PROP_MULTI_SESSION_COOKIE_STORE_ENABLED + ".");
     }
   }
 

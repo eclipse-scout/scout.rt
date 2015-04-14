@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.servicetunnel.http.internal;
+package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -18,7 +18,6 @@ import java.net.URLConnection;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.servicetunnel.http.AbstractHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
@@ -30,15 +29,17 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 public class HttpBackgroundExecutable implements IHttpBackgroundExecutable {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HttpBackgroundExecutable.class);
+  public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.client.http.debug";
 
   private final Object m_callerLock;
   private final IServiceTunnelRequest m_req;
-  private IServiceTunnelResponse m_res;
-  private final AbstractInternalHttpServiceTunnel m_tunnel;
-  private URLConnection m_urlConn;
-  private boolean m_debug;
+  private final AbstractHttpServiceTunnel m_tunnel;
+  private final boolean m_debug;
 
-  public HttpBackgroundExecutable(IServiceTunnelRequest req, Object callerLock, AbstractInternalHttpServiceTunnel tunnel) {
+  private IServiceTunnelResponse m_res;
+  private URLConnection m_urlConn;
+
+  public HttpBackgroundExecutable(IServiceTunnelRequest req, Object callerLock, AbstractHttpServiceTunnel tunnel) {
     m_req = req;
     m_callerLock = callerLock;
     m_tunnel = tunnel;
@@ -46,7 +47,7 @@ public class HttpBackgroundExecutable implements IHttpBackgroundExecutable {
   }
 
   private static boolean isDebug() {
-    return ConfigIniUtility.getPropertyBoolean(AbstractHttpServiceTunnel.HTTP_DEBUG_PARAM, false);
+    return ConfigIniUtility.getPropertyBoolean(HTTP_DEBUG_PARAM, false);
   }
 
   @Override
@@ -56,7 +57,6 @@ public class HttpBackgroundExecutable implements IHttpBackgroundExecutable {
 
   @Override
   public void run() {
-    InputStream httpin = null;
     try {
       delayForDebug(m_req, 0);
       long time1 = 0, time2 = 0;
@@ -64,13 +64,16 @@ public class HttpBackgroundExecutable implements IHttpBackgroundExecutable {
       if (m_debug) {
         time1 = System.nanoTime();
       }
+
       // build soap request
       ByteArrayOutputStream msgout = new ByteArrayOutputStream();
       m_tunnel.getContentHandler().writeRequest(msgout, m_req);
       msgout.close();
       byte[] callData = msgout.toByteArray();
+
       // send
       m_urlConn = m_tunnel.createURLConnection(m_req, callData);
+
       // receive
       int code = (m_urlConn instanceof HttpURLConnection ? ((HttpURLConnection) m_urlConn).getResponseCode() : 200);
       m_tunnel.preprocessHttpRepsonse(m_urlConn, m_req, code);
@@ -81,31 +84,24 @@ public class HttpBackgroundExecutable implements IHttpBackgroundExecutable {
         m_res = new ServiceTunnelResponse(code, null, null, new HttpException(code));
         return;
       }
-      httpin = m_urlConn.getInputStream();
-      m_res = m_tunnel.getContentHandler().readResponse(httpin);
-      httpin.close();
-      httpin = null;
+
+      try (InputStream httpin = m_urlConn.getInputStream()) {
+        m_res = m_tunnel.getContentHandler().readResponse(httpin);
+        httpin.close();
+      }
+
       if (m_debug) {
         time2 = System.nanoTime();
         LOG.debug("TIME " + m_req.getServiceInterfaceClassName() + "." + m_req.getOperation() + " " + (time2 - time1) / 1000000L + "ms " + callData.length + " bytes");
       }
-      return;
     }
     catch (Throwable e) {
       //cancel has precedence over failure
       if (m_res == null) {
         m_res = new ServiceTunnelResponse(null, null, e);
       }
-      return;
     }
     finally {
-      if (httpin != null) {
-        try {
-          httpin.close();
-        }
-        catch (Throwable fatal) {
-        }
-      }
       synchronized (m_callerLock) {
         m_callerLock.notifyAll();
       }

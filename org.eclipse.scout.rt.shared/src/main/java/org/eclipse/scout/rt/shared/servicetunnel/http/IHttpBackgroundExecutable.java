@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.servicetunnel.http.internal;
+package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;

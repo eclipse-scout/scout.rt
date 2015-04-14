@@ -80,7 +80,7 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
 
   @Override
   protected URLConnection createURLConnection(final IServiceTunnelRequest call, byte[] callData) throws IOException {
-    URLConnection urlConn = new MockHttpURLConnection(getServerURL()) {
+    URLConnection urlConn = new MockHttpURLConnection(getServerUrl()) {
       @Override
       protected int mockHttpServlet(InputStream servletIn, OutputStream servletOut) throws Exception {
         IServiceTunnelRequest req = getContentHandler().readRequest(servletIn);

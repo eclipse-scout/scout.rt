@@ -21,6 +21,7 @@ import org.junit.Test;
 public final class PublicKeyUtilityTest {
 
   @Test
+  @SuppressWarnings("deprecation")
   public void test() throws Exception {
     byte[][] tmp = PublicKeyUtility.createKeyPair(null, 1024);
     assertEquals("array size", 2, tmp.length);

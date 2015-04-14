@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.server.commons.servletfilter.security;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -29,7 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.EncryptionUtility;
+import org.eclipse.scout.commons.SecurityUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
@@ -72,6 +73,12 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DataSourceSecurityFilter.class);
   public static final String PROP_BASIC_ATTEMPT = "DataSourceSecurityFilter.basicAttempt";
+
+  /**
+   * Default random salt that will be used to hash the passwords. Should be replaced by projects with an implementation
+   * that uses a separate salt for each password.
+   */
+  private static final byte[] DEFAULT_SALT = Base64Utility.decode("X89TeeW9tSB0KQkYex3/LQ==");
 
   // init params
   private String m_jdbcUserName;
@@ -207,17 +214,16 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
   }
 
   protected String encryptPass(String pass) throws ServletException {
-    String passEncrypted = null;
-    if (pass != null) {
-      try {
-        passEncrypted = Base64Utility.encode(EncryptionUtility.signMD5(pass.getBytes()));
-      }
-      catch (NoSuchAlgorithmException e) {
-        LOG.error("couldn't create the password", e);
-        throw new ServletException("couldn't create the password", e);
-      }
+    if (pass == null) {
+      return null;
     }
-    return passEncrypted;
+
+    try {
+      return Base64Utility.encode(SecurityUtility.hash(pass.getBytes("UTF-8"), DEFAULT_SALT));
+    }
+    catch (ProcessingException | UnsupportedEncodingException e) {
+      throw new ServletException("Unable to hash password", e);
+    }
   }
 
   protected Connection createJdbcDirectConnection() throws ClassNotFoundException, SQLException {

@@ -42,7 +42,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.servicetunnel.VersionMismatchException;
 import org.eclipse.scout.rt.shared.validate.DefaultValidator;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.IValidator;
@@ -72,11 +71,9 @@ public class DefaultTransactionDelegate {
   public static final Pattern DEFAULT_QUERY_NAMES_PATTERN = Pattern.compile("(get|is|has|load|read|find|select)([A-Z].*)?");
   public static final Pattern DEFAULT_PROCESS_NAMES_PATTERN = Pattern.compile("(set|put|add|remove|store|write|create|insert|update|delete)([A-Z].*)?");
 
-  private final String m_requestMinVersion;
   private final boolean m_debug;
 
-  public DefaultTransactionDelegate(String requestMinVersion, boolean debug) {
-    m_requestMinVersion = requestMinVersion;
+  public DefaultTransactionDelegate(boolean debug) {
     m_debug = debug;
   }
 
@@ -139,16 +136,6 @@ public class DefaultTransactionDelegate {
     String authenticatedUser = serverSession.getUserId();
     if (LOG.isDebugEnabled()) {
       LOG.debug("started " + serviceReq.getServiceInterfaceClassName() + "." + serviceReq.getOperation() + " by " + authenticatedUser + " at " + new Date());
-    }
-    // version check of request
-    if (m_requestMinVersion != null) {
-      String requestVersion = serviceReq.getVersion();
-      if (requestVersion == null) {
-        requestVersion = "0.0.0";
-      }
-      if (requestVersion.compareTo(m_requestMinVersion) < 0) {
-        return new ServiceTunnelResponse(null, null, new VersionMismatchException(requestVersion, m_requestMinVersion.toString()));
-      }
     }
     Set<String> consumedNotifications = serviceReq.getConsumedNotifications();
     if (consumedNotifications != null && consumedNotifications.size() > 0) {

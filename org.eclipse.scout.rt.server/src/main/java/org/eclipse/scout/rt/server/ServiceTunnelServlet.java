@@ -59,7 +59,6 @@ public class ServiceTunnelServlet extends HttpServlet {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelServlet.class);
 
   private transient IServiceTunnelContentHandler m_contentHandler;
-  private String m_requestMinVersion;
   private final boolean m_debug;
 
   public ServiceTunnelServlet() {
@@ -171,7 +170,7 @@ public class ServiceTunnelServlet extends HttpServlet {
 
       @Override
       public IServiceTunnelResponse call() throws Exception {
-        return new DefaultTransactionDelegate(getRequestMinVersion(), isDebug()).invoke(serviceTunnelRequest);
+        return new DefaultTransactionDelegate(isDebug()).invoke(serviceTunnelRequest);
       }
     });
   }
@@ -217,7 +216,6 @@ public class ServiceTunnelServlet extends HttpServlet {
     catch (Exception e) {
       throw new ServletException(e);
     }
-    m_requestMinVersion = initRequestMinVersion(config);
   }
 
   @Override
@@ -238,26 +236,6 @@ public class ServiceTunnelServlet extends HttpServlet {
   @Internal
   protected void lazyInit(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException {
     m_contentHandler = createContentHandler();
-  }
-
-  /**
-   * Reads the minimum version a request must have.
-   * <p/>
-   * The version has to be defined as init parameter in the servlet configuration. <br/>
-   * This can be done by adding a new init-param at the {@link DefaultHttpProxyHandlerServlet} in the web.xml and
-   * setting its name to 'min-version' and its value to the desired version (like 1.2.3). <br/>
-   * If there is no min-version defined it uses the version of the {@link IApplication} if there is one.
-   */
-  @Internal
-  protected String initRequestMinVersion(ServletConfig config) {
-    String version = config.getInitParameter("min-version");//TODO [nosgi] imo remove version and make config ini param for it
-    if (version == null) {
-      IApplication app = BEANS.opt(IApplication.class);
-      if (app != null) {
-        version = app.getVersion();
-      }
-    }
-    return version;
   }
 
   /**
@@ -310,13 +288,6 @@ public class ServiceTunnelServlet extends HttpServlet {
   }
 
   // === Helper methods ===
-
-  /**
-   * @return minimal version a service request must have.
-   */
-  protected String getRequestMinVersion() {
-    return m_requestMinVersion;
-  }
 
   /**
    * @return <code>true</code> if the {@link ServiceTunnelServlet} runs in debug mode; see property

@@ -98,9 +98,10 @@ public class ClientExceptionHandler extends ExceptionHandler {
 
   @Internal
   protected Semaphore getLoopDetectionSemaphore(final IClientSession session) {
-    final Semaphore semaphore = (Semaphore) session.getData(SESSION_DATA_KEY);
+    Semaphore semaphore = (Semaphore) session.getData(SESSION_DATA_KEY);
     if (semaphore == null) {
-      session.setData(SESSION_DATA_KEY, new Semaphore(1));
+      semaphore = new Semaphore(1);
+      session.setData(SESSION_DATA_KEY, semaphore);
     }
     return semaphore;
   }

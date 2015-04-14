@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInterceptor;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
-import org.eclipse.scout.rt.servicetunnel.IServiceTunnel;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 
 /**
  * {@link IBeanInterceptor} that uses the {@link IServiceTunnel} available in the current {@link IClientSession}.

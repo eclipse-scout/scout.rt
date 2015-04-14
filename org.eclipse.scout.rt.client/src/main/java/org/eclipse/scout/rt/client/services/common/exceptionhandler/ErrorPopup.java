@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
-import org.eclipse.scout.rt.shared.servicetunnel.VersionMismatchException;
 
 /**
  * Popup to visualize an error.
@@ -161,13 +160,6 @@ public class ErrorPopup {
         m_title = ScoutTexts.get("IOErrorTitle");
         m_text = ScoutTexts.get("IOErrorText") + ": " + t.getLocalizedMessage() + msg;
         m_detail = ScoutTexts.get("IOErrorInfo");
-        return;
-      }
-      else if (t instanceof VersionMismatchException) {
-        VersionMismatchException ve = (VersionMismatchException) t;
-        m_title = ScoutTexts.get("VersionMismatchTitle");
-        m_text = ScoutTexts.get("VersionMismatchTextXY", ve.getOldVersion(), ve.getNewVersion());
-        m_detail = null;
         return;
       }
       else if (t instanceof VetoException) {

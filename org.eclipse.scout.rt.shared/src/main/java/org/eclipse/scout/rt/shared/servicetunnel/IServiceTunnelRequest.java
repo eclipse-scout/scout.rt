@@ -37,8 +37,6 @@ public interface IServiceTunnelRequest extends Serializable {
    */
   String getServiceInterfaceClassName();
 
-  String getVersion();
-
   String getOperation();
 
   Class[] getParameterTypes();

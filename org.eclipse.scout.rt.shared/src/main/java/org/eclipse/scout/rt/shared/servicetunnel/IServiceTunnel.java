@@ -8,22 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.servicetunnel;
+package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.Method;
-import java.net.URL;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
  * Interface of a tunnel used to invoke a service through HTTP.
- *
- * @author awe (refactoring)
  */
 public interface IServiceTunnel {
-  String PROP_TARGET_URL = "org.eclipse.scout.rt.servicetunnel.targetUrl";
-  String PROP_SHARED_SECRET = "org.eclipse.scout.rt.servicetunnel.sharedSecret";
-  String PROP_MULTI_SESSION_COOKIE_STORE_ENABLED = "org.eclipse.scout.rt.servicetunnel.multiSessionCookieStoreEnabled";
 
   /**
    * Invoke a remote service through a service tunnel<br>
@@ -32,9 +26,4 @@ public interface IServiceTunnel {
    * used by the framework itself
    */
   Object invokeService(Class<?> serviceInterfaceClass, Method operation, Object[] args) throws ProcessingException;
-
-  URL getServerURL();//TODO [nosgi] imo remove and use servicetunnel.targetUrl (legacy) support server.url
-
-  void setServerURL(URL url);//TODO [nosgi] imo remove and use
-
 }

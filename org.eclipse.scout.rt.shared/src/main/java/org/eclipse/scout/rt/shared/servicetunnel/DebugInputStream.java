@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,8 +20,8 @@ import java.io.UnsupportedEncodingException;
  * used partly to make Date's timezone independent using StaticDate class
  */
 public class DebugInputStream extends InputStream {
-  private InputStream m_in;
-  private ByteArrayOutputStream m_debugOut;
+  private final InputStream m_in;
+  private final ByteArrayOutputStream m_debugOut;
   private int m_lastReadCharacter;
   private Throwable m_lastThrownException;
 

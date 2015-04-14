@@ -83,7 +83,7 @@ public class RemoteServiceAccessTest {
     private final Permissions m_permissionCollection;
 
     public DefaultTransactionDelegateMock() {
-      super("0.0.0", false);
+      super(false);
       m_permissionCollection = new Permissions();
       m_permissionCollection.add(new RemoteServiceAccessPermission("*.shared.*", "*"));
       m_permissionCollection.add(new RemoteServiceAccessPermission("*.IMockProcessService", "*"));

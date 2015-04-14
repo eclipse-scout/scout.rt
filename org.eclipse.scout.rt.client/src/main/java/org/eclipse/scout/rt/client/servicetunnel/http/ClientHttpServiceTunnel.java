@@ -10,141 +10,166 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.servicetunnel.http;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLConnection;
+import java.security.PrivilegedAction;
+import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
+import javax.security.auth.Subject;
+
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.servicetunnel.http.internal.InternalClientHttpServiceTunnel;
-import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.job.ClientJobs;
+import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
+import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
+import org.eclipse.scout.rt.client.servicetunnel.http.internal.ClientNotificationPollingJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IProgressMonitor;
+import org.eclipse.scout.rt.shared.OfflineState;
+import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
 
 /**
  * Client-side tunnel used to invoke a service through HTTP. This class re-defines methods of it's super class
  * since the internal class does not belong to the public API.
- *
- * @author awe (refactoring)
  */
-public class ClientHttpServiceTunnel extends InternalClientHttpServiceTunnel {
+public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel<IClientSession> implements IClientServiceTunnel {
+
+  private IFuture<Void> m_pollingJob;
+  private long m_pollInterval = -1L;
+  private boolean m_analyzeNetworkLatency = true;
+
+  public ClientHttpServiceTunnel(IClientSession session) {
+    super(session);
+  }
 
   public ClientHttpServiceTunnel(IClientSession session, URL url) {
     super(session, url);
   }
 
-  /**
-   * @param url
-   * @param version
-   *          the version that is sent down to the server with every request.
-   *          This allows the server to check client request and refuse old
-   *          clients. Check the servers HttpProxyHandlerServlet init-parameter
-   *          (example: min-version="0.0.0") If the version parameter is null,
-   *          the product bundle (for example com.myapp.ui.swing) version is
-   *          used
-   */
-  public ClientHttpServiceTunnel(IClientSession session, URL url, String version) {
-    super(session, url, version);
-  }
-
   @Override
-  public void setAnalyzeNetworkLatency(boolean b) {
-    super.setAnalyzeNetworkLatency(b);
+  public long getClientNotificationPollInterval() {
+    return m_pollInterval;
   }
 
   @Override
   public void setClientNotificationPollInterval(long intervallMillis) {
-    super.setClientNotificationPollInterval(intervallMillis);
-  }
-
-  /**
-   * @param call
-   *          the original call
-   * @param callData
-   *          the data created by the {@link IServiceTunnelContentHandler} used
-   *          by this tunnel Create url connection and write post data (if
-   *          required)
-   * @throws IOException
-   *           override this method to customize the creation of the {@link URLConnection} see
-   *           {@link #addCustomHeaders(URLConnection, String)}
-   */
-  @Override
-  protected URLConnection createURLConnection(IServiceTunnelRequest call, byte[] callData) throws IOException {
-    return super.createURLConnection(call, callData);
-  }
-
-  /**
-   * Signals the server to cancel processing jobs for the current session.
-   *
-   * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
-   */
-  @Override
-  protected boolean sendCancelRequest(long requestSequence) {
-    return super.sendCancelRequest(requestSequence);
-  }
-
-  /**
-   * @param method
-   *          GET or POST override this method to add custom HTTP headers
-   */
-  @Override
-  protected void addCustomHeaders(URLConnection urlConn, String method) throws IOException {
-    super.addCustomHeaders(urlConn, method);
-  }
-
-  /**
-   * @return msgEncoder used to encode and decode a request / response to and
-   *         from the binary stream. Default is the {@link DefaultServiceTunnelContentHandler} which handles soap style
-   *         messages
-   */
-  @Override
-  public IServiceTunnelContentHandler getContentHandler() {
-    return super.getContentHandler();
-  }
-
-  /**
-   * @param msgEncoder
-   *          that can encode and decode a request / response to and from the
-   *          binary stream. Default is the {@link DefaultServiceTunnelContentHandler} which handles soap
-   *          style messages
-   */
-  @Override
-  public void setContentHandler(IServiceTunnelContentHandler e) {
-    super.setContentHandler(e);
+    long oldInterval = m_pollInterval;
+    m_pollInterval = intervallMillis;
+    if (m_pollInterval != oldInterval) {
+      updatePollingJobInternal();
+    }
   }
 
   @Override
-  public Object invokeService(Class serviceInterfaceClass, Method operation, Object[] callerArgs) throws ProcessingException {
-    return super.invokeService(serviceInterfaceClass, operation, callerArgs);
+  public boolean isAnalyzeNetworkLatency() {
+    return m_analyzeNetworkLatency;
+  }
+
+  @Override
+  public void setAnalyzeNetworkLatency(boolean b) {
+    m_analyzeNetworkLatency = b;
+  }
+
+  @Override
+  protected void decorateServiceRequest(IServiceTunnelRequest call) {
+    IClientNotificationConsumerService cns = BEANS.get(IClientNotificationConsumerService.class);
+    if (call instanceof ServiceTunnelRequest && cns != null) {
+      ((ServiceTunnelRequest) call).setConsumedNotifications(cns.getConsumedNotificationIds(getSession()));
+    }
+  }
+
+  @Override
+  protected void onInvokeService(long t0, IServiceTunnelResponse response) {
+    if (isAnalyzeNetworkLatency()) {
+      // performance analyzer
+      IPerformanceAnalyzerService perf = BEANS.get(IPerformanceAnalyzerService.class);
+      if (perf != null) {
+        long totalMillis = (System.nanoTime() - t0) / 1000000L;
+        Long execMillis = response.getProcessingDuration();
+        if (execMillis != null) {
+          perf.addNetworkLatencySample(totalMillis - execMillis);
+          perf.addServerExecutionTimeSample(execMillis);
+        }
+        else {
+          perf.addNetworkLatencySample(totalMillis);
+        }
+      }
+    }
+
+    // client notification handler
+    IClientNotificationConsumerService cns = BEANS.get(IClientNotificationConsumerService.class);
+    if (cns != null) {
+      cns.dispatchClientNotifications(response.getClientNotifications(), getSession());
+    }
+  }
+
+  private synchronized void updatePollingJobInternal() {
+    long p = getClientNotificationPollInterval();
+    if (p > 0) {
+      if (m_pollingJob != null) {
+        // cancel the old
+        m_pollingJob.cancel(true);
+      }
+      ClientRunContext runContext = ClientRunContexts.copyCurrent().session(getSession());
+      m_pollingJob = ClientJobs.scheduleWithFixedDelay(new ClientNotificationPollingJob(), p, p, TimeUnit.MILLISECONDS, ClientJobs.newInput(runContext).name("Client notification fetcher"));
+    }
+    else {
+      if (m_pollingJob != null) {
+        m_pollingJob.cancel(true);
+        m_pollingJob = null;
+      }
+    }
   }
 
   @Override
   protected IServiceTunnelResponse tunnel(IServiceTunnelRequest call) {
-    return super.tunnel(call);
+    boolean offline = OfflineState.isOfflineInCurrentThread();
+    //
+    if (offline) {
+      return tunnelOffline(call);
+    }
+    else {
+      return tunnelOnline(call);
+    }
   }
 
-  @Override
-  protected IServiceTunnelResponse tunnelOnline(final IServiceTunnelRequest call) {
-    return super.tunnelOnline(call);
-  }
-
-  @Override
-  protected IServiceTunnelResponse tunnelOffline(IServiceTunnelRequest call) {
-    return super.tunnelOffline(call);
+  protected IServiceTunnelResponse tunnelOnline(final IServiceTunnelRequest req) {
+    if (IProgressMonitor.CURRENT.get().isCancelled()) {
+      return new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted")));
+    }
+    return super.tunnel(req);
   }
 
   /**
-   * This method is called just after the http response is received but before
-   * the http response is processed by scout. This might be used to read and
-   * interpret custom http headers.
-   *
-   * @since 06.07.2009
+   * Default for offline handling
    */
-  @Override
-  protected void preprocessHttpRepsonse(URLConnection urlConn, IServiceTunnelRequest call, int httpCode) {
-    super.preprocessHttpRepsonse(urlConn, call, httpCode);
+  protected IServiceTunnelResponse tunnelOffline(final IServiceTunnelRequest call) {
+    IClientSession clientSession = ClientSessionProvider.currentSession();
+    if (clientSession != null && clientSession.getOfflineSubject() != null) {
+      Object response = Subject.doAs(clientSession.getOfflineSubject(), new PrivilegedAction<IServiceTunnelResponse>() {
+        @Override
+        public IServiceTunnelResponse run() {
+          return BEANS.get(IOfflineDispatcherService.class).dispatch(call);
+        }
+      });
+      return (IServiceTunnelResponse) response;
+    }
+    else {
+      return BEANS.get(IOfflineDispatcherService.class).dispatch(call);
+    }
   }
 
+  @Override
+  protected IFuture<?> schedule(IRunnable runnable, IServiceTunnelRequest req) {
+    return ClientJobs.schedule(runnable, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(getSession())));
+  }
 }

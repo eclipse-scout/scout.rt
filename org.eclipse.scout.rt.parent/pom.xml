@@ -26,7 +26,6 @@
     <!-- module>../org.eclipse.scout.jaxws216.jre17.fragment</module -->
     <!-- module>../org.eclipse.scout.jaxws216.jre18.fragment</module -->
 
-    <module>../org.eclipse.scout.rt.servicetunnel</module>
     <module>../org.eclipse.scout.rt.shared</module>
 
     <module>../org.eclipse.scout.rt.client</module>

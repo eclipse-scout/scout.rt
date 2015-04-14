@@ -26,7 +26,7 @@
 
   <dependencies>
     <dependency>
-      <artifactId>org.eclipse.scout.rt.servicetunnel</artifactId>
+      <artifactId>org.eclipse.scout.rt.shared</artifactId>
       <groupId>org.eclipse.scout.rt</groupId>
       <version>5.1.0-SNAPSHOT</version>
     </dependency>

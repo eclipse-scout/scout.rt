@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.net.InetAddress;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,15 +38,12 @@ import org.eclipse.scout.commons.serialization.SerializationUtility;
 
 /**
  * Creates SOAP envelopes for {@link IServiceTunnelRequest} and {@link IServiceTunnelResponse} objects.<br>
- * Use config.ini property org.eclipse.scout.rt.shared.servicetunnel.debug=true
- * to activate debug info
- * <p>
  * This fast hi-speed encoder/decoder ignores xml structure and reads content of first &lt;data&gt; tag directly.
  * <p>
  * Example request:
  *
  * <pre>
- * @code
+ * {@code
  * <?xml version="1.0" encoding="UTF-8"?>
  * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
  *   <soapenv:Body>
@@ -55,11 +54,11 @@ import org.eclipse.scout.commons.serialization.SerializationUtility;
  * </soapenv:Envelope>
  * }
  * </pre>
- *
+ * <p>
  * Example response (success):
  *
  * <pre>
- * @code
+ * {@code
  * <?xml version="1.0" encoding="UTF-8"?>
  * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
  *   <soapenv:Body>
@@ -74,7 +73,7 @@ import org.eclipse.scout.commons.serialization.SerializationUtility;
  * Example response (error):
  *
  * <pre>
- * @code
+ * {@code
  * <?xml version="1.0" encoding="UTF-8"?>
  * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
  *   <soapenv:Body>
@@ -99,10 +98,7 @@ import org.eclipse.scout.commons.serialization.SerializationUtility;
  * <p>
  * The default is true.
  * <p>
- * To enable debug output only for this class, use logger specific parameters. When using the "simple" scout log manager
- * you may add the following property to the config.ini or as a system property:
- * <code>scout.log.level.org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler=4</code>
- * <p>
+ * To enable debug output only for this class, use logger specific parameters.
  */
 public class DefaultServiceTunnelContentHandler implements IServiceTunnelContentHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultServiceTunnelContentHandler.class);
@@ -159,112 +155,112 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   }
 
   @Override
-  public void writeRequest(OutputStream out, IServiceTunnelRequest msg) throws Exception {
-    // build soap message without sax (hi-speed)
-    boolean compressed = isUseCompression();
-    StringBuilder buf = new StringBuilder();
-    buf.append("<soapenv:Envelope soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wsse=\"http://schemas.xmlsoap.org/ws/2002/04/secext\">\n");
-    buf.append("<soapenv:Body>\n");
-    buf.append("  <request version=\"");
-    buf.append(msg.getVersion());
-    buf.append("\" compressed=\"");
-    buf.append(compressed);
-    buf.append("\" locale=\"");
-    buf.append(msg.getLocale().toString());
-    buf.append("\" service=\"");
-    buf.append(msg.getServiceInterfaceClassName());
-    buf.append("\" operation=\"");
-    buf.append(msg.getOperation());
-    buf.append("\"/>\n");
-    buf.append("  <data>");
-    long y = System.nanoTime();
-    setData(buf, msg, compressed);
-    y = System.nanoTime() - y;
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("message encoding took " + y + " nanoseconds");
+  public void writeRequest(OutputStream stream, IServiceTunnelRequest msg) throws Exception {
+    boolean debugEnabled = LOG.isDebugEnabled();
+    if (debugEnabled) {
+      stream = new DebugOutputStream(stream);
     }
-    buf.append("</data>\n");
-    buf.append("  <info");
-    buf.append(" origin=\"" + m_originAddress + "\"");
-    buf.append("/>\n");
-    buf.append("</soapenv:Body>");
-    buf.append("</soapenv:Envelope>");
-    //
-    if (LOG.isDebugEnabled()) {
-      out = new DebugOutputStream(out);
-    }
-    try {
-      out.write(buf.toString().getBytes("UTF-8"));
+    try (OutputStreamWriter out = new OutputStreamWriter(stream, "UTF-8")) {
+
+      // build soap message without sax (hi-speed)
+      boolean compressed = isUseCompression();
+      out.write("<soapenv:Envelope soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wsse=\"http://schemas.xmlsoap.org/ws/2002/04/secext\">\n");
+      out.write("<soapenv:Body>\n");
+      out.write("  <request compressed=\"");
+      out.write(Boolean.toString(compressed));
+      out.write("\" locale=\"");
+      out.write(msg.getLocale().toString());
+      out.write("\" service=\"");
+      out.write(msg.getServiceInterfaceClassName());
+      out.write("\" operation=\"");
+      out.write(msg.getOperation());
+      out.write("\"/>\n");
+      out.write("  <data>");
+
+      long y = System.nanoTime();
+      setData(out, msg, compressed);
+      y = System.nanoTime() - y;
+      if (debugEnabled) {
+        LOG.debug("message encoding took " + y + " nanoseconds");
+      }
+
+      out.write("</data>\n");
+      out.write("  <info");
+      out.write(" origin=\"" + m_originAddress + "\"");
+      out.write("/>\n");
+      out.write("</soapenv:Body>");
+      out.write("</soapenv:Envelope>");
     }
     finally {
-      if (LOG.isDebugEnabled()) {
-        String sentData = ((DebugOutputStream) out).getContent("UTF-8");
-        int lastWrittenCharacter = ((DebugOutputStream) out).getLastWrittenCharacter();
-        Throwable lastThrownException = ((DebugOutputStream) out).getLastThrownException();
+      if (debugEnabled) {
+        String sentData = ((DebugOutputStream) stream).getContent("UTF-8");
+        int lastWrittenCharacter = ((DebugOutputStream) stream).getLastWrittenCharacter();
+        Throwable lastThrownException = ((DebugOutputStream) stream).getLastThrownException();
         LOG.debug("lastWrittenCharacter=" + lastWrittenCharacter + ",lastThrownException=" + lastThrownException + ", sentData: " + sentData);
       }
     }
   }
 
   @Override
-  public void writeResponse(OutputStream out, IServiceTunnelResponse msg) throws Exception {
-    // build soap message without sax (hi-speed)
-    boolean compressed = isUseCompression();
-    StringBuilder buf = new StringBuilder();
-    buf.append("<soapenv:Envelope soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n");
-    buf.append("<soapenv:Body>\n");
-    if (msg.getException() == null) {
-      buf.append("  <response status=\"OK\"");
-      Object x = msg.getData();
-      if (x != null) {
-        buf.append(" type=\"" + x.getClass().getSimpleName() + "\"");
+  public void writeResponse(OutputStream stream, IServiceTunnelResponse msg) throws Exception {
+    boolean debugEnabled = LOG.isDebugEnabled();
+    if (debugEnabled) {
+      stream = new DebugOutputStream(stream);
+    }
+    try (OutputStreamWriter out = new OutputStreamWriter(stream, "UTF-8")) {
+
+      // build soap message without sax (hi-speed)
+      boolean compressed = isUseCompression();
+      out.write("<soapenv:Envelope soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n");
+      out.write("<soapenv:Body>\n");
+      if (msg.getException() == null) {
+        out.write("  <response status=\"OK\"");
+        Object x = msg.getData();
+        if (x != null) {
+          out.write(" type=\"" + x.getClass().getSimpleName() + "\"");
+        }
+        else {
+          out.write(" type=\"\"");
+        }
+        out.write(" compressed=\"" + compressed + "\"");
+        out.write("/>\n");
       }
       else {
-        buf.append(" type=\"\"");
+        out.write("  <response status=\"ERROR\"");
+        out.write(" compressed=\"" + compressed + "\"");
+        out.write(">\n");
+        out.write("    <exception type=\"" + msg.getException().getClass().getSimpleName() + "\">");
+        out.write(msg.getException().getMessage());
+        out.write("</exception>\n");
+        out.write("  </response>\n");
       }
-      buf.append(" compressed=\"" + compressed + "\"");
-      buf.append("/>\n");
-    }
-    else {
-      buf.append("  <response status=\"ERROR\"");
-      buf.append(" compressed=\"" + compressed + "\"");
-      buf.append(">\n");
-      buf.append("    <exception type=\"" + msg.getException().getClass().getSimpleName() + "\">");
-      buf.append(msg.getException().getMessage());
-      buf.append("</exception>\n");
-      buf.append("  </response>\n");
-    }
-    buf.append("  <data>");
-    long y = System.nanoTime();
-    setData(buf, msg, compressed);
-    y = System.nanoTime() - y;
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("message encoding took " + y + " nanoseconds");
-    }
-    buf.append("</data>\n");
-    buf.append("  <info");
-    buf.append(" origin=\"" + m_originAddress + "\"");
-    buf.append("/>\n");
-    buf.append("</soapenv:Body>");
-    buf.append("</soapenv:Envelope>");
-    //
-    if (LOG.isDebugEnabled()) {
-      out = new DebugOutputStream(out);
-    }
-    try {
-      out.write(buf.toString().getBytes("UTF-8"));
+      out.write("  <data>");
+
+      long y = System.nanoTime();
+      setData(out, msg, compressed);
+      y = System.nanoTime() - y;
+      if (debugEnabled) {
+        LOG.debug("message encoding took " + y + " nanoseconds");
+      }
+
+      out.write("</data>\n");
+      out.write("  <info");
+      out.write(" origin=\"" + m_originAddress + "\"");
+      out.write("/>\n");
+      out.write("</soapenv:Body>");
+      out.write("</soapenv:Envelope>");
     }
     finally {
-      if (LOG.isDebugEnabled()) {
-        String sentData = ((DebugOutputStream) out).getContent("UTF-8");
-        int lastWrittenCharacter = ((DebugOutputStream) out).getLastWrittenCharacter();
-        Throwable lastThrownException = ((DebugOutputStream) out).getLastThrownException();
+      if (debugEnabled) {
+        String sentData = ((DebugOutputStream) stream).getContent("UTF-8");
+        int lastWrittenCharacter = ((DebugOutputStream) stream).getLastWrittenCharacter();
+        Throwable lastThrownException = ((DebugOutputStream) stream).getLastThrownException();
         LOG.debug("lastWrittenCharacter=" + lastWrittenCharacter + ",lastThrownException=" + lastThrownException + ", sentData: " + sentData);
       }
     }
   }
 
-  protected void setData(StringBuilder buf, Object msg, boolean compressed) throws IOException {
+  protected void setData(Writer writer, Object msg, boolean compressed) throws IOException {
     Deflater deflater = null;
     try {
       // build serialized data
@@ -276,7 +272,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
       }
       m_objectSerializer.serialize(out, msg);
       String base64Data = StringUtility.wrapText(Base64Utility.encode(bos.toByteArray()), 10000);
-      buf.append(base64Data);
+      writer.write(base64Data);
     }
     finally {
       if (deflater != null) {
@@ -317,7 +313,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
       //get the 'compressed' attribute
       Matcher mc = COMPRESSED_ATTRIBUTE.matcher(xml);
       if (mc.find()) {
-        compressed = mc.group(1).equals("true");
+        compressed = "true".equals(mc.group(1));
         m_receivedCompressed = compressed;
       }
       // simply get the content of <ns:data>{?}</ns:data> or <data>{?}</data>

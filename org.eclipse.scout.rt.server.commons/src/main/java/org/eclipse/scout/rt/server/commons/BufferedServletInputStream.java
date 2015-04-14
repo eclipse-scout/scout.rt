@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.IOUtility;
 public class BufferedServletInputStream extends ServletInputStream {
 
   private final ByteArrayInputStream m_data;
-  private final int m_length;
+  private final byte[] m_rawData;
   private volatile Object m_readListener;
   private volatile boolean m_finished;
 
@@ -38,21 +38,25 @@ public class BufferedServletInputStream extends ServletInputStream {
 
   public BufferedServletInputStream(byte[] data) {
     m_finished = false;
-    m_length = data.length;
+    m_rawData = data;
     m_data = new ByteArrayInputStream(data);
   }
 
-  @Override
+  @SuppressWarnings("all")
   public boolean isFinished() {
     return m_finished;
   }
 
-  @Override
+  public byte[] getData() {
+    return m_rawData;
+  }
+
+  @SuppressWarnings("all")
   public boolean isReady() {
     return true; // always ready as data is buffered
   }
 
-  @Override
+  @SuppressWarnings("all")
   public void setReadListener(javax.servlet.ReadListener readListener) {
     if (readListener == null) {
       throw new NullPointerException("readlistener may not be null."); // as per ServletInputStream spec
@@ -89,7 +93,7 @@ public class BufferedServletInputStream extends ServletInputStream {
   }
 
   public int getLength() {
-    return m_length;
+    return m_rawData.length;
   }
 
 }

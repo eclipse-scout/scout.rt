@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.services.common.clientnotification;
 import java.util.EventListener;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.servicetunnel.IServiceTunnel;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 
 public interface IClientNotificationConsumerListener extends EventListener {
 

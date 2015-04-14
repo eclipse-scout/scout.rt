@@ -8,92 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.servicetunnel;
+package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.servicetunnel.VersionMismatchException;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
  * Service tunnel is Thread-Safe.
- *
- * @author awe (refactoring)
  */
 public abstract class AbstractServiceTunnel<T extends ISession> implements IServiceTunnel {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractServiceTunnel.class);
 
-  private String m_version;
-  private URL m_serverURL;
-  private String m_sharedSecret;
   private final T m_session;
 
-  /**
-   * If the version parameter is null, the product bundle (e.g. com.bsiag.crm.ui.swing) version is used.
-   */
-  //TODO [nosgi] imo no version param, use config.ini servicetunnel.version
-  public AbstractServiceTunnel(T session, String version) {
+  public AbstractServiceTunnel(T session) {
     m_session = session;
-    m_version = getVersion(version);
-    m_sharedSecret = ConfigIniUtility.getProperty(PROP_SHARED_SECRET, ConfigIniUtility.getProperty("scout.ajax.token.key"));
-    String url = ConfigIniUtility.getProperty(PROP_TARGET_URL, ConfigIniUtility.getProperty("server.url"));
-    if (!StringUtility.isNullOrEmpty(url)) {
-      try {
-        m_serverURL = new URL(url);
-      }
-      catch (MalformedURLException e) {
-        throw new IllegalArgumentException("targetUrl: " + url, e);
-      }
-    }
-  }
-
-  private static String getVersion(String providedVersion) {
-    if (providedVersion == null) {
-      IApplication app = BEANS.opt(IApplication.class);
-      if (app != null) {
-        String version = app.getVersion();
-        if (version != null) {
-          return version;
-        }
-      }
-    }
-    return providedVersion;
-  }
-
-  public String getVersion() {
-    return m_version;
-  }
-
-  @Override
-  public URL getServerURL() {
-    return m_serverURL;
-  }
-
-  @Override
-  public void setServerURL(URL url) {
-    m_serverURL = url;
-  }
-
-  public String getSharedSecret() {
-    return m_sharedSecret;
   }
 
   protected T getSession() {
@@ -102,9 +40,6 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
 
   @Override
   public Object invokeService(Class serviceInterfaceClass, Method operation, Object[] callerArgs) throws ProcessingException {
-    if (getServerURL() == null) {
-      throw new ProcessingException("serverURL is null. Check proxyHandler extension. Example value is: http://localhost:8080/myapp/process");
-    }
     long t0 = System.nanoTime();
     try {
       if (callerArgs == null) {
@@ -114,7 +49,7 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
         LOG.debug("" + serviceInterfaceClass + "." + operation + "(" + Arrays.asList(callerArgs) + ")");
       }
       Object[] serializableArgs = ServiceUtility.filterHolderArguments(callerArgs);
-      IServiceTunnelRequest call = createServiceTunnelRequest(getVersion(), serviceInterfaceClass, operation, serializableArgs);
+      IServiceTunnelRequest call = createServiceTunnelRequest(serviceInterfaceClass, operation, serializableArgs);
       decorateServiceRequest(call);
       //
       IServiceTunnelResponse response = tunnel(call);
@@ -128,11 +63,7 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
       if (t != null) {
         String msg = "Calling " + serviceInterfaceClass.getSimpleName() + "." + operation.getName() + "()";
         ProcessingException pe;
-        if (t instanceof VersionMismatchException) {
-          VersionMismatchException ve = (VersionMismatchException) t;
-          pe = ve;
-        }
-        else if (t instanceof ProcessingException) {
+        if (t instanceof ProcessingException) {
           ((ProcessingException) t).addContextMessage(msg);
           pe = (ProcessingException) t;
         }
@@ -161,7 +92,7 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
     }
   }
 
-  protected IServiceTunnelRequest createServiceTunnelRequest(String version, Class serviceInterfaceClass, Method operation, Object[] args) {
+  protected IServiceTunnelRequest createServiceTunnelRequest(Class serviceInterfaceClass, Method operation, Object[] args) {
     UserAgent userAgent = UserAgent.CURRENT.get();
     if (userAgent == null) {
       LOG.warn("No UserAgent set on calling context; include default in service-request");
@@ -169,7 +100,7 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
     }
 
     // default implementation
-    ServiceTunnelRequest call = new ServiceTunnelRequest(version, serviceInterfaceClass.getName(), operation.getName(), operation.getParameterTypes(), args);
+    ServiceTunnelRequest call = new ServiceTunnelRequest(serviceInterfaceClass.getName(), operation.getName(), operation.getParameterTypes(), args);
     call.setClientSubject(getSession().getSubject());
     call.setUserAgent(userAgent.createIdentifier());
 
