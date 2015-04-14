@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
@@ -107,16 +106,6 @@ public class DefaultTransactionDelegate {
       }
       catch (Throwable ignore) {
         // nop
-      }
-      //log it
-      if (transaction == null || !transaction.isCancelled()) {
-        if (t instanceof ProcessingException) {
-          ((ProcessingException) t).addContextMessage("invoking " + serviceReq.getServiceInterfaceClassName() + ":" + serviceReq.getOperation());
-          SERVICES.getService(IExceptionHandlerService.class).handleException((ProcessingException) t);
-        }
-        else {
-          LOG.error("invoking " + serviceReq.getServiceInterfaceClassName() + ":" + serviceReq.getOperation(), t);
-        }
       }
       Throwable p = replaceOutboundException(t);
       response = new ServiceTunnelResponse(null, null, p);
