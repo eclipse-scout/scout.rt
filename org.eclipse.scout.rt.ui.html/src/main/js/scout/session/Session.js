@@ -69,7 +69,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
   // re-name "detach window", since "detach" is also an often used JQuery operation on the DOM
   if (window.opener && window.opener.scout && window.opener.scout.sessions) {
-    // Should never happen, as forms are not detachable when multiple sessions are alive (see Form.js)
+    // Should never happen, as forms are not detachable when multiple sessions are alive (see Form.js/_onFormClosed)
     if (window.opener.scout.sessions.length > 1) {
       window.close();
       throw new Error('Too many scout sessions');

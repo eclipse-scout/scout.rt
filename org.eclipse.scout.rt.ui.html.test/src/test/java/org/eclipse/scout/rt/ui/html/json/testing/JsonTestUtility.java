@@ -79,8 +79,6 @@ public final class JsonTestUtility {
     @SuppressWarnings("unchecked")
     AtomicReference<HttpServletRequest> ref = (AtomicReference<HttpServletRequest>) field.get(jsonSession);
     ref.set(null);
-
-    jsonSession.flush();
   }
 
   /**

@@ -47,8 +47,6 @@ public class JsonFormTest {
     assertNotNull(m_jsonSession.getJsonAdapter(form, m_jsonSession.getRootJsonAdapter()));
 
     form.doClose();
-    m_jsonSession.flush();
     assertNull(m_jsonSession.getJsonAdapter(form, m_jsonSession.getRootJsonAdapter()));
   }
-
 }

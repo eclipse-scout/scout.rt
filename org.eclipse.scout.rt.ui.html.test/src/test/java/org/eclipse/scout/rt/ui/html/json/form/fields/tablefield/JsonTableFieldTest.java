@@ -57,7 +57,6 @@ public class JsonTableFieldTest {
 
     assertNotNull(jsonTableField.getAdapter(table));
     jsonTableField.dispose();
-    m_jsonSession.flush();
     assertNull(jsonTableField.getAdapter(table));
   }
 
@@ -71,13 +70,11 @@ public class JsonTableFieldTest {
     //Switch table -> old one needs to be disposed
     assertNotNull(jsonTableField.getAdapter(table));
     tableField.setTable(table2, false);
-    m_jsonSession.flush();
     assertNull(jsonTableField.getAdapter(table));
     assertNotNull(jsonTableField.getAdapter(table2));
     assertTrue(jsonTableField.getAdapter(table2).isInitialized());
 
     jsonTableField.dispose();
-    m_jsonSession.flush();
     assertNull(jsonTableField.getAdapter(table2));
   }
 
@@ -96,7 +93,6 @@ public class JsonTableFieldTest {
 
     // Dispose table field -> table must not be disposed because table page still needs it
     jsonTableField.dispose();
-    m_jsonSession.flush();
     assertNotNull(jsonOutline.getAdapter(tablePageTable));
     assertTrue(jsonOutline.getAdapter(tablePageTable).isInitialized());
   }
@@ -127,11 +123,9 @@ public class JsonTableFieldTest {
     // Switch table -> table must not be disposed because table page still needs it
     ITable table2 = new Table();
     tableField.setTable(table2, true);
-    m_jsonSession.flush();
     assertNotNull(jsonTableField.getAdapter(table2));
     assertTrue(jsonTableField.getAdapter(table2).isInitialized());
     assertNotNull(jsonOutline.getAdapter(tablePageTable));
     assertTrue(jsonOutline.getAdapter(tablePageTable).isInitialized());
   }
-
 }

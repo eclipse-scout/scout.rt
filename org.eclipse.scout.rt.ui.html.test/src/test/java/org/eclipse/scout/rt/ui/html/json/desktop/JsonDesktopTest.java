@@ -80,7 +80,6 @@ public class JsonDesktopTest {
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     WeakReference<?> ref = new WeakReference<IJsonAdapter>(jsonDesktop);
     jsonDesktop.dispose();
-    m_jsonSession.flush();
     jsonDesktop = null;
     JsonTestUtility.assertGC(ref);
   }
@@ -167,7 +166,9 @@ public class JsonDesktopTest {
 
     desktop.removeForm(form);
     responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formRemoved");
-    assertEquals(1, responseEvents.size());
+    // 0 instead of 1, because formClosed includes "formRemoved" implicitly. The event itself cannot be sent, because
+    // the form adapter is already disposed when the form is closed.
+    assertEquals(0, responseEvents.size());
   }
 
   @Test

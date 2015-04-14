@@ -170,7 +170,6 @@ public class JsonTreeTest {
     WeakReference<JsonTree> ref = new WeakReference<JsonTree>(object);
 
     object.dispose();
-    m_jsonSession.flush();
     m_jsonSession = null;
     object = null;
     JsonTestUtility.assertGC(ref);
@@ -191,7 +190,6 @@ public class JsonTreeTest {
     assertTrue(contextMenu.getAdapter(menu1).isInitialized());
 
     tree.getContextMenu().removeChildAction(menu1);
-    m_jsonSession.flush();
     assertNull(contextMenu.getAdapter(menu1));
   }
 
@@ -214,7 +212,6 @@ public class JsonTreeTest {
     assertTrue(contextMenu.getAdapter(menu2).isInitialized());
 
     tree.getContextMenu().removeChildAction(menu1);
-    m_jsonSession.flush();
     assertNull(contextMenu.getAdapter(menu1));
     assertNotNull(contextMenu.getAdapter(menu2));
     assertTrue(contextMenu.getAdapter(menu2).isInitialized());

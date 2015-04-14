@@ -11,9 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.form;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -27,7 +24,6 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonForm.class);
 
   public static final String EVENT_FORM_CLOSING = "formClosing";
   public static final String PROP_FORM_ID = "formId";
@@ -139,12 +135,12 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
   }
 
   protected void handleModelFormClosed(IForm form) {
-    // FIXME CGU: what happens if isAutoAddRemoveOnDesktop = false and form removed comes after closing? maybe remove form first?
-    if (ClientSessionProvider.currentSession().getDesktop().isShowing(form)) {
-      LOG.error("Form closed but is still showing on desktop.");
-      // handleModelFormRemoved(form);
-    }
+    // There is no need to send a 'formRemoved' event to the desktop. The UI will assume 'formRemoved' implicitly,
+    // when it encounters a 'formClosed' event (see Form.js/_onFormClosed).
     dispose();
+    // Important: The following event must be send _after_ the dispose() call! Otherwise,
+    // it would be deleted automatically from the JSON response. This is a special case
+    // where we explicitly want to send an event for an already disposed adapter.
     addActionEvent("formClosed", new JSONObject());
   }
 

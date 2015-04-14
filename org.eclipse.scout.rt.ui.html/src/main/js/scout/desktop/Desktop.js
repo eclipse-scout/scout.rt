@@ -351,6 +351,16 @@ scout.Desktop.prototype.changeOutline = function(outline) {
   this.navigation.onOutlineChanged(this.outline);
 };
 
+scout.Desktop.prototype.removeForm = function(id) {
+  var form = this.session.getOrCreateModelAdapter(id, this);
+  if (this._isDialog(form)) {
+    scout.arrays.remove(this.dialogs, form);
+  } else {
+    scout.arrays.remove(this.views, form);
+  }
+  this._removeForm(form);
+};
+
 /* message boxes */
 
 scout.Desktop.prototype._renderMessageBox = function(messageBox) {
@@ -375,13 +385,7 @@ scout.Desktop.prototype._onModelFormAdded = function(event) {
 };
 
 scout.Desktop.prototype._onModelFormRemoved = function(event) {
-  var form = this.session.getOrCreateModelAdapter(event.form, this);
-  if (this._isDialog(form)) {
-    scout.arrays.remove(this.dialogs, form);
-  } else {
-    scout.arrays.remove(this.views, form);
-  }
-  this._removeForm(form);
+  this.removeForm(event.form);
 };
 
 scout.Desktop.prototype._isDialog = function(form) {

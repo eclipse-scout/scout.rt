@@ -279,18 +279,14 @@ public class JsonResponse {
   /**
    * Removes all traces of the adapter with the given ID from the current response. This includes all events with
    * the given ID as target. Also, if the adapter was registered as "buffered events adapter", it is unregistered
-   * automatically. Any deferred model event for this adapter will therefore not be handled. <b>This method should
-   * therefore only be called when disposing an adapter that was created in the <i>same</i> request!</b>.
+   * automatically. Any deferred model event for this adapter will therefore not be handled.
    *
    * @param id
    *          Adapter ID to be removed
    */
   public void removeJsonAdapter(String id) {
     // Remove from adapterMap
-    IJsonAdapter<?> removedAdapter = m_adapterMap.remove(id);
-    if (removedAdapter == null) {
-      LOG.warn("Adapter with ID '" + id + "' was removed from the current JSON response, but it was apparently not created in the current request. Removing the adapter will most likely result in lost events. Please check carefully!");
-    }
+    m_adapterMap.remove(id);
 
     // Remove all events with the given ID as event target
     for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {

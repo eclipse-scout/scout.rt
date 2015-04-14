@@ -121,6 +121,14 @@ public class JsonAdapterRegistry {
         }
       }
     }
+    // "Leak detection". After disposing all adapters and flushing the session, no adapters should be remaining.
+    assertEmpty();
+  }
+
+  protected void assertEmpty() {
+    if (!isEmpty()) {
+      throw new IllegalStateException("JsonAdapterRegistry should be empty, but is not!");
+    }
   }
 
   public boolean isEmpty() {

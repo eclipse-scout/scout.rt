@@ -13,11 +13,9 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.security.AccessController;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
@@ -69,7 +67,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   private final IJsonObjectFactory m_jsonObjectFactory;
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
-  private final Set<String> m_unregisterAdapterSet = new HashSet<String>();
   private final P_RootAdapter m_rootJsonAdapter;
 
   private boolean m_initialized;
@@ -385,11 +382,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     notifyPollingBackgroundJobRequests();
     m_jsonAdapterRegistry.disposeAllJsonAdapters();
     m_currentJsonResponse = null;
-    flush();
-    // "Leak detection". After disposing all adapters and flushing the session, no adapters should be remaining.
-    if (!m_jsonAdapterRegistry.isEmpty() && !m_unregisterAdapterSet.isEmpty()) {
-      throw new IllegalStateException("JsonAdapterRegistry should be empty, but is not!");
-    }
   }
 
   @Override
@@ -510,39 +502,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public void unregisterJsonAdapter(String id) {
-    boolean createdInCurrentRequest = m_currentJsonResponse.adapterMap().containsKey(id);
-    if (createdInCurrentRequest) {
-      // If adapter was not yet sent to the client, we can safely remove it from the registry
-      // (as if it was never registered) and remove it completely from the response (including
-      // events targeting the adapter).
-      m_jsonAdapterRegistry.removeJsonAdapter(id);
-      m_currentJsonResponse.removeJsonAdapter(id);
-    }
-    else {
-      // Because the client might be interested in events for the disposed adapter, we cannot
-      // remove it yet from the registry. Therefore, we add it to a temporary list which will
-      // be processed after the response has been sent (see flush()).
-      // Example case where this is relevant:
-      //   0) Form was previously sent to the client
-      //   1) Form is closed and disposed
-      //   2) Desktop sends a "formRemoved" event
-      // If the form adapter was removed in step 2), the JsonDesktop could not resolve the
-      // adapter ID anymore in step 3).
-      m_unregisterAdapterSet.add(id);
-    }
-  }
-
-  @Override
-  public void flush() {
-    // Response has been sent, it is now safe to remove all adapters from the registry
-    // that were previously only remembered in m_unregisterAdapterSet.
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Flush. Remove these adapter IDs from registry: " + m_unregisterAdapterSet);
-    }
-    for (String id : m_unregisterAdapterSet) {
-      m_jsonAdapterRegistry.removeJsonAdapter(id);
-    }
-    m_unregisterAdapterSet.clear();
+    // Remove it from the registry. All subsequent calls of "getAdapter(id)" will return null.
+    m_jsonAdapterRegistry.removeJsonAdapter(id);
+    // Remove it completely from the response (including events targeting the adapter).
+    m_currentJsonResponse.removeJsonAdapter(id);
   }
 
   @Override
@@ -577,7 +540,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     finally {
       // FIXME CGU really finally? what if exception occurs and some events are already delegated to the model?
       // reset event map (aka jsonResponse) when response has been sent to client
-      flush();
       m_currentJsonResponse = createJsonResponse();
       m_currentHttpRequest.set(null);
 

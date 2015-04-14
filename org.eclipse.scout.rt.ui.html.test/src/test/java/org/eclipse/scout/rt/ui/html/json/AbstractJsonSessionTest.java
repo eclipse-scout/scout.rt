@@ -91,7 +91,6 @@ public class AbstractJsonSessionTest {
     assertEquals(1, session.currentJsonResponse().eventList().size());
 
     adapter.dispose();
-    session.flush();
     assertEquals(1, session.getJsonAdapterRegistry().getJsonAdapterCount());
     assertEquals(0, session.currentJsonResponse().adapterMap().size());
     assertEquals(0, session.currentJsonResponse().eventList().size());

@@ -105,9 +105,21 @@ scout.Form.prototype._remove = function() {
   }
 };
 
+scout.Form.prototype._onFormClosed = function(event) {
+  // 'formClosed' implies a 'formRemoved' event on the desktop. Because the form adapter is disposed
+  // after 'formClosed', the 'formRemoved' event is not sent. Therefore, we manually call the
+  // remove method on the desktop (e.g. to remove the tab).
+  if (this.session.desktop) {
+    this.session.desktop.removeForm(this.id);
+  }
+
+  // Now destroy the form, it will never be used again.
+  this.destroy();
+};
+
 scout.Form.prototype.onModelAction = function(event) {
   if (event.type === 'formClosed') {
-    this.destroy();
+    this._onFormClosed(event);
   } else {
     $.log.warn('Model event not handled. Widget: Form. Event: ' + event.type + '.');
   }

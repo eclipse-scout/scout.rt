@@ -342,7 +342,6 @@ public class JsonTableTest {
     assertTrue(jsonContextMenu.getAdapter(menu1).isInitialized());
 
     table.getContextMenu().removeChildAction(menu1);
-    m_jsonSession.flush();
     assertNull(jsonContextMenu.getAdapter(menu1));
   }
 
@@ -365,7 +364,6 @@ public class JsonTableTest {
 
     table.getContextMenu().removeChildAction(NonDisplayableMenu);
     table.getContextMenu().removeChildAction(displayableMenu);
-    m_jsonSession.flush();
 
     assertNull(jsonContextMenu.getAdapter(NonDisplayableMenu));
     assertNull(jsonContextMenu.getAdapter(displayableMenu));
@@ -383,7 +381,6 @@ public class JsonTableTest {
     assertTrue(jsonTable.getAdapter(control).isInitialized());
 
     table.removeTableControl(control);
-    m_jsonSession.flush();
     assertNull(jsonTable.getAdapter(control));
   }
 
@@ -403,7 +400,6 @@ public class JsonTableTest {
     assertTrue(jsonTable.getAdapter(tableControl2).isInitialized());
 
     table.removeTableControl(tableControl1);
-    m_jsonSession.flush();
     assertNull(jsonTable.getAdapter(tableControl1));
     assertNotNull(jsonTable.getAdapter(tableControl2));
     assertTrue(jsonTable.getAdapter(tableControl2).isInitialized());
@@ -458,7 +454,6 @@ public class JsonTableTest {
 
     WeakReference<JsonTable> ref = new WeakReference<JsonTable>(object);
     object.dispose();
-    m_jsonSession.flush();
     m_jsonSession = null;
     object = null;
     JsonTestUtility.assertGC(ref);

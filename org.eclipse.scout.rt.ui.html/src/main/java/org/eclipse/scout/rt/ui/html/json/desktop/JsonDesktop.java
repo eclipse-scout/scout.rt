@@ -293,6 +293,9 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
 
   protected void handleModelFormRemoved(IForm form) {
     IJsonAdapter<?> jsonAdapter = getAdapter(form);
+    // When the form is closed, it is disposed automatically. Therefore, we cannot resolve
+    // the adapter anymore, hence the null check. (This is no problem, because 'formClosed'
+    // event implies 'formRemoved', see Form.js/_onFormClosed.)
     if (jsonAdapter != null) {
       JSONObject jsonEvent = new JSONObject();
       putProperty(jsonEvent, PROP_FORM, jsonAdapter.getId());

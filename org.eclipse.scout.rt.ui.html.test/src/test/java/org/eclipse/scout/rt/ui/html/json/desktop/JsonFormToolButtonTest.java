@@ -53,14 +53,11 @@ public class JsonFormToolButtonTest {
 
     assertNotNull(jsonFormToolButton.getAdapter(form));
     jsonFormToolButton.dispose();
-    m_jsonSession.flush();
 
     // Form has not been closed yet -> must still be registered
     assertNotNull(jsonFormToolButton.getAdapter(form));
 
     form.doClose();
-    m_jsonSession.flush();
     assertNull(jsonFormToolButton.getAdapter(form));
   }
-
 }

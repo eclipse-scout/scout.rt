@@ -49,11 +49,6 @@ public interface IJsonSession {
 
   JSONObject processRequest(HttpServletRequest httpReq, JsonRequest jsonReq);
 
-  /**
-   * Performs clean-up operations on the current session, after a request has been processed.
-   */
-  void flush();
-
   String getJsonSessionId();
 
   String getClientSessionId();

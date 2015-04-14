@@ -123,7 +123,6 @@ public class JsonOutlineTest {
     }
 
     // Verify table adapter gets unregistered
-    m_jsonSession.flush();
     assertNull(m_jsonSession.getJsonAdapter(tablePage.getTable(), m_jsonSession.getRootJsonAdapter()));
   }
 
@@ -156,7 +155,6 @@ public class JsonOutlineTest {
     WeakReference<JsonTree> ref = new WeakReference<JsonTree>(object);
 
     object.dispose();
-    m_jsonSession.flush();
     m_jsonSession = null;
     object = null;
     JsonTestUtility.assertGC(ref);
