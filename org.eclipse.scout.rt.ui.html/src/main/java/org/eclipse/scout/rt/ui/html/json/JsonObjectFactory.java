@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
-import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField;
+import org.eclipse.scout.rt.client.ui.form.fields.colorfield.IColorField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
@@ -89,7 +89,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.browserfield.JsonBrowserFie
 import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.calendar.JsonCalendarField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.colorpickerfield.JsonColorField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.colorfield.JsonColorField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.composer.JsonComposerField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.customfield.JsonBeanField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.filechooserfield.JsonFileChooserField;

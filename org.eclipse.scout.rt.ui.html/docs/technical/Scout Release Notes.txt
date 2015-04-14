@@ -188,3 +188,6 @@ With the new html ui real hyperlinks are handled by the browser. Other
 links (formerly local links) are now called app links. The new method
 execAppLinkAction is only called for app links, hence the parameters url
 and local are not necessary anymore.
+
+AWE 14.04.2015
+Renamed package package org.eclipse.scout.rt.client.ui.form.fields.colorpicker to *.colorfield.
