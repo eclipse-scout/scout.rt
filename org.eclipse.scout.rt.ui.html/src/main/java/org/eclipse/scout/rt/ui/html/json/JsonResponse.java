@@ -37,8 +37,8 @@ public class JsonResponse {
   public static final String PROP_EVENTS = "events";
   public static final String PROP_ADAPTER_DATA = "adapterData";
   public static final String PROP_ERROR = "error";
-  public static final String PROP_ERROR_CODE = "errorCode";
-  public static final String PROP_ERROR_MESSAGE = "errorMessage";
+  public static final String PROP_ERROR_CODE = "code";
+  public static final String PROP_ERROR_MESSAGE = "message";
 
   private final Map<String/*adapterId*/, IJsonAdapter<?>> m_adapterMap;
   private final List<JsonEvent> m_eventList;

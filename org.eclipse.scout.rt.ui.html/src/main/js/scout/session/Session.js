@@ -468,11 +468,11 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
   throw new Error('Error while processing request: ' + errorThrown);
 };
 
-scout.Session.prototype._processErrorJsonResponse = function(jsonResponse) {
+scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
   // Default values for fatal message boxes
   var boxOptions = {
     title: this.text('ServerError'),
-    text: jsonResponse.errorMessage,
+    text: jsonError.message,
     yesButtonText: this.text('Reload'),
     yesButtonAction: function() {
       // Hide everything (on entire page, not only $entryPoint)
@@ -485,15 +485,15 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonResponse) {
   };
 
   // Customize for specific error codes
-  if (jsonResponse.errorCode === 5) { // JsonResponse.ERR_STARTUP_FAILED
+  if (jsonError.code === 5) { // JsonResponse.ERR_STARTUP_FAILED
     // there are no texts yet if session startup failed
     boxOptions.title = '';
-    boxOptions.text = jsonResponse.errorMessage;
+    boxOptions.text = jsonError.message;
     boxOptions.yesButtonText = 'Retry';
-  } else if (jsonResponse.errorCode === 10) { // JsonResponse.ERR_SESSION_TIMEOUT
+  } else if (jsonError.code === 10) { // JsonResponse.ERR_SESSION_TIMEOUT
     boxOptions.title = this.optText('SessionTimeout', boxOptions.title);
     boxOptions.text = this.optText('SessionExpiredMsg', boxOptions.text);
-  } else if (jsonResponse.errorCode === 20) { // JsonResponse.ERR_UI_PROCESSING
+  } else if (jsonError.code === 20) { // JsonResponse.ERR_UI_PROCESSING
     boxOptions.title = this.optText('UiProcessingErrorTitle', boxOptions.title);
     boxOptions.text = this.optText('UiProcessingErrorText', boxOptions.text);
     boxOptions.actionText = this.optText('UiProcessingErrorAction', boxOptions.actionText);
