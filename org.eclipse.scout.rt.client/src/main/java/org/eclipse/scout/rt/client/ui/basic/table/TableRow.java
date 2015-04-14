@@ -29,6 +29,7 @@ public class TableRow implements ITableRow {
   private boolean m_checked;
   private final List<Cell> m_cells;
   private boolean m_rowPropertiesChanged;
+
   /**
    * @param columnSet
    *          may be null
@@ -120,9 +121,6 @@ public class TableRow implements ITableRow {
   @Override
   public void setEnabled(boolean b) {
     m_enabled = b;
-    for (int i = 0; i < m_cells.size(); i++) {
-      m_cells.get(i).setEnabled(b);
-    }
   }
 
   @Override

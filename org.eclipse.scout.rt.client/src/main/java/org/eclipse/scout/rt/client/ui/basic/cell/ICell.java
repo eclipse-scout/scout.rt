@@ -23,7 +23,6 @@ public interface ICell {
   int BG_COLOR_BIT = 6;
   int FG_COLOR_BIT = 7;
   int FONT_BIT = 8;
-  int ENABLED_BIT = 9;// default true, value Boolean
   int EDITABLE_BIT = 10;// default false, value Boolean
   int CSS_CLASS_BIT = 11;
   int HTML_ENABLED_BIT = 12; //default false, value Boolean
@@ -45,8 +44,6 @@ public interface ICell {
   String getForegroundColor();
 
   FontSpec getFont();
-
-  boolean isEnabled();
 
   boolean isEditable();
 

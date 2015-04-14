@@ -138,8 +138,8 @@ public class BasicPropertySupport implements IEventListenerSource {
     return m_props.containsKey(name);
   }
 
-  public void setPropertyInt(String name, int i) {
-    setProperty(name, Integer.valueOf(i), DEFAULT_INT);
+  public boolean setPropertyInt(String name, int i) {
+    return setProperty(name, Integer.valueOf(i), DEFAULT_INT);
   }
 
   public int getPropertyInt(String name) {
@@ -147,8 +147,8 @@ public class BasicPropertySupport implements IEventListenerSource {
     return n != null ? n.intValue() : 0;
   }
 
-  public void setPropertyDouble(String name, double d) {
-    setProperty(name, new Double(d), DEFAULT_DOUBLE);
+  public boolean setPropertyDouble(String name, double d) {
+    return setProperty(name, new Double(d), DEFAULT_DOUBLE);
   }
 
   public double getPropertyDouble(String name) {
@@ -156,8 +156,8 @@ public class BasicPropertySupport implements IEventListenerSource {
     return n != null ? n.doubleValue() : 0;
   }
 
-  public void setPropertyLong(String name, long i) {
-    setProperty(name, Long.valueOf(i), DEFAULT_LONG);
+  public boolean setPropertyLong(String name, long i) {
+    return setProperty(name, Long.valueOf(i), DEFAULT_LONG);
   }
 
   public long getPropertyLong(String name) {
@@ -174,8 +174,8 @@ public class BasicPropertySupport implements IEventListenerSource {
     return b != null ? b.booleanValue() : DEFAULT_BOOL.booleanValue();
   }
 
-  public void setPropertyString(String name, String s) {
-    setProperty(name, s);
+  public boolean setPropertyString(String name, String s) {
+    return setProperty(name, s);
   }
 
   public void setPropertyStringAlwaysFire(String name, String s) {

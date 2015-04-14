@@ -16,7 +16,6 @@ import java.math.BigDecimal;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
@@ -32,20 +31,20 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFieldTest.Table> {
   private static final String[] LOREM_IPSUM = new String[]{
-    "Lorem ipsum dolor sit amet,",
-    "consetetur sadipscing elitr,",
-    "sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,",
-    "sed diam voluptua.",
-    "At vero eos et accusam et justo duo dolores et ea rebum.",
-    "Stet clita kasd gubergren,",
-    "no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-    "Lorem ipsum dolor sit amet,",
-    "consetetur sadipscing elitr,",
-    "sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,",
-    "sed diam voluptua.",
-    "At vero eos et accusam et justo duo dolores et ea rebum.",
-    "Stet clita kasd gubergren,",
-    "no sea takimata sanctus est Lorem ipsum dolor sit amet."
+      "Lorem ipsum dolor sit amet,",
+      "consetetur sadipscing elitr,",
+      "sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,",
+      "sed diam voluptua.",
+      "At vero eos et accusam et justo duo dolores et ea rebum.",
+      "Stet clita kasd gubergren,",
+      "no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+      "Lorem ipsum dolor sit amet,",
+      "consetetur sadipscing elitr,",
+      "sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,",
+      "sed diam voluptua.",
+      "At vero eos et accusam et justo duo dolores et ea rebum.",
+      "Stet clita kasd gubergren,",
+      "no sea takimata sanctus est Lorem ipsum dolor sit amet."
   };
 
   private static final BigDecimal FAR_BELOW_ZERO = new BigDecimal("-999999999999999999999999999999999999999999999999999999999999");
@@ -145,11 +144,6 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
       }
 
       @Override
-      protected void execDecorateCell(Cell cell, ITableRow row) throws ProcessingException {
-        cell.setEnabled(getIntegerColumn().getValue(row) != 2);
-      }
-
-      @Override
       protected int getConfiguredWidth() {
         return 70;
       }
@@ -167,11 +161,6 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
       @Override
       protected String getConfiguredHeaderText() {
         return "Long";
-      }
-
-      @Override
-      protected void execDecorateCell(Cell cell, ITableRow row) throws ProcessingException {
-        cell.setEnabled(getIntegerColumn().getValue(row) != 2);
       }
 
       @Override
@@ -283,11 +272,6 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
       @Override
       protected String getConfiguredHeaderText() {
         return "Double";
-      }
-
-      @Override
-      protected void execDecorateCell(Cell cell, ITableRow row) throws ProcessingException {
-        cell.setEnabled(getIntegerColumn().getValue(row) != 2);
       }
 
       @Override

@@ -64,6 +64,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -71,7 +72,6 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 @ClassId("ebe15e4d-017b-4ac0-9a5a-2c9e07c8ad6f")
@@ -843,12 +843,15 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   protected void reinitCells() {
+    if (getTable() == null) {
+      return;
+    }
     for (ITableRow row : getTable().getRows()) {
       try {
         initCell(row);
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
   }
@@ -1341,7 +1344,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public final IFormField prepareEdit(ITableRow row) throws ProcessingException {
     ITable table = getTable();
-    if (table == null) {
+    if (table == null || !this.isCellEditable(row)) {
       return null;
     }
     IFormField f = interceptPrepareEdit(row);
@@ -1499,8 +1502,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public void setHorizontalAlignment(int hAglin) {
-    propertySupport.setPropertyInt(PROP_HORIZONTAL_ALIGNMENT, hAglin);
-    if (isInitialized()) {
+    boolean changed = propertySupport.setPropertyInt(PROP_HORIZONTAL_ALIGNMENT, hAglin);
+    if (changed && isInitialized()) {
       reinitCells();
     }
   }
@@ -1558,8 +1561,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public void setEditable(boolean b) {
-    propertySupport.setPropertyBool(PROP_EDITABLE, b);
-    if (isInitialized()) {
+    boolean changed = propertySupport.setPropertyBool(PROP_EDITABLE, b);
+    if (changed && isInitialized()) {
       reinitCells();
     }
   }
@@ -1576,8 +1579,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public void setCssClass(String cssClass) {
-    propertySupport.setProperty(PROP_CSS_CLASS, cssClass);
-    if (isInitialized()) {
+    boolean changed = propertySupport.setProperty(PROP_CSS_CLASS, cssClass);
+    if (changed && isInitialized()) {
       reinitCells();
     }
   }
@@ -1589,8 +1592,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public void setForegroundColor(String c) {
-    propertySupport.setProperty(PROP_FOREGROUND_COLOR, c);
-    if (isInitialized()) {
+    boolean changed = propertySupport.setProperty(PROP_FOREGROUND_COLOR, c);
+    if (changed && isInitialized()) {
       reinitCells();
     }
   }
@@ -1602,8 +1605,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public void setBackgroundColor(String c) {
-    propertySupport.setProperty(PROP_BACKGROUND_COLOR, c);
-    if (isInitialized()) {
+    boolean changed = propertySupport.setProperty(PROP_BACKGROUND_COLOR, c);
+    if (changed && isInitialized()) {
       reinitCells();
     }
   }
@@ -1615,8 +1618,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public void setFont(FontSpec f) {
-    propertySupport.setProperty(PROP_FONT, f);
-    if (isInitialized()) {
+    boolean changed = propertySupport.setProperty(PROP_FONT, f);
+    if (changed && isInitialized()) {
       reinitCells();
     }
   }
@@ -1640,8 +1643,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public void setHtmlEnabled(boolean enabled) {
-    propertySupport.setProperty(PROP_HTML_ENABLED, enabled);
-    if (isInitialized()) {
+    boolean changed = propertySupport.setProperty(PROP_HTML_ENABLED, enabled);
+    if (changed && isInitialized()) {
       reinitCells();
     }
   }

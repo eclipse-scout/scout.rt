@@ -160,9 +160,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
       setRowChanging(true);
       //
       m_enabled = b;
-      for (Cell c : m_cells) {
-        c.setEnabled(m_enabled);
-      }
+      m_rowPropertiesChanged = true;
     }
     finally {
       setRowChanging(false);

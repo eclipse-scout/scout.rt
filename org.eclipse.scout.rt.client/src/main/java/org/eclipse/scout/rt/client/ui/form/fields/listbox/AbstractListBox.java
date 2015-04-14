@@ -721,7 +721,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     Set<ILookupRow<KEY>> result = new HashSet<ILookupRow<KEY>>(checkedRows.size());
     for (ITableRow row : checkedRows) {
       ICell cell = row.getCell(1);
-      result.add(new LookupRow<KEY>((KEY) row.getCellValue(0), cell.getText(), cell.getIconId(), cell.getTooltipText(), cell.getBackgroundColor(), cell.getForegroundColor(), cell.getFont(), cell.isEnabled()));
+      result.add(new LookupRow<KEY>((KEY) row.getCellValue(0), cell.getText(), cell.getIconId(), cell.getTooltipText(), cell.getBackgroundColor(), cell.getForegroundColor(), cell.getFont(), row.isEnabled()));
     }
     return result;
   }
@@ -1037,10 +1037,10 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       getTextColumnInternal().setValue(tableRow, dataRow.getText());
       getActiveColumnInternal().setValue(tableRow, dataRow.isActive());
 
-      //enable/disabled row
-      Cell cell = tableRow.getCellForUpdate(1);
-      cell.setEnabled(dataRow.isEnabled());
+      // enable/disabled row
+      tableRow.setEnabled(dataRow.isEnabled());
 
+      Cell cell = tableRow.getCellForUpdate(1);
       // hint for inactive codes
       if (!dataRow.isActive()) {
         if (cell.getFont() == null) {

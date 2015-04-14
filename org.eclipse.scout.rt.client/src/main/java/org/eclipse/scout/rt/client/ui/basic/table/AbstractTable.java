@@ -2539,20 +2539,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public final void setEnabled(boolean b) {
-    boolean changed = propertySupport.setPropertyBool(PROP_ENABLED, b);
-    if (changed) {
-      //update the state of all current cell beans that are out there
-      try {
-        setTableChanging(true);
-        //
-        for (ITableRow row : getRows()) {
-          enqueueDecorationTasks(row);
-        }
-      }
-      finally {
-        setTableChanging(false);
-      }
-    }
+    propertySupport.setPropertyBool(PROP_ENABLED, b);
   }
 
   @Override

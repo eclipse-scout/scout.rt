@@ -88,7 +88,6 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
       setIconId(c.getIconId());
       setText(c.getText());
       setValue(c.getValue());
-      setEnabled(c.isEnabled());
       setErrorStatus(c.getErrorStatus());
       setHtmlEnabled(c.isHtmlEnabled());
       //do not reset observer
@@ -234,26 +233,6 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
       ICellSpecialization newStyle = m_cellSpecialization.copy();
       newStyle.setFont(f);
       setValueInternal(FONT_BIT, newStyle);
-    }
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return m_cellSpecialization.isEnabled();
-  }
-
-  public void setEnabled(boolean b) {
-    if (m_cellSpecialization instanceof CellStyle) {
-      if (!b) {
-        ICellSpecialization newStyle = new CellExtension(m_cellSpecialization);
-        newStyle.setEnabled(b);
-        setValueInternal(ENABLED_BIT, newStyle);
-      }
-    }
-    else if (m_cellSpecialization.isEnabled() != b) {
-      ICellSpecialization newStyle = m_cellSpecialization.copy();
-      newStyle.setEnabled(b);
-      setValueInternal(ENABLED_BIT, newStyle);
     }
   }
 

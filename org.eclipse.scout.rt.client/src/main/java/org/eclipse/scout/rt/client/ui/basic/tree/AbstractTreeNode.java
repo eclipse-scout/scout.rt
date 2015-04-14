@@ -73,6 +73,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private boolean m_filterAccepted;
   private Object m_primaryKey;// user object
   // enabled is defined as: enabledGranted && enabledProperty
+  private boolean m_enabled;
   private boolean m_enabledGranted;
   private boolean m_enabledProperty;
   // visible is defined as: visibleGranted && visibleProperty
@@ -600,7 +601,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public boolean isEnabled() {
-    return m_cell.isEnabled();
+    return m_enabled;
   }
 
   @Override
@@ -621,7 +622,12 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   private void calculateEnabled() {
-    m_cell.setEnabled(m_enabledGranted && m_enabledProperty);
+    boolean enabled = m_enabledGranted && m_enabledProperty;
+    boolean changed = enabled != m_enabled;
+    m_enabled = enabled;
+    if (changed && getTree() != null) {
+      getTree().fireNodeChanged(this);
+    }
   }
 
   @Override

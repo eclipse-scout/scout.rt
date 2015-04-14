@@ -59,7 +59,7 @@ public class SwingTreeCellRenderer implements TreeCellRenderer {
     if (label == null) {
       return comp;
     }
-    label.setEnabled(scoutTree.isEnabled() && node.isEnabled() && cell.isEnabled());
+    label.setEnabled(scoutTree.isEnabled() && node.isEnabled());
     // icon
     String iconName = cell.getIconId();
     CheckboxIcon checkboxIcon = null;

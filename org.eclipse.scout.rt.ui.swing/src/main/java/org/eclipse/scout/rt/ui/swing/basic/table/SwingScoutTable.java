@@ -1165,7 +1165,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         ICell cell = scoutTable.getCell(scoutRow, scoutCol);
         if (cell != null) {
           // enabled
-          c.setEnabled(scoutTable.isEnabled() && scoutRow.isEnabled() && cell.isEnabled());
+          c.setEnabled(scoutTable.isEnabled() && scoutRow.isEnabled());
 
           if (c instanceof JLabel) {
             JLabel label = (JLabel) c;
