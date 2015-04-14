@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.TimesStatement;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.notification.RunNotifier;
@@ -241,8 +242,9 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    * @return the head of the chain to be invoked first.
    */
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
-    final Statement s2 = new SubjectStatement(next, ReflectionUtility.getAnnotation(RunWithSubject.class, testMethod, testClass));
-    final Statement s1 = new RegisterBeanStatement(s2, new BeanMetaData(JUnitExceptionHandler.class).replace(true).order(-1000)); // exception handler to not silently swallow handled exceptions.
+    final Statement s3 = new SubjectStatement(next, ReflectionUtility.getAnnotation(RunWithSubject.class, testMethod, testClass));
+    final Statement s2 = new RegisterBeanStatement(s3, new BeanMetaData(JUnitExceptionHandler.class).replace(true).order(-1000)); // exception handler to not silently swallow handled exceptions.
+    final Statement s1 = new TimesStatement(s2, ReflectionUtility.getAnnotation(Times.class, testMethod, testClass));
 
     return s1;
   }

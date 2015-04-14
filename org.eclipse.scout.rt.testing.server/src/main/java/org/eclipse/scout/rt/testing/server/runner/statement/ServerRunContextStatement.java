@@ -30,6 +30,7 @@ import org.junit.runners.model.Statement;
 /**
  * Statement to run the following statements within a <code>ServerRunContext</code>.
  *
+ * @see RunWithServerSession
  * @since 5.1
  */
 public class ServerRunContextStatement extends Statement {

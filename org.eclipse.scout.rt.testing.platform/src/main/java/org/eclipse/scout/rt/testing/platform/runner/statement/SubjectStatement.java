@@ -23,7 +23,8 @@ import org.junit.runners.model.Statement;
 /**
  * Statement to execute the following statements under a particular user.
  *
- * @since5.1
+ * @see RunWithSubject
+ * @since 5.1
  */
 public class SubjectStatement extends Statement {
 
