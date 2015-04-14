@@ -12,6 +12,36 @@ describe("scout.arrays", function() {
 
   });
 
+  describe("remove", function() {
+
+    it("removes elements", function() {
+      // Ensure empty arguments are supported
+      expect(scout.arrays.remove()).toBe(false);
+      expect(scout.arrays.remove([])).toBe(false);
+      expect(scout.arrays.remove([], 'x')).toBe(false);
+
+      var arr = ['a', 'b', 'c', 'a', 'd']; // 'a' is two times in the list
+
+      expect(scout.arrays.remove(arr, 'y')).toBe(false);
+      expect(arr).toEqual(['a', 'b', 'c', 'a', 'd']);
+      expect(scout.arrays.remove(arr, 'b')).toBe(true);
+      expect(arr).toEqual(['a', 'c', 'a', 'd']);
+      expect(scout.arrays.remove(arr, 'a')).toBe(true);
+      expect(arr).toEqual(['c', 'a', 'd']);
+      expect(scout.arrays.remove(arr, 'a')).toBe(true);
+      expect(arr).toEqual(['c', 'd']);
+      expect(scout.arrays.remove(arr, 'a')).toBe(false);
+      expect(arr).toEqual(['c', 'd']);
+
+      arr = ['a', 'b', undefined, 'c', undefined, 'd'];
+      expect(scout.arrays.remove(arr, 'a')).toBe(true);
+      expect(arr).toEqual(['b', undefined, 'c', undefined, 'd' ]);
+      expect(scout.arrays.remove(arr)).toBe(true);
+      expect(arr).toEqual(['b', 'c', undefined, 'd' ]);
+    });
+
+  });
+
   describe("replace", function() {
 
     it("replaces elements", function() {

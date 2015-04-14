@@ -271,13 +271,6 @@ scout.Desktop.prototype._renderView = function(view) {
   view.tab = tab;
 };
 
-scout.Desktop.prototype._removeForm = function(form) {
-  if (form.displayHint === 'view') {
-    this._removeTab(form.tab);
-  }
-  form.remove();
-};
-
 scout.Desktop.prototype._showForm = function(form) {
   if (this._isDialog(form)) {
     // FIXME AWE: (modal dialog) - show dialogs
@@ -356,9 +349,12 @@ scout.Desktop.prototype.removeForm = function(id) {
   if (this._isDialog(form)) {
     scout.arrays.remove(this.dialogs, form);
   } else {
-    scout.arrays.remove(this.views, form);
+    var removed = scout.arrays.remove(this.views, form);
+    if (removed) {
+      this._removeTab(form.tab);
+    }
   }
-  this._removeForm(form);
+  form.remove();
 };
 
 /* message boxes */

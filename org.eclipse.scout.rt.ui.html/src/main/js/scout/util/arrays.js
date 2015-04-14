@@ -24,17 +24,22 @@ scout.arrays = {
     return array;
   },
 
+  /**
+   * Removes the first occurrence of the specified element from the array,
+   * if it is present (optional operation).  If the array does not contain
+   * the element, it is unchanged.
+   *
+   * @return true if the array contained the specified element
+   */
   remove: function(arr, element) {
-    var index = arr.indexOf(element);
-    if (index !== -1) {
-      arr.splice(index, 1);
+    if (arr) {
+      var index = arr.indexOf(element);
+      if (index !== -1) {
+        arr.splice(index, 1);
+        return true;
+      }
     }
-  },
-
-  removeAll: function(arr, arr2) {
-    for (var i = 0; i < arr2.length; i++) {
-      scout.arrays.remove(arr, arr2[i]);
-    }
+    return false;
   },
 
   replace: function(arr, element, replacement) {
