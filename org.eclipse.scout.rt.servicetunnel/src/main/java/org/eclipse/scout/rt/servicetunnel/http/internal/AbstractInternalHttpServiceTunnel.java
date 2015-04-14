@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -199,7 +200,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
         Boolean result = (Boolean) cancelResult.getData();
         return result != null && result.booleanValue();
       }
-      catch (ProcessingException ie) {
+      catch (ProcessingException | JobException ie) {
         return false;
       }
     }

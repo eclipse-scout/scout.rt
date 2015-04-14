@@ -39,6 +39,7 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -304,8 +305,8 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
     try {
       job.awaitDoneAndGet(2345, TimeUnit.MILLISECONDS);
     }
-    catch (ProcessingException e) {
-      //nop
+    catch (ProcessingException | JobException e) {
+      // NOOP
     }
     // end notify
     getSwingEnvironment().dispatchImmediateSwingJobs();

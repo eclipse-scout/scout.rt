@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobException;
 
 /**
  * Common code for Swing fields corresponding to {@link IBasicField}.
@@ -149,8 +150,8 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
     try {
       job.awaitDoneAndGet(2345, TimeUnit.MILLISECONDS);
     }
-    catch (ProcessingException e) {
-      //nop
+    catch (ProcessingException | JobException e) {
+      // NOOP
     }
     // end notify
     getSwingEnvironment().dispatchImmediateSwingJobs();

@@ -45,6 +45,7 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
+import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.basic.document.BasicDocumentFilter;
@@ -351,8 +352,8 @@ public abstract class SwingScoutTextFieldComposite<T extends IStringField> exten
       try {
         getSwingEnvironment().invokeScoutLater(t, 5678).awaitDoneAndGet(5678, TimeUnit.MILLISECONDS);
       }
-      catch (ProcessingException e) {
-        //nop
+      catch (ProcessingException | JobException ex) {
+        // NOOP
       }
       // end notify
     }

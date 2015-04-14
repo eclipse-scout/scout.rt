@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -303,7 +304,7 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
     try {
       return future.awaitDoneAndGet(10, TimeUnit.SECONDS);
     }
-    catch (ProcessingException e) {
+    catch (ProcessingException | JobException e) {
       LOG.warn("Failed to wait for the Scout model to accept a location change.", e);
       return false;
     }

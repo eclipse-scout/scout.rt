@@ -56,6 +56,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -511,7 +512,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
             }, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(getSwingEnvironment().getScoutSession())));
             future.awaitDoneAndGet(1, TimeUnit.MINUTES); // wait no longer than one minute
           }
-          catch (ProcessingException ex) {
+          catch (ProcessingException | JobException ex) {
             LOG.error("Error invoking desktop closed hook.", ex);
           }
           break;
