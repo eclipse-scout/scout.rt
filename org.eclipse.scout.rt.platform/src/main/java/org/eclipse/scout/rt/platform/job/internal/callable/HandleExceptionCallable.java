@@ -16,8 +16,8 @@ import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
-import org.eclipse.scout.rt.platform.job.JobExceptionHandler;
 import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
@@ -54,12 +54,12 @@ public class HandleExceptionCallable<RESULT> implements ICallable<RESULT>, IChai
       return m_next.call();
     }
     catch (final Throwable t) {
-      // If logging is enabled for the current job, pass the exception to the JobExceptionHandler. That is important if the job's result is not queried by the submitter, so that the exception is not swallowed silently.
+      // If logging is enabled for the current job, pass the exception to the ExceptionHandler. That is important if the job's result is not queried by the submitter, so that the exception is not swallowed silently.
       if (m_input.logOnError()) {
         try {
-          BEANS.get(JobExceptionHandler.class).handleException(m_input, t);
+          BEANS.get(ExceptionHandler.class).handle(t);
         }
-        catch (final RuntimeException e) {
+        catch (final Throwable unhandledThrowable) {
           // NOOP
         }
       }

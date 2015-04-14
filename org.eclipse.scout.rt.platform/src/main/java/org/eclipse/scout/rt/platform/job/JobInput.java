@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
  * A <code>JobInput</code> contains information about a job like its name with execution instructions like 'serial
@@ -125,7 +126,8 @@ public class JobInput {
   }
 
   /**
-   * To instrument the job manager to log execution exceptions; is <code>true</code> by default.
+   * To instrument the job manager to log execution exceptions by use of the installed {@link ExceptionHandler}; is
+   * <code>true</code> by default.
    */
   public JobInput logOnError(final boolean logOnError) {
     m_logOnError = logOnError;

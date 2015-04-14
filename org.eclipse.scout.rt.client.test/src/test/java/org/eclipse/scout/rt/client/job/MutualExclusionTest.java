@@ -94,8 +94,8 @@ public class MutualExclusionTest {
     m_jobManager = new P_JobManager();
     m_beans = TestingUtility.registerBeans(
         new BeanMetaData(JobManager.class).
-            initialInstance(m_jobManager).
-            applicationScoped(true));
+        initialInstance(m_jobManager).
+        applicationScoped(true));
 
     ISession.CURRENT.set(m_clientSession);
   }
@@ -422,7 +422,7 @@ public class MutualExclusionTest {
         protocol.add("running-2");
         setupLatch.countDownAndBlock();
       }
-    });
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false));
     ModelJobs.schedule(new IRunnable() {
 
       @Override
@@ -598,9 +598,9 @@ public class MutualExclusionTest {
     final TestJobManager jobManager = new TestJobManager();
     m_beans.addAll(TestingUtility.registerBeans(
         new BeanMetaData(IJobManager.class).
-        order(-1000).
-        initialInstance(jobManager).
-        applicationScoped(true)));
+            order(-1000).
+            initialInstance(jobManager).
+            applicationScoped(true)));
 
     final BlockingCountDownLatch jobsScheduledLatch = new BlockingCountDownLatch(1);
 
@@ -721,9 +721,9 @@ public class MutualExclusionTest {
 
     m_beans.addAll(TestingUtility.registerBeans(
         new BeanMetaData(IJobManager.class).
-            order(-1000).
-            initialInstance(jobManager).
-            applicationScoped(true)));
+        order(-1000).
+        initialInstance(jobManager).
+        applicationScoped(true)));
 
     final BlockingCountDownLatch jobsScheduledLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch job3RunningLatch = new BlockingCountDownLatch(1);

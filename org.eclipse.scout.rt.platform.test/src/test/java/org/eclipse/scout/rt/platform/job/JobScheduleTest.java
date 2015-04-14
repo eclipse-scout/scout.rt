@@ -100,7 +100,7 @@ public class JobScheduleTest {
       public void run() throws Exception {
         throw exception;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
 
     try {
       future.awaitDoneAndGet();
@@ -122,7 +122,7 @@ public class JobScheduleTest {
       public Void call() throws Exception {
         throw exception;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
 
     try {
       future.awaitDoneAndGet();
@@ -144,7 +144,7 @@ public class JobScheduleTest {
       public void run() throws Exception {
         throw exception;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
 
     try {
       future.awaitDoneAndGet();
@@ -167,7 +167,7 @@ public class JobScheduleTest {
       public void run() throws Exception {
         throw exception;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
 
     try {
       future.awaitDoneAndGet();
@@ -190,7 +190,7 @@ public class JobScheduleTest {
       public void run() throws Exception {
         throw exception;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
 
     try {
       future.awaitDoneAndGet();
@@ -213,7 +213,7 @@ public class JobScheduleTest {
       public void run() throws Exception {
         throw exception;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
 
     try {
       future.awaitDoneAndGet();
@@ -344,7 +344,7 @@ public class JobScheduleTest {
       public void run() throws Exception {
         barrier.countDownAndBlock();
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
 
     m_jobManager.schedule(new IRunnable() {
 
@@ -352,7 +352,7 @@ public class JobScheduleTest {
       public void run() throws Exception {
         barrier.countDownAndBlock();
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
 
     m_jobManager.schedule(new IRunnable() {
 
@@ -360,7 +360,7 @@ public class JobScheduleTest {
       public void run() throws Exception {
         barrier.countDownAndBlock();
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()));
+    }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
 
     assertTrue(barrier.await());
     barrier.unblock();
@@ -461,7 +461,7 @@ public class JobScheduleTest {
         latch.countDownAndBlock();
         return "job-1";
       }
-    }, Jobs.newInput(RunContexts.empty()).mutex(mutex));
+    }, Jobs.newInput(RunContexts.empty()).mutex(mutex).logOnError(false));
 
     IFuture<String> future2 = m_jobManager.schedule(new ICallable<String>() {
 

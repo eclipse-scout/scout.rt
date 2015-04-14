@@ -71,7 +71,7 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().name());
         bc1.waitFor();
       }
-    }, Jobs.newInput(RunContexts.empty()).id("session1").name("mutex1_job1").mutex(m_mutexObject1));
+    }, Jobs.newInput(RunContexts.empty()).id("session1").name("mutex1_job1").mutex(m_mutexObject1).logOnError(false));
 
     // SESSION 1 (JOB-2)
     m_jobManager.schedule(new IRunnable() {
@@ -81,7 +81,7 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().name());
         latch.countDownAndBlock();
       }
-    }, Jobs.newInput(RunContexts.empty()).id("session1").name("mutex1_job2").mutex(m_mutexObject1));
+    }, Jobs.newInput(RunContexts.empty()).id("session1").name("mutex1_job2").mutex(m_mutexObject1).logOnError(false));
 
     // SESSION 1 (JOB-3)
     m_jobManager.schedule(new IRunnable() {
@@ -110,7 +110,7 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().name());
         bc2.waitFor();
       }
-    }, Jobs.newInput(RunContexts.empty()).id("session2").name("mutex2_job2").mutex(m_mutexObject2));
+    }, Jobs.newInput(RunContexts.empty()).id("session2").name("mutex2_job2").mutex(m_mutexObject2).logOnError(false));
 
     // SESSION 2  (JOB-3)
     m_jobManager.schedule(new IRunnable() {
@@ -124,7 +124,7 @@ public class JobFutureVisitTest {
 
         latch.countDownAndBlock();
       }
-    }, Jobs.newInput(RunContexts.empty()).id("session2").name("mutex2_job3").mutex(m_mutexObject2));
+    }, Jobs.newInput(RunContexts.empty()).id("session2").name("mutex2_job3").mutex(m_mutexObject2).logOnError(false));
 
     // SESSION 2  (JOB-4)
     m_jobManager.schedule(new IRunnable() {
@@ -144,7 +144,7 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().name());
         latch.countDownAndBlock();
       }
-    }, Jobs.newInput(RunContexts.empty()).id("session3").name("mutex3_job1").mutex(m_mutexObject3));
+    }, Jobs.newInput(RunContexts.empty()).id("session3").name("mutex3_job1").mutex(m_mutexObject3).logOnError(false));
 
     assertTrue(latch.await());
   }

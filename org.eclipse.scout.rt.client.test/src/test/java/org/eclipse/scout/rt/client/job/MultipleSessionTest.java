@@ -75,7 +75,7 @@ public class MultipleSessionTest {
         protocol.add("job1-S1");
         latch1.countDownAndBlock();
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1)).name("job-1-S1"));
+    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1)).name("job-1-S1").logOnError(false));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -84,7 +84,7 @@ public class MultipleSessionTest {
         protocol.add("job2-S1");
         latch2.countDownAndBlock();
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1)).name("job-2-S1"));
+    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1)).name("job-2-S1").logOnError(false));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -93,7 +93,7 @@ public class MultipleSessionTest {
         protocol.add("job1-S2");
         latch1.countDownAndBlock();
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession2)).name("job-1-S2"));
+    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession2)).name("job-1-S2").logOnError(false));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -102,7 +102,7 @@ public class MultipleSessionTest {
         protocol.add("job2-S2");
         latch2.countDownAndBlock();
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession2)).name("job-2-S2"));
+    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession2)).name("job-2-S2").logOnError(false));
 
     assertTrue(latch1.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2"), protocol);
@@ -138,7 +138,7 @@ public class MultipleSessionTest {
           interruptedLatch.countDown();
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1)).name("job-1-S1"));
+    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1)).name("job-1-S1").logOnError(false));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -152,7 +152,7 @@ public class MultipleSessionTest {
           protocol.add("job2-S1-interrupted");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1)).name("job-2-S1"));
+    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1)).name("job-2-S1").logOnError(false));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -166,7 +166,7 @@ public class MultipleSessionTest {
           protocol.add("job1-S2-interrupted");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession2)).name("job-1-S2"));
+    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession2)).name("job-1-S2").logOnError(false));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -180,7 +180,7 @@ public class MultipleSessionTest {
           protocol.add("job2-S2-interrupted");
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession2)).name("job-2-S2"));
+    }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession2)).name("job-2-S2").logOnError(false));
 
     assertTrue(latch1.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2"), protocol);

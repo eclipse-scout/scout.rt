@@ -152,7 +152,7 @@ public class WhenDoneTest {
         protocol.add("1");
         throw pe;
       }
-    }, 1, TimeUnit.SECONDS);
+    }, 1, TimeUnit.SECONDS, Jobs.newInput(null).logOnError(false));
 
     future.whenDone(new IDoneCallback<String>() {
 
@@ -197,7 +197,7 @@ public class WhenDoneTest {
         protocol.add("1");
         throw pe;
       }
-    });
+    }, Jobs.newInput(null).logOnError(false));
     try {
       future.awaitDoneAndGet();
       fail("exception expected");
