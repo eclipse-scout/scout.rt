@@ -41,14 +41,4 @@ public interface IHtmlElement extends CharSequence, IHtmlContent {
    */
   <T extends IHtmlElement> T appLink(CharSequence path);
 
-  /**
-   * @return
-   */
-  String toEncodedHtml();
-
-  /**
-   * @return
-   */
-  HtmlBinds getBinds();
-
 }

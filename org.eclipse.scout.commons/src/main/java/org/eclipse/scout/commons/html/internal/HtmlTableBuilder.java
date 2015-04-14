@@ -20,8 +20,8 @@ import org.eclipse.scout.commons.html.IHtmlTableRow;
  */
 public class HtmlTableBuilder extends HtmlNodeBuilder implements IHtmlTable {
 
-  public HtmlTableBuilder(List<IHtmlTableRow> texts) {
-    super("table", texts);
+  public HtmlTableBuilder(List<IHtmlTableRow> rows) {
+    super("table", rows);
   }
 
   @Override

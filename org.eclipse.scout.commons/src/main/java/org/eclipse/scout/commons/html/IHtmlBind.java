@@ -10,16 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.html;
 
+import java.util.Map;
 
 /**
- * Marker Interface for any Html Content that may contain bind variables.
+ *
  */
-public interface IHtmlContent extends IHtmlBind {
+public interface IHtmlBind extends CharSequence {
 
-  String toEncodedHtml();
-
-  HtmlBinds getBinds();
-
-  void setBinds(HtmlBinds binds);
+  public void replaceBinds(Map<String, String> bindMap);
 
 }

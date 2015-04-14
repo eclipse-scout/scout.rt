@@ -13,16 +13,23 @@ package org.eclipse.scout.rt.client.ui.form;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.html.HTML;
+import org.eclipse.scout.commons.html.IHtmlElement;
+import org.eclipse.scout.commons.html.IHtmlTable;
+import org.eclipse.scout.commons.html.IHtmlTableRow;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
-import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.CloseButton;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.GroupBox.HtmlField;
@@ -163,72 +170,75 @@ public class ScoutInfoForm extends AbstractForm {
     }
   }
 
-  protected void createHtmlBody(StringBuffer buf) {
-    IApplication app = BEANS.opt(IApplication.class);
-    String title = "unknown";
-    String version = "0.0.0";
-    if (app != null) {
-      title = app.getName();
-      version = app.getVersion();
-    }
-    buf.append("<head>\n");
-    buf.append("<style type=\"text/css\">\n");
-    buf.append("h1 {font-family: sans-serif}\n");
-    buf.append("h2 {font-family: sans-serif}\n");
-    buf.append("h3 {font-family: sans-serif}\n");
-    buf.append("body {font-family: sans-serif}\n");
-    buf.append("p {font-family: sans-serif}\n");
-    buf.append("</style>\n");
-    buf.append("</head>\n");
-    buf.append("<p>");
-    RemoteFile f = getLogoImage();
-    if (f != null) {
-      buf.append("<img src=\"" + f.getPath() + "\">");
-    }
-    else {
-      buf.append("<h3>" + title + "</h3>");
-    }
-    buf.append("<p>");
-    buf.append("<h2>" + title + " " + version + "</h2>");
-    buf.append("<table cellspacing=0 cellpadding=0>");
-    //
-    StringBuffer contentBuf = new StringBuffer();
-    createHtmlPropertyTableContent(contentBuf);
-    buf.append(contentBuf.toString());
-    buf.append("<tr><td>" + ScoutTexts.get("DetailedVersion") + ":</td><td>&nbsp;</td><td>" + version + "</td></tr>");
-    //
-    buf.append("</table>");
+  /**
+   * @return text contained in Html Field
+   */
+  protected String createHtmlBody() {
+    final IHtmlElement html = HTML.div(
+        HTML.p(getLogoHtml()),
+        getTitleHtml(),
+        createHtmlTable(getProperties())
+        );
+    return html.toEncodedHtml();
   }
 
-  protected void createHtmlPropertyTableContent(StringBuffer buf) {
-    IClientSession session = ClientSessionProvider.currentSession();
-    long memUsed = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024 / 1024;
-    long memTotal = Runtime.getRuntime().totalMemory() / 1024 / 1024;
-    long memMax = Runtime.getRuntime().maxMemory() / 1024 / 1024;
-    //
-    buf.append("<tr><td>" + ScoutTexts.get("Username") + ":</td><td>&nbsp;</td><td>" + session.getUserId() + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("Language") + ":</td><td>&nbsp;</td><td>" + NlsLocale.get().getDisplayLanguage() + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("FormattingLocale") + ":</td><td>&nbsp;</td><td>" + NlsLocale.get() + "</td></tr>");
-
-    /**
-     * These information must only be presented in the case of an richclient. If the client is a webclient (ui.rap) then
-     * these informations must be omitted (Security) https://bugs.eclipse.org/bugs/show_bug.cgi?id=365761
-     */
-    if (UserAgentUtility.isRichClient()) {
-      buf.append("<tr><td>" + ScoutTexts.get("JavaVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.version") + "</td></tr>");
-      buf.append("<tr><td>" + ScoutTexts.get("JavaVMVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.vm.version") + "</td></tr>");
-      buf.append("<tr><td>" + ScoutTexts.get("OSVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("os.name") + " " + System.getProperty("os.version") + "</td></tr>");
-      buf.append("<tr><td>" + ScoutTexts.get("OSUser") + ":</td><td>&nbsp;</td><td>" + System.getProperty("user.name") + "</td></tr>");
-      buf.append("<tr><td>" + ScoutTexts.get("MemoryStatus") + ":</td><td>&nbsp;</td><td>" + memUsed + "MB (total " + memTotal + "MB / max " + memMax + "MB)</td></tr>");
-      IPerformanceAnalyzerService perf = BEANS.get(IPerformanceAnalyzerService.class);
-      if (perf != null) {
-        buf.append("<tr><td>" + ScoutTexts.get("NetworkLatency") + ":</td><td>&nbsp;</td><td>" + perf.getNetworkLatency() + " ms</td></tr>");
-        buf.append("<tr><td>" + ScoutTexts.get("ExecutionTime") + ":</td><td>&nbsp;</td><td>" + perf.getServerExecutionTime() + " ms</td></tr>");
-      }
-      if (session.getServiceTunnel() != null) {
-        buf.append("<tr><td>" + ScoutTexts.get("Server") + ":</td><td>&nbsp;</td><td>" + session.getServiceTunnel().getServerURL() + "</td></tr>");
-      }
+  /**
+   * @return Product Logo Html
+   */
+  protected IHtmlElement getLogoHtml() {
+    RemoteFile f = getLogoImage();
+    HTML.img(f.getPath());
+    if (f != null && f.getPath() != null) {
+      return HTML.img(f.getPath());
     }
+    else {
+      return HTML.h3(getProductName());
+    }
+  }
+
+  /**
+   * @return Product Name with Version Html
+   */
+  private IHtmlElement getTitleHtml() {
+    String title = getProductName() + " " + getVersion();
+    return HTML.h2(title);
+  }
+
+  private String getProductName() {
+    IApplication app = BEANS.opt(IApplication.class);
+    if (app != null) {
+      return StringUtility.emptyIfNull(app.getName());
+    }
+    return "unknown";
+  }
+
+  private String getVersion() {
+    IApplication app = BEANS.opt(IApplication.class);
+    if (app != null) {
+      return StringUtility.emptyIfNull(app.getVersion());
+    }
+    return "";
+  }
+
+  protected Map<String, Object> getProperties() {
+    Map<String, Object> props = new LinkedHashMap<>();
+    props.put(ScoutTexts.get("Username"), ClientSessionProvider.currentSession().getUserId());
+    props.put(ScoutTexts.get("Language"), NlsLocale.get().getDisplayLanguage());
+    props.put(ScoutTexts.get("FormattingLocale"), NlsLocale.get());
+    props.put(ScoutTexts.get("DetailedVersion"), getVersion());
+    return props;
+  }
+
+  public IHtmlTable createHtmlTable(Map<String, ? extends Object> properties) {
+    List<IHtmlTableRow> rows = new ArrayList<>();
+    for (Entry<String, ? extends Object> p : properties.entrySet()) {
+      rows.add(createHtmlRow(p.getKey(), p.getValue()));
+    }
+    return HTML.table(rows);
+  }
+
+  public IHtmlTableRow createHtmlRow(String property, Object value) {
+    return HTML.row(HTML.cell(property + ":"), HTML.cell(StringUtility.emptyIfNull(value)));
   }
 
   @Order(20.0f)
@@ -241,9 +251,7 @@ public class ScoutInfoForm extends AbstractForm {
       if (attachments.size() > 0) {
         getHtmlField().setAttachments(attachments);
       }
-      StringBuffer buf = new StringBuffer();
-      createHtmlBody(buf);
-      getHtmlField().setValue(buf.toString());
+      getHtmlField().setValue(createHtmlBody());
     }
   }
 }

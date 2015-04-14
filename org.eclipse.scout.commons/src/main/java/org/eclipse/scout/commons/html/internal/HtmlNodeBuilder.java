@@ -13,9 +13,11 @@ package org.eclipse.scout.commons.html.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.html.HtmlBinds;
+import org.eclipse.scout.commons.html.IHtmlBind;
 import org.eclipse.scout.commons.html.IHtmlContent;
 import org.eclipse.scout.commons.html.IHtmlElement;
 
@@ -23,10 +25,12 @@ import org.eclipse.scout.commons.html.IHtmlElement;
  * Builder for a html node with start tag, end tag and attributes.
  */
 public class HtmlNodeBuilder extends AbstractExpressionBuilder implements IHtmlElement {
-  private final List<? extends CharSequence> m_texts;
+
+  /** any {@link IHtmlBind} or subclasses */
+  private final List<? extends IHtmlBind> m_texts;
+
   private final List<String> m_attributes = new ArrayList<>();
   private String m_tag;
-  private final HtmlBinds m_binds = new HtmlBinds();
 
   protected String getTag() {
     return m_tag;
@@ -42,18 +46,28 @@ public class HtmlNodeBuilder extends AbstractExpressionBuilder implements IHtmlE
 
   public HtmlNodeBuilder(String tag, List<? extends CharSequence> texts) {
     m_tag = tag;
-
-    ArrayList<IHtmlContent> bindTexts = new ArrayList<IHtmlContent>();
+    ArrayList<IHtmlBind> bindTexts = new ArrayList<IHtmlBind>();
     for (CharSequence text : texts) {
-      if (text instanceof IHtmlElement) {
-        m_binds.putAll(((IHtmlElement) text).getBinds());
-      }
       if (text instanceof IHtmlContent) {
-        bindTexts.add((IHtmlContent) text);
+        IHtmlContent contentText = (IHtmlContent) text;
+
+        HtmlBinds binds = contentText.getBinds();
+        Map<String, String> replacements = getBinds().getReplacements(binds);
+        if (!replacements.isEmpty()) {
+          contentText.replaceBinds(replacements);
+        }
+
+        bindTexts.add(contentText);
+        getBinds().putAll(contentText.getBinds());
+      }
+      else if (text instanceof IHtmlBind) {
+        IHtmlBind contentText = (IHtmlBind) text;
+        bindTexts.add(contentText);
       }
       else {
-        bindTexts.add(m_binds.put(text));
+        bindTexts.add(getBinds().put(text));
       }
+
     }
     m_texts = bindTexts;
   }
@@ -101,6 +115,15 @@ public class HtmlNodeBuilder extends AbstractExpressionBuilder implements IHtmlE
     m_attributes.add(name + "=\"" + value + "\"");
   }
 
+  @Override
+  public void replaceBinds(Map<String/*old Bind*/, String/*new Bind*/> bindMap) {
+    for (IHtmlBind elem : m_texts) {
+      elem.replaceBinds(bindMap);
+    }
+    getBinds().replaceBinds(bindMap);
+    invalidate();
+  }
+
 /// GLOBAL ATTRIBUTES
   @SuppressWarnings("unchecked")
   @Override
@@ -132,16 +155,6 @@ public class HtmlNodeBuilder extends AbstractExpressionBuilder implements IHtmlE
     cssClass("app-link");
     addAttribute("data-ref", ref);
     return (T) this;
-  }
-
-  @Override
-  public String toEncodedHtml() {
-    return m_binds.applyBindParameters(this);
-  }
-
-  @Override
-  public HtmlBinds getBinds() {
-    return m_binds;
   }
 
 }

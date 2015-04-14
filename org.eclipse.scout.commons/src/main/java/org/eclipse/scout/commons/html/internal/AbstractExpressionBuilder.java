@@ -10,19 +10,34 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.html.internal;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.html.HtmlBinds;
+import org.eclipse.scout.commons.html.IHtmlContent;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+
 /**
  * Buffer for expressions</br>
  * (not thread safe)
  */
-public abstract class AbstractExpressionBuilder implements CharSequence {
+public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlContent {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractExpressionBuilder.class);
   private StringBuilder m_buf;
+  private HtmlBinds m_binds = new HtmlBinds();
 
-  private StringBuilder validate() {
+  protected StringBuilder validate() {
     if (m_buf == null) {
       m_buf = new StringBuilder();
       build();
     }
     return m_buf;
+  }
+
+  protected void invalidate() {
+    m_buf = null;
   }
 
   protected abstract void build();
@@ -49,6 +64,41 @@ public abstract class AbstractExpressionBuilder implements CharSequence {
 
   protected void append(CharSequence arg) {
     m_buf.append(arg);
+  }
+
+  @Override
+  public HtmlBinds getBinds() {
+    return m_binds;
+  }
+
+  @Override
+  public void setBinds(HtmlBinds binds) {
+    m_binds = binds;
+  }
+
+  @Override
+  public String toEncodedHtml() {
+    String res = this.toString();
+    List<String> binds = getBinds().getBindParameters(res);
+    Collections.sort(binds, new ReversedLengthComparator());
+    for (String b : binds) {
+      Object value = getBinds().getBindValue(b);
+      if (value == null) {
+        LOG.error("No bind value found for ", b);
+      }
+      else {
+        final String encode = encode(value);
+        res = res.replaceAll(b, encode);
+      }
+    }
+    return res;
+  }
+
+  /**
+   * @return the encoded bind value.
+   */
+  protected String encode(Object value) {
+    return StringUtility.htmlEncode(StringUtility.emptyIfNull(value).toString(), false);
   }
 
 }
