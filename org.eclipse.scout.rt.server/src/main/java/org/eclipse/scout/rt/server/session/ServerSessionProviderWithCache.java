@@ -22,9 +22,7 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
@@ -32,9 +30,6 @@ import org.eclipse.scout.rt.server.context.ServerRunContext;
 /**
  * Provider for server sessions. A server session is only created if not contained in the session cache.
  */
-//TODO dwi, imo prio?
-@Priority(-10)
-@ApplicationScoped
 public class ServerSessionProviderWithCache extends ServerSessionProvider {
 
   private static final String PROP_SESSION_EXPIRATION = String.format("%s#expiration", ServerSessionProviderWithCache.class.getName());

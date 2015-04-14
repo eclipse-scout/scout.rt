@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.session;
+package org.eclipse.scout.testing.client;
 
 import java.security.Principal;
 import java.util.Collection;
@@ -22,24 +22,18 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.annotations.Internal;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * Provider for client sessions. A client session is only created if not contained in the session cache.
- * TODO [dwi/imo]: move into test-package?
  */
-//TODO dwi, imo prio?
-// FIXME abr rename this class to TestingClientSessionProviderWithCache and move it to rt.testing.client module
-@Priority(-10)
-@ApplicationScoped
 public class ClientSessionProviderWithCache extends ClientSessionProvider {
 
   private static final String PROP_SESSION_EXPIRATION = String.format("%s#expiration", ClientSessionProviderWithCache.class.getName());

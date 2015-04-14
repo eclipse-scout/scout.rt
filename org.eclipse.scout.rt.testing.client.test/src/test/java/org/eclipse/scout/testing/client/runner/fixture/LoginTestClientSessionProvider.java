@@ -20,12 +20,10 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
-import org.eclipse.scout.rt.client.session.ClientSessionProviderWithCache;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.testing.client.ClientSessionProviderWithCache;
 
-@Bean
-@Priority(10)
 public class LoginTestClientSessionProvider extends ClientSessionProviderWithCache {
 
   private static IClientSession s_currentSession;
