@@ -172,7 +172,7 @@ public abstract class AbstractUiServlet extends HttpServlet {
       }
       finally {
         if (LOG.isDebugEnabled()) {
-          LOG.debug(m_requestType + " request " + req.getRequestURI() + " completed in " + DateUtility.formatNanos(System.nanoTime() - start) + "ms");
+          LOG.debug(m_requestType + " request " + req.getRequestURI() + " completed in " + DateUtility.formatNanos(System.nanoTime() - start) + " ms");
         }
       }
     }
