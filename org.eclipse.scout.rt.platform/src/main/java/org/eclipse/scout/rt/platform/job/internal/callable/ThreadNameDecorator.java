@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal.callable;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
@@ -55,21 +57,30 @@ public class ThreadNameDecorator<RESULT> implements ICallable<RESULT>, IChainabl
   public RESULT call() throws Exception {
     final ThreadInfo currentThreadInfo = ThreadInfo.CURRENT.get();
 
+    final AtomicLong lastEventTime = new AtomicLong(System.nanoTime());
+
     // Install job listener to decorate the thread's name once being blocked.
     final IJobListener listener = Jobs.getJobManager().addListener(Jobs.newEventFilter().currentFuture().eventTypes(JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.RESUMED), new IJobListener() {
 
       @Override
       public void changed(final JobEvent event) {
-        switch (event.getType()) {
-          case BLOCKED:
-            currentThreadInfo.updateState(JobState.Blocked, event.getBlockingCondition().getName());
-            break;
-          case UNBLOCKED:
-            currentThreadInfo.updateState(JobState.Resuming, event.getBlockingCondition().getName());
-            break;
-          case RESUMED:
-            currentThreadInfo.updateState(JobState.Running, null);
-            break;
+        synchronized (lastEventTime) { // synchronize event handling because being fired asynchronously.
+          if (event.getNanoTime() < lastEventTime.get()) {
+            return; // this event is out-of-date
+          }
+          lastEventTime.set(event.getNanoTime());
+
+          switch (event.getType()) {
+            case BLOCKED:
+              currentThreadInfo.updateState(JobState.Blocked, event.getBlockingCondition().getName());
+              break;
+            case UNBLOCKED:
+              currentThreadInfo.updateState(JobState.Resuming, event.getBlockingCondition().getName());
+              break;
+            case RESUMED:
+              currentThreadInfo.updateState(JobState.Running, null);
+              break;
+          }
         }
       }
     });

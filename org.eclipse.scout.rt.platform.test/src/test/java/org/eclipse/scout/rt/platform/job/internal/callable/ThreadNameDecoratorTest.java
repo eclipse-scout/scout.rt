@@ -19,18 +19,20 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.StringHolder;
-import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
+import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,17 +41,13 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class ThreadNameDecoratorTest {
 
-  private JobManager m_jobManager;
-  private IBean<JobManager> m_bean;
+  private IJobManager m_jobManager;
+  private IBean<Object> m_bean;
 
   @Before
   public void before() {
     m_jobManager = new JobManager();
-
-    BeanMetaData b = new BeanMetaData(JobManager.class, m_jobManager);
-    b.addAnnotation(AnnotationFactory.createApplicationScoped());
-    b.addAnnotation(AnnotationFactory.createOrder(-10000));
-    m_bean = Platform.get().getBeanManager().registerBean(b);
+    m_bean = Platform.get().getBeanManager().registerBean(new BeanMetaData(JobManager.class, m_jobManager).replace(true).order(-1));
   }
 
   @After
@@ -103,52 +101,78 @@ public class ThreadNameDecoratorTest {
   }
 
   @Test
+  @Times(50) // This test is executed 50 times (regression)
   public void testThreadNameBlocking() throws Exception {
     final Object mutexObject = new Object();
-    final IBlockingCondition BC = m_jobManager.createBlockingCondition("blocking-condition", true);
-    final Holder<Thread> threadJob1 = new Holder<>();
+    final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("blocking-condition", true);
+
+    final Holder<Thread> workerThreadJob1Holder = new Holder<>();
+    final Holder<ThreadInfo> threadInfoJob1Holder = new Holder<>();
 
     // Job-1 (same mutex as job-2)
-    IFuture<Boolean> future1 = m_jobManager.schedule(new ICallable<Boolean>() {
+    IFuture<Boolean> future1 = Jobs.schedule(new ICallable<Boolean>() {
 
       @Override
       public Boolean call() throws Exception {
-        threadJob1.setValue(Thread.currentThread());
+        workerThreadJob1Holder.setValue(Thread.currentThread());
+        threadInfoJob1Holder.setValue(ThreadInfo.CURRENT.get());
 
+        // verify job-status is 'RUNNING'.
         String currentThreadName = Thread.currentThread().getName();
-        assertTrue(currentThreadName, currentThreadName.matches("scout-thread-\\d+ \\[Running\\] job-1"));
+        assertTrue("actual=" + currentThreadName, currentThreadName.matches("scout-thread-\\d+ \\[Running\\] job-1"));
 
         // Start blocking
         BC.waitFor();
 
-        // Wait for event to be processed because being fired asynchronously. (max 30s)
-        waitForCondition(new ICondition() {
+        // Wait for the thread name to be updated because job-state change events are fired asynchronously (max 30s).
+        waitForConditionElseFail(new ICondition() {
 
           @Override
           public boolean evaluate() {
-            return Thread.currentThread().getName().matches("scout-thread-\\d+ \\[Running\\] job-1");
+            return JobState.Running.equals(ThreadInfo.CURRENT.get().getCurrentJobState());
           }
         });
+
+        // verify job-status is 'RUNNING'.
+        currentThreadName = Thread.currentThread().getName();
+        assertTrue("actual=" + currentThreadName, currentThreadName.matches("scout-thread-\\d+ \\[Running\\] job-1"));
         return true;
       }
     }, Jobs.newInput(RunContexts.copyCurrent()).name("job-1").mutex(mutexObject));
 
     // Job-2 (same mutex as job-1)
-    IFuture<Boolean> future2 = m_jobManager.schedule(new ICallable<Boolean>() {
+    IFuture<Boolean> future2 = Jobs.schedule(new ICallable<Boolean>() {
 
       @Override
       public Boolean call() throws Exception {
-        // Wait for event to be processed because being fired asynchronously. (max 30s)
-        waitForCondition(new ICondition() {
+        // Wait for the thread name to be updated because job-state change events are fired asynchronously (max 30s).
+        waitForConditionElseFail(new ICondition() {
 
           @Override
           public boolean evaluate() {
-            return threadJob1.getValue().getName().matches("scout-thread-\\d+ \\[Blocked 'blocking-condition'\\] job-1");
+            return JobState.Blocked.equals(threadInfoJob1Holder.getValue().getCurrentJobState());
           }
         });
 
+        // verify job1 to be in blocked state.
+        String threadNameJob1 = workerThreadJob1Holder.getValue().getName();
+        assertTrue("actual=" + threadNameJob1, threadNameJob1.matches("scout-thread-\\d+ \\[Blocked 'blocking-condition'\\] job-1"));
+
         // Release job-1
         BC.setBlocking(false);
+
+        // Wait for the thread name to be updated because job-state change events are fired asynchronously (max 30s).
+        waitForConditionElseFail(new ICondition() {
+
+          @Override
+          public boolean evaluate() {
+            return JobState.Resuming.equals(threadInfoJob1Holder.getValue().getCurrentJobState());
+          }
+        });
+
+        // verify job1 to be in resume state.
+        threadNameJob1 = workerThreadJob1Holder.getValue().getName();
+        assertTrue("actual=" + threadNameJob1, threadNameJob1.matches("scout-thread-\\d+ \\[Resuming 'blocking-condition'\\] job-1"));
 
         return true;
       }
@@ -158,7 +182,7 @@ public class ThreadNameDecoratorTest {
     assertTrue(future1.awaitDoneAndGet());
   }
 
-  public static void waitForCondition(ICondition condition) throws InterruptedException {
+  private static void waitForConditionElseFail(ICondition condition) throws InterruptedException {
     long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
 
     // Wait until the other jobs tried to re-acquire the mutex.

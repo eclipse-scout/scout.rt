@@ -117,6 +117,13 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
     }
 
     /**
+     * @return current job state.
+     */
+    public synchronized JobState getCurrentJobState() {
+      return m_currentJobState;
+    }
+
+    /**
      * Invoke to update the thread's state.
      *
      * @param jobState
@@ -124,7 +131,7 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
      * @param jobStateInfo
      *          information associated with the new job state.
      */
-    public void updateState(final JobState jobState, final String jobStateInfo) {
+    public synchronized void updateState(final JobState jobState, final String jobStateInfo) {
       m_currentJobStateInfo = jobStateInfo;
       m_currentJobState = jobState;
       m_thread.setName(buildThreadName());
@@ -140,7 +147,7 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
      * @param state
      *          state of the current job.
      */
-    public void updateNameAndState(final String threadName, final String jobName, final JobState state) {
+    public synchronized void updateNameAndState(final String threadName, final String jobName, final JobState state) {
       m_currentThreadName = threadName;
       m_currentJobName = jobName;
       m_currentJobState = state;
