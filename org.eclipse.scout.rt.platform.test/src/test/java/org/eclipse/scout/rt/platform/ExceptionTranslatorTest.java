@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.runner.statement.ExceptionHandlerError;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -73,16 +72,6 @@ public class ExceptionTranslatorTest {
     catch (Throwable t) {
       assertSame(assertError, t);
 
-    }
-
-    // test 'Error' (3)
-    ExceptionHandlerError exceptionHandlerError = new ExceptionHandlerError(new ProcessingException());
-    try {
-      exceptionTranslator.translate(exceptionHandlerError);
-      fail("Error's should not be translated but re-throw instead");
-    }
-    catch (Throwable t) {
-      assertSame(exceptionHandlerError, t);
     }
 
     // test 'UndeclaredThrowableException'

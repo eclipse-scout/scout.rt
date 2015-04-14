@@ -55,6 +55,7 @@
     <module>../org.eclipse.scout.rt.testing.commons</module>
     <module>../org.eclipse.scout.rt.testing.commons.test</module>
     <module>../org.eclipse.scout.rt.testing.platform</module>
+    <module>../org.eclipse.scout.rt.testing.platform.test</module>
     <module>../org.eclipse.scout.rt.testing.server</module>
     <module>../org.eclipse.scout.rt.testing.server.test</module>
     <module>../org.eclipse.scout.rt.testing.shared</module>

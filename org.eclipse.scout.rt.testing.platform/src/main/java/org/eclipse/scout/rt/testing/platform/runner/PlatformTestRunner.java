@@ -15,10 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.ReflectionUtility;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
-import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowExceptionHandlerCauseStatement;
+import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.notification.RunNotifier;
@@ -201,7 +203,10 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    * @return the head of the chain to be invoked first.
    */
   protected Statement interceptClassLevelStatement(final Statement next, final Class<?> testClass) {
-    return new SubjectStatement(next, testClass.getAnnotation(RunWithSubject.class));
+    final Statement s2 = new SubjectStatement(next, testClass.getAnnotation(RunWithSubject.class));
+    final Statement s1 = new RegisterBeanStatement(s2, new BeanMetaData(JUnitExceptionHandler.class).replace(true).order(-1000)); // exception handler to not silently swallow handled exceptions.
+
+    return s1;
   }
 
   /**
@@ -236,12 +241,15 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
    * @return the head of the chain to be invoked first.
    */
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
-    return new SubjectStatement(next, ReflectionUtility.getAnnotation(RunWithSubject.class, testMethod, testClass));
+    final Statement s2 = new SubjectStatement(next, ReflectionUtility.getAnnotation(RunWithSubject.class, testMethod, testClass));
+    final Statement s1 = new RegisterBeanStatement(s2, new BeanMetaData(JUnitExceptionHandler.class).replace(true).order(-1000)); // exception handler to not silently swallow handled exceptions.
+
+    return s1;
   }
 
   @Override
   protected Statement possiblyExpectingExceptions(FrameworkMethod method, Object test, Statement next) {
-    // install statement to re-throw exceptions caught by JUnitExceptionHandler.
-    return super.possiblyExpectingExceptions(method, test, new ThrowExceptionHandlerCauseStatement(next));
+    // install statement to re-throw the first exception handled by JUnitExceptionHandler.
+    return super.possiblyExpectingExceptions(method, test, new ThrowHandledExceptionStatement(next));
   }
 }

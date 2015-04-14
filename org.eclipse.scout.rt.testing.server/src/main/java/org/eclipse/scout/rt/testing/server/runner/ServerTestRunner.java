@@ -13,16 +13,9 @@ package org.eclipse.scout.rt.testing.server.runner;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.ReflectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.BeanMetaData;
-import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.platform.runner.statement.ExceptionHandlerError;
-import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
-import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowExceptionHandlerCauseStatement;
 import org.eclipse.scout.rt.testing.server.runner.statement.ClearServerRunContextStatement;
 import org.eclipse.scout.rt.testing.server.runner.statement.ServerRunContextStatement;
 import org.junit.Test;
@@ -72,9 +65,8 @@ public class ServerTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptClassLevelStatement(final Statement next, final Class<?> testClass) {
-    final Statement s4 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testClass));
-    final Statement s3 = super.interceptClassLevelStatement(s4, testClass);
-    final Statement s2 = new RegisterBeanStatement(s3, new BeanMetaData(IExceptionHandlerService.class, new JUnitExceptionHandler()).order(-1000)); // exception handler to not silently swallow exceptions.
+    final Statement s3 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testClass));
+    final Statement s2 = super.interceptClassLevelStatement(s3, testClass);
     final Statement s1 = new ClearServerRunContextStatement(s2);
 
     return s1;
@@ -86,24 +78,9 @@ public class ServerTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
-    final Statement s4 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testMethod, testClass));
-    final Statement s3 = super.interceptMethodLevelStatement(s4, testClass, testMethod);
-    final Statement s2 = new RegisterBeanStatement(s3, new BeanMetaData(IExceptionHandlerService.class, new JUnitExceptionHandler()).order(-1000)); // exception handler to not silently swallow exceptions.
+    final Statement s3 = new ServerRunContextStatement(next, ReflectionUtility.getAnnotation(RunWithServerSession.class, testMethod, testClass));
+    final Statement s2 = super.interceptMethodLevelStatement(s3, testClass, testMethod);
     final Statement s1 = new ClearServerRunContextStatement(s2);
     return s1;
-  }
-
-  /**
-   * {@code IExceptionHandler} to not silently swallow exceptions during JUnit test execution. In
-   * {@link ThrowExceptionHandlerCauseStatement}, the cause is propagated to the caller.
-   */
-  protected class JUnitExceptionHandler extends AbstractService implements IExceptionHandlerService {
-
-    @Override
-    public void handleException(final ProcessingException pe) {
-      if (!pe.isConsumed()) {
-        throw new ExceptionHandlerError(pe);
-      }
-    }
   }
 }
