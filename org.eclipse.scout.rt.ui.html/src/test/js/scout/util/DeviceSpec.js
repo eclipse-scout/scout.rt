@@ -1,7 +1,7 @@
 describe("Device", function() {
 
   function verifyDevices(actual, expected) {
-    expect(actual.getSystem()).toBe(expected.getSystem());
+    expect(actual.system).toBe(expected.system);
   }
 
   function createDevice(system) {
