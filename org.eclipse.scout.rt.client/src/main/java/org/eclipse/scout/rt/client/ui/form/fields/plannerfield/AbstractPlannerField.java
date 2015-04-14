@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("8fbfbf19-ff9d-4e89-8a78-8e6a4a8dc36c")
 public abstract class AbstractPlannerField<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractFormField implements IPlannerField<T, P, RI, AI> {
@@ -174,7 +174,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
           m_resourceTable = (T) ConfigurationUtility.newInnerInstance(this, configuredResourceTable);
         }
         catch (Exception e) {
-          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredResourceTable().getName() + "'.", e));
+          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredResourceTable().getName() + "'.", e));
         }
       }
     }
@@ -206,7 +206,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
           m_activityMap = (P) ConfigurationUtility.newInnerInstance(this, configuredActivityMap);
         }
         catch (Exception e) {
-          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + configuredActivityMap.getName() + "'.", e));
+          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + configuredActivityMap.getName() + "'.", e));
         }
       }
     }
@@ -387,7 +387,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
         loadResourceTableData();
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
 
@@ -418,7 +418,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
             loadActivityMapDataInternal(getResourceTable().getFilteredRows());
           }
           catch (ProcessingException ex) {
-            BEANS.get(IExceptionHandlerService.class).handleException(ex);
+            BEANS.get(ExceptionHandler.class).handle(ex);
           }
         }
         case TableEvent.TYPE_ROWS_INSERTED: {
@@ -426,7 +426,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
             loadActivityMapDataInternal(e.getRows());
           }
           catch (ProcessingException ex) {
-            BEANS.get(IExceptionHandlerService.class).handleException(ex);
+            BEANS.get(ExceptionHandler.class).handle(ex);
           }
           break;
         }
@@ -435,7 +435,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
             loadActivityMapDataInternal(e.getRows());
           }
           catch (ProcessingException ex) {
-            BEANS.get(IExceptionHandlerService.class).handleException(ex);
+            BEANS.get(ExceptionHandler.class).handle(ex);
           }
           break;
         }

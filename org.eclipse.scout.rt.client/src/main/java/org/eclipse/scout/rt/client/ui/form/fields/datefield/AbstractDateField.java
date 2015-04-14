@@ -37,8 +37,8 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.IDateField
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 /**
  * A Value field for date and time values.
@@ -1096,7 +1096,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
         setValue(d);
       }
       catch (Throwable t) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
 
@@ -1122,7 +1122,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
         setValue(d);
       }
       catch (Throwable t) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
 
@@ -1132,7 +1132,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
         setValue(d);
       }
       catch (Throwable t) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
 
@@ -1142,10 +1142,10 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
         interceptShiftDate(level, value);
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
       catch (Throwable t) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
 
@@ -1155,10 +1155,10 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
         interceptShiftTime(level, value);
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
       catch (Throwable t) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
 

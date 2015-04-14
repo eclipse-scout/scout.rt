@@ -22,8 +22,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 public class CopyWidthsOfColumnsMenu extends AbstractMenu {
@@ -85,7 +85,7 @@ public class CopyWidthsOfColumnsMenu extends AbstractMenu {
     }
     catch (ProcessingException se) {
       se.addContextMessage(getText());
-      BEANS.get(IExceptionHandlerService.class).handleException(se);
+      BEANS.get(ExceptionHandler.class).handle(se);
     }
   }
 

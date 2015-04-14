@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxProcessButtonGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.VerticalSmartGroupBoxBodyGrid;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("6a093505-c2b1-4df2-84d6-e799f91e6e7c")
 public abstract class AbstractGroupBox extends AbstractCompositeField implements IGroupBox {
@@ -249,7 +249,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
         setBodyGrid(bodyGrid);
       }
       catch (Exception e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + bodyGridClazz.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + bodyGridClazz.getName() + "'.", e));
       }
     }
     m_customProcessButtonGrid = new GroupBoxProcessButtonGrid(this, true, false);
@@ -278,7 +278,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
         menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
       }
       catch (Exception e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
 

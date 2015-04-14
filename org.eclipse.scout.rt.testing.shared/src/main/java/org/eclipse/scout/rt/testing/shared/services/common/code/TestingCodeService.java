@@ -25,12 +25,12 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeVisitor;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 /**
  * Dynamic code service for testing purposes. Arbitrary code types can be registered dynamically. Consumers must
@@ -154,7 +154,7 @@ public class TestingCodeService extends AbstractService implements ICodeService 
           declaringCodeTypeClass = type.newInstance().getCodeType().getClass();
         }
         catch (Throwable t) {
-          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + type.getName() + "'.", t));
+          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + type.getName() + "'.", t));
         }
       }
       ICodeType<?, CODE_ID_TYPE> codeType = getCodeType(declaringCodeTypeClass);

@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 public class DeviceTransformationDesktopExtension extends AbstractDesktopExtension {
@@ -143,7 +143,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
       getDeviceTransformer().transformForm(form);
     }
     catch (ProcessingException e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
 
     if (!getDeviceTransformer().acceptFormAddingToDesktop(form)) {

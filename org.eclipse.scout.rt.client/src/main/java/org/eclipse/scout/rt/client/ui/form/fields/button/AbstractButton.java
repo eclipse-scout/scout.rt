@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("998788cf-df0f-480b-bd5a-5037805610c9")
 public abstract class AbstractButton extends AbstractFormField implements IButton {
@@ -222,7 +222,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
         menus.addOrdered(menu);
       }
       catch (Throwable t) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", t));
       }
     }
 
@@ -360,7 +360,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
         interceptSelectionChanged(b);
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
   }
@@ -437,7 +437,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
         }
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
 

@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
  * @since 3.8.0
@@ -36,7 +36,7 @@ public class OutlineMediator {
       pageWithNodes.rebuildTableInternal();
     }
     catch (ProcessingException e1) {
-      BEANS.get(IExceptionHandlerService.class).handleException(e1);
+      BEANS.get(ExceptionHandler.class).handle(e1);
     }
   }
 

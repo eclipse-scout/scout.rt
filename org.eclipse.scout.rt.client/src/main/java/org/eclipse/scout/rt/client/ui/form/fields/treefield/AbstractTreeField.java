@@ -41,9 +41,9 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 @ClassId("bfbf00d0-b70a-48d4-8481-4faff294f37f")
 @FormData(value = AbstractTreeFieldData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
@@ -144,7 +144,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
       loadRootNode();
     }
     catch (ProcessingException e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
 
@@ -161,7 +161,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
           tree = ConfigurationUtility.newInnerInstance(this, configuredTree);
         }
         catch (Exception e) {
-          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + configuredTree.getName() + "'.", e));
+          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + configuredTree.getName() + "'.", e));
         }
       }
     }

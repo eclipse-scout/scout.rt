@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
  * A tool button that can be used in the {@link IDesktop} to toggle a form in the tools area.
@@ -122,7 +122,7 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
       return getConfiguredForm().newInstance();
     }
     catch (Exception e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredForm().getName() + "'.", e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredForm().getName() + "'.", e));
     }
     return null;
   }

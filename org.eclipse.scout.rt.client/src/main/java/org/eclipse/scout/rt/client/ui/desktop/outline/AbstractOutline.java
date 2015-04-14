@@ -52,7 +52,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 public abstract class AbstractOutline extends AbstractTree implements IOutline {
@@ -207,7 +207,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       ensureDefaultDetailFormStarted();
     }
     catch (ProcessingException e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
 
@@ -311,7 +311,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
             unloadNode(page);
           }
           catch (ProcessingException e) {
-            BEANS.get(IExceptionHandlerService.class).handleException(e);
+            BEANS.get(ExceptionHandler.class).handle(e);
           }
         }
         return true;
@@ -673,7 +673,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       return getConfiguredDefaultDetailForm().newInstance();
     }
     catch (Exception e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredDefaultDetailForm().getName() + "'.", e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredDefaultDetailForm().getName() + "'.", e));
     }
     return null;
   }

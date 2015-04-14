@@ -50,8 +50,8 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode implements IPage<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPage.class);
@@ -314,7 +314,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
         }
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
     else {
@@ -329,7 +329,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
         }
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
   }
@@ -486,10 +486,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       }
     }
     catch (ProcessingException e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
     catch (Exception e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
     }
   }
 
@@ -500,10 +500,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       disposeDetailForm();
     }
     catch (ProcessingException e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
     catch (Exception e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
     }
     // automatically remove all data change listeners
     if (m_internalDataChangeListener != null) {
@@ -522,10 +522,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       interceptPageActivated();
     }
     catch (ProcessingException t) {
-      BEANS.get(IExceptionHandlerService.class).handleException(t);
+      BEANS.get(ExceptionHandler.class).handle(t);
     }
     catch (Exception e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
     }
   }
 
@@ -535,10 +535,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       interceptPageDeactivated();
     }
     catch (ProcessingException p) {
-      BEANS.get(IExceptionHandlerService.class).handleException(p);
+      BEANS.get(ExceptionHandler.class).handle(p);
     }
     catch (Exception e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
     }
   }
 
@@ -550,7 +550,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       return getConfiguredDetailForm().newInstance();
     }
     catch (Exception e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredDetailForm().getName() + "'.", e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredDetailForm().getName() + "'.", e));
     }
     return null;
   }
@@ -653,10 +653,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       interceptDataChanged(dataTypes);
     }
     catch (ProcessingException p) {
-      BEANS.get(IExceptionHandlerService.class).handleException(p);
+      BEANS.get(ExceptionHandler.class).handle(p);
     }
     catch (Exception e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
     }
   }
 

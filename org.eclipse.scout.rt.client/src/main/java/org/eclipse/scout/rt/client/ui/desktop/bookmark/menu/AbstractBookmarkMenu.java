@@ -32,12 +32,12 @@ import org.eclipse.scout.rt.client.ui.desktop.bookmark.BookmarkForm;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.IBookmarkForm;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.internal.ManageBookmarksForm;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.CreateGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.CreateUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 /**
  * Maintain a menu per bookmark and its key stroke on the desktop
@@ -91,7 +91,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
           form = getConfiguredBookmarkForm().newInstance();
         }
         catch (Exception e) {
-          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredBookmarkForm().getName() + "'.", e));
+          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredBookmarkForm().getName() + "'.", e));
         }
       }
       if (form == null) {

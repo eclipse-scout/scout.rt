@@ -31,8 +31,8 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.MailFieldC
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 /**
  * @version 3.x
@@ -256,7 +256,7 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
         doAttachementAction(file);
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
 
@@ -266,7 +266,7 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
         doAppLinkAction(ref);
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
 

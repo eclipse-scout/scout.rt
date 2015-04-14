@@ -52,6 +52,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -63,7 +64,6 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 public abstract class AbstractWizard extends AbstractPropertyObserver implements IWizard, IContributionOwner, IExtensibleObject {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractWizard.class);
@@ -421,7 +421,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         steps.addOrdered(step);
       }
       catch (Exception e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + element.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + element.getName() + "'.", e));
       }
     }
     for (IWizardStep step : contributedSteps) {
@@ -816,10 +816,10 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
           interceptActiveStepChanged();
         }
         catch (ProcessingException e) {
-          BEANS.get(IExceptionHandlerService.class).handleException(e);
+          BEANS.get(ExceptionHandler.class).handle(e);
         }
         catch (Throwable t) {
-          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
         }
       }
       finally {
@@ -835,10 +835,10 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       interceptRefreshButtonPolicy();
     }
     catch (ProcessingException e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
     catch (Throwable t) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
     }
   }
 

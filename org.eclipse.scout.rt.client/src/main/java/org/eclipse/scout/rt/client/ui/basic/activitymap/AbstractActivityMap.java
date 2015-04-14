@@ -56,13 +56,13 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IActivityMapContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.ActivityMapContextMenu;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserver implements IActivityMap<RI, AI>, IContributionOwner, IExtensibleObject {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractActivityMap.class);
@@ -285,7 +285,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
         menus.addOrdered(menu);
       }
       catch (Exception e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
     m_contributionHolder = new ContributionComposite(this);
@@ -344,10 +344,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
               interceptActivityCellSelected(cell);
             }
             catch (ProcessingException t) {
-              BEANS.get(IExceptionHandlerService.class).handleException(t);
+              BEANS.get(ExceptionHandler.class).handle(t);
             }
             catch (Throwable t) {
-              BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+              BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
             }
           }
         }
@@ -432,10 +432,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       setTimeScale(scale);
     }
     catch (ProcessingException t) {
-      BEANS.get(IExceptionHandlerService.class).handleException(t);
+      BEANS.get(ExceptionHandler.class).handle(t);
     }
     catch (Throwable t) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
     }
   }
 
@@ -729,10 +729,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       interceptCellAction(resourceId, column, activityCell);
     }
     catch (ProcessingException t) {
-      BEANS.get(IExceptionHandlerService.class).handleException(t);
+      BEANS.get(ExceptionHandler.class).handle(t);
     }
     catch (Throwable t) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
     }
     ActivityMapEvent e = new ActivityMapEvent(this, ActivityMapEvent.TYPE_CELL_ACTION, resourceId, column, activityCell);
     fireActivityMapEventInternal(e);
@@ -1125,8 +1125,8 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
 
           if (CompareUtility.equals(cell.getBeginTime(), beginTime) &&
               (CompareUtility.equals(cell.getEndTime(), endTime)
-              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-              || (cell != null
+                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+                  || (cell != null
                   && cell.getEndTime() != null
                   && endTime != null
                   && cell.getEndTime().getTime() == endTime.getTime() + 1))) {
@@ -1164,10 +1164,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       interceptDecorateActivityCell(cell);
     }
     catch (ProcessingException t) {
-      BEANS.get(IExceptionHandlerService.class).handleException(t);
+      BEANS.get(ExceptionHandler.class).handle(t);
     }
     catch (Throwable t) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
     }
     finally {
       cell.setObserver(m_cellObserver);

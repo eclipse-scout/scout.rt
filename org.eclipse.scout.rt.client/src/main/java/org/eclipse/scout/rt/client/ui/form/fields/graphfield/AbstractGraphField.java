@@ -16,8 +16,8 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.graphfield.IGraphFie
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 public class AbstractGraphField extends AbstractValueField<GraphModel> implements IGraphField {
 
@@ -68,7 +68,7 @@ public class AbstractGraphField extends AbstractValueField<GraphModel> implement
         doAppLinkAction(ref);
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
   }

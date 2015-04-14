@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.client.ui.wizard.WizardEvent;
 import org.eclipse.scout.rt.client.ui.wizard.WizardListener;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 public class AbstractWizardProgressField extends AbstractFormField implements IWizardProgressField {
 
@@ -149,7 +149,7 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
       }
       catch (Exception e) {
         ProcessingException pe = (e instanceof ProcessingException ? (ProcessingException) e : new ProcessingException("Unexpected error", e));
-        BEANS.get(IExceptionHandlerService.class).handleException(pe);
+        BEANS.get(ExceptionHandler.class).handle(pe);
       }
     }
   }

@@ -65,6 +65,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.TreeNodeData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -73,7 +74,6 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 public abstract class AbstractTree extends AbstractPropertyObserver implements ITree, IContributionOwner, IExtensibleObject {
@@ -550,7 +550,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
               interceptNodesChecked(CollectionUtility.arrayList(e.getNodes()));
             }
             catch (ProcessingException ex) {
-              BEANS.get(IExceptionHandlerService.class).handleException(ex);
+              BEANS.get(ExceptionHandler.class).handle(ex);
             }
             break;
           }
@@ -580,7 +580,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         ksList.add(ConfigurationUtility.newInnerInstance(this, keystrokeClazz));
       }
       catch (Throwable t) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", t));
       }
     }
     //ticket 87370: add ENTER key stroke when execNodeAction has an override
@@ -610,7 +610,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         menus.addOrdered(menu);
       }
       catch (Exception e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
     try {
@@ -1091,7 +1091,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           fireNodeExpanded(node, b);
         }
         catch (ProcessingException e) {
-          BEANS.get(IExceptionHandlerService.class).handleException(e);
+          BEANS.get(ExceptionHandler.class).handle(e);
         }
       }
     }
@@ -1303,7 +1303,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           interceptAutoCheckChildNodes(nodes);
         }
         catch (ProcessingException ex) {
-          BEANS.get(IExceptionHandlerService.class).handleException(ex);
+          BEANS.get(ExceptionHandler.class).handle(ex);
         }
       }
       fireNodesChecked(changedNodes);
@@ -1932,7 +1932,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         getRootNode().ensureChildrenLoaded();
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
     final Holder<ITreeNode> foundVisited = new Holder<ITreeNode>(ITreeNode.class);
@@ -1961,7 +1961,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         getRootNode().ensureChildrenLoaded();
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
     final Holder<ITreeNode> foundVisited = new Holder<ITreeNode>(ITreeNode.class);
@@ -2248,10 +2248,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       interceptNodesSelected(e);
     }
     catch (ProcessingException ex) {
-      BEANS.get(IExceptionHandlerService.class).handleException(ex);
+      BEANS.get(ExceptionHandler.class).handle(ex);
     }
     catch (Throwable t) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
     }
     //end single observer
     fireTreeEventInternal(e);
@@ -2296,10 +2296,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         interceptNodeClick(node, mouseButton);
       }
       catch (ProcessingException ex) {
-        BEANS.get(IExceptionHandlerService.class).handleException(ex);
+        BEANS.get(ExceptionHandler.class).handle(ex);
       }
       catch (Throwable t) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
   }
@@ -2326,10 +2326,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
               interceptNodeAction(node);
             }
             catch (ProcessingException ex) {
-              BEANS.get(IExceptionHandlerService.class).handleException(ex);
+              BEANS.get(ExceptionHandler.class).handle(ex);
             }
             catch (Throwable t) {
-              BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+              BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
             }
           }
         }
@@ -2720,7 +2720,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           msg.append("]");
         }
         se.addContextMessage(msg.toString());
-        BEANS.get(IExceptionHandlerService.class).handleException(se);
+        BEANS.get(ExceptionHandler.class).handle(se);
       }
       finally {
         popUIProcessor();
@@ -2753,7 +2753,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       catch (ProcessingException se) {
         se.addContextMessage(node.getCell().getText());
-        BEANS.get(IExceptionHandlerService.class).handleException(se);
+        BEANS.get(ExceptionHandler.class).handle(se);
       }
       finally {
         popUIProcessor();
@@ -2786,7 +2786,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       catch (ProcessingException se) {
         se.addContextMessage(node.getCell().getText());
-        BEANS.get(IExceptionHandlerService.class).handleException(se);
+        BEANS.get(ExceptionHandler.class).handle(se);
       }
       finally {
         popUIProcessor();
@@ -2827,7 +2827,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       catch (ProcessingException se) {
         se.addContextMessage(nodes.toString());
-        BEANS.get(IExceptionHandlerService.class).handleException(se);
+        BEANS.get(ExceptionHandler.class).handle(se);
       }
       finally {
         popUIProcessor();
@@ -2845,7 +2845,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         }
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
       finally {
         popUIProcessor();
@@ -2864,7 +2864,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         }
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
       finally {
         popUIProcessor();
@@ -2880,7 +2880,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         return fireNodesDragRequest(nodes);
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
         return null;
       }
       finally {
@@ -2911,7 +2911,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         }
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
       finally {
         popUIProcessor();
@@ -2930,7 +2930,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         }
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
       finally {
         popUIProcessor();
@@ -2944,7 +2944,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         doAppLinkAction(ref);
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
       finally {
         popUIProcessor();

@@ -26,11 +26,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.shared.extension.AbstractContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 @Bean
 public abstract class AbstractFormData extends AbstractContributionComposite implements Serializable, Cloneable, IPropertyHolder {
@@ -66,7 +66,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
         propMap.put(p.getClass(), p);
       }
       catch (Exception e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + propertyDataClazz.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + propertyDataClazz.getName() + "'.", e));
       }
     }
     if (!propMap.isEmpty()) {
@@ -86,7 +86,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
         m_fieldMap.put(f.getClass(), f);
       }
       catch (Exception e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + formFieldDataClazz.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + formFieldDataClazz.getName() + "'.", e));
       }
     }
   }

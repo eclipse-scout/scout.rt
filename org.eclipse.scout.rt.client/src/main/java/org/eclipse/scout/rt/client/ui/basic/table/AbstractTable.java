@@ -111,6 +111,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
@@ -122,7 +123,6 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
 import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
@@ -708,10 +708,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         runMenu(defaultMenuType);
       }
       catch (ProcessingException ex) {
-        BEANS.get(IExceptionHandlerService.class).handleException(ex);
+        BEANS.get(ExceptionHandler.class).handle(ex);
       }
       catch (Throwable t) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
     else {
@@ -920,7 +920,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (clazz != null) {
           className = clazz.getName();
         }
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + className + "'.", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + className + "'.", t));
       }
     }
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
@@ -955,7 +955,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (clazz != null) {
           className = clazz.getName();
         }
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + className + "'.", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + className + "'.", t));
       }
     }
     //add ENTER key stroke when default menu is used or execRowAction has an override
@@ -990,7 +990,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
                 e.setDragObject(interceptDrag(e.getRows()));
               }
               catch (ProcessingException ex) {
-                BEANS.get(IExceptionHandlerService.class).handleException(ex);
+                BEANS.get(ExceptionHandler.class).handle(ex);
               }
             }
             break;
@@ -1001,7 +1001,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
                 interceptDrop(e.getFirstRow(), e.getDropObject());
               }
               catch (ProcessingException ex) {
-                BEANS.get(IExceptionHandlerService.class).handleException(ex);
+                BEANS.get(ExceptionHandler.class).handle(ex);
               }
             }
             break;
@@ -1012,7 +1012,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
                 e.setCopyObject(interceptCopy(e.getRows()));
               }
               catch (ProcessingException ex) {
-                BEANS.get(IExceptionHandlerService.class).handleException(ex);
+                BEANS.get(ExceptionHandler.class).handle(ex);
               }
             }
             break;
@@ -1025,7 +1025,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               interceptContentChanged();
             }
             catch (ProcessingException ex) {
-              BEANS.get(IExceptionHandlerService.class).handleException(ex);
+              BEANS.get(ExceptionHandler.class).handle(ex);
             }
             break;
           }
@@ -1034,7 +1034,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               interceptRowsChecked(e.getRows());
             }
             catch (ProcessingException ex) {
-              BEANS.get(IExceptionHandlerService.class).handleException(ex);
+              BEANS.get(ExceptionHandler.class).handle(ex);
             }
             break;
         }
@@ -1090,7 +1090,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (clazz != null) {
           className = clazz.getName();
         }
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + className + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + className + "'.", e));
       }
     }
     m_tableControls = tableControls.getOrderedList();
@@ -1111,7 +1111,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (clazz != null) {
           className = clazz.getName();
         }
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + className + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + className + "'.", e));
       }
     }
 
@@ -2486,7 +2486,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     catch (ProcessingException e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
 
@@ -3561,7 +3561,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     catch (ProcessingException e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
     finally {
       m_cellLookupBuffer.clear();
@@ -3783,10 +3783,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       interceptDecorateCell(cell, row, col);
     }
     catch (ProcessingException e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
     catch (Throwable t) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
     }
   }
 
@@ -3820,10 +3820,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       interceptDecorateRow(row);
     }
     catch (ProcessingException e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
     catch (Throwable t) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
     }
   }
 
@@ -3930,10 +3930,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         interceptRowClick(row, mouseButton);
       }
       catch (ProcessingException ex) {
-        BEANS.get(IExceptionHandlerService.class).handleException(ex);
+        BEANS.get(ExceptionHandler.class).handle(ex);
       }
       catch (Throwable t) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
   }
@@ -3976,10 +3976,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             interceptRowAction(row);
           }
           catch (ProcessingException ex) {
-            BEANS.get(IExceptionHandlerService.class).handleException(ex);
+            BEANS.get(ExceptionHandler.class).handle(ex);
           }
           catch (Throwable t) {
-            BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+            BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
           }
         }
       }
@@ -4444,7 +4444,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         doAppLinkAction(ref);
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
       finally {
         popUIProcessor();
@@ -4485,10 +4485,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             return f;
           }
           catch (ProcessingException e) {
-            BEANS.get(IExceptionHandlerService.class).handleException(e);
+            BEANS.get(ExceptionHandler.class).handle(e);
           }
           catch (Throwable t) {
-            BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+            BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
           }
         }
       }
@@ -4508,10 +4508,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             m_editContext.getColumn().completeEdit(m_editContext.getRow(), m_editContext.getFormField());
           }
           catch (ProcessingException e) {
-            BEANS.get(IExceptionHandlerService.class).handleException(e);
+            BEANS.get(ExceptionHandler.class).handle(e);
           }
           catch (Throwable t) {
-            BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+            BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
           }
           finally {
             m_editContext = null;
@@ -4544,7 +4544,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           m_reloadHandler.reload();
         }
         catch (ProcessingException e) {
-          BEANS.get(IExceptionHandlerService.class).handleException(e);
+          BEANS.get(ExceptionHandler.class).handle(e);
         }
         finally {
           popUIProcessor();
@@ -4603,10 +4603,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             interceptRowsSelected(e.getRows());
           }
           catch (ProcessingException ex) {
-            BEANS.get(IExceptionHandlerService.class).handleException(ex);
+            BEANS.get(ExceptionHandler.class).handle(ex);
           }
           catch (Throwable t) {
-            BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+            BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
           }
           break;
         }

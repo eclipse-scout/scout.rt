@@ -11,7 +11,7 @@ import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
  * Visitor calling {@link IMenu#handleOwnerValueChanged(Object)} on menus, if the menu type allows it.
@@ -34,7 +34,7 @@ public class MenuOwnerChangedVisitor implements IActionVisitor {
         menu.handleOwnerValueChanged(m_ownerValue);
       }
       catch (ProcessingException ex) {
-        BEANS.get(IExceptionHandlerService.class).handleException(ex);
+        BEANS.get(ExceptionHandler.class).handle(ex);
       }
       catch (Exception ex) {
         LOG.error("Error handling handleOwnerValueChanged in " + menu.getClass().getName(), ex);

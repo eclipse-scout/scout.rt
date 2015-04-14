@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("0b1ac83b-6fa4-4e12-88d0-680ed168e914")
 public abstract class AbstractCalendarField<T extends ICalendar> extends AbstractValueField<Date> implements ICalendarField<T> {
@@ -108,7 +108,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
       }
     }
     catch (Exception e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating calendar of calendar field '" + getClass().getName() + "'.", e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating calendar of calendar field '" + getClass().getName() + "'.", e));
     }
   }
 

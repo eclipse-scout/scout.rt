@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
@@ -39,7 +40,6 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.extension.data.model.DataModelEntityChains.DataModelEntityInitEntityChain;
 import org.eclipse.scout.rt.shared.extension.data.model.IDataModelEntityExtension;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 public abstract class AbstractDataModelEntity extends AbstractPropertyObserver implements IDataModelEntity, Serializable, IContributionOwner, IExtensibleObject {
@@ -207,7 +207,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
         attributes.addOrdered(ConfigurationUtility.newInnerInstance(this, c));
       }
       catch (Exception e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + c.getName() + "'.", e));
       }
     }
 
@@ -441,7 +441,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
           entities.addOrdered(e);
         }
         catch (Exception ex) {
-          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", ex));
+          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + c.getName() + "'.", ex));
         }
       }
       newConfiguredInstances.addAll(contributedEntities);

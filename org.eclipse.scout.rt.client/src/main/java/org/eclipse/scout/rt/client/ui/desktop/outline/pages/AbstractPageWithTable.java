@@ -56,11 +56,11 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
@@ -417,7 +417,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       }
     }
     catch (Exception e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating inner table of class '" + getClass().getName() + "'.", e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating inner table of class '" + getClass().getName() + "'.", e));
     }
     return table;
   }
@@ -453,7 +453,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       return configuredSearchForm.newInstance();
     }
     catch (Exception e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + configuredSearchForm.getName() + "'.", e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + configuredSearchForm.getName() + "'.", e));
     }
     return null;
   }
@@ -510,7 +510,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
               reloadPage();
             }
             catch (ProcessingException ex) {
-              BEANS.get(IExceptionHandlerService.class).handleException(ex);
+              BEANS.get(ExceptionHandler.class).handle(ex);
             }
             break;
           }
@@ -704,7 +704,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       super.nodeRemovedNotify();
     }
     catch (ProcessingException e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
 
@@ -903,7 +903,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       }
     }
     catch (ProcessingException e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(e);
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
     return result;
   }
@@ -963,10 +963,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
                 }
               }
               catch (ProcessingException ex) {
-                BEANS.get(IExceptionHandlerService.class).handleException(ex);
+                BEANS.get(ExceptionHandler.class).handle(ex);
               }
               catch (Throwable t) {
-                BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Page " + element, t));
+                BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Page " + element, t));
               }
             }
 

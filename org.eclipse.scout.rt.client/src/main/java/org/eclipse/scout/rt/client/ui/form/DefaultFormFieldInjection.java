@@ -29,7 +29,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
  * Default implementation that inserts new fields and that replaces existing fields using the {@link Replace}
@@ -229,7 +229,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
       fields.addOrdered(f);
     }
     catch (Exception e) {
-      BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("exception while injecting field '" + fieldClass.getName() + "'.", e));
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("exception while injecting field '" + fieldClass.getName() + "'.", e));
     }
   }
 

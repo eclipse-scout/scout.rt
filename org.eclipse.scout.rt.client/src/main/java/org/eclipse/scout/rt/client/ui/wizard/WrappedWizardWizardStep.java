@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.wizard;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
  * Wizard step containing another wizard. This step invokes the parent's <code>doNextStep()</code> method when
@@ -45,7 +45,7 @@ public class WrappedWizardWizardStep extends AbstractWizardStep<IForm> {
               m_parentWizard.doNextStep();
             }
             catch (ProcessingException t) {
-              BEANS.get(IExceptionHandlerService.class).handleException(t);
+              BEANS.get(ExceptionHandler.class).handle(t);
             }
             break;
           }

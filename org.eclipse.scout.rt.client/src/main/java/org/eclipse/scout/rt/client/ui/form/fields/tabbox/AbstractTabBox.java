@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.internal.TabBoxGrid;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("14555c41-2d65-414a-94b1-d4328cbd818c")
 public abstract class AbstractTabBox extends AbstractCompositeField implements ITabBox {
@@ -97,10 +97,10 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
           interceptTabSelected(getSelectedTab());
         }
         catch (ProcessingException ex) {
-          BEANS.get(IExceptionHandlerService.class).handleException(ex);
+          BEANS.get(ExceptionHandler.class).handle(ex);
         }
         catch (Throwable t) {
-          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
         }
       }
     });

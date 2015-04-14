@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
 
 /**
@@ -36,7 +36,7 @@ public class PasswordPolicyVerifier {
    * advance about the expiration. If expired, calls the {@link DefaultPasswordForm#startChange()} and - when closed -
    * re-checks the
    * expiry date. When still expired, exits the application (scout session).
-   * 
+   *
    * @param warnInAdvanceDays
    *          number of days before the expiry when a warning shall occur, -1 to
    *          omit this feature
@@ -71,10 +71,10 @@ public class PasswordPolicyVerifier {
               ScoutTexts.get("PasswordWillExpireTitle"),
               remainDays == 0 ?
                   ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("Today")) :
-                  remainDays == 1 ?
-                      ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("Tomorrow")) :
-                      ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("InDaysX", "" + remainDays)),
-              ScoutTexts.get("PasswordWillExpireInfo")
+                    remainDays == 1 ?
+                        ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("Tomorrow")) :
+                          ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("InDaysX", "" + remainDays)),
+                          ScoutTexts.get("PasswordWillExpireInfo")
               );
           if (answer == MessageBox.YES_OPTION) {
             changeNow = true;
@@ -96,7 +96,7 @@ public class PasswordPolicyVerifier {
     }
     catch (Throwable t) {
       ProcessingException pe = (t instanceof ProcessingException ? (ProcessingException) t : new ProcessingException("Unexpected", t));
-      BEANS.get(IExceptionHandlerService.class).handleException(pe);
+      BEANS.get(ExceptionHandler.class).handle(pe);
       return false;
     }
   }

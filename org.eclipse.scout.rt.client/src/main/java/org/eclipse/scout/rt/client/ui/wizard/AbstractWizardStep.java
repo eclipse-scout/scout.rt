@@ -31,11 +31,11 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPropertyObserver implements IWizardStep<FORM>, IPropertyObserver, IExtensibleObject {
   private IWizard m_wizard;
@@ -293,10 +293,10 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
               }
             }
             catch (ProcessingException pe) {
-              BEANS.get(IExceptionHandlerService.class).handleException(pe);
+              BEANS.get(ExceptionHandler.class).handle(pe);
             }
             catch (Throwable t) {
-              BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
+              BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
             }
             switch (e.getType()) {
               case FormEvent.TYPE_CLOSED: {

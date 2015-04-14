@@ -35,11 +35,11 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 public abstract class AbstractAction extends AbstractPropertyObserver implements IAction, IExtensibleObject {
@@ -511,7 +511,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
         interceptSelectionChanged(b);
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
   }
@@ -737,10 +737,10 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
         }
       }
       catch (ProcessingException e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(e);
+        BEANS.get(ExceptionHandler.class).handle(e);
       }
       catch (Throwable e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected exception", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected exception", e));
       }
     }
 

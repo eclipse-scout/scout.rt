@@ -17,7 +17,7 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
  * Maintains a cache of ICodeType objects that can be (re)loaded using the
@@ -57,7 +57,7 @@ public class CodeTypeCache {
           m_cache.put(type, instance);
         }
         catch (Throwable t) {
-          BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + type.getName() + "'.", t));
+          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + type.getName() + "'.", t));
         }
       }
       return instance;
@@ -91,7 +91,7 @@ public class CodeTypeCache {
         declaringCodeTypeClass = type.newInstance().getCodeType().getClass();
       }
       catch (Throwable t) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + type.getName() + "'.", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + type.getName() + "'.", t));
       }
     }
     ICodeType<?, CODE_ID_TYPE> codeType = getCodeType(declaringCodeTypeClass);

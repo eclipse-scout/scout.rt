@@ -22,10 +22,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 
 public abstract class AbstractDataModel implements IDataModel, Serializable, IContributionOwner {
   private static final long serialVersionUID = 1L;
@@ -82,7 +82,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
         attributes.addOrdered(a);
       }
       catch (Exception e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + attributeClazz.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + attributeClazz.getName() + "'.", e));
       }
     }
     attributes.addAllOrdered(contributedAttributes);
@@ -101,7 +101,7 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
         entities.addOrdered(ConfigurationUtility.newInnerInstance(holder, dataModelEntityClazz));
       }
       catch (Exception e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + dataModelEntityClazz.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + dataModelEntityClazz.getName() + "'.", e));
       }
     }
 

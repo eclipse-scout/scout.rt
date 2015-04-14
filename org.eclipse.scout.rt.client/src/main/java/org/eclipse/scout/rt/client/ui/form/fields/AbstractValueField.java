@@ -49,10 +49,10 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.ValueFieldContextMenu;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.w3c.dom.Element;
 
 @ScoutSdkIgnore
@@ -120,7 +120,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
         menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
       }
       catch (Exception e) {
-        BEANS.get(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
 
@@ -368,7 +368,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
             interceptChangedValue();
           }
           catch (ProcessingException ex) {
-            BEANS.get(IExceptionHandlerService.class).handleException(ex);
+            BEANS.get(ExceptionHandler.class).handle(ex);
           }
         }
       }
@@ -461,7 +461,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
         interceptChangedValue();
       }
       catch (ProcessingException ex) {
-        BEANS.get(IExceptionHandlerService.class).handleException(ex);
+        BEANS.get(ExceptionHandler.class).handle(ex);
       }
       fireMasterChanged();
     }
@@ -655,7 +655,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * any further chain elements.
    */
   protected static class LocalValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends AbstractFormField.LocalFormFieldExtension<OWNER>
-  implements IValueFieldExtension<VALUE, OWNER> {
+      implements IValueFieldExtension<VALUE, OWNER> {
 
     public LocalValueFieldExtension(OWNER owner) {
       super(owner);
