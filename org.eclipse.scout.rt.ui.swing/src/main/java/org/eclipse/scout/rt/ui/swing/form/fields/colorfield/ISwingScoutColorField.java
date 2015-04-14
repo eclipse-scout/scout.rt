@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swing.form.fields.colorpickerfield;
+package org.eclipse.scout.rt.ui.swing.form.fields.colorfield;
 
-import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField;
+import org.eclipse.scout.rt.client.ui.form.fields.colorfield.IColorField;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 
 /**

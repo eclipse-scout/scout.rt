@@ -8,7 +8,7 @@
  * Contributors:
  *    Schweizerische Bundesbahnen SBB - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield;
+package org.eclipse.scout.rt.client.ui.form.fields.colorfield;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.colorpickerfield.IColorFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.colorfield.IColorFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;

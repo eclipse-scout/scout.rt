@@ -8,7 +8,7 @@
  * Contributors:
  *    Schweizerische Bundesbahnen SBB - initial API and implementation and/or initial documentation
  *******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield;
+package org.eclipse.scout.rt.client.ui.form.fields.colorfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 

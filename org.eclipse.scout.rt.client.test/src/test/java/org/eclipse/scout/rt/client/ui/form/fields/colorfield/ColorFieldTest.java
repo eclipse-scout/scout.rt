@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.colorpicker;
+package org.eclipse.scout.rt.client.ui.form.fields.colorfield;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -20,9 +20,9 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
-import org.eclipse.scout.rt.client.ui.form.fields.colorpicker.ColorFieldTest.TestForm.MainBox.ColorField01;
-import org.eclipse.scout.rt.client.ui.form.fields.colorpicker.ColorFieldTest.TestForm.MainBox.ColorField01.TestMenu1;
-import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.AbstractColorField;
+import org.eclipse.scout.rt.client.ui.form.fields.colorfield.AbstractColorField;
+import org.eclipse.scout.rt.client.ui.form.fields.colorfield.ColorFieldTest.TestForm.MainBox.ColorField01;
+import org.eclipse.scout.rt.client.ui.form.fields.colorfield.ColorFieldTest.TestForm.MainBox.ColorField01.TestMenu1;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;

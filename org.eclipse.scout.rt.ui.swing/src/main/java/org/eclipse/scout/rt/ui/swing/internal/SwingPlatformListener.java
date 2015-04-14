@@ -49,7 +49,7 @@ public class SwingPlatformListener implements IPlatformListener {
       FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox.class, org.eclipse.scout.rt.ui.swing.form.fields.splitbox.SwingScoutSplitBox.class);
       FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField.class, org.eclipse.scout.rt.ui.swing.form.fields.placeholder.SwingScoutPlaceholderField.class);
       FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.IFormField.class, org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFormFieldPlaceholder.class);
-      FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField.class, org.eclipse.scout.rt.ui.swing.form.fields.colorpickerfield.SwingScoutColorField.class);
+      FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.colorfield.IColorField.class, org.eclipse.scout.rt.ui.swing.form.fields.colorfield.SwingScoutColorField.class);
     }
   }
 }
