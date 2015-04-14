@@ -13,7 +13,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITree5;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -80,17 +79,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       @Override
       protected String modelValue() {
         return getModel().getTitle();
-      }
-    });
-    putJsonProperty(new JsonProperty<T>(ITree5.PROP_FILTER_ENABLED, model) {
-      @Override
-      protected Boolean modelValue() {
-        if (getModel() instanceof ITree5) {
-          return ((ITree5) getModel()).isFilterEnabled();
-        }
-        else {
-          return false;
-        }
       }
     });
     putJsonProperty(new JsonProperty<T>(ITree.PROP_CHECKABLE, model) {
