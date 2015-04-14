@@ -73,7 +73,12 @@ public class JandexInventoryBuilder {
       }
     }
     //scan location
-    LOG.info("found no pre-built " + indexUri + "; scanning location...");
+    if (m_forceRebuildFolderIndexes) {
+      LOG.info("forcing rebuild of index " + indexUri + "; scanning location...");
+    }
+    else {
+      LOG.info("found no pre-built " + indexUri + "; scanning location...");
+    }
     try {
       if (urlText.startsWith("jar:file:")) {
         Indexer indexer = new Indexer();
@@ -114,5 +119,4 @@ public class JandexInventoryBuilder {
   public IndexView finish() {
     return CompositeIndex.create(m_indexList);
   }
-
 }

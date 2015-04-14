@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.inventory;
 
+import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -34,8 +35,8 @@ public final class ClassInventory {
       JandexInventoryBuilder beanFinder = new JandexInventoryBuilder();
       beanFinder.scanAllModules();
       IndexView index = beanFinder.finish();
-      long millis = (System.nanoTime() - t0) / 1000000L;
-      LOG.info("created class inventory  in {0} ms", millis);
+      long nanos = System.nanoTime() - t0;
+      LOG.info("Finished preparatation of jandex class inventory in {0} ms", DateUtility.formatNanos(nanos));
       INSTANCE = new JandexClassInventory(index);
     }
     catch (Throwable t) {
