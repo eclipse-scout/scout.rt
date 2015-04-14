@@ -18,12 +18,11 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Tests for {@link CompareUtility}
- * 
+ *
  * @since 3.8.1
  */
 public class CompareUtilityTest {
@@ -125,25 +124,6 @@ public class CompareUtilityTest {
     assertTrue(CompareUtility.equals(s2, s));
     assertFalse(CompareUtility.equals(s, s3));
     assertFalse(CompareUtility.equals(s3, s));
-  }
-
-  /**
-   * Tests {@link org.eclipse.scout.commons.CompareUtility#equals(T, T) CompareUtility#equals(T, T)} with respect to
-   * {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
-   * Test a timestamp with nanos against a date
-   */
-  @Test
-  @Ignore
-  public void testTimestampDateEquality_WithNanos() {
-    Timestamp twithNanos = new Timestamp(TEST_MILLIS);
-    final int testNanos = 15;
-    twithNanos.setNanos(testNanos);
-
-    assertTrue(CompareUtility.equals(twithNanos, twithNanos));
-    assertFalse(CompareUtility.equals(twithNanos, m_testTimestamp));
-//TODO A timestamp with nanoseconds different to date should always be false?
-    assertFalse(CompareUtility.equals(twithNanos, m_testDate));
-    assertFalse(CompareUtility.equals(m_testDate, twithNanos));
   }
 
 }
