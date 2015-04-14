@@ -132,9 +132,6 @@ scout.Table.prototype._unwrapCells = function(cells) {
       };
       cells[i] = cell;
     }
-    if (cell.editable === undefined) {
-      cell.editable = this.columns[i].editable;
-    }
   }
 };
 
@@ -811,7 +808,7 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
 
   predicate = function(column) {
     cell = this.cell(column.index, row);
-    return cell.editable;
+    return this.enabled && row.enabled && cell.editable;
   }.bind(this);
 
   column = scout.arrays.findFrom(this.columns, startColumnIndex, predicate, backwards);

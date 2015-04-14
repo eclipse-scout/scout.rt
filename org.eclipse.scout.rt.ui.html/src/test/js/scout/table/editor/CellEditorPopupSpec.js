@@ -39,7 +39,7 @@ describe("CellEditor", function() {
 
   function startCellEdit() {
     var model = helper.createModelFixture(2, 2);
-    model.columns[0].editable = true;
+    model.rows[0].cells[0].editable = true;
     var table = helper.createTable(model);
     table.render(session.$entryPoint);
 
@@ -47,6 +47,59 @@ describe("CellEditor", function() {
     table.columns[0].startCellEdit(table.rows[0], field.id);
     return findPopup();
   }
+
+  describe("mouse click", function() {
+    var table, model, $rows, $cells0, $cells1, $cell0_0, $cell1_0;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(2, 2);
+      table = helper.createTable(model);
+      table.render(session.$entryPoint);
+      $rows = table.$rows();
+      $cells0 = $rows.eq(0).find('.table-cell');
+      $cells1 = $rows.eq(1).find('.table-cell');
+      $cell0_0 = $cells0.eq(0);
+      $cell1_0 = $cells1.eq(0);
+    });
+
+    it("starts cell edit if cell is editable", function() {
+      table.rows[0].cells[0].editable = true;
+      table.rows[1].cells[0].editable = false;
+
+      spyOn(table, 'sendPrepareCellEdit');
+      $cell1_0.triggerClick();
+      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+      $cell0_0.triggerClick();
+      expect(table.sendPrepareCellEdit).toHaveBeenCalled();
+    });
+
+    it("does not start cell edit if cell is not editable", function() {
+      table.rows[0].cells[0].editable = false;
+
+      spyOn(table, 'sendPrepareCellEdit');
+      $cell0_0.triggerClick();
+      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+    });
+
+    it("does not start cell edit if row is disabled", function() {
+      table.rows[0].cells[0].editable = true;
+      table.rows[0].enabled = false;
+
+      spyOn(table, 'sendPrepareCellEdit');
+      $cell0_0.triggerClick();
+      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+    });
+
+    it("does not start cell edit if table is disabled", function() {
+      table.rows[0].cells[0].editable = true;
+      table.enabled = false;
+
+      spyOn(table, 'sendPrepareCellEdit');
+      $cell0_0.triggerClick();
+      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+    });
+
+  });
 
   describe("startCellEdit event", function() {
 

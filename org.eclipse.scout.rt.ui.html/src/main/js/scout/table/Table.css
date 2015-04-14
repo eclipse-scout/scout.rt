@@ -92,11 +92,11 @@
   mix-blend-mode: multiply; /* experimental support, currently only in FF */
   vertical-align: top; /* for multiline text */
 
-  .table-row-sum & {
+  .table-row-sum > & {
     font-weight: bold;
   }
 
-  &.editable:before {
+  .table:not(.disabled) > .table-data > .table-row:not(.disabled) > &.editable:before {
     position: absolute;
     content: '';
     top: 0;

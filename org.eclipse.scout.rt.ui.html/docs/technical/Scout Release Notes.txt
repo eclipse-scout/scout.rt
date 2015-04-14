@@ -191,3 +191,14 @@ and local are not necessary anymore.
 
 AWE 14.04.2015
 Renamed package package org.eclipse.scout.rt.client.ui.form.fields.colorpicker to *.colorfield.
+
+CGU 14.04.2015
+Refactored editable behaviour of cells.
+- Table.isCellEditable only returns cell.editable and does not consider table or row enabled and visible states
+  Conforms to the behaviour of the other cell properties (text, cssStyle, etc).
+- execIsEditable has been removed
+  Use cell.setEditable (e.g. in execDecorateCell) if you want a cell to behave differently than the column.
+- decorateCellInternal does not write properties to the cell anymore, this is now done initially or if the column property changes.
+  Advantage: It's now possible to modify the cell properties outside of execDecorateCell. Furthermore, there is no need to execute this code so many times.
+- Removed ICell.setEnabled
+  Did not have any effect, use row.setEnabled instead. Or ICell.setEditable if you would like to control editability of a cell.
