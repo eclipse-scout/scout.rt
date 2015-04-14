@@ -13,6 +13,7 @@ package org.eclipse.scout.commons.logger;
 import java.io.File;
 import java.util.logging.Logger;
 
+import org.eclipse.scout.commons.ConfigIniConstants;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.internal.java.JavaScoutLogManager;
@@ -72,7 +73,7 @@ public final class ScoutLogManager {
   }
 
   private static IScoutLogManager createScoutLogManager() {
-    String strategy = ConfigIniUtility.getProperty("org.eclipse.scout.log");
+    String strategy = ConfigIniUtility.getProperty(ConfigIniConstants.logStrategy);
     if ("java".equalsIgnoreCase(strategy)) {
       return new JavaScoutLogManager();
     }
