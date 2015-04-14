@@ -57,7 +57,7 @@ public class ProposalFieldParseValueTest {
     // select proposal
     assertNotNull(m_proposalField.getProposalChooser());
     m_proposalField.getProposalChooser().forceProposalSelection();
-    m_proposalField.getProposalChooser().doOk();
+    m_proposalField.acceptProposal();
     assertEquals("aName", m_proposalField.getValue());
     assertNull(m_proposalField.getProposalChooser());
 
@@ -73,7 +73,7 @@ public class ProposalFieldParseValueTest {
     // select first
     m_proposalField.getProposalChooser().forceProposalSelection();
     // close the proposal form
-    m_proposalField.getProposalChooser().doOk();
+    m_proposalField.acceptProposal();
     assertNull(m_proposalField.getProposalChooser());
     assertEquals("aName", m_proposalField.getValue());
   }

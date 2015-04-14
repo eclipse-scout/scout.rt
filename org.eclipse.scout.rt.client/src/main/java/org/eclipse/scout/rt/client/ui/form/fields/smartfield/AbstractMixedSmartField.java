@@ -300,7 +300,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
         }
         if (proposalChooser != null &&
             (StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) ||
-                StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
+            StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
           /*
            * empty text means null
            */
@@ -375,7 +375,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
         IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
         if (proposalChooser != null) {
           if (proposalChooser.getAcceptedProposal() != null) {
-            proposalChooser.doOk();
+            acceptProposal();
             return true;
           }
           else {

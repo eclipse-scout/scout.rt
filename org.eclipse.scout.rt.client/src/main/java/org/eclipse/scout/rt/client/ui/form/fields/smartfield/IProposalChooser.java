@@ -35,7 +35,7 @@ public interface IProposalChooser<T, LOOKUP_KEY> extends IPropertyObserver {
 
   /**
    * Legacy event required for old Swing client.
-   * FIXME AWE: remove before release 6.0.0 is shipped.
+   * FIXME AWE: (post-swing) remove before release 6.0.0 is shipped.
    */
   String SWING_STRUCTURE_CHANGED = "swingStructureChanged";
 
@@ -69,13 +69,6 @@ public interface IProposalChooser<T, LOOKUP_KEY> extends IPropertyObserver {
    * @return the displayed result.
    */
   IContentAssistFieldDataFetchResult<LOOKUP_KEY> getSearchResult();
-
-  /**
-   * Stores input provided by the proposal chooser and closes the proposal chooser.
-   */
-  void doOk() throws ProcessingException;
-
-  // FIXME AWE: entfernen --> stattdessen acceptProposal auf contentAssistField aufrufen
 
   boolean isActiveFilterEnabled();
 

@@ -69,7 +69,7 @@ public class SmartFieldParseValueTest {
     // select first
     m_smartField.getProposalChooser().forceProposalSelection();
     // close the proposal form
-    m_smartField.getProposalChooser().doOk();
+    m_smartField.acceptProposal();
     assertNull(m_smartField.getProposalChooser());
     assertEquals(Long.valueOf(1L), m_smartField.getValue());
   }
@@ -84,7 +84,7 @@ public class SmartFieldParseValueTest {
 
     // proposal chooser should not be closed when proposal is not valid
     try {
-      m_smartField.getProposalChooser().doOk();
+      m_smartField.acceptProposal();
       fail();
     }
     catch (VetoException e) {

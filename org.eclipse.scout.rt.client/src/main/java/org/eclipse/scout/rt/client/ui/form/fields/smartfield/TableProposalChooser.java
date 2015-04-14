@@ -198,7 +198,7 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
   protected void execResultTableRowClicked(ITableRow row) throws ProcessingException {
     ILookupRow<LOOKUP_KEY> lrow = m_model.getSelectedLookupRow();
     if (lrow != null && lrow.isEnabled()) {
-      doOk();
+      m_contentAssistField.acceptProposal();
     }
   }
 

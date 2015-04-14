@@ -16,9 +16,8 @@ package org.eclipse.scout.rt.shared.ui;
 public enum UiLayer implements IUiLayer {
 
   /**
-   * FIXME AWE: (UiLayer) remove SWING before new Scout version is released.
-   * we keep this value for a while, to compare with the old UI while the
-   * new Html UI is developed.
+   * FIXME AWE: (post-swing) remove SWING value before new Scout version is released.
+   * we keep this value for a while, to compare with the old UI while the new Html UI is developed.
    */
   SWING,
   HTML(true),

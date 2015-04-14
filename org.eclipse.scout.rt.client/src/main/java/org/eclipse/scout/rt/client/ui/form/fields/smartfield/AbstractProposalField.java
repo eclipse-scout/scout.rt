@@ -257,7 +257,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
         IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
         if (proposalChooser != null) {
           if (proposalChooser.getAcceptedProposal() != null) {
-            proposalChooser.doOk();
+            acceptProposal();
             return true;
           }
           else {

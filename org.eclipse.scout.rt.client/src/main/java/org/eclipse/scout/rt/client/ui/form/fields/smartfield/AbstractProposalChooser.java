@@ -87,11 +87,6 @@ abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPropertyOb
   }
 
   @Override
-  public void doOk() throws ProcessingException {
-    m_contentAssistField.acceptProposal();
-  }
-
-  @Override
   public void setStatus(IStatus status) {
     propertySupport.setProperty(PROP_STATUS, status);
   }

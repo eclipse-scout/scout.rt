@@ -582,7 +582,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   }
 
   protected void execResultTreeNodeClick(ITreeNode node) throws ProcessingException {
-    doOk();
+    m_contentAssistField.acceptProposal();
   }
 
   @Override

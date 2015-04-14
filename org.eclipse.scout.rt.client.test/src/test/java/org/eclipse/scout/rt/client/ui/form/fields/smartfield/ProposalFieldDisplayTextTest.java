@@ -70,7 +70,7 @@ public class ProposalFieldDisplayTextTest {
     m_proposalField.getUIFacadeLegacy().setTextFromUI("a");
     // select proposal
     m_proposalField.getProposalChooser().forceProposalSelection();
-    m_proposalField.getProposalChooser().doOk();
+    m_proposalField.acceptProposal();
     assertEquals("aName", m_proposalField.getValue());
     assertEquals("aName", m_proposalField.getDisplayText());
     // lookup row available now
