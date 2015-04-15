@@ -357,9 +357,11 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * @param local
    *          true if the url is not a valid external url but a local model url
    *          (http://local/...)
+   * @deprecated use {@link #execAppLinkAction(String)} instead
    */
   @ConfigOperation
   @Order(230)
+  @Deprecated
   protected void execHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
     LOG.info("execHyperlinkAction " + url + " (in " + getClass().getName() + ")");
   }
