@@ -36,7 +36,7 @@ public final class ClassInventory {
       beanFinder.scanAllModules();
       IndexView index = beanFinder.finish();
       long nanos = System.nanoTime() - t0;
-      LOG.info("Finished preparatation of jandex class inventory in {0} ms", DateUtility.formatNanos(nanos));
+      LOG.info("Finished preparation of jandex class inventory in {0} ms", DateUtility.formatNanos(nanos));
       INSTANCE = new JandexClassInventory(index);
     }
     catch (Throwable t) {
