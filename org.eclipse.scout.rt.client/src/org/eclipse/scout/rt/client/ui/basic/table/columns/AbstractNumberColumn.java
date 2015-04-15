@@ -258,6 +258,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
     return f;
   }
 
+  @SuppressWarnings("deprecation")
   protected void mapEditorFieldProperties(INumberField<NUMBER> f) {
     super.mapEditorFieldProperties(f);
     f.setFormat(getFormat());

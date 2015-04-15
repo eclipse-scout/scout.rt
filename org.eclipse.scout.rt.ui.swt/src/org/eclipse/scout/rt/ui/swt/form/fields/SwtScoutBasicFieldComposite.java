@@ -30,6 +30,7 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
     inputField.addListener(SWT.Modify, typedListener);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   protected void attachScout() {
     super.attachScout();

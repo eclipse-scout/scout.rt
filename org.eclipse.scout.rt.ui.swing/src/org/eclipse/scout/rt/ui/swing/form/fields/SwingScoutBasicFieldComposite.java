@@ -36,6 +36,7 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
   /**
    * attach Scout Model: set scout properties
    */
+  @SuppressWarnings("deprecation")
   @Override
   protected void attachScout() {
     IBasicField f = getScoutObject();

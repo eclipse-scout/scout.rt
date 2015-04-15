@@ -31,6 +31,7 @@ public abstract class RwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
   protected boolean m_updateDisplayTextOnModify;
   protected boolean m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown;
 
+  @SuppressWarnings("deprecation")
   @Override
   protected void attachScout() {
     super.attachScout();
