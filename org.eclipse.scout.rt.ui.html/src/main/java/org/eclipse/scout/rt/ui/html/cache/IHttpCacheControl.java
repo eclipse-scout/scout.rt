@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.cache;
 
+import java.io.Serializable;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,9 +20,9 @@ import javax.servlet.http.HttpServletResponse;
  * <p>
  * In development mode the cache is disabled.
  * <p>
- * In production it makes heavey use of the max-age concept.
+ * In production it makes heavy use of the max-age concept.
  */
-public interface IHttpCacheControl {
+public interface IHttpCacheControl extends Serializable {
   String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
   String IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
   int IF_MODIFIED_SINCE_FIDELITY = 999;

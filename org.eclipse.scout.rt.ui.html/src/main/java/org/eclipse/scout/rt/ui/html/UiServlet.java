@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 
 import javax.servlet.ServletConfig;
@@ -139,7 +140,8 @@ public class UiServlet extends HttpServlet {
   /**
    * Template pattern.
    */
-  protected abstract class P_AbstractRequestHandler {
+  protected abstract class P_AbstractRequestHandler implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final String m_requestType;
 
@@ -175,6 +177,7 @@ public class UiServlet extends HttpServlet {
   }
 
   protected class P_RequestHandlerGet extends P_AbstractRequestHandler {
+    private static final long serialVersionUID = 1L;
 
     protected P_RequestHandlerGet() {
       super("GET");
@@ -202,6 +205,7 @@ public class UiServlet extends HttpServlet {
   }
 
   protected class P_RequestHandlerPost extends P_AbstractRequestHandler {
+    private static final long serialVersionUID = 1L;
 
     protected P_RequestHandlerPost() {
       super("POST");

@@ -10,12 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.cache;
 
+import java.io.Serializable;
+
 import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 
 /**
  * Used in {@link IHttpCacheControl}
  */
-public class HttpCacheObject {
+public class HttpCacheObject implements Serializable {
+  private static final long serialVersionUID = 1L;
 
   private final String m_cacheId;
   private final boolean m_cachingAllowed;

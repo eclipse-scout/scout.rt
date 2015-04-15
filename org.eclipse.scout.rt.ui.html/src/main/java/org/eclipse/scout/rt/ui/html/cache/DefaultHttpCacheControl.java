@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.UiHints;
 
 public class DefaultHttpCacheControl implements IHttpCacheControl {
+  private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultHttpCacheControl.class);
 
   /**
