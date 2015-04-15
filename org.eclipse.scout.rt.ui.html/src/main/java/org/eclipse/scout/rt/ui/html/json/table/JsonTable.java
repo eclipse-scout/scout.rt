@@ -712,7 +712,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       }
     }
     handleModelRowsDeleted(rowsToDelete);
-    handleModelRowsInserted(rowsToDelete);
+    handleModelRowsInserted(rowsToInsert);
   }
 
   protected void handleModelRowsUpdated(Collection<ITableRow> modelRows) {
