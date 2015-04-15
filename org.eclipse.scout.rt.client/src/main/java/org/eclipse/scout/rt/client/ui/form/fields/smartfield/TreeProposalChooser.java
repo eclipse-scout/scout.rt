@@ -46,21 +46,23 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
+/**
+ * Proposal chooser with a tree to choose hierarchical proposals. You can provide your own tree implementation
+ * when your smart-field defines an inner AbstractTree class. You should call <code>smartField.acceptProposal()</code>
+ * in your <code>tree.execNodeClick(ITreeNode, MouseButton)</code> method, otherwise the proposal-chooser isn't
+ * closed when a proposal is selected in the tree.
+ *
+ * @since 6.0.0
+ * @param <LOOKUP_KEY>
+ */
 public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITree, LOOKUP_KEY> {
-
-  class P_Tree extends AbstractTree {
-
-    @Override
-    protected void execNodeClick(ITreeNode node, MouseButton mouseButton) throws ProcessingException {
-      execResultTreeNodeClick(node);
-    }
-  }
 
   private P_ActiveNodesFilter m_activeNodesFilter;
   private P_MatchingNodesFilter m_matchingNodesFilter;
   private boolean m_selectCurrentValueRequested;
   private boolean m_populateInitialTreeDone;
   private IFuture<?> m_populateInitialTreeJob;
+  private boolean m_modelExternallyManaged = false;
 
   public TreeProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) throws ProcessingException {
     super(contentAssistField, allowCustomText);
@@ -71,7 +73,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     m_activeNodesFilter = new P_ActiveNodesFilter();
     m_matchingNodesFilter = new P_MatchingNodesFilter();
 
-    ITree tree = new P_Tree();
+    ITree tree = createConfiguredOrDefaultModel(ITree.class);
     tree.setIconId(m_contentAssistField.getBrowseIconId());
     tree.addTreeListener(new TreeAdapter() {
       @Override
@@ -87,6 +89,11 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       }
     });
     return tree;
+  }
+
+  @Override
+  protected ITree createDefaultModel() throws ProcessingException {
+    return new P_DefaultProposalTree();
   }
 
   @Override
@@ -242,8 +249,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       });
       if (matchingNodes.size() > 0) {
         selectValue(m_model, matchingNodes.get(0));
-
-        //ticket 87030
+        // ticket 87030
         for (int i = 1; i < matchingNodes.size(); i++) {
           ITreeNode node = matchingNodes.get(i);
           m_model.setNodeExpanded(node, true);
@@ -252,7 +258,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
         return true;
       }
       else {
-        //load tree
+        // load tree
         ITreeNode node = loadNodeWithKey(selectedKey);
         if (node != null) {
           selectValue(m_model, node);
@@ -267,9 +273,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     if (tree == null || node == null) {
       return;
     }
-
     tree.selectNode(node);
-
     if (tree.isCheckable()) {
       tree.setNodeChecked(node, true);
     }
@@ -304,7 +308,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       }
       parentNode = nextNode;
     }
-    //
     return parentNode;
   }
 
@@ -348,66 +351,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     tree.addChildNodes(parentNode, subTree);
   }
 
-  private class P_ActiveNodesFilter implements ITreeNodeFilter {
-    private TriState m_ts;
-
-    public P_ActiveNodesFilter() {
-    }
-
-    public void update(TriState ts) {
-      m_ts = ts;
-    }
-
-    @Override
-    public boolean accept(ITreeNode node, int level) {
-      if (m_ts.isUndefined()) {
-        return true;
-      }
-      else {
-        ILookupRow row = (LookupRow) node.getCell().getValue();
-        if (row != null) {
-          return row.isActive() == m_ts.equals(TriState.TRUE);
-        }
-        else {
-          return true;
-        }
-      }
-    }
-  }
-
-  private class P_MatchingNodesFilter implements ITreeNodeFilter {
-    private Pattern m_searchPattern;
-
-    public P_MatchingNodesFilter() {
-    }
-
-    public void update(String text) {
-      m_searchPattern = execCreatePatternForTreeFilter(text);
-    }
-
-    @Override
-    public boolean accept(ITreeNode node, int level) {
-      return execAcceptNodeByTreeFilter(m_searchPattern, node, level);
-    }
-  }
-
-  private class P_TreeNodeBuilder extends AbstractTreeNodeBuilder<LOOKUP_KEY> {
-    @Override
-    protected ITreeNode createEmptyTreeNode() throws ProcessingException {
-      ITreeNode node = TreeProposalChooser.this.createTreeNode();
-      if (m_model.getIconId() != null) {
-        Cell cell = node.getCellForUpdate();
-        cell.setIconId(m_model.getIconId());
-      }
-      return node;
-    }
-  }
-
-  // FIXME AWE: (smart-field) Zeugs das auf dem AbstractTreeField implementiert ist
-  // ----------------------------------------------------------------------------------------------
-
-  private boolean m_modelExternallyManaged = false;
-
   public void loadRootNode() throws ProcessingException {
     if (m_model != null && !m_modelExternallyManaged) {
       loadChildNodes(m_model.getRootNode());
@@ -419,7 +362,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       try {
         m_model.setTreeChanging(true);
         //
-        // FIXME AWE: (smart-field) hier fehlt der ganze intercept-Teil
         execLoadChildNodes(parentNode);
       }
       finally {
@@ -428,19 +370,12 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     }
   }
 
-  public ITreeNode createTreeNode() throws ProcessingException {
-    ITreeNode node = new P_InternalTreeNode();
-    return node;
+  protected ITreeNode createTreeNode() throws ProcessingException {
+    return new P_InternalTreeNode();
   }
 
-//  protected final void interceptLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
-//    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-//    TreeFieldLoadChildNodesChain chain = new TreeFieldLoadChildNodesChain(extensions);
-//    chain.execLoadChildNodes(parentNode);
-//  }
-
-  // FIXME AWE: (smart-field) Quelle ContentAssistTreeForm > ResultTreeField
-  // ----------------------------------------------------------------------------------------------
+  @ConfigOperation
+  @Order(10)
   @SuppressWarnings("unchecked")
   protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
     if (m_contentAssistField.isBrowseLoadIncremental()) {
@@ -453,31 +388,16 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       List<? extends ILookupRow<LOOKUP_KEY>> data = m_contentAssistField.callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
       List<ITreeNode> subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
       updateSubTree(m_model, parentNode, subTree);
-      //hide loading status
+      // hide loading status
       setStatusVisible(statusWasVisible);
     }
   }
 
   /**
-   * TreeNode implementation with delegation of loadChildren to
-   * this.loadChildNodes()
-   */
-  private class P_InternalTreeNode extends AbstractTreeNode {
-
-    @Override
-    public void loadChildren() throws ProcessingException {
-      TreeProposalChooser.this.loadChildNodes(this);
-    }
-  }
-
-  // FIXME AWE: (smart-field) das hier war überschreibbar/konfigurierbar via ContentAssistTreeForm
-  // ----------------------------------------------------------------------------------------------
-
-  /**
    * @return the pattern used to filter tree nodes based on the text typed into the smartfield
    */
   @ConfigOperation
-  @Order(100)
+  @Order(20)
   protected Pattern execCreatePatternForTreeFilter(String filterText) {
     // check pattern
     String s = filterText;
@@ -501,7 +421,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
    *         {@link #execCreatePatternForTreeFilter(String)}
    */
   @ConfigOperation
-  @Order(110)
+  @Order(30)
   protected boolean execAcceptNodeByTreeFilter(Pattern filterPattern, ITreeNode node, int level) {
     IContentAssistField<?, LOOKUP_KEY> sf = m_contentAssistField;
     @SuppressWarnings("unchecked")
@@ -531,12 +451,10 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
 
   /**
    * Override this method to change that behaviour of what is a single match.
-   * <p>
    * By default a single match is when there is a single enabled LEAF node in the tree
-   * <p>
    */
   @ConfigOperation
-  @Order(120)
+  @Order(40)
   @Override
   protected ILookupRow<LOOKUP_KEY> execGetSingleMatch() {
     // when load incremental is set, don't visit the tree but use text-to-key
@@ -581,13 +499,86 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     }
   }
 
-  protected void execResultTreeNodeClick(ITreeNode node) throws ProcessingException {
-    m_contentAssistField.acceptProposal();
-  }
-
   @Override
   public void deselect() {
     m_model.deselectNode(m_model.getSelectedNode());
+  }
+
+  /**
+   * Default tree class used when smart-field doesn't provide a custom tree class.
+   */
+  private class P_DefaultProposalTree extends AbstractTree {
+
+    @Override
+    protected void execNodeClick(ITreeNode node, MouseButton mouseButton) throws ProcessingException {
+      m_contentAssistField.acceptProposal();
+    }
+  }
+
+  private class P_TreeNodeBuilder extends AbstractTreeNodeBuilder<LOOKUP_KEY> {
+    @Override
+    protected ITreeNode createEmptyTreeNode() throws ProcessingException {
+      ITreeNode node = TreeProposalChooser.this.createTreeNode();
+      if (m_model.getIconId() != null) {
+        Cell cell = node.getCellForUpdate();
+        cell.setIconId(m_model.getIconId());
+      }
+      return node;
+    }
+  }
+
+  /**
+   * TreeNode implementation with delegation of loadChildren to this.loadChildNodes()
+   */
+  private class P_InternalTreeNode extends AbstractTreeNode {
+
+    @Override
+    public void loadChildren() throws ProcessingException {
+      TreeProposalChooser.this.loadChildNodes(this);
+    }
+  }
+
+  private class P_MatchingNodesFilter implements ITreeNodeFilter {
+    private Pattern m_searchPattern;
+
+    public P_MatchingNodesFilter() {
+    }
+
+    public void update(String text) {
+      m_searchPattern = execCreatePatternForTreeFilter(text);
+    }
+
+    @Override
+    public boolean accept(ITreeNode node, int level) {
+      return execAcceptNodeByTreeFilter(m_searchPattern, node, level);
+    }
+  }
+
+  private class P_ActiveNodesFilter implements ITreeNodeFilter {
+    private TriState m_ts;
+
+    public P_ActiveNodesFilter() {
+    }
+
+    public void update(TriState ts) {
+      m_ts = ts;
+    }
+
+    @Override
+    public boolean accept(ITreeNode node, int level) {
+      if (m_ts.isUndefined()) {
+        return true;
+      }
+      else {
+        ILookupRow row = (LookupRow) node.getCell().getValue();
+        if (row != null) {
+          return row.isActive() == m_ts.equals(TriState.TRUE);
+        }
+        else {
+          return true;
+        }
+      }
+    }
   }
 
 }

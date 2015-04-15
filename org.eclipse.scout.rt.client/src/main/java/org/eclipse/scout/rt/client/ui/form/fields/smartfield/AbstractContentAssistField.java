@@ -75,9 +75,6 @@ import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 @ScoutSdkIgnore
 public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends AbstractValueField<VALUE> implements IContentAssistField<VALUE, LOOKUP_KEY> {
 
-  // FIXME AWE: (content-assist) ausprobieren - anstatt model für proposal zu erzeugen und wieder zu disposen, model einfach behalten
-  // danach werden nur noch delete/insertRows events gesendet
-
   public final ILookupRow<LOOKUP_KEY> EMPTY_LOOKUP_ROW = new LookupRow<LOOKUP_KEY>(null, "", null, null, null, null, null, true);
 
   private final EventListenerList m_listenerList = new EventListenerList();

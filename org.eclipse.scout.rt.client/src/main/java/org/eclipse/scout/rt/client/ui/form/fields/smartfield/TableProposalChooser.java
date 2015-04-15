@@ -27,12 +27,16 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
+/**
+ * Proposal chooser with a table to choose proposals. You can provide your own table implementation
+ * when your smart-field defines an inner ContentAssistFieldTable class.
+ *
+ * @since 6.0.0
+ * @param <LOOKUP_KEY>
+ */
 public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IContentAssistFieldTable<LOOKUP_KEY>, LOOKUP_KEY> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableProposalChooser.class);
-
-  static class P_Table<LOOKUP_KEY> extends ContentAssistFieldTable<LOOKUP_KEY> {
-  }
 
   private LOOKUP_KEY m_lastSelectedKey;
 
@@ -41,8 +45,8 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
   }
 
   @Override
-  protected IContentAssistFieldTable createModel() {
-    IContentAssistFieldTable<LOOKUP_KEY> table = new P_Table<LOOKUP_KEY>();
+  protected IContentAssistFieldTable createModel() throws ProcessingException {
+    IContentAssistFieldTable<LOOKUP_KEY> table = createConfiguredOrDefaultModel(IContentAssistFieldTable.class);
     table.setMultilineText(m_contentAssistField.isMultilineText());
     table.addTableListener(new TableListener() {
 
@@ -63,6 +67,11 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
       }
     });
     return table;
+  }
+
+  @Override
+  protected IContentAssistFieldTable<LOOKUP_KEY> createDefaultModel() throws ProcessingException {
+    return new P_DefaultProposalTable<>();
   }
 
   @Override
@@ -205,7 +214,12 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
   @Override
   public void deselect() {
     m_model.deselectAllRows();
-    System.out.println("deselect!");
+  }
+
+  /**
+   * Default table class used when smart-field doesn't provide a custom table class.
+   */
+  static class P_DefaultProposalTable<LOOKUP_KEY> extends ContentAssistFieldTable<LOOKUP_KEY> {
   }
 
 }

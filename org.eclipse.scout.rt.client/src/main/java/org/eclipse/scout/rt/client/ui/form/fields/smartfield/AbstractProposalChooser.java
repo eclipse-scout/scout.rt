@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPropertyObserver implements IProposalChooser<T, LOOKUP_KEY> {
+public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPropertyObserver implements IProposalChooser<T, LOOKUP_KEY> {
 
   protected IContentAssistField<?, LOOKUP_KEY> m_contentAssistField;
 
@@ -35,10 +36,36 @@ abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPropertyOb
   }
 
   /**
+   * Creates a new instance of the proposal model if the smart-field has an inner class for tree or table,
+   * or returns an instance of the default class for the proposal model.
+   */
+  protected T createConfiguredOrDefaultModel(Class<?> modelInterface) throws ProcessingException {
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(m_contentAssistField.getClass());
+    // We cannot use 'Class<T> modelInterface' since we cannot pass a parameterized class like ArrayList<String> to it
+    @SuppressWarnings("unchecked")
+    Class<T> modelClass = ConfigurationUtility.filterClass(dca, (Class<T>) modelInterface);
+    if (modelClass == null) {
+      return createDefaultModel();
+    }
+    try {
+      return ConfigurationUtility.newInnerInstance(m_contentAssistField, modelClass);
+    }
+    catch (Exception e) {
+      throw new ProcessingException("Failed to create new instance for configured proposal model", e);
+    }
+  }
+
+  /**
    * Used to create the 'model' of the proposal chooser. In this method you shouldn't call methods that access the
    * m_model variable since it isn't set until this method has completed. Use the {@link #init()} method instead.
    */
   abstract protected T createModel() throws ProcessingException;
+
+  /**
+   * Called when smart-field doesn't provide a inner class for a proposal model (tree or table).
+   * Returns the default proposal model.
+   */
+  abstract protected T createDefaultModel() throws ProcessingException;
 
   /**
    * Init method called by the CTOR of the class, after createModel() has been called and m_model variable is set.
