@@ -67,4 +67,11 @@ public final class BEANS {
     }
     return instances;
   }
+
+  /**
+   * @return the {@link IBeanManager} of the current {@link Platform#get()}
+   */
+  public static IBeanManager getBeanManager() {
+    return Platform.get().getBeanManager();
+  }
 }
