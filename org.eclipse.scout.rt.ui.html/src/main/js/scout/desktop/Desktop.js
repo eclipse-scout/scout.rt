@@ -283,15 +283,37 @@ scout.Desktop.prototype._showForm = function(form) {
   }
 };
 
+scout.Desktop.UrlTarget = {
+  AUTO: 'AUTO',
+  SELF: 'SELF',
+  BLANK: 'BLANK'
+};
+
 scout.Desktop.prototype._openUrlInBrowser = function(event) {
-  $.log.debug('(Desktop#_openUrlInBrowser) path=' + event.path + ' urlTarget=' + event.urlTarget);
   if (!event.path) {
     return;
   }
-  if (event.urlTarget === 'SELF') {
-    window.location.href = event.path;
-  } else {
+  var newWindow = false,
+    requestedTarget = event.urlTarget;
+
+  if (scout.Desktop.UrlTarget.BLANK === requestedTarget) {
+    newWindow = true;
+  } else if (scout.Desktop.UrlTarget.SELF === requestedTarget) {
+    newWindow = false;
+  } else if (scout.Desktop.UrlTarget.AUTO === requestedTarget) {
+    // this is important for download resources with Firefox. Firefox cancels all running
+    // requests (also the background polling job) when a resource is opened in the same
+    // windows as the Scout application. This would lead to a connection failure, thus
+    // we always want to open the resource in a new window (Firefox automatically closes
+    // this window as soon as the download is started).
+    newWindow = !scout.device.supportsDownloadInSameWindow();
+  }
+
+  $.log.debug('(Desktop#_openUrlInBrowser) path=' + event.path + ' urlTarget=' + event.urlTarget + ' newWindow=' + newWindow);
+  if (newWindow) {
     window.open(event.path);
+  } else {
+    window.location.href = event.path;
   }
 };
 

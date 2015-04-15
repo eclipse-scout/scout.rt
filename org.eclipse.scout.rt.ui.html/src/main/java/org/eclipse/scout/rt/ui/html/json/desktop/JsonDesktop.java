@@ -238,14 +238,14 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
 
   protected void handleModelOpenDownloadInBrowser(IDownloadHandler handler) {
     if (handler == null) {
-      return;
+      return; // FIXME AWE: (download) remove this null if?
     }
     manageDownloadHandlers();
     m_downloadHandlers.put(handler.getResource().getFilename(), handler);
     String path = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, handler.getResource().getFilename());
     JSONObject json = new JSONObject();
     putProperty(json, "path", path);
-    putProperty(json, "urlTarget", UrlTarget.SELF);
+    putProperty(json, "urlTarget", UrlTarget.AUTO); // FIXME AWE: document why it must be AUTO, unit-test
     addActionEvent("openUrlInBrowser", json);
   }
 

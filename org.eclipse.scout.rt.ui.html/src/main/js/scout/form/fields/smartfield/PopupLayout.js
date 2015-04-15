@@ -30,7 +30,7 @@ scout.PopupLayout.prototype.layout = function($container) {
 
   if (htmlProposalChooser) {
     size = popupSize.subtract(this._htmlPopup.getInsets());
-    htmlProposalChooser.invalidate(); // FIXME AWE: warum ist das hier plötzlich notwendig damit der status korrekt dargestellt wird???
+    htmlProposalChooser.invalidate(); // FIXME AWE: (smart-field) warum ist das hier plötzlich notwendig damit der status korrekt dargestellt wird???
     htmlProposalChooser.setSize(size);
   }
 };

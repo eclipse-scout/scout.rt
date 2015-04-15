@@ -736,7 +736,7 @@ scout.Session.prototype.onModelAction = function(event) {
 scout.Session.prototype._onLocaleChanged = function(event) {
   this.locale = new scout.Locale(event.locale);
   this._texts = new scout.Texts(event.textMap);
-  // FIXME inform components to reformat display text?
+  // FIXME BSH(?): inform components to reformat display text?
 };
 
 scout.Session.prototype._onInitialized = function(event) {
@@ -747,6 +747,9 @@ scout.Session.prototype._onInitialized = function(event) {
   this.desktop.render(this.$entryPoint);
   this._setApplicationLoading(false);
   this._backgroundJobPollingEnabled = event.backgroundJobPollingEnabled;
+
+  var d = scout.device;
+  $.log.info('Session initialized. Detected user-agent: system=' + d.system + ' device=' + d.device + ' browser=' + d.browser);
 };
 
 scout.Session.prototype._onLogout = function(event) {
