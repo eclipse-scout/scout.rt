@@ -135,6 +135,7 @@
     // Other objects
     "Cell": {
       "horizontalAlignment": -1,
+      "htmlEnabled": false,
       "editable": false
     },
     "TableRow": {
@@ -144,6 +145,7 @@
     "Column": {
       "editable": false,
       "horizontalAlignment": -1,
+      "htmlEnabled": false,
       "sortActive": false,
       "sortAscending": true,
       "sortIndex": -1,

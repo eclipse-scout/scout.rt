@@ -140,6 +140,24 @@ describe("Table", function() {
       expect($cells1.eq(1)).not.toHaveClass('abc');
     });
 
+    it("considers htmlEnabled of a cell", function() {
+      var model = helper.createModelFixture(3, 2);
+      model.rows[0].cells[0].text = '<b>hi</b>';
+      model.rows[0].cells[0].htmlEnabled = false;
+      model.rows[0].cells[1].text = '<b>hi</b>';
+      model.rows[0].cells[1].htmlEnabled = true;
+
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $rows = table.$rows();
+      var $cells0 = $rows.eq(0).find('.table-cell');
+
+      expect($cells0.eq(0).text()).toBe('<b>hi</b>');
+      expect($cells0.eq(1).text()).toBe('hi');
+    });
+
+
   });
 
   describe("checkRow", function() {

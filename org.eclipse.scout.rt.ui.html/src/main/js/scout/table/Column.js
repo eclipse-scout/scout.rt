@@ -20,8 +20,11 @@ scout.Column.prototype.buildCell = function(row) {
   cell = this.table.cell(this.index, row);
   style = this.table.cellStyle(this, row);
   text = this.table.cellText(this, row);
+  if (!cell.htmlEnabled) {
+    text = scout.strings.encode(text);
+  }
   if (this.table.multilineText) {
-    text = scout.strings.nl2br(text);
+    text = scout.strings.nl2br(text, false);
   }
   cssClass = this._cssClass(row, cell);
   tooltipText = this.table.cellTooltipText(this, row);
@@ -39,6 +42,7 @@ scout.Column.prototype._cssClass = function(row, cell) {
   if (cell.editable) {
     cssClass += ' editable';
   }
+  //TODO CGU cssClass is actually only sent for cells, should we change this in model? discuss with jgu
   if (cell.cssClass) {
     cssClass += ' ' + cell.cssClass;
   } else if (this.cssClass) {
