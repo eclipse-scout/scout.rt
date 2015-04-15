@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
@@ -456,7 +457,11 @@ public interface IDesktop extends IPropertyObserver {
    * @param target
    *          used to specify where the url should be opened. Only considered by the web ui.
    */
-  void openUrlInBrowser(String url, IUrlTarget target);
+  void openUrlInBrowser(String uri, IUrlTarget target);
+
+  // FIXME AWE: (download) rename to openUri (since tel:079... is an URI but not an URL)
+
+  // FIXME AWE: (download) add method openUri(URI)
 
   /**
    * Opens the download in the browser.
@@ -465,6 +470,25 @@ public interface IDesktop extends IPropertyObserver {
    *          used to specify where the url should be opened. Only considered by the web ui.
    */
   void openDownloadInBrowser(IDownloadHandler handler);
+
+  /**
+   * Instructs the UI client to download the given binary resource. Download handler is valid for the given time in
+   * milliseconds.
+   *
+   * @param binaryResource
+   * @param validDuration
+   *          milliseconds
+   */
+  void openDownloadInBrowser(BinaryResource binaryResource, long validDuration);
+
+  /**
+   * Instructs the UI client to download the given binary resource. Download handler is valid for 1 minute.
+   *
+   * @param binaryResource
+   */
+  void openDownloadInBrowser(BinaryResource binaryResource);
+
+  // FIXME AWE: rename these methods to openResource, downloadResource (!), startDownload
 
   /**
    * Prints the desktop

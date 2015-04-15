@@ -58,13 +58,15 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   public static final int TYPE_FILE_CHOOSER_ADDED = 910;
   /**
    * Creates and opens a browser window to download a static resource or opens an url via user interface (only supported
-   * in web ui),
-   * see {@link IDesktop#openUrlInBrowser(String)}
+   * in web ui).
+   *
+   * @see IDesktop#openUrlInBrowser(String)
    */
   public static final int TYPE_OPEN_URL_IN_BROWSER = 920;
   /**
-   * Creates and opens a browser window to download a resource (only supported in web ui),
-   * see {@link IDesktop#openDownloadInBrowser(IDownloadHandler)}
+   * Creates and opens a browser window to download a resource (only supported in web ui).
+   *
+   * @see IDesktop#openDownloadInBrowser(IDownloadHandler)
    */
   public static final int TYPE_OPEN_DOWNLOAD_IN_BROWSER = 921;
   /**

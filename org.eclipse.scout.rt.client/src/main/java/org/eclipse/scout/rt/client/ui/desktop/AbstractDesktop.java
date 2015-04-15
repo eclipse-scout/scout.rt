@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
@@ -91,6 +92,7 @@ import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
@@ -1379,6 +1381,33 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (UserAgentUtility.isWebClient()) {
       fireOpenDownloadInBrowser(handler);
     }
+  }
+
+  @Override
+  public void openDownloadInBrowser(final BinaryResource binaryResource, long validDuration) {
+    final long validUntil = System.currentTimeMillis() + validDuration;
+    IDownloadHandler handler = new IDownloadHandler() {
+
+      // FIXME AWE: (downloads) in-aktive download handler entfernen (z.Z. geschieht dies
+      // erst wenn wieder ein neuer download gestartet wird - sollte aber auch einfach so
+      // geschehen -> job, mit delay schedulen.
+
+      @Override
+      public boolean isActive() {
+        return System.currentTimeMillis() < validUntil;
+      }
+
+      @Override
+      public BinaryResource getResource() {
+        return binaryResource;
+      }
+    };
+    openDownloadInBrowser(handler);
+  }
+
+  @Override
+  public void openDownloadInBrowser(BinaryResource binaryResource) {
+    openDownloadInBrowser(binaryResource, TimeUnit.MINUTES.toMillis(1));
   }
 
   @Override

@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
  *
  */
 @Priority(0)
+@SuppressWarnings("deprecation")
 public class DefaultShellService extends AbstractService implements IShellService {
 
   @Override

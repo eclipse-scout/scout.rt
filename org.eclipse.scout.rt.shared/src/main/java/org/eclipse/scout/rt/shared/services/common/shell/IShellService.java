@@ -19,12 +19,18 @@ import org.eclipse.scout.rt.shared.validate.InputValidation;
 /**
  * Currently known implementations are {@link org.eclipse.scout.rt.shared.win32.x86.service.internal.WindowsService} and
  * {@link org.eclipse.scout.rt.client.services.common.shell.DefaultShellService}
+ *
+ * @deprecated since 6.0.0. Because Scout is a web-framework now, the Scout client should not use the shell-service
+ *             anymore. In earlier releases the Scout client layer was deployed on the client-workstation and ran
+ *             together with the UI layer in a Java VM. Today the Scout client runs on a server and the UI layer runs in
+ *             a browser on the client workstation. Thus it's not possible to do anything useful with the shell-service
+ *             in the client. Use <code>IDesktop.openDownloadInBrowser()</code> when you must instruct the UI layer to
+ *             download a (binary) resource, like a Word- or Excel document or a PDF.
  */
 @Priority(-3)
 @InputValidation(IValidationStrategy.PROCESS.class)
+@Deprecated
 public interface IShellService extends IService {
-
-  // FIXME AWE: Deprecaten, und convenience methode auf Desktop anbieten openBinaryResource(binaryRes, validUntil)
 
   /**
    * Open the resource at the specified path with the typical application
