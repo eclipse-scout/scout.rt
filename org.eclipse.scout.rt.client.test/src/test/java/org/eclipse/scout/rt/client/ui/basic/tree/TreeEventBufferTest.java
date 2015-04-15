@@ -82,7 +82,7 @@ public class TreeEventBufferTest {
   public void testUpdateCoalesce() {
     final TreeEvent e1 = mockEvent(TreeEvent.TYPE_NODES_UPDATED, "A", "B", "C");
     final TreeEvent e2 = mockEvent(TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, "C", "B", "A");
-    final TreeEvent e3 = mockEvent(TreeEvent.TYPE_NODES_UPDATED, "B");
+    final TreeEvent e3 = mockEvent(TreeEvent.TYPE_NODES_UPDATED, "B", "E");
     final TreeEvent e4 = mockEvent(TreeEvent.TYPE_NODES_UPDATED, "C", "B", "D");
     m_testBuffer.add(e1);
     m_testBuffer.add(e2);
@@ -95,7 +95,7 @@ public class TreeEventBufferTest {
     assertEquals(TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, coalesced.get(1).getType());
     assertEquals(3, coalesced.get(1).getNodes().size());
     assertEquals(TreeEvent.TYPE_NODES_UPDATED, coalesced.get(2).getType());
-    assertEquals(3, coalesced.get(2).getNodes().size());
+    assertEquals(4, coalesced.get(2).getNodes().size());
   }
 
   /**

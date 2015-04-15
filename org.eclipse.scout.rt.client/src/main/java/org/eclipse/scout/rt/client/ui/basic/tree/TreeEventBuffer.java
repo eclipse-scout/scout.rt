@@ -186,7 +186,12 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       TreeEvent event = events.get(i);
 
       if (isCoalesceConsecutivePrevious(event.getType())) {
-        coalesceConsecutivePrevious(event, events.subList(0, i));
+        TreeEvent mergedEvent = coalesceConsecutivePrevious(event, events.subList(0, i));
+        if (mergedEvent != event) {
+          // replace in (now shorter) list
+          i = events.size() - 1 - j;
+          events.set(i, mergedEvent);
+        }
       }
     }
   }
@@ -194,18 +199,21 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   /**
    * Merge events of the same type in the given list into the current and delete the other events
    * from the list.
+   *
+   * @return the updated event (with other events merged into it)
    */
-  protected void coalesceConsecutivePrevious(TreeEvent event, List<TreeEvent> list) {
+  protected TreeEvent coalesceConsecutivePrevious(TreeEvent event, List<TreeEvent> list) {
     for (ListIterator<TreeEvent> it = list.listIterator(list.size()); it.hasPrevious();) {
       TreeEvent previous = it.previous();
       if (event.getType() == previous.getType() && hasSameCommonParentNode(event, previous)) {
-        merge(previous, event);
+        event = merge(previous, event);
         it.remove();
       }
       else {
-        return;
+        return event;
       }
     }
+    return event;
   }
 
   protected boolean hasSameCommonParentNode(TreeEvent event1, TreeEvent event2) {
@@ -234,7 +242,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   protected List<ITreeNode> mergeNodes(Collection<ITreeNode> first, Collection<ITreeNode> second) {
     List<ITreeNode> nodes = new ArrayList<>();
     for (ITreeNode node : first) {
-      if (second.contains(node)) {
+      if (!second.contains(node)) {
         nodes.add(node);
       }
     }
