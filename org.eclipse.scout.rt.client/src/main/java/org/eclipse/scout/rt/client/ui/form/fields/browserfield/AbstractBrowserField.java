@@ -141,12 +141,12 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
         try {
           url = new URL(location);
         }
-        catch (Throwable t) {
+        catch (Exception t) {
           //nop
         }
         return interceptAcceptLocationChange(location, url != null ? url.getPath() : null, url != null && "local".equals(url.getHost()));
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.error("location: " + location, t);
       }
       return false;
@@ -159,12 +159,12 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
         try {
           url = new URL(location);
         }
-        catch (Throwable t) {
+        catch (Exception t) {
           //nop
         }
         interceptLocationChanged(location, url != null ? url.getPath() : null, url != null && "local".equals(url.getHost()));
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.error("location: " + location, t);
       }
     }

@@ -69,8 +69,8 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
     try {
       return new String(IOUtility.getContent(getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableCellContent.html").openStream()), "iso-8859-1");
     }
-    catch (Throwable t) {
-      throw new ProcessingException("Exception while loading html cell template for mobile table", t);
+    catch (Exception e) {
+      throw new ProcessingException("Exception while loading html cell template for mobile table", e);
     }
   }
 
@@ -78,8 +78,8 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
     try {
       return new String(IOUtility.getContent(getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableDrillDown.html").openStream()), "iso-8859-1");
     }
-    catch (Throwable t) {
-      throw new ProcessingException("Exception while loading html cell template for mobile table", t);
+    catch (Exception e) {
+      throw new ProcessingException("Exception while loading html cell template for mobile table", e);
     }
   }
 
@@ -87,8 +87,8 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
     try {
       return new String(IOUtility.getContent(getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableDrillDownButton.html").openStream()), "iso-8859-1");
     }
-    catch (Throwable t) {
-      throw new ProcessingException("Exception while loading html cell template for mobile table", t);
+    catch (Exception e) {
+      throw new ProcessingException("Exception while loading html cell template for mobile table", e);
     }
   }
 

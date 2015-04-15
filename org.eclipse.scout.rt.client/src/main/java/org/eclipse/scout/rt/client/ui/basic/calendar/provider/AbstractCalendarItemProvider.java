@@ -260,11 +260,8 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     try {
       interceptDecorateCell(cell, item);
     }
-    catch (ProcessingException e) {
+    catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(e);
-    }
-    catch (Throwable e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
     }
   }
 
@@ -395,7 +392,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     catch (ProcessingException e) {
       throw e;
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       throw new ProcessingException("Unexpected", e);
     }
   }
@@ -408,7 +405,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     catch (ProcessingException e) {
       throw e;
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       throw new ProcessingException("Unexpected", e);
     }
   }

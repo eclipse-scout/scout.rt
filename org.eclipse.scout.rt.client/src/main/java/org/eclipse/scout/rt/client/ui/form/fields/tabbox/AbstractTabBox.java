@@ -96,11 +96,8 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
         try {
           interceptTabSelected(getSelectedTab());
         }
-        catch (ProcessingException ex) {
+        catch (Exception ex) {
           BEANS.get(ExceptionHandler.class).handle(ex);
-        }
-        catch (Throwable t) {
-          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
         }
       }
     });

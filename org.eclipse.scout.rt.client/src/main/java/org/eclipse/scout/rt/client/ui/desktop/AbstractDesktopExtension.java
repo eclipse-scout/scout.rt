@@ -115,7 +115,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
         IOutline o = element.newInstance();
         outlines.addOrdered(o);
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + element.getName() + "'.", t));
       }
     }

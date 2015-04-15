@@ -254,8 +254,8 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
               try {
                 updateSharedVariableMap(notification.getSharedVariableMap());
               }
-              catch (Throwable t) {
-                LOG.error("update of shared contex", t);
+              catch (Exception ex) {
+                LOG.error("update of shared contex", ex);
               }
             }
             else {
@@ -300,9 +300,9 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
       interceptLoadSession();
       setActive(true);
     }
-    catch (Throwable t) {
-      m_loadError = t;
-      LOG.error("load session", t);
+    catch (Exception e) {
+      m_loadError = e;
+      LOG.error("load session", e);
     }
   }
 
@@ -414,14 +414,14 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     try {
       interceptStoreSession();
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.error("Failed to store the client session.", t);
     }
     if (m_desktop != null) {
       try {
         m_desktop.closeInternal();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.error("Failed to close the desktop.", t);
       }
       m_desktop = null;
@@ -468,7 +468,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
       try {
         BEANS.get(ILogoutService.class).logout();
       }
-      catch (Throwable e) {
+      catch (Exception e) {
         LOG.info("Failed to logout from server.", e);
       }
     }

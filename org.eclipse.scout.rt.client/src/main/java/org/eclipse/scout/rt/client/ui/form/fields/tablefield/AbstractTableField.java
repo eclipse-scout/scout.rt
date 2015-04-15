@@ -560,7 +560,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
                 columnNames.add(col.getHeaderCell().getText());
               }
             }
-            catch (Throwable t) {
+            catch (Exception t) {
               LOG.error("validating " + getClass().getSimpleName() + " for row " + row.getRowIndex() + " for column " + col.getClass().getSimpleName(), t);
             }
           }
@@ -627,7 +627,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     try {
       interceptUpdateTableStatus();
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.warn("Updating status of " + AbstractTableField.this.getClass().getName(), t);
     }
   }

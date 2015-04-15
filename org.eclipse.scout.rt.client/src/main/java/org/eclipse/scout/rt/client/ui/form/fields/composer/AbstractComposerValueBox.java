@@ -156,8 +156,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           try {
             interceptChangedValue();
           }
-          catch (Throwable t) {
-            LOG.error("fire value change on " + e.getSource(), t);
+          catch (Exception ex) {
+            LOG.error("fire value change on " + e.getSource(), ex);
           }
         }
       }

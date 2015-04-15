@@ -397,7 +397,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       try {
         fieldList.add(ConfigurationUtility.newInnerInstance(this, fieldClazz));
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
       }
     }

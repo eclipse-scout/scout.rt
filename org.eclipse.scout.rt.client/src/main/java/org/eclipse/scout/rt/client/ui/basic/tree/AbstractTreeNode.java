@@ -446,8 +446,8 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     try {
       interceptDecorateCell(m_cell);
     }
-    catch (Throwable t) {
-      LOG.warn("node " + getClass() + " " + getCell().getText(), t);
+    catch (Exception t) {
+      LOG.error("node " + getClass() + " " + getCell().getText(), t);
     }
   }
 
@@ -927,8 +927,8 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       try {
         node.nodeAddedNotify();
       }
-      catch (Throwable t) {
-        t.printStackTrace();
+      catch (Exception t) {
+        LOG.error("", t);
       }
       // access control after adding the page. The add triggers the
       // page.initPage() which eventually
@@ -974,8 +974,8 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       try {
         node.nodeRemovedNotify();
       }
-      catch (Throwable t) {
-        t.printStackTrace();
+      catch (Exception t) {
+        LOG.error("Error removing node", t);
       }
     }
   }

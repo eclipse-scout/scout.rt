@@ -111,7 +111,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
           IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
           fields.addOrdered(f);
         }// end try
-        catch (Throwable t) {
+        catch (Exception t) {
           BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + clazz.getName() + "'.", t));
         }
       }

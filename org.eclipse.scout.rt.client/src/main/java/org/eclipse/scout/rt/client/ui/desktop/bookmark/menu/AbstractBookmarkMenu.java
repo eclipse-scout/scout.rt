@@ -226,8 +226,8 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
           try {
             ClientSessionProvider.currentSession().getDesktop().activateBookmark(b);
           }
-          catch (Throwable t) {
-            LOG.error(null, t);
+          catch (Exception e) {
+            LOG.error("Error activating bookmark", e);
           }
         }
       }

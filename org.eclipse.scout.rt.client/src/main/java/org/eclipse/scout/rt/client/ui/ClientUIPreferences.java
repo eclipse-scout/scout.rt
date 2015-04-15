@@ -242,7 +242,7 @@ public class ClientUIPreferences {
         Object customizerData = SerializationUtility.createObjectSerializer().deserialize(serialData, null);
         return customizerData;
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.error("Failed reading custom table data for " + key + ": " + t);
         m_env.remove(key);
         return null;
@@ -267,7 +267,7 @@ public class ClientUIPreferences {
         byte[] data = SerializationUtility.createObjectSerializer().serialize(customizerData);
         m_env.putByteArray(key, data);
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.error("Failed storing custom table data for " + key, t);
         m_env.remove(key);
       }

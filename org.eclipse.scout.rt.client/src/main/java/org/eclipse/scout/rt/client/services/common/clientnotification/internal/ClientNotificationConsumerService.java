@@ -170,7 +170,7 @@ public class ClientNotificationConsumerService extends AbstractService implement
         try {
           l.handleEvent(e, sync);
         }
-        catch (Throwable t) {
+        catch (Exception t) {
           LOG.error("Listener " + l.getClass().getName() + " on event " + notification, t);
         }
       }

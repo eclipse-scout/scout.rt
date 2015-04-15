@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -41,7 +41,7 @@ public class PerformanceAnalyzerService extends AbstractService implements IPerf
     try {
       m_propertySupport.firePropertyChange(PROP_NETWORK_LATENCY, oldValue, newValue);
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.warn(null, t);
     }
   }
@@ -59,7 +59,7 @@ public class PerformanceAnalyzerService extends AbstractService implements IPerf
     try {
       m_propertySupport.firePropertyChange(PROP_SERVER_EXECUTION_TIME, oldValue, newValue);
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.warn(null, t);
     }
   }

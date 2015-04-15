@@ -166,7 +166,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       try {
         fields.addOrdered(ConfigurationUtility.newInnerInstance(this, fieldClazz));
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
       }
     }

@@ -53,7 +53,7 @@ public class MessageBoxEvent extends EventObject implements IModelEvent {
         }
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       buf.append("#" + m_type);
     }
     // messageBox

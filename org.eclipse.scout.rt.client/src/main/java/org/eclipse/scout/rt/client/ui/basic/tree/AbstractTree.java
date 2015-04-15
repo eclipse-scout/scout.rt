@@ -523,7 +523,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
                 }
                 e.setDragObject(transferObject);
               }
-              catch (Throwable t) {
+              catch (Exception t) {
                 LOG.error("Drag", t);
               }
             }
@@ -535,7 +535,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
               try {
                 interceptDrop(e.getNode(), e.getDropObject());
               }
-              catch (Throwable t) {
+              catch (Exception t) {
                 LOG.error("Drop", t);
               }
             }
@@ -579,7 +579,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       try {
         ksList.add(ConfigurationUtility.newInnerInstance(this, keystrokeClazz));
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", t));
       }
     }
@@ -645,8 +645,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     try {
       interceptDisposeTree();
     }
-    catch (Throwable t) {
-      LOG.warn(getClass().getName(), t);
+    catch (Exception e) {
+      LOG.warn(getClass().getName(), e);
     }
   }
 
@@ -2247,11 +2247,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       nodesSelectedInternal(deselectedNodes, newSelectedNodes);
       interceptNodesSelected(e);
     }
-    catch (ProcessingException ex) {
+    catch (Exception ex) {
       BEANS.get(ExceptionHandler.class).handle(ex);
-    }
-    catch (Throwable t) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
     }
     //end single observer
     fireTreeEventInternal(e);
@@ -2295,11 +2292,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       try {
         interceptNodeClick(node, mouseButton);
       }
-      catch (ProcessingException ex) {
+      catch (Exception ex) {
         BEANS.get(ExceptionHandler.class).handle(ex);
-      }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
   }
@@ -2325,11 +2319,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
             try {
               interceptNodeAction(node);
             }
-            catch (ProcessingException ex) {
+            catch (Exception ex) {
               BEANS.get(ExceptionHandler.class).handle(ex);
-            }
-            catch (Throwable t) {
-              BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
             }
           }
         }
@@ -2490,7 +2481,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
             try {
               interceptDecorateCell(node, node.getCellForUpdate());
             }
-            catch (Throwable t) {
+            catch (Exception t) {
               LOG.warn("node " + node.getClass() + " " + node.getCell().getText(), t);
             }
           }

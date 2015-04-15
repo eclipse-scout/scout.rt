@@ -529,11 +529,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           acceptProposal(newRow);
         }
       }
-      catch (ProcessingException e) {
+      catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(e);
-      }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
   }

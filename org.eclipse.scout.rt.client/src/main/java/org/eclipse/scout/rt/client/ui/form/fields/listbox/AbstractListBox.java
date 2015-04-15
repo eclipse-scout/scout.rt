@@ -378,7 +378,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
         IFormField f = ConfigurationUtility.newInnerInstance(this, fieldClazz);
         fieldList.add(f);
       }// end try
-      catch (Throwable t) {
+      catch (Exception t) {
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
       }
     }

@@ -166,8 +166,8 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
       catch (ProcessingException e) {
         throw e;
       }
-      catch (Throwable t) {
-        throw new ProcessingException("URL " + url, t);
+      catch (Exception e) {
+        throw new ProcessingException("URL " + url, e);
       }
     }
     else {

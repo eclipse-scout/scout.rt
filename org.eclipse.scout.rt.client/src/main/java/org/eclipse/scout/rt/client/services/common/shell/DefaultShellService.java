@@ -98,7 +98,7 @@ public class DefaultShellService extends AbstractService implements IShellServic
     catch (InterruptedException ie) {
       throw new ProcessingException(ScoutTexts.get("Interrupted"), ie);
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       throw new ProcessingException("Unexpected: " + path, t);
     }
   }

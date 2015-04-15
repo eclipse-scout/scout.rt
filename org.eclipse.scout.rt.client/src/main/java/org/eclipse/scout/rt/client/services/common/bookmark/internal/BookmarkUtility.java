@@ -814,7 +814,7 @@ public final class BookmarkUtility {
       crc.update(bo.toByteArray());
       return crc.getValue();
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       // nop
       return -1L;
     }

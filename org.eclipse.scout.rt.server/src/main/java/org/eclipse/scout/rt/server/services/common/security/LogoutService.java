@@ -45,8 +45,8 @@ public class LogoutService extends AbstractService implements ILogoutService {
     catch (IllegalStateException e) {
       //already invalid
     }
-    catch (Throwable t) {
-      LOG.warn("Failed to invalidate HTTP session.", t);
+    catch (Exception e) {
+      LOG.warn("Failed to invalidate HTTP session.", e);
     }
   }
 }

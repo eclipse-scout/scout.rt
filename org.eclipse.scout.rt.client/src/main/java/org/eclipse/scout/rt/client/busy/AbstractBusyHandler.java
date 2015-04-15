@@ -134,7 +134,7 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
         try {
           job.cancel(true);
         }
-        catch (Throwable t) {
+        catch (Exception t) {
           //nop
         }
       }

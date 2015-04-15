@@ -221,8 +221,8 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
         menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
         menus.addOrdered(menu);
       }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", t));
+      catch (Exception e) {
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
 

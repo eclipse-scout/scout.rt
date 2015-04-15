@@ -438,7 +438,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         try {
           interceptAnyFieldChanged((IFormField) e.getSource());
         }
-        catch (Throwable t) {
+        catch (Exception t) {
           LOG.error("" + e.getSource() + " " + e.getPropertyName() + "=" + e.getNewValue(), t);
         }
       }
@@ -815,11 +815,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         try {
           interceptActiveStepChanged();
         }
-        catch (ProcessingException e) {
+        catch (Exception e) {
           BEANS.get(ExceptionHandler.class).handle(e);
-        }
-        catch (Throwable t) {
-          BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
         }
       }
       finally {
@@ -834,11 +831,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     try {
       interceptRefreshButtonPolicy();
     }
-    catch (ProcessingException e) {
+    catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(e);
-    }
-    catch (Throwable t) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
     }
   }
 
@@ -1047,8 +1041,8 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
           m_containerForm = null;
         }
       }
-      catch (Throwable t) {
-        LOG.error("closing " + getTitle(), t);
+      catch (Exception e) {
+        LOG.error("closing " + getTitle(), e);
       }
       // dispose all steps
       HashSet<IWizardStep<? extends IForm>> set = new HashSet<IWizardStep<? extends IForm>>();
@@ -1058,7 +1052,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         try {
           step.dispose();
         }
-        catch (Throwable t) {
+        catch (Exception t) {
           LOG.error("closing " + getTitle(), t);
         }
       }
@@ -1123,7 +1117,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       catch (ProcessingException pe) {
         throw pe;
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         throw new ProcessingException("Unexpected", t);
       }
     }
@@ -1141,7 +1135,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       catch (ProcessingException pe) {
         throw pe;
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         throw new ProcessingException("Unexpected", t);
       }
     }
@@ -1162,7 +1156,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         setCloseTypeInternal(oldType);
         throw pe;
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         setCloseTypeInternal(oldType);
         throw new ProcessingException("Unexpected", t);
       }
@@ -1184,9 +1178,9 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         setCloseTypeInternal(oldType);
         throw pe;
       }
-      catch (Throwable t) {
+      catch (Exception e) {
         setCloseTypeInternal(oldType);
-        throw new ProcessingException("Unexpected", t);
+        throw new ProcessingException("Unexpected", e);
       }
     }
   }
@@ -1206,7 +1200,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         setCloseTypeInternal(oldType);
         throw pe;
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         setCloseTypeInternal(oldType);
         throw new ProcessingException("Unexpected", t);
       }
@@ -1224,7 +1218,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     catch (ProcessingException pe) {
       throw pe;
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       throw new ProcessingException("Unexpected", t);
     }
   }

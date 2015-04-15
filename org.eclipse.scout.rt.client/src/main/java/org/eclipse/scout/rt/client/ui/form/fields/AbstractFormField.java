@@ -928,14 +928,14 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     try {
       disposeFieldInternal();
     }
-    catch (Throwable t) {
-      LOG.warn("Field " + getClass().getName(), t);
+    catch (Exception e) {
+      LOG.warn("Field " + getClass().getName(), e);
     }
     try {
       interceptDisposeField();
     }
-    catch (Throwable t) {
-      LOG.warn("Field " + getClass().getName(), t);
+    catch (Exception e) {
+      LOG.warn("Field " + getClass().getName(), e);
     }
   }
 
@@ -1922,8 +1922,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         ks.initAction();
         ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
       }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", t));
+      catch (Exception e) {
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", e));
       }
     }
 
@@ -1932,8 +1932,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         ks.initAction();
         ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
       }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error initializing key stroke '" + ks.getClass().getName() + "'.", t));
+      catch (Exception e) {
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error initializing key stroke '" + ks.getClass().getName() + "'.", e));
       }
     }
     return CollectionUtility.arrayList(ksMap.values());

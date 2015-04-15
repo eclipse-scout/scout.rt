@@ -211,11 +211,8 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
           interceptComReadyStatusChanged(comReady);
         }
       }
-      catch (ProcessingException e) {
+      catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(e);
-      }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
   }

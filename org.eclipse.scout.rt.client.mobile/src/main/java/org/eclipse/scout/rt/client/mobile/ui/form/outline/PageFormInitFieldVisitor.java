@@ -45,7 +45,7 @@ public class PageFormInitFieldVisitor implements IFormFieldVisitor {
         m_firstEx = e;
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       if (m_firstEx == null) {
         m_firstEx = new ProcessingException("Unexpected", t);
       }

@@ -31,7 +31,7 @@ public class ClientNotificationPollingJob implements IRunnable {
       // side-effect of every service call (whether ping or any other) is to get client notifications
       pingService.ping("GetClientNotifications");
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       if (LOG.isInfoEnabled()) {
         LOG.info("polling", t);
       }

@@ -45,7 +45,7 @@ public final class ActionUtility {
 
   /**
    * Removes invisible actions. Also removes leading and trailing separators as well as multiple consecutive separators.
-   * 
+   *
    * @since 3.8.1
    */
   public static <T extends IAction> List<T> visibleNormalizedActions(List<T> actionNodes) {
@@ -136,7 +136,7 @@ public final class ActionUtility {
           m_firstEx = e;
         }
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         if (m_firstEx == null) {
           m_firstEx = new ProcessingException("Unexpected", t);
         }
@@ -182,7 +182,7 @@ public final class ActionUtility {
    * visibleOnly) and at least one of its leaf children (recursively) is visible (depending on visible only) and and has
    * one of the passed menu types.</li>
    * </ul>
-   * 
+   *
    * @param menuTypes
    * @param visibleOnly
    * @return

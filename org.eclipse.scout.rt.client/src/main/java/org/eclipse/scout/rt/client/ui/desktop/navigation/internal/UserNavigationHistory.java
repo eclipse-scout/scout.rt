@@ -74,8 +74,8 @@ public class UserNavigationHistory {
 
       return addStep(bm);
     }
-    catch (Throwable t) {
-      return handleAddStepError(t, bm);
+    catch (Exception e) {
+      return handleAddStepError(e, bm);
     }
   }
 
@@ -94,8 +94,8 @@ public class UserNavigationHistory {
 
       return addStep(bm);
     }
-    catch (Throwable t) {
-      return handleAddStepError(t, bm);
+    catch (Exception e) {
+      return handleAddStepError(e, bm);
     }
   }
 
@@ -228,7 +228,7 @@ public class UserNavigationHistory {
         }
       }
     }
-    catch (Throwable t) {
+    catch (Exception e) {
       // nop
     }
   }

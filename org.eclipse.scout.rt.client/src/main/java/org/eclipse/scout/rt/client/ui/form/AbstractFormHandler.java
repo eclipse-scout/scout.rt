@@ -219,7 +219,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
     catch (ProcessingException e) {
       throw e;
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       throw new ProcessingException("Unexpected", e);
     }
   }
@@ -232,7 +232,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
     catch (ProcessingException e) {
       throw e;
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       throw new ProcessingException("Unexpected", e);
     }
   }
@@ -245,7 +245,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
     catch (ProcessingException e) {
       throw e;
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       throw new ProcessingException("Unexpected", e);
     }
   }
@@ -258,7 +258,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
     catch (ProcessingException e) {
       throw e;
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       throw new ProcessingException("Unexpected", e);
     }
   }
@@ -271,7 +271,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
     catch (ProcessingException e) {
       throw e;
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       throw new ProcessingException("Unexpected", e);
     }
   }
@@ -284,7 +284,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
     catch (ProcessingException e) {
       throw e;
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       throw new ProcessingException("Unexpected", e);
     }
   }
@@ -297,7 +297,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
     catch (ProcessingException e) {
       throw e;
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       throw new ProcessingException("Unexpected", e);
     }
   }

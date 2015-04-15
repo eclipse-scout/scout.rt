@@ -145,7 +145,7 @@ public class FormEvent extends EventObject implements IModelEvent {
         }
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       buf.append("#" + m_type);
     }
     // dialog

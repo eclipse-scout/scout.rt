@@ -132,7 +132,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
       aboutToShowInternal();
       interceptAboutToShow();
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.warn("Action " + getClass().getName(), t);
     }
   }

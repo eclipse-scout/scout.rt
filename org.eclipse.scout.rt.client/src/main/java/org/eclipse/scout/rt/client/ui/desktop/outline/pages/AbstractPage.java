@@ -485,11 +485,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
         policy.pageCreated(this);
       }
     }
-    catch (ProcessingException e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
     catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
 

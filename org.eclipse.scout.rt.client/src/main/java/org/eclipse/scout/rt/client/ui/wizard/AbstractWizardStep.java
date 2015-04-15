@@ -292,11 +292,8 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
                 }
               }
             }
-            catch (ProcessingException pe) {
+            catch (Exception pe) {
               BEANS.get(ExceptionHandler.class).handle(pe);
-            }
-            catch (Throwable t) {
-              BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
             }
             switch (e.getType()) {
               case FormEvent.TYPE_CLOSED: {

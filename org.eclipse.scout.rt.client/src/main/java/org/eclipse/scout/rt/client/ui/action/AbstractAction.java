@@ -692,7 +692,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
       prepareActionInternal();
       execPrepareAction();
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.warn("Action " + getClass().getName(), t);
     }
   }
@@ -736,11 +736,8 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
           doAction();
         }
       }
-      catch (ProcessingException e) {
+      catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(e);
-      }
-      catch (Throwable e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected exception", e));
       }
     }
 

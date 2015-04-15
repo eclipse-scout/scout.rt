@@ -103,7 +103,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
             try {
               reloadCodeTypes(notification.getCodeTypes());
             }
-            catch (Throwable t) {
+            catch (Exception t) {
               LOG.error("update due to client notification", t);
             }
           }
@@ -257,7 +257,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
       try {
         declaringCodeTypeClass = type.newInstance().getCodeType().getClass();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.error("find code " + type, t);
       }
     }
@@ -357,7 +357,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
           classLoader.loadClass(d.getName());
           verifiedCodeTypes.add(d);
         }
-        catch (Throwable t) {
+        catch (Exception t) {
           LOG.error("Missing code-type in client: " + d.getName());
         }
       }
@@ -376,7 +376,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
       try {
         list.add((Class<? extends ICodeType<?, ?>>) classLoader.loadClass(d.getName()));
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.warn("Loading " + d.getName(), t);
         continue;
       }

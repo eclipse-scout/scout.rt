@@ -361,7 +361,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
         DateFormat df = getDateFormat();
         rawValue = df.parse(df.format(rawValue));
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         // nop, take raw value
       }
     }
@@ -507,8 +507,8 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
         try {
           return new SimpleDateFormat(pat.substring(0, h).trim(), NlsLocale.get());
         }
-        catch (Throwable t) {
-          LOG.error("could not isolate date pattern from '" + pat + "'", t);
+        catch (Exception e) {
+          LOG.error("could not isolate date pattern from '" + pat + "'", e);
         }
       }
     }
@@ -525,8 +525,8 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
         try {
           return new SimpleDateFormat(pat.substring(h).trim(), NlsLocale.get());
         }
-        catch (Throwable t) {
-          LOG.error("could not isolate time pattern from '" + pat + "'", t);
+        catch (Exception e) {
+          LOG.error("could not isolate time pattern from '" + pat + "'", e);
         }
       }
     }
@@ -1095,8 +1095,8 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
         }
         setValue(d);
       }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
+      catch (Exception e) {
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
       }
     }
 
@@ -1121,8 +1121,8 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
         }
         setValue(d);
       }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
+      catch (Exception e) {
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
       }
     }
 
@@ -1131,8 +1131,8 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       try {
         setValue(d);
       }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
+      catch (Exception e) {
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
       }
     }
 
@@ -1141,11 +1141,8 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       try {
         interceptShiftDate(level, value);
       }
-      catch (ProcessingException e) {
+      catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(e);
-      }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
 
@@ -1154,11 +1151,8 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       try {
         interceptShiftTime(level, value);
       }
-      catch (ProcessingException e) {
+      catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(e);
-      }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
 

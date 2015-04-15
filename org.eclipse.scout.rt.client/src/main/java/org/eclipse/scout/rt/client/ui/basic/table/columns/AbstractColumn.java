@@ -1423,11 +1423,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
         getTable().getColumnSet().updateColumn(this);
       }
     }
-    catch (ProcessingException e) {
-      LOG.warn(null, e);
-    }
-    catch (Throwable t) {
-      LOG.warn(null, t);
+    catch (Exception e) {
+      LOG.warn("Error decorating header", e);
     }
   }
 
@@ -1775,8 +1772,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
           }
         }
       }
-      catch (Throwable t) {
-        LOG.error("validating " + getTable().getClass().getSimpleName() + " for new row for column " + getClass().getSimpleName(), t);
+      catch (Exception e) {
+        LOG.error("validating " + getTable().getClass().getSimpleName() + " for new row for column " + getClass().getSimpleName(), e);
         return;
       }
     }

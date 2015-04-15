@@ -707,11 +707,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       try {
         runMenu(defaultMenuType);
       }
-      catch (ProcessingException ex) {
+      catch (Exception ex) {
         BEANS.get(ExceptionHandler.class).handle(ex);
-      }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
     else {
@@ -915,12 +912,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         IMenu menu = ConfigurationUtility.newInnerInstance(this, clazz);
         menus.addOrdered(menu);
       }
-      catch (Throwable t) {
+      catch (Exception e) {
         String className = "null";
         if (clazz != null) {
           className = clazz.getName();
         }
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + className + "'.", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + className + "'.", e));
       }
     }
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
@@ -950,12 +947,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, clazz);
         ksList.add(ks);
       }
-      catch (Throwable t) {
+      catch (Exception e) {
         String className = "null";
         if (clazz != null) {
           className = clazz.getName();
         }
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + className + "'.", t));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + className + "'.", e));
       }
     }
     //add ENTER key stroke when default menu is used or execRowAction has an override
@@ -1057,7 +1054,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       try {
         c.initColumn();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.error("column " + c, t);
       }
     }
@@ -1069,7 +1066,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       try {
         c.disposeColumn();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.error("column " + c, t);
       }
     }
@@ -1230,8 +1227,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       disposeTableInternal();
       interceptDisposeTable();
     }
-    catch (Throwable t) {
-      LOG.warn(getClass().getName(), t);
+    catch (Exception e) {
+      LOG.error(getClass().getName(), e);
     }
   }
 
@@ -1605,7 +1602,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     else {
       // all calls to further methods are wrapped into a try-catch block so that the change counters are adjusted correctly
       if (m_tableChanging > 0) {
-        Throwable saveEx = null;
+        Exception saveEx = null;
         if (m_tableChanging == 1) {
           try {
             //will be going to zero, but process decorations here, so events are added to the event buffer
@@ -1614,7 +1611,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               sort();
             }
           }
-          catch (Throwable t) {
+          catch (Exception t) {
             saveEx = t;
           }
         }
@@ -1623,7 +1620,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           try {
             processEventBuffer();
           }
-          catch (Throwable t) {
+          catch (Exception t) {
             if (saveEx == null) {
               saveEx = t;
             }
@@ -1631,7 +1628,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           try {
             propertySupport.setPropertiesChanging(false);
           }
-          catch (Throwable t) {
+          catch (Exception t) {
             if (saveEx == null) {
               saveEx = t;
             }
@@ -1642,9 +1639,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
         else if (saveEx instanceof RuntimeException) {
           throw (RuntimeException) saveEx;
-        }
-        else if (saveEx instanceof Error) {
-          throw (Error) saveEx;
         }
       }
     }
@@ -3407,8 +3401,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         resetColumnsInternal(visibility, order, sorting, widths);
         interceptResetColumns(visibility, order, sorting, widths);
       }
-      catch (Throwable t) {
-        LOG.error("reset columns " + visibility + "," + order + "," + sorting + "," + widths, t);
+      catch (Exception e) {
+        LOG.error("reset columns " + visibility + "," + order + "," + sorting + "," + widths, e);
       }
     }
     finally {
@@ -3643,8 +3637,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         this.decorateCell(tableRow, col);
       }
     }
-    catch (Throwable t) {
-      LOG.error("Error occured while applying row decoration", t);
+    catch (Exception ex) {
+      LOG.error("Error occured while applying row decoration", ex);
     }
     finally {
       tableRow.setRowPropertiesChanged(false);
@@ -3756,11 +3750,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     try {
       interceptDecorateCell(cell, row, col);
     }
-    catch (ProcessingException e) {
+    catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(e);
-    }
-    catch (Throwable t) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
     }
   }
 
@@ -3793,11 +3784,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     try {
       interceptDecorateRow(row);
     }
-    catch (ProcessingException e) {
+    catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(e);
-    }
-    catch (Throwable t) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
     }
   }
 
@@ -3903,11 +3891,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         interceptRowClickSingleObserver(row, mouseButton);
         interceptRowClick(row, mouseButton);
       }
-      catch (ProcessingException ex) {
+      catch (Exception ex) {
         BEANS.get(ExceptionHandler.class).handle(ex);
-      }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
       }
     }
   }
@@ -3949,11 +3934,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           try {
             interceptRowAction(row);
           }
-          catch (ProcessingException ex) {
+          catch (Exception ex) {
             BEANS.get(ExceptionHandler.class).handle(ex);
-          }
-          catch (Throwable t) {
-            BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
           }
         }
       }
@@ -4458,11 +4440,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             }
             return f;
           }
-          catch (ProcessingException e) {
+          catch (Exception e) {
             BEANS.get(ExceptionHandler.class).handle(e);
-          }
-          catch (Throwable t) {
-            BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
           }
         }
       }
@@ -4481,11 +4460,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           try {
             m_editContext.getColumn().completeEdit(m_editContext.getRow(), m_editContext.getFormField());
           }
-          catch (ProcessingException e) {
+          catch (Exception e) {
             BEANS.get(ExceptionHandler.class).handle(e);
-          }
-          catch (Throwable t) {
-            BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
           }
           finally {
             m_editContext = null;
@@ -4576,11 +4552,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           try {
             interceptRowsSelected(e.getRows());
           }
-          catch (ProcessingException ex) {
+          catch (Exception ex) {
             BEANS.get(ExceptionHandler.class).handle(ex);
-          }
-          catch (Throwable t) {
-            BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
           }
           break;
         }

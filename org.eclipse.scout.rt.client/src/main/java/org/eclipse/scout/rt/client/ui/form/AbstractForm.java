@@ -587,8 +587,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         IToolButton b = ConfigurationUtility.newInnerInstance(this, clazz);
         toolButtonList.add(b);
       }
-      catch (Throwable t) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unable to create ToolButton '" + clazz.getName() + "'.", t));
+      catch (Exception e) {
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unable to create ToolButton '" + clazz.getName() + "'.", e));
       }
     }
     List<IToolButton> contributedToolButtons = m_contributionHolder.getContributionsByClass(IToolButton.class);
@@ -619,7 +619,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           try {
             rootBox = ConfigurationUtility.newInnerInstance(this, mainBoxClass);
           }
-          catch (Throwable t) {
+          catch (Exception t) {
             String mainBoxName = null;
             if (mainBoxClass == null) {
               mainBoxName = "null";
@@ -906,9 +906,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         throw e;
       }
     }
-    catch (Throwable t) {
+    catch (Exception e) {
       disposeFormInternal();
-      throw new ProcessingException("failed showing " + getTitle(), t);
+      throw new ProcessingException("failed showing " + getTitle(), e);
     }
     // request a gui
     setButtonsArmed(true);
@@ -1374,11 +1374,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       interceptResetSearchFilter(m_searchFilter);
     }
-    catch (ProcessingException e) {
+    catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(e);
-    }
-    catch (Throwable t) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", t));
     }
   }
 
@@ -1417,8 +1414,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     catch (ProcessingException e) {
       throw e;
     }
-    catch (Throwable t) {
-      throw new ProcessingException("Create form data", t);
+    catch (Exception e) {
+      throw new ProcessingException("Create form data", e);
     }
   }
 
@@ -1590,7 +1587,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       // normally this code is not reached since the exception will  be passed out
       m_formStored = true;
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       // clear search
       if (m_searchFilter != null) {
         m_searchFilter.clear();
@@ -1940,7 +1937,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       se.addContextMessage(ScoutTexts.get("FormFinally") + " " + getTitle());
       BEANS.get(ExceptionHandler.class).handle(se);
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       ProcessingException e = new ProcessingException(ScoutTexts.get("FormFinally") + " " + getTitle(), t);
       BEANS.get(ExceptionHandler.class).handle(e);
     }
@@ -2040,7 +2037,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         se.addContextMessage(ScoutTexts.get("FormClosing") + " " + getTitle());
         BEANS.get(ExceptionHandler.class).handle(se);
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         ProcessingException e = new ProcessingException(ScoutTexts.get("FormClosing") + " " + getTitle(), t);
         BEANS.get(ExceptionHandler.class).handle(e);
       }
@@ -2084,7 +2081,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       m_timerFutureMap.clear();
       m_formLoading = true;
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.warn("Form " + getClass().getName(), t);
     }
     // dispose fields
@@ -2093,7 +2090,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     try {
       interceptDisposeForm();
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.warn("Form " + getClass().getName(), t);
     }
     try {
@@ -2537,7 +2534,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
             pe = ex;
           }
         }
-        catch (Throwable t) {
+        catch (Exception t) {
           if (pe == null) {
             pe = new ProcessingException("Unexpected", t);
           }

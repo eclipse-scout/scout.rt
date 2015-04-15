@@ -198,7 +198,7 @@ public final class DesktopProfiler {
         dumpWeakList(out, "VARIOUS", m_objects);
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       t.printStackTrace();
     }
     finally {

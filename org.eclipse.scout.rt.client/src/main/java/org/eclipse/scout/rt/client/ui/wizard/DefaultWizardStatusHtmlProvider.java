@@ -52,7 +52,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     try {
       return new String(IOUtility.getContent(getClass().getResource("/org/eclipse/scout/rt/client/html/defaultWizardStatus.html").openStream()), "iso-8859-1");
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       throw new ProcessingException("Unexpected", t);
     }
   }
@@ -185,7 +185,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
         attachments.add(iconFile);
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.warn("Failed to load icon '" + tempIconName + "'", t);
     }
     finally {
@@ -193,7 +193,7 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
         try {
           is.close();
         }
-        catch (Throwable t) {
+        catch (Exception t) {
           // nop
         }
       }

@@ -71,10 +71,10 @@ public class PasswordPolicyVerifier {
               ScoutTexts.get("PasswordWillExpireTitle"),
               remainDays == 0 ?
                   ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("Today")) :
-                    remainDays == 1 ?
-                        ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("Tomorrow")) :
-                          ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("InDaysX", "" + remainDays)),
-                          ScoutTexts.get("PasswordWillExpireInfo")
+                  remainDays == 1 ?
+                      ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("Tomorrow")) :
+                      ScoutTexts.get("PasswordWillExpireHeaderX", ScoutTexts.get("InDaysX", "" + remainDays)),
+              ScoutTexts.get("PasswordWillExpireInfo")
               );
           if (answer == MessageBox.YES_OPTION) {
             changeNow = true;
@@ -94,9 +94,8 @@ public class PasswordPolicyVerifier {
       }
       return expiryDate.after(now);
     }
-    catch (Throwable t) {
-      ProcessingException pe = (t instanceof ProcessingException ? (ProcessingException) t : new ProcessingException("Unexpected", t));
-      BEANS.get(ExceptionHandler.class).handle(pe);
+    catch (Exception t) {
+      BEANS.get(ExceptionHandler.class).handle(t);
       return false;
     }
   }

@@ -121,20 +121,20 @@ public class PrintFormsAction extends AbstractAction {
           }
         }
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         m_errorCount++;
         LOG.error(c.getName(), t);
       }
     }
   }
 
-  protected List<IForm> createFormInstancesFor(Class<? extends IForm> formClass) throws Throwable {
+  protected List<IForm> createFormInstancesFor(Class<? extends IForm> formClass) throws Exception {
     List<IForm> list = new ArrayList<IForm>();
     list.add(formClass.newInstance());
     return list;
   }
 
-  protected void processForm(final IForm f) throws Throwable {
+  protected void processForm(final IForm f) throws Exception {
     f.setModal(false);
     f.setAutoAddRemoveOnDesktop(true);
     f.setDisplayHint(IForm.DISPLAY_HINT_DIALOG);

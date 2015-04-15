@@ -156,8 +156,8 @@ public class TableRowDataMapper implements ITableRowDataMapper {
           Object dto = getDataContainer(column, rowData);
           value = propertyDesc.getReadMethod().invoke(dto);
         }
-        catch (Throwable t) {
-          LOG.warn("Error reading row data property for column [" + column.getClass().getName() + "]", t);
+        catch (Exception e) {
+          LOG.warn("Error reading row data property for column [" + column.getClass().getName() + "]", e);
         }
       }
       else {
@@ -181,7 +181,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
           Object dto = getDataContainer(column, rowData);
           propertyDesc.getWriteMethod().invoke(dto, value);
         }
-        catch (Throwable t) {
+        catch (Exception t) {
           LOG.warn("Error writing row data property for column [" + column.getClass().getName() + "]", t);
         }
       }

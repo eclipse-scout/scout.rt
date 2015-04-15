@@ -185,7 +185,7 @@ public class ActivityMapEvent extends java.util.EventObject implements IModelEve
         }
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       buf.append("#" + m_type);
     }
     buf.append(" ");

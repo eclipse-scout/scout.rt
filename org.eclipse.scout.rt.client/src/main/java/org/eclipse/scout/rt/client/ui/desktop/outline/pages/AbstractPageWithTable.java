@@ -564,7 +564,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         policy.pageSearchFormStarted(this);
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.error("pageCreated " + getClass().getSimpleName(), t);
     }
   }
@@ -749,7 +749,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         ensureSearchFormStarted();
         interceptPopulateTable();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         getTable().discardAllRows();
         ProcessingException pe;
         if (t instanceof ProcessingException) {
@@ -965,7 +965,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
               catch (ProcessingException ex) {
                 BEANS.get(ExceptionHandler.class).handle(ex);
               }
-              catch (Throwable t) {
+              catch (Exception t) {
                 BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Page " + element, t));
               }
             }

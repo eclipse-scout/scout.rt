@@ -79,7 +79,7 @@ public class UserActivityManager {
       try {
         updateCache(s.getUserStatusMap());
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.error("service " + s.getClass().getName(), t);
       }
     }
@@ -92,7 +92,7 @@ public class UserActivityManager {
         m_provider.addPropertyChangeListener(IUserActivityProvider.PROP_ACTIVE, m_userActivityProviderListener);
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.error("provider " + m_provider, t);
     }
     // switch to online
@@ -127,7 +127,7 @@ public class UserActivityManager {
       try {
         listener.stateChanged(e);
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.error("listener " + listener.getClass().getName(), t);
       }
     }

@@ -130,7 +130,7 @@ public class CalendarEvent extends java.util.EventObject implements IModelEvent 
         }
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       buf.append("#" + m_type);
     }
     if (m_component != null) {

@@ -350,8 +350,8 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       try {
         p.disposeProvider();
       }
-      catch (Throwable t) {
-        LOG.warn(p.getClass().getName(), t);
+      catch (Exception e) {
+        LOG.warn(p.getClass().getName(), e);
       }
     }
   }
@@ -362,8 +362,8 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     try {
       interceptDisposeCalendar();
     }
-    catch (Throwable t) {
-      LOG.warn(getClass().getName(), t);
+    catch (Exception e) {
+      LOG.warn(getClass().getName(), e);
     }
   }
 
@@ -955,11 +955,8 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
           try {
             comp.getProvider().onItemMoved(comp.getItem(), newDate);
           }
-          catch (ProcessingException e) {
+          catch (Exception e) {
             BEANS.get(ExceptionHandler.class).handle(e);
-          }
-          catch (Throwable e) {
-            BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Unexpected", e));
           }
         }
         fireCalendarComponentAction();

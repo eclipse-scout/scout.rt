@@ -185,7 +185,7 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
         filter.setColumn(null);
         return SerializationUtility.createObjectSerializer().serialize(filter);
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.error("Failed storing filter data for " + t);
       }
       finally {
@@ -206,7 +206,7 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
       }
       m_table.applyRowFilters();
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.error("Failed reading filter data: " + t);
     }
   }
@@ -255,7 +255,7 @@ public class DefaultTableColumnFilterManager implements ITableColumnFilterManage
             pe = ex;
           }
         }
-        catch (Throwable t) {
+        catch (Exception t) {
           if (pe == null) {
             pe = new ProcessingException("Unexpected", t);
           }

@@ -172,7 +172,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
       try {
         ClientSessionProvider.currentSession().getDesktop().activateBookmark(b);
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.error(null, t);
       }
     }

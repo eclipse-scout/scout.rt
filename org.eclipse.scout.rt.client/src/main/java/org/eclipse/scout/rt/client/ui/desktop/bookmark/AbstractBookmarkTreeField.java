@@ -437,7 +437,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           }
         }
         catch (ProcessingException e) {
-          e.printStackTrace();
+          LOG.error(null, e);
         }
         finally {
           getTree().setTreeChanging(false);

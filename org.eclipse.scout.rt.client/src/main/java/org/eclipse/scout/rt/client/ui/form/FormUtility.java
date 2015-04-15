@@ -88,7 +88,7 @@ public final class FormUtility {
 
   /**
    * With this method it's possible to set the mark strategy of all tab boxes of the given form.
-   * 
+   *
    * @param form
    *          the form
    * @param strategy
@@ -112,7 +112,7 @@ public final class FormUtility {
           m_firstEx = e;
         }
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         if (m_firstEx == null) {
           m_firstEx = new ProcessingException("Unexpected", t);
         }
@@ -137,7 +137,7 @@ public final class FormUtility {
           ((ICompositeField) field).rebuildFieldGrid();
         }
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         if (m_firstEx == null) {
           m_firstEx = new ProcessingException("Unexpected", t);
         }
@@ -165,7 +165,7 @@ public final class FormUtility {
           m_firstEx = e;
         }
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         if (m_firstEx == null) {
           m_firstEx = new ProcessingException("Unexpected", t);
         }
@@ -186,7 +186,7 @@ public final class FormUtility {
       try {
         field.disposeField();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         LOG.warn("dispose on " + field, t);
         // nop
       }

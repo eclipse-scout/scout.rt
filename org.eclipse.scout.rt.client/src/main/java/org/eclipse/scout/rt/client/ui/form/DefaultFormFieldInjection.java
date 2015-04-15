@@ -247,7 +247,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
         return t;
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
     }
     return ConfigurationUtility.newInnerInstance(m_enclosingContext, fieldClass);
   }

@@ -82,7 +82,7 @@ public class TableColumnFilterEvent extends EventObject implements IModelEvent {
         }
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       sb.append("#" + m_type);
     }
     // table
