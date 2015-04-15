@@ -25,8 +25,14 @@ scout.NavigateDownButton.prototype._buttonEnabled = function() {
   if (this._isDetail()) {
     return true;
   }
-  // When node is not a leaf and we're displaying the detail-table - button is only enabled when a single row is selected
-  return this.node.detailTable.selectedRowIds.length === 1;
+
+  // when it's not a leaf and not a detail - the button is only enabled when a single row is selected
+  var table = this.node.detailTable;
+  if (table) {
+    return table.selectedRowIds.length === 1;
+  } else {
+    return true;
+  }
 };
 
 scout.NavigateDownButton.prototype._drill = function() {
