@@ -80,6 +80,12 @@ public class BeanFilter {
       }
       return;
     }
+    if (!ci.hasNoArgsConstructor()) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Skipping bean candidate '{0}' because it has no empty constructor().", ci.name());
+      }
+      return;
+    }
     try {
       collector.add(ci.resolveClass());
     }
