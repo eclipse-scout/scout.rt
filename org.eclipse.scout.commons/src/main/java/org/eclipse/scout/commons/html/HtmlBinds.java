@@ -140,14 +140,20 @@ public class HtmlBinds {
 
   /**
    * Replace bind names with encoded values.
+   *
+   * @deprecated use {@link IHtmlElement#toEncodedHtml()} instead
    */
+  @Deprecated
   public String applyBindParameters(IHtmlContent... htmls) {
     return applyBindParameters(Arrays.asList(htmls));
   }
 
   /**
    * Replace bind names with encoded values.
+   *
+   * @deprecated use {@link IHtmlElement#toEncodedHtml()} instead
    */
+  @Deprecated
   public String applyBindParameters(List<? extends IHtmlContent> htmls) {
     StringBuilder sb = new StringBuilder();
     for (IHtmlContent html : htmls) {

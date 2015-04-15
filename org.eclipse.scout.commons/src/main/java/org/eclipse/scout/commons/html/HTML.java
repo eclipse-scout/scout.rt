@@ -230,7 +230,7 @@ public final class HTML {
    * String encodedHtml = HTML.li("text").toEncodedHtml(); <br>
    * </p>
    */
-  public static IHtmlListElement li(String text) {
+  public static IHtmlListElement li(CharSequence text) {
     return new HtmlListElement(text);
   }
 
@@ -363,7 +363,7 @@ public final class HTML {
   /**
    * Creates HTML content from multiple elements. e.g. <b>Bold Text</b> Text <b> More bold text </b>
    */
-  public static IHtmlContent fragment(IHtmlElement... elements) {
+  public static IHtmlContent fragment(CharSequence... elements) {
     return new EmptyNodeBuilder(elements);
   }
 
