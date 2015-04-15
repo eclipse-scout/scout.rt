@@ -19,7 +19,7 @@
   border-bottom: @wizard-progress-border-width solid @desktop-border-color;
   /* If wizard progress field is in the root-group-box and there is a menubar, */
   /* disable the top-border (because the menubar already has a border) */
-  .menubar ~ .root-group-box > .group-box-body > .wizard-progress-field > & {
+  .menubar ~ .group-box-body > .wizard-progress-field > & {
     border-top-color: transparent;
     margin-top: -@wizard-progress-border-width;
   }
