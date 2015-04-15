@@ -144,31 +144,31 @@ describe("Table", function() {
 
   describe("checkRow", function() {
 
-    it("checks the row, does not uncheck others if multiCheck is set to true", function() {
-      var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
-      table.multiCheck = true;
-      table.checkable = true;
-      table.render(session.$entryPoint);
-
-      var rows = table.rows;
+    function findCheckedRows(rows) {
       var checkedRows = [];
       for (var i = 0; i < rows.length; i++){
         if (rows[i].checked){
           checkedRows.push(rows[i]);
         }
       }
+      return checkedRows;
+    }
+
+    it("checks the row, does not uncheck others if multiCheck is set to true", function() {
+      var model = helper.createModelFixture(2, 5);
+      model.checkable = true;
+      model.multiCheck = true;
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var rows = table.rows;
+      var checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
       table.checkRow(rows[0], true, true);
       table.checkRow(rows[4], true, true);
 
-      checkedRows = [];
-      for (var j = 0; j < rows.length; j++){
-        if (rows[j].checked){
-          checkedRows.push(rows[j]);
-        }
-      }
+      checkedRows = checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(2);
 
       table.checkRow(rows[4], false, true);
@@ -185,118 +185,73 @@ describe("Table", function() {
 
     it("unchecks other rows if multiCheck is set to false", function() {
       var model = helper.createModelFixture(2, 5);
+      model.checkable = true;
+      model.multiCheck = false;
       var table = helper.createTable(model);
-      table.multiCheck = false;
-      table.checkable = true;
       table.render(session.$entryPoint);
 
       var rows = table.rows;
-      var checkedRows = [];
-      for (var i = 0; i < rows.length; i++){
-        if (rows[i].checked){
-          checkedRows.push(rows[i]);
-        }
-      }
+      var checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
       table.checkRow(rows[0], true, true);
       table.checkRow(rows[4], true, true);
 
-      checkedRows = [];
-      for (var j = 0; j < rows.length; j++){
-        if (rows[j].checked){
-          checkedRows.push(rows[j]);
-        }
-      }
+      checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(1);
 
       table.checkRow(rows[4], false, true);
 
-      checkedRows = [];
-      for (var z = 0; z < rows.length; z++){
-        if (rows[z].checked){
-          checkedRows.push(rows[z]);
-        }
-      }
+      checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
     });
 
     it("does not check the row if checkable is set to false", function() {
       var model = helper.createModelFixture(2, 5);
+      model.checkable = false;
+      model.multiCheck = false;
       var table = helper.createTable(model);
-      table.multiCheck = false;
-      table.checkable = false;
       table.render(session.$entryPoint);
 
       var rows = table.rows;
-      var checkedRows = [];
-      for(var i = 0; i<rows.length; i++){
-        if(rows[i].checked){
-          checkedRows.push(rows[i]);
-        }
-      }
+      var checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
       table.checkRow(rows[0], true, true);
-      checkedRows = [];
-      for(var j = 0; j<rows.length; j++){
-        if(rows[j].checked){
-          checkedRows.push(rows[j]);
-        }
-      }
+      checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
     });
 
     it("does not check the row if the row is disabled", function() {
       var model = helper.createModelFixture(2, 5);
+      model.multiCheck = false;
+      model.checkable = false;
       var table = helper.createTable(model);
-      table.multiCheck = false;
-      table.checkable = false;
       table.render(session.$entryPoint);
 
       var rows = table.rows;
-      var checkedRows = [];
-      for(var i = 0; i<rows.length; i++){
-        if(rows[i].checked){
-          checkedRows.push(rows[i]);
-        }
-      }
+      var checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
       rows[0].enabled = false;
       table.checkRow(rows[0], true, true);
-      checkedRows = [];
-      for(var j = 0; j<rows.length; j++){
-        if(rows[j].checked){
-          checkedRows.push(rows[j]);
-        }
-      }
+      checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
     });
 
     it("does not check the row if the table is disabled", function() {
       var model = helper.createModelFixture(2, 5);
+      model.checkable = true;
+      model.multiCheck = true;
       var table = helper.createTable(model);
-      table.multiCheck = true;
-      table.checkable = true;
       table.enabled = false;
       table.render(session.$entryPoint);
 
       var rows = table.rows;
-      var checkedRows = [];
-      for(var i = 0; i<rows.length; i++){
-        if(rows[i].checked){
-          checkedRows.push(rows[i]);
-        }
-      }
+      var checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
       table.checkRow(rows[0], true, true);
-      checkedRows = [];
-      for(var j = 0; j<rows.length; j++){
-        if(rows[j].checked){
-          checkedRows.push(rows[j]);
-        }
-      }
+      checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
     });
 

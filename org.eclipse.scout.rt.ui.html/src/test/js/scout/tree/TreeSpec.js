@@ -218,7 +218,7 @@ describe("Tree", function() {
 
   describe("check nodes", function() {
 
-    it("checks a subnode->mark upper nodes ", function() {
+    it("checks a subnode -> mark upper nodes ", function() {
       var model = createModelFixture(4, 4);
       var tree = createTree(model);
       tree.render(session.$entryPoint);
@@ -244,7 +244,7 @@ describe("Tree", function() {
 
     });
 
-    it("checks a node->mark upper nodes ->uncheck node and test if node keeps marked because children are checked", function() {
+    it("checks a node -> mark upper nodes -> uncheck node and test if node keeps marked because children are checked", function() {
       var model = createModelFixture(4, 4);
       var tree = createTree(model);
       tree.render(session.$entryPoint);

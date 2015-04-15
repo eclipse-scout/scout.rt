@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBeanColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
@@ -123,6 +124,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
 import org.eclipse.scout.rt.ui.html.json.table.JsonBeanColumn;
+import org.eclipse.scout.rt.ui.html.json.table.JsonBooleanColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonDateColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonNumberColumn;
@@ -349,6 +351,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (object instanceof IDateColumn) {
       return new JsonDateColumn((IDateColumn) object);
+    }
+    if (object instanceof IBooleanColumn) {
+      return new JsonBooleanColumn((IBooleanColumn) object);
     }
     if (object instanceof IBeanColumn<?>) {
       return new JsonBeanColumn((IBeanColumn<?>) object);

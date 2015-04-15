@@ -1,5 +1,4 @@
-scout.Column = function() {
-};
+scout.Column = function() {};
 
 scout.Column.prototype.init = function(model, session) {
   this.session = session;
@@ -17,14 +16,26 @@ scout.Column.prototype.init = function(model, session) {
 };
 
 scout.Column.prototype.buildCell = function(row) {
-  var style, text, tooltipText, tooltip, cssClass, cell, alignment;
+  var style, text, tooltipText, tooltip, cssClass, cell;
   cell = this.table.cell(this.index, row);
   style = this.table.cellStyle(this, row);
   text = this.table.cellText(this, row);
   if (this.table.multilineText) {
     text = scout.strings.nl2br(text);
   }
-  cssClass = 'table-cell';
+  cssClass = this._cssClass(row, cell);
+  tooltipText = this.table.cellTooltipText(this, row);
+  tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
+
+  return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + text + '</div>';
+};
+
+scout.Column.prototype._cssClass = function(row, cell) {
+  var cssClass = 'table-cell';
+  if (!cell) {
+    // gui only columns don't have cells
+    return cssClass;
+  }
   if (cell.editable) {
     cssClass += ' editable';
   }
@@ -33,12 +44,7 @@ scout.Column.prototype.buildCell = function(row) {
   } else if (this.cssClass) {
     cssClass += ' ' + this.cssClass;
   }
-  alignment = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
-  cssClass += ' cell-align-' + alignment;
-  tooltipText = this.table.cellTooltipText(this, row);
-  tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
-
-  return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + text + '</div>';
+  return cssClass;
 };
 
 scout.Column.prototype.onMouseUp = function(event, $row) {
@@ -52,8 +58,8 @@ scout.Column.prototype.onMouseUp = function(event, $row) {
 
 scout.Column.prototype.startCellEdit = function(row, fieldId) {
   var popup,
-    cell = this.table.cell(this.index, row),
     $row = row.$row,
+    cell = this.table.cell(this.index, row),
     $cell = this.table.$cell(this, $row);
 
   cell.field = this.session.getOrCreateModelAdapter(fieldId, this.table);

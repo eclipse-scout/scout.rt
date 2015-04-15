@@ -18,7 +18,7 @@ scout.TreeControlKeyStrokes.prototype.handle = function(event) {
     var check = !$($currentNode[0]).data('node').checked;
     for (var j = 0; j < $currentNode.length; j++) {
       var node = $($currentNode[j]).data('node');
-      this._field.checkNodeAndRender(node, check);
+      this._field.checkNode(node, check);
     }
   }
 

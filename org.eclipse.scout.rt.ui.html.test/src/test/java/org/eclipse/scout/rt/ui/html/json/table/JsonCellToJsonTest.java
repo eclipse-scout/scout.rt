@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithBooleanColumn;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithDateColumn;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithLongColumn;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithStringColumn;
@@ -124,4 +125,26 @@ public class JsonCellToJsonTest {
     Object jsonObj = jsonTable.cellToJson(row, table.getColumn());
     assertTrue(jsonObj instanceof String);
   }
+
+  /**
+   * Don't send value and text if they are equal. They may be equal if the date column uses the same pattern as
+   * {@link JsonDate}.
+   */
+  @Test
+  public void testBooleanColumn() throws ProcessingException, JSONException {
+    TableWithBooleanColumn table = new TableWithBooleanColumn();
+    table.initTable();
+    ITableRow row = table.addRow(table.createRow());
+    table.getColumn().setValue(row, true);
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
+
+    JSONObject jsonObj = (JSONObject) jsonTable.cellToJson(row, table.getColumn());
+    Assert.assertNull(jsonObj.optString("text", null));
+    Assert.assertEquals(true, jsonObj.get("value"));
+
+    table.getColumn().setValue(row, false);
+    jsonObj = (JSONObject) jsonTable.cellToJson(row, table.getColumn());
+    Assert.assertEquals(false, jsonObj.get("value"));
+  }
+
 }

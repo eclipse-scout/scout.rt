@@ -67,10 +67,16 @@ scout.Table.prototype._createKeyStrokeAdapter = function() {
 };
 
 scout.Table.prototype._insertCheckBoxColumn = function() {
-  var column = new scout.CheckBoxColumn();
+  var column = new scout.CheckBoxColumn(),
+    columnWidth = 30;
   column.init();
   column.table = this;
+  column.fixedWidth = true;
+  column.guiOnlyCheckBoxColumn = true;
+  column.width = columnWidth;
   scout.arrays.insert(this.columns, column, 0);
+
+  this.checkableColumn = column;
 };
 
 scout.Table.prototype._render = function($parent) {
@@ -409,6 +415,7 @@ scout.Table.prototype._drawData = function(startRow) {
     $rows = $(rowString);
 
     // Link model and jQuery objects
+    //FIXME CGU merge with loop in installRows
     $rows.each(function(index, rowObject) {
       var $row = $(rowObject);
       var row = that.rows[startRow + index];
@@ -743,13 +750,14 @@ scout.Table.prototype.cellStyle = function(column, row) {
     return 'display: none;';
   }
 
-  hAlign = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
   style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
-  if (typeof cell === 'object' && cell !== null) {
+  if (!column.guiOnlyCheckBoxColumn) {
+    // guiOnly column doesn't have cells
     style += scout.helpers.legacyCellStyle(cell);
+    hAlign = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
     // TODO BSH Table | iconId, editable, errorStatus
   }
-  return style + (hAlign === 'left' ? '' : 'text-align: ' + hAlign + '; ');
+  return style + (hAlign === 'left' || !hAlign ? '' : 'text-align: ' + hAlign + '; ');
 };
 
 scout.Table.prototype.cellTooltipText = function(column, row) {
@@ -1040,15 +1048,15 @@ scout.Table.prototype._onRowsUpdated = function(rows) {
 };
 
 scout.Table.prototype._renderRowChecked = function(row) {
-  var $checkbox = $('#' + row.id + '-checkable', this.$data);
+  if (!this.checkableColumn) {
+    throw new Error('checkableColumn not set');
+  }
+
+  var $checkbox = this.checkableColumn.$checkBox(row.$row);
   $checkbox.prop('checked', row.checked);
 };
 
-scout.Table.prototype.checkRowAndRender = function(row, checked) {
-  this.checkRow(row, checked, true);
-};
-
-scout.Table.prototype.checkRow = function(row, checked, render) {
+scout.Table.prototype.checkRow = function(row, checked) {
   if (!this.checkable || !this.enabled || !row.enabled || row.checked === checked) {
     return;
   }
@@ -1065,7 +1073,7 @@ scout.Table.prototype.checkRow = function(row, checked, render) {
   row.checked = checked;
   updatedRows.push(row);
   this.sendRowsChecked(updatedRows);
-  if (render) {
+  if (this.rendered) {
     this._renderRowChecked(row);
   }
 };
@@ -1563,6 +1571,7 @@ scout.Table.prototype._syncCheckable = function(checkable) {
     this._insertCheckBoxColumn();
   } else if (!this.checkable && column.guiOnlyCheckBoxColumn) {
     scout.arrays.remove(this.columns, column);
+    this.checkableColumn = null;
   }
 };
 

@@ -326,7 +326,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     IColumn column = extractColumn(event.getData());
     ArrayList<ITableRow> rows = new ArrayList<ITableRow>();
     rows.add(tableRow);
-    addTableEventFilterCondition(TableEvent.TYPE_ROWS_UPDATED).setRows(rows);
     getModel().getUIFacade().setContextColumnFromUI(column);
     getModel().getUIFacade().fireRowClickFromUI(tableRow, MouseButton.Left);
   }

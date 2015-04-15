@@ -21,7 +21,7 @@ scout.TableControlKeyStrokes.prototype.handle = function(event) {
       var check = !$($rowsSelected[0]).data('row').checked;
       for (var j = 0; j < $rowsSelected.length; j++) {
         var row = $($rowsSelected[j]).data('row');
-        this._field.checkRowAndRender(row, check);
+        this._field.checkRow(row, check);
       }
     }
   }

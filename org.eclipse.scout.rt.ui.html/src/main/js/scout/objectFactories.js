@@ -62,6 +62,11 @@ scout.defaultObjectFactories = [{
     return new scout.Column();
   }
 }, {
+  objectType: 'BooleanColumn',
+  create: function() {
+    return new scout.CheckBoxColumn();
+  }
+}, {
   objectType: 'BeanColumn',
   create: function() {
     return new scout.BeanColumn();

@@ -771,12 +771,14 @@ scout.Tree.prototype._decorateNode = function(node) {
 };
 
 scout.Tree.prototype._renderNodeChecked = function(node) {
-  var $checkbox = $('#' + node.id + '-tree-checkable', this.$data);
+  if (!node.$node) {
+    // if node is not rendered, do nothing
+    return;
+  }
+  var $checkbox = node.$node
+    .children('.tree-item-checkbox')
+    .children('input');
   $checkbox.prop('checked', node.checked);
-};
-
-scout.Tree.prototype.checkNodeAndRender = function(node, checked) {
-  this.checkNode(node, checked);
 };
 
 scout.Tree.prototype.checkNode = function(node, checked, suppressSend) {
@@ -846,11 +848,9 @@ scout.Tree.prototype._renderTreeItemControl = function($node) {
 
 scout.Tree.prototype._renderTreeItemCheckbox = function(node) {
   var $node = node.$node,
-    $controlItem = $node.prependDiv('tree-item-checkbox'),
-    forRefId = node.id + '-tree-checkable';
+    $controlItem = $node.prependDiv('tree-item-checkbox');
   var $checkbox = $('<input>')
     .attr('tabindex', '-1')
-    .attr('id', forRefId)
     .attr('type', 'checkbox')
     .prop('checked', node.checked)
     .appendTo($controlItem);
