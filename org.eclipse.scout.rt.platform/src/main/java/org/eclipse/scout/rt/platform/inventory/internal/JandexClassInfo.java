@@ -26,7 +26,6 @@ import org.jboss.jandex.ClassInfo;
 public class JandexClassInfo implements IClassInfo {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JandexClassInfo.class);
   private final ClassInfo m_classInfo;
-  private volatile boolean m_hasNoArgsConstructor;
   private volatile Class<?> m_class;
 
   public JandexClassInfo(ClassInfo classInfo) {
@@ -50,7 +49,6 @@ public class JandexClassInfo implements IClassInfo {
         if (m_class == null) {
           try {
             m_class = Class.forName(name());
-            m_hasNoArgsConstructor = hasNoArgsConstructor(m_class);
           }
           catch (ClassNotFoundException ex) {
             throw new PlatformException("Error loading class '" + name() + "' with flags 0x" + Integer.toHexString(flags()), ex);
@@ -70,12 +68,6 @@ public class JandexClassInfo implements IClassInfo {
   }
 
   @Override
-  public boolean hasNoArgsConstructor() {
-    ensureClassLoaded();
-    return m_hasNoArgsConstructor;
-  }
-
-  @Override
   public Class<?> resolveClass() {
     ensureClassLoaded();
     return m_class;
@@ -88,10 +80,6 @@ public class JandexClassInfo implements IClassInfo {
     }
 
     try {
-      if (!hasNoArgsConstructor()) {
-        return false;
-      }
-
       Class<?> clazz = resolveClass();
       // top level or static inner
       if (clazz.isMemberClass() && !Modifier.isStatic(clazz.getModifiers())) {

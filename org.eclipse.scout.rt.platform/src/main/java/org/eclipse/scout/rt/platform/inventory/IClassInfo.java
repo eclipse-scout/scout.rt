@@ -36,8 +36,6 @@ public interface IClassInfo {
 
   int flags();
 
-  boolean hasNoArgsConstructor();
-
   Class<?> resolveClass();
 
   /**
