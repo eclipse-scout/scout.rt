@@ -250,7 +250,9 @@ public class JsonResponse {
   public void fireProcessBufferedEvents() {
     m_processingBufferedEvents = true;
     try {
-      for (IJsonAdapter<?> adapter : m_bufferedEventsAdapters) {
+      // Use a copy of the original m_bufferedEventsAdapters list to prevent ConcurrentModificationExceptions
+      // while we're looping through the list and removeJsonAdapter is called.
+      for (IJsonAdapter<?> adapter : new ArrayList<>(m_bufferedEventsAdapters)) {
         if (!adapter.isDisposed()) {
           adapter.processBufferedEvents();
         }
