@@ -83,6 +83,7 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
       adapter.removeKeyBox();
       that._adaptersToDraw = [];
       event.stopPropagation();
+      scout.focusManager.validateFocus(adapter.jsonSessionId());
     }
   };
 

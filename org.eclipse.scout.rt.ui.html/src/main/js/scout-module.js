@@ -81,6 +81,8 @@ __include("scout/table/control/GraphTableControl.js"); // requires TableControl.
 __include("scout/table/control/MapTableControl.js"); // requires TableControl.js
 __include("scout/table/Table.js");
 __include("scout/table/TableFooter.js");
+__include("scout/table/TableControlKeyStrokeAdapter.js");
+__include("scout/table/TableAdditionalControlsKeyStrokes.js");
 __include("scout/table/TableHeader.js");
 __include("scout/table/TableHeaderMenu.js");
 __include("scout/table/TableKeyStrokeAdapter.js");

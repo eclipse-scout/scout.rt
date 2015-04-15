@@ -209,6 +209,8 @@ scout.Desktop.prototype._selectTab = function(tab) {
     var htmlParent = htmlComp.getParent();
     htmlComp.setSize(htmlParent.getSize());
   }
+
+  scout.focusManager.validateFocus(this.session.jsonSessionId,'desktop');
 };
 
 scout.Desktop.prototype._unselectTab = function(tab) {
@@ -264,6 +266,8 @@ scout.Desktop.prototype._renderView = function(view) {
   this._addTab(tab);
   this._selectTab(tab);
   view.render(this.$bench);
+
+  scout.focusManager.validateFocus(this.session.jsonSessionId);
 
   // FIXME CGU: maybe include in render?
   view.htmlComp.layout();
@@ -333,6 +337,9 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
     if (content instanceof scout.Table) {
       content.menuBar.$container.addClass('main-menubar');
     }
+    //request focus on first element in new outlineTab.
+    scout.focusManager.validateFocus(this.session.jsonSessionId);
+
     // FIXME CGU: maybe include in render?
     content.htmlComp.layout();
     content.htmlComp.validateRoot = true;
@@ -342,6 +349,7 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
 scout.Desktop.prototype.changeOutline = function(outline) {
   this.outline = outline;
   this.navigation.onOutlineChanged(this.outline);
+//  scout.focusManager.validateFocus(this.session);
 };
 
 scout.Desktop.prototype.removeForm = function(id) {
@@ -408,6 +416,7 @@ scout.Desktop.prototype.onModelAction = function(event) {
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }
+  scout.focusManager.validateFocus(this.session.jsonSessionId);
 };
 
 /* --- INNER TYPES ---------------------------------------------------------------- */

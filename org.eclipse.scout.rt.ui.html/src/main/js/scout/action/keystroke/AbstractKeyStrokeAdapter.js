@@ -5,6 +5,10 @@ scout.AbstractKeyStrokeAdapter = function(field) {
   this._field = field;
   this.installModelKeystrokes();
   this.keyBoxDrawn = false;
+  this._jsonSessionId;
+  if(this._field && this._field.session){
+    this._jsonSessionId = this._field.session.jsonSessionId;
+  }
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {
@@ -54,4 +58,11 @@ scout.AbstractKeyStrokeAdapter.prototype.unregisterKeyStroke = function(keyStrok
   if (index > -1) {
     this.keyStrokes.splice(index, 1);
   }
+};
+
+scout.AbstractKeyStrokeAdapter.prototype.jsonSessionId = function(jsonSessionId){
+  if(jsonSessionId){
+    this._jsonSessionId = jsonSessionId;
+  }
+  return this._jsonSessionId;
 };

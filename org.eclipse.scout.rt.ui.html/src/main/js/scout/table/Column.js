@@ -57,7 +57,7 @@ scout.Column.prototype.startCellEdit = function(row, fieldId) {
     $cell = this.table.$cell(this, $row);
 
   cell.field = this.session.getOrCreateModelAdapter(fieldId, this.table);
-  popup = new scout.CellEditorPopup(this, row, cell);
+  popup = new scout.CellEditorPopup(this, row, cell, this.session);
   popup.$origin = this.$cell;
   popup.render();
 };

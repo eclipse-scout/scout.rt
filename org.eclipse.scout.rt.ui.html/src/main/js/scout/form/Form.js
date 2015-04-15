@@ -42,6 +42,7 @@ scout.Form.prototype._render = function($parent) {
 
     setTimeout(function() {
       this.$container.addClass('shown');
+      $.log.warn('startInstall');
       this._$glassPane.installFocusContext('auto', this.session.jsonSessionId);
     }.bind(this));
   }

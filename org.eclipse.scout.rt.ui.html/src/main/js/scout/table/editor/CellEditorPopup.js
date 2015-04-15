@@ -1,5 +1,5 @@
-scout.CellEditorPopup = function(column, row, cell) {
-  scout.CellEditorPopup.parent.call(this);
+scout.CellEditorPopup = function(column, row, cell, session) {
+  scout.CellEditorPopup.parent.call(this, session);
   this.table = column.table;
   this.column = column;
   this.row = row;

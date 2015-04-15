@@ -1,7 +1,8 @@
 // ---- Popup ----
-scout.Popup = function() {
+scout.Popup = function(session) {
   this.$container;
   this.$body;
+  this.session = session;
 };
 
 /**
@@ -9,7 +10,7 @@ scout.Popup = function() {
  * That way we never have z-index issues with the rendered popups.
  */
 scout.Popup.prototype.render = function() {
-  var $docBody = $('body');
+  var $docBody = this.session.$entryPoint;// $('body');
   this.$body = $.makeDiv('popup-body');
   this.$container = $.makeDiv('popup')
     .append(this.$body)
@@ -58,12 +59,11 @@ scout.Popup.prototype.setLocation = function(location) {
  * which has a different size than the popup-body.
  */
 scout.PopupMenuItem = function($menuItem, session) {
-  scout.PopupMenuItem.parent.call(this);
+  scout.PopupMenuItem.parent.call(this, session);
   this.$menuItem = $menuItem;
   this.$head;
   this.$deco;
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
-  this._session = session;
 };
 scout.inherits(scout.PopupMenuItem, scout.Popup);
 
@@ -105,7 +105,7 @@ scout.PopupMenuItem.prototype.render = function($parent) {
   this._copyCssClass('taskbar');
   this._installKeyStrokeAdapter();
   setTimeout(function() {
-    this.$container.installFocusContext('auto', this._session.jsonSessionId);
+    this.$container.installFocusContext('auto', this.session.jsonSessionId);
     this.$container.focus();
   }.bind(this), 0);
   return this.$container;

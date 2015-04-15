@@ -4,6 +4,7 @@ scout.TableControl = function() {
   this.form;
   this._addAdapterProperties('form');
   this.contentRendered = false;
+  this.tableControlKeyStrokeAdapter;
 };
 scout.inherits(scout.TableControl, scout.Action);
 
@@ -122,6 +123,13 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   this.selected = selected;
   this.sendSelected(selected);
   this._renderSelected(this.selected, closeWhenUnselected);
+  if(selected){
+    this.tableControlKeyStrokeAdapter=new scout.TableControlKeyStrokeAdapter(this);
+    scout.keyStrokeManager.installAdapter(this.tableFooter.$controlContent, this.tableControlKeyStrokeAdapter);
+  }
+  else{
+    scout.keyStrokeManager.uninstallAdapter(this.tableFooter.$controlContent, this.tableControlKeyStrokeAdapter);
+  }
 };
 
 scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected) {

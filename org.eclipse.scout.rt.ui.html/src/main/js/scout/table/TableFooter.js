@@ -232,7 +232,7 @@ scout.TableFooter.prototype.openControlContainer = function() {
   // adjust content
   this.$controlContent.outerHeight(contentHeight);
 
-  this.$controlContainer.installFocusContext('auto', this._table.session.jsonSessionId);
+//  this.$controlContainer.installFocusContext('auto', this._table.session.jsonSessionId);
 
   // open container, stop existing (close) animations before
   this.$controlContainer.stop(true).show().animate({
@@ -248,6 +248,9 @@ scout.TableFooter.prototype.openControlContainer = function() {
 scout.TableFooter.prototype.closeControlContainer = function(control) {
   //TODO nbu uninstall focuscontext
   var that = this;
+  if(this.tableControlKeyStrokeAdapter){
+    scout.keyStrokeManager.uninstallAdapter(this.$controlContainer, this.tableControlKeyStrokeAdapter);
+  }
 
   this.$controlContainer.stop(true).show().animate({
     height: 0
