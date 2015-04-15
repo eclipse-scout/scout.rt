@@ -586,12 +586,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected List<ITableRow> jsonToTableRows(JSONArray rowIds) {
     List<ITableRow> rows = new ArrayList<>(rowIds.length());
     for (int i = 0; i < rowIds.length(); i++) {
-      // FIXME AWE/CGU: das sollte nicht mehr nötig sein, wenn das reihenfolgen problem in der table korrigiert wurde
-      // Durch die falsche Reihenfolge wurde die Table inzwischen schon abgeräumt
-      ITableRow e = m_tableRows.get(JsonObjectUtility.get(rowIds, i));
-      if (e != null) {
-        rows.add(e);
-      }
+      rows.add(m_tableRows.get(JsonObjectUtility.get(rowIds, i)));
     }
     return rows;
   }
