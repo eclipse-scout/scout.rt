@@ -64,7 +64,7 @@ public final class UserAgentUtility {
     }
   }
 
-  // FIXME AWE: (UiLayer) remove this method when wizard refactoring is done
+  // FIXME BSH: (UiLayer) remove this method when wizard refactoring is done
   public static String getFontSizeUnit() {
     return isWebClient() ? "px" : "pt";
   }

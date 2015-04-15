@@ -838,7 +838,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return (IProposalChooser<?, LOOKUP_KEY>) propertySupport.getProperty(PROP_PROPOSAL_CHOOSER);
   }
 
-  // FIXME AWE: remove if/else when swing client is no more. The new web-client has no browse_all logic in its UI facade.
+  // FIXME AWE: (post-swing) remove if/else when swing client is no more. The new web-client has no browse_all logic in its UI facade.
   protected String toSearchText(String text) {
     if (UserAgentUtility.isWebClient()) {
       return StringUtility.isNullOrEmpty(text) ? IContentAssistField.BROWSE_ALL_TEXT : text;

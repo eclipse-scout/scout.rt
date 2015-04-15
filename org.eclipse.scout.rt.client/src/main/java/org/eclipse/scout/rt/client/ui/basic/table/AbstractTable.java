@@ -814,7 +814,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *          the end.
    */
   protected void addHeaderMenus(OrderedCollection<IMenu> menus) {
-    // FIXME AWE/CGU: (table) temporary solution for parallel development of Swing/Html UI
+    // FIXME AWE/CGU: (post-swing, table) temporary solution for parallel development of Swing/Html UI
     // when Html UI development is completed, we must remove this if/else, delete all menu
     // implementations. Only the TableOrganizeMenu should remain.
     if (UserAgentUtility.isWebClient()) {
