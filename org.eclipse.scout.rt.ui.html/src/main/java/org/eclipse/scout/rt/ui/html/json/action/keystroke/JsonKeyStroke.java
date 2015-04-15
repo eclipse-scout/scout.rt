@@ -11,14 +11,14 @@
 package org.eclipse.scout.rt.ui.html.json.action.keystroke;
 
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 
 public class JsonKeyStroke<T extends IKeyStroke> extends JsonAction<T> {
 
-  public JsonKeyStroke(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonKeyStroke(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

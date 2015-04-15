@@ -12,8 +12,8 @@ import org.eclipse.scout.rt.shared.data.basic.graph.GraphLineStyle;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphModel;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphNode;
 import org.eclipse.scout.rt.shared.data.basic.graph.GraphShape;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -24,8 +24,8 @@ import org.json.JSONObject;
 public class JsonGraphField extends JsonValueField<IGraphField> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonGraphField.class);
 
-  public JsonGraphField(IGraphField model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonGraphField(IGraphField model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

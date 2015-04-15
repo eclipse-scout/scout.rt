@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.MenuWithNonDisplayableChild;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
@@ -36,11 +36,11 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonMenuTest {
 
-  private JsonSessionMock m_jsonSession;
+  private UiSessionMock m_uiSession;
 
   @Before
   public void setUp() {
-    m_jsonSession = new JsonSessionMock();
+    m_uiSession = new UiSessionMock();
   }
 
   @Test
@@ -49,26 +49,20 @@ public class JsonMenuTest {
     menu.setText("foo");
 
     // when adapter has been created we have the complete adapter in the adapter-data section of the JSON response
-    JsonMenu<IMenu> menuAdapter = m_jsonSession.getOrCreateJsonAdapter(menu, null);
-    JSONObject json = m_jsonSession.currentJsonResponse().toJson();
+    JsonMenu<IMenu> menuAdapter = m_uiSession.getOrCreateJsonAdapter(menu, null);
+    JSONObject json = m_uiSession.currentJsonResponse().toJson();
     JSONObject adpaterData = JsonTestUtility.getAdapterData(json, menuAdapter.getId());
     assertEquals("foo", adpaterData.getString("text"));
 
-    simulateProcessRequestOnJsonSession();
+    // Simulate processRequest, which resets the current JSON response. Otherwise the property change event
+    // would be ignored because a new adapter exists in the current JSON response.
+    JsonTestUtility.endRequest(m_uiSession);
 
     // when a property change occurs we assert an event is created for the adapter to update, containing only the changed property
     menu.setText("bar");
-    json = m_jsonSession.currentJsonResponse().toJson();
+    json = m_uiSession.currentJsonResponse().toJson();
     JSONObject event = JsonTestUtility.getPropertyChange(json, 0);
     assertEquals("bar", event.getString("text"));
-  }
-
-  /**
-   * Simulate processRequest, which resets the current JSON response. Otherwise the property change event
-   * would be ignored because a new adapter exists in the current JSON response.
-   */
-  private void simulateProcessRequestOnJsonSession() throws Exception {
-    JsonTestUtility.endRequest(m_jsonSession);
   }
 
   /**
@@ -82,7 +76,7 @@ public class JsonMenuTest {
     IMenu menu = new MenuWithNonDisplayableChild();
     ActionUtility.initActions(CollectionUtility.arrayList(menu));
 
-    JsonMenu<IMenu> jsonMenu = m_jsonSession.newJsonAdapter(menu, null, null);
+    JsonMenu<IMenu> jsonMenu = m_uiSession.newJsonAdapter(menu, null, null);
 
     JsonMenu<IMenu> jsonDisplayableMenu = jsonMenu.getAdapter(new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.DisplayableMenu.class));
     JsonMenu<IMenu> jsonNonDisplayableMenu = jsonMenu.getAdapter(new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.NonDisplayableMenu.class));

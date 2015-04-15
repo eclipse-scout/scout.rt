@@ -33,9 +33,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -53,8 +53,8 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   private Map<String, IDownloadHandler> m_downloadHandlers = new HashMap<String, IDownloadHandler>();
   private DesktopListener m_desktopListener;
 
-  public JsonDesktop(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonDesktop(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override
@@ -318,7 +318,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   protected void handleModelDesktopClosed() {
-    getJsonSession().logout();
+    getUiSession().logout();
   }
 
   protected ISearchOutline getSearchOutline() {
@@ -342,7 +342,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
 
   protected void handleUiOutlineChanged(JsonEvent event) {
     String outlineId = JsonObjectUtility.getString(event.getData(), "outlineId");
-    IJsonAdapter<?> jsonOutline = getJsonSession().getJsonAdapter(outlineId);
+    IJsonAdapter<?> jsonOutline = getUiSession().getJsonAdapter(outlineId);
     getModel().setOutline((IOutline) jsonOutline.getModel());
   }
 

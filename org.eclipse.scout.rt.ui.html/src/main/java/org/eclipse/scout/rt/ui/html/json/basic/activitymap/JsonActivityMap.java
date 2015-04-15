@@ -10,9 +10,9 @@ import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityMapListener;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMapUIFacade;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.TimeScale;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -31,8 +31,8 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
 
   private ActivityMapListener m_activityMapListener;
 
-  public JsonActivityMap(P model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonActivityMap(P model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

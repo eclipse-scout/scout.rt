@@ -9,8 +9,8 @@ scout.init = function(options) {
     var $container = $(this);
 
     var portletPartId = $container.data('partid') || '0';
-    var jsonSessionId = [portletPartId, tabId].join(':');
-    var session = new scout.Session($container, jsonSessionId, options);
+    var uiSessionId = [portletPartId, tabId].join(':');
+    var session = new scout.Session($container, uiSessionId, options);
     session.init();
     scout.sessions.push(session);
   });

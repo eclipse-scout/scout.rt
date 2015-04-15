@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.OutlineViewButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.OutlineWithOneNode;
-import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONException;
 import org.junit.Before;
@@ -41,11 +41,11 @@ import org.mockito.Mockito;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonOutlineViewButtonTest {
 
-  private JsonSessionMock m_jsonSession;
+  private UiSessionMock m_uiSession;
 
   @Before
   public void setUp() {
-    m_jsonSession = new JsonSessionMock();
+    m_uiSession = new UiSessionMock();
   }
 
   @Test
@@ -54,14 +54,14 @@ public class JsonOutlineViewButtonTest {
     IDesktop desktop = Mockito.mock(IDesktop.class);
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
-    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_jsonSession.newJsonAdapter(button, null, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null, null);
     assertNull(jsonViewButton.getAdapter(outline));
 
     button.setSelected(true);
 
     IJsonAdapter<?> outlineAdapter = jsonViewButton.getAdapter(outline);
     assertNotNull(outlineAdapter);
-    String outlineId = JsonTestUtility.extractProperty(m_jsonSession.currentJsonResponse(), jsonViewButton.getId(), "outline");
+    String outlineId = JsonTestUtility.extractProperty(m_uiSession.currentJsonResponse(), jsonViewButton.getId(), "outline");
     assertEquals(outlineAdapter.getId(), outlineId);
   }
 
@@ -71,7 +71,7 @@ public class JsonOutlineViewButtonTest {
     IDesktop desktop = Mockito.mock(IDesktop.class);
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
-    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_jsonSession.newJsonAdapter(button, null, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null, null);
 
     assertNull(jsonViewButton.getAdapter(outline));
 
@@ -81,7 +81,7 @@ public class JsonOutlineViewButtonTest {
     // Outline needs to be created and sent if selection changes to true
     IJsonAdapter<?> outlineAdapter = jsonViewButton.getAdapter(outline);
     assertNotNull(outlineAdapter);
-    String outlineId = JsonTestUtility.extractProperty(m_jsonSession.currentJsonResponse(), jsonViewButton.getId(), "outline");
+    String outlineId = JsonTestUtility.extractProperty(m_uiSession.currentJsonResponse(), jsonViewButton.getId(), "outline");
     assertEquals(outlineAdapter.getId(), outlineId);
   }
 
@@ -92,13 +92,13 @@ public class JsonOutlineViewButtonTest {
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
     button.setSelected(true);
-    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_jsonSession.newJsonAdapter(button, null, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null, null);
 
     IJsonAdapter<?> outlineAdapter = jsonViewButton.getAdapter(outline);
     assertNotNull(outlineAdapter);
 
     // Expects outlineId is sent along with the button and not with a separate property change event
-    String outlineId = JsonTestUtility.extractProperty(m_jsonSession.currentJsonResponse(), jsonViewButton.getId(), "outline");
+    String outlineId = JsonTestUtility.extractProperty(m_uiSession.currentJsonResponse(), jsonViewButton.getId(), "outline");
     assertNull(outlineId);
   }
 

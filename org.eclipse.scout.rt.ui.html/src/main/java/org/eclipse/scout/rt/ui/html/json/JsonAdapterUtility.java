@@ -14,6 +14,7 @@ import java.util.Collection;
 
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONArray;
 
 public final class JsonAdapterUtility {
@@ -21,8 +22,8 @@ public final class JsonAdapterUtility {
   private JsonAdapterUtility() {
   }
 
-  public static <M> String getAdapterIdForModel(IJsonSession jsonSession, M model, IJsonAdapter<?> parent) {
-    return getAdapterIdForModel(jsonSession, model, parent, null);
+  public static <M> String getAdapterIdForModel(IUiSession uiSession, M model, IJsonAdapter<?> parent) {
+    return getAdapterIdForModel(uiSession, model, parent, null);
   }
 
   /**
@@ -30,11 +31,11 @@ public final class JsonAdapterUtility {
    * This method requires that the adapter has already been created before.
    * The method will never create a new adapter instance.
    */
-  public static <M> String getAdapterIdForModel(IJsonSession jsonSession, M model, IJsonAdapter<?> parent, IFilter<M> filter) {
+  public static <M> String getAdapterIdForModel(IUiSession uiSession, M model, IJsonAdapter<?> parent, IFilter<M> filter) {
     if (filter != null && !filter.accept(model)) {
       return null;
     }
-    IJsonAdapter<?> adapter = jsonSession.getJsonAdapter(model, parent);
+    IJsonAdapter<?> adapter = uiSession.getJsonAdapter(model, parent);
     if (adapter == null) {
       throw new IllegalArgumentException("No adapter registered for model=" + model);
     }
@@ -46,10 +47,10 @@ public final class JsonAdapterUtility {
    * This method requires that the adapter has already been created before.
    * The method will never create a new adapter instance.
    */
-  public static <M> JSONArray getAdapterIdsForModel(IJsonSession jsonSession, Collection<M> models, IJsonAdapter<?> parent, IFilter<M> filter) {
+  public static <M> JSONArray getAdapterIdsForModel(IUiSession uiSession, Collection<M> models, IJsonAdapter<?> parent, IFilter<M> filter) {
     JSONArray jsonAdapterIds = new JSONArray();
     for (M model : models) {
-      String adapterId = getAdapterIdForModel(jsonSession, model, parent, filter);
+      String adapterId = getAdapterIdForModel(uiSession, model, parent, filter);
       if (adapterId != null) {
         jsonAdapterIds.put(adapterId);
       }
@@ -57,8 +58,8 @@ public final class JsonAdapterUtility {
     return jsonAdapterIds;
   }
 
-  public static <M extends Object> JSONArray getAdapterIdsForModel(IJsonSession jsonSession, Collection<M> models, IJsonAdapter<?> parent) {
-    return getAdapterIdsForModel(jsonSession, models, parent, null);
+  public static <M extends Object> JSONArray getAdapterIdsForModel(IUiSession uiSession, Collection<M> models, IJsonAdapter<?> parent) {
+    return getAdapterIdsForModel(uiSession, models, parent, null);
   }
 
   public static String getObjectType(String objectType, Object model) {

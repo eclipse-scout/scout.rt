@@ -10,9 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import org.eclipse.scout.rt.ui.html.IUiSession;
+
+// Implementation note: Do _not_ add @Bean annotation to this interface, only to implementations!
+// Reason: There are cases where we want to pass an instance of this interface to UiSession.newJsonAdapter()
+// without registering it with the bean manager.
 public interface IJsonObjectFactory {
 
-  IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession session, String id, IJsonAdapter<?> parent);
+  IJsonAdapter<?> createJsonAdapter(Object model, IUiSession session, String id, IJsonAdapter<?> parent);
 
   IJsonObject createJsonObject(Object object);
 }

@@ -5,9 +5,9 @@ scout.AbstractKeyStrokeAdapter = function(field) {
   this._field = field;
   this.installModelKeystrokes();
   this.keyBoxDrawn = false;
-  this._jsonSessionId;
+  this._uiSessionId;
   if(this._field && this._field.session){
-    this._jsonSessionId = this._field.session.jsonSessionId;
+    this._uiSessionId = this._field.session.uiSessionId;
   }
 };
 
@@ -60,9 +60,9 @@ scout.AbstractKeyStrokeAdapter.prototype.unregisterKeyStroke = function(keyStrok
   }
 };
 
-scout.AbstractKeyStrokeAdapter.prototype.jsonSessionId = function(jsonSessionId){
-  if(jsonSessionId){
-    this._jsonSessionId = jsonSessionId;
+scout.AbstractKeyStrokeAdapter.prototype.uiSessionId = function(uiSessionId){
+  if(uiSessionId){
+    this._uiSessionId = uiSessionId;
   }
-  return this._jsonSessionId;
+  return this._uiSessionId;
 };

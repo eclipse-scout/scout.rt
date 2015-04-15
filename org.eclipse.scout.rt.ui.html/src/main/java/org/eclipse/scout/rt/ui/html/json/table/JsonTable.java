@@ -35,9 +35,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.IJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
@@ -93,8 +95,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   private final Map<IColumn, JsonColumn> m_jsonColumns;
   private final AbstractEventBuffer<TableEvent> m_eventBuffer;
 
-  public JsonTable(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonTable(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
     m_tableRows = new HashMap<>();
     m_tableRowIds = new HashMap<>();
     m_tableEventFilter = new TableEventFilter(this);
@@ -186,7 +188,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().isTableStatusVisible();
       }
     });
-    putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_TABLE_CONTROLS, model, getJsonSession()) {
+    putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_TABLE_CONTROLS, model, getUiSession()) {
       @Override
       protected List<ITableControl> modelValue() {
         return getModel().getTableControls();
@@ -211,8 +213,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         continue;
       }
 
-      JsonColumn jsonColumn = (JsonColumn) getJsonSession().getJsonObjectFactory().createJsonObject(column);
-      jsonColumn.setJsonSession(getJsonSession());
+      JsonColumn jsonColumn = (JsonColumn) BEANS.get(IJsonObjectFactory.class).createJsonObject(column);
+      jsonColumn.setUiSession(getUiSession());
       jsonColumn.setColumnIndexOffset(offset);
       m_jsonColumns.put(column, jsonColumn);
     }
@@ -470,7 +472,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void endCellEdit(String fieldId) {
-    IJsonAdapter<?> jsonField = getJsonSession().getJsonAdapter(fieldId);
+    IJsonAdapter<?> jsonField = getUiSession().getJsonAdapter(fieldId);
     if (jsonField == null) {
       throw new IllegalStateException("No field adapter found for id " + fieldId);
     }
@@ -536,7 +538,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
     String id = m_tableRowIds.get(row);
     if (id == null) {
-      id = getJsonSession().createUniqueIdFor(null);
+      id = getUiSession().createUniqueIdFor(null);
       m_tableRows.put(id, row);
       m_tableRowIds.put(row, id);
     }

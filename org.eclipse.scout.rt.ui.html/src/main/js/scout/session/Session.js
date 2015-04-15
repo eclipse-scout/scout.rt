@@ -8,11 +8,11 @@ scout.BackgroundJobPollingStatus = {
 };
 
 /**
- * $entryPoint and jsonSessionId are required to create a new session. The 'options'
- * argument holds all optional values that may be used during initialization (it is
- * the same object passed to the scout.init() function).
+ * $entryPoint and uiSessionId are required to create a new session.
  *
- * The following properties are read by this constructor function:
+ * The 'options' argument holds all optional values that may be used during
+ * initialization (it is the same object passed to the scout.init() function).
+ * The following 'options' properties are read by this constructor function:
  *   [clientSessionId]
  *     Identifies the 'client instance' on the UI server. If the property is not set
  *     (which is the default case), the clientSessionId is taken from the browser's
@@ -23,7 +23,7 @@ scout.BackgroundJobPollingStatus = {
  *   [objectFactories]
  *     Factories to build model adapters. Default: scout.defaultObjectFactories.
  */
-scout.Session = function($entryPoint, jsonSessionId, options) {
+scout.Session = function($entryPoint, uiSessionId, options) {
   options = options || {};
 
   // Prepare clientSessionId
@@ -38,8 +38,8 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
 
   // Set members
   this.$entryPoint = $entryPoint;
-  this.jsonSessionId = jsonSessionId;
-  this.parentJsonSession;
+  this.uiSessionId = uiSessionId;
+  this.parentUiSession;
   this.clientSessionId = clientSessionId;
   this.userAgent = options.userAgent || new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
   this.modelAdapterRegistry = {};
@@ -61,7 +61,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this._busyCounter = 0; //  >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper();
-  this.partId = jsonSessionId.substring(0, jsonSessionId.indexOf(':'));
+  this.partId = uiSessionId.substring(0, uiSessionId.indexOf(':')); // FIXME BSH Improve this, maybe pass partId as argument
   this._backgroundJobPollingEnabled = false;
   this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.STOPPED;
 
@@ -74,12 +74,12 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
       window.close();
       throw new Error('Too many scout sessions');
     }
-    var parentJsonSession = window.opener.scout.sessions[0];
-    parentJsonSession.registerChildWindow(window);
-    this.parentJsonSession = parentJsonSession; // TODO BSH Detach | Get from options instead?
+    var parentUiSession = window.opener.scout.sessions[0];
+    parentUiSession.registerChildWindow(window);
+    this.parentUiSession = parentUiSession; // TODO BSH Detach | Get from options instead?
   }
 
-  this.modelAdapterRegistry[jsonSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
+  this.modelAdapterRegistry[uiSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
     id: '1',
@@ -215,7 +215,7 @@ scout.Session.prototype.sendEvent = function(event, delay) {
 
 scout.Session.prototype._sendNow = function() {
   var request = {
-    jsonSessionId: this.jsonSessionId
+    uiSessionId: this.uiSessionId
   };
 
   if (this._startup) {
@@ -223,8 +223,8 @@ scout.Session.prototype._sendNow = function() {
     // Build startup request (see JavaDoc for JsonStartupRequest.java for details)
     request.startup = true;
     request.clientSessionId = this.clientSessionId;
-    if (this.parentJsonSession) {
-      request.parentJsonSessionId = this.parentJsonSession.jsonSessionId;
+    if (this.parentUiSession) {
+      request.parentUiSessionId = this.parentUiSession.uiSessionId;
     }
     if (this.userAgent.deviceType !== scout.UserAgent.DEVICE_TYPE_DESKTOP) {
       request.userAgent = this.userAgent;
@@ -372,7 +372,7 @@ scout.Session.prototype._resumeBackgroundJobPolling = function() {
  */
 scout.Session.prototype._pollForBackgroundJobs = function() {
   var request = {
-    jsonSessionId: this.jsonSessionId,
+    uiSessionId: this.uiSessionId,
     pollForBackgroundJobs: true
   };
 
@@ -719,7 +719,7 @@ scout.Session.prototype.init = function() {
     }
   }.bind(this));
 
-  // Destroy json session on server when page is closed or reloaded
+  // Destroy UI session on server when page is closed or reloaded
   $(window).on('unload.' + this.id, this._onWindowUnload.bind(this));
 };
 
@@ -763,7 +763,7 @@ scout.Session.prototype._onLogout = function(event) {
 };
 
 scout.Session.prototype._onWindowUnload = function() {
-  // Destroy JSON session on server
+  // Destroy UI session on server
   this._unload = true;
   this._sendNow();
 

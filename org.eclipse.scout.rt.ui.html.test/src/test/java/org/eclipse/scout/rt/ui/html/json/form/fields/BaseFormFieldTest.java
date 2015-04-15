@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 
 public class BaseFormFieldTest {
 
-  protected IJsonSession m_session = new JsonSessionMock();
+  protected IUiSession m_session = new UiSessionMock();
 
 }

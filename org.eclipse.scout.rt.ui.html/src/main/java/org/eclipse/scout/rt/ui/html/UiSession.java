@@ -8,14 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json;
+package org.eclipse.scout.rt.ui.html;
 
 import java.security.AccessController;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
@@ -48,30 +49,38 @@ import org.eclipse.scout.rt.shared.ui.IUiLayer;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.rt.ui.html.JobUtility;
-import org.eclipse.scout.rt.ui.html.UiHints;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.IJsonObjectFactory;
+import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
+import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
+import org.eclipse.scout.rt.ui.html.json.JsonEventProcessor;
+import org.eclipse.scout.rt.ui.html.json.JsonException;
+import org.eclipse.scout.rt.ui.html.json.JsonLocale;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.json.JsonRequest;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-// TODO BSH Remove abstract, maybe rename to UiSession
-public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBindingListener, IJobListener {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
+public class UiSession implements IUiSession, HttpSessionBindingListener, IJobListener {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiSession.class);
 
   /**
    * Prefix for name of HTTP session attribute that is used to store the associated {@link IClientSession}s.
    * <p>
    * The full attribute name is: <b><code>{@link #CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX} + clientSessionId</code></b>
    */
-  public static final String CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX = "scout.htmlui.session.client."/*+m_clientSessionId*/;
+  public static final String CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX = "scout.htmlui.clientsession."/*+m_clientSessionId*/;
   private static final long ROOT_ID = 1;
 
-  private final IJsonObjectFactory m_jsonObjectFactory;
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final P_RootAdapter m_rootJsonAdapter;
 
   private boolean m_initialized;
   private String m_clientSessionId;
-  private String m_jsonSessionId;
+  private String m_uiSessionId;
   private JsonClientSession<? extends IClientSession> m_jsonClientSession;
   private long m_jsonAdapterSeq = ROOT_ID;
   private JsonResponse m_currentJsonResponse;
@@ -84,11 +93,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private final JsonEventProcessor m_jsonEventProcessor;
   private boolean m_disposing;
   private final Object m_backgroundJobLock = new Object();
-  private final ReentrantLock m_jsonSessionLock = new ReentrantLock();
+  private final ReentrantLock m_uiSessionLock = new ReentrantLock();
 
-  public AbstractJsonSession() {
+  public UiSession() {
     m_currentJsonResponse = createJsonResponse();
-    m_jsonObjectFactory = createJsonObjectFactory();
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
     m_rootJsonAdapter = new P_RootAdapter(this);
     m_jsonEventProcessor = createJsonEventProcessor();
@@ -111,10 +119,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return new JsonResponse();
   }
 
-  protected IJsonObjectFactory createJsonObjectFactory() {
-    return new JsonObjectFactory();
-  }
-
   protected JsonAdapterRegistry createJsonAdapterRegistry() {
     return new JsonAdapterRegistry();
   }
@@ -123,82 +127,16 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return new JsonEventProcessor(this);
   }
 
-  /**
-   * Returns a list of text keys (which must exist in a NLS property file) that are sent to the HTML client on start-up.
-   * The texts returned by this method should be used as static UI texts. All other texts are sent as regular
-   * (form-)data and must not be added here.
-   */
-  protected List<String> getTextKeys() {
-    return Arrays.asList(
-        // From org.eclipse.scout.rt.client
-        "ResetTableColumns",
-        "ColumnSorting",
-        "Column",
-        // From org.eclipse.scout.rt.ui.html
-        "LoadOptions_",
-        "NoOptions",
-        "OneOption",
-        "NumOptions",
-        "InvalidDateFormat",
-        "FilterBy_",
-        "SearchFor_",
-        "TableRowCount0",
-        "TableRowCount1",
-        "TableRowCount",
-        "NumRowsSelected",
-        "SelectAll",
-        "SelectNone",
-        "NumRowsFiltered",
-        "NumRowsFilteredBy",
-        "RemoveFilter",
-        "NumRowsLoaded",
-        "ReloadData",
-        "Reload",
-        "showEveryDate",
-        "groupedByWeekday",
-        "groupedByMonth",
-        "groupedByYear",
-        "Count",
-        "ConnectionInterrupted",
-        "ConnectionReestablished",
-        "Reconnecting_",
-        "ServerError",
-        "SessionTimeout",
-        "SessionExpiredMsg",
-        "Move",
-        "toBegin",
-        "forward",
-        "backward",
-        "toEnd",
-        "ascending",
-        "descending",
-        "ascendingAdditionally",
-        "descendingAdditionally",
-        "Sum",
-        "overEverything",
-        "grouped",
-        "ColorCells",
-        "fromRedToGreen",
-        "fromGreenToRed",
-        "withBarGraph",
-        "remove",
-        "add",
-        "FilterBy",
-        "Reconnecting",
-        "Show",
-        "Up",
-        "Back",
-        "Continue",
-        "Ignore",
-        "UiProcessingErrorTitle",
-        "UiProcessingErrorText",
-        "UiProcessingErrorAction"
-        );
-  }
-
   protected JSONObject getTextMap(Locale locale) {
+    // Collect textKeys
+    Set<String> textKeys = new HashSet<String>();
+    for (IUiTextContributor contributor : BEANS.all(IUiTextContributor.class)) {
+      contributor.contributeUiTextKeys(textKeys);
+    }
+
+    // Resolve texts with the given locale
     JSONObject map = new JSONObject();
-    for (String textKey : getTextKeys()) {
+    for (String textKey : textKeys) {
       JsonObjectUtility.putProperty(map, textKey, TEXTS.get(locale, textKey));
     }
     return map;
@@ -217,7 +155,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_currentHttpRequest.set(httpRequest);
     m_currentJsonRequest = jsonStartupRequest;
     m_clientSessionId = jsonStartupRequest.getClientSessionId();
-    m_jsonSessionId = jsonStartupRequest.getJsonSessionId();
+    m_uiSessionId = jsonStartupRequest.getUiSessionId();
 
     HttpSession httpSession = httpRequest.getSession();
 
@@ -239,12 +177,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
     // Send "initialized" event
     sendInitializationEvent();
-    LOG.info("JsonSession with ID " + m_jsonSessionId + " initialized");
+    LOG.info("UiSession with ID " + m_uiSessionId + " initialized");
   }
 
   @Override
-  public ReentrantLock jsonSessionLock() {
-    return m_jsonSessionLock;
+  public ReentrantLock uiSessionLock() {
+    return m_uiSessionLock;
   }
 
   protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
@@ -327,11 +265,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   protected void handleDetach(JsonStartupRequest jsonStartupRequest, HttpSession httpSession) {
-    String parentJsonSessionId = jsonStartupRequest.getParentJsonSessionId();
-    if (parentJsonSessionId != null) {
-      IJsonSession parentJsonSession = (IJsonSession) httpSession.getAttribute(HTTP_SESSION_ATTRIBUTE_PREFIX + parentJsonSessionId);
-      if (parentJsonSession != null) {
-        LOG.info("Attaching jsonSession '" + m_jsonSessionId + "' to parentJsonSession '" + parentJsonSessionId + "'");
+    String parentUiSessionId = jsonStartupRequest.getParentUiSessionId();
+    if (parentUiSessionId != null) {
+      IUiSession parentUiSession = (IUiSession) httpSession.getAttribute(HTTP_SESSION_ATTRIBUTE_PREFIX + parentUiSessionId);
+      if (parentUiSession != null) {
+        LOG.info("Attaching uiSession '" + m_uiSessionId + "' to parentUiSession '" + parentUiSessionId + "'");
         // TODO BSH Detach | Actually do something
       }
     }
@@ -342,7 +280,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     JsonObjectUtility.putProperty(jsonEvent, "clientSession", m_jsonClientSession.getId());
     putLocaleData(jsonEvent, m_jsonClientSession.getModel().getLocale());
     JsonObjectUtility.putProperty(jsonEvent, "backgroundJobPollingEnabled", isBackgroundJobPollingEnabled());
-    m_currentJsonResponse.addActionEvent(m_jsonSessionId, "initialized", jsonEvent);
+    m_currentJsonResponse.addActionEvent(m_uiSessionId, "initialized", jsonEvent);
   }
 
   protected UserAgent createUserAgent(JsonStartupRequest jsonStartupRequest) {
@@ -384,11 +322,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_currentJsonResponse = null;
   }
 
-  @Override
-  public IJsonObjectFactory getJsonObjectFactory() {
-    return m_jsonObjectFactory;
-  }
-
   protected JsonAdapterRegistry getJsonAdapterRegistry() {
     return m_jsonAdapterRegistry;
   }
@@ -399,8 +332,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public String getJsonSessionId() {
-    return m_jsonSessionId;
+  public String getUiSessionId() {
+    return m_uiSessionId;
   }
 
   @Override
@@ -487,7 +420,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   @SuppressWarnings("unchecked")
   public <M, A extends IJsonAdapter<? super M>> A newJsonAdapter(M model, IJsonAdapter<?> parent, IJsonObjectFactory objectFactory) {
     if (objectFactory == null) {
-      objectFactory = m_jsonObjectFactory;
+      objectFactory = BEANS.get(IJsonObjectFactory.class);
     }
     String id = createUniqueIdFor(null); // FIXME CGU
     A adapter = (A) objectFactory.createJsonAdapter(model, this, id, parent);
@@ -598,7 +531,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   public void sendLocaleChangedEvent(Locale locale) {
     JSONObject jsonEvent = new JSONObject();
     putLocaleData(jsonEvent, locale);
-    currentJsonResponse().addActionEvent(getJsonSessionId(), "localeChanged", jsonEvent);
+    currentJsonResponse().addActionEvent(getUiSessionId(), "localeChanged", jsonEvent);
   }
 
   /**
@@ -619,7 +552,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       if (httpSession != null) {
         httpSession.invalidate();
       }
-      currentJsonResponse().addActionEvent(getJsonSessionId(), "logout", new JSONObject());
+      currentJsonResponse().addActionEvent(getUiSessionId(), "logout", new JSONObject());
     }
     LOG.info("Logged out");
   }
@@ -670,8 +603,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   private static class P_RootAdapter extends AbstractJsonAdapter<Object> {
 
-    public P_RootAdapter(IJsonSession jsonSession) {
-      super(new Object(), jsonSession, ROOT_ID + "", null);
+    public P_RootAdapter(IUiSession uiSession) {
+      super(new Object(), uiSession, ROOT_ID + "", null);
     }
 
     @Override
@@ -689,7 +622,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   @Override
   public void valueUnbound(HttpSessionBindingEvent event) {
     dispose();
-    LOG.info("JSON session with ID " + m_jsonSessionId + " unbound from HTTP session.");
+    LOG.info("UI session with ID " + m_uiSessionId + " unbound from HTTP session.");
   }
 
   // === IJobListener ===

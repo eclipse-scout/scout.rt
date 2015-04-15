@@ -11,15 +11,15 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.mailfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 // FIXME ???: impl. JsonMailField
 public class JsonMailField extends JsonValueField<IMailField> {
 
-  public JsonMailField(IMailField model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonMailField(IMailField model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

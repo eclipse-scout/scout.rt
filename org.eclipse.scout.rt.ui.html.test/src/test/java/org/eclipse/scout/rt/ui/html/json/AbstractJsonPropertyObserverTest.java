@@ -17,7 +17,8 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,7 +34,7 @@ public class AbstractJsonPropertyObserverTest {
   private static final String PROP_FOOBAR = "fooBar";
   private static final String ID = "fooId";
 
-  private IJsonSession m_session = new JsonSessionMock();
+  private IUiSession m_session = new UiSessionMock();
   private IPropertyObserver m_model = Mockito.mock(IPropertyObserver.class);
 
   class P_Observer extends AbstractJsonPropertyObserver<IPropertyObserver> {

@@ -24,8 +24,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
@@ -42,8 +42,8 @@ public final class JsonTestUtility {
   private JsonTestUtility() {
   }
 
-  public static IJsonSession createAndInitializeJsonSession() {
-    String jsonSessionId = "1.1";
+  public static IUiSession createAndInitializeUiSession() {
+    String uiSessionId = "1.1";
     String clientSessionId = "testClientSession123";
     HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     HttpSession httpSession = Mockito.mock(HttpSession.class);
@@ -51,41 +51,41 @@ public final class JsonTestUtility {
     Mockito.when(request.getHeader("User-Agent")).thenReturn("dummy");
     Mockito.when(request.getSession()).thenReturn(httpSession);
     Mockito.when(request.getSession(false)).thenReturn(httpSession);
-    Mockito.when(httpSession.getAttribute("scout.htmlui.session.client." + clientSessionId)).thenReturn(null);
+    Mockito.when(httpSession.getAttribute("scout.htmlui.clientsession." + clientSessionId)).thenReturn(null);
     JSONObject jsonReqObj = new JSONObject();
     try {
-      jsonReqObj.put(JsonRequest.PROP_JSON_SESSION_ID, jsonSessionId);
+      jsonReqObj.put(JsonRequest.PROP_UI_SESSION_ID, uiSessionId);
       jsonReqObj.put(JsonStartupRequest.PROP_CLIENT_SESSION_ID, clientSessionId);
     }
     catch (JSONException e) {
       throw new JsonException(e);
     }
     JsonRequest jsonRequest = new JsonRequest(jsonReqObj);
-    IJsonSession jsonSession = new TestEnvironmentJsonSession();
-    jsonSession.init(request, new JsonStartupRequest(jsonRequest));
-    return jsonSession;
+    IUiSession uiSession = new TestEnvironmentUiSession();
+    uiSession.init(request, new JsonStartupRequest(jsonRequest));
+    return uiSession;
   }
 
   /**
    * Empties the response object and flushes the session
    */
-  public static void endRequest(IJsonSession jsonSession) throws Exception {
-    Field field = AbstractJsonSession.class.getDeclaredField("m_currentJsonResponse");
+  public static void endRequest(IUiSession uiSession) throws Exception {
+    Field field = UiSession.class.getDeclaredField("m_currentJsonResponse");
     field.setAccessible(true);
-    field.set(jsonSession, new JsonResponse());
+    field.set(uiSession, new JsonResponse());
 
-    field = AbstractJsonSession.class.getDeclaredField("m_currentHttpRequest");
+    field = UiSession.class.getDeclaredField("m_currentHttpRequest");
     field.setAccessible(true);
     @SuppressWarnings("unchecked")
-    AtomicReference<HttpServletRequest> ref = (AtomicReference<HttpServletRequest>) field.get(jsonSession);
+    AtomicReference<HttpServletRequest> ref = (AtomicReference<HttpServletRequest>) field.get(uiSession);
     ref.set(null);
   }
 
   /**
    * Ensures that all buffered events are applied to the JSON-Adapters.
    */
-  public static void processBufferedEvents(IJsonSession jsonSession) {
-    jsonSession.currentJsonResponse().fireProcessBufferedEvents();
+  public static void processBufferedEvents(IUiSession uiSession) {
+    uiSession.currentJsonResponse().fireProcessBufferedEvents();
   }
 
   /**

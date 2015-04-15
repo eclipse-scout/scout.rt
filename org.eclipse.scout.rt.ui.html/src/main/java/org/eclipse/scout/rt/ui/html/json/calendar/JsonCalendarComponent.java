@@ -3,9 +3,9 @@ package org.eclipse.scout.rt.ui.html.json.calendar;
 import java.util.Date;
 
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
@@ -13,8 +13,8 @@ import org.json.JSONObject;
 
 public class JsonCalendarComponent<T extends CalendarComponent> extends AbstractJsonAdapter<T> {
 
-  public JsonCalendarComponent(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonCalendarComponent(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

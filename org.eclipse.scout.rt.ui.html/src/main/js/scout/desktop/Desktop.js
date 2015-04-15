@@ -210,7 +210,7 @@ scout.Desktop.prototype._selectTab = function(tab) {
     htmlComp.setSize(htmlParent.getSize());
   }
 
-  scout.focusManager.validateFocus(this.session.jsonSessionId,'desktop');
+  scout.focusManager.validateFocus(this.session.uiSessionId,'desktop');
 };
 
 scout.Desktop.prototype._unselectTab = function(tab) {
@@ -267,7 +267,7 @@ scout.Desktop.prototype._renderView = function(view) {
   this._selectTab(tab);
   view.render(this.$bench);
 
-  scout.focusManager.validateFocus(this.session.jsonSessionId);
+  scout.focusManager.validateFocus(this.session.uiSessionId);
 
   // FIXME CGU: maybe include in render?
   view.htmlComp.layout();
@@ -360,7 +360,7 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
       content.menuBar.$container.addClass('main-menubar');
     }
     //request focus on first element in new outlineTab.
-    scout.focusManager.validateFocus(this.session.jsonSessionId);
+    scout.focusManager.validateFocus(this.session.uiSessionId);
 
     // FIXME CGU: maybe include in render?
     content.htmlComp.layout();
@@ -438,7 +438,7 @@ scout.Desktop.prototype.onModelAction = function(event) {
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }
-  scout.focusManager.validateFocus(this.session.jsonSessionId);
+  scout.focusManager.validateFocus(this.session.uiSessionId);
 };
 
 /* --- INNER TYPES ---------------------------------------------------------------- */

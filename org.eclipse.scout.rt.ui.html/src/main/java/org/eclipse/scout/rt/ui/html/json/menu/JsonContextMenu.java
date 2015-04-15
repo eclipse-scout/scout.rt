@@ -18,9 +18,9 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuListener;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.json.JSONArray;
@@ -33,8 +33,8 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
   private ContextMenuListener m_contextMenuListener;
   private Set<IJsonAdapter<?>> m_jsonMenuAdapters = new HashSet<IJsonAdapter<?>>();
 
-  public JsonContextMenu(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonContextMenu(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override
@@ -69,7 +69,7 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
   }
 
   public JSONArray childActionsToJson() {
-    return JsonAdapterUtility.getAdapterIdsForModel(getJsonSession(), getModel().getChildActions(), this, new DisplayableActionFilter<IMenu>());
+    return JsonAdapterUtility.getAdapterIdsForModel(getUiSession(), getModel().getChildActions(), this, new DisplayableActionFilter<IMenu>());
   }
 
   @Override

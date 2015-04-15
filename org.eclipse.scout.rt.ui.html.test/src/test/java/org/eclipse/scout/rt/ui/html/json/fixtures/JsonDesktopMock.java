@@ -11,15 +11,15 @@
 package org.eclipse.scout.rt.ui.html.json.fixtures;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.json.JSONObject;
 
 public class JsonDesktopMock extends JsonDesktop<IDesktop> {
 
-  public JsonDesktopMock(IDesktop model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonDesktopMock(IDesktop model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

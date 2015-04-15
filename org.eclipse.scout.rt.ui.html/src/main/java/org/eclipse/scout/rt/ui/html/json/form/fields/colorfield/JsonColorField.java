@@ -11,15 +11,15 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.colorfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.colorfield.IColorField;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 // FIXME ???: impl. JsonColorField
 public class JsonColorField extends JsonValueField<IColorField> {
 
-  public JsonColorField(IColorField model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonColorField(IColorField model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

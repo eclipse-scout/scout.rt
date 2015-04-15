@@ -68,6 +68,6 @@ public class BinaryResourceUrlUtility {
     if (filename == null) {
       return null;
     }
-    return "dynamic/" + jsonAdapter.getJsonSession().getJsonSessionId() + "/" + jsonAdapter.getId() + "/" + filename;
+    return "dynamic/" + jsonAdapter.getUiSession().getUiSessionId() + "/" + jsonAdapter.getId() + "/" + filename;
   }
 }

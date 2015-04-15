@@ -15,8 +15,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.CachingEnabled;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
@@ -31,8 +31,8 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
 
   private boolean m_proposal;
 
-  public JsonSmartField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonSmartField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
     m_proposal = model instanceof IProposalField;
   }
 
@@ -47,7 +47,7 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonAdapterProperty<IContentAssistField<K, V>>(IContentAssistField.PROP_PROPOSAL_CHOOSER, model, getJsonSession()) {
+    putJsonProperty(new JsonAdapterProperty<IContentAssistField<K, V>>(IContentAssistField.PROP_PROPOSAL_CHOOSER, model, getUiSession()) {
       @Override
       protected Object modelValue() {
         return getModel().getProposalChooser();

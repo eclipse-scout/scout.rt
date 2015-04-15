@@ -74,7 +74,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.client.ui.form.fields.wizard.IWizardProgressField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.basic.activitymap.JsonActivityMap;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendar;
@@ -141,11 +143,12 @@ import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
  * This factory creates IJsonAdapter instances for a given model object. You must call the <code>init()</code> method
  * on the return value from <code>createJsonAdapter()</code>.
  */
+@ApplicationScoped
 public class JsonObjectFactory implements IJsonObjectFactory {
 
   @Override
   @SuppressWarnings("unchecked")
-  public IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession session, String id, IJsonAdapter<?> parent) {
+  public IJsonAdapter<?> createJsonAdapter(Object model, IUiSession session, String id, IJsonAdapter<?> parent) {
     // --- form fields ----
     if (model instanceof IGroupBox) {
       // we must distinct between normal group-boxes and group-boxes in tab-boxes

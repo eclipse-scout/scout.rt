@@ -24,7 +24,7 @@ public class JsonRequest {
 
   public static final String PROP_STARTUP = "startup";
   public static final String PROP_UNLOAD = "unload";
-  public static final String PROP_JSON_SESSION_ID = "jsonSessionId";
+  public static final String PROP_UI_SESSION_ID = "uiSessionId";
   public static final String PROP_EVENTS = "events";
 
   private final JSONObject m_request;
@@ -32,13 +32,12 @@ public class JsonRequest {
   /**
    * Creates a new JsonRequest instance.
    *
-   * @param request
    * @throws IllegalArgumentException
-   *           when mandatory property jsonSessionId is not set
+   *           when mandatory property uiSessionId is not set
    */
   public JsonRequest(JSONObject request) {
-    if (!request.has(PROP_JSON_SESSION_ID)) {
-      throw new IllegalArgumentException("Missing property '" + PROP_JSON_SESSION_ID + "' in request " + request);
+    if (!request.has(PROP_UI_SESSION_ID)) {
+      throw new IllegalArgumentException("Missing property '" + PROP_UI_SESSION_ID + "' in request " + request);
     }
     m_request = request;
   }
@@ -47,8 +46,8 @@ public class JsonRequest {
     return m_request;
   }
 
-  public String getJsonSessionId() {
-    return JsonObjectUtility.getString(m_request, PROP_JSON_SESSION_ID);
+  public String getUiSessionId() {
+    return JsonObjectUtility.getString(m_request, PROP_UI_SESSION_ID);
   }
 
   public List<JsonEvent> getEvents() {

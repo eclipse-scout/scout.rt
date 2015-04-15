@@ -11,15 +11,15 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.filechooserfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 //FIXME ???: impl. JsonFileChooserField
 public class JsonFileChooserField extends JsonValueField<IFileChooserField> {
 
-  public JsonFileChooserField(IFileChooserField model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonFileChooserField(IFileChooserField model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

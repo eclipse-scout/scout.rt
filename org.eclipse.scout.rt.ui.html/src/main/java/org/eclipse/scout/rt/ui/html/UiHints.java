@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.server.commons.servletfilter.GzipServletFilter;
 
 /**
- * Helper to manage url param hints for the {@link AbstractUiServlet}.
+ * Helper to manage url param hints for the {@link UiServlet}.
  * <p>
  * The following hints are supported:
  * <ul>

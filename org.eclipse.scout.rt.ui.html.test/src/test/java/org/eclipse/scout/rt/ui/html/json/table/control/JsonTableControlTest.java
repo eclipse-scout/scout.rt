@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableControl;
@@ -38,11 +38,11 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonTableControlTest {
 
-  private JsonSessionMock m_jsonSession;
+  private UiSessionMock m_uiSession;
 
   @Before
   public void setUp() {
-    m_jsonSession = new JsonSessionMock();
+    m_uiSession = new UiSessionMock();
   }
 
   @Test
@@ -53,14 +53,14 @@ public class JsonTableControlTest {
     control.setTable(new Table());
     control.setForm(form);
     control.decorateForm();
-    JsonTableControl<ITableControl> jsonControl = m_jsonSession.newJsonAdapter(control, null, null);
+    JsonTableControl<ITableControl> jsonControl = m_uiSession.newJsonAdapter(control, null, null);
     assertNull(jsonControl.getAdapter(form));
 
     control.setSelected(true);
 
     IJsonAdapter<?> formAdapter = jsonControl.getAdapter(form);
     assertNotNull(formAdapter);
-    String formId = JsonTestUtility.extractProperty(m_jsonSession.currentJsonResponse(), jsonControl.getId(), "form");
+    String formId = JsonTestUtility.extractProperty(m_uiSession.currentJsonResponse(), jsonControl.getId(), "form");
     assertEquals(formAdapter.getId(), formId);
   }
 
@@ -71,7 +71,7 @@ public class JsonTableControlTest {
     control.setTable(new Table());
     control.setForm(form);
     control.decorateForm();
-    JsonTableControl<ITableControl> jsonControl = m_jsonSession.newJsonAdapter(control, null, null);
+    JsonTableControl<ITableControl> jsonControl = m_uiSession.newJsonAdapter(control, null, null);
 
     assertNull(jsonControl.getAdapter(form));
 
@@ -81,20 +81,20 @@ public class JsonTableControlTest {
     // Form needs to be created and sent if selection changes to true
     IJsonAdapter<?> formAdapter = jsonControl.getAdapter(form);
     assertNotNull(formAdapter);
-    String formId = JsonTestUtility.extractProperty(m_jsonSession.currentJsonResponse(), jsonControl.getId(), "form");
+    String formId = JsonTestUtility.extractProperty(m_uiSession.currentJsonResponse(), jsonControl.getId(), "form");
     assertEquals(formAdapter.getId(), formId);
-    JsonTestUtility.endRequest(m_jsonSession);
+    JsonTestUtility.endRequest(m_uiSession);
 
     // Don't send form again on subsequent selection changes
     event = createJsonSelectedEvent(jsonControl.getId(), false);
     jsonControl.handleUiEvent(event);
-    formId = JsonTestUtility.extractProperty(m_jsonSession.currentJsonResponse(), jsonControl.getId(), "form");
+    formId = JsonTestUtility.extractProperty(m_uiSession.currentJsonResponse(), jsonControl.getId(), "form");
     assertNull(formId);
-    JsonTestUtility.endRequest(m_jsonSession);
+    JsonTestUtility.endRequest(m_uiSession);
 
     event = createJsonSelectedEvent(jsonControl.getId(), true);
     jsonControl.handleUiEvent(event);
-    formId = JsonTestUtility.extractProperty(m_jsonSession.currentJsonResponse(), jsonControl.getId(), "form");
+    formId = JsonTestUtility.extractProperty(m_uiSession.currentJsonResponse(), jsonControl.getId(), "form");
     assertNull(formId);
   }
 
@@ -106,13 +106,13 @@ public class JsonTableControlTest {
     control.setForm(form);
     control.decorateForm();
     control.setSelected(true);
-    JsonTableControl<ITableControl> jsonControl = m_jsonSession.newJsonAdapter(control, null, null);
+    JsonTableControl<ITableControl> jsonControl = m_uiSession.newJsonAdapter(control, null, null);
 
     IJsonAdapter<?> formAdapter = jsonControl.getAdapter(form);
     assertNotNull(formAdapter);
 
     // Expects formId is sent along with the control and not with a separate property change event
-    String formId = JsonTestUtility.extractProperty(m_jsonSession.currentJsonResponse(), jsonControl.getId(), "form");
+    String formId = JsonTestUtility.extractProperty(m_uiSession.currentJsonResponse(), jsonControl.getId(), "form");
     assertNull(formId);
   }
 

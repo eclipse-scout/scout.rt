@@ -24,26 +24,28 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
-import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
+import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * This interceptor contributes to the {@link AbstractUiServlet} as the default POST handler
+ * This interceptor contributes to the {@link UiServlet} as the default POST handler
  */
 @Priority(-10)
 public class JsonMessageRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestInterceptor.class);
 
   @Override
-  public boolean interceptGet(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
   }
 
   @Override
-  public boolean interceptPost(AbstractUiServlet servlet, HttpServletRequest httpReq, HttpServletResponse httpResp) throws ServletException, IOException {
+  public boolean interceptPost(UiServlet servlet, HttpServletRequest httpReq, HttpServletResponse httpResp) throws ServletException, IOException {
     //serve only /json
     String pathInfo = httpReq.getPathInfo();
     if (CompareUtility.notEquals(pathInfo, "/json")) {
@@ -51,7 +53,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       httpResp.sendError(HttpServletResponse.SC_NOT_FOUND);
       return true;
     }
-    IJsonSession jsonSession = null;
+    IUiSession uiSession = null;
     JsonRequest jsonReq = null;
     try {
       //disable cache
@@ -64,8 +66,8 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       }
 
       jsonReq = new JsonRequest(jsonReqObj);
-      jsonSession = getOrCreateJsonSession(servlet, httpReq, httpResp, jsonReq);
-      if (jsonSession == null) {
+      uiSession = getOrCreateUiSession(servlet, httpReq, httpResp, jsonReq);
+      if (uiSession == null) {
         return true;
       }
 
@@ -73,29 +75,29 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
         // Blocks the current thread until:
         // - a model job terminates
         // - the max. wait time has exceeded
-        jsonSession.waitForBackgroundJobs();
+        uiSession.waitForBackgroundJobs();
       }
 
       // GUI requests for the same session must be processed consecutively
-      jsonSession.jsonSessionLock().lock();
+      uiSession.uiSessionLock().lock();
       try {
-        if (jsonSession.currentJsonResponse() == null) {
-          // Missing current JSON response, probably because the JsonSession is disposed -> send empty answer
+        if (uiSession.currentJsonResponse() == null) {
+          // Missing current JSON response, probably because the UiSession is disposed -> send empty answer
           writeResponse(httpResp, createSessionTerminatedResponse());
           return true;
         }
-        JSONObject jsonResp = jsonSession.processRequest(httpReq, jsonReq);
+        JSONObject jsonResp = uiSession.processRequest(httpReq, jsonReq);
         writeResponse(httpResp, jsonResp);
       }
       finally {
-        jsonSession.jsonSessionLock().unlock();
+        uiSession.uiSessionLock().unlock();
       }
     }
     catch (Exception e) {
-      if (jsonReq == null || jsonSession == null || jsonReq.isStartupRequest()) {
+      if (jsonReq == null || uiSession == null || jsonReq.isStartupRequest()) {
         // Send a special error code when an error happens during initialization, because
         // the UI has no translated texts to show in this case.
-        LOG.error("Error while initializing json session", e);
+        LOG.error("Error while initializing UI session", e);
         writeResponse(httpResp, createStartupFailedResponse());
       }
       else {
@@ -107,14 +109,14 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
   }
 
   /**
-   * Check if request is a simple ping. We don't use JsonRequest here because a ping request has no jsonSessionId.
+   * Check if request is a simple ping. We don't use JsonRequest here because a ping request has no uiSessionId.
    */
   protected boolean isPingRequest(JSONObject json) {
     return json.has("ping");
   }
 
-  protected IJsonSession getOrCreateJsonSession(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
-    String jsonSessionAttributeName = IJsonSession.HTTP_SESSION_ATTRIBUTE_PREFIX + jsonReq.getJsonSessionId();
+  protected IUiSession getOrCreateUiSession(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
+    String uiSessionAttributeName = IUiSession.HTTP_SESSION_ATTRIBUTE_PREFIX + jsonReq.getUiSessionId();
     HttpSession httpSession = req.getSession();
 
     // Because the appserver might keep or request locks on the httpSession object, we don't synchronize directly
@@ -122,45 +124,45 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     ReentrantLock httpSessionLock = httpSessionLock(httpSession);
     httpSessionLock.lock();
     try {
-      IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(jsonSessionAttributeName);
+      IUiSession uiSession = (IUiSession) httpSession.getAttribute(uiSessionAttributeName);
 
       if (jsonReq.isUnloadRequest()) {
-        LOG.info("Unloading JSON session with ID " + jsonReq.getJsonSessionId() + " (requested by UI)");
-        if (jsonSession != null) {
-          // Unbinding the jsonSession will cause it to be disposed automatically, see AbstractJsonSession.valueUnbound()
-          jsonSession.jsonSessionLock().lock();
+        LOG.info("Unloading UI session with ID " + jsonReq.getUiSessionId() + " (requested by UI)");
+        if (uiSession != null) {
+          // Unbinding the uiSession will cause it to be disposed automatically, see UiSession.valueUnbound()
+          uiSession.uiSessionLock().lock();
           try {
-            httpSession.removeAttribute(jsonSessionAttributeName);
+            httpSession.removeAttribute(uiSessionAttributeName);
           }
           finally {
-            jsonSession.jsonSessionLock().unlock();
+            uiSession.uiSessionLock().unlock();
           }
         }
         writeResponse(resp, createEmptyResponse()); // send empty response to satisfy clients expecting a valid response
         return null;
       }
 
-      if (jsonSession == null) {
+      if (uiSession == null) {
         if (!jsonReq.isStartupRequest()) {
-          LOG.info("Request cannot be processed due to JSON session timeout [id=" + jsonReq.getJsonSessionId() + "]");
+          LOG.info("Request cannot be processed due to UI session timeout [id=" + jsonReq.getUiSessionId() + "]");
           writeResponse(resp, createSessionTimeoutResponse());
           return null;
         }
-        LOG.info("Creating new JSON session with ID " + jsonReq.getJsonSessionId() + "...");
-        jsonSession = servlet.createJsonSession();
-        jsonSession.jsonSessionLock().lock();
+        LOG.info("Creating new UI session with ID " + jsonReq.getUiSessionId() + "...");
+        uiSession = BEANS.get(IUiSession.class);
+        uiSession.uiSessionLock().lock();
         try {
-          jsonSession.init(req, new JsonStartupRequest(jsonReq));
-          httpSession.setAttribute(jsonSessionAttributeName, jsonSession);
+          uiSession.init(req, new JsonStartupRequest(jsonReq));
+          httpSession.setAttribute(uiSessionAttributeName, uiSession);
         }
         finally {
-          jsonSession.jsonSessionLock().unlock();
+          uiSession.uiSessionLock().unlock();
         }
       }
       else if (jsonReq.isStartupRequest()) {
-        throw new IllegalStateException("Startup requested for existing JSON session with ID " + jsonReq.getJsonSessionId());
+        throw new IllegalStateException("Startup requested for existing UI session with ID " + jsonReq.getUiSessionId());
       }
-      return jsonSession;
+      return uiSession;
     }
     finally {
       httpSessionLock.unlock();
@@ -169,7 +171,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
 
   protected ReentrantLock httpSessionLock(HttpSession httpSession) {
     synchronized (httpSession) {
-      String lockAttributeName = "scout.htmlui.httpSessionLock";
+      String lockAttributeName = "scout.htmlui.httpsession.lock";
       ReentrantLock lock = (ReentrantLock) httpSession.getAttribute(lockAttributeName);
       if (lock == null) {
         lock = new ReentrantLock();

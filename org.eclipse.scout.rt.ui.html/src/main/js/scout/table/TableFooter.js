@@ -232,7 +232,7 @@ scout.TableFooter.prototype.openControlContainer = function() {
   // adjust content
   this.$controlContent.outerHeight(contentHeight);
 
-//  this.$controlContainer.installFocusContext('auto', this._table.session.jsonSessionId);
+//  this.$controlContainer.installFocusContext('auto', this._table.session.uiSessionId);
 
   // open container, stop existing (close) animations before
   this.$controlContainer.stop(true).show().animate({

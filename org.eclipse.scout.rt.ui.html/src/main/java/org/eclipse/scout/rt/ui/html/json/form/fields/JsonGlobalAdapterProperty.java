@@ -11,15 +11,15 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
 import org.eclipse.scout.commons.filter.IFilter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 
 public abstract class JsonGlobalAdapterProperty<T> extends JsonAdapterProperty<T> {
 
-  public JsonGlobalAdapterProperty(String propertyName, T model, IJsonSession session) {
+  public JsonGlobalAdapterProperty(String propertyName, T model, IUiSession session) {
     super(propertyName, model, session, true, null);
   }
 
-  public JsonGlobalAdapterProperty(String propertyName, T model, IJsonSession session, IFilter<Object> filter) {
+  public JsonGlobalAdapterProperty(String propertyName, T model, IUiSession session, IFilter<Object> filter) {
     super(propertyName, model, session, true, filter);
   }
 }

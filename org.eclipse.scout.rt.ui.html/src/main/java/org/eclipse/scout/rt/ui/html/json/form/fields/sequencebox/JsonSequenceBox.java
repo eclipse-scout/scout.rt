@@ -12,14 +12,14 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
 
 public class JsonSequenceBox<T extends ISequenceBox> extends JsonCompositeField<T, IFormField> {
 
-  public JsonSequenceBox(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonSequenceBox(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

@@ -5,8 +5,8 @@ import java.io.UnsupportedEncodingException;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.svg.client.SVGUtility;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
@@ -17,8 +17,8 @@ import org.w3c.dom.svg.SVGDocument;
 public class JsonSvgField extends JsonFormField<ISvgField> {
   private static final String SVG_ENCODING = "UTF-8";
 
-  public JsonSvgField(ISvgField model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonSvgField(ISvgField model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

@@ -14,15 +14,15 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
 public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
 
-  private IJsonSession m_jsonSession;
+  private IUiSession m_uiSession;
   private T m_column;
   private int m_indexOffset;
 
@@ -91,11 +91,11 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     return m_column;
   }
 
-  public IJsonSession getJsonSession() {
-    return m_jsonSession;
+  public IUiSession getUiSession() {
+    return m_uiSession;
   }
 
-  public void setJsonSession(IJsonSession jsonSession) {
-    m_jsonSession = jsonSession;
+  public void setUiSession(IUiSession uiSession) {
+    m_uiSession = uiSession;
   }
 }

@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.ui.html.cache.DefaultHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.res.StaticResourceRequestInterceptor;
 
@@ -46,16 +45,16 @@ import org.eclipse.scout.rt.ui.html.res.StaticResourceRequestInterceptor;
  * <p>
  * Ajax requests are processed as "/json" using HTTP POST, see {@link JsonMessageRequestInterceptor}
  */
-public abstract class AbstractUiServlet extends HttpServlet {
+public class UiServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractUiServlet.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiServlet.class);
 
   private final IHttpCacheControl m_httpCacheControl;
   private final P_AbstractRequestHandler m_requestHandlerGet;
   private final P_AbstractRequestHandler m_requestHandlerPost;
 
-  protected AbstractUiServlet() {
+  public UiServlet() {
     m_httpCacheControl = createHttpCacheControl();
     m_requestHandlerGet = createRequestHandlerGet();
     m_requestHandlerPost = createRequestHandlerPost();
@@ -102,11 +101,6 @@ public abstract class AbstractUiServlet extends HttpServlet {
   protected P_AbstractRequestHandler createRequestHandlerPost() {
     return new P_RequestHandlerPost();
   }
-
-  /**
-   * @return a new uninitialized JsonSession
-   */
-  public abstract IJsonSession createJsonSession();
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -203,7 +197,7 @@ public abstract class AbstractUiServlet extends HttpServlet {
 
     @Override
     protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return interceptor.interceptGet(AbstractUiServlet.this, req, resp);
+      return interceptor.interceptGet(UiServlet.this, req, resp);
     }
   }
 
@@ -215,7 +209,7 @@ public abstract class AbstractUiServlet extends HttpServlet {
 
     @Override
     protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return interceptor.interceptPost(AbstractUiServlet.this, req, resp);
+      return interceptor.interceptPost(UiServlet.this, req, resp);
     }
   }
 }

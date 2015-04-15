@@ -11,14 +11,14 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.numberfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 public class JsonNumberField<T extends INumberField> extends JsonValueField<T> {
 
-  public JsonNumberField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonNumberField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

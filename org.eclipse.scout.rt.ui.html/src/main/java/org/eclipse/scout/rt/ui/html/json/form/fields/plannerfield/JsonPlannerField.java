@@ -3,16 +3,16 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.plannerfield;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.json.JSONObject;
 
 public class JsonPlannerField<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends JsonFormField<IPlannerField<T, P, RI, AI>> {
 
-  public JsonPlannerField(IPlannerField<T, P, RI, AI> model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonPlannerField(IPlannerField<T, P, RI, AI> model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

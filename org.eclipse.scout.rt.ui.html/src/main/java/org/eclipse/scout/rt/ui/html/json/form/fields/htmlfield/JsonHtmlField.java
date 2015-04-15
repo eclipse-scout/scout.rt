@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.htmlfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -25,8 +25,8 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
  */
 public class JsonHtmlField<T extends IHtmlField> extends JsonValueField<T> {
 
-  public JsonHtmlField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonHtmlField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

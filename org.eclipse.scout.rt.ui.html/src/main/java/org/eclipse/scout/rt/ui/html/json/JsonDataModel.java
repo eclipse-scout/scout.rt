@@ -16,14 +16,15 @@ import java.net.URL;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.ResourceBase;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonDataModel<T extends IDataModel> extends AbstractJsonAdapter<T> {
 
-  public JsonDataModel(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonDataModel(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

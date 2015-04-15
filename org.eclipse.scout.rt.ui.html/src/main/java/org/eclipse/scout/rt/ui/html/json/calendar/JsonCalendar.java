@@ -20,9 +20,9 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarListener;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -47,8 +47,8 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   private CalendarListener m_calendarListener;
 
-  public JsonCalendar(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonCalendar(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override
@@ -79,13 +79,13 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   @Override
   protected void initJsonProperties(T model) {
     //FIXME CGU/BSH improve adapterproperty so that components are not disposed when changed?
-    putJsonProperty(new JsonAdapterProperty<T>(ICalendar.PROP_COMPONENTS, model, getJsonSession()) {
+    putJsonProperty(new JsonAdapterProperty<T>(ICalendar.PROP_COMPONENTS, model, getUiSession()) {
       @Override
       protected Set<? extends CalendarComponent> modelValue() {
         return getModel().getComponents();
       }
     });
-    putJsonProperty(new JsonAdapterProperty<T>(ICalendar.PROP_SELECTED_COMPONENT, model, getJsonSession()) {
+    putJsonProperty(new JsonAdapterProperty<T>(ICalendar.PROP_SELECTED_COMPONENT, model, getUiSession()) {
       @Override
       protected CalendarComponent modelValue() {
         return getModel().getSelectedComponent();
@@ -190,7 +190,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     if (id == null) {
       return null;
     }
-    return (JsonCalendarComponent<C>) getJsonSession().getJsonAdapter(id);
+    return (JsonCalendarComponent<C>) getUiSession().getJsonAdapter(id);
   }
 
   @Override

@@ -105,7 +105,7 @@ scout.PopupMenuItem.prototype.render = function($parent) {
   this._copyCssClass('taskbar');
   this._installKeyStrokeAdapter();
   setTimeout(function() {
-    this.$container.installFocusContext('auto', this.session.jsonSessionId);
+    this.$container.installFocusContext('auto', this.session.uiSessionId);
     this.$container.focus();
   }.bind(this), 0);
   return this.$container;

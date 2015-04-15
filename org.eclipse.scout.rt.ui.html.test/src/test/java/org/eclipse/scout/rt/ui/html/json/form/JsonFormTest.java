@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,11 +28,11 @@ import org.junit.runner.RunWith;
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonFormTest {
-  private JsonSessionMock m_jsonSession;
+  private UiSessionMock m_uiSession;
 
   @Before
   public void before() {
-    m_jsonSession = new JsonSessionMock();
+    m_uiSession = new UiSessionMock();
   }
 
   /**
@@ -41,12 +41,12 @@ public class JsonFormTest {
   @Test
   public void testFormDisposalOnClose() throws ProcessingException {
     FormWithOneField form = new FormWithOneField();
-    m_jsonSession.newJsonAdapter(form, m_jsonSession.getRootJsonAdapter(), null);
+    m_uiSession.newJsonAdapter(form, m_uiSession.getRootJsonAdapter(), null);
 
     form.start();
-    assertNotNull(m_jsonSession.getJsonAdapter(form, m_jsonSession.getRootJsonAdapter()));
+    assertNotNull(m_uiSession.getJsonAdapter(form, m_uiSession.getRootJsonAdapter()));
 
     form.doClose();
-    assertNull(m_jsonSession.getJsonAdapter(form, m_jsonSession.getRootJsonAdapter()));
+    assertNull(m_uiSession.getJsonAdapter(form, m_uiSession.getRootJsonAdapter()));
   }
 }

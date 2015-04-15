@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,7 +57,7 @@ public class AbstractJsonAdapterTest {
   }
 
   private AbstractJsonAdapter<?> newAdapter(Object model) {
-    AbstractJsonAdapter<?> adapter = new AbstractJsonAdapter<Object>(model, new JsonSessionMock(), "x", null) {
+    AbstractJsonAdapter<?> adapter = new AbstractJsonAdapter<Object>(model, new UiSessionMock(), "x", null) {
       @Override
       public String getObjectType() {
         return "Foo";

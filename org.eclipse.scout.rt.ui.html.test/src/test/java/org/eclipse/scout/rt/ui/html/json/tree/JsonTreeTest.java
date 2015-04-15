@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
@@ -52,11 +52,11 @@ import org.junit.runner.RunWith;
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonTreeTest {
-  private JsonSessionMock m_jsonSession;
+  private UiSessionMock m_uiSession;
 
   @Before
   public void setUp() {
-    m_jsonSession = new JsonSessionMock();
+    m_uiSession = new UiSessionMock();
   }
 
   /**
@@ -68,7 +68,7 @@ public class JsonTreeTest {
     ITreeNode node = tree.getRootNode().getChildNode(0);
     assertFalse(node.isSelectedNode());
 
-    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
 
     JsonEvent event = createJsonSelectedEvent(jsonTree.getOrCreateNodeId(node));
     jsonTree.handleUiEvent(event);
@@ -84,13 +84,13 @@ public class JsonTreeTest {
     ITree tree = createTreeWithOneNode();
     ITreeNode node = tree.getRootNode().getChildNode(0);
 
-    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
 
     JsonEvent event = createJsonSelectedEvent(jsonTree.getOrCreateNodeId(node));
     jsonTree.handleUiEvent(event);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
-        m_jsonSession.currentJsonResponse(), JsonTree.EVENT_NODES_SELECTED);
+        m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODES_SELECTED);
     assertTrue(responseEvents.size() == 0);
   }
 
@@ -116,7 +116,7 @@ public class JsonTreeTest {
 //      }
 //    };
 //
-//    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+//    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
 //    JsonEvent event = createJsonSelectedEvent(jsonTree.getOrCreateNodeId(secondNode));
 //
 //    assertFalse(firstNode.isSelectedNode());
@@ -128,7 +128,7 @@ public class JsonTreeTest {
 //    assertFalse(secondNode.isSelectedNode());
 //
 //    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
-//        m_jsonSession.currentJsonResponse(), JsonTree.EVENT_NODES_SELECTED);
+//        m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODES_SELECTED);
 //    assertTrue(responseEvents.size() == 1);
 //
 //    List<ITreeNode> treeNodes = jsonTree.extractTreeNodes(responseEvents.get(0).getData());
@@ -143,14 +143,14 @@ public class JsonTreeTest {
     ITree tree = createTreeWithOneNode();
     ITreeNode node = tree.getRootNode().getChildNode(0);
 
-    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
 
     //Check expanded = true
     JsonEvent event = createJsonExpansionEvent(jsonTree.getOrCreateNodeId(node), true);
     jsonTree.handleUiEvent(event);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
-        m_jsonSession.currentJsonResponse(), JsonTree.EVENT_NODE_EXPANDED);
+        m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODE_EXPANDED);
     assertTrue(responseEvents.size() == 0);
 
     //Check expanded = false
@@ -158,7 +158,7 @@ public class JsonTreeTest {
     jsonTree.handleUiEvent(event);
 
     responseEvents = JsonTestUtility.extractEventsFromResponse(
-        m_jsonSession.currentJsonResponse(), JsonTree.EVENT_NODE_EXPANDED);
+        m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODE_EXPANDED);
     assertTrue(responseEvents.size() == 0);
   }
 
@@ -166,11 +166,11 @@ public class JsonTreeTest {
   public void testDispose() throws ProcessingException {
     ITree tree = new TreeWith3Levels();
     tree.initTree();
-    JsonTree<ITree> object = m_jsonSession.newJsonAdapter(tree, null, null);
+    JsonTree<ITree> object = m_uiSession.newJsonAdapter(tree, null, null);
     WeakReference<JsonTree> ref = new WeakReference<JsonTree>(object);
 
     object.dispose();
-    m_jsonSession = null;
+    m_uiSession = null;
     object = null;
     JsonTestUtility.assertGC(ref);
   }
@@ -181,7 +181,7 @@ public class JsonTreeTest {
     ITreeNode node = tree.getRootNode().getChildNode(0);
     assertFalse(node.isSelectedNode());
 
-    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
     IJsonAdapter<?> contextMenu = jsonTree.getAdapter(tree.getContextMenu());
 
     Menu menu1 = new Menu();
@@ -199,7 +199,7 @@ public class JsonTreeTest {
     ITreeNode node = tree.getRootNode().getChildNode(0);
     assertFalse(node.isSelectedNode());
 
-    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
     IJsonAdapter<?> contextMenu = jsonTree.getAdapter(tree.getContextMenu());
 
     Menu menu1 = new Menu();
@@ -226,7 +226,7 @@ public class JsonTreeTest {
     ITreeNode node = tree.getRootNode().getChildNode(0);
     assertFalse(node.isSelectedNode());
 
-    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
     IJsonAdapter<?> contextMenu = jsonTree.getAdapter(tree.getContextMenu());
 
     Menu menu1 = new Menu();
@@ -236,7 +236,7 @@ public class JsonTreeTest {
     assertTrue(jsonMenu1.isInitialized());
 
     JSONArray jsonMenus = JsonTestUtility.extractProperty(
-        m_jsonSession.currentJsonResponse(), jsonTree.getId(), IContextMenuOwner.PROP_MENUS);
+        m_uiSession.currentJsonResponse(), jsonTree.getId(), IContextMenuOwner.PROP_MENUS);
 
     assertNotNull(jsonMenus);
     assertEquals(1, jsonMenus.length());
@@ -253,13 +253,13 @@ public class JsonTreeTest {
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
     ITree tree = createTree(nodes);
-    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
 
     String node1Id = jsonTree.getOrCreateNodeId(nodes.get(1));
     tree.removeNode(nodes.get(1));
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
-        m_jsonSession.currentJsonResponse(), JsonTree.EVENT_NODES_DELETED);
+        m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODES_DELETED);
     assertTrue(responseEvents.size() == 1);
 
     JsonEvent event = responseEvents.get(0);
@@ -279,7 +279,7 @@ public class JsonTreeTest {
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
     ITree tree = createTree(nodes);
-    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
 
     String node0Id = jsonTree.getOrCreateNodeId(nodes.get(0));
     assertNotNull(node0Id);
@@ -287,7 +287,7 @@ public class JsonTreeTest {
 
     tree.removeNode(nodes.get(0));
 
-    JsonTestUtility.processBufferedEvents(m_jsonSession);
+    JsonTestUtility.processBufferedEvents(m_uiSession);
     assertNull(jsonTree.getNodeId(nodes.get(0)));
     assertNull(jsonTree.getNode(node0Id));
   }
@@ -302,7 +302,7 @@ public class JsonTreeTest {
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
     ITree tree = createTree(nodes);
-    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
 
     String node0Id = jsonTree.getOrCreateNodeId(nodes.get(0));
     assertNotNull(node0Id);
@@ -316,7 +316,7 @@ public class JsonTreeTest {
       }
     });
 
-    JsonTestUtility.processBufferedEvents(m_jsonSession);
+    JsonTestUtility.processBufferedEvents(m_uiSession);
     assertNull(jsonTree.getNodeId(nodes.get(0)));
     assertNull(jsonTree.getNode(node0Id));
   }
@@ -332,7 +332,7 @@ public class JsonTreeTest {
     List<ITreeNode> allNodes = getAllTreeNodes(tree);
     List<String> allNodeIds = new LinkedList<String>();
 
-    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
 
     for (ITreeNode node : allNodes) {
       String nodeId = jsonTree.getOrCreateNodeId(node);
@@ -344,7 +344,7 @@ public class JsonTreeTest {
 
     tree.removeNode(allNodes.get(0));
 
-    JsonTestUtility.processBufferedEvents(m_jsonSession);
+    JsonTestUtility.processBufferedEvents(m_uiSession);
     for (ITreeNode node : allNodes) {
       assertNull(jsonTree.getNodeId(node));
     }
@@ -363,12 +363,12 @@ public class JsonTreeTest {
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
     ITree tree = createTree(nodes);
-    m_jsonSession.createJsonAdapter(tree, null);
+    m_uiSession.createJsonAdapter(tree, null);
 
     tree.removeChildNodes(tree.getRootNode(), tree.getRootNode().getChildNodes());
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
-        m_jsonSession.currentJsonResponse(), JsonTree.EVENT_ALL_NODES_DELETED);
+        m_uiSession.currentJsonResponse(), JsonTree.EVENT_ALL_NODES_DELETED);
     JsonEvent event = responseEvents.get(0);
     assertNull(event.getData().optJSONArray("nodeIds"));
   }
@@ -380,7 +380,7 @@ public class JsonTreeTest {
   @Test
   public void testGetOrCreateNodeIdWithNull() throws ProcessingException, JSONException {
     ITree tree = createTreeWithOneNode();
-    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
     Assert.assertNull(jsonTree.getOrCreateNodeId(null));
   }
 

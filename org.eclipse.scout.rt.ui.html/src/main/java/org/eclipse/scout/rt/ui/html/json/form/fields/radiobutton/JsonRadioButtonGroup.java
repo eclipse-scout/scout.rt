@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONObject;
 
@@ -21,8 +21,8 @@ public class JsonRadioButtonGroup<T extends IRadioButtonGroup> extends JsonValue
 
   private static final String FORM_FIELDS = "formFields";
 
-  public JsonRadioButtonGroup(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonRadioButtonGroup(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

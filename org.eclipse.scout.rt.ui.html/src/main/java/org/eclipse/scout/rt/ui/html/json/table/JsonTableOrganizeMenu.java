@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
@@ -20,8 +20,8 @@ import org.json.JSONObject;
 
 public class JsonTableOrganizeMenu extends JsonMenu<TableOrganizeMenu> {
 
-  public JsonTableOrganizeMenu(TableOrganizeMenu model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonTableOrganizeMenu(TableOrganizeMenu model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

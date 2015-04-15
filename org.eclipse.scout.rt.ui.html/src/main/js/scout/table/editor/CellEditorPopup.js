@@ -58,7 +58,7 @@ scout.CellEditorPopup.prototype.render = function($parent) {
   setTimeout(function() {
     //FIXME CGU Maybe null if removed directly after render, better remove $container = undefined in popup.js?
     if (this.$container) {
-      this.$container.installFocusContext('auto', this.table.session.jsonSessionId);
+      this.$container.installFocusContext('auto', this.table.session.uiSessionId);
     }
   }.bind(this), 0);
   this._installKeyStrokeAdapter();

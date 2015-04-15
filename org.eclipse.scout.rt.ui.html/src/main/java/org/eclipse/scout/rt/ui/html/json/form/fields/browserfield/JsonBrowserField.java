@@ -11,15 +11,15 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.browserfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 //FIXME ???: impl. JsonBrowserField
 public class JsonBrowserField extends JsonValueField<IBrowserField> {
 
-  public JsonBrowserField(IBrowserField model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonBrowserField(IBrowserField model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

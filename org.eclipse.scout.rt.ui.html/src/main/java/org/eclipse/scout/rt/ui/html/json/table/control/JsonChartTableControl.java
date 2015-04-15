@@ -11,13 +11,13 @@
 package org.eclipse.scout.rt.ui.html.json.table.control;
 
 import org.eclipse.scout.rt.client.ui.basic.table.control.IChartTableControl;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 
 public class JsonChartTableControl<T extends IChartTableControl> extends JsonTableControl<T> {
 
-  public JsonChartTableControl(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonChartTableControl(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

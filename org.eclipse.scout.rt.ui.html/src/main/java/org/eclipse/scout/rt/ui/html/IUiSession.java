@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json;
+package org.eclipse.scout.rt.ui.html;
 
 import java.util.List;
 import java.util.Locale;
@@ -17,23 +17,31 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.IJsonObjectFactory;
+import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
+import org.eclipse.scout.rt.ui.html.json.JsonRequest;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.json.JSONObject;
 
-public interface IJsonSession {
+@Bean
+public interface IUiSession {
 
   /**
-   * Prefix for name of HTTP session attribute that is used to store the associated {@link IJsonSession}s.
+   * Prefix for name of HTTP session attribute that is used to store the associated {@link IUiSession}s.
    * <p>
-   * The full attribute name is: <b><code>{@link #HTTP_SESSION_ATTRIBUTE_PREFIX} + jsonSessionId</code></b>
+   * The full attribute name is: <b><code>{@link #HTTP_SESSION_ATTRIBUTE_PREFIX} + uiSessionId</code></b>
    */
-  String HTTP_SESSION_ATTRIBUTE_PREFIX = "scout.htmlui.session.json."/*+JsonRequest.PROP_JSON_SESSION_ID*/;
+  String HTTP_SESSION_ATTRIBUTE_PREFIX = "scout.htmlui.uisession."/*+JsonRequest.PROP_UI_SESSION_ID*/;
 
   void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest);
 
   /**
-   * Returns a reentrant lock that can be used to synchronize on the JsonSession.
+   * Returns a reentrant lock that can be used to synchronize on the {@link IUiSession}.
    */
-  ReentrantLock jsonSessionLock();
+  ReentrantLock uiSessionLock();
 
   void dispose();
 
@@ -49,15 +57,13 @@ public interface IJsonSession {
 
   JSONObject processRequest(HttpServletRequest httpReq, JsonRequest jsonReq);
 
-  String getJsonSessionId();
+  String getUiSessionId();
 
   String getClientSessionId();
 
   IClientSession getClientSession();
 
   JsonClientSession<? extends IClientSession> getJsonClientSession();
-
-  IJsonObjectFactory getJsonObjectFactory();
 
   IJsonAdapter<?> getRootJsonAdapter();
 

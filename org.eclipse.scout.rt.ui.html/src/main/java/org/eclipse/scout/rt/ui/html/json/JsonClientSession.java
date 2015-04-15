@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.json.JSONObject;
 
@@ -25,8 +26,8 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
   private boolean m_started;
   private JsonDesktop<IDesktop> m_jsonDesktop;
 
-  public JsonClientSession(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonClientSession(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
     m_started = false;
   }
 
@@ -36,7 +37,7 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
     return null;
   }
 
-  protected void startUp() {
+  public void startUp() {
     Assertions.assertTrue(ModelJobs.isModelThread(), "startUp() must be run in model job context");
 
     // TODO BSH Why is this attached before startSession?
@@ -55,7 +56,7 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
 
     // attach child adapters - we cannot do this in attachModel() as normal
     // since the desktop is not yet created when attachModel runs.
-    // see AbstractJsonSession#init()
+    // see UiSession#init()
     m_jsonDesktop = attachAdapter(getModel().getDesktop());
 
     if (!getModel().getDesktop().isOpened()) {
@@ -100,7 +101,7 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
         // If Locale changes during session startup (execLoadSession) it is not necessary to notify the GUI
         return;
       }
-      getJsonSession().sendLocaleChangedEvent(event.getLocale());
+      getUiSession().sendLocaleChangedEvent(event.getLocale());
     }
   }
 }

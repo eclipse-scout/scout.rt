@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.JobUtility;
 
 /**
@@ -26,10 +27,10 @@ public class JsonEventProcessor {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonEventProcessor.class);
 
-  private final IJsonSession m_jsonSession;
+  private final IUiSession m_uiSession;
 
-  public JsonEventProcessor(IJsonSession jsonSession) {
-    m_jsonSession = jsonSession;
+  public JsonEventProcessor(IUiSession uiSession) {
+    m_uiSession = uiSession;
   }
 
   public void processEvents(final JsonRequest request, final JsonResponse response) {
@@ -48,14 +49,14 @@ public class JsonEventProcessor {
           processEvent(event, response);
         }
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_jsonSession.getClientSession())).name("event-processing"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_uiSession.getClientSession())).name("event-processing"));
 
     // Wait for all events to be processed. It is not sufficient to only wait for the Future to complete, because other jobs might be started as well.
     JobUtility.awaitModelJobs(future);
   }
 
   protected void processEvent(JsonEvent event, JsonResponse response) {
-    final IJsonAdapter jsonAdapter = m_jsonSession.getJsonAdapter(event.getTarget());
+    final IJsonAdapter jsonAdapter = m_uiSession.getJsonAdapter(event.getTarget());
     if (jsonAdapter == null) {
       throw new JsonException("No adapter found for ID " + event.getTarget());
     }

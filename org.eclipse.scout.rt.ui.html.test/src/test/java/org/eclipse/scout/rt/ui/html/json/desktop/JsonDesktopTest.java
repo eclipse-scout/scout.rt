@@ -23,8 +23,8 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithNonDisplayableActions;
@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithNonDisplaya
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithOneOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithOutlineForms;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NonDisplayableOutlineWithOneNode;
-import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
@@ -49,15 +49,15 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonDesktopTest {
 
-  private IJsonSession m_jsonSession;
+  private IUiSession m_uiSession;
 
   @Before
   public void setUp() {
-    m_jsonSession = new JsonSessionMock();
+    m_uiSession = new UiSessionMock();
   }
 
   private JsonDesktop<IDesktop> createJsonDesktop(IDesktop desktop) {
-    JsonDesktop<IDesktop> jsonDesktop = new JsonDesktop<IDesktop>(desktop, m_jsonSession, m_jsonSession.createUniqueIdFor(null), null);
+    JsonDesktop<IDesktop> jsonDesktop = new JsonDesktop<IDesktop>(desktop, m_uiSession, m_uiSession.createUniqueIdFor(null), null);
     jsonDesktop.init();
     return jsonDesktop;
   }
@@ -100,7 +100,7 @@ public class JsonDesktopTest {
     formAdapter = (JsonForm) jsonDesktop.getAdapter(form);
     assertNotNull(formAdapter);
 
-    JsonResponse jsonResp = m_jsonSession.currentJsonResponse();
+    JsonResponse jsonResp = m_uiSession.currentJsonResponse();
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonResp, "formAdded");
     assertTrue(responseEvents.size() == 1);
 
@@ -124,7 +124,7 @@ public class JsonDesktopTest {
 
     desktop.removeForm(form);
 
-    responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formRemoved");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formRemoved");
     assertTrue(responseEvents.size() == 1);
 
     event = responseEvents.get(0);
@@ -151,21 +151,21 @@ public class JsonDesktopTest {
     jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
     assertNotNull(jsonForm);
 
-    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formAdded");
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formAdded");
     assertEquals(1, responseEvents.size());
 
     form.start();
 
-    JsonTestUtility.endRequest(m_jsonSession);
+    JsonTestUtility.endRequest(m_uiSession);
     // -------------------------------
     // New request:
 
     form.doClose();
-    responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formClosed");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formClosed");
     assertEquals(1, responseEvents.size());
 
     desktop.removeForm(form);
-    responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formRemoved");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formRemoved");
     // 0 instead of 1, because formClosed includes "formRemoved" implicitly. The event itself cannot be sent, because
     // the form adapter is already disposed when the form is closed.
     assertEquals(0, responseEvents.size());
@@ -187,16 +187,16 @@ public class JsonDesktopTest {
     jsonForm = (JsonForm) jsonDesktop.getAdapter(form);
     assertNotNull(jsonForm);
 
-    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formAdded");
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formAdded");
     assertEquals(1, responseEvents.size());
 
     form.start();
     form.doClose();
-    responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formClosed");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formClosed");
     assertEquals(1, responseEvents.size());
 
     desktop.removeForm(form);
-    responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), "formRemoved");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formRemoved");
     assertEquals(0, responseEvents.size());
   }
 

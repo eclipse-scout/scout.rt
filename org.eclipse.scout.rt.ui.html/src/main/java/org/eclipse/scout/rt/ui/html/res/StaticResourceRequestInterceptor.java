@@ -34,20 +34,20 @@ import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
-import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiHints;
+import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonUtility;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
 /**
- * This interceptor contributes to the {@link AbstractUiServlet} as the default GET handler for
+ * This interceptor contributes to the {@link UiServlet} as the default GET handler for
  * <p>
  * js, css, html, png, gif, jpg, woff, json
  */
@@ -89,7 +89,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   private ScriptProcessor m_scriptProcessor;
 
   @Override
-  public boolean interceptGet(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String pathInfo = resolvePathInfo(req);
     LOG.debug("processing static resource: " + pathInfo);
 
@@ -140,7 +140,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   }
 
   @Override
-  public boolean interceptPost(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptPost(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
   }
 
@@ -173,7 +173,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   /**
    * Loads a resource with an appropriate method, based on the URL
    */
-  protected HttpCacheObject loadResource(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadResource(UiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     if (pathInfo.matches("^/icon/.*")) {
       return loadIcon(servlet, req, pathInfo);
     }
@@ -193,12 +193,10 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   }
 
   /**
-   * /**
-   * This method loads static icon images from the /resource/icons folders of all jars on the classpath
-   * <p>
-   * The {@link HttpServletRequest} must contain the parameter <code>jsonSessionId</code>
+   * This method loads static icon images from {@link IconLocator} (<code>/resource/icons</code> folders of all jars on
+   * the classpath).
    */
-  protected HttpCacheObject loadIcon(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) {
+  protected HttpCacheObject loadIcon(UiServlet servlet, HttpServletRequest req, String pathInfo) {
     final String imageId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
     IconSpec iconSpec = IconLocator.instance().getIconSpec(imageId);
     if (iconSpec != null) {
@@ -212,7 +210,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   /**
    * js, css
    */
-  protected HttpCacheObject loadScriptFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadScriptFile(UiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     ScriptFileBuilder builder = new ScriptFileBuilder(BEANS.get(IWebContentService.class), getSharedScriptProcessor());
     builder.setMinifyEnabled(UiHints.isMinifyHint(req));
     ScriptOutput out = builder.buildScript(pathInfo);
@@ -227,7 +225,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   /**
    * html
    */
-  protected HttpCacheObject loadHtmlFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadHtmlFile(UiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
     if (url == null) {
       //not handled here
@@ -243,7 +241,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   /**
    * json
    */
-  protected HttpCacheObject loadJsonFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadJsonFile(UiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
     if (url == null) {
       //not handled here
@@ -258,27 +256,27 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   }
 
   /**
-   * This method loads resources that are temporary or dynamically registered on the {@link IJsonSession}. This includes
+   * This method loads resources that are temporary or dynamically registered on the {@link IUiSession}. This includes
    * adapter/form-fields such as the image field, WordAddIn docx documents, temporary and time-limited landing page
    * files etc.
    * <p>
-   * The pathInfo is expected to have the following form: <code>/dynamic/[jsonSessionId]/[adapterId]/[filename]</code>
+   * The pathInfo is expected to have the following form: <code>/dynamic/[uiSessionId]/[adapterId]/[filename]</code>
    */
-  protected HttpCacheObject loadDynamicAdapterResource(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) {
+  protected HttpCacheObject loadDynamicAdapterResource(UiServlet servlet, HttpServletRequest req, String pathInfo) {
     Matcher m = PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH.matcher(pathInfo);
     if (!m.matches()) {
       return null;
     }
-    String jsonSessionId = m.group(1);
+    String uiSessionId = m.group(1);
     String adapterId = m.group(2);
     String filename = m.group(3);
 
     HttpSession httpSession = req.getSession();
-    IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(IJsonSession.HTTP_SESSION_ATTRIBUTE_PREFIX + jsonSessionId);
-    if (jsonSession == null) {
+    IUiSession uiSession = (IUiSession) httpSession.getAttribute(IUiSession.HTTP_SESSION_ATTRIBUTE_PREFIX + uiSessionId);
+    if (uiSession == null) {
       return null;
     }
-    IJsonAdapter<?> jsonAdapter = jsonSession.getJsonAdapter(adapterId);
+    IJsonAdapter<?> jsonAdapter = uiSession.getJsonAdapter(adapterId);
     if (!(jsonAdapter instanceof IBinaryResourceProvider)) {
       return null;
     }
@@ -300,7 +298,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   /**
    * Static binary file png, jpg, woff, pdf, docx
    */
-  protected HttpCacheObject loadBinaryFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadBinaryFile(UiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
     if (url == null) {
       //not handled here
@@ -317,7 +315,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     return DOWNLOAD_CONTENT_TYPES.contains(res.getContentType());
   }
 
-  protected String detectContentType(AbstractUiServlet servlet, String path) {
+  protected String detectContentType(UiServlet servlet, String path) {
     int lastSlash = path.lastIndexOf('/');
     String fileName = lastSlash >= 0 ? path.substring(lastSlash + 1) : path;
     //Prefer mime type mapping from container
@@ -334,7 +332,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    * Process all js and css script tags that contain the marker text "fingerprint". The marker text is replaced by the
    * effective files {@link HttpCacheObject#getFingerprint()} in hex format
    */
-  protected byte[] replaceHtmlScriptTags(AbstractUiServlet servlet, HttpServletRequest req, byte[] content) throws IOException, ServletException {
+  protected byte[] replaceHtmlScriptTags(UiServlet servlet, HttpServletRequest req, byte[] content) throws IOException, ServletException {
     String oldHtml = new String(content, UTF_8);
     Matcher m = ScriptFileBuilder.SCRIPT_URL_PATTERN.matcher(oldHtml);
     StringBuilder buf = new StringBuilder();

@@ -12,15 +12,15 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.calendar;
 
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.json.JSONObject;
 
 public class JsonCalendarField<T extends ICalendarField<? extends ICalendar>> extends JsonFormField<T> {
 
-  public JsonCalendarField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonCalendarField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override

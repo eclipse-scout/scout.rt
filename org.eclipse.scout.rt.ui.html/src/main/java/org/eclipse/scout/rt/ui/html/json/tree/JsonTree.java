@@ -17,9 +17,9 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -59,8 +59,8 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   private final TreeEventFilter m_treeEventFilter;
   private final AbstractEventBuffer<TreeEvent> m_eventBuffer;
 
-  public JsonTree(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonTree(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
     m_treeEventFilter = new TreeEventFilter(getModel());
@@ -394,7 +394,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     if (id != null) {
       return id;
     }
-    id = getJsonSession().createUniqueIdFor(null);
+    id = getUiSession().createUniqueIdFor(null);
     m_treeNodes.put(id, node);
     m_treeNodeIds.put(node, id);
     return id;

@@ -20,9 +20,9 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.FormToolButton;
-import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,11 +32,11 @@ import org.junit.runner.RunWith;
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonFormToolButtonTest {
-  private IJsonSession m_jsonSession;
+  private IUiSession m_uiSession;
 
   @Before
   public void before() {
-    m_jsonSession = new JsonSessionMock();
+    m_uiSession = new UiSessionMock();
   }
 
   /**
@@ -49,7 +49,7 @@ public class JsonFormToolButtonTest {
     form.start();
     button.setForm(form);
 
-    JsonFormToolButton<IFormToolButton<IForm>> jsonFormToolButton = m_jsonSession.createJsonAdapter(button, null);
+    JsonFormToolButton<IFormToolButton<IForm>> jsonFormToolButton = m_uiSession.createJsonAdapter(button, null);
 
     assertNotNull(jsonFormToolButton.getAdapter(form));
     jsonFormToolButton.dispose();

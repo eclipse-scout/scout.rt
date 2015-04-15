@@ -4,9 +4,9 @@ scout.FocusManager = function() {
   var that = this;
 };
 
-scout.FocusManager.prototype.installManagerForSession = function(jsonSession, options) {
-  this._sessionFocusContexts[jsonSession.jsonSessionId] = {
-    session: jsonSession,
+scout.FocusManager.prototype.installManagerForSession = function(session, options) {
+  this._sessionFocusContexts[session.uiSessionId] = {
+    session: session,
     focusContexts: []
   };
 
@@ -15,13 +15,13 @@ scout.FocusManager.prototype.installManagerForSession = function(jsonSession, op
     options.focusFirstPart = true;
   }
 
-  var $container = jsonSession.$entryPoint;
+  var $container = session.$entryPoint;
   var portletPartId = $container.data('partid') || '0';
   var firstPartFocusApplied = false;
   //Make container focusable and install focus context
   $container.attr('tabindex', portletPartId);
 
-  this.installFocusContext($container, jsonSession.jsonSessionId, undefined, true);
+  this.installFocusContext($container, session.uiSessionId, undefined, true);
   if (options.focusFirstPart && !firstPartFocusApplied) {
     firstPartFocusApplied = true;
     $container.focus();
@@ -29,7 +29,7 @@ scout.FocusManager.prototype.installManagerForSession = function(jsonSession, op
 
 };
 
-scout.FocusManager.prototype.installFocusContext = function($container, jsonSessionId, $firstFocusElement, isRoot) {
+scout.FocusManager.prototype.installFocusContext = function($container, uiSessionId, $firstFocusElement, isRoot) {
   // Ensure $container is focusable (-1 = only programmatically)
   if ($container.attr('tabindex') === undefined) {
     $container.attr('tabindex', '-1');
@@ -42,7 +42,7 @@ scout.FocusManager.prototype.installFocusContext = function($container, jsonSess
 //  if ($firstFocusElement) {
 //    $firstFocusElement.focus();
 //  }
-  var focusContext = new scout.FocusContext($container, $firstFocusElement, jsonSessionId, isRoot);
+  var focusContext = new scout.FocusContext($container, $firstFocusElement, uiSessionId, isRoot);
 
   $.log.warn('install focuscontext ');
   focusContext.activate(true);
@@ -50,9 +50,9 @@ scout.FocusManager.prototype.installFocusContext = function($container, jsonSess
   return this;
 };
 
-scout.FocusManager.prototype.disposeActiveFocusContext = function(jsonSessionId) {
+scout.FocusManager.prototype.disposeActiveFocusContext = function(uiSessionId) {
   //get last focus context and dispose it
-  var oldFocusContext = this._sessionFocusContexts[jsonSessionId].focusContexts[this._sessionFocusContexts[jsonSessionId].focusContexts.length - 1];
+  var oldFocusContext = this._sessionFocusContexts[uiSessionId].focusContexts[this._sessionFocusContexts[uiSessionId].focusContexts.length - 1];
   if (oldFocusContext) {
     //dispose old
     oldFocusContext.dispose();
@@ -60,7 +60,7 @@ scout.FocusManager.prototype.disposeActiveFocusContext = function(jsonSessionId)
 };
 
 scout.FocusManager.prototype.activateFocusContext = function(focusContext) {
-  var focusContexts = this._sessionFocusContexts[focusContext._jsonSessionId].focusContexts;
+  var focusContexts = this._sessionFocusContexts[focusContext._uiSessionId].focusContexts;
   var index = focusContexts.indexOf(focusContext);
   if (index > -1) {
     focusContexts.splice(index, 1);
@@ -68,8 +68,8 @@ scout.FocusManager.prototype.activateFocusContext = function(focusContext) {
   focusContexts.push(focusContext);
 };
 
-scout.FocusManager.prototype.uninstallFocusContext = function(focusContext, jsonSessionId) {
-  var focusContexts = this._sessionFocusContexts[jsonSessionId].focusContexts;
+scout.FocusManager.prototype.uninstallFocusContext = function(focusContext, uiSessionId) {
+  var focusContexts = this._sessionFocusContexts[uiSessionId].focusContexts;
 
   var index = focusContexts.indexOf(focusContext);
   var oldLength = focusContexts.length;
@@ -84,24 +84,24 @@ scout.FocusManager.prototype.uninstallFocusContext = function(focusContext, json
 };
 
 scout.FocusManager.prototype.checkFocusContextIsActive = function(focusContext) {
-  var focusContexts = this._sessionFocusContexts[focusContext._jsonSessionId].focusContexts;
+  var focusContexts = this._sessionFocusContexts[focusContext._uiSessionId].focusContexts;
   var index = focusContexts.indexOf(focusContext);
   return index === focusContexts.length - 1;
 };
-scout.FocusManager.prototype.validateFocus = function(jsonSessionId, caller) {
+scout.FocusManager.prototype.validateFocus = function(uiSessionId, caller) {
   $.log.warn('validate focus, caller: '+caller);
-  if (this._sessionFocusContexts[jsonSessionId].focusContexts.length > 0) {
-    var context = this._sessionFocusContexts[jsonSessionId].focusContexts[this._sessionFocusContexts[jsonSessionId].focusContexts.length - 1];
+  if (this._sessionFocusContexts[uiSessionId].focusContexts.length > 0) {
+    var context = this._sessionFocusContexts[uiSessionId].focusContexts[this._sessionFocusContexts[uiSessionId].focusContexts.length - 1];
     $.log.warn('validate focus, caller: '+caller);
     context._validateFocus();
   }
 };
 
-scout.FocusContext = function($container, $focusedElement, jsonSessionId, isRoot) {
+scout.FocusContext = function($container, $focusedElement, uiSessionId, isRoot) {
   this._$container = $container;
   this.name = 'name'+$container.attr('class');
   this._$focusedElement = $focusedElement;
-  this._jsonSessionId = jsonSessionId;
+  this._uiSessionId = uiSessionId;
   this._isRoot = isRoot;
   this._$container.bind('focusin.focusContext', this._validateFocusInEvent.bind(this));
   this._$container.bind('remove', this.uninstall.bind(this));
@@ -110,7 +110,7 @@ scout.FocusContext = function($container, $focusedElement, jsonSessionId, isRoot
 scout.FocusContext.prototype.uninstall = function(event) {
   this._$container.unbind('keydown.focusContext');
   this._$container.unbind('focusin.focusContext');
-  scout.focusManager.uninstallFocusContext(this, this._jsonSessionId);
+  scout.focusManager.uninstallFocusContext(this, this._uiSessionId);
 };
 
 scout.FocusContext.prototype.dispose = function() {
@@ -148,7 +148,7 @@ scout.FocusContext.prototype.activate = function(disposeOld) {
   this._$container.bind('keydown.focusContext', this.handleTab.bind(this));
   $.log.warn('activate event focus context: ' +this.name);
   if(disposeOld){
-    scout.focusManager.disposeActiveFocusContext(this._jsonSessionId);
+    scout.focusManager.disposeActiveFocusContext(this._uiSessionId);
   }
   scout.focusManager.activateFocusContext(this);
   if( this._$focusedElement && this._$focusedElement.length>0){
@@ -169,8 +169,8 @@ scout.FocusContext.prototype._validateFocusInEvent = function(event) {
 
 scout.FocusContext.prototype.bindHideListener = function() {
   var $focusedElement =  this._$focusedElement;
-  $focusedElement.bind('hide.focusContext', scout.focusManager.validateFocus.bind( scout.focusManager,this._jsonSessionId, 'hide'));
-  $focusedElement.bind('remove.focusContext', scout.focusManager.validateFocus.bind(scout.focusManager, this._jsonSessionId, 'remove'));
+  $focusedElement.bind('hide.focusContext', scout.focusManager.validateFocus.bind( scout.focusManager,this._uiSessionId, 'hide'));
+  $focusedElement.bind('remove.focusContext', scout.focusManager.validateFocus.bind(scout.focusManager, this._uiSessionId, 'remove'));
   $focusedElement.bind('focusout.unbindListener.focusContext', function(){
     $.log.warn('hidelistner unbound on ' + $focusedElement.attr('class'));
     $focusedElement.unbind('remove.focusContext');

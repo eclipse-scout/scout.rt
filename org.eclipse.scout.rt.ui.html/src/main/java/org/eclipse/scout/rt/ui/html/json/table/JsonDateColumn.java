@@ -38,7 +38,7 @@ public class JsonDateColumn<T extends IDateColumn> extends JsonColumn<T> {
     // Alternative would be to use a clientJob or set localethreadlocal in ui thread as well, as done in rap
     Locale oldLocale = NlsLocale.get(false);
     try {
-      NlsLocale.set(getJsonSession().getClientSession().getLocale());
+      NlsLocale.set(getUiSession().getClientSession().getLocale());
       Method method = AbstractDateColumn.class.getDeclaredMethod("getDateFormat");
       method.setAccessible(true);
       SimpleDateFormat dateFormat = (SimpleDateFormat) method.invoke(getColumn());

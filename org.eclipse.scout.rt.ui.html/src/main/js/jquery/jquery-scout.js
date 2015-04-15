@@ -501,8 +501,8 @@
    *   argument is the string 'auto', the current focus is set to the first focusable element inside the parent
    *   element. All other values don't change the current focus.
    */
-  $.fn.installFocusContext = function($firstFocusElement, jsonSessionId) {
-    scout.focusManager.installFocusContext(this, jsonSessionId, $firstFocusElement);
+  $.fn.installFocusContext = function($firstFocusElement, uiSessionId) {
+    scout.focusManager.installFocusContext(this, uiSessionId, $firstFocusElement);
   };
 
   /**

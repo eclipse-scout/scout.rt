@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBoxUIFacade;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
-import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONArray;
@@ -37,7 +37,7 @@ import org.mockito.Mockito;
 
 @RunWith(PlatformTestRunner.class)
 public class JsonTabBoxTest {
-  private JsonSessionMock m_jsonSession;
+  private UiSessionMock m_uiSession;
   private JsonTabBox<ITabBox> m_tabBox;
   private ITabBox m_tabBoxModel;
   private ITabBoxUIFacade m_uiFacade;
@@ -46,15 +46,15 @@ public class JsonTabBoxTest {
 
   @Before
   public void setUp() {
-    JsonSessionMock jsonSession = new JsonSessionMock();
+    UiSessionMock uiSession = new UiSessionMock();
     m_tabBoxModel = Mockito.mock(ITabBox.class);
     m_groupBox1 = Mockito.mock(IGroupBox.class);
     m_groupBox2 = Mockito.mock(IGroupBox.class);
     m_uiFacade = Mockito.mock(ITabBoxUIFacade.class);
     Mockito.when(m_tabBoxModel.getGroupBoxes()).thenReturn(Arrays.asList(m_groupBox1, m_groupBox2));
     Mockito.when(m_tabBoxModel.getUIFacade()).thenReturn(m_uiFacade);
-    m_tabBox = new JsonTabBox<ITabBox>(m_tabBoxModel, jsonSession, "123", null);
-    m_jsonSession = new JsonSessionMock();
+    m_tabBox = new JsonTabBox<ITabBox>(m_tabBoxModel, uiSession, "123", null);
+    m_uiSession = new UiSessionMock();
   }
 
   @Test
@@ -82,9 +82,9 @@ public class JsonTabBoxTest {
     ITabBox tabBox = new TabBoxWithNonDisplayableGroup();
     JsonTestUtility.initField(tabBox);
 
-    JsonTabBox<ITabBox> jsonTabBox = m_jsonSession.newJsonAdapter(tabBox, null, null);
-    JsonGroupBox<IGroupBox> jsonDisplayableGroup = m_jsonSession.getJsonAdapter(tabBox.getFieldByClass(TabBoxWithNonDisplayableGroup.DisplayableGroup.class), jsonTabBox);
-    JsonGroupBox<IGroupBox> jsonNonDisplayableGroup = m_jsonSession.getJsonAdapter(tabBox.getFieldByClass(TabBoxWithNonDisplayableGroup.NonDisplayableGroup.class), jsonTabBox);
+    JsonTabBox<ITabBox> jsonTabBox = m_uiSession.newJsonAdapter(tabBox, null, null);
+    JsonGroupBox<IGroupBox> jsonDisplayableGroup = m_uiSession.getJsonAdapter(tabBox.getFieldByClass(TabBoxWithNonDisplayableGroup.DisplayableGroup.class), jsonTabBox);
+    JsonGroupBox<IGroupBox> jsonNonDisplayableGroup = m_uiSession.getJsonAdapter(tabBox.getFieldByClass(TabBoxWithNonDisplayableGroup.NonDisplayableGroup.class), jsonTabBox);
 
     // Adapter for NonDisplayableField must not exist
     assertNull(jsonNonDisplayableGroup);

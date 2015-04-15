@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalChooser;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
@@ -24,8 +24,8 @@ import org.json.JSONObject;
 
 public class JsonProposalChooser<T extends IProposalChooser> extends AbstractJsonPropertyObserver<T> {
 
-  public JsonProposalChooser(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonProposalChooser(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override
@@ -39,7 +39,7 @@ public class JsonProposalChooser<T extends IProposalChooser> extends AbstractJso
     // We don't support that a smart-field could change the activeStateFilterEnabled property at runtime
     // Because very few smart-fields do have such a filter we'd rather not send the additional JSON data
     // used to render the filter in the UI for each smart-field.
-    putJsonProperty(new JsonAdapterProperty<IProposalChooser>("model", model, getJsonSession()) {
+    putJsonProperty(new JsonAdapterProperty<IProposalChooser>("model", model, getUiSession()) {
       @Override
       protected Object modelValue() {
         return getModel().getModel();
@@ -82,7 +82,7 @@ public class JsonProposalChooser<T extends IProposalChooser> extends AbstractJso
 
   @Override
   protected void detachModel() {
-    getJsonSession().currentJsonResponse().getEventList();
+    getUiSession().currentJsonResponse().getEventList();
   }
 
   private void handleActiveFilterChanged(JsonEvent event) {

@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fields.BaseFormFieldTest;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
@@ -33,7 +33,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class JsonGroupBoxTest extends BaseFormFieldTest {
-  private JsonSessionMock m_jsonSession;
+  private UiSessionMock m_uiSession;
 
   private AbstractGroupBox m_model = new AbstractGroupBox() {
   };
@@ -45,7 +45,7 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
     m_groupBox.init();
     m_model.setBorderDecoration("x");
     m_model.setBorderVisible(true);
-    m_jsonSession = new JsonSessionMock();
+    m_uiSession = new UiSessionMock();
   }
 
   @Test
@@ -66,9 +66,9 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
     IGroupBox groupBox = new GroupBoxWithNonDisplayableField();
     JsonTestUtility.initField(groupBox);
 
-    JsonGroupBox<IGroupBox> jsonGroupBox = m_jsonSession.newJsonAdapter(groupBox, null, null);
-    JsonFormField<IFormField> jsonDisplayableField = m_jsonSession.getJsonAdapter(groupBox.getFieldByClass(GroupBoxWithNonDisplayableField.DisplayableField.class), jsonGroupBox);
-    JsonFormField<IFormField> jsonNonDisplayableField = m_jsonSession.getJsonAdapter(groupBox.getFieldByClass(GroupBoxWithNonDisplayableField.NonDisplayableField.class), jsonGroupBox);
+    JsonGroupBox<IGroupBox> jsonGroupBox = m_uiSession.newJsonAdapter(groupBox, null, null);
+    JsonFormField<IFormField> jsonDisplayableField = m_uiSession.getJsonAdapter(groupBox.getFieldByClass(GroupBoxWithNonDisplayableField.DisplayableField.class), jsonGroupBox);
+    JsonFormField<IFormField> jsonNonDisplayableField = m_uiSession.getJsonAdapter(groupBox.getFieldByClass(GroupBoxWithNonDisplayableField.NonDisplayableField.class), jsonGroupBox);
 
     // Adapter for NonDisplayableField must not exist
     assertNull(jsonNonDisplayableField);

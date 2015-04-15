@@ -16,27 +16,28 @@ import java.util.List;
 
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.json.JSONObject;
 
 public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
-  private final IJsonSession m_jsonSession;
+  private final IUiSession m_uiSession;
   private final T m_model;
   private final String m_id;
   private boolean m_initialized;
   private boolean m_disposed;
   private IJsonAdapter<?> m_parent;
 
-  public AbstractJsonAdapter(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+  public AbstractJsonAdapter(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     if (model == null) {
       throw new IllegalArgumentException("model must not be null");
     }
     m_model = model;
-    m_jsonSession = jsonSession;
+    m_uiSession = uiSession;
     m_id = id;
     m_parent = parent;
-    m_jsonSession.registerJsonAdapter(this);
+    m_uiSession.registerJsonAdapter(this);
   }
 
   @Override
@@ -45,12 +46,12 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   @Override
-  public IJsonSession getJsonSession() {
-    return m_jsonSession;
+  public IUiSession getUiSession() {
+    return m_uiSession;
   }
 
   protected JsonDesktop<IDesktop> getJsonDesktop() {
-    return getJsonSession().getJsonClientSession().getJsonDesktop();
+    return getUiSession().getJsonClientSession().getJsonDesktop();
   }
 
   @Override
@@ -71,7 +72,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   protected void disposeChildAdapters() {
-    List<IJsonAdapter<?>> childAdapters = getJsonSession().getJsonChildAdapters(this);
+    List<IJsonAdapter<?>> childAdapters = getUiSession().getJsonChildAdapters(this);
     for (IJsonAdapter<?> childAdapter : childAdapters) {
       if (!childAdapter.isDisposed()) {
         childAdapter.dispose();
@@ -104,7 +105,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     }
     detachModel();
     disposeChildAdapters();
-    m_jsonSession.unregisterJsonAdapter(m_id);
+    m_uiSession.unregisterJsonAdapter(m_id);
     m_disposed = true;
   }
 
@@ -126,14 +127,14 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     putProperty(json, "id", getId());
     putProperty(json, "objectType", getObjectTypeVariant());
-    if (getJsonSession().isInspectorHint()) {
+    if (getUiSession().isInspectorHint()) {
       putProperty(json, "modelClass", getModel().getClass().getName());
     }
 
     // Only send parent if its a global adapter. In the other cases the client may use its creator as parent.
     // Note: The parent adapter is called "owner" in the UI, whereas "parent" refers to the "outer field".
     // FIXME BSH/CGU What if owner is different from creator but not the root adapter? How to check???
-    if (getParent() == getJsonSession().getRootJsonAdapter()) {
+    if (getParent() == getUiSession().getRootJsonAdapter()) {
       putProperty(json, "owner", getParent().getId());
     }
     return json;
@@ -164,7 +165,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     if (filter != null && !filter.accept(model)) {
       return null;
     }
-    return m_jsonSession.getOrCreateJsonAdapter(model, this, objectFactory);
+    return m_uiSession.getOrCreateJsonAdapter(model, this, objectFactory);
   }
 
   protected final <M> List<IJsonAdapter<?>> attachAdapters(Collection<M> models) {
@@ -184,15 +185,15 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   /**
    * Returns an existing adapter for the given model. When no adapter is registered for the given model this method will
-   * return null. This method is a shortcut for <code>getJsonSession().getJsonAdapter(model)</code>.
+   * return null. This method is a shortcut for <code>getUiSession().getJsonAdapter(model)</code>.
    */
   @Override
   public final <A extends IJsonAdapter<?>> A getAdapter(Object model) {
-    return m_jsonSession.getJsonAdapter(model, this);
+    return m_uiSession.getJsonAdapter(model, this);
   }
 
   public final <A extends IJsonAdapter<?>> A getGlobalAdapter(Object model) {
-    return m_jsonSession.getJsonAdapter(model, getJsonSession().getRootJsonAdapter());
+    return m_uiSession.getJsonAdapter(model, getUiSession().getRootJsonAdapter());
   }
 
   @Override
@@ -235,7 +236,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     if (filter != null && !filter.accept(model)) {
       return null;
     }
-    return m_jsonSession.getOrCreateJsonAdapter(model, getJsonSession().getRootJsonAdapter(), objectFactory);
+    return m_uiSession.getOrCreateJsonAdapter(model, getUiSession().getRootJsonAdapter(), objectFactory);
   }
 
   protected final <M> JSONObject putAdapterIdProperty(JSONObject json, String key, M model) {
@@ -249,7 +250,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     if (filter != null && !filter.accept(model)) {
       return null;
     }
-    return JsonObjectUtility.putProperty(json, key, JsonAdapterUtility.getAdapterIdForModel(getJsonSession(), model, this));
+    return JsonObjectUtility.putProperty(json, key, JsonAdapterUtility.getAdapterIdForModel(getUiSession(), model, this));
   }
 
   protected final <M> JSONObject putAdapterIdsProperty(JSONObject json, String key, Collection<M> models) {
@@ -257,7 +258,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   protected final <M> JSONObject putAdapterIdsProperty(JSONObject json, String key, Collection<M> models, IFilter<M> filter) {
-    return JsonObjectUtility.putProperty(json, key, JsonAdapterUtility.getAdapterIdsForModel(getJsonSession(), models, this, filter));
+    return JsonObjectUtility.putProperty(json, key, JsonAdapterUtility.getAdapterIdsForModel(getUiSession(), models, this, filter));
   }
 
   protected final JSONObject putProperty(JSONObject json, String key, Object value) {
@@ -265,15 +266,15 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   protected final void addActionEvent(String eventName, JSONObject eventData) {
-    getJsonSession().currentJsonResponse().addActionEvent(getId(), eventName, eventData);
+    getUiSession().currentJsonResponse().addActionEvent(getId(), eventName, eventData);
   }
 
   protected final void registerAsBufferedEventsAdapter() {
-    getJsonSession().currentJsonResponse().registerBufferedEventsAdapter(this);
+    getUiSession().currentJsonResponse().registerBufferedEventsAdapter(this);
   }
 
   protected final void unregisterAsBufferedEventsAdapter() {
-    getJsonSession().currentJsonResponse().unregisterBufferedEventsAdapter(this);
+    getUiSession().currentJsonResponse().unregisterBufferedEventsAdapter(this);
   }
 
   /**
@@ -281,14 +282,14 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * event in the current response, all existing events are removed before adding the new event.
    */
   protected final void replaceActionEvent(String eventName, JSONObject eventData) {
-    getJsonSession().currentJsonResponse().replaceActionEvent(getId(), eventName, eventData);
+    getUiSession().currentJsonResponse().replaceActionEvent(getId(), eventName, eventData);
   }
 
   protected void addPropertyChangeEvent(String propertyName, Object newValue) {
     if (newValue instanceof IJsonAdapter<?>) {
       throw new IllegalArgumentException("Cannot pass an adapter instance to a JSON response");
     }
-    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), propertyName, newValue);
+    getUiSession().currentJsonResponse().addPropertyChangeEvent(getId(), propertyName, newValue);
   }
 
   @Override

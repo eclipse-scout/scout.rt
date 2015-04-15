@@ -185,7 +185,7 @@ public class JsonResponse {
    * This method will call the <code>toJson()</code> method on all adapter objects. Note that you can NOT create new
    * adapter instances when the toJson() method runs! All new adapter instances must be created before: either in
    * the <code>attachModel()</code> method or in an event handler method like <code>handleXYZ()</code>. The technical
-   * reason for this is, first: new adapters are added to the current response (see AbstractJsonSession), but at the
+   * reason for this is, first: new adapters are added to the current response (see UiSession), but at the
    * point in time toJson() is called, we already have a new instance of the current response. Second: when we loop
    * through the adapterMap and call toJson() for each adapter, if the adapter would create another adapter in its
    * toJson() method, the adapterMap would grow, which would cause a ConcurrentModificationException. Additionally

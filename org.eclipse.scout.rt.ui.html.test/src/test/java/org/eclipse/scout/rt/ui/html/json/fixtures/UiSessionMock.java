@@ -14,19 +14,19 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
+import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEventProcessor;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.mockito.Mockito;
 
-public class JsonSessionMock extends AbstractJsonSession {
+public class UiSessionMock extends UiSession {
   private JsonClientSession m_jsonClientSession;
   private JsonDesktop m_jsonDesktopMock;
   private JsonEventProcessor m_jsonEventProcessor;
 
-  public JsonSessionMock() {
+  public UiSessionMock() {
     init(null, null);
   }
 
@@ -37,7 +37,7 @@ public class JsonSessionMock extends AbstractJsonSession {
     Mockito.when(m_jsonClientSession.getJsonDesktop()).thenReturn(m_jsonDesktopMock);
     m_jsonEventProcessor = new JsonEventProcessor(this);
 
-    // For a fully initialized jsonSession use TestEnvironmentJsonSession
+    // For a fully initialized uiSession use TestEnvironmentUiSession
   }
 
   @SuppressWarnings("unchecked")

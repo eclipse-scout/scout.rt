@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.testing;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
+import org.eclipse.scout.rt.ui.html.UiSession;
 
-public class TestEnvironmentJsonSession extends AbstractJsonSession {
+public class TestEnvironmentUiSession extends UiSession {
 
   @Override
   protected Subject currentSubject() {

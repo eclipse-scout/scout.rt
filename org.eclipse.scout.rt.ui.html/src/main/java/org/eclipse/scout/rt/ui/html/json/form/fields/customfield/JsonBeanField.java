@@ -12,8 +12,10 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.customfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.beanfield.IBeanField;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.IJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -22,8 +24,8 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 public class JsonBeanField<T extends IBeanField<?>> extends JsonValueField<T> {
 
-  public JsonBeanField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonBeanField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override
@@ -42,7 +44,7 @@ public class JsonBeanField<T extends IBeanField<?>> extends JsonValueField<T> {
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        return getJsonSession().getJsonObjectFactory().createJsonObject(value).toJson();
+        return BEANS.get(IJsonObjectFactory.class).createJsonObject(value).toJson();
       }
     });
   }

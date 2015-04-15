@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,12 +31,12 @@ import org.mockito.Mockito;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonResponseTest {
 
-  JsonSessionMock m_jsonSession = new JsonSessionMock();
+  UiSessionMock m_uiSession = new UiSessionMock();
 
   @Test
   public void testJsonEventPropertyChangeEvent() throws JSONException {
     // Check empty response
-    JSONObject json = m_jsonSession.currentJsonResponse().toJson();
+    JSONObject json = m_uiSession.currentJsonResponse().toJson();
 
     assertNotNull(json);
     JSONArray events = json.optJSONArray(JsonResponse.PROP_EVENTS);
@@ -46,8 +46,8 @@ public class JsonResponseTest {
     final String testId = "ID007";
     final String testPropName = "a stränge prøpertÿ name";
     final String testValue = "#";
-    m_jsonSession.currentJsonResponse().addPropertyChangeEvent(testId, testPropName, testValue);
-    json = m_jsonSession.currentJsonResponse().toJson();
+    m_uiSession.currentJsonResponse().addPropertyChangeEvent(testId, testPropName, testValue);
+    json = m_uiSession.currentJsonResponse().toJson();
 
     assertNotNull(json);
     events = json.getJSONArray(JsonResponse.PROP_EVENTS);
@@ -69,8 +69,8 @@ public class JsonResponseTest {
    */
   @Test
   public void testJsonEventPropertyNullToEmptyString() throws JSONException {
-    m_jsonSession.currentJsonResponse().addPropertyChangeEvent("-1", "name", null);
-    JSONObject json = m_jsonSession.currentJsonResponse().toJson();
+    m_uiSession.currentJsonResponse().addPropertyChangeEvent("-1", "name", null);
+    JSONObject json = m_uiSession.currentJsonResponse().toJson();
     JSONArray events = json.getJSONArray(JsonResponse.PROP_EVENTS);
     JSONObject props = events.getJSONObject(0).getJSONObject("properties");
     assertEquals(props.get("name"), "");

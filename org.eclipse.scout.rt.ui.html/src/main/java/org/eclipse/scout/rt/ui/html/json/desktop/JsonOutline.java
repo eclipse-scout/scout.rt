@@ -20,10 +20,10 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.IJsonObjectFactory;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
@@ -37,8 +37,8 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
   private Set<IJsonAdapter<?>> m_jsonDetailTables = new HashSet<IJsonAdapter<?>>();
 
-  public JsonOutline(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonOutline(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+    super(model, uiSession, id, parent);
   }
 
   @Override
@@ -159,6 +159,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     }
   }
 
+  // FIXME BSH Check if this factory is really needed
   private class P_JsonOutlineTableFactory implements IJsonObjectFactory {
     private final IPage m_page;
 
@@ -168,8 +169,8 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public IJsonAdapter<Object> createJsonAdapter(Object model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-      return new JsonOutlineTable((ITable) model, jsonSession, id, new P_JsonOutlineAdapter(m_page), parent);
+    public IJsonAdapter<Object> createJsonAdapter(Object model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+      return new JsonOutlineTable((ITable) model, uiSession, id, new P_JsonOutlineAdapter(m_page), parent);
     }
 
     @Override
