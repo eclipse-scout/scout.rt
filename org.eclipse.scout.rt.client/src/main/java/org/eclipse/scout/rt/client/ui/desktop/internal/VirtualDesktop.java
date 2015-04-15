@@ -43,6 +43,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 /**
@@ -258,6 +259,14 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void openDownloadInBrowser(IDownloadHandler handler) {
+  }
+
+  @Override
+  public void openDownloadInBrowser(BinaryResource binaryResource, long validDuration) {
+  }
+
+  @Override
+  public void openDownloadInBrowser(BinaryResource binaryResource) {
   }
 
   @Override
