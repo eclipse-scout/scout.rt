@@ -214,3 +214,19 @@ Renamed IDesktop#openDownloadInBrowser to downloadResource, added overridden met
 Renamed IUrlTarget to ITargetWindows, UrlTarget to TargetWindow
 Renamed DesktopEvent#TYPE_OPEN_URL_IN_BROWSER to TYPE_OPEN_URI
 Renamed DesktopEvent#TYPE_OPEN_DOWNLOAD_IN_BROWSER to TYPE_DOWNLOAD_RESOURCE
+
+
+ASA 21.04.2015 [bug 459893: replace ValidateOnAnyKey mechanism]
+- removed:
+    IBasicField.setValidateOnAnyKey(boolean)
+    IBasicField.isValidateOnAnyKey()
+    IBasicField.PROP_VALIDATE_ON_ANY_KEY
+  use new updateDisplayTextOnModify-mechanism instead:
+    IBasicField.setUpdateDisplayTextOnModify(boolean)}
+    IBasicField.isUpdateDisplayTextOnModify(boolean)}
+    AbstractBasicField.execChangedDisplayText()}
+    IBasicField.PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY
+- IBasicFieldUIFacade renamed and changed method:
+    from: boolean setTextFromUI(String newText, boolean whileTyping);
+    to:   void setValueFromUI(String value);
+- removed IColorFieldUiFacade

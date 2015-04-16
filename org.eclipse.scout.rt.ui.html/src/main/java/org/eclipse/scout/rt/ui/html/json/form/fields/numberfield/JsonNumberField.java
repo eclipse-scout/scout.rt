@@ -28,6 +28,6 @@ public class JsonNumberField<T extends INumberField> extends JsonValueField<T> {
 
   @Override
   protected void handleUiTextChangedImpl(String displayText) {
-    getModel().getUIFacade().setTextFromUI(displayText, false);
+    getModel().getUIFacade().parseAndSetValueFromUI(displayText);
   }
 }

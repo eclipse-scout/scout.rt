@@ -36,11 +36,10 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
         return getModel().isMultilineText();
       }
     });
-    // The JSON layer uses the same property for both cases
     putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY, model) {
       @Override
       protected Boolean modelValue() {
-        return getModel().isUpdateDisplayTextOnModify(); // FIXME ASA: remove parameter whileTyping?
+        return getModel().isUpdateDisplayTextOnModify();
       }
     });
     putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_INPUT_MASKED, model) {
@@ -54,7 +53,7 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
   // FIXME AWE: (display-text) rename to handleUiValueChanged after renaming in Scout RT
   @Override
   protected void handleUiTextChangedImpl(String displayText) {
-    getModel().getUIFacade().setTextFromUI(displayText, false);
+    getModel().getUIFacade().parseAndSetValueFromUI(displayText);
   }
 
   @Override

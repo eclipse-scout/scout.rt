@@ -27,7 +27,7 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
 
   @Override
   protected void handleUiTextChangedImpl(String displayText) {
-    getModel().getUIFacade().setTextFromUI(displayText, false);
+    getModel().getUIFacade().parseAndSetValueFromUI(displayText);
   }
 
 }
