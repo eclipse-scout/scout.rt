@@ -8,15 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.html;
+package org.eclipse.scout.commons.html.internal;
+
+import org.eclipse.scout.commons.html.IStyleElement;
 
 /**
- * Marker Interface for html table
+ *
  */
-public interface IHtmlTable extends IHtmlElement {
+public class StyleElementBuilder extends HtmlNodeBuilder implements IStyleElement {
 
-  IHtmlTable cellspacing(int pixel);
+  public StyleElementBuilder(CharSequence... elements) {
+    super("style", elements);
+  }
 
-  IHtmlTable cellpadding(int pixel);
+  @Override
+  public IStyleElement type(String typeName) {
+    addAttribute("type", typeName);
+    return this;
+  }
 
 }

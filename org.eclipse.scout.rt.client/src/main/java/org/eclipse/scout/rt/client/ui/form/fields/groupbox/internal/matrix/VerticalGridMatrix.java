@@ -233,12 +233,7 @@ public class VerticalGridMatrix implements IGridMatrix {
         builder.append("PlaceHolder");
       }
       else {
-        if (cell.field == null) {
-          builder.append("No field");
-        }
-        else {
-          builder.append(cell.field.getClass().getSimpleName()).append("/").append(cell.field.getLabel()).append("\t").append(cell.field.getGridData());
-        }
+        builder.append(cell.field.getClass().getSimpleName()).append("/").append(cell.field.getLabel()).append("\t").append(cell.field.getGridData());
       }
       builder.append("\n");
     }

@@ -11,12 +11,17 @@
 package org.eclipse.scout.commons.html;
 
 /**
- * Marker Interface for html table
+ *
  */
-public interface IHtmlTable extends IHtmlElement {
+public interface IHtmlDocument extends IHtmlElement {
 
-  IHtmlTable cellspacing(int pixel);
+  public static final String HTML5_DOCTYPE = "<!DOCTYPE html>";
 
-  IHtmlTable cellpadding(int pixel);
+  IHtmlDocument doctype(CharSequence type);
+
+  /**
+   * @return HTML document with HTML5 doctype {@value #HTML5_DOCTYPE}
+   */
+  IHtmlDocument doctype();
 
 }

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.commons.html.internal.EmptyNodeBuilder;
+import org.eclipse.scout.commons.html.internal.HtmlDocumentBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlImageBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlLinkBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlListElement;
@@ -21,6 +22,7 @@ import org.eclipse.scout.commons.html.internal.HtmlNodeBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlTableBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlTableDataBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlTableRowBuilder;
+import org.eclipse.scout.commons.html.internal.StyleElementBuilder;
 
 /**
  * Convenience for building a html document or parts of it with encoded binds. <br>
@@ -32,6 +34,34 @@ public final class HTML {
    * Utility class
    */
   private HTML() {
+  }
+
+  /**
+   * Create a html element with encoded text for &lt;head&gt;text&lt;/head&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.head("text").toEncodedHtml(); <br>
+   * </p>
+   *
+   * @param text
+   *          text as bind
+   */
+  public static IHtmlContent head(CharSequence... elements) {
+    return new HtmlNodeBuilder("head", elements);
+  }
+
+  /**
+   * Create a html element with encoded text for &lt;body&gt;text&lt;/body&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.body("text").toEncodedHtml(); <br>
+   * </p>
+   *
+   * @param text
+   *          text as bind
+   */
+  public static IHtmlContent body(CharSequence... elements) {
+    return new HtmlNodeBuilder("body", elements);
   }
 
   /**
@@ -351,13 +381,13 @@ public final class HTML {
    * Creates an application local link
    * String encodedHtml = HTML.appLink("path","text").toEncodedHtml(); <br>
    *
-   * @param path
-   *          path to identify what is the link referring to.
+   * @param ref
+   *          what the link is referring to
    * @param text
    *          the link text
    */
-  public static IHtmlElement appLink(CharSequence path, CharSequence text) {
-    return span(text).appLink(path);
+  public static IHtmlElement appLink(CharSequence ref, CharSequence text) {
+    return span(text).appLink(ref);
   }
 
   /**
@@ -367,4 +397,25 @@ public final class HTML {
     return new EmptyNodeBuilder(elements);
   }
 
+  /**
+   * Creates HTML content with &ltstyle type="text/css"&gt; cssStype &lt;style&gt;
+   */
+  public static IHtmlElement cssStyle(CharSequence... cssContent) {
+    return new StyleElementBuilder(cssContent).type("text/css");
+  }
+
+  /**
+   * Creates HTML content with HTML 5 doctype: &lt!DOCTYPE
+   * html&gt;&lt;html&gt;&lt;head&gt;...&lt;/head&gt;body&gt;...&lt;/body&gt;&lt;html&gt;.
+   */
+  public static IHtmlDocument html5(CharSequence head, CharSequence body) {
+    return new HtmlDocumentBuilder(head(head), body(body)).doctype();
+  }
+
+  /**
+   * Creates HTML content with binds: &lt;html&gt;&lt;head&gt;...&lt;/head&gt;body&gt;...&lt;/body&gt;&lt;/html&gt;.
+   */
+  public static IHtmlDocument html(CharSequence head, CharSequence body) {
+    return new HtmlDocumentBuilder(head(head), body(body));
+  }
 }

@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -33,6 +35,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * This class is Thread safe
  */
 public final class DesktopProfiler {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DesktopProfiler.class);
   private static DesktopProfiler instance = new DesktopProfiler();
 
   public static DesktopProfiler getInstance() {
@@ -199,7 +202,7 @@ public final class DesktopProfiler {
       }
     }
     catch (Exception t) {
-      t.printStackTrace();
+      LOG.error("Error writing dump", t);
     }
     finally {
       if (o != System.out) {

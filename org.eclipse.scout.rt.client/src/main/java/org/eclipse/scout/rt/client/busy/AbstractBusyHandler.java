@@ -274,7 +274,6 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
       if (!isJobActive(m_future)) {
         removeBusyOperation(m_future);
       }
-      return;
     }
   }
 

@@ -11,12 +11,10 @@
 package org.eclipse.scout.commons.html;
 
 /**
- * Marker Interface for html table
+ * Marker Interface for style element
  */
-public interface IHtmlTable extends IHtmlElement {
+public interface IStyleElement extends IHtmlElement {
 
-  IHtmlTable cellspacing(int pixel);
-
-  IHtmlTable cellpadding(int pixel);
+  IStyleElement type(String typeName);
 
 }
