@@ -81,7 +81,7 @@ public class HttpBackgroundExecutable implements IHttpBackgroundExecutable {
         // ok
       }
       else {
-        m_res = new ServiceTunnelResponse(code, null, null, new HttpException(code));
+        m_res = new ServiceTunnelResponse(null, null, new HttpException(code));
         return;
       }
 

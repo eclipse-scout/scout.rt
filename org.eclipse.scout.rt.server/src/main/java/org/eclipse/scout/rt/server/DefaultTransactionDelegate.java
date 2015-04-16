@@ -40,7 +40,6 @@ import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.validate.DefaultValidator;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
@@ -131,7 +130,6 @@ public class DefaultTransactionDelegate {
    * This method is executed within a {@link IServerSession} context on behalf of a server job.
    */
   protected IServiceTunnelResponse invokeImpl(IServiceTunnelRequest serviceReq) throws Throwable {
-    String soapOperation = ServiceTunnelRequest.toSoapOperation(serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation());
     IServerSession serverSession = ServerSessionProvider.currentSession();
     String authenticatedUser = serverSession.getUserId();
     if (LOG.isDebugEnabled()) {
@@ -189,9 +187,7 @@ public class DefaultTransactionDelegate {
         }
         validateOutput(outputValidationStrategyClass.newInstance(), service, serviceOp, data, outParameters);
       }
-      //
       serviceRes = new ServiceTunnelResponse(data, outParameters, null);
-      serviceRes.setSoapOperation(soapOperation);
 
       ITransaction.CURRENT.get().registerMember(new P_ClientNotificationTransactionMember(serviceRes));
       return serviceRes;

@@ -68,13 +68,13 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
         break;
       }
       Object result = ServiceUtility.invoke(serviceOperation, service, req.getArgs());
-      return new ServiceTunnelResponse(200, result, null, null);
+      return new ServiceTunnelResponse(result, null, null);
     }
     catch (ProcessingException pe) {
-      return new ServiceTunnelResponse(200, null, null, pe);
+      return new ServiceTunnelResponse(null, null, pe);
     }
     catch (Throwable t) {
-      return new ServiceTunnelResponse(200, null, null, t);
+      return new ServiceTunnelResponse(null, null, t);
     }
   }
 
@@ -82,14 +82,16 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
   protected URLConnection createURLConnection(final IServiceTunnelRequest call, byte[] callData) throws IOException {
     URLConnection urlConn = new MockHttpURLConnection(getServerUrl()) {
       @Override
-      protected int mockHttpServlet(InputStream servletIn, OutputStream servletOut) throws Exception {
+      protected void mockHttpServlet(InputStream servletIn, OutputStream servletOut) throws Exception {
         IServiceTunnelRequest req = getContentHandler().readRequest(servletIn);
         try {
           m_runningMap.put(call.getRequestSequence(), Thread.currentThread());
           //
           ServiceTunnelResponse res = MockServiceTunnel.this.mockServiceCall(req);
+          if (res.getException() != null) {
+            throw new Exception(res.getException());
+          }
           getContentHandler().writeResponse(servletOut, res);
-          return res.getHttpCode();
         }
         finally {
           m_runningMap.remove(call.getRequestSequence());

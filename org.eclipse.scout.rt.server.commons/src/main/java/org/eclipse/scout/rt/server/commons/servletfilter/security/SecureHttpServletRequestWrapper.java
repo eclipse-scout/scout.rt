@@ -11,15 +11,16 @@
 package org.eclipse.scout.rt.server.commons.servletfilter.security;
 
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import org.eclipse.scout.commons.CollectionUtility;
+
 public class SecureHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
-  private static List<String> AUTH_TYPES = Arrays.asList(new String[]{"BASIC_AUTH", "FORM_AUTH", "CLIENT_CERT_AUTH", "DIGEST_AUTH", "NTLM"});
+  private static List<String> AUTH_TYPES = CollectionUtility.arrayList(BASIC_AUTH, FORM_AUTH, CLIENT_CERT_AUTH, DIGEST_AUTH);
 
   private final Principal m_principal;
   private final String m_authType;

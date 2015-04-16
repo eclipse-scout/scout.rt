@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.SecurityUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.UriUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -46,8 +45,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHttpServiceTunnel.class);
 
   public static final String TOKEN_AUTH_HTTP_HEADER = "X-ScoutAccessToken";
-
-  public static final String PROP_PRIVATE_KEY = "org.eclipse.scout.rt.servicetunnel.signature.privatekey";
+  public static final String PROP_PRIVATE_KEY = "scout.auth.privatekey";
   public static final String PROP_TARGET_URL = "org.eclipse.scout.rt.servicetunnel.targetUrl";
 
   private static final byte[] PRIVATE_KEY;
@@ -170,18 +168,24 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
   }
 
   protected void addSignatureHeader(URLConnection urlConn, String method, byte[] callData) throws IOException {
-    if (PRIVATE_KEY == null) {
-      // no private -> no signature
-      return;
-    }
-
     try {
-      byte[] signature = SecurityUtility.createSignature(PRIVATE_KEY, callData);
-      urlConn.setRequestProperty(TOKEN_AUTH_HTTP_HEADER, Base64Utility.encode(signature));
+      String token = createAuthToken(urlConn, method, callData);
+      if (StringUtility.hasText(token)) {
+        urlConn.setRequestProperty(TOKEN_AUTH_HTTP_HEADER, token);
+      }
     }
     catch (ProcessingException e) {
       throw new IOException(e);
     }
+  }
+
+  protected String createAuthToken(URLConnection urlConn, String method, byte[] callData) throws ProcessingException {
+    if (PRIVATE_KEY == null) {
+      // no private -> no token
+      return null;
+    }
+
+    return new DefaultAuthToken(getSession(), callData).toSignedString(PRIVATE_KEY);
   }
 
   /**

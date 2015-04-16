@@ -20,13 +20,6 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
  */
 public interface IServiceTunnelResponse extends Serializable {
 
-  String getSoapOperation();
-
-  /**
-   * @return 0 if code is unknown or >0 if code is known
-   */
-  int getHttpCode();
-
   Object getData();
 
   Object[] getOutVars();

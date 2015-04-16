@@ -66,8 +66,8 @@ public abstract class MockHttpURLConnection extends HttpURLConnection {
         @Override
         public void run() {
           try {
-            int sc = mockHttpServlet(servletIn, servletOut);
-            scRef.set(sc);
+            mockHttpServlet(servletIn, servletOut);
+            scRef.set(200);
           }
           catch (Throwable f) {
             //nop
@@ -90,10 +90,6 @@ public abstract class MockHttpURLConnection extends HttpURLConnection {
     return m_in;
   }
 
-  /**
-   * @return the http response code
-   *         write to the output stream
-   */
-  protected abstract int mockHttpServlet(InputStream servletIn, OutputStream servletOut) throws Exception;
+  protected abstract void mockHttpServlet(InputStream servletIn, OutputStream servletOut) throws Exception;
 
 }

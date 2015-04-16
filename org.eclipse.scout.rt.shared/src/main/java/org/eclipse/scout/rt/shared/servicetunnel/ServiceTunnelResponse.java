@@ -20,8 +20,6 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
 public class ServiceTunnelResponse implements IServiceTunnelResponse {
   private static final long serialVersionUID = 0L;
 
-  private transient int m_httpCode;
-  private transient String m_soapOperation;
   private Object m_data;
   private Object[] m_outVars;
   private Throwable m_exception;
@@ -34,30 +32,11 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
   }
 
   public ServiceTunnelResponse(Object data, Object[] outVars, Throwable t) {
-    this(0, data, outVars, t);
-  }
-
-  public ServiceTunnelResponse(int httpCode, Object data, Object[] outVars, Throwable t) {
-    m_httpCode = httpCode;
     m_data = data;
     if (outVars != null) {
       m_outVars = outVars;
     }
     m_exception = t;
-  }
-
-  @Override
-  public String getSoapOperation() {
-    return m_soapOperation;
-  }
-
-  public void setSoapOperation(String soapOperation) {
-    m_soapOperation = soapOperation;
-  }
-
-  @Override
-  public int getHttpCode() {
-    return m_httpCode;
   }
 
   @Override

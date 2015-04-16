@@ -14,8 +14,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.security.auth.Subject;
-
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
@@ -36,10 +34,6 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
    * @since 3.8
    */
   private final long m_requestSequence = requestSequenceGenerator.incrementAndGet();
-  /**
-   * @since 3.8
-   */
-  private transient Subject m_clientSubject;
 
   public ServiceTunnelRequest(String serviceInterfaceName, String op, Class[] parameterTypes, Object[] args) {
     m_serviceInterfaceClassName = serviceInterfaceName;
@@ -89,20 +83,6 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
   }
 
   @Override
-  public Subject getClientSubject() {
-    return m_clientSubject;
-  }
-
-  /**
-   * The subject under which the request is done
-   * <p>
-   * Client only method. The member is transient and will be null on the server.
-   */
-  public void setClientSubject(Subject requestSubject) {
-    m_clientSubject = requestSubject;
-  }
-
-  @Override
   public String getUserAgent() {
     return m_userAgent;
   }
@@ -126,7 +106,7 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("Service call " + m_serviceInterfaceClassName + "." + m_operation);
     if (m_args != null && m_args.length > 0) {
       for (int i = 0; i < m_args.length; i++) {
@@ -134,40 +114,6 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
         buf.append("arg[" + i + "]=" + VerboseUtility.dumpObject(m_args[i]));
       }
     }
-    return buf.toString();
-  }
-
-  /**
-   * @return a single string with all package parts reduced to their first character,
-   *         except the last package fragment. All is concatenated together with _ instead of '.' and the method name is
-   *         appended with '__'
-   *         <p>
-   *         Example for IPingService is "oesrssc_ping_IPingService__ping"
-   */
-  public static String toSoapOperation(String className, String methodName) {
-    if (className == null || methodName == null) {
-      return null;
-    }
-    int i = className.lastIndexOf('.');
-    if (i < 0) {
-      return className + "__" + methodName;
-    }
-    String simpleName = className.substring(i + 1);
-    String packageName = className.substring(0, i);
-    i = packageName.lastIndexOf('.');
-    if (i < 0) {
-      return packageName + "_" + simpleName + "__" + methodName;
-    }
-    StringBuilder buf = new StringBuilder();
-    for (String s : packageName.substring(0, i).split("[.]")) {
-      buf.append(s.charAt(0));
-    }
-    buf.append("_");
-    buf.append(packageName.substring(i + 1));
-    buf.append("_");
-    buf.append(simpleName);
-    buf.append("__");
-    buf.append(methodName);
     return buf.toString();
   }
 }

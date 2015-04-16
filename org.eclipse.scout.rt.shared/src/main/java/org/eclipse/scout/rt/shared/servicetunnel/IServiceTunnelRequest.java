@@ -14,8 +14,6 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.security.auth.Subject;
-
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
@@ -44,13 +42,6 @@ public interface IServiceTunnelRequest extends Serializable {
   Object[] getArgs();
 
   Locale getLocale();
-
-  /**
-   * The subject under which the request is done
-   * <p>
-   * Client only method. The member is transient and will be null on the server.
-   */
-  Subject getClientSubject();
 
   /**
    * Represents the user interface on client side.<br/>
