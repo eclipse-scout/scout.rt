@@ -9,10 +9,27 @@ scout.DetachHelper = function() {
 
 scout.DetachHelper.prototype.beforeDetach = function($container) {
   this._storeScrollPositions($container);
+  this._storeFocus($container);
 };
 
 scout.DetachHelper.prototype.afterAttach = function($container) {
   this._restoreScrollPositions($container);
+  this._restoreFocus($container);
+};
+
+scout.DetachHelper.prototype._storeFocus = function($container) {
+  if($container.find(':focus')){
+    var $focusedElement =$container.find(':focus');
+    $container.data('lastFocus', $focusedElement);
+    $.log.debug('Stored focus ' + $focusedElement.attr('class'));
+  }
+};
+
+scout.DetachHelper.prototype._restoreFocus = function($container) {
+  if($container.data('lastFocus')){
+    $container.data('lastFocus').focus();
+    $.log.debug('Restored focus on ' + $container.data('lastFocus').attr('class'));
+  }
 };
 
 scout.DetachHelper.prototype._storeScrollPositions = function($container) {
@@ -28,7 +45,7 @@ scout.DetachHelper.prototype._storeScrollPositions = function($container) {
       scrollLeft = this._$scrollables[i].scrollLeft();
       this._$scrollables[i].data('scrollLeft', this._$scrollables[i].scrollLeft());
 
-      $.log.debug('Stored scroll position for ' + this._$scrollables[i].attr('class') + '. Top: ' + scrollTop +'. Left: ' + scrollLeft);
+      $.log.debug('Stored scroll position for ' + this._$scrollables[i].attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
     }
   }
 };
@@ -55,7 +72,7 @@ scout.DetachHelper.prototype._restoreScrollPositions = function($container) {
       // Introduced for use case: Open large table page, edit entry, press f5
       // -> outline tab gets rendered, scrollbar gets updated with set timeout, outline tab gets detached -> update event never had any effect because it executed after detaching (due to set timeout)
       scout.scrollbars.update(this._$scrollables[i]);
-      $.log.debug('Restored scroll position for ' + this._$scrollables[i].attr('class') + '. Top: ' + scrollTop +'. Left: ' + scrollLeft);
+      $.log.debug('Restored scroll position for ' + this._$scrollables[i].attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
     }
   }
 };
