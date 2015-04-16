@@ -411,9 +411,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
    * <code>init()</code> method
    * on the created instance.
    */
-  @SuppressWarnings("unchecked")
   public <M, A extends IJsonAdapter<? super M>> A newJsonAdapter(M model, IJsonAdapter<?> parent) {
     String id = createUniqueIdFor(null); // FIXME CGU
+    @SuppressWarnings("unchecked")
     A adapter = (A) MainJsonObjectFactory.get().createJsonAdapter(model, this, id, parent);
     adapter.init();
     return adapter;
