@@ -245,7 +245,8 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     if (handler == null) {
       return; // FIXME AWE: (download) remove this null if?
     }
-    manageDownloadHandlers();
+    manageDownloadHandlers(); // FIXME AWE: (download) remove handler after timeout -> job? mit BSH besprechen, wäre es nicht besser nur
+    // 1 clean-up job pro UI server zu haben? oder evtl. den poller job benutzen?
     String fileName = handler.getResource().getFilename();
     m_downloadHandlers.put(fileName, handler);
     String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, fileName);
@@ -253,16 +254,15 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   @Override
-  public BinaryResource loadDynamicResource(String fileName) {
+  public BinaryResource getBinaryResource(String fileName) {
     manageDownloadHandlers();
     IDownloadHandler handler = m_downloadHandlers.get(fileName);
     if (handler != null) {
-      BinaryResource binaryResource = handler.getResource();
-      if (binaryResource != null) {
-        return binaryResource;
-      }
+      return handler.getResource();
     }
-    return null;
+    else {
+      return null;
+    }
   }
 
   protected void manageDownloadHandlers() {

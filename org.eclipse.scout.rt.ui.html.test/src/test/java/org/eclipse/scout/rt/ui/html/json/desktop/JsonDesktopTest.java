@@ -16,10 +16,12 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -279,6 +281,28 @@ public class JsonDesktopTest {
     JSONObject json = jsonDesktop.toJson();
     String outlineId = json.optString("outline", null);
     assertNull(outlineId);
+  }
+
+  static class P_DownloadHandler implements IDownloadHandler {
+    @Override
+    public boolean isActive() {
+      return true;
+    }
+
+    @Override
+    public BinaryResource getResource() {
+      return new BinaryResource("foo.txt", null);
+    }
+  }
+
+  @Test
+  public void testHandleModelDownloadResource() throws Exception {
+    IDesktop desktop = new DesktopWithNonDisplayableOutline();
+    desktop.initDesktop();
+    JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
+    jsonDesktop.handleModelDownloadResource(new P_DownloadHandler());
+    JSONObject json = m_uiSession.currentJsonResponse().toJson();
+//    JSONObject event = json.getJSONArray("events").get(0);
   }
 
 }

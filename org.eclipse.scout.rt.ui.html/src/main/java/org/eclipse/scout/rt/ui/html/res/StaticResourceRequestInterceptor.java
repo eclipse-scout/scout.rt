@@ -281,7 +281,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       return null;
     }
     IBinaryResourceProvider provider = (IBinaryResourceProvider) jsonAdapter;
-    BinaryResource binaryResource = provider.loadDynamicResource(filename);
+    BinaryResource binaryResource = provider.getBinaryResource(filename);
     if (binaryResource == null) {
       return null;
     }

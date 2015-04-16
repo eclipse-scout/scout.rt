@@ -14,5 +14,5 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
  */
 public interface IBinaryResourceProvider {
 
-  BinaryResource loadDynamicResource(String filename);
+  BinaryResource getBinaryResource(String fileName);
 }
