@@ -38,6 +38,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
   public static final String PROP_DISPLAY_HINT = "displayHint";
   public static final String PROP_DISPLAY_VIEW_ID = "displayViewId";
   public static final String PROP_CLOSABLE = "closable";
+  public static final String PROP_FOCUS_REQUESTER_ELEMENT = "focusRequesterElement";
 
   private FormListener m_formListener;
 
@@ -129,6 +130,9 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
       case FormEvent.TYPE_CLOSED:
         handleModelFormClosed(event.getForm());
         break;
+      case FormEvent.TYPE_REQUEST_FOCUS:
+        handleModelRequestFocus(event.getFormField());
+        break;
       default:
         // NOP
     }
@@ -142,6 +146,12 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
     // it would be deleted automatically from the JSON response. This is a special case
     // where we explicitly want to send an event for an already disposed adapter.
     addActionEvent("formClosed", new JSONObject());
+  }
+
+  protected void handleModelRequestFocus(IFormField formField) {
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_FOCUS_REQUESTER_ELEMENT, getAdapter(formField).getId());
+    addActionEvent("requestFocus", jsonEvent);
   }
 
   @Override

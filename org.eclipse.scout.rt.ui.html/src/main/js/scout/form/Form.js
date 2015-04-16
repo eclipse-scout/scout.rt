@@ -118,10 +118,21 @@ scout.Form.prototype._onFormClosed = function(event) {
   this.destroy();
 };
 
+scout.Form.prototype._onRequestFocus = function(formFieldId) {
+  var formField = this.session.getOrCreateModelAdapter(formFieldId, this);
+  if (formField) {
+    formField.$field.focus();
+  }
+};
+
 scout.Form.prototype.onModelAction = function(event) {
   if (event.type === 'formClosed') {
     this._onFormClosed(event);
-  } else {
+  }
+  else if (event.type === 'requestFocus') {
+    this._onFormClosed(event.focusRequesterElement);
+  }
+  else {
     $.log.warn('Model event not handled. Widget: Form. Event: ' + event.type + '.');
   }
 };
