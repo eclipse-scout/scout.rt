@@ -510,20 +510,24 @@ public class JsonTableTest {
   }
 
   @Test
-  public void testRowFilterWithUpdates() throws ProcessingException, JSONException {
+  public void testRowFilterWithUpdates() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(3);
     table.initTable();
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
-    ITableRow row = table.getRow(0);
+    // Simulate that the full table is sent to the UI
+    jsonTable.toJson();
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    JsonTestUtility.endRequest(m_uiSession);
 
+    // Now filter the first row
+    ITableRow row = table.getRow(0);
     String row0Id = jsonTable.getOrCreatedRowId(row);
     assertNotNull(row0Id);
     assertNotNull(jsonTable.getTableRowForRowId(row0Id));
 
     table.addRowFilter(new ITableRowFilter() {
-
       @Override
       public boolean accept(ITableRow r) {
         return r.getRowIndex() > 0; // hide first row
@@ -539,7 +543,7 @@ public class JsonTableTest {
     assertEquals(0, m_uiSession.currentJsonResponse().getEventList().size());
     assertEquals(2, jsonTable.eventBuffer().size()); // TYPE_ROW_FILTER_CHANGED + TYPE_ROWS_UPDATED
 
-    // Only one deletion event should be emitted (no update event!)
+    // Filtering is implemented by Only one deletion event should be emitted (no update event!)
     JsonTestUtility.processBufferedEvents(m_uiSession);
     assertEquals(1, m_uiSession.currentJsonResponse().getEventList().size());
     assertEquals("rowsDeleted", m_uiSession.currentJsonResponse().getEventList().get(0).getType());
