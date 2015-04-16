@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
-import org.eclipse.scout.rt.client.ui.desktop.IUrlTarget;
+import org.eclipse.scout.rt.client.ui.desktop.ITargetWindow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -248,25 +248,25 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void openUrlInBrowser(String url) {
+  public void openUri(String url) {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public void openUrlInBrowser(String url, IUrlTarget target) {
+  public void openUri(String url, ITargetWindow target) {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public void openDownloadInBrowser(IDownloadHandler handler) {
+  public void downloadResource(IDownloadHandler handler) {
   }
 
   @Override
-  public void openDownloadInBrowser(BinaryResource binaryResource, long validDuration) {
+  public void downloadResource(BinaryResource binaryResource, long validDuration) {
   }
 
   @Override
-  public void openDownloadInBrowser(BinaryResource binaryResource) {
+  public void downloadResource(BinaryResource binaryResource) {
   }
 
   @Override

@@ -5,7 +5,7 @@ import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 /**
  * Used by {@link IDesktop#createDownloadUrl(String, IDownloadHandler)} in order to create a dynamic url for a file
  * download
- * that can be opened with {@link IDesktop#openUrlInBrowser(String)}
+ * that can be opened with {@link IDesktop#openUri(String)}
  *
  * @since 5.0
  */

@@ -1354,13 +1354,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void openUrlInBrowser(String url) {
-    openUrlInBrowser(url, null);
+  public void openUri(String url) {
+    openUri(url, TargetWindow.AUTO);
   }
 
   @Override
-  public void openUrlInBrowser(String url, IUrlTarget target) {
-    if (!UserAgentUtility.isWebClient()) {
+  public void openUri(String url, ITargetWindow target) {
+    if (UserAgentUtility.isWebClient()) {
+      fireOpenUri(url, target);
+    }
+    else {
       try {
         BEANS.get(IShellService.class).shellOpen(url);
       }
@@ -1368,23 +1371,20 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
-    else {
-      if (target == null) {
-        target = UrlTarget.AUTO;
-      }
-      fireOpenUrlInBrowser(url, target);
-    }
   }
 
   @Override
-  public void openDownloadInBrowser(IDownloadHandler handler) {
+  public void downloadResource(IDownloadHandler handler) {
     if (UserAgentUtility.isWebClient()) {
-      fireOpenDownloadInBrowser(handler);
+      fireDownloadResource(handler);
+    }
+    else {
+      throw new UnsupportedOperationException("downloadResource is only supported by Html UI");
     }
   }
 
   @Override
-  public void openDownloadInBrowser(final BinaryResource binaryResource, long validDuration) {
+  public void downloadResource(final BinaryResource binaryResource, long validDuration) {
     final long validUntil = System.currentTimeMillis() + validDuration;
     IDownloadHandler handler = new IDownloadHandler() {
 
@@ -1402,12 +1402,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         return binaryResource;
       }
     };
-    openDownloadInBrowser(handler);
+    downloadResource(handler);
   }
 
   @Override
-  public void openDownloadInBrowser(BinaryResource binaryResource) {
-    openDownloadInBrowser(binaryResource, TimeUnit.MINUTES.toMillis(1));
+  public void downloadResource(BinaryResource binaryResource) {
+    downloadResource(binaryResource, TimeUnit.MINUTES.toMillis(1));
   }
 
   @Override
@@ -1663,13 +1663,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(e);
   }
 
-  private void fireOpenUrlInBrowser(String path, IUrlTarget target) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URL_IN_BROWSER, path, target);
+  private void fireOpenUri(String uri, ITargetWindow target) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URI, uri, target);
     fireDesktopEvent(e);
   }
 
-  private void fireOpenDownloadInBrowser(IDownloadHandler handler) {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_DOWNLOAD_IN_BROWSER, handler);
+  private void fireDownloadResource(IDownloadHandler handler) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_DOWNLOAD_RESOURCE, handler);
     fireDesktopEvent(e);
   }
 

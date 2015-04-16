@@ -57,18 +57,17 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   public static final int TYPE_PRINTED = 901;
   public static final int TYPE_FILE_CHOOSER_ADDED = 910;
   /**
-   * Creates and opens a browser window to download a static resource or opens an url via user interface (only supported
-   * in web ui).
+   * Opens a given URI.
    *
-   * @see IDesktop#openUrlInBrowser(String)
+   * @see IDesktop#openUri(String)
    */
-  public static final int TYPE_OPEN_URL_IN_BROWSER = 920;
+  public static final int TYPE_OPEN_URI = 920;
   /**
-   * Creates and opens a browser window to download a resource (only supported in web ui).
+   * Downloads a resource using a given download handler.
    *
-   * @see IDesktop#openDownloadInBrowser(IDownloadHandler)
+   * @see IDesktop#downloadResource(IDownloadHandler)
    */
-  public static final int TYPE_OPEN_DOWNLOAD_IN_BROWSER = 921;
+  public static final int TYPE_DOWNLOAD_RESOURCE = 921;
   /**
    * Send a broadcast event to find the {@link IFormField} that owns the focus
    * The listener can store the result using {@link #setFocusedField()} The event waits some time to give asynchronous
@@ -109,12 +108,12 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   private IFormField m_focusedField;
   private IMessageBox m_messageBox;
   private IFileChooser m_fileChooser;
-  private String m_path;
+  private String m_uri;
   private PrintDevice m_printDevice;
   private Map<String, Object> m_printParameters;
   private List<IMenu> m_popupMenus;
   private File m_printedFile;
-  private IUrlTarget m_urlTarget;
+  private ITargetWindow m_target;
   private IDownloadHandler m_downloadHandler;
 
   public DesktopEvent(IDesktop source, int type) {
@@ -147,10 +146,10 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     m_fileChooser = fc;
   }
 
-  public DesktopEvent(IDesktop source, int type, String path, IUrlTarget urlTarget) {
+  public DesktopEvent(IDesktop source, int type, String uri, ITargetWindow target) {
     this(source, type);
-    m_path = path;
-    m_urlTarget = urlTarget;
+    m_uri = uri;
+    m_target = target;
   }
 
   public DesktopEvent(IDesktop source, int type, PrintDevice printDevice, Map<String, Object> printParameters) {
@@ -191,12 +190,12 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     return m_fileChooser;
   }
 
-  public String getPath() {
-    return m_path;
+  public String getUri() {
+    return m_uri;
   }
 
-  public IUrlTarget getUrlTarget() {
-    return m_urlTarget;
+  public ITargetWindow getTarget() {
+    return m_target;
   }
 
   public IDownloadHandler getDownloadHandler() {

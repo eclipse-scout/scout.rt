@@ -447,48 +447,42 @@ public interface IDesktop extends IPropertyObserver {
   void addFileChooser(IFileChooser fc);
 
   /**
-   * Opens the link in the browser.
+   * Opens the given URI (http:, tel:, mailto:, etc.).
    */
-  void openUrlInBrowser(String url);
+  void openUri(String uri);
 
   /**
-   * Opens the link in the browser.
+   * Opens the given URI (http:, tel:, mailto:, etc.), the given target controls whether or
+   * not the URI is opened in a new window.
+   *
+   * @param target
+   *          where the URI should be opened
+   */
+  void openUri(String uri, ITargetWindow target);
+
+  /**
+   * Downloads the resource provided by the given download handler.
    *
    * @param target
    *          used to specify where the url should be opened. Only considered by the web ui.
    */
-  void openUrlInBrowser(String uri, IUrlTarget target);
-
-  // FIXME AWE: (download) rename to openUri (since tel:079... is an URI but not an URL)
-
-  // FIXME AWE: (download) add method openUri(URI)
+  void downloadResource(IDownloadHandler handler);
 
   /**
-   * Opens the download in the browser.
+   * Downloads the given binary resource. Download handler is valid for 1 minute.
    *
-   * @param target
-   *          used to specify where the url should be opened. Only considered by the web ui.
+   * @param binaryResource
    */
-  void openDownloadInBrowser(IDownloadHandler handler);
+  void downloadResource(BinaryResource binaryResource);
 
   /**
-   * Instructs the UI client to download the given binary resource. Download handler is valid for the given time in
-   * milliseconds.
+   * Downloads the given binary resource. Download handler is valid for the given time in milliseconds.
    *
    * @param binaryResource
    * @param validDuration
    *          milliseconds
    */
-  void openDownloadInBrowser(BinaryResource binaryResource, long validDuration);
-
-  /**
-   * Instructs the UI client to download the given binary resource. Download handler is valid for 1 minute.
-   *
-   * @param binaryResource
-   */
-  void openDownloadInBrowser(BinaryResource binaryResource);
-
-  // FIXME AWE: rename these methods to openResource, downloadResource (!), startDownload
+  void downloadResource(BinaryResource binaryResource, long validDuration);
 
   /**
    * Prints the desktop
