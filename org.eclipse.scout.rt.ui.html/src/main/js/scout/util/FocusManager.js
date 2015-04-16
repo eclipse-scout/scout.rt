@@ -112,11 +112,11 @@ scout.FocusManager.prototype.checkFocusContextIsActive = function(focusContext) 
 };
 scout.FocusManager.prototype.validateFocus = function(uiSessionId, caller) {
   $.log.warn('validate focus, caller: '+caller);
-  if (this._sessionFocusContexts[uiSessionId].focusContexts.length > 0) {
-    var context = this._sessionFocusContexts[uiSessionId].focusContexts[this._sessionFocusContexts[uiSessionId].focusContexts.length - 1];
-    $.log.warn('validate focus, caller: '+caller);
-    context._validateFocus();
-  }
+//  if (this._sessionFocusContexts[uiSessionId].focusContexts.length > 0) {
+//    var context = this._sessionFocusContexts[uiSessionId].focusContexts[this._sessionFocusContexts[uiSessionId].focusContexts.length - 1];
+//    $.log.warn('validate focus, caller: '+caller);
+//    context._validateFocus();
+//  }
 };
 
 scout.FocusContext = function($container, $focusedElement, uiSessionId, isRoot) {
