@@ -195,8 +195,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
     else {
       // No client session for the requested ID was found, so create one and store it in the map
       LOG.info("Creating new client session [clientSessionId=" + m_clientSessionId + "]");
-      clientSession = createClientSession(request.getLocale(), createUserAgent(jsonStartupRequest));
-      initCustomParams(clientSession, jsonStartupRequest.getCustomParams());
+      clientSession = createClientSession(request.getLocale(), createUserAgent(jsonStartupRequest), extractSessionInitParams(jsonStartupRequest.getCustomParams()));
     }
     return clientSession;
   }
@@ -230,9 +229,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
     return CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX + m_clientSessionId;
   }
 
-  protected IClientSession createClientSession(Locale locale, UserAgent userAgent) {
+  protected IClientSession createClientSession(Locale locale, UserAgent userAgent, Map<String, String> sessionInitParams) {
     try {
-      return BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().locale(locale).userAgent(userAgent));
+      ClientRunContext ctx = ClientRunContexts.empty().locale(locale).userAgent(userAgent);
+      for (Map.Entry<String, String> e : sessionInitParams.entrySet()) {
+        ctx.propertyMap().put(e.getKey(), e.getValue());
+      }
+      return BEANS.get(ClientSessionProvider.class).provide(ctx);
     }
     catch (ProcessingException e) {
       throw new JsonException("Error while creating new client session for clientSessionId=" + m_clientSessionId, e);
@@ -240,10 +243,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
   }
 
   /**
-   * initialize the properties of the {@link IClientSession} but does not yet start it
-   * {@link IClientSession#startSession(org.osgi.framework.Bundle)} was not yet called
+   * extract the params used to create a new {@link IClientSession}
    */
-  protected void initCustomParams(IClientSession clientSession, JSONObject customParams) {
+  protected Map<String, String> extractSessionInitParams(JSONObject customParams) {
     Map<String, String> customParamsMap = new HashMap<String, String>();
     if (customParams != null) {
       JSONArray names = customParams.names();
@@ -251,7 +253,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
         customParamsMap.put(names.optString(i), customParams.optString(names.optString(i)));
       }
     }
-    clientSession.initCustomParams(customParamsMap);
+    return customParamsMap;
   }
 
   protected void initializeJsonClientSession(IClientSession clientSession) {
