@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.testing.platform.runner.statement.PlatformStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
@@ -34,6 +35,9 @@ import org.junit.runners.model.Statement;
 /**
  * Use this Runner to run tests which require the platform to be started.
  * The {@link Platform#setDefault()} is started {@link IPlatform#start(Class)} without an application.
+ * <p/>
+ * Use {@link RunWithPrivatePlatform} to control whether the platform used for this test execution is shared or private.
+ * Default is shared.
  * <p/>
  * Use <code>RunWithSubject</code> annotation to specify the user to run the test. This annotation can be defined on
  * class or method-level. If defining the user on class-level, all test-methods inherit that user.
@@ -53,37 +57,13 @@ import org.junit.runners.model.Statement;
  */
 public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
-  private IPlatform m_platformBackup;
-
   public PlatformTestRunner(final Class<?> clazz) throws InitializationError {
     super(clazz);
   }
 
   @Override
   protected Statement classBlock(final RunNotifier notifier) {
-    return new Statement() {
-      @Override
-      public void evaluate() throws Throwable {
-        try {
-          m_platformBackup = Platform.get();
-          Platform.setDefault();
-          try {
-            Platform.get().start(null);
-            //
-            Statement inner = PlatformTestRunner.super.classBlock(notifier);
-            if (inner != null) {
-              inner.evaluate();
-            }
-          }
-          finally {
-            Platform.get().stop();
-          }
-        }
-        finally {
-          Platform.set(m_platformBackup);
-        }
-      }
-    };
+    return new PlatformStatement(super.classBlock(notifier), ReflectionUtility.getAnnotation(RunWithPrivatePlatform.class, getTestClass().getJavaClass()));
   }
 
   @Override

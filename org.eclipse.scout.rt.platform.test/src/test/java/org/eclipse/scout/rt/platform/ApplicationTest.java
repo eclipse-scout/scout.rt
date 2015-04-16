@@ -17,18 +17,25 @@ import org.junit.Test;
 public class ApplicationTest {
 
   @Test
-  public void test() {
-    IPlatform p = Platform.get();
+  public void testStartApplication() {
+    // backup current platform
+    IPlatform backup = Platform.get();
     try {
-      Platform.setDefault();
-      Platform.get().start(TestApplication.class);
+      try {
+        Platform.setDefault();
+        Platform.get().start(TestApplication.class);
 
-      Assert.assertEquals(TestApplication.getInstance().getClass(), TestApplication.class);
+        Assert.assertEquals(TestApplication.getInstance().getClass(), TestApplication.class);
+      }
+      finally {
+        Platform.get().stop();
+      }
+      // Platform.get() is null after stopping it
+      Assert.assertNull(Platform.get());
     }
     finally {
-      Platform.get().stop();
+      // restore previous platform
+      Platform.set(backup);
     }
-    Assert.assertSame(Platform.get(), p);
   }
-
 }
