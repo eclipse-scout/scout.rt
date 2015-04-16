@@ -202,3 +202,15 @@ Refactored editable behaviour of cells.
   Advantage: It's now possible to modify the cell properties outside of execDecorateCell. Furthermore, there is no need to execute this code so many times.
 - Removed ICell.setEnabled
   Did not have any effect, use row.setEnabled instead. Or ICell.setEditable if you would like to control editability of a cell.
+
+AWE 15.04.2015
+AbstractContentAssistField and IProposalChooser implementations now have the ability to provide an inner class which extend AbstractTree
+or AbstractTable to provide a custom implementation used in the proposal chooser.
+
+AWE 16.04.2015
+Renamed IDesktop#openUrlInBrowser to openUri, since passed String is not always an URL but sometimes an URI like tel:123 or mailto:foo@bar.com, etc.
+Renamed IDesktop#openDownloadInBrowser to downloadResource, added overridden methods with BinaryResource parameter, so it's not required to create
+  a IDownloadHandler instance to use the download methods.
+Renamed IUrlTarget to ITargetWindows, UrlTarget to TargetWindow
+Renamed DesktopEvent#TYPE_OPEN_URL_IN_BROWSER to TYPE_OPEN_URI
+Renamed DesktopEvent#TYPE_OPEN_DOWNLOAD_IN_BROWSER to TYPE_DOWNLOAD_RESOURCE

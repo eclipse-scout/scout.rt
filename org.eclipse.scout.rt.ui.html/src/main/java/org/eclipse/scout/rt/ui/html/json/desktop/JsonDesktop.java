@@ -24,8 +24,8 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
-import org.eclipse.scout.rt.client.ui.desktop.IUrlTarget;
-import org.eclipse.scout.rt.client.ui.desktop.UrlTarget;
+import org.eclipse.scout.rt.client.ui.desktop.ITargetWindow;
+import org.eclipse.scout.rt.client.ui.desktop.TargetWindow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
@@ -212,11 +212,11 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
       case DesktopEvent.TYPE_FORM_ENSURE_VISIBLE:
         handleModelFormEnsureVisible(event.getForm());
         break;
-      case DesktopEvent.TYPE_OPEN_URL_IN_BROWSER:
-        handleModelOpenUrlInBrowser(event.getPath(), event.getUrlTarget());
+      case DesktopEvent.TYPE_OPEN_URI:
+        handleModelOpenUri(event.getUri(), event.getTarget());
         break;
-      case DesktopEvent.TYPE_OPEN_DOWNLOAD_IN_BROWSER:
-        handleModelOpenDownloadInBrowser(event.getDownloadHandler());
+      case DesktopEvent.TYPE_DOWNLOAD_RESOURCE:
+        handleModelDownloadResource(event.getDownloadHandler());
         break;
       case DesktopEvent.TYPE_MESSAGE_BOX_ADDED:
         handleModelMessageBoxAdded(event.getMessageBox());
@@ -229,34 +229,37 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     }
   }
 
-  protected void handleModelOpenUrlInBrowser(String path, IUrlTarget urlTarget) {
+  protected void handleModelOpenUri(String uri, ITargetWindow target) {
+    // Note: property 'target' is reserved by Scouts JSON protocol
     JSONObject json = new JSONObject();
-    putProperty(json, "path", path);
-    putProperty(json, "urlTarget", urlTarget.toString());
-    addActionEvent("openUrlInBrowser", json);
+    putProperty(json, "uri", uri);
+    putProperty(json, "uriTarget", target.getIdentifier());
+    addActionEvent("openUri", json);
   }
 
-  protected void handleModelOpenDownloadInBrowser(IDownloadHandler handler) {
+  /**
+   * Target for download URL is AUTO because it depends on the type of browser if the browser opens a new window for the
+   * downloaded resource or if the download is processed in the same window as the Scout application.
+   */
+  protected void handleModelDownloadResource(IDownloadHandler handler) {
     if (handler == null) {
       return; // FIXME AWE: (download) remove this null if?
     }
     manageDownloadHandlers();
-    m_downloadHandlers.put(handler.getResource().getFilename(), handler);
-    String path = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, handler.getResource().getFilename());
-    JSONObject json = new JSONObject();
-    putProperty(json, "path", path);
-    putProperty(json, "urlTarget", UrlTarget.AUTO); // FIXME AWE: document why it must be AUTO, unit-test
-    addActionEvent("openUrlInBrowser", json);
+    String fileName = handler.getResource().getFilename();
+    m_downloadHandlers.put(fileName, handler);
+    String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, fileName);
+    handleModelOpenUri(downloadUrl, TargetWindow.AUTO); // FIXME AWE: (download) unit-test AUTO
   }
 
   @Override
-  public BinaryResource loadDynamicResource(String filename) {
+  public BinaryResource loadDynamicResource(String fileName) {
     manageDownloadHandlers();
-    IDownloadHandler handler = m_downloadHandlers.get(filename);
+    IDownloadHandler handler = m_downloadHandlers.get(fileName);
     if (handler != null) {
-      BinaryResource res = handler.getResource();
-      if (res != null) {
-        return res;
+      BinaryResource binaryResource = handler.getResource();
+      if (binaryResource != null) {
+        return binaryResource;
       }
     }
     return null;

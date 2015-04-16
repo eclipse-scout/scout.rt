@@ -283,24 +283,22 @@ scout.Desktop.prototype._showForm = function(form) {
   }
 };
 
-scout.Desktop.UrlTarget = {
+scout.Desktop.TargetWindow = {
   AUTO: 'AUTO',
   SELF: 'SELF',
   BLANK: 'BLANK'
 };
 
-scout.Desktop.prototype._openUrlInBrowser = function(event) {
-  if (!event.path) {
+scout.Desktop.prototype._openUri = function(event) {
+  if (!event.uri) {
     return;
   }
-  var newWindow = false,
-    requestedTarget = event.urlTarget;
-
-  if (scout.Desktop.UrlTarget.BLANK === requestedTarget) {
+  var newWindow = false;
+  if (scout.Desktop.TargetWindow.BLANK === event.uriTarget) {
     newWindow = true;
-  } else if (scout.Desktop.UrlTarget.SELF === requestedTarget) {
+  } else if (scout.Desktop.TargetWindow.SELF === event.uriTarget) {
     newWindow = false;
-  } else if (scout.Desktop.UrlTarget.AUTO === requestedTarget) {
+  } else if (scout.Desktop.TargetWindow.AUTO === event.uriTarget) {
     // this is important for download resources with Firefox. Firefox cancels all running
     // requests (also the background polling job) when a resource is opened in the same
     // windows as the Scout application. This would lead to a connection failure, thus
@@ -309,11 +307,11 @@ scout.Desktop.prototype._openUrlInBrowser = function(event) {
     newWindow = !scout.device.supportsDownloadInSameWindow();
   }
 
-  $.log.debug('(Desktop#_openUrlInBrowser) path=' + event.path + ' urlTarget=' + event.urlTarget + ' newWindow=' + newWindow);
+  $.log.debug('(Desktop#_openUri) uri=' + event.uri + ' target=' + event.uriTarget + ' newWindow=' + newWindow);
   if (newWindow) {
-    window.open(event.path);
+    window.open(event.uri);
   } else {
-    window.location.href = event.path;
+    window.location.href = event.uri;
   }
 };
 
@@ -433,8 +431,8 @@ scout.Desktop.prototype.onModelAction = function(event) {
     this.navigation.onSearchPerformed(event);
   } else if (event.type === 'messageBoxAdded') {
     this._renderMessageBox(this.session.getOrCreateModelAdapter(event.messageBox, this));
-  } else if (event.type === 'openUrlInBrowser') {
-    this._openUrlInBrowser(event);
+  } else if (event.type === 'openUri') {
+    this._openUri(event);
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }

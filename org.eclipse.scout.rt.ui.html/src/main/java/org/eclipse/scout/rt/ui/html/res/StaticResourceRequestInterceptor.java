@@ -91,7 +91,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   @Override
   public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String pathInfo = resolvePathInfo(req);
-    LOG.debug("processing static resource: " + pathInfo);
+    LOG.debug("processing resource request: " + pathInfo);
 
     // lookup cache or load
     IHttpCacheControl httpCacheControl = servlet.getHttpCacheControl();
@@ -281,15 +281,15 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       return null;
     }
     IBinaryResourceProvider provider = (IBinaryResourceProvider) jsonAdapter;
-    BinaryResource content0 = provider.loadDynamicResource(filename);
-    if (content0 == null) {
+    BinaryResource binaryResource = provider.loadDynamicResource(filename);
+    if (binaryResource == null) {
       return null;
     }
-    String contentType = content0.getContentType();
+    String contentType = binaryResource.getContentType();
     if (contentType == null) {
       contentType = detectContentType(servlet, pathInfo);
     }
-    BinaryResource content = new BinaryResource(pathInfo, contentType, content0.getContent(), content0.getLastModified());
+    BinaryResource content = new BinaryResource(pathInfo, contentType, binaryResource.getContent(), binaryResource.getLastModified());
 
     // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
     return new HttpCacheObject(pathInfo, content.getLastModified() > 0, -1, content);
