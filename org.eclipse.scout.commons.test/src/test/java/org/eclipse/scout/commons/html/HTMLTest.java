@@ -97,7 +97,7 @@ public class HTMLTest {
   public void testTableAttributesNoBinds() {
     final IHtmlTable table = HTML.table(
         row(
-        cell(BIND_TEXT))
+            cell(BIND_TEXT))
         ).cellspacing(1).cellpadding(2);
 
     assertEquals("<table cellspacing=\"1\" cellpadding=\"2\"><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", table.toEncodedHtml());
@@ -206,6 +206,11 @@ public class HTMLTest {
     String expected = "<!DOCTYPE html><html><head><style type=\"text/css\">" + sampleCSS + "</style>"
         + "</head><body>" + ENCODED_BIND_TEXT + "</body></html>";
     assertEquals(expected, html.toEncodedHtml());
+  }
+
+  @Test
+  public void testPlain() {
+    assertEquals(BIND_TEXT, HTML.plain(BIND_TEXT).toEncodedHtml());
   }
 
 }

@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.html.internal.HtmlImageBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlLinkBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlListElement;
 import org.eclipse.scout.commons.html.internal.HtmlNodeBuilder;
+import org.eclipse.scout.commons.html.internal.HtmlPlainBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlTableBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlTableDataBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlTableRowBuilder;
@@ -418,4 +419,12 @@ public final class HTML {
   public static IHtmlDocument html(CharSequence head, CharSequence body) {
     return new HtmlDocumentBuilder(head(head), body(body));
   }
+
+  /**
+   * Creates HTML content that will not be encoded with {@link IHtmlContent#toEncodedHtml()}. <b>Use with caution!</b>
+   */
+  public static IHtmlContent plain(CharSequence... text) {
+    return new HtmlPlainBuilder(text);
+  }
+
 }
