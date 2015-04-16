@@ -277,13 +277,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   }
 
   @Override
-  public void initCustomParams(Map<String, String> customParams) {
-    if (LOG.isInfoEnabled()) {
-      LOG.info("customParams: " + customParams);
-    }
-  }
-
-  @Override
   public void startSession() {
     if (isActive()) {
       throw new IllegalStateException("session is active");

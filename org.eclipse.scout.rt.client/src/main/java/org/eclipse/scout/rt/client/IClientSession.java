@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client;
 
 import java.util.Locale;
-import java.util.Map;
 
 import javax.security.auth.Subject;
 
@@ -61,14 +60,6 @@ public interface IClientSession extends ISession {
   boolean isLoaded();
 
   Throwable getLoadError();
-
-  /**
-   * Called before {@link #startSession()} in order to prepare the state used to start the session with some
-   * custom and runtime options
-   *
-   * @since 4.2
-   */
-  void initCustomParams(Map<String, String> customParams);
 
   /**
    * Invoke this method to initialize the session. The session is active just after this method returns.
