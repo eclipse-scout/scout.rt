@@ -67,6 +67,28 @@ scout.FocusManager.prototype.activateFocusContext = function(focusContext) {
   }
   focusContexts.push(focusContext);
 };
+scout.FocusManager.prototype.uninstallFocusContextForContainer = function($container, uiSessionId) {
+  $.log.warn('focuscontext for container started');
+  var focusContext = this._findFocusContext($container, uiSessionId);
+  if (focusContext) {
+    $.log.warn('focuscontext for container. uninstall now');
+    focusContext.uninstall();
+  }
+};
+
+scout.FocusManager.prototype._findFocusContext = function($container, uiSessionId) {
+  var contexts = this._sessionFocusContexts[uiSessionId].focusContexts;
+  $.log.warn('find focuscontext for container');
+  if (contexts && contexts.length > 0) {
+    for (var i = contexts.length-1; i >= 0; i--) {
+      if (contexts[i]._$container === $container) {
+        $.log.warn('find focuscontext for container. Context found.');
+        return contexts[i];
+      }
+    }
+  }
+};
+
 
 scout.FocusManager.prototype.uninstallFocusContext = function(focusContext, uiSessionId) {
   var focusContexts = this._sessionFocusContexts[uiSessionId].focusContexts;

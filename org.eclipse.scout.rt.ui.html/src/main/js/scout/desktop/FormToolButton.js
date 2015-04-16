@@ -37,6 +37,7 @@ scout.FormToolButton.prototype.setSelected = function(selected) {
 };
 
 scout.FormToolButton.prototype._openContainer = function() {
+
   var containerOffsetBounds = scout.graphics.offsetBounds(this.$container),
     right = this.desktop.$parent.outerWidth() - containerOffsetBounds.x - containerOffsetBounds.width;
 
@@ -55,10 +56,9 @@ scout.FormToolButton.prototype._openContainer = function() {
   }
   this.desktop.$toolContainer.data('toolButton', this);
 
-
-  // setTimeout is required because the container is opened on mouse-down
   setTimeout(function() {
-    this.desktop.$toolContainer.find(':focusable').first().focus();
+    this.desktop.$toolContainer.installFocusContext('auto', this.session.uiSessionId);
+    this.desktop.$toolContainer.focus();
   }.bind(this), 0);
 };
 
@@ -72,6 +72,7 @@ scout.FormToolButton.prototype._closeContainer = function() {
   this.desktop.$toolContainer.children().detach();
   this.desktop.$toolContainer.hide();
   this.desktop.$toolContainer.removeData('toolButton');
+  this.desktop.$toolContainer.uninstallFocusContext(this.session.uiSessionId);
 };
 
 /* event handling */
