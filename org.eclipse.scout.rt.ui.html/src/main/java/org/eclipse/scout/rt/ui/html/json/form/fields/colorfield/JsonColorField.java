@@ -16,9 +16,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 // FIXME ???: impl. JsonColorField
-public class JsonColorField extends JsonValueField<IColorField> {
+public class JsonColorField<T extends IColorField> extends JsonValueField<T> {
 
-  public JsonColorField(IColorField model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonColorField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

@@ -66,7 +66,7 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
     IGroupBox groupBox = new GroupBoxWithNonDisplayableField();
     JsonTestUtility.initField(groupBox);
 
-    JsonGroupBox<IGroupBox> jsonGroupBox = m_uiSession.newJsonAdapter(groupBox, null, null);
+    JsonGroupBox<IGroupBox> jsonGroupBox = m_uiSession.newJsonAdapter(groupBox, null);
     JsonFormField<IFormField> jsonDisplayableField = m_uiSession.getJsonAdapter(groupBox.getFieldByClass(GroupBoxWithNonDisplayableField.DisplayableField.class), jsonGroupBox);
     JsonFormField<IFormField> jsonNonDisplayableField = m_uiSession.getJsonAdapter(groupBox.getFieldByClass(GroupBoxWithNonDisplayableField.NonDisplayableField.class), jsonGroupBox);
 

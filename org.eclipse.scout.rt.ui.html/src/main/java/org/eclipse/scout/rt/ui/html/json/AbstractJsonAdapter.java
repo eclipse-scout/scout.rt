@@ -155,17 +155,13 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   @Override
   public final <A extends IJsonAdapter<?>, M> A attachAdapter(M model, IFilter<M> filter) {
-    return attachAdapter(model, null, filter);
-  }
-
-  protected final <A extends IJsonAdapter<?>, M> A attachAdapter(M model, IJsonObjectFactory objectFactory, IFilter<M> filter) {
     if (model == null) {
       return null;
     }
     if (filter != null && !filter.accept(model)) {
       return null;
     }
-    return m_uiSession.getOrCreateJsonAdapter(model, this, objectFactory);
+    return m_uiSession.getOrCreateJsonAdapter(model, this);
   }
 
   protected final <M> List<IJsonAdapter<?>> attachAdapters(Collection<M> models) {
@@ -222,21 +218,17 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * Global adapters (like every other) get disposed on session disposal.
    */
   protected final <A extends IJsonAdapter<?>, M> A attachGlobalAdapter(M model) {
-    return attachGlobalAdapter(model, null, null);
+    return attachGlobalAdapter(model, null);
   }
 
   protected final <A extends IJsonAdapter<?>, M> A attachGlobalAdapter(M model, IFilter<M> filter) {
-    return attachGlobalAdapter(model, null, filter);
-  }
-
-  protected final <A extends IJsonAdapter<?>, M> A attachGlobalAdapter(M model, IJsonObjectFactory objectFactory, IFilter<M> filter) {
     if (model == null) {
       return null;
     }
     if (filter != null && !filter.accept(model)) {
       return null;
     }
-    return m_uiSession.getOrCreateJsonAdapter(model, getUiSession().getRootJsonAdapter(), objectFactory);
+    return m_uiSession.getOrCreateJsonAdapter(model, getUiSession().getRootJsonAdapter());
   }
 
   protected final <M> JSONObject putAdapterIdProperty(JSONObject json, String key, M model) {

@@ -525,5 +525,5 @@ Keystrokes:
 -DefaultButton soll DefaultFormEnterKeyStroke ersetzen.
 -Mnemonics werden höher Priorisiert als konfigurierte Keystrokes.
 
-
-
+AppLink-Handling
+TODO CGU describe

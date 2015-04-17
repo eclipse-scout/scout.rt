@@ -17,6 +17,10 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 // without registering it with the bean manager.
 public interface IJsonObjectFactory {
 
+  /**
+   * This factory creates IJsonAdapter instances for a given model object. The instance must not be initialized (using
+   * <code>Init()</code>), this has to be done by the caller.
+   */
   IJsonAdapter<?> createJsonAdapter(Object model, IUiSession session, String id, IJsonAdapter<?> parent);
 
   IJsonObject createJsonObject(Object object);

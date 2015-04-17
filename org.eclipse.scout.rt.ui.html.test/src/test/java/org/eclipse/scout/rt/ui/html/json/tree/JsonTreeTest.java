@@ -166,7 +166,7 @@ public class JsonTreeTest {
   public void testDispose() throws ProcessingException {
     ITree tree = new TreeWith3Levels();
     tree.initTree();
-    JsonTree<ITree> object = m_uiSession.newJsonAdapter(tree, null, null);
+    JsonTree<ITree> object = m_uiSession.newJsonAdapter(tree, null);
     WeakReference<JsonTree> ref = new WeakReference<JsonTree>(object);
 
     object.dispose();

@@ -16,9 +16,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 // FIXME ???: impl. JsonMailField
-public class JsonMailField extends JsonValueField<IMailField> {
+public class JsonMailField<T extends IMailField> extends JsonValueField<T> {
 
-  public JsonMailField(IMailField model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonMailField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

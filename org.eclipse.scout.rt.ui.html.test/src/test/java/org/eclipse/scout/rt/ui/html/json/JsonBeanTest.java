@@ -30,7 +30,7 @@ public class JsonBeanTest {
     bean.setLong(4);
     bean.setString("hello");
 
-    JsonObjectFactory factory = new JsonObjectFactory();
+    MainJsonObjectFactory factory = new MainJsonObjectFactory();
     IJsonObject jsonObj = factory.createJsonObject(bean);
 
     JSONObject json = (JSONObject) jsonObj.toJson();
@@ -46,7 +46,7 @@ public class JsonBeanTest {
     cal.set(Calendar.MILLISECOND, 0);
     bean.setDate(cal.getTime());
 
-    JsonObjectFactory factory = new JsonObjectFactory();
+    MainJsonObjectFactory factory = new MainJsonObjectFactory();
     IJsonObject jsonObj = factory.createJsonObject(bean);
 
     JSONObject json = (JSONObject) jsonObj.toJson();
@@ -59,7 +59,7 @@ public class JsonBeanTest {
     String str = "hello";
     bean.setBytes(str.getBytes());
 
-    JsonObjectFactory factory = new JsonObjectFactory();
+    MainJsonObjectFactory factory = new MainJsonObjectFactory();
     IJsonObject jsonObj = factory.createJsonObject(bean);
 
     JSONObject json = (JSONObject) jsonObj.toJson();
@@ -76,7 +76,7 @@ public class JsonBeanTest {
     list.add(5000L);
     bean.setLongs(list);
 
-    JsonObjectFactory factory = new JsonObjectFactory();
+    MainJsonObjectFactory factory = new MainJsonObjectFactory();
     IJsonObject jsonObj = factory.createJsonObject(bean);
 
     JSONObject json = (JSONObject) jsonObj.toJson();

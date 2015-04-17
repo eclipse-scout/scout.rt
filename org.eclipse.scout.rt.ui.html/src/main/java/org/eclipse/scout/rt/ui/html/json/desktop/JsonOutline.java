@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -22,8 +21,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonObject;
-import org.eclipse.scout.rt.ui.html.json.IJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
@@ -120,7 +117,8 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   }
 
   protected IJsonAdapter<?> attachDetailTable(IPage page) {
-    IJsonAdapter<?> detailTableAdapter = attachGlobalAdapter(page.getTable(), new P_JsonOutlineTableFactory(page), null);
+    page.getTable().setProperty(JsonOutlineTable.PROP_PAGE, page);
+    IJsonAdapter<?> detailTableAdapter = attachGlobalAdapter(page.getTable());
     m_jsonDetailTables.add(detailTableAdapter);
     return detailTableAdapter;
   }
@@ -145,37 +143,4 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     replaceActionEvent("pageChanged", jsonEvent);
   }
 
-  private class P_JsonOutlineAdapter implements IJsonOutlineAdapter {
-    private final IPage m_page;
-
-    public P_JsonOutlineAdapter(IPage page) {
-      m_page = page;
-    }
-
-    @Override
-    public String getNodeId(ITableRow tableRow) {
-      ITreeNode treeNode = m_page.getTreeNodeFor(tableRow);
-      return JsonOutline.this.getOrCreateNodeId(treeNode);
-    }
-  }
-
-  // FIXME BSH Check if this factory is really needed
-  private class P_JsonOutlineTableFactory implements IJsonObjectFactory {
-    private final IPage m_page;
-
-    public P_JsonOutlineTableFactory(IPage page) {
-      m_page = page;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public IJsonAdapter<Object> createJsonAdapter(Object model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
-      return new JsonOutlineTable((ITable) model, uiSession, id, new P_JsonOutlineAdapter(m_page), parent);
-    }
-
-    @Override
-    public IJsonObject createJsonObject(Object object) {
-      return null;
-    }
-  }
 }

@@ -80,7 +80,7 @@ public class JsonOutlineTest {
     rowPage = (IPage) tablePage.resolveVirtualChildNode((rowPage));
     outline.selectNode(rowPage);
 
-    JsonOutline<IOutline> jsonOutline = m_uiSession.newJsonAdapter(outline, null, null);
+    JsonOutline<IOutline> jsonOutline = m_uiSession.newJsonAdapter(outline, null);
 
     Assert.assertNotNull(jsonOutline.getAdapter(nodePage.getDetailForm()));
     Assert.assertNotNull(jsonOutline.getAdapter(rowPage.getDetailForm()));
@@ -98,7 +98,7 @@ public class JsonOutlineTest {
     outline.addChildNode(nodePage, tablePage);
     outline.selectNode(tablePage);
 
-    JsonOutline<IOutline> jsonOutline = m_uiSession.newJsonAdapter(outline, null, null);
+    JsonOutline<IOutline> jsonOutline = m_uiSession.newJsonAdapter(outline, null);
 
     List<ITreeNode> allNodes = JsonTreeTest.getAllTreeNodes(outline);
     List<String> allNodeIds = new LinkedList<String>();
@@ -137,7 +137,7 @@ public class JsonOutlineTest {
     List<IPage<?>> pages = new ArrayList<IPage<?>>();
     pages.add(nodePage);
     IOutline outline = new Outline(pages);
-    JsonOutline<IOutline> jsonOutline = m_uiSession.newJsonAdapter(outline, null, null);
+    JsonOutline<IOutline> jsonOutline = m_uiSession.newJsonAdapter(outline, null);
 
     JSONObject jsonNode = jsonOutline.toJson().getJSONArray("nodes").getJSONObject(0);
     Assert.assertNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
@@ -151,7 +151,7 @@ public class JsonOutlineTest {
   @Test
   public void testDispose() {
     ITree tree = new OutlineWithOneNode();
-    JsonTree<ITree> object = m_uiSession.newJsonAdapter(tree, null, null);
+    JsonTree<ITree> object = m_uiSession.newJsonAdapter(tree, null);
     WeakReference<JsonTree> ref = new WeakReference<JsonTree>(object);
 
     object.dispose();
@@ -192,7 +192,7 @@ public class JsonOutlineTest {
     outline.selectNode(page1);
 
     // Outline to JsonOutline
-    JsonOutline<IOutline> jsonOutline = m_uiSession.newJsonAdapter(outline, null, null);
+    JsonOutline<IOutline> jsonOutline = m_uiSession.newJsonAdapter(outline, m_uiSession.getRootJsonAdapter());
     jsonOutline.toJson(); // simulate "send to client"
 
     Assert.assertEquals(0, initPageCounter.getValue().intValue());

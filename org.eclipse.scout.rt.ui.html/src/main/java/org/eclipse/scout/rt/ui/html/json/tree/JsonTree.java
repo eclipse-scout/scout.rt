@@ -383,7 +383,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     return jsonNodeIds;
   }
 
-  protected String getOrCreateNodeId(ITreeNode node) {
+  public String getOrCreateNodeId(ITreeNode node) {
     if (node == null) {
       return null;
     }

@@ -16,9 +16,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 //FIXME ???: impl. JsonFileChooserField
-public class JsonFileChooserField extends JsonValueField<IFileChooserField> {
+public class JsonFileChooserField<T extends IFileChooserField> extends JsonValueField<T> {
 
-  public JsonFileChooserField(IFileChooserField model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonFileChooserField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

@@ -16,9 +16,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 //FIXME ???: impl. JsonBrowserField
-public class JsonBrowserField extends JsonValueField<IBrowserField> {
+public class JsonBrowserField<T extends IBrowserField> extends JsonValueField<T> {
 
-  public JsonBrowserField(IBrowserField model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonBrowserField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

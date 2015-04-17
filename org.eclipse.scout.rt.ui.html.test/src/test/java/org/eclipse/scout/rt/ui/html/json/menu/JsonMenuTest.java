@@ -76,7 +76,7 @@ public class JsonMenuTest {
     IMenu menu = new MenuWithNonDisplayableChild();
     ActionUtility.initActions(CollectionUtility.arrayList(menu));
 
-    JsonMenu<IMenu> jsonMenu = m_uiSession.newJsonAdapter(menu, null, null);
+    JsonMenu<IMenu> jsonMenu = m_uiSession.newJsonAdapter(menu, null);
 
     JsonMenu<IMenu> jsonDisplayableMenu = jsonMenu.getAdapter(new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.DisplayableMenu.class));
     JsonMenu<IMenu> jsonNonDisplayableMenu = jsonMenu.getAdapter(new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.NonDisplayableMenu.class));

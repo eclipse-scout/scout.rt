@@ -51,7 +51,6 @@ import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEventProcessor;
@@ -61,6 +60,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
+import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -389,26 +389,16 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
 
   @Override
   public <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent) {
-    return getOrCreateJsonAdapter(model, parent, null);
-  }
-
-  @Override
-  public <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent, IJsonObjectFactory objectFactory) {
     A jsonAdapter = getJsonAdapter(model, parent);
     if (jsonAdapter != null) {
       return jsonAdapter;
     }
-    return createJsonAdapter(model, parent, objectFactory);
+    return createJsonAdapter(model, parent);
   }
 
   @Override
   public <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent) {
-    return createJsonAdapter(model, parent, null);
-  }
-
-  @Override
-  public <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent, IJsonObjectFactory objectFactory) {
-    A jsonAdapter = newJsonAdapter(model, parent, objectFactory);
+    A jsonAdapter = newJsonAdapter(model, parent);
 
     // because it's a new adapter we must add it to the response
     m_currentJsonResponse.addAdapter(jsonAdapter);
@@ -416,16 +406,14 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
   }
 
   /**
-   * Creates an adapter instance for the given model using the given factory and calls the <code>init()</code> method
+   * Creates an adapter instance for the given model using {@link MainJsonObjectFactory} and calls the
+   * <code>init()</code> method
    * on the created instance.
    */
   @SuppressWarnings("unchecked")
-  public <M, A extends IJsonAdapter<? super M>> A newJsonAdapter(M model, IJsonAdapter<?> parent, IJsonObjectFactory objectFactory) {
-    if (objectFactory == null) {
-      objectFactory = BEANS.get(IJsonObjectFactory.class);
-    }
+  public <M, A extends IJsonAdapter<? super M>> A newJsonAdapter(M model, IJsonAdapter<?> parent) {
     String id = createUniqueIdFor(null); // FIXME CGU
-    A adapter = (A) objectFactory.createJsonAdapter(model, this, id, parent);
+    A adapter = (A) MainJsonObjectFactory.get().createJsonAdapter(model, this, id, parent);
     adapter.init();
     return adapter;
   }

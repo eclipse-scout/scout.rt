@@ -54,7 +54,7 @@ public class JsonOutlineViewButtonTest {
     IDesktop desktop = Mockito.mock(IDesktop.class);
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
-    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null);
     assertNull(jsonViewButton.getAdapter(outline));
 
     button.setSelected(true);
@@ -71,7 +71,7 @@ public class JsonOutlineViewButtonTest {
     IDesktop desktop = Mockito.mock(IDesktop.class);
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
-    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null);
 
     assertNull(jsonViewButton.getAdapter(outline));
 
@@ -92,7 +92,7 @@ public class JsonOutlineViewButtonTest {
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
     button.setSelected(true);
-    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null);
 
     IJsonAdapter<?> outlineAdapter = jsonViewButton.getAdapter(outline);
     assertNotNull(outlineAdapter);

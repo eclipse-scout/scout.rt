@@ -41,7 +41,7 @@ public class JsonFormTest {
   @Test
   public void testFormDisposalOnClose() throws ProcessingException {
     FormWithOneField form = new FormWithOneField();
-    m_uiSession.newJsonAdapter(form, m_uiSession.getRootJsonAdapter(), null);
+    m_uiSession.newJsonAdapter(form, m_uiSession.getRootJsonAdapter());
 
     form.start();
     assertNotNull(m_uiSession.getJsonAdapter(form, m_uiSession.getRootJsonAdapter()));
