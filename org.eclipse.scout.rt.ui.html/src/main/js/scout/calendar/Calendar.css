@@ -116,18 +116,12 @@
   overflow: hidden;
 }
 
-.calendar-year {
-  width: 270px;
-  padding: 0px 10px;
-  height: 100%;
-}
-
-
-.calendar-list {
+.calendar-list-container {
   display: inline-block;
   width: 0%;
+  padding: 0;
   height: calc(~"100%" - @calendar-header-height);
-  background-color: #FFFFCC;
+  background-color: @palette-white;
   overflow: hidden;
 }
 
@@ -257,22 +251,6 @@
     content: attr(data-axis-name);
    }
 
-
-  & .calendar-week-axis-over {
-    position: absolute;
-    left: @calendar-header-height - 6px;
-    width:  calc(~"100%" - 8px);
-  }
-
-  & .calendar-week-axis-over::before {
-    position: absolute;
-    font-size: 10px;
-    top: -5px;
-    left: -30px;
-    color: @palette-gray-4;
-    content: attr(data-axis-name);
-   }
-
   & .calendar-week-task {
     position: absolute;
     left: 0px;
@@ -333,14 +311,15 @@
   & .component-day,
   & .component-task {
     position: absolute;
+    word-break: break-all;
     left: 7px;
     margin-left: 0px;
     width: calc(~"100%" - 14px);
-    overflow: visible;
    }
-
+  /*
   & .component-open-top {
     padding-top: 10px;
+    overflow: visible;
 
     & .component-link {
       top: 10px;
@@ -372,6 +351,8 @@
   }
 
   & .component-open-bottom {
+    overflow: visible;
+
     &:before {
       content: "";
       display: block;
@@ -396,10 +377,68 @@
       bottom: -4px;
     }
   }
+  */
+}
 
+.calendar-list {
+  width: 270px;
+  padding: 0px 0px 0px 30px;
+  height: 100%;
+
+  & .list-title {
+    position: relative;
+    width: calc(~"100%" - 10px);
+    height: 45px;
+    line-height: 45px;
+    font-size: 17px;
+    color: @palette-gray-4;
+
+    &:after{
+      position: absolute;
+      height: 1px;
+      width: 100%;
+      left: 0px;
+      bottom: -1px;
+      content: " ";
+      background-color: @palette-gray-6;
+    }
+
+  }
+
+  & .calendar-component {
+    position: relative;
+    float: left;
+    font-size: 10px;
+    line-height: 20px;
+    height: auto;
+    padding-left: 4px;
+    .overflow-ellipsis;
+    min-height: 20px;
+    margin-top: 12px;
+    width: calc(~"100%" - 10px);
+    background-color:  @palette-white !important;
+    border-left: 4px solid  @palette-gray-6;
+    text-align: left;
+
+    & .component-link {
+      position: absolute;
+      top: 0px;
+      right: 6px;
+      cursor: pointer;
+
+      &:hover{
+        color: @hover-color;
+      }
+    }
+
+  }
 }
 
 .calendar-year {
+  width: 270px;
+  padding: 0px 10px;
+  height: 100%;
+
   & .year-title {
     position: relative;
     width: calc(~"100%" - 20px);
