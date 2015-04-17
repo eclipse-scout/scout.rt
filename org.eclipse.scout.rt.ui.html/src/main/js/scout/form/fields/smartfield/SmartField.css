@@ -33,7 +33,7 @@
     border-bottom-left-radius: @border-radius;
     border-top: none;
     padding: 3px 10px;
-    .overflow-ellipsis;
+    .overflow-ellipsis-nowrap;
     .user-select(text);
 
     .disabled & {

@@ -27,7 +27,7 @@
   margin-left: @mandatory-indicator-width;
   border-bottom: 3px solid @desktop-border-color;
   padding-bottom: 6px;
-  .overflow-ellipsis;
+  .overflow-ellipsis-nowrap;
 
   .group-box.collapsed:not(.with-line) > & {
     border-bottom-color: transparent;

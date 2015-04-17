@@ -1,4 +1,4 @@
-.button button {
+.button > button {
   position: relative;
   height: 30px;
   color: @text-color;
@@ -6,6 +6,7 @@
   border: 1px solid @border-color;
   border-radius: @border-radius;
   cursor: pointer;
+  .overflow-ellipsis-nowrap;
 
   &:hover {
     color: @hover-color;
@@ -48,7 +49,7 @@
   }
 }
 
-button img {
+button > img {
   vertical-align: middle;
   margin-bottom: 1px;
 

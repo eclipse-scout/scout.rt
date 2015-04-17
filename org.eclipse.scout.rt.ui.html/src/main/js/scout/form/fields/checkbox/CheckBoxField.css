@@ -10,6 +10,10 @@
     padding-left: 25px;
     margin-right: 15px;
     font-size: 13px;
+
+    white-space: nowrap;
+    /* FIXME NBU overflow cannot be set, checkbox looks ugly because height is too small */
+/*     .overflow-ellipsis-nowrap;     */
   }
 
   & label::before {

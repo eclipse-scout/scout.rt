@@ -4,6 +4,7 @@
   margin-left: @mandatory-indicator-width;
   .user-select(text);
   .overflow-ellipsis;
+  /*FIXME CGU mit BSH besprechen ob das Sinn macht, auch ellipsis etc*/
 
   /* Set styles for allowed HTML tags inside HTML field: */
 

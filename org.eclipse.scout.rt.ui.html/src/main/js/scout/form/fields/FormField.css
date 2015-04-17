@@ -1,11 +1,10 @@
 .form-field {
-  white-space: nowrap;
   border-spacing: 0;
   position: absolute;
 
   & > label {
     position: absolute;
-    .overflow-ellipsis;
+    .overflow-ellipsis-nowrap;
     padding-top: @borderless-field-padding-y;
     padding-bottom: @borderless-field-padding-y;
     margin-left: @mandatory-indicator-width;
@@ -71,12 +70,4 @@
       color: @error-color;
     }
   }
-}
-
-.not-implemented {
-  border: 1px dashed @border-color;
-  border-radius: @border-radius;
-  padding: 6px @text-field-padding;
-  color: @disabled-color;
-  .overflow-ellipsis;
 }
