@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextPr
  * corresponding keys to {@link UiSession#getTextKeys()}.
  */
 @Priority(-10)
-public class HtmlTextProviderService extends AbstractDynamicNlsTextProviderService {
+public class UiTextProviderService extends AbstractDynamicNlsTextProviderService {
 
   @Override
   protected String getDynamicNlsBaseName() {

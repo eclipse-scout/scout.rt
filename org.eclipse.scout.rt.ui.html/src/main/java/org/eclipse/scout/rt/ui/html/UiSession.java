@@ -132,6 +132,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
     Set<String> textKeys = new HashSet<String>();
     for (IUiTextContributor contributor : BEANS.all(IUiTextContributor.class)) {
       contributor.contributeUiTextKeys(textKeys);
+      LOG.info("Gathered ui text keys from contributor " + contributor);
     }
 
     // Resolve texts with the given locale
