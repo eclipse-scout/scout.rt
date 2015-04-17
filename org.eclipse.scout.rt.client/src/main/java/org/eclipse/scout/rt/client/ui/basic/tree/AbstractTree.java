@@ -1359,7 +1359,15 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void expandAll(ITreeNode parent) {
-    expandAllRec(parent, 0);
+    try {
+      setTreeChanging(true);
+      //
+      expandAllRec(parent, 0);
+      fireNodeExpandedRecursive(parent, true);
+    }
+    finally {
+      setTreeChanging(false);
+    }
   }
 
   private void expandAllRec(ITreeNode parent, int level) {
@@ -1381,11 +1389,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     try {
       setTreeChanging(true);
       //
-      ArrayList<ITreeNode> list = new ArrayList<ITreeNode>();
+      List<ITreeNode> list = new ArrayList<ITreeNode>();
       fetchAllCollapsingNodesRec(parent, 0, list);
       for (int n = list.size(), i = n - 1; i >= 0; i--) {
         setNodeExpanded(list.get(i), false);
       }
+      fireNodeExpandedRecursive(parent, false);
     }
     finally {
       setTreeChanging(false);
@@ -2283,6 +2292,17 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       else {
         fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODE_COLLAPSED, node));
+      }
+    }
+  }
+
+  private void fireNodeExpandedRecursive(ITreeNode node, boolean b) {
+    if (node != null && !node.isInitializing()) {
+      if (b) {
+        fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE, node));
+      }
+      else {
+        fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE, node));
       }
     }
   }

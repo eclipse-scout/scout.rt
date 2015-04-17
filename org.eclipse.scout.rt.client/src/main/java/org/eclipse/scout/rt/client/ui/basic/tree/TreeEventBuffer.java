@@ -63,6 +63,9 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         List<ITreeNode> remainingNodes = removeNodesFromPreviousEvents(event.getNodes(), events.subList(0, i), TreeEvent.TYPE_NODES_INSERTED);
         events.set(i, replaceNodesInEvent(event, remainingNodes));
       }
+      else if (type == TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE || type == TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE) {
+        remove(getExpansionRelatedEvents(), events.subList(0, i));
+      }
     }
   }
 
@@ -261,6 +264,15 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     }
   }
 
+  protected List<Integer> getExpansionRelatedEvents() {
+    List<Integer> res = new ArrayList<>();
+    res.add(TreeEvent.TYPE_NODE_EXPANDED);
+    res.add(TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE);
+    res.add(TreeEvent.TYPE_NODE_COLLAPSED);
+    res.add(TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE);
+    return res;
+  }
+
   /**
    * @param type
    *          {@link TreeEvent} type
@@ -270,7 +282,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     switch (type) {
       case TreeEvent.TYPE_NODES_SELECTED:
       case TreeEvent.TYPE_BEFORE_NODES_SELECTED:
-      case TreeEvent.TYPE_SCROLL_TO_SELECTION: {
+      case TreeEvent.TYPE_SCROLL_TO_SELECTION:
+      case TreeEvent.TYPE_NODE_FILTER_CHANGED: {
         return true;
       }
       default: {

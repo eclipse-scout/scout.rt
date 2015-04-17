@@ -176,6 +176,78 @@ public class TreeEventBufferTest {
     assertEquals(2, coalesced.size()); // e1, e2
   }
 
+  /**
+   * Expanded/Collapsed events ==> If all are collapsed, we don't care about the previous expansion events
+   */
+  @Test
+  public void testCoalesce_Expanded() {
+    // A
+    // +-B
+    // | +-E
+    // |   +-F
+    // +-C
+    //   +-G
+    // +-D
+    ITreeNode nodeA = mockNode("A");
+    ITreeNode nodeB = mockNode("B");
+    ITreeNode nodeC = mockNode("C");
+    ITreeNode nodeD = mockNode("D");
+    ITreeNode nodeE = mockNode("E");
+    ITreeNode nodeF = mockNode("F");
+    ITreeNode nodeG = mockNode("G");
+    installChildNodes(nodeA, nodeB, nodeC, nodeD);
+    installChildNodes(nodeB, nodeE);
+    installChildNodes(nodeE, nodeF);
+    installChildNodes(nodeC, nodeG);
+
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE, nodeA));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE, nodeB));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeB));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeE));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeC));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_COLLAPSED, nodeB));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeG));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE, nodeA));
+
+    List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(1, coalesced.size());
+    assertEquals(TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE, coalesced.get(0).getType());
+  }
+
+  /**
+   * We cannot coalesce NODE_EXPANDED, because this is not supported by the UI
+   */
+  @Test
+  public void testCoalesce_NoCoalesceSingleEvents() {
+    // A
+    // +-B
+    // | +-E
+    // |   +-F
+    // +-C
+    //   +-G
+    // +-D
+    ITreeNode nodeA = mockNode("A");
+    ITreeNode nodeB = mockNode("B");
+    ITreeNode nodeC = mockNode("C");
+    ITreeNode nodeD = mockNode("D");
+    ITreeNode nodeE = mockNode("E");
+    ITreeNode nodeF = mockNode("F");
+    ITreeNode nodeG = mockNode("G");
+    installChildNodes(nodeA, nodeB, nodeC, nodeD);
+    installChildNodes(nodeB, nodeE);
+    installChildNodes(nodeE, nodeF);
+    installChildNodes(nodeC, nodeG);
+
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeB));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeE));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeC));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_COLLAPSED, nodeB));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeG));
+
+    List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(5, coalesced.size());
+  }
+
   @SuppressWarnings("unused")
   private TreeEvent mockEvent(int type) {
     return mockEvent(type, 0);
@@ -231,5 +303,8 @@ public class TreeEventBufferTest {
     List<ITreeNode> childNodeList = Arrays.asList(childNodes);
     when(node.getChildNodes()).thenReturn(childNodeList);
     when(node.getChildNodeCount()).thenReturn(childNodeList.size());
+    for (ITreeNode childNode : childNodeList) {
+      when(childNode.getParentNode()).thenReturn(node);
+    }
   }
 }

@@ -68,6 +68,14 @@ public class TreeEvent extends EventObject implements IModelEvent {
   /**
    * valid attributes are node
    */
+  public static final int TYPE_NODE_EXPANDED_RECURSIVE = 102;
+  /**
+   * valid attributes are node
+   */
+  public static final int TYPE_NODE_COLLAPSED_RECURSIVE = 103;
+  /**
+   * valid attributes are node
+   */
   public static final int TYPE_NODE_ACTION = 705;
 
   /**
