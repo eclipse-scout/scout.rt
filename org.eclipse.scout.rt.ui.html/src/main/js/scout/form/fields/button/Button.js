@@ -37,7 +37,7 @@ scout.Button.prototype._render = function($parent) {
      * effort required to change an existing application).
      */
     $button = $('<div>');
-    $button.setTabbable(true);
+    $button.setTabbable(this.enabled);
     $button.addClass('menu-item');
     cssClass = 'link-button';
   } else {
@@ -98,13 +98,13 @@ scout.Button.prototype._renderProperties = function() {
 scout.Button.prototype._renderEnabled = function() {
   scout.Button.parent.prototype._renderEnabled.call(this);
   if (this.displayStyle === scout.Button.DISPLAY_STYLE.LINK) {
-    this.$field.setTabbable(!!this.enabled);
+    this.$field.setTabbable(this.enabled);
   }
 };
 
 scout.Button.prototype._renderSelected = function() {
   if (this.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {
-    this.$field.toggleClass('selected', !! this.selected);
+    this.$field.toggleClass('selected', this.selected);
   }
 };
 
