@@ -49,17 +49,14 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
 
   // Fix for Firefox issue with float:right. In Firefox elements with float:right must
   // come first in the HTML order of elements. Otherwise a strange layout bug occurs.
-  this.$container.children('.menu-right').detach().prependTo(this.$container);
+  this.$container.children('.right-aligned').detach().prependTo(this.$container);
 
-  // The _first_ menu-right must have the 'last' class (reverse order because of float:right)
-  this.$container.children('.menu-right').first().addClass('last');
-
-  // FIXME AWE: (menu) check if this code is still needed
-  // if (this.lastItem && !this.lastItem.$container.hasClass('menu-right')) {
-  //    this.lastItem.$container.addClass('last');
-  //  }
+  // The _first_ right-aligned item must have the 'last' class (reverse order because of float:right)
+  this.$container.children('.right-aligned').first().addClass('last');
 
   this.updateVisibility();
+
+  // --- Helper functions ---
 
   function notIsSeparator(menu) {
     return !menu.separator;
@@ -86,7 +83,7 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     item.render(this.$container);
     item.$container.removeClass('form-field');
     if (right) {
-      item.$container.addClass('menu-right');
+      item.$container.addClass('right-aligned');
     }
   }.bind(this));
 };

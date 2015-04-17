@@ -99,12 +99,8 @@
   }
 }
 
-.menu-right {
+.right-aligned {
   float: right;
-
-  &:not(.last) {
-    margin-right: 33px;
-  }
 }
 
 .menu-textandicon[data-icon]::before {
@@ -180,5 +176,3 @@
   left: 1px;
   background-color:@body-background-color;
 }
-
-

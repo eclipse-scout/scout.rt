@@ -138,7 +138,7 @@ scout.PopupMenuItem.prototype.alignTo = function() {
     ' headInsets=' + headInsets + ' left=' + left + ' top=' + top);
   this.$body.cssTop(bodyTop);
   this.$deco.cssTop(bodyTop);
-  if (this.$menuItem.hasClass('menu-right')) {
+  if (this.$menuItem.hasClass('right-aligned')) {
     // when we use float:right, browser uses fractions of pixels, that's why we must
     // use the subPixelCorr variable. It corrects some visual pixel-shifting issues.
     var widthDiff = bodyWidth - headSize.width,

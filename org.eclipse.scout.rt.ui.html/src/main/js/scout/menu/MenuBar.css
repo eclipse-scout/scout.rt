@@ -11,9 +11,14 @@
     vertical-align: middle;
   }
 
-  & button {
+  & .button button {
     min-width: 110px;
-    margin: 6px 0 3px 0;
+    margin-top: 6px;
+    margin-bottom: 3px;
+    margin-right: @menu-item-margin-right;
+  }
+  & .button.last.right-aligned button {
+    margin-right: 0;
   }
 
   &.bottom {
