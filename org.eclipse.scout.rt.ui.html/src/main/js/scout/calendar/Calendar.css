@@ -23,7 +23,6 @@
   height: @calendar-header-height;
   min-width: 420px;
 
-
   & .calendar-range {
     float: left;
 
@@ -53,7 +52,6 @@
     & .calendar-plus::before {
       .calendar-icon(@icon-angle-right, 29px);
     }
-
   }
 
   & .calendar-commands {
@@ -114,6 +112,101 @@
   height: calc(~"100%" - @calendar-header-height);
   background-color: @palette-white;
   overflow: hidden;
+
+  & .calendar-year {
+    width: 270px;
+    padding: 0px 10px;
+    height: 100%;
+
+    & .year-title {
+      position: relative;
+      width: calc(~"100%" - 20px);
+      height: 45px;
+    }
+
+    & .year-title-item {
+      display: inline-block;
+      padding-right: 15px;
+      line-height: 45px;
+      font-size: 17px;
+      color: @palette-gray-6;
+      cursor: pointer;
+
+      &.selected {
+        color: @palette-gray-4;
+        cursor: default;
+      }
+
+      &:hover {
+        color: @palette-gray-4;
+      }
+    }
+
+
+     & .year-title:after{
+      position: absolute;
+      height: 1px;
+      width: 100%;
+      left: 0px;
+      bottom: -1px;
+      content: " ";
+      background-color: @palette-gray-6;
+    }
+
+    & .year-month{
+      margin-top: 18px;
+      position: relative;
+      padding-top: 20px;
+      padding-right: 15px;
+      float: left;
+      height: 85px;
+      width: 125px;
+
+      font-size: 17px;
+      color: red;
+    }
+
+      & .year-month:before{
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      height: 100px;
+      width: 100%;
+      content: attr(data-title);
+      font-size: 17px;
+      color: @palette-green-active;
+    }
+
+    & .year-day{
+      position: relative;
+      float: left;
+      width: 15px;
+      text-align: right;
+      color: @palette-gray-4;
+      font-size: 10px;
+      height: 12px;
+      padding: 1px;
+      line-height: 12px;
+      cursor: pointer;
+    }
+
+    & .year-range{
+      background-color: @palette-green-background;
+    }
+
+    & .year-range-day{
+      background-color: @palette-green-normal;
+    }
+
+    & .year-hover{
+      background-color: @palette-orange-background !important;
+    }
+
+    & .year-hover-day{
+      background-color: @palette-orange-disabled !important;
+    }
+  }
+
 }
 
 .calendar-list-container {
@@ -123,6 +216,59 @@
   height: calc(~"100%" - @calendar-header-height);
   background-color: @palette-white;
   overflow: hidden;
+
+  & .calendar-list {
+    width: 270px;
+    padding: 0px 0px 0px 30px;
+    height: 100%;
+
+    & .list-title {
+      position: relative;
+      width: calc(~"100%" - 10px);
+      height: 45px;
+      line-height: 45px;
+      font-size: 17px;
+      color: @palette-gray-4;
+
+      &:after{
+        position: absolute;
+        height: 1px;
+        width: 100%;
+        left: 0px;
+        bottom: -1px;
+        content: " ";
+        background-color: @palette-gray-6;
+      }
+    }
+
+    & .calendar-component {
+      position: relative;
+      float: left;
+      font-size: 10px;
+      line-height: 20px;
+      height: auto;
+      padding-left: 4px;
+      .overflow-ellipsis;
+      min-height: 20px;
+      margin-top: 12px;
+      width: calc(~"100%" - 10px);
+      background-color:  @palette-white !important;
+      border-left: 4px solid  @palette-gray-6;
+      text-align: left;
+
+      & .component-link {
+        position: absolute;
+        top: 0px;
+        right: 6px;
+        cursor: pointer;
+
+        &:hover{
+          color: @hover-color;
+        }
+      }
+
+    }
+  }
 }
 
 .calendar-grid {
@@ -313,217 +459,46 @@
     position: absolute;
     word-break: break-all;
     left: 7px;
+    border-style: wave;
     margin-left: 0px;
     width: calc(~"100%" - 14px);
    }
-  /*
+
   & .component-open-top {
+    overflow: visible !important;
     padding-top: 10px;
-    overflow: visible;
 
     & .component-link {
       top: 10px;
-    };
-
-    &:before {
-      content: "";
-      display: block;
-      position: absolute;
-      border-radius: 100% 50%;
-      width: 63%;
-      height: 20px;
-      background-color: inherit;
-      right: 0px;
-      top: -4px;
     }
 
-    &:after {
-      content: "";
-      display: block;
+
+    &:before {
       position: absolute;
-      border-radius: 100% 50%;
-      width: 50%;
+      display: block;
+      content: "";
+      width: 16px;
       height: 16px;
+      left: calc(~"50%" - 8px);
+      top: -10px;
+      transform: rotate(45deg);
       background-color: @palette-white;
-      left: 1px;
-      top: -11px;
     }
   }
 
   & .component-open-bottom {
-    overflow: visible;
-
-    &:before {
-      content: "";
-      display: block;
-      position: absolute;
-      border-radius: 100% 50%;
-      width: 61%;
-      height: 20px;
-      background-color: @palette-white;
-      right: -5px;
-      bottom: -12px;
-    }
+    overflow: visible !important;
 
     &:after {
-      content: "";
+      position: absolute;
       display: block;
-      position: absolute;
-      border-radius: 100% 50%;
-      width: 50%;
+      content: "";
+      width: 16px;
       height: 16px;
+      left: calc(~"50%" - 8px);
+      bottom: -10px;
+      transform: rotate(45deg);
       background-color: inherit;
-      left: 1px;
-      bottom: -4px;
     }
-  }
-  */
-}
-
-.calendar-list {
-  width: 270px;
-  padding: 0px 0px 0px 30px;
-  height: 100%;
-
-  & .list-title {
-    position: relative;
-    width: calc(~"100%" - 10px);
-    height: 45px;
-    line-height: 45px;
-    font-size: 17px;
-    color: @palette-gray-4;
-
-    &:after{
-      position: absolute;
-      height: 1px;
-      width: 100%;
-      left: 0px;
-      bottom: -1px;
-      content: " ";
-      background-color: @palette-gray-6;
-    }
-
-  }
-
-  & .calendar-component {
-    position: relative;
-    float: left;
-    font-size: 10px;
-    line-height: 20px;
-    height: auto;
-    padding-left: 4px;
-    .overflow-ellipsis;
-    min-height: 20px;
-    margin-top: 12px;
-    width: calc(~"100%" - 10px);
-    background-color:  @palette-white !important;
-    border-left: 4px solid  @palette-gray-6;
-    text-align: left;
-
-    & .component-link {
-      position: absolute;
-      top: 0px;
-      right: 6px;
-      cursor: pointer;
-
-      &:hover{
-        color: @hover-color;
-      }
-    }
-
-  }
-}
-
-.calendar-year {
-  width: 270px;
-  padding: 0px 10px;
-  height: 100%;
-
-  & .year-title {
-    position: relative;
-    width: calc(~"100%" - 20px);
-    height: 45px;
-  }
-
-  & .year-title-item {
-    display: inline-block;
-    padding-right: 15px;
-    line-height: 45px;
-    font-size: 17px;
-    color: @palette-gray-6;
-    cursor: pointer;
-
-    &.selected {
-      color: @palette-gray-4;
-      cursor: default;
-    }
-
-    &:hover {
-      color: @palette-gray-4;
-    }
-  }
-
-
-   & .year-title:after{
-    position: absolute;
-    height: 1px;
-    width: 100%;
-    left: 0px;
-    bottom: -1px;
-    content: " ";
-    background-color: @palette-gray-6;
-  }
-
-  & .year-month{
-    margin-top: 18px;
-    position: relative;
-    padding-top: 20px;
-    padding-right: 15px;
-    float: left;
-    height: 85px;
-    width: 125px;
-
-    font-size: 17px;
-    color: red;
-  }
-
-    & .year-month:before{
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    height: 100px;
-    width: 100%;
-    content: attr(data-title);
-    font-size: 17px;
-    color: @palette-green-active;
-  }
-
-  & .year-day{
-    position: relative;
-    float: left;
-    width: 15px;
-    text-align: right;
-    color: @palette-gray-4;
-    font-size: 10px;
-    height: 12px;
-    padding: 1px;
-    line-height: 12px;
-    cursor: pointer;
-  }
-
-  & .year-range{
-    background-color: @palette-green-background;
-  }
-
-  & .year-range-day{
-    background-color: @palette-green-normal;
-  }
-
-  & .year-hover{
-    background-color: @palette-orange-background !important;
-  }
-
-  & .year-hover-day{
-    background-color: @palette-orange-disabled !important;
   }
 }
