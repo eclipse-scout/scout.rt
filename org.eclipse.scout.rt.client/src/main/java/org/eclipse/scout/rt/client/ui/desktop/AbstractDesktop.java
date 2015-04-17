@@ -1384,25 +1384,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void downloadResource(final BinaryResource binaryResource, long validDuration) {
-    final long validUntil = System.currentTimeMillis() + validDuration;
-    IDownloadHandler handler = new IDownloadHandler() {
-
-      // FIXME AWE: (downloads) in-aktive download handler entfernen (z.Z. geschieht dies
-      // erst wenn wieder ein neuer download gestartet wird - sollte aber auch einfach so
-      // geschehen -> job, mit delay schedulen.
-
-      @Override
-      public boolean isActive() {
-        return System.currentTimeMillis() < validUntil;
-      }
-
-      @Override
-      public BinaryResource getResource() {
-        return binaryResource;
-      }
-    };
-    downloadResource(handler);
+  public void downloadResource(final BinaryResource binaryResource, final long ttl) {
+    downloadResource(new DownloadHandler(binaryResource, ttl));
   }
 
   @Override
