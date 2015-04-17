@@ -49,7 +49,7 @@ describe("menus", function() {
       menu2.menuTypes = ['SingleSelection'];
       menu3 = helper.createMenu(helper.createModel(3));
       menu3.menuTypes = ['MultiSelection'];
-      menu2.childMenus = [menu3];
+      menu2.childActions = [menu3];
 
       menus = scout.menus.filter([menu1, menu2], 'SingleSelection');
       expect(menus).toEqual([menu1]);
@@ -67,7 +67,7 @@ describe("menus", function() {
       menu1.menuTypes = ['SingleSelection'];
       menu2 = helper.createMenu(helper.createModel(3));
       menu2.menuTypes = ['EmptySpace'];
-      parentMenu.childMenus = [menu1, menu2];
+      parentMenu.childActions = [menu1, menu2];
 
       menus = scout.menus.filter([parentMenu], 'EmptySpace');
       expect(menus).toEqual([parentMenu]);

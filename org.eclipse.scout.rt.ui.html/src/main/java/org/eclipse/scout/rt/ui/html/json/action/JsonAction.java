@@ -11,12 +11,14 @@
 package org.eclipse.scout.rt.ui.html.json.action;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 
 public abstract class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<T> {
@@ -92,6 +94,16 @@ public abstract class JsonAction<T extends IAction> extends AbstractJsonProperty
       @Override
       protected Integer modelValue() {
         return getModel().getHorizontalAlignment();
+      }
+    });
+
+    putJsonProperty(new JsonAdapterProperty<T>(IActionNode.PROP_CHILD_ACTIONS, model, getUiSession(), new DisplayableActionFilter<IAction>()) {
+      @Override
+      protected Object modelValue() {
+        if (getModel() instanceof IActionNode) {
+          return ((IActionNode) getModel()).getChildActions();
+        }
+        return null;
       }
     });
   }

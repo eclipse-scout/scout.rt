@@ -86,7 +86,7 @@ public class JsonMenuTest {
 
     // Json response must not contain NonDisplayableMenu
     JSONObject json = jsonMenu.toJson();
-    JSONArray jsonMenus = json.getJSONArray("childMenus");
+    JSONArray jsonMenus = json.getJSONArray("childActions");
     assertEquals(1, jsonMenus.length());
     assertEquals(jsonDisplayableMenu.getId(), jsonMenus.get(0));
   }

@@ -51,7 +51,7 @@
       "defaultMenu": false,
       "systemType": 0,
       "separator": false,
-      "childMenus": [],
+      "childActions": [],
       "menuTypes": ["Table.EmptySpace"]
     },
     "TableOrganizeMenu": {

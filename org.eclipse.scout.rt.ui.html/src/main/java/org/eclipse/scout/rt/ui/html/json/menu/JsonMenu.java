@@ -19,15 +19,12 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
-import org.json.JSONObject;
 
 public class JsonMenu<T extends IMenu> extends JsonAction<T> {
 
   public static final String EVENT_ABOUT_TO_SHOW = "aboutToShow";
   public static final String PROP_SEPARATOR = "separator";
-  public static final String PROP_CHILD_MENUS = "childMenus";
   public static final String PROP_SYSTEM_TYPE = "systemType";
 
   public JsonMenu(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
@@ -35,16 +32,22 @@ public class JsonMenu<T extends IMenu> extends JsonAction<T> {
   }
 
   @Override
+  public String getObjectType() {
+    return "Menu";
+  }
+
+  @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonProperty<IMenu>(PROP_SEPARATOR, model) {
+    putJsonProperty(new JsonProperty<T>(PROP_SEPARATOR, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isSeparator();
       }
     });
-    putJsonProperty(new JsonProperty<IMenu>(IMenu.PROP_MENU_TYPES, model) {
+
+    putJsonProperty(new JsonProperty<T>(IMenu.PROP_MENU_TYPES, model) {
       @Override
       protected Set<IMenuType> modelValue() {
         return getModel().getMenuTypes();
@@ -60,22 +63,6 @@ public class JsonMenu<T extends IMenu> extends JsonAction<T> {
         return menuTypes;
       }
     });
-  }
-
-  @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    attachAdapters(getModel().getChildActions(), new DisplayableActionFilter<IMenu>());
-  }
-
-  @Override
-  public JSONObject toJson() {
-    return putAdapterIdsProperty(super.toJson(), PROP_CHILD_MENUS, getModel().getChildActions(), new DisplayableActionFilter<IMenu>());
-  }
-
-  @Override
-  public String getObjectType() {
-    return "Menu";
   }
 
   @Override

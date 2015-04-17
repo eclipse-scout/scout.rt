@@ -15,15 +15,14 @@ scout.menus = {
     }
     types = scout.arrays.ensure(types);
 
-    var i, menu, childMenus,
-      filteredMenus = [],
+    var filteredMenus = [],
       separatorCount = 0;
 
-    for (i = 0; i < menus.length; i++) {
-      menu = menus[i];
-      childMenus = menu.childMenus;
+    for (var i = 0; i < menus.length; i++) {
+      var menu = menus[i];
+      var childMenus = menu.childActions;
       if (childMenus.length > 0) {
-        childMenus = scout.menus.filter(menu.childMenus, types);
+        childMenus = scout.menus.filter(childMenus, types);
         if (childMenus.length === 0) {
           continue;
         }
@@ -48,11 +47,10 @@ scout.menus = {
   },
 
   checkType: function(menu, types) {
-    var childMenus;
     types = scout.arrays.ensure(types);
 
-    if (menu.childMenus.length > 0) {
-      childMenus = scout.menus.filter(menu.childMenus, types);
+    if (menu.childActions.length > 0) {
+      var childMenus = scout.menus.filter(menu.childActions, types);
       return (childMenus.length > 0);
     }
 

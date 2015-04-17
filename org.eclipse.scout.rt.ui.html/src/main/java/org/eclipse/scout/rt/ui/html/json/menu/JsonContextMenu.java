@@ -27,7 +27,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 // FIXME AWE: (menu) diese klasse soll kein JsonAdapter mehr sein. Parent der menus ist dann die Table
-
 public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropertyObserver<T> {
 
   private ContextMenuListener m_contextMenuListener;
@@ -39,7 +38,8 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
 
   @Override
   public String getObjectType() {
-    return "ContextMenu";
+    // ContextMenu is just a wrapper, not a real adapter meant to be sent to client
+    return null;
   }
 
   @Override
@@ -113,7 +113,5 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
     public void contextMenuChanged(ContextMenuEvent event) {
       handleModelContextMenuChanged(event);
     }
-
   }
-
 }

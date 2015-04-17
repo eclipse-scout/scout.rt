@@ -30,11 +30,17 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
     this(propertyName, model, session, false, null);
   }
 
-  public JsonAdapterProperty(String propertyName, T model, IUiSession session, boolean global, IFilter<Object> filter) {
+  public JsonAdapterProperty(String propertyName, T model, IUiSession session, IFilter<?> filter) {
+    this(propertyName, model, session, false, filter);
+  }
+
+  public JsonAdapterProperty(String propertyName, T model, IUiSession session, boolean global, IFilter<?> filter) {
     super(propertyName, model);
     m_uiSession = session;
     m_global = global;
-    m_filter = filter;
+    @SuppressWarnings("unchecked")
+    IFilter<Object> castedFilter = (IFilter<Object>) filter;
+    m_filter = castedFilter;
   }
 
   public IUiSession getUiSession() {
@@ -84,9 +90,9 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
       m_uiSession.getRootJsonAdapter().attachAdapter(model, m_filter);
     }
     else {
-      IJsonAdapter<?> adapter = getParentJsonAdapter().attachAdapter(model, m_filter);
+      IJsonAdapter<?> adapter = getParentJsonAdapter().attachAdapter(model, m_filter); // result may be null due to filter
       // Only track owned adapters, only those may be disposed
-      if (getParentJsonAdapter() == adapter.getParent()) {
+      if (adapter != null && adapter.getParent() == getParentJsonAdapter()) {
         m_ownedAdapters.add(adapter);
       }
     }

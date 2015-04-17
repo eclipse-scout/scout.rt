@@ -1,7 +1,7 @@
 scout.Menu = function() {
   scout.Menu.parent.call(this);
-  this.childMenus = [];
-  this._addAdapterProperties('childMenus');
+  this.childActions = [];
+  this._addAdapterProperties('childActions');
   this.popup = undefined;
 };
 scout.inherits(scout.Menu, scout.Action);
@@ -30,7 +30,7 @@ scout.Menu.prototype._renderItem = function($parent) {
   if ('taskbar' === this.menuStyle) {
     this.$container.addClass('taskbar');
   }
-  if (this.childMenus.length > 0 && this.text) {
+  if (this.childActions.length > 0 && this.text) {
     this.$container.addClass('has-submenu');
   }
 

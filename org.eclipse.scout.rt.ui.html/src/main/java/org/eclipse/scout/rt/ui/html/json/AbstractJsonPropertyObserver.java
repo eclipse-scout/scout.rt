@@ -159,7 +159,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     return m_propertyEventFilter.filter(event);
   }
 
-  private void handleSlaveJsonProperties(JsonProperty<?> masterProperty) {
+  protected void handleSlaveJsonProperties(JsonProperty<?> masterProperty) {
     for (JsonProperty<?> slaveProperty : masterProperty.getSlaveProperties()) {
       Object modelValue = slaveProperty.modelValue();
       slaveProperty.handlePropertyChange(null, modelValue);
@@ -170,7 +170,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     }
   }
 
-  private void addPropertyChangeEvent(JsonProperty<?> jsonProperty, Object oldValue, Object newValue) {
+  protected void addPropertyChangeEvent(JsonProperty<?> jsonProperty, Object oldValue, Object newValue) {
     String propertyName = jsonProperty.getPropertyName();
     addPropertyChangeEvent(propertyName, jsonProperty.prepareValueForToJson(newValue));
     jsonProperty.setValueSent(true);
@@ -178,7 +178,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   }
 
   /**
-   * This method is called, when no a PropertyChangeEvent from the model occurs and no JsonProperty is registered for
+   * This method is called, when no PropertyChangeEvent from the model occurs and no JsonProperty is registered for
    * the given propertyName. Note that you must check if the property-change-event has been filtered by using the
    * {@link #filterPropertyChangeEvent(PropertyChangeEvent)} method before you add an event to the JSON response.
    * The default implementation does nothing.
@@ -186,15 +186,15 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
   }
 
+  @Override
+  public void cleanUpEventFilters() {
+    m_propertyEventFilter.removeAllConditions();
+  }
+
   private class P_PropertyChangeListener implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
       handleModelPropertyChange(event);
     }
-  }
-
-  @Override
-  public void cleanUpEventFilters() {
-    m_propertyEventFilter.removeAllConditions();
   }
 }

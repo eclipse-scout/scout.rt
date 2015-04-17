@@ -146,6 +146,11 @@ scout.ModelAdapter.prototype.destroy = function() {
     this.owner.removeOwnedAdapter(this);
     this.owner = null;
   }
+  // Disconnect from parent (adapter is being destroyed, it will never be rendered again)
+  if (this.parent) {
+    this.parent.removeChild(this);
+    this.parent = null;
+  }
   this.destroyed = true;
 };
 
@@ -301,7 +306,6 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldPrope
       if (oldValue) {
         this._destroyAdapters(propertyName, oldValue, value);
       }
-
       if (value) {
         value = this._createAdapters(propertyName, value);
       }

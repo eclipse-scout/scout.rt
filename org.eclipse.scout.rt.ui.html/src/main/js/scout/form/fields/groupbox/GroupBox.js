@@ -28,8 +28,7 @@ scout.GroupBox.prototype._createKeyStrokeAdapter = function() {
 scout.GroupBox.prototype._render = function($parent) {
   var htmlBody, i,
     env = scout.HtmlEnvironment,
-    htmlComp = this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', new scout.GroupBoxLayout(this)),
-    menuItems = [];
+    htmlComp = this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', new scout.GroupBoxLayout(this));
 
   if (this.mainBox) {
     htmlComp.layoutData = null;
@@ -52,9 +51,6 @@ scout.GroupBox.prototype._render = function($parent) {
     this.controls[i].render(this.$body);
   }
 
-  menuItems = this.staticMenus
-    .concat(this.menus)
-    .concat(this.processButtons);
   this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.GroupBoxMenuItemsOrder.order);
   if (this.menuBar.position === 'top') {
     this._$groupBoxTitle.after(this.menuBar.$container);
@@ -62,7 +58,6 @@ scout.GroupBox.prototype._render = function($parent) {
   if (this.mainBox && !(this.getForm().parent instanceof scout.WrappedFormField)) {
     this.menuBar.$container.addClass('main-menubar');
   }
-  this.menuBar.updateItems(menuItems);
 };
 
 scout.GroupBox.prototype._renderProperties = function() {
@@ -71,6 +66,7 @@ scout.GroupBox.prototype._renderProperties = function() {
   this._renderBorderVisible(this.borderVisible);
   this._renderExpandable(this.expandable);
   this._renderExpanded(this.expanded);
+  this._renderMenus(this.menus);
 };
 
 scout.GroupBox.prototype._remove = function() {
@@ -204,6 +200,19 @@ scout.GroupBox.prototype._renderLabelVisible = function(visible) {
   // TODO AWE: (concept) discuss with C.GU -> auf dem GUI server korrigieren oder im Browser UI?
   // --> kein hack für main-box, wenn die auf dem model ein label hat, hat es im UI auch eins
   this._$groupBoxTitle.setVisible(visible && this.label && !this.mainBox);
+};
+
+scout.GroupBox.prototype._renderMenus = function(menus) {
+  var menuItems = this.staticMenus.
+    concat(menus).
+    concat(this.processButtons);
+  this.menuBar.updateItems(menuItems);
+};
+
+scout.GroupBox.prototype._removeMenus = function(menus) {
+  menus.forEach(function(menu) {
+    menu.remove();
+  });
 };
 
 scout.GroupBox.prototype._onGroupBoxControlClick = function(event) {
