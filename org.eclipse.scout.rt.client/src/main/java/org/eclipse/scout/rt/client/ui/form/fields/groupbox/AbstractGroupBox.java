@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.IGroupBoxExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
@@ -281,9 +282,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
-
     menus.addAllOrdered(contributedMenus);
-
     try {
       injectMenusInternal(menus);
     }
@@ -295,6 +294,13 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     IFormFieldContextMenu contextMenu = new FormFieldContextMenu<IGroupBox>(this, menus.getOrderedList());
     contextMenu.setContainerInternal(this);
     setContextMenu(contextMenu);
+  }
+
+  @Override
+  protected void initFieldInternal() throws ProcessingException {
+    super.initFieldInternal();
+    // init actions
+    ActionUtility.initActions(getMenus());
   }
 
   private void categorizeFields() {

@@ -186,7 +186,7 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
       }
     }
     if (changed) {
-      // Information parent form (update layout etc.)
+      // Inform parent form (update layout etc.)
       if (getForm() != null) {
         getForm().structureChanged(this);
       }
