@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.html.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import org.eclipse.scout.commons.html.IHtmlContent;
 
 public class HtmlPlainBuilder extends AbstractExpressionBuilder {
   private final List<? extends CharSequence> m_texts;
@@ -22,7 +25,21 @@ public class HtmlPlainBuilder extends AbstractExpressionBuilder {
   }
 
   public HtmlPlainBuilder(List<? extends CharSequence> texts) {
-    m_texts = texts;
+    m_texts = createBindTexts(texts);
+  }
+
+  private ArrayList<CharSequence> createBindTexts(List<? extends CharSequence> texts) {
+    ArrayList<CharSequence> bindTexts = new ArrayList<CharSequence>();
+    for (CharSequence text : texts) {
+      if (text instanceof IHtmlContent) {
+        getBinds().putAll(((IHtmlContent) text).getBinds());
+        bindTexts.add((IHtmlContent) text);
+      }
+      else {
+        bindTexts.add(text);
+      }
+    }
+    return bindTexts;
   }
 
   @Override
@@ -36,11 +53,6 @@ public class HtmlPlainBuilder extends AbstractExpressionBuilder {
     for (CharSequence t : m_texts) {
       append(t);
     }
-  }
-
-  @Override
-  public String toEncodedHtml() {
-    return toString();
   }
 
   @Override

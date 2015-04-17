@@ -211,6 +211,10 @@ public class HTMLTest {
   @Test
   public void testPlain() {
     assertEquals(BIND_TEXT, HTML.plain(BIND_TEXT).toEncodedHtml());
+    IHtmlContent plainLink = HTML.plain(BIND_TEXT, HTML.appLink("REF", BIND_TEXT));
+    String plainLinkString = String.format("%s<span class=\"app-link\" data-ref=\"REF\">%s</span>", BIND_TEXT, ENCODED_BIND_TEXT);
+    assertEquals(String.format(plainLinkString, BIND_TEXT, ENCODED_BIND_TEXT), plainLink.toEncodedHtml());
+    assertEquals(String.format("<b>%s</b>", plainLinkString), HTML.bold(plainLink).toEncodedHtml());
   }
 
 }
