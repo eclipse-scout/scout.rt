@@ -666,6 +666,34 @@ public class JsonTableTest {
     assertEquals(2, events.length());
   }
 
+  @Test
+  public void testTableEventCoalesceInUi_UpdateEventOnFilteredRow() throws Exception {
+    TableWith3Cols table = new TableWith3Cols();
+    table.initTable();
+    table.fill(1, false);
+    table.resetDisplayableColumns();
+    JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
+    m_uiSession.currentJsonResponse().addAdapter(jsonTable);
+    JSONObject response = m_uiSession.currentJsonResponse().toJson();
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // -------------
+
+    table.fill(2, false);
+    table.getRow(2).setChecked(true); // would normally trigger an event, but we filter the row in the next step
+    table.addRowFilter(new ITableRowFilter() {
+      @Override
+      public boolean accept(ITableRow r) {
+        return r.getRowIndex() == 0; // hide everything expect the first (already existing row)
+      }
+    });
+
+    response = m_uiSession.currentJsonResponse().toJson();
+    assertEquals(0, jsonTable.eventBuffer().size());
+    JSONArray events = response.optJSONArray("events");
+    assertNull(events); // No events should be emitted
+  }
+
   public static Table createTableFixture(int numRows) throws ProcessingException {
     Table table = new Table();
     table.fill(numRows);

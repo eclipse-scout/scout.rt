@@ -541,7 +541,7 @@ describe("Tree", function() {
       tree.render(session.$entryPoint);
 
       var allNodes = [];
-      tree._visitNodes(tree.nodes, function(parentNode, node) {
+      tree._visitNodes(tree.nodes, function(node) {
         allNodes.push(node);
       });
 

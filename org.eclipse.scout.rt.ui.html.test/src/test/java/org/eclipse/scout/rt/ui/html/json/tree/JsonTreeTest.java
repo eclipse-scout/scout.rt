@@ -384,6 +384,67 @@ public class JsonTreeTest {
     Assert.assertNull(jsonTree.getOrCreateNodeId(null));
   }
 
+  @Test
+  public void testTreeExpandedRecursive() throws Exception {
+    // (root)
+    //   +-(node)
+    //   |   +-(node)
+    //   |   |   +-(node)
+    //   |   |   +-(node)
+    //   |   +-(node)
+    //   +-(node)
+    //   |   +-(node)
+    //   +-(node)
+    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    ITree tree = createTree(nodes);
+    tree.addChildNode(tree.getRootNode().getChildNode(0), new TreeNode());
+    tree.addChildNode(tree.getRootNode().getChildNode(0), new TreeNode());
+    tree.addChildNode(tree.getRootNode().getChildNode(0).getChildNode(0), new TreeNode());
+    tree.addChildNode(tree.getRootNode().getChildNode(0).getChildNode(0), new TreeNode());
+    tree.addChildNode(tree.getRootNode().getChildNode(1), new TreeNode());
+
+    IJsonAdapter<? super ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
+    m_uiSession.currentJsonResponse().addAdapter(jsonTree);
+    JSONObject response = m_uiSession.currentJsonResponse().toJson();
+    System.out.println("Response #1: " + response);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // --------------------------------------
+
+    tree.expandAll(tree.getRootNode());
+    response = m_uiSession.currentJsonResponse().toJson();
+    System.out.println("Response #2: " + response);
+
+    List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
+    assertEquals(3, events.size());
+    assertEquals("nodeExpanded", events.get(0).getType());
+    assertEquals(true, events.get(0).getData().optBoolean("expanded"));
+    assertEquals(true, events.get(0).getData().optBoolean("recursive"));
+    assertEquals("nodeExpanded", events.get(1).getType());
+    assertEquals(true, events.get(1).getData().optBoolean("expanded"));
+    assertEquals(true, events.get(1).getData().optBoolean("recursive"));
+    assertEquals("nodeExpanded", events.get(2).getType());
+    assertEquals(true, events.get(2).getData().optBoolean("expanded"));
+    assertEquals(true, events.get(2).getData().optBoolean("recursive"));
+
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // --------------------------------------
+
+    tree.collapseAll(tree.getRootNode().getChildNode(0));
+    response = m_uiSession.currentJsonResponse().toJson();
+    System.out.println("Response #3: " + response);
+
+    events = m_uiSession.currentJsonResponse().getEventList();
+    assertEquals(1, events.size());
+    assertEquals("nodeExpanded", events.get(0).getType());
+    assertEquals(false, events.get(0).getData().optBoolean("expanded"));
+    assertEquals(true, events.get(0).getData().optBoolean("recursive"));
+  }
+
   public static JsonEvent createJsonSelectedEvent(String nodeId) throws JSONException {
     String desktopId = "x"; // never used
     JSONObject data = new JSONObject();

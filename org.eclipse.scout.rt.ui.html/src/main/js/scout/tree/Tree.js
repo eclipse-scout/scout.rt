@@ -31,7 +31,7 @@ scout.Tree.prototype.init = function(model, session) {
   }
 };
 
-scout.Tree.prototype._initTreeNode = function(parentNode, node) {
+scout.Tree.prototype._initTreeNode = function(node, parentNode) {
   this.nodesMap[node.id] = node;
   if (parentNode) {
     node.parentNode = parentNode;
@@ -48,7 +48,7 @@ scout.Tree.prototype.destroy = function() {
   this._visitNodes(this.nodes, this._destroyTreeNode.bind(this));
 };
 
-scout.Tree.prototype._destroyTreeNode = function(parentNode, node) {
+scout.Tree.prototype._destroyTreeNode = function(node, parentNode) {
   delete this.nodesMap[node.id];
   if (this._onNodeDeleted) { // Necessary for subclasses
     this._onNodeDeleted(node);
@@ -67,7 +67,7 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
 
   for (i = 0; i < nodes.length; i++) {
     node = nodes[i];
-    func(parentNode, node);
+    func(node, parentNode);
     if (node.childNodes.length > 0) {
       this._visitNodes(node.childNodes, func, node);
     }
@@ -254,7 +254,7 @@ scout.Tree.prototype.collapseAll = function() {
   });
 
   // Collapse all expanded child nodes (only model)
-  this._visitNodes(this.nodes, function(parentNode, node) {
+  this._visitNodes(this.nodes, function(node) {
     this.setNodeExpanded(node, false);
   }.bind(this));
 };
@@ -509,7 +509,7 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
     } else {
       scout.arrays.remove(this.nodes, node);
     }
-    this._destroyTreeNode(node.parentNode, node);
+    this._destroyTreeNode(node, node.parentNode);
     deletedNodes.push(node);
     this._updateMarkChildrenChecked(node, false, false);
 
@@ -524,13 +524,7 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
 };
 
 scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
-  var updateNodeMap, parentNode, nodes;
-
-  // Update model and nodemap
-  updateNodeMap = function(parentNode, node) {
-    this._destroyTreeNode(parentNode, node);
-    this._updateMarkChildrenChecked(node, false, false);
-  }.bind(this);
+  var parentNode, nodes;
 
   if (parentNodeId >= 0) {
     parentNode = this.nodesMap[parentNodeId];
@@ -545,11 +539,19 @@ scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
     nodes = this.nodes;
     this.nodes = [];
   }
-  this._visitNodes(nodes, updateNodeMap);
+  this._visitNodes(nodes, updateNodeMap.bind(this));
 
   // remove node from html document
   if (this.rendered) {
     this._removeNodes(nodes, parentNodeId);
+  }
+
+  // --- Helper functions ---
+
+  // Update model and nodemap
+  function updateNodeMap(node, parentNode) {
+    this._destroyTreeNode(node, parentNode);
+    this._updateMarkChildrenChecked(node, false, false);
   }
 };
 
@@ -562,12 +564,22 @@ scout.Tree.prototype._onNodesSelected = function(nodeIds) {
   this._triggerNodesSelected(nodeIds);
 };
 
-scout.Tree.prototype._onNodeExpanded = function(nodeId, expanded) {
+scout.Tree.prototype._onNodeExpanded = function(nodeId, expanded, recursive) {
   var node = this.nodesMap[nodeId];
-  node.expanded = expanded;
+  expandNodeInternal.call(this, node);
+  if (recursive) {
+    this._visitNodes(node.childNodes, function(childNode) {
+      expandNodeInternal.call(this, childNode);
+    }.bind(this));
+  }
 
-  if (this.rendered) {
-    this._renderExpansion(node);
+  // --- Helper functions ---
+
+  function expandNodeInternal(node) {
+    node.expanded = expanded;
+    if (this.rendered) {
+      this._renderExpansion(node);
+    }
   }
 };
 
@@ -1030,7 +1042,7 @@ scout.Tree.prototype.onModelAction = function(event) {
   } else if (event.type === 'nodesSelected') {
     this._onNodesSelected(event.nodeIds);
   } else if (event.type === 'nodeExpanded') {
-    this._onNodeExpanded(event.nodeId, event.expanded);
+    this._onNodeExpanded(event.nodeId, event.expanded, event.recursive);
   } else if (event.type === 'nodeChanged') {
     this._onNodeChanged(event.nodeId, event);
   } else if (event.type === 'nodesChecked') {

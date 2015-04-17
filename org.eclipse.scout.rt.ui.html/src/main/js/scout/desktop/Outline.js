@@ -41,8 +41,8 @@ scout.Outline.prototype._renderEnabled = function() {
 /**
  * @override
  */
-scout.Outline.prototype._initTreeNode = function(parentNode, node) {
-  scout.Outline.parent.prototype._initTreeNode.call(this, parentNode, node);
+scout.Outline.prototype._initTreeNode = function(node, parentNode) {
+  scout.Outline.parent.prototype._initTreeNode.call(this, node, parentNode);
   node.detailFormVisibleByUi = true;
   // FIXME AWE: (outline) bezeichner detailTable ist nicht konsistent zu java code, dort ist es nur "table"
   if (node.detailTable) {
