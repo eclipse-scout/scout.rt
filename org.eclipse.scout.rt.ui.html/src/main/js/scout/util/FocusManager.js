@@ -1,4 +1,3 @@
-//TODO nbu add listener for hide and show on forms. and reset focus();
 scout.FocusManager = function() {
   this._sessionFocusContexts = {};
   var that = this;
@@ -112,11 +111,10 @@ scout.FocusManager.prototype.checkFocusContextIsActive = function(focusContext) 
 };
 scout.FocusManager.prototype.validateFocus = function(uiSessionId, caller) {
   $.log.warn('validate focus, caller: '+caller);
-//  if (this._sessionFocusContexts[uiSessionId].focusContexts.length > 0) {
-//    var context = this._sessionFocusContexts[uiSessionId].focusContexts[this._sessionFocusContexts[uiSessionId].focusContexts.length - 1];
-//    $.log.warn('validate focus, caller: '+caller);
-//    context._validateFocus();
-//  }
+  if (this._sessionFocusContexts[uiSessionId].focusContexts.length > 0 ) {
+    var context = this._sessionFocusContexts[uiSessionId].focusContexts[this._sessionFocusContexts[uiSessionId].focusContexts.length - 1];
+    context._validateFocus();
+  }
 };
 
 scout.FocusContext = function($container, $focusedElement, uiSessionId, isRoot) {
@@ -127,6 +125,7 @@ scout.FocusContext = function($container, $focusedElement, uiSessionId, isRoot) 
   this._isRoot = isRoot;
   this._$container.bind('focusin.focusContext', this._validateFocusInEvent.bind(this));
   this._$container.bind('remove', this.uninstall.bind(this));
+  this.validatingFocus = false;
 };
 
 scout.FocusContext.prototype.uninstall = function(event) {
@@ -177,10 +176,7 @@ scout.FocusContext.prototype.activate = function(disposeOld) {
 
     $.log.warn('activated context: ' +this.name);
   }
-  if (this._$focusedElement && this._$focusedElement.length>0 && !this._$focusedElement.is(":focus")) {
-    $.log.warn('activate context set focus on element focus ' + this._$focusedElement.attr('class') + ' already focused '+this._$focusedElement.is(":focus")+ ' context: ' +this.name);
-    this._$focusedElement.focus();
-  }
+  this._validateFocus();
 };
 
 scout.FocusContext.prototype._validateFocusInEvent = function(event) {
@@ -190,9 +186,13 @@ scout.FocusContext.prototype._validateFocusInEvent = function(event) {
 };
 
 scout.FocusContext.prototype.bindHideListener = function() {
+  //ensure only one of each listenertype exists.
   var $focusedElement =  this._$focusedElement;
+  $focusedElement.unbind('hide.focusContext');
   $focusedElement.bind('hide.focusContext', scout.focusManager.validateFocus.bind( scout.focusManager,this._uiSessionId, 'hide'));
+  $focusedElement.unbind('remove.focusContext');
   $focusedElement.bind('remove.focusContext', scout.focusManager.validateFocus.bind(scout.focusManager, this._uiSessionId, 'remove'));
+  $focusedElement.unbind('focusout.unbindListener.focusContext');
   $focusedElement.bind('focusout.unbindListener.focusContext', function(){
     $.log.warn('hidelistner unbound on ' + $focusedElement.attr('class'));
     $focusedElement.unbind('remove.focusContext');
@@ -201,27 +201,33 @@ scout.FocusContext.prototype.bindHideListener = function() {
   });
   $.log.warn('hidelistner bound on ' + $focusedElement.attr('class')+ ' context: ' +this.name);
 };
-
 scout.FocusContext.prototype._validateFocus = function() {
+  if(this.validatingFocus){
+    return;
+    }
+  this.validatingFocus = true;
   $.log.warn('_validate focus called');
   //If somehow, this scout div gets the focus, ensure it is set to the correct focus context.
   // For example, if glasspanes are active, the focus should _only_ be applied to the top-most glasspane.
   var activeElement = document.activeElement;
   if( this._$focusedElement && this._$focusedElement.length>0){
 
-    $.log.warn('_validate focus ' + document.activeElement.id+ ' context: ' +this.name + ' activeElement =' +document.activeElement.id);
+    $.log.warn('_validate focus ' + this._$focusedElement.attr('class')+ ' context: ' +this.name + ' activeElement =' + this._$focusedElement.attr('class'));
   }
   //activate Context if it is not on top
   if (!scout.focusManager.checkFocusContextIsActive(this)) {
-    $.log.warn('set focus on top if its not on top' + this._$focusedElement.attr('class')+ ' context: ' +this.name);
+    $.log.warn(this._$focusedElement ? 'set focus on top if its not on top' +  this._$focusedElement.attr('class') + ' context: ' +this.name :'set focus on top if its not on top context: ' +this.name );
     this.activate(true);
   }
 
-  // If there are glasspanes, find the top-most one. Otherwise, use the scout div as context.
+  // If there are glasspanes under this element do not update focus on this element. Glasspane should always install own focus contexts.
+  // The problem is when glasspane is started by clicking a nonfocusable element the focuscontext for the glasspane is installed after a focusvalidation on the last focuscontext.
+  // This is prevented by the following div.
   var $focusContext = this._$container;
   var $glasspanes = this._$container.find('.glasspane');
   if ($glasspanes.length > 0) {
-    $focusContext = $glasspanes.last();
+    this.validatingFocus = false;
+    return;
   }
 
   // If any non-focusable element inside the $container got the focus...
@@ -231,7 +237,7 @@ scout.FocusContext.prototype._validateFocus = function() {
       //if we are on scout div and there are elements on this div which can gain the focus then it's not allowed to focus scout div. focus last element
       if (this._$focusedElement && this._$focusedElement.length>0 && this._$focusedElement.is(':focusable')) {
         this._$focusedElement.focus();
-        $.log.warn('_validate focus  focused ' + this._$focusedElement.attr('class')+ ' context: ' +this.name);
+        $.log.warn(this._$focusedElement ? '_validate focus  focused ' + this._$focusedElement.attr('class') + ' context: ' +this.name : '_validate focus  focused context: ' +this.name);
       } else {
         $.log.warn('_validate first focused '+ ' context: ' +this.name);
         $focusContext.find(':focusable').first().focus();
@@ -253,14 +259,14 @@ scout.FocusContext.prototype._validateFocus = function() {
     }
     $.log.warn(' ...set the focus to the first focusable element inside the context element '+ ' context: ' +this.name);
   }
-
   if (this._$container.find(':focusable').filter(function() {
     return this === document.activeElement;
-  }).length === 1 ) {
+  }).length === 1) {
     this._$focusedElement = $(document.activeElement);
-    $.log.warn('focused element :' + this._$focusedElement.attr('class'));
+    $.log.warn(this._$focusedElement ? 'focused element :' + this._$focusedElement.attr('class') : 'focused element with undefined class');
     this.bindHideListener();
   }
+  this.validatingFocus = false;
 };
 
 //Singleton

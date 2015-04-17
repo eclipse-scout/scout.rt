@@ -369,7 +369,6 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
 scout.Desktop.prototype.changeOutline = function(outline) {
   this.outline = outline;
   this.navigation.onOutlineChanged(this.outline);
-//  scout.focusManager.validateFocus(this.session);
 };
 
 scout.Desktop.prototype.removeForm = function(id) {
