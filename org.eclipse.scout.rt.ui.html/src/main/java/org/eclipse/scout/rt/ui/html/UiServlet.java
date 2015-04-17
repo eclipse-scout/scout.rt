@@ -27,7 +27,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.ui.html.cache.DefaultHttpCacheControl;
@@ -65,11 +64,8 @@ public class UiServlet extends HttpServlet {
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
     try {
-      String appParam = config.getInitParameter("application");
-      @SuppressWarnings("unchecked")
-      Class<? extends IApplication> appType = (Class<? extends IApplication>) (appParam != null ? Class.forName(appParam) : null);
       Platform.setDefault();
-      Platform.get().start(appType);
+      Platform.get().start();
     }
     catch (Exception e) {
       throw new ServletException(e);
