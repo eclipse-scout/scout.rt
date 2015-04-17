@@ -119,20 +119,11 @@ public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAs
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("LookupRowFetcherResult {");
-    builder.append("[searchText:'").append(getSearchText()).append("']");
-    builder.append(" [rowCount:'");
-    if (getLookupRows() != null) {
-      builder.append(getLookupRows().size());
-    }
-    else {
-      builder.append("null");
-    }
-    builder.append("']");
-    builder.append(" [selectCurrentValue:'").append(isSelectCurrentValue()).append("']");
-    builder.append(" [processingException:'").append(getProcessingException()).append("']");
-    builder.append("}");
-    return builder.toString();
+    String s = getClass().getSimpleName() + " {";
+    s += "[searchText: " + (m_searchText == null ? "null" : "'" + m_searchText + "'") + "], ";
+    s += "[lookupRows: " + (getLookupRows() == null ? "null" : getLookupRows().size() + " rows") + "], ";
+    s += "[selectCurrentValue: " + isSelectCurrentValue() + "], ";
+    s += "[processingException: " + getProcessingException() + "]}";
+    return s;
   }
 }
