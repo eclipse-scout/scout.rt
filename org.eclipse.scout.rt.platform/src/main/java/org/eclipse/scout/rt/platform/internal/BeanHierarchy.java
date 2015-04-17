@@ -18,24 +18,29 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
 
 /**
  * This class is not thread safe
  */
-public class TypeHierarchy<T> {
+public class BeanHierarchy<T> {
   private final Class<T> m_clazz;
-  private final Set<IBean<T>> m_beans = new HashSet<>();
-  private List<IBean<T>> m_querySingle;
-  private List<IBean<T>> m_queryAll;
+  private final Set<IBean<T>> m_beans;
+  private final Map<Object, List<IBean<T>>> m_singleQueryByScope;
+  private final Map<Object, List<IBean<T>>> m_allQueryByScope;
 
-  public TypeHierarchy(Class<T> clazz) {
+  public BeanHierarchy(Class<T> clazz) {
     m_clazz = clazz;
+    m_beans = new HashSet<>();
+    m_singleQueryByScope = new HashMap<>();
+    m_allQueryByScope = new HashMap<>();
   }
 
   public Class<T> getClazz() {
@@ -65,9 +70,10 @@ public class TypeHierarchy<T> {
    *         This means when B replaces A using {@link Replace} then A is not part of the result. Also if C extends A
    *         without {@link Replace} then C is not part of the result.
    */
-  public List<IBean<T>> querySingle() {
-    validate();
-    return m_querySingle;
+  public List<IBean<T>> querySingle(IBeanScopeEvaluator evaluator) {
+    Object currentScope = getCurrentScope(evaluator);
+    validate(currentScope, evaluator);
+    return m_singleQueryByScope.get(currentScope);
   }
 
   /**
@@ -77,20 +83,31 @@ public class TypeHierarchy<T> {
    *         This means when B replaces A using {@link Replace} then A is not part of the result. But if C extends A
    *         without {@link Replace} then C is part of the result.
    */
-  public List<IBean<T>> queryAll() {
-    validate();
-    return m_queryAll;
+  public List<IBean<T>> queryAll(IBeanScopeEvaluator evaluator) {
+    Object currentScope = getCurrentScope(evaluator);
+    validate(currentScope, evaluator);
+    return m_allQueryByScope.get(currentScope);
+  }
+
+  protected Object getCurrentScope(IBeanScopeEvaluator evaluator) {
+    if (evaluator == null) {
+      return null;
+    }
+    return evaluator.getCurrentScope();
   }
 
   protected void invalidate() {
-    m_querySingle = null;
-    m_queryAll = null;
+    m_singleQueryByScope.clear();
+    m_allQueryByScope.clear();
   }
 
   @SuppressWarnings("unchecked")
-  protected void validate() {
-    if (m_querySingle == null || m_queryAll == null) {
-      ArrayList<IBean<T>> list = new ArrayList<>(m_beans);
+  protected void validate(Object scope, IBeanScopeEvaluator evaluator) {
+    List<IBean<T>> singleList = m_singleQueryByScope.get(scope);
+    List<IBean<T>> allList = m_allQueryByScope.get(scope);
+
+    if (singleList == null || allList == null) {
+      List<IBean<T>> list = new ArrayList<>(m_beans);
       //sort by Order ascending
       Collections.sort(list, ORDER_COMPARATOR);
       //remove duplicate classes
@@ -101,6 +118,10 @@ public class TypeHierarchy<T> {
           it.remove();
         }
         lastSeen = bean.getBeanClazz();
+      }
+      //filter beans not matching scope
+      if (evaluator != null) {
+        list = evaluator.filter(list, scope);
       }
 
       //manage replaced beans
@@ -130,7 +151,7 @@ public class TypeHierarchy<T> {
         }
       }
 
-      m_queryAll = Collections.unmodifiableList(new ArrayList<IBean<T>>(list));
+      m_allQueryByScope.put(scope, Collections.unmodifiableList(new ArrayList<IBean<T>>(list)));
 
       //now retain only beans that are exactly of type refClazz, but only if refClass is not an interface
       if (!refClazz.isInterface()) {
@@ -160,7 +181,7 @@ public class TypeHierarchy<T> {
           it.remove();
         }
       }
-      m_querySingle = Collections.unmodifiableList(list);
+      m_singleQueryByScope.put(scope, Collections.unmodifiableList(new ArrayList<IBean<T>>(list)));
     }
   }
 

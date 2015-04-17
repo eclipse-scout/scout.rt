@@ -14,9 +14,7 @@ import org.eclipse.scout.commons.annotations.Replace;
  * All objects marked with this annotation (or an annotation that has this annotation) are automatically registered in
  * the scout {@link IBeanManager}
  * <p>
- * see also {@link Order}, {@link ApplicationScoped}, and annotations qualifed with {@link BeanInvocationHint}
- * <p>
- * In more details...
+ * see also {@link Order}, {@link ApplicationScoped}, and annotations qualified with {@link BeanInvocationHint}
  * <p>
  * The existence of the file
  * <code>src/main/resources/META-INF/services/org.eclipse.scout.rt.platform.IBeanContributor</code> will make scout add
@@ -38,12 +36,13 @@ import org.eclipse.scout.commons.annotations.Replace;
  * existing behaviour, the java <code>extends</code> keyword does not distinguish between <b>REPLACE</b> and
  * <b>RE-USE</b> of code. For example there may be a <code>PersonForm</code> and a
  * <code>VIPPersonForm extends PersonForm</code>. Both of them are required at runtime. One is just more specialized and
- * handles special persons. So {@link BEANS#get(Class)} of PersonForm.class should yield an instance of PersonForm whereas
- * {@link BEANS#get(Class)} of VIPPersonForm.class should yield an instance of VIPPersonForm.
+ * handles special persons. So {@link BEANS#get(Class)} of PersonForm.class should yield an instance of PersonForm
+ * whereas {@link BEANS#get(Class)} of VIPPersonForm.class should yield an instance of VIPPersonForm.
  * <p>
  * On the other hand consider the case of <code>PersonForm</code> and <code>PersonFormEx extends PersonForm</code> with
- * the goal of replacing the former PersonForm. Here {@link BEANS#get(Class)} of PersonForm.class should yield an instance
- * of PersonFormEx and also {@link BEANS#get(Class)} of PersonFormEx.class should yield an instance of PersonFormEx.
+ * the goal of replacing the former PersonForm. Here {@link BEANS#get(Class)} of PersonForm.class should yield an
+ * instance of PersonFormEx and also {@link BEANS#get(Class)} of PersonFormEx.class should yield an instance of
+ * PersonFormEx.
  * <p>
  * How could the {@link IBeanManager} know which is the case?
  * <p>

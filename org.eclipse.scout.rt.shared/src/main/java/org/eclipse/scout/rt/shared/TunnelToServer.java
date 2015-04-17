@@ -23,10 +23,10 @@ import org.eclipse.scout.rt.platform.BeanInvocationHint;
  * there is
  * no real implementation available for the service
  */
-@BeanInvocationHint
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
 @Documented
+@BeanInvocationHint
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
 public @interface TunnelToServer {
 
 }

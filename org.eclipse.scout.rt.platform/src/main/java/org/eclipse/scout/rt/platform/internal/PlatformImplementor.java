@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Platform;
@@ -74,6 +75,7 @@ public class PlatformImplementor implements IPlatform {
       changeState(State.BeanManagerPrepared, true);
 
       //validateBeanManager();
+      initBeanScopeEvaluator();
       initBeanDecorationFactory();
 
       changeState(State.BeanManagerValid, true);
@@ -96,11 +98,21 @@ public class PlatformImplementor implements IPlatform {
     return context;
   }
 
+  protected void initBeanScopeEvaluator() {
+    if (m_beanContext.getScopeEvaluator() != null) {
+      return;
+    }
+    IBean<IBeanScopeEvaluator> bean = m_beanContext.optBean(IBeanScopeEvaluator.class);
+    if (bean != null) {
+      m_beanContext.setScopeEvaluator(bean.getInstance(IBeanScopeEvaluator.class));
+    }
+  }
+
   protected void initBeanDecorationFactory() {
     if (m_beanContext.getBeanDecorationFactory() != null) {
       return;
     }
-    IBean<IBeanDecorationFactory> bean = m_beanContext.getBean(IBeanDecorationFactory.class);
+    IBean<IBeanDecorationFactory> bean = m_beanContext.optBean(IBeanDecorationFactory.class);
     if (bean != null) {
       m_beanContext.setBeanDecorationFactory(bean.getInstance(IBeanDecorationFactory.class));
       return;
@@ -132,7 +144,7 @@ public class PlatformImplementor implements IPlatform {
           }
           System.out.println("-------- " + s.getName() + " --------");
           for (IBean<?> bean : list) {
-            System.out.println(" @Order(" + TypeHierarchy.orderOf(bean) + ") " + bean.getBeanClazz());
+            System.out.println(" @Order(" + BeanHierarchy.orderOf(bean) + ") " + bean.getBeanClazz());
           }
         }
         catch (Exception e) {

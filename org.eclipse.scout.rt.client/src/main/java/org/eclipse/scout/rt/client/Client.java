@@ -9,7 +9,6 @@ import java.lang.annotation.Target;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.BeanInvocationHint;
 
 /**
  * An object (typically a service implementation) with this annotation creates a client transaction whenever an
@@ -18,7 +17,6 @@ import org.eclipse.scout.rt.platform.BeanInvocationHint;
  * Only valid if the object is obtained using {@link BEANS#get(Class)} with an interface argument
  */
 @Bean
-@BeanInvocationHint
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @Documented

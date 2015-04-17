@@ -28,11 +28,13 @@ import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
 
 public class BeanManagerImplementor implements IBeanManager {
   private final ReentrantReadWriteLock m_lock;
-  private final Map<Class<?>, TypeHierarchy> m_beanHierarchies;
+  private final Map<Class<?>, BeanHierarchy> m_beanHierarchies;
   private IBeanDecorationFactory m_beanDecorationFactory;
+  private IBeanScopeEvaluator m_scopeEvaluator;
 
   public BeanManagerImplementor() {
     this(null);
@@ -54,8 +56,8 @@ public class BeanManagerImplementor implements IBeanManager {
     m_lock.readLock().lock();
     try {
       @SuppressWarnings("unchecked")
-      TypeHierarchy<T> h = m_beanHierarchies.get(beanClazz);
-      return (h == null) ? Collections.<IBean<T>> emptyList() : h.querySingle();
+      BeanHierarchy<T> h = m_beanHierarchies.get(beanClazz);
+      return (h == null) ? Collections.<IBean<T>> emptyList() : h.querySingle(getScopeEvaluator());
     }
     finally {
       m_lock.readLock().unlock();
@@ -67,11 +69,11 @@ public class BeanManagerImplementor implements IBeanManager {
     m_lock.readLock().lock();
     try {
       @SuppressWarnings("unchecked")
-      TypeHierarchy<T> h = m_beanHierarchies.get(beanClazz);
+      BeanHierarchy<T> h = m_beanHierarchies.get(beanClazz);
       if (h == null) {
         return Collections.emptyList();
       }
-      return h.queryAll();
+      return h.queryAll(getScopeEvaluator());
     }
     finally {
       m_lock.readLock().unlock();
@@ -112,9 +114,9 @@ public class BeanManagerImplementor implements IBeanManager {
     try {
       IBean<T> bean = new BeanImplementor<T>(beanData, this);
       for (Class<?> type : listImplementedTypes(bean)) {
-        TypeHierarchy h = m_beanHierarchies.get(type);
+        BeanHierarchy h = m_beanHierarchies.get(type);
         if (h == null) {
-          h = new TypeHierarchy(type);
+          h = new BeanHierarchy(type);
           m_beanHierarchies.put(type, h);
         }
         h.addBean(bean);
@@ -133,7 +135,7 @@ public class BeanManagerImplementor implements IBeanManager {
     try {
       Assertions.assertNotNull(bean);
       for (Class<?> type : listImplementedTypes(bean)) {
-        TypeHierarchy h = m_beanHierarchies.get(type);
+        BeanHierarchy h = m_beanHierarchies.get(type);
         if (h != null) {
           h.removeBean(bean);
         }
@@ -152,7 +154,7 @@ public class BeanManagerImplementor implements IBeanManager {
   public <T> List<IBean<T>> getRegisteredBeans(Class<T> beanClazz) {
     m_lock.readLock().lock();
     try {
-      TypeHierarchy<T> h = m_beanHierarchies.get(beanClazz);
+      BeanHierarchy<T> h = m_beanHierarchies.get(beanClazz);
       if (h == null) {
         return CollectionUtility.emptyArrayList();
       }
@@ -205,6 +207,16 @@ public class BeanManagerImplementor implements IBeanManager {
   @Internal
   protected IBeanDecorationFactory getBeanDecorationFactory() {
     return m_beanDecorationFactory;
+  }
+
+  @Internal
+  protected IBeanScopeEvaluator getScopeEvaluator() {
+    return m_scopeEvaluator;
+  }
+
+  @Internal
+  protected void setScopeEvaluator(IBeanScopeEvaluator scopeEvaluator) {
+    m_scopeEvaluator = scopeEvaluator;
   }
 
   @SuppressWarnings("unchecked")

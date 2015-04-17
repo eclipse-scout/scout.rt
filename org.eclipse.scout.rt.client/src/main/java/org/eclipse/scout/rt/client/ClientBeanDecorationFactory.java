@@ -20,20 +20,10 @@ public class ClientBeanDecorationFactory extends SimpleBeanDecorationFactory {
     if (bean.getBeanAnnotation(TunnelToServer.class) != null) {
       return decorateWithTunnelToServer(bean, queryType);
     }
-    if (bean.getBeanAnnotation(Client.class) != null) {
-      return decorateWithClientSessionCheck(bean, queryType);
-    }
     return super.decorate(bean, queryType);
   }
 
   protected <T> IBeanInterceptor<T> decorateWithTunnelToServer(IBean<T> bean, Class<T> queryType) {
-    //TODO imo add context check
     return new TunnelToServerBeanInterceptor<T>(queryType);
   }
-
-  protected <T> IBeanInterceptor<T> decorateWithClientSessionCheck(IBean<T> bean, Class<T> queryType) {
-    //TODO imo add context check
-    return null;
-  }
-
 }
