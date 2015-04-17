@@ -17,7 +17,3 @@ scout.CalendarLayout.prototype.layout = function($container) {
 scout.CalendarLayout.prototype.preferredLayoutSize = function($comp) {
   return scout.graphics.getSize($comp);
 };
-
-scout.CalendarLayout.prototype.invalidate = function($comp) {
-  this.calendar.layoutSize();
-};

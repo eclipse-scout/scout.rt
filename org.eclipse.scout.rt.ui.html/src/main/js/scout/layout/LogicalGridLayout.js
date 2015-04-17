@@ -3,13 +3,15 @@
  */
 scout.LogicalGridLayout = function(hgap, vgap) {
   scout.LogicalGridLayout.parent.call(this);
+  this.validityBasedOnParentSize = new scout.Dimension();
+  this.valid = false;
   this.m_info;
   this.m_hgap = hgap || 0;
   this.m_vgap = vgap || 0;
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
-scout.AbstractLayout.prototype._verifyLayout = function($parent) {
+scout.LogicalGridLayout.prototype._verifyLayout = function($parent) {
   var htmlParent = scout.HtmlComponent.get($parent),
     parentSize = htmlParent.getSize();
 
@@ -20,7 +22,10 @@ scout.AbstractLayout.prototype._verifyLayout = function($parent) {
   }
 };
 
-scout.AbstractLayout.prototype.invalidate = function() {
+/**
+ * @override
+ */
+scout.LogicalGridLayout.prototype.invalidate = function() {
   this.valid = false;
 };
 

@@ -21,8 +21,6 @@ public class JsonGridData implements IJsonObject {
     m_gridData = gridData;
   }
 
-  // TODO AWE: (layout) wahrscheinlich müssen nicht alle properties gesendet werden, vielleicht nur die,
-  // die != default wert sind?
   @Override
   public JSONObject toJson() {
     if (m_gridData == null) {
@@ -44,6 +42,10 @@ public class JsonGridData implements IJsonObject {
     JsonObjectUtility.putProperty(json, "x", m_gridData.x);
     JsonObjectUtility.putProperty(json, "y", m_gridData.y);
     return json;
+  }
+
+  public static Object toJson(GridData gridData) {
+    return gridData == null ? "" : new JsonGridData(gridData).toJson();
   }
 
 }

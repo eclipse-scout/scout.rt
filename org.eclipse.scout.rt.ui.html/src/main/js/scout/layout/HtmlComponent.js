@@ -2,18 +2,18 @@
  * Wrapper for a JQuery selector. Used as replacement for javax.swing.JComponent.
  */
 scout.HtmlComponent = function($comp, session) {
-  this.$comp = $comp;
-  this.layoutManager = new scout.NullLayout();
-  this.layoutData;
-  this.valid = false;
-
-  // Set this to false if your component automatically adjusts its size (e.g. by using css styling)
-  // -> setSize won't be called
-  this.pixelBasedSizing = true;
-
   if (!session) {
     throw new Error('session must be defined for ' + this);
   }
+  this.$comp = $comp;
+  this._layout = new scout.NullLayout();
+  this.layoutData;
+  this.valid = false;
+  /**
+   * Set pixelBasedSizing to false if your component automatically adjusts its size,
+   * e.g. by using CSS styling -> setSize won't be called.
+   */
+  this.pixelBasedSizing = true;
   this.session = session;
   // link DOM element with this instance
   $comp.data('htmlComponent', this);
@@ -52,15 +52,15 @@ scout.HtmlComponent.prototype.getAvailableSize = function() {
 };
 
 /**
- * Calls the layout manager of the component to layout its children.
- * @exception when component has no layout manager
+ * Calls the layout of the component to layout its children.
+ * @exception when component has no layout
  */
 scout.HtmlComponent.prototype.layout = function() {
-  if (!this.layoutManager) {
-    throw new Error('Called layout() but component has no layout manager');
+  if (!this._layout) {
+    throw new Error('Called layout() but component has no layout');
   }
   if (!this.valid) {
-    this.layoutManager.layout(this.$comp);
+    this._layout.layout(this.$comp);
     // Save size for later use (necessary if pixelBasedSizing is set to false)
     this.size = this.getSize();
     this.valid = true;
@@ -68,12 +68,12 @@ scout.HtmlComponent.prototype.layout = function() {
 };
 
 /**
- * Invalidates the component (sets the valid-flag to false).
+ * Invalidates the component (sets the valid property to false).
  */
 scout.HtmlComponent.prototype.invalidate = function() {
-  this.valid = false; // FIXME AWE: check why this flag is required here and on the layoutManager too
-  if (this.layoutManager) {
-    this.layoutManager.invalidate();
+  this.valid = false;
+  if (this._layout) {
+    this._layout.invalidate();
   }
 };
 
@@ -109,23 +109,23 @@ scout.HtmlComponent.prototype.isValidateRoot = function() {
 };
 
 /**
- * Sets the given layout manager.
+ * Sets the given layout.
  */
-scout.HtmlComponent.prototype.setLayout = function(layoutManager) {
-  this.layoutManager = layoutManager;
+scout.HtmlComponent.prototype.setLayout = function(layout) {
+  this._layout = layout;
 };
 
 /**
  * Returns the preferred size of the component, insets included.
- * @exception When component has no layout manager
+ * @exception When component has no layout
  */
 scout.HtmlComponent.prototype.getPreferredSize = function() {
-  if (this.layoutManager) {
-    var prefSize = this.layoutManager.preferredLayoutSize(this.$comp);
+  if (this._layout) {
+    var prefSize = this._layout.preferredLayoutSize(this.$comp);
     $.log.trace('(HtmlComponent#getPreferredSize) ' + this.debug() + ' preferredSize=' + prefSize);
     return prefSize;
   } else {
-    throw new Error('Called getPreferredSize() but component has no layout manager');
+    throw new Error('Called getPreferredSize() but component has no layout');
   }
 };
 

@@ -66,7 +66,7 @@ describe("HtmlComponent", function() {
     var $comp = $('<div>');
     var htmlComp = new scout.HtmlComponent($comp, session);
 
-    htmlComp.layoutManager = new LayoutMock();
+    htmlComp._layout = new LayoutMock();
 
     it("accepts scout.Dimension as single argument", function() {
       spyOn($comp, 'css').and.callThrough();
@@ -78,10 +78,10 @@ describe("HtmlComponent", function() {
       expect($comp.css).toHaveBeenCalledWith('height', '7px');
     });
 
-    it("calls invalidate on layout-manager when size has changed", function() {
-      spyOn(htmlComp.layoutManager, 'invalidate');
+    it("calls invalidate on layout when size has changed", function() {
+      spyOn(htmlComp._layout, 'invalidate');
       htmlComp.setSize(new scout.Dimension(1, 2));
-      expect(htmlComp.layoutManager.invalidate).toHaveBeenCalled();
+      expect(htmlComp._layout.invalidate).toHaveBeenCalled();
     });
 
   });

@@ -103,7 +103,7 @@ public abstract class JsonFormField<T extends IFormField> extends AbstractJsonPr
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        return new JsonGridData((GridData) value).toJson();
+        return JsonGridData.toJson((GridData) value);
       }
     });
   }
