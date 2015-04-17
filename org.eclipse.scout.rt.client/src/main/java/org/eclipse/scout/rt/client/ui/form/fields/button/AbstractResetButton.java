@@ -42,8 +42,4 @@ public abstract class AbstractResetButton extends AbstractButton {
     return ScoutTexts.get("ResetButtonTooltip");
   }
 
-  @Override
-  protected int getConfiguredHorizontalAlignment() {
-    return 1;
-  }
 }

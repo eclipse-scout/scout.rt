@@ -36,11 +36,6 @@ public abstract class AbstractFormStateButton extends AbstractButton {
   }
 
   @Override
-  protected int getConfiguredHorizontalAlignment() {
-    return -1;
-  }
-
-  @Override
   protected void execClickAction() throws ProcessingException {
     getForm().doImportXml();
   }

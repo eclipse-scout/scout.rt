@@ -44,11 +44,6 @@ public abstract class AbstractCloseButton extends AbstractButton {
   }
 
   @Override
-  protected int getConfiguredHorizontalAlignment() {
-    return 1;
-  }
-
-  @Override
   protected String getConfiguredKeyStroke() {
     return IKeyStroke.ESCAPE;
   }
