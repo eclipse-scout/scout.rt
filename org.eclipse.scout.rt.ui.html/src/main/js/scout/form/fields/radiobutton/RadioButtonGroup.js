@@ -23,7 +23,7 @@ scout.RadioButtonGroup.prototype._render = function($parent) {
 
   for (var i = 0; i < this.formFields.length; i++) {
     this.formFields[i].render(this._$body);
-    if (this.formFields[i].objectType === 'RadioButton') {
+    if (this.formFields[i] instanceof scout.RadioButton) {
       this.formFields[i].$field.attr('name', this.id);
       this._radioButtonMap[this.formFields[i].radioValue] = this.formFields[i];
     }

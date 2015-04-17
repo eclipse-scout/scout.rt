@@ -231,7 +231,7 @@ scout.FormField.prototype._showStatusMessage = function(options) {
 
 scout.FormField.prototype.getForm = function() {
   var parent = this.parent;
-  while (parent && parent.objectType !== 'Form') {
+  while (parent && !(parent instanceof scout.Form)) {
     parent = parent.parent;
   }
   return parent;

@@ -192,9 +192,9 @@ scout.Desktop.prototype._selectTab = function(tab) {
 
   tab.$container.select(true);
   this._selectedTab = tab;
-  if (tab.content && tab.content.objectType === 'Table') {
+  if (tab.content instanceof scout.Table) {
     // Install adapter on parent (no table focus required)
-    if (tab.content.keyStrokeAdapter.objectType !== 'TableKeyStrokeAdapter') {
+    if (!(tab.content.keyStrokeAdapter instanceof scout.TableKeyStrokeAdapter)) {
       tab.content.injectKeyStrokeAdapter(new scout.DesktopTableKeyStrokeAdapter(tab.content), this.$parent);
     } else {
       scout.keyStrokeManager.installAdapter(this.$parent, tab.content.keyStrokeAdapter);
@@ -339,10 +339,10 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   }
   this._updateTab(this._outlineTab);
   this._selectTab(this._outlineTab);
-  //FIXME CGU create DesktopTable or OutlineTable
+  // FIXME CGU: create DesktopTable or OutlineTable
   if (content instanceof scout.Table) {
     if (!scout.keyStrokeManager.isAdapterInstalled(content.keyStrokeAdapter)) {
-      if (content.keyStrokeAdapter.objectType !== 'TableKeyStrokeAdapter') {
+      if (!(content.keyStrokeAdapter instanceof scout.TableKeyStrokeAdapter)) {
         content.injectKeyStrokeAdapter(new scout.DesktopTableKeyStrokeAdapter(content), this.$parent);
       } else {
         scout.keyStrokeManager.installAdapter(this.$parent, content.keyStrokeAdapter);
