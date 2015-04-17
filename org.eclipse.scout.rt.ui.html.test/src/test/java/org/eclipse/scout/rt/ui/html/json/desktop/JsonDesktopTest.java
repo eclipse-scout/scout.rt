@@ -15,8 +15,8 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.desktop.DownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
@@ -283,26 +283,16 @@ public class JsonDesktopTest {
     assertNull(outlineId);
   }
 
-  static class P_DownloadHandler implements IDownloadHandler {
-    @Override
-    public boolean isActive() {
-      return true;
-    }
-
-    @Override
-    public BinaryResource getResource() {
-      return new BinaryResource("foo.txt", null);
-    }
-  }
-
   @Test
   public void testHandleModelDownloadResource() throws Exception {
     IDesktop desktop = new DesktopWithNonDisplayableOutline();
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
-    jsonDesktop.handleModelDownloadResource(new P_DownloadHandler());
-    JSONObject json = m_uiSession.currentJsonResponse().toJson();
-//    JSONObject event = json.getJSONArray("events").get(0);
+    jsonDesktop.handleModelDownloadResource(new DownloadHandler(new BinaryResource("foo.txt", null), 100));
+    List<JsonEvent> events = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "openUri");
+    JSONObject data = events.get(0).getData();
+    assertEquals("dynamic/null/2/foo.txt", data.getString("uri"));
+    assertEquals("AUTO", data.getString("uriTarget"));
   }
 
 }

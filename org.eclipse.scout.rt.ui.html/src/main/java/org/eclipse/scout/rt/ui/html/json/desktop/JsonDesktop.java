@@ -12,10 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -50,11 +47,12 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   public static final String PROP_FORM = "form";
   public static final String PROP_MESSAGE_BOX = "messageBox";
 
-  private Map<String, IDownloadHandler> m_downloadHandlers = new HashMap<String, IDownloadHandler>();
+  private DownloadHandlerStorage m_downloads;
   private DesktopListener m_desktopListener;
 
   public JsonDesktop(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
+    m_downloads = new DownloadHandlerStorage();
   }
 
   @Override
@@ -242,35 +240,20 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
    * downloaded resource or if the download is processed in the same window as the Scout application.
    */
   protected void handleModelDownloadResource(IDownloadHandler handler) {
-    if (handler == null) {
-      return; // FIXME AWE: (download) remove this null if?
-    }
-    manageDownloadHandlers(); // FIXME AWE: (download) remove handler after timeout -> job? mit BSH besprechen, wäre es nicht besser nur
-    // 1 clean-up job pro UI server zu haben? oder evtl. den poller job benutzen?
     String fileName = handler.getResource().getFilename();
-    m_downloadHandlers.put(fileName, handler);
+    m_downloads.put(fileName, handler);
     String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, fileName);
-    handleModelOpenUri(downloadUrl, TargetWindow.AUTO); // FIXME AWE: (download) unit-test AUTO
+    handleModelOpenUri(downloadUrl, TargetWindow.AUTO);
   }
 
   @Override
   public BinaryResource getBinaryResource(String fileName) {
-    manageDownloadHandlers();
-    IDownloadHandler handler = m_downloadHandlers.get(fileName);
+    IDownloadHandler handler = m_downloads.remove(fileName);
     if (handler != null) {
       return handler.getResource();
     }
     else {
       return null;
-    }
-  }
-
-  protected void manageDownloadHandlers() {
-    for (Iterator<IDownloadHandler> it = m_downloadHandlers.values().iterator(); it.hasNext();) {
-      IDownloadHandler handler = it.next();
-      if (!handler.isActive()) {
-        it.remove();
-      }
     }
   }
 
