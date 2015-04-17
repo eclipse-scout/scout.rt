@@ -23,7 +23,7 @@ public class ApplicationTest {
     try {
       try {
         Platform.setDefault();
-        Platform.get().start(TestApplication.class);
+        Platform.get().start();
 
         Assert.assertEquals(TestApplication.getInstance().getClass(), TestApplication.class);
       }

@@ -18,7 +18,7 @@ public class MultiSessionCookieStoreInstallListener implements IPlatformListener
     if (TierState.get() == Tier.BackEnd) {
       return;
     }
-    if (event.getState() == IPlatform.State.PlatformInit) {
+    if (event.getState() == IPlatform.State.BeanManagerPrepared) {
       // Install cookie handler for HTTP based service tunnels
       m_multiSessionCookieStoreInstaller = new MultiSessionCookieStoreInstaller();
       String enabledText = ConfigIniUtility.getProperty(MultiSessionCookieStoreInstaller.PROP_MULTI_SESSION_COOKIE_STORE_ENABLED);

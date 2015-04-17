@@ -26,7 +26,7 @@ public class JaxWs216Module implements IPlatformListener {
 
   @Override
   public void stateChanged(PlatformEvent event) throws PlatformException {
-    if (event.getState() == IPlatform.State.PlatformInit) {
+    if (event.getState() == IPlatform.State.BeanManagerPrepared) {
       // apply properties
       boolean stacktraceEnabled = ConfigIniUtility.getPropertyBoolean(PROP_STACKTRACE, false);
       if (!stacktraceEnabled) {

@@ -24,7 +24,7 @@ public class ClientModule implements IPlatformListener {
 
   @Override
   public void stateChanged(PlatformEvent event) throws PlatformException {
-    if (event.getState() == IPlatform.State.ApplicationStopped) {
+    if (event.getState() == IPlatform.State.PlatformStopping) {
       for (IJobManager mgr : BEANS.all(IJobManager.class)) {
         mgr.shutdown();
       }

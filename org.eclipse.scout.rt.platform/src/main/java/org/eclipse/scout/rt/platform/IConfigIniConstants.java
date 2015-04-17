@@ -10,24 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
-
 /**
- * The application with the highest {@link Priority} will be launched in the {@link IPlatform.State#ApplicationStarting}
- * phase
+ *
  */
-@Bean
-public interface IApplication {
-
-  String CONFIG_KEY_VERSION = "scout.application.version";
-  String CONFIG_KEY_NAME = "scout.application.name";
-  
-  void start() throws PlatformException;
-
-  void stop() throws PlatformException;
-  
-  String getName();
-
-  String getVersion();
+public interface IConfigIniConstants {
+  String APPLICATION_VERSION = "scout.application.version";
+  String APPLICATION_NAME = "scout.application.name";
 }

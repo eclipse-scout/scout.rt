@@ -27,8 +27,10 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.UserInterruptedException;
-import org.eclipse.scout.rt.platform.AbstractApplication;
+import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -43,7 +45,7 @@ import org.eclipse.scout.rt.ui.swing.splash.SplashProgressMonitor;
  *
  * @author awe
  */
-abstract class BaseSwingApplication extends AbstractApplication {
+abstract class BaseSwingApplication implements IPlatformListener {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BaseSwingApplication.class);
 
@@ -112,34 +114,31 @@ abstract class BaseSwingApplication extends AbstractApplication {
     return m_monitor;
   }
 
-  /**
-   * This abstract template application creates a JAAS subject based on the system property "user.name"
-   * <p>
-   * Normally {@link #startInSubject(IApplicationContext)} is overridden
-   */
   @Override
-  public void start() throws PlatformException {
-    try {
-      if (Subject.getSubject(AccessController.getContext()) != null) {
-        // there is a subject context
-        startInSubject();
-        exit();
+  public void stateChanged(PlatformEvent event) throws PlatformException {
+    if (event.getState() == IPlatform.State.PlatformStarted) {
+      try {
+        if (Subject.getSubject(AccessController.getContext()) != null) {
+          // there is a subject context
+          startInSubject();
+          exit();
+        }
+        else {
+          Subject subject = new Subject();
+          subject.getPrincipals().add(new SimplePrincipal(System.getProperty("user.name")));
+          Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
+            @Override
+            public Object run() throws Exception {
+              startInSubject();
+              exit();
+              return null;
+            }
+          });
+        }
       }
-      else {
-        Subject subject = new Subject();
-        subject.getPrincipals().add(new SimplePrincipal(System.getProperty("user.name")));
-        Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
-          @Override
-          public Object run() throws Exception {
-            startInSubject();
-            exit();
-            return null;
-          }
-        });
+      catch (Exception e) {
+        throw new PlatformException("Unable to start application.", e);
       }
-    }
-    catch (Exception e) {
-      throw new PlatformException("Unable to start application.", e);
     }
   }
 

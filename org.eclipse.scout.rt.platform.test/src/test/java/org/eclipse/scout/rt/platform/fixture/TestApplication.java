@@ -10,37 +10,29 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.fixture;
 
-import org.eclipse.scout.rt.platform.AbstractApplication;
+import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
  *
  */
-public class TestApplication extends AbstractApplication {
+public class TestApplication implements IPlatformListener {
 
   private static TestApplication instance;
 
   @Override
-  public void start() {
-    instance = this;
-  }
-
-  @Override
-  public void stop() {
-    instance = null;
+  public void stateChanged(PlatformEvent event) throws PlatformException {
+    if (event.getState() == IPlatform.State.PlatformStarted) {
+      instance = this;
+    }
+    else if (event.getState() == IPlatform.State.PlatformStopping) {
+      instance = null;
+    }
   }
 
   public static TestApplication getInstance() {
     return instance;
   }
-
-  @Override
-  public String getName() {
-    return "test app";
-  }
-
-  @Override
-  public String getVersion() {
-    return "0.0.0";
-  }
-
 }

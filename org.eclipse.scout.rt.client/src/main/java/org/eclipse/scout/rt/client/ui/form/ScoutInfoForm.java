@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -36,8 +37,7 @@ import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.GroupBox.HtmlFi
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.IConfigIniConstants;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
@@ -205,19 +205,11 @@ public class ScoutInfoForm extends AbstractForm {
   }
 
   private String getProductName() {
-    IApplication app = BEANS.opt(IApplication.class);
-    if (app != null) {
-      return StringUtility.emptyIfNull(app.getName());
-    }
-    return "unknown";
+    return ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_NAME, "unknown");
   }
 
   private String getVersion() {
-    IApplication app = BEANS.opt(IApplication.class);
-    if (app != null) {
-      return StringUtility.emptyIfNull(app.getVersion());
-    }
-    return "";
+    return ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_VERSION, "0.0.0");
   }
 
   protected Map<String, Object> getProperties() {

@@ -26,10 +26,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.IConfigIniConstants;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.security.ReadDiagnosticServletPermission;
 import org.eclipse.scout.rt.shared.security.UpdateDiagnosticServletPermission;
@@ -101,14 +102,8 @@ public class DiagnosticSession {
     DiagnosticFactory.addDiagnosticItemToList(result, "System.gc()", "", "<input type='checkbox' name='gc' value='yes'/>");
 
     String diagnosticHTML = getDiagnosticItemsHTML(result);
-
-    IApplication app = BEANS.opt(IApplication.class);
-    String title = "unknown";
-    String version = "0.0.0";
-    if (app != null) {
-      title = app.getName();
-      version = app.getVersion();
-    }
+    String title = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_NAME, "unknown");
+    String version = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_VERSION, "0.0.0");
 
     resp.setContentType("text/html");
     ServletOutputStream out = resp.getOutputStream();
@@ -207,18 +202,10 @@ public class DiagnosticSession {
 
     DiagnosticFactory.addDiagnosticItemToList(result, "Version", "", DiagnosticFactory.STATUS_TITLE);
 
-    IApplication app = BEANS.opt(IApplication.class);
-    String productName = "unknown";
-    String application = "unknown";
-    String version = "0.0.0";
-    if (app != null) {
-      productName = app.getName();
-      version = app.getVersion();
-      application = app.getClass().getName();
-    }
+    String title = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_NAME, "unknown");
+    String version = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_VERSION, "0.0.0");
 
-    DiagnosticFactory.addDiagnosticItemToList(result, "Product Name", productName, DiagnosticFactory.STATUS_INFO);
-    DiagnosticFactory.addDiagnosticItemToList(result, "Application", application, DiagnosticFactory.STATUS_INFO);
+    DiagnosticFactory.addDiagnosticItemToList(result, "Product Name", title, DiagnosticFactory.STATUS_INFO);
     DiagnosticFactory.addDiagnosticItemToList(result, "Defining Bundle Version", version, DiagnosticFactory.STATUS_INFO);
 
     DiagnosticFactory.addDiagnosticItemToList(result, "Change values", "", DiagnosticFactory.STATUS_TITLE);

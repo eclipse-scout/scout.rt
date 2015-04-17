@@ -72,12 +72,6 @@ public interface IClientSession extends ISession {
    */
   void stopSession();
 
-  /**
-   * @param exitCode
-   *          {@link org.eclipse.equinox.app.IApplication#EXIT_OK},
-   *          {@link org.eclipse.equinox.app.IApplication#EXIT_RELAUNCH},
-   *          {@link org.eclipse.equinox.app.IApplication#EXIT_RESTART}
-   */
   void stopSession(int exitCode);
 
   int getExitCode();

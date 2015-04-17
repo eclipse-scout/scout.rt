@@ -82,7 +82,7 @@ public class PlatformStatement extends Statement {
     try {
       Platform.setDefault();
       try {
-        Platform.get().start(null);
+        Platform.get().start();
         m_next.evaluate();
       }
       finally {
@@ -98,7 +98,7 @@ public class PlatformStatement extends Statement {
     // ensure platform is started
     if (Platform.get() == null) {
       Platform.setDefault();
-      Platform.get().start(null);
+      Platform.get().start();
     }
     m_next.evaluate();
   }

@@ -19,8 +19,6 @@ import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanManager;
@@ -34,7 +32,7 @@ import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
- * @since 15.2
+ * @since 15.1
  */
 public class PlatformImplementor implements IPlatform {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PlatformImplementor.class);
@@ -42,7 +40,6 @@ public class PlatformImplementor implements IPlatform {
   private final ReentrantReadWriteLock m_stateLock;
   private volatile State m_state; // may be read at any time by any thread
   private BeanManagerImplementor m_beanContext;
-  private IApplication m_application;
 
   public PlatformImplementor() {
     m_stateLock = new ReentrantReadWriteLock(true);
@@ -67,14 +64,13 @@ public class PlatformImplementor implements IPlatform {
   }
 
   @Override
-  public synchronized void start(Class<? extends IApplication> appType) {
+  public synchronized void start() {
     m_stateLock.writeLock().lock();
     try {
       changeState(State.PlatformStopped, true);
       m_beanContext = createBeanManager();
       //now all IPlatformListener are registered and can receive platform events
 
-      changeState(State.PlatformInit, true);
       changeState(State.BeanManagerPrepared, true);
 
       //validateBeanManager();
@@ -87,10 +83,8 @@ public class PlatformImplementor implements IPlatform {
       m_stateLock.writeLock().unlock();
     }
 
-    // start of application not part of the lock to allow the application to use the bean context and the inventory
-    changeState(State.ApplicationStarting, true);
-    startApplication(appType);
-    changeState(State.ApplicationStarted, true);
+    // last event is outside lock to allow the listeners to use the bean context and the inventory
+    changeState(State.PlatformStarted, true);
   }
 
   protected BeanManagerImplementor createBeanManager() {
@@ -155,28 +149,11 @@ public class PlatformImplementor implements IPlatform {
     ((BeanManagerImplementor) m_beanContext).startCreateImmediatelyBeans();
   }
 
-  protected void startApplication(Class<? extends IApplication> appType) {
-    m_application = BEANS.opt(appType);
-    if (m_application != null) {
-      try {
-        m_application.start();
-      }
-      catch (Exception e) {
-        LOG.error(String.format("Could not start application '%s'.", m_application.getClass().getName()), e);
-      }
-    }
-    else {
-      LOG.warn("Start platform without an application. No application has been found.");
-    }
-  }
-
   @Override
   public synchronized void stop() {
     m_stateLock.writeLock().lock();
     try {
-      changeState(State.ApplicationStopping, false);
-      stopApplication();
-      changeState(State.ApplicationStopped, false);
+      changeState(State.PlatformStopping, false);
       if (Platform.get() == this) {
         Platform.set(null);
       }
@@ -185,20 +162,6 @@ public class PlatformImplementor implements IPlatform {
     }
     finally {
       m_stateLock.writeLock().unlock();
-    }
-  }
-
-  protected void stopApplication() {
-    if (m_application != null) {
-      try {
-        m_application.stop();
-      }
-      catch (Exception e) {
-        LOG.error(String.format("Could not stop application '%s'.", m_application.getClass().getName()), e);
-      }
-      finally {
-        m_application = null;
-      }
     }
   }
 
@@ -221,28 +184,20 @@ public class PlatformImplementor implements IPlatform {
     if (oldState == newState) {
       return;
     }
-    else if (oldState == State.PlatformInit && newState == State.BeanManagerPrepared) {
+    if (oldState == State.PlatformStopped && newState == State.BeanManagerPrepared) {
       return;
     }
     else if (oldState == State.BeanManagerPrepared && newState == State.BeanManagerValid) {
       return;
     }
-    else if (oldState == State.BeanManagerValid && newState == State.ApplicationStarting) {
+    else if (oldState == State.BeanManagerValid && newState == State.PlatformStarted) {
       return;
     }
-    else if (oldState == State.ApplicationStarting && newState == State.ApplicationStarted) {
+
+    else if (oldState == State.PlatformStarted && newState == State.PlatformStopping) {
       return;
     }
-    else if (oldState == State.ApplicationStarted && newState == State.ApplicationStopping) {
-      return;
-    }
-    else if (oldState == State.ApplicationStopping && newState == State.ApplicationStopped) {
-      return;
-    }
-    else if (oldState == State.ApplicationStopped && newState == State.PlatformStopped) {
-      return;
-    }
-    else if (oldState == State.PlatformStopped && newState == State.PlatformInit) {
+    else if (oldState == State.PlatformStopping && newState == State.PlatformStopped) {
       return;
     }
     throw new PlatformException("Invalid state change from " + oldState + " to " + newState);
@@ -256,13 +211,13 @@ public class PlatformImplementor implements IPlatform {
           IPlatformListener listener = bean.getInstance(IPlatformListener.class);
           listener.stateChanged(e);
         }
-        catch (Throwable t) {
-          LOG.warn(IPlatformListener.class.getSimpleName() + " " + bean.getBeanClazz(), t);
+        catch (Exception ex) {
+          LOG.warn(IPlatformListener.class.getSimpleName() + " " + bean.getBeanClazz(), ex);
         }
       }
     }
-    catch (Throwable t) {
-      LOG.warn("state " + newState, t);
+    catch (Exception ex) {
+      LOG.warn("state " + newState, ex);
     }
   }
 

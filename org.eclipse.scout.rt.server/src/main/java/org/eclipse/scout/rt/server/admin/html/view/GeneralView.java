@@ -18,11 +18,12 @@ import java.util.Iterator;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.IConfigIniConstants;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -56,14 +57,11 @@ public class GeneralView extends DefaultView {
     String loggingStatusMessage = createLoggingQuickLink(p);
 
     // infos
-    IApplication app = BEANS.opt(IApplication.class);
-    if (app != null) {
-      p.print("Product: name=" + app.getName() + ", app=" + app.getClass().getName() + ", version=" + app.getVersion());
-      p.br();
-    }
-    else {
-      p.print("No product available");
-    }
+    String title = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_NAME, "unknown");
+    String version = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_VERSION, "0.0.0");
+
+    p.print("Product: name=" + title + ", version=" + version);
+    p.br();
     p.br();
     p.print("Date: " + new Date());
     p.br();

@@ -65,12 +65,6 @@ public abstract class AbstractSwingApplication extends BaseSwingApplication {
 
   /**
    * Blocks the main thread as as the client session is active.
-   *
-   * @param clientSession
-   * @return exit code {@link org.eclipse.equinox.app.IApplication#EXIT_OK EXIT_OK},
-   *         {@link org.eclipse.equinox.app.IApplication#EXIT_RELAUNCH EXIT_RELAUNCH},
-   *         {@link org.eclipse.equinox.app.IApplication#EXIT_RESTART EXIT_RESTART}
-   * @throws InterruptedException
    */
   private int runWhileActive(IClientSession clientSession) throws InterruptedException {
     Object stateLock = clientSession.getStateLock();
@@ -106,11 +100,6 @@ public abstract class AbstractSwingApplication extends BaseSwingApplication {
 
   protected ISwingEnvironment createSwingEnvironment() {
     return new DefaultSwingEnvironment();
-  }
-
-  @Override
-  public void stop() {
-
   }
 
 }

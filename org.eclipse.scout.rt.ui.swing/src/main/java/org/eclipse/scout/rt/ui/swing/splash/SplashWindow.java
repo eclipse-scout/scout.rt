@@ -28,10 +28,10 @@ import javax.swing.JLabel;
 import javax.swing.JRootPane;
 import javax.swing.UIManager;
 
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.IConfigIniConstants;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.JFrameEx;
@@ -46,12 +46,9 @@ public class SplashWindow extends JFrameEx implements ISplashWindow {
   public SplashWindow(Frame owner) {
     setUndecorated(true);
     getRootPane().setWindowDecorationStyle(JRootPane.NONE);
-    IApplication app = BEANS.opt(IApplication.class);
-    String version = "0.0.0";
-    if (app != null) {
-      m_title = app.getName();
-      version = app.getVersion();
-    }
+
+    m_title = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_NAME, "unknown");
+    String version = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_VERSION, "0.0.0");
 
     SwingUtility.setDefaultImageIcons(this);
     setTitle(m_title);
