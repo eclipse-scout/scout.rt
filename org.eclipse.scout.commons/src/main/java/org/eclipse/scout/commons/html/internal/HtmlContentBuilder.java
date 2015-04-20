@@ -36,7 +36,10 @@ public class HtmlContentBuilder extends AbstractExpressionBuilder implements IHt
   protected ArrayList<? extends IHtmlBind> importTexts(List<? extends CharSequence> texts) {
     ArrayList<IHtmlBind> bindTexts = new ArrayList<IHtmlBind>();
     for (CharSequence text : texts) {
-      if (text instanceof IHtmlContent) {
+      if (text == null) {
+        continue;
+      }
+      else if (text instanceof IHtmlContent) {
         bindTexts.add(importHtml((IHtmlContent) text));
       }
       else if (text instanceof IHtmlBind) {
