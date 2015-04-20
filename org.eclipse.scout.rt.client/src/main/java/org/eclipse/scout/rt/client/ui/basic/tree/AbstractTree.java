@@ -2936,9 +2936,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         //
         node = resolveNode(node);
         node = resolveVirtualNode(node);
-        if (node != null) {
-          fireNodeDropAction(node, dropData);
-        }
+        fireNodeDropAction(node, dropData);
       }
       catch (ProcessingException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
