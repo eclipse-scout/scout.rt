@@ -26,8 +26,6 @@ import org.eclipse.scout.rt.shared.extension.IMoveModelObjectToRootMarker;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeTypeWithGeneric;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
-import org.eclipse.scout.rt.shared.services.common.workflow.AbstractWorkflowData;
-import org.eclipse.scout.rt.shared.services.common.workflow.AbstractWorkflowStepData;
 
 /**
  *
@@ -49,7 +47,6 @@ public class SharedContainerValidationService extends AbstractContainerValidatio
     addPossibleContributionForContainer(IDataModelEntity.class, AbstractDataModelEntity.class);
     addPossibleContributionForContainer(ICode.class, AbstractCode.class);
     addPossibleContributionForContainer(ICode.class, AbstractCodeTypeWithGeneric.class);
-    addPossibleContributionForContainer(AbstractWorkflowStepData.class, AbstractWorkflowData.class);
     addPossibleContributionForContainer(Serializable.class, AbstractTableRowData.class); // for row data extensions serializable beans are allowed.
 
     // moves
