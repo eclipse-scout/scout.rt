@@ -16,9 +16,12 @@ import java.util.List;
 
 import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.commons.html.IHtmlContent;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
@@ -40,11 +43,13 @@ public class HTMLTextTest {
         new BeanMetaData(TestTextProviderService.class).
         applicationScoped(true)
         );
+    ScoutTexts.CURRENT.set(new ScoutTexts(BEANS.all(ITextProviderService.class)));
   }
 
   @After
   public void after() {
     TestingUtility.unregisterBeans(m_testTextService);
+    ScoutTexts.CURRENT.remove();
   }
 
   @Test
