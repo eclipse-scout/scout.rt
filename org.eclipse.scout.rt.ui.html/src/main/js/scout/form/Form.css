@@ -32,16 +32,19 @@
   & > .title-box {
     margin-top: 10px;
     margin-left: 20px;
-  }
+    margin-right: 30px; /* Leave space for 'x' closable */
 
-  & > .title {
-    .font-text-large;
-    color: @active-color;
-  }
+    & > .title {
+      .overflow-ellipsis-nowrap;
+      .font-text-large;
+      color: @active-color;
+    }
 
-  & > .sub-title {
-    .font-text-normal;
-    color: @active-color;
+    & > .sub-title {
+      .overflow-ellipsis-nowrap;
+      .font-text-normal;
+      color: @active-color;
+    }
   }
 
   & > .closable {
