@@ -4,6 +4,7 @@
   position: relative;
   height: @menubar-height;
   border-bottom: 1px solid @desktop-border-color;
+  white-space: nowrap;
 
   & div {
     position: relative; /* reset a possible different value (e.g. set by .form-field) which might cause 'display: inline-block' to be ignored for the computed style */
