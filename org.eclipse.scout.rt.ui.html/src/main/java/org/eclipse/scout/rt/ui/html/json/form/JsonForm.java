@@ -100,7 +100,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
     return json;
   }
 
-  private boolean isClosable() {
+  protected boolean isClosable() {
     for (IFormField f : getModel().getAllFields()) {
       if (f.isEnabled() && f.isVisible() && (f instanceof IButton)) {
         switch (((IButton) f).getSystemType()) {

@@ -23,15 +23,23 @@ import org.eclipse.scout.rt.platform.job.Jobs;
  * This class manages downloadable items. Each item has a TTL, after that time the item is removed automatically.
  * When the item is removed before the timeout occurs, the scheduled removal-job will be canceled.
  */
-class DownloadHandlerStorage {
+public class DownloadHandlerStorage {
 
-  Map<String, IDownloadHandler> m_valueMap = new HashMap<>();
-  Map<String, IFuture> m_futureMap = new HashMap<>();
+  private final Map<String, IDownloadHandler> m_valueMap = new HashMap<>();
+  private final Map<String, IFuture> m_futureMap = new HashMap<>();
+
+  protected Map<String, IDownloadHandler> valueMap() {
+    return m_valueMap;
+  }
+
+  protected Map<String, IFuture> futureMap() {
+    return m_futureMap;
+  }
 
   /**
    * Put a downloadable item in the storage, after the given TTL has passed the item is removed automatically.
    */
-  void put(String key, IDownloadHandler downloadHandler) {
+  public void put(String key, IDownloadHandler downloadHandler) {
     long ttl = downloadHandler.getTTL();
     if (ttl <= 0) {
       throw new IllegalArgumentException("TTL must be > 0");
@@ -42,7 +50,7 @@ class DownloadHandlerStorage {
     }
   }
 
-  private void scheduleRemoval(final String key, long ttl) {
+  protected void scheduleRemoval(final String key, long ttl) {
     IFuture<?> future = Jobs.schedule(new IRunnable() {
       @Override
       public void run() throws Exception {
@@ -52,7 +60,7 @@ class DownloadHandlerStorage {
     m_futureMap.put(key, future);
   }
 
-  private void removeOnTimeout(String key) {
+  protected void removeOnTimeout(String key) {
     synchronized (m_valueMap) {
       m_valueMap.remove(key);
       m_futureMap.remove(key);
@@ -62,7 +70,7 @@ class DownloadHandlerStorage {
   /**
    * Remove a downloadable item from the storage.
    */
-  IDownloadHandler remove(String key) {
+  public IDownloadHandler remove(String key) {
     IFuture future = m_futureMap.remove(key);
     if (future != null) {
       future.cancel(false);
@@ -70,9 +78,5 @@ class DownloadHandlerStorage {
     synchronized (m_valueMap) {
       return m_valueMap.remove(key);
     }
-  }
-
-  int getFutureMapSize() {
-    return m_futureMap.size();
   }
 }

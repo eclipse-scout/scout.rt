@@ -30,42 +30,34 @@ public class DownloadHandlerStorageTest {
 
   private static final String KEY = "foo";
 
-  DownloadHandlerStorage storage = new DownloadHandlerStorage();
-
-  class TestHandler extends DownloadHandler {
-
-    public TestHandler(long ttl) {
-      super(new BinaryResource("bar.txt", null), ttl);
-    }
-
-  }
+  private DownloadHandlerStorage storage = new DownloadHandlerStorage();
 
   @Test
   public void testRemove() {
-    IDownloadHandler handler = new TestHandler(100);
+    IDownloadHandler handler = new P_TestHandler(100);
     storage.put(KEY, handler);
-    assertEquals(1, storage.getFutureMapSize());
+    assertEquals(1, storage.futureMap().size());
     assertEquals(handler, storage.remove(KEY));
-    assertEquals("futureMap must be cleared when element is removed", 0, storage.getFutureMapSize());
+    assertEquals("futureMap must be cleared when element is removed", 0, storage.futureMap().size());
     assertNull(storage.remove(KEY));
   }
 
   @Test
   public void testRemove_AfterTimeout() {
-    TestHandler handler = new TestHandler(1);
+    P_TestHandler handler = new P_TestHandler(1);
     storage.put(KEY, handler);
     sleepSafe(20);
     assertNull(storage.remove(KEY));
-    assertEquals("futureMap must be cleared after timeout", 0, storage.getFutureMapSize());
+    assertEquals("futureMap must be cleared after timeout", 0, storage.futureMap().size());
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testPut_InvalidTTL() {
-    TestHandler handler = new TestHandler(0);
+    P_TestHandler handler = new P_TestHandler(0);
     storage.put(KEY, handler);
   }
 
-  private void sleepSafe(long sleepTime) {
+  private static void sleepSafe(long sleepTime) {
     try {
       Thread.sleep(sleepTime);
     }
@@ -74,4 +66,10 @@ public class DownloadHandlerStorageTest {
     }
   }
 
+  private class P_TestHandler extends DownloadHandler {
+
+    public P_TestHandler(long ttl) {
+      super(new BinaryResource("bar.txt", null), ttl);
+    }
+  }
 }
