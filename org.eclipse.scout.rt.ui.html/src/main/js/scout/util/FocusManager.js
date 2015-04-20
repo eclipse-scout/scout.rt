@@ -257,6 +257,9 @@ scout.FocusContext.prototype._validateFocus = function() {
     if($focusContext.find(':focusable').length===0){
       $focusContext.focus();
     }
+    else if(this._$focusedElement && this._$focusedElement.length>0 && this._$focusedElement.is(':focusable')){
+      this._$focusedElement.focus();
+    }
     else{
       $focusContext.find(':focusable').first().focus();
     }
