@@ -1,6 +1,6 @@
 describe("HtmlComponent", function() {
   setFixtures(sandbox());
-  var session = new scout.Session($('#sandbox'), '1.1');
+  var session;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -64,9 +64,11 @@ describe("HtmlComponent", function() {
     addWidthHeightMock(jqueryMock);
 
     var $comp = $('<div>');
-    var htmlComp = new scout.HtmlComponent($comp, session);
-
-    htmlComp._layout = new LayoutMock();
+    var htmlComp;
+    beforeEach(function() {
+      htmlComp = new scout.HtmlComponent($comp, session);
+      htmlComp._layout = new LayoutMock();
+    });
 
     it("accepts scout.Dimension as single argument", function() {
       spyOn($comp, 'css').and.callThrough();

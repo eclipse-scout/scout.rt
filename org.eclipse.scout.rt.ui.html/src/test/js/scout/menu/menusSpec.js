@@ -3,6 +3,7 @@ describe("menus", function() {
   var helper, session;
 
   beforeEach(function() {
+    setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
     helper = new MenuSpecHelper(session);
   });

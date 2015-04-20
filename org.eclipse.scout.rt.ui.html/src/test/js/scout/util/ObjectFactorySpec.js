@@ -50,12 +50,14 @@ describe("ObjectFactory", function() {
   }
 
   it("creates objects which are getting registered in the widget map", function() {
+    setFixtures(sandbox());
     var session = new scout.Session($('#sandbox'), '1.1'),
       factories = scout.defaultObjectFactories;
     verifyCreationAndRegistration(session, factories);
   });
 
   it("distinguishes between mobile and desktop objects", function() {
+    setFixtures(sandbox());
     var session = new scout.Session($('#sandbox'), '1.1'),
       factories = scout.mobileObjectFactories;
     verifyCreationAndRegistration(session, factories);

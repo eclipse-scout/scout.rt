@@ -3,6 +3,7 @@ describe("NavigateDownButton", function() {
   var session, outline, menu, node = {};
 
   beforeEach(function() {
+    setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
     outline = {session: session};
     menu = new scout.NavigateDownButton(outline, node);
