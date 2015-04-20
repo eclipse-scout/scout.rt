@@ -17,7 +17,7 @@ scout.ActivityMap.prototype.init = function(model, session) {
 // TODO ActivityMap | Implement all _render* methods
 scout.ActivityMap.prototype._render = function($parent) {
   this._$parent = $parent;
-  this.$container = this._$parent.appendDiv('activity-map').attr('id', this._generateId('activity-map'));
+  this.$container = this._$parent.appendDiv('activity-map');
   this.$container.addClass('not-implemented'); // TODO Remove once implemented
   var layout = new scout.ActivityMapLayout(this);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
@@ -28,7 +28,7 @@ scout.ActivityMap.prototype._render = function($parent) {
   scout.scrollbars.install(this.$data);
   this.session.detachHelper.pushScrollable(this.$data);
 
-  this.drawData();
+  this._renderActivityRows();
 };
 
 scout.ActivityMap.prototype._remove = function() {
@@ -36,26 +36,30 @@ scout.ActivityMap.prototype._remove = function() {
   scout.ActivityMap.parent.prototype._remove.call(this);
 };
 
-scout.ActivityMap.prototype.drawData = function() {
-  this.$data.text('ACTIVITY MAP');
+scout.ActivityMap.prototype._renderActivityRows = function() {
+  var i, $row;
+  for (i = 0; i < this.rows.length; i++) {
+    $row = this._build$ActivityRow(this.rows[i], this.$data);
+    $row.appendTo(this.$data);
+  }
 };
 
-scout.ActivityMap.prototype._renderDays = function() {
+scout.ActivityMap.prototype._build$ActivityRow = function(row) {
+  var i, $cell,
+    $row = $.makeDiv('activity-row');
+  $row.appendSpan().text('resourceId: ' + row.resourceId);
+  for (i = 0; i < row.cells.length; i++) {
+    $cell = this._build$ActivityCell(row.cells[i]);
+    $cell.appendTo($row);
+  }
+  return $row;
 };
 
-scout.ActivityMap.prototype._renderWorkDayCount = function() {
-};
-
-scout.ActivityMap.prototype._renderWorkDaysOnly = function() {
-};
-
-scout.ActivityMap.prototype._renderFirstHourOfDay = function() {
-};
-
-scout.ActivityMap.prototype._renderLastHourOfDay = function() {
-};
-
-scout.ActivityMap.prototype._renderIntradayInterval = function() {
+scout.ActivityMap.prototype._build$ActivityCell = function(cell) {
+  var i,
+    $cell = $.makeDiv('activity-cell');
+  $cell.text('minorValue: ' + cell.minorValue + ', majorValue: ' + cell.majorValue);
+  return $cell;
 };
 
 scout.ActivityMap.prototype._renderPlanningMode = function() {

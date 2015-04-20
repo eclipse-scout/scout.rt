@@ -1,0 +1,11 @@
+.activity-map {
+  position: absolute;
+}
+
+.activity-row {
+  display: table-row;
+}
+
+.activity-cell {
+  display: table-cell;
+}

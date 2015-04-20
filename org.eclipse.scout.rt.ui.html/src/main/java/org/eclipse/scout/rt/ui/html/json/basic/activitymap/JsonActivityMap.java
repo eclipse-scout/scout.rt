@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends AbstractJsonPropertyObserver<P> {
 
@@ -63,54 +64,6 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
   @Override
   protected void initJsonProperties(P model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_DAYS, model) {
-      @Override
-      protected Date[] modelValue() {
-        return getModel().getDays();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        if (value == null) {
-          return null;
-        }
-        JSONArray jsonArray = new JSONArray();
-        for (Date date : (Date[]) value) {
-          jsonArray.put(new JsonDate(date).asJsonString());
-        }
-        return jsonArray;
-      }
-    });
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_WORK_DAY_COUNT, model) {
-      @Override
-      protected Integer modelValue() {
-        return getModel().getWorkDayCount();
-      }
-    });
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_WORK_DAYS_ONLY, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isWorkDaysOnly();
-      }
-    });
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_FIRST_HOUR_OF_DAY, model) {
-      @Override
-      protected Integer modelValue() {
-        return getModel().getFirstHourOfDay();
-      }
-    });
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_LAST_HOUR_OF_DAY, model) {
-      @Override
-      protected Integer modelValue() {
-        return getModel().getLastHourOfDay();
-      }
-    });
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_INTRADAY_INTERVAL, model) {
-      @Override
-      protected Long modelValue() {
-        return getModel().getIntradayInterval();
-      }
-    });
     putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_PLANNING_MODE, model) {
       @Override
       protected Integer modelValue() {
@@ -203,6 +156,19 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
     });
 
     // TODO BSH | Calendar String PROP_CONTEXT_MENU = "contextMenus";
+  }
+
+  @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    List<RI> resourceIds = getModel().getResourceIds();
+    JSONArray jsonRows = new JSONArray();
+    for (RI resourceId : resourceIds) {
+      JsonActivityRow<RI, AI> jsonRow = new JsonActivityRow<RI, AI>(resourceId, getModel().getActivityCells(resourceId));
+      jsonRows.put(jsonRow.toJson());
+    }
+    json.put("rows", jsonRows);
+    return json;
   }
 
   @Override
