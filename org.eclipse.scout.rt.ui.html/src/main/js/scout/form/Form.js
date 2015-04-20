@@ -130,7 +130,7 @@ scout.Form.prototype.onModelAction = function(event) {
     this._onFormClosed(event);
   }
   else if (event.type === 'requestFocus') {
-    this._onFormClosed(event.focusRequesterElement);
+    this._onRequestFocus(event.formField);
   }
   else {
     $.log.warn('Model event not handled. Widget: Form. Event: ' + event.type + '.');

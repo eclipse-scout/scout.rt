@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.html.json.form;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -19,11 +21,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonForm.class);
 
   public static final String EVENT_FORM_CLOSING = "formClosing";
   public static final String PROP_FORM_ID = "formId";
@@ -38,7 +42,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
   public static final String PROP_DISPLAY_HINT = "displayHint";
   public static final String PROP_DISPLAY_VIEW_ID = "displayViewId";
   public static final String PROP_CLOSABLE = "closable";
-  public static final String PROP_FOCUS_REQUESTER_ELEMENT = "focusRequesterElement";
+  public static final String PROP_FORM_FIELD = "formField";
 
   private FormListener m_formListener;
 
@@ -149,8 +153,14 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
   }
 
   protected void handleModelRequestFocus(IFormField formField) {
+    IJsonAdapter<?> formFieldAdapter = JsonAdapterUtility.findChildAdapter(this, formField);
+    if (formFieldAdapter == null) {
+      LOG.error("Cannot handle requestFocus event, because adapter for " + formField + " could not be resolved in " + toString());
+      return;
+    }
+
     JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_FOCUS_REQUESTER_ELEMENT, getAdapter(formField).getId());
+    putProperty(jsonEvent, PROP_FORM_FIELD, formFieldAdapter.getId());
     addActionEvent("requestFocus", jsonEvent);
   }
 
@@ -172,5 +182,4 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> {
       handleModelFormChanged(e);
     }
   }
-
 }

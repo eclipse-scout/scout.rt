@@ -52,6 +52,12 @@ public interface IJsonAdapter<T extends Object> extends IJsonObject {
    */
   void cleanUpEventFilters();
 
+  // TODO CGU/BSH: The following methods should be renamed:
+  // attachAdapter -> attachChildAdapter
+  // getAdapter -> getChildAdapter
+  // getAdapters -> getChildAdapters
+  // getParent -> getParentAdapter
+
   <A extends IJsonAdapter<?>, M> A attachAdapter(M model, IFilter<M> filter);
 
   <A extends IJsonAdapter<?>> A getAdapter(Object model);

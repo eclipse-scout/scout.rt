@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.json.JSONArray;
@@ -70,5 +73,39 @@ public final class JsonAdapterUtility {
     else {
       return objectType;
     }
+  }
+
+  /**
+   * Resolves the adapter for the given formField, even when it is not a direct child adapter of the given
+   * parentJsonAdapter (but the child adapter of a child adapter). If the formField does not belong to
+   * the adapter/field hierarchy of the given parent, <code>null</code> is returned.
+   */
+  public static IJsonAdapter<?> findChildAdapter(IJsonAdapter<?> parentJsonAdapter, IFormField formField) {
+    // Find all parent model fields of the given formField (ordered from top to bottom)
+    List<IFormField> fieldHierarchy = getFieldHierarchy(formField);
+
+    // Starting from the given parent adapter, resolve the corresponding adapters for all fields in
+    // the hierarchy. Eventually, we should find the adapter that corresponds to the given formField.
+    IJsonAdapter<?> formFieldAdapter = parentJsonAdapter;
+    for (IFormField field : fieldHierarchy) {
+      if (formFieldAdapter != null) {
+        formFieldAdapter = formFieldAdapter.getAdapter(field);
+      }
+    }
+    return formFieldAdapter;
+  }
+
+  /**
+   * Returns an ordered list with the given formField as last element and the top-most parent field as first element.
+   * <p>
+   * Example: StringField -> [ GroupBox, GroupBox, TabBox, GroupBox, SequenceBox, StringField ].
+   */
+  protected static List<IFormField> getFieldHierarchy(IFormField formField) {
+    List<IFormField> fieldHierarchy = new ArrayList<IFormField>();
+    while (formField != null) {
+      fieldHierarchy.add(0, formField);
+      formField = formField.getParentField();
+    }
+    return fieldHierarchy;
   }
 }
