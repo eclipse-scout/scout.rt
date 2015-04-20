@@ -7,7 +7,7 @@ scout.BeanField = function() {
 scout.inherits(scout.BeanField, scout.ValueField);
 
 scout.BeanField.prototype._render = function($parent) {
-  this.addContainer($parent);
+  this.addContainer($parent, 'bean-field');
   this.addLabel();
   this.addField($('<div>'));
   this.addStatus();

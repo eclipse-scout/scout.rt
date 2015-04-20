@@ -1,4 +1,4 @@
-.html-field > .field {
+.bean-field > .field {
   margin-left: @mandatory-indicator-width;
   .user-select(text);
 }
