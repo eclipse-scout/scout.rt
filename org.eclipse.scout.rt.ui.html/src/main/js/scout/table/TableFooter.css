@@ -7,7 +7,8 @@
   bottom: 0px;
   height: @table-footer-height;
   width: 100%;
-  white-space: nowrap;
+    /* FIXME nowrap does not seem to work, when fixing this. If white-space can be removed, remove resetting below too (white-space: normal) */
+/*   white-space: nowrap; */
   border-top: 1px solid @desktop-border-color;
 }
 
@@ -30,6 +31,8 @@
   height: 0px;
   display: none;
   z-index: 1;
+  /* Reset nowrap, forms may have fields which need wrapping (e.g. label field) */
+  white-space: normal;
 }
 
 .control-content {
