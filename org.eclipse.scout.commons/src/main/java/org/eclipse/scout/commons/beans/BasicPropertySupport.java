@@ -264,13 +264,7 @@ public class BasicPropertySupport implements IEventListenerSource {
   public boolean/* changed */setPropertyNoFire(String name, Object newValue) {
     Object oldValue = m_props.get(name);
     m_props.put(name, newValue);
-    if (CompareUtility.equals(oldValue, newValue)) {
-      // no change
-      return false;
-    }
-    else {
-      return true;
-    }
+    return !CompareUtility.equals(oldValue, newValue);
   }
 
   /**

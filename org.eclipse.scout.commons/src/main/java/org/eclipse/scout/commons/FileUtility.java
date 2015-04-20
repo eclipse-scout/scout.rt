@@ -360,11 +360,8 @@ public final class FileUtility {
             done = true;
           }
           catch (IOException ioXcp) {
-            // getLog().warn(ioXcp);
             if (ioXcp.getMessage().contains("Insufficient system resources exist to complete the requested service")) {
               mbCount--;
-              // getLog().debug( "Dropped resource count down to ["+mbCount+"]"
-              // );
               if (mbCount == 0) {
                 done = true;
               }

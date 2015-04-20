@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
 
 /**
  * Parser for into variables in arbitrary sql text Syntax (EBNF):
- * 
+ *
  * <pre>
  * statement = S? * token-list .
  * token-list = token (S? token)* .
@@ -109,9 +109,9 @@ public class IntoParser {
     if (LOG.isTraceEnabled()) {
       trace("parseToken");
     }
-    if (parseText() ||
-        parseInto() ||
-        parseChar()) {
+    if (parseText()
+        || parseInto()
+        || parseChar()) {
       return true;
     }
     else {
@@ -176,9 +176,9 @@ public class IntoParser {
       trace("parseBind");
     }
     int index = m_pos.getIndex();
-    if (parseHashBind() ||
-        parsePlainBind() ||
-        parseStdBind()) {
+    if (parseHashBind()
+        || parsePlainBind()
+        || parseStdBind()) {
       return true;
     }
     else {

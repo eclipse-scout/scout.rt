@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Reflection Utility to change final modifiers on fields
  */
-public class ReflectionUtility {
+public final class ReflectionUtility {
 
   private ReflectionUtility() {
   }

@@ -18,4 +18,31 @@ public class HtmlListElement extends HtmlNodeBuilder implements IHtmlListElement
     super("li", text);
   }
 
+  /**
+   * Add a css class
+   */
+  @Override
+  public IHtmlListElement cssClass(CharSequence cssClass) {
+    return (IHtmlListElement) super.cssClass(cssClass);
+  }
+
+  /**
+   * Add a css style
+   */
+  @Override
+  public IHtmlListElement style(CharSequence style) {
+    return (IHtmlListElement) super.style(style);
+  }
+
+  /**
+   * Add an application local link
+   *
+   * @param ref
+   *          path to identify what is the link referring to.
+   */
+  @Override
+  public IHtmlListElement appLink(CharSequence ref) {
+    return (IHtmlListElement) super.appLink(ref);
+  }
+
 }

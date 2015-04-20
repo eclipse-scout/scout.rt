@@ -22,26 +22,31 @@ import org.eclipse.scout.commons.html.IHtmlContent;
  * Empty node for HTML fragments:
  * Creates a node that may contain other html content, but does not have a tag name.
  */
-public class EmptyNodeBuilder extends AbstractExpressionBuilder implements IHtmlContent {
+public class HtmlContentBuilder extends AbstractExpressionBuilder implements IHtmlContent {
   private final List<? extends IHtmlBind> m_texts;
 
-  public EmptyNodeBuilder(CharSequence... texts) {
+  public HtmlContentBuilder(CharSequence... texts) {
     this(Arrays.asList(texts));
   }
 
-  public EmptyNodeBuilder(List<? extends CharSequence> texts) {
+  public HtmlContentBuilder(List<? extends CharSequence> texts) {
+    m_texts = importTexts(texts);
+  }
+
+  protected ArrayList<? extends IHtmlBind> importTexts(List<? extends CharSequence> texts) {
     ArrayList<IHtmlBind> bindTexts = new ArrayList<IHtmlBind>();
     for (CharSequence text : texts) {
       if (text instanceof IHtmlContent) {
-        getBinds().putAll(((IHtmlContent) text).getBinds());
-        bindTexts.add((IHtmlContent) text);
+        bindTexts.add(importHtml((IHtmlContent) text));
+      }
+      else if (text instanceof IHtmlBind) {
+        bindTexts.add((IHtmlBind) text);
       }
       else {
         bindTexts.add(getBinds().put(text));
       }
     }
-
-    m_texts = bindTexts;
+    return bindTexts;
   }
 
   @Override
@@ -59,9 +64,14 @@ public class EmptyNodeBuilder extends AbstractExpressionBuilder implements IHtml
 
   @Override
   public void replaceBinds(Map<String, String> bindMap) {
+    super.replaceBinds(bindMap);
     for (IHtmlBind elem : m_texts) {
       elem.replaceBinds(bindMap);
     }
+  }
+
+  protected List<? extends IHtmlBind> getTexts() {
+    return m_texts;
   }
 
 }

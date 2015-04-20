@@ -95,9 +95,6 @@ public final class FastBeanUtility {
           String kind = matcher.group(1);
           String name = decapitalize(matcher.group(2));
           Class<?>[] paramTypes = m.getParameterTypes();
-          if (paramTypes == null) {
-            paramTypes = new Class<?>[0];
-          }
           Class<?> retType = m.getReturnType();
           //
           if ("get".equals(kind) && paramTypes.length == 0 && retType != null && retType != Void.TYPE) {

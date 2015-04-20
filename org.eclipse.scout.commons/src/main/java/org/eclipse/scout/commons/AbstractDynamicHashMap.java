@@ -33,12 +33,11 @@ import java.util.WeakHashMap;
 public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Serializable {
   private static final long serialVersionUID = 1L;
 
-  protected final Long internalMapLock;
-  protected final Map<K, DynamicEntry<V>> internalMap;
+  protected final Object m_internalMapLock = new Object();
+  protected final Map<K, DynamicEntry<V>> m_internalMap;
 
   public AbstractDynamicHashMap() {
-    internalMapLock = Long.valueOf(1L);
-    internalMap = new HashMap<K, DynamicEntry<V>>();
+    m_internalMap = new HashMap<K, DynamicEntry<V>>();
   }
 
   /**
@@ -53,7 +52,7 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
    * verifies all entries in the internal map and makes it valid
    */
   protected void validateInternalMap() {
-    for (Iterator<Map.Entry<K, DynamicEntry<V>>> it = internalMap.entrySet().iterator(); it.hasNext();) {
+    for (Iterator<Map.Entry<K, DynamicEntry<V>>> it = m_internalMap.entrySet().iterator(); it.hasNext();) {
       Map.Entry<K, DynamicEntry<V>> e = it.next();
       DynamicEntry<V> entry = e.getValue();
       if (!isEntryValid(entry)) {
@@ -85,9 +84,9 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
 
   @Override
   public V get(Object key) {
-    synchronized (internalMapLock) {
+    synchronized (m_internalMapLock) {
       beforeAccessToInternalMap();
-      DynamicEntry<V> entry = internalMap.get(key);
+      DynamicEntry<V> entry = m_internalMap.get(key);
       if (entry != null && isEntryValid(entry)) {
         return entry.getValue();
       }
@@ -97,9 +96,9 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
 
   @Override
   public V put(K key, V value) {
-    synchronized (internalMapLock) {
+    synchronized (m_internalMapLock) {
       beforeAccessToInternalMap();
-      DynamicEntry<V> entry = internalMap.put(key, createDynamicEntry(value));
+      DynamicEntry<V> entry = m_internalMap.put(key, createDynamicEntry(value));
       if (entry != null && isEntryValid(entry)) {
         return entry.getValue();
       }
@@ -109,18 +108,18 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
 
   @Override
   public void putAll(Map<? extends K, ? extends V> m) {
-    synchronized (internalMapLock) {
+    synchronized (m_internalMapLock) {
       beforeAccessToInternalMap();
       for (Map.Entry<? extends K, ? extends V> e : m.entrySet()) {
-        internalMap.put(e.getKey(), createDynamicEntry(e.getValue()));
+        m_internalMap.put(e.getKey(), createDynamicEntry(e.getValue()));
       }
     }
   }
 
   public V touch(K key) {
-    synchronized (internalMapLock) {
+    synchronized (m_internalMapLock) {
       beforeAccessToInternalMap();
-      DynamicEntry<V> entry = internalMap.get(key);
+      DynamicEntry<V> entry = m_internalMap.get(key);
       if (entry != null) {
         entry.touch();
         return entry.getValue();
@@ -131,9 +130,9 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
 
   @Override
   public boolean containsKey(Object key) {
-    synchronized (internalMapLock) {
+    synchronized (m_internalMapLock) {
       beforeAccessToInternalMap();
-      DynamicEntry<V> entry = internalMap.get(key);
+      DynamicEntry<V> entry = m_internalMap.get(key);
       if (entry != null && isEntryValid(entry)) {
         return true;
       }
@@ -143,9 +142,9 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
 
   @Override
   public boolean containsValue(Object value) {
-    synchronized (internalMapLock) {
+    synchronized (m_internalMapLock) {
       validateInternalMap();
-      for (Map.Entry<K, DynamicEntry<V>> e : internalMap.entrySet()) {
+      for (Map.Entry<K, DynamicEntry<V>> e : m_internalMap.entrySet()) {
         Object existingValue = e.getValue().getValue();
         if (value == existingValue || (value != null && value.equals(existingValue))) {
           return true;
@@ -157,9 +156,9 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
 
   @Override
   public V remove(Object key) {
-    synchronized (internalMapLock) {
+    synchronized (m_internalMapLock) {
       beforeAccessToInternalMap();
-      DynamicEntry<V> entry = internalMap.remove(key);
+      DynamicEntry<V> entry = m_internalMap.remove(key);
       if (entry != null && isEntryValid(entry)) {
         return entry.getValue();
       }
@@ -169,41 +168,41 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
 
   @Override
   public void clear() {
-    synchronized (internalMapLock) {
-      internalMap.clear();
+    synchronized (m_internalMapLock) {
+      m_internalMap.clear();
     }
   }
 
   @Override
   public int size() {
-    synchronized (internalMapLock) {
+    synchronized (m_internalMapLock) {
       validateInternalMap();
-      return internalMap.size();
+      return m_internalMap.size();
     }
   }
 
   @Override
   public boolean isEmpty() {
-    synchronized (internalMapLock) {
+    synchronized (m_internalMapLock) {
       validateInternalMap();
-      return internalMap.isEmpty();
+      return m_internalMap.isEmpty();
     }
   }
 
   @Override
   public Set<K> keySet() {
-    synchronized (internalMapLock) {
+    synchronized (m_internalMapLock) {
       validateInternalMap();
-      return new HashSet<K>(internalMap.keySet());
+      return new HashSet<K>(m_internalMap.keySet());
     }
   }
 
   @Override
   public Collection<V> values() {
-    synchronized (internalMapLock) {
+    synchronized (m_internalMapLock) {
       validateInternalMap();
-      ArrayList<V> list = new ArrayList<V>(internalMap.size());
-      for (Map.Entry<K, DynamicEntry<V>> e : internalMap.entrySet()) {
+      ArrayList<V> list = new ArrayList<V>(m_internalMap.size());
+      for (Map.Entry<K, DynamicEntry<V>> e : m_internalMap.entrySet()) {
         list.add(e.getValue().getValue());
       }
       return list;
@@ -212,10 +211,10 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
 
   @Override
   public Set<Map.Entry<K, V>> entrySet() {
-    synchronized (internalMapLock) {
+    synchronized (m_internalMapLock) {
       validateInternalMap();
       HashMap<K, V> map = new HashMap<K, V>();
-      for (Map.Entry<K, DynamicEntry<V>> e : internalMap.entrySet()) {
+      for (Map.Entry<K, DynamicEntry<V>> e : m_internalMap.entrySet()) {
         map.put(e.getKey(), e.getValue().getValue());
       }
       return map.entrySet();

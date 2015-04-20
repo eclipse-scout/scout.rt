@@ -17,21 +17,13 @@ public interface IHtmlElement extends CharSequence, IHtmlContent {
 
   /**
    * Add a css class
-   *
-   * @deprecated use cssClass.
    */
-  @Deprecated
-  <T extends IHtmlElement> T clazz(CharSequence clazz);
-
-  /**
-   * Add a css class
-   */
-  <T extends IHtmlElement> T cssClass(CharSequence cssClass);
+  IHtmlElement cssClass(CharSequence cssClass);
 
   /**
    * Add a css style
    */
-  <T extends IHtmlElement> T style(CharSequence style);
+  IHtmlElement style(CharSequence style);
 
   /**
    * Add an application local link
@@ -39,6 +31,6 @@ public interface IHtmlElement extends CharSequence, IHtmlContent {
    * @param path
    *          path to identify what is the link referring to.
    */
-  <T extends IHtmlElement> T appLink(CharSequence path);
+  IHtmlElement appLink(CharSequence path);
 
 }

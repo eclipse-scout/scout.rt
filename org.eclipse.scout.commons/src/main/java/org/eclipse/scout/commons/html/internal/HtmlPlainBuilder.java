@@ -13,7 +13,6 @@ package org.eclipse.scout.commons.html.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.scout.commons.html.IHtmlContent;
 
@@ -25,15 +24,14 @@ public class HtmlPlainBuilder extends AbstractExpressionBuilder {
   }
 
   public HtmlPlainBuilder(List<? extends CharSequence> texts) {
-    m_texts = createBindTexts(texts);
+    m_texts = importTexts(texts);
   }
 
-  private ArrayList<CharSequence> createBindTexts(List<? extends CharSequence> texts) {
+  protected ArrayList<? extends CharSequence> importTexts(List<? extends CharSequence> texts) {
     ArrayList<CharSequence> bindTexts = new ArrayList<CharSequence>();
     for (CharSequence text : texts) {
       if (text instanceof IHtmlContent) {
-        getBinds().putAll(((IHtmlContent) text).getBinds());
-        bindTexts.add((IHtmlContent) text);
+        bindTexts.add(importHtml((IHtmlContent) text));
       }
       else {
         bindTexts.add(text);
@@ -53,10 +51,6 @@ public class HtmlPlainBuilder extends AbstractExpressionBuilder {
     for (CharSequence t : m_texts) {
       append(t);
     }
-  }
-
-  @Override
-  public void replaceBinds(Map<String, String> bindMap) {
   }
 
 }

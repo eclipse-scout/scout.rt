@@ -158,9 +158,9 @@ public class BindParser {
     if (LOG.isTraceEnabled()) {
       trace("parseToken");
     }
-    if (parseText() != null ||
-        parseExtendedBind() != null ||
-        parseChar()) {
+    if (parseText() != null
+        || parseExtendedBind() != null
+        || parseChar()) {
       return true;
     }
     else {
@@ -310,10 +310,10 @@ public class BindParser {
     }
     IToken token = null;
     int index = m_pos.getIndex();
-    if ((token = parsePlainValueBind()) != null ||
-        (token = parseFunctionBind()) != null ||
-        (token = parseDatabaseSpecificToken()) != null ||
-        (token = parseStdBind()) != null) {
+    if ((token = parsePlainValueBind()) != null
+        || (token = parseFunctionBind()) != null
+        || (token = parseDatabaseSpecificToken()) != null
+        || (token = parseStdBind()) != null) {
       return token;
     }
     else {

@@ -13,7 +13,7 @@ package org.eclipse.scout.commons.html;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.scout.commons.html.internal.EmptyNodeBuilder;
+import org.eclipse.scout.commons.html.internal.HtmlContentBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlDocumentBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlImageBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlLinkBuilder;
@@ -89,7 +89,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement p(CharSequence text) {
+  public static IHtmlElement p(CharSequence... text) {
     return new HtmlNodeBuilder("p", text);
   }
 
@@ -114,7 +114,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement h1(CharSequence text) {
+  public static IHtmlElement h1(CharSequence... text) {
     return new HtmlNodeBuilder("h1", text);
   }
 
@@ -128,7 +128,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement h2(CharSequence text) {
+  public static IHtmlElement h2(CharSequence... text) {
     return new HtmlNodeBuilder("h2", text);
   }
 
@@ -142,7 +142,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement h3(CharSequence text) {
+  public static IHtmlElement h3(CharSequence... text) {
     return new HtmlNodeBuilder("h3", text);
   }
 
@@ -156,7 +156,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement h4(CharSequence text) {
+  public static IHtmlElement h4(CharSequence... text) {
     return new HtmlNodeBuilder("h4", text);
   }
 
@@ -170,7 +170,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement h5(CharSequence text) {
+  public static IHtmlElement h5(CharSequence... text) {
     return new HtmlNodeBuilder("h5", text);
   }
 
@@ -184,7 +184,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement h6(CharSequence text) {
+  public static IHtmlElement h6(CharSequence... text) {
     return new HtmlNodeBuilder("h6", text);
   }
 
@@ -222,7 +222,7 @@ public final class HTML {
    * @param text
    *          text as bind
    */
-  public static IHtmlElement span(CharSequence text) {
+  public static IHtmlElement span(CharSequence... text) {
     return new HtmlNodeBuilder("span", text);
   }
 
@@ -333,7 +333,31 @@ public final class HTML {
    *          table data within row
    */
   public static IHtmlTableRow row(IHtmlTableCell... td) {
-    return new HtmlTableRowBuilder(Arrays.asList(td));
+    return row(Arrays.asList(td));
+  }
+
+  /**
+   * Create a html element with encoded text for a table row: &lt;tr&gt;...&lt;/tr&gt;.
+   * Example:<br>
+   * <code>
+   * HTML.table(<br>
+        &nbsp;HTML.row(<br>
+        &nbsp;&nbsp;HTML.cell("cell1"),<br>
+        &nbsp;&nbsp;HTML.cell("cell2")<br>
+        &nbsp;),<br>
+        &nbsp;HTML.row(<br>
+        &nbsp;&nbsp;HTML.cell("cell3"),<br>
+        &nbsp;&nbsp;HTML.cell("cell4")<br>
+        )<br>
+        ).cellspacing(1).cellpadding(2)<br>
+   * </p>
+   * </code>
+   *
+   * @param td
+   *          table data within row
+   */
+  public static IHtmlTableRow row(List<IHtmlTableCell> td) {
+    return new HtmlTableRowBuilder(td);
   }
 
   /**
@@ -395,7 +419,7 @@ public final class HTML {
    * Creates HTML content from multiple elements. e.g. <b>Bold Text</b> Text <b> More bold text </b>
    */
   public static IHtmlContent fragment(CharSequence... elements) {
-    return new EmptyNodeBuilder(elements);
+    return new HtmlContentBuilder(elements);
   }
 
   /**

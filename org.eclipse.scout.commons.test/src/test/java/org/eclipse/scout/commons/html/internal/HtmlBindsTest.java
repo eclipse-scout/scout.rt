@@ -8,19 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.html;
+package org.eclipse.scout.commons.html.internal;
 
 /**
- * Marker Interface for style element
+ *
  */
-public interface IStyleElement extends IHtmlElement {
-
-  IStyleElement type(String typeName);
-
-  /**
-   * Add a css class
-   */
-  @Override
-  IStyleElement cssClass(CharSequence cssClass);
+public class HtmlBindsTest {
 
 }

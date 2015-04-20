@@ -15,4 +15,25 @@ package org.eclipse.scout.commons.html;
  */
 public interface IHtmlTableCell extends IHtmlElement {
 
+  /**
+   * Add a css class
+   */
+  @Override
+  IHtmlTableCell cssClass(CharSequence cssClass);
+
+  /**
+   * Add a css style
+   */
+  @Override
+  IHtmlTableCell style(CharSequence style);
+
+  /**
+   * Add an application local link
+   *
+   * @param path
+   *          path to identify what is the link referring to.
+   */
+  @Override
+  IHtmlTableCell appLink(CharSequence path);
+
 }

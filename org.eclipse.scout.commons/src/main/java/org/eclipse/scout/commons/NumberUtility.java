@@ -398,12 +398,12 @@ public final class NumberUtility {
     }
     double d = n.doubleValue();
     if (d < 0) {
-      return new Integer(-1);
+      return Integer.valueOf(-1);
     }
     if (d > 0) {
-      return new Integer(+1);
+      return Integer.valueOf(+1);
     }
-    return new Integer(0);
+    return Integer.valueOf(0);
   }
 
   /**

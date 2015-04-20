@@ -15,8 +15,37 @@ package org.eclipse.scout.commons.html;
  */
 public interface IHtmlTable extends IHtmlElement {
 
+  /**
+   * @deprecated use {@link IHtmlElement#cssClass(CharSequence)} or {@link IHtmlElement#style(CharSequence)}
+   */
+  @Deprecated
   IHtmlTable cellspacing(int pixel);
 
+  /**
+   * @deprecated use {@link IHtmlElement#cssClass(CharSequence)} or {@link IHtmlElement#style(CharSequence)}
+   */
+  @Deprecated
   IHtmlTable cellpadding(int pixel);
+
+  /**
+   * Add a css class
+   */
+  @Override
+  IHtmlTable cssClass(CharSequence cssClass);
+
+  /**
+   * Add a css style
+   */
+  @Override
+  IHtmlTable style(CharSequence style);
+
+  /**
+   * Add an application local link
+   *
+   * @param path
+   *          path to identify what is the link referring to.
+   */
+  @Override
+  IHtmlTable appLink(CharSequence path);
 
 }

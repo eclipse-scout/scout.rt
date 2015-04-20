@@ -45,7 +45,7 @@ public final class FormattingUtility {
    * <li>{@link Number} is formatted using {@link java.text.NumberFormat}</li>
    * <li>{@link Boolean} is formatted as "X" for <code>true</code>, "" for <code>false</code></li>
    * </ul>
-   * 
+   *
    * @param o
    *          object to format
    * @return Returns formatted string representation, never <code>null</code>.
@@ -81,7 +81,7 @@ public final class FormattingUtility {
       ret = NumberFormat.getNumberInstance(loc).format(o);
     }
     else if (o instanceof Boolean) {
-      ret = ((Boolean) o).booleanValue() == true ? "X" : "";
+      ret = ((Boolean) o) ? "X" : "";
     }
 
     return ret == null ? "" : ret;

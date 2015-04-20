@@ -39,7 +39,7 @@ public final class Base64Utility {
   /**
    * Base-64 encodes the supplied block of data. Line wrapping is not applied on
    * output.
-   * 
+   *
    * @param bytes
    *          The block of data that is to be Base-64 encoded.
    * @return A <code>String</code> containing the encoded data.
@@ -55,8 +55,8 @@ public final class Base64Utility {
     int block;
     int i = 0;
     while (i < length) {
-      block = ((bytes[i++] & 0xff) << 16) | ((bytes[i++] & 0xff) << 8) |
-          (bytes[i++] & 0xff);
+      block = ((bytes[i++] & 0xff) << 16) | ((bytes[i++] & 0xff) << 8)
+          | (bytes[i++] & 0xff);
       buffer.append(BYTE_TO_CHAR[block >>> 18]);
       buffer.append(BYTE_TO_CHAR[(block >>> 12) & 0x3f]);
       buffer.append(BYTE_TO_CHAR[(block >>> 6) & 0x3f]);
@@ -82,7 +82,7 @@ public final class Base64Utility {
 
   /**
    * Decodes the supplied Base-64 encoded string.
-   * 
+   *
    * @param string
    *          The Base-64 encoded string that is to be decoded.
    * @return A <code>byte[]</code> containing the decoded data block.
@@ -103,10 +103,10 @@ public final class Base64Utility {
       c4 = is.read();
       while (c1 >= 0 || c2 >= 0 || c3 >= 0 || c4 >= 0) {
         int block;
-        block = ((c1 != -1 ? CHAR_TO_BYTE[c1] : -1) & 0xff) << 18 |
-            ((c2 != -1 ? CHAR_TO_BYTE[c2] : -1) & 0xff) << 12 |
-            ((c3 != -1 ? CHAR_TO_BYTE[c3] : -1) & 0xff) << 6 |
-            ((c4 != -1 ? CHAR_TO_BYTE[c4] : -1) & 0xff);
+        block = ((c1 != -1 ? CHAR_TO_BYTE[c1] : -1) & 0xff) << 18
+            | ((c2 != -1 ? CHAR_TO_BYTE[c2] : -1) & 0xff) << 12
+            | ((c3 != -1 ? CHAR_TO_BYTE[c3] : -1) & 0xff) << 6
+            | ((c4 != -1 ? CHAR_TO_BYTE[c4] : -1) & 0xff);
         buffer.write((byte) (block >>> 16));
         if (c3 != -1) {
           buffer.write((byte) ((block >>> 8) & 0xff));

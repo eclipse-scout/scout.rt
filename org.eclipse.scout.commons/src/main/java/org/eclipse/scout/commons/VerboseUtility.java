@@ -166,7 +166,7 @@ public final class VerboseUtility {
     }
     else if (o.getClass() == Byte.class) {
       Byte b = (Byte) o;
-      String s = Integer.toHexString(b != null ? (b.intValue() & 0xff) : 0);
+      String s = Integer.toHexString(b.intValue() & 0xff);
       if (s.length() < 2) {
         s = "0" + s;
       }

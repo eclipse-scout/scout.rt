@@ -411,7 +411,8 @@ public final class ConfigIniUtility {
         }
       }
       catch (MalformedURLException e) {
-        e.printStackTrace();
+        // Do not use logger here. Because the logger uses this class, it is not yet initialized
+        e.printStackTrace(); //NOSONAR
         return null;
       }
     }
@@ -431,7 +432,7 @@ public final class ConfigIniUtility {
     }
     catch (Exception t) {
       // Do not use logger here. Because the logger uses this class, it is not yet initialized
-      t.printStackTrace();
+      t.printStackTrace(); //NOSONAR
       return;
     }
     for (Entry<Object, Object> entry : props.entrySet()) {

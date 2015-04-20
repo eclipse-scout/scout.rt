@@ -15,7 +15,7 @@ package org.eclipse.scout.commons.html;
  */
 public interface IHtmlDocument extends IHtmlElement {
 
-  public static final String HTML5_DOCTYPE = "<!DOCTYPE html>";
+  String HTML5_DOCTYPE = "<!DOCTYPE html>";
 
   IHtmlDocument doctype(CharSequence type);
 

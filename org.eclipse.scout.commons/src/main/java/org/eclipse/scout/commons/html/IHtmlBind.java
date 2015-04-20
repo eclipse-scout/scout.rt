@@ -17,6 +17,6 @@ import java.util.Map;
  */
 public interface IHtmlBind extends CharSequence {
 
-  public void replaceBinds(Map<String, String> bindMap);
+  void replaceBinds(Map<String, String> bindMap);
 
 }

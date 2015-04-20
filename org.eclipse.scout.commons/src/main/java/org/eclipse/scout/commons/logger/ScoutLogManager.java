@@ -85,12 +85,12 @@ public final class ScoutLogManager {
         return (IScoutLogManager) clazz.newInstance();
       }
     }
-    catch (ClassNotFoundException e) {
+    catch (ClassNotFoundException e) {// NOSONAR
       // nop (custom logger is not installed)
     }
-    catch (Exception e) {
+    catch (Exception e) { // NOSONAR
       // error cannot be logged by log manager as not installed yet
-      e.printStackTrace();
+      e.printStackTrace(); // NOSONAR
     }
 
     return new JavaScoutLogManager();
@@ -105,7 +105,7 @@ public final class ScoutLogManager {
    * @throws UnsupportedOperationException
    *           is thrown if the log implementation does not support global log level
    */
-  public static void setGlobalLogLevel(Integer level) throws UnsupportedOperationException {
+  public static void setGlobalLogLevel(Integer level) {
     instance.setGlobalLogLevel(level);
   }
 
@@ -117,7 +117,7 @@ public final class ScoutLogManager {
    * @throws UnsupportedOperationException
    *           is thrown if the log implementation does not support global log level
    */
-  public static Integer getGlobalLogLevel() throws UnsupportedOperationException {
+  public static Integer getGlobalLogLevel() {
     return instance.getGlobalLogLevel();
   }
 
@@ -131,7 +131,7 @@ public final class ScoutLogManager {
    * @throws UnsupportedOperationException
    *           is thrown if the log implementation does not support recording of log messages
    */
-  public static boolean startRecording() throws ProcessingException, UnsupportedOperationException {
+  public static boolean startRecording() throws ProcessingException {
     return instance.startRecording();
   }
 
@@ -143,7 +143,7 @@ public final class ScoutLogManager {
    * @throws UnsupportedOperationException
    *           is thrown if the log implementation does not support recording of log messages
    */
-  public static File stopRecording() throws UnsupportedOperationException {
+  public static File stopRecording() {
     return instance.stopRecording();
   }
 

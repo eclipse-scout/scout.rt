@@ -27,4 +27,31 @@ public class StyleElementBuilder extends HtmlNodeBuilder implements IStyleElemen
     return this;
   }
 
+  /**
+   * Add a css class
+   */
+  @Override
+  public IStyleElement cssClass(CharSequence cssClass) {
+    return (IStyleElement) super.cssClass(cssClass);
+  }
+
+  /**
+   * Add a css style
+   */
+  @Override
+  public IStyleElement style(CharSequence style) {
+    return (IStyleElement) super.style(style);
+  }
+
+  /**
+   * Add an application local link
+   *
+   * @param ref
+   *          path to identify what is the link referring to.
+   */
+  @Override
+  public IStyleElement appLink(CharSequence ref) {
+    return (IStyleElement) super.appLink(ref);
+  }
+
 }

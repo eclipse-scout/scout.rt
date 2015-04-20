@@ -254,13 +254,10 @@ public class SqlFormatter {
       if (!(t instanceof MathOp)) {
         formatSimpleExpr(t, ctx);
       }
-      else if (t instanceof MathOp) {
-        ctx.print(" ");
-        formatDefault(t, ctx);
-        ctx.print(" ");
-      }
       else {
+        ctx.print(" ");
         formatDefault(t, ctx);
+        ctx.print(" ");
       }
     }
   }

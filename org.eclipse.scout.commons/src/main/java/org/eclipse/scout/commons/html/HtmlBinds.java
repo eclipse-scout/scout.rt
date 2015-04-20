@@ -12,6 +12,8 @@ package org.eclipse.scout.commons.html;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,26 +38,12 @@ public class HtmlBinds {
   /**
    * Prefix for bind variable name.
    */
-  private final String m_prefix;
+  private final String m_prefix = ":b__";
 
   /**
    * sequence for bind names
    */
   private long m_sequenceId = 0L;
-
-  /**
-   * Create binds map.
-   */
-  public HtmlBinds() {
-    m_prefix = ":b__";
-  }
-
-  /**
-   * Create binds map.
-   */
-  public HtmlBinds(String prefix) {
-    m_prefix = prefix;
-  }
 
   public IHtmlBind putString(String value) {
     String qualifiedName = nextBindName();
@@ -64,10 +52,10 @@ public class HtmlBinds {
   }
 
   /**
+   * Generates a unique bind variable for a given value and puts key and value into the bind map.<br>
    * Puts a value with a generated key into the map.
    *
-   * @param value
-   * @return the key of the new bind
+   * @return {@link IHtmlBind} key
    */
   public IHtmlBind put(Object value) {
     return putString(StringUtility.nvl(value, ""));
@@ -127,11 +115,13 @@ public class HtmlBinds {
 
   public Map<String, String> getReplacements(HtmlBinds binds) {
     Map<String, String> replaceMap = new HashMap<>();
-    for (Entry<String, Object> bindEntry : binds.getBindMap().entrySet()) {
-      String existingBind = bindEntry.getKey();
+    Map<String, Object> bindMap = binds.getBindMap();
+    ArrayList<String> keys = new ArrayList<>(bindMap.keySet());
+    Collections.sort(keys, new BindIdComparator());
+    for (String existingBind : keys) {
       if (m_bindMap.containsKey(existingBind)) {
         String newBind = nextBindName();
-        m_bindMap.put(newBind, bindEntry.getValue());
+        m_bindMap.put(newBind, bindMap.get(existingBind));
         replaceMap.put(existingBind, newBind);
       }
     }
@@ -188,6 +178,15 @@ public class HtmlBinds {
     for (Entry<String, String> entry : bindMap.entrySet()) {
       m_bindMap.put(entry.getValue(), m_bindMap.get(entry.getKey()));
       m_bindMap.remove(entry.getKey());
+    }
+
+  }
+
+  class BindIdComparator implements Comparator<String> {
+
+    @Override
+    public int compare(String o1, String o2) {
+      return (int) (Long.parseLong(o1.substring(getPrefix().length())) - Long.parseLong(o2.substring(getPrefix().length())));
     }
 
   }

@@ -12,6 +12,7 @@ package org.eclipse.scout.commons.html.internal;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.html.HtmlBinds;
@@ -76,6 +77,17 @@ public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlCo
     m_binds = binds;
   }
 
+  protected IHtmlContent importHtml(IHtmlContent contentText) {
+    HtmlBinds binds = contentText.getBinds();
+    Map<String, String> replacements = getBinds().getReplacements(binds);
+    if (!replacements.isEmpty()) {
+      contentText.replaceBinds(replacements);
+    }
+
+    getBinds().putAll(contentText.getBinds());
+    return contentText;
+  }
+
   @Override
   public String toEncodedHtml() {
     String res = this.toString();
@@ -99,6 +111,11 @@ public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlCo
    */
   protected String encode(Object value) {
     return StringUtility.htmlEncode(StringUtility.emptyIfNull(value).toString(), false);
+  }
+
+  @Override
+  public void replaceBinds(Map<String, String> bindMap) {
+    invalidate();
   }
 
 }

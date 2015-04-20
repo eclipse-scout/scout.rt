@@ -24,4 +24,31 @@ public class HtmlTableRowBuilder extends HtmlNodeBuilder implements IHtmlTableRo
     super("tr", text);
   }
 
+  /**
+   * Add a css class
+   */
+  @Override
+  public IHtmlTableRow cssClass(CharSequence cssClass) {
+    return (IHtmlTableRow) super.cssClass(cssClass);
+  }
+
+  /**
+   * Add a css style
+   */
+  @Override
+  public IHtmlTableRow style(CharSequence style) {
+    return (IHtmlTableRow) super.style(style);
+  }
+
+  /**
+   * Add an application local link
+   *
+   * @param ref
+   *          path to identify what is the link referring to.
+   */
+  @Override
+  public IHtmlTableRow appLink(CharSequence ref) {
+    return (IHtmlTableRow) super.appLink(ref);
+  }
+
 }

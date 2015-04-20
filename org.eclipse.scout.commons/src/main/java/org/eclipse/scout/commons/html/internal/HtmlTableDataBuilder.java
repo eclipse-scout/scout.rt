@@ -23,4 +23,31 @@ public class HtmlTableDataBuilder extends HtmlNodeBuilder implements IHtmlTableC
     super("td", text);
   }
 
+  /**
+   * Add a css class
+   */
+  @Override
+  public IHtmlTableCell cssClass(CharSequence cssClass) {
+    return (IHtmlTableCell) super.cssClass(cssClass);
+  }
+
+  /**
+   * Add a css style
+   */
+  @Override
+  public IHtmlTableCell style(CharSequence style) {
+    return (IHtmlTableCell) super.style(style);
+  }
+
+  /**
+   * Add an application local link
+   *
+   * @param ref
+   *          path to identify what is the link referring to.
+   */
+  @Override
+  public IHtmlTableCell appLink(CharSequence ref) {
+    return (IHtmlTableCell) super.appLink(ref);
+  }
+
 }

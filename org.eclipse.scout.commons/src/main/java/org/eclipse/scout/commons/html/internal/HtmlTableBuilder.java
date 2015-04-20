@@ -12,6 +12,7 @@ package org.eclipse.scout.commons.html.internal;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.html.IHtmlElement;
 import org.eclipse.scout.commons.html.IHtmlTable;
 import org.eclipse.scout.commons.html.IHtmlTableRow;
 
@@ -24,16 +25,53 @@ public class HtmlTableBuilder extends HtmlNodeBuilder implements IHtmlTable {
     super("table", rows);
   }
 
+  /**
+   * @deprecated use {@link IHtmlElement#cssClass(CharSequence)} or {@link IHtmlElement#style(CharSequence)}
+   */
+  @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public IHtmlTable cellspacing(int pixel) {
     addAttribute("cellspacing", pixel);
     return this;
   }
 
+  /**
+   * @deprecated use {@link IHtmlElement#cssClass(CharSequence)} or {@link IHtmlElement#style(CharSequence)}
+   */
+  @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public IHtmlTable cellpadding(int pixel) {
     addAttribute("cellpadding", pixel);
     return this;
+  }
+
+  /**
+   * Add a css class
+   */
+  @Override
+  public IHtmlTable cssClass(CharSequence cssClass) {
+    return (IHtmlTable) super.cssClass(cssClass);
+  }
+
+  /**
+   * Add a css style
+   */
+  @Override
+  public IHtmlTable style(CharSequence style) {
+    return (IHtmlTable) super.style(style);
+  }
+
+  /**
+   * Add an application local link
+   *
+   * @param ref
+   *          path to identify what is the link referring to.
+   */
+  @Override
+  public IHtmlTable appLink(CharSequence ref) {
+    return (IHtmlTable) super.appLink(ref);
   }
 
 }

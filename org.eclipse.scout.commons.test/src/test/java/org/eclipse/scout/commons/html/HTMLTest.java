@@ -17,6 +17,10 @@ import static org.eclipse.scout.commons.html.HTML.link;
 import static org.eclipse.scout.commons.html.HTML.row;
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.junit.Test;
 
@@ -98,9 +102,8 @@ public class HTMLTest {
     final IHtmlTable table = HTML.table(
         row(
             cell(BIND_TEXT))
-        ).cellspacing(1).cellpadding(2);
-
-    assertEquals("<table cellspacing=\"1\" cellpadding=\"2\"><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", table.toEncodedHtml());
+        );
+    assertEquals("<table><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", table.toEncodedHtml());
   }
 
   @Test
@@ -124,6 +127,12 @@ public class HTMLTest {
   public void testFragment() {
     final IHtmlContent fragment = HTML.fragment(HTML.div(BIND_TEXT), BIND_TEXT);
     assertEquals("<div>" + ENCODED_BIND_TEXT + "</div>" + ENCODED_BIND_TEXT, fragment.toEncodedHtml());
+  }
+
+  @Test
+  public void testMultipleFragments() {
+    final IHtmlContent fragment = HTML.fragment(HTML.div("1"), HTML.div("2"));
+    assertEquals("<div>1</div><div>2</div>", fragment.toEncodedHtml());
   }
 
   @Test
@@ -215,6 +224,45 @@ public class HTMLTest {
     String plainLinkString = String.format("%s<span class=\"app-link\" data-ref=\"REF\">%s</span>", BIND_TEXT, ENCODED_BIND_TEXT);
     assertEquals(String.format(plainLinkString, BIND_TEXT, ENCODED_BIND_TEXT), plainLink.toEncodedHtml());
     assertEquals(String.format("<b>%s</b>", plainLinkString), HTML.bold(plainLink).toEncodedHtml());
+  }
+
+  @Test
+  public void testManyBinds() throws Exception {
+    IHtmlElement h2 = HTML.h2("h2");
+    IHtmlTable table = createTable("0");
+
+    IHtmlElement html = HTML.div(
+        h2,
+        table
+        );
+
+    String exp = "<div><h2>h2</h2>" + createTableString("0") + "</div>";
+    assertEquals(exp, html.toEncodedHtml());
+  }
+
+  private String createTableString(String prefix) {
+    List<String> rows = new ArrayList<String>();
+    for (int i = 0; i < 1; i++) {
+      rows.add(createRowString(prefix, i));
+    }
+    return "<table>" + CollectionUtility.format(rows, "") + "</table>";
+
+  }
+
+  private String createRowString(String prefix, int i) {
+    return HTML.row(HTML.cell("A" + prefix + i), HTML.cell("B" + prefix + i)).toEncodedHtml();
+  }
+
+  private IHtmlTable createTable(String prefix) {
+    List<IHtmlTableRow> rows = new ArrayList<IHtmlTableRow>();
+    for (int i = 0; i < 1; i++) {
+      rows.add(createRow(prefix, i));
+    }
+    return HTML.table(rows);
+  }
+
+  private IHtmlTableRow createRow(String prefix, int i) {
+    return HTML.row(HTML.cell("A" + prefix + i), HTML.cell("B" + prefix + i));
   }
 
 }
