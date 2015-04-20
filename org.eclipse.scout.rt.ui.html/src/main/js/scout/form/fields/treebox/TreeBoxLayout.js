@@ -11,14 +11,14 @@ scout.TreeBoxLayout.prototype.layout = function($container) {
     size = htmlContainer.getSize(),
     height = size.height;
 
-  if (this.filterBox && this.filterBox.$container.isVisible()) {
+  if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
     height -= scout.HtmlEnvironment.formRowHeight;
   }
 
   var htmlTree = scout.HtmlComponent.get(this.tree.$container);
   htmlTree.setSize(new scout.Dimension(size.width, height));
 
-  if (this.filterBox && this.filterBox.$container.isVisible()) {
+  if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
     var htmlFilterBox = scout.HtmlComponent.get(this.filterBox.$container);
     htmlFilterBox.setSize(new scout.Dimension(size.width, scout.HtmlEnvironment.formRowHeight));
   }
