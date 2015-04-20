@@ -724,7 +724,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
 scout.Tree.prototype._$buildNode = function(node, $parent) {
   var level = $parent ? parseFloat($parent.attr('data-level')) + 1 : 0;
 
-  var $node = $.makeDiv('tree-item')
+  var $node = $.makeDiv('tree-node')
     .attr('id', node.id)
     .on('click', '', this._onNodeClick.bind(this))
     .on('dblclick', '', this._onNodeDoubleClick.bind(this))
@@ -751,7 +751,7 @@ scout.Tree.prototype._decorateNode = function(node) {
     return;
   }
 
-  formerClasses = 'tree-item';
+  formerClasses = 'tree-node';
   if ($node.isSelected()) {
     formerClasses += ' selected';
   }
@@ -788,7 +788,7 @@ scout.Tree.prototype._renderNodeChecked = function(node) {
     return;
   }
   var $checkbox = node.$node
-    .children('.tree-item-checkbox')
+    .children('.tree-node-checkbox')
     .children('input');
   $checkbox.prop('checked', node.checked);
 };
@@ -849,7 +849,7 @@ scout.Tree.prototype.sendNodesChecked = function(nodes) {
 };
 
 scout.Tree.prototype._renderTreeItemControl = function($node) {
-  var $control = $node.prependDiv('tree-item-control')
+  var $control = $node.prependDiv('tree-node-control')
     .on('click', '', this._onNodeControlClick.bind(this))
     .on('dblclick', '', this._onNodeControlClick.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
 
@@ -860,7 +860,7 @@ scout.Tree.prototype._renderTreeItemControl = function($node) {
 
 scout.Tree.prototype._renderTreeItemCheckbox = function(node) {
   var $node = node.$node,
-    $controlItem = $node.prependDiv('tree-item-checkbox');
+    $controlItem = $node.prependDiv('tree-node-checkbox');
   var $checkbox = $('<input>')
     .attr('tabindex', '-1')
     .attr('type', 'checkbox')
@@ -901,7 +901,7 @@ scout.Tree.prototype._onNodeClick = function(event) {
 
 scout.Tree.prototype._isCheckboxClicked = function(event) {
   var $target = $(event.target);
-  return $target.is('label') && $target.parent().hasClass('tree-item-checkbox');
+  return $target.is('label') && $target.parent().hasClass('tree-node-checkbox');
 };
 
 scout.Tree.prototype._onNodeDoubleClick = function(event) {
@@ -944,7 +944,7 @@ scout.Tree.prototype._updateItemPath = function() {
   var $selectedNodes, $node, level;
 
   // first remove and select selected
-  this.$data.find('.tree-item').removeClass('parent children group');
+  this.$data.find('.tree-node').removeClass('parent children group');
 
   // if no selection: mark all top elements as children
   if (this.selectedNodeIds.length === 0) {
@@ -1019,7 +1019,7 @@ scout.Tree.prototype.$selectedNodes = function() {
 };
 
 scout.Tree.prototype.$nodes = function() {
-  return this.$data.find('.tree-item');
+  return this.$data.find('.tree-node');
 };
 
 scout.Tree.prototype.selectedNodes = function() {

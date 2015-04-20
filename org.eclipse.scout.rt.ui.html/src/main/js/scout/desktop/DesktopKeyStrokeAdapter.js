@@ -32,7 +32,7 @@ scout.DesktopKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeyStrokes) 
 
 scout.DesktopKeyStrokeAdapter.prototype.removeKeyBox = function() {
   scout.DesktopKeyStrokeAdapter.parent.prototype.removeKeyBox.call(this);
-  $('.tree-item-control').css('display', '');
+  $('.tree-node-control').css('display', '');
   this._viewTabAutoKeyStroke.removeKeyBox();
   this.keyBoxDrawn = false;
   for (var i = 0; i < this.keyStrokes.length; i++) {

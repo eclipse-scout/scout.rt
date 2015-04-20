@@ -12,8 +12,8 @@
 
 .outline > .tree-data {
 
-  & > .tree-item,
-  & > .animationWrapper > .tree-item {
+  & > .tree-node,
+  & > .animationWrapper > .tree-node {
     .font-text-plus;
     cursor: pointer;
     border: 0;
@@ -38,18 +38,18 @@
       border: 0;
     }
 
-    & > .tree-item-control {
+    & > .tree-node-control {
       /* adjust control position */
-      margin-left: -@outline-item-control-size - 5px;
+      margin-left: -@outline-node-control-size - 5px;
       margin-top: -3px;
 
-      width: @outline-item-control-size;
-      height: @outline-item-control-size;
-      line-height: @outline-item-control-size;
+      width: @outline-node-control-size;
+      height: @outline-node-control-size;
+      line-height: @outline-node-control-size;
 
       &::before {
-        font-size: @outline-item-control-size;
-        /* always use same color as the tree-item label */
+        font-size: @outline-node-control-size;
+        /* always use same color as the tree-node label */
         color: inherit;
       }
     }
@@ -57,8 +57,8 @@
 
   /* bread crumb mode */
 
-  .navigation-breadcrumb & > .tree-item,
-  .navigation-breadcrumb & > .animationWrapper > .tree-item {
+  .navigation-breadcrumb & > .tree-node,
+  .navigation-breadcrumb & > .animationWrapper > .tree-node {
     overflow: visible;
     white-space: normal;
     text-align: center;
@@ -121,7 +121,7 @@
     }
   }
 
-  .navigation-breadcrumb & > .tree-item-control {
+  .navigation-breadcrumb & > .tree-node-control {
     display: none;
   }
 }

@@ -8,9 +8,9 @@
 @mandatory-indicator-width: 8px;
 @borderless-field-padding-y: 7px;
 
-@tree-item-control-size: 15px;
-@outline-item-control-size: 20px;
+@tree-node-control-size: 15px;
+@outline-node-control-size: 20px;
 @group-box-control-size: 20px;
 
-@tree-item-control-checkbox-size: 20px + @tree-item-control-size;
-@tree-item-checkbox-size: 20px;
+@tree-node-control-checkbox-size: 20px + @tree-node-control-size;
+@tree-node-checkbox-size: 20px;

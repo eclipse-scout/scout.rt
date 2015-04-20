@@ -4,7 +4,7 @@
   width: 100%;
 
   &:focus {
-    & .tree-item.selected {
+    & .tree-node.selected {
       background-color: @selection-row-background-color;
       border-color: @selection-row-border-color;
     }
@@ -26,7 +26,7 @@
   float: left;
 }
 
-.tree-item {
+.tree-node {
   display: block;
   position: relative;
   .overflow-ellipsis-nowrap;
@@ -43,15 +43,15 @@
   }
 }
 
-.tree-item-checkbox {
+.tree-node-checkbox {
   display: block;
   position: absolute;
   top: auto;
   left: auto;
   margin-top: -2px;
-  margin-left: -@tree-item-checkbox-size - 4px;
-  width: @tree-item-checkbox-size;
-  height: @tree-item-checkbox-size;
+  margin-left: -@tree-node-checkbox-size - 4px;
+  width: @tree-node-checkbox-size;
+  height: @tree-node-checkbox-size;
 
   & label {
     cursor: pointer;
@@ -106,7 +106,7 @@
   }
 }
 
-.tree-item-control {
+.tree-node-control {
   display: block;
   position: absolute;
   top: auto;
@@ -115,50 +115,50 @@
   cursor: pointer;
 
   /* adjust control position */
-  margin-left: -@tree-item-control-size - 2px;
+  margin-left: -@tree-node-control-size - 2px;
   margin-top: -1px;
 
   /* for good animation, ensure that the control is a square and the icon is centered */
-  width: @tree-item-control-size;
-  height: @tree-item-control-size;
-  line-height: @tree-item-control-size;
+  width: @tree-node-control-size;
+  height: @tree-node-control-size;
+  line-height: @tree-node-control-size;
   text-align: center;
 
   &::before {
     .font-icon;
-    font-size: @tree-item-control-size;
+    font-size: @tree-node-control-size;
     content: @icon-angle-right;
     color: @border-color;
 
-    .tree-item.leaf > & {
+    .tree-node.leaf > & {
       content: '';
     }
 
-    .tree-item-control:hover& {
+    .tree-node-control:hover& {
       color: @highlight-color;
     }
 
     .disabled & {
       color: @palette-gray-5;
     }
-    .disabled .tree-item-control:hover& {
+    .disabled .tree-node-control:hover& {
       color: @palette-gray-3;
     }
   }
 
-  .tree-item.expanded > & {
+  .tree-node.expanded > & {
     /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
     /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
     .transform(rotate(89.99deg));
   }
 
   &.checkable {
-    margin-left: -@tree-item-control-checkbox-size - 8px;
+    margin-left: -@tree-node-control-checkbox-size - 8px;
   }
 }
 
 /* key handling */
 
-.tree-item .key-box {
+.tree-node .key-box {
   top: 4px;
 }

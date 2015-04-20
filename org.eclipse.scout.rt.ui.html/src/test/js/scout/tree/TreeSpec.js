@@ -72,7 +72,7 @@ describe("Tree", function() {
   }
 
   function findAllNodes(tree) {
-    return tree.$container.find('.tree-item');
+    return tree.$container.find('.tree-node');
   }
 
   function createNodeExpandedEvent(model, nodeId, expanded) {
@@ -164,7 +164,7 @@ describe("Tree", function() {
       spyOn(tree, '_onNodeClick');
       tree.render(session.$entryPoint);
 
-      var $node = tree.$container.find('.tree-item:first');
+      var $node = tree.$container.find('.tree-node:first');
       $node.click();
 
       expect(tree._onNodeClick).toHaveBeenCalled();
@@ -175,7 +175,7 @@ describe("Tree", function() {
       var tree = createTree(model);
       tree.render(session.$entryPoint);
 
-      var $node = tree.$container.find('.tree-item:first');
+      var $node = tree.$container.find('.tree-node:first');
       $node.triggerClick();
 
       sendQueuedAjaxCalls();
@@ -191,7 +191,7 @@ describe("Tree", function() {
       tree.checkable = true;
       tree.render(session.$entryPoint);
 
-      var $checkbox = tree.$container.find('.tree-item:first').find('.tree-item-checkbox label').first();
+      var $checkbox = tree.$container.find('.tree-node:first').find('.tree-node-checkbox label').first();
       $checkbox.triggerClick();
 
       sendQueuedAjaxCalls();
@@ -208,7 +208,7 @@ describe("Tree", function() {
 
       expect(tree.selectedNodeIds.length).toBe(0);
 
-      var $node = tree.$container.find('.tree-item:first');
+      var $node = tree.$container.find('.tree-node:first');
       $node.triggerClick();
 
       expect(tree.selectedNodeIds.length).toBe(1);
@@ -465,7 +465,7 @@ describe("Tree", function() {
       var tree = createTree(model);
       tree.render(session.$entryPoint);
 
-      var $node = tree.$container.find('.tree-item:first');
+      var $node = tree.$container.find('.tree-node:first');
       expect($node).not.toHaveClass('expanded');
 
       $node.triggerDoubleClick();
@@ -480,7 +480,7 @@ describe("Tree", function() {
       var tree = createTree(model);
       tree.render(session.$entryPoint);
 
-      var $node = tree.$container.find('.tree-item:first');
+      var $node = tree.$container.find('.tree-node:first');
       $node.triggerDoubleClick();
 
       sendQueuedAjaxCalls();
@@ -506,7 +506,7 @@ describe("Tree", function() {
       var tree = createTree(model);
       tree.render(session.$entryPoint);
 
-      var $nodeControl = tree.$container.find('.tree-item-control:first');
+      var $nodeControl = tree.$container.find('.tree-node-control:first');
       var $node = $nodeControl.parent();
       expect($node).not.toHaveClass('expanded');
 
@@ -522,7 +522,7 @@ describe("Tree", function() {
       var tree = createTree(model);
       tree.render(session.$entryPoint);
 
-      var $node = tree.$container.find('.tree-item:first');
+      var $node = tree.$container.find('.tree-node:first');
       $node.triggerDoubleClick();
 
       sendQueuedAjaxCalls();
@@ -1022,7 +1022,7 @@ describe("Tree", function() {
         expect($node0.text()).toBe(event.text);
 
         //Check whether tree-control is still there
-        expect($node0.children('.tree-item-control').length).toBe(1);
+        expect($node0.children('.tree-node-control').length).toBe(1);
       });
 
       it("updates custom cssClass of model and html node", function() {
@@ -1043,7 +1043,7 @@ describe("Tree", function() {
         var $node0 = node0.$node;
         expect($node0).toHaveClass('new-css-class');
         // check if other classes are still there
-        expect($node0).toHaveClass('tree-item');
+        expect($node0).toHaveClass('tree-node');
         expect($node0).toHaveClass('selected');
 
         // Check if removal works (event does not contain cssClass again)
@@ -1060,7 +1060,7 @@ describe("Tree", function() {
         $node0 = node0.$node;
         expect($node0).not.toHaveClass('new-css-class');
         // check if other classes are still there
-        expect($node0).toHaveClass('tree-item');
+        expect($node0).toHaveClass('tree-node');
         expect($node0).toHaveClass('selected');
       });
 
