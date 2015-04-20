@@ -33,19 +33,15 @@
   }
 }
 
-.button.default-button button,
-.button button.default-button {
+.button.default-button button:not(:disabled),
+.button button.default-button:not(:disabled) {
   .font-text-normal(@bold);
   background-color: @palette-bsi-normal;
   color: @palette-white;
   border-width: 0;
 
-  &:not(:disabled):hover {
+  &:hover {
     background-color: @default-button-background-color;
-  }
-
-  &.default-button:disabled {
-    background-color: @palette-gray-5;
   }
 }
 
