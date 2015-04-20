@@ -6,7 +6,10 @@
   border: 1px solid @border-color;
   border-radius: @border-radius;
   cursor: pointer;
-  .overflow-ellipsis-nowrap;
+  /* FIXME CGU/BSH: Actually, we wanted to use .overflow-ellipsis-nowrap to support */
+  /* ellipsis, but this breaks the focus, because the ::before inline element gets */
+  /* cut off. We should find a better solution for this. */
+  white-space: nowrap;
 
   &:hover {
     color: @hover-color;
