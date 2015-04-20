@@ -14,14 +14,12 @@ import java.io.File;
 import java.nio.file.Paths;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.SessionManager;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 public class JettyServer {
 
   public static final String WEB_APP_FOLDER_KEY = "scout.jetty.webapp.folder";
   public static final String SERVER_PORT_KEY = "scout.jetty.port";
-  public static final String SESSION_TIMEOUT_KEY = "scout.jetty.session.timeout";
 
   public static void main(String[] args) throws Exception {
     new JettyServer().start();
@@ -46,35 +44,23 @@ public class JettyServer {
         port = Integer.parseInt(portConfig);
       }
       catch (Exception e) {
+        System.err.println("Error while parsing value '" + portConfig + "' for property " + SERVER_PORT_KEY + ":");
         e.printStackTrace();
+        System.err.println("Using default port " + port + " instead.");
       }
     }
 
-    // session timeout
-    int timeoutInSeconds = 15 * 60; // 15 min default
-    String timeoutConfig = System.getProperty(SESSION_TIMEOUT_KEY);
-    if (timeoutConfig != null && timeoutConfig.length() > 0) {
-      try {
-        timeoutInSeconds = Integer.parseInt(timeoutConfig);
-      }
-      catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-
-    WebAppContext webApp = createWebApp(webappFolder, timeoutInSeconds);
+    WebAppContext webApp = createWebApp(webappFolder);
     Server server = new Server(port);
     server.setHandler(webApp);
     server.start();
   }
 
-  protected WebAppContext createWebApp(File webappDir, int sessionTimeoutSeconds) throws Exception {
+  protected WebAppContext createWebApp(File webappDir) throws Exception {
     WebAppContext webAppContext = new WebAppContext();
     webAppContext.setContextPath("/");
     webAppContext.setResourceBase(webappDir.getAbsolutePath());
     webAppContext.setParentLoaderPriority(true);
-    SessionManager sessionManager = webAppContext.getSessionHandler().getSessionManager();
-    sessionManager.setMaxInactiveInterval(sessionTimeoutSeconds);
 
     webAppContext.setConfigurationClasses(new String[]{
         "org.eclipse.jetty.webapp.WebInfConfiguration",
