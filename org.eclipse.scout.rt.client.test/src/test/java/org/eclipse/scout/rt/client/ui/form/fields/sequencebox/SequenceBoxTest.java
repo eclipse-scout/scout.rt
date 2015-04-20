@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
@@ -34,7 +35,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.Se
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence.EndField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.SequenceBoxTest.SequenceTestForm.MainBox.GroupBox.TwoElementSequence.StartField;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +47,9 @@ import org.junit.runner.RunWith;
  * Tests from to check in Sequence Box
  * {@link org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox}
  */
-@RunWith(PlatformTestRunner.class)
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class SequenceBoxTest {
 
   @Before
