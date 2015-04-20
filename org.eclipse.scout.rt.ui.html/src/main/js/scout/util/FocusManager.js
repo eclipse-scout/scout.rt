@@ -100,7 +100,10 @@ scout.FocusManager.prototype.uninstallFocusContext = function(focusContext, uiSe
   if (index === oldLength - 1 && focusContexts[focusContexts.length - 1]) {
     //when focuscontext was on top(active) install old focusContext and set focus to focused element
     $.log.warn('focuscontext uninstalled') ;
-    focusContexts[focusContexts.length - 1].activate(false);
+    setTimeout(function() {
+      $.log.warn('activated runned after timeout');
+      focusContexts[focusContexts.length - 1].activate(false);
+    }.bind(this));
   }
 };
 
