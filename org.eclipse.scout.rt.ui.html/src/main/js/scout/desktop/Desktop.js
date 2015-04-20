@@ -139,7 +139,7 @@ scout.Desktop.prototype.onSplitterResizeEnd = function(event) {
 
 scout.Desktop.prototype._addTab = function(tab, prepend) {
   tab.$container = $.makeDiv('taskbar-tab-item')
-    .append($.makeDiv('title', tab.title).attr('title', tab.title))
+    .append($.makeDiv('title', tab.title))
     .append($.makeDiv('sub-title', tab.subTitle));
   if (prepend) {
     tab.$container.prependTo(this.$tabbar);
@@ -164,7 +164,7 @@ scout.Desktop.prototype._updateTab = function(tab) {
   var setTitle = function(selector, title) {
     var $e = tab.$container.children(selector);
     if (title) {
-      $e.text(title).attr('title', title).setVisible(true);
+      $e.text(title).setVisible(true);
     } else {
       $e.setVisible(false);
     }

@@ -259,9 +259,8 @@ scout.FormField.prototype._goOnline = function() {
  */
 scout.FormField.prototype.addLabel = function() {
   this.$label = $('<label>')
-    .appendTo(this.$container)
-    .attr('title', this.label ? scout.strings.removeAmpersand(this.label) : '')
-    .attr('for', this.refFieldId);
+    .attr('for', this.refFieldId)
+    .appendTo(this.$container);
 };
 
 /**

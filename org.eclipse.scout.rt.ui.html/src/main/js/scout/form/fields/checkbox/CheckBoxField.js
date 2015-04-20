@@ -24,7 +24,6 @@ scout.CheckBoxField.prototype._render = function($parent) {
 
   this._$checkBoxLabel = $('<label>')
     .attr('for', this.refFieldId)
-    .attr('title', this.label)
     .appendTo(this.$fieldContainer);
 
   this._$checkBox.on('click', this._onClick.bind(this));
