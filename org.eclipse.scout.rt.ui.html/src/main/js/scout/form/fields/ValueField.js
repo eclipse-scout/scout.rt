@@ -47,35 +47,35 @@ scout.ValueField.prototype._renderUpdateDisplayTextOnModify = function() {
   }
 };
 
-scout.ValueField.prototype._onFieldKeyUp = function() {
-  this.acceptDisplayText(true);
-};
-
 scout.ValueField.prototype._onFieldBlur = function() {
-  this.acceptDisplayText();
+  this._displayTextChanged();
 };
 
-scout.ValueField.prototype.acceptDisplayText = function(whileTyping) {
-  this._updateDisplayText(this._readDisplayText(), whileTyping);
-};
+// FIXME AWE: (naming) in JavaStyleGuide ergänzen:
+// - wenn als event handler registriert $field.on('click', this._onClick.bind(this));
+// - Wenn event vom server kommt, z.B. selection _onSelection(event)
+// - Wenn Wert an Server gesendet werden soll displayTextChanged();
+//   wird typischerweise auch im _onChange oder _onKeyUp aufgerufen.
+//   ruft typischerweise auch sendDisplayText(displayText) auf
 
-scout.ValueField.prototype._updateDisplayText = function(displayText, whileTyping) {
-  displayText = scout.strings.nvl(displayText, '');
-  var oldDisplayText = scout.strings.nvl(this.displayText, '');
+scout.ValueField.prototype._displayTextChanged = function() {
+  var displayText = scout.strings.nvl(this._readDisplayText(), ''),
+    oldDisplayText = scout.strings.nvl(this.displayText, '');
   if (displayText === oldDisplayText) {
     return;
   }
-
-  var data = {
-    displayText: displayText
-  };
-
-  // Don't send when set to false (save some bytes)
-  // TODO ASA: remove whileTyping argument when validateOnAnyKey is removed
-  if (whileTyping) {
-    data.whileTyping = true;
-  }
-
   this.displayText = displayText;
-  this.session.send(this.id, 'displayTextChanged', data);
+  this._sendDisplayTextChanged(displayText, false);
 };
+
+scout.ValueField.prototype._onFieldKeyUp = function() {
+  var displayText = scout.strings.nvl(this._readDisplayText(), '');
+  this._sendDisplayTextChanged(displayText, true);
+};
+
+scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, whileTyping) {
+  this.session.send(this.id, 'displayTextChanged', {
+    displayText: displayText,
+    whileTyping: whileTyping});
+};
+

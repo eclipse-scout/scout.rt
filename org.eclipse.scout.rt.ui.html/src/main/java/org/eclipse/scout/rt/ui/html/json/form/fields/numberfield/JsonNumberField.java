@@ -27,7 +27,7 @@ public class JsonNumberField<T extends INumberField> extends JsonValueField<T> {
   }
 
   @Override
-  protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
-    getModel().getUIFacade().setTextFromUI(displayText, whileTyping);
+  protected void handleUiTextChangedImpl(String displayText) {
+    getModel().getUIFacade().setTextFromUI(displayText, false);
   }
 }

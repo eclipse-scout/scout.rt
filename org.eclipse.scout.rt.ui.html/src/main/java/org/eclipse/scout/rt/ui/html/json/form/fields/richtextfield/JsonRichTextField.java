@@ -27,7 +27,7 @@ public class JsonRichTextField<T extends IRichTextField> extends JsonValueField<
   }
 
   @Override
-  protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
+  protected void handleUiTextChangedImpl(String displayText) {
   }
 
 }

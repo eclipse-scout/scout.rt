@@ -33,6 +33,12 @@ import org.json.JSONObject;
  * @param <T>
  */
 public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> implements IContextMenuOwner {
+
+  /**
+   * This event is used when display-text has changed after field loses focus or when the display-text has changed
+   * while typing (this event is send after each key-press). You can distinct the two cases by looking on the while-
+   * Typing flag.
+   */
   public static final String EVENT_DISPLAY_TEXT_CHANGED = "displayTextChanged";
 
   public JsonValueField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
@@ -88,12 +94,22 @@ public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormF
 
   protected void handleUiDisplayTextChanged(JsonEvent event) {
     String displayText = JsonObjectUtility.getString(event.getData(), IValueField.PROP_DISPLAY_TEXT);
-    boolean whileTyping = event.getData().optBoolean("whileTyping");
     addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
-    handleUiDisplayTextChangedImpl(displayText, whileTyping);
+    boolean whileTyping = event.getData().optBoolean("whileTyping", false);
+    if (whileTyping) {
+      handleUiDisplayTextChangedImpl(displayText);
+    }
+    else {
+      handleUiTextChangedImpl(displayText);
+    }
   }
 
-  protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
-    // NOP may be implemented by subclasses
+  protected void handleUiTextChangedImpl(String displayText) {
+    // NOP may be implemented by sub-classes
   }
+
+  protected void handleUiDisplayTextChangedImpl(String displayText) {
+    // NOP may be implemented by sub-classes
+  }
+
 }
