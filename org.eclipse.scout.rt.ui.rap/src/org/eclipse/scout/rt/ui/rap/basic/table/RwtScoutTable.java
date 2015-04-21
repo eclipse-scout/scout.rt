@@ -97,7 +97,7 @@ import org.eclipse.swt.widgets.TableItem;
  * - multi line support in headers is not supported by rwt.
  * <p>
  * - multi line support in row texts is not supported so far. Might probably be done by customized table rows.
- * 
+ *
  * @since 3.8.0
  */
 @SuppressWarnings("restriction")
@@ -252,7 +252,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         }
         rwtCol.setMoveable(true);
         rwtCol.setToolTipText(cell.getTooltipText());
-        updateHeaderText(rwtCol, scoutColumn);
         rwtCol.setWidth(scoutColumn.getWidth());
         if (scoutColumn.isFixedWidth()) {
           rwtCol.setResizable(false);
@@ -267,6 +266,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         rwtCol.addListener(SWT.Move, m_columnListener);
         rwtCol.addListener(SWT.Resize, m_columnListener);
       }
+      decorateHeaderTexts();
       //multiline header settings
       if (multilineHeaders) {
         getUiField().setData("multiLineHeader", Boolean.TRUE);
@@ -584,49 +584,61 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     switch (e.getType()) {
       case TableEvent.TYPE_ROW_FILTER_CHANGED:
         // Update column title if filter changed (mark column as filtered)
-        for (TableColumn swtCol : getUiField().getColumns()) {
-          updateHeaderText(swtCol);
-        }
+        decorateHeaderTexts();
         setSelectionFromScout(e.getTable().getSelectedRows());
         break;
     }
   }
 
-  private void updateHeaderText(TableColumn swtCol) {
-    if (swtCol == null) {
-      return;
-    }
-    Object data = swtCol.getData(KEY_SCOUT_COLUMN);
-    if (data instanceof IColumn<?>) {
-      updateHeaderText(swtCol, (IColumn<?>) data);
-    }
-  }
-
-  private void updateHeaderText(TableColumn swtCol, IColumn<?> scoutCol) {
-    updateHeaderText(swtCol, scoutCol, false);
-  }
-
-  private void updateHeaderText(TableColumn swtCol, IColumn<?> scoutCol, boolean indicateSortOrder) {
-    IHeaderCell cell = scoutCol.getHeaderCell();
-    String text = cell.getText();
-    if (text == null) {
-      text = "";
-    }
-    if (scoutCol instanceof ICustomColumn) {
-      text = "[+] " + text;
-    }
-    if (scoutCol.isColumnFilterActive()) {
-      text = "(*) " + text;
-    }
-    if (indicateSortOrder) {
-      if (scoutCol.isSortAscending()) {
-        text = "[a-z] " + text;
-      }
-      else {
-        text = "[z-a] " + text;
+  private void decorateHeaderTexts() {
+    // Because SWT can only indicate one sort column, we will use the first (i.e. the column
+    // with the lowest sort index) user sort column that is visible for that purpose. Further
+    // sort columns will be indicated by a special header text (see updateHeaderText() method).
+    List<IColumn<?>> sortColumns = getScoutObject().getColumnSet().getSortColumns();
+    // strip invisible columns
+    Iterator<IColumn<?>> it = sortColumns.iterator();
+    while (it.hasNext()) {
+      IColumn<?> next = it.next();
+      if (!next.isVisible() || !next.isSortExplicit()) {
+        it.remove();
       }
     }
-    swtCol.setText(text);
+    // reset RWT sort column
+    if (sortColumns.size() > 1) {
+      getUiField().setSortColumn(null);
+    }
+
+    for (TableColumn uiColumn : getUiField().getColumns()) {
+      IColumn<?> scoutColumn = (IColumn<?>) uiColumn.getData(KEY_SCOUT_COLUMN);
+      if (scoutColumn != null) {
+        IHeaderCell cell = scoutColumn.getHeaderCell();
+        StringBuilder textBuilder = new StringBuilder();
+        if (cell.getText() != null) {
+          textBuilder.append(cell.getText());
+        }
+        if (scoutColumn instanceof ICustomColumn) {
+          textBuilder.insert(0, "[+] ");
+        }
+        if (scoutColumn.isColumnFilterActive()) {
+          textBuilder.insert(0, "(*) ");
+        }
+        if (sortColumns.contains(scoutColumn)) {
+          if (sortColumns.size() > 1) {
+            if (scoutColumn.isSortAscending()) {
+              textBuilder.insert(0, "[a-z] ");
+            }
+            else {
+              textBuilder.insert(0, "[z-a] ");
+            }
+          }
+          else {
+            getUiField().setSortDirection(scoutColumn.isSortAscending() ? SWT.UP : SWT.DOWN);
+            getUiField().setSortColumn(uiColumn);
+          }
+        }
+        uiColumn.setText(textBuilder.toString());
+      }
+    }
   }
 
   protected void setHeaderVisibleFromScout(boolean headerVisible) {
@@ -763,40 +775,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
   }
 
   protected void headerUpdateFromScout() {
-    // Because SWT can only indicate one sort column, we will use the first (i.e. the column
-    // with the lowest sort index) user sort column that is visible for that purpose. Further
-    // sort columns will be indicated by a special header text (see updateHeaderText() method).
-    int minSortIndex = -1;
-    TableColumn minUiSortColumn = null;
-    IColumn<?> minScoutSortColumn = null;
-    for (TableColumn col : getUiField().getColumns()) {
-      Object data = col.getData(KEY_SCOUT_COLUMN);
-      if (data instanceof IColumn<?>) {
-        IColumn<?> cell = (IColumn<?>) data;
-        if (cell.isSortExplicit() && (minSortIndex == -1 || cell.getSortIndex() < minSortIndex)) {
-          minSortIndex = cell.getSortIndex();
-          minUiSortColumn = col;
-          minScoutSortColumn = cell;
-        }
-        updateHeaderText(col);
-      }
-    }
-
-    if (minUiSortColumn != null && minScoutSortColumn != null) {
-      getUiField().setSortColumn(minUiSortColumn);
-      getUiField().setSortDirection(minScoutSortColumn.isSortAscending() ? SWT.UP : SWT.DOWN);
-    }
-    else {
-      getUiField().setSortColumn(null);
-    }
-    for (TableColumn col : getUiField().getColumns()) {
-      Object data = col.getData(KEY_SCOUT_COLUMN);
-      if (data instanceof IColumn<?>) {
-        IColumn<?> cell = (IColumn<?>) data;
-        boolean indicateSortOrder = (cell.isSortExplicit() && cell != minScoutSortColumn);
-        updateHeaderText(col, cell, indicateSortOrder);
-      }
-    }
+    decorateHeaderTexts();
   }
 
   protected void handleUiRowClick(final ITableRow row, final int rwtMouseButton) {
