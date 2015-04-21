@@ -2,16 +2,20 @@ package org.eclipse.scout.rt.ui.html.json.basic.activitymap;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityMapEvent;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityMapListener;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMapUIFacade;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.TimeScale;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.IIdProvider;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -20,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends AbstractJsonPropertyObserver<P> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonActivityMap.class);
 
   // from model
   public static final String EVENT_ACTIVITY_MAP_CHANGED = "activityMapChanged";
@@ -31,9 +36,13 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
   private static final String EVENT_CELL_ACTION = "cellAction";
 
   private ActivityMapListener m_activityMapListener;
+  private final Map<String, ActivityCell<RI, AI>> m_cells;
+  private final Map<ActivityCell<RI, AI>, String> m_cellIds;
 
   public JsonActivityMap(P model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
+    m_cells = new HashMap<>();
+    m_cellIds = new HashMap<>();
   }
 
   @Override
@@ -70,10 +79,10 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
         return getModel().getPlanningMode();
       }
     });
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_RESOURCE_IDS, model) {
+    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_DAYS, model) {
       @Override
-      protected List<RI> modelValue() {
-        return getModel().getResourceIds();
+      protected Date[] modelValue() {
+        return getModel().getDays();
       }
 
       @Override
@@ -81,9 +90,11 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
         if (value == null) {
           return null;
         }
-        @SuppressWarnings("unchecked")
-        List<RI> list = (List<RI>) value;
-        return new JSONArray(list);
+        JSONArray jsonArray = new JSONArray();
+        for (Date date : (Date[]) value) {
+          jsonArray.put(new JsonDate(date).asJsonString());
+        }
+        return jsonArray;
       }
     });
     putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_SELECTED_BEGIN_TIME, model) {
@@ -130,22 +141,11 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
         return getModel().getSelectedActivityCell();
       }
 
+      @SuppressWarnings("unchecked")
       @Override
       public Object prepareValueForToJson(Object value) {
-        @SuppressWarnings("unchecked")
         ActivityCell<RI, AI> activityCell = (ActivityCell<RI, AI>) value;
-        return new JsonActivityCell<RI, AI>(activityCell).toJson();
-      }
-    });
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_TIME_SCALE, model) {
-      @Override
-      protected TimeScale modelValue() {
-        return getModel().getTimeScale();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        return new JsonTimeScale((TimeScale) value).toJson();
+        return new P_GetOrCreateCellIdProvider().getId(activityCell);
       }
     });
     putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_DRAW_SECTIONS, model) {
@@ -164,11 +164,28 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
     List<RI> resourceIds = getModel().getResourceIds();
     JSONArray jsonRows = new JSONArray();
     for (RI resourceId : resourceIds) {
-      JsonActivityRow<RI, AI> jsonRow = new JsonActivityRow<RI, AI>(resourceId, getModel().getActivityCells(resourceId));
-      jsonRows.put(jsonRow.toJson());
+      JsonActivityRow<RI, AI> jsonRow = new JsonActivityRow<RI, AI>(resourceId, getModel().getActivityCells(resourceId), new P_NewCellIdProvider());
+      Object row = jsonRow.toJson();
+      LOG.debug("Id: " + getId() + ". Resources: " + row.toString());
+      jsonRows.put(row);
     }
     json.put("rows", jsonRows);
     return json;
+  }
+
+  protected String getCellId(ActivityCell<RI, AI> cell) {
+    return m_cellIds.get(cell);
+  }
+
+  protected String createCellId(ActivityCell<RI, AI> cell) {
+    String id = getCellId(cell);
+    if (id != null) {
+      throw new IllegalStateException("Cell already has an id. " + cell);
+    }
+    id = getUiSession().createUniqueIdFor(null);
+    m_cells.put(id, cell);
+    m_cellIds.put(cell, id);
+    return id;
   }
 
   @Override
@@ -255,6 +272,34 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
     @Override
     public void activityMapChanged(ActivityMapEvent e) {
       addActionEvent(EVENT_ACTIVITY_MAP_CHANGED, new JsonActivityMapEvent(e).toJson());
+    }
+  }
+
+  protected class P_CellIdProvider implements IIdProvider<ActivityCell<RI, AI>> {
+
+    @Override
+    public String getId(ActivityCell<RI, AI> cell) {
+      return getCellId(cell);
+    }
+  }
+
+  protected class P_NewCellIdProvider implements IIdProvider<ActivityCell<RI, AI>> {
+
+    @Override
+    public String getId(ActivityCell<RI, AI> cell) {
+      return createCellId(cell);
+    }
+  }
+
+  protected class P_GetOrCreateCellIdProvider implements IIdProvider<ActivityCell<RI, AI>> {
+
+    @Override
+    public String getId(ActivityCell<RI, AI> cell) {
+      String id = getCellId(cell);
+      if (id == null) {
+        id = createCellId(cell);
+      }
+      return id;
     }
   }
 }

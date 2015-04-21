@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.basic.activitymap;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
+import org.eclipse.scout.rt.ui.html.json.IIdProvider;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONArray;
@@ -20,11 +21,14 @@ import org.json.JSONObject;
 
 public class JsonActivityRow<RI, AI> implements IJsonObject {
   private RI m_resourceId;
+  private final IIdProvider<ActivityCell<RI, AI>> m_cellIdProvider;
+
   private List<ActivityCell<RI, AI>> m_cells;
 
-  public JsonActivityRow(RI resourceId, List<ActivityCell<RI, AI>> cells) {
+  public JsonActivityRow(RI resourceId, List<ActivityCell<RI, AI>> cells, IIdProvider<ActivityCell<RI, AI>> cellIdProvider) {
     m_resourceId = resourceId;
     m_cells = cells;
+    m_cellIdProvider = cellIdProvider;
   }
 
   @Override
@@ -40,7 +44,7 @@ public class JsonActivityRow<RI, AI> implements IJsonObject {
   protected JSONArray cellsToJson() {
     JSONArray jsonCells = new JSONArray();
     for (ActivityCell<RI, AI> cell : m_cells) {
-      JsonActivityCell<RI, AI> jsonCell = new JsonActivityCell<RI, AI>(cell);
+      JsonActivityCell<RI, AI> jsonCell = new JsonActivityCell<RI, AI>(cell, m_cellIdProvider);
       jsonCells.put(jsonCell.toJson());
     }
     return jsonCells;

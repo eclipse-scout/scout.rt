@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.ui.html.json.basic.activitymap;
 
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
+import org.eclipse.scout.rt.ui.html.json.IIdProvider;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -9,10 +10,12 @@ import org.json.JSONObject;
 
 public class JsonActivityCell<RI, AI> implements IJsonObject {
 
+  private final IIdProvider<ActivityCell<RI, AI>> m_idProvider;
   private final ActivityCell<RI, AI> m_activityCell;
 
-  public JsonActivityCell(ActivityCell<RI, AI> activityCell) {
+  public JsonActivityCell(ActivityCell<RI, AI> activityCell, IIdProvider<ActivityCell<RI, AI>> idProvider) {
     m_activityCell = activityCell;
+    m_idProvider = idProvider;
   }
 
   public ActivityCell<RI, AI> getActivityCell() {
@@ -24,9 +27,8 @@ public class JsonActivityCell<RI, AI> implements IJsonObject {
     if (m_activityCell == null) {
       return null;
     }
-    JSONObject json = new JSONObject();
-    JsonObjectUtility.putProperty(json, "resourceId", m_activityCell.getResourceId()); // TODO BSH How to convert to JSON?
-    JsonObjectUtility.putProperty(json, "activityId", m_activityCell.getActivityId()); // TODO BSH How to convert to JSON?
+    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JsonObjectUtility.putProperty(json, "id", m_idProvider.getId(m_activityCell));
     JsonObjectUtility.putProperty(json, "beginTime", new JsonDate(m_activityCell.getBeginTime()).asJsonString());
     JsonObjectUtility.putProperty(json, "endTime", new JsonDate(m_activityCell.getEndTime()).asJsonString());
     JsonObjectUtility.putProperty(json, "text", m_activityCell.getText());
