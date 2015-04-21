@@ -27,10 +27,12 @@ public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IR
   private final boolean m_textVisible;
   private String m_variantInActive;
   private String m_variantActive;
+  private boolean m_radioBehaviour;
 
-  public RwtScoutToolButton(boolean textVisible, boolean iconVisible, String variantInActive, String variantActive) {
+  public RwtScoutToolButton(boolean textVisible, boolean iconVisible, boolean radioBehaviour, String variantInActive, String variantActive) {
     m_textVisible = textVisible;
     m_iconVisible = iconVisible;
+    m_radioBehaviour = radioBehaviour;
     m_variantInActive = variantInActive;
     m_variantActive = variantActive;
   }
@@ -45,7 +47,13 @@ public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IR
 
       @Override
       public void widgetSelected(SelectionEvent e) {
-        handleUiSelection(getUiField().getSelection());
+        e.doit = false;
+        if (!m_radioBehaviour) {
+          handleUiSelection(getUiField().getSelection());
+        }
+        else if (getUiField().getSelection()) {
+          handleUiSelection(getUiField().getSelection());
+        }
       }
     });
   }

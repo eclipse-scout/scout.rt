@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Label;
 
 /**
  * <h3>ViewButtonBar</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.7.0 June 2011
  */
@@ -117,7 +117,7 @@ public class RwtScoutToolButtonBar extends RwtScoutComposite<IDesktop> implement
       String activeVariant = VARIANT_TOOL_BUTTON_BUTTON_ACTIVE;
       variant += "-" + simpleClassName;
       activeVariant += "-" + simpleClassName;
-      IRwtScoutToolButton uiToolButton = new RwtScoutToolButton(false, true, variant, activeVariant);
+      IRwtScoutToolButton uiToolButton = new RwtScoutToolButton(false, true, false, variant, activeVariant);
       uiToolButton.createUiField(m_toolButtonContainer, scoutButton, getUiEnvironment());
       m_toolTabItems.put(scoutButton, uiToolButton);
     }

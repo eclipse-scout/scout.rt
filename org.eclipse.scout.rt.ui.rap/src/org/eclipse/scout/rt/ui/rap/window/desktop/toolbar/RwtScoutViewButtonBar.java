@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * <h3>ViewButtonBar</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.7.0 June 2011
  */
@@ -78,7 +78,7 @@ public class RwtScoutViewButtonBar extends RwtScoutComposite<IDesktop> implement
     buttonBar.setData(RWT.CUSTOM_VARIANT, VARIANT_TOOLBAR_CONTAINER);
     for (IViewButton scoutButton : getScoutObject().getViewButtons()) {
       if (scoutButton.isVisible()) {
-        IRwtScoutToolButton uiButton = new RwtScoutToolButton(true, false, VARIANT_VIEW_BUTTON, VARIANT_VIEW_BUTTON_ACTIVE);
+        IRwtScoutToolButton uiButton = new RwtScoutToolButton(true, false, true, VARIANT_VIEW_BUTTON, VARIANT_VIEW_BUTTON_ACTIVE);
         uiButton.createUiField(buttonBar, scoutButton, getUiEnvironment());
         m_viewTabItems.put(scoutButton, uiButton);
       }
