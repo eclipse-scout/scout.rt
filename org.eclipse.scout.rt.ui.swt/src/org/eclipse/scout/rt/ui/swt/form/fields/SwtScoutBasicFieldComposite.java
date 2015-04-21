@@ -209,6 +209,7 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
   /**
    * scout property handler override
    */
+  @SuppressWarnings("deprecation")
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);

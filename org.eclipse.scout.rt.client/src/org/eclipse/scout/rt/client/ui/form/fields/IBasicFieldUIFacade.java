@@ -28,7 +28,9 @@ public interface IBasicFieldUIFacade {
   boolean setTextFromUI(String newText, boolean whileTyping);
 
   /**
-   * TODO ASA javadoc
+   * Iff {@link IBasicField#PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY} is true the UI calls this method on any changes in the
+   * field. If {@link IBasicField#PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY} is false the model's display-text is only updated
+   * when a new value is set.
    *
    * @param text
    */

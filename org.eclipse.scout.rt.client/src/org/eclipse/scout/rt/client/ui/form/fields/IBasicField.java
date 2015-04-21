@@ -17,6 +17,12 @@ package org.eclipse.scout.rt.client.ui.form.fields;
  * @since 3.10.0-M3
  */
 public interface IBasicField<T> extends IValueField<T> {
+  /**
+   * @deprecated use {@link IBasicField#PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY},
+   *             {@link IBasicField#setUpdateDisplayTextOnModify(boolean)} and
+   *             {@link AbstractBasicField#execChangedDisplayText()} instead; will be removed in 5.1.0;
+   */
+  @Deprecated
   String PROP_VALIDATE_ON_ANY_KEY = "validateOnAnyKey";
   String PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY = "updateDisplayTextOnModify";
 

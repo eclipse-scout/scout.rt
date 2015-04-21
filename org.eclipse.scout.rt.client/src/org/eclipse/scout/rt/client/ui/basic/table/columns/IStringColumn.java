@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
+import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
+
 public interface IStringColumn extends IColumn<String> {
   /* enum for formats */
 
@@ -45,8 +48,18 @@ public interface IStringColumn extends IColumn<String> {
 
   void setSelectAllOnEdit(boolean b);
 
+  /**
+   * @deprecated use {@link IBasicField#setUpdateDisplayTextOnModify(boolean)} and
+   *             {@link AbstractBasicField#execChangedDisplayText()} instead; will be removed in 5.1.0;
+   */
+  @Deprecated
   void setValidateOnAnyKey(boolean b);
 
+  /**
+   * @deprecated use {@link IBasicField#setUpdateDisplayTextOnModify(boolean)} and
+   *             {@link AbstractBasicField#execChangedDisplayText()} instead; will be removed in 5.1.0;
+   */
+  @Deprecated
   boolean isValidateOnAnyKey();
 
   void setMaxLength(int len);

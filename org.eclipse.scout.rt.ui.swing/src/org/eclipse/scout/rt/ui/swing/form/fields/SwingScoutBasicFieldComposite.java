@@ -176,6 +176,7 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
   /**
    * scout property handler override
    */
+  @SuppressWarnings("deprecation")
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);

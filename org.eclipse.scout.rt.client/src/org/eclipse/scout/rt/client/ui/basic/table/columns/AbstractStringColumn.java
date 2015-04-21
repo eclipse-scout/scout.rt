@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IStringColum
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
@@ -112,7 +113,11 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    * Causes the ui to send a validate event every time the text field content is changed.
    * <p>
    * Be careful when using this property since this can influence performance and the characteristics of text input.
+   *
+   * @deprecated use {@link IBasicField#setUpdateDisplayTextOnModify(boolean)} and
+   *             {@link AbstractBasicField#execChangedDisplayText()} instead; will be removed in 5.1.0;
    */
+  @Deprecated
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(180)
   protected boolean getConfiguredValidateOnAnyKey() {
@@ -174,11 +179,13 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     propertySupport.setPropertyBool(IStringField.PROP_SELECT_ALL_ON_FOCUS, b);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean isValidateOnAnyKey() {
     return propertySupport.getPropertyBool(IBasicField.PROP_VALIDATE_ON_ANY_KEY);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void setValidateOnAnyKey(boolean b) {
     propertySupport.setPropertyBool(IBasicField.PROP_VALIDATE_ON_ANY_KEY, b);
