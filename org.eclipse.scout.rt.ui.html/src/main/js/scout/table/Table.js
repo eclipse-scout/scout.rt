@@ -1008,9 +1008,10 @@ scout.Table.prototype._onRowsSelected = function(rowIds) {
 
 scout.Table.prototype._onRowsChecked = function(rows) {
   for (var i = 0; i < rows.length; i++) {
-    this.rowsMap[rows[i].id].checked = rows[i].checked;
+    var row = this.rowsMap[rows[i].id];
+    row.checked = rows[i].checked;
     if (this.rendered) {
-      this._renderRowChecked(rows[i]);
+      this._renderRowChecked(row);
     }
   }
 };
