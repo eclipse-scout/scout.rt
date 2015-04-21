@@ -118,7 +118,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * Container of this table, {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage IPage},
    * {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField ITableField},
    * {@link org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox IListBox},
-   * {@link org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField IPlannerField}
+   * {@link org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld IPlannerField}
    * <p>
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
    *
@@ -790,7 +790,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * Container of this table, {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage IPage},
    * {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField ITableField},
    * {@link org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox IListBox},
-   * {@link org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField IPlannerField}
+   * {@link org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld IPlannerField}
    * <p>
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
    *

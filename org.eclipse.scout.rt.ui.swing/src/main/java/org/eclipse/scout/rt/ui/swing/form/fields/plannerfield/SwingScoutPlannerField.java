@@ -31,7 +31,7 @@ import javax.swing.table.JTableHeader;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.activitymap.SwingScoutActivityMap;
 import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swing.form.fields.plannerfield.layout.PlannerFieldLayout;
 import org.eclipse.scout.rt.ui.swing.form.fields.plannerfield.layout.PlannerFieldLayoutConstraints;
 
-public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerField<?, ?, ?, ?>> implements ISwingScoutPlannerField {
+public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFieldOld<?, ?, ?, ?>> implements ISwingScoutPlannerField {
   private ISwingScoutTable m_resourceTableComposite;
   private SwingScoutActivityMap m_activityMapComposite;
   private DateChooser[] m_miniDateChooser;
@@ -207,10 +207,10 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
-    if (IPlannerField.PROP_MINI_CALENDAR_COUNT.equals(name)) {
+    if (IPlannerFieldOld.PROP_MINI_CALENDAR_COUNT.equals(name)) {
       setMiniCalendarCountFromScout((Integer) newValue);
     }
-    if (IPlannerField.PROP_SPLITTER_POSITION.equals(name)) {
+    if (IPlannerFieldOld.PROP_SPLITTER_POSITION.equals(name)) {
       setSplitterLocation((Integer) newValue);
     }
   }

@@ -44,7 +44,7 @@ public class SwingPlatformListener implements IPlatformListener {
       FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField.class, org.eclipse.scout.rt.ui.swing.form.fields.treefield.SwingScoutTreeField.class);
       FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField.class, org.eclipse.scout.rt.ui.swing.form.fields.composer.SwingScoutComposerField.class);
       FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField.class, org.eclipse.scout.rt.ui.swing.form.fields.calendarfield.SwingScoutCalendarField.class);
-      FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField.class, org.eclipse.scout.rt.ui.swing.form.fields.plannerfield.SwingScoutPlannerField.class);
+      FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld.class, org.eclipse.scout.rt.ui.swing.form.fields.plannerfield.SwingScoutPlannerField.class);
       FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField.class, org.eclipse.scout.rt.ui.swing.form.fields.wrappedformfield.SwingScoutWrappedFormField.class);
       FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox.class, org.eclipse.scout.rt.ui.swing.form.fields.splitbox.SwingScoutSplitBox.class);
       FormFieldExtensions.INSTANCE.put(org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField.class, org.eclipse.scout.rt.ui.swing.form.fields.placeholder.SwingScoutPlaceholderField.class);

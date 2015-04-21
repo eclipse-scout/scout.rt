@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.plannerfield;
+package org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold;
 
-public interface IPlannerFieldUIFacade {
+public interface IPlannerFieldOldUIFacade {
 
   void refreshFromUI();
 

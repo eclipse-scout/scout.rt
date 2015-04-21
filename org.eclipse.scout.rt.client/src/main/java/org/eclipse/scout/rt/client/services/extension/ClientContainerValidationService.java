@@ -46,7 +46,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.AbstractImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.AbstractPlannerFieldOld;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
@@ -93,8 +93,8 @@ public class ClientContainerValidationService extends AbstractContainerValidatio
     addPossibleContributionForContainer(IMenu.class, AbstractImageField.class);
     addPossibleContributionForContainer(IFormField.class, AbstractListBox.class);
     addPossibleContributionForContainer(ITable.class, AbstractListBox.class);
-    addPossibleContributionForContainer(IActivityMap.class, AbstractPlannerField.class);
-    addPossibleContributionForContainer(ITable.class, AbstractPlannerField.class);
+    addPossibleContributionForContainer(IActivityMap.class, AbstractPlannerFieldOld.class);
+    addPossibleContributionForContainer(ITable.class, AbstractPlannerFieldOld.class);
     addPossibleContributionForContainer(IFormField.class, AbstractRadioButtonGroup.class);
     addPossibleContributionForContainer(ITable.class, AbstractTableField.class);
     addPossibleContributionForContainer(IFormField.class, AbstractTreeBox.class);

@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IActivityMapContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld;
 
 /**
  * The activity map is a specialized model which contains a set of {@link ActivityCell}s that are grouped by resourceId.
@@ -82,7 +82,7 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
    */
   String PROP_DRAW_SECTIONS = "drawSections";
   /**
-   * {@link Object} Container of this map, {@link IPlannerField} https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
+   * {@link Object} Container of this map, {@link IPlannerFieldOld} https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
    *
    * @since 3.8.1
    */
@@ -328,7 +328,7 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
   /**
    * {@link Object}
    * <p>
-   * Container of this map, {@link IPlannerField}
+   * Container of this map, {@link IPlannerFieldOld}
    * <p>
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
    *

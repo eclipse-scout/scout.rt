@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.PlannerFieldTest.PlannerField.ActivityMap;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.PlannerFieldTest.PlannerField.ResourceTable;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.AbstractPlannerFieldOld;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class PlannerFieldTest {
   /**
    * Test field
    */
-  public class PlannerField extends AbstractPlannerField<ResourceTable, ActivityMap, String, Integer> {
+  public class PlannerField extends AbstractPlannerFieldOld<ResourceTable, ActivityMap, String, Integer> {
 
     @Override
     protected Object[][] execLoadResourceTableData() throws ProcessingException {

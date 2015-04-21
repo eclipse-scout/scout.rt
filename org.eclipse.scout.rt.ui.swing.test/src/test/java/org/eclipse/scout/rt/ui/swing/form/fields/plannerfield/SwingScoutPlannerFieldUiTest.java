@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.client.ui.basic.activitymap.TimeScale;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.basic.table.SwingScoutTable;
 import org.junit.Ignore;
@@ -53,7 +53,7 @@ public class SwingScoutPlannerFieldUiTest {
     activityMap.getTimeScale();
     expectLastCall().andReturn(new TimeScale()).anyTimes();
 
-    IPlannerField<?, ?, ?, ?> scoutObject = createNiceMock(IPlannerField.class);
+    IPlannerFieldOld<?, ?, ?, ?> scoutObject = createNiceMock(IPlannerFieldOld.class);
     scoutObject.getResourceTable();
     expectLastCall().andReturn(scoutTable);
     scoutObject.getGridData();

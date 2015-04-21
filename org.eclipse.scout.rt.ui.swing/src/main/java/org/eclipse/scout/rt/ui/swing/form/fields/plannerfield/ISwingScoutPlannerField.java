@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.form.fields.plannerfield;
 
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld;
 import org.eclipse.scout.rt.ui.swing.basic.activitymap.SwingScoutActivityMap;
 import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 
-public interface ISwingScoutPlannerField extends ISwingScoutFormField<IPlannerField<?, ?, ?, ?>> {
+public interface ISwingScoutPlannerField extends ISwingScoutFormField<IPlannerFieldOld<?, ?, ?, ?>> {
 
   ISwingScoutTable getResourceTableComposite();
 

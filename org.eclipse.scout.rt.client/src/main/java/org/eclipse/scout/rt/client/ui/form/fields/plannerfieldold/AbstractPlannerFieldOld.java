@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.plannerfield;
+package org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -26,11 +26,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.IPlannerFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldLoadActivityMapDataChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldLoadResourceTableDataChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldPopulateActivitiesChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldPopulateResourceTableChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfieldold.IPlannerFieldOldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfieldold.PlannerFieldOldChains.PlannerFieldOldLoadActivityMapDataChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfieldold.PlannerFieldOldChains.PlannerFieldOldLoadResourceTableDataChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfieldold.PlannerFieldOldChains.PlannerFieldOldPopulateActivitiesChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfieldold.PlannerFieldOldChains.PlannerFieldOldPopulateResourceTableChain;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.AbstractActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
@@ -45,20 +45,20 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("8fbfbf19-ff9d-4e89-8a78-8e6a4a8dc36c")
-public abstract class AbstractPlannerField<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractFormField implements IPlannerField<T, P, RI, AI> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPlannerField.class);
+public abstract class AbstractPlannerFieldOld<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractFormField implements IPlannerFieldOld<T, P, RI, AI> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPlannerFieldOld.class);
 
-  private IPlannerFieldUIFacade m_uiFacade;
+  private IPlannerFieldOldUIFacade m_uiFacade;
   private T m_resourceTable;
   private IColumn<RI> m_resourceIdColumn;
   private P m_activityMap;
   private boolean m_selectionMediatorRunning;// true when mediation is running
 
-  public AbstractPlannerField() {
+  public AbstractPlannerFieldOld() {
     this(true);
   }
 
-  public AbstractPlannerField(boolean callInitializer) {
+  public AbstractPlannerFieldOld(boolean callInitializer) {
     super(callInitializer);
   }
 
@@ -375,11 +375,11 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
   }
 
   @Override
-  public IPlannerFieldUIFacade getUIFacade() {
+  public IPlannerFieldOldUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
-  private class P_PlannerFieldUIFacade implements IPlannerFieldUIFacade {
+  private class P_PlannerFieldUIFacade implements IPlannerFieldOldUIFacade {
 
     @Override
     public void refreshFromUI() {
@@ -449,58 +449,58 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
 
   protected final void interceptPopulateActivities(List<RI> resourceIds, List<ITableRow> resourceRows) throws ProcessingException {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    PlannerFieldPopulateActivitiesChain<T, P, RI, AI> chain = new PlannerFieldPopulateActivitiesChain<T, P, RI, AI>(extensions);
+    PlannerFieldOldPopulateActivitiesChain<T, P, RI, AI> chain = new PlannerFieldOldPopulateActivitiesChain<T, P, RI, AI>(extensions);
     chain.execPopulateActivities(resourceIds, resourceRows);
   }
 
   protected final Object[][] interceptLoadResourceTableData() throws ProcessingException {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    PlannerFieldLoadResourceTableDataChain<T, P, RI, AI> chain = new PlannerFieldLoadResourceTableDataChain<T, P, RI, AI>(extensions);
+    PlannerFieldOldLoadResourceTableDataChain<T, P, RI, AI> chain = new PlannerFieldOldLoadResourceTableDataChain<T, P, RI, AI>(extensions);
     return chain.execLoadResourceTableData();
   }
 
   protected final void interceptPopulateResourceTable() throws ProcessingException {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    PlannerFieldPopulateResourceTableChain<T, P, RI, AI> chain = new PlannerFieldPopulateResourceTableChain<T, P, RI, AI>(extensions);
+    PlannerFieldOldPopulateResourceTableChain<T, P, RI, AI> chain = new PlannerFieldOldPopulateResourceTableChain<T, P, RI, AI>(extensions);
     chain.execPopulateResourceTable();
   }
 
   protected final Object[][] interceptLoadActivityMapData(List<? extends RI> resourceIds, List<? extends ITableRow> resourceRows) throws ProcessingException {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    PlannerFieldLoadActivityMapDataChain<T, P, RI, AI> chain = new PlannerFieldLoadActivityMapDataChain<T, P, RI, AI>(extensions);
+    PlannerFieldOldLoadActivityMapDataChain<T, P, RI, AI> chain = new PlannerFieldOldLoadActivityMapDataChain<T, P, RI, AI>(extensions);
     return chain.execLoadActivityMapData(resourceIds, resourceRows);
   }
 
-  protected static class LocalPlannerFieldExtension<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI, OWNER extends AbstractPlannerField<T, P, RI, AI>> extends LocalFormFieldExtension<OWNER> implements IPlannerFieldExtension<T, P, RI, AI, OWNER> {
+  protected static class LocalPlannerFieldExtension<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI, OWNER extends AbstractPlannerFieldOld<T, P, RI, AI>> extends LocalFormFieldExtension<OWNER> implements IPlannerFieldOldExtension<T, P, RI, AI, OWNER> {
 
     public LocalPlannerFieldExtension(OWNER owner) {
       super(owner);
     }
 
     @Override
-    public void execPopulateActivities(PlannerFieldPopulateActivitiesChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain, List<RI> resourceIds, List<ITableRow> resourceRows) throws ProcessingException {
+    public void execPopulateActivities(PlannerFieldOldPopulateActivitiesChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain, List<RI> resourceIds, List<ITableRow> resourceRows) throws ProcessingException {
       getOwner().execPopulateActivities(resourceIds, resourceRows);
     }
 
     @Override
-    public Object[][] execLoadResourceTableData(PlannerFieldLoadResourceTableDataChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain) throws ProcessingException {
+    public Object[][] execLoadResourceTableData(PlannerFieldOldLoadResourceTableDataChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain) throws ProcessingException {
       return getOwner().execLoadResourceTableData();
     }
 
     @Override
-    public void execPopulateResourceTable(PlannerFieldPopulateResourceTableChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain) throws ProcessingException {
+    public void execPopulateResourceTable(PlannerFieldOldPopulateResourceTableChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain) throws ProcessingException {
       getOwner().execPopulateResourceTable();
     }
 
     @Override
-    public Object[][] execLoadActivityMapData(PlannerFieldLoadActivityMapDataChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain, List<? extends RI> resourceIds, List<? extends ITableRow> resourceRows) throws ProcessingException {
+    public Object[][] execLoadActivityMapData(PlannerFieldOldLoadActivityMapDataChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain, List<? extends RI> resourceIds, List<? extends ITableRow> resourceRows) throws ProcessingException {
       return getOwner().execLoadActivityMapData(resourceIds, resourceRows);
     }
   }
 
   @Override
-  protected IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<T, P, RI, AI>> createLocalExtension() {
-    return new LocalPlannerFieldExtension<T, P, RI, AI, AbstractPlannerField<T, P, RI, AI>>(this);
+  protected IPlannerFieldOldExtension<T, P, RI, AI, ? extends AbstractPlannerFieldOld<T, P, RI, AI>> createLocalExtension() {
+    return new LocalPlannerFieldExtension<T, P, RI, AI, AbstractPlannerFieldOld<T, P, RI, AI>>(this);
   }
 
 }

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.plannerfield;
+package org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * </pre>
  */
 
-public interface IPlannerField<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends IFormField {
+public interface IPlannerFieldOld<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends IFormField {
 
   String PROP_MINI_CALENDAR_COUNT = "miniCalendarCount";
 
@@ -104,6 +104,6 @@ public interface IPlannerField<T extends ITable, P extends IActivityMap<RI, AI>,
 
   List<ActivityCell<RI, AI>> resourceRowsToActivityCells(List<? extends ITableRow> resourceRows);
 
-  IPlannerFieldUIFacade getUIFacade();
+  IPlannerFieldOldUIFacade getUIFacade();
 
 }
