@@ -20,8 +20,7 @@ import org.eclipse.scout.rt.platform.BeanInvocationHint;
 
 /**
  * Marks an interface (typically a service) that is capable of being called as client proxy to the back-end server if
- * there is
- * no real implementation available for the service
+ * there is no real implementation available for the service
  */
 @Documented
 @BeanInvocationHint

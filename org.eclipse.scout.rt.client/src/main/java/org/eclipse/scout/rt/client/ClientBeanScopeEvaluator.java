@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
+import org.eclipse.scout.rt.shared.TunnelToServer;
 
 /**
  *
@@ -39,20 +40,29 @@ public class ClientBeanScopeEvaluator implements IBeanScopeEvaluator {
   public <T> List<IBean<T>> filter(List<IBean<T>> candidates, Object currentScope) {
     List<IBean<T>> result = new ArrayList<IBean<T>>(candidates.size());
     for (IBean<T> bean : candidates) {
-      Client annotation = bean.getBeanAnnotation(Client.class);
-      if (annotation == null) {
-        // no client filter -> accept
+      Client clientAnnotation = bean.getBeanAnnotation(Client.class);
+      TunnelToServer tunnelToServerAnnotation = bean.getBeanAnnotation(TunnelToServer.class);
+      if (clientAnnotation == null && tunnelToServerAnnotation == null) {
+        // no filter -> accept
         result.add(bean);
       }
       else if (currentScope != null) {
         // check session scope
-        Class<? extends IClientSession> expectedSession = annotation.value();
+        Class<? extends IClientSession> expectedSession = null;
+        if (clientAnnotation != null) {
+          expectedSession = clientAnnotation.value();
+        }
+        else {
+          // @TunnelToServer does not specify a specific session class
+          expectedSession = IClientSession.class;
+        }
+
         Class<?> scopeClass = (Class<?>) currentScope;
         if (expectedSession.isAssignableFrom(scopeClass)) {
           result.add(bean);
         }
         else {
-          LOG.debug("Filtered out bean " + bean.toString() + " because it expects session '" + expectedSession.getName() + "' but was '" + scopeClass.getName() + "'.");
+          LOG.debug("Filtered out bean " + bean.toString() + " because it expects session '" + expectedSession.getName() + "' but was '" + scopeClass.getName() + "'.", new Exception());
         }
       }
       else {
