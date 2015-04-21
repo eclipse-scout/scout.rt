@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.ui.html.services.common.icon;
 
 import java.net.URL;
 
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.services.common.icon.AbstractIconProviderService;
 
-@Priority(-1000)
+@Order(400)
 public class HtmlBundleIconProviderService extends AbstractIconProviderService {
 
   @Override

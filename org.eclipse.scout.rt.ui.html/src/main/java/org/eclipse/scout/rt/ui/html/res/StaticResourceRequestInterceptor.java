@@ -26,7 +26,7 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
@@ -51,7 +51,7 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
  * <p>
  * js, css, html, png, gif, jpg, woff, json
  */
-@Priority(-10)
+@Order(10)
 public class StaticResourceRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(StaticResourceRequestInterceptor.class);
 

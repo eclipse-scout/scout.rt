@@ -1,6 +1,6 @@
 package org.eclipse.scout.rt.ui.html;
 
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService;
 
 /**
@@ -9,7 +9,7 @@ import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextPr
  * Note: Texts that are required on the UI (javascript) have to be sent to the browser beforehand, by adding the
  * corresponding keys to {@link UiSession#getTextKeys()}.
  */
-@Priority(-10)
+@Order(10)
 public class UiTextProviderService extends AbstractDynamicNlsTextProviderService {
 
   @Override

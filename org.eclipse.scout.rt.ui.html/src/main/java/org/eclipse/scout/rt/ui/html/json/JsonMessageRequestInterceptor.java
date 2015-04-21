@@ -20,7 +20,7 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -35,7 +35,7 @@ import org.json.JSONObject;
 /**
  * This interceptor contributes to the {@link UiServlet} as the default POST handler
  */
-@Priority(-10)
+@Order(10)
 public class JsonMessageRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestInterceptor.class);
 
