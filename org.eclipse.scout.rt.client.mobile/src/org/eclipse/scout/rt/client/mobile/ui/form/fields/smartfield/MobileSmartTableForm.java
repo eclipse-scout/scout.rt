@@ -189,6 +189,11 @@ public class MobileSmartTableForm<LOOKUP_TYPE> extends ContentAssistTableForm<LO
       public class FilterField extends AbstractStringField {
 
         @Override
+        protected void execInitField() throws ProcessingException {
+          setValue(getContentAssistField().getDisplayText());
+        }
+
+        @Override
         protected boolean getConfiguredLabelVisible() {
           return false;
         }
