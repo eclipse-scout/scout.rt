@@ -40,7 +40,7 @@ public class StringFieldSetMultilineTextTest {
     MyForm f = new MyForm();
     try {
       f.startForm();
-      f.getText1Field().getUIFacade().setTextFromUI("ABC\nDEF\nGHI", false);
+      f.getText1Field().getUIFacade().parseAndSetValueFromUI("ABC\nDEF\nGHI");
       assertEquals(f.getText1Field().getValue(), "ABC DEF GHI");
     }
     finally {

@@ -31,12 +31,19 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.IBasicFieldExtension
 @ClassId("d5a72dd8-cb1c-4dea-a568-90d77e65854e")
 public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE> implements IBasicField<VALUE> {
 
-  private boolean m_whileTyping;
-
-  protected abstract class P_UIFacade implements IBasicFieldUIFacade {
+  public class P_UIFacade implements IBasicFieldUIFacade {
     @Override
     public void setDisplayTextFromUI(String text) {
       setDisplayText(text);
+    }
+
+    @Override
+    public void parseAndSetValueFromUI(String value) {
+      if (value != null && value.length() == 0) {
+        value = null;
+      }
+      // parse always, validity might change even if text is same
+      parseAndSetValue(value);
     }
   }
 
@@ -63,7 +70,6 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
   @Override
   protected void initConfig() {
     super.initConfig();
-    setValidateOnAnyKey(getConfiguredValidateOnAnyKey());
     setUpdateDisplayTextOnModify(getConfiguredUpdateDisplayTextOnModify());
   }
 
@@ -74,21 +80,6 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
     if (CompareUtility.notEquals(oldDisplayText, s)) {
       interceptExecChangedDisplayText();
     }
-  }
-
-  /**
-   * Causes the ui to send a validate event every time the input field content is changed.
-   * <p>
-   * Be careful when using this property since this can influence performance and the characteristics of text input.
-   *
-   * @deprecated use {@link AbstractBasicField#getConfiguredUpdateDisplayTextOnModify()} and
-   *             {@link AbstractBasicField#execChangedDisplayText()} instead; will be removed in 5.1.0;
-   */
-  @Deprecated
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(310)
-  protected boolean getConfiguredValidateOnAnyKey() {
-    return false;
   }
 
   /**
@@ -109,23 +100,6 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
   }
 
   @Override
-  protected boolean shouldUpdateDisplayText(boolean validValueDiffersFromRawValue) {
-    return !(isWhileTyping() && !validValueDiffersFromRawValue) && super.shouldUpdateDisplayText(validValueDiffersFromRawValue);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public boolean isValidateOnAnyKey() {
-    return propertySupport.getPropertyBool(PROP_VALIDATE_ON_ANY_KEY);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void setValidateOnAnyKey(boolean b) {
-    propertySupport.setPropertyBool(PROP_VALIDATE_ON_ANY_KEY, b);
-  }
-
-  @Override
   public void setUpdateDisplayTextOnModify(boolean b) {
     propertySupport.setPropertyBool(PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY, b);
   }
@@ -133,22 +107,6 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
   @Override
   public boolean isUpdateDisplayTextOnModify() {
     return propertySupport.getPropertyBool(PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY);
-  }
-
-  /**
-   * If {@link #isValidateOnAnyKey()} is true, the {@link #execParseValue(String)}, {@link #execValidateValue(Object)}
-   * and {@link #execFormatValue(Object)} will be called after each modification of the text in the field. This flag
-   * tells if the user is typing text or not.
-   *
-   * @return true to indicate if the user is typing text or
-   *         false if the method is called on focus lost.
-   */
-  protected boolean isWhileTyping() {
-    return m_whileTyping;
-  }
-
-  protected void setWhileTyping(boolean whileTyping) {
-    m_whileTyping = whileTyping;
   }
 
   protected final void interceptExecChangedDisplayText() {

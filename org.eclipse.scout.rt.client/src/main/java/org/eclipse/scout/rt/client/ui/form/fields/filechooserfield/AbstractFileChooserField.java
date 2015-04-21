@@ -145,7 +145,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   public void setFolderMode(boolean b) {
     m_folderMode = b;
     if (isInitialized()) {
-      if (shouldUpdateDisplayText(false)) {
+      if (isAutoDisplayText()) {
         setDisplayText(interceptFormatValue(getValue()));
       }
     }
@@ -163,7 +163,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
       m_showDirectory = false;
     }
     if (isInitialized()) {
-      if (shouldUpdateDisplayText(false)) {
+      if (isAutoDisplayText()) {
         setDisplayText(interceptFormatValue(getValue()));
       }
     }
@@ -178,7 +178,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   public void setShowFileName(boolean b) {
     m_showFileName = b;
     if (isInitialized()) {
-      if (shouldUpdateDisplayText(false)) {
+      if (isAutoDisplayText()) {
         setDisplayText(interceptFormatValue(getValue()));
       }
     }
@@ -193,7 +193,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   public void setShowFileExtension(boolean b) {
     m_showFileExtension = b;
     if (isInitialized()) {
-      if (shouldUpdateDisplayText(false)) {
+      if (isAutoDisplayText()) {
         setDisplayText(interceptFormatValue(getValue()));
       }
     }
@@ -422,12 +422,14 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   }
 
   private class P_UIFacade implements IFileChooserFieldUIFacade {
+
     @Override
-    public boolean setTextFromUI(String newText) {
-      if (newText != null && newText.length() == 0) {
-        newText = null;
+    public void parseAndSetValueFromUI(String value) {
+      if (value != null && value.length() == 0) {
+        value = null;
       }
-      return parseValue(newText);
+      // parse always, validity might change even if text is same
+      parseAndSetValue(value);
     }
   }
 

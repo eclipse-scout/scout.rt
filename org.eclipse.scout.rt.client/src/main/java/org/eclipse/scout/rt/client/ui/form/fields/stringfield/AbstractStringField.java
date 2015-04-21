@@ -372,7 +372,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   public void setFormat(String s) {
     propertySupport.setPropertyString(PROP_FORMAT, s);
     if (isInitialized()) {
-      if (shouldUpdateDisplayText(false)) {
+      if (isAutoDisplayText()) {
         String t = interceptFormatValue(getValue());
         setDisplayText(t);
       }
@@ -425,16 +425,6 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IStringFieldUIFacade {
 
-    @Override
-    public boolean setTextFromUI(String newText, boolean whileTyping) {
-      if (newText != null && newText.length() == 0) {
-        newText = null;
-      }
-      // parse always, validity might change even if text is same
-      setWhileTyping(whileTyping);
-      return parseValue(newText);
-    }
-
     /*
      * (non-Javadoc)
      * @see
@@ -450,22 +440,6 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
       catch (ProcessingException e) {
         LOG.warn("execLinkAction failed", e);
       }
-    }
-
-    @Override
-    public void fireKeyTypedFromUI(String newText) {
-      String oldText = getDisplayText();
-      if (oldText != null && oldText.length() == 0) {
-        oldText = null;
-      }
-      if (newText != null && newText.length() == 0) {
-        newText = null;
-      }
-      if (oldText == newText || (oldText != null && oldText.equals(newText))) {
-        // no change
-        return;
-      }
-      parseValue(newText);
     }
 
     @Override
@@ -522,7 +496,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    * any further chain elements.
    */
   protected static class LocalStringFieldExtension<OWNER_FIELD extends AbstractStringField> extends AbstractBasicField.LocalBasicFieldExtension<String, OWNER_FIELD>
-      implements IStringFieldExtension<OWNER_FIELD> {
+  implements IStringFieldExtension<OWNER_FIELD> {
 
     public LocalStringFieldExtension(OWNER_FIELD owner) {
       super(owner);

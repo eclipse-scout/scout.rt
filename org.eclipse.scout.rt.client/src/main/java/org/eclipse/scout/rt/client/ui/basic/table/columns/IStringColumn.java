@@ -45,10 +45,6 @@ public interface IStringColumn extends IColumn<String> {
 
   void setSelectAllOnEdit(boolean b);
 
-  void setValidateOnAnyKey(boolean b);
-
-  boolean isValidateOnAnyKey();
-
   void setMaxLength(int len);
 
   int getMaxLength();

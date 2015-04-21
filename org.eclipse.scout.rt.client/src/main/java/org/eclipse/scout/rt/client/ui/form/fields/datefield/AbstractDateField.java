@@ -229,7 +229,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   public void setFormat(String s) {
     m_format = s;
     if (isInitialized()) {
-      if (shouldUpdateDisplayText(false)) {
+      if (isAutoDisplayText()) {
         setDisplayText(interceptFormatValue(getValue()));
       }
     }
@@ -1013,25 +1013,27 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IDateFieldUIFacade {
 
     @Override
-    public boolean setDateTextFromUI(String newDate) {
+    public void setDateTextFromUI(String newDate) {
       if (!isHasDate()) {
         //nop
-        return false;
+        return;
       }
       if (newDate != null && newDate.length() == 0) {
         newDate = null;
       }
-      setWhileTyping(false);
       if (!isHasTime()) {
-        return parseValue(newDate);
+        parseAndSetValue(newDate);
+        return;
       }
       if (newDate == null) {
-        return parseValue(null);
+        parseAndSetValue(null);
+        return;
       }
       //date part only
       try {
         PARSE_CONTEXT.set(ParseContext.Date);
-        return parseValue(newDate);
+        parseAndSetValue(newDate);
+        return;
       }
       finally {
         PARSE_CONTEXT.set(null);
@@ -1039,36 +1041,27 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     }
 
     @Override
-    public boolean setTimeTextFromUI(String newTime) {
+    public void setTimeTextFromUI(String newTime) {
       if (!isHasTime()) {
         //nop
-        return false;
+        return;
       }
       if (newTime != null && newTime.length() == 0) {
         newTime = null;
       }
-      setWhileTyping(false);
       if (!isHasDate()) {
-        return parseValue(newTime);
+        parseAndSetValue(newTime);
+        return;
       }
       //time part
       try {
         PARSE_CONTEXT.set(ParseContext.Time);
-        return parseValue(newTime);
+        parseAndSetValue(newTime);
+        return;
       }
       finally {
         PARSE_CONTEXT.set(null);
       }
-    }
-
-    @Override
-    public boolean setDateTimeTextFromUI(String newText) {
-      if (newText != null && newText.length() == 0) {
-        newText = null;
-      }
-      // parse always, validity might change even if text is same
-      setWhileTyping(false);
-      return parseValue(newText);
     }
 
     @Override
@@ -1156,15 +1149,6 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       }
     }
 
-    @Override
-    public boolean setTextFromUI(String newText, boolean whileTyping) {
-      if (newText != null && newText.length() == 0) {
-        newText = null;
-      }
-      // parse always, validity might change even if text is same
-      setWhileTyping(whileTyping);
-      return parseValue(newText);
-    }
   }
 
   protected final void interceptShiftTime(int level, int value) throws ProcessingException {

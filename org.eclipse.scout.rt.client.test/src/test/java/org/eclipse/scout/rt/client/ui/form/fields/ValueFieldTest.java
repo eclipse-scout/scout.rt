@@ -45,7 +45,7 @@ public class ValueFieldTest {
   @Test
   public void testParseError() {
     IValueField<String> v = new ParseErrorField();
-    v.parseValue(UNPARSABLE_VALUE);
+    v.parseAndSetValue(UNPARSABLE_VALUE);
     assertEquals(PARSE_ERROR_MESSAGE, v.getErrorStatus().getMessage());
     assertEquals(IStatus.ERROR, v.getErrorStatus().getSeverity());
     assertFalse(v.isContentValid());
@@ -72,8 +72,8 @@ public class ValueFieldTest {
   @Test
   public void testResetParse() throws Exception {
     IValueField<String> v = new ParseErrorField();
-    v.parseValue(UNPARSABLE_VALUE);
-    v.parseValue("valid");
+    v.parseAndSetValue(UNPARSABLE_VALUE);
+    v.parseAndSetValue("valid");
     assertTrue(v.isContentValid());
   }
 
@@ -96,7 +96,7 @@ public class ValueFieldTest {
   @Test
   public void testParseValidateError() {
     IValueField<String> v = new ParseErrorField();
-    v.parseValue(UNPARSABLE_VALUE);
+    v.parseAndSetValue(UNPARSABLE_VALUE);
     v.setValue(INVALID_VALUE);
     assertEquals(INVALID_VALUE, v.getErrorStatus().getMessage());
     assertEquals(IStatus.ERROR, v.getErrorStatus().getSeverity());

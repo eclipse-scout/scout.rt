@@ -94,12 +94,17 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE> {
   void setValue(VALUE o);
 
   /**
-   * parse a new value The new value is parsed calls execParseValue which
-   * delegates to parseValueInternal Then the value is validated calls
-   * validateInternal and then delegates to execValidateValue after setting the
-   * value calls execChangedValue
+   * @deprecated Will be removed with scout 7. Use {@link IValueField#parseAndSetValue(String)}
    */
+  @Deprecated
   boolean parseValue(String text);
+
+  /**
+   * Parses and sets either the value or an errorStatus, if parsing or validation fails.
+   *
+   * @param text
+   */
+  void parseAndSetValue(String text);
 
   String getDisplayText();
 

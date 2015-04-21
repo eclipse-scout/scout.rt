@@ -79,7 +79,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
       String oldDisplayText = m_field.getDisplayText();
       if (!StringUtility.equalsIgnoreCase(oldDisplayText, text)) {
         LOG.debug("acceptProposalFromUI, no accepted proposal. parseValue text=" + text);
-        m_field.parseValue(text);
+        m_field.parseAndSetValue(text);
       }
     }
     m_field.unregisterProposalChooserInternal();

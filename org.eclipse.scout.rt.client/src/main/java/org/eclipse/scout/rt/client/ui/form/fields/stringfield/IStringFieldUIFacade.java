@@ -28,8 +28,6 @@ public interface IStringFieldUIFacade extends IBasicFieldUIFacade {
    */
   void fireLinkActionFromUI(String text);
 
-  void fireKeyTypedFromUI(String newText);
-
   void setSelectionFromUI(int startOfSelection, int endOfSelection);
 
   TransferObject fireDragRequestFromUI();

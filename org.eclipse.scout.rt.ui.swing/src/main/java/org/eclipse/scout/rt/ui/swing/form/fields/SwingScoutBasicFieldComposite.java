@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.ui.swing.form.fields;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Caret;
@@ -33,7 +31,6 @@ import org.eclipse.scout.rt.platform.job.JobException;
  */
 public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> extends SwingScoutValueFieldComposite<T> {
 
-  private boolean m_validateOnAnyKey;
   protected boolean m_updateDisplayTextOnModify;
   protected boolean m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown;
 
@@ -43,7 +40,6 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
   @Override
   protected void attachScout() {
     IBasicField f = getScoutObject();
-    setValidateOnAnyKeyFromScout(f.isValidateOnAnyKey());
     setUpdateDisplayTextOnModifyFromScout(f.isUpdateDisplayTextOnModify());
 
     //super call must come after reading model properties:
@@ -57,11 +53,6 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
 
   protected void addInputListenersForBasicField(JTextComponent textField, Document doc) {
     doc.addDocumentListener(new P_SwingDocumentListener());
-    textField.addCaretListener(new P_SwingCaretListener());
-  }
-
-  protected void setValidateOnAnyKeyFromScout(boolean b) {
-    m_validateOnAnyKey = b;
   }
 
   protected void setUpdateDisplayTextOnModifyFromScout(boolean b) {
@@ -143,7 +134,7 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().setTextFromUI(text, false);
+        getScoutObject().getUIFacade().parseAndSetValueFromUI(text);
       }
     };
     IFuture<Void> job = getSwingEnvironment().invokeScoutLater(t, 0);
@@ -155,10 +146,7 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
     }
     // end notify
     getSwingEnvironment().dispatchImmediateSwingJobs();
-    //if not validate any key, also update selections
-    if (!m_validateOnAnyKey) {
-      setSelectionFromSwing();
-    }
+    setSelectionFromSwing();
     if (m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown && !m_updateDisplayTextOnModify) {
       m_updateDisplayTextOnModifyWasTrueSinceLastWriteDown = false;
     }
@@ -182,56 +170,28 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
-    if (name.equals(IBasicField.PROP_VALIDATE_ON_ANY_KEY)) {
-      setValidateOnAnyKeyFromScout(((Boolean) newValue).booleanValue());
-    }
     if (name.equals(IBasicField.PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY)) {
       setUpdateDisplayTextOnModifyFromScout(((Boolean) newValue).booleanValue());
     }
   }
-
-  private class P_SwingCaretListener implements CaretListener {
-    @Override
-    public void caretUpdate(CaretEvent e) {
-      //only if validate any key, update selections immediately, otherwise it is done in handleSwingInputVerifier
-      if (m_validateOnAnyKey) {
-        setSelectionFromSwing();
-      }
-    }
-  }// end class P_SwingCaretListener
 
   private class P_SwingDocumentListener implements DocumentListener {
     @Override
     public void changedUpdate(DocumentEvent e) {
       setInputDirty(true);
       setDisplayTextInScout();
-      if (m_validateOnAnyKey) {
-        if (getUpdateSwingFromScoutLock().isReleased()) {
-          sendVerifyToScoutAndIgnoreResponses();
-        }
-      }
     }
 
     @Override
     public void insertUpdate(DocumentEvent e) {
       setInputDirty(true);
       setDisplayTextInScout();
-      if (m_validateOnAnyKey) {
-        if (getUpdateSwingFromScoutLock().isReleased()) {
-          sendVerifyToScoutAndIgnoreResponses();
-        }
-      }
     }
 
     @Override
     public void removeUpdate(DocumentEvent e) {
       setInputDirty(true);
       setDisplayTextInScout();
-      if (m_validateOnAnyKey) {
-        if (getUpdateSwingFromScoutLock().isReleased()) {
-          sendVerifyToScoutAndIgnoreResponses();
-        }
-      }
     }
 
     private void setDisplayTextInScout() {
@@ -248,20 +208,5 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
       }
     }
 
-    /**
-     * This method notify scout, with the information that we are during "ValidateOnAnyKey".
-     * Do not call handleSwingInputVerifier(), this can lead to endless loops.
-     */
-    private void sendVerifyToScoutAndIgnoreResponses() {
-      final String text = getSwingField().getText();
-      // notify Scout
-      Runnable t = new Runnable() {
-        @Override
-        public void run() {
-          getScoutObject().getUIFacade().setTextFromUI(text, true);
-        }
-      };
-      getSwingEnvironment().invokeScoutLater(t, 0);
-    }
   }// end class P_SwingDocumentListener
 }

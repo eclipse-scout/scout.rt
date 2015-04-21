@@ -261,7 +261,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
 
   @Override
   public void refreshDisplayText() {
-    if (shouldUpdateDisplayText(false)) {
+    if (isAutoDisplayText()) {
       String t = interceptFormatValue(getValue());
       setDisplayText(t);
     }
@@ -384,21 +384,9 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * @param validValueDiffersFromRawValue
    */
   private void updateDisplayText(VALUE rawValue, boolean validValueDiffersFromRawValue) {
-    if (shouldUpdateDisplayText(validValueDiffersFromRawValue)) {
+    if (isAutoDisplayText()) {
       setDisplayText(interceptFormatValue(rawValue));
     }
-  }
-
-  /**
-   * Computes if the displayText should be computed and displayed in the field.
-   *
-   * @param validValueDiffersFromRawValue
-   *          indicates if there is business logic in {@link #validateValue(Object)} that changed the value of the field
-   *          (in comparison to what has been parsed).
-   * @return true if the displayText should be displayed, false if not.
-   */
-  protected boolean shouldUpdateDisplayText(boolean validValueDiffersFromRawValue) {
-    return isAutoDisplayText();
   }
 
   /**
@@ -522,14 +510,22 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   protected void execChangedValue() throws ProcessingException {
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  @Override
+  public final boolean parseValue(String text) {
+    parseAndSetValue(text);
+    return !hasError();
+  }
+
   /**
    * Parses and sets either the value or an errorStatus, if parsing or validation fails.
    */
   @Override
-  public final boolean parseValue(String text) {
+  public final void parseAndSetValue(String text) {
     if (isValueParsing()) {
       LOG.warn("Loop detection in " + getLabel() + " with text " + text);
-      return false;
+      return;
     }
     try {
       setFieldChanging(true);
@@ -539,17 +535,17 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
       removeErrorStatus(ParsingFailedStatus.class);
       VALUE parsedValue = interceptParseValue(text);
       setValue(parsedValue);
-      return true;
+      return;
     }
     catch (ProcessingException pe) {
       addErrorStatus(new ParsingFailedStatus(pe, text));
-      return false;
+      return;
     }
     catch (Exception e) {
       LOG.error("Unexpected Error: ", e);
       ProcessingException pe = new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), e);
       addErrorStatus(new ParsingFailedStatus(pe, text));
-      return false;
+      return;
     }
     finally {
       setValueParsing(false);
@@ -655,7 +651,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * any further chain elements.
    */
   protected static class LocalValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends AbstractFormField.LocalFormFieldExtension<OWNER>
-      implements IValueFieldExtension<VALUE, OWNER> {
+  implements IValueFieldExtension<VALUE, OWNER> {
 
     public LocalValueFieldExtension(OWNER owner) {
       super(owner);

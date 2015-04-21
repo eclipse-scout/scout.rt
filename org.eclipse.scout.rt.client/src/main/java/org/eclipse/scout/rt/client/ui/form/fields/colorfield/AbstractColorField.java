@@ -20,11 +20,12 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.colorfield.IColorFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
+import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public abstract class AbstractColorField extends AbstractBasicField<String> implements IColorField {
-  private IColorFieldUiFacade m_uiFacade;
+  private IBasicFieldUIFacade m_uiFacade;
 
   protected static final Pattern RGB_COLOR_PATTERN = Pattern.compile("^([0-9]{1,3})[\\-\\,\\;\\/\\\\\\s]{1}([0-9]{1,3})[\\-\\,\\;\\/\\\\\\s]{1}([0-9]{1,3})$");
 
@@ -45,13 +46,13 @@ public abstract class AbstractColorField extends AbstractBasicField<String> impl
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_uiFacade = new P_UiFacade();
+    m_uiFacade = new P_UIFacade();
     setIconId(getConfiguredIconId());
 
   }
 
   @Override
-  public IColorFieldUiFacade getUIFacade() {
+  public IBasicFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
@@ -96,30 +97,6 @@ public abstract class AbstractColorField extends AbstractBasicField<String> impl
   @Override
   public void setIconId(String s) {
     propertySupport.setPropertyString(PROP_ICON_ID, s);
-  }
-
-  // ---------------------------------------------------------------------------------
-  private class P_UiFacade extends AbstractBasicField.P_UIFacade implements IColorFieldUiFacade {
-    @Override
-    public boolean setTextFromUI(String newText, boolean whileTyping) {
-      if (newText != null && newText.length() == 0) {
-        newText = null;
-      }
-      // parse always, validity might change even if text is same
-      setWhileTyping(whileTyping);
-      return parseValue(newText);
-    }
-
-    @Override
-    public void setValueFromUi(String value) {
-      if (StringUtility.hasText(value)) {
-        setValue(value);
-      }
-      else {
-        setValue(null);
-      }
-    }
-
   }
 
   protected static class LocalColorFieldExtension<OWNER extends AbstractColorField> extends LocalBasicFieldExtension<String, OWNER> implements IColorFieldExtension<OWNER> {

@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IStringColum
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
@@ -108,17 +107,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     return true;
   }
 
-  /**
-   * Causes the ui to send a validate event every time the text field content is changed.
-   * <p>
-   * Be careful when using this property since this can influence performance and the characteristics of text input.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(180)
-  protected boolean getConfiguredValidateOnAnyKey() {
-    return false;
-  }
-
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -127,7 +115,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     setMaxLength(getConfiguredMaxLength());
     setTextWrap(getConfiguredTextWrap());
     setSelectAllOnEdit(getConfiguredSelectAllOnEdit());
-    setValidateOnAnyKey(getConfiguredValidateOnAnyKey());
   }
 
   /*
@@ -172,16 +159,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
   @Override
   public void setSelectAllOnEdit(boolean b) {
     propertySupport.setPropertyBool(IStringField.PROP_SELECT_ALL_ON_FOCUS, b);
-  }
-
-  @Override
-  public boolean isValidateOnAnyKey() {
-    return propertySupport.getPropertyBool(IBasicField.PROP_VALIDATE_ON_ANY_KEY);
-  }
-
-  @Override
-  public void setValidateOnAnyKey(boolean b) {
-    propertySupport.setPropertyBool(IBasicField.PROP_VALIDATE_ON_ANY_KEY, b);
   }
 
   @Override
@@ -259,7 +236,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     f.setFormat(getDisplayFormat());
     f.setWrapText(isTextWrap());
     f.setSelectAllOnFocus(isSelectAllOnEdit());
-    f.setValidateOnAnyKey(isValidateOnAnyKey());
     f.setMaxLength(getMaxLength());
     boolean multi = (getTable() != null ? getTable().isMultilineText() : isTextWrap());
     f.setMultilineText(multi);

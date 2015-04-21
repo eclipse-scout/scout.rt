@@ -263,7 +263,6 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
     f.setFormat(getFormat());
     f.setMinValue(getMinValue());
     f.setMaxValue(getMaxValue());
-    f.setValidateOnAnyKey(isValidateOnAnyKey());
   }
 
   @Override

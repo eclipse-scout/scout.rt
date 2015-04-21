@@ -44,13 +44,13 @@ public class ExecMethodExtensionTest extends AbstractLocalExtensionTestCase {
     MyForm myForm = new MyForm();
     myForm.start();
     NameField nameField = myForm.getNameField();
-    nameField.getUIFacade().setTextFromUI("hans", false);
+    nameField.getUIFacade().parseAndSetValueFromUI("hans");
     Assert.assertNull(nameField.getErrorStatus());
 
-    nameField.getUIFacade().setTextFromUI("bernd", false);
+    nameField.getUIFacade().parseAndSetValueFromUI("bernd");
     Assert.assertNotNull(nameField.getErrorStatus());
 
-    nameField.getUIFacade().setTextFromUI("berndExtension", false);
+    nameField.getUIFacade().parseAndSetValueFromUI("berndExtension");
     Assert.assertNotNull(nameField.getErrorStatus());
 
   }

@@ -418,21 +418,21 @@ public class DateAndTimeFieldParseTest {
   }
 
   private void expectSuccess(IDateField field, String input, String expectedDisplayText) {
-    field.getUIFacade().setDateTimeTextFromUI(input);
+    field.getUIFacade().parseAndSetValueFromUI(input);
     if (field.getErrorStatus() != null) {
       fail(field.getClass().getSimpleName() + ": Validation error: " + field.getErrorStatus().getMessage());
     }
     assertEquals(field.getClass().getSimpleName() + ": Validation error for input " + input, expectedDisplayText, field.getDisplayText());
     // reset
-    field.getUIFacade().setDateTimeTextFromUI(null);
+    field.getUIFacade().parseAndSetValueFromUI(null);
   }
 
   private void expectError(IDateField field, String input) {
-    field.getUIFacade().setDateTimeTextFromUI(input);
+    field.getUIFacade().parseAndSetValueFromUI(input);
     if (field.getErrorStatus() == null) {
       fail(field.getClass().getSimpleName() + ": Validation did _not_ fail for input '" + input + "'! (Display text is: ' " + field.getDisplayText() + "', current locale is: " + Locale.getDefault().toString() + ")");
     }
     // reset
-    field.getUIFacade().setDateTimeTextFromUI(null);
+    field.getUIFacade().parseAndSetValueFromUI(null);
   }
 }

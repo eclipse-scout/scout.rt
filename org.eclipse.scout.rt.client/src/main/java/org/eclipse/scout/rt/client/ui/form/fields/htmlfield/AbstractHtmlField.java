@@ -247,15 +247,14 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   private class P_UIFacade implements IHtmlFieldUIFacade {
 
     @Override
-    public boolean setTextFromUI(String htmlText) {
+    public void parseAndSetValueFromUI(String htmlText) {
       if (isHtmlEditor()) {
         if (htmlText != null && htmlText.length() == 0) {
           htmlText = null;
         }
         // parse always, validity might change even if text is same
-        return parseValue(htmlText);
+        parseAndSetValue(htmlText);
       }
-      return true;
     }
 
     @Override

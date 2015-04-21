@@ -35,7 +35,6 @@ import javax.swing.text.JTextComponent;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -292,13 +291,11 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
       return true;
     }
     m_displayTextToVerify = text;
-    final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, false);
     // notify Scout
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        boolean b = getScoutObject().getUIFacade().setDateTextFromUI(text);
-        result.setValue(b);
+        getScoutObject().getUIFacade().setDateTextFromUI(text);
       }
     };
     IFuture<Void> job = getSwingEnvironment().invokeScoutLater(t, 0);

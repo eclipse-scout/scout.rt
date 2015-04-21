@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
-import org.eclipse.scout.rt.client.ui.form.fields.colorfield.AbstractColorField;
 import org.eclipse.scout.rt.client.ui.form.fields.colorfield.ColorFieldTest.TestForm.MainBox.ColorField01;
 import org.eclipse.scout.rt.client.ui.form.fields.colorfield.ColorFieldTest.TestForm.MainBox.ColorField01.TestMenu1;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -49,19 +48,19 @@ public class ColorFieldTest {
   @Test
   public void testParseValue() {
     ColorField01 field = m_form.getColorField01();
-    field.getUIFacade().setTextFromUI("120 135 160", false);
+    field.getUIFacade().parseAndSetValueFromUI("120 135 160");
     assertEquals("#7887A0", field.getValue());
 
-    field.getUIFacade().setTextFromUI("50-160-240", false);
+    field.getUIFacade().parseAndSetValueFromUI("50-160-240");
     assertEquals("#32A0F0", field.getValue());
 
-    field.getUIFacade().setTextFromUI("#FF8000", false);
+    field.getUIFacade().parseAndSetValueFromUI("#FF8000");
     assertEquals("#FF8000", field.getValue());
 
-    field.getUIFacade().setTextFromUI("0x008080", false);
+    field.getUIFacade().parseAndSetValueFromUI("0x008080");
     assertEquals("#008080", field.getValue());
 
-    field.getUIFacade().setTextFromUI("0XFFFF00", false);
+    field.getUIFacade().parseAndSetValueFromUI("0XFFFF00");
     assertEquals("#FFFF00", field.getValue());
   }
 
@@ -69,12 +68,12 @@ public class ColorFieldTest {
   public void testParseInvalidValues() {
     // valid
     ColorField01 field = m_form.getColorField01();
-    field.getUIFacade().setTextFromUI("120 135 160", false);
+    field.getUIFacade().parseAndSetValueFromUI("120 135 160");
     assertEquals("#7887A0", field.getValue());
     assertNull(field.getErrorStatus());
 
     // invalid hex
-    field.getUIFacade().setTextFromUI("#5989A4E", false);
+    field.getUIFacade().parseAndSetValueFromUI("#5989A4E");
     assertEquals("#7887A0", field.getValue());
     assertNotNull(field.getErrorStatus());
 
@@ -83,22 +82,22 @@ public class ColorFieldTest {
   @Test
   public void testInvalidRgbValues() {
     ColorField01 field = m_form.getColorField01();
-    field.getUIFacade().setTextFromUI("120 135 160", false);
+    field.getUIFacade().parseAndSetValueFromUI("120 135 160");
     assertEquals("#7887A0", field.getValue());
     assertNull(field.getErrorStatus());
 
     // invalid rgb
-    field.getUIFacade().setTextFromUI("256-200-200", false);
+    field.getUIFacade().parseAndSetValueFromUI("256-200-200");
     assertEquals("#7887A0", field.getValue());
     assertNotNull(field.getErrorStatus());
 
     // reset to valid
-    field.getUIFacade().setTextFromUI("#1010A0", false);
+    field.getUIFacade().parseAndSetValueFromUI("#1010A0");
     assertEquals("#1010A0", field.getValue());
     assertNull(field.getErrorStatus());
 
     // invalid rgb
-    field.getUIFacade().setTextFromUI("-100-200-200", false);
+    field.getUIFacade().parseAndSetValueFromUI("-100-200-200");
     assertEquals("#1010A0", field.getValue());
     assertNotNull(field.getErrorStatus());
   }

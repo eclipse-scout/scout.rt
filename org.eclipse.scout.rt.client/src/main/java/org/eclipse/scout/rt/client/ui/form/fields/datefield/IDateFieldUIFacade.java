@@ -16,11 +16,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 
 public interface IDateFieldUIFacade extends IBasicFieldUIFacade {
 
-  boolean setDateTimeTextFromUI(String newText);
+  void setDateTextFromUI(String newText);
 
-  boolean setDateTextFromUI(String newText);
-
-  boolean setTimeTextFromUI(String newText);
+  void setTimeTextFromUI(String newText);
 
   void setDateTimeFromUI(Date d);
 

@@ -29,7 +29,7 @@ public class MultipeChainCallsTest extends AbstractLocalExtensionTestCase {
     BEANS.get(IExtensionRegistry.class).register(NameFieldExt.class);
 
     NameField field = new NameField();
-    field.getUIFacade().setTextFromUI("abc", false);
+    field.getUIFacade().parseAndSetValueFromUI("abc");
     Assert.assertNull(field.getErrorStatus());
     Assert.assertEquals(3, nameFieldExecValidateCounter.intValue());
     Assert.assertEquals(1, nameFieldExtExecValidateCounter.intValue());

@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
 public interface IHtmlFieldUIFacade {
 
-  boolean setTextFromUI(String htmlText);
+  void parseAndSetValueFromUI(String htmlText);
 
   void setAttachmentsFromUI(Collection<? extends RemoteFile> attachments);
 

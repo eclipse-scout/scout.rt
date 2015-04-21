@@ -18,17 +18,17 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 public interface IBasicFieldUIFacade {
 
   /**
-   * @param newText
+   * Triggers parsing the text and setting a new value.
+   *
+   * @param value
    *          new value of the display text in the ui.
-   * @param whileTyping
-   *          true to indicate if the user is typing (e.g. {@link IBasicField#isValidateOnAnyKey()} is true) or
-   *          false if the method is called on focus lost.
-   * @return
    */
-  boolean setTextFromUI(String newText, boolean whileTyping);
+  void parseAndSetValueFromUI(String value);
 
   /**
-   * TODO ASA javadoc
+   * Iff {@link IBasicField#PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY} is true the UI calls this method on any changes in the
+   * field. If {@link IBasicField#PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY} is false the model's display-text is only updated
+   * when a new value is set.
    *
    * @param text
    */

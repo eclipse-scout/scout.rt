@@ -208,7 +208,7 @@ public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorFi
       RunnableWithData t = new RunnableWithData() {
         @Override
         public void run() {
-          getScoutObject().getUIFacade().setValueFromUi(colorString);
+          getScoutObject().getUIFacade().parseAndSetValueFromUI(colorString);
         }
       };
       getSwingEnvironment().invokeScoutLater(t, 2345);

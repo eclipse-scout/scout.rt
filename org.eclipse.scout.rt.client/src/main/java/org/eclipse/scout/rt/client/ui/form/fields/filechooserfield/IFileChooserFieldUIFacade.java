@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.filechooserfield;
 
-
 public interface IFileChooserFieldUIFacade {
 
-  boolean setTextFromUI(String newText);
+  void parseAndSetValueFromUI(String value);
 
 }

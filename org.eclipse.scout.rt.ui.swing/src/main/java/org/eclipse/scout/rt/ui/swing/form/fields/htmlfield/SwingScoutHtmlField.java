@@ -36,7 +36,6 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField;
@@ -322,13 +321,11 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     if (CompareUtility.equals(text, getScoutObject().getDisplayText()) && getScoutObject().getErrorStatus() == null) {
       return true;
     }
-    final Holder<Boolean> result = new Holder<Boolean>(Boolean.class, false);
     // notify Scout
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        boolean b = getScoutObject().getUIFacade().setTextFromUI(text);
-        result.setValue(b);
+        getScoutObject().getUIFacade().parseAndSetValueFromUI(text);
       }
     };
     IFuture<Void> job = getSwingEnvironment().invokeScoutLater(t, 0);

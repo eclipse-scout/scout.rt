@@ -130,7 +130,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
       format.setRoundingMode(roundingMode);
       setFormat(format);
       if (isInitialized()) {
-        if (shouldUpdateDisplayText(false)) {
+        if (isAutoDisplayText()) {
           setDisplayText(interceptFormatValue(getValue()));
         }
       }
@@ -157,7 +157,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
 
       propertySupport.setProperty(INumberValueContainer.PROP_DECIMAL_FORMAT, newFormat);
       if (isInitialized()) {
-        if (shouldUpdateDisplayText(false)) {
+        if (isAutoDisplayText()) {
           setDisplayText(interceptFormatValue(getValue()));
         }
       }
@@ -189,7 +189,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
       format.setGroupingUsed(b);
       setFormat(format);
       if (isInitialized()) {
-        if (shouldUpdateDisplayText(false)) {
+        if (isAutoDisplayText()) {
           setDisplayText(interceptFormatValue(getValue()));
         }
       }
@@ -211,7 +211,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
       format.setMaximumIntegerDigits(maxIntegerDigits);
       setFormat(format);
       if (isInitialized()) {
-        if (shouldUpdateDisplayText(false)) {
+        if (isAutoDisplayText()) {
           setDisplayText(interceptFormatValue(getValue()));
         }
       }
@@ -331,18 +331,6 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
   @Override
   public IBasicFieldUIFacade getUIFacade() {
     return m_uiFacade;
-  }
-
-  private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IBasicFieldUIFacade {
-    @Override
-    public boolean setTextFromUI(String newText, boolean whileTyping) {
-      if (newText != null && newText.length() == 0) {
-        newText = null;
-      }
-      // parse always, validity might change even if text is same
-      setWhileTyping(whileTyping);
-      return parseValue(newText);
-    }
   }
 
   @Override

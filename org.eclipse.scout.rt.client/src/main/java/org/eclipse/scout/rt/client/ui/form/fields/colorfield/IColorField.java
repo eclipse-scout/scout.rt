@@ -15,9 +15,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 public interface IColorField extends IBasicField<String> {
   String PROP_ICON_ID = "iconId";
 
-  @Override
-  IColorFieldUiFacade getUIFacade();
-
   /**
    * @return
    */

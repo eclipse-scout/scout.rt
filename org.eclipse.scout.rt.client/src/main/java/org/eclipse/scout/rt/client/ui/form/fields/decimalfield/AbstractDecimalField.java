@@ -136,7 +136,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       setFormat(format);
       //
       if (isInitialized()) {
-        if (shouldUpdateDisplayText(false)) {
+        if (isAutoDisplayText()) {
           setDisplayText(interceptFormatValue(getValue()));
         }
       }
@@ -160,7 +160,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       format.setMaximumFractionDigits(i);
       setFormat(format);
       if (isInitialized()) {
-        if (shouldUpdateDisplayText(false)) {
+        if (isAutoDisplayText()) {
           setDisplayText(interceptFormatValue(getValue()));
         }
       }
@@ -193,7 +193,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       setFormat(format);
 
       if (isInitialized()) {
-        if (shouldUpdateDisplayText(false)) {
+        if (isAutoDisplayText()) {
           setDisplayText(interceptFormatValue(getValue()));
         }
       }
