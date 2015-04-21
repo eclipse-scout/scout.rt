@@ -220,15 +220,41 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void disposeColumns() {
-    m_jsonColumns.clear();
+    for (IColumn<?> column : getModel().getColumns()) {
+      disposeColumn(column);
+    }
+    // "Leak detection"
+    if (!m_jsonColumns.isEmpty()) {
+      throw new IllegalStateException("Not all columns have been disposed! Columns: " + m_jsonColumns.keySet());
+    }
+  }
+
+  protected void disposeColumn(IColumn<?> column) {
+    m_jsonColumns.remove(column);
+  }
+
+  protected void disposeRows() {
+    for (ITableRow row : getModel().getRows()) {
+      disposeRow(row);
+    }
+    // "Leak detection"
+    if (!m_tableRowIds.isEmpty() || !m_tableRows.isEmpty()) {
+      throw new IllegalStateException("Not all rows have been disposed! TableRowIds: " + m_tableRowIds + " TableRows: " + m_tableRows);
+    }
+  }
+
+  protected void disposeRow(ITableRow row) {
+    String rowId = m_tableRowIds.get(row);
+    m_tableRowIds.remove(row);
+    m_tableRows.remove(rowId);
   }
 
   @Override
   protected void disposeChildAdapters() {
     super.disposeChildAdapters();
+    processBufferedEvents();
     disposeColumns();
-    m_tableRows.clear();
-    m_tableRowIds.clear();
+    disposeRows();
   }
 
   @Override
@@ -816,12 +842,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(visibleColumns));
       addActionEvent(EVENT_COLUMN_HEADERS_UPDATED, jsonEvent);
     }
-  }
-
-  protected void disposeRow(ITableRow row) {
-    String rowId = m_tableRowIds.get(row);
-    m_tableRowIds.remove(row);
-    m_tableRows.remove(rowId);
   }
 
   protected Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {

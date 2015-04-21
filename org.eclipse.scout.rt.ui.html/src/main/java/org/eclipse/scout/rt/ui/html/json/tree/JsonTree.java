@@ -117,11 +117,10 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   @Override
   protected void disposeChildAdapters() {
     super.disposeChildAdapters();
+    processBufferedEvents();
     disposeNodes(getTopLevelNodes(true), true);
 
-    // "Leak detection". Assert that after disposing the child adapters,
-    // all nodes have been disposed (they will remove themselves in their
-    // dispose() method).
+    // "Leak detection"
     if (!m_treeNodeIds.isEmpty() || !m_treeNodes.isEmpty()) {
       throw new IllegalStateException("Not all nodes have been disposed! TreeNodeIds: " + m_treeNodeIds + " TreeNodes: " + m_treeNodes);
     }
