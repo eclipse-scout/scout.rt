@@ -18,7 +18,7 @@ scout.inherits(scout.ValueFieldAcceptDisplayTextKeyStroke, scout.KeyStroke);
  * @Override scout.KeyStroke
  */
 scout.ValueFieldAcceptDisplayTextKeyStroke.prototype.handle = function(event) {
-  this._field.acceptDisplayText();
+  this._field.displayTextChanged();
 };
 
 /**

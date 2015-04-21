@@ -29,7 +29,7 @@ scout.DateField.prototype._onFieldBlur = function() {
 
   // Only update model if date is valid (according to ui)
   if (!this.errorStatusUi) {
-    this._displayTextChanged();
+    this.displayTextChanged();
   }
 
   this._$predict.remove();
@@ -101,7 +101,7 @@ scout.DateField.prototype._onKeyDown = function(event) {
   }
   if (event.which === scout.keys.ENTER) {
     // Update model and close picker
-    this._displayTextChanged();
+    this.displayTextChanged();
     if (this._picker.isOpen()) {
       this._picker.close();
       event.stopPropagation();

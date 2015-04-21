@@ -48,7 +48,7 @@ scout.ValueField.prototype._renderUpdateDisplayTextOnModify = function() {
 };
 
 scout.ValueField.prototype._onFieldBlur = function() {
-  this._displayTextChanged();
+  this.displayTextChanged();
 };
 
 // FIXME AWE: (naming) in JavaStyleGuide ergänzen:
@@ -58,7 +58,7 @@ scout.ValueField.prototype._onFieldBlur = function() {
 //   wird typischerweise auch im _onChange oder _onKeyUp aufgerufen.
 //   ruft typischerweise auch sendDisplayText(displayText) auf
 
-scout.ValueField.prototype._displayTextChanged = function() {
+scout.ValueField.prototype.displayTextChanged = function() {
   var displayText = scout.strings.nvl(this._readDisplayText(), ''),
     oldDisplayText = scout.strings.nvl(this.displayText, '');
   if (displayText === oldDisplayText) {
