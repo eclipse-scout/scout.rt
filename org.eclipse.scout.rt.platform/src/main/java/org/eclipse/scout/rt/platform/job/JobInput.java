@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
  * A <code>JobInput</code> contains information about a job like its name with execution instructions like 'serial
  * execution' or 'expiration', and tells the job manager in what {@link RunContext} to run the job.
  * <p/>
- * The 'setter-methods' returns <code>this</code> in order to support for method chaining.
+ * The 'setter-methods' return <code>this</code> in order to support for method chaining.
  *
  * @see RunContext
  * @since 5.1
@@ -52,7 +52,7 @@ public class JobInput {
   }
 
   /**
-   * To set the <code>id</code> of a job; must not be set; must not be unique; is primarily used for logging purpose, to
+   * Sets the <code>id</code> of a job. Optional, does not have to be unique. Is primarily used for logging purposes, to
    * decorate the worker thread's name and to identify the job's Future.
    */
   public JobInput id(final String id) {
@@ -65,7 +65,7 @@ public class JobInput {
   }
 
   /**
-   * To set the name of a job; is used to decorate the worker thread's name and for logging purpose; must not be set.
+   * Sets the name of a job. Optional. Is used to decorate the worker thread's name and for logging purposes.
    *
    * @param name
    *          the name
@@ -82,7 +82,7 @@ public class JobInput {
   }
 
   /**
-   * To set the mutex object (mutual exclusion) for the job. This is used to run the job in sequence among other jobs
+   * Sets the mutex object (mutual exclusion) for the job. This is used to run the job in sequence among other jobs
    * with the same mutex object, so that no two such jobs are run in parallel at the same time.
    */
   public JobInput mutex(final Object mutexObject) {
@@ -95,8 +95,9 @@ public class JobInput {
   }
 
   /**
-   * To set the maximal expiration time, until the job must commence execution; if elapsed, the executable is cancelled
-   * and never commence execution; is useful, if using a scheduling strategy which might queue scheduled executables
+   * Sets the maximal expiration time, until the job must commence execution. If elapsed, the executable is cancelled
+   * and never commence execution. This is useful when using a scheduling strategy which might queue scheduled
+   * executables
    * prior execution. By default, there is no expiration time set.
    *
    * @param time
@@ -114,7 +115,7 @@ public class JobInput {
   }
 
   /**
-   * To set the <code>RunContext</code> to be applied for the time of execution.
+   * Sets the <code>RunContext</code> to be applied for the time of execution.
    */
   public JobInput runContext(final RunContext runContext) {
     m_runContext = runContext;
@@ -126,7 +127,7 @@ public class JobInput {
   }
 
   /**
-   * To instrument the job manager to log execution exceptions by use of the installed {@link ExceptionHandler}; is
+   * Instruments the job manager to log execution exceptions by use of the installed {@link ExceptionHandler}; is
    * <code>true</code> by default.
    */
   public JobInput logOnError(final boolean logOnError) {
@@ -139,7 +140,7 @@ public class JobInput {
   }
 
   /**
-   * To set the thread name of the worker thread that will execute the job.
+   * Sets the thread name of the worker thread that will execute the job.
    */
   public JobInput threadName(final String threadName) {
     m_threadName = threadName;
