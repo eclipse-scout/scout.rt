@@ -19,6 +19,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -393,7 +395,7 @@ public final class FileUtility {
     }
   }
 
-  public static byte[] readFile(File source) throws IOException {
+  private static byte[] readFile(File source) throws IOException {
     if (!source.exists()) {
       throw new FileNotFoundException(source.getAbsolutePath());
     }
@@ -533,6 +535,43 @@ public final class FileUtility {
     }
     ext = ext.toLowerCase();
     return EXT_TO_MIME_TYPE_MAP.get(ext);
+  }
+
+  /**
+   * Gets the content type (MIME) of the given file.
+   * <p>
+   * The return value of this method is the string form of the value of a Multipurpose Internet Mail Extension (MIME)
+   * content type as defined by <a href="http://www.ietf.org/rfc/rfc2045.txt"><i>RFC&nbsp;2045: Multipurpose Internet
+   * Mail Extensions (MIME) Part One: Format of Internet Message Bodies</i></a>. The string is guaranteed to be parsable
+   * according to the grammar in the RFC.
+   *
+   * @param f
+   *          The file for which the content type should be returned.
+   * @return The content type or null if it could not be determined.
+   * @throws ProcessingException
+   */
+  public static String getContentType(File f) throws ProcessingException {
+    if (f == null || !f.exists()) {
+      return null;
+    }
+
+    try {
+      String contentType = Files.probeContentType(Paths.get(f.toURI()));
+      if (contentType != null) {
+        return contentType;
+      }
+
+      String fileName = f.getName();
+      int i = fileName.lastIndexOf('.');
+      if (i >= 0) {
+        return FileUtility.getContentTypeForExtension(fileName.substring(i + 1));
+      }
+
+      return null;
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Unable to read content type of file '" + f.getAbsolutePath() + "'.", e);
+    }
   }
 
   /**

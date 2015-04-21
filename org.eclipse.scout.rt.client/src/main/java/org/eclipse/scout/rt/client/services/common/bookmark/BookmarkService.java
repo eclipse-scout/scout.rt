@@ -15,7 +15,6 @@ import java.util.EventListener;
 import java.util.List;
 
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -41,7 +40,6 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
  * <p>
  * service state is per {@link IClientSession} instance
  */
-@Priority(-3)
 @Client
 public class BookmarkService extends AbstractService implements IBookmarkService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BookmarkService.class);

@@ -21,7 +21,7 @@ import java.util.Set;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -52,8 +52,8 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
  * <p>
  * Service state is per [{@link IClientSession}.class,{@link NlsLocale#get()},partitionId]
  */
-@Priority(-3)
 @Client
+@Order(3)
 @CreateImmediately
 public class CodeServiceClientProxy extends AbstractService implements ICodeService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(CodeServiceClientProxy.class);

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 
 @Client
-@Priority(-3)
+@Order(3)
 public class BatchLookupServiceClientProxy extends AbstractService implements IBatchLookupService {
 
   public BatchLookupServiceClientProxy() {

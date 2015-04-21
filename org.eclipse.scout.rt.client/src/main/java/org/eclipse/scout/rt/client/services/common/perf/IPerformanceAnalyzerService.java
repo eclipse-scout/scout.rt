@@ -4,17 +4,15 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.perf;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.platform.service.IService;
 
-@Priority(-3)
 public interface IPerformanceAnalyzerService extends IService, IPropertyObserver {
   String PROP_NETWORK_LATENCY = "networkLatency";
   String PROP_SERVER_EXECUTION_TIME = "serverExecutionTime";

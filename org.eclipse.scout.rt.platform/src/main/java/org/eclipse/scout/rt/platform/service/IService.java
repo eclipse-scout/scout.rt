@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.service;
 
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
@@ -146,11 +148,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  * <p>
  * Online Mode in client (even though there are offline plugins available) is FE and ON
  * </p>
- * <p>
- * Wicket in server is BE and ON
- * </p>
- *
- * @since 1.0.0 see also {@link org.eclipse.scout.commons.annotations.Priority} for defining service ranking
+ * See also {@link Order} for defining service ranking or {@link Replace} to hide the parent service
  */
 @ApplicationScoped
 public interface IService {

@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
@@ -23,10 +22,6 @@ import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 
-/**
- * delegates to {@link PermissionStore}
- */
-@Priority(-1)
 public class PermissionService extends AbstractService implements IPermissionService {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PermissionService.class);

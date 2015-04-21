@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.offline;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
@@ -21,7 +20,6 @@ import org.eclipse.scout.rt.shared.validate.InputValidation;
  * This service is representing a local server on the frontend used to process
  * server logic similiar to the backend in transactions and with transaction support. <br>
  */
-@Priority(-3)
 @InputValidation(IValidationStrategy.PROCESS.class)
 public interface IOfflineDispatcherService extends IService {
 

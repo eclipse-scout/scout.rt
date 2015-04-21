@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 
@@ -28,7 +27,7 @@ public final class BEANS {
   }
 
   /**
-   * @return the single instance of this type with respect to {@link Priority} and {@link Replace}. See also
+   * @return the single instance of this type with respect to {@link Order} and {@link Replace}. See also
    *         {@link IBeanManager#getBean(Class)}
    * @throws AssertionError
    *           when no instance is available or when multiple instances are registered
@@ -38,8 +37,7 @@ public final class BEANS {
   }
 
   /**
-   * @return the single instance of this type with respect to {@link Priority} and {@link Replace}. See also
-   *         {@link Bean}
+   * @return the single instance of this type with respect to {@link Order} and {@link Replace}. See also {@link Bean}
    *         <p>
    *         returns null when no instance is available
    * @throws AssertionException

@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.client.services.common.search;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.Client;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
-@Priority(-1)
+@Order(1)
 @Client
 public class DefaultSearchFilterService extends AbstractService implements ISearchFilterService {
 

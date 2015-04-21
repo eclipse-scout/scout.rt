@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 import java.lang.reflect.Method;
 import java.security.Permissions;
 
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
@@ -78,7 +78,7 @@ public class RemoteServiceAccessTest {
     fail("should fail");
   }
 
-  @Priority(10)
+  @Order(-10)
   static class DefaultTransactionDelegateMock extends DefaultTransactionDelegate {
     private final Permissions m_permissionCollection;
 

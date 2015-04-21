@@ -14,11 +14,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 
-@Priority(-3)
 public interface IFileService extends IService {
 
   /**

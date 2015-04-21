@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.services.common.clientnotification;
 import java.util.Collection;
 import java.util.Set;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
@@ -23,7 +22,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
  * A service to dispatch incoming client notifications (from the server) to {@link IClientNotificationConsumerListener}
  * listeners.
  */
-@Priority(-3)
 public interface IClientNotificationConsumerService extends IService {
 
   /**

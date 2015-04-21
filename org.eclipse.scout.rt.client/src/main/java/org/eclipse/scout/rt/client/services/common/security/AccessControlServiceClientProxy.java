@@ -18,7 +18,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 import org.eclipse.scout.commons.TTLCache;
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.Client;
@@ -40,10 +40,10 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 /**
  * Access control permissions received from backend (JAAS permissions), cached for convenience and performance.
  * <p>
- * Service state is per [{@link IClientSession} instance and stored as {@link IClientSession#getData(String)}
+ * Service state is per {@link IClientSession} instance and stored as {@link IClientSession#getData(String)}
  */
-@Priority(-3)
 @Client
+@Order(10)
 @CreateImmediately
 public class AccessControlServiceClientProxy extends AbstractService implements IAccessControlService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AccessControlServiceClientProxy.class);

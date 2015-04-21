@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
 import org.eclipse.scout.commons.dnd.ImageTransferObject;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
@@ -45,7 +44,6 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 
-@Priority(-2)
 @Client
 public class SwingScoutClipboardService extends AbstractService implements IClipboardService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutClipboardService.class);

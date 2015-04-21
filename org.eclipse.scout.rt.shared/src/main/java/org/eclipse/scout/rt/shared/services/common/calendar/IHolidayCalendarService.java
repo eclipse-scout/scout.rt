@@ -13,12 +13,10 @@ package org.eclipse.scout.rt.shared.services.common.calendar;
 import java.util.Date;
 import java.util.Set;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
-@Priority(-3)
 @TunnelToServer
 public interface IHolidayCalendarService extends ICalendarService {
 

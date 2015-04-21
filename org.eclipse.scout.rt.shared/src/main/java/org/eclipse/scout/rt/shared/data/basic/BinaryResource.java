@@ -10,12 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.basic;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.zip.Adler32;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.FileUtility;
+import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
  * Wrapper for binary content (<code>byte[]</code>) with some meta data.
@@ -71,6 +74,10 @@ public final class BinaryResource implements Serializable {
     else {
       m_fingerprint = -1;
     }
+  }
+
+  public BinaryResource(File file) throws ProcessingException {
+    this(file.getName(), FileUtility.getContentType(file), IOUtility.getContent(file), file.lastModified());
   }
 
   /**

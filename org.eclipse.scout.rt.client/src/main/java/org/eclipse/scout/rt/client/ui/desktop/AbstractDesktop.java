@@ -101,7 +101,6 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
-import org.eclipse.scout.rt.shared.services.common.shell.IShellService;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 /**
@@ -1360,17 +1359,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void openUri(String url, ITargetWindow target) {
-    if (UserAgentUtility.isWebClient()) {
-      fireOpenUri(url, target);
-    }
-    else {
-      try {
-        BEANS.get(IShellService.class).shellOpen(url);
-      }
-      catch (ProcessingException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
-    }
+    fireOpenUri(url, target);
   }
 
   @Override

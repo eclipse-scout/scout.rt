@@ -10,14 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.lookup;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
 /**
  * @since 3.8.1
  */
-@Priority(-1)
 public class DefaultCodeLookupCallFactoryService extends AbstractService implements ICodeLookupCallFactoryService {
 
   @Override

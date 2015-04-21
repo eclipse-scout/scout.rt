@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.extension;
 
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -59,7 +59,7 @@ import org.eclipse.scout.rt.shared.extension.IMoveModelObjectToRootMarker;
 /**
  *
  */
-@Priority(1000)
+@Order(-400)
 public class ClientContainerValidationService extends AbstractContainerValidationService {
 
   @Override

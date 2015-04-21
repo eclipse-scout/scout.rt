@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.services.common.code;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.IService;
@@ -31,8 +31,8 @@ import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotificat
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
-@Priority(-1)
 @Server
+@Order(2)
 public class CodeService extends AbstractSharedCodeService implements IClusterNotificationListenerService {
 
   @Override

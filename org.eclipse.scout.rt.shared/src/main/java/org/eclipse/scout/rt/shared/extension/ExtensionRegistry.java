@@ -31,13 +31,11 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.Extends;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 
-@Priority(-50)
 public class ExtensionRegistry extends AbstractService implements IInternalExtensionRegistry {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ExtensionRegistry.class);

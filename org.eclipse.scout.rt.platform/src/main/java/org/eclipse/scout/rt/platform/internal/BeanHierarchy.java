@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanScopeEvaluator;
@@ -188,7 +187,7 @@ public class BeanHierarchy<T> {
   private static final Comparator<IBean<?>> ORDER_COMPARATOR = new Comparator<IBean<?>>() {
     @Override
     public int compare(IBean<?> o1, IBean<?> o2) {
-      int cmp = orderOf(o1).compareTo(orderOf(o2));
+      int cmp = Double.compare(orderOf(o1), orderOf(o2));
       if (cmp != 0) {
         return cmp;
       }
@@ -196,17 +195,12 @@ public class BeanHierarchy<T> {
     }
   };
 
-  public static Double orderOf(IBean<?> b) {
-    double o = 0;
-    Priority priorityAnnotation = b.getBeanAnnotation(Priority.class);
-    if (priorityAnnotation != null) {
-      o = -priorityAnnotation.value();
-    }
+  public static double orderOf(IBean<?> b) {
     Order orderAnnotation = b.getBeanAnnotation(Order.class);
     if (orderAnnotation != null) {
-      o = orderAnnotation.value();
+      return orderAnnotation.value();
     }
-    return o;
+    return 0;
   }
 
 }

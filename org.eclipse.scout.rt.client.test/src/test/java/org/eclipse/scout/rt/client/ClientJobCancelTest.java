@@ -77,11 +77,11 @@ public class ClientJobCancelTest {
     m_session.setServiceTunnel(tunnel);
     m_serviceReg = TestingUtility.registerBeans(
         new BeanMetaData(MockPingService.class).
-        initialInstance(new MockPingService()).
-        applicationScoped(true),
+            initialInstance(new MockPingService()).
+            applicationScoped(true),
         new BeanMetaData(MockServerProcessingCancelService.class).
-        initialInstance(new MockServerProcessingCancelService(tunnel)).
-        applicationScoped(true)
+            initialInstance(new MockServerProcessingCancelService(tunnel)).
+            applicationScoped(true).order(-1)
         );
   }
 

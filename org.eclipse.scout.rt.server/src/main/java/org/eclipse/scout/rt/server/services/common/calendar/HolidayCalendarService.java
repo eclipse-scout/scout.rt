@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TTLCache;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -32,7 +31,6 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 /**
  * For details see {@link HolidayCalendarItemParser}
  */
-@Priority(-1)
 public class HolidayCalendarService extends AbstractService implements IHolidayCalendarService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HolidayCalendarService.class);
 

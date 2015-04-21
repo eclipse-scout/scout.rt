@@ -12,11 +12,9 @@ package org.eclipse.scout.rt.shared.services.lookup;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 
-@Priority(-3)
 public interface ILookupService<KEY_TYPE> extends IService {
 
   /**

@@ -175,13 +175,17 @@ public final class IOUtility {
     }
   }
 
-  public static byte[] getContent(String filename) throws ProcessingException {
+  public static byte[] getContent(File file) throws ProcessingException {
     try {
-      return getContent(new FileInputStream(toFile(filename)), true);
+      return getContent(new FileInputStream(file), true);
     }
     catch (FileNotFoundException e) {
-      throw new ProcessingException("filename: " + filename, e);
+      throw new ProcessingException("filename: " + file.getAbsolutePath(), e);
     }
+  }
+
+  public static byte[] getContent(String filename) throws ProcessingException {
+    return getContent(toFile(filename));
   }
 
   /**

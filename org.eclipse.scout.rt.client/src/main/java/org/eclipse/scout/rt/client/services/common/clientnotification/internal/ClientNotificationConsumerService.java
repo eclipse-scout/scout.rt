@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -39,7 +38,6 @@ import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNot
  * notification is arrived.
  * </p>
  */
-@Priority(-3)
 public class ClientNotificationConsumerService extends AbstractService implements IClientNotificationConsumerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationConsumerService.class);
   private static final String SESSION_DATA_KEY = "clientNotificationConsumerServiceState";

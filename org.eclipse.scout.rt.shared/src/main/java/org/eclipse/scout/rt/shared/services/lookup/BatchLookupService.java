@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.shared.services.lookup;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 
@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.service.AbstractService;
  *
  * @since 4.3.0 (Mars-M5)
  */
-@Priority(-10)
+@Order(10)
 public class BatchLookupService extends AbstractService implements IBatchLookupService {
 
   @Override

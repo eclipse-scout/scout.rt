@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.XmlUtility;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -53,7 +52,6 @@ import org.w3c.dom.Element;
  * }
  * </pre>
  */
-@Priority(-1)
 public class HolidayCalendarItemParser {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HolidayCalendarItemParser.class);
 

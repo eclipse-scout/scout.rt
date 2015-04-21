@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -26,7 +25,6 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 
-@Priority(-1)
 @Server
 public class LogoutService extends AbstractService implements ILogoutService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(LogoutService.class);

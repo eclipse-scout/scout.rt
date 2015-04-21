@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.services.common.security;
 import java.security.Permissions;
 import java.util.Collection;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -34,7 +33,6 @@ import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlCh
 /**
  * Implementations should override {@link #execLoadPermissions()}
  */
-@Priority(-1)
 public abstract class AbstractAccessControlService extends AbstractSharedAccessControlService implements IClusterNotificationListenerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractAccessControlService.class);
 

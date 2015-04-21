@@ -22,7 +22,6 @@ import javax.swing.SwingUtilities;
 
 import org.easymock.EasyMock;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -427,7 +426,7 @@ public class SwingScoutModelFinderUiTest {
   public static class PageWithNode extends AbstractPageWithNodes {
   }
 
-  @Priority(1000)
+  @Order(-1000)
   public static class P_NullIconLocator extends IconLocator {
 
     @Override

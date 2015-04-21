@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -32,7 +31,6 @@ import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
-@Priority(-1)
 public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageService implements IBookmarkStorageService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FileSystemBookmarkStorageService.class);
 

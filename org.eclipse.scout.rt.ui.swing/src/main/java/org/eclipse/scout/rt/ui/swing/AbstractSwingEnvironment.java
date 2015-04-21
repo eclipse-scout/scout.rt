@@ -26,6 +26,8 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyVetoException;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -53,6 +55,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -69,6 +72,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.ITargetWindow;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -77,6 +81,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
@@ -374,6 +379,10 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
               invokeSwingLater(t);
               break;
             }
+            case DesktopEvent.TYPE_OPEN_URI: {
+              handleModelOpenUri(e.getUri(), e.getTarget());
+              break;
+            }
             case DesktopEvent.TYPE_MESSAGE_BOX_ADDED: {
               Runnable t = new Runnable() {
                 @Override
@@ -492,6 +501,66 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     SwingBusyHandler handler = createBusyHandler();
     service.register(getScoutSession(), handler);
     return handler;
+  }
+
+  protected void handleModelOpenUri(String uri, ITargetWindow target /* ignored for swing */) {
+    try {
+      openWithRuntimeExec(uri);
+    }
+    catch (ProcessingException e) {
+      LOG.error("Unable to open URI '" + uri + "'.", e);
+    }
+  }
+
+  protected String validatePath(String path) throws IOException {
+    path = path.replace('\\', File.separatorChar);
+    if (new File(path).exists()) {
+      path = new File(path).getCanonicalPath();
+      String osName = System.getProperty("os.name");
+      if (osName != null && osName.startsWith("Mac OS")) {
+        //mac is not able to open files with a space, even when in quotes
+        String ext = path.substring(path.lastIndexOf('.'));
+        File f = new File(new File(path).getParentFile(), "" + System.nanoTime() + ext);
+        f.deleteOnExit();
+        if (new File(path).renameTo(f)) {
+          path = f.getAbsolutePath();
+        }
+      }
+    }
+    return path;
+  }
+
+  protected void openWithRuntimeExec(String path) throws ProcessingException {
+    String osName = System.getProperty("os.name");
+    if (osName == null) {
+      return;
+    }
+    try {
+      String commandline = null;
+      if (osName.startsWith("Windows")) {
+        String pathQuoted = "\"" + validatePath(path) + "\"";
+        commandline = "cmd.exe /c start \"\" " + pathQuoted;
+      }
+      else if (osName.startsWith("Mac OS")) {
+        //mac is not able to open files with a space, even when in quotes
+        commandline = "open " + validatePath(path);
+      }
+      else if (osName.startsWith("Linux")) {
+        String pathQuoted = "\"" + validatePath(path) + "\"";
+        commandline = "xdg-open " + pathQuoted;
+      }
+      if (commandline == null) {
+        return;
+      }
+      Process process = Runtime.getRuntime().exec(commandline);
+      process.waitFor();
+    }
+    catch (InterruptedException ie) {
+      throw new ProcessingException(ScoutTexts.get("Interrupted"), ie);
+    }
+    catch (Exception t) {
+      throw new ProcessingException("Unexpected: " + path, t);
+    }
   }
 
   protected SwingBusyHandler createBusyHandler() {

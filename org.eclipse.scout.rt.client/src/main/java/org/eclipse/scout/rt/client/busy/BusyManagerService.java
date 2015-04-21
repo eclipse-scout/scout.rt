@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.busy;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.job.ClientJobs;
@@ -33,7 +32,6 @@ import org.eclipse.scout.rt.platform.service.AbstractService;
  * @since 3.8
  */
 
-@Priority(-1000)
 public class BusyManagerService extends AbstractService implements IBusyManagerService {
   private static final String HANDLER_CLIENT_SESSION_KEY = IBusyHandler.class.getName();
 

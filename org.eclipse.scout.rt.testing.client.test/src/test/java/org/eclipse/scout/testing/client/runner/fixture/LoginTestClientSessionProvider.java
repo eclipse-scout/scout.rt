@@ -16,7 +16,7 @@ import java.util.List;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -60,7 +60,7 @@ public class LoginTestClientSessionProvider extends ClientSessionProviderWithCac
   }
 
   @Bean
-  @Priority(10)
+  @Order(-10)
   public static class LoginTestClientSession extends TestEnvironmentClientSession {
 
     @Override

@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.service;
 
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
@@ -18,8 +18,8 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  *
  * @see ServiceUtility#injectConfigProperties
  */
+@Order(-400)
 @ApplicationScoped
-@Priority(50l)
 public class DefaultServiceInitializer implements IServiceInitializer {
 
   /**

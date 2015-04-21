@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.services.common.security.internal.AccessControlStore;
@@ -34,7 +33,6 @@ import org.eclipse.scout.rt.shared.services.common.security.internal.AccessContr
  *
  * @since 4.3.0 (Mars-M5)
  */
-@Priority(-1)
 public abstract class AbstractSharedAccessControlService extends AbstractService implements IAccessControlService {
   private AccessControlStore m_accessControlStore;
   private Pattern[] m_userIdSearchPatterns;

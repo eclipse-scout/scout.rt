@@ -13,14 +13,12 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 
-@Priority(-3)
 @InputValidation(IValidationStrategy.PROCESS.class)
 public interface ICodeService extends IService {
 

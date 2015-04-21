@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
@@ -180,7 +179,7 @@ public final class TestingUtility {
       return null;
     }
     Assertions.assertFalse(Mockito.mockingDetails(beanData.getBeanClazz()).isMock() && beanData.getInitialInstance() == null, "Cannot register mocked bean. Use 'registerService' and provide the concrete type. [mock=%s]", beanData.getBeanClazz());
-    if (beanData.getBeanAnnotation(Order.class) == null && beanData.getBeanAnnotation(Priority.class) == null) {
+    if (beanData.getBeanAnnotation(Order.class) == null) {
       beanData.order(TESTING_BEAN_ORDER);
     }
     return Platform.get().getBeanManager().registerBean(beanData);

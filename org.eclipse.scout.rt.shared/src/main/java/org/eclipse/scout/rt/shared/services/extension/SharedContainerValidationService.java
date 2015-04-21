@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.services.extension;
 
 import java.io.Serializable;
 
-import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
 /**
  *
  */
-@Priority(500)
+@Order(-200)
 public class SharedContainerValidationService extends AbstractContainerValidationService {
   @Override
   protected void initializeService() {

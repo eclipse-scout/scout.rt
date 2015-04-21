@@ -37,13 +37,10 @@ import org.junit.runner.RunWith;
 public class AbstractBigDecimalFieldTest extends AbstractBigDecimalField {
 
   private NumberFormat m_formatter;
-  private char m_decimalSeparator;
 
   @Before
   public void setUp() {
     m_formatter = DecimalFormat.getInstance();
-    DecimalFormat df = (DecimalFormat) DecimalFormat.getNumberInstance();
-    m_decimalSeparator = df.getDecimalFormatSymbols().getDecimalSeparator();
   }
 
   @Test

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.services.common.bookmark;
 
 import java.util.Map;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
@@ -20,7 +19,6 @@ import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 
-@Priority(-3)
 @TunnelToServer
 @InputValidation(IValidationStrategy.PROCESS.class)
 public interface IBookmarkStorageService extends IService {

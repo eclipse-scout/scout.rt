@@ -14,7 +14,6 @@ import java.security.Permission;
 import java.security.Permissions;
 import java.util.Collection;
 
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
@@ -28,7 +27,6 @@ import org.eclipse.scout.rt.shared.validate.InputValidation;
  * and caches permissions per user principal for maximum performance when using stateless request/response patterns as
  * in webservice environments.
  */
-@Priority(-3)
 @InputValidation(IValidationStrategy.PROCESS.class)
 public interface IAccessControlService extends IService {
 
