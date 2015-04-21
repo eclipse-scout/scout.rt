@@ -196,13 +196,13 @@ public class DateChooserDialog extends Dialog {
     new TableCellRolloverSupport(viewer);
     table.setHeaderVisible(true);
 
-    table.addListener(SWT.MouseDown, new Listener() {
+    table.addListener(SWT.MouseUp, new Listener() {
       private static final long serialVersionUID = 1L;
 
       @Override
       public void handleEvent(Event event) {
         switch (event.type) {
-          case SWT.MouseDown: {
+          case SWT.MouseUp: {
             TableColumn columnAt = RwtUtility.getRwtColumnAt(table, new Point(event.x, event.y));
             TableItem item = table.getItem(new Point(event.x, event.y));
             if (item != null) {
