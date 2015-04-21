@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -186,7 +187,8 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     }
     else {
       Collection<? extends ILookupRow<LOOKUP_KEY>> rows = result.getLookupRows();
-      if (rows == null || rows.isEmpty()) {
+      // keep proposal form open in case of mobile or tablet bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=440091
+      if ((rows == null || rows.isEmpty()) && UserAgentUtility.isDesktopDevice()) {
         unregisterProposalFormInternal(smartForm);
       }
       else {
