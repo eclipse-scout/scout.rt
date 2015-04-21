@@ -25,19 +25,19 @@ import org.eclipse.scout.commons.nls.NlsLocale;
  */
 public final class EventListenerProfiler {
 
-  private static EventListenerProfiler instance = new EventListenerProfiler();
+  private static final EventListenerProfiler INSTANCE = new EventListenerProfiler();
 
   public static EventListenerProfiler getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   private boolean m_enabled = false;
-  private Object m_sourcesLock = new Object();
-  private List<WeakReference<IEventListenerSource>> m_sources = new ArrayList<WeakReference<IEventListenerSource>>();
+  private final Object m_sourcesLock;
+  private final List<WeakReference<IEventListenerSource>> m_sources;
 
   private EventListenerProfiler() {
     m_sourcesLock = new Object();
-    m_sources = new ArrayList<WeakReference<IEventListenerSource>>();
+    m_sources = new ArrayList<>();
   }
 
   public boolean isEnabled() {
@@ -71,11 +71,10 @@ public final class EventListenerProfiler {
      * this call to gc is intended
      */
     System.gc();
-    PrintWriter out = new PrintWriter(o, true);
     if (!m_enabled) {
       return;
     }
-    try {
+    try (PrintWriter out = new PrintWriter(o, true)) {
       EventListenerSnapshot snapshot = new EventListenerSnapshot();
       synchronized (m_sourcesLock) {
         manageNoLock();
@@ -96,11 +95,6 @@ public final class EventListenerProfiler {
     }
     catch (Throwable t) {
       t.printStackTrace();
-    }
-    finally {
-      if (o != System.out) {
-        out.close();
-      }
     }
   }
 

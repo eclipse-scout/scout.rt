@@ -24,14 +24,6 @@ public final class FormattingUtility {
   private FormattingUtility() {
   }
 
-  public static String fixedRecord(String s, int length) {
-    StringBuffer b = new StringBuffer(s != null ? s : "");
-    while (b.length() < length) {
-      b.append(" ");
-    }
-    return b.toString();
-  }
-
   /**
    * Formats the given object respecting the current thread's {@link NlsLocale} and converts it to a String.
    * Supported types are:

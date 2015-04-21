@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,8 +15,8 @@ import java.util.EnumSet;
 import org.eclipse.scout.commons.holders.IBeanArrayHolder.State;
 
 public class BeanArrayHolderFilter<T> {
-  private IBeanArrayHolder<T> m_beanArray;
-  private EnumSet<State> m_states = EnumSet.noneOf(State.class);
+  private final IBeanArrayHolder<T> m_beanArray;
+  private final EnumSet<State> m_states = EnumSet.noneOf(State.class);
 
   public BeanArrayHolderFilter(IBeanArrayHolder<T> beanArray, State... states) {
     m_beanArray = beanArray;

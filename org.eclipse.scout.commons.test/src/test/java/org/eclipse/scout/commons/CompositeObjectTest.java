@@ -20,7 +20,7 @@ import org.junit.Test;
 
 /**
  * Tests for {@link CompositeObject}
- * 
+ *
  * @since 3.10.0-M2
  */
 public class CompositeObjectTest {
@@ -112,26 +112,16 @@ public class CompositeObjectTest {
   @Test
   public void testEqualsDifferentType() {
     // same CompositeObject.m_value length, not same type, not same value
-    testEqualsDifferentTypeWithClassCastException(m_compObjLongValue, m_compObjDoubleValue);
-    testEqualsDifferentTypeWithClassCastException(m_compObjDoubleValue, m_compObjLongValue);
-    testEqualsDifferentTypeWithClassCastException(m_compObjLongArray, m_compObjDoubleArray);
-    testEqualsDifferentTypeWithClassCastException(m_compObjDoubleArray, m_compObjLongArray);
+    assertFalse(m_compObjLongValue.equals(m_compObjDoubleValue));
+    assertFalse(m_compObjDoubleValue.equals(m_compObjLongValue));
+    assertFalse(m_compObjLongArray.equals(m_compObjDoubleArray));
+    assertFalse(m_compObjDoubleArray.equals(m_compObjLongArray));
 
     // same CompositeObject.m_value length, not same type, same value
-    testEqualsDifferentTypeWithClassCastException(m_compObjLongValue, otherDoubleValue);
-    testEqualsDifferentTypeWithClassCastException(otherDoubleValue, m_compObjLongValue);
-    testEqualsDifferentTypeWithClassCastException(m_compObjDoubleArray, otherLongValue);
-    testEqualsDifferentTypeWithClassCastException(otherLongValue, m_compObjDoubleArray);
-  }
-
-  private void testEqualsDifferentTypeWithClassCastException(CompositeObject a, CompositeObject b) {
-    try {
-      a.equals(b);
-      fail("Expects ClassCastException when comparing " + a.toString() + " with " + b.toString());
-    }
-    catch (ClassCastException e) {
-      // ok
-    }
+    assertFalse(m_compObjLongValue.equals(otherDoubleValue));
+    assertFalse(otherDoubleValue.equals(m_compObjLongValue));
+    assertFalse(m_compObjDoubleArray.equals(otherLongValue));
+    assertFalse(otherLongValue.equals(m_compObjDoubleArray));
   }
 
   @Test
@@ -145,14 +135,14 @@ public class CompositeObjectTest {
     assertTrue(a.equals(b));
     assertTrue(b.equals(a));
 
-    assertFalse(a.equals(c));
+    assertTrue(a.equals(c));
     assertFalse(c.equals(a));
 
-    assertFalse(b.equals(c));
+    assertTrue(b.equals(c));
     assertFalse(c.equals(b));
 
-    assertTrue(c.equals(c2));
-    assertTrue(c2.equals(c));
+    assertFalse(c.equals(c2));
+    assertFalse(c2.equals(c));
   }
 
   @Test
@@ -274,6 +264,29 @@ public class CompositeObjectTest {
     }
 
     @Override
+    public int hashCode() {
+      return Long.valueOf(m_value).hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (!(obj instanceof A)) {
+        return false;
+      }
+      A other = (A) obj;
+      if (m_value != other.m_value) {
+        return false;
+      }
+      return true;
+    }
+
+    @Override
     public String toString() {
       return String.valueOf(m_value);
     }
@@ -288,6 +301,11 @@ public class CompositeObjectTest {
   static class C extends A {
     public C(long value) {
       super(value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return this == obj;
     }
 
     @Override

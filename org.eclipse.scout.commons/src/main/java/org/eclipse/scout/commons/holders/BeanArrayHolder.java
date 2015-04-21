@@ -16,6 +16,8 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @param <T>
@@ -24,12 +26,14 @@ import java.util.HashMap;
  */
 public class BeanArrayHolder<T> implements IBeanArrayHolder<T>, Serializable {
   private static final long serialVersionUID = 1L;
-  private ArrayList<T> m_list = new ArrayList<T>();
-  private HashMap<T, State> m_stateList = new HashMap<T, State>();
-  private Class<T> m_clazz;
+  private final List<T> m_list;
+  private final Map<T, State> m_stateList;
+  private final Class<T> m_clazz;
 
   public BeanArrayHolder(Class<T> clazz) {
     m_clazz = clazz;
+    m_list = new ArrayList<>();
+    m_stateList = new HashMap<T, State>();
   }
 
   @Override
@@ -93,7 +97,7 @@ public class BeanArrayHolder<T> implements IBeanArrayHolder<T>, Serializable {
 
   @Override
   public T[] getBeans(State... states) {
-    ArrayList<T> ret = new ArrayList<T>();
+    List<T> ret = new ArrayList<T>();
     EnumSet<State> state = EnumSet.noneOf(State.class);
     if (states != null) {
       for (State s : states) {

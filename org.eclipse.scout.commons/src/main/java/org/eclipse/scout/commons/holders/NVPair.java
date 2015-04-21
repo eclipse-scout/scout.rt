@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,13 +18,14 @@ import java.io.Serializable;
 public class NVPair implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private String m_name;
-  private Object m_value;
-  private Class m_nullType;
+  private final String m_name;
+  private final Object m_value;
+  private final Class m_nullType;
 
   public NVPair(String name, Object value) {
     m_name = name;
     m_value = value;
+    m_nullType = null;
   }
 
   public NVPair(String name, Object value, Class nullType) {

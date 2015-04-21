@@ -137,27 +137,10 @@ public final class NlsUtility {
     return text;
   }
 
-  public static Locale parseLocale(String pattern) {
-    if (pattern == null) {
-      return NlsLocale.get();
-    }
-    String[] a = pattern.split("_");
-    switch (a.length) {
-      case 1:
-        return new Locale(a[0]);
-      case 2:
-        return new Locale(a[0], a[1]);
-      case 3:
-        return new Locale(a[0], a[1], a[2]);
-      default:
-        return NlsLocale.get();
-    }
-  }
-
   /**
    * Only use this {@link Locale} resolver if the calling code is executed in both, server- and client side.
    * On client side, use {@link Locale#getDefault()} whereas on server side use {@link NlsLocale#get()}.
-   * 
+   *
    * @return the locale hold by the current thread in {@link NlsLocale} or if not set by the instance of the
    *         Java Virtual Machine.
    */

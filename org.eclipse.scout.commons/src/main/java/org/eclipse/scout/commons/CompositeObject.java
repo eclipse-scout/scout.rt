@@ -11,6 +11,7 @@
 package org.eclipse.scout.commons;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -18,7 +19,7 @@ import java.util.Collection;
  */
 public class CompositeObject implements Comparable<CompositeObject>, Serializable {
   private static final long serialVersionUID = 0L;
-  private Object[] m_value;
+  private final Object[] m_value;
 
   public CompositeObject(Object... a) {
     if (a != null && a.length == 1 && a[0] instanceof Collection<?>) {
@@ -31,24 +32,31 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
 
   @Override
   public int hashCode() {
-    long h = 0;
-    for (Object v : m_value) {
-      if (v != null) {
-        h = h ^ v.hashCode();
-      }
-    }
-    return (int) h;
+    return Arrays.hashCode(m_value);
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (!(o instanceof CompositeObject)) {
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
       return false;
     }
-    return compareTo((CompositeObject) o) == 0;
+    if (!(obj instanceof CompositeObject)) {
+      return false;
+    }
+    CompositeObject other = (CompositeObject) obj;
+    if (!Arrays.equals(m_value, other.m_value)) {
+      return false;
+    }
+    return true;
   }
 
   public int getComponentCount() {
+    if (m_value == null) {
+      return 0;
+    }
     return m_value.length;
   }
 
@@ -64,6 +72,12 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
   public int compareTo(CompositeObject o) {
     Object[] me = this.m_value;
     Object[] other = o.m_value;
+    if (me == null) {
+      return -1;
+    }
+    else if (other == null) {
+      return 1;
+    }
     for (int i = 0; i < me.length && i < other.length; i++) {
       int c = compareImpl(me[i], other[i]);
       if (c != 0) {
@@ -98,14 +112,18 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
 
   @Override
   public String toString() {
-    String s = "[";
-    for (int i = 0; i < m_value.length; i++) {
-      s += String.valueOf(m_value[i]);
-      if (i + 1 < m_value.length) {
-        s += ",";
+    StringBuilder sb = new StringBuilder();
+    sb.append('[');
+    if (m_value != null && m_value.length > 0) {
+      sb.append(String.valueOf(m_value[0]));
+      if (m_value.length > 1) {
+        for (int i = 1; i < m_value.length; i++) {
+          sb.append(',');
+          sb.append(String.valueOf(m_value[i]));
+        }
       }
     }
-    s += "]";
-    return s;
+    sb.append(']');
+    return sb.toString();
   }
 }

@@ -23,12 +23,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.DateUtility;
@@ -75,7 +75,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   private Map<CompositeObject/* resourceId,activityId */, ActivityCell<RI, AI>> m_activities;
   private Set<RI/* resourceId */> m_selectedResourceIds;
   private int m_tableChanging;
-  private List<ActivityMapEvent> m_eventBuffer = new ArrayList<ActivityMapEvent>();
+  private List<ActivityMapEvent> m_eventBuffer = new ArrayList<>();
   private IActivityCellObserver<RI, AI> m_cellObserver;
   private boolean m_timeScaleValid;
   private IContributionOwner m_contributionHolder;
@@ -86,7 +86,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   }
 
   public AbstractActivityMap(boolean callInitializer) {
-    m_objectExtensions = new ObjectExtensions<AbstractActivityMap<RI, AI>, IActivityMapExtension<RI, AI, ? extends AbstractActivityMap<RI, AI>>>(this);
+    m_objectExtensions = new ObjectExtensions<>(this);
     if (callInitializer) {
       callInitializer();
     }
@@ -264,10 +264,10 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   protected void initConfig() {
     m_listenerList = new EventListenerList();
     m_activityMapUIFacade = createUIFacade();
-    m_resourceIdToActivities = new HashMap<RI, List<ActivityCell<RI, AI>>>();
-    m_activities = new HashMap<CompositeObject, ActivityCell<RI, AI>>();
+    m_resourceIdToActivities = new HashMap<>();
+    m_activities = new HashMap<>();
     m_cellObserver = new P_ActivityCellObserver();
-    m_selectedResourceIds = new HashSet<RI>();
+    m_selectedResourceIds = new HashSet<>();
     //
     setWorkDayCount(getConfiguredWorkDayCount());
     setWorkDaysOnly(getConfiguredWorkDaysOnly());
@@ -278,7 +278,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     setDrawSections(getConfiguredDrawSections());
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       try {
         IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
@@ -359,7 +359,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   }
 
   protected IActivityMapExtension<RI, AI, ? extends AbstractActivityMap<RI, AI>> createLocalExtension() {
-    return new LocalActivityMapExtension<RI, AI, AbstractActivityMap<RI, AI>>(this);
+    return new LocalActivityMapExtension<>(this);
   }
 
   @Override
@@ -476,7 +476,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     if (cells == null) {
       return CollectionUtility.emptyArrayList();
     }
-    List<ActivityCell<RI, AI>> result = new ArrayList<ActivityCell<RI, AI>>(cells.size());
+    List<ActivityCell<RI, AI>> result = new ArrayList<>(cells.size());
     for (ActivityCell<RI, AI> cell : cells) {
       if (resolveActivityCell(cell) == cell) {
         result.add(cell);
@@ -487,14 +487,14 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
 
   @Override
   public List<ActivityCell<RI, AI>> getActivityCells(RI resourceId) {
-    ArrayList<RI> resourceList = new ArrayList<RI>();
+    List<RI> resourceList = new ArrayList<>();
     resourceList.add(resourceId);
     return getActivityCells(resourceList);
   }
 
   @Override
   public List<ActivityCell<RI, AI>> getActivityCells(List<? extends RI> resourceIds) {
-    List<ActivityCell<RI, AI>> all = new ArrayList<ActivityCell<RI, AI>>();
+    List<ActivityCell<RI, AI>> all = new ArrayList<>();
     for (RI resourceId : resourceIds) {
       List<ActivityCell<RI, AI>> list = m_resourceIdToActivities.get(resourceId);
       if (list != null) {
@@ -504,22 +504,21 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     return all;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public List<ActivityCell<RI, AI>> getAllActivityCells() {
-    return new ArrayList(m_activities.values());
+    return new ArrayList<>(m_activities.values());
   }
 
   @Override
   public void addActivityCells(List<? extends ActivityCell<RI, AI>> cells) {
-    List<ActivityCell<RI, AI>> addedCells = new ArrayList<ActivityCell<RI, AI>>();
+    List<ActivityCell<RI, AI>> addedCells = new ArrayList<>();
     for (ActivityCell<RI, AI> cell : cells) {
       CompositeObject key = new CompositeObject(cell.getResourceId(), cell.getActivityId());
       if (!m_activities.containsKey(key)) {
         m_activities.put(key, cell);
         List<ActivityCell<RI, AI>> list = m_resourceIdToActivities.get(cell.getResourceId());
         if (list == null) {
-          list = new ArrayList<ActivityCell<RI, AI>>();
+          list = new ArrayList<>();
           m_resourceIdToActivities.put(cell.getResourceId(), list);
         }
         list.add(cell);
@@ -661,14 +660,14 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       resourceIds = CollectionUtility.emptyArrayList();
     }
     // delete activities of resourceIds that no Object exists
-    HashSet<RI> eliminatedResourceIdSet = new HashSet<RI>();
+    HashSet<RI> eliminatedResourceIdSet = new HashSet<>();
     eliminatedResourceIdSet.addAll(getResourceIds());
     eliminatedResourceIdSet.removeAll(resourceIds);
     try {
       setActivityMapChanging(true);
       //
       propertySupport.setProperty(PROP_RESOURCE_IDS, resourceIds);
-      removeActivityCellsById(new ArrayList<RI>(eliminatedResourceIdSet));
+      removeActivityCellsById(new ArrayList<>(eliminatedResourceIdSet));
       updateActivityCellsInternal(getAllActivityCells());
     }
     finally {
@@ -791,18 +790,18 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
      * eventually merge
      */
     List<ActivityMapEvent> list = m_eventBuffer;
-    m_eventBuffer = new ArrayList<ActivityMapEvent>();
+    m_eventBuffer = new ArrayList<>();
     if (list.size() > 0) {
-      HashMap<Integer, List<ActivityMapEvent>> coalesceMap = new HashMap<Integer, List<ActivityMapEvent>>();
+      HashMap<Integer, List<ActivityMapEvent>> coalesceMap = new HashMap<>();
       for (ActivityMapEvent e : list) {
         List<ActivityMapEvent> subList = coalesceMap.get(e.getType());
         if (subList == null) {
-          subList = new ArrayList<ActivityMapEvent>();
+          subList = new ArrayList<>();
           coalesceMap.put(e.getType(), subList);
         }
         subList.add(e);
       }
-      TreeMap<Integer, ActivityMapEvent> sortedCoalescedMap = new TreeMap<Integer, ActivityMapEvent>();
+      Map<Integer, ActivityMapEvent> sortedCoalescedMap = new TreeMap<>();
       for (Map.Entry<Integer, List<ActivityMapEvent>> entry : coalesceMap.entrySet()) {
         int type = entry.getKey();
         List<ActivityMapEvent> subList = entry.getValue();
@@ -850,13 +849,13 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       //
       ce.addPopupMenus(last.getPopupMenus());
       //
-      HashSet<ActivityCell> coalesceList = new HashSet<ActivityCell>();
+      HashSet<ActivityCell> coalesceList = new HashSet<>();
       for (ActivityMapEvent t : list) {
         if (t.getActivityCount() > 0) {
           coalesceList.addAll(t.getActivities());
         }
       }
-      ce.setActivities(new ArrayList<ActivityCell>(coalesceList));
+      ce.setActivities(new ArrayList<>(coalesceList));
       //
       return ce;
     }
@@ -951,7 +950,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   public void addDay(Date day) {
     day = DateUtility.truncDate(day);
     if (day != null) {
-      TreeSet<Date> set = new TreeSet<Date>();
+      TreeSet<Date> set = new TreeSet<>();
       set.addAll(Arrays.asList(getDays()));
       set.add(day);
       setDaysInternal(set);
@@ -962,7 +961,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   public void removeDay(Date day) {
     day = DateUtility.truncDate(day);
     if (day != null) {
-      TreeSet<Date> set = new TreeSet<Date>();
+      TreeSet<Date> set = new TreeSet<>();
       set.addAll(Arrays.asList(getDays()));
       set.remove(day);
       setDaysInternal(set);
@@ -972,7 +971,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   @Override
   public void setDay(Date day) {
     day = DateUtility.truncDate(day);
-    TreeSet<Date> set = new TreeSet<Date>();
+    TreeSet<Date> set = new TreeSet<>();
     if (day != null) {
       set.add(day);
     }
@@ -981,7 +980,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
 
   @Override
   public void setDays(Date[] days) {
-    TreeSet<Date> set = new TreeSet<Date>();
+    TreeSet<Date> set = new TreeSet<>();
     for (Date d : days) {
       set.add(DateUtility.truncDate(d));
     }
@@ -1116,8 +1115,8 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
 
           if (CompareUtility.equals(cell.getBeginTime(), beginTime) &&
               (CompareUtility.equals(cell.getEndTime(), endTime)
-              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-              || (cell != null
+                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+                  || (cell != null
                   && cell.getEndTime() != null
                   && endTime != null
                   && cell.getEndTime().getTime() == endTime.getTime() + 1))) {
@@ -1239,7 +1238,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     if (multiTimeRange.isEmpty()) {
       return;
     }
-    TreeMap<CompositeLong, ActivityCell<Integer, Integer>> sortMap = new TreeMap<CompositeLong, ActivityCell<Integer, Integer>>();
+    SortedMap<CompositeObject, ActivityCell<Integer, Integer>> sortMap = new TreeMap<>();
     Random rnd = new Random();
     int resourceIndex = 0;
     for (RI resourceId : getSelectedResourceIds()) {
@@ -1252,16 +1251,16 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
         long durationMillis = tr.getDurationMillis();
         long sortNo = chooseRandom ? rnd.nextLong() : resourceIndex;
         if (durationMillis >= preferredDuration) {
-          ActivityCell<Integer, Integer> a = new ActivityCell<Integer, Integer>(0, 0);
+          ActivityCell<Integer, Integer> a = new ActivityCell<>(0, 0);
           a.setBeginTime(tr.getFrom());
           a.setEndTime(new Date(tr.getFrom().getTime() + preferredDuration));
-          sortMap.put(new CompositeLong(0, a.getBeginTime().getTime(), sortNo), a);
+          sortMap.put(new CompositeObject(0, a.getBeginTime().getTime(), sortNo), a);
         }
         else if (durationMillis >= 15L * 60L * 1000L) {// at least 15 minutes
-          ActivityCell<Integer, Integer> a = new ActivityCell<Integer, Integer>(0, 0);
+          ActivityCell<Integer, Integer> a = new ActivityCell<>(0, 0);
           a.setBeginTime(tr.getFrom());
           a.setEndTime(new Date(tr.getFrom().getTime() + durationMillis));
-          sortMap.put(new CompositeLong(1, -durationMillis, sortNo), a);
+          sortMap.put(new CompositeObject(1, -durationMillis, sortNo), a);
         }
       }
       resourceIndex++;
@@ -1287,7 +1286,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     if (multiTimeRange.isEmpty()) {
       return;
     }
-    TreeMap<CompositeLong, ActivityCell<Integer, Integer>> sortMap = new TreeMap<CompositeLong, ActivityCell<Integer, Integer>>();
+    SortedMap<CompositeObject, ActivityCell<Integer, Integer>> sortMap = new TreeMap<>();
     for (RI resourceId : getSelectedResourceIds()) {
       for (ActivityCell<RI, AI> a : getActivityCells(resourceId)) {
         multiTimeRange.remove(a.getBeginTime(), a.getEndTime());
@@ -1300,13 +1299,13 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
         ActivityCell<Integer, Integer> a = new ActivityCell<Integer, Integer>(0, 0);
         a.setBeginTime(tr.getFrom());
         a.setEndTime(new Date(tr.getFrom().getTime() + preferredDuration));
-        sortMap.put(new CompositeLong(0, a.getBeginTime().getTime()), a);
+        sortMap.put(new CompositeObject(0, a.getBeginTime().getTime()), a);
       }
       else if (durationMillis >= 15L * 60L * 1000L) {// at least 15 minutes
         ActivityCell<Integer, Integer> a = new ActivityCell<Integer, Integer>(0, 0);
         a.setBeginTime(tr.getFrom());
         a.setEndTime(new Date(tr.getFrom().getTime() + durationMillis));
-        sortMap.put(new CompositeLong(1, -durationMillis), a);
+        sortMap.put(new CompositeObject(1, -durationMillis), a);
       }
     }
     // the top entry of the sort map is the one with best score (lowest number)

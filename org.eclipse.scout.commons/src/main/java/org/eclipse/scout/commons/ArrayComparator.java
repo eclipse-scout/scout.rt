@@ -14,7 +14,7 @@ import java.util.Comparator;
 import java.util.Locale;
 
 public class ArrayComparator implements Comparator<Object[]> {
-  private ColumnComparator[] m_comparators;
+  private final ColumnComparator[] m_comparators;
 
   public ArrayComparator(ColumnComparator... comparators) {
     m_comparators = comparators;
@@ -23,7 +23,7 @@ public class ArrayComparator implements Comparator<Object[]> {
   /**
    * Convenience constructor that creates {@link ColumnComparator ColumnComparators} with
    * {@link DefaultObjectComparator DefaultObjectComparators} for all sort columns.
-   * 
+   *
    * @param locale
    * @param sortCols
    *          0-based column indices

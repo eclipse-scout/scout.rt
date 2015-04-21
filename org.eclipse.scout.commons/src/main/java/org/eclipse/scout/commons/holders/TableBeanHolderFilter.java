@@ -11,13 +11,14 @@
 package org.eclipse.scout.commons.holders;
 
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Filter for {@link ITableBeanHolder}: provide an array of {@link ITableBeanRowHolder} depending on their row state.
  */
 public class TableBeanHolderFilter {
-  private ITableBeanHolder m_table;
-  private HashSet<Integer> m_rowStates;
+  private final ITableBeanHolder m_table;
+  private final Set<Integer> m_rowStates;
 
   public TableBeanHolderFilter(ITableBeanHolder table, int... rowStates) {
     m_table = table;
