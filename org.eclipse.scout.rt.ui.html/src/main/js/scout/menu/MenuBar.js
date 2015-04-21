@@ -77,6 +77,11 @@ scout.MenuBar.prototype.updateVisibility = function() {
 };
 
 scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
+  // Reverse the list if alignment is right to preserve the visible order specified by the
+  // Scout model (in HTML, elements with 'float: right' are displayed in reverse order)
+  if (right) {
+    menuItems.reverse();
+  }
   var tooltipPosition = (this.position === 'top' ? 'bottom' : 'top');
   menuItems.forEach(function(item) {
     item.tooltipPosition = tooltipPosition;
