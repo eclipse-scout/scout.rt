@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +26,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.ui.html.cache.DefaultHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
@@ -58,29 +56,6 @@ public class UiServlet extends HttpServlet {
     m_httpCacheControl = createHttpCacheControl();
     m_requestHandlerGet = createRequestHandlerGet();
     m_requestHandlerPost = createRequestHandlerPost();
-  }
-
-  @Override
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
-    try {
-      Platform.setDefault();
-      Platform.get().start();
-    }
-    catch (Exception e) {
-      throw new ServletException(e);
-    }
-  }
-
-  @Override
-  public void destroy() {
-    try {
-      Platform.get().stop();
-    }
-    catch (Exception e) {
-      LOG.warn("Unable to stop platform.", e);
-    }
-    super.destroy();
   }
 
   protected IHttpCacheControl createHttpCacheControl() {
