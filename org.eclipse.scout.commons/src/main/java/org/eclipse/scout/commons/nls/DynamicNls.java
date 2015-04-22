@@ -31,7 +31,7 @@ public class DynamicNls {
    * Setting the system property "scout.resourceBundle.checkContainsKey" to <code>false</code> is recommended for
    * affected environments.
    */
-  public static final boolean doContainsCheckInResourceBundle = doContainsCheckInResourceBundle();
+  public static final boolean doContainsCheckInResourceBundle = ConfigIniUtility.getPropertyBoolean(ConfigIniConstants.nlsCheckContainsKey, true);
 
   public DynamicNls() {
     m_resourceBundles = new ArrayList<NlsResourceBundleCache>();
@@ -80,16 +80,6 @@ public class DynamicNls {
 
     String text = getTextInternal(locale, key);
     return NlsUtility.bindText(text, messageArguments);
-  }
-
-  private static boolean doContainsCheckInResourceBundle() {
-    boolean checkContainsKey = true;
-    String checkContainsKeyVal = ConfigIniUtility.getProperty(ConfigIniConstants.nlsCheckContainsKey);
-    if (checkContainsKeyVal != null) {
-      checkContainsKeyVal = checkContainsKeyVal.trim().toLowerCase();
-      checkContainsKey = !"false".equals(checkContainsKeyVal);
-    }
-    return checkContainsKey;
   }
 
   private String getTextInternal(Locale locale, String key) {
