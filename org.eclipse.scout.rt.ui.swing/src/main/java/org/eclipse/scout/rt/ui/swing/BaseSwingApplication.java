@@ -25,7 +25,6 @@ import org.eclipse.scout.commons.LocaleUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.UserInterruptedException;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
@@ -170,14 +169,6 @@ abstract class BaseSwingApplication implements IPlatformListener {
 
   protected UserAgent initUserAgent() {
     return UserAgent.create(UiLayer.SWING, UiDeviceType.DESKTOP);
-  }
-
-  boolean isClientSessionValid(IClientSession clientSession) {
-    if (clientSession.isActive()) {
-      return true;
-    }
-    showLoadError(clientSession.getLoadError());
-    return false;
   }
 
   protected void stopSplashScreen() {

@@ -55,16 +55,9 @@ public interface IClientSession extends ISession {
   Object getStateLock();
 
   /**
-   * The session is running and was loaded
-   */
-  boolean isLoaded();
-
-  Throwable getLoadError();
-
-  /**
    * Invoke this method to initialize the session. The session is active just after this method returns.
    */
-  void startSession();
+  void startSession() throws ProcessingException;
 
   /**
    * send a stop signal to the session event queue<br>

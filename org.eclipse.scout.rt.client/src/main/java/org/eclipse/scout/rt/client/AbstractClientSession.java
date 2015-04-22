@@ -75,7 +75,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   private final Object m_stateLock;
   private volatile boolean m_active;
   private volatile boolean m_isStopping;
-  private Throwable m_loadError;
   private int m_exitCode = 0;
   // model
   private IDesktop m_desktop;
@@ -208,11 +207,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   }
 
   @Override
-  public boolean isLoaded() {
-    return m_active;
-  }
-
-  @Override
   public Map<String, Object> getSharedVariableMap() {
     return CollectionUtility.copyMap(m_sharedVariableMap);
   }
@@ -223,11 +217,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   protected <T> T getSharedContextVariable(String name, Class<T> type) {
     Object o = m_sharedVariableMap.get(name);
     return TypeCastUtility.castValue(o, type);
-  }
-
-  @Override
-  public final Throwable getLoadError() {
-    return m_loadError;
   }
 
   @Override
@@ -277,26 +266,20 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   }
 
   @Override
-  public void startSession() {
+  public void startSession() throws ProcessingException {
     if (isActive()) {
       throw new IllegalStateException("session is active");
     }
-    try {
-      String policy = ConfigIniUtility.getProperty("org.eclipse.scout.memory");
-      if ("small".equals(policy)) {
-        setMemoryPolicy(new SmallMemoryPolicy());
-      }
-      else if ("medium".equals(policy)) {
-        setMemoryPolicy(new MediumMemoryPolicy());
-      }
+    String policy = ConfigIniUtility.getProperty("org.eclipse.scout.memory");
+    if ("small".equals(policy)) {
+      setMemoryPolicy(new SmallMemoryPolicy());
+    }
+    else if ("medium".equals(policy)) {
+      setMemoryPolicy(new MediumMemoryPolicy());
+    }
 
-      interceptLoadSession();
-      setActive(true);
-    }
-    catch (Exception e) {
-      m_loadError = e;
-      LOG.error("load session", e);
-    }
+    interceptLoadSession();
+    setActive(true);
   }
 
   /**

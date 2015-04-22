@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swing;
 
 import javax.swing.SwingUtilities;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -30,7 +31,7 @@ public abstract class AbstractSwingApplication extends BaseSwingApplication {
    * @return The client session for this application. </br>
    *         May return a new instance every time it is called.
    */
-  protected abstract IClientSession getClientSession();
+  protected abstract IClientSession getClientSession() throws ProcessingException;
 
   public AbstractSwingApplication() {
   }
@@ -39,8 +40,13 @@ public abstract class AbstractSwingApplication extends BaseSwingApplication {
   protected void startInSubject() throws Exception {
     initialize();
 
-    final IClientSession clientSession = getClientSession();
-    if (!isClientSessionValid(clientSession)) {
+    final IClientSession clientSession;
+    try {
+      clientSession = getClientSession();
+    }
+    catch (Exception e) {
+      LOG.warn("Unexpected error while getting client session", e);
+      showLoadError(e);
       return;
     }
     // Post-condition: session is active and loaded

@@ -104,7 +104,7 @@ public class SwingScoutModelFinderUiTest {
       final ISwingEnvironment m_env = new AbstractSwingApplication() {
 
         @Override
-        protected IClientSession getClientSession() {
+        protected IClientSession getClientSession() throws ProcessingException {
           return clientSession;
         }
       }.getSwingEnvironment();

@@ -64,7 +64,7 @@ public class LoginTestClientSessionProvider extends ClientSessionProviderWithCac
   public static class LoginTestClientSession extends TestEnvironmentClientSession {
 
     @Override
-    public void startSession() {
+    public void startSession() throws ProcessingException {
       String runAs = Subject.getSubject(AccessController.getContext()).getPrincipals().iterator().next().getName();
       s_beforeStartRunAs.add(runAs);
       super.startSession();
