@@ -24,7 +24,9 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.server.ServerConfigProperties.RemoteFilesRootDirProperty;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
@@ -32,11 +34,22 @@ import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 public class RemoteFileService extends AbstractService implements IRemoteFileService {
   private String m_rootPath;
 
+  public RemoteFileService() {
+    this(CONFIG.getPropertyValue(RemoteFilesRootDirProperty.class));
+  }
+
+  protected RemoteFileService(String rootPath) {
+    m_rootPath = rootPath;
+    if (m_rootPath == null) {
+      throw new SecurityException("Invalid path for file service: path may not be null.");
+    }
+  }
+
   public String getRootPath() {
     return m_rootPath;
   }
 
-  public void setRootPath(String rootPath) {
+  protected void setRootPath(String rootPath) {
     m_rootPath = rootPath;
   }
 
@@ -60,9 +73,6 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
   }
 
   private RemoteFile getRemoteFileInternal(RemoteFile spec, Boolean includeContent, long startPosition, long maxBlockSize) throws ProcessingException {
-    if (m_rootPath == null) {
-      throw new SecurityException("invalid path for file service: path may not be null");
-    }
     File file = getFileInternal(spec);
     RemoteFile result = new RemoteFile(spec.getDirectory(), file.getName(), spec.getLocale(), -1, spec.getCharsetName());
     result.setContentType(spec.getContentType());
@@ -108,9 +118,6 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
   }
 
   private String[][] getFiles(String folderBase, FilenameFilter filter) throws ProcessingException {
-    if (m_rootPath == null) {
-      throw new SecurityException("invalid path for file service: path may not be null");
-    }
     File root = new File(getRootPath());
     File path = null;
     if (folderBase == null || folderBase.length() == 0) {
@@ -287,9 +294,6 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
 
   @Override
   public void streamRemoteFile(RemoteFile spec, OutputStream out) throws ProcessingException {
-    if (m_rootPath == null) {
-      throw new SecurityException("invalid path for file service: path may not be null");
-    }
     File file = getFileInternal(spec);
     if (!file.exists()) {
       throw new ProcessingException("remote file does not exist: " + spec.getPath());

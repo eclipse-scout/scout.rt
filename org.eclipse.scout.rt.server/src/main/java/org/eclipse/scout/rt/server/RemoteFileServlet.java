@@ -26,6 +26,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.ServerConfigProperties.RemoteFileServletFolderProperty;
+import org.eclipse.scout.rt.server.commons.config.WebXmlConfigManager;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
@@ -36,15 +38,16 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
  * folder: folder inside external file location
  */
 public class RemoteFileServlet extends HttpServlet {
-  private static final long serialVersionUID = 1L;
 
+  private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RemoteFileServlet.class);
   private static final String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
   private static final String IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
   private static final String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
   private static final String ETAG = "ETag"; //$NON-NLS-1$
 
-  private String m_folder = ""; //$NON-NLS-1$
+  private String m_folder;
+  private WebXmlConfigManager m_configManager;
 
   public RemoteFileServlet() {
   }
@@ -52,19 +55,14 @@ public class RemoteFileServlet extends HttpServlet {
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    String f = config.getInitParameter("folder"); //$NON-NLS-1$
-    if (f != null) {
-      f = f.replaceAll("\\\\", "/"); //$NON-NLS-1$
-      while (f.startsWith("/"))
-      {
-        f = f.substring(1);
-      }
-      while (f.endsWith("/"))
-      {
-        f = f.substring(0, f.lastIndexOf('/'));
-      }
-      m_folder = '/' + f;
-    }
+    m_configManager = new WebXmlConfigManager(config);
+
+    // read config
+    m_folder = m_configManager.getPropertyValue(RemoteFileServletFolderProperty.class);
+  }
+
+  protected WebXmlConfigManager getConfigManager() {
+    return m_configManager;
   }
 
   @Override
@@ -98,7 +96,7 @@ public class RemoteFileServlet extends HttpServlet {
           prefix + "default.htm", //$NON-NLS-1$
           prefix + "index.jsp", //$NON-NLS-1$
           prefix + "index.php" //$NON-NLS-1$
-          );
+      );
     }
     //
     try {

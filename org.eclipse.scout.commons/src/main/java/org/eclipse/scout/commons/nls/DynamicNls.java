@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.scout.commons.ConfigIniConstants;
 import org.eclipse.scout.commons.ConfigIniUtility;
 
 public class DynamicNls {
@@ -27,12 +26,20 @@ public class DynamicNls {
   private final List<NlsResourceBundleCache> m_resourceBundles;
 
   /**
+   * Performance optimization: sometimes a {@link ResourceBundle#containsKey(String)} is faster that the
+   * {@link ResourceBundle#getString(String)}
+   * <p>
+   * default: true
+   */
+  public static final String RESOURCE_BUNDLE_USE_CONTAINS_KEY = "scout.resourceBundle.checkContainsKey";
+
+  /**
    * Specifies if this class should use {@link ResourceBundle#containsKey(String)} to check if a key is available in a
    * specific bundle. This operation may be slow some 1.6 IBM JREs.<br>
    * Setting the system property "scout.resourceBundle.checkContainsKey" to <code>false</code> is recommended for
    * affected environments.
    */
-  public static final boolean doContainsCheckInResourceBundle = ConfigIniUtility.getPropertyBoolean(ConfigIniConstants.nlsCheckContainsKey, true);
+  public static final boolean DO_CONTAINS_CHECK_IN_RESOURCE_BUNDLE = ConfigIniUtility.getPropertyBoolean(RESOURCE_BUNDLE_USE_CONTAINS_KEY, true);
 
   public DynamicNls() {
     m_resourceBundles = new ArrayList<>();
@@ -92,7 +99,7 @@ public class DynamicNls {
       try {
         ResourceBundle resourceBundle = c.getResourceBundle(locale);
         if (resourceBundle != null) {
-          if (doContainsCheckInResourceBundle) {
+          if (DO_CONTAINS_CHECK_IN_RESOURCE_BUNDLE) {
             if (resourceBundle.containsKey(key)) {
               return resourceBundle.getString(key);
             }

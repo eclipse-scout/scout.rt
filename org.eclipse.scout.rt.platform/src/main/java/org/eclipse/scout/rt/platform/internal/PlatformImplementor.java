@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanManager;
@@ -28,6 +29,10 @@ import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
+import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.IConfigPropertyWithStatus;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.service.IService;
@@ -75,6 +80,7 @@ public class PlatformImplementor implements IPlatform {
       changeState(State.BeanManagerPrepared, true);
 
       //validateBeanManager();
+      validateConfiguration();
       initBeanScopeEvaluator();
       initBeanDecorationFactory();
 
@@ -87,6 +93,15 @@ public class PlatformImplementor implements IPlatform {
 
     // last event is outside lock to allow the listeners to use the bean context and the inventory
     changeState(State.PlatformStarted, true);
+  }
+
+  protected void validateConfiguration() {
+    if (!ConfigIniUtility.isInitialized()) {
+      LOG.warn(": No " + ConfigIniUtility.CONFIG_INI + " found. Running with empty configuration.", new Exception("origin"));
+    }
+
+    List<IConfigPropertyWithStatus> configs = BEANS.all(IConfigPropertyWithStatus.class);
+    AbstractConfigProperty.checkStatus(configs);
   }
 
   protected BeanManagerImplementor createBeanManager() {
@@ -235,6 +250,6 @@ public class PlatformImplementor implements IPlatform {
 
   @Override
   public boolean inDevelopmentMode() {
-    return ConfigIniUtility.getPropertyBoolean(ConfigIniUtility.KEY_PLATFORM_DEV_MODE, false);
+    return CONFIG.getPropertyValue(PlatformDevModeProperty.class); // cannot be null
   }
 }

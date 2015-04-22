@@ -22,14 +22,16 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.SessionCacheExpirationProperty;
 
 /**
  * Service for caching server side data dependent on request/response.
  * <p>
  * Cached values may expire. Expired Values are removed from the cache.
  * </p>
- * 
+ *
  * @since 4.0.0
  */
 public abstract class AbstractHttpSessionCacheService extends AbstractService implements IHttpSessionCacheService {
@@ -37,8 +39,8 @@ public abstract class AbstractHttpSessionCacheService extends AbstractService im
 
   private final IObjectSerializer m_objs;
 
-  //expiration time in milliseconds (default 1h)
-  private AtomicLong m_defaultExpirationTime = new AtomicLong(60L * 60L * 1000L);
+  //expiration time in milliseconds
+  private final AtomicLong m_defaultExpirationTime = new AtomicLong(CONFIG.getPropertyValue(SessionCacheExpirationProperty.class));
 
   protected AbstractHttpSessionCacheService() {
     m_objs = SerializationUtility.createObjectSerializer();
@@ -80,7 +82,7 @@ public abstract class AbstractHttpSessionCacheService extends AbstractService im
 
   /**
    * Serializes cache element
-   * 
+   *
    * @param e
    *          Object to serialize
    * @return {@link String}
@@ -97,7 +99,7 @@ public abstract class AbstractHttpSessionCacheService extends AbstractService im
 
   /**
    * deserializes bytestreams
-   * 
+   *
    * @param bytes
    *          bytestream
    * @return deserialized Object

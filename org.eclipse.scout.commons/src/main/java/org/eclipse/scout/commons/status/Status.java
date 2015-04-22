@@ -189,7 +189,7 @@ public class Status implements IStatus, Serializable {
 
   @Override
   public boolean isOK() {
-    return m_severity == OK;
+    return getSeverity() == OK;
   }
 
   @Override

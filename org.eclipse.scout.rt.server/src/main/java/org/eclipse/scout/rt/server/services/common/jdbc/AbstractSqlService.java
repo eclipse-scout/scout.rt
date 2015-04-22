@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -32,9 +31,25 @@ import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.IServiceInventory;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlDirectJdbcConnectionProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlJdbcDriverNameProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlJdbcMappingNameProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlJdbcPoolConnectionBusyTimeoutProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlJdbcPoolConnectionLifetimeProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlJdbcPoolSizeProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlJdbcPropertiesProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlJdbcStatementCacheSizeProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlJndiInitialContextFactoryProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlJndiNameProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlJndiProviderUrlProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlJndiUrlPkgPrefixesProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlPasswordProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlTransactionMemberIdProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.SqlUsernameProperty;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.PreparedStatementCache;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.StatementProcessor;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.pool.SqlConnectionBuilder;
@@ -50,77 +65,110 @@ import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 
 public abstract class AbstractSqlService extends AbstractService implements ISqlService, IServiceInventory {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlService.class);
-  public static final int DEFAULT_MEMORY_PREFETCH_SIZE = 1048576; // = 1MB default
+  public static final int DEFAULT_MEMORY_PREFETCH_SIZE = 1024 * 1024; // = 1MB default
 
   private SqlConnectionPool m_pool;
-  private Class<? extends ScoutTexts> m_nlsProvider;
-  private ISqlStyle m_sqlStyle;
-  private String m_transactionMemberId;
-  private boolean m_directJdbcConnection;
-  private String m_jndiName;
-  private String m_jndiInitialContextFactory;
-  private String m_jndiProviderUrl;
-  private String m_jndiUrlPkgPrefixes;
-  private String m_jdbcMappingName;
-  private String m_jdbcDriverName;
-  private String m_jdbcProps;
-  private int m_jdbcPoolSize;
-  private long m_jdbcPoolConnectionLifetime;
-  private long m_jdbcPoolConnectionBusyTimeout;
-  private String m_defaultUser;
-  private String m_defaultPass;
-  private int m_queryCacheSize;
-  private int m_maxFetchMemorySize = DEFAULT_MEMORY_PREFETCH_SIZE;
+  private final String m_transactionMemberId;
+  private final boolean m_directJdbcConnection;
+  private final String m_jndiName;
+  private final String m_jndiInitialContextFactory;
+  private final String m_jndiProviderUrl;
+  private final String m_jndiUrlPkgPrefixes;
+  private final String m_jdbcMappingName;
+  private final String m_jdbcDriverName;
+  private final String m_jdbcProps;
+  private final int m_jdbcPoolSize;
+  private final long m_jdbcPoolConnectionLifetime;
+  private final long m_jdbcPoolConnectionBusyTimeout;
+  private final String m_defaultUser;
+  private final String m_defaultPass;
+  private final int m_queryCacheSize;
+  private final int m_maxFetchMemorySize = DEFAULT_MEMORY_PREFETCH_SIZE;
+  private final Class<? extends ScoutTexts> m_nlsProvider;
+  private final ISqlStyle m_sqlStyle;
 
-  //
-  private HashMap<String, List<Class<?>>> m_permissionNameToDescriptor;
-  private HashMap<String, List<Class<?>>> m_codeNameToDescriptor;
+  private final Map<String, List<Class<?>>> m_permissionNameToDescriptor;
+  private final Map<String, List<Class<?>>> m_codeNameToDescriptor;
 
-  @Override
-  protected void initializeService() {
-    initConfig();
-    super.initializeService();
+  public AbstractSqlService() {
+    // load config
+    String tid = getConfiguredTransactionMemberId();
+    if (tid == null) {
+      tid = getClass().getSimpleName() + "." + "transaction";
+    }
+    m_transactionMemberId = CONFIG.getPropertyValue(SqlTransactionMemberIdProperty.class, tid);
+    m_directJdbcConnection = CONFIG.getPropertyValue(SqlDirectJdbcConnectionProperty.class, getConfiguredDirectJdbcConnection());
+    m_defaultUser = CONFIG.getPropertyValue(SqlUsernameProperty.class, getConfiguredUsername());
+    m_defaultPass = CONFIG.getPropertyValue(SqlPasswordProperty.class, getConfiguredPassword());
+    m_jndiName = CONFIG.getPropertyValue(SqlJndiNameProperty.class, getConfiguredJndiName());
+    m_jndiInitialContextFactory = CONFIG.getPropertyValue(SqlJndiInitialContextFactoryProperty.class, getConfiguredJndiInitialContextFactory());
+    m_jndiProviderUrl = CONFIG.getPropertyValue(SqlJndiProviderUrlProperty.class, getConfiguredJndiProviderUrl());
+    m_jndiUrlPkgPrefixes = CONFIG.getPropertyValue(SqlJndiUrlPkgPrefixesProperty.class, getConfiguredJndiUrlPkgPrefixes());
+    m_jdbcMappingName = CONFIG.getPropertyValue(SqlJdbcMappingNameProperty.class, getConfiguredJdbcMappingName());
+    m_jdbcDriverName = CONFIG.getPropertyValue(SqlJdbcDriverNameProperty.class, getConfiguredJdbcDriverName());
+    m_jdbcProps = CONFIG.getPropertyValue(SqlJdbcPropertiesProperty.class, getConfiguredJdbcProperties());
+    m_queryCacheSize = CONFIG.getPropertyValue(SqlJdbcStatementCacheSizeProperty.class, getConfiguredJdbcStatementCacheSize());
+    m_jdbcPoolSize = CONFIG.getPropertyValue(SqlJdbcPoolSizeProperty.class, getConfiguredJdbcPoolSize());
+    m_jdbcPoolConnectionBusyTimeout = CONFIG.getPropertyValue(SqlJdbcPoolConnectionBusyTimeoutProperty.class, getConfiguredJdbcPoolConnectionBusyTimeout());
+    m_jdbcPoolConnectionLifetime = CONFIG.getPropertyValue(SqlJdbcPoolConnectionLifetimeProperty.class, getConfiguredJdbcPoolConnectionLifetime());
+    m_nlsProvider = getConfiguredNlsProvider();
+
+    // load sql style
+    Class<? extends ISqlStyle> styleClass = getConfiguredSqlStyle();
+    ISqlStyle style = null;
+    if (styleClass != null) {
+      try {
+        style = styleClass.newInstance();
+      }
+      catch (Exception e) {
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + styleClass.getName() + "'.", e));
+      }
+    }
+    else {
+      style = new OracleSqlStyle();
+    }
+    m_sqlStyle = style;
 
     // load code and permission names
-    m_permissionNameToDescriptor = new HashMap<String, List<Class<?>>>();
+    m_permissionNameToDescriptor = new HashMap<>();
     IPermissionService psvc = BEANS.get(IPermissionService.class);
     if (psvc != null) {
       for (Class<? extends Permission> d : psvc.getAllPermissionClasses()) {
         List<Class<?>> list = m_permissionNameToDescriptor.get(d.getSimpleName());
         if (list == null) {
-          list = new ArrayList<Class<?>>();
+          list = new ArrayList<>();
           m_permissionNameToDescriptor.put(d.getSimpleName(), list);
         }
         list.add(d);
-        //
+
         list = m_permissionNameToDescriptor.get(d.getName());
         if (list == null) {
-          list = new ArrayList<Class<?>>();
+          list = new ArrayList<>();
           m_permissionNameToDescriptor.put(d.getName(), list);
         }
         list.add(d);
       }
     }
-    m_codeNameToDescriptor = new HashMap<String, List<Class<?>>>();
+
+    m_codeNameToDescriptor = new HashMap<>();
     ICodeService csvc = BEANS.get(ICodeService.class);
     if (csvc != null) {
       for (Class<?> d : csvc.getAllCodeTypeClasses("")) {
         List<Class<?>> list = m_codeNameToDescriptor.get(d.getSimpleName());
         if (list == null) {
-          list = new ArrayList<Class<?>>();
+          list = new ArrayList<>();
           m_codeNameToDescriptor.put(d.getSimpleName(), list);
         }
         list.add(d);
-        //
+
         list = m_codeNameToDescriptor.get(d.getName());
         if (list == null) {
-          list = new ArrayList<Class<?>>();
+          list = new ArrayList<>();
           m_codeNameToDescriptor.put(d.getName(), list);
         }
         list.add(d);
       }
     }
-
   }
 
   /*
@@ -373,42 +421,6 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   protected void execEndTransaction(boolean willBeCommitted) throws ProcessingException {
   }
 
-  protected void initConfig() {
-    String tid = getConfiguredTransactionMemberId();
-    if (tid == null) {
-      tid = getClass().getSimpleName() + "." + "transaction";
-    }
-    setTransactionMemberId(tid);
-    setDirectJdbcConnection(getConfiguredDirectJdbcConnection());
-    setUsername(getConfiguredUsername());
-    setPassword(getConfiguredPassword());
-    setJndiName(getConfiguredJndiName());
-    setJndiInitialContextFactory(getConfiguredJndiInitialContextFactory());
-    setJndiProviderUrl(getConfiguredJndiProviderUrl());
-    setJndiUrlPkgPrefixes(getConfiguredJndiUrlPkgPrefixes());
-    setJdbcMappingName(getConfiguredJdbcMappingName());
-    setJdbcDriverName(getConfiguredJdbcDriverName());
-    setJdbcProperties(getConfiguredJdbcProperties());
-    setJdbcStatementCacheSize(getConfiguredJdbcStatementCacheSize());
-    setJdbcPoolSize(getConfiguredJdbcPoolSize());
-    setJdbcPoolConnectionBusyTimeout(getConfiguredJdbcPoolConnectionBusyTimeout());
-    setJdbcPoolConnectionLifetime(getConfiguredJdbcPoolConnectionLifetime());
-    setNlsProvider(getConfiguredNlsProvider());
-    // sql style
-    Class<? extends ISqlStyle> styleClass = getConfiguredSqlStyle();
-    if (styleClass != null) {
-      try {
-        setSqlStyle(styleClass.newInstance());
-      }
-      catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + styleClass.getName() + "'.", e));
-      }
-    }
-    else {
-      setSqlStyle(new OracleSqlStyle());
-    }
-  }
-
   /*
    * Runtime
    */
@@ -489,73 +501,6 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     return m_maxFetchMemorySize;
   }
 
-  public void setTransactionMemberId(String s) {
-    m_transactionMemberId = s;
-  }
-
-  public void setDirectJdbcConnection(boolean b) {
-    m_directJdbcConnection = b;
-  }
-
-  public void setJdbcStatementCacheSize(int n) {
-    m_queryCacheSize = n;
-  }
-
-  public void setJndiName(String s) {
-    m_jndiName = s;
-  }
-
-  public void setJndiInitialContextFactory(String s) {
-    m_jndiInitialContextFactory = s;
-  }
-
-  public void setJndiProviderUrl(String s) {
-    m_jndiProviderUrl = s;
-  }
-
-  public void setJndiUrlPkgPrefixes(String s) {
-    m_jndiUrlPkgPrefixes = s;
-  }
-
-  /**
-   * Supports ${...} variables resolved by {@link BundleContextUtility#resolve(String)}
-   */
-  public void setJdbcMappingName(String s) {
-    m_jdbcMappingName = ConfigIniUtility.resolve(s);
-  }
-
-  public void setJdbcDriverName(String s) {
-    m_jdbcDriverName = s;
-  }
-
-  public void setJdbcProperties(String s) {
-    m_jdbcProps = s;
-  }
-
-  public void setUsername(String s) {
-    m_defaultUser = s;
-  }
-
-  public void setPassword(String s) {
-    m_defaultPass = s;
-  }
-
-  public void setJdbcPoolSize(int n) {
-    m_jdbcPoolSize = n;
-  }
-
-  public void setJdbcPoolConnectionLifetime(long t) {
-    m_jdbcPoolConnectionLifetime = t;
-  }
-
-  public void setJdbcPoolConnectionBusyTimeout(long t) {
-    m_jdbcPoolConnectionBusyTimeout = t;
-  }
-
-  public void setMaxFetchMemorySize(int maxFetchMemorySize) {
-    m_maxFetchMemorySize = maxFetchMemorySize;
-  }
-
   @Override
   public String getInventory() {
     if (m_pool != null) {
@@ -568,17 +513,9 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     return m_nlsProvider;
   }
 
-  public void setNlsProvider(Class<? extends ScoutTexts> nlsProvider) {
-    m_nlsProvider = nlsProvider;
-  }
-
   @Override
   public ISqlStyle getSqlStyle() {
     return m_sqlStyle;
-  }
-
-  public void setSqlStyle(ISqlStyle sqlStyle) {
-    m_sqlStyle = sqlStyle;
   }
 
   /*

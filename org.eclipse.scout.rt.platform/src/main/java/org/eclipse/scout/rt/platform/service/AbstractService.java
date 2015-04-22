@@ -17,16 +17,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.IServiceInitializer.ServiceInitializerResult;
 
 /**
- * Convenience {@link IService} implementation with support for config.ini
- * variable injection. see {@link ServiceUtility#injectConfigProperties(IService)}
+ * Convenience {@link IService} implementation with support for {@link IServiceInitializer}s.
  */
 public abstract class AbstractService implements IService {
 
   /**
-   * This default implementation calls the default initializer {@link DefaultServiceInitializer} which calls
-   * {@link org.eclipse.scout.rt.platform.service.ServiceUtility#injectConfigParams}(this).
-   * It ensures that properties are getting initialized. This method can be overwritten by
-   * implementers. Implementers should aware the property injection is only done if the super call is made.
+   * This default implementation calls all {@link IServiceInitializer}s.
    */
   @PostConstruct
   protected void initializeService() {

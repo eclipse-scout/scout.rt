@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.exception;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -273,6 +275,12 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
     builder.attr("title", getTitle(), false);
     builder.attr("body", getBody(), false);
     builder.attr("exception", m_exception, false);
+    if (m_exception != null) {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      m_exception.printStackTrace(pw);
+      builder.attr("stacktrace", sw.toString(), false);
+    }
     return builder.toString();
   }
 

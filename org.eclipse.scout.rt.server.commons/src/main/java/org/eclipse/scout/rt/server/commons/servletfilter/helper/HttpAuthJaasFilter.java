@@ -26,9 +26,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
 import org.eclipse.scout.rt.server.commons.servletfilter.security.SecureHttpServletRequestWrapper;
 
 /**
@@ -44,16 +44,13 @@ import org.eclipse.scout.rt.server.commons.servletfilter.security.SecureHttpServ
  * active flag set to true
  */
 public class HttpAuthJaasFilter implements Filter {
-  private FilterConfigInjection m_injection;
 
   @Override
-  public void init(FilterConfig config0) throws ServletException {
-    m_injection = new FilterConfigInjection(config0, getClass());
+  public void init(FilterConfig config) throws ServletException {
   }
 
   @Override
   public void destroy() {
-    m_injection = null;
   }
 
   @Override
@@ -63,12 +60,6 @@ public class HttpAuthJaasFilter implements Filter {
 
     String username = req.getRemoteUser();
     if (isSubjectSetWithCorrectPrincipal(username)) {
-      chain.doFilter(in, out);
-      return;
-    }
-
-    FilterConfigInjection.FilterConfig config = m_injection.getConfig(in);
-    if (!config.isActive()) {
       chain.doFilter(in, out);
       return;
     }
@@ -112,11 +103,8 @@ public class HttpAuthJaasFilter implements Filter {
     if (subject.getPrincipals().size() == 0) {
       return false;
     }
-    String name = subject.getPrincipals().iterator().next().getName();
-    if (!StringUtility.hasText(name) || !StringUtility.contains(name, username)) {
-      return false;
-    }
-    return true;
+    String name = CollectionUtility.firstElement(subject.getPrincipals()).getName();
+    return StringUtility.hasText(name) && name.equalsIgnoreCase(username);
   }
 
   private void continueChainWithPrincipal(Subject subject, final HttpServletRequest req, final HttpServletResponse res, final FilterChain chain) throws IOException, ServletException {

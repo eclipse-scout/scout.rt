@@ -18,9 +18,10 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 public class JavaLogFormatter extends Formatter {
-  private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");
 
-  private Date m_tmpDate = new Date();
+  private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+
+  private final Date m_tmpDate = new Date();
 
   /**
    * Format the given LogRecord.
@@ -31,9 +32,11 @@ public class JavaLogFormatter extends Formatter {
    */
   @Override
   public synchronized String format(LogRecord record) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
+
     //single instance of date to save memory
     m_tmpDate.setTime(record.getMillis());
+
     buf.append(TIMESTAMP_FORMAT.format(m_tmpDate));
     buf.append(" ");
     String levelText = record.getLevel().getName();
@@ -60,7 +63,6 @@ public class JavaLogFormatter extends Formatter {
         StringWriter sw = new StringWriter();
         PrintWriter p = new PrintWriter(sw);
         record.getThrown().printStackTrace(p);
-        p.close();
         buf.append(sw.toString());
       }
       catch (Exception e) {

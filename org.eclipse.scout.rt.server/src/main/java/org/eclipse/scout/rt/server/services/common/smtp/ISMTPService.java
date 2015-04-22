@@ -57,38 +57,17 @@ public interface ISMTPService extends IService {
 
   String getHost();
 
-  void setHost(String host);
-
   int getPort();
-
-  void setPort(int port);
 
   boolean isUseAuthentication();
 
-  void setUseAuthentication(boolean useAuthentication);
-
   String getUsername();
 
-  void setUsername(String username);
-
   String getPassword();
-
-  void setPassword(String password);
-
-  /**
-   * The prefix will be added to every emails subject sent with the smtp
-   * service. <br>
-   * subject = prefix+message.subject
-   *
-   * @param prefix
-   */
-  void setSubjectPrefix(String prefix);
 
   String getSubjectPrefix();
 
   String getDefaultFromEmail();
-
-  void setDefaultFromEmail(String defaultFromEmail);
 
   /**
    * This email is used when no sender address is set on the message to send.
@@ -104,26 +83,9 @@ public interface ISMTPService extends IService {
   boolean isUseSmtps();
 
   /**
-   * Controls whether the communication between this service and the SMTP
-   * host is encrypted (i.e. is using SMTPS)
-   *
-   * @param useSmtps
-   */
-  void setUseSmtps(boolean useSmtps);
-
-  /**
    * @return Returns a comma-separated list of SSL protocols used for
    *         establishing the connection to the SMTP host.
    */
   String getSslProtocols();
-
-  /**
-   * Sets the list of supported SSL protocols used for establishing a
-   * connection to the SMTP host.
-   *
-   * @param sslProtocols
-   *          comma-separated list of protocol names.
-   */
-  void setSslProtocols(String sslProtocols);
 
 }

@@ -18,12 +18,13 @@ import java.util.Iterator;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpSession;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IConfigIniConstants;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -57,8 +58,8 @@ public class GeneralView extends DefaultView {
     String loggingStatusMessage = createLoggingQuickLink(p);
 
     // infos
-    String title = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_NAME, "unknown");
-    String version = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_VERSION, "0.0.0");
+    String title = CONFIG.getPropertyValue(ApplicationNameProperty.class);
+    String version = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
 
     p.print("Product: name=" + title + ", version=" + version);
     p.br();

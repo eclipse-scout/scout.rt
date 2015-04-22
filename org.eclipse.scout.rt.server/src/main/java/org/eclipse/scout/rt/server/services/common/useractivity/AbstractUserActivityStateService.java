@@ -21,12 +21,12 @@ import org.eclipse.scout.rt.shared.services.common.useractivity.UserActivityClie
 import org.eclipse.scout.rt.shared.services.common.useractivity.UserStatusMap;
 
 public abstract class AbstractUserActivityStateService extends AbstractService implements IUserActivityStateService {
-  private Object m_usersLock;
-  private TTLCache<Long, Integer> m_users;
+  private final Object m_usersLock;
+  private final TTLCache<Long, Integer> m_users;
 
   public AbstractUserActivityStateService() {
     m_usersLock = new Object();
-    m_users = new TTLCache<Long, Integer>(60000L);
+    m_users = new TTLCache<>(60000L);
   }
 
   /**

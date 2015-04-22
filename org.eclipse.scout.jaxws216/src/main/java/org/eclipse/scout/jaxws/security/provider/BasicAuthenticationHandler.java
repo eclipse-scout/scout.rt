@@ -31,7 +31,6 @@ import org.eclipse.scout.jaxws.annotation.ScoutTransaction;
 import org.eclipse.scout.jaxws.internal.JaxWsConstants;
 import org.eclipse.scout.jaxws.internal.JaxWsHelper;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -56,8 +55,6 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
   public BasicAuthenticationHandler(final IAuthenticator authenticator) {
     m_authenticator = Assertions.assertNotNull(authenticator, "authenticator must not be null");
     m_transactionalAuthenticator = m_authenticator.getClass().getAnnotation(ScoutTransaction.class) != null;
-
-    ServiceUtility.injectConfigProperties(this);
   }
 
   @Override

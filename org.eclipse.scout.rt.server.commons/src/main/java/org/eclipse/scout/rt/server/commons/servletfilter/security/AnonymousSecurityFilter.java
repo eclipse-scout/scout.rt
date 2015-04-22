@@ -30,4 +30,8 @@ public class AnonymousSecurityFilter extends AbstractChainableSecurityFilter {
     return STATUS_CONTINUE_WITH_PRINCIPAL;
   }
 
+  @Override
+  public void destroy() {
+  }
+
 }

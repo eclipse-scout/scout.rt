@@ -27,8 +27,8 @@ import javax.swing.JLabel;
 import javax.swing.RootPaneContainer;
 import javax.swing.UIManager;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
-import org.eclipse.scout.rt.platform.IConfigIniConstants;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
 
@@ -42,7 +42,7 @@ public class EmbeddedSplashWindow implements ISplashWindow {
 
   public EmbeddedSplashWindow(RootPaneContainer owner) {
     m_owner = owner;
-    m_versionText = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_VERSION, "0.0.0");
+    m_versionText = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
   }
 
   @Override

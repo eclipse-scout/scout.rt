@@ -10,57 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.TierProperty;
 
 /**
- * Indicates whether the osgi is running in back-end, front-end or undetermined
+ * Indicates whether the application is running in back-end, front-end or undetermined
  * <p>
- * see {@link IService} for description of this indicator
- * <p>
- * When scout.osgi.tier is not set, the default value is automatically determined. </ul>
+ * When <code>scout.tier</code> is not set, the default value is automatically detected.
+ *
+ * @see TierProperty
+ * @see IService
  */
 public final class TierState {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TierState.class);
   private static final Tier VALUE;
 
-  public static Tier get() {
-    return VALUE;
-  }
-
-  public static enum Tier {
-    /**
-     * scout client on classpath
-     */
-    FrontEnd,
-    /**
-     * scout server on classpath
-     */
-    BackEnd,
-    /**
-     * neither client nor server found on classpath
-     */
-    Undefined
-  }
-
   static {
-    String s = ConfigIniUtility.getProperty("scout.osgi.tier");
-    if (StringUtility.isNullOrEmpty(s)) {
-      s = ConfigIniUtility.getProperty("scout.tier");
-    }
-    if ("frontend".equalsIgnoreCase(s)) {
-      VALUE = Tier.FrontEnd;
-    }
-    else if ("backend".equalsIgnoreCase(s)) {
-      VALUE = Tier.BackEnd;
-    }
-    else if ("undefined".equalsIgnoreCase(s)) {
-      VALUE = Tier.Undefined;
-    }
-    else {
+    Tier result = CONFIG.getPropertyValue(TierProperty.class);
+    if (result == null) {
       //auto detect
       boolean hasClient = false;
       boolean hasServer = false;
@@ -84,18 +54,37 @@ public final class TierState {
       }
 
       if (hasClient) {
-        VALUE = Tier.FrontEnd;
+        result = Tier.FrontEnd;
       }
       else if (hasServer) {
-        VALUE = Tier.BackEnd;
+        result = Tier.BackEnd;
       }
       else {
-        VALUE = Tier.Undefined;
+        result = Tier.Undefined;
       }
     }
+    VALUE = result;
+  }
+
+  public static Tier get() {
+    return VALUE;
+  }
+
+  public static enum Tier {
+    /**
+     * scout client on classpath
+     */
+    FrontEnd,
+    /**
+     * scout server on classpath
+     */
+    BackEnd,
+    /**
+     * neither client nor server found on classpath
+     */
+    Undefined
   }
 
   private TierState() {
   }
-
 }

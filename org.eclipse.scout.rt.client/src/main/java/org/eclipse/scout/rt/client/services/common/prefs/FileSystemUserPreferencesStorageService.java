@@ -28,6 +28,8 @@ import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientConfigProperties.UserAreaProperty;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.shared.services.common.prefs.AbstractUserPreferencesStorageService;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 
@@ -39,7 +41,6 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FileSystemUserPreferencesStorageService.class);
 
   public static final String PROP_USER_HOME = "user.home";
-  public static final String PROP_USER_AREA = "user.area";
 
   public static final String SETTINGS_SUB_DIR = ".settings";
   public static final char NODE_NAME_DELIM = '-';
@@ -160,17 +161,18 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
   }
 
   protected String getBaseFolder() {
-    String location = ConfigIniUtility.getProperty(PROP_USER_AREA);
+    UserAreaProperty userAreaProperty = CONFIG.getProperty(UserAreaProperty.class);
+    String location = userAreaProperty.getValue();
     if (location == null) {
       // legacy
       String legacyUserArea = "osgi.user.area";
       location = ConfigIniUtility.getProperty(legacyUserArea);
       if (location == null) {
         location = new File(ConfigIniUtility.getProperty(PROP_USER_HOME), "user").getAbsolutePath();
-        LOG.warn("No user area property found. Using '" + location + "' as fallback. Consider specifying a user area using property '" + PROP_USER_AREA + "'.");
+        LOG.warn("No user area property found. Using '" + location + "' as fallback. Consider specifying a user area using property '" + userAreaProperty.getKey() + "'.");
       }
       else {
-        LOG.warn("Legacy user area property found: '" + legacyUserArea + "'. Consider migrating to the new one: '" + PROP_USER_AREA + "'.");
+        LOG.warn("Legacy user area property found: '" + legacyUserArea + "'. Consider migrating to the new one: '" + userAreaProperty.getKey() + "'.");
       }
     }
     location = location.trim();
@@ -185,11 +187,4 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
     }
     return location;
   }
-
-  protected String substituteVar(String source, String var, String prop) {
-    String value = System.getProperty(prop, "");
-    int len = value.length() + source.length() - var.length();
-    return new StringBuilder(len).append(value).append(source.substring(var.length())).toString();
-  }
-
 }

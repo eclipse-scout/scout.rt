@@ -20,14 +20,14 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IConfigIniConstants;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 
@@ -117,12 +117,10 @@ public abstract class AbstractJmsService<T> extends AbstractService {
   }
 
   protected String createClientId() {
-    String serverVersion = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_VERSION);
+    String serverVersion = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append(" ");
-    if (serverVersion != null) {
-      sb.append(serverVersion).append(" ");
-    }
+    sb.append(serverVersion).append(" ");
     sb.append("nodeId=").append(BEANS.get(IClusterSynchronizationService.class).getNodeId()).append(" ");
     sb.append("registered at ");
     sb.append(DateUtility.format(new Date(), "yyyy-MM-dd HH:mm:ss,SSS"));

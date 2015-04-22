@@ -30,21 +30,21 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
-import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.ChainableFilterFailoverProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.ChainableFilterRealmProperty;
+import org.eclipse.scout.rt.server.commons.config.WebXmlConfigManager;
 
 /**
  * <h4>AbstractChainableSecurityFilter</h4> The following properties can be set
- * in the <code>config.ini</code> file:
+ * in the <code>web.xml</code> file:
  * <ul>
- * <li><code>&lt;fully qualified name of class&gt;#active=true/false</code></li>
- * <li><code>&lt;fully qualified name of class&gt;#realm=abcde</code> <b>required</b></li>
- * <li><code>&lt;fully qualified name of class&gt;#failover=true/false</code> <b>default false</b></li>
+ * <li><code>realm=abcde</code> <b>default: "Default"</b></li>
+ * <li><code>failover=true/false</code> <b>default false</b></li>
  * </ul>
  * <p>
  * <h5>NOTE</h5> All security filters inheriting from {@link AbstractChainableSecurityFilter} are chainable. What means
- * can be used together with other Filters. The <code>runOrder</code> flag of the extension point defines the run order
- * of chainable security filters. To make this filter chainable set the flag failover to true. <b>Ensure to set the
- * failover flag on the last security filter to false!</b>
+ * can be used together with other Filters. To make this filter chainable set the flag failover to true. <b>Ensure to
+ * set the failover flag on the last security filter to false!</b>
  * <p>
  * Make sure to dectivate session persistence. In tomcat: in server.xml inside <Context> tag add
  *
@@ -61,12 +61,9 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
   public static final int STATUS_BREAK_CHAIN = 2;
   public static final int STATUS_CONTINUE_WITH_PRINCIPAL = 3;
 
+  private WebXmlConfigManager m_configManager;
   private boolean m_failover;
   private String m_realm;
-  private FilterConfigInjection m_injection;
-
-  public AbstractChainableSecurityFilter() {
-  }
 
   /**
    * identifier for this filter.
@@ -78,32 +75,20 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
   }
 
   @Override
-  public void init(FilterConfig config0) throws ServletException {
-    m_injection = new FilterConfigInjection(config0, getClass());
-    FilterConfigInjection.FilterConfig config = m_injection.getAnyConfig();
-    String failoverString = config.getInitParameter("failover");
-    m_failover = Boolean.parseBoolean(failoverString);
-    String realmParam = config.getInitParameter("realm");
-    if (realmParam == null) {
-      realmParam = "Default";
-    }
-    m_realm = realmParam;
+  public void init(FilterConfig config) throws ServletException {
+    m_configManager = new WebXmlConfigManager(config);
+
+    // read config
+    m_failover = m_configManager.getPropertyValue(ChainableFilterFailoverProperty.class);
+    m_realm = m_configManager.getPropertyValue(ChainableFilterRealmProperty.class);
   }
 
-  @Override
-  public void destroy() {
-    m_injection = null;
+  protected WebXmlConfigManager getConfigManager() {
+    return m_configManager;
   }
 
   @Override
   public final void doFilter(ServletRequest in, ServletResponse out, final FilterChain chain) throws IOException, ServletException {
-    //ticket 94794
-    FilterConfigInjection.FilterConfig config = m_injection.getConfig(in);
-    if (!config.isActive()) {
-      chain.doFilter(in, out);
-      return;
-    }
-    //
     final HttpServletRequest req = (HttpServletRequest) in;
     final HttpServletResponse res = (HttpServletResponse) out;
     //touch the session so it is effectively used

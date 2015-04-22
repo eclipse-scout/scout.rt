@@ -12,21 +12,21 @@ package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.SecurityUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenHashContentProperty;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLifeProperty;
 
 public class DefaultAuthToken {
-
-  public static final String PROP_TOKEN_TIME_TO_LIFE = "scout.auth.token.ttl";
-  public static final String PROP_USE_CONTENT_HASH = "scout.auth.token.hash.content";
 
   /**
    * According to HTTP spec
@@ -35,7 +35,12 @@ public class DefaultAuthToken {
    */
   protected static final char TOKEN_DELIM = ';';
   protected static final Pattern TOKEN_SPLIT_REGEX = Pattern.compile(Character.toString(TOKEN_DELIM));
+
   protected static final byte[] SALT = Base64Utility.decode("tIJdVyLxYDCoXZOAFlZ8Xw==");
+  protected static final byte[] PRIVATE_KEY = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
+  protected static final byte[] PUBLIC_KEY = CONFIG.getPropertyValue(AuthTokenPublicKeyProperty.class);
+  protected static final long TOKEN_TTL = CONFIG.getPropertyValue(AuthTokenTimeToLifeProperty.class);
+  protected static final boolean USE_CONTENT_HASH = CONFIG.getPropertyValue(AuthTokenHashContentProperty.class);
 
   private final String m_userId;
   private final long m_validUntil;
@@ -78,7 +83,7 @@ public class DefaultAuthToken {
 
   public DefaultAuthToken(String userId, byte[] data, String[] customTokens) throws ProcessingException {
     m_userId = userId;
-    m_validUntil = System.currentTimeMillis() + getConfiguredTokenTimeToLife();
+    m_validUntil = System.currentTimeMillis() + TOKEN_TTL;
     if (customTokens == null) {
       m_customTokens = null;
     }
@@ -88,26 +93,25 @@ public class DefaultAuthToken {
     m_contentHash = calcContentHash(data);
   }
 
-  protected long getConfiguredTokenTimeToLife() {
-    return ConfigIniUtility.getPropertyLong(PROP_TOKEN_TIME_TO_LIFE, TimeUnit.MINUTES.toMillis(10));
-  }
-
   protected byte[] calcContentHash(byte[] content) throws ProcessingException {
     if (content == null) {
       return null;
     }
 
-    boolean useContentHash = ConfigIniUtility.getPropertyBoolean(PROP_USE_CONTENT_HASH, true);
-    if (!useContentHash) {
+    if (!USE_CONTENT_HASH) {
       return null;
     }
 
     return SecurityUtility.hash(content, SALT);
   }
 
-  protected void calcSignature(byte[] privateKey, String clearTextPart) throws ProcessingException {
+  public static boolean isActive() {
+    return PRIVATE_KEY != null || PUBLIC_KEY != null;
+  }
+
+  protected void calcSignature(String clearTextPart) throws ProcessingException {
     try {
-      m_signature = SecurityUtility.createSignature(privateKey, clearTextPart.getBytes("UTF-8"));
+      m_signature = SecurityUtility.createSignature(PRIVATE_KEY, clearTextPart.getBytes("UTF-8"));
     }
     catch (UnsupportedEncodingException e) {
       throw new ProcessingException("Could not find utf-8 encoding.", e);
@@ -168,21 +172,29 @@ public class DefaultAuthToken {
     return Arrays.equals(calculatedHash, m_contentHash);
   }
 
-  public boolean isSignatureValid(byte[] publicKey) throws ProcessingException {
+  public boolean isSignatureValid() throws ProcessingException {
+    if (!isActive()) {
+      return false;
+    }
+
     try {
-      return SecurityUtility.verifySignature(publicKey, toString().getBytes("UTF-8"), m_signature);
+      return SecurityUtility.verifySignature(PUBLIC_KEY, toString().getBytes("UTF-8"), m_signature);
     }
     catch (UnsupportedEncodingException e) {
       throw new ProcessingException("Could not find utf-8 encoding.", e);
     }
   }
 
-  public String toSignedString(byte[] privateKey) throws ProcessingException {
+  public String toSignedString() throws ProcessingException {
+    if (!isActive()) {
+      return null;
+    }
+
     String clearTextPart = toString();
     StringBuilder sb = new StringBuilder(clearTextPart);
 
     // sign it
-    calcSignature(privateKey, clearTextPart);
+    calcSignature(clearTextPart);
     sb.append(TOKEN_DELIM);
     sb.append(Base64Utility.encode(m_signature));
 

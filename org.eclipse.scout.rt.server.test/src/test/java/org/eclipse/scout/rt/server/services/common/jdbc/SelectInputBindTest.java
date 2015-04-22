@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldBeanData;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldBeanData.TableFieldBeanDataRowData;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldData;
-import org.eclipse.scout.rt.server.services.common.jdbc.oracle.OracleSqlStyle;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -306,7 +305,6 @@ public class SelectInputBindTest {
 
   private static SqlServiceMock createSqlServiceMock() {
     SqlServiceMock sql = new SqlServiceMock();
-    sql.setSqlStyle(new OracleSqlStyle());
     sql.clearProtocol();
     return sql;
   }

@@ -15,9 +15,10 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.HttpClientDebugProperty;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
@@ -29,7 +30,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 public class HttpBackgroundExecutable implements IHttpBackgroundExecutable {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HttpBackgroundExecutable.class);
-  public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.client.http.debug";
 
   private final Object m_callerLock;
   private final IServiceTunnelRequest m_req;
@@ -43,11 +43,7 @@ public class HttpBackgroundExecutable implements IHttpBackgroundExecutable {
     m_req = req;
     m_callerLock = callerLock;
     m_tunnel = tunnel;
-    m_debug = isDebug();
-  }
-
-  private static boolean isDebug() {
-    return ConfigIniUtility.getPropertyBoolean(HTTP_DEBUG_PARAM, false);
+    m_debug = CONFIG.getPropertyValue(HttpClientDebugProperty.class);
   }
 
   @Override

@@ -36,37 +36,43 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
-import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJdbcDriverNameProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJdbcMappingNameProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJdbcPasswordProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJdbcSelectUserPassProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJdbcUsernameProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJndiInitialContextFactoryProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJndiNameProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJndiProviderUrlProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterJndiUrlPkgPrefixesProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.DataSourceFilterUseJndiProperty;
 
 /**
- * <h4>DataSourceSecurityFilter</h4> The following properties can be set in the <code>config.ini</code> file:
+ * <h4>DataSourceSecurityFilter</h4> The following properties can be set in the <code>web.xml</code> file:
  * <ul>
- * <li><code>&lt;fully qualified name of class&gt;#active=true/false</code> <b>might be set in the extension point</b></li>
- * <li><code>&lt;fully qualified name of class&gt;#realm=abcde</code> <b>required</b></li>
- * <li><code>&lt;fully qualified name of class&gt;#failover=true/false</code> <b>default false</b></li>
+ * <li><code>realm=abcde</code> <b>default "Default"</b></li>
+ * <li><code>failover=true/false</code> <b>default false</b></li>
  * <li>
- * <code>&lt;fully qualified name of class&gt;#jdbcDriverName=[e.g. oracle.jdbc.OracleDriver]</code> <b>required for
- * JDBC</b></li>
+ * <code>jdbcDriverName=[e.g. oracle.jdbc.OracleDriver]</code> <b>required for JDBC</b></li>
  * <li>
- * <code>&lt;fully qualified name of class&gt;#jdbcMappingName=[e.g. jdbc:oracle:thin:@dbUrl:1521:DBNAME]</code>
+ * <code>jdbcMappingName=[e.g. jdbc:oracle:thin:@dbUrl:1521:DBNAME]</code> <b>required for JDBC</b></li>
+ * <li><code>jdbcUsername=USER</code> <b>required for JDBC, optional JNDI</b></li>
+ * <li><code>jdbcPassword=PASS</code> <b>required for JDBC, optional JNDI</b></li>
+ * <li><code>selectUserPass=<br>
+ * [e.g. SELECT LOWER(USERNAME), SALT FROM TAB_USER WHERE ACCOUNT_LOCKED=0 AND NVL(EVT_ACCOUNT_EXPIRY,SYSDATE)>=SYSDATE AND LOWER(USERNAME)=? AND PASSWORD=?]</code>
  * <b>required for JDBC</b></li>
- * <li><code>&lt;fully qualified name of class&gt;#jdbcUsername=USER</code> <b>required for JDBC, optional JNDI</b></li>
- * <li><code>&lt;fully qualified name of class&gt;#jdbcPassword=PASS</code> <b>required for JDBC, optional JNDI</b></li>
- * <li><code>&lt;fully qualified name of class&gt;#selectUserPass=<br>
- * [e.g. SELECT LOWER(USERNAME) FROM ORS_WEB_USER WHERE ACCOUNT_LOCKED=0 AND NVL(EVT_ACCOUNT_EXPIRY,SYSDATE)>=SYSDATE AND LOWER(USERNAME)=? AND PASSWORD=?]</code>
- * <b>required</b></li>
  * <li>
- * <code>&lt;fully qualified name of class&gt;#useJndiConnection=false</code> <b>default false</b></li>
+ * <code>useJndiConnection=false</code> <b>default false</b></li>
  * <li>
- * <code>&lt;fully qualified name of class&gt;#jndiName=[e.g. jdbc/jndiDbname]</code> <b>required for JNDI</b></li>
+ * <code>jndiName=[e.g. jdbc/jndiDbname]</code> <b>required for JNDI</b></li>
  * <li>
- * <code>&lt;fully qualified name of class&gt;#jndiInitialContextFactory=</code></li>
- * <li><code>&lt;fully qualified name of class&gt;#jndiProviderUrl=</code></li>
- * <li><code>&lt;fully qualified name of class&gt;#jndiUrlPkgPrefixes=</code></li>
+ * <code>jndiInitialContextFactory=</code></li>
+ * <li><code>jndiProviderUrl=</code></li>
+ * <li><code>jndiUrlPkgPrefixes=</code></li>
  * </ul>
  * <p>
- * , Michael Rudolf
  *
+ * @author Michael Rudolf
  * @since 1.0.3 06.02.2009
  */
 public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
@@ -77,13 +83,14 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
   /**
    * Default random salt that will be used to hash the passwords. Should be replaced by projects with an implementation
    * that uses a separate salt for each password.
+   *
+   * @see #isValidUser(String, String, Connection)
    */
   private static final byte[] DEFAULT_SALT = Base64Utility.decode("X89TeeW9tSB0KQkYex3/LQ==");
 
   // init params
   private String m_jdbcUserName;
   private String m_jdbcPassword;
-
   private String m_jdbcDriverName;
   private String m_jdbcMappingName;
   private String m_selectStatement;
@@ -95,30 +102,24 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
   private String m_jndiUrlPkgPrefixes;
 
   @Override
-  public void init(FilterConfig config0) throws ServletException {
-    super.init(config0);
-    FilterConfigInjection.FilterConfig config = new FilterConfigInjection(config0, getClass()).getAnyConfig();
+  public void init(FilterConfig config) throws ServletException {
+    super.init(config);
 
-    String useJndiConnectionString = config.getInitParameter("useJndiConnection");
-    m_useJndiConnection = Boolean.parseBoolean(useJndiConnectionString);
-
-    m_jdbcDriverName = getInitParam(config, "jdbcDriverName", !m_useJndiConnection);
-    m_jdbcMappingName = getInitParam(config, "jdbcMappingName", !m_useJndiConnection);
-    m_jdbcUserName = getInitParam(config, "jdbcUsername", false);
-    m_jdbcPassword = getInitParam(config, "jdbcPassword", false);
-    m_selectStatement = getInitParam(config, "selectUserPass", !m_useJndiConnection);
-    m_jndiName = getInitParam(config, "jndiName", m_useJndiConnection);
-    m_jndiInitialContextFactory = config.getInitParameter("jndiInitialContextFactory");
-    m_jndiProviderUrl = config.getInitParameter("jndiProviderUrl");
-    m_jndiUrlPkgPrefixes = config.getInitParameter("jndiUrlPkgPrefixes");
+    // read config
+    m_useJndiConnection = getConfigManager().getPropertyValue(DataSourceFilterUseJndiProperty.class);
+    m_jdbcDriverName = getConfigManager().getPropertyValue(DataSourceFilterJdbcDriverNameProperty.class);
+    m_jdbcMappingName = getConfigManager().getPropertyValue(DataSourceFilterJdbcMappingNameProperty.class);
+    m_jdbcUserName = getConfigManager().getPropertyValue(DataSourceFilterJdbcUsernameProperty.class);
+    m_jdbcPassword = getConfigManager().getPropertyValue(DataSourceFilterJdbcPasswordProperty.class);
+    m_selectStatement = getConfigManager().getPropertyValue(DataSourceFilterJdbcSelectUserPassProperty.class);
+    m_jndiName = getConfigManager().getPropertyValue(DataSourceFilterJndiNameProperty.class);
+    m_jndiInitialContextFactory = getConfigManager().getPropertyValue(DataSourceFilterJndiInitialContextFactoryProperty.class);
+    m_jndiProviderUrl = getConfigManager().getPropertyValue(DataSourceFilterJndiProviderUrlProperty.class);
+    m_jndiUrlPkgPrefixes = getConfigManager().getPropertyValue(DataSourceFilterJndiUrlPkgPrefixesProperty.class);
   }
 
-  private String getInitParam(FilterConfig filterConfig, String paramName, boolean requierd) throws ServletException {
-    String paramValue = filterConfig.getInitParameter(paramName);
-    if (requierd && paramValue == null) {
-      throw new ServletException("Missing init-param with name '" + paramName + "'.");
-    }
-    return paramValue;
+  @Override
+  public void destroy() {
   }
 
   @Override
@@ -129,8 +130,7 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
       String user = a[0].toLowerCase();
       String pass = a[1];
       if (user != null && pass != null) {
-        String passEncrypted = encryptPass(pass);
-        if (isValidUser(user, passEncrypted)) {
+        if (isValidUser(user, pass)) {
           holder.setPrincipal(new SimplePrincipal(user));
           return STATUS_CONTINUE_WITH_PRINCIPAL;
         }
@@ -160,56 +160,47 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
     BEANS.get(IHttpSessionCacheService.class).put(PROP_BASIC_ATTEMPT, attempts, req, res);
   }
 
+  protected Connection createConnection() throws Exception {
+    if (m_useJndiConnection) {
+      return createJndiConnection();
+    }
+    else {
+      return createJdbcDirectConnection();
+    }
+  }
+
   protected boolean isValidUser(String username, String password) throws ServletException {
-    Connection databaseConnection = null;
-    try {
-
-      if (m_useJndiConnection) {
-        databaseConnection = createJndiConnection();
-      }
-      else {
-        databaseConnection = createJdbcDirectConnection();
-      }
-      return isValidUser(username, password, databaseConnection);
-
+    try (Connection connection = createConnection()) {
+      return isValidUser(username, password, connection);
     }
     catch (Exception e) {
       LOG.error("Cannot SELECT user/pass.", e);
       throw new ServletException(e.getMessage(), e);
     }
-    finally {
-      try {
-        if (databaseConnection != null) {
-          databaseConnection.close();
-          databaseConnection = null;
-        }
-      }
-      catch (SQLException e) {
-        LOG.warn("Exception in close connection!", e);
-      }
-    }
   }
 
-  protected boolean isValidUser(String username, String password, Connection connection) throws SQLException {
-    PreparedStatement stmt = null;
-    try {
-      stmt = connection.prepareStatement(m_selectStatement);
+  /**
+   * This method can be overwritten by projects to use a custom salt per user instead of the pre-defined one of this
+   * filter.
+   *
+   * @param username
+   *          The username
+   * @param password
+   *          The clear text password
+   * @param connection
+   *          The connection to use to verify the username and password
+   * @return <code>true</code> if it is valid. <code>false</code> otherwise.
+   * @throws Exception
+   */
+  protected boolean isValidUser(String username, String password, Connection connection) throws Exception {
+    password = encryptPass(password);
+
+    try (PreparedStatement stmt = connection.prepareStatement(m_selectStatement)) {
       stmt.setString(1, username);
       stmt.setString(2, password);
       stmt.execute();
       ResultSet resultSet = stmt.getResultSet();
       return (resultSet.next() && resultSet.getString(1).equals(username));
-    }
-    finally {
-      try {
-        if (stmt != null) {
-          stmt.close();
-          stmt = null;
-        }
-      }
-      catch (SQLException e) {
-        LOG.warn("Exception in close stmt!", e);
-      }
     }
   }
 

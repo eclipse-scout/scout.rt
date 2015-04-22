@@ -45,6 +45,22 @@ public class MultiStatusTest {
   }
 
   @Test
+  public void testMultiStatusOk() {
+    MultiStatus s = new MultiStatus();
+    s.add(Status.OK_STATUS);
+    s.add(Status.OK_STATUS);
+    assertTrue(s.isOK());
+  }
+
+  @Test
+  public void testMultiStatusNok() {
+    MultiStatus s = new MultiStatus();
+    s.add(Status.OK_STATUS);
+    s.add(new Status("error", IStatus.ERROR));
+    assertFalse(s.isOK());
+  }
+
+  @Test
   public void testStatusHierarchy() {
     MultiStatus root = new MultiStatus();
     root.add(new Status("aaa", IStatus.INFO));

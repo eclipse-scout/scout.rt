@@ -17,9 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.security.SimplePrincipal;
@@ -33,34 +31,19 @@ import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
  */
 public class ServiceTunnelAccessTokenFilter implements Filter {
 
-  public static final String PROP_PUBLIC_KEY = "scout.auth.publickey";
-
-  private byte[] m_publicKey;
-
   @Override
-  public void init(FilterConfig config0) throws ServletException {
-    String publicKeyForSignatureValidation = ConfigIniUtility.getProperty(PROP_PUBLIC_KEY);
-    if (StringUtility.hasText(publicKeyForSignatureValidation)) {
-      m_publicKey = Base64Utility.decode(publicKeyForSignatureValidation);
-      if (m_publicKey == null || m_publicKey.length < 1) {
-        throw new ServletException("Invalid digital signature public key.");
-      }
-    }
-    else {
-      throw new ServletException("Missing public key for digital signature verification. Use property '" + PROP_PUBLIC_KEY + "' in " + ConfigIniUtility.CONFIG_INI + " to specify a base64 encoded public key.");
-    }
+  public void init(FilterConfig config) throws ServletException {
   }
 
   @Override
   public void destroy() {
-    m_publicKey = null;
   }
 
   @Override
   public void doFilter(ServletRequest in, ServletResponse out, final FilterChain chain) throws IOException, ServletException {
     HttpServletRequest req = (HttpServletRequest) in;
 
-    if (m_publicKey == null) {
+    if (!DefaultAuthToken.isActive()) {
       fail(out);
       return;
     }
@@ -86,7 +69,7 @@ public class ServiceTunnelAccessTokenFilter implements Filter {
 
     try {
       // check signature
-      if (!token.isSignatureValid(m_publicKey)) {
+      if (!token.isSignatureValid()) {
         fail(out);
         return;
       }

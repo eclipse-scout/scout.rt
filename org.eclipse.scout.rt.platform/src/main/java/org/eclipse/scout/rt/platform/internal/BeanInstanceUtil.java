@@ -87,10 +87,9 @@ public final class BeanInstanceUtil {
         }
       }
       catch (Exception e) {
-        LOG.error(String.format("Could not call initialze method '%s' on '%s'.", method.getName(), instance.getClass()));
+        LOG.error(String.format("Could not call initialze method '%s' on '%s'.", method.getName(), instance.getClass()), e);
       }
     }
-
   }
 
   private static void collectPostConstructRec(Class<?> clazz, LinkedHashMap<String /*method name*/, Method> outMap) {

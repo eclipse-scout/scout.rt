@@ -24,7 +24,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CollectorVisitor;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -36,6 +35,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.client.ClientConfigProperties.MemoryPolicyProperty;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.OfflineState;
@@ -230,7 +231,18 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
 
   protected void initConfig() {
     m_virtualDesktop = new VirtualDesktop();
-    setMemoryPolicy(new LargeMemoryPolicy());
+
+    String memPolicyValue = CONFIG.getPropertyValue(MemoryPolicyProperty.class);
+    if ("small".equals(memPolicyValue)) {
+      setMemoryPolicy(new SmallMemoryPolicy());
+    }
+    else if ("medium".equals(memPolicyValue)) {
+      setMemoryPolicy(new MediumMemoryPolicy());
+    }
+    else {
+      setMemoryPolicy(new LargeMemoryPolicy());
+    }
+
     // add client notification listener
     IClientNotificationConsumerService clientNotificationConsumerService = BEANS.get(IClientNotificationConsumerService.class);
     if (clientNotificationConsumerService != null) {
@@ -270,14 +282,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     if (isActive()) {
       throw new IllegalStateException("session is active");
     }
-    String policy = ConfigIniUtility.getProperty("org.eclipse.scout.memory");
-    if ("small".equals(policy)) {
-      setMemoryPolicy(new SmallMemoryPolicy());
-    }
-    else if ("medium".equals(policy)) {
-      setMemoryPolicy(new MediumMemoryPolicy());
-    }
-
     interceptLoadSession();
     setActive(true);
   }

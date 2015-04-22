@@ -8,12 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform;
+package org.eclipse.scout.rt.platform.config;
+
 
 /**
  *
  */
-public interface IConfigIniConstants {
-  String APPLICATION_VERSION = "scout.application.version";
-  String APPLICATION_NAME = "scout.application.name";
+public abstract class AbstractStringConfigProperty extends AbstractConfigProperty<String> {
+
+  @Override
+  protected String parse(String value) {
+    return value;
+  }
 }

@@ -26,17 +26,22 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.GzipFilterGetMinSizeProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.GzipFilterGetPatternProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.GzipFilterPostMinSizeProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.GzipFilterPostPatternProperty;
+import org.eclipse.scout.rt.server.commons.config.WebXmlConfigManager;
 
 /**
  * Supports the servlet init-params
  * <p>
- * get_min_size = minimum size that is compressed, default {@value #DEFAULT_GET_MIN_SIZE} = 64
+ * get_min_size = minimum size that is compressed
  * <p>
- * post_min_size = minimum size that is compressed, default {@link #DEFAULT_POST_MIN_SIZE} = 64
+ * post_min_size = minimum size that is compressed
  * <p>
- * get_pattern = regex of pathInfo that is compressed, default {@link #DEFAULT_GET_PATTERN} = '*(html|css|js)'
+ * get_pattern = regex of pathInfo that is compressed
  * <p>
- * post_pattern = regex of pathInfo that is compressed, default {@link #DEFAULT_POST_PATTERN} = '/json'
+ * post_pattern = regex of pathInfo that is compressed
  */
 public class GzipServletFilter implements Filter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(GzipServletFilter.class);
@@ -44,45 +49,28 @@ public class GzipServletFilter implements Filter {
   public static final String ACCEPT_ENCODING = "Accept-Encoding";
   public static final String CONTENT_ENCODING = "Content-Encoding";
   public static final String GZIP = "gzip";
-
-  public static final int DEFAULT_GET_MIN_SIZE = 64;
-  public static final int DEFAULT_POST_MIN_SIZE = 64;
-
-  public static final Pattern DEFAULT_GET_PATTERN = Pattern.compile(".*\\.(html|css|js)", Pattern.CASE_INSENSITIVE);
-  public static final Pattern DEFAULT_POST_PATTERN = Pattern.compile(".*/json", Pattern.CASE_INSENSITIVE);
-
   public static final String URL_PARAM_COMPRESS_HINT = "compress";
   public static final String SESSION_ATTRIBUTE_COMPRESS_HINT = GzipServletFilter.class.getName() + "#compress";
 
-  private int m_getMinSize = DEFAULT_GET_MIN_SIZE;
-  private int m_postMinSize = DEFAULT_POST_MIN_SIZE;
-
-  private Pattern m_getPattern = DEFAULT_GET_PATTERN;
-  private Pattern m_postPattern = DEFAULT_POST_PATTERN;
+  private WebXmlConfigManager m_configManager;
+  private int m_getMinSize;
+  private int m_postMinSize;
+  private Pattern m_getPattern;
+  private Pattern m_postPattern;
 
   @Override
-  public void init(FilterConfig filterConfig) throws ServletException {
-    String s;
+  public void init(FilterConfig config) throws ServletException {
+    m_configManager = new WebXmlConfigManager(config);
 
-    s = filterConfig.getInitParameter("get_min_size");
-    if (s != null) {
-      m_getMinSize = Integer.parseInt(s);
-    }
+    // read config
+    m_getMinSize = m_configManager.getPropertyValue(GzipFilterGetMinSizeProperty.class);
+    m_postMinSize = m_configManager.getPropertyValue(GzipFilterPostMinSizeProperty.class);
+    m_getPattern = Pattern.compile(m_configManager.getPropertyValue(GzipFilterGetPatternProperty.class), Pattern.CASE_INSENSITIVE);
+    m_postPattern = Pattern.compile(m_configManager.getPropertyValue(GzipFilterPostPatternProperty.class), Pattern.CASE_INSENSITIVE);
+  }
 
-    s = filterConfig.getInitParameter("post_min_size");
-    if (s != null) {
-      m_getMinSize = Integer.parseInt(s);
-    }
-
-    s = filterConfig.getInitParameter("get_pattern");
-    if (s != null) {
-      m_getPattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
-    }
-
-    s = filterConfig.getInitParameter("post_pattern");
-    if (s != null) {
-      m_postPattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
-    }
+  protected WebXmlConfigManager getConfigManager() {
+    return m_configManager;
   }
 
   @Override

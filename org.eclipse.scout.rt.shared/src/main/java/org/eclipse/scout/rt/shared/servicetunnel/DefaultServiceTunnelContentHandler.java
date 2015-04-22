@@ -29,12 +29,13 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.CompressServiceTunnelRequestProperty;
 
 /**
  * Creates SOAP envelopes for {@link IServiceTunnelRequest} and {@link IServiceTunnelResponse} objects.<br>
@@ -105,26 +106,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   private static final Pattern BEGIN_DATA_TAG = Pattern.compile("[<]([a-zA-Z0-9]+:)?data\\s*>");
   private static final Pattern END_DATA_TAG = Pattern.compile("[<][/]([a-zA-Z0-9]+:)?data\\s*>");
   private static final Pattern COMPRESSED_ATTRIBUTE = Pattern.compile("compressed\\s*=\\s*\"(true|false)\"");
-
-  private static final Boolean COMPRESS;
-
-  static {
-    String compressProp = ConfigIniUtility.getProperty("org.eclipse.scout.serviceTunnel.compress");
-    if (StringUtility.hasText(compressProp)) {
-      if ("true".equalsIgnoreCase(compressProp)) {
-        COMPRESS = Boolean.TRUE;
-      }
-      else if ("false".equalsIgnoreCase(compressProp)) {
-        COMPRESS = Boolean.FALSE;
-      }
-      else {
-        COMPRESS = null;
-      }
-    }
-    else {
-      COMPRESS = null;
-    }
-  }
+  private static final Boolean COMPRESS = CONFIG.getPropertyValue(CompressServiceTunnelRequestProperty.class);
 
   private String m_originAddress;
   private Boolean m_sendCompressed;

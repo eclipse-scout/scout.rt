@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
@@ -31,10 +30,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.server.ServerConfigProperties.HttpServerDebugProperty;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
+import org.eclipse.scout.rt.server.commons.config.WebXmlConfigManager;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
@@ -51,22 +51,15 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * {@link IServiceTunnelResponse} and any {@link IServiceTunnelContentHandler} implementation.
  */
 public class ServiceTunnelServlet extends HttpServlet {
-  public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.server.http.debug";
+
   private static final String ADMIN_SESSION_KEY = AdminSession.class.getName();
 
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelServlet.class);
 
   private transient IServiceTunnelContentHandler m_contentHandler;
-  private final boolean m_debug;
-
-  public ServiceTunnelServlet() {
-    this(ConfigIniUtility.getPropertyBoolean(HTTP_DEBUG_PARAM, false));
-  }
-
-  public ServiceTunnelServlet(boolean debug) {
-    m_debug = debug;
-  }
+  private boolean m_debug;
+  private WebXmlConfigManager m_configManager;
 
   // === HTTP-GET ===
 
@@ -205,24 +198,15 @@ public class ServiceTunnelServlet extends HttpServlet {
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    try {
-      Platform.setDefault();
-      Platform.get().start();
-    }
-    catch (Exception e) {
-      throw new ServletException(e);
-    }
+
+    m_configManager = new WebXmlConfigManager(config);
+
+    // read config
+    m_debug = m_configManager.getPropertyValue(HttpServerDebugProperty.class);
   }
 
-  @Override
-  public void destroy() {
-    try {
-      Platform.get().stop();
-    }
-    catch (Exception e) {
-      LOG.warn("Unable to stop platform.", e);
-    }
-    super.destroy();
+  protected WebXmlConfigManager getConfigManager() {
+    return m_configManager;
   }
 
   /**
@@ -235,7 +219,7 @@ public class ServiceTunnelServlet extends HttpServlet {
   }
 
   /**
-   * Create the (reusable) content handler (soap, xml, binary) for marshalling scout/osgi remote service calls
+   * Create the (reusable) content handler (soap, xml, binary) for marshalling scout remote service calls
    * <p>
    * This method is part of the protected api and can be overridden.
    */

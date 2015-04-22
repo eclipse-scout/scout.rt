@@ -17,18 +17,18 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.UriUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
@@ -45,22 +45,6 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHttpServiceTunnel.class);
 
   public static final String TOKEN_AUTH_HTTP_HEADER = "X-ScoutAccessToken";
-  public static final String PROP_PRIVATE_KEY = "scout.auth.privatekey";
-  public static final String PROP_TARGET_URL = "org.eclipse.scout.rt.servicetunnel.targetUrl";
-
-  private static final byte[] PRIVATE_KEY;
-  static {
-    String privateKeyForSigning = ConfigIniUtility.getProperty(PROP_PRIVATE_KEY);
-    if (StringUtility.hasText(privateKeyForSigning)) {
-      PRIVATE_KEY = Base64Utility.decode(privateKeyForSigning);
-      if (PRIVATE_KEY == null || PRIVATE_KEY.length < 1) {
-        throw new IllegalArgumentException("Invalid digital signature private key configured.");
-      }
-    }
-    else {
-      PRIVATE_KEY = null;
-    }
-  }
 
   private IServiceTunnelContentHandler m_contentHandler;
   private final URL m_serverUrl;
@@ -75,11 +59,12 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
   }
 
   protected static URL getConfiguredServerUrl() {
-    String url = ConfigIniUtility.getProperty(PROP_TARGET_URL, ConfigIniUtility.getProperty("server.url") /* legacy */);
+    ServiceTunnelTargetUrlProperty targetUrlProperty = CONFIG.getProperty(ServiceTunnelTargetUrlProperty.class);
+    String url = targetUrlProperty.getValue();
     try {
       URL targetUrl = UriUtility.toUrl(url);
       if (targetUrl == null) {
-        throw new IllegalArgumentException("No target url configured. Please specify a target URL in the config.ini using property '" + PROP_TARGET_URL + "'.");
+        throw new IllegalArgumentException("No target url configured. Please specify a target URL in the config.ini using property '" + targetUrlProperty.getKey() + "'.");
       }
       return targetUrl;
     }
@@ -180,12 +165,10 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
   }
 
   protected String createAuthToken(URLConnection urlConn, String method, byte[] callData) throws ProcessingException {
-    if (PRIVATE_KEY == null) {
-      // no private -> no token
+    if (!DefaultAuthToken.isActive()) {
       return null;
     }
-
-    return new DefaultAuthToken(getSession(), callData).toSignedString(PRIVATE_KEY);
+    return new DefaultAuthToken(getSession(), callData).toSignedString();
   }
 
   /**

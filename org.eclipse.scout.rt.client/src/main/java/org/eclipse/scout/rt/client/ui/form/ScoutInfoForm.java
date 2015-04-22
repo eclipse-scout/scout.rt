@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -37,7 +36,9 @@ import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.GroupBox.HtmlFi
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
-import org.eclipse.scout.rt.platform.IConfigIniConstants;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
@@ -205,11 +206,11 @@ public class ScoutInfoForm extends AbstractForm {
   }
 
   private String getProductName() {
-    return ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_NAME, "unknown");
+    return CONFIG.getPropertyValue(ApplicationNameProperty.class);
   }
 
   private String getVersion() {
-    return ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_VERSION, "0.0.0");
+    return CONFIG.getPropertyValue(ApplicationVersionProperty.class);
   }
 
   protected Map<String, Object> getProperties() {

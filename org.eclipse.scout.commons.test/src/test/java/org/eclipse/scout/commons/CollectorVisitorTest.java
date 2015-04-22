@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package CollectorVisitor;
+package org.eclipse.scout.commons;
 
 import static org.junit.Assert.assertEquals;
 

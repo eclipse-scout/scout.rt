@@ -13,13 +13,11 @@ package org.eclipse.scout.testing.client;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -30,18 +28,18 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.testing.client.TestingClientConfigProperties.ClientSessionCacheExpirationProperty;
 
 /**
  * Provider for client sessions. A client session is only created if not contained in the session cache.
  */
 public class ClientSessionProviderWithCache extends ClientSessionProvider {
 
-  private static final String PROP_SESSION_EXPIRATION = String.format("%s#expiration", ClientSessionProviderWithCache.class.getName());
-
   private final LRUCache<CompositeObject, IClientSession> m_cache;
 
   public ClientSessionProviderWithCache() {
-    m_cache = new LRUCache<>(1000, ConfigIniUtility.getPropertyLong(PROP_SESSION_EXPIRATION, TimeUnit.DAYS.toMillis(1)));
+    m_cache = new LRUCache<>(1000, CONFIG.getPropertyValue(ClientSessionCacheExpirationProperty.class));
   }
 
   @Override

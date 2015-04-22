@@ -24,18 +24,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.FileUtility;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.server.ServerConfigProperties.ResourceServletPathProperty;
+import org.eclipse.scout.rt.server.commons.config.WebXmlConfigManager;
 
 /**
  * Init parameters for WAR resources<br>
  * war-path: Path to resource within war file. Normally starting with /WEB-INF
- * <p>
- * Init parameters for osgi bundle resources<br>
- * bundle-name: symbolic name of bundle with resources<br>
- * bundle-path: Path to resource within bundle. Normally starting with /resources
- * <p>
- * Legacy parameters<br>
- * base-name: same as war-path
  */
 public class ResourceServlet extends HttpServlet {
 
@@ -46,30 +40,19 @@ public class ResourceServlet extends HttpServlet {
   private static final String ETAG = "ETag"; //$NON-NLS-1$
 
   private String m_warPath;
-
-  public ResourceServlet() {
-  }
-
-  public ResourceServlet(String internalName) {
-  }
+  private WebXmlConfigManager m_configManager;
 
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    m_warPath = config.getInitParameter("base-name"); //$NON-NLS-1$, legacy
-    if (m_warPath == null) {
-      m_warPath = config.getInitParameter("war-path"); //$NON-NLS-1$
-    }
-    if (!StringUtility.hasText(m_warPath)) {
-      m_warPath = null;
-    }
-    if (m_warPath != null && m_warPath.endsWith("/")) {
-      m_warPath = m_warPath.substring(0, m_warPath.length() - 1);
-    }
-    // check config
-    if (m_warPath == null) {
-      throw new ServletException("Missing init parameters. Set 'war-path' parameter.");
-    }
+    m_configManager = new WebXmlConfigManager(config);
+
+    // read config
+    m_warPath = m_configManager.getPropertyValue(ResourceServletPathProperty.class);
+  }
+
+  protected WebXmlConfigManager getConfigManager() {
+    return m_configManager;
   }
 
   @Override

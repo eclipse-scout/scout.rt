@@ -24,32 +24,36 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.service.AbstractService;
+import org.eclipse.scout.rt.server.ServerConfigProperties.ImapHostProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.ImapMailboxProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.ImapPasswordProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.ImapPortProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.ImapSslProtocolsProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.ImapUsernameProperty;
 
 public abstract class AbstractIMAPService extends AbstractService implements IIMAPService {
 
-  private String m_host;
-  private int m_port;
-  private String m_sslProtocols;
-  private String m_mailbox;
-  private String m_username;
-  private String m_password;
-  private boolean m_opened = false;
+  private final String m_host;
+  private final int m_port;
+  private final String m_mailbox;
+  private final String m_username;
+  private final String m_password;
+  private final String m_sslProtocols;
+
+  private boolean m_opened;
   private Folder m_folder;
   private Store m_store;
 
-  @Override
-  protected void initializeService() {
-    super.initializeService();
-    initConfig();
-  }
-
-  private void initConfig() {
-    setHost(getConfiguredHost());
-    setPort(getConfiguredPort());
-    setMailbox(getConfiguredMailbox());
-    setUserName(getConfiguredUserName());
-    setPassword(getConfiguredPassword());
+  public AbstractIMAPService() {
+    m_host = CONFIG.getPropertyValue(ImapHostProperty.class, getConfiguredHost());
+    m_port = CONFIG.getPropertyValue(ImapPortProperty.class, getConfiguredPort());
+    m_mailbox = CONFIG.getPropertyValue(ImapMailboxProperty.class, getConfiguredMailbox());
+    m_username = CONFIG.getPropertyValue(ImapUsernameProperty.class, getConfiguredUserName());
+    m_password = CONFIG.getPropertyValue(ImapPasswordProperty.class, getConfiguredPassword());
+    m_sslProtocols = CONFIG.getPropertyValue(ImapSslProtocolsProperty.class, getConfiguredSslProtocols());
+    m_opened = false;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
@@ -58,26 +62,10 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
     return null;
   }
 
-  public String getHost() {
-    return m_host;
-  }
-
-  public void setHost(String s) {
-    m_host = s;
-  }
-
   @ConfigProperty(ConfigProperty.STRING)
   @Order(20)
   protected int getConfiguredPort() {
     return -1;
-  }
-
-  public int getPort() {
-    return m_port;
-  }
-
-  public void setPort(int i) {
-    m_port = i;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
@@ -86,26 +74,10 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
     return null;
   }
 
-  public String getSslProtocols() {
-    return m_sslProtocols;
-  }
-
-  public void setSslProtocols(String s) {
-    m_sslProtocols = s;
-  }
-
   @ConfigProperty(ConfigProperty.STRING)
   @Order(30)
   protected String getConfiguredMailbox() {
     return null;
-  }
-
-  public String getMailbox() {
-    return m_mailbox;
-  }
-
-  public void setMailbox(String s) {
-    m_mailbox = s;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
@@ -114,26 +86,10 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
     return null;
   }
 
-  public String getUserName() {
-    return m_username;
-  }
-
-  public void setUserName(String s) {
-    m_username = s;
-  }
-
   @ConfigProperty(ConfigProperty.STRING)
   @Order(50)
   protected String getConfiguredPassword() {
     return null;
-  }
-
-  public String getPassword() {
-    return m_password;
-  }
-
-  public void setPassword(String s) {
-    m_password = s;
   }
 
   public void openConnection() throws ProcessingException {
@@ -150,8 +106,8 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
       if (m_port > 0) {
         props.put("mail.imap.port", "" + m_port);
       }
-      if (!StringUtility.isNullOrEmpty(getSslProtocols())) {
-        props.put("mail.imap.ssl.protocols", getSslProtocols());
+      if (StringUtility.hasText(m_sslProtocols)) {
+        props.put("mail.imap.ssl.protocols", m_sslProtocols);
       }
       if (m_username != null) {
         props.put("mail.imap.user", m_username);
@@ -166,7 +122,7 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
       Session session = Session.getInstance(props, null);
       m_store = session.getStore("imap");
       if (m_username != null && m_host != null) {
-        m_store.connect(System.getProperty("mail.imap.host"), m_username, m_password);
+        m_store.connect(m_host, m_username, m_password);
       }
       else {
         m_store.connect();

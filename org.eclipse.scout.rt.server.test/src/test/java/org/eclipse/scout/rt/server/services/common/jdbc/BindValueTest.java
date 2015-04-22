@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.holders.LongHolder;
 import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.VerboseMock;
-import org.eclipse.scout.rt.server.services.common.jdbc.oracle.OracleSqlStyle;
 import org.junit.Test;
 
 /**
@@ -33,7 +32,6 @@ public class BindValueTest {
 
   public BindValueTest() {
     sqlService = new SqlServiceMock();
-    sqlService.setSqlStyle(new OracleSqlStyle());
   }
 
   @Test

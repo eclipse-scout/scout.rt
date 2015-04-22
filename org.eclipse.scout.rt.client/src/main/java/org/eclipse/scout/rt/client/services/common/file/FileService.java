@@ -249,7 +249,6 @@ public class FileService extends AbstractService implements IFileService {
         path = path + "/";
       }
       if (local) {
-
         path = path + "local";
       }
       else {

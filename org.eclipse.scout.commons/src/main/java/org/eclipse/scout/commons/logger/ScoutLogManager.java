@@ -13,52 +13,18 @@ package org.eclipse.scout.commons.logger;
 import java.io.File;
 import java.util.logging.Logger;
 
-import org.eclipse.scout.commons.ConfigIniConstants;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.internal.java.JavaScoutLogManager;
 
 /**
  * The default factory to create {@link IScoutLogger} objects.
  * <p>
- * This factory creates transparent wrappers of JUL logger {@link Logger} see {@link IScoutLogger} for more
- * details.</br> Set the system (or config.ini) property <code>org.eclipse.scout.log</code> to define a logging
- * strategy. Valid values are:
- * <table border="1">
- * <tr>
- * <td><strong>System (or config.ini) property</strong></td>
- * <td><strong>Strategy</strong></td>
- * <td><strong>Description</strong></td>
- * </tr>
- * <tr>
- * <td>java</td>
- * <td>JUL (Java Util Logger)</td>
- * <td>All log events are passed to the java.util.log logger. This is the default strategy used.</td>
- * </tr>
- * <tr>
- * <td><i>EMPTY</td>
- * <td>Custom logger</i></td>
- * <td>By not setting the strategy property, the system looks for a class named
- * <code>org.eclipse.scout.commons.logger.CustomLogManager</code> within its classpath. If found, this class is
- * instantiated and used as logging strategy.</b>Typically, this is done by creating a fragment with this Plug-In
- * configured as host Plug-In. In addition, the fragment must contain the class
- * <code>org.eclipse.scout.commons.logger.CustomLogManager</code> (instance of {@link IScoutLogManager}) to be
- * considered as logging strategy.</td>
- * </tr>
- * </table>
- * <p>
- * It is possible to set a global log level to affect all loggers. Also, log messages can be recorded into a separate
- * file.
- * </p>
- * <p>
- * Example settings in config.ini for java log:
+ * This factory creates transparent wrappers of JUL logger {@link Logger}.<br>
+ * Add a class named <code>org.eclipse.scout.commons.logger.CustomLogManager</code> to the classpath to define a custom
+ * logging manager.
  *
- * <pre>
- * org.eclipse.scout.log=java
- * org.eclipse.scout.log.level=WARNING
- * </pre>
- *
- * </p>
+ * @see IScoutLogManager
+ * @see IScoutLogger
  */
 public final class ScoutLogManager {
 
@@ -73,12 +39,6 @@ public final class ScoutLogManager {
   }
 
   private static IScoutLogManager createScoutLogManager() {
-    String strategy = ConfigIniUtility.getProperty(ConfigIniConstants.logStrategy);
-    if ("java".equalsIgnoreCase(strategy)) {
-      return new JavaScoutLogManager();
-    }
-
-    // no logging strategy set. Try to find class 'org.eclipse.scout.commons.logger.CustomLogManager' for custom logging
     try {
       Class clazz = Class.forName("org.eclipse.scout.commons.logger.CustomLogManager");
       if (clazz != null && IScoutLogManager.class.isAssignableFrom(clazz)) {

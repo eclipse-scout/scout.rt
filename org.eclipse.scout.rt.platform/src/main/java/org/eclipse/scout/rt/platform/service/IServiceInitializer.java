@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.platform.service;
 
 /**
  * Interface for a service initializer.
- *
- * @see IServiceInitializerFactory
  */
 public interface IServiceInitializer {
 

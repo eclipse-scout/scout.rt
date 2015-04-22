@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
-import org.eclipse.scout.rt.server.services.common.jdbc.oracle.OracleSqlStyle;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
@@ -38,7 +37,6 @@ public class SelectIntoTest {
   @Before
   public void setup() throws Exception {
     SqlServiceMock sqlService = new SqlServiceMock();
-    sqlService.setSqlStyle(new OracleSqlStyle());
     m_beans = TestingUtility.registerBeans(new BeanMetaData(ISqlService.class).initialInstance(sqlService).applicationScoped(true));
   }
 

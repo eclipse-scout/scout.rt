@@ -22,14 +22,15 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.server.jms.JmsConfigProperties.JmsRequestTimeoutProperty;
 import org.eclipse.scout.rt.server.jms.context.JmsRunContexts;
 import org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService;
 import org.eclipse.scout.rt.server.job.ServerJobs;
@@ -48,12 +49,12 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  */
 public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSimpleJmsService.class);
-  private static final String PROP_REQUEST_TIMEOUT = String.format("%s#requestTimeout", AbstractSimpleJmsService.class.getName());
 
-  private final long m_receiveTimeout = ConfigIniUtility.getPropertyLong(PROP_REQUEST_TIMEOUT, TimeUnit.SECONDS.toMillis(1));
+  private final long m_receiveTimeout;
   private volatile IFuture<Void> m_messageConsumerFuture;
 
   protected AbstractSimpleJmsService() {
+    m_receiveTimeout = CONFIG.getPropertyValue(JmsRequestTimeoutProperty.class);
   }
 
   protected Session createSession(Connection connection) throws JMSException {

@@ -33,8 +33,11 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncNodeIdProperty;
+import org.eclipse.scout.rt.server.ServerConfigProperties.ClusterSyncUserProperty;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
@@ -48,8 +51,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClusterSynchronizationService.class);
 
   private static final String TRANSACTION_MEMBER_ID = ClusterSynchronizationService.class.getName();
-  private static final String PROP_USER_CLUSTER_SYNC = String.format("%s#user", ClusterSynchronizationService.class.getName());
-  private static final String CLUSTER_NODE_ID_PARAM = "org.eclipse.scout.rt.server.clusterNodeId";
 
   private final EventListenerList m_listenerList = new EventListenerList();
   private final ClusterNodeStatusInfo m_statusInfo = new ClusterNodeStatusInfo();
@@ -62,18 +63,19 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
   public ClusterSynchronizationService() {
     m_subject = new Subject();
-    m_subject.getPrincipals().add(new SimplePrincipal(ConfigIniUtility.getProperty(PROP_USER_CLUSTER_SYNC, "system")));
+    m_subject.getPrincipals().add(new SimplePrincipal(CONFIG.getPropertyValue(ClusterSyncUserProperty.class)));
     m_subject.setReadOnly();
   }
 
   @Override
   public void initializeService() {
+    super.initializeService();
     m_nodeId = createNodeId();
   }
 
   protected String createNodeId() {
     // system property defined node id
-    String nodeId = ConfigIniUtility.getProperty(CLUSTER_NODE_ID_PARAM);
+    String nodeId = CONFIG.getPropertyValue(ClusterSyncNodeIdProperty.class);
 
     // weblogic name as node id
     if (!StringUtility.hasText(nodeId)) {
@@ -95,15 +97,17 @@ public class ClusterSynchronizationService extends AbstractService implements IC
         hostname = null;
       }
       // might result in a hostname 'localhost'
-      if (StringUtility.isNullOrEmpty(hostname) || "localhost".equals(hostname)) {
+      if (StringUtility.isNullOrEmpty(hostname) || "localhost".equalsIgnoreCase(hostname)) {
         // use random number
         nodeId = UUID.randomUUID().toString();
       }
 
       // in development on same machine there might run multiple instances on different ports (usecase when testing cluster sync)
       // therefore we use in this case the port jetty port too
-      String port = ConfigIniUtility.getProperty("org.eclipse.equinox.http.jetty.http.port");
-      nodeId = StringUtility.join(":", hostname, port);
+      String port = ConfigIniUtility.getProperty("scout.jetty.port"); // see org.eclipse.scout.dev.jetty.JettyServer.SERVER_PORT_KEY
+      if (StringUtility.hasText(port)) {
+        nodeId = StringUtility.join(":", hostname, port);
+      }
     }
     return nodeId;
   }

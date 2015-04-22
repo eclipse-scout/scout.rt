@@ -13,18 +13,18 @@ package org.eclipse.scout.rt.server.session;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.ServerConfigProperties.ServerSessionCacheExpirationProperty;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 
 /**
@@ -32,12 +32,10 @@ import org.eclipse.scout.rt.server.context.ServerRunContext;
  */
 public class ServerSessionProviderWithCache extends ServerSessionProvider {
 
-  private static final String PROP_SESSION_EXPIRATION = String.format("%s#expiration", ServerSessionProviderWithCache.class.getName());
-
   private final LRUCache<CompositeObject, IServerSession> m_cache;
 
   public ServerSessionProviderWithCache() {
-    m_cache = new LRUCache<>(1000, ConfigIniUtility.getPropertyLong(PROP_SESSION_EXPIRATION, TimeUnit.DAYS.toMillis(1)));
+    m_cache = new LRUCache<>(1000, CONFIG.getPropertyValue(ServerSessionCacheExpirationProperty.class));
   }
 
   @Override

@@ -26,11 +26,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IConfigIniConstants;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.security.ReadDiagnosticServletPermission;
 import org.eclipse.scout.rt.shared.security.UpdateDiagnosticServletPermission;
@@ -102,8 +103,8 @@ public class DiagnosticSession {
     DiagnosticFactory.addDiagnosticItemToList(result, "System.gc()", "", "<input type='checkbox' name='gc' value='yes'/>");
 
     String diagnosticHTML = getDiagnosticItemsHTML(result);
-    String title = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_NAME, "unknown");
-    String version = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_VERSION, "0.0.0");
+    String title = CONFIG.getPropertyValue(ApplicationNameProperty.class);
+    String version = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
 
     resp.setContentType("text/html");
     ServletOutputStream out = resp.getOutputStream();
@@ -202,8 +203,8 @@ public class DiagnosticSession {
 
     DiagnosticFactory.addDiagnosticItemToList(result, "Version", "", DiagnosticFactory.STATUS_TITLE);
 
-    String title = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_NAME, "unknown");
-    String version = ConfigIniUtility.getProperty(IConfigIniConstants.APPLICATION_VERSION, "0.0.0");
+    String title = CONFIG.getPropertyValue(ApplicationNameProperty.class);
+    String version = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
 
     DiagnosticFactory.addDiagnosticItemToList(result, "Product Name", title, DiagnosticFactory.STATUS_INFO);
     DiagnosticFactory.addDiagnosticItemToList(result, "Defining Bundle Version", version, DiagnosticFactory.STATUS_INFO);

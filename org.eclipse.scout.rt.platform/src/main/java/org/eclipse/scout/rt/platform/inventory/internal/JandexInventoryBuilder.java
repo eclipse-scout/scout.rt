@@ -9,10 +9,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JandexRebuildProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.jboss.jandex.CompositeIndex;
 import org.jboss.jandex.Index;
@@ -23,16 +24,18 @@ import org.jboss.jandex.Indexer;
 import org.jboss.jandex.JarIndexer;
 
 public class JandexInventoryBuilder {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JandexInventoryBuilder.class);
+
   private static final String SCOUT_XML_PATH = "META-INF/scout.xml";
   private static final String JANDEX_INDEX_PATH = "META-INF/jandex.idx";
-  private static final String SYSTEM_PROPERTY_JANDEX_REBUILD = "jandex.rebuild";
 
-  private final ArrayList<IndexView> m_indexList = new ArrayList<>();
+  private final List<IndexView> m_indexList;
   private final boolean m_forceRebuildFolderIndexes;
 
   public JandexInventoryBuilder() {
-    m_forceRebuildFolderIndexes = ConfigIniUtility.getProperty(SYSTEM_PROPERTY_JANDEX_REBUILD, "false").equals("true");
+    m_forceRebuildFolderIndexes = new JandexRebuildProperty().getValue(); // do not use the CONFIG class here because the platform is not ready yet
+    m_indexList = new ArrayList<>();
   }
 
   public void scanAllModules() throws PlatformException {

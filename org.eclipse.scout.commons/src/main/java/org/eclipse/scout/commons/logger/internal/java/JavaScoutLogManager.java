@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogManager;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -51,14 +52,23 @@ public class JavaScoutLogManager implements IScoutLogManager {
   }
 
   /**
-   * install "better" simple log formatter when SimpleFormatter is used
+   * install "better" simple log formatter when SimpleFormatter is used and the simple log formatter has not been
+   * configured (default).
    */
   @Override
   public void initialize() {
     Logger root = Logger.getLogger("");
 
+    final String simpleFormatterConfigKey = "java.util.logging.SimpleFormatter.format";
+    String simpleFormatterConfig = System.getProperty(simpleFormatterConfigKey);
+    if (!StringUtility.hasText(simpleFormatterConfig)) {
+      simpleFormatterConfig = LogManager.getLogManager().getProperty(simpleFormatterConfigKey);
+    }
+    boolean isSimpleFormatterConfigured = StringUtility.hasText(simpleFormatterConfig);
+
     for (Handler h : root.getHandlers()) {
-      if (h.getFormatter() instanceof SimpleFormatter) {
+      // switch formatter if the default formatter is used and no configuration is supplied
+      if (h.getFormatter() instanceof SimpleFormatter && !isSimpleFormatterConfigured) {
         h.setFormatter(new JavaLogFormatter());
       }
     }

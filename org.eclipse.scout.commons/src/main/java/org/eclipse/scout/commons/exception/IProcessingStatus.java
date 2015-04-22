@@ -32,9 +32,9 @@ public interface IProcessingStatus extends IStatus {
 
   /**
    * Returns a list of context informations that were collected while the
-   * exception was travelling from its origin to the handler
+   * exception was traveling from its origin to the handler
    *
-   * @return a list of localized contect messages
+   * @return a list of localized context messages
    */
   List<String> getContextMessages();
 

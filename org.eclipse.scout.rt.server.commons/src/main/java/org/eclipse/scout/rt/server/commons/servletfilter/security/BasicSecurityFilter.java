@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.commons.servletfilter.security;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
@@ -19,10 +20,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.Base64Utility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
-import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.BasicFilterUsersProperty;
 
 /**
  * <h4>BasicSecurityFilter</h4> A simple security filter using username,password
@@ -36,23 +39,26 @@ import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
  * <b>required</b></li>
  * </ul>
  * <p>
- * 
+ *
  * @since 1.0.3 06.02.2009
  */
 public class BasicSecurityFilter extends AbstractChainableSecurityFilter {
   public static final String PROP_BASIC_ATTEMPT = "BasicSecurityFilter.basicAttempt";
 
-  private HashMap<String, String> m_userDatabase;
+  private Map<String, String> m_userDatabase;
 
   @Override
-  public void init(FilterConfig config0) throws ServletException {
-    super.init(config0);
-    FilterConfigInjection.FilterConfig config = new FilterConfigInjection(config0, getClass()).getAnyConfig();
-    String usersParam = config.getInitParameter("users");
-    if (usersParam == null) {
-      throw new ServletException("missing init-param with name 'users'");
+  public void init(FilterConfig config) throws ServletException {
+    super.init(config);
+
+    // read config
+    IConfigProperty<String> param = getConfigManager().getProperty(BasicFilterUsersProperty.class);
+    String usersParam = param.getValue();
+    if (!StringUtility.hasText(usersParam)) {
+      throw new ServletException("missing init-param with name '" + param.getKey() + "'.");
     }
-    m_userDatabase = new HashMap<String, String>();
+
+    m_userDatabase = new HashMap<>();
     for (String pair : usersParam.split(",")) {
       String[] a = pair.trim().split("=", 2);
       m_userDatabase.put(a[0].toLowerCase(), a[1]);

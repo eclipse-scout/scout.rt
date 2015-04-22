@@ -30,7 +30,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
 import org.eclipse.scout.rt.server.commons.servletfilter.security.SecureHttpServletRequestWrapper;
 
 /**
@@ -42,27 +41,19 @@ import org.eclipse.scout.rt.server.commons.servletfilter.security.SecureHttpServ
 public class DevelopmentAuthFilter implements Filter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DevelopmentAuthFilter.class);
 
-  private FilterConfigInjection m_injection;
   private boolean m_showWarning = true;
 
   @Override
-  public void init(FilterConfig config0) throws ServletException {
-    m_injection = new FilterConfigInjection(config0, getClass());
+  public void init(FilterConfig config) throws ServletException {
   }
 
   @Override
   public void destroy() {
-    m_injection = null;
   }
 
   @Override
   public void doFilter(ServletRequest in, ServletResponse out, final FilterChain chain) throws IOException, ServletException {
     if (isSubjectSet() || !Platform.get().inDevelopmentMode()) {
-      chain.doFilter(in, out);
-      return;
-    }
-    FilterConfigInjection.FilterConfig config = m_injection.getConfig(in);
-    if (!config.isActive()) {
       chain.doFilter(in, out);
       return;
     }

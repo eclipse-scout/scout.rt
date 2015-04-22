@@ -12,20 +12,12 @@ package org.eclipse.scout.rt.platform.service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
 
-import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.ConfigIniUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.beans.FastBeanInfo;
-import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.HolderUtility;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.holders.NVPair;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.service.internal.AbstractHolderArgumentVisitor;
@@ -34,49 +26,8 @@ import org.eclipse.scout.rt.platform.service.internal.AbstractHolderArgumentVisi
  * Handle calls directly on current session (no remoting)
  */
 public final class ServiceUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceUtility.class);
 
   private ServiceUtility() {
-  }
-
-  /**
-   * Inject config.ini bean properties.
-   * <p>
-   * A config ini bean property is a config.ini entry in the format classOrInterfaceName#propertyName=value
-   * <p>
-   * Example: org.myproject.IMyService#endpointAddress=http://....
-   * <p>
-   * or
-   * <p>
-   * <br>
-   * client.id=13 org.myproject.MyService#clientId=${client.id}
-   * <p>
-   * The property is set if service is a subtype of the config ini type.
-   */
-  public static void injectConfigProperties(Object service) {
-    if (service == null) {
-      return;
-    }
-    FastBeanInfo beanInfo = BeanUtility.getFastBeanInfo(service.getClass(), null);
-    Map<String, String> map = ConfigIniUtility.getProperties(service.getClass());
-    for (Map.Entry<String, String> e : map.entrySet()) {
-      String name = e.getKey();
-      String text = e.getValue();
-      try {
-        FastPropertyDescriptor propDesc = beanInfo.getPropertyDescriptor(name);
-        Method setterMethod = propDesc.getWriteMethod();
-        if (setterMethod != null) {
-          Object value = TypeCastUtility.castValue(text, propDesc.getPropertyType());
-          setterMethod.invoke(service, value);
-        }
-        else {
-          LOG.warn("no setter for " + name + "=" + text + " on " + service.getClass());
-        }
-      }
-      catch (Exception ex) {
-        LOG.error("setting " + name + "=" + text + " on " + service.getClass(), ex);
-      }
-    }
   }
 
   /**

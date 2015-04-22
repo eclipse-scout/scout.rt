@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldBeanData;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldBeanData.TableFieldBeanDataRowData;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldData;
-import org.eclipse.scout.rt.server.services.common.jdbc.oracle.OracleSqlStyle;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -91,7 +90,6 @@ public class SelectIntoArrayTest {
   @Test
   public void testSelectFromFormDataArray() throws Exception {
     SqlServiceMock sql = new SqlServiceMock();
-    sql.setSqlStyle(new OracleSqlStyle());
     Object[][] expectedData = new Object[][]{
         new Object[]{true, 1, "abc"},
     };
@@ -325,7 +323,6 @@ public class SelectIntoArrayTest {
 
   private SqlServiceMock createSqlServiceMock(Object[][] resultData) {
     SqlServiceMock sql = new SqlServiceMock();
-    sql.setSqlStyle(new OracleSqlStyle());
     sql.setResultData(resultData);
     return sql;
   }

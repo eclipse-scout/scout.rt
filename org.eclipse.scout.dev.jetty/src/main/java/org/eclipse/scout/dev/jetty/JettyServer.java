@@ -19,7 +19,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 public class JettyServer {
 
   public static final String WEB_APP_FOLDER_KEY = "scout.jetty.webapp.folder";
-  public static final String SERVER_PORT_KEY = "scout.jetty.port";
+  public static final String SERVER_PORT_KEY = "scout.jetty.port"; // see also org.eclipse.scout.rt.server.services.common.clustersync.ClusterSynchronizationService.createNodeId()
 
   public static void main(String[] args) throws Exception {
     new JettyServer().start();
@@ -58,6 +58,7 @@ public class JettyServer {
 
   protected WebAppContext createWebApp(File webappDir) throws Exception {
     WebAppContext webAppContext = new WebAppContext();
+    webAppContext.setThrowUnavailableOnStartupException(true);
     webAppContext.setContextPath("/");
     webAppContext.setResourceBase(webappDir.getAbsolutePath());
     webAppContext.setParentLoaderPriority(true);

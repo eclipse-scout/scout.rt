@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.commons.servletfilter.security;
 
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.naming.Context;
@@ -32,7 +31,10 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
-import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.LdapFilterBaseDnProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.LdapFilterGroupAttributeIdProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.LdapFilterGroupDnProperty;
+import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.LdapFilterServerProperty;
 
 /**
  * <h4>LDAPSecurityFilter</h4> The following properties can be set in the <code>config.ini</code> file:
@@ -50,7 +52,7 @@ import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
  * <code>&lt;fully qualified name of class&gt;#lDAPgroupAttributeId=[e.g. cn]</code> <b>required</b></li>
  * </ul>
  * <p>
- * 
+ *
  * @since 1.0.0 02.07.2008
  */
 public class LDAPSecurityFilter extends AbstractChainableSecurityFilter {
@@ -62,33 +64,17 @@ public class LDAPSecurityFilter extends AbstractChainableSecurityFilter {
   private String m_groupDn;
   private String m_groupAttr;
 
-  public LDAPSecurityFilter() {
+  @Override
+  public void destroy() {
   }
 
   @Override
-  public void init(FilterConfig config0) throws ServletException {
-    super.init(config0);
-    FilterConfigInjection.FilterConfig config = new FilterConfigInjection(config0, getClass()).getAnyConfig();
-    m_serverUrl = getParam(config, "ldapServer", false);
-    m_baseDn = getParam(config, "ldapBaseDN", true);
-    m_groupDn = getParam(config, "lDAPgroupDN", true);
-    m_groupAttr = getParam(config, "lDAPgroupAttributeId", true);
-  }
-
-  protected String getParam(FilterConfig filterConfig, String paramName, boolean nullAllowed) throws ServletException {
-    String paramValue = filterConfig.getInitParameter(paramName);
-    boolean exists = false;
-    if (paramValue == null && nullAllowed) { // check if parameter exists
-      Enumeration initParameterNames = filterConfig.getInitParameterNames();
-      while (initParameterNames.hasMoreElements() && exists == false) {
-        String object = (String) initParameterNames.nextElement();
-        exists = object.equals(paramName);
-      }
-    }
-    if (paramValue == null && !exists) {
-      throw new ServletException("Missing init-param with name '" + paramName + "'.");
-    }
-    return paramValue;
+  public void init(FilterConfig config) throws ServletException {
+    super.init(config);
+    m_serverUrl = getConfigManager().getPropertyValue(LdapFilterServerProperty.class);
+    m_baseDn = getConfigManager().getPropertyValue(LdapFilterBaseDnProperty.class);
+    m_groupDn = getConfigManager().getPropertyValue(LdapFilterGroupDnProperty.class);
+    m_groupAttr = getConfigManager().getPropertyValue(LdapFilterGroupAttributeIdProperty.class);
   }
 
   @Override
@@ -99,10 +85,7 @@ public class LDAPSecurityFilter extends AbstractChainableSecurityFilter {
       String user = a[0].toLowerCase();
       String pass = a[1];
       if (user != null && pass != null) {
-        if (ldapLogin(m_serverUrl, m_baseDn, m_groupDn, m_groupAttr, user, pass, false/*
-                                                                                       * show
-                                                                                       * exceptions
-                                                                                       */)) {
+        if (ldapLogin(m_serverUrl, m_baseDn, m_groupDn, m_groupAttr, user, pass, false/* show exceptions */)) {
           // success
           holder.setPrincipal(new SimplePrincipal(user));
           return STATUS_CONTINUE_WITH_PRINCIPAL;

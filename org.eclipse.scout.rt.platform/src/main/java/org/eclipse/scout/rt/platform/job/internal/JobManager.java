@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.Callables;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
@@ -32,6 +31,12 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobAllowCoreThreadTimeoutProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobCorePoolSizeProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobDispatcherThreadCountProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobKeepAliveTimeProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobMaximumPoolSizeProperty;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -63,21 +68,6 @@ public class JobManager implements IJobManager {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobManager.class);
 
-  protected static final String PROP_CORE_POOL_SIZE = "org.eclipse.scout.job.corePoolSize";
-  protected static final int DEFAULT_CORE_POOL_SIZE = 10; // The number of threads to keep in the pool, even if they are idle;
-
-  protected static final String PROP_MAXIMUM_POOL_SIZE = "org.eclipse.scout.job.maximumPoolSize";
-  protected static final int DEFAULT_MAXIMUM_POOL_SIZE = Integer.MAX_VALUE; // The maximal number of threads to be created once the core-pool-size is exceeded.
-
-  protected static final String PROP_KEEP_ALIVE_TIME = "org.eclipse.scout.job.keepAliveTime"; // The time limit for which threads, which are created upon exceeding the 'core-pool-size' limit, may remain idle before being terminated.
-  protected static final long DEFAULT_KEEP_ALIVE_TIME = 60; // seconds
-
-  protected static final String PROP_ALLOW_CORE_THREAD_TIME_OUT = "org.eclipse.scout.job.allowCoreThreadTimeOut"; // Specifies whether threads of the core-pool should be terminated after being idle for longer than 'keepAliveTime'.
-  protected static final boolean DEFAULT_ALLOW_CORE_THREAD_TIME_OUT = false;
-
-  protected static final String PROP_DISPATCHER_THREAD_COUNT = "org.eclipse.scout.job.dispatcherThreadCount";
-  protected static final int DEFAULT_DISPATCHER_THREAD_COUNT = 1; // The number of dispatcher threads to be used to dispatch delayed jobs, meaning jobs scheduled with a delay or periodic jobs.
-
   @Internal
   protected final ExecutorService m_executor;
   @Internal
@@ -94,7 +84,8 @@ public class JobManager implements IJobManager {
     m_futures = new FutureSet();
     m_mutexSemaphores = Assertions.assertNotNull(createMutexSemaphores(m_executor));
     m_listeners = Assertions.assertNotNull(createJobListeners(m_executor));
-    m_delayedExecutor = new DelayedExecutor(m_executor, "internal-dispatcher", ConfigIniUtility.getPropertyInt(PROP_DISPATCHER_THREAD_COUNT, DEFAULT_DISPATCHER_THREAD_COUNT));
+    int dispatcherThreadCount = CONFIG.getPropertyValue(JobDispatcherThreadCountProperty.class);
+    m_delayedExecutor = new DelayedExecutor(m_executor, "internal-dispatcher", dispatcherThreadCount);
 
     addListener(Jobs.newEventFilter().eventTypes(JobEventType.SCHEDULED, JobEventType.DONE, JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.SHUTDOWN), m_futures);
   }
@@ -279,11 +270,11 @@ public class JobManager implements IJobManager {
    */
   @Internal
   protected ExecutorService createExecutor() {
-    final int corePoolSize = ConfigIniUtility.getPropertyInt(PROP_CORE_POOL_SIZE, DEFAULT_CORE_POOL_SIZE);
-    final int maximumPoolSize = ConfigIniUtility.getPropertyInt(PROP_MAXIMUM_POOL_SIZE, DEFAULT_MAXIMUM_POOL_SIZE);
-    final long keepAliveTime = ConfigIniUtility.getPropertyLong(PROP_KEEP_ALIVE_TIME, DEFAULT_KEEP_ALIVE_TIME);
-    final boolean allowCoreThreadTimeOut = ConfigIniUtility.getPropertyBoolean(PROP_ALLOW_CORE_THREAD_TIME_OUT, DEFAULT_ALLOW_CORE_THREAD_TIME_OUT);
-    final int dispatcherThreadCount = Assertions.assertGreater(ConfigIniUtility.getPropertyInt(PROP_DISPATCHER_THREAD_COUNT, DEFAULT_DISPATCHER_THREAD_COUNT), 0);
+    final int corePoolSize = CONFIG.getPropertyValue(JobCorePoolSizeProperty.class);
+    final int maximumPoolSize = CONFIG.getPropertyValue(JobMaximumPoolSizeProperty.class);
+    final long keepAliveTime = CONFIG.getPropertyValue(JobKeepAliveTimeProperty.class);
+    final boolean allowCoreThreadTimeOut = CONFIG.getPropertyValue(JobAllowCoreThreadTimeoutProperty.class);
+    final int dispatcherThreadCount = CONFIG.getPropertyValue(JobDispatcherThreadCountProperty.class);
 
     // Create the rejection handler.
     final RejectedExecutionHandler rejectHandler = new RejectedExecutionHandler() {

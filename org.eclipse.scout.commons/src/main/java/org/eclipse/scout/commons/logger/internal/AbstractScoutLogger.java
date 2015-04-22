@@ -13,8 +13,10 @@ package org.eclipse.scout.commons.logger.internal;
 import java.util.HashSet;
 import java.util.logging.LogRecord;
 
+import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.JavaLogUtility;
+import org.eclipse.scout.commons.status.IStatus;
 
 public abstract class AbstractScoutLogger implements IScoutLogger {
 
@@ -188,6 +190,29 @@ public abstract class AbstractScoutLogger implements IScoutLogger {
   @Override
   public void warn(String msg, Throwable t) {
     log(LEVEL_WARN, msg, null, t);
+  }
+
+  @Override
+  public void log(IProcessingStatus status) {
+    log(statusSeverityToLogSeverity(status.getSeverity()), status.toString(), null, status.getException());
+  }
+
+  @Override
+  public void log(IStatus status) {
+    log(statusSeverityToLogSeverity(status.getSeverity()), status.getMessage(), null, null);
+  }
+
+  protected int statusSeverityToLogSeverity(int statusSeverity) {
+    switch (statusSeverity) {
+      case IProcessingStatus.WARNING:
+        return LEVEL_WARN;
+      case IProcessingStatus.INFO:
+        return LEVEL_INFO;
+      case IProcessingStatus.OK:
+        return LEVEL_DEBUG;
+      default:
+        return LEVEL_ERROR;
+    }
   }
 
   @Override
