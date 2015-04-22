@@ -87,6 +87,9 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
           return true;
         }
         JSONObject jsonResp = uiSession.processRequest(httpReq, jsonReq);
+        if (jsonResp == null) {
+          jsonResp = createEmptyResponse();
+        }
         writeResponse(httpResp, jsonResp);
       }
       finally {

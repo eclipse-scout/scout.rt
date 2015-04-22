@@ -11,14 +11,10 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.JobUtility;
 
 /**
  * Processes JSON events from the UI in a Scout model job and waits for all model jobs of that session to complete.
@@ -34,25 +30,10 @@ public class JsonEventProcessor {
   }
 
   public void processEvents(final JsonRequest request, final JsonResponse response) {
-    Assertions.assertFalse(ModelJobs.isModelThread(), "Event processing must be called from a thread other than the model thread [thread=%s, request=%s, response=%s]", Thread.currentThread().getName(), request, response);
-
-    // No need to schedule job and wait if there are no requests (e.g. polling for background jobs)
-    if (request.getEvents().isEmpty()) {
-      return;
+    Assertions.assertTrue(ModelJobs.isModelThread(), "Event processing must be called from the model thread  [currentThread=%s, request=%s, response=%s]", Thread.currentThread().getName(), request, response);
+    for (final JsonEvent event : request.getEvents()) {
+      processEvent(event, response);
     }
-
-    // Process requested events.
-    IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        for (final JsonEvent event : request.getEvents()) {
-          processEvent(event, response);
-        }
-      }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(m_uiSession.getClientSession())).name("event-processing"));
-
-    // Wait for all events to be processed. It is not sufficient to only wait for the Future to complete, because other jobs might be started as well.
-    JobUtility.awaitModelJobs(future);
   }
 
   protected void processEvent(JsonEvent event, JsonResponse response) {

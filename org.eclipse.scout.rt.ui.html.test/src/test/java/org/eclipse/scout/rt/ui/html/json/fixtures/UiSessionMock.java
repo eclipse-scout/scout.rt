@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
-import org.eclipse.scout.rt.ui.html.json.JsonEventProcessor;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.mockito.Mockito;
@@ -24,7 +23,6 @@ import org.mockito.Mockito;
 public class UiSessionMock extends UiSession {
   private JsonClientSession m_jsonClientSession;
   private JsonDesktop m_jsonDesktopMock;
-  private JsonEventProcessor m_jsonEventProcessor;
 
   public UiSessionMock() {
     init(null, null);
@@ -35,7 +33,6 @@ public class UiSessionMock extends UiSession {
     m_jsonClientSession = Mockito.mock(JsonClientSession.class);
     m_jsonDesktopMock = Mockito.mock(JsonDesktop.class);
     Mockito.when(m_jsonClientSession.getJsonDesktop()).thenReturn(m_jsonDesktopMock);
-    m_jsonEventProcessor = new JsonEventProcessor(this);
 
     // For a fully initialized uiSession use TestEnvironmentUiSession
   }
@@ -44,11 +41,6 @@ public class UiSessionMock extends UiSession {
   @Override
   public JsonClientSession getJsonClientSession() {
     return m_jsonClientSession;
-  }
-
-  @Override
-  public JsonEventProcessor getJsonEventProcessor() {
-    return m_jsonEventProcessor;
   }
 
   @Override

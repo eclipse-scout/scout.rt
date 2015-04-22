@@ -590,7 +590,9 @@ scout.Session.prototype.onReconnectingSucceeded = function() {
 };
 
 scout.Session.prototype.onReconnectingFailed = function() {
-  this.desktop.onReconnectingFailed();
+  if (this.desktop) {
+    this.desktop.onReconnectingFailed();
+  }
 };
 
 scout.Session.prototype.listen = function() {
@@ -753,13 +755,24 @@ scout.Session.prototype._onInitialized = function(event) {
 };
 
 scout.Session.prototype._onLogout = function(event) {
-  // Make sure the unload handler does not get triggered since the server initiated the logout and already disposed the session
-  $(window).off('unload.' + this.id);
-  if (event.redirectUrl) {
-    window.location.href = event.redirectUrl;
-  } else {
-    window.location.reload();
-  }
+  // Clear everything and reload the page. Scheduling this ensures, that any
+  // other events may still be executed normally.
+  setTimeout(function() {
+    // Hide everything (on entire page, not only $entryPoint)
+    $('body').html('');
+
+    // Make sure the unload handler does not get triggered since the server initiated the logout and already disposed the session
+    $(window).off('unload.' + this.id);
+
+    // Reload window (using setTimeout, to overcome drawing issues in IE)
+    setTimeout(function() {
+      if (event.redirectUrl) {
+        window.location.href = event.redirectUrl;
+      } else {
+        window.location.reload();
+      }
+    });
+  });
 };
 
 scout.Session.prototype._onWindowUnload = function() {

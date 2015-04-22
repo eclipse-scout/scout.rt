@@ -54,6 +54,9 @@ public interface IUiSession {
 
   HttpServletRequest currentHttpRequest();
 
+  /**
+   * @return a JSON object to send back to the client or <code>null</code> if an empty response shall be sent.
+   */
   JSONObject processRequest(HttpServletRequest httpReq, JsonRequest jsonReq);
 
   String getUiSessionId();

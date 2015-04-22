@@ -259,7 +259,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
 
   protected void initializeJsonClientSession(IClientSession clientSession) {
     m_jsonClientSession = (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
-    JobUtility.runModelJobAndAwait(clientSession, new IRunnable() {
+    JobUtility.runModelJobAndAwait("startUp jsonClientSession", clientSession, new IRunnable() {
       @Override
       public void run() throws Exception {
         m_jsonClientSession.startUp();
@@ -281,7 +281,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
   protected void sendInitializationEvent() {
     JSONObject jsonEvent = new JSONObject();
     JsonObjectUtility.putProperty(jsonEvent, "clientSession", m_jsonClientSession.getId());
-    putLocaleData(jsonEvent, m_jsonClientSession.getModel().getLocale());
+    Locale sessionLocale = JobUtility.runModelJobAndAwait("fetch locale from model", m_jsonClientSession.getModel(), new ICallable<Locale>() {
+      @Override
+      public Locale call() throws Exception {
+        return m_jsonClientSession.getModel().getLocale();
+      }
+    });
+    putLocaleData(jsonEvent, sessionLocale);
     JsonObjectUtility.putProperty(jsonEvent, "backgroundJobPollingEnabled", isBackgroundJobPollingEnabled());
     m_currentJsonResponse.addActionEvent(m_uiSessionId, "initialized", jsonEvent);
   }
@@ -446,7 +452,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
     return m_currentHttpRequest.get();
   }
 
-  public JsonEventProcessor getJsonEventProcessor() {
+  public JsonEventProcessor jsonEventProcessor() {
     return m_jsonEventProcessor;
   }
 
@@ -455,14 +461,34 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
     if (LOG.isDebugEnabled()) {
       LOG.debug("Adapter count before request: " + m_jsonAdapterRegistry.getJsonAdapterCount());
     }
+
     try {
       m_currentHttpRequest.set(httpRequest);
       m_currentJsonRequest = jsonRequest;
-      getJsonEventProcessor().processEvents(m_currentJsonRequest, currentJsonResponse());
-      return jsonResponseToJson();
+
+      // Process events in model job
+      JobUtility.runModelJobAndAwait("event-processing", getClientSession(), new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          processRequestInternal();
+        }
+      });
+
+      // Wait for any other model jobs that might have been scheduled during event processing. If there are any
+      // (e.g. "data fetched" from smart fields), we want to return their results to the UI in the same request.
+      JobUtility.awaitAllModelJobs(getClientSession());
+
+      // Convert the collected response to JSON. It is important that this is done in a
+      // model job, because during toJson(), the model might be accessed.
+      JSONObject result = JobUtility.runModelJobAndAwait("response-to-json", getClientSession(), new ICallable<JSONObject>() {
+        @Override
+        public JSONObject call() throws Exception {
+          return responseToJsonInternal();
+        }
+      });
+      return result;
     }
     finally {
-      // FIXME CGU really finally? what if exception occurs and some events are already delegated to the model?
       // reset event map (aka jsonResponse) when response has been sent to client
       m_currentJsonResponse = createJsonResponse();
       m_currentHttpRequest.set(null);
@@ -475,6 +501,24 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
         LOG.debug("Adapter count after request: " + m_jsonAdapterRegistry.getJsonAdapterCount());
       }
     }
+  }
+
+  /**
+   * <b>Do not call this internal method directly!</b> It should only be called be
+   * {@link #processRequest(HttpServletRequest, JsonRequest)} which ensures that the required
+   * state is set up correctly (and will be cleaned up later) and is run as a model job.
+   */
+  protected void processRequestInternal() {
+    jsonEventProcessor().processEvents(currentJsonRequest(), currentJsonResponse());
+  }
+
+  /**
+   * <b>Do not call this internal method directly!</b> It should only be called be
+   * {@link #processRequest(HttpServletRequest, JsonRequest)} which ensures that the required
+   * state is set up correctly (and will be cleaned up later) and is run as a model job.
+   */
+  protected JSONObject responseToJsonInternal() {
+    return currentJsonResponse().toJson();
   }
 
   @Override
@@ -508,16 +552,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
     return currentHttpRequest() != null;
   }
 
-  protected JSONObject jsonResponseToJson() {
-    // Because the model might be accessed during toJson(), we have to execute it in a model job
-    return JobUtility.runModelJobAndAwait(getClientSession(), new ICallable<JSONObject>() {
-      @Override
-      public JSONObject call() throws Exception {
-        return currentJsonResponse().toJson();
-      }
-    });
-  }
-
   @Override
   public void sendLocaleChangedEvent(Locale locale) {
     JSONObject jsonEvent = new JSONObject();
@@ -536,16 +570,19 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
 
   @Override
   public void logout() {
-    LOG.info("Logging out...");
-    // when timeout occurs, logout is called without a http context
-    if (currentHttpRequest() != null) {
-      HttpSession httpSession = currentHttpRequest().getSession(false);
-      if (httpSession != null) {
-        httpSession.invalidate();
-      }
-      currentJsonResponse().addActionEvent(getUiSessionId(), "logout", new JSONObject());
+    HttpServletRequest req = currentHttpRequest();
+    if (req == null) {
+      // when timeout occurs, logout is called without a http context
+      return;
     }
-    LOG.info("Logged out");
+    LOG.info("Logging out from UI session with ID " + m_uiSessionId + " [clientSessionId=" + m_clientSessionId + "]");
+    HttpSession httpSession = req.getSession(false);
+    if (httpSession != null) {
+      // This will cause P_ClientSessionCleanupHandler.valueUnbound() to be executed
+      httpSession.invalidate();
+    }
+    currentJsonResponse().addActionEvent(getUiSessionId(), "logout", new JSONObject());
+    LOG.info("Logged out successfully from UI session with ID " + m_uiSessionId);
   }
 
   @Override
@@ -575,19 +612,16 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
 
     @Override
     public void valueUnbound(HttpSessionBindingEvent event) {
-      LOG.info("Shutting down client session with ID " + m_clientSessionId + " due to invalidation of HTTP session...");
-
+      LOG.info("Shutting down client session with ID " + m_clientSessionId + " due to invalidation of HTTP session");
       // Dispose model (if session was not already stopped earlier by itself)
       if (m_clientSession.isActive()) {
-        JobUtility.runModelJobAndAwait(m_clientSession, new IRunnable() {
-
+        JobUtility.runModelJobAndAwait("fireDesktopClosingFromUI", m_clientSession, new IRunnable() {
           @Override
           public void run() throws Exception {
             m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
           }
         });
       }
-
       LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
     }
   }
