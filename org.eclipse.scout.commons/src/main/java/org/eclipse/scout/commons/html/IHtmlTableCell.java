@@ -16,6 +16,11 @@ package org.eclipse.scout.commons.html;
 public interface IHtmlTableCell extends IHtmlElement {
 
   /**
+   * Set the colspan.
+   */
+  IHtmlTableCell colspan(int colspan);
+
+  /**
    * Add a css class
    */
   @Override

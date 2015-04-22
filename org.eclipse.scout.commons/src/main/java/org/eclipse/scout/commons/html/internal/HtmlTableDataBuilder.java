@@ -23,6 +23,12 @@ public class HtmlTableDataBuilder extends HtmlNodeBuilder implements IHtmlTableC
     super("td", text);
   }
 
+  @Override
+  public IHtmlTableCell colspan(int colspan) {
+    addAttribute("colspan", colspan);
+    return this;
+  }
+
   /**
    * Add a css class
    */

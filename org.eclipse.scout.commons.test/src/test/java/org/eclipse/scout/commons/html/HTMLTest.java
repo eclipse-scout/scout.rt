@@ -151,6 +151,12 @@ public class HTMLTest {
   }
 
   @Test
+  public void testCellWithColspan() {
+    IHtmlTableRow row = HTML.row(HTML.cell("1").colspan(2), HTML.cell("2"));
+    assertEquals("<tr><td colspan=\"2\">1</td><td>2</td></tr>", row.toEncodedHtml());
+  }
+
+  @Test
   public void testMultipleRowsNoBinds() {
     IHtmlTableRow row1 = HTML.row(HTML.cell("p1"), HTML.cell("p2"));
     IHtmlTableRow row2 = HTML.row(HTML.cell("p3"), HTML.cell("p4"));
