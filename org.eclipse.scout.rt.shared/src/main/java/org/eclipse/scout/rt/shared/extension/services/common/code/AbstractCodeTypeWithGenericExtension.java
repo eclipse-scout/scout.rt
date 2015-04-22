@@ -54,7 +54,9 @@ public abstract class AbstractCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID
     return chain.execLoadCodes(codeRowType);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void execOverwriteCode(CodeTypeWithGenericOverwriteCodeChain chain, ICodeRow<CODE_ID> oldCode, ICodeRow<CODE_ID> newCode) throws ProcessingException {
+    chain.execOverwriteCode(oldCode, newCode);
   }
 }
