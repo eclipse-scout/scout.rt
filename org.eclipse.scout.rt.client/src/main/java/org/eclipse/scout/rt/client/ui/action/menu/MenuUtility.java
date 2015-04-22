@@ -93,6 +93,15 @@ public final class MenuUtility {
     }
   }
 
+  public static Set<PlannerMenuType> getMenuTypesForPlannerSelection(org.eclipse.scout.rt.client.ui.basic.planner.Activity<?, ?> selectedCell) {
+    if (selectedCell == null) {
+      return CollectionUtility.hashSet(PlannerMenuType.Selection);
+    }
+    else {
+      return CollectionUtility.hashSet(PlannerMenuType.Activity);
+    }
+  }
+
   public static Set<CalendarMenuType> getMenuTypesForCalendarSelection(CalendarComponent selectedComponent) {
     if (selectedComponent == null) {
       return CollectionUtility.hashSet(CalendarMenuType.EmptySpace);

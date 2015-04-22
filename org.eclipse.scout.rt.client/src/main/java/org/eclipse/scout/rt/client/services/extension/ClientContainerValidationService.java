@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.AbstractCalendarItemProvider;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
+import org.eclipse.scout.rt.client.ui.basic.planner.AbstractPlanner;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -69,6 +70,7 @@ public class ClientContainerValidationService extends AbstractContainerValidatio
     addPossibleContributionForContainer(IFormHandler.class, AbstractForm.class);
     addPossibleContributionForContainer(IActionNode.class, AbstractActionNode.class);
     addPossibleContributionForContainer(IMenu.class, AbstractActivityMap.class);
+    addPossibleContributionForContainer(IMenu.class, AbstractPlanner.class);
     addPossibleContributionForContainer(ICalendarItemProvider.class, AbstractCalendar.class);
     addPossibleContributionForContainer(IMenu.class, AbstractCalendar.class);
     addPossibleContributionForContainer(IMenu.class, AbstractCalendarItemProvider.class);
