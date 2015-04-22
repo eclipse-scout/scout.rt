@@ -13,6 +13,7 @@ package org.eclipse.scout.commons.nls;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -23,7 +24,7 @@ import org.eclipse.scout.commons.ConfigIniUtility;
 
 public class DynamicNls {
 
-  private ArrayList<NlsResourceBundleCache> m_resourceBundles;
+  private final List<NlsResourceBundleCache> m_resourceBundles;
 
   /**
    * Specifies if this class should use {@link ResourceBundle#containsKey(String)} to check if a key is available in a
@@ -34,7 +35,7 @@ public class DynamicNls {
   public static final boolean doContainsCheckInResourceBundle = ConfigIniUtility.getPropertyBoolean(ConfigIniConstants.nlsCheckContainsKey, true);
 
   public DynamicNls() {
-    m_resourceBundles = new ArrayList<NlsResourceBundleCache>();
+    m_resourceBundles = new ArrayList<>();
   }
 
   public void registerResourceBundle(String resourceBundleName, Class<?> wrapperClass) {
@@ -113,7 +114,7 @@ public class DynamicNls {
    * get all key/texts defined or redefined by the wrapper class for that locale
    */
   public Map<String, String> getTextMap(Locale locale) {
-    HashMap<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     if (locale == null) {
       locale = getDefaultLocale();
     }
@@ -139,7 +140,7 @@ public class DynamicNls {
   }
 
   /**
-   * Override this method to change default locale behaviour
+   * Override this method to change default locale behavior
    */
   protected Locale getDefaultLocale() {
     return NlsUtility.getDefaultLocale();
