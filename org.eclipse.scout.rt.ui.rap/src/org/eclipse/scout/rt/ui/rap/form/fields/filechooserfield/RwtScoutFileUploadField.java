@@ -188,6 +188,7 @@ public class RwtScoutFileUploadField extends RwtScoutValueFieldComposite<IFileCh
         }
 
         getUiField().setText(filename);
+        resetUpload();
         handleUpload();
       }
     });
@@ -421,32 +422,22 @@ public class RwtScoutFileUploadField extends RwtScoutValueFieldComposite<IFileCh
     if (m_uploadListener == null) {
       m_uploadListener = new P_FileUploadListener();
     }
-    m_uploadListener.startUpload();
     m_handler.addUploadListener(m_uploadListener);
+    m_uploadListener.startUpload();
     createProgressBar();
     getUiBrowseButton().submit(url);
   }
 
+  private void resetUpload() {
+    disposeHandler();
+    disposeProgressBar();
+    initializeFileUpload();
+  }
+
   private boolean cancelUpload() {
-    if (m_uploadedFile != null) {
-      return false;
-    }
-    if (m_uploadListener != null) {
-      m_handler.removeUploadListener(m_uploadListener);
-      m_uploadListener.cancelUpload();
-      m_uploadListener = null;
-    }
-    m_handler.dispose();
-
-    DropDownFileUpload uiBrowseButton = getUiBrowseButton();
-    if (uiBrowseButton != null && !uiBrowseButton.isDisposed()) {
-      uiBrowseButton.dispose();
-    }
-
-    ProgressBar uiProgressBar = getUiProgressBar();
-    if (uiProgressBar != null && !uiProgressBar.isDisposed()) {
-      uiProgressBar.dispose();
-    }
+    disposeHandler();
+    disposeBrowseButton();
+    disposeProgressBar();
     getUiField().setText("");
 
     initializeFileUpload();
@@ -454,6 +445,30 @@ public class RwtScoutFileUploadField extends RwtScoutValueFieldComposite<IFileCh
     createBrowseButton();
 
     return true;
+  }
+
+
+  private void disposeBrowseButton() {
+    DropDownFileUpload uiBrowseButton = getUiBrowseButton();
+    if (uiBrowseButton != null && !uiBrowseButton.isDisposed()) {
+      uiBrowseButton.dispose();
+    }
+  }
+
+  private void disposeProgressBar() {
+    ProgressBar uiProgressBar = getUiProgressBar();
+    if (uiProgressBar != null && !uiProgressBar.isDisposed()) {
+      uiProgressBar.dispose();
+    }
+  }
+
+  private void disposeHandler() {
+    if (m_uploadListener != null) {
+      m_handler.removeUploadListener(m_uploadListener);
+      m_uploadListener.cancelUpload();
+      m_uploadListener = null;
+    }
+    m_handler.dispose();
   }
 
   @Override
