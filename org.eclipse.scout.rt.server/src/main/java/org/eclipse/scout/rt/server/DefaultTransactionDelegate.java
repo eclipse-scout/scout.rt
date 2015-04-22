@@ -117,7 +117,7 @@ public class DefaultTransactionDelegate {
     Throwable p;
     if (t instanceof VetoException) {
       VetoException ve = (VetoException) t;
-      p = new VetoException(ve.getStatus().getTitle(), ve.getMessage(), ve.getStatus().getCode(), ve.getStatus().getSeverity());
+      p = new VetoException(ve.getStatus().getTitle(), ve.getStatus().getBody(), ve.getStatus().getCode(), ve.getStatus().getSeverity());
     }
     else {
       p = new ProcessingException(ScoutTexts.get("RequestProblem"));
