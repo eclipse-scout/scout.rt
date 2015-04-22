@@ -101,7 +101,7 @@ public class HTMLTest {
   public void testTableAttributesNoBinds() {
     final IHtmlTable table = HTML.table(
         row(
-            cell(BIND_TEXT))
+        cell(BIND_TEXT))
         );
     assertEquals("<table><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", table.toEncodedHtml());
   }
@@ -238,6 +238,15 @@ public class HTMLTest {
 
     String exp = "<div><h2>h2</h2>" + createTableString("0") + "</div>";
     assertEquals(exp, html.toEncodedHtml());
+  }
+
+  @Test
+  public void testInput() {
+    String expected = "<input id='lastName' name='Last name' class='person-data' maxlength='30' value='' type='text'>";
+    expected = expected.replace("'", "\"");
+
+    IHtmlInput htmlInput = HTML.input().id("lastName").name("Last name").cssClass("person-data").maxlength(30).value("").type("text");
+    assertEquals(expected, htmlInput.toEncodedHtml());
   }
 
   private String createTableString(String prefix) {

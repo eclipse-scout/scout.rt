@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.commons.html.internal.HtmlContentBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlDocumentBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlImageBuilder;
+import org.eclipse.scout.commons.html.internal.HtmlInputBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlLinkBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlListElement;
 import org.eclipse.scout.commons.html.internal.HtmlNodeBuilder;
@@ -451,4 +452,10 @@ public final class HTML {
     return new HtmlPlainBuilder(text);
   }
 
+  /**
+   * Creates a html input field.
+   */
+  public static IHtmlInput input() {
+    return new HtmlInputBuilder();
+  }
 }
