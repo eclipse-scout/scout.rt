@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.rap;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -176,7 +177,6 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
     m_applicationBundle = applicationBundle;
     m_clientSessionClazz = clientSessionClazz;
     m_environmentListeners = new EventListenerList();
-    m_requestInterceptor = new P_RequestInterceptor();
     //Linked hash map to preserve the order of the opening
     m_openForms = new LinkedHashMap<IForm, IRwtScoutPart>();
     m_status = RwtEnvironmentEvent.INACTIVE;
@@ -352,6 +352,7 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
       // enable HTTP request handling
       // the first beforeRequest-event has to be fired manually, because currently no MessageFilter is attached
       beforeHttpRequestInternal();
+      m_requestInterceptor = new P_RequestInterceptor(RWT.getUISession().getId());
 
       /**
        * TODO: remove cast and restriction annotation when
@@ -541,6 +542,10 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
     IClientSession clientSession = getClientSession();
     if (clientSession != null) {
       setLocaleInUi(clientSession.getLocale());
+      // update subject which can be changed by the web container without relogin (f.e. on WebSphere with an LTPA token authentication)
+      Subject subject = Subject.getSubject(AccessController.getContext());
+      setSubject(subject);
+      getClientSession().setSubject(subject);
     }
     beforeHttpRequest();
   }
@@ -1488,12 +1493,28 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
 
   private class P_RequestInterceptor implements MessageFilter {
 
+    private final String m_rwtUiSessionId;
+
+    public P_RequestInterceptor(String rwtUiSessionId) {
+      m_rwtUiSessionId = rwtUiSessionId;
+    }
+
     @Override
     public ResponseMessage handleMessage(RequestMessage request, MessageFilterChain chain) {
+      if (!isCorrespondingRwtEnvironment()) {
+        return chain.handleMessage(request);
+      }
       beforeHttpRequestInternal();
       ResponseMessage ret = chain.handleMessage(request);
       afterHttpRequestInternal();
       return ret;
+    }
+
+    /**
+     * Checks if the current request corresponds to this Rwt-Environment.
+     */
+    protected boolean isCorrespondingRwtEnvironment() {
+      return m_rwtUiSessionId != null && m_rwtUiSessionId.equals(RWT.getUISession().getId());
     }
 
   }
