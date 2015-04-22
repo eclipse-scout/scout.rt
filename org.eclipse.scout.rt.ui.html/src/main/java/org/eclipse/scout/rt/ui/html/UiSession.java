@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -160,21 +161,20 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
 
     HttpSession httpSession = httpRequest.getSession();
 
-    // Look up the requested client session
+    // Look up the requested client session (create and start a new one if necessary)
     IClientSession clientSession = getOrCreateClientSession(httpSession, httpRequest, jsonStartupRequest);
-    // Create JsonAdapter for client session and ensure it is started and attached
-    initializeJsonClientSession(clientSession);
 
-    // Check if startup succeeded
-    if (!clientSession.isActive()) {
-      throw new JsonException("ClientSession is not active, there must have been a problem with loading or starting");
-    }
-    // ...if success, store the client session in the HTTP session. This must _not_ happen earlier,
-    // otherwise, we might store a client session with errors!
+    // At this point we have a valid, active clientSession. Therefore, we may now safely store it in the HTTP session
     storeClientSessionInHttpSession(httpSession, clientSession);
+
+    // Create a new JsonAdapter for the client session
+    m_jsonClientSession = createClientSessionAdapter(clientSession);
 
     // Handle detach
     handleDetach(jsonStartupRequest, httpSession);
+
+    // Start desktop
+    fireDesktopOpened();
 
     // Send "initialized" event
     sendInitializationEvent();
@@ -194,9 +194,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
       LOG.info("Using cached client session [clientSessionId=" + m_clientSessionId + "]");
     }
     else {
-      // No client session for the requested ID was found, so create one and store it in the map
+      // No client session for the requested ID was found, so create one
       LOG.info("Creating new client session [clientSessionId=" + m_clientSessionId + "]");
-      clientSession = createClientSession(request.getLocale(), createUserAgent(jsonStartupRequest), extractSessionInitParams(jsonStartupRequest.getCustomParams()));
+      clientSession = createAndStartClientSession(request.getLocale(), createUserAgent(jsonStartupRequest), extractSessionInitParams(jsonStartupRequest.getCustomParams()));
+      // Ensure session is active
+      if (!clientSession.isActive()) {
+        throw new JsonException("ClientSession is not active, there must have been a problem with loading or starting [clientSessionId=" + m_clientSessionId + "]");
+      }
     }
     return clientSession;
   }
@@ -230,7 +234,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
     return CLIENT_SESSION_ATTRIBUTE_NAME_PREFIX + m_clientSessionId;
   }
 
-  protected IClientSession createClientSession(Locale locale, UserAgent userAgent, Map<String, String> sessionInitParams) {
+  protected IClientSession createAndStartClientSession(Locale locale, UserAgent userAgent, Map<String, String> sessionInitParams) {
     try {
       ClientRunContext ctx = ClientRunContexts.empty().locale(locale).userAgent(userAgent);
       for (Map.Entry<String, String> e : sessionInitParams.entrySet()) {
@@ -257,12 +261,12 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
     return customParamsMap;
   }
 
-  protected void initializeJsonClientSession(IClientSession clientSession) {
-    m_jsonClientSession = (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
-    JobUtility.runModelJobAndAwait("startUp jsonClientSession", clientSession, new IRunnable() {
+  protected JsonClientSession<?> createClientSessionAdapter(final IClientSession clientSession) {
+    // Ensure adapter is created in model job, because the model might be accessed during the adapter's initialization
+    return JobUtility.runModelJobAndAwait("startUp jsonClientSession", clientSession, new ICallable<JsonClientSession<?>>() {
       @Override
-      public void run() throws Exception {
-        m_jsonClientSession.startUp();
+      public JsonClientSession<?> call() throws Exception {
+        return (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter);
       }
     });
   }
@@ -276,6 +280,23 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
         // TODO BSH Detach | Actually do something
       }
     }
+  }
+
+  protected void fireDesktopOpened() {
+    JobUtility.runModelJobAndAwait("start up desktop", m_jsonClientSession.getModel(), new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        IClientSession clientSession = ClientSessionProvider.currentSession();
+        IDesktop desktop = clientSession.getDesktop();
+
+        if (!desktop.isOpened()) {
+          desktop.getUIFacade().fireDesktopOpenedFromUI();
+        }
+        if (!desktop.isGuiAvailable()) {
+          desktop.getUIFacade().fireGuiAttached();
+        }
+      }
+    });
   }
 
   protected void sendInitializationEvent() {

@@ -17,12 +17,10 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.mockito.Mockito;
 
 public class UiSessionMock extends UiSession {
   private JsonClientSession m_jsonClientSession;
-  private JsonDesktop m_jsonDesktopMock;
 
   public UiSessionMock() {
     init(null, null);
@@ -31,9 +29,6 @@ public class UiSessionMock extends UiSession {
   @Override
   public void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
     m_jsonClientSession = Mockito.mock(JsonClientSession.class);
-    m_jsonDesktopMock = Mockito.mock(JsonDesktop.class);
-    Mockito.when(m_jsonClientSession.getJsonDesktop()).thenReturn(m_jsonDesktopMock);
-
     // For a fully initialized uiSession use TestEnvironmentUiSession
   }
 
