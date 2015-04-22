@@ -40,7 +40,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
-import org.eclipse.scout.rt.client.job.ClientJobFutureFilters;
+import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.Filter;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
@@ -427,11 +427,13 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     if (shutdownWaitTime > 0) {
       // Wait for the client and model jobs to finish before shutdown the session.
       ClientJobs.schedule(new IRunnable() {
-
         @Override
         public void run() throws Exception {
           try {
-            Jobs.getJobManager().awaitDone(new ClientJobFutureFilters.Filter().notCurrentFuture().notBlocked(), shutdownWaitTime, TimeUnit.MILLISECONDS);
+            boolean timeout = !Jobs.getJobManager().awaitDone(otherRunningJobsFilter(), shutdownWaitTime, TimeUnit.MILLISECONDS);
+            if (timeout) {
+              logRunningJobs();
+            }
           }
           finally {
             inactivateSession();
@@ -440,23 +442,12 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
       }, ClientJobs.newInput(ClientRunContexts.copyCurrent().session(this)).name("Wait for client jobs to finish before shutdown the session"));
     }
     else {
+      logRunningJobs();
       inactivateSession();
     }
   }
 
   protected void inactivateSession() {
-    CollectorVisitor<IFuture<?>> runningJobsCollector = new CollectorVisitor<>();
-    Jobs.getJobManager().visit(new ClientJobFutureFilters.Filter().notCurrentFuture().notBlocked(), runningJobsCollector);
-    List<IFuture<?>> runningJobs = runningJobsCollector.getElements();
-
-    if (!runningJobs.isEmpty()) {
-      LOG.warn(""
-          + "Some running client jobs found while client session is going to shutdown. "
-          + "If waiting for a condition or running a periodic job, the associated worker threads may never been released. "
-          + "Please ensure to terminate all client jobs when the session is going down. [session={0}, user={1}, jobs={2}]"
-          , new Object[]{AbstractClientSession.this, getUserId(), runningJobs});
-    }
-
     if (getServiceTunnel() != null) {
       try {
         BEANS.get(ILogoutService.class).logout();
@@ -471,7 +462,33 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     }
   }
 
-  protected boolean isStopping() {
+  /**
+   * Check if any jobs are currently running, that are different from the current job, have the same session assigned
+   * and are not blocked. If yes, a warning with the list of found jobs is printed to the logger.
+   */
+  protected void logRunningJobs() {
+    CollectorVisitor<IFuture<?>> runningJobsCollector = new CollectorVisitor<>();
+    Jobs.getJobManager().visit(otherRunningJobsFilter(), runningJobsCollector);
+    List<IFuture<?>> runningJobs = runningJobsCollector.getElements();
+
+    if (!runningJobs.isEmpty()) {
+      LOG.warn(""
+          + "Some running client jobs found while client session is going to shutdown. "
+          + "If waiting for a condition or running a periodic job, the associated worker threads may never been released. "
+          + "Please ensure to terminate all client jobs when the session is going down. [session={0}, user={1}, jobs=(see below)]\n{2}"
+          , new Object[]{AbstractClientSession.this, getUserId(), CollectionUtility.format(runningJobs, "\n")});
+    }
+  }
+
+  /**
+   * Returns a new {@link Filter} that matches all non-blocked jobs for the current session (except the current job).
+   */
+  protected Filter otherRunningJobsFilter() {
+    return ClientJobs.newFutureFilter().notCurrentFuture().currentSession().notBlocked();
+  }
+
+  @Override
+  public boolean isStopping() {
     return m_isStopping;
   }
 
