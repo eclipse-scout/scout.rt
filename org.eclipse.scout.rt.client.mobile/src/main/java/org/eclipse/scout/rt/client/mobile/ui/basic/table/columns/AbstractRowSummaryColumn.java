@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
  */
 @ClassId("349c912d-0e60-42a0-bd8d-b4c6c08ec62a")
 public abstract class AbstractRowSummaryColumn extends AbstractStringColumn implements IRowSummaryColumn {
-  private boolean m_initialized;
+  private boolean m_decorationConfigurationInitialized;
 
   private IColumn<?> m_cellHeaderColumn;
   private List<IColumn<?>> m_cellDetailColumns;
@@ -106,8 +106,8 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
     return null;
   }
 
-  public boolean isInitialized() {
-    return m_initialized;
+  public boolean isDecorationConfigurationInitialized() {
+    return m_decorationConfigurationInitialized;
   }
 
   public static boolean isDrillDownButtonUrl(String ref) {
@@ -156,7 +156,7 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
       columnVisibleIndex++;
     }
 
-    m_initialized = true;
+    m_decorationConfigurationInitialized = true;
   }
 
   private boolean useColumnForCellHeader(ITable table, IColumn<?> column) {

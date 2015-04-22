@@ -281,7 +281,7 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   }
 
   private void insertWrappedTableRows(List<? extends ITableRow> rows) {
-    if (!getContentColumn().isInitialized()) {
+    if (!getContentColumn().isDecorationConfigurationInitialized()) {
       getContentColumn().initializeDecorationConfiguration(getOriginalTable(), m_maxCellDetailColumns);
     }
 
