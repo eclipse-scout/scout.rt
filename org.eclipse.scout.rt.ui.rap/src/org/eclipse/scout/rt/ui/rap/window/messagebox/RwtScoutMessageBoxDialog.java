@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.groupbox.layout.ButtonBarLayout;
 import org.eclipse.scout.rt.ui.rap.form.fields.groupbox.layout.ButtonBarLayoutData;
@@ -51,14 +52,14 @@ public class RwtScoutMessageBoxDialog extends Dialog {
   private IRwtEnvironment m_uiEnvironment;
 
   private Label m_imageLabel;
-  private Label m_introLabel;
-  private Label m_actionLabel;
+  private StyledText m_introLabel;
+  private StyledText m_actionLabel;
 
   public RwtScoutMessageBoxDialog(Shell parentShell, IMessageBox scoutObject, IRwtEnvironment uiEnvironment) {
     super(parentShell);
     m_scoutObject = scoutObject;
     m_uiEnvironment = uiEnvironment;
-    int dialogStyle = SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL;
+    int dialogStyle = SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE;
     setShellStyle(dialogStyle);
     setBlockOnOpen(false);
   }
@@ -145,6 +146,8 @@ public class RwtScoutMessageBoxDialog extends Dialog {
       exclude = true;
     }
     m_actionLabel.setText(actionText);
+    // Hide empty labels
+    m_actionLabel.setVisible(StringUtility.hasText(m_actionLabel.getText()));
     if (m_actionLabel.getLayoutData() instanceof GridData) {
       GridData gridData = ((GridData) m_actionLabel.getLayoutData());
       if (gridData.exclude != exclude) {
@@ -153,8 +156,6 @@ public class RwtScoutMessageBoxDialog extends Dialog {
         m_actionLabel.getParent().getParent().layout(true, true);
       }
     }
-    // Hide empty labels
-    m_actionLabel.setVisible(StringUtility.hasText(m_actionLabel.getText()));
   }
 
   protected void dettachScout() {
@@ -168,7 +169,9 @@ public class RwtScoutMessageBoxDialog extends Dialog {
   protected Control createDialogArea(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     Control header = createHeaderArea(container);
-    m_actionLabel = getUiEnvironment().getFormToolkit().createLabel(container, "", SWT.WRAP | SWT.LEFT);
+    m_actionLabel = getUiEnvironment().getFormToolkit().createStyledText(container, SWT.WRAP | SWT.LEFT | SWT.V_SCROLL);
+    m_actionLabel.setEditable(false);
+    m_actionLabel.setData(StyledText.WRAP_TEXT_WITHOUT_SPACES, Boolean.TRUE);
 
     // layout
     container.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
@@ -192,7 +195,9 @@ public class RwtScoutMessageBoxDialog extends Dialog {
   private Control createHeaderArea(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     m_imageLabel = getUiEnvironment().getFormToolkit().createLabel(container, "");
-    m_introLabel = getUiEnvironment().getFormToolkit().createLabel(container, "", SWT.WRAP | SWT.LEFT);
+    m_introLabel = getUiEnvironment().getFormToolkit().createStyledText(container, SWT.WRAP | SWT.LEFT | SWT.V_SCROLL);
+    m_introLabel.setData(StyledText.WRAP_TEXT_WITHOUT_SPACES, Boolean.TRUE);
+    m_introLabel.setEditable(false);
     m_introLabel.setData(RWT.MARKUP_ENABLED, Boolean.TRUE);
     //Unsafe configuration. Size for h1, h2, h3.. tags isn't well calculated at the first time
     m_introLabel.setData(MarkupValidator.MARKUP_VALIDATION_DISABLED, Boolean.TRUE);
