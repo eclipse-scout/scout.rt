@@ -1,8 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.ActivityMap = function() {
-  scout.ActivityMap.parent.call(this);
+scout.Planner = function() {
+  scout.Planner.parent.call(this);
 
   // main elements
   this.$container;
@@ -26,44 +26,46 @@ scout.ActivityMap = function() {
   // adapter
   //this._addAdapterProperties(['days', 'selectedDays']);
 };
-scout.inherits(scout.ActivityMap, scout.ModelAdapter);
+scout.inherits(scout.Planner, scout.ModelAdapter);
 
-scout.ActivityMap.prototype.init = function(model, session) {
-  scout.ActivityMap.parent.prototype.init.call(this, model, session);
+scout.Planner.prototype.init = function(model, session) {
+  scout.Planner.parent.prototype.init.call(this, model, session);
 };
 
-scout.ActivityMap.prototype._render = function($parent) {
+scout.Planner.prototype._render = function($parent) {
   //basics, layout etc.
   this._$parent = $parent;
-  this.$container = this._$parent.appendDiv('activity-map').attr('id', this._generateId('activity-map'));
-  var layout = new scout.ActivityMapLayout(this);
+  this.$container = this._$parent.appendDiv('planner').attr('id', this._generateId('planner'));
+  var layout = new scout.PlannerLayout(this);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
 
   // main elements
-  this.$header = this.$container.appendDiv('activity-map-header');
-  this.$year = this.$container.appendDiv('activity-map-year-container').appendDiv('activity-map-year');
-  this.$grid = this.$container.appendDiv('activity-map-grid');
-  this.$list = this.$container.appendDiv('activity-map-list-container').appendDiv('activity-map-list');
+  this.$header = this.$container.appendDiv('planner-header');
+  this.$year = this.$container.appendDiv('planner-year-container').appendDiv('planner-year');
+  this.$grid = this.$container.appendDiv('planner-grid');
+  scout.scrollbars.install(this.$grid);
+  this.$list = this.$container.appendDiv('planner-list-container').appendDiv('planner-list');
 
   // header contains all controls
-  this.$range = this.$header.appendDiv('activity-map-range');
-  this.$range.appendDiv('activity-map-minus').click(this._onClickMinus.bind(this));
-  this.$range.appendDiv('activity-map-plus').click(this._onClickPlus.bind(this));
-  this.$range.appendDiv('activity-map-select');
+  this.$range = this.$header.appendDiv('planner-range');
+  this.$range.appendDiv('planner-minus').click(this._onClickMinus.bind(this));
+  this.$range.appendDiv('planner-plus').click(this._onClickPlus.bind(this));
+  this.$range.appendDiv('planner-select');
 
   // ... and modes
-  this.$commands = this.$header.appendDiv('activity-map-commands');
-  this.$commands.appendDiv('activity-map-today').click(this._onClickToday.bind(this));
-  this.$commands.appendDiv('activity-map-separator');
-  this.$commands.appendDiv('activity-map-mode-day activity-map-mode').attr('data-mode', this.DAY).click(this._onClickMode.bind(this));
-  this.$commands.appendDiv('activity-map-mode-work activity-map-mode').attr('data-mode', this.WORK).click(this._onClickMode.bind(this));
-  this.$commands.appendDiv('activity-map-mode-week activity-map-mode').attr('data-mode', this.WEEK).click(this._onClickMode.bind(this));
-  this.$commands.appendDiv('activity-map-mode-month activity-map-mode').attr('data-mode', this.MONTH).click(this._onClickMode.bind(this));
-  this.$commands.appendDiv('activity-map-separator');
-  this.$commands.appendDiv('activity-map-toggle-year').click(this._onClickYear.bind(this));
-  this.$commands.appendDiv('activity-map-toggle-list').click(this._onClickList.bind(this));
+  this.$commands = this.$header.appendDiv('planner-commands');
+  this.$commands.appendDiv('planner-today').click(this._onClickToday.bind(this));
+  this.$commands.appendDiv('planner-separator');
+  this.$commands.appendDiv('planner-mode-day planner-mode').attr('data-mode', this.DAY).click(this._onClickMode.bind(this));
+  this.$commands.appendDiv('planner-mode-work planner-mode').attr('data-mode', this.WORK).click(this._onClickMode.bind(this));
+  this.$commands.appendDiv('planner-mode-week planner-mode').attr('data-mode', this.WEEK).click(this._onClickMode.bind(this));
+  this.$commands.appendDiv('planner-mode-month planner-mode').attr('data-mode', this.MONTH).click(this._onClickMode.bind(this));
+  this.$commands.appendDiv('planner-separator');
+  this.$commands.appendDiv('planner-toggle-year').click(this._onClickYear.bind(this));
+  this.$commands.appendDiv('planner-toggle-list').click(this._onClickList.bind(this));
+
 
   // should be done by server?
   this.displayMode = this.MONTH;
@@ -73,7 +75,7 @@ scout.ActivityMap.prototype._render = function($parent) {
 
 /* -- basics, events -------------------------------------------- */
 
-scout.ActivityMap.prototype._onClickMinus = function(event) {
+scout.Planner.prototype._onClickMinus = function(event) {
   var year = this.selected.getFullYear(),
     month = this.selected.getMonth(),
     date = this.selected.getDate(),
@@ -93,7 +95,7 @@ scout.ActivityMap.prototype._onClickMinus = function(event) {
   this._updateScreen();
 };
 
-scout.ActivityMap.prototype._onClickPlus = function(event) {
+scout.Planner.prototype._onClickPlus = function(event) {
   var year = this.selected.getFullYear(),
     month = this.selected.getMonth(),
     date = this.selected.getDate(),
@@ -113,7 +115,7 @@ scout.ActivityMap.prototype._onClickPlus = function(event) {
   this._updateScreen();
 };
 
-scout.ActivityMap.prototype._onClickToday = function(event) {
+scout.Planner.prototype._onClickToday = function(event) {
   // new selected date
   this.selected = new Date();
 
@@ -122,7 +124,7 @@ scout.ActivityMap.prototype._onClickToday = function(event) {
   this._updateScreen();
 };
 
-scout.ActivityMap.prototype._onClickMode = function(event) {
+scout.Planner.prototype._onClickMode = function(event) {
   // set new mode
   this.displayMode = $(event.target).data('mode');
 
@@ -131,14 +133,14 @@ scout.ActivityMap.prototype._onClickMode = function(event) {
   this._updateScreen();
 };
 
-scout.ActivityMap.prototype._onClickYear = function(event) {
+scout.Planner.prototype._onClickYear = function(event) {
   // set flag
   this.showYear = !this.showYear;
 
   // update screen
   this._updateScreen();
 };
-scout.ActivityMap.prototype._onClickList = function(event) {
+scout.Planner.prototype._onClickList = function(event) {
   // set flag
   this.showList = !this.showList;
 
@@ -146,7 +148,7 @@ scout.ActivityMap.prototype._onClickList = function(event) {
   this._updateScreen();
 };
 
-scout.ActivityMap.prototype._onClickDay = function(event) {
+scout.Planner.prototype._onClickDay = function(event) {
   var $clicked = $(event.currentTarget);
 
   // select clicked day
@@ -167,27 +169,27 @@ scout.ActivityMap.prototype._onClickDay = function(event) {
 
 /* --  set display mode and range ------------------------------------- */
 
-scout.ActivityMap.prototype._updateModel = function() {
+scout.Planner.prototype._updateModel = function() {
 };
 
-scout.ActivityMap.prototype._updateScreen = function() {
-  this._renderActivityRows();
+scout.Planner.prototype._updateScreen = function() {
+  this._renderResourceRows();
 };
 
 
 
-scout.ActivityMap.prototype._renderActivityRows = function() {
+scout.Planner.prototype._renderResourceRows = function() {
   var i, $row;
   for (i = 0; i < this.rows.length; i++) {
-    $row = this._build$ActivityRow(this.rows[i], this.$data);
-    $row.appendTo(this.$data);
+    $row = this._build$ResourceRow(this.rows[i], this.$grid);
+    $row.appendTo(this.$grid);
   }
 };
 
-scout.ActivityMap.prototype._build$ActivityRow = function(row) {
+scout.Planner.prototype._build$ResourceRow = function(row) {
   var i, $cell,
-    $row = $.makeDiv('activity-row');
-  $row.appendSpan().text('resourceId: ' + row.resourceId);
+    $row = $.makeDiv('resource-row');
+  $row.appendSpan('resource-cell').text(row.resourceCell.text);
   for (i = 0; i < row.cells.length; i++) {
     $cell = this._build$ActivityCell(row.cells[i]);
     $cell.appendTo($row);
@@ -195,17 +197,27 @@ scout.ActivityMap.prototype._build$ActivityRow = function(row) {
   return $row;
 };
 
-scout.ActivityMap.prototype._build$ActivityCell = function(cell) {
+scout.Planner.prototype._build$ActivityCell = function(cell) {
   var i,
-    $cell = $.makeDiv('activity-cell');
-  $cell.text('minorValue: ' + cell.minorValue + ', majorValue: ' + cell.majorValue);
+    $cell = $.makeDiv('activity-cell'),
+    level = Math.min(cell.level * 100, 100),
+    levelColor = scout.helpers.modelToCssColor(cell.levelColor);
+
+    if (!levelColor) {
+      levelColor = '#80c1d0';
+    }
+
+    $cell.text(cell.text);
+    $cell.css('background-color', 'transparent');
+    $cell.css('background-image', 'linear-gradient(to top, ' + levelColor + ' 0%, ' + levelColor + ' ' + level + '%, transparent ' + level + '%, transparent 100% )');
+
   return $cell;
 };
 
 
 /* -- year, draw and color ---------------------------------------- */
 
-scout.ActivityMap.prototype.drawYear = function() {
+scout.Planner.prototype.drawYear = function() {
   // init vars
   var year = this.start.getFullYear(),
     first, $month, day, $day;
@@ -252,7 +264,7 @@ scout.ActivityMap.prototype.drawYear = function() {
    .hover(this._onYearHoverIn.bind(this), this._onYearHoverOut.bind(this));
 };
 
-scout.ActivityMap.prototype.colorYear = function() {
+scout.Planner.prototype.colorYear = function() {
   // color is only needed if visible
   if (!this.showYear) {
     return;
@@ -281,7 +293,7 @@ scout.ActivityMap.prototype.colorYear = function() {
 
 /* -- year, events ---------------------------------------- */
 
-scout.ActivityMap.prototype._onYearClick = function(event) {
+scout.Planner.prototype._onYearClick = function(event) {
   // prepare calculation
   var diff = $(event.target).data('year-diff'),
     year = this.selected.getFullYear(),
@@ -297,7 +309,7 @@ scout.ActivityMap.prototype._onYearClick = function(event) {
 };
 
 
-scout.ActivityMap.prototype._onYearDayClick = function(event) {
+scout.Planner.prototype._onYearDayClick = function(event) {
   // new selected day
   this.selected = $('.year-hover-day', this.$year).data('date');
 
@@ -307,7 +319,7 @@ scout.ActivityMap.prototype._onYearDayClick = function(event) {
 };
 
 
-scout.ActivityMap.prototype._onYearHoverIn = function(event) {
+scout.Planner.prototype._onYearHoverIn = function(event) {
   // init vars
   var $day = $(event.target),
     date1 = $day.data('date'),
@@ -358,65 +370,64 @@ scout.ActivityMap.prototype._onYearHoverIn = function(event) {
   });
 };
 
-scout.ActivityMap.prototype._onYearHoverOut = function(event) {
+scout.Planner.prototype._onYearHoverOut = function(event) {
   // remove all hover effects
   $('.year-day.year-hover, .year-day.year-hover-day', this.$year).removeClass('year-hover year-hover-day');
 };
 
 
 
-/*
-scout.ActivityMap.prototype._renderDays = function() {
+
+scout.Planner.prototype._renderDays = function() {
 };
 
-scout.ActivityMap.prototype._renderWorkDayCount = function() {
+scout.Planner.prototype._renderWorkDayCount = function() {
 };
 
-scout.ActivityMap.prototype._renderWorkDaysOnly = function() {
+scout.Planner.prototype._renderWorkDaysOnly = function() {
 };
 
-scout.ActivityMap.prototype._renderFirstHourOfDay = function() {
+scout.Planner.prototype._renderFirstHourOfDay = function() {
 };
 
-scout.ActivityMap.prototype._renderLastHourOfDay = function() {
+scout.Planner.prototype._renderLastHourOfDay = function() {
 };
 
-scout.ActivityMap.prototype._renderIntradayInterval = function() {
+scout.Planner.prototype._renderIntradayInterval = function() {
 };
 
-scout.ActivityMap.prototype._renderPlanningMode = function() {
+scout.Planner.prototype._renderPlanningMode = function() {
 };
 
-scout.ActivityMap.prototype._renderResourceIds = function() {
+scout.Planner.prototype._renderResourceIds = function() {
 };
 
-scout.ActivityMap.prototype._renderSelectedBeginTime = function() {
+scout.Planner.prototype._renderSelectedBeginTime = function() {
 };
 
-scout.ActivityMap.prototype._renderSelectedEndTime = function() {
+scout.Planner.prototype._renderSelectedEndTime = function() {
 };
 
-scout.ActivityMap.prototype._renderSelectedResourceIds = function() {
+scout.Planner.prototype._renderSelectedResourceIds = function() {
 };
 
-scout.ActivityMap.prototype._renderSelectedActivityCell = function() {
+scout.Planner.prototype._renderSelectedActivityCell = function() {
 };
 
-scout.ActivityMap.prototype._renderTimeScale = function() {
+scout.Planner.prototype._renderTimeScale = function() {
 };
 
-scout.ActivityMap.prototype._renderDrawSections = function() {
+scout.Planner.prototype._renderDrawSections = function() {
 };
 
-scout.ActivityMap.prototype.onModelAction = function(event) {
-  if (event.type === 'activityMapChanged') {
-    this._onActivityMapChanged(event);
+scout.Planner.prototype.onModelAction = function(event) {
+  if (event.type === 'plannerChanged') {
+    this._onPlannerChanged(event);
   } else {
     $.log.warn('Model event not handled. Widget: scout.Calendar. Event: ' + event.type + '.');
   }
 };
 
-scout.ActivityMap.prototype._onActivityMapChanged = function(event) {
-  // TODO ActivityMap | Implement --> see JsonActivityMapEvent
+scout.Planner.prototype._onPlannerChanged = function(event) {
+  // TODO Planner | Implement --> see JsonPlannerEvent
 };
-*/

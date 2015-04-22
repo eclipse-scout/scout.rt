@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.ui.html.json.basic.activitymap;
+package org.eclipse.scout.rt.ui.html.json.basic.planner;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,11 +8,12 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityMapEvent;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityMapListener;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMapUIFacade;
+import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
+import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
+import org.eclipse.scout.rt.client.ui.basic.planner.IPlannerUIFacade;
+import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
+import org.eclipse.scout.rt.client.ui.basic.planner.PlannerListener;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IIdProvider;
@@ -23,11 +24,11 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends AbstractJsonPropertyObserver<P> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonActivityMap.class);
+public class JsonPlanner<P extends IPlanner<RI, AI>, RI, AI> extends AbstractJsonPropertyObserver<P> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonPlanner.class);
 
   // from model
-  public static final String EVENT_ACTIVITY_MAP_CHANGED = "activityMapChanged";
+  public static final String EVENT_PLANNER_CHANGED = "plannerChanged";
 
   // from UI
   private static final String EVENT_SELECTION = "selection";
@@ -35,11 +36,11 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
   private static final String EVENT_SET_SELECTED_ACTIVITY_CELLS = "setSelectedActivityCells";
   private static final String EVENT_CELL_ACTION = "cellAction";
 
-  private ActivityMapListener m_activityMapListener;
-  private final Map<String, ActivityCell<RI, AI>> m_cells;
-  private final Map<ActivityCell<RI, AI>, String> m_cellIds;
+  private PlannerListener m_plannerListener;
+  private final Map<String, Activity<?, ?>> m_cells;
+  private final Map<Activity<?, ?>, String> m_cellIds;
 
-  public JsonActivityMap(P model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonPlanner(P model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
     m_cells = new HashMap<>();
     m_cellIds = new HashMap<>();
@@ -47,39 +48,39 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
 
   @Override
   public String getObjectType() {
-    return "ActivityMap";
+    return "Planner";
   }
 
   @Override
   protected void attachModel() {
     super.attachModel();
-    if (m_activityMapListener != null) {
+    if (m_plannerListener != null) {
       throw new IllegalStateException();
     }
-    m_activityMapListener = new P_ActivityMapListener();
-    getModel().addActivityMapListener(m_activityMapListener);
+    m_plannerListener = new P_PlannerListener();
+    getModel().addPlannerListener(m_plannerListener);
   }
 
   @Override
   protected void detachModel() {
     super.detachModel();
-    if (m_activityMapListener == null) {
+    if (m_plannerListener == null) {
       throw new IllegalStateException();
     }
-    getModel().removeActivityMapListener(m_activityMapListener);
-    m_activityMapListener = null;
+    getModel().removePlannerListener(m_plannerListener);
+    m_plannerListener = null;
   }
 
   @Override
   protected void initJsonProperties(P model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_PLANNING_MODE, model) {
+    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_PLANNING_MODE, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getPlanningMode();
       }
     });
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_DAYS, model) {
+    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_DAYS, model) {
       @Override
       protected Date[] modelValue() {
         return getModel().getDays();
@@ -97,7 +98,40 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
         return jsonArray;
       }
     });
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_SELECTED_BEGIN_TIME, model) {
+    //FIXME CGU remove
+//    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_WORK_DAY_COUNT, model) {
+//      @Override
+//      protected Integer modelValue() {
+//        return getModel().getWorkDayCount();
+//      }
+//    });
+    //FIXME CGU not part of planner mode?
+//    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_WORK_DAYS_ONLY, model) {
+//      @Override
+//      protected Boolean modelValue() {
+//        return getModel().isWorkDaysOnly();
+//      }
+//    });
+    //FIXME CGU needed?
+//    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_FIRST_HOUR_OF_DAY, model) {
+//      @Override
+//      protected Integer modelValue() {
+//        return getModel().getFirstHourOfDay();
+//      }
+//    });
+//    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_LAST_HOUR_OF_DAY, model) {
+//      @Override
+//      protected Integer modelValue() {
+//        return getModel().getLastHourOfDay();
+//      }
+//    });
+//    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_INTRADAY_INTERVAL, model) {
+//      @Override
+//      protected Long modelValue() {
+//        return getModel().getIntradayInterval();
+//      }
+//    });
+    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_SELECTED_BEGIN_TIME, model) {
       @Override
       protected Date modelValue() {
         return getModel().getSelectedBeginTime();
@@ -108,7 +142,7 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
         return new JsonDate((Date) value).asJsonString();
       }
     });
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_SELECTED_END_TIME, model) {
+    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_SELECTED_END_TIME, model) {
       @Override
       protected Date modelValue() {
         return getModel().getSelectedEndTime();
@@ -119,10 +153,10 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
         return new JsonDate((Date) value).asJsonString();
       }
     });
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_SELECTED_RESOURCE_IDS, model) {
+    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_SELECTED_RESOURCES, model) {
       @Override
-      protected List<RI> modelValue() {
-        return getModel().getSelectedResourceIds();
+      protected List<Resource> modelValue() {
+        return getModel().getSelectedResources();
       }
 
       @Override
@@ -135,20 +169,20 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
         return new JSONArray(list);
       }
     });
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_SELECTED_ACTIVITY_CELL, model) {
+    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_SELECTED_ACTIVITY_CELL, model) {
       @Override
-      protected ActivityCell<RI, AI> modelValue() {
+      protected Activity<RI, AI> modelValue() {
         return getModel().getSelectedActivityCell();
       }
 
       @SuppressWarnings("unchecked")
       @Override
       public Object prepareValueForToJson(Object value) {
-        ActivityCell<RI, AI> activityCell = (ActivityCell<RI, AI>) value;
+        Activity<RI, AI> activityCell = (Activity<RI, AI>) value;
         return new P_GetOrCreateCellIdProvider().getId(activityCell);
       }
     });
-    putJsonProperty(new JsonProperty<P>(IActivityMap.PROP_DRAW_SECTIONS, model) {
+    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_DRAW_SECTIONS, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isDrawSections();
@@ -161,10 +195,10 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    List<RI> resourceIds = getModel().getResourceIds();
+    List<Resource> resources = getModel().getResources();
     JSONArray jsonRows = new JSONArray();
-    for (RI resourceId : resourceIds) {
-      JsonActivityRow<RI, AI> jsonRow = new JsonActivityRow<RI, AI>(resourceId, getModel().getActivityCells(resourceId), new P_NewCellIdProvider());
+    for (Resource resource : resources) {
+      JsonResource jsonRow = new JsonResource(resource, new P_NewCellIdProvider());
       Object row = jsonRow.toJson();
       LOG.debug("Id: " + getId() + ". Resources: " + row.toString());
       jsonRows.put(row);
@@ -173,11 +207,11 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
     return json;
   }
 
-  protected String getCellId(ActivityCell<RI, AI> cell) {
+  protected String getCellId(Activity<?, ?> cell) {
     return m_cellIds.get(cell);
   }
 
-  protected String createCellId(ActivityCell<RI, AI> cell) {
+  protected String createCellId(Activity<?, ?> cell) {
     String id = getCellId(cell);
     if (id != null) {
       throw new IllegalStateException("Cell already has an id. " + cell);
@@ -209,26 +243,19 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
 
   protected void handleUiSelection(JsonEvent event) {
     JSONArray resourceIdsArray = event.getData().optJSONArray("resourceIds");
-    List<RI> resourceIds = new ArrayList<>();
+    List<Resource> resources = new ArrayList<>();
     for (int i = 0; i < resourceIdsArray.length(); i++) {
       // TODO Convert IDs from JSON
-      @SuppressWarnings("unchecked")
-      RI id = (RI) resourceIdsArray.opt(i);
-      resourceIds.add(id);
-    }
-
-    JSONArray normalizedRangeArray = event.getData().optJSONArray("normalizedRange");
-    double[] normalizedRange = null;
-    if (normalizedRangeArray != null) {
-      normalizedRange = new double[normalizedRangeArray.length()];
-      for (int i = 0; i < normalizedRangeArray.length(); i++) {
-        normalizedRange[i] = normalizedRangeArray.optDouble(i);
-      }
+//      @SuppressWarnings("unchecked")
+//      RI id = (RI) resourceIdsArray.opt(i);
+//      resources.add(id);
     }
 
     @SuppressWarnings("unchecked")
-    IActivityMapUIFacade<RI, AI> uiFacade = (IActivityMapUIFacade<RI, AI>) getModel().getUIFacade();
-    uiFacade.setSelectionFromUI(resourceIds, normalizedRange);
+    IPlannerUIFacade<RI, AI> uiFacade = (IPlannerUIFacade<RI, AI>) getModel().getUIFacade();
+    Date endTime = null;
+    Date beginTime = null;
+    uiFacade.setSelectionFromUI(resources, beginTime, endTime);
   }
 
   protected void handleUiSetDays(JsonEvent event) {
@@ -239,62 +266,59 @@ public class JsonActivityMap<P extends IActivityMap<RI, AI>, RI, AI> extends Abs
     }
 
     @SuppressWarnings("unchecked")
-    IActivityMapUIFacade<RI, AI> uiFacade = (IActivityMapUIFacade<RI, AI>) getModel().getUIFacade();
+    IPlannerUIFacade<RI, AI> uiFacade = (IPlannerUIFacade<RI, AI>) getModel().getUIFacade();
     uiFacade.setDaysFromUI(days);
   }
 
   protected void handleUiSetSelectedActivityCells(JsonEvent event) {
-    ActivityCell<RI, AI> activityCell = null;
+    Activity<RI, AI> activityCell = null;
     // TODO Map data from JSON
 
     @SuppressWarnings("unchecked")
-    IActivityMapUIFacade<RI, AI> uiFacade = (IActivityMapUIFacade<RI, AI>) getModel().getUIFacade();
+    IPlannerUIFacade<RI, AI> uiFacade = (IPlannerUIFacade<RI, AI>) getModel().getUIFacade();
     uiFacade.setSelectedActivityCellFromUI(activityCell);
   }
 
   protected void handleCellAction(JsonEvent event) {
-    RI resourceId = null;
+    Resource resource = null;
     // TODO Map data from JSON
 
-    double[] normalizedRange = null;
-    // TODO Map data from JSON
-
-    ActivityCell<RI, AI> activityCell = null;
+    Activity<RI, AI> activityCell = null;
     // TODO Map data from JSON
 
     @SuppressWarnings("unchecked")
-    IActivityMapUIFacade<RI, AI> uiFacade = (IActivityMapUIFacade<RI, AI>) getModel().getUIFacade();
-    uiFacade.fireCellActionFromUI(resourceId, normalizedRange, activityCell);
+    IPlannerUIFacade<RI, AI> uiFacade = (IPlannerUIFacade<RI, AI>) getModel().getUIFacade();
+    uiFacade.fireCellActionFromUI(resource, activityCell);
   }
 
-  protected class P_ActivityMapListener implements ActivityMapListener {
+  protected class P_PlannerListener implements PlannerListener {
 
     @Override
-    public void activityMapChanged(ActivityMapEvent e) {
-      addActionEvent(EVENT_ACTIVITY_MAP_CHANGED, new JsonActivityMapEvent(e).toJson());
+    public void plannerChanged(PlannerEvent e) {
+      addActionEvent(EVENT_PLANNER_CHANGED, new JsonPlannerEvent(e).toJson());
     }
   }
 
-  protected class P_CellIdProvider implements IIdProvider<ActivityCell<RI, AI>> {
+  protected class P_CellIdProvider implements IIdProvider<Activity<?, ?>> {
 
     @Override
-    public String getId(ActivityCell<RI, AI> cell) {
+    public String getId(Activity<?, ?> cell) {
       return getCellId(cell);
     }
   }
 
-  protected class P_NewCellIdProvider implements IIdProvider<ActivityCell<RI, AI>> {
+  protected class P_NewCellIdProvider implements IIdProvider<Activity<?, ?>> {
 
     @Override
-    public String getId(ActivityCell<RI, AI> cell) {
+    public String getId(Activity<?, ?> cell) {
       return createCellId(cell);
     }
   }
 
-  protected class P_GetOrCreateCellIdProvider implements IIdProvider<ActivityCell<RI, AI>> {
+  protected class P_GetOrCreateCellIdProvider implements IIdProvider<Activity<?, ?>> {
 
     @Override
-    public String getId(ActivityCell<RI, AI> cell) {
+    public String getId(Activity<?, ?> cell) {
       String id = getCellId(cell);
       if (id == null) {
         id = createCellId(cell);

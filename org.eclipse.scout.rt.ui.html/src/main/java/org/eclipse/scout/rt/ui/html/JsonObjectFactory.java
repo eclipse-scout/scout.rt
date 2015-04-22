@@ -17,9 +17,9 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
+import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBeanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
@@ -60,6 +60,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.richtextfield.IRichTextField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
@@ -85,7 +86,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonDataModel;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
-import org.eclipse.scout.rt.ui.html.json.basic.activitymap.JsonActivityMap;
+import org.eclipse.scout.rt.ui.html.json.basic.planner.JsonPlanner;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendar;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendarComponent;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
@@ -113,6 +114,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.mailfield.JsonMailField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.numberfield.JsonNumberField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.placeholder.JsonPlaceholderField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.plannerfield.JsonPlannerField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.plannerfield.JsonPlannerFieldOld;
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButtonGroup;
 import org.eclipse.scout.rt.ui.html.json.form.fields.richtextfield.JsonRichTextField;
@@ -226,8 +228,11 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     if (model instanceof ICalendarField<?>) {
       return new JsonCalendarField<ICalendarField<? extends ICalendar>>((ICalendarField<?>) model, session, id, parent);
     }
-    if (model instanceof IPlannerField<?, ?, ?, ?>) {
-      return new JsonPlannerField((IPlannerField<?, ?, ?, ?>) model, session, id, parent);
+    if (model instanceof IPlannerField<?, ?, ?>) {
+      return new JsonPlannerField((IPlannerField<?, ?, ?>) model, session, id, parent);
+    }
+    if (model instanceof IPlannerFieldOld<?, ?, ?, ?>) {
+      return new JsonPlannerFieldOld((IPlannerFieldOld<?, ?, ?, ?>) model, session, id, parent);
     }
     if (model instanceof IWrappedFormField<?>) {
       return new JsonWrappedFormField<IWrappedFormField<? extends IForm>>((IWrappedFormField<?>) model, session, id, parent);
@@ -318,8 +323,8 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     if (model instanceof CalendarComponent) {
       return new JsonCalendarComponent<CalendarComponent>((CalendarComponent) model, session, id, parent);
     }
-    if (model instanceof IActivityMap<?, ?>) {
-      return new JsonActivityMap((IActivityMap<?, ?>) model, session, id, parent);
+    if (model instanceof IPlanner<?, ?>) {
+      return new JsonPlanner((IPlanner<?, ?>) model, session, id, parent);
     }
 
     if (model instanceof IChartTableControl) { // needs to be before ITableControl

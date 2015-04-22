@@ -62,13 +62,13 @@ __include("scout/menu/Popup.js");
 __include("scout/menu/MenuControlKeyStrokes.js");
 __include("scout/menu/MenuCloseKeyStrokes.js");
 __include("scout/menu/PopupKeyStrokeAdapter.js");
-__include("scout/activitymap/ActivityMap.js");
-__include("scout/activitymap/ActivityMapLayout.js");
 __include("scout/calendar/Calendar.js");
 __include("scout/calendar/CalendarComponent.js");
 __include("scout/calendar/CalendarLayout.js");
 __include("scout/messagebox/MessageBox.js");
 __include("scout/messagebox/MessageBoxModelAdapter.js");
+__include("scout/planner/Planner.js");
+__include("scout/planner/PlannerLayout.js");
 // Table
 __include("scout/table/Column.js");
 __include("scout/table/BeanColumn.js"); // requires Column.js

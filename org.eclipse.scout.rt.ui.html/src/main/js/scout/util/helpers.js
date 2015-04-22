@@ -89,6 +89,17 @@ scout.helpers = {
     return fontSpec;
   },
 
+  modelToCssColor: function(color) {
+    var cssColor = '';
+    if (/^[A-Fa-f0-9]{3}([A-Fa-f0-9]{3})?$/.test(color)) { // hex color
+      cssColor = '#' + color;
+    }
+    else if (/^[A-Za-z0-9().,%-]+$/.test(color)) { // named colors or color functions
+      cssColor = color;
+    }
+    return cssColor;
+  },
+
   /**
    * Returns a string with CSS definitions for use in an element's "style" attribute. All CSS relevant
    * properties of the given cell are converted to CSS definitions, namely foreground color, background
@@ -106,19 +117,8 @@ scout.helpers = {
       cssFontFamily = '';
 
     if (typeof cell === 'object' && cell !== null) {
-      if (/^[A-Fa-f0-9]{3}([A-Fa-f0-9]{3})?$/.test(cell.foregroundColor)) { // hex color
-        cssColor = '#' + cell.foregroundColor;
-      }
-      else if (/^[A-Za-z0-9().,%-]+$/.test(cell.foregroundColor)) { // named colors or color functions
-        cssColor = cell.foregroundColor;
-      }
-
-      if (/^[A-Fa-f0-9]{3}([A-Fa-f0-9]{3})?$/.test(cell.backgroundColor)) { // hex color
-        cssBackgroundColor = '#' + cell.backgroundColor;
-      }
-      else if (/^[A-Za-z0-9().,%-]+$/.test(cell.backgroundColor)) { // named colors or color functions
-        cssBackgroundColor = cell.backgroundColor;
-      }
+      cssColor = scout.helpers.modelToCssColor(cell.foregroundColor);
+      cssBackgroundColor = scout.helpers.modelToCssColor(cell.backgroundColor);
 
       if (cell.font) {
         var fontSpec = this.parseFontSpec(cell.font);

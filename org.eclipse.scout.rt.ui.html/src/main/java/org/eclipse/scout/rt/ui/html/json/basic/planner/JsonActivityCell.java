@@ -1,6 +1,6 @@
-package org.eclipse.scout.rt.ui.html.json.basic.activitymap;
+package org.eclipse.scout.rt.ui.html.json.basic.planner;
 
-import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
+import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.ui.html.json.IIdProvider;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
@@ -8,17 +8,17 @@ import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
-public class JsonActivityCell<RI, AI> implements IJsonObject {
+public class JsonActivityCell implements IJsonObject {
 
-  private final IIdProvider<ActivityCell<RI, AI>> m_idProvider;
-  private final ActivityCell<RI, AI> m_activityCell;
+  private final IIdProvider<Activity<?, ?>> m_idProvider;
+  private final Activity<?, ?> m_activityCell;
 
-  public JsonActivityCell(ActivityCell<RI, AI> activityCell, IIdProvider<ActivityCell<RI, AI>> idProvider) {
-    m_activityCell = activityCell;
+  public JsonActivityCell(Activity<?, ?> cell, IIdProvider<Activity<?, ?>> idProvider) {
+    m_activityCell = cell;
     m_idProvider = idProvider;
   }
 
-  public ActivityCell<RI, AI> getActivityCell() {
+  public Activity<?, ?> getActivityCell() {
     return m_activityCell;
   }
 
@@ -34,10 +34,8 @@ public class JsonActivityCell<RI, AI> implements IJsonObject {
     JsonObjectUtility.putProperty(json, "text", m_activityCell.getText());
     JsonObjectUtility.putProperty(json, "backgroundColor", m_activityCell.getBackgroundColor());
     JsonObjectUtility.putProperty(json, "foregroundColor", m_activityCell.getForegroundColor());
-    JsonObjectUtility.putProperty(json, "majorValue", m_activityCell.getMajorValue());
-    JsonObjectUtility.putProperty(json, "majorColor", m_activityCell.getMajorColor());
-    JsonObjectUtility.putProperty(json, "minorValue", m_activityCell.getMinorValue());
-    JsonObjectUtility.putProperty(json, "minorColor", m_activityCell.getMinorColor());
+    JsonObjectUtility.putProperty(json, "level", m_activityCell.getLevel());
+    JsonObjectUtility.putProperty(json, "levelColor", m_activityCell.getLevelColor());
     JsonObjectUtility.putProperty(json, "durationMinutes", m_activityCell.getDurationMinutes());
     JsonObjectUtility.putProperty(json, "tooltipText", m_activityCell.getTooltipText());
     JsonObjectUtility.putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(m_activityCell.getIconId()));

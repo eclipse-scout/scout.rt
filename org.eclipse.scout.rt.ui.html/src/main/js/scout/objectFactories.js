@@ -252,9 +252,9 @@ scout.defaultObjectFactories = [{
     return new scout.CalendarField();
   }
 }, {
-  objectType: 'ActivityMap',
+  objectType: 'Planner',
   create: function() {
-    return new scout.ActivityMap();
+    return new scout.Planner();
   }
 }, {
   objectType: 'PlannerField',

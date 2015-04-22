@@ -3,7 +3,7 @@
 
 scout.PlannerField = function() {
   scout.PlannerField.parent.call(this);
-  this._addAdapterProperties(['resourceTable', 'activityMap']);
+  this._addAdapterProperties(['planner']);
 };
 scout.inherits(scout.PlannerField, scout.FormField);
 
@@ -11,21 +11,22 @@ scout.PlannerField.prototype._render = function($parent) {
   this.addContainer($parent, 'planner-field');
   this.addLabel();
   this.addStatus();
-  this.addFieldContainer($.makeDiv());
-  // TODO Implement rendering!
-  if (this.resourceTable) {
-    this.resourceTable.render(this.$fieldContainer);
-    this.resourceTable.$container.cssWidth(150);
-  }
-  if (this.activityMap) {
-    this.activityMap.render(this.$fieldContainer);
-    this.activityMap.$container
-      .cssTop(0)
-      .cssLeft(150);
+  if (this.planner) {
+    this._renderPlanner();
   }
 };
 
-scout.PlannerField.prototype._renderMiniCalendarCount = function() {
+/**
+ * Will also be called by model adapter on property change event
+ */
+scout.PlannerField.prototype._renderPlanner = function() {
+  this.planner.render(this.$container);
+  this.addField(this.planner.$container);
+};
+
+scout.PlannerField.prototype._removePlanner = function(oldPlanner) {
+  oldPlanner.remove();
+  this.removeField();
 };
 
 scout.PlannerField.prototype._renderSplitterPosition = function() {

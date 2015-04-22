@@ -1,5 +1,4 @@
 //@include("scout/main.css")
-//@include("scout/activitymap/ActivityMap.css")
 //@include("scout/calendar/Calendar.css")
 //@include("scout/desktop/Desktop.css")
 //@include("scout/desktop/DesktopNavigation.css")
@@ -36,6 +35,7 @@
 //@include("scout/menu/Menu.css")
 //@include("scout/menu/MenuBar.css")
 //@include("scout/messagebox/MessageBox.css")
+//@include("scout/planner/Planner.css")
 //@include("scout/scrollbar/Scrollbar.css")
 //@include("scout/splitter/Splitter.css")
 //@include("scout/style/animations.css")

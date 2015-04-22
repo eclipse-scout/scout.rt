@@ -8,21 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.basic.activitymap;
+package org.eclipse.scout.rt.ui.html.json.basic.planner;
 
-import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityMapEvent;
+import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.json.JSONObject;
 
-public class JsonActivityMapEvent implements IJsonObject {
+public class JsonPlannerEvent implements IJsonObject {
 
-  private final ActivityMapEvent m_event;
+  private final PlannerEvent m_event;
 
-  public JsonActivityMapEvent(ActivityMapEvent event) {
+  public JsonPlannerEvent(PlannerEvent event) {
     m_event = event;
   }
 
-  public final ActivityMapEvent getEvent() {
+  public final PlannerEvent getEvent() {
     return m_event;
   }
 

@@ -8,26 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.basic.activitymap;
+package org.eclipse.scout.rt.ui.html.json.basic.planner;
 
-import java.util.List;
-
-import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
+import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
 import org.eclipse.scout.rt.ui.html.json.IIdProvider;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonActivityRow<RI, AI> implements IJsonObject {
-  private RI m_resourceId;
-  private final IIdProvider<ActivityCell<RI, AI>> m_cellIdProvider;
+public class JsonResource implements IJsonObject {
+  private Resource m_resource;
+  private final IIdProvider<Activity<?, ?>> m_cellIdProvider;
 
-  private List<ActivityCell<RI, AI>> m_cells;
-
-  public JsonActivityRow(RI resourceId, List<ActivityCell<RI, AI>> cells, IIdProvider<ActivityCell<RI, AI>> cellIdProvider) {
-    m_resourceId = resourceId;
-    m_cells = cells;
+  public JsonResource(Resource resource, IIdProvider<Activity<?, ?>> cellIdProvider) {
+    m_resource = resource;
     m_cellIdProvider = cellIdProvider;
   }
 
@@ -35,7 +32,7 @@ public class JsonActivityRow<RI, AI> implements IJsonObject {
   public Object toJson() {
     JSONObject jsonRow = new JSONObject();
     //FIXME CGU resourceId? probably create unique id
-    jsonRow.put("resourceId", m_resourceId);
+    jsonRow.put("resourceCell", new JsonCell(m_resource.getCell()).toJson());
     jsonRow.put("cells", cellsToJson());
     JsonObjectUtility.filterDefaultValues(jsonRow, "ActivityRow");
     return jsonRow;
@@ -43,8 +40,8 @@ public class JsonActivityRow<RI, AI> implements IJsonObject {
 
   protected JSONArray cellsToJson() {
     JSONArray jsonCells = new JSONArray();
-    for (ActivityCell<RI, AI> cell : m_cells) {
-      JsonActivityCell<RI, AI> jsonCell = new JsonActivityCell<RI, AI>(cell, m_cellIdProvider);
+    for (Activity<?, ?> cell : m_resource.getActivities()) {
+      JsonActivityCell jsonCell = new JsonActivityCell(cell, m_cellIdProvider);
       jsonCells.put(jsonCell.toJson());
     }
     return jsonCells;

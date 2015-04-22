@@ -1,6 +1,6 @@
-@activity-map-header-height: 45px;
+@planner-header-height: 45px;
 
-.activity-map-icon(@icon, @size) {
+.planner-icon(@icon, @size) {
   .font-icon;
   display: inline-block;
   position: relative;
@@ -12,36 +12,41 @@
   text-align: center;
 }
 
-.activity-map {
+.planner {
   width: 100%;
   height: 100%;
   min-height: 400px;
   position: absolute;
 }
 
-.activity-row {
+.resource-row {
   display: table-row;
+}
+
+.resource-cell {
+  padding: 8px;
 }
 
 .activity-cell {
   display: table-cell;
+  padding: 8px;
+  border-bottom: 1px solid black;
 }
 
-
-.activity-map-header {
-  height: @activity-map-header-height;
+.planner-header {
+  height: @planner-header-height;
   min-width: 420px;
 
-  & .activity-map-range {
+  & .planner-range {
     float: left;
 
-    & .activity-map-minus,
-    & .activity-map-plus {
+    & .planner-minus,
+    & .planner-plus {
       cursor: pointer;
       display: inline-block;
     }
 
-    & .activity-map-select {
+    & .planner-select {
       display: inline-block;
       font-size: 17px;
       position: relative;
@@ -49,21 +54,21 @@
       left: 2px;
     }
 
-    & .activity-map-minus:hover::before,
-    & .activity-map-plus:hover::before {
+    & .planner-minus:hover::before,
+    & .planner-plus:hover::before {
       color: @hover-color;
     }
 
-    & .activity-map-minus::before {
-      .activity-map-icon(@icon-angle-left, 29px);
+    & .planner-minus::before {
+      .planner-icon(@icon-angle-left, 29px);
     }
 
-    & .activity-map-plus::before {
-      .activity-map-icon(@icon-angle-right, 29px);
+    & .planner-plus::before {
+      .planner-icon(@icon-angle-right, 29px);
     }
   }
 
-  & .activity-map-commands {
+  & .planner-commands {
     float: right;
 
     & * {
@@ -71,35 +76,35 @@
       cursor: pointer;
     }
 
-    & .activity-map-today::before {
-      .activity-map-icon(@icon-target, 20px);
+    & .planner-today::before {
+      .planner-icon(@icon-target, 20px);
     }
 
-    & .activity-map-mode-day::before {
-      .activity-map-icon("1", 20px);
+    & .planner-mode-day::before {
+      .planner-icon("1", 20px);
      }
 
-    & .activity-map-mode-work::before {
-      .activity-map-icon("5", 20px);
+    & .planner-mode-work::before {
+      .planner-icon("5", 20px);
      }
 
-    & .activity-map-mode-week::before {
-      .activity-map-icon("7", 20px);
+    & .planner-mode-week::before {
+      .planner-icon("7", 20px);
      }
 
-    & .activity-map-mode-month::before {
-      .activity-map-icon("31", 20px);
+    & .planner-mode-month::before {
+      .planner-icon("31", 20px);
      }
 
-    & .activity-map-toggle-year::before {
-      .activity-map-icon(@icon-clock, 20px);
+    & .planner-toggle-year::before {
+      .planner-icon(@icon-clock, 20px);
      }
 
-    & .activity-map-toggle-list::before {
-      .activity-map-icon(@icon-menu, 20px);
+    & .planner-toggle-list::before {
+      .planner-icon(@icon-menu, 20px);
      }
 
-    & .activity-map-separator {
+    & .planner-separator {
       box-sizing: content-box;
       width: 20px;
       height: 25px;
@@ -114,15 +119,15 @@
 
 }
 
-.activity-map-year-container {
+.planner-year-container {
   display: inline-block;
   width: 0%;
   padding: 0;
-  height: calc(~"100%" - @activity-map-header-height);
+  height: calc(~"100%" - @planner-header-height);
   background-color: @palette-white;
   overflow: hidden;
 
-  & .activity-map-year {
+  & .planner-year {
     width: 270px;
     padding: 0px 10px;
     height: 100%;
@@ -218,15 +223,15 @@
 
 }
 
-.activity-map-list-container {
+.planner-list-container {
   display: inline-block;
   width: 0%;
   padding: 0;
-  height: calc(~"100%" - @activity-map-header-height);
+  height: calc(~"100%" - @planner-header-height);
   background-color: @palette-white;
   overflow: hidden;
 
-  & .activity-map-list {
+  & .planner-list {
     width: 270px;
     padding: 0px 0px 0px 30px;
     height: 100%;
@@ -252,11 +257,12 @@
   }
 }
 
-.activity-map-grid {
+.planner-grid {
   display: inline-block;
   width: 60%;
-  height: calc(~"100%" - @activity-map-header-height);
+  height: calc(~"100%" - @planner-header-height);
   overflow: hidden;
+  position: absolute;
 /*
   & .calendar-week-header,
   & .calendar-week {
