@@ -188,7 +188,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     else {
       Collection<? extends ILookupRow<LOOKUP_KEY>> rows = result.getLookupRows();
       // keep proposal form open in case of mobile or tablet bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=440091
-      if ((rows == null || rows.isEmpty()) && UserAgentUtility.isDesktopDevice()) {
+      if ((rows == null || rows.isEmpty()) && !UserAgentUtility.isTouchDevice()) {
         unregisterProposalFormInternal(smartForm);
       }
       else {
