@@ -30,6 +30,7 @@
 
 .messagebox-label {
   padding-top: @messagebox-label-padding;
+  word-wrap: break-word;
 }
 
 .messagebox-intro-text {
