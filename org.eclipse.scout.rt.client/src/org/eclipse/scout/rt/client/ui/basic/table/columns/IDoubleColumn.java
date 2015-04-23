@@ -10,6 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+
+/**
+ * @deprecated Will be removed in N release. Use {@link IBigDecimalColumn} instead.
+ */
+@Deprecated
 public interface IDoubleColumn extends IDecimalColumn<Double> {
 
 }

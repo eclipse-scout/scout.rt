@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.junit.Test;
 
+@SuppressWarnings("deprecation")
 public class AbstractDoubleColumnTest extends AbstractDoubleColumn {
 
   @Test

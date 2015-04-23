@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 /**
  * @since 3.9.0
  */
+@SuppressWarnings("deprecation")
 public class ColumnFieldBuilder {
 
   private static final String PROP_PROPERTY_DELEGATOR = "propertyDelegator";

@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.doublefield.IDoubleField;
 /**
  * @since 3.9.0
  */
+@SuppressWarnings("deprecation")
 public class DoubleColumnFieldPropertyDelegator extends ColumnFieldPropertyDelegator<IDoubleColumn, IDoubleField> {
 
   public DoubleColumnFieldPropertyDelegator(IDoubleColumn sender, IDoubleField receiver) {

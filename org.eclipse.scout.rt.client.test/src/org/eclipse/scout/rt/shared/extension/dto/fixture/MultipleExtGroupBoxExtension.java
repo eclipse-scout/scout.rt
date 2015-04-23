@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox;
 /**
  *
  */
+@SuppressWarnings("deprecation")
 @Extends(MainBox.class)
 @Data(MultipleExtGroupBoxExtensionData.class)
 public class MultipleExtGroupBoxExtension extends AbstractGroupBoxExtension<MainBox> {

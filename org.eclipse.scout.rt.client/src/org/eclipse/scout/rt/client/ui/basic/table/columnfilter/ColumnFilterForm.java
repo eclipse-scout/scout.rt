@@ -62,6 +62,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
+@SuppressWarnings("deprecation")
 public class ColumnFilterForm extends AbstractForm {
   private ITableColumnFilter<?> m_columnFilter;
 

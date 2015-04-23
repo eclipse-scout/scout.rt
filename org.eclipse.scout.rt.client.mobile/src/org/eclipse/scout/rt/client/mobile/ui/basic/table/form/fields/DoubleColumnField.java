@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleFiel
 /**
  * @since 3.9.0
  */
+@SuppressWarnings("deprecation")
 public class DoubleColumnField extends AbstractDoubleField implements IColumnWrapper<IDoubleColumn> {
   private DoubleColumnFieldPropertyDelegator m_propertyDelegator;
 

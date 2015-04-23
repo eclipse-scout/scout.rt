@@ -43,6 +43,7 @@ import org.eclipse.scout.service.SERVICES;
 /**
  * TODO imo these methods are from AbstractTable, move them over here in release jun/2011.
  */
+@SuppressWarnings("deprecation")
 public final class TableUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableUtility.class);
 

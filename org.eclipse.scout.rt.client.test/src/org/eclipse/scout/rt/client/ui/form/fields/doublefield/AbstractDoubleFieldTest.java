@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@SuppressWarnings("deprecation")
 @RunWith(ScoutClientTestRunner.class)
 public class AbstractDoubleFieldTest extends AbstractDoubleField {
 

@@ -61,6 +61,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
  * Template box containing all composer values.
  * <p>
  */
+@SuppressWarnings("deprecation")
 @ClassId("2d8065cf-eeb3-4d64-8753-adb36cf852b8")
 public abstract class AbstractComposerValueBox extends AbstractGroupBox implements IComposerValueBox {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractComposerValueBox.class);

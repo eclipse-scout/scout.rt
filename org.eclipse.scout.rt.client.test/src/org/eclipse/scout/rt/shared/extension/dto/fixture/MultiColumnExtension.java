@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigPageWithTable.Table
 /**
  *
  */
+@SuppressWarnings("deprecation")
 @Data(MultiColumnExtensionData.class)
 @Extends(OrigPageWithTable.Table.class)
 public class MultiColumnExtension extends AbstractTableExtension<OrigPageWithTable.Table> {
