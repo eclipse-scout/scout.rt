@@ -47,6 +47,7 @@ public class DownloadHandlerStorageTest {
     P_TestHandler handler = new P_TestHandler(1);
     storage.put(KEY, handler);
     sleepSafe(20);
+    // FIXME AWE Improve this test (it fails sometimes because of timing issues)
     assertNull(storage.remove(KEY));
     assertEquals("futureMap must be cleared after timeout", 0, storage.futureMap().size());
   }
