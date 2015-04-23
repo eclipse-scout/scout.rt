@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.shared.runner.parameterized;
+package org.eclipse.scout.rt.testing.platform.runner.parameterized;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedTestRunnerExtensionTest.ParameterizedTestClassParameter;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedTestRunnerExtensionTest.ParameterizedTestClassParameter;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;

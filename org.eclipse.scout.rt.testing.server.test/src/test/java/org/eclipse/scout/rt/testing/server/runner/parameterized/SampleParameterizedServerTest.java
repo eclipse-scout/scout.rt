@@ -15,22 +15,22 @@ import static org.junit.Assert.assertTrue;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.rt.testing.shared.runner.parameterized.AbstractScoutTestParameter;
-import org.eclipse.scout.rt.testing.shared.runner.parameterized.IScoutTestParameter;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.AbstractScoutTestParameter;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * This test illustrates the use of the {@link ParameterizedScoutServerTestRunner}. <br/>
+ * This test illustrates the use of the {@link ParameterizedServerTestRunner}. <br/>
  * The test runner executes the test case {@link #testIsGreaterZero()} for each parameter which is returned from
  * {@link #getParameters()}.
  * It creates an instance of the test class for each parameter (and test case), hands the parameter over as constructor
  * argument and executes the test case.
  *
- * @see ParameterizedScoutServerTestRunner
+ * @see ParameterizedServerTestRunner
  */
-@RunWith(ParameterizedScoutServerTestRunner.class)
+@RunWith(ParameterizedServerTestRunner.class)
 public class SampleParameterizedServerTest {
 
   @Parameters

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.client.runner.parameterized;
+package org.eclipse.scout.rt.testing.server.runner.parameterized;
 
 import static org.junit.Assert.assertTrue;
 
@@ -16,11 +16,11 @@ import org.junit.Test;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 
-public class ParameterizedScoutClientTestRunnerTest {
+public class ParameterizedServerTestRunnerTest {
 
   @Test
   public void testTestRunner() {
-    Result result = JUnitCore.runClasses(SampleParameterizedClientTest.class);
+    Result result = JUnitCore.runClasses(SampleParameterizedServerTest.class);
     assertTrue(result.wasSuccessful());
     assertTrue(result.getRunCount() > 0);
   }

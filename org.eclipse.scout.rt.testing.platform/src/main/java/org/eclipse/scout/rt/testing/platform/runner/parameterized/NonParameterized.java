@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.shared.runner.parameterized;
+package org.eclipse.scout.rt.testing.platform.runner.parameterized;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

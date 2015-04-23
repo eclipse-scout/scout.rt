@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.shared.runner.parameterized;
+package org.eclipse.scout.rt.testing.platform.runner.parameterized;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -21,8 +21,8 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.TestClass;
 
 /**
- * This class contains the logic which is shared among {@link ParameterizedScoutServerTestRunner} and
- * {@link ParameterizedScoutClientTestRunner}
+ * This class contains the logic which is shared among {@link ParameterizedServerTestRunner} and
+ * {@link ParameterizedClientTestRunner}
  */
 public class ParameterizedTestRunnerExtension {
 

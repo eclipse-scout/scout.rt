@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.client.runner.parameterized;
+package org.eclipse.scout.rt.testing.platform.runner.parameterized;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
-import org.eclipse.scout.rt.testing.shared.runner.parameterized.IScoutTestParameter;
-import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedFrameworkMethod;
-import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedTestRunnerExtension;
+import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.runner.Description;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -24,12 +23,14 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
 /**
- * Parameterized form of {@link ScoutClientTestRunner}. <br/>
+ * Parameterized form of {@link PlatformTestRunner}. <br/>
+ * <b>Note:</b>
+ * The shared {@link IPlatform} is available while invoking the {@link Parameters}-annotated method.<br/>
  * <b>Example:</b>
  *
  * <pre>
- * &#064;RunWith(ParameterizedScoutServerTestRunner.class)
- * public class SampleParameterizedServerTest {
+ * &#064;RunWith(ParameterizedPlatformTestRunner.class)
+ * public class SampleParameterizedPlatformTest {
  * 
  *   &#064;Parameters
  *   public static List&lt;IScoutTestParameter&gt; getParameters() {
@@ -71,23 +72,29 @@ import org.junit.runners.model.Statement;
  * }
  * </pre>
  *
- * @see ParameterizedScoutServerTestRunner
  * @see Parameterized
  * @see Parameters
+ * @since 5.1
  */
-public class ParameterizedScoutClientTestRunner extends ClientTestRunner {
+public class ParameterizedPlatformTestRunner extends PlatformTestRunner {
 
   /** Parameters returned by the <code>@</code>{@link Parameters} annotated method in the test class. */
   private List<IScoutTestParameter> m_parameterList;
   /** Parameter for the current test method being executed. */
   private IScoutTestParameter m_currentTestParameter = null;
 
-  public ParameterizedScoutClientTestRunner(Class<?> klass) throws InitializationError {
+  public ParameterizedPlatformTestRunner(Class<?> klass) throws InitializationError {
     super(klass);
   }
 
   @Override
   protected List<FrameworkMethod> getChildren() {
+    // ensure platform is started
+    if (Platform.get() == null) {
+      Platform.setDefault();
+      Platform.get().start();
+    }
+
     m_parameterList = ParameterizedTestRunnerExtension.loadParameterList(getTestClass());
     return ParameterizedTestRunnerExtension.createTestMethods(super.getChildren(), m_parameterList.size());
   }

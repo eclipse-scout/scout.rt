@@ -1,0 +1,154 @@
+/*******************************************************************************
+ * Copyright (c) 2014 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.testing.client.runner.parameterized;
+
+import java.util.List;
+
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedFrameworkMethod;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedTestRunnerExtension;
+import org.junit.runner.Description;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.Statement;
+
+/**
+ * Parameterized form of {@link ClientTestRunner}. <br/>
+ * <b>Note:</b>
+ * The shared {@link IPlatform} is available while invoking the {@link Parameters}-annotated method, but it is no
+ * invoked within an {@link IClientSession} context.<br/>
+ * <b>Example:</b>
+ *
+ * <pre>
+ * &#064;RunWith(ParameterizedServerTestRunner.class)
+ * public class SampleParameterizedServerTest {
+ * 
+ *   &#064;Parameters
+ *   public static List&lt;IScoutTestParameter&gt; getParameters() {
+ *     List&lt;IScoutTestParameter&gt; parametersList = new LinkedList&lt;IScoutTestParameter&gt;();
+ *     parametersList.add(new MathTestParameter(&quot;Scenario 1&quot;, 2));
+ *     parametersList.add(new MathTestParameter(&quot;Scenario 2&quot;, 5));
+ *     return parametersList;
+ *   }
+ * 
+ *   private final MathTestParameter m_testParameter;
+ * 
+ *   public SampleParameterizedServerTest(MathTestParameter testParameter) {
+ *     m_testParameter = testParameter;
+ *   }
+ * 
+ *   &#064;Test
+ *   public void testIsGreaterZero() {
+ *     assertTrue(m_testParameter.getX() &gt; 0);
+ *   }
+ * 
+ *   &#064;Test
+ *   &#064;NonParameterized
+ *   public void testGeneral() {
+ *     assertFalse(0 &gt; 0);
+ *   }
+ * 
+ *   static class MathTestParameter extends AbstractScoutTestParameter {
+ *     private int m_x;
+ * 
+ *     public MathTestParameter(String name, int x) {
+ *       super(name);
+ *       m_x = x;
+ *     }
+ * 
+ *     public int getX() {
+ *       return m_x;
+ *     }
+ *   }
+ * }
+ * </pre>
+ *
+ * @see ParameterizedServerTestRunner
+ * @see Parameterized
+ * @see Parameters
+ */
+public class ParameterizedClientTestRunner extends ClientTestRunner {
+
+  /** Parameters returned by the <code>@</code>{@link Parameters} annotated method in the test class. */
+  private List<IScoutTestParameter> m_parameterList;
+  /** Parameter for the current test method being executed. */
+  private IScoutTestParameter m_currentTestParameter = null;
+
+  public ParameterizedClientTestRunner(Class<?> klass) throws InitializationError {
+    super(klass);
+  }
+
+  @Override
+  protected List<FrameworkMethod> getChildren() {
+    // ensure platform is started
+    if (Platform.get() == null) {
+      Platform.setDefault();
+      Platform.get().start();
+    }
+
+    m_parameterList = ParameterizedTestRunnerExtension.loadParameterList(getTestClass());
+    return ParameterizedTestRunnerExtension.createTestMethods(super.getChildren(), m_parameterList.size());
+  }
+
+  @Override
+  protected final Object createTest() throws Exception {
+    return createTestInternal(m_currentTestParameter);
+  }
+
+  protected Object createTestInternal(IScoutTestParameter testParameter) throws Exception {
+    return ParameterizedTestRunnerExtension.createTest(getTestClass(), testParameter);
+  }
+
+  @Override
+  protected Statement methodBlock(FrameworkMethod method) {
+    if (method instanceof ParameterizedFrameworkMethod) {
+      int paramsIndex = ((ParameterizedFrameworkMethod) method).getParamIndex();
+      m_currentTestParameter = m_parameterList.get(paramsIndex);
+    }
+    else {
+      m_currentTestParameter = null;
+    }
+
+    return super.methodBlock(method);
+  }
+
+  @Override
+  protected void collectInitializationErrors(List<Throwable> errors) {
+    super.collectInitializationErrors(errors);
+    validateParametersMethod(errors);
+  }
+
+  @Override
+  protected void validateConstructor(List<Throwable> errors) {
+    validateOnlyOneConstructor(errors);
+  }
+
+  /** Validate the method which specifies the test parameters. */
+  protected void validateParametersMethod(List<Throwable> errors) {
+    ParameterizedTestRunnerExtension.validateOneParametersMethod(getTestClass(), errors);
+  }
+
+  @Override
+  protected Description describeChild(FrameworkMethod method) {
+    if (method instanceof ParameterizedFrameworkMethod) {
+      return ParameterizedTestRunnerExtension.describeParameterizedChild(getTestClass(), (ParameterizedFrameworkMethod) method, testName(method), m_parameterList);
+    }
+    else {
+      return super.describeChild(method);
+    }
+  }
+}

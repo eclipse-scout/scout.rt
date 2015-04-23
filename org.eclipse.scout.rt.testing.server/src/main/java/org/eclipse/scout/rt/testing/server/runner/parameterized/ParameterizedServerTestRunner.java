@@ -12,10 +12,13 @@ package org.eclipse.scout.rt.testing.server.runner.parameterized;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedFrameworkMethod;
+import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedTestRunnerExtension;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
-import org.eclipse.scout.rt.testing.shared.runner.parameterized.IScoutTestParameter;
-import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedFrameworkMethod;
-import org.eclipse.scout.rt.testing.shared.runner.parameterized.ParameterizedTestRunnerExtension;
 import org.junit.runner.Description;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -24,11 +27,14 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
 /**
- * Parameterized form of {@link ScoutServerTestRunner}. <br/>
+ * Parameterized form of {@link ServerTestRunner}. <br/>
+ * <b>Note:</b>
+ * The shared {@link IPlatform} is available while invoking the {@link Parameters}-annotated method, but it is no
+ * invoked within an {@link IServerSession} context.<br/>
  * <b>Example:</b>
  *
  * <pre>
- * &#064;RunWith(ParameterizedScoutServerTestRunner.class)
+ * &#064;RunWith(ParameterizedServerTestRunner.class)
  * public class SampleParameterizedServerTest {
  * 
  *   &#064;Parameters
@@ -71,24 +77,29 @@ import org.junit.runners.model.Statement;
  * }
  * </pre>
  *
- * @see ParameterizedScoutClientTestRunner
+ * @see ParameterizedClientTestRunner
  * @see Parameterized
  * @see Parameters
  */
-// TODO [dwi/abr] do we need this class? -> imo says yes, in bsi crm, please rename and remove "scout" prefix
-public class ParameterizedScoutServerTestRunner extends ServerTestRunner {
+public class ParameterizedServerTestRunner extends ServerTestRunner {
 
   /** Parameters returned by the <code>@</code>{@link Parameters} annotated method in the test class. */
   private List<IScoutTestParameter> m_parameterList;
   /** Parameter for the current test method being executed. */
   private IScoutTestParameter m_currentTestParameter = null;
 
-  public ParameterizedScoutServerTestRunner(Class<?> klass) throws InitializationError {
+  public ParameterizedServerTestRunner(Class<?> klass) throws InitializationError {
     super(klass);
   }
 
   @Override
   protected List<FrameworkMethod> getChildren() {
+    // ensure platform is started
+    if (Platform.get() == null) {
+      Platform.setDefault();
+      Platform.get().start();
+    }
+
     m_parameterList = ParameterizedTestRunnerExtension.loadParameterList(getTestClass());
     return ParameterizedTestRunnerExtension.createTestMethods(super.getChildren(), m_parameterList.size());
   }

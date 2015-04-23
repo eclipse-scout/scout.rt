@@ -8,27 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.testing.shared.runner.parameterized;
+package org.eclipse.scout.rt.testing.platform.runner.parameterized;
 
 /**
- * This convenience class implements the interface {@link IScoutTestParameter}.
- * It holds the name of the test parameter and implements the getter.
+ * This interface must be implemented by the test parameter which is used by the {@link ParameterizedServerTestRunner}
+ * and the {@link ParameterizedClientTestRunner}. <br/>
+ * The test runner will provide this class as input for a test case of a test class.
  */
-public abstract class AbstractScoutTestParameter implements IScoutTestParameter {
+public interface IScoutTestParameter {
 
-  /** Name of the test parameter. */
-  private final String m_name;
-
-  /**
-   * @param name
-   *          of the test parameter
-   */
-  public AbstractScoutTestParameter(String name) {
-    m_name = name;
-  }
-
-  @Override
-  public String getName() {
-    return m_name;
-  }
+  /** Get the name of the parameter. It is used in the test result. */
+  String getName();
 }
