@@ -36,6 +36,12 @@ describe("TabBox", function() {
       expect(session.layoutValidator.invalidateTree).not.toHaveBeenCalled();
     });
 
+    it("must clear cache when render is called anew", function() {
+      field._$tabContentCache = ['foo'];
+      field.render(session.$entryPoint);
+      expect(field._$tabContentCache.length).toBe(0);
+    });
+
   });
 
 });

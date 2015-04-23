@@ -18,6 +18,7 @@ scout.TabBox = function() {
 scout.inherits(scout.TabBox, scout.CompositeField);
 
 scout.TabBox.prototype._render = function($parent) {
+  this._$tabContentCache = []; // clear cache when tab-box is rendered anew
   this.addContainer($parent, 'tab-box', new scout.TabBoxLayout(this));
 
   this._$tabArea = this.$container.appendDiv('tab-area');
@@ -89,7 +90,7 @@ scout.TabBox.prototype._onKeyDown = function(e) {
 };
 
 scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
-  $.log.debug('(TabBox#_setSelectedTab) selectedTab='+selectedTab);
+  $.log.debug('(TabBox#_renderSelectedTab) selectedTab='+selectedTab);
   var $tabs = this._$tabArea.children('button');
 
   var $oldTabButton;
