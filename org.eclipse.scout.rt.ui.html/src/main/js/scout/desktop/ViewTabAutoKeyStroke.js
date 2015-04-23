@@ -34,13 +34,13 @@ scout.ViewTabAutoKeyStroke.prototype.accept = function(event) {
  * @Override scout.KeyStroke
  */
 scout.ViewTabAutoKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
-  if (scout.keyStrokeBox.keyStrokesAlreadyDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9])) {
+  if (scout.keyStrokeBox.keyStrokesAlreadyDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[1], scout.keys[9])) {
     return;
   }
   if (this.drawHint) {
     this._drawKeyBox($container);
     drawedKeys[this.keyStrokeName()] = true;
-    scout.keyStrokeBox.keyStrokeRangeDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9]);
+    scout.keyStrokeBox.keyStrokeRangeDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[1], scout.keys[9]);
   }
 };
 /**
@@ -51,10 +51,10 @@ scout.ViewTabAutoKeyStroke.prototype._drawKeyBox = function($container) {
     return;
   }
   if (this._enabled && this._tabs) {
-    for (var i = 1; i < this._tabs.length+1; i++) {
+    for (var i = 1; i < this._tabs.length + 1; i++) {
       var offsetLeft = 4;
       if (i <= 9) {
-        scout.keyStrokeBox.drawSingleKeyBoxItem(offsetLeft, i, this._tabs[i - 1].$container, this.ctrl, this.alt, this.shift);
+        scout.keyStrokeBox.drawSingleKeyBoxItem(offsetLeft, i, this._tabs[i - 1].$container, this.ctrl, this.alt, this.shift, true);
       }
     }
     this.keyBoxDrawed = true;

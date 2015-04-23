@@ -3,6 +3,7 @@ scout.StringFieldKeyStrokeAdapter = function(field) {
 
   // Prevent enter to bubble up and execute form or groupbox enter key.
   this.keyStrokes.push(new scout.StringFieldEnterKeyStroke());
+  this.keyStrokes.push(new scout.StringFieldBackspaceKeyStroke());
 };
 
 scout.inherits(scout.StringFieldKeyStrokeAdapter, scout.ValueFieldKeyStrokeAdapter);
@@ -26,3 +27,26 @@ scout.StringFieldEnterKeyStroke.prototype.accept = function(event) {
   }
   return false;
 };
+
+scout.StringFieldEnterKeyStroke.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
+  if (drawedKeys[this.keyStrokeName()]) {
+    return;
+  }
+  var elementType = document.activeElement.tagName.toLowerCase();
+  if (this.drawHint) {
+    this._drawKeyBox($container);
+  }
+  if (elementType === 'textarea') {
+    drawedKeys[this.keyStrokeName()] = true;
+  }
+};
+
+scout.StringFieldBackspaceKeyStroke = function() {
+  scout.StringFieldBackspaceKeyStroke.parent.call(this);
+  this.keyStroke = 'Backspace';
+  this.drawHint = false;
+  this.initKeyStrokeParts();
+};
+scout.inherits(scout.StringFieldBackspaceKeyStroke, scout.KeyStroke);
+
+scout.StringFieldBackspaceKeyStroke.prototype.handle = function(event) {};

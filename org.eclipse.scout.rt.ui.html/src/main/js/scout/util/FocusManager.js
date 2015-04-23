@@ -10,8 +10,7 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
   };
 
   // Set default options
-  if (options.focusFirstPart === undefined) {
-    options.focusFirstPart = true;
+  if (options.focusFirstPart === undefined) {options.focusFirstPart = true;
   }
 
   var $container = session.$entryPoint;
@@ -28,6 +27,18 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
 
 };
 
+scout.FocusManager.prototype.focusFirstElement = function($container) {
+  var $focusableElementsValid = $container.find(':focusable:not(:parent((.menubar))');
+  if ($focusableElementsValid && $focusableElementsValid.length > 0) {
+    $focusableElementsValid.first().focus();
+  } else {
+    $focusableElementsValid = $container.find(':focusable');
+    if ($focusableElementsValid && $focusableElementsValid.length > 0) {
+      $focusableElementsValid.first().focus();
+    }
+  }
+};
+
 scout.FocusManager.prototype.installFocusContext = function($container, uiSessionId, $firstFocusElement, isRoot) {
   // Ensure $container is focusable (-1 = only programmatically)
   if ($container.attr('tabindex') === undefined) {
@@ -38,9 +49,6 @@ scout.FocusManager.prototype.installFocusContext = function($container, uiSessio
   if ($firstFocusElement === 'auto') {
     $firstFocusElement = $container.find(':focusable').first();
   }
-//  if ($firstFocusElement) {
-//    $firstFocusElement.focus();
-//  }
   var focusContext = new scout.FocusContext($container, $firstFocusElement, uiSessionId, isRoot);
 
   $.log.warn('install focuscontext ');
@@ -79,7 +87,7 @@ scout.FocusManager.prototype._findFocusContext = function($container, uiSessionI
   var contexts = this._sessionFocusContexts[uiSessionId].focusContexts;
   $.log.warn('find focuscontext for container');
   if (contexts && contexts.length > 0) {
-    for (var i = contexts.length-1; i >= 0; i--) {
+    for (var i = contexts.length - 1; i >= 0; i--) {
       if (contexts[i]._$container === $container) {
         $.log.warn('find focuscontext for container. Context found.');
         return contexts[i];
@@ -87,7 +95,6 @@ scout.FocusManager.prototype._findFocusContext = function($container, uiSessionI
     }
   }
 };
-
 
 scout.FocusManager.prototype.uninstallFocusContext = function(focusContext, uiSessionId) {
   var focusContexts = this._sessionFocusContexts[uiSessionId].focusContexts;
@@ -100,7 +107,7 @@ scout.FocusManager.prototype.uninstallFocusContext = function(focusContext, uiSe
   var prevFocusContext = focusContexts[focusContexts.length - 1];
   if (index === oldLength - 1 && prevFocusContext) {
     //when focuscontext was on top(active) install old focusContext and set focus to focused element
-    $.log.warn('focuscontext uninstalled') ;
+    $.log.warn('focuscontext uninstalled');
     setTimeout(function() {
       $.log.warn('activated runned after timeout');
       prevFocusContext.activate(false);
@@ -114,8 +121,8 @@ scout.FocusManager.prototype.checkFocusContextIsActive = function(focusContext) 
   return index === focusContexts.length - 1;
 };
 scout.FocusManager.prototype.validateFocus = function(uiSessionId, caller) {
-  $.log.warn('validate focus, caller: '+caller);
-  if (this._sessionFocusContexts[uiSessionId].focusContexts.length > 0 ) {
+  $.log.warn('validate focus, caller: ' + caller);
+  if (this._sessionFocusContexts[uiSessionId].focusContexts.length > 0) {
     var context = this._sessionFocusContexts[uiSessionId].focusContexts[this._sessionFocusContexts[uiSessionId].focusContexts.length - 1];
     context._validateFocus();
   }
@@ -123,7 +130,7 @@ scout.FocusManager.prototype.validateFocus = function(uiSessionId, caller) {
 
 scout.FocusContext = function($container, $focusedElement, uiSessionId, isRoot) {
   this._$container = $container;
-  this.name = 'name'+$container.attr('class');
+  this.name = 'name' + $container.attr('class');
   this._$focusedElement = $focusedElement;
   this._uiSessionId = uiSessionId;
   this._isRoot = isRoot;
@@ -171,56 +178,56 @@ scout.FocusContext.prototype.handleTab = function(event) {
 
 scout.FocusContext.prototype.activate = function(disposeOld) {
   this._$container.bind('keydown.focusContext', this.handleTab.bind(this));
-  $.log.warn('activate event focus context: ' +this.name);
-  if(disposeOld){
+  $.log.warn('activate event focus context: ' + this.name);
+  if (disposeOld) {
     scout.focusManager.disposeActiveFocusContext(this._uiSessionId);
   }
   scout.focusManager.activateFocusContext(this);
-  if( this._$focusedElement && this._$focusedElement.length>0){
+  if (this._$focusedElement && this._$focusedElement.length > 0) {
 
-    $.log.warn('activated context: ' +this.name);
+    $.log.warn('activated context: ' + this.name);
   }
   this._validateFocus();
 };
 
 scout.FocusContext.prototype._validateFocusInEvent = function(event) {
-  $.log.warn('_validateFocusInEvent'+ ' context: ' +this.name + ' eventTarget: ' +event.target);
+  $.log.warn('_validateFocusInEvent' + ' context: ' + this.name + ' eventTarget: ' + event.target);
   this._validateFocus();
   $.suppressEvent(event);
 };
 
 scout.FocusContext.prototype.bindHideListener = function() {
   //ensure only one of each listenertype exists.
-  var $focusedElement =  this._$focusedElement;
+  var $focusedElement = this._$focusedElement;
   $focusedElement.unbind('hide.focusContext');
-  $focusedElement.bind('hide.focusContext', scout.focusManager.validateFocus.bind( scout.focusManager,this._uiSessionId, 'hide'));
+  $focusedElement.bind('hide.focusContext', scout.focusManager.validateFocus.bind(scout.focusManager, this._uiSessionId, 'hide'));
   $focusedElement.unbind('remove.focusContext');
   $focusedElement.bind('remove.focusContext', scout.focusManager.validateFocus.bind(scout.focusManager, this._uiSessionId, 'remove'));
   $focusedElement.unbind('focusout.unbindListener.focusContext');
-  $focusedElement.bind('focusout.unbindListener.focusContext', function(){
+  $focusedElement.bind('focusout.unbindListener.focusContext', function() {
     $.log.warn('hidelistner unbound on ' + $focusedElement.attr('class'));
     $focusedElement.unbind('remove.focusContext');
     $focusedElement.unbind('hide.focusContext');
     $focusedElement.unbind('focusout.unbindListener.focusContext');
   });
-  $.log.warn('hidelistner bound on ' + $focusedElement.attr('class')+ ' context: ' +this.name);
+  $.log.warn('hidelistner bound on ' + $focusedElement.attr('class') + ' context: ' + this.name);
 };
 scout.FocusContext.prototype._validateFocus = function() {
-  if(this.validatingFocus){
+  if (this.validatingFocus) {
     return;
-    }
+  }
   this.validatingFocus = true;
   $.log.warn('_validate focus called');
   //If somehow, this scout div gets the focus, ensure it is set to the correct focus context.
   // For example, if glasspanes are active, the focus should _only_ be applied to the top-most glasspane.
   var activeElement = document.activeElement;
-  if( this._$focusedElement && this._$focusedElement.length>0){
+  if (this._$focusedElement && this._$focusedElement.length > 0) {
 
-    $.log.warn('_validate focus ' + this._$focusedElement.attr('class')+ ' context: ' +this.name + ' activeElement =' + this._$focusedElement.attr('class'));
+    $.log.warn('_validate focus ' + this._$focusedElement.attr('class') + ' context: ' + this.name + ' activeElement =' + this._$focusedElement.attr('class'));
   }
   //activate Context if it is not on top
   if (!scout.focusManager.checkFocusContextIsActive(this)) {
-    $.log.warn(this._$focusedElement ? 'set focus on top if its not on top' +  this._$focusedElement.attr('class') + ' context: ' +this.name :'set focus on top if its not on top context: ' +this.name );
+    $.log.warn(this._$focusedElement ? 'set focus on top if its not on top' + this._$focusedElement.attr('class') + ' context: ' + this.name : 'set focus on top if its not on top context: ' + this.name);
     this.activate(true);
   }
 
@@ -235,36 +242,40 @@ scout.FocusContext.prototype._validateFocus = function() {
   }
 
   // If any non-focusable element inside the $container got the focus...
+  $.log.warn(!$(activeElement).is(':focusable') + ':' + $(activeElement).attr('class'));
   if (activeElement === this._$container[0]) {
     var $focusableElements = this._$container.find(':focusable');
-    $.log.warn('_fuu '+ ' context: ' +this.name);
-      //if we are on scout div and there are elements on this div which can gain the focus then it's not allowed to focus scout div. focus last element
-      if (this._$focusedElement && this._$focusedElement.length>0 && this._$focusedElement.is(':focusable')) {
-        this._$focusedElement.focus();
-        $.log.warn(this._$focusedElement ? '_validate focus  focused ' + this._$focusedElement.attr('class') + ' context: ' +this.name : '_validate focus  focused context: ' +this.name);
-      } else {
-        $.log.warn('_validate first focused '+ ' context: ' +this.name);
-        $focusContext.find(':focusable').first().focus();
-      }
+    $.log.warn('_fuu ' + ' context: ' + this.name);
+    //if we are on scout div and there are elements on this div which can gain the focus then it's not allowed to focus scout div. focus last element
+    if (this._$focusedElement && this._$focusedElement.length > 0 && this._$focusedElement.is(':focusable')) {
+      this._$focusedElement.focus();
+      $.log.warn(this._$focusedElement ? '_validate focus  focused ' + this._$focusedElement.attr('class') + ' context: ' + this.name : '_validate focus  focused context: ' + this.name);
+    } else {
+      $.log.warn('_validate first focused ' + ' context: ' + this.name);
+      scout.focusManager.focusFirstElement($focusContext);
+    }
   }
   // If any non-focusable element inside the $focusContext got the focus...
   else if (activeElement === $focusContext[0]) {
     // ... do nothing and swallow the event
-    $.log.warn('... do nothing and swallow the event'+ ' context: ' +this.name);
+    $.log.warn('... do nothing and swallow the event' + ' context: ' + this.name);
   }
-  // If the active element is inside or equal to the focus context...
-  else if (!$focusContext[0].contains(activeElement)) {
+  // If the active element is inside or equal to the focus context or if activeElement is no longer focusable.
+  else if (!$focusContext[0].contains(activeElement) || !$(activeElement).is(':focusable')) {
     // ...set the focus to the first focusable element inside the context element
-    if($focusContext.find(':focusable').length===0){
+    $.log.warn(this._$focusedElement ? 'If the active element is inside or equal to the focus context...   ' + this._$focusedElement.attr('class') + ' context: ' + this.name : 'If the active element is inside or equal to the focus context... ' + this.name);
+    if ($focusContext.find(':focusable').length === 0) {
       $focusContext.focus();
-    }
-    else if(this._$focusedElement && this._$focusedElement.length>0 && this._$focusedElement.is(':focusable')){
+    } else if (this._$focusedElement && this._$focusedElement.length > 0 && this._$focusedElement.is(':focusable')) {
       this._$focusedElement.focus();
+    } else {
+      scout.focusManager.focusFirstElement($focusContext);
     }
-    else{
-      $focusContext.find(':focusable').first().focus();
-    }
-    $.log.warn(' ...set the focus to the first focusable element inside the context element '+ ' context: ' +this.name);
+    $.log.warn(' ...set the focus to the first focusable element inside the context element ' + ' context: ' + this.name);
+  }
+  //if active element is no longer focusable
+  else {
+    $.log.warn('do nothing');
   }
   if (this._$container.find(':focusable').filter(function() {
     return this === document.activeElement;

@@ -25,9 +25,7 @@ scout.TableAdditionalControlsKeyStrokes.prototype._drawKeyBox = function($contai
   if (event.which === scout.keys.ESC) {
     //close actual controlwindow
     var $openControl = $('.control.selected', this._field.$container);
-    if ($openControl) {
-      $openControl.trigger('click');
-    }
+
     return;
   }
 };

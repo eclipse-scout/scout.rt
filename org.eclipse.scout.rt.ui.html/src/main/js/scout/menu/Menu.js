@@ -29,6 +29,8 @@ scout.Menu.prototype._renderItem = function($parent) {
 
   if ('taskbar' === this.menuStyle) {
     this.$container.addClass('taskbar');
+  } else {
+    this.$container.attr('tabindex', 0);
   }
   if (this.childActions.length > 0 && this.text) {
     this.$container.addClass('has-submenu');

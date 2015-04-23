@@ -113,11 +113,20 @@ scout.GroupBox.prototype._prepareFields = function() {
       for (var j = 0; j < field.keyStrokes.length; j++) {
         this.keyStrokeAdapter.registerKeyStroke(field.keyStrokes[j]);
       }
+    } else if (field instanceof scout.TabBox) {
+      this.controls.push(field);
+      for (var k = 0; k < field.tabItems.length; k++) {
+        if (field.tabItems[k].label !== scout.strings.removeAmpersand(field.tabItems[k].label)) {
+          //Add mnemonic keyStrokevar
+          var tabmnemonic = field.tabItems[k].label.match(/(^|[^&]|&&)&($|[^&]|&&)/g)[0].replace('&', '');
+          res = tabmnemonic.charAt(tabmnemonic.length - 1);
+          this.getForm().rootGroupBox.keyStrokeAdapter.registerKeyStroke(new scout.TabItemMnemonicKeyStroke(res, field.tabItems[k]));
+
+        }
+      }
+
     } else {
       this.controls.push(field);
-      if (res) {
-        this.keyStrokeAdapter.registerKeyStroke(new scout.MnemonicKeyStroke(res, field));
-      }
     }
   }
 };
@@ -204,8 +213,8 @@ scout.GroupBox.prototype._renderLabelVisible = function(visible) {
 
 scout.GroupBox.prototype._renderMenus = function(menus) {
   var menuItems = this.staticMenus.
-    concat(menus).
-    concat(this.processButtons);
+  concat(menus).
+  concat(this.processButtons);
   this.menuBar.updateItems(menuItems);
 };
 

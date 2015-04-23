@@ -11,11 +11,11 @@ scout.inherits(scout.DesktopNavigationKeyStroke, scout.KeyStroke);
  * @Override scout.KeyStroke
  */
 scout.DesktopNavigationKeyStroke.prototype.handle = function(event) {
-  if (event && event.which === scout.keys.F2 && this._desktopNavigation.activeTab !== this._desktopNavigation.searchTab) {
+  if (event && event.which === scout.keys.F4 && this._desktopNavigation.activeTab !== this._desktopNavigation.searchTab) {
     this._desktopNavigation.searchTab.$tab.trigger('click');
   }
 
-  if (event && event.which === scout.keys.F11) {
+  if (event && event.which === scout.keys.F2) {
     if (this._desktopNavigation.activeTab === this._desktopNavigation.outlineTab) {
       this._desktopNavigation.outlineTab.$tab.find('.navigation-tab-outline-button').trigger('mousedown');
     } else {
@@ -28,7 +28,7 @@ scout.DesktopNavigationKeyStroke.prototype.handle = function(event) {
  * @Override scout.KeyStroke
  */
 scout.DesktopNavigationKeyStroke.prototype.accept = function(event) {
-  if (event && ((event.which === scout.keys.F2 && this._desktopNavigation.activeTab !== this._desktopNavigation.searchTab) || event.which === scout.keys.F11) &&
+  if (event && ((event.which === scout.keys.F4 && this._desktopNavigation.activeTab !== this._desktopNavigation.searchTab) || event.which === scout.keys.F2) &&
     event.ctrlKey === this.ctrl && event.altKey === this.alt && event.shiftKey === this.shift) {
     return true;
   }
@@ -48,13 +48,13 @@ scout.DesktopNavigationKeyStroke.prototype._drawKeyBox = function($container, dr
   if (this.keyBoxDrawed) {
     return;
   }
-  if (!drawedKeys.F2 && this._desktopNavigation.activeTab !== this._desktopNavigation.searchTab) {
-    scout.keyStrokeBox.drawSingleKeyBoxItem(10, 'F2', this._desktopNavigation.searchTab.$tab, this.ctrl, this.alt, this.shift);
-    drawedKeys.F2 = true;
+  if (!drawedKeys.F4 && this._desktopNavigation.activeTab !== this._desktopNavigation.searchTab) {
+    scout.keyStrokeBox.drawSingleKeyBoxItem(10, 'F4', this._desktopNavigation.searchTab.$tab, this.ctrl, this.alt, this.shift);
+    drawedKeys.F4 = true;
   }
-  if (!drawedKeys.F11) {
-    scout.keyStrokeBox.drawSingleKeyBoxItem(10, 'F11', this._desktopNavigation.outlineTab.$tab, this.ctrl, this.alt, this.shift);
-    drawedKeys.F11 = true;
+  if (!drawedKeys.F2) {
+    scout.keyStrokeBox.drawSingleKeyBoxItem(10, 'F2', this._desktopNavigation.outlineTab.$tab, this.ctrl, this.alt, this.shift);
+    drawedKeys.F2 = true;
   }
   this.keyBoxDrawed = true;
 };

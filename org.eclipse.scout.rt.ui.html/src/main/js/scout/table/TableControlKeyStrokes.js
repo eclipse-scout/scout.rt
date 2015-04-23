@@ -191,9 +191,7 @@ scout.TableControlKeyStrokes.prototype.checkAndDrawKeyBox = function($container,
  */
 scout.TableControlKeyStrokes.prototype.accept = function(event) {
   return event &&
-    $.inArray(event.which, [scout.keys.UP, scout.keys.DOWN, scout.keys.HOME, scout.keys.END, scout.keys.PAGE_UP, scout.keys.PAGE_DOWN, scout.keys.SPACE]) >= 0;
-    //FIXME NBU this prevents row selection using shift
-//    event.ctrlKey === this.ctrl &&
-//    event.altKey === this.alt &&
-//    event.shiftKey === this.shift;
+    $.inArray(event.which, [scout.keys.UP, scout.keys.DOWN, scout.keys.HOME, scout.keys.END, scout.keys.PAGE_UP, scout.keys.PAGE_DOWN, scout.keys.SPACE]) >= 0 &&
+    event.ctrlKey === this.ctrl &&
+    event.altKey === this.alt;
 };

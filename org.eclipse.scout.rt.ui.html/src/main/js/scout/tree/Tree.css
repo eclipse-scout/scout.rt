@@ -160,5 +160,5 @@
 /* key handling */
 
 .tree-node .key-box {
-  top: 4px;
+  top: calc(~"50%" - 8px);
 }

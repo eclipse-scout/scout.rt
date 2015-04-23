@@ -5,8 +5,8 @@ scout.KeystrokeManager = function() {
   //f1-help
   $(document).keydown(function(event) {
     if (event.which === scout.keys.F1) {
-            drawKeyBox();
-            event.preventDefault();
+      drawKeyBox();
+      event.preventDefault();
     }
     that._adaptersToDraw = [];
   });
@@ -24,7 +24,6 @@ scout.KeystrokeManager = function() {
     that._adaptersToDraw = [];
   });
 
-
   function removeKeyBox() {
     var i, adapter;
     for (i = 0; i < that._adapters.length; i++) {
@@ -36,7 +35,7 @@ scout.KeystrokeManager = function() {
   }
 
   function drawKeyBox() {
-    var i, adapter, drawedKeys={};
+    var i, adapter, drawedKeys = {};
     for (i = 0; i < that._adaptersToDraw.length; i++) {
       adapter = that._adaptersToDraw[i];
       if (adapter.drawKeyBox) {
@@ -83,7 +82,7 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
       adapter.removeKeyBox();
       that._adaptersToDraw = [];
       event.stopPropagation();
-      scout.focusManager.validateFocus(adapter.uiSessionId());
+      scout.focusManager.validateFocus(adapter.uiSessionId(), 'KeyStrokeManager');
     }
   };
 

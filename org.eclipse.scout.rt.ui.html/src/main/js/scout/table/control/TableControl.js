@@ -123,11 +123,21 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   this.selected = selected;
   this.sendSelected(selected);
   this._renderSelected(this.selected, closeWhenUnselected);
-  if(selected){
-    this.tableControlKeyStrokeAdapter=new scout.TableControlKeyStrokeAdapter(this);
+  if (selected) {
+    this.tableControlKeyStrokeAdapter = new scout.TableControlKeyStrokeAdapter(this);
     scout.keyStrokeManager.installAdapter(this.tableFooter.$controlContent, this.tableControlKeyStrokeAdapter);
-  }
-  else{
+    //focus first element on table control
+    if (this.form && this.form.$container.find(':focusable:not(button)').length > 0) {
+      var that = this;
+      setTimeout(function() {
+        that.form.$container.find(':focusable:not(button)').first().focus();
+      });
+    } else if (this.form && this.form.$container.find(':focusable').length > 0) {
+      setTimeout(function() {
+        scout.focusManager.focusFirstElement(that.form.$container);
+      }, 0);
+    }
+  } else {
     scout.keyStrokeManager.uninstallAdapter(this.tableFooter.$controlContent, this.tableControlKeyStrokeAdapter);
   }
 };
@@ -198,4 +208,7 @@ scout.TableControl.prototype._drawKeyBox = function($container) {
 
 scout.TableControl.prototype.handle = function(event) {
   this.toggle();
+  if (this.preventDefaultOnEvent) {
+    event.preventDefault();
+  }
 };

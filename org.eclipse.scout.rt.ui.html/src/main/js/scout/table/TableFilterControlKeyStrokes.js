@@ -12,11 +12,11 @@ scout.TableFilterControlKeyStrokes.prototype.handle = function(event) {
   // set focus
   var $input = $('.control-filter', this._field.$container);
   //TODO nbu check if keyStroke should be registered when no filter control is available.
-  if($input){
-  var length = $input.val().length;
+  if ($input) {
+    var length = $input.val().length;
 
-  $input.focus();
-  $input[0].setSelectionRange(length, length);
+    $input.focus();
+    $input[0].setSelectionRange(length, length);
   }
 };
 /**
@@ -33,7 +33,7 @@ scout.TableFilterControlKeyStrokes.prototype._drawKeyBox = function($container, 
     var filterInputPosition = $filterinput.position();
     var top = $filterinput.css('margin-top').replace("px", "");
     var left = filterInputPosition.left + parseInt($filterinput.css('margin-left').replace("px", ""), 0) + 4;
-    $filterinput.beforeDiv('key-box char', 'a - z').css('left', left + 'px').css('top', top + 'px');
+    $filterinput.beforeDiv('key-box char', 'a - z').css('left', left + 'px');
     scout.keyStrokeBox.keyStrokeRangeDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys[0], scout.keys[9]);
     scout.keyStrokeBox.keyStrokeRangeDrawn(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.A, scout.keys.Z);
   }

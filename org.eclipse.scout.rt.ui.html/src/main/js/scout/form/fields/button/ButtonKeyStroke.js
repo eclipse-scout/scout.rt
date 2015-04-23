@@ -11,12 +11,17 @@ scout.inherits(scout.ButtonKeyStroke, scout.KeyStroke);
  * @Override scout.KeyStroke
  */
 scout.ButtonKeyStroke.prototype.handle = function(event) {
-  this._button.doAction();
+  if (this._button.enabled && this._button.visible) {
+    this._button.doAction();
+    if (this.preventDefaultOnEvent) {
+      event.preventDefault();
+    }
+  }
 };
 
 scout.ButtonKeyStroke.prototype._drawKeyBox = function($container) {
-  if (this._button.$container) {
+  if (this._button.$container && this._button.enabled && this._button.visible) {
     var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
-    scout.keyStrokeBox.drawSingleKeyBoxItem(4, keyBoxText, this._button.$container, this.ctrl, this.alt, this.shift);
+    scout.keyStrokeBox.drawSingleKeyBoxItem(16, keyBoxText, this._button.$container, this.ctrl, this.alt, this.shift, true);
   }
 };

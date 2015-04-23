@@ -140,11 +140,15 @@
 
 /* key box */
 
-.table .key-box {
+.table-row>.key-box {
+  top: calc(~"50%" - 17px/2);
+}
+
+.control-group>.control>.key-box {
   top: 2px;
 }
 
 .table .key-box.char {
-  bottom: 2px;
+  top: calc(~"50%" - 17px/2);
 }
 

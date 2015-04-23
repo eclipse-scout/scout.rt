@@ -96,25 +96,25 @@ scout.keys = {
 };
 
 scout.codesToKeys = {
-  8: 'backspace',
-  9: 'tab',
-  13: 'enter',
+  8: 'Backspace',
+  9: 'Tab',
+  13: 'Enter',
   16: 'SHIFT',
   17: 'CTRL',
   18: 'ALT',
   19: 'PAUSE',
-  27: 'esc',
-  33: 'page up',
-  34: 'page down',
-  35: 'end',
-  36: 'home',
-  37: 'left',
+  27: 'Esc',
+  33: 'Page up',
+  34: 'Page down',
+  35: 'End',
+  36: 'Home',
+  37: 'Left',
   38: 'UP',
-  39: 'right',
-  40: 'down',
+  39: 'Right',
+  40: 'Down',
   32: 'SPACE',
-  45: 'insert',
-  46: 'delete',
+  45: 'Insert',
+  46: 'Delete',
   48: '0',
   49: '1',
   50: '2',
@@ -178,8 +178,8 @@ scout.codesToKeys = {
   109: 'SUBTRACT',
   110: 'DECIMAL_POINT',
   111: '/',
-  144: 'num lock',
-  145: 'scroll lock',
+  144: 'Num lock',
+  145: 'Scroll lock',
   186: 'ü', //ü
   189: '-',
   188: ',',
@@ -192,35 +192,30 @@ scout.codesToKeys = {
 };
 
 scout.keyStrokeBox = {
-  additionalMarginLeft: 22,
-  marginLeft: 28,
-  drawSingleKeyBoxItem: function(offset, keyBoxText, $container, ctrl, alt, shift) {
+  gap: 4,
+  drawSingleKeyBoxItem: function(offset, keyBoxText, $container, ctrl, alt, shift, alignementRight) {
     var $existingKeyBoxes = $('.key-box', $container);
-    var boxGroup = 0;
+
+    var align = alignementRight ? 'right' : 'left';
     if ($existingKeyBoxes.length > 0) {
-      boxGroup = $existingKeyBoxes.first().attr('box-group');
-    }
-    offset = offset + this.marginLeft * $existingKeyBoxes.length + boxGroup * this.additionalMarginLeft;
-    boxGroup++;
-    if (shift) {
-      //$container.prependDiv('key-box ', 'shift').css('left', '' + offset + 'px').attr('box-group', boxGroup);
-      //offset = offset + this.marginLeft;
-      keyBoxText = 'shift + ' + keyBoxText;
+      var $boxLastAdded = $existingKeyBoxes.first();
+      if (alignementRight) {
+        offset = $container.width() - $boxLastAdded.position().left + this.gap;
+      } else {
+        offset = this.gap + $boxLastAdded.position().left + $boxLastAdded.outerWidth();
       }
+    }
+    if (shift) {
+      keyBoxText = 'Shift ' + keyBoxText;
+    }
 
     if (alt) {
-      $container.prependDiv('key-box ', 'alt').css('left', '' + offset + 'px').attr('box-group', boxGroup);
-      offset = offset + this.marginLeft;
-      keyBoxText = 'alt + ' + keyBoxText;
+      keyBoxText = 'Alt ' + keyBoxText;
     }
     if (ctrl) {
-      //$container.prependDiv('key-box ', 'ctrl').css('left', '' + offset + 'px').attr('box-group', boxGroup);
-      //offset = offset + this.marginLeft;
-      keyBoxText = 'ctrl + ' + keyBoxText;
+      keyBoxText = 'Ctrl ' + keyBoxText;
     }
-    $container.prependDiv('key-box ', keyBoxText).css('left', '' + offset + 'px').attr('box-group', boxGroup);
-    offset = offset + this.marginLeft;
-    return offset;
+    $container.prependDiv('key-box ', keyBoxText).css(align, '' + offset + 'px');
   },
 
   keyStrokeName: function(ctrl, alt, shift, keyStroke) {

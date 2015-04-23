@@ -4,7 +4,7 @@ scout.NavigateDownButton = function(outline, node) {
   this._text2 = 'Show';
   this.systemType = scout.Button.SYSTEM_TYPE.OK;
   this.id = 'NavigateDownButton';
-  this.keyStroke = 'ENTER';
+  this.keyStroke = 'Enter';
 };
 scout.inherits(scout.NavigateDownButton, scout.AbstractNavigationButton);
 

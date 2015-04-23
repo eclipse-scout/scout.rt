@@ -14,6 +14,7 @@ scout.MessageBox = function(modelAdapter, session) {
   this.focusListener;
   this._$glassPane;
   this._session = session;
+  this.keyStrokeAdapter;
 };
 
 scout.MessageBox.prototype.render = function($parent) {
@@ -72,16 +73,16 @@ scout.MessageBox.prototype.render = function($parent) {
 
   // Now that all texts are set, we can calculate the position
   this._position();
+  this.keyStrokeAdapter = new scout.MessageBoxKeyStrokeAdapter(this);
+  this._installKeyStrokeAdapter();
 };
 
 scout.MessageBox.prototype.remove = function() {
   if (this.$container) {
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
     this._$glassPane.fadeOutAndRemove();
     this.$container = null;
   }
-
-  // FIXME CGU does not work, because button gets disabled when clicked (why??).
-  this.previouslyFocusedElement.focus();
 };
 
 scout.MessageBox.prototype._position = function() {
@@ -144,4 +145,10 @@ scout.MessageBox.prototype._updateButtonWidths = function() {
   $($visibleButtons).each(function() {
     this.css('width', width + '%');
   });
+};
+
+scout.MessageBox.prototype._installKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+  }
 };

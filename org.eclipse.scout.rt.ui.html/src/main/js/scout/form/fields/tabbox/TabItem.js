@@ -16,9 +16,9 @@ scout.inherits(scout.TabItem, scout.GroupBox);
  */
 scout.TabItem.prototype.renderTab = function($parent, tabIndex) {
   this._$tabButton = $('<button>').
-    text(this.label).
-    appendTo($parent).
-    data('tabIndex', tabIndex);
+  text(scout.strings.removeAmpersand(this.label)).
+  appendTo($parent).
+  data('tabIndex', tabIndex);
   this._tabButtonRendered = true;
   this._updateTabButton();
   return this._$tabButton;

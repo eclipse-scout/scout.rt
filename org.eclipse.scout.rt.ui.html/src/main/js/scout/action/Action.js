@@ -181,8 +181,8 @@ scout.Action.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
   }
   if (this.drawHint) {
     this._drawKeyBox($container);
-    drawedKeys[this.keyStrokeName()] = true;
   }
+  drawedKeys[this.keyStrokeName()] = true;
 };
 
 scout.Action.prototype._drawKeyBox = function($container) {

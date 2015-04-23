@@ -3,6 +3,10 @@ scout.RichTextField = function() {
 };
 scout.inherits(scout.RichTextField, scout.ValueField);
 
+scout.RichTextField.prototype._createKeyStrokeAdapter = function() {
+  return new scout.RichTextFieldKeyStrokeAdapter(this);
+};
+
 scout.RichTextField.prototype._renderProperties = function() {
   scout.RichTextField.parent.prototype._renderProperties.call(this);
 };
@@ -24,7 +28,8 @@ scout.RichTextField.prototype._render = function($parent) {
   $editorContent.attr('contentEditable', 'true')
     .on('keydown keyup paste', this._onChange.bind(this))
     .on('focus', this._onFocus.bind(this))
-    .on('blur', this._onBlur.bind(this));
+    .on('blur', this._onBlur.bind(this))
+    .attr('tabindex', '0');
   this.addField($editorContent);
 
   // demo data
