@@ -224,9 +224,12 @@ scout.AbstractSmartField.prototype._onFieldBlur = function() {
 /**
  * This method is called when the user presses the TAB or ENTER key in the UI.
  * onFieldBlur is also executed, but won't do anything, since the $popup is already closed in the UI.
+ * In case the smart-field is a proposal-field we must send the current searchText to the server,
+ * even when the popup is not opened (this happens when the user types something which is not in the
+ * list of proposals). We must accept the user defined text in that case.
  */
 scout.AbstractSmartField.prototype._acceptProposal = function() {
-  if (!this._$popup) {
+  if (!this.proposal && !this._$popup) {
     $.log.debug('proposal popup is not opened. do not acceptProposal');
     return;
   }

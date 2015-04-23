@@ -254,18 +254,17 @@ scout.Session.prototype._coalesceEvents = function(previousEvents, event) {
 scout.Session.prototype._sendRequest = function(request) {
   var unload = !! request.unload;
 
-  if (this.offline) {
+  if (this.offline && !unload) {
     // No need to queue the request when document is unloading
-    if (!unload) {
-      request.events.forEach(function(event) {
-        this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
-      }.bind(this));
-      if (this._queuedRequest.events) {
-        this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
-      }
-      else {
-        this._queuedRequest.events = request.events;
-      }
+    // Note: Firefox is offline when page is unloaded
+    request.events.forEach(function(event) {
+      this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
+    }.bind(this));
+    if (this._queuedRequest.events) {
+      this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
+    }
+    else {
+      this._queuedRequest.events = request.events;
     }
     return;
   }
