@@ -13,78 +13,37 @@ package org.eclipse.scout.rt.client.ui.basic.planner;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
 
 public class PlannerEvent extends java.util.EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
-  /**
-   * Some activities have been added valid properties: activities,
-   * firstActivity, lastActivity
-   */
-  public static final int TYPE_ACTIVITIES_INSERTED = 100;
-  /**
-   * Some activities have been updated valid properties: activities,
-   * firstActivity, lastActivity
-   */
-  public static final int TYPE_ACTIVITIES_UPDATED = 101;
-  /**
-   * Some activities have been deleted valid properties: activities,
-   * firstActivity, lastActivity
-   */
-  public static final int TYPE_ACTIVITIES_DELETED = 102;
-  /**
-   * A row has been activated valid properties: activities, firstActivity,
-   * lastActivity, resource, column
-   */
-  public static final int TYPE_CELL_ACTION = 104;
-  /**
-   * All activities have been deleted valid properties: activities,
-   * firstActivity, lastActivity
-   */
-  public static final int TYPE_ALL_ACTIVITIES_DELETED = 105;
+
+  public static final int TYPE_RESOURCES_INSERTED = 100;
+  public static final int TYPE_RESOURCES_UPDATED = 101;
+  public static final int TYPE_RESOURCES_DELETED = 102;
+  public static final int TYPE_ACTIVITY_ACTION = 104;
+  public static final int TYPE_ALL_RESOURCES_DELETED = 105;
 
   private int m_type;
-  private List<? extends Activity> m_activities = CollectionUtility.emptyArrayList();
+  private List<? extends Resource> m_resources = CollectionUtility.emptyArrayList();
   private List<IMenu> m_popupMenus;
-  private Object m_resource;
 
   public PlannerEvent(IPlanner source, int type) {
     super(source);
     m_type = type;
   }
 
-  public PlannerEvent(IPlanner source, int type, Activity activity) {
+  public PlannerEvent(IPlanner source, int type, List<? extends Resource> resources) {
     super(source);
     m_type = type;
-    if (activity != null) {
-      ArrayList<Activity> list = new ArrayList<Activity>();
-      list.add(activity);
-      m_activities = list;
+    if (CollectionUtility.hasElements(resources)) {
+      m_resources = resources;
     }
-  }
-
-  public PlannerEvent(IPlanner source, int type, List<? extends Activity> activities) {
-    super(source);
-    m_type = type;
-    if (CollectionUtility.hasElements(activities)) {
-      m_activities = activities;
-    }
-  }
-
-  public PlannerEvent(IPlanner source, int type, Object resource, Activity activity) {
-    super(source);
-    m_type = type;
-    if (activity != null) {
-      ArrayList<Activity> list = new ArrayList<Activity>();
-      list.add(activity);
-      m_activities = list;
-    }
-    m_resource = resource;
   }
 
   public IPlanner getPlanner() {
@@ -96,28 +55,16 @@ public class PlannerEvent extends java.util.EventObject implements IModelEvent {
     return m_type;
   }
 
-  public Object getResourceId() {
-    return m_resource;
+  public List<? extends Resource> getResources() {
+    return CollectionUtility.arrayList(m_resources);
   }
 
-  public List<Activity> getActivities() {
-    return CollectionUtility.arrayList(m_activities);
+  protected void setResources(List<? extends Resource> resources) {
+    m_resources = CollectionUtility.arrayList(resources);
   }
 
-  protected void setActivities(List<? extends Activity> activities) {
-    m_activities = CollectionUtility.arrayList(activities);
-  }
-
-  public int getActivityCount() {
-    return m_activities != null ? m_activities.size() : 0;
-  }
-
-  public Activity getFirstActivity() {
-    return CollectionUtility.firstElement(m_activities);
-  }
-
-  public Activity getLastActivity() {
-    return CollectionUtility.lastElement(m_activities);
+  public int getResourceCount() {
+    return m_resources != null ? m_resources.size() : 0;
   }
 
   /**
@@ -183,18 +130,8 @@ public class PlannerEvent extends java.util.EventObject implements IModelEvent {
       buf.append("#" + m_type);
     }
     buf.append(" ");
-    // activities
-    if (CollectionUtility.hasElements(m_activities) && getPlanner() != null) {
-      if (m_activities.size() == 1) {
-        buf.append("row " + CollectionUtility.firstElement(m_activities));
-      }
-      else {
-        Iterator<? extends Activity> actIt = m_activities.iterator();
-        buf.append("" + actIt.next());
-        while (actIt.hasNext()) {
-          buf.append(",").append("" + actIt.next());
-        }
-      }
+    if (CollectionUtility.hasElements(m_resources) && getPlanner() != null) {
+      buf.append("Resources: " + m_resources);
     }
     else {
       buf.append("{}");

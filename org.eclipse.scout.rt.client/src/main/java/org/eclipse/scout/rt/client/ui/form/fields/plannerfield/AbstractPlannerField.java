@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("8fbfbf19-ff9d-4e89-8a78-8e6a4a8dc36c")
-public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> extends AbstractFormField implements IPlannerField<P, RI, AI> {
+public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> extends AbstractFormField implements IPlannerField<P> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPlannerField.class);
 
   private IPlannerFieldUIFacade m_uiFacade;
@@ -80,7 +80,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
    */
   @ConfigOperation
   @Order(10)
-  protected List<Resource> execLoadResources() throws ProcessingException {
+  protected List<Resource<RI>> execLoadResources() throws ProcessingException {
     return null;
   }
 
@@ -97,13 +97,13 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
    * </pre>
    *
    * Load activity data<br>
-   * By default loads data using {@link #interceptLoadPlannerData(List, List)}, transforms to {@link Activity}, maps
-   * to resources using the resourceId, and sets the {@link Activity}s on the corresponding activtyRow.
+   * By default loads data using {@link #interceptLoadPlannerData(List, List)}, transforms to {@link Activity}, maps to
+   * resources using the resourceId, and sets the {@link Activity}s on the corresponding activtyRow.
    */
   @ConfigOperation
   @Order(20)
   protected void execPopulateResources() throws ProcessingException {
-    List<Resource> resources = interceptLoadResources();
+    List<Resource<RI>> resources = interceptLoadResources();
     getPlanner().replaceResources(resources);
   }
 
@@ -169,11 +169,6 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
   }
 
   @Override
-  public void loadPlannerDataOfSelectedRecources() throws ProcessingException {
-//    loadPlannerDataInternal(getResourceTable().getSelectedRows());
-  }
-
-  @Override
   public IPlannerFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
@@ -196,7 +191,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
     }
   }
 
-  protected final List<Resource> interceptLoadResources() throws ProcessingException {
+  protected final List<Resource<RI>> interceptLoadResources() throws ProcessingException {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     PlannerFieldLoadResourcesChain<P, RI, AI> chain = new PlannerFieldLoadResourcesChain<P, RI, AI>(extensions);
     return chain.execLoadResourceTableData();
@@ -215,7 +210,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
     }
 
     @Override
-    public List<Resource> execLoadResources(PlannerFieldLoadResourcesChain<? extends IPlanner<RI, AI>, RI, AI> chain) throws ProcessingException {
+    public List<Resource<RI>> execLoadResources(PlannerFieldLoadResourcesChain<? extends IPlanner<RI, AI>, RI, AI> chain) throws ProcessingException {
       return getOwner().execLoadResources();
     }
 

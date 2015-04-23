@@ -21,7 +21,7 @@ public interface IPlannerUIFacade<RI, AI> {
 
   void setSelectedActivityCellFromUI(Activity<RI, AI> cell);
 
-  void setSelectionFromUI(List<Resource> resourcess, Date beginTime, Date endTime);
+  void setSelectionFromUI(List<? extends Resource<RI>> resources, Date beginTime, Date endTime);
 
   /**
    * Action on a empty cell or activity cell
@@ -29,5 +29,5 @@ public interface IPlannerUIFacade<RI, AI> {
    * @param activityCell
    *          may be null
    */
-  void fireCellActionFromUI(Resource resource, Activity<RI, AI> activityCell);
+//  void fireCellActionFromUI(Resource resource, Activity<RI, AI> activityCell);
 }

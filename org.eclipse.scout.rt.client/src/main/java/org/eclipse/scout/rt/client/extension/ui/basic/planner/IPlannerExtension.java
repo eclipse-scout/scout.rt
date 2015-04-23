@@ -31,6 +31,6 @@ public interface IPlannerExtension<RI, AI, OWNER extends AbstractPlanner<RI, AI>
 
   void execInitPlanner(PlannerInitPlannerChain<RI, AI> chain) throws ProcessingException;
 
-  void execCellAction(PlannerCellActionChain<RI, AI> chain, Resource resource, Activity<RI, AI> activityCell) throws ProcessingException;
+  void execCellAction(PlannerCellActionChain<RI, AI> chain, Resource<RI> resource, Activity<RI, AI> activityCell) throws ProcessingException;
 
 }

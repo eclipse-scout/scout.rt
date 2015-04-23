@@ -19,11 +19,13 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 
-public class Resource implements ICellObserver {
+public class Resource<RI> implements ICellObserver {
+  private RI m_id;
   private Cell m_cell;
   private List<Activity<?, ?>> m_activities;
 
-  public Resource(String text, List<Activity<?, ?>> activities) {
+  public Resource(RI id, String text, List<Activity<?, ?>> activities) {
+    m_id = id;
     m_cell = new Cell(this);
     m_cell.setText(text);
     m_activities = activities;
@@ -32,8 +34,12 @@ public class Resource implements ICellObserver {
     }
   }
 
-  public Resource(String text) {
-    this(text, null);
+  public Resource(RI id, String text) {
+    this(id, text, null);
+  }
+
+  public RI getId() {
+    return m_id;
   }
 
   public ICell getCell() {

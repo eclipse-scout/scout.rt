@@ -48,7 +48,7 @@ public abstract class AbstractPlannerExtension<RI, AI, OWNER extends AbstractPla
   }
 
   @Override
-  public void execCellAction(PlannerCellActionChain<RI, AI> chain, Resource resource, Activity<RI, AI> activityCell) throws ProcessingException {
+  public void execCellAction(PlannerCellActionChain<RI, AI> chain, Resource<RI> resource, Activity<RI, AI> activityCell) throws ProcessingException {
     chain.execCellAction(resource, activityCell);
   }
 

@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * This class strintly uses java.util.Date staticly AND dynamicly<br>
  * All Date-Objects and subclasses are run through {@link com.bsiag.DateUtility#toUtilDate(java.util.Date)}()
  */
-public interface IPlannerField<P extends IPlanner<RI, AI>, RI, AI> extends IFormField {
+public interface IPlannerField<P extends IPlanner<?, ?>> extends IFormField {
 
   String PROP_SPLITTER_POSITION = "splitterPosition";
 
@@ -37,11 +37,6 @@ public interface IPlannerField<P extends IPlanner<RI, AI>, RI, AI> extends IForm
    * (re)load table data
    */
   void loadResources() throws ProcessingException;
-
-  /**
-   * (re)load activity map data of selected resources only
-   */
-  void loadPlannerDataOfSelectedRecources() throws ProcessingException;
 
   IPlannerFieldUIFacade getUIFacade();
 

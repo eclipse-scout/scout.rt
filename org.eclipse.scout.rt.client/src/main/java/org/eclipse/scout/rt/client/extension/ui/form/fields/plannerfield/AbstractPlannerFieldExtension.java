@@ -17,7 +17,7 @@ public abstract class AbstractPlannerFieldExtension<P extends IPlanner<RI, AI>, 
   }
 
   @Override
-  public List<Resource> execLoadResources(PlannerFieldLoadResourcesChain<? extends IPlanner<RI, AI>, RI, AI> chain) throws ProcessingException {
+  public List<Resource<RI>> execLoadResources(PlannerFieldLoadResourcesChain<? extends IPlanner<RI, AI>, RI, AI> chain) throws ProcessingException {
     return chain.execLoadResourceTableData();
   }
 

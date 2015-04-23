@@ -234,7 +234,7 @@ public interface IPlanner<RI, AI> extends IPropertyObserver {
    *          false=plan an activity for all of the selected resources
    * @param chooseRandom
    *          only used in combination with singleMatch=true. true=a random
-   *          person is chosen, false=the first matching resource is chosen
+   *          person is chosen, false=the first matching Resource<RI> is chosen
    * @param earliestBeginTime
    *          consider only matches that start after this time; {@link System#currentTimeMillis()} is used when null is
    *          passed
@@ -248,13 +248,15 @@ public interface IPlanner<RI, AI> extends IPropertyObserver {
    */
   void planActivityForSelectedResources(boolean singleMatch, boolean chooseRandom, Date earliestBeginTime, Date latestEndTime, long preferredDuration);
 
-  void replaceResources(List<Resource> resources);
+  void replaceResources(List<Resource<RI>> resources);
 
-  void removeAllResources();
+  void deleteResources(List<Resource<RI>> resources);
 
-  void addResources(List<Resource> resources);
+  void deleteAllResources();
 
-  List<Resource> getResources();
+  void addResources(List<Resource<RI>> resources);
+
+  List<Resource<RI>> getResources();
 
 //  ActivityCell<RI, AI> resolveActivityCell(ActivityCell<RI, AI> cell);
 //
@@ -262,7 +264,7 @@ public interface IPlanner<RI, AI> extends IPropertyObserver {
 //
 //  List<ActivityCell<RI, AI>> getActivityCells(RI resource);
 //
-//  List<ActivityCell<RI, AI>> getActivityCells(List<Resource> resources);
+//  List<ActivityCell<RI, AI>> getActivityCells(List<Resource<RI>> resources);
 //
 //  List<ActivityCell<RI, AI>> getAllActivityCells();
 
@@ -270,11 +272,11 @@ public interface IPlanner<RI, AI> extends IPropertyObserver {
 //
 //  void updateActivityCells(List<? extends ActivityCell<RI, AI>> cells);
 //
-//  void updateActivityCellsById(List<Resource> resources);
+//  void updateActivityCellsById(List<Resource<RI>> resources);
 //
 //  void removeActivityCells(List<? extends ActivityCell<RI, AI>> cells);
 //
-//  void removeActivityCellsById(List<Resource> resources);
+//  void removeActivityCellsById(List<Resource<RI>> resources);
 //
 //  void removeAllActivityCells();
 
@@ -284,16 +286,16 @@ public interface IPlanner<RI, AI> extends IPropertyObserver {
 
   boolean isSelectedActivityCell(Activity<RI, AI> cell);
 
-//  void setResources(List<Resource> resources);
+//  void setResources(List<Resource<RI>> resources);
 
   /**
    * selected resources in arbitrary order
    */
-  List<Resource> getSelectedResources();
+  List<? extends Resource<RI>> getSelectedResources();
 
-  void setSelectedResources(List<Resource> resources);
+  void setSelectedResources(List<? extends Resource<RI>> resources);
 
-  void isSelectedResource(Resource resource);
+  void isSelectedResource(Resource<RI> resource);
 
   /**
    * Indicates whether the selected sections in the activity

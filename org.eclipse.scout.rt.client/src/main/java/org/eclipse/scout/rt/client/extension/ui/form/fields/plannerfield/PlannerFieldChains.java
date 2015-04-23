@@ -28,8 +28,8 @@ public final class PlannerFieldChains {
       super(extensions);
     }
 
-    public List<Resource> execLoadResourceTableData() throws ProcessingException {
-      MethodInvocation<List<Resource>> methodInvocation = new MethodInvocation<List<Resource>>() {
+    public List<Resource<RI>> execLoadResourceTableData() throws ProcessingException {
+      MethodInvocation<List<Resource<RI>>> methodInvocation = new MethodInvocation<List<Resource<RI>>>() {
         @Override
         protected void callMethod(IPlannerFieldExtension<? extends IPlanner<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends IPlanner<RI, AI>, RI, AI>> next) throws ProcessingException {
           setReturnValue(next.execLoadResources(PlannerFieldLoadResourcesChain.this));

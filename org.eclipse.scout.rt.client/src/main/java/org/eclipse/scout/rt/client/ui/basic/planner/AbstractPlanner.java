@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -69,10 +70,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   private EventListenerList m_listenerList;
   private IPlannerUIFacade m_activityMapUIFacade;
   private long m_minimumActivityDuration;// millis
-  private List<Resource> m_resources;
-//  private Map<RI/* resource */, List<ActivityCell<RI, AI>>> m_resourceToActivities;
-//  private Map<CompositeObject/* resource,activityId */, ActivityCell<RI, AI>> m_activities;
-  private Set<Resource> m_selectedResources;
+  private List<Resource<RI>> m_resources;
   private int m_tableChanging;
   private List<PlannerEvent> m_eventBuffer = new ArrayList<PlannerEvent>();
 //  private IActivityCellObserver<RI, AI> m_cellObserver;
@@ -85,7 +83,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   public AbstractPlanner(boolean callInitializer) {
     m_objectExtensions = new ObjectExtensions<AbstractPlanner<RI, AI>, IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>>(this);
-    m_resources = new ArrayList<Resource>();
+    m_resources = new ArrayList<Resource<RI>>();
     if (callInitializer) {
       callInitializer();
     }
@@ -185,6 +183,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
+  @ConfigOperation
+  @Order(50)
+  protected void execResourcesSelected(List<Resource<RI>> resources) throws ProcessingException {
+  }
+
   /**
    * @param activityCell
    *          may be null
@@ -207,10 +210,10 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
    * @param activityCell
    *          may be null
    */
-  @ConfigOperation
-  @Order(75)
-  protected void execCellAction(Resource resource, Activity<RI, AI> activityCell) throws ProcessingException {
-  }
+//  @ConfigOperation
+//  @Order(75)
+//  protected void execCellAction(Resource<RI> resource, Activity<RI, AI> activityCell) throws ProcessingException {
+//  }
 
   @ConfigOperation
   @Order(80)
@@ -234,10 +237,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   protected void initConfig() {
     m_listenerList = new EventListenerList();
     m_activityMapUIFacade = createUIFacade();
-//    m_resourceToActivities = new HashMap<RI, List<ActivityCell<RI, AI>>>();
-//    m_activities = new HashMap<CompositeObject, ActivityCell<RI, AI>>();
 //    m_cellObserver = new P_ActivityCellObserver();
-    m_selectedResources = new HashSet<Resource>();
     //
     setWorkDayCount(getConfiguredWorkDayCount());
     setWorkDaysOnly(getConfiguredWorkDaysOnly());
@@ -275,9 +275,18 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     // local property observer
     addPropertyChangeListener(new PropertyChangeListener() {
       @Override
+      @SuppressWarnings("unchecked")
       public void propertyChange(PropertyChangeEvent e) {
-        if (e.getPropertyName().equals(PROP_SELECTED_ACTIVITY_CELL)) {
-          @SuppressWarnings("unchecked")
+        if (e.getPropertyName().equals(PROP_SELECTED_RESOURCES)) {
+          List<Resource<RI>> resources = (List<Resource<RI>>) e.getNewValue();
+          try {
+            interceptResourcesSelected(resources);
+          }
+          catch (Exception t) {
+            BEANS.get(ExceptionHandler.class).handle(t);
+          }
+        }
+        else if (e.getPropertyName().equals(PROP_SELECTED_ACTIVITY_CELL)) {
           Activity<RI, AI> cell = (Activity<RI, AI>) e.getNewValue();
           if (cell != null) {
             try {
@@ -386,16 +395,16 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 //  }
 //
 //  @Override
-//  public List<ActivityCell<RI, AI>> getActivityCells(Resource resource) {
-//    ArrayList<Resource> resourceList = new ArrayList<Resource>();
+//  public List<ActivityCell<RI, AI>> getActivityCells(Resource<RI> resource) {
+//    ArrayList<Resource<RI>> resourceList = new ArrayList<Resource<RI>>();
 //    resourceList.add(resource);
 //    return getActivityCells(resourceList);
 //  }
 
 //  @Override
-//  public List<ActivityCell<RI, AI>> getActivityCells(List<Resource> resources) {
+//  public List<ActivityCell<RI, AI>> getActivityCells(List<Resource<RI>> resources) {
 //    List<ActivityCell<RI, AI>> all = new ArrayList<ActivityCell<RI, AI>>();
-//    for (Resource resource : resources) {
+//    for (Resource<RI> Resource<RI> : resources) {
 //      List<ActivityCell<RI, AI>> list = m_resourceToActivities.get(resource);
 //      if (list != null) {
 //        all.addAll(list);
@@ -441,7 +450,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 //  }
 //
 //  @Override
-//  public void updateActivityCellsById(List<Resource> resources) {
+//  public void updateActivityCellsById(List<Resource<RI>> resources) {
 //    updateActivityCellsInternal(getActivityCells(resources));
 //  }
 //
@@ -460,7 +469,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 //  }
 //
 //  @Override
-//  public void removeActivityCellsById(List<Resource> resources) {
+//  public void removeActivityCellsById(List<Resource<RI>> resources) {
 //    removeActivityCellsInternal(getActivityCells(resources));
 //  }
 //
@@ -493,32 +502,85 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 //  }
 
   @Override
-  public void replaceResources(List<Resource> resources) {
-    removeAllResources();
+  public void replaceResources(List<Resource<RI>> resources) {
+    deleteAllResources();
     addResources(resources);
   }
 
   @Override
-  public void removeAllResources() {
-    m_resources.clear();
-//    fireAllResourcesDeleted();
-  }
-
-  @Override
-  public void addResources(List<Resource> resources) {
-    //FIXME CGU copy? fire Event
-    for (Resource resource : resources) {
-      for (Activity<?, ?> activity : resource.getActivities()) {
-        decorateActivityCell((Activity<RI, AI>) activity);
+  public void deleteResources(List<Resource<RI>> resources) {
+    setPlannerChanging(true);
+    try {
+      int resourceCountBefore = m_resources.size();
+      List<Resource<RI>> deletedResources = new ArrayList<Resource<RI>>();
+      for (Resource<RI> resource : resources) {
+        m_resources.remove(resource);
+        deletedResources.add(resource);
       }
-      //FIXME CGU fire Event
-      m_resources.add(resource);
+      if (deletedResources.size() == resourceCountBefore) {
+        fireAllResourcesDeleted();
+      }
+      else {
+        fireResourcesDeleted(deletedResources);
+      }
+      //FIXME CGU consider selection
     }
-    //FIXME CGU fire Event
+    finally {
+      setPlannerChanging(false);
+    }
   }
 
   @Override
-  public List<Resource> getResources() {
+  public void deleteAllResources() {
+    setPlannerChanging(true);
+    try {
+      m_resources.clear();
+      fireAllResourcesDeleted();
+    }
+    finally {
+      setPlannerChanging(false);
+    }
+  }
+
+  @Override
+  public void addResources(List<Resource<RI>> resources) {
+    setPlannerChanging(true);
+    try {
+      //FIXME CGU copy? fire Event
+      for (Resource<RI> resource : resources) {
+        for (Activity<?, ?> activity : resource.getActivities()) {
+          decorateActivityCell((Activity<RI, AI>) activity);
+        }
+        //FIXME CGU fire Event
+        m_resources.add(resource);
+      }
+      fireResourcesInserted(resources);
+    }
+    finally {
+      setPlannerChanging(false);
+    }
+  }
+
+  public void updateResource(Resource<RI> resource) throws ProcessingException {
+    updateResources(CollectionUtility.arrayList(resource));
+  }
+
+  public void updateResources(List<Resource<RI>> resources) throws ProcessingException {
+    if (resources == null || resources.size() == 0) {
+      return;
+    }
+
+    setPlannerChanging(true);
+    try {
+      fireResourcesUpdated(resources);
+    }
+    finally {
+      setPlannerChanging(false);
+    }
+  }
+
+  @Override
+  public List<Resource<RI>> getResources() {
     return CollectionUtility.arrayList(m_resources);
   }
 
@@ -541,8 +603,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<Resource> getSelectedResources() {
-    List<Resource> a = (List<Resource>) propertySupport.getProperty(PROP_SELECTED_RESOURCES);
+  public List<Resource<RI>> getSelectedResources() {
+    List<Resource<RI>> a = (List<Resource<RI>>) propertySupport.getProperty(PROP_SELECTED_RESOURCES);
     if (a == null) {
       a = CollectionUtility.emptyArrayList();
     }
@@ -550,10 +612,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
-  public void setSelectedResources(List<Resource> resources) {
-    List<Resource> internalResources = CollectionUtility.arrayList(resources);
-    m_selectedResources.clear();
-    m_selectedResources.addAll(internalResources);
+  public void setSelectedResources(List<? extends Resource<RI>> resources) {
+    List<Resource<RI>> internalResources = CollectionUtility.arrayList(resources);
     propertySupport.setProperty(PROP_SELECTED_RESOURCES, internalResources);
 
     // check whether current selected activity cell needs to be updated
@@ -569,47 +629,16 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       return;
     }
 
-    Resource resource = CollectionUtility.firstElement(resources);
+    Resource<RI> resource = CollectionUtility.firstElement(resources);
     if (CompareUtility.notEquals(resource, selectedCell.getResourceId())) {
       // selected cell does not belong to selected resources
       setSelectedActivityCell(null);
     }
   }
 
-//  @SuppressWarnings("unchecked")
-//  @Override
-//  public List<Resource> getResources() {
-//    List<Resource> resources = (List<Resource>) propertySupport.getProperty(PROP_RESOURCE_IDS);
-//    if (resources == null) {
-//      return CollectionUtility.emptyArrayList();
-//    }
-//    return CollectionUtility.arrayList(resources);
-//  }
-//
-//  @Override
-//  public void setResources(List<Resource> resources) {
-//    if (resources == null) {
-//      resources = CollectionUtility.emptyArrayList();
-//    }
-//    // delete activities of resources that no Object exists
-//    HashSet<Resource> eliminatedResourceIdSet = new HashSet<Resource>();
-//    eliminatedResourceIdSet.addAll(getResources());
-//    eliminatedResourceIdSet.removeAll(resources);
-//    try {
-//      setPlannerChanging(true);
-//      //
-//      propertySupport.setProperty(PROP_RESOURCE_IDS, resources);
-//      removeActivityCellsById(new ArrayList<Resource>(eliminatedResourceIdSet));
-//      updateActivityCellsInternal(getAllActivityCells());
-//    }
-//    finally {
-//      setPlannerChanging(false);
-//    }
-//  }
-
   @Override
-  public void isSelectedResource(Resource resource) {
-    m_selectedResources.contains(resource);
+  public void isSelectedResource(Resource<RI> resource) {
+    getSelectedResources().contains(resource);
   }
 
   @Override
@@ -648,37 +677,37 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     return getContextMenu().getChildActions();
   }
 
-  private void fireCellAction(Resource resource, Activity<RI, AI> activityCell) {
-    // single observer
-    try {
-      interceptCellAction(resource, activityCell);
-    }
-    catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
-    PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_CELL_ACTION, resource, activityCell);
+//  private void fireCellAction(Resource<RI> resource, Activity<RI, AI> activityCell) {
+//    // single observer
+//    try {
+//      interceptCellAction(resource, activityCell);
+//    }
+//    catch (Exception e) {
+//      BEANS.get(ExceptionHandler.class).handle(e);
+//    }
+//    PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_ACTIVITY_ACTION, resource, activityCell);
+//    firePlannerEventInternal(e);
+//  }
+
+  private void fireResourcesInserted(List<Resource<RI>> resources) {
+    PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_RESOURCES_INSERTED, resources);
     firePlannerEventInternal(e);
   }
 
-//  private void fireActivitiesInserted(List<? extends ActivityCell<RI, AI>> a) {
-//    PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_ACTIVITIES_INSERTED, a);
-//    firePlannerEventInternal(e);
-//  }
-//
-//  private void fireActivitiesUpdated(List<? extends ActivityCell<RI, AI>> a) {
-//    PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_ACTIVITIES_UPDATED, a);
-//    firePlannerEventInternal(e);
-//  }
-//
-//  private void fireActivitiesDeleted(List<? extends ActivityCell<RI, AI>> a) {
-//    PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_ACTIVITIES_DELETED, a);
-//    firePlannerEventInternal(e);
-//  }
-//
-//  private void fireAllActivitiesDeleted(List<? extends ActivityCell<RI, AI>> a) {
-//    PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_ALL_ACTIVITIES_DELETED, a);
-//    firePlannerEventInternal(e);
-//  }
+  private void fireResourcesUpdated(List<Resource<RI>> resources) {
+    PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_RESOURCES_UPDATED, resources);
+    firePlannerEventInternal(e);
+  }
+
+  private void fireResourcesDeleted(List<Resource<RI>> resources) {
+    PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_RESOURCES_DELETED, resources);
+    firePlannerEventInternal(e);
+  }
+
+  private void fireAllResourcesDeleted() {
+    PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_ALL_RESOURCES_DELETED);
+    firePlannerEventInternal(e);
+  }
 
   // main handler
   private void firePlannerEventInternal(PlannerEvent e) {
@@ -739,23 +768,23 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
         List<PlannerEvent> subList = entry.getValue();
         int lastIndex = subList.size() - 1;
         switch (type) {
-          case PlannerEvent.TYPE_ALL_ACTIVITIES_DELETED: {
+          case PlannerEvent.TYPE_ALL_RESOURCES_DELETED: {
             sortedCoalescedMap.put(10, subList.get(lastIndex));// use last
             break;
           }
-          case PlannerEvent.TYPE_ACTIVITIES_INSERTED: {
+          case PlannerEvent.TYPE_RESOURCES_INSERTED: {
             sortedCoalescedMap.put(20, coalescePlannerEvents(subList));// merge
             break;
           }
-          case PlannerEvent.TYPE_ACTIVITIES_DELETED: {
+          case PlannerEvent.TYPE_RESOURCES_DELETED: {
             sortedCoalescedMap.put(30, coalescePlannerEvents(subList));// merge
             break;
           }
-          case PlannerEvent.TYPE_ACTIVITIES_UPDATED: {
+          case PlannerEvent.TYPE_RESOURCES_UPDATED: {
             sortedCoalescedMap.put(40, coalescePlannerEvents(subList));// merge
             break;
           }
-          case PlannerEvent.TYPE_CELL_ACTION: {
+          case PlannerEvent.TYPE_ACTIVITY_ACTION: {
             sortedCoalescedMap.put(50, subList.get(lastIndex));// use last
             break;
           }
@@ -768,6 +797,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     }
   }
 
+  //FIXME CGU use event buffer
   private PlannerEvent coalescePlannerEvents(List<PlannerEvent> list) {
     if (list.size() == 0) {
       return null;
@@ -781,13 +811,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       //
       ce.addPopupMenus(last.getPopupMenus());
       //
-      HashSet<Activity> coalesceList = new HashSet<Activity>();
+      Set<Resource<RI>> coalesceList = new HashSet<Resource<RI>>();
       for (PlannerEvent t : list) {
-        if (t.getActivityCount() > 0) {
-          coalesceList.addAll(t.getActivities());
+        if (t.getResourceCount() > 0) {
+          coalesceList.addAll((Collection<? extends Resource<RI>>) t.getResources());
         }
       }
-      ce.setActivities(new ArrayList<Activity>(coalesceList));
+      ce.setResources(new ArrayList<Resource<RI>>(coalesceList));
       //
       return ce;
     }
@@ -1038,16 +1068,16 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       // update selected activity cell based on selected time range.
       // this is a work around for enforcing an owner value change event on context menus. Actually the empty selection event
       // should be handled correctly in the GUI.
-      List<Resource> selectedResources = getSelectedResources();
+      List<Resource<RI>> selectedResources = getSelectedResources();
       if (selectedResources.size() == 1) {
-        Resource resource = CollectionUtility.firstElement(selectedResources);
+        Resource<RI> resource = CollectionUtility.firstElement(selectedResources);
         List<Activity<?, ?>> activityCells = resource.getActivities();
         for (Activity<?, ?> cell : activityCells) {
 
           if (CompareUtility.equals(cell.getBeginTime(), beginTime) &&
               (CompareUtility.equals(cell.getEndTime(), endTime)
-              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-              || (cell != null
+                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+                  || (cell != null
                   && cell.getEndTime() != null
                   && endTime != null
                   && cell.getEndTime().getTime() == endTime.getTime() + 1))) {
@@ -1160,12 +1190,12 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     SortedMap<CompositeObject, Activity<Integer, Integer>> sortMap = new TreeMap<>();
     Random rnd = new Random();
     int resourceIndex = 0;
-    for (Resource resource : getSelectedResources()) {
+    for (Resource<RI> resource : getSelectedResources()) {
       MultiTimeRange localTimeRanges = (MultiTimeRange) multiTimeRange.clone();
       for (Activity<?, ?> a : resource.getActivities()) {
         localTimeRanges.remove(a.getBeginTime(), a.getEndTime());
       }
-      // now only available time ranges for that resource are left
+      // now only available time ranges for that Resource<RI> are left
       for (TimeRange tr : localTimeRanges.getTimeRanges()) {
         long durationMillis = tr.getDurationMillis();
         long sortNo = chooseRandom ? rnd.nextLong() : resourceIndex;
@@ -1206,7 +1236,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       return;
     }
     TreeMap<CompositeObject, Activity<Integer, Integer>> sortMap = new TreeMap<CompositeObject, Activity<Integer, Integer>>();
-    for (Resource resource : getSelectedResources()) {
+    for (Resource<RI> resource : getSelectedResources()) {
       for (Activity<?, ?> a : resource.getActivities()) {
         multiTimeRange.remove(a.getBeginTime(), a.getEndTime());
       }
@@ -1258,7 +1288,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   private class P_PlannerUIFacade implements IPlannerUIFacade<RI, AI> {
 
     @Override
-    public void setSelectionFromUI(List<Resource> resources, Date beginTime, Date endTime) {
+    public void setSelectionFromUI(List<? extends Resource<RI>> resources, Date beginTime, Date endTime) {
       try {
         setPlannerChanging(true);
         setSelectedResources(resources);
@@ -1279,13 +1309,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       setSelectedActivityCell(cell);
     }
 
-    @Override
-    public void fireCellActionFromUI(Resource resource, Activity<RI, AI> activityCell) {
-      if (activityCell != null) {
-        setSelectedActivityCell(activityCell);
-      }
-      fireCellAction(resource, activityCell);
-    }
+//    @Override
+//    public void fireCellActionFromUI(Resource<RI> resource, Activity<RI, AI> activityCell) {
+//      if (activityCell != null) {
+//        setSelectedActivityCell(activityCell);
+//      }
+//      fireCellAction(resource, activityCell);
+//    }
   }
 
   /**
@@ -1319,10 +1349,19 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     }
 
     @Override
-    public void execCellAction(PlannerCellActionChain<RI, AI> chain, Resource resource, Activity<RI, AI> activityCell) throws ProcessingException {
-      getOwner().execCellAction(resource, activityCell);
+    public void execCellAction(PlannerCellActionChain<RI, AI> chain, Resource<RI> resource, Activity<RI, AI> activityCell) throws ProcessingException {
+      //FIXME CGU check if still needed, better replace with menus
+//      getOwner().execCellAction(resource, activityCell);
     }
 
+  }
+
+  protected final void interceptResourcesSelected(List<Resource<RI>> resources) throws ProcessingException {
+    execResourcesSelected(resources);
+    //FIXME CGU implement
+//    List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
+//    PlannerActivityCellSelectedChain<RI, AI> chain = new PlannerActivityCellSelectedChain<RI, AI>(extensions);
+//    chain.execActivityCellSelected(cell);
   }
 
   protected final void interceptActivityCellSelected(Activity<RI, AI> cell) throws ProcessingException {
@@ -1349,7 +1388,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     chain.execInitPlanner();
   }
 
-  protected final void interceptCellAction(Resource resource, Activity<RI, AI> activityCell) throws ProcessingException {
+  protected final void interceptCellAction(Resource<RI> resource, Activity<RI, AI> activityCell) throws ProcessingException {
     List<? extends IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> extensions = getAllExtensions();
     PlannerCellActionChain<RI, AI> chain = new PlannerCellActionChain<RI, AI>(extensions);
     chain.execCellAction(resource, activityCell);
