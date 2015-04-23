@@ -1920,7 +1920,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       try {
         IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, keystrokeClazz);
         ks.initAction();
-        ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
+        if (ks.getKeyStroke() != null) {
+          ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
+        }
       }
       catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", e));
@@ -1930,7 +1932,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     for (IKeyStroke ks : contributedKeyStrokes) {
       try {
         ks.initAction();
-        ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
+        if (ks.getKeyStroke() != null) {
+          ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
+        }
       }
       catch (Exception e) {
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error initializing key stroke '" + ks.getClass().getName() + "'.", e));
