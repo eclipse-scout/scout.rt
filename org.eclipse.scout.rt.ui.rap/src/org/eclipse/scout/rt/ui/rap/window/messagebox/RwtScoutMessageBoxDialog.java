@@ -46,6 +46,13 @@ import org.eclipse.swt.widgets.Shell;
 public class RwtScoutMessageBoxDialog extends Dialog {
   private static final long serialVersionUID = 1L;
 
+  /**
+   * must be sync with the patched version of RAP (org.eclipse.swt.widgets.Text.WRAP_TEXT_WITHOUT_SPACES)
+   * double kept because the open source release does not know anything about this constant. It is only available in the
+   * internal patched version of RAP 2.3.
+   */
+  public static final String WRAP_TEXT_WITHOUT_SPACES = "WrapWithoutSpaces";
+
   private P_ScoutMessageBoxListener m_scoutMessageBoxListener;
 
   private final IMessageBox m_scoutObject;
@@ -171,7 +178,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
     Control header = createHeaderArea(container);
     m_actionLabel = getUiEnvironment().getFormToolkit().createStyledText(container, SWT.WRAP | SWT.LEFT | SWT.V_SCROLL);
     m_actionLabel.setEditable(false);
-    m_actionLabel.setData(StyledText.WRAP_TEXT_WITHOUT_SPACES, Boolean.TRUE);
+    m_actionLabel.setData(WRAP_TEXT_WITHOUT_SPACES, Boolean.TRUE);
 
     // layout
     container.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
@@ -196,7 +203,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     m_imageLabel = getUiEnvironment().getFormToolkit().createLabel(container, "");
     m_introLabel = getUiEnvironment().getFormToolkit().createStyledText(container, SWT.WRAP | SWT.LEFT | SWT.V_SCROLL);
-    m_introLabel.setData(StyledText.WRAP_TEXT_WITHOUT_SPACES, Boolean.TRUE);
+    m_introLabel.setData(WRAP_TEXT_WITHOUT_SPACES, Boolean.TRUE);
     m_introLabel.setEditable(false);
     m_introLabel.setData(RWT.MARKUP_ENABLED, Boolean.TRUE);
     //Unsafe configuration. Size for h1, h2, h3.. tags isn't well calculated at the first time
