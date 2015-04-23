@@ -48,6 +48,6 @@ public class SearchFormTableControl extends AbstractTableControl {
 
   @Override
   protected String getConfiguredKeyStroke() {
-    return IKeyStroke.CONTROL + "-" + IKeyStroke.F2;
+    return IKeyStroke.F6;
   }
 }
