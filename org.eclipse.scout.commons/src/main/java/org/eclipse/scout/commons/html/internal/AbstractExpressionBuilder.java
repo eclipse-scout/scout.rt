@@ -13,6 +13,7 @@ package org.eclipse.scout.commons.html.internal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.html.HtmlBinds;
@@ -99,8 +100,9 @@ public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlCo
         LOG.error("No bind value found for ", b);
       }
       else {
-        final String encode = encode(value);
-        res = res.replaceAll(b, encode);
+        String encode = encode(value);
+        // quoteReplacement disables special meaning of $ and \ (back-references)
+        res = res.replaceAll(b, Matcher.quoteReplacement(encode));
       }
     }
     return res;
@@ -117,5 +119,4 @@ public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlCo
   public void replaceBinds(Map<String, String> bindMap) {
     invalidate();
   }
-
 }

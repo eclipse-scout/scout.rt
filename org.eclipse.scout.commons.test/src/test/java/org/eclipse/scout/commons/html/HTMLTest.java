@@ -255,6 +255,12 @@ public class HTMLTest {
     assertEquals(expected, htmlInput.toEncodedHtml());
   }
 
+  @Test
+  public void testSpecialCharacters() {
+    assertEquals("<p>Test$Class</p>", HTML.p("Test$Class").toEncodedHtml());
+    assertEquals("<p>C:\\Temp\\config.ini</p>", HTML.p("C:\\Temp\\config.ini").toEncodedHtml());
+  }
+
   private String createTableString(String prefix) {
     List<String> rows = new ArrayList<String>();
     for (int i = 0; i < 1; i++) {
