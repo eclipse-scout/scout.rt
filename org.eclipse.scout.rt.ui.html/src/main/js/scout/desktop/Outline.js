@@ -128,7 +128,7 @@ scout.Outline.prototype.setNodesSelected = function(nodes) {
 scout.Outline.prototype._showDefaultDetailForm = function() {
   var form = this.defaultDetailForm;
   if (form) {
-    this.session.desktop.updateOutlineTab(form, form.title);
+    this.session.desktop.updateOutlineTab(form, form.title, form.subTitle);
     this.events.trigger('outlineUpdated', {});
   }
 };
@@ -171,8 +171,10 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
     subTitle = nodeText;
   } else if (parentText) {
     title = parentText;
+    subTitle = this.title;
   } else if (nodeText) {
     title = nodeText;
+    subTitle = this.title;
   }
   this.session.desktop.updateOutlineTab(content, title, subTitle);
   this.events.trigger('outlineUpdated', {
