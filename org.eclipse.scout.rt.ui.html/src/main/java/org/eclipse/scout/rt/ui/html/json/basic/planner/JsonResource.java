@@ -20,21 +20,23 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonResource implements IJsonObject {
-  private Resource m_resource;
+  private Resource<?> m_resource;
+  private final IIdProvider<Resource<?>> m_resourceIdProvider;
   private final IIdProvider<Activity<?, ?>> m_cellIdProvider;
 
-  public JsonResource(Resource resource, IIdProvider<Activity<?, ?>> cellIdProvider) {
+  public JsonResource(Resource resource, IIdProvider<Resource<?>> resourceIdProvider, IIdProvider<Activity<?, ?>> cellIdProvider) {
     m_resource = resource;
+    m_resourceIdProvider = resourceIdProvider;
     m_cellIdProvider = cellIdProvider;
   }
 
   @Override
   public Object toJson() {
     JSONObject jsonRow = new JSONObject();
-    //FIXME CGU resourceId? probably create unique id
+    jsonRow.put("id", m_resourceIdProvider.getId(m_resource));
     jsonRow.put("resourceCell", new JsonCell(m_resource.getCell()).toJson());
-    jsonRow.put("cells", cellsToJson());
-    JsonObjectUtility.filterDefaultValues(jsonRow, "ActivityRow");
+    jsonRow.put("activities", cellsToJson());
+    JsonObjectUtility.filterDefaultValues(jsonRow, "Resource");
     return jsonRow;
   }
 

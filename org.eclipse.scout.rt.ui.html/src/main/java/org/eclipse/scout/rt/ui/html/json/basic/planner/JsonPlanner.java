@@ -10,7 +10,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
-import org.eclipse.scout.rt.client.ui.basic.planner.IPlannerUIFacade;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerListener;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
@@ -20,18 +19,19 @@ import org.eclipse.scout.rt.ui.html.json.IIdProvider;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonPlanner<P extends IPlanner<RI, AI>, RI, AI> extends AbstractJsonPropertyObserver<P> {
+public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyObserver<P> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonPlanner.class);
 
   // from model
   public static final String EVENT_PLANNER_CHANGED = "plannerChanged";
 
   // from UI
-  private static final String EVENT_SELECTION = "selection";
+  private static final String EVENT_SET_SELECTION = "setSelection";
   private static final String EVENT_SET_DAYS = "setDays";
   private static final String EVENT_SET_SELECTED_ACTIVITY_CELLS = "setSelectedActivityCells";
   private static final String EVENT_CELL_ACTION = "cellAction";
@@ -39,11 +39,15 @@ public class JsonPlanner<P extends IPlanner<RI, AI>, RI, AI> extends AbstractJso
   private PlannerListener m_plannerListener;
   private final Map<String, Activity<?, ?>> m_cells;
   private final Map<Activity<?, ?>, String> m_cellIds;
+  private final Map<String, Resource<?>> m_resources;
+  private final Map<Resource<?>, String> m_resourceIds;
 
   public JsonPlanner(P model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
     m_cells = new HashMap<>();
     m_cellIds = new HashMap<>();
+    m_resources = new HashMap<>();
+    m_resourceIds = new HashMap<>();
   }
 
   @Override
@@ -155,30 +159,26 @@ public class JsonPlanner<P extends IPlanner<RI, AI>, RI, AI> extends AbstractJso
     });
     putJsonProperty(new JsonProperty<P>(IPlanner.PROP_SELECTED_RESOURCES, model) {
       @Override
-      protected List<Resource> modelValue() {
+      protected List<?> modelValue() {
         return getModel().getSelectedResources();
       }
 
       @Override
+      @SuppressWarnings("unchecked")
       public Object prepareValueForToJson(Object value) {
-        if (value == null) {
-          return null;
-        }
-        @SuppressWarnings("unchecked")
-        List<RI> list = (List<RI>) value;
-        return new JSONArray(list);
+        List<Resource<?>> resources = (List<Resource<?>>) value;
+        return resourceIdsToJson(resources, new P_GetOrCreateResourceIdProvider());
       }
     });
     putJsonProperty(new JsonProperty<P>(IPlanner.PROP_SELECTED_ACTIVITY_CELL, model) {
       @Override
-      protected Activity<RI, AI> modelValue() {
+      protected Activity<?, ?> modelValue() {
         return getModel().getSelectedActivityCell();
       }
 
-      @SuppressWarnings("unchecked")
       @Override
       public Object prepareValueForToJson(Object value) {
-        Activity<RI, AI> activityCell = (Activity<RI, AI>) value;
+        Activity<?, ?> activityCell = (Activity<?, ?>) value;
         return new P_GetOrCreateCellIdProvider().getId(activityCell);
       }
     });
@@ -195,15 +195,16 @@ public class JsonPlanner<P extends IPlanner<RI, AI>, RI, AI> extends AbstractJso
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    List<Resource> resources = getModel().getResources();
+    List<? extends Resource<?>> resources = getModel().getResources();
     JSONArray jsonRows = new JSONArray();
-    for (Resource resource : resources) {
-      JsonResource jsonRow = new JsonResource(resource, new P_NewCellIdProvider());
+    for (Resource<?> resource : resources) {
+      //FIXME CGU can't use NewResourceId Provider because properties come before toJson and already create an id, make sure properties come after?
+      JsonResource jsonRow = new JsonResource(resource, new P_GetOrCreateResourceIdProvider(), new P_GetOrCreateCellIdProvider());
       Object row = jsonRow.toJson();
       LOG.debug("Id: " + getId() + ". Resources: " + row.toString());
       jsonRows.put(row);
     }
-    json.put("rows", jsonRows);
+    json.put("resources", jsonRows);
     return json;
   }
 
@@ -222,10 +223,25 @@ public class JsonPlanner<P extends IPlanner<RI, AI>, RI, AI> extends AbstractJso
     return id;
   }
 
+  protected String getResourceId(Resource<?> resource) {
+    return m_resourceIds.get(resource);
+  }
+
+  protected String createResourceId(Resource<?> resource) {
+    String id = getResourceId(resource);
+    if (id != null) {
+      throw new IllegalStateException("Resource already has an id. " + resource);
+    }
+    id = getUiSession().createUniqueIdFor(null);
+    m_resources.put(id, resource);
+    m_resourceIds.put(resource, id);
+    return id;
+  }
+
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_SELECTION.equals(event.getType())) {
-      handleUiSelection(event);
+    if (EVENT_SET_SELECTION.equals(event.getType())) {
+      handleUiSetSelection(event);
     }
     else if (EVENT_SET_DAYS.equals(event.getType())) {
       handleUiSetDays(event);
@@ -241,21 +257,13 @@ public class JsonPlanner<P extends IPlanner<RI, AI>, RI, AI> extends AbstractJso
     }
   }
 
-  protected void handleUiSelection(JsonEvent event) {
-    JSONArray resourceIdsArray = event.getData().optJSONArray("resourceIds");
-    List<Resource> resources = new ArrayList<>();
-    for (int i = 0; i < resourceIdsArray.length(); i++) {
-      // TODO Convert IDs from JSON
-//      @SuppressWarnings("unchecked")
-//      RI id = (RI) resourceIdsArray.opt(i);
-//      resources.add(id);
-    }
-
-    @SuppressWarnings("unchecked")
-    IPlannerUIFacade<RI, AI> uiFacade = (IPlannerUIFacade<RI, AI>) getModel().getUIFacade();
-    Date endTime = null;
-    Date beginTime = null;
-    uiFacade.setSelectionFromUI(resources, beginTime, endTime);
+  @SuppressWarnings("unchecked")
+  protected void handleUiSetSelection(JsonEvent event) {
+    Date beginTime = new JsonDate(event.getData().optString("beginTime")).asJavaDate();
+    Date endTime = new JsonDate(event.getData().optString("endTime")).asJavaDate();
+    List<Resource<?>> resources = extractResources(event.getData());
+    addPropertyEventFilterCondition(IPlanner.PROP_SELECTED_RESOURCES, resources);
+    getModel().getUIFacade().setSelectionFromUI(resources, beginTime, endTime);
   }
 
   protected void handleUiSetDays(JsonEvent event) {
@@ -265,31 +273,56 @@ public class JsonPlanner<P extends IPlanner<RI, AI>, RI, AI> extends AbstractJso
       days[i] = new JsonDate(jsonDays.optString(i)).asJavaDate();
     }
 
-    @SuppressWarnings("unchecked")
-    IPlannerUIFacade<RI, AI> uiFacade = (IPlannerUIFacade<RI, AI>) getModel().getUIFacade();
-    uiFacade.setDaysFromUI(days);
+    getModel().getUIFacade().setDaysFromUI(days);
   }
 
   protected void handleUiSetSelectedActivityCells(JsonEvent event) {
-    Activity<RI, AI> activityCell = null;
+    Activity<?, ?> activityCell = null;
     // TODO Map data from JSON
 
-    @SuppressWarnings("unchecked")
-    IPlannerUIFacade<RI, AI> uiFacade = (IPlannerUIFacade<RI, AI>) getModel().getUIFacade();
-    uiFacade.setSelectedActivityCellFromUI(activityCell);
+    getModel().getUIFacade().setSelectedActivityCellFromUI(activityCell);
   }
 
   protected void handleCellAction(JsonEvent event) {
     Resource resource = null;
     // TODO Map data from JSON
 
-    Activity<RI, AI> activityCell = null;
+    Activity<?, ?> activityCell = null;
     // TODO Map data from JSON
 
-    @SuppressWarnings("unchecked")
-    IPlannerUIFacade<RI, AI> uiFacade = (IPlannerUIFacade<RI, AI>) getModel().getUIFacade();
-    uiFacade.fireCellActionFromUI(resource, activityCell);
+//    getModel().getUIFacade().fireCellActionFromUI(resource, activityCell);
   }
+
+  protected List<Resource<?>> extractResources(JSONObject json) {
+    return jsonToResources(JsonObjectUtility.getJSONArray(json, "resourceIds"));
+  }
+
+  protected List<Resource<?>> jsonToResources(JSONArray resourceIds) {
+    List<Resource<?>> resources = new ArrayList<>(resourceIds.length());
+    for (int i = 0; i < resourceIds.length(); i++) {
+      resources.add(m_resources.get(resourceIds.get(i)));
+    }
+    return resources;
+  }
+
+  protected JSONArray resourceIdsToJson(List<? extends Resource<?>> selectedResources, IIdProvider<Resource<?>> idProvider) {
+    JSONArray jsonResourceIds = new JSONArray();
+    for (Resource resource : selectedResources) {
+      jsonResourceIds.put(idProvider.getId(resource));
+    }
+    return jsonResourceIds;
+  }
+
+//  @Override
+//  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
+//    if (IPlanner.PROP_SELECTED_RESOURCES.equals(propertyName)) {
+//      List<? extends Resource<?>> selectedResources = getModel().getSelectedResources();
+//      JSONArray resourceIds = resourceIdsToJson(selectedResources);
+//      addPropertyChangeEvent("selectedResourceIds, newValue);
+//    }else {
+//      super.handleModelPropertyChange(propertyName, oldValue, newValue);
+//    }
+//  }
 
   protected class P_PlannerListener implements PlannerListener {
 
@@ -322,6 +355,34 @@ public class JsonPlanner<P extends IPlanner<RI, AI>, RI, AI> extends AbstractJso
       String id = getCellId(cell);
       if (id == null) {
         id = createCellId(cell);
+      }
+      return id;
+    }
+  }
+
+  protected class P_ResourceIdProvider implements IIdProvider<Resource<?>> {
+
+    @Override
+    public String getId(Resource<?> resource) {
+      return getResourceId(resource);
+    }
+  }
+
+  protected class P_NewResourceIdProvider implements IIdProvider<Resource<?>> {
+
+    @Override
+    public String getId(Resource<?> resource) {
+      return createResourceId(resource);
+    }
+  }
+
+  protected class P_GetOrCreateResourceIdProvider implements IIdProvider<Resource<?>> {
+
+    @Override
+    public String getId(Resource<?> resource) {
+      String id = getResourceId(resource);
+      if (id == null) {
+        id = createResourceId(resource);
       }
       return id;
     }

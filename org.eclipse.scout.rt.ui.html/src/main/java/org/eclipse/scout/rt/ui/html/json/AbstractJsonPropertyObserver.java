@@ -178,7 +178,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   }
 
   /**
-   * This method is called, when no PropertyChangeEvent from the model occurs and no JsonProperty is registered for
+   * This method is called, when a PropertyChangeEvent from the model occurs and no JsonProperty is registered for
    * the given propertyName. Note that you must check if the property-change-event has been filtered by using the
    * {@link #filterPropertyChangeEvent(PropertyChangeEvent)} method before you add an event to the JSON response.
    * The default implementation does nothing.

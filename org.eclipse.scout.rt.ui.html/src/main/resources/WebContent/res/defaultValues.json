@@ -71,6 +71,19 @@
       "mainBox": false,
       "scrollable": false
     },
+    "PlannerField": {
+      "splitterPosition": 168
+    },
+    "Planner": {
+      "rows": [],
+      "selectedResources": []
+    },
+    "Resource": {
+      "cells": []
+    },
+    "ActivityCell": {
+      "level": 0
+    },
     "SequenceBox": {
       "fields": []
     },

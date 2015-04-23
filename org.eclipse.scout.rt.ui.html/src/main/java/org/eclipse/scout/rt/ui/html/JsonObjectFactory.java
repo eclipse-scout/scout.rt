@@ -228,8 +228,8 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     if (model instanceof ICalendarField<?>) {
       return new JsonCalendarField<ICalendarField<? extends ICalendar>>((ICalendarField<?>) model, session, id, parent);
     }
-    if (model instanceof IPlannerField<?, ?, ?>) {
-      return new JsonPlannerField((IPlannerField<?, ?, ?>) model, session, id, parent);
+    if (model instanceof IPlannerField<?>) {
+      return new JsonPlannerField((IPlannerField<?>) model, session, id, parent);
     }
     if (model instanceof IPlannerFieldOld<?, ?, ?, ?>) {
       return new JsonPlannerFieldOld((IPlannerFieldOld<?, ?, ?, ?>) model, session, id, parent);

@@ -3,6 +3,7 @@
 
 scout.Planner = function() {
   scout.Planner.parent.call(this);
+  this.resourceMap = [];
 
   // main elements
   this.$container;
@@ -30,6 +31,17 @@ scout.inherits(scout.Planner, scout.ModelAdapter);
 
 scout.Planner.prototype.init = function(model, session) {
   scout.Planner.parent.prototype.init.call(this, model, session);
+  for (var i = 0; i < this.resources.length; i++) {
+    this._initResource(this.resources[i]);
+  }
+  // this.selectedResources contains ids -> map to actual resources
+  this.selectedResources = this._resourcesByIds(this.selectedResources);
+};
+
+scout.Planner.prototype._initResource = function(resource) {
+  scout.defaultValues.applyTo(resource, 'Resource');
+  scout.defaultValues.applyTo(resource.activities, 'Cell');
+  this.resourceMap[resource.id] = resource;
 };
 
 scout.Planner.prototype._render = function($parent) {
@@ -71,6 +83,11 @@ scout.Planner.prototype._render = function($parent) {
   this.displayMode = this.MONTH;
   this._updateModel();
   this._updateScreen();
+};
+
+scout.Planner.prototype._renderProperties = function() {
+  scout.Planner.parent.prototype._renderProperties.call(this);
+  this._renderSelectedResources();
 };
 
 /* -- basics, events -------------------------------------------- */
@@ -173,45 +190,49 @@ scout.Planner.prototype._updateModel = function() {
 };
 
 scout.Planner.prototype._updateScreen = function() {
-  this._renderResourceRows();
+  this._renderResources();
 };
 
 
 
-scout.Planner.prototype._renderResourceRows = function() {
-  var i, $row;
-  for (i = 0; i < this.rows.length; i++) {
-    $row = this._build$ResourceRow(this.rows[i], this.$grid);
-    $row.appendTo(this.$grid);
+scout.Planner.prototype._renderResources = function() {
+  var i, $resource, resource;
+  for (i = 0; i < this.resources.length; i++) {
+    resource = this.resources[i];
+    $resource = this._build$Resource(resource, this.$grid);
+    $resource.data('resource', resource)
+      .on('mousedown', this._onResourceMousedown.bind(this))
+      .appendTo(this.$grid);
+    resource.$resource = $resource;
   }
 };
 
-scout.Planner.prototype._build$ResourceRow = function(row) {
-  var i, $cell,
-    $row = $.makeDiv('resource-row');
-  $row.appendSpan('resource-cell').text(row.resourceCell.text);
-  for (i = 0; i < row.cells.length; i++) {
-    $cell = this._build$ActivityCell(row.cells[i]);
-    $cell.appendTo($row);
+scout.Planner.prototype._build$Resource = function(resource) {
+  var i, $activity,
+    $resource = $.makeDiv('resource');
+  $resource.appendSpan('resource-cell').text(resource.resourceCell.text);
+  for (i = 0; i < resource.activities.length; i++) {
+    $activity = this._build$Activity(resource.activities[i]);
+    $activity.appendTo($resource);
   }
-  return $row;
+  return $resource;
 };
 
-scout.Planner.prototype._build$ActivityCell = function(cell) {
+scout.Planner.prototype._build$Activity = function(activity) {
   var i,
-    $cell = $.makeDiv('activity-cell'),
-    level = Math.min(cell.level * 100, 100),
-    levelColor = scout.helpers.modelToCssColor(cell.levelColor);
+    $activity = $.makeDiv('activity'),
+    level = Math.min(activity.level * 100, 100),
+    levelColor = scout.helpers.modelToCssColor(activity.levelColor);
 
     if (!levelColor) {
       levelColor = '#80c1d0';
     }
 
-    $cell.text(cell.text);
-    $cell.css('background-color', 'transparent');
-    $cell.css('background-image', 'linear-gradient(to top, ' + levelColor + ' 0%, ' + levelColor + ' ' + level + '%, transparent ' + level + '%, transparent 100% )');
+    $activity.text(activity.text);
+    $activity.css('background-color', 'transparent');
+    $activity.css('background-image', 'linear-gradient(to top, ' + levelColor + ' 0%, ' + levelColor + ' ' + level + '%, transparent ' + level + '%, transparent 100% )');
 
-  return $cell;
+  return $activity;
 };
 
 
@@ -376,8 +397,6 @@ scout.Planner.prototype._onYearHoverOut = function(event) {
 };
 
 
-
-
 scout.Planner.prototype._renderDays = function() {
 };
 
@@ -408,7 +427,20 @@ scout.Planner.prototype._renderSelectedBeginTime = function() {
 scout.Planner.prototype._renderSelectedEndTime = function() {
 };
 
-scout.Planner.prototype._renderSelectedResourceIds = function() {
+scout.Planner.prototype._syncSelectedResources = function(selectedResources) {
+  this.selectedResources = this._resourcesByIds(selectedResources);
+};
+
+scout.Planner.prototype._renderSelectedResources = function(newIds, oldSelectedResources) {
+  if (oldSelectedResources) {
+    oldSelectedResources.forEach(function(resource) {
+      resource.$resource.select(false);
+    });
+  }
+
+  this.selectedResources.forEach(function(resource) {
+    resource.$resource.select(true);
+  });
 };
 
 scout.Planner.prototype._renderSelectedActivityCell = function() {
@@ -420,14 +452,70 @@ scout.Planner.prototype._renderTimeScale = function() {
 scout.Planner.prototype._renderDrawSections = function() {
 };
 
-scout.Planner.prototype.onModelAction = function(event) {
-  if (event.type === 'plannerChanged') {
-    this._onPlannerChanged(event);
-  } else {
-    $.log.warn('Model event not handled. Widget: scout.Calendar. Event: ' + event.type + '.');
-  }
+scout.Planner.prototype._resourcesByIds = function(ids) {
+  return ids.map(this._resourceById.bind(this));
 };
 
-scout.Planner.prototype._onPlannerChanged = function(event) {
-  // TODO Planner | Implement --> see JsonPlannerEvent
+scout.Planner.prototype._resourceById = function(id) {
+  return this.resourceMap[id];
+};
+
+scout.Planner.prototype._sendSetSelection = function(resourceIds, beginTime, endTime) {
+  this.session.send(this.id, 'setSelection', {
+    resourceIds: resourceIds,
+    beginTime: beginTime,
+    endTime: endTime
+  });
+};
+
+scout.Planner.prototype._onResourceMousedown = function(event) {
+  var $resource = $(event.delegateTarget),
+    resource = $resource.data('resource');
+
+  this.selectResource(resource);
+};
+
+scout.Planner.prototype.selectResource = function(resource) {
+  var oldSelection = this.selectedResources;
+  this.selectedResources = [resource];
+  // FIXME CRU set begin and end time
+  this._sendSetSelection([resource.id]);
+  this._renderSelectedResources('', oldSelection);
+};
+
+
+scout.Planner.prototype._onResourcesInserted = function(resources) {
+
+};
+
+scout.Planner.prototype._onResourcesDeleted = function(resourceIds) {
+
+};
+
+scout.Planner.prototype._onAllResourcesDeleted = function() {
+
+};
+
+scout.Planner.prototype._onResourcesUpdated = function(resources) {
+
+};
+
+scout.Planner.prototype._onResourceOrderChanged = function(resourceIds) {
+
+};
+
+scout.Planner.prototype.onModelAction = function(event) {
+  if (event.type === 'resourcesInserted') {
+    this._onResourcesInserted(event.resources);
+  } else if (event.type === 'resourcesDeleted') {
+    this._onResourcesDeleted(event.resourceIds);
+  } else if (event.type === 'allResourcesDeleted') {
+    this._onAllResourcesDeleted();
+  } else if (event.type === 'resourceOrderChanged') {
+    this._onResourceOrderChanged(event.resourceIds);
+  } else if (event.type === 'resourcesUpdated') {
+    this._onResourcesUpdated(event.resources);
+  } else {
+    $.log.warn('Model event not handled. Widget: scout.Planner. Event: ' + event.type + '.');
+  }
 };

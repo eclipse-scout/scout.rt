@@ -19,15 +19,19 @@
   position: absolute;
 }
 
-.resource-row {
+.resource {
   display: table-row;
+
+  &.selected {
+    background-color: lightblue;
+  }
 }
 
 .resource-cell {
   padding: 8px;
 }
 
-.activity-cell {
+.activity {
   display: table-cell;
   padding: 8px;
   border-bottom: 1px solid black;
