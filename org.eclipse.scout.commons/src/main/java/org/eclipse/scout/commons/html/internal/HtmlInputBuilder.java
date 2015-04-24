@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.html.internal;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.html.IHtmlInput;
 
 public class HtmlInputBuilder extends HtmlNodeBuilder implements IHtmlInput {
@@ -37,8 +38,8 @@ public class HtmlInputBuilder extends HtmlNodeBuilder implements IHtmlInput {
   }
 
   @Override
-  public IHtmlInput value(String value) {
-    addAttribute("value", value);
+  public IHtmlInput value(Object value) {
+    addAttribute("value", StringUtility.nvl(value, ""));
     return this;
   }
 

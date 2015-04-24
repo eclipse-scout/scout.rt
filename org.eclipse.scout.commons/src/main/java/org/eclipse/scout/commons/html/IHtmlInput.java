@@ -12,13 +12,23 @@ package org.eclipse.scout.commons.html;
 
 public interface IHtmlInput extends IHtmlElement {
 
+  String TYPE_TEXT = "text";
+  String TYPE_PASSWORD = "password";
+  String TYPE_CHECKBOX = "checkbox";
+  String TYPE_RADIO = "radio";
+  String TYPE_BUTTON = "button";
+  String TYPE_HIDDEN = "hidden";
+
+  String TYPE_SUBMIT = "submit";
+  String TYPE_RESET = "reset";
+
   IHtmlInput id(String id);
 
   IHtmlInput name(String name);
 
   IHtmlInput type(String type);
 
-  IHtmlInput value(String value);
+  IHtmlInput value(Object value);
 
   IHtmlInput maxlength(int maxlength);
 
