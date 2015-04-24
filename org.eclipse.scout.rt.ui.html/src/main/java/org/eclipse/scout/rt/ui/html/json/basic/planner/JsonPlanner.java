@@ -8,8 +8,10 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
+import org.eclipse.scout.rt.client.ui.basic.planner.PlannerAdapter;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerListener;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
@@ -29,6 +31,10 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
 
   // from model
   public static final String EVENT_PLANNER_CHANGED = "plannerChanged";
+  public static final String EVENT_RESOURCES_INSERTED = "resourcesInserted";
+  public static final String EVENT_RESOURCES_UPDATED = "resourcesUpdated";
+  public static final String EVENT_RESOURCES_DELETED = "resourcesDeleted";
+  public static final String EVENT_ALL_RESOURCES_DELETED = "allResourcesDeleted";
 
   // from UI
   private static final String EVENT_SET_SELECTION = "setSelection";
@@ -41,6 +47,7 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   private final Map<Activity<?, ?>, String> m_cellIds;
   private final Map<String, Resource<?>> m_resources;
   private final Map<Resource<?>, String> m_resourceIds;
+  private final AbstractEventBuffer<PlannerEvent> m_eventBuffer;
 
   public JsonPlanner(P model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -48,6 +55,7 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
     m_cellIds = new HashMap<>();
     m_resources = new HashMap<>();
     m_resourceIds = new HashMap<>();
+    m_eventBuffer = model.createEventBuffer();
   }
 
   @Override
@@ -78,10 +86,10 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   @Override
   protected void initJsonProperties(P model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_PLANNING_MODE, model) {
+    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_DISPLAY_MODE, model) {
       @Override
       protected Integer modelValue() {
-        return getModel().getPlanningMode();
+        return getModel().getDisplayMode();
       }
     });
     putJsonProperty(new JsonProperty<P>(IPlanner.PROP_DAYS, model) {
@@ -167,6 +175,7 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
       @SuppressWarnings("unchecked")
       public Object prepareValueForToJson(Object value) {
         List<Resource<?>> resources = (List<Resource<?>>) value;
+        resources = new ArrayList<Resource<?>>();
         return resourceIdsToJson(resources, new P_GetOrCreateResourceIdProvider());
       }
     });
@@ -196,15 +205,14 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     List<? extends Resource<?>> resources = getModel().getResources();
-    JSONArray jsonRows = new JSONArray();
+    JSONArray jsonResources = new JSONArray();
     for (Resource<?> resource : resources) {
       //FIXME CGU can't use NewResourceId Provider because properties come before toJson and already create an id, make sure properties come after?
-      JsonResource jsonRow = new JsonResource(resource, new P_GetOrCreateResourceIdProvider(), new P_GetOrCreateCellIdProvider());
-      Object row = jsonRow.toJson();
-      LOG.debug("Id: " + getId() + ". Resources: " + row.toString());
-      jsonRows.put(row);
+      Object jsonResource = resourceToJson(resource, new P_GetOrCreateResourceIdProvider(), new P_GetOrCreateCellIdProvider());
+      LOG.debug("Id: " + getId() + ". Resources: " + jsonResource.toString());
+      jsonResources.put(jsonResource);
     }
-    json.put("resources", jsonRows);
+    json.put("resources", jsonResources);
     return json;
   }
 
@@ -236,6 +244,113 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
     m_resources.put(id, resource);
     m_resourceIds.put(resource, id);
     return id;
+  }
+
+  protected void disposeResource(Resource resource) {
+    String resourceId = getResourceId(resource);
+    m_resourceIds.remove(resource);
+    m_resources.remove(resourceId);
+  }
+
+  protected void disposeAllResources() {
+    m_resourceIds.clear();
+    m_resources.clear();
+  }
+
+  protected void handleModelEvent(PlannerEvent event) {
+    // Add event to buffer instead of handling it immediately. (This allows coalescing the events at JSON response level.)
+    m_eventBuffer.add(event);
+    registerAsBufferedEventsAdapter();
+  }
+
+  @Override
+  public void processBufferedEvents() {
+    if (m_eventBuffer.isEmpty()) {
+      return;
+    }
+    List<PlannerEvent> coalescedEvents = m_eventBuffer.consumeAndCoalesceEvents();
+    for (PlannerEvent event : coalescedEvents) {
+      processEvent(event);
+    }
+  }
+
+  protected void processEvent(PlannerEvent event) {
+    switch (event.getType()) {
+      case PlannerEvent.TYPE_RESOURCES_INSERTED:
+        handleModelResourcesInserted(event.getResources());
+        break;
+      case PlannerEvent.TYPE_RESOURCES_UPDATED:
+        handleModelResourcesUpdated(event.getResources());
+        break;
+      case PlannerEvent.TYPE_RESOURCES_DELETED:
+        handleModelResourcesDeleted(event.getResources());
+        break;
+      case PlannerEvent.TYPE_ALL_RESOURCES_DELETED:
+        handleModelAllResourcesDeleted();
+        break;
+//      case PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED:
+//        handleModelResourceOrderChanged(event.getResources());
+//        break;
+      default:
+        // NOP
+    }
+  }
+
+  protected void handleModelResourcesInserted(List<? extends Resource> resources) {
+    JSONArray jsonResources = new JSONArray();
+    for (Resource resource : resources) {
+      Object jsonResource = new JsonResource(resource, new P_NewResourceIdProvider(), new P_NewCellIdProvider()).toJson();
+      jsonResources.put(jsonResource);
+    }
+    if (jsonResources.length() == 0) {
+      return;
+    }
+    JSONObject jsonEvent = new JSONObject();
+    jsonEvent.put("resources", jsonResources);
+    addActionEvent(EVENT_RESOURCES_INSERTED, jsonEvent);
+  }
+
+  protected void handleModelResourcesUpdated(List<? extends Resource> resources) {
+    JSONArray jsonResources = new JSONArray();
+    for (Resource resource : resources) {
+      Object jsonResource = resourceToJson(resource);
+      jsonResources.put(jsonResource);
+    }
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, "resources", jsonResources);
+    addActionEvent(EVENT_RESOURCES_UPDATED, jsonEvent);
+  }
+
+  protected void handleModelResourcesDeleted(List<? extends Resource> resources) {
+    if (resources.isEmpty()) {
+      return;
+    }
+    JSONObject jsonEvent = new JSONObject();
+    for (Resource resource : resources) {
+      String resourceId = getResourceId(resource);
+      jsonEvent.append("resourceIds", resourceId);
+      disposeResource(resource);
+    }
+    addActionEvent(EVENT_RESOURCES_DELETED, jsonEvent);
+  }
+
+  protected void handleModelAllResourcesDeleted() {
+    disposeAllResources();
+    addActionEvent(EVENT_ALL_RESOURCES_DELETED, new JSONObject());
+  }
+
+  protected void handleModelResourceOrderChanged(List<? extends Resource> resources) {
+    JSONObject jsonEvent = new JSONObject();
+    jsonEvent.put("resourceIds", resourceIdsToJson(resources, new P_ResourceIdProvider()));
+    JSONArray jsonResourceIds = new JSONArray();
+    for (Resource resource : resources) {
+      String resourceId = getResourceId(resource);
+      jsonResourceIds.put(resourceId);
+    }
+    if (jsonResourceIds.length() == 0) {
+      return;
+    }
+    addActionEvent("resourceOrderChanged", jsonEvent);
   }
 
   @Override
@@ -305,9 +420,17 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
     return resources;
   }
 
-  protected JSONArray resourceIdsToJson(List<? extends Resource<?>> selectedResources, IIdProvider<Resource<?>> idProvider) {
+  protected Object resourceToJson(Resource resource) {
+    return new JsonResource(resource, new P_NewResourceIdProvider(), new P_NewCellIdProvider()).toJson();
+  }
+
+  protected Object resourceToJson(Resource resource, IIdProvider<Resource<?>> idProvider, IIdProvider<Activity<?, ?>> cellIdProvider) {
+    return new JsonResource(resource, idProvider, cellIdProvider).toJson();
+  }
+
+  protected JSONArray resourceIdsToJson(List<? extends Resource> resources, IIdProvider<Resource<?>> idProvider) {
     JSONArray jsonResourceIds = new JSONArray();
-    for (Resource resource : selectedResources) {
+    for (Resource resource : resources) {
       jsonResourceIds.put(idProvider.getId(resource));
     }
     return jsonResourceIds;
@@ -324,11 +447,11 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
 //    }
 //  }
 
-  protected class P_PlannerListener implements PlannerListener {
+  protected class P_PlannerListener extends PlannerAdapter {
 
     @Override
-    public void plannerChanged(PlannerEvent e) {
-      addActionEvent(EVENT_PLANNER_CHANGED, new JsonPlannerEvent(e).toJson());
+    public void plannerChanged(PlannerEvent event) {
+      handleModelEvent(event);
     }
   }
 

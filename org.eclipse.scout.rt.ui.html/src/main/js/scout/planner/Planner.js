@@ -78,17 +78,19 @@ scout.Planner.prototype._render = function($parent) {
   this.$commands.appendDiv('planner-toggle-year').click(this._onClickYear.bind(this));
   this.$commands.appendDiv('planner-toggle-list').click(this._onClickList.bind(this));
 
-
   // should be done by server?
   this.displayMode = this.MONTH;
   this._updateModel();
   this._updateScreen();
 };
 
-scout.Planner.prototype._renderProperties = function() {
-  scout.Planner.parent.prototype._renderProperties.call(this);
-  this._renderSelectedResources();
-};
+//TODO CGU/CRU vermutlich nicht nötig, da in updateScreen gemacht
+//scout.Planner.prototype._renderProperties = function() {
+//  scout.Planner.parent.prototype._renderProperties.call(this);
+
+  //this._renderSelectedResources();
+//  this._renderDisplayMode();
+//};
 
 /* -- basics, events -------------------------------------------- */
 
@@ -186,19 +188,28 @@ scout.Planner.prototype._onClickDay = function(event) {
 
 /* --  set display mode and range ------------------------------------- */
 
-scout.Planner.prototype._updateModel = function() {
-};
+scout.Planner.prototype._updateModel = function() {};
 
 scout.Planner.prototype._updateScreen = function() {
+  if (this.rendered) {
+    this._removeAllResources();
+  }
   this._renderResources();
+  this._renderSelectedResources();
 };
 
+scout.Planner.prototype._removeAllResources = function() {
+  this.resources.forEach(function(resource) {
+    resource.$resource.remove();
+  });
+};
 
-
-scout.Planner.prototype._renderResources = function() {
+scout.Planner.prototype._renderResources = function(resources) {
   var i, $resource, resource;
-  for (i = 0; i < this.resources.length; i++) {
-    resource = this.resources[i];
+
+  resources = resources || this.resources;
+  for (i = 0; i < resources.length; i++) {
+    resource = resources[i];
     $resource = this._build$Resource(resource, this.$grid);
     $resource.data('resource', resource)
       .on('mousedown', this._onResourceMousedown.bind(this))
@@ -224,19 +235,18 @@ scout.Planner.prototype._build$Activity = function(activity) {
     level = 100 - Math.min(activity.level * 100, 100),
     levelColor = scout.helpers.modelToCssColor(activity.levelColor);
 
-    $activity.text(activity.text);
-    if (activity.cssClass) {
-      $activity.addClass(activity.cssClass);
-    }
-    if (levelColor) {
-      $activity.css('background-color', levelColor);
-    }
-    // the background-color represents the fill level and not the image. This makes it easier to change the color using a css class
-    $activity.css('background-image', 'linear-gradient(to bottom, #fff 0%, #fff ' + level + '%, transparent ' + level + '%, transparent 100% )');
+  $activity.text(activity.text);
+  if (activity.cssClass) {
+    $activity.addClass(activity.cssClass);
+  }
+  if (levelColor) {
+    $activity.css('background-color', levelColor);
+  }
+  // the background-color represents the fill level and not the image. This makes it easier to change the color using a css class
+  $activity.css('background-image', 'linear-gradient(to bottom, #fff 0%, #fff ' + level + '%, transparent ' + level + '%, transparent 100% )');
 
   return $activity;
 };
-
 
 /* -- year, draw and color ---------------------------------------- */
 
@@ -283,8 +293,8 @@ scout.Planner.prototype.drawYear = function() {
 
   // bind events for days divs
   $('.year-day', this.$year)
-   .click(this._onYearDayClick.bind(this))
-   .hover(this._onYearHoverIn.bind(this), this._onYearHoverOut.bind(this));
+    .click(this._onYearDayClick.bind(this))
+    .hover(this._onYearHoverIn.bind(this), this._onYearHoverOut.bind(this));
 };
 
 scout.Planner.prototype.colorYear = function() {
@@ -300,7 +310,7 @@ scout.Planner.prototype.colorYear = function() {
   var that = this,
     $day, date;
 
-  $('.year-day', this.$year).each( function (){
+  $('.year-day', this.$year).each(function() {
     $day = $(this);
     date = $day.data('date');
 
@@ -331,7 +341,6 @@ scout.Planner.prototype._onYearClick = function(event) {
   this._updateScreen();
 };
 
-
 scout.Planner.prototype._onYearDayClick = function(event) {
   // new selected day
   this.selected = $('.year-hover-day', this.$year).data('date');
@@ -340,7 +349,6 @@ scout.Planner.prototype._onYearDayClick = function(event) {
   this._updateModel();
   this._updateScreen();
 };
-
 
 scout.Planner.prototype._onYearHoverIn = function(event) {
   // init vars
@@ -376,7 +384,7 @@ scout.Planner.prototype._onYearHoverIn = function(event) {
   }
 
   // loop days and colorize based on hover start and hover end
-  $('.year-day', this.$year).each( function (){
+  $('.year-day', this.$year).each(function() {
     $day2 = $(this);
     date2 = $day2.data('date');
 
@@ -398,36 +406,30 @@ scout.Planner.prototype._onYearHoverOut = function(event) {
   $('.year-day.year-hover, .year-day.year-hover-day', this.$year).removeClass('year-hover year-hover-day');
 };
 
+scout.Planner.prototype._onResourceMousedown = function(event) {
+  var $resource = $(event.delegateTarget),
+    resource = $resource.data('resource');
 
-scout.Planner.prototype._renderDays = function() {
+  this.selectResource(resource);
 };
 
-scout.Planner.prototype._renderWorkDayCount = function() {
-};
+scout.Planner.prototype._renderDays = function() {};
 
-scout.Planner.prototype._renderWorkDaysOnly = function() {
-};
+scout.Planner.prototype._renderWorkDayCount = function() {};
 
-scout.Planner.prototype._renderFirstHourOfDay = function() {
-};
+scout.Planner.prototype._renderWorkDaysOnly = function() {};
 
-scout.Planner.prototype._renderLastHourOfDay = function() {
-};
+scout.Planner.prototype._renderFirstHourOfDay = function() {};
 
-scout.Planner.prototype._renderIntradayInterval = function() {
-};
+scout.Planner.prototype._renderLastHourOfDay = function() {};
 
-scout.Planner.prototype._renderPlanningMode = function() {
-};
+scout.Planner.prototype._renderIntradayInterval = function() {};
 
-scout.Planner.prototype._renderResourceIds = function() {
-};
+scout.Planner.prototype._renderDisplayMode = function() {};
 
-scout.Planner.prototype._renderSelectedBeginTime = function() {
-};
+scout.Planner.prototype._renderSelectedBeginTime = function() {};
 
-scout.Planner.prototype._renderSelectedEndTime = function() {
-};
+scout.Planner.prototype._renderSelectedEndTime = function() {};
 
 scout.Planner.prototype._syncSelectedResources = function(selectedResources) {
   this.selectedResources = this._resourcesByIds(selectedResources);
@@ -445,14 +447,9 @@ scout.Planner.prototype._renderSelectedResources = function(newIds, oldSelectedR
   });
 };
 
-scout.Planner.prototype._renderSelectedActivityCell = function() {
-};
+scout.Planner.prototype._renderSelectedActivityCell = function() {};
 
-scout.Planner.prototype._renderTimeScale = function() {
-};
-
-scout.Planner.prototype._renderDrawSections = function() {
-};
+scout.Planner.prototype._renderDrawSections = function() {};
 
 scout.Planner.prototype._resourcesByIds = function(ids) {
   return ids.map(this._resourceById.bind(this));
@@ -460,21 +457,6 @@ scout.Planner.prototype._resourcesByIds = function(ids) {
 
 scout.Planner.prototype._resourceById = function(id) {
   return this.resourceMap[id];
-};
-
-scout.Planner.prototype._sendSetSelection = function(resourceIds, beginTime, endTime) {
-  this.session.send(this.id, 'setSelection', {
-    resourceIds: resourceIds,
-    beginTime: beginTime,
-    endTime: endTime
-  });
-};
-
-scout.Planner.prototype._onResourceMousedown = function(event) {
-  var $resource = $(event.delegateTarget),
-    resource = $resource.data('resource');
-
-  this.selectResource(resource);
 };
 
 scout.Planner.prototype.selectResource = function(resource) {
@@ -485,17 +467,66 @@ scout.Planner.prototype.selectResource = function(resource) {
   this._renderSelectedResources('', oldSelection);
 };
 
+scout.Planner.prototype._insertResources = function(resources) {
+  // Update model
+  resources.forEach(function(resource) {
+    this._initResource(resource);
+    // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
+    this.resources.push(resource);
+  }.bind(this));
+
+  // Update HTML
+  if (this.rendered) {
+    this._renderResources(resources);
+    this.htmlComp.invalidateTree();
+  }
+};
+
+scout.Planner.prototype._deleteResources = function(resources) {
+  resources.forEach(function(resource) {
+    // Update model
+    scout.arrays.remove(this.resources, resource);
+    delete this.resourcesMap[resource.id];
+
+    // Update HTML
+    if (this.rendered) {
+      resource.$resource.remove();
+      delete resource.$resource;
+    }
+  }.bind(this));
+};
+
+scout.Planner.prototype._deleteAllResources = function() {
+  // Update HTML
+  if (this.rendered) {
+    this._removeAllResources();
+    this.htmlComp.invalidateTree();
+  }
+
+  // Update model
+  this.resources = [];
+  this.resourcesMap = {};
+};
+
+scout.Planner.prototype._sendSetSelection = function(resourceIds, beginTime, endTime) {
+  this.session.send(this.id, 'setSelection', {
+    resourceIds: resourceIds,
+    beginTime: beginTime,
+    endTime: endTime
+  });
+};
 
 scout.Planner.prototype._onResourcesInserted = function(resources) {
-
+  this._insertResources(resources);
 };
 
 scout.Planner.prototype._onResourcesDeleted = function(resourceIds) {
-
+  var resources = this._resourcesByIds(resourceIds);
+  this._deleteResources(resources);
 };
 
 scout.Planner.prototype._onAllResourcesDeleted = function() {
-
+  this._deleteAllResources();
 };
 
 scout.Planner.prototype._onResourcesUpdated = function(resources) {

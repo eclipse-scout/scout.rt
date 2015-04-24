@@ -15,12 +15,15 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.filter.IFilter;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.json.JSONObject;
 
 public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonAdapter.class);
 
   private final IUiSession m_uiSession;
   private final T m_model;
@@ -259,6 +262,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   protected final void addActionEvent(String eventName, JSONObject eventData) {
     getUiSession().currentJsonResponse().addActionEvent(getId(), eventName, eventData);
+    LOG.debug("Added action event '" + eventName + "' for " + getObjectType() + " with id " + getId() + ". Model: " + getModel());
   }
 
   protected final void registerAsBufferedEventsAdapter() {
