@@ -69,4 +69,9 @@ public class HtmlInputBuilder extends HtmlNodeBuilder implements IHtmlInput {
   public IHtmlInput appLink(CharSequence ref) {
     return (IHtmlInput) super.appLink(ref);
   }
+
+  @Override
+  public IHtmlInput addAttribute(String name, CharSequence value) {
+    return (IHtmlInput) super.addAttribute(name, value);
+  }
 }

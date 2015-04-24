@@ -36,4 +36,9 @@ public interface IHtmlListElement extends IHtmlElement {
   @Override
   IHtmlListElement appLink(CharSequence path);
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  IHtmlListElement addAttribute(String name, CharSequence value);
 }

@@ -51,4 +51,8 @@ public class HtmlTableRowBuilder extends HtmlNodeBuilder implements IHtmlTableRo
     return (IHtmlTableRow) super.appLink(ref);
   }
 
+  @Override
+  public IHtmlTableRow addAttribute(String name, CharSequence value) {
+    return (IHtmlTableRow) super.addAttribute(name, value);
+  }
 }

@@ -33,4 +33,13 @@ public interface IHtmlElement extends CharSequence, IHtmlContent {
    */
   IHtmlElement appLink(CharSequence path);
 
+  /**
+   * Add a html attribute to the element.
+   *
+   * @param name
+   *          of the attribute
+   * @param value
+   *          of the attribute
+   */
+  IHtmlElement addAttribute(String name, CharSequence value);
 }

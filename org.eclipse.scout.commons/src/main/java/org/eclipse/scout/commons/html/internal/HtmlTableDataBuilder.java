@@ -56,4 +56,8 @@ public class HtmlTableDataBuilder extends HtmlNodeBuilder implements IHtmlTableC
     return (IHtmlTableCell) super.appLink(ref);
   }
 
+  @Override
+  public IHtmlTableCell addAttribute(String name, CharSequence value) {
+    return (IHtmlTableCell) super.addAttribute(name, value);
+  }
 }

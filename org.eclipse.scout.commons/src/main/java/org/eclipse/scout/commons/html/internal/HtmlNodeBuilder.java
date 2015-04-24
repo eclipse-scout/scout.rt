@@ -76,8 +76,10 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
     addAttribute(name, Integer.toString(value));
   }
 
-  protected void addAttribute(String name, CharSequence value) {
+  @Override
+  public IHtmlElement addAttribute(String name, CharSequence value) {
     m_attributes.add(name + "=\"" + value + "\"");
+    return this;
   }
 
   @Override

@@ -82,6 +82,12 @@ public class HTMLTest {
     assertEquals("<br>", br.toEncodedHtml());
   }
 
+  @Test
+  public void testAddAttribute() {
+    IHtmlElement span = HTML.span("text").addAttribute("name", "value");
+    assertEquals("<span name=\"value\">text</span>", span.toEncodedHtml());
+  }
+
   /**
    * Test for {@link IHtmlElement#appLink(CharSequence)}
    */
@@ -101,7 +107,7 @@ public class HTMLTest {
   public void testTableAttributesNoBinds() {
     final IHtmlTable table = HTML.table(
         row(
-        cell(BIND_TEXT))
+            cell(BIND_TEXT))
         );
     assertEquals("<table><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", table.toEncodedHtml());
   }
@@ -141,7 +147,6 @@ public class HTMLTest {
     assertEquals("<tr><td>p1</td><td>p2</td><td>p4</td></tr>", row.toEncodedHtml());
     assertEquals("<tr><td>:b__0</td><td>:b__1</td><td>:b__2</td></tr>", row.toString());
     assertEquals(3, row.getBinds().getBindMap().size());
-
   }
 
   @Test

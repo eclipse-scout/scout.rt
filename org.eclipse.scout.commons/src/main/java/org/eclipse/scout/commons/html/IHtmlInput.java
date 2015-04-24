@@ -54,4 +54,10 @@ public interface IHtmlInput extends IHtmlElement {
    */
   @Override
   IHtmlInput appLink(CharSequence path);
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  IHtmlInput addAttribute(String name, CharSequence value);
 }

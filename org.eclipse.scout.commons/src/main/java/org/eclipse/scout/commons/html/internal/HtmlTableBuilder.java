@@ -74,4 +74,8 @@ public class HtmlTableBuilder extends HtmlNodeBuilder implements IHtmlTable {
     return (IHtmlTable) super.appLink(ref);
   }
 
+  @Override
+  public IHtmlTable addAttribute(String name, CharSequence value) {
+    return (IHtmlTable) super.addAttribute(name, value);
+  }
 }

@@ -48,4 +48,9 @@ public interface IHtmlTable extends IHtmlElement {
   @Override
   IHtmlTable appLink(CharSequence path);
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  IHtmlTable addAttribute(String name, CharSequence value);
 }

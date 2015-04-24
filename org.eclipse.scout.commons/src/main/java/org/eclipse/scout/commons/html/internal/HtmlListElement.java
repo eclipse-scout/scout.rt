@@ -45,4 +45,8 @@ public class HtmlListElement extends HtmlNodeBuilder implements IHtmlListElement
     return (IHtmlListElement) super.appLink(ref);
   }
 
+  @Override
+  public IHtmlListElement addAttribute(String name, CharSequence value) {
+    return (IHtmlListElement) super.addAttribute(name, value);
+  }
 }
