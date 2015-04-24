@@ -190,6 +190,12 @@ scout.TableControlKeyStrokes.prototype.checkAndDrawKeyBox = function($container,
  * @Override scout.KeyStroke
  */
 scout.TableControlKeyStrokes.prototype.accept = function(event) {
+  var elementType = document.activeElement.tagName.toLowerCase();
+
+  if (document.activeElement.className !== 'control-filter' &&(elementType === 'textarea' || elementType === 'input')) {
+    return false;
+  }
+
   return event &&
     $.inArray(event.which, [scout.keys.UP, scout.keys.DOWN, scout.keys.HOME, scout.keys.END, scout.keys.PAGE_UP, scout.keys.PAGE_DOWN, scout.keys.SPACE]) >= 0 &&
     event.ctrlKey === this.ctrl &&
