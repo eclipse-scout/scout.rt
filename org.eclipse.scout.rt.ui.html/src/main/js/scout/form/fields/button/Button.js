@@ -62,6 +62,10 @@ scout.Button.prototype._render = function($parent) {
   this._registerButtonKeyStroke();
 };
 
+scout.Button.prototype._createKeyStrokeAdapter = function() {
+  return new scout.ButtonKeyStrokeAdapter(this);
+};
+
 scout.Button.prototype._onClick = function() {
   this.doAction();
 };
