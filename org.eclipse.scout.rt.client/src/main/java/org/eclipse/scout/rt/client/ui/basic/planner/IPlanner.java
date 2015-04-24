@@ -15,8 +15,8 @@ import java.util.List;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.TimeScale;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
@@ -24,6 +24,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldO
 
 /**
  * The activity map is a specialized model which contains a set of {@link Activity}s that are grouped by resource.
+ *
+ * @since 5.1
  */
 public interface IPlanner<RI, AI> extends IPropertyObserver {
 
@@ -52,9 +54,10 @@ public interface IPlanner<RI, AI> extends IPropertyObserver {
    */
   String PROP_INTRADAY_INTERVAL = "intradayInterval";
   /**
-   * {@link #PLANNING_MODE_TIME},{@link #PLANNING_MODE_DAY}, {@link #PLANNING_MODE_WEEK}
+   * {@link #DISPLAY_MODE_INTRADAY},{@link #DISPLAY_MODE_DAY}, {@link #DISPLAY_MODE_WEEK}, {@link #DISPLAY_MODE_MONTH},
+   * {@link #DISPLAY_MODE_WORKWEEK}
    */
-  String PROP_PLANNING_MODE = "planningMode";
+  String PROP_DISPLAY_MODE = "displayMode";
   /**
    * {@link Long}[]
    */
@@ -85,18 +88,16 @@ public interface IPlanner<RI, AI> extends IPropertyObserver {
   String PROP_DRAW_SECTIONS = "drawSections";
   /**
    * {@link Object} Container of this map, {@link IPlannerFieldOld} https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   *
-   * @since 3.8.1
    */
   String PROP_CONTAINER = "container";
-  /**
-   * @since 4.0.0 {@link IContextMenu}
-   */
   String PROP_CONTEXT_MENU = "contextMenus";
 
-  int PLANNING_MODE_INTRADAY = 0;
-  int PLANNING_MODE_DAY = 1;
-  int PLANNING_MODE_WEEK = 2;
+  //FIXME CGU same as for calendar, merge?
+  int DISPLAY_MODE_INTRADAY = 0;
+  int DISPLAY_MODE_DAY = 1;
+  int DISPLAY_MODE_WEEK = 2;
+  int DISPLAY_MODE_MONTH = 3;
+  int DISPLAY_MODE_WORKWEEK = 4;
 
   void initPlanner() throws ProcessingException;
 
@@ -188,14 +189,16 @@ public interface IPlanner<RI, AI> extends IPropertyObserver {
   void setLastHourOfDay(int i);
 
   /**
-   * {@link #PLANNING_MODE_INTRADAY},{@link #PLANNING_MODE_DAY}, {@link #PLANNING_MODE_WEEK}
+   * {@link #DISPLAY_MODE_INTRADAY},{@link #DISPLAY_MODE_DAY}, {@link #DISPLAY_MODE_WEEK}, {@link #DISPLAY_MODE_MONTH},
+   * {@link #DISPLAY_MODE_WORKWEEK}
    */
-  int getPlanningMode();
+  int getDisplayMode();
 
   /**
-   * {@link #PLANNING_MODE_INTRADAY},{@link #PLANNING_MODE_DAY}, {@link #PLANNING_MODE_WEEK}
+   * {@link #DISPLAY_MODE_INTRADAY},{@link #DISPLAY_MODE_DAY}, {@link #DISPLAY_MODE_WEEK}, {@link #DISPLAY_MODE_MONTH},
+   * {@link #DISPLAY_MODE_WORKWEEK}
    */
-  void setPlanningMode(int mode);
+  void setDisplayMode(int mode);
 
   /**
    * milliseconds
@@ -293,9 +296,15 @@ public interface IPlanner<RI, AI> extends IPropertyObserver {
    */
   List<? extends Resource<RI>> getSelectedResources();
 
+  List<RI> getSelectedResourceIds();
+
   void setSelectedResources(List<? extends Resource<RI>> resources);
 
   void isSelectedResource(Resource<RI> resource);
+
+  void deselectResources(List<? extends Resource> resources);
+
+  void deselectAllResources();
 
   /**
    * Indicates whether the selected sections in the activity
@@ -349,6 +358,8 @@ public interface IPlanner<RI, AI> extends IPropertyObserver {
    */
 
   IPlannerContextMenu getContextMenu();
+
+  AbstractEventBuffer<PlannerEvent> createEventBuffer();
 
   IPlannerUIFacade getUIFacade();
 

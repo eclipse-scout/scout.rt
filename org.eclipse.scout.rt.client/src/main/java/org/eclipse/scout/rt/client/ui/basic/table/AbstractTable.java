@@ -4011,9 +4011,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       getEventBuffer().add(e);
     }
     else {
-      //Ensure all editor values have been applied.
-//      getUIFacade().completeCellEditFromUI();
-
       EventListener[] listeners = m_listenerList.getListeners(TableListener.class);
       for (EventListener l : listeners) {
         try {

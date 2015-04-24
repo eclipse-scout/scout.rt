@@ -15,15 +15,10 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.EventListener;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -49,6 +44,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.Plan
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDecorateActivityCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerDisposePlannerChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.PlannerInitPlannerChain;
+import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
@@ -72,10 +68,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   private long m_minimumActivityDuration;// millis
   private List<Resource<RI>> m_resources;
   private int m_tableChanging;
-  private List<PlannerEvent> m_eventBuffer = new ArrayList<PlannerEvent>();
+  private AbstractEventBuffer<PlannerEvent> m_eventBuffer;
 //  private IActivityCellObserver<RI, AI> m_cellObserver;
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractPlanner<RI, AI>, IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>> m_objectExtensions;
+  private int m_eventBufferLoopDetection;
 
   public AbstractPlanner() {
     this(true);
@@ -84,6 +81,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   public AbstractPlanner(boolean callInitializer) {
     m_objectExtensions = new ObjectExtensions<AbstractPlanner<RI, AI>, IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>>(this);
     m_resources = new ArrayList<Resource<RI>>();
+    m_eventBuffer = createEventBuffer();
     if (callInitializer) {
       callInitializer();
     }
@@ -109,6 +107,15 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       interceptInitConfig();
       m_initialized = true;
     }
+  }
+
+  @Override
+  public AbstractEventBuffer<PlannerEvent> createEventBuffer() {
+    return new PlannerEventBuffer();
+  }
+
+  protected AbstractEventBuffer<PlannerEvent> getEventBuffer() {
+    return m_eventBuffer;
   }
 
   /*
@@ -519,11 +526,12 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       }
       if (deletedResources.size() == resourceCountBefore) {
         fireAllResourcesDeleted();
+        deselectAllResources();
       }
       else {
         fireResourcesDeleted(deletedResources);
+        deselectResources(deletedResources);
       }
-      //FIXME CGU consider selection
     }
     finally {
       setPlannerChanging(false);
@@ -534,8 +542,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   public void deleteAllResources() {
     setPlannerChanging(true);
     try {
-      m_resources.clear();
-      fireAllResourcesDeleted();
+      deleteResources(getResources());
     }
     finally {
       setPlannerChanging(false);
@@ -546,12 +553,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   public void addResources(List<Resource<RI>> resources) {
     setPlannerChanging(true);
     try {
-      //FIXME CGU copy? fire Event
+      //FIXME CGU copy?
       for (Resource<RI> resource : resources) {
         for (Activity<?, ?> activity : resource.getActivities()) {
           decorateActivityCell((Activity<RI, AI>) activity);
         }
-        //FIXME CGU fire Event
         m_resources.add(resource);
       }
       fireResourcesInserted(resources);
@@ -609,6 +615,30 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       a = CollectionUtility.emptyArrayList();
     }
     return a;
+  }
+
+  @Override
+  public List<RI> getSelectedResourceIds() {
+    List<RI> ids = new ArrayList<RI>();
+    List<Resource<RI>> resources = getSelectedResources();
+    for (Resource<RI> resource : resources) {
+      ids.add(resource.getId());
+    }
+    return ids;
+  }
+
+  @Override
+  public void deselectAllResources() {
+    setSelectedResources(new ArrayList<Resource<RI>>());
+  }
+
+  @Override
+  public void deselectResources(List<? extends Resource> resources) {
+    List<Resource<RI>> selectedResources = getSelectedResources();
+    boolean selectionChanged = selectedResources.removeAll(resources);
+    if (selectionChanged) {
+      setSelectedResources(selectedResources);
+    }
   }
 
   @Override
@@ -713,7 +743,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   private void firePlannerEventInternal(PlannerEvent e) {
     if (isPlannerChanging()) {
       // buffer the event for later batch firing
-      m_eventBuffer.add(e);
+      getEventBuffer().add(e);
     }
     else {
       EventListener[] listeners = m_listenerList.getListeners(PlannerListener.class);
@@ -726,100 +756,44 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   // batch handler
-  private void firePlannerEventBatchInternal(PlannerEvent[] batch) {
-    if (isPlannerChanging()) {
-      LOG.error("Illegal State: firing an event batch while table is changing");
-    }
-    else {
-      if (batch.length > 0) {
-        EventListener[] listeners = m_listenerList.getListeners(PlannerListener.class);
-        if (listeners != null && listeners.length > 0) {
-          for (int i = 0; i < listeners.length; i++) {
-            for (PlannerEvent e : batch) {
-              ((PlannerListener) listeners[i]).plannerChanged(e);
-            }
-          }
-        }
+  private void firePlannerEventBatchInternal(List<PlannerEvent> batch) {
+    if (CollectionUtility.hasElements(batch)) {
+      EventListener[] listeners = m_listenerList.getListeners(PlannerListener.class);
+      for (EventListener l : listeners) {
+        ((PlannerListener) l).plannerChangedBatch(batch);
       }
     }
   }
 
-  private void processChangeBuffer() {
-    /*
-     * 3. fire events changes are finished now, fire all buffered events
-     * coalesce all events of same type and sort according to their type,
-     * eventually merge
-     */
-    List<PlannerEvent> list = m_eventBuffer;
-    m_eventBuffer = new ArrayList<PlannerEvent>();
-    if (list.size() > 0) {
-      HashMap<Integer, List<PlannerEvent>> coalesceMap = new HashMap<Integer, List<PlannerEvent>>();
-      for (PlannerEvent e : list) {
-        List<PlannerEvent> subList = coalesceMap.get(e.getType());
-        if (subList == null) {
-          subList = new ArrayList<PlannerEvent>();
-          coalesceMap.put(e.getType(), subList);
-        }
-        subList.add(e);
+  /**
+   * Fires events in form in of one batch <br>
+   * Unnecessary events are removed or merged.
+   */
+  private void processEventBuffer() {
+    //loop detection
+    try {
+      m_eventBufferLoopDetection++;
+      if (m_eventBufferLoopDetection > 100) {
+        LOG.error("LOOP DETECTION in " + getClass() + ". see stack trace for more details.", new Exception("LOOP DETECTION"));
+        return;
       }
-      TreeMap<Integer, PlannerEvent> sortedCoalescedMap = new TreeMap<Integer, PlannerEvent>();
-      for (Map.Entry<Integer, List<PlannerEvent>> entry : coalesceMap.entrySet()) {
-        int type = entry.getKey();
-        List<PlannerEvent> subList = entry.getValue();
-        int lastIndex = subList.size() - 1;
-        switch (type) {
-          case PlannerEvent.TYPE_ALL_RESOURCES_DELETED: {
-            sortedCoalescedMap.put(10, subList.get(lastIndex));// use last
-            break;
-          }
-          case PlannerEvent.TYPE_RESOURCES_INSERTED: {
-            sortedCoalescedMap.put(20, coalescePlannerEvents(subList));// merge
-            break;
-          }
-          case PlannerEvent.TYPE_RESOURCES_DELETED: {
-            sortedCoalescedMap.put(30, coalescePlannerEvents(subList));// merge
-            break;
-          }
-          case PlannerEvent.TYPE_RESOURCES_UPDATED: {
-            sortedCoalescedMap.put(40, coalescePlannerEvents(subList));// merge
-            break;
-          }
-          case PlannerEvent.TYPE_ACTIVITY_ACTION: {
-            sortedCoalescedMap.put(50, subList.get(lastIndex));// use last
-            break;
-          }
-          default: {
-            sortedCoalescedMap.put(-type, subList.get(lastIndex));// use last
-          }
+      //
+      if (!getEventBuffer().isEmpty()) {
+        List<PlannerEvent> coalescedEvents = getEventBuffer().consumeAndCoalesceEvents();
+        // fire the batch and set planner to changing, otherwise a listener might trigger another events that
+        // then are processed before all other listeners received that batch
+        try {
+          setPlannerChanging(true);
+          //
+          firePlannerEventBatchInternal(coalescedEvents);
+        }
+        finally {
+          setPlannerChanging(false);
         }
       }
-      firePlannerEventBatchInternal(sortedCoalescedMap.values().toArray(new PlannerEvent[sortedCoalescedMap.size()]));
     }
-  }
-
-  //FIXME CGU use event buffer
-  private PlannerEvent coalescePlannerEvents(List<PlannerEvent> list) {
-    if (list.size() == 0) {
-      return null;
-    }
-    else if (list.size() == 1) {
-      return list.get(0);
-    }
-    else {
-      PlannerEvent last = list.get(list.size() - 1);
-      PlannerEvent ce = new PlannerEvent(last.getPlanner(), last.getType());
-      //
-      ce.addPopupMenus(last.getPopupMenus());
-      //
-      Set<Resource<RI>> coalesceList = new HashSet<Resource<RI>>();
-      for (PlannerEvent t : list) {
-        if (t.getResourceCount() > 0) {
-          coalesceList.addAll((Collection<? extends Resource<RI>>) t.getResources());
-        }
-      }
-      ce.setResources(new ArrayList<Resource<RI>>(coalesceList));
-      //
-      return ce;
+    finally {
+      m_eventBufferLoopDetection--;
     }
   }
 
@@ -845,7 +819,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
         if (m_tableChanging == 0) {
           // 1 --> 0
           try {
-            processChangeBuffer();
+            processEventBuffer();
           }
           finally {
             propertySupport.setPropertiesChanging(false);
@@ -865,15 +839,15 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     else {
       cal.setTime(DateUtility.truncDate(new Date()));
     }
-    switch (getPlanningMode()) {
-      case PLANNING_MODE_INTRADAY: {
+    switch (getDisplayMode()) {
+      case DISPLAY_MODE_INTRADAY: {
         cal.set(Calendar.HOUR_OF_DAY, getFirstHourOfDay());
         break;
       }
-      case PLANNING_MODE_DAY: {
+      case DISPLAY_MODE_DAY: {
         break;
       }
-      case PLANNING_MODE_WEEK: {
+      case DISPLAY_MODE_WEEK: {
         break;
       }
     }
@@ -890,16 +864,16 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     else {
       cal.setTime(DateUtility.truncDate(new Date()));
     }
-    switch (getPlanningMode()) {
-      case PLANNING_MODE_INTRADAY: {
+    switch (getDisplayMode()) {
+      case DISPLAY_MODE_INTRADAY: {
         cal.set(Calendar.HOUR_OF_DAY, getLastHourOfDay());
         break;
       }
-      case PLANNING_MODE_DAY: {
+      case DISPLAY_MODE_DAY: {
         cal.add(Calendar.DATE, 1);
         break;
       }
-      case PLANNING_MODE_WEEK: {
+      case DISPLAY_MODE_WEEK: {
         cal.add(Calendar.DATE, 7);
         break;
       }
@@ -1038,13 +1012,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
-  public int getPlanningMode() {
-    return propertySupport.getPropertyInt(PROP_PLANNING_MODE);
+  public int getDisplayMode() {
+    return propertySupport.getPropertyInt(PROP_DISPLAY_MODE);
   }
 
   @Override
-  public void setPlanningMode(int mode) {
-    propertySupport.setPropertyInt(PROP_PLANNING_MODE, mode);
+  public void setDisplayMode(int mode) {
+    propertySupport.setPropertyInt(PROP_DISPLAY_MODE, mode);
   }
 
   @Override
@@ -1076,8 +1050,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
           if (CompareUtility.equals(cell.getBeginTime(), beginTime) &&
               (CompareUtility.equals(cell.getEndTime(), endTime)
-                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-                  || (cell != null
+              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+              || (cell != null
                   && cell.getEndTime() != null
                   && endTime != null
                   && cell.getEndTime().getTime() == endTime.getTime() + 1))) {

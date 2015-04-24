@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,8 +16,7 @@ import java.util.Date;
  * Description: Allows to store multiple time ranges. There
  * are no overlapping on the stored ranges.
  * <p>
- * e.g. {'1.1.2006 13:00'-'1.1.2006 14:00', '2.1.2006 12:00'-'3.1.2006 12:00'} Copyright (c) 2006 BSI AG Company: BSI AG
- * - www.bsiag.com
+ * e.g. {'1.1.2006 13:00'-'1.1.2006 14:00', '2.1.2006 12:00'-'3.1.2006 12:00'}
  */
 class TimeRange {
 
