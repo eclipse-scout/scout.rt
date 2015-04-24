@@ -50,6 +50,8 @@ scout.Tree.prototype.destroy = function() {
 
 scout.Tree.prototype._destroyTreeNode = function(node, parentNode) {
   delete this.nodesMap[node.id];
+  scout.arrays.remove(this.selectedNodeIds, node.id); // ensure deleted node is not in selection list anymore (in case the model does not update the selection)
+
   if (this._onNodeDeleted) { // Necessary for subclasses
     this._onNodeDeleted(node);
   }
