@@ -1,0 +1,21 @@
+{
+  "adapterData": [
+    {
+      "id": "1",
+      "objectType": "Menu",
+      "visible": false,
+      "menuTypes": [ "Table.Empty", "Table.Header" ], // equal to default value (different order)
+      "enabled": true
+    },
+    {
+      "id": "2",
+      "objectType": "Menu",
+      "menuTypes": [ "Table.Header", "Table.Empty" ], // equal to default value (same order)
+    },
+    {
+      "id": "3",
+      "objectType": "Menu",
+      "menuTypes": [ "Table.Empty", "ActivityCell", "Table.Header" ] // NOT equal to default value
+    }
+  ]
+}

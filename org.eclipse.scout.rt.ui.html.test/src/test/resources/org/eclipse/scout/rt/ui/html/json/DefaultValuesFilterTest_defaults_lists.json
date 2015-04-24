@@ -1,0 +1,8 @@
+{
+  "defaults": {
+    "Menu": {
+      "enabled": true,
+      "menuTypes": [ "Table.Header", "Table.Empty" ]
+    }
+  }
+}

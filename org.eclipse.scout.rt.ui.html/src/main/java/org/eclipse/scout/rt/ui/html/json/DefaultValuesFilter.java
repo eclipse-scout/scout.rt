@@ -11,12 +11,15 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.json.JSONArray;
@@ -175,10 +178,16 @@ public class DefaultValuesFilter {
     }
     // Convert JSONArrays to collections to be able to compare them
     if (value instanceof JSONArray) {
-      value = jsonArrayToCollection((JSONArray) value);
+      value = jsonArrayToCollection((JSONArray) value, true);
     }
     if (defaultValue instanceof JSONArray) {
-      defaultValue = jsonArrayToCollection((JSONArray) defaultValue);
+      defaultValue = jsonArrayToCollection((JSONArray) defaultValue, false);
+    }
+    if (value instanceof List<?> && defaultValue instanceof List<?>) {
+      return CollectionUtility.equalsCollection((List<?>) value, (List<?>) defaultValue); // same order
+    }
+    if (value instanceof Collection<?> && defaultValue instanceof Collection<?>) {
+      return CollectionUtility.equalsCollection((Collection<?>) value, (Collection<?>) defaultValue); // any order
     }
     try {
       // Try to match types (to make Integer "1" equal to Double "1.0")
@@ -203,15 +212,15 @@ public class DefaultValuesFilter {
     }
   }
 
-  protected List<Object> jsonArrayToCollection(JSONArray array) {
+  protected Collection<Object> jsonArrayToCollection(JSONArray array, boolean preserveOrder) {
     if (array == null) {
       return null;
     }
-    List<Object> result = new ArrayList<>();
+    Collection<Object> result = (preserveOrder ? new ArrayList<>() : new HashSet<>());
     for (int i = 0; i < array.length(); i++) {
       Object element = array.opt(i);
       if (element instanceof JSONArray) {
-        result.add(jsonArrayToCollection((JSONArray) element));
+        result.add(jsonArrayToCollection((JSONArray) element, preserveOrder));
       }
       else {
         result.add(element);

@@ -6,6 +6,7 @@
  */
 {
   /* *** Default value definitions *** */
+  /* (Note: Array values are always tested without considering the order) */
   "defaults": {
 
     // Model adapters
