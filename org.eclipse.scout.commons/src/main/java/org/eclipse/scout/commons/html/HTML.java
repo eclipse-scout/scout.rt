@@ -424,6 +424,13 @@ public final class HTML {
   }
 
   /**
+   * Creates HTML content from multiple elements. e.g. <b>Bold Text</b> Text <b> More bold text </b>
+   */
+  public static IHtmlContent fragment(List<? extends CharSequence> elements) {
+    return new HtmlContentBuilder(elements);
+  }
+
+  /**
    * Creates HTML content with &ltstyle type="text/css"&gt; cssStype &lt;style&gt;
    */
   public static IHtmlElement cssStyle(CharSequence... cssContent) {
