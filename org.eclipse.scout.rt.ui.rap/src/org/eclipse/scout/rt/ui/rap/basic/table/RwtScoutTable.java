@@ -193,7 +193,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
 
   protected RwtScoutColumnModel getUiColumnModel() {
     if (m_columnModel == null) {
-      m_columnModel = new RwtScoutColumnModel(getScoutObject(), this, m_uiColumnManager);
+      m_columnModel = new RwtScoutColumnModel(getScoutObject(), this, m_uiColumnManager, getUiEnvironment());
     }
     return m_columnModel;
   }
