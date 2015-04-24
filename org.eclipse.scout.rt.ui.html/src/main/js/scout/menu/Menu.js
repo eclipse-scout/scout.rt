@@ -3,6 +3,7 @@ scout.Menu = function() {
   this.childActions = [];
   this._addAdapterProperties('childActions');
   this.popup = undefined;
+  this.keyStrokeAdapter;
 };
 scout.inherits(scout.Menu, scout.Action);
 
@@ -42,10 +43,33 @@ scout.Menu.prototype._renderItem = function($parent) {
     }
     this._onMenuClicked(event);
   }
+  if(this.visible && this.enabled){
+    this._registerKeyStrokeAdapter();
+  }
 };
 
 scout.Menu.prototype._onMenuClicked = function(event) {
   this.doAction($(event.target));
+};
+
+scout.Menu.prototype._renderEnabled = function(enabled) {
+  scout.Menu.parent.prototype._renderEnabled.call(this, enabled);
+  if(enabled){
+    this._registerKeyStrokeAdapter();
+  }
+  else{
+    this._unregisterKeyStrokeAdapter();
+  }
+};
+
+scout.Menu.prototype._renderVisible = function(enabled) {
+  scout.Menu.parent.prototype._renderVisible.call(this, enabled);
+  if(enabled){
+    this._registerKeyStrokeAdapter();
+  }
+  else{
+    this._unregisterKeyStrokeAdapter();
+  }
 };
 
 scout.Menu.prototype._renderText = function(text) {
@@ -90,4 +114,18 @@ scout.Menu.prototype.ignore = function(event) {
 
 scout.Menu.prototype._drawKeyBox = function($container) {
   scout.Menu.parent.prototype._drawKeyBox.call(this, $container);
+};
+
+
+scout.Menu.prototype._registerKeyStrokeAdapter = function(){
+  if(!this.keyStrokeAdapter){
+    this.keyStrokeAdapter = new scout.MenuKeyStrokeAdapter(this);
+  }
+  scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+};
+
+scout.Menu.prototype._unregisterKeyStrokeAdapter = function(){
+  if(this.keyStrokeAdapter){
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  }
 };
