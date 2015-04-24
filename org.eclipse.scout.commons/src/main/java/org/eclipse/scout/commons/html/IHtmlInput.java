@@ -33,6 +33,11 @@ public interface IHtmlInput extends IHtmlElement {
   IHtmlInput maxlength(int maxlength);
 
   /**
+   * Only to be used with input fields of type {@value #TYPE_CHECKBOX} and {@value #TYPE_RADIO}.
+   */
+  IHtmlInput checked();
+
+  /**
    * {@inheritDoc}
    */
   @Override

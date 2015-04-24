@@ -50,6 +50,12 @@ public class HtmlInputBuilder extends HtmlNodeBuilder implements IHtmlInput {
   }
 
   @Override
+  public IHtmlInput checked() {
+    addAttribute("checked", "checked");
+    return this;
+  }
+
+  @Override
   public IHtmlInput cssClass(CharSequence cssClass) {
     return (IHtmlInput) super.cssClass(cssClass);
   }
