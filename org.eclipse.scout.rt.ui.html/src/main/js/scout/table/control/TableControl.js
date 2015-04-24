@@ -77,6 +77,12 @@ scout.TableControl.prototype.renderContent = function() {
     }
     this._renderContent(this.tableFooter.$controlContent);
     this.contentRendered = true;
+    var that =this;
+    this.tableControlKeyStrokeAdapter = new scout.TableControlKeyStrokeAdapter(this);
+    scout.keyStrokeManager.installAdapter(this.tableFooter.$controlContent, this.tableControlKeyStrokeAdapter);
+    setTimeout(function() {
+      that.tableFooter.$controlContainer.installFocusContext('auto', that.tableFooter._table.session.uiSessionId);
+    });
   }
 };
 
@@ -124,13 +130,7 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   this.sendSelected(selected);
   this._renderSelected(this.selected, closeWhenUnselected);
   var that = this;
-  if (selected) {
-    this.tableControlKeyStrokeAdapter = new scout.TableControlKeyStrokeAdapter(this);
-    scout.keyStrokeManager.installAdapter(this.tableFooter.$controlContent, this.tableControlKeyStrokeAdapter);
-    setTimeout(function() {
-      that.tableFooter.$controlContainer.installFocusContext('auto', that.tableFooter._table.session.uiSessionId);
-    });
-  } else {
+  if (!selected){
     scout.keyStrokeManager.uninstallAdapter(this.tableControlKeyStrokeAdapter);
     setTimeout(function() {
       that.tableFooter.$controlContainer.uninstallFocusContext(that.tableFooter._table.session.uiSessionId);
