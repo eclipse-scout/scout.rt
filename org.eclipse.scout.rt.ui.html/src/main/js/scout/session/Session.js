@@ -574,7 +574,9 @@ scout.Session.prototype.goOffline = function() {
 scout.Session.prototype.goOnline = function() {
   this.offline = false;
   this._sendRequest(this._queuedRequest);
-  this.desktop.goOnline();
+  if (this.desktop) {
+    this.desktop.goOnline();
+  }
 };
 
 scout.Session.prototype.onReconnecting = function() {
@@ -584,7 +586,9 @@ scout.Session.prototype.onReconnecting = function() {
 };
 
 scout.Session.prototype.onReconnectingSucceeded = function() {
-  this.desktop.onReconnectingSucceeded();
+  if (this.desktop) {
+    this.desktop.onReconnectingSucceeded();
+  }
   this.goOnline();
 };
 
