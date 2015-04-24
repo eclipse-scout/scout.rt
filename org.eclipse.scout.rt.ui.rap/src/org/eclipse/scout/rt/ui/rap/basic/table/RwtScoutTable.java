@@ -91,8 +91,9 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
- * knownIssues - multi column sorting is not supported, unable to get any key
- * mask in the selection event.
+ * knownIssues:
+ * <p>
+ * - unable to get any key mask in the selection event.
  * <p>
  * - multi line support in headers is not supported by rwt.
  * <p>
@@ -119,11 +120,12 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
 
   private RwtScoutColumnModel m_columnModel = null;
 
-  private String m_variant = "";
+  private final String m_variant;
 
   private AbstractTableKeyboardNavigationSupport m_keyboardNavigationSupport;
 
   public RwtScoutTable() {
+    m_variant = "";
   }
 
   public RwtScoutTable(String variant) {
@@ -256,10 +258,10 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         if (scoutColumn.isFixedWidth()) {
           rwtCol.setResizable(false);
         }
-        if (cell.isSortActive()) {
-          getUiField().setSortColumn(rwtCol);
-          getUiField().setSortDirection(cell.isSortAscending() ? SWT.UP : SWT.DOWN);
-        }
+
+        // no sort indicator. is done in decorateHeaderTexts()
+        getUiField().setSortColumn(null);
+
         if (sortEnabled) {
           rwtCol.addSelectionListener(m_columnSortListener);
         }
@@ -591,9 +593,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
   }
 
   private void decorateHeaderTexts() {
-    // Because SWT can only indicate one sort column, we will use the first (i.e. the column
-    // with the lowest sort index) user sort column that is visible for that purpose. Further
-    // sort columns will be indicated by a special header text (see updateHeaderText() method).
     List<IColumn<?>> sortColumns = getScoutObject().getColumnSet().getSortColumns();
     // strip invisible columns
     Iterator<IColumn<?>> it = sortColumns.iterator();
@@ -602,10 +601,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
       if (!next.isVisible() || !next.isSortExplicit()) {
         it.remove();
       }
-    }
-    // reset RWT sort column
-    if (sortColumns.size() > 1) {
-      getUiField().setSortColumn(null);
     }
 
     for (TableColumn uiColumn : getUiField().getColumns()) {
@@ -623,17 +618,11 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
           textBuilder.insert(0, "(*) ");
         }
         if (sortColumns.contains(scoutColumn)) {
-          if (sortColumns.size() > 1) {
-            if (scoutColumn.isSortAscending()) {
-              textBuilder.insert(0, "[a-z] ");
-            }
-            else {
-              textBuilder.insert(0, "[z-a] ");
-            }
+          if (scoutColumn.isSortAscending()) {
+            textBuilder.append(" \u25b4");
           }
           else {
-            getUiField().setSortDirection(scoutColumn.isSortAscending() ? SWT.UP : SWT.DOWN);
-            getUiField().setSortColumn(uiColumn);
+            textBuilder.append(" \u25be");
           }
         }
         uiColumn.setText(textBuilder.toString());
