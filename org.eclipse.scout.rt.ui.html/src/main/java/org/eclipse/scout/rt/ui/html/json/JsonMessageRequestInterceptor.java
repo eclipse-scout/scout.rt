@@ -86,6 +86,11 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
           writeResponse(httpResp, createSessionTerminatedResponse());
           return true;
         }
+        else if (!uiSession.currentJsonResponse().isEmpty()) {
+          // Current JSON response was created while no polling- or client-thread was active
+          // we must first return this response to the client before we can continue
+          LOG.debug("JSON response is not empty. Most likely an asynchronous ClientJob has created it, while no request (client, polling) was running");
+        }
         JSONObject jsonResp = uiSession.processRequest(httpReq, jsonReq);
         if (jsonResp == null) {
           jsonResp = createEmptyResponse();
@@ -122,7 +127,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     String uiSessionAttributeName = IUiSession.HTTP_SESSION_ATTRIBUTE_PREFIX + jsonReq.getUiSessionId();
     HttpSession httpSession = req.getSession();
 
-    // Because the appserver might keep or request locks on the httpSession object, we don't synchronize directly
+    // Because the app-server might keep or request locks on the httpSession object, we don't synchronize directly
     // on httpSession, but use a dedicated session lock object instead.
     ReentrantLock httpSessionLock = httpSessionLock(httpSession);
     httpSessionLock.lock();

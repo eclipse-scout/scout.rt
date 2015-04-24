@@ -506,20 +506,22 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
       JSONObject result = JobUtility.runModelJobAndAwait("response-to-json", getClientSession(), new ICallable<JSONObject>() {
         @Override
         public JSONObject call() throws Exception {
-          return responseToJsonInternal();
+          JSONObject json = responseToJsonInternal();
+          // Create new jsonResponse instance after JSON object has been created
+          // This must happen synchronized (as it always is, in a model-job) to avoid concurrency issues
+          // FIXME AWE: (json-layer) ausprobieren, ob die currentResponse auch im Fall von einer Exception zurück gesetzt werden muss.
+          m_currentJsonResponse = createJsonResponse();
+          LOG.debug("Created new instance of current JSON response. New instance=" + m_clientSessionId);
+          return json;
         }
       });
       return result;
     }
     finally {
-      // reset event map (aka jsonResponse) when response has been sent to client
-      m_currentJsonResponse = createJsonResponse();
       m_currentHttpRequest.set(null);
-
       if (m_disposing) {
         dispose();
       }
-
       if (LOG.isDebugEnabled()) {
         LOG.debug("Adapter count after request: " + m_jsonAdapterRegistry.getJsonAdapterCount());
       }

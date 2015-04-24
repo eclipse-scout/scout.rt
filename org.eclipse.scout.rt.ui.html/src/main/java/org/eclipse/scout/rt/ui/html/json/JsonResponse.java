@@ -336,4 +336,8 @@ public class JsonResponse {
   protected String errorMessage() {
     return m_errorMessage;
   }
+
+  public boolean isEmpty() {
+    return m_adapterMap.isEmpty() && m_eventList.isEmpty();
+  }
 }

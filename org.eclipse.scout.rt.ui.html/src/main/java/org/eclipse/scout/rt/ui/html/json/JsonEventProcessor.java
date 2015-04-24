@@ -30,7 +30,8 @@ public class JsonEventProcessor {
   }
 
   public void processEvents(final JsonRequest request, final JsonResponse response) {
-    Assertions.assertTrue(ModelJobs.isModelThread(), "Event processing must be called from the model thread  [currentThread=%s, request=%s, response=%s]", Thread.currentThread().getName(), request, response);
+    Assertions.assertTrue(ModelJobs.isModelThread(), "Event processing must be called from the model thread  [currentThread=%s, request=%s, response=%s]",
+        Thread.currentThread().getName(), request, response);
     for (final JsonEvent event : request.getEvents()) {
       processEvent(event, response);
     }
@@ -39,7 +40,9 @@ public class JsonEventProcessor {
   protected void processEvent(JsonEvent event, JsonResponse response) {
     final IJsonAdapter jsonAdapter = m_uiSession.getJsonAdapter(event.getTarget());
     if (jsonAdapter == null) {
-      throw new JsonException("No adapter found for ID " + event.getTarget());
+      // FIXME AWE: (json-layer) schauen ob wir eine warning ans UI zurückgeben sollen
+      LOG.warn("No adapter found for ID " + event.getTarget());
+      return;
     }
     try {
       if (LOG.isDebugEnabled()) {
