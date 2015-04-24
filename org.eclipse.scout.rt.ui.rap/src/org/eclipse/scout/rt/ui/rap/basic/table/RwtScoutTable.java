@@ -256,10 +256,6 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         if (scoutColumn.isFixedWidth()) {
           rwtCol.setResizable(false);
         }
-        if (cell.isSortActive()) {
-          getUiField().setSortColumn(rwtCol);
-          getUiField().setSortDirection(cell.isSortAscending() ? SWT.UP : SWT.DOWN);
-        }
         if (sortEnabled) {
           rwtCol.addSelectionListener(m_columnSortListener);
         }
@@ -623,17 +619,11 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
           textBuilder.insert(0, "(*) ");
         }
         if (sortColumns.contains(scoutColumn)) {
-          if (sortColumns.size() > 1) {
-            if (scoutColumn.isSortAscending()) {
-              textBuilder.insert(0, "[a-z] ");
-            }
-            else {
-              textBuilder.insert(0, "[z-a] ");
-            }
+          if (scoutColumn.isSortAscending()) {
+            textBuilder.append(" \u25b4");
           }
           else {
-            getUiField().setSortDirection(scoutColumn.isSortAscending() ? SWT.UP : SWT.DOWN);
-            getUiField().setSortColumn(uiColumn);
+            textBuilder.append(" \u25be");
           }
         }
         uiColumn.setText(textBuilder.toString());
