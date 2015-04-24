@@ -67,7 +67,7 @@ public class DateChooserDialog extends Dialog {
 
   @Override
   protected int getShellStyle() {
-    return SWT.NONE;
+    return SWT.ON_TOP | SWT.NO_FOCUS;
   }
 
   /**

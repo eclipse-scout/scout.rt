@@ -253,24 +253,12 @@ public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> i
   /**
    * The event is fired only if the datepicker popup is open.
    * <p>
-   * The default sets the focus on the ui field if the new focus is inside the date picker. <br/>
    * If the new focus is outside the date picker it makes sure the date picker popup will be closed.
    * </p>
    */
   protected void handleUiFocusLostOnDatePickerPopup(FocusEvent event) {
-    if (isFocusInDatePicker()) {
+    if (!isFocusInDatePicker()) {
       getUiEnvironment().getDisplay().asyncExec(new Runnable() {
-
-        @Override
-        public void run() {
-          getUiField().setFocus();
-        }
-
-      });
-    }
-    else {
-      getUiEnvironment().getDisplay().asyncExec(new Runnable() {
-
         @Override
         public void run() {
           makeSureDateChooserIsClosed();
