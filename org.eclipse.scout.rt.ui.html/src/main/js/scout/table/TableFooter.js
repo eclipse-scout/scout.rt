@@ -232,8 +232,6 @@ scout.TableFooter.prototype.openControlContainer = function() {
   // adjust content
   this.$controlContent.outerHeight(contentHeight);
 
-//  this.$controlContainer.installFocusContext('auto', this._table.session.uiSessionId);
-
   // open container, stop existing (close) animations before
   this.$controlContainer.stop(true).show().animate({
     height: scout.TableFooter.CONTAINER_SIZE
@@ -241,17 +239,14 @@ scout.TableFooter.prototype.openControlContainer = function() {
     duration: 500,
     progress: that._revalidateTableLayout.bind(that)
   });
-
   this.open = true;
 };
 
 scout.TableFooter.prototype.closeControlContainer = function(control) {
-  //TODO nbu uninstall focuscontext
   var that = this;
-  if(this.tableControlKeyStrokeAdapter){
-    scout.keyStrokeManager.uninstallAdapter(this.$controlContainer, this.tableControlKeyStrokeAdapter);
+  if (this.tableControlKeyStrokeAdapter) {
+    scout.keyStrokeManager.uninstallAdapter(this.tableControlKeyStrokeAdapter);
   }
-
   this.$controlContainer.stop(true).show().animate({
     height: 0
   }, {
@@ -265,6 +260,7 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
   }.bind(this));
 
   this.open = false;
+
 };
 
 scout.TableFooter.prototype._addResize = function($parent) {

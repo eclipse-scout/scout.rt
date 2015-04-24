@@ -123,22 +123,18 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   this.selected = selected;
   this.sendSelected(selected);
   this._renderSelected(this.selected, closeWhenUnselected);
+  var that = this;
   if (selected) {
     this.tableControlKeyStrokeAdapter = new scout.TableControlKeyStrokeAdapter(this);
     scout.keyStrokeManager.installAdapter(this.tableFooter.$controlContent, this.tableControlKeyStrokeAdapter);
-    //focus first element on table control
-    if (this.form && this.form.$container.find(':focusable:not(button)').length > 0) {
-      var that = this;
-      setTimeout(function() {
-        that.form.$container.find(':focusable:not(button)').first().focus();
-      });
-    } else if (this.form && this.form.$container.find(':focusable').length > 0) {
-      setTimeout(function() {
-        scout.focusManager.focusFirstElement(that.form.$container);
-      }, 0);
-    }
+    setTimeout(function() {
+      that.tableFooter.$controlContainer.installFocusContext('auto', that.tableFooter._table.session.uiSessionId);
+    });
   } else {
-    scout.keyStrokeManager.uninstallAdapter(this.tableFooter.$controlContent, this.tableControlKeyStrokeAdapter);
+    scout.keyStrokeManager.uninstallAdapter(this.tableControlKeyStrokeAdapter);
+    setTimeout(function() {
+      that.tableFooter.$controlContainer.uninstallFocusContext(that.tableFooter._table.session.uiSessionId);
+    });
   }
 };
 
