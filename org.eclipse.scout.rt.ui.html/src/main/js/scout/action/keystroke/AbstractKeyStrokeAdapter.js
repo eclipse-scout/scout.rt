@@ -33,7 +33,7 @@ scout.AbstractKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
   if (this.keyStrokes.length > 0) {
     this.keyStrokes = this.keyStrokes.concat(this._field.keyStrokes);
   } else if (this._field.keyStrokes) {
-    this.keyStrokes = this._field.keyStrokes;
+    this.keyStrokes = this._field.keyStrokes.slice(0);
   }
 };
 /**
