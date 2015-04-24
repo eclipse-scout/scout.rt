@@ -97,7 +97,7 @@ import org.eclipse.swt.widgets.TableItem;
  * - multi line support in headers is not supported by rwt.
  * <p>
  * - multi line support in row texts is not supported so far. Might probably be done by customized table rows.
- * 
+ *
  * @since 3.8.0
  */
 @SuppressWarnings("restriction")
@@ -191,7 +191,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
 
   protected RwtScoutColumnModel getUiColumnModel() {
     if (m_columnModel == null) {
-      m_columnModel = new RwtScoutColumnModel(getScoutObject(), this, m_uiColumnManager);
+      m_columnModel = new RwtScoutColumnModel(getScoutObject(), this, m_uiColumnManager, getUiEnvironment());
     }
     return m_columnModel;
   }

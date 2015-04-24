@@ -9,6 +9,8 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.holders.BooleanHolder;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -16,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IProposalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.RwtIcons;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
@@ -41,8 +44,9 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   private Image m_imgCheckboxTrue;
   private Color m_disabledForegroundColor;
   private int m_defaultRowHeight;
+  private IRwtEnvironment m_environment;
 
-  public RwtScoutColumnModel(ITable scoutTable, RwtScoutTable uiTable, TableColumnManager columnManager) {
+  public RwtScoutColumnModel(ITable scoutTable, RwtScoutTable uiTable, TableColumnManager columnManager, IRwtEnvironment env) {
     m_scoutTable = scoutTable;
     m_uiTable = uiTable;
     m_columnManager = columnManager;
@@ -50,6 +54,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     m_imgCheckboxFalse = getUiTable().getUiEnvironment().getIcon(RwtIcons.CheckboxNo);
     m_disabledForegroundColor = getUiTable().getUiEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
     rebuildCache();
+    m_environment = env;
   }
 
   protected ITable getScoutTable() {
@@ -302,8 +307,29 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
    *
    * @return <code>true</code> if the cell is editable and not of the type {@link Boolean}.
    */
-  protected boolean isEditableIconNeeded(ITableRow row, IColumn<?> column) {
-    return getScoutTable().isCellEditable(row, column) && !column.getDataType().isAssignableFrom(Boolean.class);
+  protected boolean isEditableIconNeeded(final ITableRow row, final IColumn<?> column) {
+    final BooleanHolder res = new BooleanHolder(false);
+    Runnable runnable = new Runnable() {
+      @Override
+      public void run() {
+        res.setValue(
+            getScoutTable().isCellEditable(row, column) && !column.getDataType().isAssignableFrom(Boolean.class));
+      }
+    };
+
+    JobEx job = getUiEnvironment().invokeScoutLater(runnable, 0);
+    try {
+      job.join();
+    }
+    catch (InterruptedException e) {
+      //NOP
+    }
+
+    return res.getValue();
+  }
+
+  public IRwtEnvironment getUiEnvironment() {
+    return m_environment;
   }
 
   private void rebuildCache() {
