@@ -1,4 +1,5 @@
 @planner-header-height: 45px;
+@planner-resource-minheight: 30px;
 
 .planner-icon(@icon, @size) {
   .font-icon;
@@ -21,6 +22,7 @@
 
 .resource {
   display: table-row;
+  white-space: nowrap;
 
   &.selected {
     background-color: lightblue;
@@ -28,13 +30,19 @@
 }
 
 .resource-cell {
+  display: table-cell;
+  vertical-align: middle;
+  min-height: @planner-resource-minheight;
   padding: 8px;
 }
 
 .activity {
   display: table-cell;
-  padding: 8px;
+  min-height: @planner-resource-minheight;
+  vertical-align: middle;
   border-bottom: 1px solid black;
+  background-color: @palette-cyan-active;
+  padding: 8px;
 }
 
 .planner-header {

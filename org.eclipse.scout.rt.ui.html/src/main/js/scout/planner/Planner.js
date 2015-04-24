@@ -221,16 +221,18 @@ scout.Planner.prototype._build$Resource = function(resource) {
 scout.Planner.prototype._build$Activity = function(activity) {
   var i,
     $activity = $.makeDiv('activity'),
-    level = Math.min(activity.level * 100, 100),
+    level = 100 - Math.min(activity.level * 100, 100),
     levelColor = scout.helpers.modelToCssColor(activity.levelColor);
 
-    if (!levelColor) {
-      levelColor = '#80c1d0';
-    }
-
     $activity.text(activity.text);
-    $activity.css('background-color', 'transparent');
-    $activity.css('background-image', 'linear-gradient(to top, ' + levelColor + ' 0%, ' + levelColor + ' ' + level + '%, transparent ' + level + '%, transparent 100% )');
+    if (activity.cssClass) {
+      $activity.addClass(activity.cssClass);
+    }
+    if (levelColor) {
+      $activity.css('background-color', levelColor);
+    }
+    // the background-color represents the fill level and not the image. This makes it easier to change the color using a css class
+    $activity.css('background-image', 'linear-gradient(to bottom, #fff 0%, #fff ' + level + '%, transparent ' + level + '%, transparent 100% )');
 
   return $activity;
 };
