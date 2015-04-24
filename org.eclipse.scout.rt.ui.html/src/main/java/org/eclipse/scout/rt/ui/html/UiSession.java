@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
@@ -93,8 +94,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
   private final AtomicReference<HttpServletRequest> m_currentHttpRequest = new AtomicReference<>();
   private final JsonEventProcessor m_jsonEventProcessor;
   private boolean m_disposing;
-  private final Object m_backgroundJobLock = new Object();
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
+  private final ArrayBlockingQueue<Object> m_backgroundJobNotificationQueue = new ArrayBlockingQueue<>(1, true);
+  private final Object m_notificationToken = new Object();
 
   public UiSession() {
     m_currentJsonResponse = createJsonResponse();
@@ -550,23 +552,22 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
   @Override
   public void waitForBackgroundJobs() {
     LOG.trace("Wait until background job terminates...");
-    synchronized (m_backgroundJobLock) {
-      try {
-        m_backgroundJobLock.wait(TimeUnit.MINUTES.toMillis(1)); // Wait max. one minute, then return
-      }
-      catch (InterruptedException e) {
-        LOG.warn("Interrupted while waiting for this", e);
-      }
-      finally {
-        LOG.trace("Background job terminated. Continue request processing...");
-      }
+    try {
+      m_backgroundJobNotificationQueue.poll(1, TimeUnit.MINUTES);
+    }
+    catch (InterruptedException e) {
+      LOG.warn("Interrupted while waiting for notification token", e);
+    }
+    finally {
+      LOG.trace("Background job terminated. Continue request processing...");
     }
   }
 
   protected void notifyPollingBackgroundJobRequests() {
-    synchronized (m_backgroundJobLock) {
-      m_backgroundJobLock.notifyAll();
-    }
+    // Put a notification token in the queue of size 1. If a thread is waiting, it will wake up. If no thread is waiting, the token
+    // remains in the queue, and the next thread that polls the queue will get the token immediately. If the queue is full (i.e. there
+    // is already a token in the queue), this method does nothing. This method will never block.
+    m_backgroundJobNotificationQueue.offer(m_notificationToken);
   }
 
   protected boolean isProcessingClientRequest() {
