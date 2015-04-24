@@ -259,16 +259,17 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
           rwtCol.setResizable(false);
         }
 
-        // no sort indicator. is done in decorateHeaderTexts()
-        getUiField().setSortColumn(null);
-
         if (sortEnabled) {
           rwtCol.addSelectionListener(m_columnSortListener);
         }
         rwtCol.addListener(SWT.Move, m_columnListener);
         rwtCol.addListener(SWT.Resize, m_columnListener);
       }
+
+      // no sort indicator. is done in decorateHeaderTexts()
+      getUiField().setSortColumn(null);
       decorateHeaderTexts();
+
       //multiline header settings
       if (multilineHeaders) {
         getUiField().setData("multiLineHeader", Boolean.TRUE);

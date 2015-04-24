@@ -275,7 +275,7 @@ public class OrganizeColumnsForm extends AbstractForm {
 
                 // Sorting
                 getTable().getSortingColumn().setValue(row, col);
-                if (col.isSortActive()) {
+                if (col.isSortActive() && col.isSortExplicit()) {
                   row.getCellForUpdate(getTable().getSortingColumn().getColumnIndex()).setIconId(col.isSortAscending() ? AbstractIcons.TableSortAsc : AbstractIcons.TableSortDesc);
                 }
 
