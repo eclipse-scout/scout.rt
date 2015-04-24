@@ -75,13 +75,13 @@
       "splitterPosition": 168
     },
     "Planner": {
-      "rows": [],
+      "resources": [],
       "selectedResources": []
     },
     "Resource": {
-      "cells": []
+      "activities": []
     },
-    "ActivityCell": {
+    "Activity": {
     },
     "SequenceBox": {
       "fields": []

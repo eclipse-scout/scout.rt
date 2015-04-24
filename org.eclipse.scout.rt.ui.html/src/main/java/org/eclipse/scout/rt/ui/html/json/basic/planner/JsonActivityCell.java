@@ -39,7 +39,7 @@ public class JsonActivityCell implements IJsonObject {
     JsonObjectUtility.putProperty(json, "durationMinutes", m_activityCell.getDurationMinutes());
     JsonObjectUtility.putProperty(json, "tooltipText", m_activityCell.getTooltipText());
     JsonObjectUtility.putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(m_activityCell.getIconId()));
-    JsonObjectUtility.filterDefaultValues(json, "ActivityCell");
+    JsonObjectUtility.filterDefaultValues(json, "Activity");
     return json;
   }
 }
