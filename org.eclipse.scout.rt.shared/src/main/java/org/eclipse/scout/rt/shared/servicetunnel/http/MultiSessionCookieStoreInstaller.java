@@ -22,8 +22,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * Install and uninstall {@link MultiSessionCookieStore}
  */
 public class MultiSessionCookieStoreInstaller {
-  public static final String PROP_MULTI_SESSION_COOKIE_STORE_ENABLED = "org.eclipse.scout.rt.servicetunnel.multiSessionCookieStoreEnabled";
-
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MultiSessionCookieStoreInstaller.class);
 
   private CookieHandler m_oldCookieHandler;
@@ -39,16 +37,6 @@ public class MultiSessionCookieStoreInstaller {
     m_newCookieHandler = new CookieManager(new MultiSessionCookieStore(), CookiePolicy.ACCEPT_ALL);
     CookieHandler.setDefault(m_newCookieHandler);
     LOG.info("Successfully installed " + cookieHandlerToString(m_newCookieHandler));
-  }
-
-  public void check() {
-    CookieHandler cookieHandler = CookieHandler.getDefault();
-    if (cookieHandler != null) {
-      LOG.info("Using pre-installed cookie handler: " + cookieHandlerToString(cookieHandler));
-    }
-    else {
-      LOG.warn("No cookie handler is installed. This will result in the creation of a new HTTP session for every request. Please check the value of the property " + PROP_MULTI_SESSION_COOKIE_STORE_ENABLED + ".");
-    }
   }
 
   public void uninstall() {
