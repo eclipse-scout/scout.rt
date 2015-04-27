@@ -1,16 +1,17 @@
 package org.eclipse.scout.rt.ui.rap.basic.table;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.holders.BooleanHolder;
-import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -18,7 +19,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IProposalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.RwtIcons;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
@@ -30,23 +30,22 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableItem;
 
 public class RwtScoutColumnModel extends ColumnLabelProvider {
+
+  public static final String EDITABLE_VARIANT_PREFIX = "EDITABLE_CELL_VARIANT_";
+  public static final String EDITABLE_VARIANT_CELL_MARKER = "EDITABLE";
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutColumnModel.class);
   private static final long serialVersionUID = 1L;
 
-  private static final int HTML_ROW_LINE_HIGHT = 19;
-  private static final int NEWLINE_LINE_HIGHT = 15;
-
-  private transient ListenerList listenerList = null;
   private final ITable m_scoutTable;
-  private HashMap<ITableRow, HashMap<IColumn<?>, ICell>> m_cachedCells;
   private final RwtScoutTable m_uiTable;
   private final TableColumnManager m_columnManager;
-  private Image m_imgCheckboxFalse;
-  private Image m_imgCheckboxTrue;
-  private Color m_disabledForegroundColor;
-  private int m_defaultRowHeight;
-  private IRwtEnvironment m_environment;
+  private final Image m_imgCheckboxFalse;
+  private final Image m_imgCheckboxTrue;
+  private final Color m_disabledForegroundColor;
+  private Map<ITableRow, Map<IColumn<?>, P_CachedCell>> m_cachedCells;
 
-  public RwtScoutColumnModel(ITable scoutTable, RwtScoutTable uiTable, TableColumnManager columnManager, IRwtEnvironment env) {
+  public RwtScoutColumnModel(ITable scoutTable, RwtScoutTable uiTable, TableColumnManager columnManager) {
     m_scoutTable = scoutTable;
     m_uiTable = uiTable;
     m_columnManager = columnManager;
@@ -54,7 +53,6 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     m_imgCheckboxFalse = getUiTable().getUiEnvironment().getIcon(RwtIcons.CheckboxNo);
     m_disabledForegroundColor = getUiTable().getUiEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
     rebuildCache();
-    m_environment = env;
   }
 
   protected ITable getScoutTable() {
@@ -132,10 +130,6 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
       text = StringUtility.replaceNewLines(text, " ");
     }
     return text;
-  }
-
-  protected int getDefaultRowHeight() {
-    return m_defaultRowHeight;
   }
 
   public Image getColumnImage(ITableRow element, int columnIndex) {
@@ -265,11 +259,12 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
       if (m_cachedCells == null || m_cachedCells.get(row) == null) {
         rebuildCache();
       }
-      return m_cachedCells.get(row).get(column);
+      P_CachedCell cachedCell = m_cachedCells.get(row).get(column);
+      if (cachedCell != null) {
+        return cachedCell.m_cell;
+      }
     }
-    else {
-      return null;
-    }
+    return null;
   }
 
   /**
@@ -283,23 +278,31 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
    */
   protected String createTableRowVariant(ITableRow row) {
     StringBuilder builder = new StringBuilder();
-    for (int column = 0; column < row.getCellCount(); column++) {
-      if (column > 0) {
-        builder.append("_");
+
+    Map<IColumn<?>, P_CachedCell> cachedRow = m_cachedCells.get(row);
+    int[] visibleColumnIndexes = getScoutTable().getColumnSet().getVisibleColumnIndexes();
+    boolean isEditable = false;
+    for (int i = 0; i < visibleColumnIndexes.length; i++) {
+      if (i > 0) {
+        builder.append('_');
       }
 
-      if (isEditableIconNeeded(row, m_columnManager.getColumnByModelIndex(column))) {
-        builder.append("EDITABLE");
+      IColumn<?> col = getScoutTable().getColumnSet().getColumn(visibleColumnIndexes[i]);
+      if (col != null && cachedRow != null) {
+        P_CachedCell cachedCell = cachedRow.get(col);
+        if (cachedCell != null && cachedCell.m_isEditable) {
+          builder.append(EDITABLE_VARIANT_CELL_MARKER);
+          isEditable = true;
+        }
       }
     }
 
-    String variant = builder.toString();
-    if (variant.contains("EDITABLE")) {
-      return "EDITABLE_CELL_VARIANT_" + variant;
+    if (isEditable) {
+      builder.insert(0, EDITABLE_VARIANT_PREFIX);
+      return builder.toString();
     }
-    else {
-      return null;
-    }
+
+    return null;
   }
 
   /**
@@ -307,41 +310,63 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
    *
    * @return <code>true</code> if the cell is editable and not of the type {@link Boolean}.
    */
-  protected boolean isEditableIconNeeded(final ITableRow row, final IColumn<?> column) {
-    final BooleanHolder res = new BooleanHolder(false);
-    Runnable runnable = new Runnable() {
-      @Override
-      public void run() {
-        res.setValue(
-            getScoutTable().isCellEditable(row, column) && !column.getDataType().isAssignableFrom(Boolean.class));
-      }
-    };
-
-    JobEx job = getUiEnvironment().invokeScoutLater(runnable, 0);
-    try {
-      job.join();
-    }
-    catch (InterruptedException e) {
-      //NOP
+  protected boolean isEditableIconNeededInScoutThread(final ITableRow row, final IColumn<?> column) {
+    if (column == null || row == null) {
+      return false;
     }
 
-    return res.getValue();
-  }
+    if (column.getDataType().isAssignableFrom(Boolean.class)) {
+      return false;
+    }
 
-  public IRwtEnvironment getUiEnvironment() {
-    return m_environment;
+    ITable scoutTable = getScoutTable();
+    if (scoutTable == null) {
+      return false;
+    }
+    return scoutTable.isCellEditable(row, column);
   }
 
   private void rebuildCache() {
-    m_cachedCells = new HashMap<ITableRow, HashMap<IColumn<?>, ICell>>();
-    if (getScoutTable() != null) {
-      for (ITableRow scoutRow : getScoutTable().getRows()) {
-        HashMap<IColumn<?>, ICell> cells = new HashMap<IColumn<?>, ICell>();
-        for (IColumn<?> col : getScoutTable().getColumnSet().getVisibleColumns()) {
-          cells.put(col, getScoutTable().getCell(scoutRow, col));
+    if (getScoutTable() == null) {
+      m_cachedCells = new HashMap<ITableRow, Map<IColumn<?>, P_CachedCell>>(0);
+      return;
+    }
+
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        List<ITableRow> rows = getScoutTable().getRows();
+        Map<ITableRow, Map<IColumn<?>, P_CachedCell>> tmp = new HashMap<ITableRow, Map<IColumn<?>, P_CachedCell>>(rows.size());
+        for (ITableRow scoutRow : rows) {
+          List<IColumn<?>> visibleColumns = getScoutTable().getColumnSet().getVisibleColumns();
+          Map<IColumn<?>, P_CachedCell> cells = new HashMap<IColumn<?>, P_CachedCell>(visibleColumns.size());
+          for (IColumn<?> col : visibleColumns) {
+            ICell cell = getScoutTable().getCell(scoutRow, col);
+            boolean isCellEditable = isEditableIconNeededInScoutThread(scoutRow, col);
+            cells.put(col, new P_CachedCell(cell, isCellEditable));
+          }
+          tmp.put(scoutRow, cells);
         }
-        m_cachedCells.put(scoutRow, cells);
+
+        m_cachedCells = tmp;
       }
+    };
+
+    try {
+      getUiTable().getUiEnvironment().invokeScoutLater(r, 2345).join(2345);
+    }
+    catch (InterruptedException e) {
+      LOG.warn("Interrupted while waiting for the model.", e);
+    }
+  }
+
+  private static final class P_CachedCell {
+    private final ICell m_cell;
+    private final boolean m_isEditable;
+
+    private P_CachedCell(ICell cell, boolean isEditable) {
+      m_cell = cell;
+      m_isEditable = isEditable;
     }
   }
 }
