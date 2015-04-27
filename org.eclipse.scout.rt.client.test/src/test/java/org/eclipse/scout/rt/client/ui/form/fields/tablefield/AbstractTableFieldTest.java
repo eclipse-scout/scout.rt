@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDoubleColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -60,7 +59,6 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
       getTable().getString3Column().setValue(row, getTextFor(i, " "));
       getTable().getString4Column().setValue(row, getTextFor(i, "\n"));
       getTable().getBigDecimalColumn().setValue(row, FAR_BELOW_ZERO.add(BigDecimal.valueOf(1.11).multiply(BigDecimal.valueOf(i))));
-      getTable().getDoubleColumn().setValue(row, BigDecimal.valueOf(1.11).multiply(BigDecimal.valueOf(i)).doubleValue());
       getTable().addRow(row);
 
       getTable().selectAllRows();
@@ -72,10 +70,8 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
     String tableStatus = createDefaultTableStatus();
     assertTrue("TableStatus does not contain sum of Integer-column as expected. (tableStatus [" + tableStatus + "])", tableStatus.contains("Integer: " + getTable().getIntegerColumn().getFormat().format(45)));
     assertTrue("TableStatus does not contain sum of Long-column as expected. (tableStatus [" + tableStatus + "])", tableStatus.contains("Long: " + getTable().getLongColumn().getFormat().format(90)));
-    assertTrue("TableStatus does not contain sum of Double-column as expected. (tableStatus [" + tableStatus + "])", tableStatus.contains("Double: " + getTable().getDoubleColumn().getFormat().format(49.95d)));
-    // XXX[aho]
-//    String formattedBigDecimalSum = "BigDecimal: " + getTable().getBigDecimalColumn().getFormat().format(FAR_BELOW_ZERO.multiply(BigDecimal.TEN).add(BigDecimal.valueOf(49.95d)));
-//    assertTrue("TableStatus does not contain sum of BigDecimal-column as expected. (expected [" + formattedBigDecimalSum + "] in tableStatus [" + tableStatus + "])", tableStatus.contains(formattedBigDecimalSum));
+    String formattedBigDecimalSum = "BigDecimal: " + getTable().getBigDecimalColumn().getFormat().format(FAR_BELOW_ZERO.multiply(BigDecimal.TEN).add(BigDecimal.valueOf(49.95d)));
+    assertTrue("TableStatus does not contain sum of BigDecimal-column as expected. (expected [" + formattedBigDecimalSum + "] in tableStatus [" + tableStatus + "])", tableStatus.contains(formattedBigDecimalSum));
   }
 
   private String getTextFor(int size, String separator) {
@@ -124,10 +120,6 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
 
     public BigDecimalColumn getBigDecimalColumn() {
       return getColumnSet().getColumnByClass(BigDecimalColumn.class);
-    }
-
-    public DoubleColumn getDoubleColumn() {
-      return getColumnSet().getColumnByClass(DoubleColumn.class);
     }
 
     @Order(1.0)
@@ -259,26 +251,6 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
       protected int getConfiguredWidth() {
         return 200;
       }
-    }
-
-    @Order(35.0)
-    public class DoubleColumn extends AbstractDoubleColumn {
-
-      @Override
-      protected boolean getConfiguredEditable() {
-        return true;
-      }
-
-      @Override
-      protected String getConfiguredHeaderText() {
-        return "Double";
-      }
-
-      @Override
-      protected int getConfiguredWidth() {
-        return 70;
-      }
-
     }
 
     @Order(40)

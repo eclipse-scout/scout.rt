@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
@@ -35,19 +36,19 @@ public class MultipleExtGroupBoxExtensionData extends AbstractFormFieldData {
   public MultipleExtGroupBoxExtensionData() {
   }
 
-  public SecondDouble getSecondDouble() {
-    return getFieldByClass(SecondDouble.class);
+  public SecondBigDecimal getSecondBigDecimal() {
+    return getFieldByClass(SecondBigDecimal.class);
   }
 
   public ThirdDate getThirdDate() {
     return getFieldByClass(ThirdDate.class);
   }
 
-  public static class SecondDouble extends AbstractValueFieldData<Double> {
+  public static class SecondBigDecimal extends AbstractValueFieldData<BigDecimal> {
 
     private static final long serialVersionUID = 1L;
 
-    public SecondDouble() {
+    public SecondBigDecimal() {
     }
 
     /**
@@ -56,8 +57,8 @@ public class MultipleExtGroupBoxExtensionData extends AbstractFormFieldData {
     @Override
     protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
-      ruleMap.put(ValidationRule.MAX_VALUE, Double.MAX_VALUE);
-      ruleMap.put(ValidationRule.MIN_VALUE, -Double.MAX_VALUE);
+      ruleMap.put(ValidationRule.MAX_VALUE, new BigDecimal("999999999999999999999999999999999999999999999999999999999999"));
+      ruleMap.put(ValidationRule.MIN_VALUE, new BigDecimal("-999999999999999999999999999999999999999999999999999999999999"));
     }
   }
 

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columnfilter;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -38,23 +39,23 @@ import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterForm.MainBox.ValuesBox.ValuesTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractObjectColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
+import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractLinkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
-import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
-import org.eclipse.scout.rt.client.ui.form.fields.doublefield.IDoubleField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
@@ -146,9 +147,9 @@ public class ColumnFilterForm extends AbstractForm {
     }
   }
 
-  private void setupNumberField(IDoubleField f, IColumn<?> obj) {
-    if (obj instanceof IDoubleColumn) {
-      IDoubleColumn col = (IDoubleColumn) obj;
+  private void setupNumberField(IBigDecimalField f, IColumn<?> obj) {
+    if (obj instanceof IBigDecimalColumn) {
+      IBigDecimalColumn col = (IBigDecimalColumn) obj;
       f.setFormat(col.getFormat());
 
       f.setGroupingUsed(col.isGroupingUsed());
@@ -454,7 +455,7 @@ public class ColumnFilterForm extends AbstractForm {
         }
 
         @Order(10)
-        public class NumberFromField extends AbstractDoubleField {
+        public class NumberFromField extends AbstractBigDecimalField {
           @Override
           protected String getConfiguredLabel() {
             return ScoutTexts.get("from");
@@ -462,7 +463,7 @@ public class ColumnFilterForm extends AbstractForm {
         }
 
         @Order(20)
-        public class NumberToField extends AbstractDoubleField {
+        public class NumberToField extends AbstractBigDecimalField {
           @Override
           protected String getConfiguredLabel() {
             return ScoutTexts.get("to");
@@ -540,8 +541,8 @@ public class ColumnFilterForm extends AbstractForm {
           getNumberDetailBox().setVisible(true);
           setupNumberField(getNumberFromField(), getColumnFilter().getColumn());
           setupNumberField(getNumberToField(), getColumnFilter().getColumn());
-          getNumberFromField().setValue(TypeCastUtility.castValue(filter.getMinimumValue(), Double.class));
-          getNumberToField().setValue(TypeCastUtility.castValue(filter.getMaximumValue(), Double.class));
+          getNumberFromField().setValue(TypeCastUtility.castValue(filter.getMinimumValue(), BigDecimal.class));
+          getNumberToField().setValue(TypeCastUtility.castValue(filter.getMaximumValue(), BigDecimal.class));
         }
       }
     }

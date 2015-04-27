@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
-@ClassId("8fbfbf19-ff9d-4e89-8a78-8e6a4a8dc36c")
+@ClassId("8826a70c-d1d7-4156-bccb-74b23ba4fec7")
 public abstract class AbstractPlannerFieldOld<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractFormField implements IPlannerFieldOld<T, P, RI, AI> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPlannerFieldOld.class);
 

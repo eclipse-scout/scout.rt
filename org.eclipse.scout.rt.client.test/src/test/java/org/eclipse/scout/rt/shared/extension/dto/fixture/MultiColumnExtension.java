@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.annotations.Data;
 import org.eclipse.scout.commons.annotations.Extends;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.AbstractTableExtension;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDoubleColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigPageWithTable.Table;
 
@@ -36,8 +36,8 @@ public class MultiColumnExtension extends AbstractTableExtension<OrigPageWithTab
     return getOwner().getColumnSet().getColumnByClass(ThirdLongColumn.class);
   }
 
-  public FourthDoubleColumn getFourthDoubleColumn() {
-    return getOwner().getColumnSet().getColumnByClass(FourthDoubleColumn.class);
+  public FourthBigDecimalColumn getFourthBigDecimalColumn() {
+    return getOwner().getColumnSet().getColumnByClass(FourthBigDecimalColumn.class);
   }
 
   @Order(3000.0)
@@ -46,7 +46,7 @@ public class MultiColumnExtension extends AbstractTableExtension<OrigPageWithTab
   }
 
   @Order(4000.0)
-  public class FourthDoubleColumn extends AbstractDoubleColumn {
+  public class FourthBigDecimalColumn extends AbstractBigDecimalColumn {
 
   }
 }

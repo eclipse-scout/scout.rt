@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -37,9 +38,9 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractTimeField;
-import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
@@ -115,12 +116,12 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     HashMap<Integer, IComposerValueField> betweenMap = new HashMap<Integer, IComposerValueField>();
     betweenMap.put(IDataModelAttribute.TYPE_DATE, getFieldByClass(BetweenDateField.class));
     betweenMap.put(IDataModelAttribute.TYPE_DATE_TIME, getFieldByClass(BetweenDateTimeField.class));
-    betweenMap.put(IDataModelAttribute.TYPE_DOUBLE, getFieldByClass(BetweenDoubleField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_BIG_DECIMAL, getFieldByClass(BetweenBigDecimalField.class));
     betweenMap.put(IDataModelAttribute.TYPE_AGGREGATE_COUNT, getFieldByClass(BetweenIntegerField.class));
     betweenMap.put(IDataModelAttribute.TYPE_INTEGER, getFieldByClass(BetweenIntegerField.class));
     betweenMap.put(IDataModelAttribute.TYPE_LONG, getFieldByClass(BetweenLongField.class));
-    betweenMap.put(IDataModelAttribute.TYPE_PERCENT, getFieldByClass(BetweenDoubleField.class));
-    betweenMap.put(IDataModelAttribute.TYPE_PLAIN_DOUBLE, getFieldByClass(BetweenDoubleField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_PERCENT, getFieldByClass(BetweenBigDecimalField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_PLAIN_DOUBLE, getFieldByClass(BetweenBigDecimalField.class));
     betweenMap.put(IDataModelAttribute.TYPE_PLAIN_INTEGER, getFieldByClass(BetweenIntegerField.class));
     betweenMap.put(IDataModelAttribute.TYPE_PLAIN_LONG, getFieldByClass(BetweenLongField.class));
     betweenMap.put(IDataModelAttribute.TYPE_TIME, getFieldByClass(BetweenTimeField.class));
@@ -131,7 +132,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     HashMap<Integer, IComposerValueField> defaultMap = new HashMap<Integer, IComposerValueField>();
     defaultMap.put(IDataModelAttribute.TYPE_DATE, getFieldByClass(DateField.class));
     defaultMap.put(IDataModelAttribute.TYPE_DATE_TIME, getFieldByClass(DateTimeField.class));
-    defaultMap.put(IDataModelAttribute.TYPE_DOUBLE, getFieldByClass(DoubleField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_BIG_DECIMAL, getFieldByClass(BigDecimalField.class));
     defaultMap.put(IDataModelAttribute.TYPE_AGGREGATE_COUNT, getFieldByClass(IntegerField.class));
     defaultMap.put(IDataModelAttribute.TYPE_INTEGER, getFieldByClass(IntegerField.class));
     defaultMap.put(IDataModelAttribute.TYPE_NUMBER_LIST, getFieldByClass(ListBoxField.class));
@@ -139,8 +140,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     defaultMap.put(IDataModelAttribute.TYPE_CODE_LIST, getFieldByClass(ListBoxField.class));
     defaultMap.put(IDataModelAttribute.TYPE_CODE_TREE, getFieldByClass(TreeBoxField.class));
     defaultMap.put(IDataModelAttribute.TYPE_LONG, getFieldByClass(LongField.class));
-    defaultMap.put(IDataModelAttribute.TYPE_PERCENT, getFieldByClass(DoubleField.class));
-    defaultMap.put(IDataModelAttribute.TYPE_PLAIN_DOUBLE, getFieldByClass(DoubleField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_PERCENT, getFieldByClass(BigDecimalField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_PLAIN_DOUBLE, getFieldByClass(BigDecimalField.class));
     defaultMap.put(IDataModelAttribute.TYPE_PLAIN_INTEGER, getFieldByClass(IntegerField.class));
     defaultMap.put(IDataModelAttribute.TYPE_PLAIN_LONG, getFieldByClass(LongField.class));
     defaultMap.put(IDataModelAttribute.TYPE_STRING, getFieldByClass(StringField.class));
@@ -707,7 +708,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
   @Order(10)
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
-  public class DoubleField extends AbstractDoubleField implements IComposerValueField {
+  public class BigDecimalField extends AbstractBigDecimalField implements IComposerValueField {
     @Override
     public void addValueChangeListenerToTarget(PropertyChangeListener listener) {
       this.addPropertyChangeListener(listener);
@@ -721,7 +722,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List values) {
       switch (dataType) {
-        case IDataModelAttribute.TYPE_DOUBLE: {
+        case IDataModelAttribute.TYPE_BIG_DECIMAL: {
           setGroupingUsed(true);
           setPercent(false);
           break;
@@ -740,8 +741,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       try {
         @SuppressWarnings("unchecked")
         Object firstElement = CollectionUtility.firstElement(values);
-        if (firstElement instanceof Double) {
-          setValue((Double) firstElement);
+        if (firstElement instanceof BigDecimal) {
+          setValue((BigDecimal) firstElement);
         }
         else {
           setValue(null);
@@ -1244,13 +1245,13 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
   @Order(10)
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
-  public class BetweenDoubleField extends AbstractSequenceBox implements IComposerValueField {
+  public class BetweenBigDecimalField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
-    public class DoubleFromField extends AbstractDoubleField {
+    public class BigDecimalFromField extends AbstractBigDecimalField {
     }
 
     @Order(20)
-    public class DoubleToField extends AbstractDoubleField {
+    public class BigDecimalToField extends AbstractBigDecimalField {
     }
 
     @Override
@@ -1270,14 +1271,14 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List values) {
       try {
-        getFieldByClass(BetweenDoubleField.DoubleFromField.class).setValue(null);
-        getFieldByClass(BetweenDoubleField.DoubleToField.class).setValue(null);
+        getFieldByClass(BetweenBigDecimalField.BigDecimalFromField.class).setValue(null);
+        getFieldByClass(BetweenBigDecimalField.BigDecimalToField.class).setValue(null);
         if (values != null && values.size() == 2) {
-          if (values.get(0) instanceof Double) {
-            getFieldByClass(BetweenDoubleField.DoubleFromField.class).setValue((Double) values.get(0));
+          if (values.get(0) instanceof BigDecimal) {
+            getFieldByClass(BetweenBigDecimalField.BigDecimalFromField.class).setValue((BigDecimal) values.get(0));
           }
-          if (values.get(1) instanceof Double) {
-            getFieldByClass(BetweenDoubleField.DoubleToField.class).setValue((Double) values.get(1));
+          if (values.get(1) instanceof BigDecimal) {
+            getFieldByClass(BetweenBigDecimalField.BigDecimalToField.class).setValue((BigDecimal) values.get(1));
           }
         }
       }
@@ -1288,14 +1289,14 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public void clearSelectionContext() {
-      getFieldByClass(BetweenDoubleField.DoubleFromField.class).setValue(null);
-      getFieldByClass(BetweenDoubleField.DoubleToField.class).setValue(null);
+      getFieldByClass(BetweenBigDecimalField.BigDecimalFromField.class).setValue(null);
+      getFieldByClass(BetweenBigDecimalField.BigDecimalToField.class).setValue(null);
     }
 
     @Override
     public List<Object> getValues() {
-      Object a = getFieldByClass(BetweenDoubleField.DoubleFromField.class).getValue();
-      Object b = getFieldByClass(BetweenDoubleField.DoubleToField.class).getValue();
+      Object a = getFieldByClass(BetweenBigDecimalField.BigDecimalFromField.class).getValue();
+      Object b = getFieldByClass(BetweenBigDecimalField.BigDecimalToField.class).getValue();
       if (a == null && b == null) {
         return null;
       }
@@ -1304,8 +1305,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
 
     @Override
     public List<String> getTexts() {
-      String a = getFieldByClass(BetweenDoubleField.DoubleFromField.class).getDisplayText();
-      String b = getFieldByClass(BetweenDoubleField.DoubleToField.class).getDisplayText();
+      String a = getFieldByClass(BetweenBigDecimalField.BigDecimalFromField.class).getDisplayText();
+      String b = getFieldByClass(BetweenBigDecimalField.BigDecimalToField.class).getDisplayText();
       return CollectionUtility.arrayList(a, b);
     }
   }

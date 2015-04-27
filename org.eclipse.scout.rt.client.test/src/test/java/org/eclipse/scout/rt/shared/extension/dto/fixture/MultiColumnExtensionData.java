@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.annotation.Generated;
 
@@ -28,9 +29,9 @@ public class MultiColumnExtensionData implements Serializable {
 
   private static final long serialVersionUID = 1L;
   public static final String thirdLong = "thirdLong";
-  public static final String fourthDouble = "fourthDouble";
+  public static final String fourthBigDecimal = "fourthBigDecimal";
   private Long m_thirdLong;
-  private Double m_fourthDouble;
+  private BigDecimal m_fourthBigDecimal;
 
   public MultiColumnExtensionData() {
   }
@@ -43,11 +44,11 @@ public class MultiColumnExtensionData implements Serializable {
     m_thirdLong = thirdLong;
   }
 
-  public Double getFourthDouble() {
-    return m_fourthDouble;
+  public BigDecimal getFourthBigDecimal() {
+    return m_fourthBigDecimal;
   }
 
-  public void setFourthDouble(Double fourthDouble) {
-    m_fourthDouble = fourthDouble;
+  public void setFourthBigDecimal(BigDecimal fourthBigDecimal) {
+    m_fourthBigDecimal = fourthBigDecimal;
   }
 }

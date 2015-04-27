@@ -72,9 +72,9 @@ public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
 
   private void doTestMulti() throws Exception {
     Long EXT_TEST_VAL1_EXPORT = Long.valueOf(6);
-    Double EXT_TEST_VAL2_EXPORT = Double.valueOf(7);
+    BigDecimal EXT_TEST_VAL2_EXPORT = BigDecimal.valueOf(7);
     Long EXT_TEST_VAL1_IMPORT = Long.valueOf(8);
-    Double EXT_TEST_VAL2_IMPORT = Double.valueOf(9);
+    BigDecimal EXT_TEST_VAL2_IMPORT = BigDecimal.valueOf(9);
 
     // setup table
     OrigPageWithTable pwt = new OrigPageWithTable();
@@ -89,14 +89,15 @@ public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
     OrigPageWithTableData data = new OrigPageWithTableData();
     pwt.getTable().exportToTableBeanData(data);
     Assert.assertEquals(EXT_TEST_VAL1_EXPORT, data.getRows()[0].getContribution(MultiColumnExtensionData.class).getThirdLong());
-    Assert.assertEquals(EXT_TEST_VAL2_EXPORT, data.getRows()[0].getContribution(MultiColumnExtensionData.class).getFourthDouble());
+    Assert.assertEquals(EXT_TEST_VAL2_EXPORT, data.getRows()[0].getContribution(MultiColumnExtensionData.class).getFourthBigDecimal());
+    Assert.assertTrue(EXT_TEST_VAL2_EXPORT.compareTo((BigDecimal) data.getRows()[0].getContribution(MultiColumnExtensionData.class).getFourthBigDecimal()) == 0);
 
     // test import
     data.getRows()[0].getContribution(MultiColumnExtensionData.class).setThirdLong(EXT_TEST_VAL1_IMPORT);
-    data.getRows()[0].getContribution(MultiColumnExtensionData.class).setFourthDouble(EXT_TEST_VAL2_IMPORT);
+    data.getRows()[0].getContribution(MultiColumnExtensionData.class).setFourthBigDecimal(EXT_TEST_VAL2_IMPORT);
     pwt.getTable().importFromTableBeanData(data);
     Assert.assertEquals(EXT_TEST_VAL1_IMPORT, pwt.getTable().getRow(0).getCell(2).getValue());
-    Assert.assertEquals(EXT_TEST_VAL2_IMPORT, pwt.getTable().getRow(0).getCell(3).getValue());
+    Assert.assertTrue(EXT_TEST_VAL2_IMPORT.compareTo((BigDecimal) pwt.getTable().getRow(0).getCell(3).getValue()) == 0);
   }
 
   private void doTestSingle() throws Exception {

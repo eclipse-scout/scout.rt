@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,8 +20,8 @@ import org.eclipse.scout.commons.annotations.Extends;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.AbstractGroupBoxExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
-import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox;
 
 /**
@@ -30,7 +31,7 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigForm.MainBox;
 @Data(MultipleExtGroupBoxExtensionData.class)
 public class MultipleExtGroupBoxExtension extends AbstractGroupBoxExtension<MainBox> {
 
-  public static final Double DOUBLE_FIELD_ORIG_VAL = Double.valueOf(12.3);
+  public static final BigDecimal BIGDECIMAL_FIELD_ORIG_VAL = BigDecimal.valueOf(12.3);
   public static final Date DATE_FIELD_ORIG_VAL = getTestDate();
 
   public MultipleExtGroupBoxExtension(MainBox ownerBox) {
@@ -38,11 +39,11 @@ public class MultipleExtGroupBoxExtension extends AbstractGroupBoxExtension<Main
   }
 
   @Order(2000)
-  public class SecondDoubleField extends AbstractDoubleField {
+  public class SecondBigDecimalField extends AbstractBigDecimalField {
     @Override
     protected void execInitField() throws ProcessingException {
       super.execInitField();
-      setValue(DOUBLE_FIELD_ORIG_VAL);
+      setValue(BIGDECIMAL_FIELD_ORIG_VAL);
     }
   }
 

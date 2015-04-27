@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColu
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateTimeColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDoubleColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractObjectColumn;
@@ -149,7 +148,7 @@ public class TableUtilityTest {
     assertEquals("TestDateTimeColumn", columnNames[2]);
     assertEquals("TestTimeColumn", columnNames[3]);
     assertEquals("TestBigDecimalColumn", columnNames[4]);
-    assertEquals("TestDoubleColumn", columnNames[5]);
+    assertEquals("TestBigDecimalColumn2", columnNames[5]);
     assertEquals("TestIntegerColumn", columnNames[6]);
     assertEquals("TestLongColumn", columnNames[7]);
     assertEquals("TestObjectColumn", columnNames[8]);
@@ -198,7 +197,7 @@ public class TableUtilityTest {
     assertEquals(date, row1[2]);
     assertEquals(date, row1[3]);
     assertEquals(BigDecimal.valueOf(111.2233D), row1[4]);
-    assertEquals(111.223D, row1[5]);
+    assertEquals(BigDecimal.valueOf(111.223D), row1[5]);
     assertEquals(3333, row1[6]);
     assertEquals(4444L, row1[7]);
     assertNull(row1[8]); // no display text
@@ -215,7 +214,7 @@ public class TableUtilityTest {
     assertEquals(date, row2[2]);
     assertEquals(date, row2[3]);
     assertEquals(BigDecimal.valueOf(9999.8877D), row2[4]);
-    assertEquals(777.66D, row2[5]);
+    assertEquals(BigDecimal.valueOf(777.66D), row2[5]);
     assertEquals(6666, row2[6]);
     assertEquals(5555L, row2[7]);
     assertNull(row2[8]); // no display text
@@ -318,10 +317,10 @@ public class TableUtilityTest {
     }
 
     @Order(60)
-    public class DoubleColumn extends AbstractDoubleColumn {
+    public class BigDecimalColumn2 extends AbstractBigDecimalColumn {
       @Override
       protected String getConfiguredHeaderText() {
-        return "TestDoubleColumn";
+        return "TestBigDecimalColumn2";
       }
 
       @Override

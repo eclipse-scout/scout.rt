@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IProposalColumn;
@@ -37,7 +36,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
-import org.eclipse.scout.rt.client.ui.form.fields.doublefield.IDoubleField;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
@@ -86,9 +84,6 @@ public class ColumnFieldBuilder {
     if (column instanceof ISmartColumn) {
       return new SmartColumnField((ISmartColumn<?>) column);
     }
-    if (column instanceof IDoubleColumn) {
-      return new DoubleColumnField((IDoubleColumn) column);
-    }
     if (column instanceof IDateColumn) {
       return new DateColumnField((IDateColumn) column);
     }
@@ -121,9 +116,6 @@ public class ColumnFieldBuilder {
     }
     else if (column instanceof IProposalColumn && formField instanceof IProposalField) {
       return new ProposalColumnFieldPropertyDelegator((IProposalColumn) column, (IProposalField) formField);
-    }
-    else if (column instanceof IDoubleColumn && formField instanceof IDoubleField) {
-      return new DoubleColumnFieldPropertyDelegator((IDoubleColumn) column, (IDoubleField) formField);
     }
     else if (column instanceof IDateColumn && formField instanceof IDateField) {
       return new DateColumnFieldPropertyDelegator((IDateColumn) column, (IDateField) formField);

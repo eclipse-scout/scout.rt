@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
@@ -210,11 +209,6 @@ public final class TableUtility {
           byValue = true;
           format = ((IDateColumn) col).getFormat();
         }
-      }
-      else if (col instanceof IDoubleColumn) {
-        type = Double.class;
-        byValue = true;
-        format = ((IDoubleColumn) col).getFormat().toPattern();
       }
       else if (col instanceof IIntegerColumn) {
         type = Integer.class;
