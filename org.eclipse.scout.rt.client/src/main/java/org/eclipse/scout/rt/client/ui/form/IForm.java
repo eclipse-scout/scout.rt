@@ -227,6 +227,11 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
   boolean isFormLoading();
 
   /**
+   * Creates an empty form data.
+   */
+  AbstractFormData createFormData() throws ProcessingException;
+
+  /**
    * fill a FormData structure to be sent to the backend<br>
    * the configurator is creating typed subclasses of FormData and FormFieldData
    */

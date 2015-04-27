@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.Writer;
+import java.lang.reflect.Modifier;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -994,6 +995,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
+  public AbstractFormData createFormData() throws ProcessingException {
+    return interceptCreateFormData();
+  }
+
+  @Override
   public void exportFormData(final AbstractFormData target) throws ProcessingException {
     // locally declared form properties
     Map<String, Object> properties = BeanUtility.getProperties(this, AbstractForm.class, new FormDataPropertyFilter());
@@ -1388,8 +1394,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * <p>
    * May call {@link #setSearchFilter(SearchFilter)}
    * <p>
-   * Implement {@link #interceptCreateFormData()} to automatically attach a filled form data to the search filter (since
-   * 3.8).
+   * Attaches a filled form data to the search filter if {@link #execCreateFormData()} returns a value.
    *
    * @param searchFilter
    *          is never null
@@ -1405,7 +1410,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     interceptAddSearchTerms(searchFilter);
     // override may add form data
     try {
-      AbstractFormData data = interceptCreateFormData();
+      AbstractFormData data = createFormData();
       if (data != null) {
         exportFormData(data);
         getSearchFilter().setFormData(data);
@@ -1420,15 +1425,53 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Convenience to add form data to search filter and load/store form data.
-   * override this method to create an empty search form data that can be used for example by
-   * {@link #interceptResetSearchFilter(SearchFilter)}
+   * Creates an empty form data that can be used for example by {@link #interceptResetSearchFilter(SearchFilter)}.
+   * <p>
+   * The default creates a new instance based on the {@link FormData} annotation.
    *
    * @since 3.8
    */
   @ConfigOperation
   @Order(11)
   protected AbstractFormData execCreateFormData() throws ProcessingException {
+    Class<? extends AbstractFormData> formDataClass = getFormDataClass();
+    if (formDataClass == null) {
+      return null;
+    }
+    try {
+      return formDataClass.newInstance();
+    }
+    catch (InstantiationException | IllegalAccessException e) {
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + formDataClass.getName() + "'.", e));
+      return null;
+    }
+  }
+
+  protected Class<? extends AbstractFormData> getFormDataClass() {
+    FormData formDataAnnotation = getClass().getAnnotation(FormData.class);
+
+    //look in superclasses for annotation
+    Class<?> superclazz = getClass().getSuperclass();
+    while (formDataAnnotation == null && superclazz != null) {
+      formDataAnnotation = superclazz.getAnnotation(FormData.class);
+      superclazz = superclazz.getSuperclass();
+    }
+
+    if (formDataAnnotation == null) {
+      //no annotation found..
+      return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    Class<? extends AbstractFormData> formDataClass = formDataAnnotation.value();
+    if (formDataClass == null) {
+      return null;
+    }
+    if (AbstractFormData.class.isAssignableFrom(formDataClass)) {
+      if (!Modifier.isAbstract(formDataClass.getModifiers())) {
+        return formDataClass;
+      }
+    }
     return null;
   }
 
