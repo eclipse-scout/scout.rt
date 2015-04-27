@@ -1,5 +1,6 @@
 @planner-header-height: 45px;
 @planner-resource-minheight: 30px;
+@planner-resource-cell-width: 150px;
 
 .planner-icon(@icon, @size) {
   .font-icon;
@@ -18,31 +19,6 @@
   height: 100%;
   min-height: 400px;
   position: absolute;
-}
-
-.resource {
-  display: table-row;
-  white-space: nowrap;
-
-  &.selected {
-    background-color: lightblue;
-  }
-}
-
-.resource-cell {
-  display: table-cell;
-  vertical-align: middle;
-  min-height: @planner-resource-minheight;
-  padding: 8px;
-}
-
-.activity {
-  display: table-cell;
-  min-height: @planner-resource-minheight;
-  vertical-align: middle;
-  border-bottom: 1px solid black;
-  background-color: @palette-cyan-active;
-  padding: 8px;
 }
 
 .planner-header {
@@ -106,6 +82,11 @@
 
     & .planner-mode-month::before {
       .planner-icon("31", 20px);
+     }
+
+     & .planner-mode-year::before {
+      .planner-icon("365", 20px);
+      padding: 0 35px 0px 8px;
      }
 
     & .planner-toggle-year::before {
@@ -235,269 +216,105 @@
 
 }
 
-.planner-list-container {
-  display: inline-block;
-  width: 0%;
-  padding: 0;
-  height: calc(~"100%" - @planner-header-height);
-  background-color: @palette-white;
-  overflow: hidden;
+.planner-scale {
+  height: @planner-header-height;
+  border-bottom:  1px solid @palette-gray-6;
 
-  & .planner-list {
-    width: 270px;
-    padding: 0px 0px 0px 30px;
+  & .planner-scale-title {
     height: 100%;
+    float: left;
+    padding: 0px 10px;
+    font-size: 17px;
+    color: @palette-gray-4;
+    line-height: @calendar-header-height;
+    width: @planner-resource-cell-width;
+    border-right:  1px solid @palette-gray-6;
+  }
 
-    & .list-title {
+  & .timeline-large {
+    height: 50%;
+    float: right;
+    width: calc(~"100%" - @planner-resource-cell-width);
+    background-color: @palette-gray-8;
+    line-height: @calendar-header-height / 2;
+
+    & .scale-item {
+      display: inline-block;
       position: relative;
-      width: calc(~"100%" - 10px);
-      height: 45px;
-      line-height: 45px;
-      font-size: 17px;
-      color: @palette-gray-4;
+      padding: 0px 5px;
+    }
 
-      &:after{
-        position: absolute;
-        height: 1px;
-        width: 100%;
-        left: 0px;
-        bottom: -1px;
-        content: " ";
-        background-color: @palette-gray-6;
-      }
+    & .scale-item:after{
+      position: absolute;
+      height: 1000px;
+      width: 1px;
+      left: 0px;
+      top: 0px;
+      content: " ";
+      background-color: @palette-gray-6;
+      z-index: 2;
     }
   }
+
+  & .timeline-small {
+    height: 50%;
+    float: right;
+    width: calc(~"100%" - @planner-resource-cell-width);
+    //background-color: @palette-gray-8-5;
+    line-height: @calendar-header-height / 2;
+
+    & .scale-item {
+      display: inline-block;
+      position: relative;
+      padding: 0px 5px;
+    }
+
+    & .scale-item:after{
+      position: absolute;
+      height: 1000px;
+      width: 1px;
+      left: 0px;
+      top: 0px;
+      content: " ";
+      z-index: 1;
+      background-color: @palette-gray-7;
+    }
+  }
+
 }
 
 .planner-grid {
   display: inline-block;
-/*   width: 60%; */
-  height: calc(~"100%" - @planner-header-height);
+  height: calc(~"100%" - 2 * @planner-header-height);
   overflow: hidden;
   position: absolute;
-/*
-  & .calendar-week-header,
-  & .calendar-week {
-    display: block;
-    width: 100%;
-  }
 
-  & .calendar-week-header {
-    height: @calendar-header-height;
-  }
-
-  & .calendar-week {
-    position: relative;
-    height: calc(~"(100%" - @calendar-header-height ~") / 6");
-  }
-
-  & .calendar-week-name{
-    width: @calendar-header-height;
-  }
-
-  & .calendar-day-name,
-  & .calendar-week-name,
-  & .calendar-day {
-    position: relative;
-    display: inline-block;
-    overflow: hidden;
-    height: 100%;
-    text-align: center;
-    z-index: 2;
+  & .resource {
+    display: table-row;
+    white-space: nowrap;
 
     &.selected {
-      box-shadow:  1px 1px 10px -1px @selection-background-color;
+      background-color: lightblue;
     }
   }
 
-  & .calendar-day {
-    padding: 0px;
-  }
-
-  & .calendar-week-name {
-    font-size: 10px;
-    color: @palette-gray-6;
+  & .resource-cell {
+    display: table-cell;
     vertical-align: middle;
+    min-height: @planner-resource-minheight;
+    padding: 8px;
+    width: @planner-resource-cell-width;
   }
 
-  & .calendar-day::after,
-  & .calendar-day-name::after{
-    position: absolute;
-    width: 1px;
-    height: 100%;
-    left: 0px;
-    top: 0px;
-    content: " ";
-    background-color: @palette-gray-6;
+  & .activity {
+    display: table-cell;
+    min-height: @planner-resource-minheight;
+    vertical-align: middle;
+    border-bottom: 1px solid black;
+    background-color: @palette-cyan-active;
+    padding: 8px;
   }
-
-  & .calendar-week::after{
-    position: absolute;
-    height: 1px;
-    width: 100%;
-    left: 0px;
-    top: 0px;
-    content: " ";
-    background-color: @palette-gray-6;
-  }
-
-
-  & .calendar-day-name {
-    line-height: @calendar-header-height;
-    color: @palette-gray-4;
-  }
-
-  & .calendar-day::before {
-    position: absolute;
-    font-size: 17px;
-    content: attr(data-day-name);
-    color: @palette-gray-4;
-    left: 7px;
-    top: 5px;
-    z-index: 2;
-  }
-
-  & .out::before {
-    color: @palette-gray-6;
-  }
-
-  & .weekend::before {
-    color: @palette-bsi-normal;
-  }
-
-  & .weekend-out::before {
-    color: @palette-bsi-disabled;
-  }
-
-  & .now::before {
-    color: @palette-orange-normal;
-  }
-
-  & .calendar-week-axis {
-    position: absolute;
-    left: @calendar-header-height - 6px;
-    width:  calc(~"100%" - 8px);
-  }
-
-  & .calendar-week-axis::after {
-    position: absolute;
-    height: 1px;
-    width: 100%;
-    content: " ";
-    background-color: @palette-gray-8;
-  }
-
-  & .calendar-week-axis::before {
-    position: absolute;
-    font-size: 10px;
-    top: -5px;
-    left: -30px;
-    color: @palette-gray-6;
-    content: attr(data-axis-name);
-   }
-
-  & .calendar-week-task {
-    position: absolute;
-    left: 0px;
-    width:  100%;
-  }
-
-  & .calendar-week-task::after {
-    position: absolute;
-    height: 1px;
-    width: 100%;
-    content: " ";
-    background-color: @palette-gray-6;
-  }
-
-  & .calendar-week-task::before {
-    position: absolute;
-    font-size: 10px;
-    top: 5px;
-    left: 9px;
-    color: @palette-gray-6;
-    content: attr(data-axis-name);
-  }
-
-  & .calendar-component {
-    position: relative;
-    float: left;
-    font-size: 10px;
-    line-height: 20px;
-    height: 20px;
-    padding-left: 4px;
-    .overflow-ellipsis;
-    min-height: 20px;
-    margin-left: 32px;
-    width: calc(~"100%" - 38px);
-    background-color: @palette-orange-background;
-    margin-bottom: -3px;
-    border-left: 4px solid @palette-orange-disabled;
-    text-align: left;
-    margin-top: 6px;
-
-    &.many-items {
-      width: calc(~"50%" - 38px);
-      margin-right: -20px;
-    }
-
-    & .component-link {
-      position: absolute;
-      top: 0px;
-      right: 6px;
-      cursor: pointer;
-
-      &:hover{
-        color: @hover-color;
-      }
-    }
-  }
-
-  & .component-day,
-  & .component-task {
-    position: absolute;
-    word-break: break-all;
-    left: 7px;
-    border-style: wave;
-    margin-left: 0px;
-    width: calc(~"100%" - 14px);
-   }
-
-  & .component-open-top {
-    overflow: visible !important;
-    padding-top: 10px;
-
-    & .component-link {
-      top: 10px;
-    }
-
-
-    &:before {
-      position: absolute;
-      display: block;
-      content: "";
-      width: 16px;
-      height: 16px;
-      left: calc(~"50%" - 8px);
-      top: -10px;
-      transform: rotate(45deg);
-      background-color: @palette-white;
-    }
-  }
-
-  & .component-open-bottom {
-    overflow: visible !important;
-
-    &:after {
-      position: absolute;
-      display: block;
-      content: "";
-      width: 16px;
-      height: 16px;
-      left: calc(~"50%" - 8px);
-      bottom: -10px;
-      transform: rotate(45deg);
-      background-color: inherit;
-    }
-  }*/
 }
+
+
+

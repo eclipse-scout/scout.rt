@@ -12,20 +12,16 @@ scout.Planner = function() {
   this.$modes;
   this.$year;
   this.$grid;
-  this.$list;
 
   // mode
   this.DAY = 1;
   this.WEEK = 2;
   this.MONTH = 3;
   this.WORK = 4;
+  this.YEAR = 5;
 
   // additional modes; should be stored in model
   this.showYear = false;
-  this.showList = false;
-
-  // adapter
-  //this._addAdapterProperties(['days', 'selectedDays']);
 };
 scout.inherits(scout.Planner, scout.ModelAdapter);
 
@@ -55,10 +51,10 @@ scout.Planner.prototype._render = function($parent) {
 
   // main elements
   this.$header = this.$container.appendDiv('planner-header');
+  this.$scale = this.$container.appendDiv('planner-scale');
   this.$year = this.$container.appendDiv('planner-year-container').appendDiv('planner-year');
   this.$grid = this.$container.appendDiv('planner-grid');
   scout.scrollbars.install(this.$grid);
-  this.$list = this.$container.appendDiv('planner-list-container').appendDiv('planner-list');
 
   // header contains all controls
   this.$range = this.$header.appendDiv('planner-range');
@@ -74,9 +70,9 @@ scout.Planner.prototype._render = function($parent) {
   this.$commands.appendDiv('planner-mode-work planner-mode').attr('data-mode', this.WORK).click(this._onClickMode.bind(this));
   this.$commands.appendDiv('planner-mode-week planner-mode').attr('data-mode', this.WEEK).click(this._onClickMode.bind(this));
   this.$commands.appendDiv('planner-mode-month planner-mode').attr('data-mode', this.MONTH).click(this._onClickMode.bind(this));
+  this.$commands.appendDiv('planner-mode-year planner-mode').attr('data-mode', this.YEAR).click(this._onClickMode.bind(this));
   this.$commands.appendDiv('planner-separator');
   this.$commands.appendDiv('planner-toggle-year').click(this._onClickYear.bind(this));
-  this.$commands.appendDiv('planner-toggle-list').click(this._onClickList.bind(this));
 
   // should be done by server?
   this.displayMode = this.MONTH;
@@ -159,32 +155,6 @@ scout.Planner.prototype._onClickYear = function(event) {
   // update screen
   this._updateScreen();
 };
-scout.Planner.prototype._onClickList = function(event) {
-  // set flag
-  this.showList = !this.showList;
-
-  // update screen
-  this._updateScreen();
-};
-
-scout.Planner.prototype._onClickDay = function(event) {
-  var $clicked = $(event.currentTarget);
-
-  // select clicked day
-  $('.selected', this.$grid).select(false);
-  $clicked.select(true);
-  this.selected = $clicked.data('date');
-
-  // change selected day in year picker
-  this.colorYear();
-
-  // if day list shown, redraw it
-  if (this.showList) {
-    this.$list.empty();
-    this.drawList();
-  }
-
-};
 
 /* --  set display mode and range ------------------------------------- */
 
@@ -196,7 +166,150 @@ scout.Planner.prototype._updateScreen = function() {
   }
   this._renderResources();
   this._renderSelectedResources();
+
+  // select mode
+  $('.planner-mode', this.$commands).select(false);
+  $("[data-mode='" + this.displayMode +"']", this.$modes).select(true);
+
+  // find range, should be part of model?
+  this.startDate = scout.dates.parseJsonDate(this.days[0]);
+  this.endDate = scout.dates.parseJsonDate(this.days[this.days.length - 1]);
+
+  // testdata - mdoe = year
+  if (this.displayMode === this.DAY) {
+    this.startDate = scout.dates.parseJsonDate("2015-04-01 00:00:00.000");
+    this.endDate = scout.dates.parseJsonDate("2015-04-01 00:00:00.000");
+  } else if (this.displayMode ===  this.WORK) {
+    this.startDate = scout.dates.parseJsonDate("2015-03-30 00:00:00.000");
+    this.endDate = scout.dates.parseJsonDate("2015-04-03 00:00:00.000");
+  } else if  (this.displayMode ===  this.WEEK) {
+    this.startDate = scout.dates.parseJsonDate("2015-03-30 00:00:00.000");
+    this.endDate = scout.dates.parseJsonDate("2015-04-05 00:00:00.000");
+  } else if (this.displayMode === this.MONTH) {
+    this.startDate = scout.dates.parseJsonDate("2015-07-01 00:00:00.000");
+    this.endDate = scout.dates.parseJsonDate("2016-02-01 00:00:00.000");
+  } else if (this.displayMode === this.YEAR) {
+    this.startDate = scout.dates.parseJsonDate("2015-04-01 00:00:00.000");
+    this.endDate = scout.dates.parseJsonDate("2016-03-01 00:00:00.000");
+  }
+
+  // update
+  this._layoutRange();
+  this._layoutScale();
+
+  // if year shown and changed, redraw year
+  if (this.showYear) {
+    this.$year.empty();
+    this.drawYear();
+  }
+
+  // color year
+  this.colorYear();
 };
+
+scout.Planner.prototype._layoutRange = function() {
+  var text,
+    toText = ' bis ';
+
+  // find range text
+  if (scout.dates.isSameDay(this.startDate, this.endDate)) {
+    text = this._dateFormat(this.startDate, 'd. MMMM yyyy');
+  } else if (this.startDate.getMonth() == this.endDate.getMonth()) {
+    text = this._dateFormat(this.startDate, 'd.') + toText + this._dateFormat(this.endDate, 'd. MMMM yyyy');
+  } else if (this.startDate.getFullYear() === this.endDate.getFullYear()) {
+    if (this.displayMode === this.MONTH || this.displayMode === this.YEAR) {
+      text = this._dateFormat(this.startDate, 'MMMM yyyy') + toText + this._dateFormat(this.endDate, 'MMMM yyyy');
+    } else {
+      text = this._dateFormat(this.startDate, 'd.  MMMM') + toText + this._dateFormat(this.endDate, 'd. MMMM yyyy');
+    }
+  } else {
+    if (this.displayMode === this.MONTH || this.displayMode === this.YEAR) {
+      text = this._dateFormat(this.startDate, 'MMMM yyyy') + toText + this._dateFormat(this.endDate, 'MMMM yyyy');
+    } else {
+      text = this._dateFormat(this.startDate, 'd.  MMMM yyyy') +toText + this._dateFormat(this.endDate, 'd. MMMM yyyy');
+    }
+  }
+
+  // set text
+  $('.planner-select', this.$range).text(text);
+};
+
+scout.Planner.prototype._layoutScale  = function() {
+  var $timelineLarge,
+    $timelineSmall;
+
+  // empty scale
+  this.$scale.empty();
+
+  // append main elements
+  this.$scale.appendDiv('planner-scale-title', "Titel");
+  $timelineLarge = this.$scale.appendDiv('timeline-large');
+  $timelineSmall = this.$scale.appendDiv('timeline-small');
+
+  // fill timeline large depending on mode
+  // TODO: depending on screen size: smaller or large representation
+  if (this.displayMode === this.DAY) {
+    // hours
+    // minute
+  } else if (this.displayMode ===  this.WORK) {
+    // days
+    // hours
+  } else if  (this.displayMode ===  this.WEEK) {
+    // days
+    // hours
+  } else if (this.displayMode === this.MONTH) {
+    var week = new Date(this.startDate.valueOf());
+
+    // from start to end
+    while (week <= this.endDate) {
+      if ((week.getDate() < 8 ) || (week.valueOf() == this.startDate.valueOf())) {
+        if ((week.getMonth() === 0) || (week.valueOf() == this.startDate.valueOf())) {
+          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(week, 'MMMM yyyy')).data('count', 0);
+        } else {
+          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(week, 'MMMM')).data('count', 0);
+        }
+      }
+
+      $timelineSmall.appendDiv('scale-item', scout.dates.weekInYear(week));
+      week.setDate(week.getDate() + 7);
+      $divLarge.data('count', $divLarge.data('count') + 1);
+    }
+
+    // set sizes
+    var w = 100 / $timelineSmall.children().length;
+    $timelineLarge.children().each(function () {
+      $(this).css('width', $(this).data('count') * w + '%');
+    });
+    $timelineSmall.children().css('width', w + '%');
+
+  } else if (this.displayMode === this.YEAR) {
+    var month = new Date(this.startDate.valueOf()),
+      $divLarge;
+
+    // from start to end
+    while (month <= this.endDate) {
+      if ((month.getMonth() === 0) || (month.valueOf() == this.startDate.valueOf())) {
+        $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(month, 'yyyy')).data('count', 0);
+      }
+
+      $timelineSmall.appendDiv('scale-item', this._dateFormat(month, 'MMMM'));
+      month.setMonth(month.getMonth() + 1);
+      $divLarge.data('count', $divLarge.data('count') + 1);
+    }
+
+    // set sizes
+    var w = 100 / $timelineSmall.children().length;
+    $timelineLarge.children().each(function () {
+      $(this).css('width', $(this).data('count') * w + '%');
+    });
+    $timelineSmall.children().css('width', w + '%');
+  }
+
+
+};
+
+
+/* --  render essources, activities --------------------------------- */
 
 scout.Planner.prototype._removeAllResources = function() {
   this.resources.forEach(function(resource) {
@@ -405,6 +518,18 @@ scout.Planner.prototype._onYearHoverOut = function(event) {
   // remove all hover effects
   $('.year-day.year-hover, .year-day.year-hover-day', this.$year).removeClass('year-hover year-hover-day');
 };
+
+/* -- helper ---------------------------------------------------- */
+
+scout.Planner.prototype._dateFormat = function(date, pattern) {
+  var d = new Date(date.valueOf()),
+    dateFormat = new scout.DateFormat(this.session.locale, pattern);
+
+  return dateFormat.format(d);
+};
+
+
+/* -----------  Scout  -------------------------------*/
 
 scout.Planner.prototype._onResourceMousedown = function(event) {
   var $resource = $(event.delegateTarget),

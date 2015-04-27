@@ -121,13 +121,13 @@
     & .year-title {
       position: relative;
       width: calc(~"100%" - 20px);
-      height: 45px;
+      height: @calendar-header-height;
     }
 
     & .year-title-item {
       display: inline-block;
       padding-right: 15px;
-      line-height: 45px;
+      line-height: @calendar-header-height;
       font-size: 17px;
       color: @palette-gray-6;
       cursor: pointer;
@@ -225,8 +225,8 @@
     & .list-title {
       position: relative;
       width: calc(~"100%" - 10px);
-      height: 45px;
-      line-height: 45px;
+      height: @calendar-header-height;
+      line-height: @calendar-header-height;
       font-size: 17px;
       color: @palette-gray-4;
 

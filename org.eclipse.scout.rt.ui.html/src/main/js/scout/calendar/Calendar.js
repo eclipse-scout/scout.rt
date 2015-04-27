@@ -386,7 +386,7 @@ scout.Calendar.prototype.layoutLabel = function() {
     } else if (this.start.getFullYear() === this.end.getFullYear()) {
       text = this._dateFormat(this.start, 'd. MMMM') + ' bis ' + this._dateFormat(this.end, 'd. MMMM yyyy');
     } else {
-      text = this._dateFormat(this.start, 'd. MMMM') + ' bis ' + this._dateFormat(this.end, 'd. MMMM yyyy');
+      text = this._dateFormat(this.start, 'd. MMMM yyyy') + ' bis ' + this._dateFormat(this.end, 'd. MMMM yyyy');
     }
   } else if (this.displayMode === this.MONTH ) {
     text = this._dateFormat(this.start, 'MMMM yyyy');
