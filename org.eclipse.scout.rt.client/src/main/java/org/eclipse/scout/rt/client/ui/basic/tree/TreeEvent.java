@@ -46,6 +46,10 @@ public class TreeEvent extends EventObject implements IModelEvent {
    */
   public static final int TYPE_NODES_DELETED = 30;
   /**
+   * no attributes
+   */
+  public static final int TYPE_ALL_NODES_DELETED = 31;
+  /**
    * valid attributes are nodes, deselectedNodes parentNode is null
    */
   public static final int TYPE_BEFORE_NODES_SELECTED = 35;

@@ -248,7 +248,43 @@ public class TreeEventBufferTest {
     assertEquals(5, coalesced.size());
   }
 
-  @SuppressWarnings("unused")
+  /**
+   * "Delete all" removes all node related events
+   */
+  @Test
+  public void testInsertDeleteAllInsert() {
+    final TreeEvent e1 = mockEvent(TreeEvent.TYPE_NODES_INSERTED, "A", "B", "C");
+    final TreeEvent e2 = mockEvent(TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, "C", "B", "A");
+    final TreeEvent e3 = mockEvent(TreeEvent.TYPE_REQUEST_FOCUS);
+    final TreeEvent e4 = mockEvent(TreeEvent.TYPE_NODES_UPDATED, "B");
+    final TreeEvent e5 = mockEvent(TreeEvent.TYPE_NODES_UPDATED, "C", "D");
+    final TreeEvent e6 = mockEvent(TreeEvent.TYPE_NODES_DELETED, "B");
+    final TreeEvent e7 = mockEvent(TreeEvent.TYPE_ALL_NODES_DELETED);
+    final TreeEvent e8 = mockEvent(TreeEvent.TYPE_NODES_INSERTED, "B");
+    final TreeEvent e9 = mockEvent(TreeEvent.TYPE_ALL_NODES_DELETED);
+    final TreeEvent e10 = mockEvent(TreeEvent.TYPE_NODES_INSERTED, "B");
+    final TreeEvent e11 = mockEvent(TreeEvent.TYPE_NODES_INSERTED, "C");
+    m_testBuffer.add(e1);
+    m_testBuffer.add(e2);
+    m_testBuffer.add(e3);
+    m_testBuffer.add(e4);
+    m_testBuffer.add(e5);
+    m_testBuffer.add(e6);
+    m_testBuffer.add(e7);
+    m_testBuffer.add(e8);
+    m_testBuffer.add(e9);
+    m_testBuffer.add(e10);
+    m_testBuffer.add(e11);
+    final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(3, coalesced.size());
+    assertEquals(TreeEvent.TYPE_REQUEST_FOCUS, coalesced.get(0).getType());
+    assertEquals(0, coalesced.get(0).getNodes().size());
+    assertEquals(TreeEvent.TYPE_ALL_NODES_DELETED, coalesced.get(1).getType());
+    assertEquals(0, coalesced.get(1).getNodes().size());
+    assertEquals(TreeEvent.TYPE_NODES_INSERTED, coalesced.get(2).getType());
+    assertEquals(2, coalesced.get(2).getNodes().size());
+  }
+
   private TreeEvent mockEvent(int type) {
     return mockEvent(type, 0);
   }

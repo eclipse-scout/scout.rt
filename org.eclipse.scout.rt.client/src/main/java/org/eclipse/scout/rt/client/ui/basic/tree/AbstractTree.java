@@ -1463,13 +1463,17 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       setTreeChanging(true);
       //
       parent = resolveNode(parent);
+      List<ITreeNode> newChildren = new ArrayList<ITreeNode>(children);
+      // Fire NODES_INSERTED event before actually inserting the nodes, because during insertion, other events might occur (e.g. NODE_CHANGED in decorateCell())
+      fireNodesInserted(parent, newChildren);
+      //
       ((AbstractTreeNode) parent).addChildNodesInternal(startIndex, children, true);
       // check if all children were added, or if some were revoked using
       // visible=false in init (addNotify) phase.
-      List<ITreeNode> newChildren = new ArrayList<ITreeNode>();
-      for (ITreeNode child : children) {
-        if (child.getParentNode() != null) {
-          newChildren.add(child);
+      for (Iterator<ITreeNode> it = newChildren.iterator(); it.hasNext();) {
+        ITreeNode child = it.next();
+        if (child.getParentNode() == null) {
+          it.remove();
         }
       }
       // decorate
@@ -1484,7 +1488,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       for (ITreeNode child : newChildren) {
         applyNodeFiltersRecInternal(child, parent.isFilterAccepted(), level);
       }
-      fireNodesInserted(parent, newChildren);
     }
     finally {
       setTreeChanging(false);
@@ -1591,6 +1594,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   public void removeAllChildNodes(ITreeNode parent) {
     if (parent != null) {
       removeChildNodes(parent, parent.getChildNodes());
+      if (parent == getRootNode()) {
+        fireAllNodesDeleted();
+      }
     }
   }
 
@@ -2201,6 +2207,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if (CollectionUtility.hasElements(children)) {
       fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODES_DELETED, parent, children));
     }
+  }
+
+  private void fireAllNodesDeleted() {
+    if (getRootNode() != null && getRootNode().isInitializing()) {
+      return;
+    }
+    fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_ALL_NODES_DELETED));
   }
 
   private void fireChildNodeOrderChanged(ITreeNode parent, List<? extends ITreeNode> children) {
