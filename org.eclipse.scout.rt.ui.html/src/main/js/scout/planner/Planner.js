@@ -226,11 +226,11 @@ scout.Planner.prototype._layoutRange = function() {
   // set text
   $('.planner-select', this.$range).text(text);
 };
-
 scout.Planner.prototype._layoutScale  = function() {
   var $timelineLarge,
     $timelineSmall,
-    width;
+    loop,
+    $divLarge;
 
   // empty scale
   this.$scale.empty();
@@ -243,63 +243,79 @@ scout.Planner.prototype._layoutScale  = function() {
   // fill timeline large depending on mode
   // TODO: depending on screen size: smaller or large representation
   if (this.displayMode === this.DAY) {
-    // hours
-    // minute
-  } else if (this.displayMode ===  this.WORK) {
-    // days
-    // hours
-  } else if  (this.displayMode ===  this.WEEK) {
-    // days
-    // hours
-  } else if (this.displayMode === this.MONTH) {
-    var week = new Date(this.viewRange.from.valueOf());
+    loop = new Date(this.startDate.valueOf());
 
     // from start to end
-    while (week <= this.viewRange.to) {
-      if ((week.getDate() < 8 ) || (week.valueOf() == this.viewRange.from.valueOf())) {
-        if ((week.getMonth() === 0) || (week.valueOf() == this.viewRange.from.valueOf())) {
-          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(week, 'MMMM yyyy')).data('count', 0);
+    while (loop < this.endDate) {
+      if ((loop.getMinutes() === 0) || (loop.valueOf() == this.startDate.valueOf())) {
+        $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'HH')).data('count', 0);
+      }
+
+      $timelineSmall.appendDiv('scale-item', this._dateFormat(loop, ':mm'));
+      loop.setMinutes(loop.getMinutes() + 30);
+      $divLarge.data('count', $divLarge.data('count') + 1);
+    }
+  } else if ((this.displayMode === this.WORK) || (this.displayMode === this.WEEK)) {
+    loop = new Date(this.startDate.valueOf());
+
+    // from start to end
+    while (loop < this.endDate) {
+      if ((loop.getHours() === 0) || (loop.valueOf() == this.startDate.valueOf())) {
+        if ((loop.getMonth() === 0) || (loop.valueOf() == this.startDate.valueOf())) {
+          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'd. MMMM yyyy')).data('count', 0);
+        } else if (loop.getDate() === 1) {
+          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'd. MMM')).data('count', 0);
         } else {
-          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(week, 'MMMM')).data('count', 0);
+          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'd.')).data('count', 0);
         }
       }
 
-      $timelineSmall.appendDiv('scale-item', scout.dates.weekInYear(week));
-      week.setDate(week.getDate() + 7);
+      $timelineSmall.appendDiv('scale-item', this._dateFormat(loop, 'HH:mm'));
+      loop.setHours(loop.getHours() + 6);
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
 
-    // set sizes
-    width = 100 / $timelineSmall.children().length;
-    $timelineLarge.children().each(function () {
-      $(this).css('width', $(this).data('count') * width + '%');
-    });
-    $timelineSmall.children().css('width', width + '%');
-
-  } else if (this.displayMode === this.YEAR) {
-    var month = new Date(this.viewRange.from.valueOf()),
-      $divLarge;
+  } else if (this.displayMode === this.MONTH) {
+    loop = new Date(this.startDate.valueOf());
 
     // from start to end
-    while (month <= this.viewRange.to) {
-      if ((month.getMonth() === 0) || (month.valueOf() == this.viewRange.from.valueOf())) {
-        $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(month, 'yyyy')).data('count', 0);
+    while (loop < this.endDate) {
+      if ((loop.getDate() < 8 ) || (loop.valueOf() == this.startDate.valueOf())) {
+        if ((loop.getMonth() === 0) || (loop.valueOf() == this.startDate.valueOf())) {
+          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM yyyy')).data('count', 0);
+        } else {
+          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM')).data('count', 0);
+        }
       }
 
-      $timelineSmall.appendDiv('scale-item', this._dateFormat(month, 'MMMM'));
-      month.setMonth(month.getMonth() + 1);
+      $timelineSmall.appendDiv('scale-item', scout.dates.weekInYear(loop));
+      loop.setDate(loop.getDate() + 7);
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
 
-    // set sizes
-    width = 100 / $timelineSmall.children().length;
-    $timelineLarge.children().each(function () {
-      $(this).css('width', $(this).data('count') * width + '%');
-    });
-    $timelineSmall.children().css('width', width + '%');
-  }
-};
+  } else if (this.displayMode === this.YEAR) {
+    loop = new Date(this.startDate.valueOf());
 
+    // from start to end
+    while (loop < this.endDate) {
+      if ((loop.getMonth() === 0) || (loop.valueOf() == this.startDate.valueOf())) {
+        $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'yyyy')).data('count', 0);
+      }
+
+      $timelineSmall.appendDiv('scale-item', this._dateFormat(loop, 'MMMM'));
+      loop.setMonth(loop.getMonth() + 1);
+      $divLarge.data('count', $divLarge.data('count') + 1);
+    }
+  }
+
+  // set sizes
+  var w = 100 / $timelineSmall.children().length;
+  $timelineLarge.children().each(function () {
+    $(this).css('width', $(this).data('count') * w + '%');
+  });
+  $timelineSmall.children().css('width', w + '%');
+
+};
 
 /* --  render essources, activities --------------------------------- */
 
