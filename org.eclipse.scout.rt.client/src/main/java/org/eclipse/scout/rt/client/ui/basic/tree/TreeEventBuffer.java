@@ -56,11 +56,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       TreeEvent event = events.get(i);
 
       int type = event.getType();
-      if (type == TreeEvent.TYPE_ALL_NODES_DELETED) {
-        //remove all previous row related events
-        remove(getNodeRelatedEvents(), events.subList(0, i));
-      }
-      else if (isIgnorePrevious(type)) {
+      if (isIgnorePrevious(type)) {
         //remove all previous events of the same type
         remove(type, events.subList(0, i));
       }
@@ -267,33 +263,6 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         it.remove();
       }
     }
-  }
-
-  protected List<Integer> getNodeRelatedEvents() {
-    List<Integer> res = new ArrayList<>();
-    res.add(TreeEvent.TYPE_NODES_INSERTED);
-    res.add(TreeEvent.TYPE_NODES_UPDATED);
-    res.add(TreeEvent.TYPE_NODES_DELETED);
-    res.add(TreeEvent.TYPE_ALL_NODES_DELETED);
-    res.add(TreeEvent.TYPE_BEFORE_NODES_SELECTED);
-    res.add(TreeEvent.TYPE_NODES_SELECTED);
-    res.add(TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED);
-    res.add(TreeEvent.TYPE_NODE_EXPANDED);
-    res.add(TreeEvent.TYPE_NODE_COLLAPSED);
-    res.add(TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE);
-    res.add(TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE);
-    res.add(TreeEvent.TYPE_NODE_ACTION);
-    res.add(TreeEvent.TYPE_NODES_DRAG_REQUEST);
-    res.add(TreeEvent.TYPE_DRAG_FINISHED);
-    res.add(TreeEvent.TYPE_NODE_DROP_ACTION);
-    res.add(TreeEvent.TYPE_NODE_REQUEST_FOCUS);
-    res.add(TreeEvent.TYPE_NODE_ENSURE_VISIBLE);
-    res.add(TreeEvent.TYPE_NODE_CLICK);
-    res.add(TreeEvent.TYPE_SCROLL_TO_SELECTION);
-    res.add(TreeEvent.TYPE_NODE_CHANGED);
-    res.add(TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED);
-    res.add(TreeEvent.TYPE_NODES_CHECKED);
-    return res;
   }
 
   protected List<Integer> getExpansionRelatedEvents() {

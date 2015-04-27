@@ -1583,7 +1583,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       for (ITreeNode child : parent.getChildNodes()) {
         applyNodeFiltersRecInternal(child, parent.isFilterAccepted(), level);
       }
-      fireNodesDeleted(parent, children);
+      if (parent.getChildNodeCount() == 0) {
+        fireAllChildNodesDeleted(parent, children);
+      }
+      else {
+        fireNodesDeleted(parent, children);
+      }
     }
     finally {
       setTreeChanging(false);
@@ -1594,9 +1599,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   public void removeAllChildNodes(ITreeNode parent) {
     if (parent != null) {
       removeChildNodes(parent, parent.getChildNodes());
-      if (parent == getRootNode()) {
-        fireAllNodesDeleted();
-      }
     }
   }
 
@@ -2209,11 +2211,14 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
-  private void fireAllNodesDeleted() {
-    if (getRootNode() != null && getRootNode().isInitializing()) {
+  private void fireAllChildNodesDeleted(ITreeNode parent, Collection<? extends ITreeNode> children) {
+    if (parent != null && parent.isInitializing()) {
       return;
     }
-    fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_ALL_NODES_DELETED));
+    filterInitializingTreeNodes(children);
+    if (CollectionUtility.hasElements(children)) {
+      fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, parent, children));
+    }
   }
 
   private void fireChildNodeOrderChanged(ITreeNode parent, List<? extends ITreeNode> children) {
