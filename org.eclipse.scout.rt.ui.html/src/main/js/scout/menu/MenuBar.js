@@ -3,6 +3,7 @@ scout.MenuBar = function($parent, position, orderFunc) {
   this.orderFunc = orderFunc;
   this.menuItems = [];
   this.$parent = $parent;
+  this.keyStrokeAdapter;
 
   // Create a menubar container and add it to the parent, but don't show it yet. It will
   // be shown automatically when items are added to the menubar, see updateVisibility().
@@ -47,6 +48,19 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
   this._renderMenuItems(orderedMenuItems.left, false);
   this._renderMenuItems(orderedMenuItems.right, true);
 
+  //Add tabindex to first valid MenuItem
+  for (var i = 0; i < this.menuItems.length; i++) {
+    var actualItem = this.menuItems[i];
+    if ((actualItem instanceof scout.Button || (actualItem instanceof scout.Menu && !actualItem.separator)) && actualItem.visible && actualItem.enabled) {
+      if (actualItem instanceof scout.Button) {
+        actualItem.$field.attr('tabindex', 0);
+      } else {
+        actualItem.$container.attr('tabindex', 0);
+      }
+      break;
+    }
+  }
+
   // Fix for Firefox issue with float:right. In Firefox elements with float:right must
   // come first in the HTML order of elements. Otherwise a strange layout bug occurs.
   this.$container.children('.right-aligned').detach().prependTo(this.$container);
@@ -73,6 +87,11 @@ scout.MenuBar.prototype.updateVisibility = function() {
     if (htmlComp) {
       htmlComp.invalidateTree();
     }
+    if (this.$container.isVisible()) {
+      this._registerKeyStrokeAdapter();
+    } else {
+      this._unregisterKeyStrokeAdapter();
+    }
   }
 };
 
@@ -87,8 +106,27 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     item.tooltipPosition = tooltipPosition;
     item.render(this.$container);
     item.$container.removeClass('form-field');
+    if(item instanceof scout.Button){
+      item.$field.removeAttr('tabindex');
+    }
+    else{
+      item.$container.removeAttr('tabindex');
+    }
     if (right) {
       item.$container.addClass('right-aligned');
     }
   }.bind(this));
+};
+
+scout.MenuBar.prototype._registerKeyStrokeAdapter = function() {
+  if (!this.keyStrokeAdapter) {
+    this.keyStrokeAdapter = new scout.MenuBarKeyStrokeAdapter(this);
+  }
+  scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+};
+
+scout.MenuBar.prototype._unregisterKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter) {
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
+  }
 };

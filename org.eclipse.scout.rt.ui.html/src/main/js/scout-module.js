@@ -58,6 +58,7 @@ __include("scout/action/keystroke/MnemonicKeyStroke.js");
 __include("scout/menu/menus.js");
 __include("scout/menu/Menu.js");
 __include("scout/menu/MenuBar.js");
+__include("scout/menu/MenuBarKeyStrokeAdapter.js");
 __include("scout/menu/MenuKeyStrokeAdapter.js");
 __include("scout/menu/Popup.js");
 __include("scout/menu/MenuControlKeyStrokes.js");
