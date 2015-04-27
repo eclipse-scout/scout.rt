@@ -97,7 +97,7 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> implements I
     if (jsonContextMenu != null) {
       JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
-    return super.toJson();
+    return json;
   }
 
   @Override

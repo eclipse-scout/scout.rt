@@ -1,3 +1,20 @@
+/* Mixins */
+
+.button-sub-menu-icon {
+  display: inline-block;
+  position: relative;
+  left: 0px;
+  top: 3px;
+  margin-top: -5px;
+  .font-icon;
+  line-height: 18px;
+  font-size: 18px;
+  padding-left: 10px;
+  content: @icon-angle-down;
+}
+
+/* Styles */
+
 .button > button {
   position: relative;
   height: 30px;
@@ -33,6 +50,10 @@
     border-style: inset;
     border-right-color: @border-color;
     border-bottom-color: @border-color;
+  }
+
+  &.has-submenu::after {
+   .button-sub-menu-icon;
   }
 }
 

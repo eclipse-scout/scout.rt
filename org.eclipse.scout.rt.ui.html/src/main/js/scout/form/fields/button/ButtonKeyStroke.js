@@ -12,7 +12,7 @@ scout.inherits(scout.ButtonKeyStroke, scout.KeyStroke);
  */
 scout.ButtonKeyStroke.prototype.handle = function(event) {
   if (this._button.enabled && this._button.visible) {
-    this._button.doAction();
+    this._button.doAction($(event.target));
     if (this.preventDefaultOnEvent) {
       event.preventDefault();
     }

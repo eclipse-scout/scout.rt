@@ -6,7 +6,7 @@
   border-bottom: 1px solid @desktop-border-color;
   white-space: nowrap;
 
-  & div {
+  & > div {
     position: relative; /* reset a possible different value (e.g. set by .form-field) which might cause 'display: inline-block' to be ignored for the computed style */
     display: inline-block;
     vertical-align: middle;
@@ -27,9 +27,20 @@
     border-bottom: 0;
   }
 
-  & > .menu-item {
+  & > .menu-item,
+  & > .link-button > .menu-item {
     height: @menubar-height;
     line-height: @menubar-height;
+
+    &:focus {
+      outline: none;
+      background-color: @palette-bsi-background;
+    }
+    /*
+    &:focus::before {
+      // TODO BSH .link-focus;
+    }
+    */
 
     &[data-icon]::before {
       font-size: 18px;

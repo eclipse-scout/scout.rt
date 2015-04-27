@@ -48,14 +48,18 @@ scout.Button.prototype._render = function($parent) {
 
   this.addContainer($parent, cssClass, new scout.ButtonLayout(this));
   this.addField($button);
+
   $button.on('click', this._onClick.bind(this));
   if (this.systemType === scout.Button.SYSTEM_TYPE.OK ||
     this.systemType === scout.Button.SYSTEM_TYPE.SAVE_WITHOUT_MARKER_CHANGE) {
     $button.addClass('default-button');
   }
-  if (this.menus) {
+  if (this.menus && this.menus.length > 0) {
     for (var j = 0; j < this.menus.length; j++) {
       this.keyStrokeAdapter.registerKeyStroke(this.menus[j]);
+    }
+    if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
+      $button.addClass('has-submenu');
     }
   }
 
@@ -66,8 +70,8 @@ scout.Button.prototype._createKeyStrokeAdapter = function() {
   return new scout.ButtonKeyStrokeAdapter(this);
 };
 
-scout.Button.prototype._onClick = function() {
-  this.doAction();
+scout.Button.prototype._onClick = function(event) {
+  this.doAction($(event.target));
 };
 
 scout.Button.prototype._remove = function() {
@@ -75,13 +79,18 @@ scout.Button.prototype._remove = function() {
   this._unregisterButtonKeyStroke();
 };
 
-scout.Button.prototype.doAction = function() {
+scout.Button.prototype.doAction = function($target) {
   if (this.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {
     this.selected = !this.selected;
     this._renderSelected();
     this.session.send(this.id, 'selected', {
       selected: this.selected
     });
+  } else if (this.menus.length > 0) {
+    this.popup = new scout.MenuBarPopup(this.$container, this.session);
+    this.popup.render();
+    scout.menus.appendMenuItems(this.popup, this.menus);
+    this.popup.alignTo();
   } else {
     this.session.send(this.id, 'clicked');
   }

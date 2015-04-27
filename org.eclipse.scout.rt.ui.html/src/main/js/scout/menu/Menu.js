@@ -88,10 +88,10 @@ scout.Menu.prototype._updateIconAndTextStyle = function() {
 };
 
 scout.Menu.prototype.doAction = function($target) {
-  if (this.children.length > 0) {
-    this.popup = new scout.PopupMenuItem($target, this.session);
+  if (this.childActions.length > 0) {
+    this.popup = new scout.MenuBarPopup(this.$container, this.session);
     this.popup.render();
-    scout.menus.appendMenuItems(this.popup, this.children);
+    scout.menus.appendMenuItems(this.popup, this.childActions);
     this.popup.alignTo();
   } else {
     this.sendDoAction();
