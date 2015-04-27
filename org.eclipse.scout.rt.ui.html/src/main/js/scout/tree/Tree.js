@@ -525,14 +525,27 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   }
 };
 
-scout.Tree.prototype._onAllNodesDeleted = function() {
-  var nodes = this.nodes;
-  this.nodes = [];
+scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
+  var parentNode, nodes;
+
+  if (parentNodeId >= 0) {
+    parentNode = this.nodesMap[parentNodeId];
+    if (!parentNode) {
+      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
+    }
+  }
+  if (parentNode) {
+    nodes = parentNode.childNodes;
+    parentNode.childNodes = [];
+  } else {
+    nodes = this.nodes;
+    this.nodes = [];
+  }
   this._visitNodes(nodes, updateNodeMap.bind(this));
 
   // remove node from html document
   if (this.rendered) {
-    this._removeNodes(nodes);
+    this._removeNodes(nodes, parentNodeId);
   }
 
   // --- Helper functions ---
@@ -1023,7 +1036,7 @@ scout.Tree.prototype.onModelAction = function(event) {
   } else if (event.type === 'nodesDeleted') {
     this._onNodesDeleted(event.nodeIds, event.commonParentNodeId);
   } else if (event.type === 'allNodesDeleted') {
-    this._onAllNodesDeleted();
+    this._onAllNodesDeleted(event.commonParentNodeId);
   } else if (event.type === 'nodesSelected') {
     this._onNodesSelected(event.nodeIds);
   } else if (event.type === 'nodeExpanded') {

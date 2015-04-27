@@ -170,11 +170,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     }
   }
 
-  protected void disposeAllNodes() {
-    m_treeNodeIds.clear();
-    m_treeNodes.clear();
-  }
-
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
@@ -227,8 +222,8 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       case TreeEvent.TYPE_NODES_DELETED:
         handleModelNodesDeleted(event);
         break;
-      case TreeEvent.TYPE_ALL_NODES_DELETED:
-        handleModelAllNodesDeleted(event);
+      case TreeEvent.TYPE_ALL_CHILD_NODES_DELETED:
+        handleModelAllChildNodesDeleted(event);
         break;
       case TreeEvent.TYPE_NODE_EXPANDED:
       case TreeEvent.TYPE_NODE_COLLAPSED:
@@ -359,9 +354,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     disposeNodes(nodes, true);
   }
 
-  protected void handleModelAllNodesDeleted(TreeEvent event) {
-    addActionEvent(EVENT_ALL_NODES_DELETED);
-    disposeAllNodes();
+  protected void handleModelAllChildNodesDeleted(TreeEvent event) {
+    JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
+    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getOrCreateNodeId(event.getCommonParentNode()));
+    addActionEvent(EVENT_ALL_NODES_DELETED, jsonEvent);
+    // Read the removed nodes from the event, because they are no longer contained in the model
+    disposeNodes(event.getChildNodes(), true);
   }
 
   protected void handleModelNodesSelected(Collection<ITreeNode> modelNodes) {
