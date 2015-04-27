@@ -26,8 +26,8 @@
   & .calendar-range {
     float: left;
 
-    & .calendar-minus,
-    & .calendar-plus {
+    & .calendar-previous,
+    & .calendar-next {
       cursor: pointer;
       display: inline-block;
     }
@@ -40,16 +40,16 @@
       left: 2px;
     }
 
-    & .calendar-minus:hover::before,
-    & .calendar-plus:hover::before {
+    & .calendar-previous:hover::before,
+    & .calendar-next:hover::before {
       color: @hover-color;
     }
 
-    & .calendar-minus::before {
+    & .calendar-previous::before {
       .calendar-icon(@icon-angle-left, 29px);
     }
 
-    & .calendar-plus::before {
+    & .calendar-next::before {
       .calendar-icon(@icon-angle-right, 29px);
     }
   }
@@ -135,6 +135,10 @@
       &.selected {
         color: @palette-gray-4;
         cursor: default;
+      }
+
+      &.ui-selected {
+        background-color: red;
       }
 
       &:hover {
@@ -308,6 +312,10 @@
 
     &.selected {
       box-shadow:  1px 1px 10px -1px @selection-background-color;
+    }
+
+    &.ui-selected {
+      background-color: @palette-cyan-background;
     }
   }
 

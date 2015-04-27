@@ -26,6 +26,8 @@ describe("ObjectFactory", function() {
           id: outlineId,
           objectType: 'Outline'
       };
+    } else if ('Calendar' === objectType) {
+      model.selectedDate = '2015-04-06 00:00:00.000';
     }
     return model;
   }

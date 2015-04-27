@@ -41,7 +41,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   private static final String EVENT_COMPONENT_ACTION = "componentAction";
   private static final String EVENT_COMPONENT_MOVED = "componentMoved";
   private static final String EVENT_RELOAD = "reload";
-  private static final String EVENT_SET_VISIBLE_RANGE = "setVisibleRange";
+  private static final String EVENT_SET_VISIBLE_RANGE = "setVisibleRange"; // FIXME AWE: (calendar) rename to viewRange, also on UI_Facade
   private static final String EVENT_SET_SELECTION = "setSelection";
   private static final String EVENT_SET_DISPLAY_MODE = "setDisplayMode";
 
@@ -78,7 +78,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   @Override
   protected void initJsonProperties(T model) {
-    //FIXME CGU/BSH improve adapterproperty so that components are not disposed when changed?
+    //FIXME CGU/BSH improve adapter-property so that components are not disposed when changed?
     putJsonProperty(new JsonAdapterProperty<T>(ICalendar.PROP_COMPONENTS, model, getUiSession()) {
       @Override
       protected Set<? extends CalendarComponent> modelValue() {
