@@ -107,7 +107,8 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     item.render(this.$container);
     item.$container.removeClass('form-field');
     if(item instanceof scout.Button){
-      item.$field.removeAttr('tabindex');
+      item.$field.attr('tabindex', -1);
+
     }
     else{
       item.$container.removeAttr('tabindex');

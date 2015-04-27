@@ -28,7 +28,12 @@ scout.MenuBarLeftKeyStroke.prototype.handle = function(event) {
 
   for (var i = 0; i < menuItems.length; i++) {
     var actualItem = menuItems[i];
-    actualItem.$container.removeAttr('tabindex');
+    if(actualItem instanceof scout.Button){
+      actualItem.$field.attr('tabindex', '-1');
+    }
+    else{
+      actualItem.$container.removeAttr('tabindex');
+    }
     if ($menuItemFocused[0] === actualItem.$container[0] || (actualItem.$field && $menuItemFocused[0] === actualItem.$field[0])) {
       if (lastValidItem) {
         elementToFocus = lastValidItem;
@@ -76,7 +81,12 @@ scout.MenuBarRightKeyStroke.prototype.handle = function(event) {
 
   for (var i = 0; i < menuItems.length; i++) {
     var actualItem = menuItems[i];
-    actualItem.$container.removeAttr('tabindex');
+    if(actualItem instanceof scout.Button){
+      actualItem.$field.attr('tabindex', '-1');
+    }
+    else{
+      actualItem.$container.removeAttr('tabindex');
+    }
     if (focusNext && (actualItem instanceof scout.Button || (actualItem instanceof scout.Menu && !actualItem.separator)) && actualItem.visible && actualItem.enabled) {
       focusNext = false;
       elementToFocus = actualItem;
