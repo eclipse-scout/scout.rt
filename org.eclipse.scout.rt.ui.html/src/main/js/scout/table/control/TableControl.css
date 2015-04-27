@@ -18,16 +18,6 @@
     content: attr(data-icon);
   }
 
-  /* Separator */
-  &:last-child::after {
-    content: '';
-    position: absolute;
-    top: @table-control-padding / 2  + 2px;
-    right: -1px;
-    height: @table-footer-height - @table-control-padding - 4px;
-    border-right: 1px solid @border-color;
-  }
-
   &:hover::before {
     color: @hover-color;
   }

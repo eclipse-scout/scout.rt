@@ -29,6 +29,7 @@ scout.TableFooter.prototype._render = function($parent) {
     .appendDiv('table-info-selection')
     .on('click', '', this._onClickInfoSelection.bind(this));
 
+<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
   this._$filterField = scout.fields.new$TextField()
     .addClass('control-filter')
     .appendTo(this.$container)
@@ -39,6 +40,21 @@ scout.TableFooter.prototype._render = function($parent) {
     this._$filterField.val(filter.text);
   }
   scout.keyStrokeManager.installAdapter(this._$filterField, this.filterKeyStrokeAdapter);
+=======
+  // filter
+  this._$filterField = scout.fields.new$TextField()
+    .addClass('control-filter')
+    .appendTo(this.$container)
+    .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
+    .placeholder(this._table.session.text('FilterBy_'));
+  filter = this._table.getFilter(scout.TableFooter.FILTER_KEY);
+  if (filter) {
+    this._$filterField.val(filter.text);
+  }
+
+  scout.keyStrokeManager.installAdapter(this._$filterField, this.filterKeyStrokeAdapter);
+
+>>>>>>> 478307a html ui: filter now right, separater after last control deleted
 
   this._updateTableControls();
   this._updateInfoLoad();
