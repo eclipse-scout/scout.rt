@@ -80,7 +80,7 @@ public class JsonBean implements IJsonObject {
       throw new IllegalArgumentException("Cannot convert " + type + " to json object");
     }
     try {
-      JSONObject jbean = new JSONObject();
+      JSONObject jbean = JsonObjectUtility.newOrderedJSONObject();
       for (Field f : type.getFields()) {
         if (Modifier.isStatic(f.getModifiers())) {
           continue;

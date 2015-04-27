@@ -229,7 +229,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
 
   protected void handleModelOpenUri(String uri, ITargetWindow target) {
     // Note: property 'target' is reserved by Scouts JSON protocol
-    JSONObject json = new JSONObject();
+    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     putProperty(json, "uri", uri);
     putProperty(json, "uriTarget", target.getIdentifier());
     addActionEvent("openUri", json);

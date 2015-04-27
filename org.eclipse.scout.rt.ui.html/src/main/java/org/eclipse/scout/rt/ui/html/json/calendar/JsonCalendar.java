@@ -122,7 +122,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
         }
         @SuppressWarnings("unchecked")
         Range<Date> modelValue = (Range<Date>) value;
-        JSONObject json = new JSONObject();
+        JSONObject json = JsonObjectUtility.newOrderedJSONObject();
         JsonObjectUtility.putProperty(json, "from", new JsonDate(modelValue.getFrom()).asJsonString());
         JsonObjectUtility.putProperty(json, "to", new JsonDate(modelValue.getTo()).asJsonString());
         return json;

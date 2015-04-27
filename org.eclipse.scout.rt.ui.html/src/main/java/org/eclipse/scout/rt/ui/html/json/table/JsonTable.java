@@ -477,7 +477,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
     IJsonAdapter<?> jsonField = attachAdapter(field);
     LOG.debug("Created new field adapter for cell editing. Adapter: " + jsonField);
-    JSONObject json = new JSONObject();
+    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     putProperty(json, "columnId", JsonObjectUtility.getString(event.getData(), PROP_COLUMN_ID));
     putProperty(json, "rowId", JsonObjectUtility.getString(event.getData(), PROP_ROW_ID));
     putProperty(json, "fieldId", jsonField.getId());
@@ -522,7 +522,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         jsonCells.put(cellToJson(row, column));
       }
     }
-    JSONObject jsonRow = new JSONObject();
+    JSONObject jsonRow = JsonObjectUtility.newOrderedJSONObject();
     putProperty(jsonRow, "id", getOrCreatedRowId(row));
     putProperty(jsonRow, "cells", jsonCells);
     putProperty(jsonRow, "checked", row.isChecked());
@@ -776,7 +776,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
     m_tableRows.clear();
     m_tableRowIds.clear();
-    addActionEvent(EVENT_ALL_ROWS_DELETED, new JSONObject());
+    addActionEvent(EVENT_ALL_ROWS_DELETED);
   }
 
   protected void handleModelRowsSelected(Collection<ITableRow> modelRows) {
@@ -791,7 +791,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       if (row.isStatusDeleted() || !row.isFilterAccepted()) { // Ignore deleted or filtered rows, because for the UI, they don't exist
         continue;
       }
-      JSONObject jsonRow = new JSONObject();
+      JSONObject jsonRow = JsonObjectUtility.newOrderedJSONObject();
       putProperty(jsonRow, "id", getOrCreatedRowId(row));
       putProperty(jsonRow, "checked", row.isChecked());
       jsonRows.put(jsonRow);
@@ -799,14 +799,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (jsonRows.length() == 0) {
       return;
     }
-    JSONObject jsonEvent = new JSONObject();
+    JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     putProperty(jsonEvent, PROP_ROWS, jsonRows);
     addActionEvent(EVENT_ROWS_CHECKED, jsonEvent);
   }
 
   protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows) {
-    JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_ROW_IDS, rowIdsToJson(modelRows));
     JSONArray jsonRowIds = new JSONArray();
     for (ITableRow row : modelRows) {
       if (row.isStatusDeleted() || !row.isFilterAccepted()) { // Ignore deleted or filtered rows, because for the UI, they don't exist
@@ -818,13 +816,15 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (jsonRowIds.length() == 0) {
       return;
     }
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_ROW_IDS, jsonRowIds);
     addActionEvent("rowOrderChanged", jsonEvent);
   }
 
   protected void handleModelColumnStructureChanged() {
-    JSONObject jsonEvent = new JSONObject();
     disposeColumns();
     attachColumns();
+    JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
     addActionEvent("columnStructureChanged", jsonEvent);
   }

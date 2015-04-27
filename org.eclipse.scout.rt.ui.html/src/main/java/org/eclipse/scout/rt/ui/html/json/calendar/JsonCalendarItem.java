@@ -22,7 +22,7 @@ public class JsonCalendarItem implements IJsonObject {
     if (m_item == null) {
       return null;
     }
-    JSONObject json = new JSONObject();
+    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     JsonObjectUtility.putProperty(json, "exists", m_item.exists());
     JsonObjectUtility.putProperty(json, "lastModified", m_item.getLastModified());
     JsonObjectUtility.putProperty(json, "itemId", m_item.getItemId());

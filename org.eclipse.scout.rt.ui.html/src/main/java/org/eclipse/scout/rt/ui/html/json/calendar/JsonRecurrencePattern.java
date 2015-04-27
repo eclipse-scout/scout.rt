@@ -23,7 +23,7 @@ public class JsonRecurrencePattern implements IJsonObject {
     if (m_recurrencePattern == null) {
       return null;
     }
-    JSONObject json = new JSONObject();
+    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     JsonObjectUtility.putProperty(json, "lastModified", m_recurrencePattern.getLastModified());
     JsonObjectUtility.putProperty(json, "regenerate", m_recurrencePattern.isRegenerate());
     JsonObjectUtility.putProperty(json, "startTimeMinutes", m_recurrencePattern.getStartTimeMinutes());

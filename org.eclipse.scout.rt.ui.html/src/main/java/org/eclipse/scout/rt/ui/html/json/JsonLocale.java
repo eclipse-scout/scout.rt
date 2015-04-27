@@ -43,7 +43,7 @@ public class JsonLocale implements IJsonObject {
   }
 
   protected JSONObject decimalFormatSymbolsToJson(DecimalFormatSymbols symbols) {
-    JSONObject json = new JSONObject();
+    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     JsonObjectUtility.putProperty(json, "decimalSeparator", String.valueOf(symbols.getDecimalSeparator()));
     JsonObjectUtility.putProperty(json, "groupingSeparator", String.valueOf(symbols.getGroupingSeparator()));
     JsonObjectUtility.putProperty(json, "minusSign", String.valueOf(symbols.getMinusSign()));
@@ -51,7 +51,7 @@ public class JsonLocale implements IJsonObject {
   }
 
   protected JSONObject dateFormatSymbolsToJson(DateFormatSymbols symbols) {
-    JSONObject json = new JSONObject();
+    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     JsonObjectUtility.putProperty(json, "months", JsonObjectUtility.newJSONArray(symbols.getMonths()));
     JsonObjectUtility.putProperty(json, "monthsShort", JsonObjectUtility.newJSONArray(symbols.getShortMonths()));
     JsonObjectUtility.putProperty(json, "weekdays", JsonObjectUtility.newJSONArray(Arrays.copyOfRange(symbols.getWeekdays(), 1, 8)));
@@ -62,7 +62,7 @@ public class JsonLocale implements IJsonObject {
   }
 
   protected JSONObject localeToJson(Locale locale) {
-    JSONObject json = new JSONObject();
+    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     DecimalFormat defaultDecimalFormat = getDefaultDecimalFormat(locale);
     SimpleDateFormat defaultDateFormat = getDefaultSimpleDateFormat(locale);
     JsonObjectUtility.putProperty(json, "languageTag", locale.toLanguageTag());

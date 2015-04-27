@@ -26,7 +26,7 @@ public class JsonGridData implements IJsonObject {
     if (m_gridData == null) {
       return null;
     }
-    JSONObject json = new JSONObject();
+    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     JsonObjectUtility.putProperty(json, "fillHorizontal", m_gridData.fillHorizontal);
     JsonObjectUtility.putProperty(json, "fillVertical", m_gridData.fillVertical);
     JsonObjectUtility.putProperty(json, "h", m_gridData.h);

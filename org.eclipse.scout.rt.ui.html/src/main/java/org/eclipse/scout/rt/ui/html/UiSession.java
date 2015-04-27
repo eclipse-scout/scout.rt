@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.ui.html;
 
 import java.security.AccessController;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -132,14 +132,14 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
 
   protected JSONObject getTextMap(Locale locale) {
     // Collect textKeys
-    Set<String> textKeys = new HashSet<String>();
+    Set<String> textKeys = new TreeSet<String>();
     for (IUiTextContributor contributor : BEANS.all(IUiTextContributor.class)) {
       contributor.contributeUiTextKeys(textKeys);
       LOG.info("Gathered ui text keys from contributor " + contributor);
     }
 
     // Resolve texts with the given locale
-    JSONObject map = new JSONObject();
+    JSONObject map = JsonObjectUtility.newOrderedJSONObject();
     for (String textKey : textKeys) {
       JsonObjectUtility.putProperty(map, textKey, TEXTS.get(locale, textKey));
     }
@@ -302,7 +302,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
   }
 
   protected void sendInitializationEvent() {
-    JSONObject jsonEvent = new JSONObject();
+    JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     JsonObjectUtility.putProperty(jsonEvent, "clientSession", m_jsonClientSession.getId());
     Locale sessionLocale = JobUtility.runModelJobAndAwait("fetch locale from model", m_jsonClientSession.getModel(), new ICallable<Locale>() {
       @Override
@@ -578,7 +578,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
 
   @Override
   public void sendLocaleChangedEvent(Locale locale) {
-    JSONObject jsonEvent = new JSONObject();
+    JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     putLocaleData(jsonEvent, locale);
     currentJsonResponse().addActionEvent(getUiSessionId(), "localeChanged", jsonEvent);
   }
@@ -605,7 +605,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
       // This will cause P_ClientSessionCleanupHandler.valueUnbound() to be executed
       httpSession.invalidate();
     }
-    currentJsonResponse().addActionEvent(getUiSessionId(), "logout", new JSONObject());
+    currentJsonResponse().addActionEvent(getUiSessionId(), "logout");
     LOG.info("Logged out successfully from UI session with ID " + m_uiSessionId);
   }
 

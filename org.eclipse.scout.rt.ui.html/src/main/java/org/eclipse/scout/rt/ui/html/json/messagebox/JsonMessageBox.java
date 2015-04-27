@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
-import org.json.JSONObject;
 
 public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyObserver<T> {
   public static final String EVENT_ACTION = "action";
@@ -125,7 +124,7 @@ public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyO
 
   protected void handleModelClosed() {
     dispose();
-    addActionEvent(EVENT_CLOSED, new JSONObject());
+    addActionEvent(EVENT_CLOSED);
   }
 
   protected void handleModelMessageBoxEvent(MessageBoxEvent event) {

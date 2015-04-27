@@ -94,7 +94,7 @@ public class JsonResponse {
 
     JSONObject props = event.getData().optJSONObject("properties");
     if (props == null) {
-      props = new JSONObject();
+      props = JsonObjectUtility.newOrderedJSONObject();
       JsonObjectUtility.putProperty(event.getData(), "properties", props);
     }
 
@@ -103,6 +103,10 @@ public class JsonResponse {
       newValue = "";
     }
     JsonObjectUtility.putProperty(props, propertyName, newValue);
+  }
+
+  public void addActionEvent(String eventTarget, String eventType) {
+    addActionEvent(eventTarget, eventType, null);
   }
 
   /**
@@ -195,8 +199,8 @@ public class JsonResponse {
     // Ensure all buffered events are handled. This might cause the addition of more events and adapters to this response.
     fireProcessBufferedEvents();
 
-    JSONObject json = new JSONObject();
-    JSONObject adapterData = new JSONObject();
+    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject adapterData = JsonObjectUtility.newOrderedJSONObject();
     m_toJsonInProgress = true;
     try {
       // If you experience a ConcurrentModificationException at this point, then most likely you've created and added a new adapter

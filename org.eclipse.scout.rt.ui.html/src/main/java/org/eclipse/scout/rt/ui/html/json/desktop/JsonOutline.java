@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
@@ -137,10 +138,9 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   protected void handleModelPageChanged(OutlineEvent event) {
     IPage page = (IPage) event.getNode();
     attachNode(page, false);
-    JSONObject jsonEvent = new JSONObject();
+    JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
     putDetailFormAndTable(jsonEvent, page);
     replaceActionEvent("pageChanged", jsonEvent);
   }
-
 }

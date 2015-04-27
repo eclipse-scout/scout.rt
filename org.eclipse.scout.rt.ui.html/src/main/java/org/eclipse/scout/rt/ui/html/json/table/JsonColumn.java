@@ -44,7 +44,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
 
   @Override
   public JSONObject toJson() {
-    JSONObject json = new JSONObject();
+    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
     JsonObjectUtility.putProperty(json, "id", getColumn().getColumnId());
     JsonObjectUtility.putProperty(json, "objectType", getObjectTypeVariant());
     JsonObjectUtility.putProperty(json, "index", getColumn().getColumnIndex() - m_indexOffset);
