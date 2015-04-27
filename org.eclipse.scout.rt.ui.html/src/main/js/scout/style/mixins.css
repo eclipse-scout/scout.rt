@@ -159,6 +159,11 @@
   white-space: nowrap;
 }
 
+.overflow-nowrap {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 .button-focus {
   .overlay(-3px, -3px, 6px, 6px);
   .focus-border;

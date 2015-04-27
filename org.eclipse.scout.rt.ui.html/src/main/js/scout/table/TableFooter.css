@@ -103,6 +103,7 @@
   color: @footer-color;
   cursor: pointer;
   line-height: 19px;
+  .overflow-nowrap;
 
   &::before {
     content: '';
