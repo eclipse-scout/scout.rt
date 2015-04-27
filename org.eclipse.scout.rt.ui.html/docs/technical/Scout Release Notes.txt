@@ -230,3 +230,9 @@ ASA 21.04.2015 [bug 459893: replace ValidateOnAnyKey mechanism]
     from: boolean setTextFromUI(String newText, boolean whileTyping);
     to:   void setValueFromUI(String value);
 - removed IColorFieldUiFacade
+
+CGU 27.04.2015
+Added default behaviour to AbstractForm#execCreateFormData
+The method now creates a new instance of the form data based on the form data annotation.
+Also added createFormData to the IForm interface.
+Migration: If execCreateFormData was implemented and just used the default constructor of the corresponding form data class, the method may be removed.
