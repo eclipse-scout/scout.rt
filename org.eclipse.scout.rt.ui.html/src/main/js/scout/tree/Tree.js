@@ -525,27 +525,14 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   }
 };
 
-scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
-  var parentNode, nodes;
-
-  if (parentNodeId >= 0) {
-    parentNode = this.nodesMap[parentNodeId];
-    if (!parentNode) {
-      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
-    }
-  }
-  if (parentNode) {
-    nodes = parentNode.childNodes;
-    parentNode.childNodes = [];
-  } else {
-    nodes = this.nodes;
-    this.nodes = [];
-  }
+scout.Tree.prototype._onAllNodesDeleted = function() {
+  var nodes = this.nodes;
+  this.nodes = [];
   this._visitNodes(nodes, updateNodeMap.bind(this));
 
   // remove node from html document
   if (this.rendered) {
-    this._removeNodes(nodes, parentNodeId);
+    this._removeNodes(nodes);
   }
 
   // --- Helper functions ---
@@ -658,7 +645,7 @@ scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNode
 };
 
 /**
- *
+ * @param parentNodeId optional. If provided, this node's state will be updated (e.g. it will be collapsed)
  * @param $parentNode optional. If not provided, parentNodeId will be used to find $parentNode.
  */
 scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
@@ -763,15 +750,11 @@ scout.Tree.prototype._decorateNode = function(node) {
   $node.toggleClass('leaf', !! node.leaf);
   $node.toggleClass('expanded', ( !! node.expanded && node.childNodes.length > 0));
 
-  // Replace only the text node in the DOM, but leave inner DIVs untouched (e.g. tree item control)
-  var textDomNodes = $node.contents().filter(function() {
-    return (this.nodeType === 3 && this.textContent.trim() !== '');
-  });
-  if (textDomNodes.length > 0) {
-    textDomNodes[0].textContent = node.text;
-  } else {
-    $node.append(node.text);
-  }
+  // Replace only the "text part" of the node, leave control and checkbox untouched
+  var preservedChildren = $node.children('.tree-node-control,.tree-node-checkbox').detach();
+  $node.empty()
+    .append(preservedChildren)
+    .append(node.text);
 
   scout.helpers.legacyCellStyle(node, $node);
 
@@ -1040,7 +1023,7 @@ scout.Tree.prototype.onModelAction = function(event) {
   } else if (event.type === 'nodesDeleted') {
     this._onNodesDeleted(event.nodeIds, event.commonParentNodeId);
   } else if (event.type === 'allNodesDeleted') {
-    this._onAllNodesDeleted(event.commonParentNodeId);
+    this._onAllNodesDeleted();
   } else if (event.type === 'nodesSelected') {
     this._onNodesSelected(event.nodeIds);
   } else if (event.type === 'nodeExpanded') {

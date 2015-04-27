@@ -170,6 +170,11 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     }
   }
 
+  protected void disposeAllNodes() {
+    m_treeNodeIds.clear();
+    m_treeNodes.clear();
+  }
+
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
@@ -221,6 +226,9 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
         break;
       case TreeEvent.TYPE_NODES_DELETED:
         handleModelNodesDeleted(event);
+        break;
+      case TreeEvent.TYPE_ALL_NODES_DELETED:
+        handleModelAllNodesDeleted(event);
         break;
       case TreeEvent.TYPE_NODE_EXPANDED:
       case TreeEvent.TYPE_NODE_COLLAPSED:
@@ -335,18 +343,25 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     Collection<ITreeNode> nodes = event.getNodes();
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
     putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getOrCreateNodeId(event.getCommonParentNode()));
-    // If no nodes remain, just send "all" instead of every single nodeId. However, the nodes must be disposed individually.
+    // Small optimization: If no nodes remain, just send "all" instead of every single nodeId. (However, the
+    // nodes must be disposed individually.) This does only work when no nodes were inserted again in the same
+    // "tree changing" scope.
     if (event.getCommonParentNode().getFilteredChildNodes().size() == 0) {
       addActionEvent(EVENT_ALL_NODES_DELETED, jsonEvent);
     }
     else {
-      JSONArray jsonNodeIds = nodeIdsToJson(nodes, false);
+      JSONArray jsonNodeIds = nodeIdsToJson(nodes);
       if (jsonNodeIds.length() > 0) {
         putProperty(jsonEvent, PROP_NODE_IDS, jsonNodeIds);
         addActionEvent(EVENT_NODES_DELETED, jsonEvent);
       }
     }
     disposeNodes(nodes, true);
+  }
+
+  protected void handleModelAllNodesDeleted(TreeEvent event) {
+    addActionEvent(EVENT_ALL_NODES_DELETED);
+    disposeAllNodes();
   }
 
   protected void handleModelNodesSelected(Collection<ITreeNode> modelNodes) {
@@ -423,13 +438,9 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes) {
-    return nodeIdsToJson(modelNodes, true);
-  }
-
-  protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes, boolean ignoreDeletedAndFilteredNodes) {
     JSONArray jsonNodeIds = new JSONArray();
     for (ITreeNode node : modelNodes) {
-      if (ignoreDeletedAndFilteredNodes && (node.isStatusDeleted() || !node.isFilterAccepted())) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
+      if (node.isStatusDeleted() || !node.isFilterAccepted()) { // Ignore deleted or filtered nodes, because for the UI, they don't exist
         continue;
       }
       String nodeId = getOrCreateNodeId(node);
