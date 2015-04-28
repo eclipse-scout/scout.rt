@@ -11,9 +11,10 @@
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
@@ -77,33 +78,20 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   /**
-   * TODO AWE/CGU: (scout, actions) mit Judith besprechen: Aufräumaktion im Bereich IToolButton/IViewButton
-   * Anstelle der vielen Marker interfaces möchten wir nur noch IActions haben. Alle IActions werden dann
-   * rechts oben angezeigt (es können Menüs und Buttons sein). Die Outlines werden einfach anhand der
-   * konfigurierten Outlines erzeugt, ohne dass dafür noch ein Button konfiguriert werden muss. Dann
-   * können alle Interfaces und abstrakten Klasse die es heute gibt gelöscht werden.
-   * <p>
-   * An dieser Stelle filtern wir einfach alle Actions weg, die wir im MiniCRM nicht sehen wollen. Wenn wir den Fork
-   * haben, können wir die Konfiguration anpassen. Nach dem Refactoring diese Methode entfernen und nur noch
-   * model.getActions() verwenden.
-   * <p>
-   * Mit Scout-Team besprechen, wie wir mit Menüs in Zukunft umgehen wollen. Wollen wir die Menü-Bar im Model abbilden?
-   * (GroupBox, Table, Desktop) Brauchen wir all die Menü-Types dann noch? Können wir die Menü-Logik überhaupt nochmals
-   * refactoren? Was machen wir mit der heutigen Button-Bar?
+   * Returns all filtered list of all {@link IAction}s provided by the desktop. The list does <b>not</b> include
+   * {@link IKeyStroke}s and {@link IViewButton}s, because those action types are handled separately. The returned list
+   * is ordered according to the actions {@link Order} annotation.
    */
   protected List<IAction> filterModelActions() {
-    List<IAction> result = new ArrayList<>();
-    for (IAction a : getModel().getActions()) {
-      //FIXME CGU remove demo as soon as demo tool forms are correct
-      if (!(a instanceof IKeyStroke) && !(a instanceof IViewButton) && !a.getClass().getName().startsWith("org.eclipsescout.demo")) {
-        result.add(a);
+    OrderedCollection<IAction> result = new OrderedCollection<>();
+    for (IAction action : getModel().getActions()) {
+      if (action instanceof IKeyStroke || action instanceof IViewButton) {
+        continue; // skip
       }
+      //  && !a.getClass().getName().startsWith("org.eclipsescout.demo")
+      result.addOrdered(action);
     }
-    // Noch ein Hack: in AbstractDesktop#getActions() ist hart-kodiert, dass menus vor toolButtons
-    // geadded werden, unabhängig von der konfigurierten Reihenfolge (Order). Dieses Problem müsste
-    // auch gelöst sein, wenn alles nur noch IActions sind.
-    Collections.reverse(result);
-    return result;
+    return result.getOrderedList();
   }
 
   @Override
