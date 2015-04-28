@@ -37,14 +37,17 @@ scout.Menu.prototype._renderItem = function($parent) {
     this.$container.addClass('has-submenu');
   }
 
+  if (this.visible && this.enabled) {
+    this._registerKeyStrokeAdapter();
+  }
+
+  // --- Helper functions ---
+
   function onClicked(event) {
     if (!this.$container.isEnabled()) {
       return;
     }
     this._onMenuClicked(event);
-  }
-  if(this.visible && this.enabled){
-    this._registerKeyStrokeAdapter();
   }
 };
 
@@ -52,31 +55,47 @@ scout.Menu.prototype._onMenuClicked = function(event) {
   this.doAction($(event.target));
 };
 
+/**
+ * @override
+ */
 scout.Menu.prototype._renderEnabled = function(enabled) {
   scout.Menu.parent.prototype._renderEnabled.call(this, enabled);
-  if(enabled){
+  if (enabled) {
     this._registerKeyStrokeAdapter();
-  }
-  else{
+  } else {
     this._unregisterKeyStrokeAdapter();
   }
 };
 
-scout.Menu.prototype._renderVisible = function(enabled) {
-  scout.Menu.parent.prototype._renderVisible.call(this, enabled);
-  if(enabled){
+/**
+ * @override
+ */
+scout.Menu.prototype._renderVisible = function(visible) {
+  scout.Menu.parent.prototype._renderVisible.call(this, visible);
+  if (visible) {
     this._registerKeyStrokeAdapter();
-  }
-  else{
+    if (this.menuBar && !this.$container.hasClass('last')) {
+      this.menuBar.updateLastItemMarker();
+    }
+  } else {
     this._unregisterKeyStrokeAdapter();
+    if (this.menuBar && this.$container.hasClass('last')) {
+      this.menuBar.updateLastItemMarker();
+    }
   }
 };
 
+/**
+ * @override
+ */
 scout.Menu.prototype._renderText = function(text) {
   scout.Menu.parent.prototype._renderText.call(this, text);
   this._updateIconAndTextStyle();
 };
 
+/**
+ * @override
+ */
 scout.Menu.prototype._renderIconId = function(iconId) {
   scout.Menu.parent.prototype._renderIconId.call(this, iconId);
   this._updateIconAndTextStyle();
@@ -116,16 +135,15 @@ scout.Menu.prototype._drawKeyBox = function($container) {
   scout.Menu.parent.prototype._drawKeyBox.call(this, $container);
 };
 
-
-scout.Menu.prototype._registerKeyStrokeAdapter = function(){
-  if(!this.keyStrokeAdapter){
+scout.Menu.prototype._registerKeyStrokeAdapter = function() {
+  if (!this.keyStrokeAdapter) {
     this.keyStrokeAdapter = new scout.MenuKeyStrokeAdapter(this);
   }
   scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
 };
 
-scout.Menu.prototype._unregisterKeyStrokeAdapter = function(){
-  if(this.keyStrokeAdapter){
+scout.Menu.prototype._unregisterKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter) {
     scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
   }
 };
