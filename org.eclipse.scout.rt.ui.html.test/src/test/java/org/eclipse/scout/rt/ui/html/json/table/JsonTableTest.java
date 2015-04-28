@@ -316,8 +316,8 @@ public class JsonTableTest {
 
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
     JsonContextMenu<IContextMenu> jsonContextMenu = jsonTable.getAdapter(table.getContextMenu());
-    JsonMenu<IMenu> jsonDisplayableMenu = jsonContextMenu.getAdapter(table.getMenu(TableWithNonDisplayableMenu.DisplayableMenu.class));
-    JsonMenu<IMenu> jsonNonDisplayableMenu = jsonContextMenu.getAdapter(table.getMenu(TableWithNonDisplayableMenu.NonDisplayableMenu.class));
+    JsonMenu<IMenu> jsonDisplayableMenu = jsonContextMenu.getAdapter(table.getMenuByClass(TableWithNonDisplayableMenu.DisplayableMenu.class));
+    JsonMenu<IMenu> jsonNonDisplayableMenu = jsonContextMenu.getAdapter(table.getMenuByClass(TableWithNonDisplayableMenu.NonDisplayableMenu.class));
 
     // Adapter for NonDisplayableMenu must not exist
     assertNull(jsonNonDisplayableMenu);
@@ -356,8 +356,8 @@ public class JsonTableTest {
     JsonTable<ITable> jsonTable = m_uiSession.newJsonAdapter(table, null);
     JsonContextMenu<IContextMenu> jsonContextMenu = jsonTable.getAdapter(table.getContextMenu());
 
-    DisplayableMenu displayableMenu = table.getMenu(TableWithNonDisplayableMenu.DisplayableMenu.class);
-    NonDisplayableMenu NonDisplayableMenu = table.getMenu(TableWithNonDisplayableMenu.NonDisplayableMenu.class);
+    DisplayableMenu displayableMenu = table.getMenuByClass(TableWithNonDisplayableMenu.DisplayableMenu.class);
+    NonDisplayableMenu NonDisplayableMenu = table.getMenuByClass(TableWithNonDisplayableMenu.NonDisplayableMenu.class);
     assertNull(jsonContextMenu.getAdapter(NonDisplayableMenu));
     assertNotNull(jsonContextMenu.getAdapter(displayableMenu));
     assertTrue(jsonContextMenu.getAdapter(displayableMenu).isInitialized());

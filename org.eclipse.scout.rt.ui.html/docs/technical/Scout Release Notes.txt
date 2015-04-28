@@ -215,7 +215,6 @@ Renamed IUrlTarget to ITargetWindows, UrlTarget to TargetWindow
 Renamed DesktopEvent#TYPE_OPEN_URL_IN_BROWSER to TYPE_OPEN_URI
 Renamed DesktopEvent#TYPE_OPEN_DOWNLOAD_IN_BROWSER to TYPE_DOWNLOAD_RESOURCE
 
-
 ASA 21.04.2015 [bug 459893: replace ValidateOnAnyKey mechanism]
 - removed:
     IBasicField.setValidateOnAnyKey(boolean)
@@ -237,7 +236,22 @@ The method now creates a new instance of the form data based on the form data an
 Also added createFormData to the IForm interface.
 Migration: If execCreateFormData was implemented and just used the default constructor of the corresponding form data class, the method may be removed.
 
+BSH 27.04.2015
+If all child nodes of a node in a tree are deleted, a TreeEvent with the new type ALL_CHILD_NODES_DELETED is
+fired (instead of NODES_DELETED). This is useful for optimization.
+Migration: If you previously added a listener for the type NODES_DELETED, you have to check if your implementation
+needs to listen to the new ALL_CHILD_NODES_DELETED as well.
 
 ASA 28.04.2015 [Bug 464770]
 removed AbstractDoubleField and AbstractDoubleColumn
 --> use AbstractBigDecimalField and AbstractBigDecimalColumn instead
+
+BSH 28.04.2015
+All owners of an IContextMenu now share a common interface: IContextMenuOwner.
+This interface provides a method getMenuByClass(T), analogous to getFieldByClass(T), getColumnByClass(T) etc.
+ITree and ITable provided a similar method getMenu(T). This method was deprecated in favor of getMenuByClass(T).
+Usually, the migration is completed by simply renaming all calls to the old method. However, it should be noted
+that the old behavior is not exactly reproduced in a special case: When more than one implementation of the given
+class T was found, the old method just returned the first instance found. The new method throws an exception in
+this case, because the order of the instances is not really defined. If you really want to find _any_ instance
+of the given class, retrieve the list of all instances using getMenus() and apply the filtering by yourself.
