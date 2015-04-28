@@ -156,7 +156,7 @@ scout.FocusContext.prototype.dispose = function() {
 scout.FocusContext.prototype.handleTab = function(event) {
   if (event.which === scout.keys.TAB) {
     var activeElement = document.activeElement;
-    var $focusableElements = this._$container.find(':focusable');
+    var $focusableElements = this._$container.find(':tabbable');
     var $firstFocusableElement = $focusableElements.first();
     var $lastFocusableElement = $focusableElements.last();
 
