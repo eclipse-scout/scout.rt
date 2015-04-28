@@ -25,10 +25,10 @@ body {
 
 /* -moz variant is required, see https://bugzilla.mozilla.org/show_bug.cgi?id=509958 */
 ::-moz-selection {
-  .selection();
+  .text-selection();
 }
 ::selection {
-  .selection();
+  .text-selection();
 }
 
 ::-webkit-input-placeholder {
@@ -48,10 +48,10 @@ body {
   color: @text-disabled-color;
 
   & ::-moz-selection {
-    .selection-disabled();
+    .text-selection-disabled();
   }
   & ::selection {
-    .selection-disabled();
+    .text-selection-disabled();
   }
 
   &::-webkit-input-placeholder {
@@ -86,13 +86,13 @@ input, textarea, button {
 
 input, textarea {
   background-color: @control-background-color;
-  color: @control-text-color;
+  color: @control-color;
   border: 1px solid @border-color;
   border-radius: @border-radius;
 
   .disabled & {
-    background-color: @control-background-disabled-color;
-    color: @control-text-disabled-color;
+    background-color: @control-disabled-background-color;
+    color: @control-disabled-color;
   }
 
   &:focus {
@@ -100,12 +100,12 @@ input, textarea {
   }
 
   &.has-error {
-    border-color: @error-color;
+    border-color: @error-border-color;
     background-color: @error-background-color;
   }
 
   &.has-error:focus {
-    .glow(@error-color);
+    .glow(@error-glow-color);
   }
 }
 

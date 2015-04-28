@@ -20,20 +20,20 @@
     margin: 5px 5px 0px 2px;
     height: 24px;
     line-height: 24px;
-    border: 1px solid @desktop-border-color;
+    border: 1px solid @border-color;
     text-align: center;
     overflow: hidden;
     white-space: nowrap;
     cursor: pointer;
 
     &:hover {
-      color: @palette-bsi-normal;
-      border: 1px solid @palette-bsi-normal;
+      color: @palette-blue-4;
+      border: 1px solid @palette-blue-4;
     }
 
     &.empty, &.empty:hover {
-      color: @palette-gray-5;
-      border: 1px solid @palette-gray-8;
+      color: @palette-gray-6;
+      border: 1px solid @palette-gray-3;
       cursor: default;
     }
 
@@ -41,20 +41,12 @@
       border-radius: @border-radius;
       cursor: text;
       color: @text-color;
-      border: 1px solid @palette-gray-6;
-      .glow(@palette-gray-6);
+      border: 1px solid @palette-gray-5;
+      .glow(@palette-gray-5);
     }
 
     &:focus {
       .focus-border();
-    }
-
-    &::selection {
-      .selection();
-    }
-
-    &::-moz-selection {
-      .selection();
     }
   }
 
@@ -68,7 +60,7 @@
     cursor: pointer;
 
     &:hover {
-      color: @palette-bsi-normal;
+      color: @palette-blue-4;
     }
   }
 
@@ -96,7 +88,7 @@
 
   & .minus:hover::before,
   & .plus:hover::before {
-     color: @palette-bsi-normal;
+     color: @palette-blue-4;
    }
 
   & .minus::before {

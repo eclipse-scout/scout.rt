@@ -28,8 +28,8 @@
         margin-left: 0; /* Override margin from Splitter.css TODO BSH Improve this */
         height: 100%;
         width: @splitter-size;
-        border-left: ((@splitter-size - @splitter-line-size) / 2) solid @body-background-color;
-        border-right: ((@splitter-size - @splitter-line-size) / 2) solid @body-background-color;
+        border-left: ((@splitter-size - @splitter-line-size) / 2) solid @background-color;
+        border-right: ((@splitter-size - @splitter-line-size) / 2) solid @background-color;
         cursor: col-resize;
       }
 
@@ -38,8 +38,8 @@
         margin-left: @mandatory-indicator-width;
         width: calc(~"100%" - @mandatory-indicator-width);
         height: @splitter-size;
-        border-top: ((@splitter-size - @splitter-line-size) / 2) solid @body-background-color;
-        border-bottom: ((@splitter-size - @splitter-line-size) / 2) solid @body-background-color;
+        border-top: ((@splitter-size - @splitter-line-size) / 2) solid @background-color;
+        border-bottom: ((@splitter-size - @splitter-line-size) / 2) solid @background-color;
         cursor: row-resize;
       }
 
@@ -56,7 +56,7 @@
       &.x-axis {
         height: 100%;
         width: @temp-splitter-line-size;
-        border-left: @temp-splitter-line-size dashed @focus-color;
+        border-left: @temp-splitter-line-size dashed @focus-border-color;
         margin-left: (@splitter-size - @temp-splitter-line-size) / 2;
         margin-right: (@splitter-size - @temp-splitter-line-size) / 2;
       }
@@ -66,7 +66,7 @@
         margin-left: @mandatory-indicator-width;
         width: calc(~"100%" - @mandatory-indicator-width);
         height: @temp-splitter-line-size;
-        border-top: @temp-splitter-line-size dashed @focus-color;
+        border-top: @temp-splitter-line-size dashed @focus-border-color;
         margin-top: (@splitter-size - @temp-splitter-line-size) / 2;
         margin-bottom: (@splitter-size - @temp-splitter-line-size) / 2;
       }

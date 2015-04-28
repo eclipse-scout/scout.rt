@@ -4,7 +4,7 @@
 .table-header {
   position: relative;
   background-color: @panel-background-color;
-  border-bottom: 1px solid @desktop-border-color;
+  border-bottom: 1px solid @border-color;
   white-space: nowrap;
   overflow: hidden;
 }
@@ -14,7 +14,7 @@
   margin-top: -2px;
   right: 6px;
   content: @icon;
-  color: @palette-gray-4;
+  color: @palette-gray-7;
 }
 
 .header-item {
@@ -55,9 +55,9 @@
   }
 
   &.menu-open {
-    border-left: 1px solid @desktop-border-color;
-    border-right: 1px solid @desktop-border-color;
-    background-color: @desktop-background-color;
+    border-left: 1px solid @border-color;
+    border-right: 1px solid @border-color;
+    background-color: @control-background-color;
     color: @active-color;
     z-index: 1;
   }
@@ -71,7 +71,7 @@
   width: 17px;
   padding: 6px 8px;
   margin-left: -8px;
-  background-color: @desktop-border-color;
+  background-color: @border-color;
   background-clip: content-box;
   cursor: col-resize;
   z-index: 1;

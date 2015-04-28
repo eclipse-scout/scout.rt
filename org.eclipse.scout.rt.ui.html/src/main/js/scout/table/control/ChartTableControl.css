@@ -21,20 +21,20 @@ rect.select-events {
 }
 
 rect.select-fill, circle.select-fill {
-  fill: @chart-unselect-color;
+  fill: @chart-type-color;
 }
 
 path.select-fill-line, line.select-fill-line {
-  stroke: @chart-unselect-color;
-  fill: @body-background-color;
+  stroke: @chart-type-color;
+  fill: @background-color;
   stroke-width: 3px;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
 
 path.select-fill-pie {
-  stroke: @body-background-color;
-  fill: @chart-unselect-color;
+  stroke: @background-color;
+  fill: @chart-type-color;
   stroke-width: 1px;
   stroke-linejoin: round;
   stroke-linecap: round;
@@ -42,21 +42,21 @@ path.select-fill-pie {
 
 svg.select-chart:hover {
   & rect.select-fill, & circle.select-fill, & path.select-fill-pie {
-    fill: @chart-select-color;
+    fill: @chart-selected-color;
   }
 
   & path.select-fill-line, & line.select-fill-line {
-    stroke: @chart-select-color;
+    stroke: @chart-selected-color;
   }
 }
 
 svg.select-chart.selected {
   & rect.select-fill, & circle.select-fill, & path.select-fill-pie {
-    fill: @chart-select-color;
+    fill: @chart-selected-color;
   }
 
   & path.select-fill-line, & line.select-fill-line {
-    stroke: @chart-select-color;
+    stroke: @chart-selected-color;
   }
 }
 
@@ -93,24 +93,24 @@ svg.select-chart.selected {
   width: 100%;
   cursor: pointer;
   .overflow-ellipsis;
-  border-top: 1px solid @desktop-border-color;
-  border-left: 1px solid @desktop-border-color;
-  border-right: 1px solid @desktop-border-color;
+  border-top: 1px solid @border-color;
+  border-left: 1px solid @border-color;
+  border-right: 1px solid @border-color;
 
   &:hover {
-    color: @active-color;
+    color: @hover-color;
   }
 
   &:last-child {
-    border-bottom: 1px solid @desktop-border-color;
+    border-bottom: 1px solid @border-color;
   }
 
   &.selected {
-    background-color: @chart-select-color;
+    background-color: @chart-selected-color;
     color: @palette-white;
     border-top: 1px solid transparent;
-    border-left: 1px solid @chart-select-color;
-    border-right: 1px solid @chart-select-color;
+    border-left: 1px solid @chart-selected-color;
+    border-right: 1px solid @chart-selected-color;
     border-bottom: 1px solid transparent;
   }
 
@@ -202,7 +202,7 @@ svg.select-chart.selected {
 
   path& {
     fill: @chart-data-color;
-    stroke: @body-background-color;
+    stroke: @background-color;
     stroke-width: 2px;
     cursor: pointer;
   }
@@ -215,11 +215,11 @@ svg.select-chart.selected {
   }
 
   &:hover {
-    fill: @chart-active-color;
+    fill: @chart-data-active-color;
   }
 
   &.selected {
-    fill: @chart-active-color;
+    fill: @chart-data-active-color;
   }
 }
 

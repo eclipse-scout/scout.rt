@@ -14,10 +14,10 @@
   cursor: pointer;
 
   &.center { fill: @highlight-color; }
-  &.internal { fill: @palette-gray-6; }
-  &.person { fill: @palette-gray-5; }
-  &.department { fill: @palette-bsi-disabled; }
-  &.company { fill: @palette-orange-disabled; }
+  &.internal { fill: @palette-gray-5; }
+  &.person { fill:@palette-gray-6; }
+  &.department { fill: @palette-blue-2 ; }
+  &.company { fill: @palette-orange-2; }
 }
 
 .graph-node-text {
@@ -31,12 +31,12 @@
 }
 
 .graph-link {
-  stroke: @palette-gray-6;
+  stroke: @palette-gray-5;
   stroke-width: 2;
 }
 
 .graph-link-text {
-  fill: @palette-gray-5;
+  fill:@palette-gray-6;
   text-anchor: middle;
   dy: 20px;
 }

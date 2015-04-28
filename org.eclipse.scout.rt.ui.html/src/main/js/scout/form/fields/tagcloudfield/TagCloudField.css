@@ -7,22 +7,22 @@
   }
 
   & text.tag-text-0 {
-    fill: @palette-orange-normal;
+    fill: @palette-orange-3;
   }
 
   & text.tag-text-1 {
-    fill: @palette-bsi-normal;
+    fill: @palette-blue-4;
   }
 
   & text.tag-text-2 {
-    fill: @palette-bsi-disabled;
+    fill: @palette-blue-2 ;
   }
 
   & text.tag-text-3 {
-    fill: @palette-gray-4;
+    fill: @palette-gray-7;
   }
 
   & text.tag-text-4 {
-    fill: @palette-gray-6;
+    fill: @palette-gray-5;
   }
 }

@@ -1,4 +1,4 @@
-@color-messagebox-border: @palette-gray-6;
+@color-messagebox-border: @palette-gray-5;
 @messagebox-label-padding: 20px;
 
 .messagebox {
@@ -12,7 +12,7 @@
   border-top-right-radius: @border-radius;
 
   &.severity-error {
-    border-top-color: @error-color;
+    border-top-color: @error-border-color;
   }
 
   &.shown {
@@ -24,7 +24,7 @@
 .messagebox-content {
   border-left: 1px solid @color-messagebox-border;
   border-right: 1px solid @color-messagebox-border;
-  background-color: @desktop-background-color;
+  background-color: @control-background-color;
   padding: (26px - @messagebox-label-padding) / 2 26px 26px 26px;
 }
 
@@ -41,7 +41,7 @@
   & button {
     position: relative;
     padding: 12px;
-    background-color: @palette-gray-8;
+    background-color: @palette-gray-3;
     border: 1px solid @color-messagebox-border;
     cursor: pointer;
     .overflow-ellipsis-nowrap;
@@ -78,7 +78,7 @@
   }
 
   .severity-error & > button:focus::before {
-    border-color: @error-color;
-    .glow(@error-color);
+    border-color: @error-border-color;
+    .glow(@error-glow-color);
   }
 }

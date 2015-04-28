@@ -191,7 +191,7 @@
 
 .keyframes-animate-dot () {
   0%   { color: @text-color;     bottom:0px; }
-  25%  { color: @palette-gray-6; bottom:4px; }
+  25%  { color: @palette-gray-5; bottom:4px; }
   50%  { color: @text-color;     bottom:0px; }
   100% { color: @text-color;     bottom:0px; }
 }

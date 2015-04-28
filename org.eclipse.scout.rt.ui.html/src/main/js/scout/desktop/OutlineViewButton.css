@@ -1,7 +1,7 @@
 .outline-menu-item {
   padding: 0px 15px 0px 15px;
   line-height: 50px;
-  border-bottom: 1px solid @desktop-border-color;
+  border-bottom: 1px solid @border-color;
   cursor: pointer;
   color: @text-color;
   font-size: 16px;

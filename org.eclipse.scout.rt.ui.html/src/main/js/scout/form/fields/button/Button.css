@@ -60,12 +60,12 @@
 .button.default-button button:not(:disabled),
 .button button.default-button:not(:disabled) {
   .font-text-normal(@bold);
-  background-color: @palette-bsi-normal;
-  color: @palette-white;
+  background-color: @default-button-background-color;
+  color: @default-button-color;
   border-width: 0;
 
   &:hover {
-    background-color: @default-button-background-color;
+    background-color: @default-button-hover-background-color;
   }
 }
 

@@ -14,7 +14,7 @@
 
 /* date box */
 .date-box.has-error {
-  border-color: @error-color;
+  border-color: @error-border-color;
 }
 
 .date-box {
@@ -74,25 +74,25 @@
   }
 
   &.date-box-out {
-    color: @palette-gray-6;
+    color: @palette-gray-5;
   }
 
   &.date-box-weekend {
-    color: @palette-bsi-normal;
+    color: @palette-blue-4;
   }
 
   &.date-box-out-weekend {
-    color: @palette-bsi-disabled;
+    color: @palette-blue-2 ;
   }
 
   &.date-box-now {
-    background-color: @palette-orange-background;
-    border: 1px solid @palette-orange-disabled;
+    background-color: @palette-orange-1;
+    border: 1px solid @palette-orange-2;
   }
 
   &.date-box-selected {
-    background-color: @palette-bsi-background;
-    border: 1px solid @palette-bsi-disabled;
+    background-color: @palette-blue-1;
+    border: 1px solid @palette-blue-2 ;
   }
 }
 
@@ -101,7 +101,7 @@
   height: 30px;
   padding: 0px 18px;
   background-color: @panel-background-color;
-  border-bottom: 1px solid @desktop-border-color;
+  border-bottom: 1px solid @border-color;
 }
 
 .date-box-separator {
@@ -110,7 +110,7 @@
   left: 0px;
   height: 1px;
   width: 100%;
-  border-bottom: 1px solid @desktop-border-color;
+  border-bottom: 1px solid @border-color;
 }
 
 .date-box-header-month {
@@ -133,7 +133,7 @@
   font-size: 17px;
 
   &:hover {
-    color: @active-color;
+    color: @hover-color;
   }
 }
 

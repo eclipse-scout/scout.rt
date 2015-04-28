@@ -25,11 +25,11 @@
     top: @table-control-padding / 2  + 2px;
     right: -1px;
     height: @table-footer-height - @table-control-padding - 4px;
-    border-right: 1px solid @desktop-border-color;
+    border-right: 1px solid @border-color;
   }
 
   &:hover::before {
-    color: @active-color;
+    color: @hover-color;
   }
 
   &.disabled:hover, &.disabled::before {
@@ -42,9 +42,9 @@
   }
 
   &.selected {
-    border-left-color: @desktop-border-color;
-    border-right-color: @desktop-border-color;
-    background-color: @body-background-color;
+    border-left-color: @border-color;
+    border-right-color: @border-color;
+    background-color: @background-color;
 
     &:first-child {
       border-left-color: transparent;

@@ -8,7 +8,7 @@
   height: 100%;
   width: @size-desktop-navigation;
   background-color: @navigation-background-color;
-  color: @navigation-light-color;
+  color: @navigation-color;
 }
 
 .navigation-header {
@@ -58,7 +58,7 @@
   }
 
   &:not(.tab-active) {
-    background-color: @palette-gray-6;
+    background-color: @palette-gray-5;
     color: @text-color;
     width: @navigation-tab-button-size;
   }
@@ -98,7 +98,7 @@
   float: left;
 
   .tab-menu-open & {
-    color: @hover-color;
+    color: @active-color;
     background-color: @control-background-color;
   }
 
@@ -132,7 +132,7 @@
   .navigation-breadcrumb & {
     width: 200%;
     text-align: center;
-    border-bottom: 1px solid @navigation-light-color;
+    border-bottom: 1px solid @navigation-color;
   }
 }
 
@@ -144,7 +144,7 @@
   margin: 10px 2px 10px 12px;
   width: calc(~"100%" - (@navigation-tab-button-size + 2px + 12x));
   display: none;
-  background-color: @palette-gray-8;
+  background-color: @palette-gray-3;
   .tab-active > & {
     display: block;
   }

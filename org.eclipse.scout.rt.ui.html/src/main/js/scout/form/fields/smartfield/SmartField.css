@@ -37,7 +37,7 @@
     .user-select(text);
 
     .disabled & {
-      background-color: @control-background-disabled-color;
+      background-color: @control-disabled-background-color;
     }
   }
 
@@ -69,7 +69,7 @@
 .proposal-chooser {
   & > .active-filter, & > .status {
     background-color: @panel-background-color;
-    border-top: solid 1px @desktop-border-color;
+    border-top: solid 1px @border-color;
     height: @logical-grid-height;
     padding: 7px 8px 0 8px;
     overflow: hidden;
@@ -78,8 +78,8 @@
   }
 
   & .table-row.selected {
-    background-color: @selection-row-background-color;
-    border-color: @selection-row-border-color;
+    background-color: @item-selection-background-color;
+    border-color: @item-selection-border-color;
   }
 }
 

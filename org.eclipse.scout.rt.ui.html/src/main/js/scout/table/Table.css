@@ -15,8 +15,8 @@
 
   &:focus {
     & .table-row.selected {
-      background-color: @selection-row-background-color;
-      border-color: @selection-row-border-color;
+      background-color: @item-selection-background-color;
+      border-color: @item-selection-border-color;
     }
   }
 
@@ -45,11 +45,11 @@
   overflow: hidden;
   border-left: 0px solid transparent;
   border-right: 0px solid transparent;
-  border-bottom: 1px solid @desktop-border-color;
+  border-bottom: 1px solid @border-color;
 
   &.selected {
-    background-color: @selection-nonfocus-row-background-color;
-    border-color: @selection-nonfocus-row-border-color;
+    background-color: @item-selection-nonfocus-background-color;
+    border-color: @item-selection-nonfocus-border-color;
     border-left-color: transparent;
     border-right-color: transparent;
 
@@ -66,7 +66,7 @@
 
     &.select-top::after,
     &.select-middle::after {
-      border-bottom: 1px solid @desktop-border-color;
+      border-bottom: 1px solid @border-color;
       content: '';
       display: block;
     }
@@ -74,13 +74,13 @@
 
   &.select-single,
   &.select-top {
-    border-top: 1px solid @selection-nonfocus-row-border-color;
+    border-top: 1px solid @item-selection-nonfocus-border-color;
     /* Move the row 1px up to cover the bottom border of the previous row. */
     margin-top: -1px;
   }
 
   &.disabled {
-    background-color: @control-background-disabled-color;
+    background-color: @control-disabled-background-color;
   }
 }
 
@@ -101,7 +101,7 @@
     content: '';
     top: 0;
     left: 0;
-    .triangle-top-left(5px, @desktop-border-color);
+    .triangle-top-left(5px, @border-color);
   }
 
   &.checkable {

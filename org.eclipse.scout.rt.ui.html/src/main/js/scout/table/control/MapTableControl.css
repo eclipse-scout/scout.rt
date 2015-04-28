@@ -18,11 +18,11 @@
   }
 
   &:hover {
-    fill: @chart-active-color;
+    fill: @chart-data-active-color;
   }
 
   &.selected {
-    fill: @chart-active-color;
+    fill: @chart-data-active-color;
   }
 }
 

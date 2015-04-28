@@ -10,8 +10,8 @@
 
 .focus-border(@bordersize: 1px) {
   outline: none;
-  border: @bordersize solid @focus-color;
-  .glow(@focus-color-glow);
+  border: @bordersize solid @focus-border-color;
+  .glow(@focus-glow-color);
 }
 
 .no-focus-border() {
@@ -25,13 +25,13 @@
   transform: @args;
 }
 
-.selection() {
-  background: @selection-background-color;
-  color: @selection-text-color;
+.text-selection() {
+  background: @text-selection-background-color;
+  color: @text-selection-color;
 }
-.selection-disabled() {
-  background: @selection-background-disabled-color;
-  color: @selection-text-disabled-color;
+.text-selection-disabled() {
+  background: @text-selection-disabled-background-color;
+  color: @text-selection-disabled-color;
 }
 
 .placeholder() {
@@ -72,11 +72,11 @@
   }
 
   &:focus ~ .icon::before {
-    color: @focus-color;
+    color: @text-field-icon-focus-color;
   }
 
   &.has-error ~ .icon::before {
-    color: @error-color;
+    color: @text-field-icon-error-color;
   }
 
   &.disabled {
@@ -97,14 +97,14 @@
 
 /*Checkbox mixins*/
 .checkboxLabelBeforeFocus {
-  border-color: @focus-color;
+  border-color: @focus-border-color;
   outline: none;
 }
 
 .checkboxLabelBeforeChecked {
   .font-icon;
   content: @icon-checked;
-  color: @palette-bsi-normal;
+  color: @palette-blue-4;
   font-size: 11px;
   text-align: center;
   line-height: 15px;
@@ -113,7 +113,7 @@
 .checkboxLabelBeforeChildChecked {
   .font-icon;
   content: @icon-square;
-  color: @palette-bsi-normal;
+  color: @palette-blue-4;
   font-size: 11px;
   text-align: center;
   line-height: 15px;
@@ -130,8 +130,8 @@
 }
 
 .checkboxLabelBeforeDisabled {
-  color: @palette-gray-5;
-  background-color: @control-background-disabled-color;
+  color: @palette-gray-6;
+  background-color: @control-disabled-background-color;
 }
 
 .checkboxLabelDisabled {

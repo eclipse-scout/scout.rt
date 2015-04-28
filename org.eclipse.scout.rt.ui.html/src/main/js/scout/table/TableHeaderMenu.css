@@ -1,10 +1,10 @@
 .table-header-menu {
   position: absolute;
   z-index: 6;
-  border-top: 1px solid @desktop-background-color;
+  border-top: 1px solid @table-header-menu-background-color;
   .menu-context;
   width: 225px;
-  background-color: @desktop-background-color;
+  background-color: @table-header-menu-background-color;
   padding-bottom: 5px;
 }
 
@@ -14,7 +14,7 @@
   top: -1px;
   left: 0px;
   max-width: 223px;
-  background-color: @desktop-background-color;
+  background-color: @table-header-menu-background-color;
 }
 
 .header-group {
@@ -43,13 +43,13 @@
   font-size: 17px;
   line-height: 29px;
   color: @icon-color;
-  border: 1px solid @desktop-border-color;
+  border: 1px solid @table-header-cmd-border-color;
   cursor: pointer;
   text-align: center;
 
   &:hover {
-    color: @palette-bsi-normal;
-    border: 1px solid @palette-bsi-normal;
+    color: @palette-blue-4;
+    border: 1px solid @palette-blue-4;
   }
 
   &::after {
@@ -61,13 +61,13 @@
   }
 
   &.selected {
-    background-color: @palette-bsi-disabled;
-    border: 1px solid @palette-bsi-disabled;
+    background-color: @table-header-cmd-active-background-color;
+    border: 1px solid @table-header-cmd-active-border-color;
   }
 
   &.selected::before,
   &.selected::after {
-    color: @desktop-background-color;
+    color: @table-header-cmd-active-color;
   }
 
   &.move-top::before,
@@ -150,22 +150,22 @@
     content: @icon-nbsp;
   }
   &.color-red {
-    background-image: linear-gradient(to right, @palette-red-disabled, @palette-green-disabled);
+    background-image: linear-gradient(to right, @palette-red-2, @palette-green-2);
   }
 
   &.color-green::after {
     content: @icon-nbsp;
   }
   &.color-green {
-    background-image: linear-gradient(to right, @palette-green-disabled, @palette-red-disabled);
+    background-image: linear-gradient(to right, @palette-green-2, @palette-red-2);
   }
 
   &.color-bar::after {
     content: @icon-nbsp;
   }
   &.color-bar {
-    background-image: linear-gradient(to right, @palette-bsi-disabled 0%, @palette-bsi-disabled 65%, @palette-white 65%, @palette-white 100% );
-    border: 1px solid @palette-bsi-disabled;
+    background-image: linear-gradient(to right, @palette-blue-2  0%, @palette-blue-2  65%, @palette-white 65%, @palette-white 100% );
+    border: 1px solid @palette-blue-2 ;
     width: 43px;
     line-height: 29px;
   }
@@ -175,7 +175,7 @@
   }
   &.color-remove {
     background: @palette-white;
-    border: 1px solid @palette-bsi-disabled;
+    border: 1px solid @table-header-cmd-active-border-color;
     width: 43px;
     line-height: 29px;
   }
@@ -212,10 +212,10 @@
   cursor: pointer;
   padding: 0px 20px 0px 8px;
   .overflow-ellipsis-nowrap;
-  border-top: 1px solid @desktop-border-color;
+  border-top: 1px solid @table-header-cmd-border-color;
 
   &:last-child {
-    border-bottom: 1px solid @desktop-border-color;
+    border-bottom: 1px solid @table-header-cmd-border-color;
   }
 
   &:hover {
@@ -229,16 +229,16 @@
   }
 
   &.selected {
-    background-color:  @palette-bsi-disabled;
-    border-top: 1px solid  @palette-bsi-disabled;
-    color: @desktop-background-color;
+    background-color: @table-header-cmd-active-background-color;
+    border-top-color: @table-header-cmd-active-border-color;
+    color: @table-header-cmd-active-color;
   }
 
   &.selected + .header-filter {
-    border-top: 1px solid @desktop-background-color;
+    border-top: 1px solid transparent;
   }
 
   &.selected:last-child {
-    border-bottom: @highlight-color;
+    border-bottom-color: @table-header-cmd-active-border-color;
   }
 }

@@ -14,7 +14,7 @@
 
 .menu-context {
   .drop-shadow;
-  border: 1px solid @desktop-border-color;
+  border: 1px solid @border-color;
 }
 
 .sub-menu-icon {
@@ -94,8 +94,8 @@
   }
 
   &.selected {
-    background-color: @selection-row-background-color;
-    border-color: @selection-row-border-color;
+    background-color: @item-selection-background-color;
+    border-color: @item-selection-border-color;
   }
 }
 
@@ -118,7 +118,7 @@
     padding: 0 13px;
     white-space: nowrap;
     background-color: white;
-    border: solid 1px @menu-border-color;
+    border: solid 1px @border-color;
     border-bottom: none;
     .drop-shadow();
 
@@ -137,19 +137,41 @@
 
 .popup-body {
   position: absolute;
-  border: solid 1px @menu-border-color;
+  border: solid 1px @border-color;
+  border-bottom: none;
   background-color: @palette-white;
   .drop-shadow();
 
   & > .menu-item {
-    border-bottom: solid 1px @menu-border-color;
+    border-top: solid 1px @border-color;
     display: block;
     width: 100%;
     padding-left: 15px;
+
+    &.selected {
+      border-top: 1px solid @item-selection-border-color;
+      border-color: @item-selection-border-color;
+    }
+
+    &.selected + .menu-item{
+      border-top-color: @item-selection-border-color;
+    }
+
+    &.selected:first-child {
+      border-top: 1px solid @item-selection-border-color;
+    }
+
+    &.selected:last-child {
+      border-color: @item-selection-border-color;
+    }
+  }
+
+  & > .menu-item:first-child {
+    border-top-color: transparent;
   }
 
   & > .menu-item:last-child {
-    border-bottom: none;
+    border-bottom: 1px solid @border-color;
   }
 }
 
@@ -166,7 +188,7 @@
 
   &[data-icon]::before {
     .menu-icon(attr(data-icon));
-    color: @hover-color;
+    color: @active-color;
   }
 }
 
@@ -174,5 +196,5 @@
   position: absolute;
   height: 1px;
   left: 1px;
-  background-color:@body-background-color;
+  background-color:@background-color;
 }

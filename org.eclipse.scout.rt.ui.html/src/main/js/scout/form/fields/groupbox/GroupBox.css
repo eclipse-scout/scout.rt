@@ -14,7 +14,7 @@
 }
 
 .root-group-box > .main-menubar {
-  border-bottom: 3px solid @desktop-border-color;
+  border-bottom: 3px solid @border-color;
 }
 
 .group-box > .menubar {
@@ -25,7 +25,7 @@
   width: calc(~"100%" - @mandatory-indicator-width);
   margin-top: @group-margin-top;
   margin-left: @mandatory-indicator-width;
-  border-bottom: 3px solid @desktop-border-color;
+  border-bottom: 3px solid @border-color;
   padding-bottom: 6px;
   .overflow-ellipsis-nowrap;
 
@@ -59,7 +59,7 @@
       }
     }
     &:hover::before {
-      color: @highlight-color;
+      color: @hover-color;
 
      .disabled & {
         color: @text-disabled-color;

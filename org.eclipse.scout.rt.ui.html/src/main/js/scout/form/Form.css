@@ -2,7 +2,7 @@
   height: 100%;
   width: 100%;
   position: relative;
-  background-color: @body-background-color;
+  background-color: @background-color;
 }
 
 .detach-menu {
@@ -16,8 +16,8 @@
 
 .dialog {
   position: absolute;
-  background-color: @body-background-color;
-  border: solid 1px @desktop-border-color;
+  background-color: @background-color;
+  border: solid 1px @border-color;
   border-top: 5px solid @active-color;
   border-top-left-radius: @border-radius;
   border-top-right-radius: @border-radius;

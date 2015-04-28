@@ -9,7 +9,7 @@
   width: 100%;
     /* FIXME nowrap does not seem to work, when fixing this. If white-space can be removed, remove resetting below too (white-space: normal) */
 /*   white-space: nowrap; */
-  border-top: 1px solid @desktop-border-color;
+  border-top: 1px solid @border-color;
 }
 
 .control-resize {
@@ -19,14 +19,14 @@
   height: 16px;
   cursor: row-resize;
   z-index: 1;
-  border-top: 3px solid @desktop-border-color;
+  border-top: 3px solid @border-color;
 }
 
 .control-container {
   position: absolute;
   overflow: hidden;
   outline: none;
-  background-color: @body-background-color;
+  background-color: @background-color;
   bottom: @table-footer-height;
   width: 100%;
   height: 0px;
@@ -60,7 +60,7 @@
       }
 
       &.marked:not(.selected) {
-        border-top-color: @palette-gray-5;
+        border-top-color: @palette-gray-6;
       }
     }
   }
@@ -101,7 +101,7 @@
   display: none;
   width: 0px;
   height: @table-footer-height;
-  color: @footer-color;
+  color: @table-info-color;
   cursor: pointer;
   line-height: 19px;
   .overflow-nowrap;
@@ -112,7 +112,7 @@
     top: @table-control-padding / 2  + 2px;
     left: 0px;
     height: @table-footer-height - @table-control-padding - 4px;
-    border-right: 1px solid @desktop-border-color;
+    border-right: 1px solid @border-color;
   }
 
   & span.info-button {
@@ -120,6 +120,6 @@
   }
 
   &:hover span.info-button {
-   color: @active-color;
+   color: @hover-color;
   }
 }

@@ -5,8 +5,8 @@
 
   &:focus {
     & .tree-node.selected {
-      background-color: @selection-row-background-color;
-      border-color: @selection-row-border-color;
+      background-color: @item-selection-background-color;
+      border-color: @item-selection-border-color;
     }
   }
 
@@ -36,8 +36,8 @@
   padding: 6px;
 
   &.selected {
-    background-color: @selection-nonfocus-row-background-color;
-    border-color: @selection-nonfocus-row-border-color;
+    background-color: @item-selection-nonfocus-background-color;
+    border-color: @item-selection-nonfocus-border-color;
     border-left-color: transparent;
     border-right-color: transparent;
   }
@@ -135,14 +135,14 @@
     }
 
     .tree-node-control:hover& {
-      color: @highlight-color;
+      color: @hover-color;
     }
 
     .disabled & {
-      color: @palette-gray-5;
+      color: @palette-gray-6;
     }
     .disabled .tree-node-control:hover& {
-      color: @palette-gray-3;
+      color: @palette-gray-8;
     }
   }
 

@@ -29,12 +29,12 @@
     }
 
     &.group {
-      background-color: @navigation-background-active-color;
+      background-color: @outline-group-background-color;
     }
 
     &.selected {
-      color: @text-color;
-      background-color: @body-background-color;
+      color: @outline-selection-color;
+      background-color: @outline-selection-background-color;
       border: 0;
     }
 
@@ -64,7 +64,7 @@
     text-align: center;
 
     display: none;
-    border-bottom: 1px solid @navigation-background-selected-color;
+    border-bottom: 1px solid @outline-selection-background-color;
 
     /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
     padding: 12px 2px 12px 2px !important;
@@ -74,12 +74,12 @@
     &.selected {
       .font-text-plus;
       display: block;
-      background-color: @navigation-background-active-color;
+      background-color: @outline-group-background-color;
     }
 
     &.selected {
-      background-color: @navigation-background-selected-color;
-      color: @text-color;
+      background-color: @outline-selection-background-color;
+      color: @outline-selection-color;
       cursor: default;
     }
 
@@ -97,19 +97,19 @@
     }
 
     &.parent::before {
-      border-color: @navigation-background-selected-color transparent transparent transparent;
+      border-color: @outline-selection-background-color transparent transparent transparent;
       border-width: 8px 13px 0 13px;
       bottom: -9px;
     }
 
     &.parent::after {
-      border-color: @navigation-background-active-color transparent transparent transparent;
+      border-color: @outline-group-background-color transparent transparent transparent;
       border-width: 8px 13px 0 13px;
       bottom: -8px;
     }
 
     &.selected::before {
-      border-color: @navigation-background-selected-color transparent transparent transparent;
+      border-color: @outline-selection-background-color transparent transparent transparent;
       border-width: 8px 13px 0 13px;
       bottom: -8px;
     }

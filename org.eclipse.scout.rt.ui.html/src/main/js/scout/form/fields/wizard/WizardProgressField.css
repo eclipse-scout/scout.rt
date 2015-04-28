@@ -1,12 +1,5 @@
 @wizard-progress-height: 40px;
 @wizard-progress-border-width: 3px;
-@wizard-progress-step-background-color: @palette-gray-8;
-@wizard-progress-step-foreground-color: @text-color;
-@wizard-progress-active-step-background-color: @palette-gray-7;
-@wizard-progress-active-step-foreground-color: @active-color;
-@wizard-progress-disabled-step-background-color: @body-background-color;
-@wizard-progress-disabled-step-foreground-color: @text-disabled-color;
-@wizard-progress-separator-color: @palette-gray-6;
 @wizard-progress-separator-width: 2px;
 
 .wizard-steps {
@@ -15,8 +8,8 @@
   margin-right: 0;
 
   overflow: hidden;
-  border-top: @wizard-progress-border-width solid @desktop-border-color;
-  border-bottom: @wizard-progress-border-width solid @desktop-border-color;
+  border-top: @wizard-progress-border-width solid @border-color;
+  border-bottom: @wizard-progress-border-width solid @border-color;
   /* If wizard progress field is in the root-group-box and there is a menubar, */
   /* disable the top-border (because the menubar already has a border) */
   .menubar ~ .group-box-body > .wizard-progress-field > & {

@@ -136,16 +136,16 @@
       padding-right: 15px;
       line-height: 45px;
       font-size: 17px;
-      color: @palette-gray-6;
+      color: @palette-gray-5;
       cursor: pointer;
 
       &.selected {
-        color: @palette-gray-4;
+        color: @palette-gray-7;
         cursor: default;
       }
 
       &:hover {
-        color: @palette-gray-4;
+        color: @palette-gray-7;
       }
     }
 
@@ -157,7 +157,7 @@
       left: 0px;
       bottom: -1px;
       content: " ";
-      background-color: @palette-gray-6;
+      background-color: @palette-gray-5;
     }
 
     & .year-month{
@@ -181,7 +181,7 @@
       width: 100%;
       content: attr(data-title);
       font-size: 17px;
-      color: @palette-green-active;
+      color: @palette-green-5;
     }
 
     & .year-day{
@@ -189,7 +189,7 @@
       float: left;
       width: 15px;
       text-align: right;
-      color: @palette-gray-4;
+      color: @palette-gray-7;
       font-size: 10px;
       height: 12px;
       padding: 1px;
@@ -198,19 +198,19 @@
     }
 
     & .year-range{
-      background-color: @palette-green-background;
+      background-color: @palette-green-1;
     }
 
     & .year-range-day{
-      background-color: @palette-green-normal;
+      background-color: @palette-green-4;
     }
 
     & .year-hover{
-      background-color: @palette-orange-background !important;
+      background-color: @palette-orange-1 !important;
     }
 
     & .year-hover-day{
-      background-color: @palette-orange-disabled !important;
+      background-color: @palette-orange-2 !important;
     }
   }
 
@@ -218,24 +218,24 @@
 
 .planner-scale {
   height: @planner-header-height;
-  border-bottom:  1px solid @palette-gray-6;
+  border-bottom:  1px solid @palette-gray-5;
 
   & .planner-scale-title {
     height: 100%;
     float: left;
     padding: 0px 10px;
     font-size: 17px;
-    color: @palette-gray-4;
+    color: @palette-gray-7;
     line-height: @calendar-header-height;
     width: @planner-resource-cell-width;
-    border-right:  1px solid @palette-gray-6;
+    border-right:  1px solid @palette-gray-5;
   }
 
   & .timeline-large {
     height: 50%;
     float: right;
     width: calc(~"100%" - @planner-resource-cell-width);
-    background-color: @palette-gray-8;
+    background-color: @palette-gray-3;
     line-height: @calendar-header-height / 2;
 
     & .scale-item {
@@ -251,7 +251,7 @@
       left: 0px;
       top: 0px;
       content: " ";
-      background-color: @palette-gray-6;
+      background-color: @palette-gray-5;
       z-index: 2;
     }
   }
@@ -260,7 +260,7 @@
     height: 50%;
     float: right;
     width: calc(~"100%" - @planner-resource-cell-width);
-    //background-color: @palette-gray-8-5;
+    //background-color: @palette-gray-2;
     line-height: @calendar-header-height / 2;
 
     & .scale-item {
@@ -277,7 +277,7 @@
       top: 0px;
       content: " ";
       z-index: 1;
-      background-color: @palette-gray-7;
+      background-color: @palette-gray-4;
     }
   }
 
@@ -311,7 +311,7 @@
     min-height: @planner-resource-minheight;
     vertical-align: middle;
     border-bottom: 1px solid black;
-    background-color: @palette-cyan-active;
+    background-color: @palette-cyan-4;
     padding: 8px;
   }
 }
