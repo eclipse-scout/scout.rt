@@ -74,6 +74,7 @@
 
 /* navigation header buttons*/
 
+.popup-head.navigation-header.navigation-tab-outline-button,
 .navigation-tab-outline-button,
 .navigation-tab-search-button {
   padding: 0px 10px 0px 10px;

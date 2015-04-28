@@ -7,23 +7,6 @@ scout.OutlineViewButton = function() {
 };
 scout.inherits(scout.OutlineViewButton, scout.Action);
 
-scout.OutlineViewButton.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('outline-menu-item');
-
-  var that = this;
-  this.$container.on('click', '', function() {
-    if (!this.$container.isEnabled()) {
-      return;
-    }
-
-    // don't await server response to make it more responsive and offline capable
-    if (this.outline) {
-      this.desktop.changeOutline(that.outline);
-    }
-    this.session.send(that.id, 'clicked');
-  }.bind(this));
-};
-
 scout.OutlineViewButton.prototype._renderOutline = function(outline) {
   // nop
 };
@@ -43,4 +26,16 @@ scout.OutlineViewButton.prototype.onModelPropertyChange = function(event) {
   if (navigation.outline === this.outline) {
     navigation.onOutlinePropertyChange(event);
   }
+};
+
+scout.OutlineViewButton.prototype.doAction = function() {
+  if (!this.$container.isEnabled()) {
+    return;
+  }
+
+  // don't await server response to make it more responsive and offline capable
+  if (this.outline) {
+    this.desktop.changeOutline(this.outline);
+  }
+  this.session.send(this.id, 'clicked');
 };

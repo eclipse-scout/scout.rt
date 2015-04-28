@@ -1,16 +1,17 @@
-scout.MenuControlKeyStrokes = function(popup) {
+scout.MenuControlKeyStrokes = function(popup, menuItemClass) {
   scout.MenuControlKeyStrokes.parent.call(this);
   this.drawHint = true;
   this._popup = popup;
   this.initKeyStrokeParts();
+  this._menuItemClass=menuItemClass;
 };
 scout.inherits(scout.MenuControlKeyStrokes, scout.KeyStroke);
 /**
  * @Override scout.KeyStroke
  */
 scout.MenuControlKeyStrokes.prototype.handle = function(event) {
-  var $menuItems = this._popup.$body.find('.menu-item');
-  var $selectedMenuItem = this._popup.$body.find('.menu-item.selected');
+  var $menuItems = this._popup.$body.find('.'+this._menuItemClass);
+  var $selectedMenuItem = this._popup.$body.find('.'+this._menuItemClass+'.selected');
   var keycode = event.which;
   var $newSelection;
   if (keycode === scout.keys.ESC) {

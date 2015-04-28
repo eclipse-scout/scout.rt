@@ -66,14 +66,6 @@ scout.DesktopNavigation.prototype._createOutlinesTab = function() {
   this.$menuButton = $tab.appendDiv('navigation-tab-outline-button')
     .on('mousedown', this._onMenuButtonClicked.bind(this));
 
-  // create menu
-  // TODO AWE: use Popup class here, maybe a new "head" style is required here
-  // than we could use the same popup for the phone-form
-  this.$outlinesMenu = $tab.appendDiv('navigation-tab-outline-menu');
-  for (var i = 0; i < this.desktop.viewButtons.length; i++) {
-    this.desktop.viewButtons[i].render(this.$outlinesMenu);
-  }
-
   // create title of active outline
   var $outlineTitle = $tab.appendDiv('navigation-tab-outline-title');
   $outlineTitle.click(function() {
@@ -87,32 +79,38 @@ scout.DesktopNavigation.prototype._createOutlinesTab = function() {
 };
 
 scout.DesktopNavigation.prototype._onMenuButtonClicked = function(event) {
-  if (this.$header.hasClass('tab-menu-open')) {
-    this._closeMenu();
-  } else if (this.activeTab === this.outlineTab) {
     this._openMenu();
-  }
+    event.stopPropagation();
+    event.stopImmediatePropagation();
 };
 
-scout.DesktopNavigation.prototype._openMenu = function() {
-  this.$header.addClass('tab-menu-open');
-  $(document).on('mousedown.remove keydown.remove', onCloseEvent.bind(this));
-
-  function onCloseEvent(event) {
-    if ($(event.target).is(this.$menuButton)) {
-      return;
-    }
-
-    // close the menu if a menu item was clicked
-    if (this.$outlinesMenu.has($(event.target)).length === 0) {
-      this._closeMenu();
-    }
-  }
+scout.DesktopNavigation.prototype._openMenu = function(event) {
+  this.popup = new scout.DesktopNavigationPopup(this, this.session);
+  this.popup.render();
+  this.appendMenuItems(this.popup);
+  this.popup.alignTo();
 };
 
-scout.DesktopNavigation.prototype._closeMenu = function() {
-  this.$header.removeClass('tab-menu-open');
-  $(document).off('.remove');
+scout.DesktopNavigation.prototype.appendMenuItems = function(popup){
+  if (!this.desktop.viewButtons || this.desktop.viewButtons.length === 0) {
+    return;
+  }
+  var i,
+    onMenuItemClicked = function(menu) {
+      menu.doAction();
+
+      popup.remove();
+    };
+    for (i = 0; i < this.desktop.viewButtons.length; i++) {
+    var menu = this.desktop.viewButtons[i];
+    menu.$container = $.makeDiv('outline-menu-item')
+    .text(menu.text)
+    .data('menu', menu)
+    .on('click', '', onMenuItemClicked.bind(this, menu))
+    .one(scout.menus.CLOSING_EVENTS, $.suppressEvent);
+
+    popup.appendToBody(menu.$container);
+  }
 };
 
 scout.DesktopNavigation.prototype._createSearchTab = function() {
@@ -174,7 +172,6 @@ scout.DesktopNavigation.prototype._setActiveTab = function(tab) {
 
 scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
   if (this.outline === outline) {
-    this.$header.removeClass('tab-menu-open');
     return;
   }
 
@@ -196,7 +193,6 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
   this.outline.htmlComp.layout();
   this.outline.pixelBasedSizing = true;
   this.$outlineTitle.html(this.outline.title);
-  this.$header.removeClass('tab-menu-open');
 
   if (outline === this.desktop.searchOutline) {
     // Focus and select content AFTER the search outline was rendered (and therefore the query field filled)

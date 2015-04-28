@@ -11,7 +11,7 @@ scout.Popup = function(session) {
  * That way we never have z-index issues with the rendered popups.
  */
 scout.Popup.prototype.render = function() {
-  var $docBody = this.session.$entryPoint;// $('body');
+  var $docBody = this.session.$entryPoint;
   this.$body = $.makeDiv('popup-body');
   this.$container = $.makeDiv('popup')
     .append(this.$body)
@@ -167,3 +167,8 @@ scout.MenuBarPopup.prototype.remove = function() {
   scout.MenuBarPopup.parent.prototype.remove.call(this);
   this._uninstallKeyStrokeAdapter();
 };
+
+scout.PopupMenuItem.prototype._createKeyStrokeAdapter = function() {
+  return new scout.PopupMenuItemKeyStrokeAdapter(this);
+};
+
