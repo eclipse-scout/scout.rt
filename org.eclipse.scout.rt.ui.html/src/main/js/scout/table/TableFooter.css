@@ -80,12 +80,12 @@
 }
 
 .control-filter {
-  float: left;
+  float: right;
   width: 200px;
   min-height: 26px;
   font-size: 13px;
   margin-top: (@table-footer-height - 26px) / 2;
-  margin-left: @table-control-padding;
+  margin-right: @table-control-padding;
 }
 
 .control-info {

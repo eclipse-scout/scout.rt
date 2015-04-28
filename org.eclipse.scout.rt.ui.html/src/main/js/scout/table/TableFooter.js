@@ -16,18 +16,6 @@ scout.TableFooter.prototype._render = function($parent) {
   this.$controlContent = this.$controlContainer.appendDiv('control-content');
   this.$controlGroup = this.$container.appendDiv('control-group');
 
-  this._$filterField = scout.fields.new$TextField()
-    .addClass('control-filter')
-    .appendTo(this.$container)
-    .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
-    .placeholder(this._table.session.text('FilterBy_'));
-  filter = this._table.getFilter(scout.TableFooter.FILTER_KEY);
-  if (filter) {
-    this._$filterField.val(filter.text);
-  }
-
-  scout.keyStrokeManager.installAdapter(this._$filterField, this.filterKeyStrokeAdapter);
-
   // info section
   this._$controlInfo = this.$container
     .appendDiv('control-info');
@@ -40,6 +28,17 @@ scout.TableFooter.prototype._render = function($parent) {
   this._$infoSelection = this._$controlInfo
     .appendDiv('table-info-selection')
     .on('click', '', this._onClickInfoSelection.bind(this));
+
+  this._$filterField = scout.fields.new$TextField()
+    .addClass('control-filter')
+    .appendTo(this.$container)
+    .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
+    .placeholder(this._table.session.text('FilterBy_'));
+  filter = this._table.getFilter(scout.TableFooter.FILTER_KEY);
+  if (filter) {
+    this._$filterField.val(filter.text);
+  }
+  scout.keyStrokeManager.installAdapter(this._$filterField, this.filterKeyStrokeAdapter);
 
   this._updateTableControls();
   this._updateInfoLoad();
