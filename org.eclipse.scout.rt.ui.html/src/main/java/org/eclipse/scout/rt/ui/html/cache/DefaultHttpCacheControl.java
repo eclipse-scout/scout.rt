@@ -71,9 +71,23 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
     }
     int maxAge = getMaxAgeFor(req, resp, obj);
     if (maxAge > 0) {
+      // "private"
+      //   Only browsers may cache this resource.
+      // "max-age"
+      //   A cache may use this resource for X seconds without checking with the server. s-maxage
+      //   is basically the same, but for proxies (s = shared). This overrides any default value
+      //   the proxy may use internally.
+      // Note: Because "must-revalidate" is not present, a cache MAY use a stale resource longer than max-age.
       resp.setHeader("cache-control", "private, max-age=" + maxAge + ", s-maxage=" + maxAge);
     }
     else {
+      // "private"
+      //   Only browsers may cache this resource.
+      // "must-revalidate"
+      //   A cache HAS TO check with the server before using stale resources.
+      // "max-age=0"
+      //   A resource will become stale immediately (after 0 seconds).
+      // Note: "max-age=0, must-revalidate" would be the same as "no-cache"
       resp.setHeader("cache-control", "private, max-age=0, must-revalidate");
     }
 
@@ -123,7 +137,15 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
 
   @Override
   public void disableCacheHeaders(HttpServletRequest req, HttpServletResponse resp) {
-    resp.setHeader("cache-control", "private, max-age=0, no-cache, no-store, must-revalidate");
+    // "private"
+    //   Only browsers may cache this resource.
+    // "no-cache"
+    //   A cache MUST NOT re-use this resource for subsequent requests.
+    // "max-age=0"
+    //   Should not be necessary here, but because some browser apparently imply a
+    //   short caching time with "no-cache" (http://stackoverflow.com/a/19938619),
+    //   we explicitly set it to 0.
+    resp.setHeader("cache-control", "private, no-cache, max-age=0");
   }
 
   protected boolean notModified(String ifNoneMatch, String etag) {
