@@ -10,9 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.beanfield;
 
+import org.eclipse.scout.commons.html.AppLink;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
+/**
+ * Bean fields may be used if a bean should be visualized. There is no default visualization, you have to provide the
+ * gui component by yourself.
+ * <p>
+ * If you would like to display an app link, you may add a property of type {@link AppLink} to your bean.
+ */
 public interface IBeanField<VALUE> extends IValueField<VALUE>, IAppLinkCapable {
   IBeanFieldUIFacade getUIFacade();
 }
