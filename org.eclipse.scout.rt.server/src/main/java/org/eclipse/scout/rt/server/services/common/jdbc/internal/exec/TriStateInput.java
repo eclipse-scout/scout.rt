@@ -20,9 +20,9 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 class TriStateInput implements IBindInput {
   private IBindInput m_delegate;
 
-  public TriStateInput(TriState ts, ValueInputToken target) throws ProcessingException {
+  public TriStateInput(ISqlStyle sqlStyle, TriState ts, ValueInputToken target) throws ProcessingException {
     if (ts == null || ts.isUndefined()) {
-      m_delegate = new ArrayInput(new int[]{0, 1}, target);
+      m_delegate = new ArrayInput(sqlStyle, new int[]{0, 1}, target);
     }
     else {
       m_delegate = new SingleInput(ts.getBooleanValue(), Boolean.class, target);
@@ -50,8 +50,8 @@ class TriStateInput implements IBindInput {
   }
 
   @Override
-  public boolean isJdbcBind() {
-    return m_delegate.isJdbcBind();
+  public boolean isJdbcBind(ISqlStyle sqlStyle) {
+    return m_delegate.isJdbcBind(sqlStyle);
   }
 
   @Override

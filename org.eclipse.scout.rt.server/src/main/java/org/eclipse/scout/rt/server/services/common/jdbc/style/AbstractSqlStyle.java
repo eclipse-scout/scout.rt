@@ -931,8 +931,14 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
 
   protected abstract int getMaxListSize();
 
+
   @Override
   public String createInList(String attribute, Object array) {
+    return createInList(attribute, false, array);
+  }
+
+  @Override
+  public String createInList(String attribute, boolean plain, Object array) {
     Object[] values = toArray(array);
     if (values.length == 0) {
       return createNull(attribute);
@@ -963,6 +969,11 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
 
   @Override
   public String createNotInList(String attribute, Object array) {
+    return createNotInList(attribute, false, array);
+  }
+
+  @Override
+  public String createNotInList(String attribute, boolean plain, Object array) {
     Object[] values = toArray(array);
     if (values.length == 0) {
       return createNotNull(attribute);
@@ -989,6 +1000,11 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
     }
     buf.append(")");// bracket 1
     return buf.toString();
+  }
+
+  @Override
+  public boolean isCreatingInListGeneratingBind(Object array) {
+    return false;
   }
 
   @Override

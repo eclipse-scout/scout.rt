@@ -22,6 +22,7 @@ class BeanPropertyInput implements IBindInput {
   private String m_propertyName;
   private FastPropertyDescriptor m_propertyDesc;
   private Object[] m_beans;
+  private Object[] m_rawValues;
   private ValueInputToken m_target;
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
@@ -56,14 +57,15 @@ class BeanPropertyInput implements IBindInput {
     if (isBatch()) {
     }
     else if (m_beans.length >= 2) {
-      m_target.setPlainValue(true);
-      // if the op is = or <> change it to IN or NOT IN
-      if (m_target.getParsedOp() != null) {
-        if (m_target.getParsedOp().equals("=")) {
-          m_target.setParsedOp("IN");
-        }
-        else if (m_target.getParsedOp().equals("<>")) {
-          m_target.setParsedOp("NOT IN");
+      if (m_target.isPlainValue() || m_target.isPlainSql()) {
+        // if the op is = or <> change it to IN or NOT IN
+        if (m_target.getParsedOp() != null) {
+          if (m_target.getParsedOp().equals("=")) {
+            m_target.setParsedOp("IN");
+          }
+          else { // != or <>
+            m_target.setParsedOp("NOT IN");
+          }
         }
       }
     }
@@ -95,7 +97,7 @@ class BeanPropertyInput implements IBindInput {
   }
 
   @Override
-  public boolean isJdbcBind() {
+  public boolean isJdbcBind(ISqlStyle sqlStyle) {
     if (isBatch()) {
       if (m_target.isPlainValue()) {
         return false;
@@ -108,7 +110,7 @@ class BeanPropertyInput implements IBindInput {
       }
     }
     else {
-      return false;
+      return m_target.getParsedAttribute() != null && !m_target.isPlainSql() && !m_target.isPlainValue() && sqlStyle.isCreatingInListGeneratingBind(getRawValues());
     }
   }
 
@@ -126,7 +128,7 @@ class BeanPropertyInput implements IBindInput {
   public SqlBind produceSqlBindAndSetReplaceToken(ISqlStyle sqlStyle) throws ProcessingException {
     if (isBatch()) {
       Object value = null;
-      Class valueType = m_propertyDesc != null ? m_propertyDesc.getPropertyType() : null;
+      Class<?> valueType = m_propertyDesc != null ? m_propertyDesc.getPropertyType() : null;
       if (m_batchIndex < m_beans.length) {
         Object bean = m_beans[m_batchIndex];
         if (bean != null && m_propertyDesc != null) {
@@ -153,35 +155,51 @@ class BeanPropertyInput implements IBindInput {
       }
     }
     else {
-      Object[] values = new Object[m_beans.length];
-      for (int i = 0; i < values.length; i++) {
-        Object bean = m_beans[i];
-        if (bean != null && m_propertyDesc != null) {
-          try {
-            values[i] = m_propertyDesc.getReadMethod().invoke(bean);
-          }
-          catch (Exception e) {
-            throw new ProcessingException("property " + m_propertyName, e);
-          }
+      return applyMultivalued(sqlStyle);
+    }
+  }
+
+  private Object[] getRawValues() throws IllegalArgumentException {
+    if (m_rawValues != null) {
+      return m_rawValues;
+    }
+    m_rawValues = new Object[m_beans.length];
+    for (int i = 0; i < m_rawValues.length; i++) {
+      Object bean = m_beans[i];
+      if (bean != null && m_propertyDesc != null) {
+        try {
+          m_rawValues[i] = m_propertyDesc.getReadMethod().invoke(bean);
+        }
+        catch (Exception e) {
+          throw new IllegalArgumentException("property " + m_propertyName, e);
         }
       }
-      if (m_target.getParsedAttribute() != null) {
-        String att = m_target.getParsedAttribute();
-        String op = m_target.getParsedOp();
-        m_target.setParsedAttribute(null);
-        m_target.setParsedOp(null);
-        if (op.equalsIgnoreCase("IN") || op.equalsIgnoreCase("=")) {
-          m_target.setReplaceToken(sqlStyle.createInList(att, values));
-        }
-        else {
-          m_target.setReplaceToken(sqlStyle.createNotInList(att, values));
-        }
+    }
+    return m_rawValues;
+  }
+
+  private SqlBind applyMultivalued(ISqlStyle sqlStyle) throws ProcessingException {
+    Object[] values = getRawValues();
+    if (m_target.getParsedAttribute() != null) {
+      boolean plain = m_target.isPlainSql() || m_target.isPlainValue();
+      String att = m_target.getParsedAttribute();
+      String op = m_target.getParsedOp();
+      m_target.setParsedAttribute(null);
+      m_target.setParsedOp(null);
+      if (op.equalsIgnoreCase("IN") || op.equalsIgnoreCase("=")) {
+        m_target.setReplaceToken(sqlStyle.createInList(att, plain, values));
       }
       else {
-        m_target.setReplaceToken(sqlStyle.toPlainText(values));
+        m_target.setReplaceToken(sqlStyle.createNotInList(att, plain, values));
       }
-      return null;
+      if (!plain && sqlStyle.isCreatingInListGeneratingBind(values)) {
+        return sqlStyle.buildBindFor(values, null);
+      }
     }
+    else {
+      m_target.setReplaceToken(sqlStyle.toPlainText(values));
+    }
+    return null;
   }
 
 }

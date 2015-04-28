@@ -133,12 +133,13 @@ public class StatementProcessor implements IStatementProcessor {
       m_ioTokens = m_bindModel.getIOTokens();
       //
       int jdbcBindIndex = 1;
+      ISqlStyle sqlStyle = m_callerService.getSqlStyle();
       for (IToken t : m_ioTokens) {
         IBindInput in = null;
         IBindOutput out = null;
         if (t.isInput()) {
           in = createInput(t, m_bindBases);
-          if (in.isJdbcBind()) {
+          if (in.isJdbcBind(sqlStyle)) {
             in.setJdbcBindIndex(jdbcBindIndex);
           }
           m_inputList.add(in);
@@ -151,7 +152,7 @@ public class StatementProcessor implements IStatementProcessor {
           m_outputList.add(out);
         }
         //
-        if ((in != null && in.isJdbcBind()) || (out != null && out.isJdbcBind())) {
+        if ((in != null && in.isJdbcBind(sqlStyle)) || (out != null && out.isJdbcBind())) {
           jdbcBindIndex++;
         }
       }
@@ -617,16 +618,17 @@ public class StatementProcessor implements IStatementProcessor {
   private void prepareInputStatementAndBinds() throws ProcessingException {
     // bind inputs and set replace token on inputs
     m_currentInputBindMap = new TreeMap<Integer, SqlBind>();
+    ISqlStyle sqlStyle = m_callerService.getSqlStyle();
     for (IBindInput in : m_inputList) {
-      SqlBind bind = in.produceSqlBindAndSetReplaceToken(m_callerService.getSqlStyle());
-      assert (bind != null) == in.isJdbcBind();
+      SqlBind bind = in.produceSqlBindAndSetReplaceToken(sqlStyle);
+      assert (bind != null) == in.isJdbcBind(sqlStyle);
       if (bind != null) {
         m_currentInputBindMap.put(in.getJdbcBindIndex(), bind);
       }
     }
     // set replace token on outputs
     for (IBindOutput out : m_outputList) {
-      out.setReplaceToken(m_callerService.getSqlStyle());
+      out.setReplaceToken(sqlStyle);
     }
     m_currentInputStm = m_bindModel.getFilteredStatement();
   }
@@ -1417,10 +1419,10 @@ public class StatementProcessor implements IStatementProcessor {
       if (Collection.class.isAssignableFrom(cls)) {
         Collection value = (Collection) ((IHolder) o).getValue();
         if (value == null) {
-          return new ArrayInput(null, bindToken);
+          return new ArrayInput(m_callerService.getSqlStyle(), null, bindToken);
         }
         else {
-          return new ArrayInput(value.toArray(), bindToken);
+          return new ArrayInput(m_callerService.getSqlStyle(), value.toArray(), bindToken);
         }
       }
       else if (cls.isArray()) {
@@ -1429,11 +1431,11 @@ public class StatementProcessor implements IStatementProcessor {
           return new SingleInput(((IHolder) o).getValue(), nullType, bindToken);
         }
         else {
-          return new ArrayInput(((IHolder) o).getValue(), bindToken);
+          return new ArrayInput(m_callerService.getSqlStyle(), ((IHolder) o).getValue(), bindToken);
         }
       }
       else if (cls == TriState.class) {
-        return new TriStateInput((TriState) ((IHolder) o).getValue(), bindToken);
+        return new TriStateInput(m_callerService.getSqlStyle(), (TriState) ((IHolder) o).getValue(), bindToken);
       }
       else {
         return new SingleInput(((IHolder) o).getValue(), nullType, bindToken);
@@ -1441,7 +1443,7 @@ public class StatementProcessor implements IStatementProcessor {
     }
     else {
       if (o instanceof Collection) {
-        return new ArrayInput(((Collection) o).toArray(), bindToken);
+        return new ArrayInput(m_callerService.getSqlStyle(), ((Collection) o).toArray(), bindToken);
       }
       else if (o.getClass().isArray()) {
         Class cls = o.getClass();
@@ -1450,11 +1452,11 @@ public class StatementProcessor implements IStatementProcessor {
           return new SingleInput(o, nullType, bindToken);
         }
         else {
-          return new ArrayInput(o, bindToken);
+          return new ArrayInput(m_callerService.getSqlStyle(), o, bindToken);
         }
       }
       else if (o.getClass() == TriState.class) {
-        return new TriStateInput((TriState) o, bindToken);
+        return new TriStateInput(m_callerService.getSqlStyle(), (TriState) o, bindToken);
       }
       else {
         return new SingleInput(o, nullType, bindToken);
