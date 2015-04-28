@@ -895,7 +895,6 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     public void setSelectionFromUI(Date d, CalendarComponent comp) {
       try {
         pushUIProcessor();
-        //
         setSelectedDate(d);
         setSelectedComponent(comp);
       }
@@ -905,16 +904,37 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
 
     @Override
-    public void setVisibleRangeFromUI(Range<Date> dateRange) {
-      setVisibleRangeFromUI(dateRange.getFrom(), dateRange.getTo());
+    public void setViewRangeFromUI(Range<Date> viewRange) {
+      setViewRangeFromUI(viewRange.getFrom(), viewRange.getTo());
     }
 
     @Override
-    public void setVisibleRangeFromUI(Date minDate, Date maxDate) {
+    public void setSelectedDateFromUI(Date date) {
       try {
         pushUIProcessor();
-        //
-        setViewRange(minDate, maxDate);
+        setSelectedDate(date);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setDisplayModeFromUI(int displayMode) {
+      try {
+        pushUIProcessor();
+        setDisplayMode(displayMode);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setViewRangeFromUI(Date from, Date to) {
+      try {
+        pushUIProcessor();
+        setViewRange(from, to);
       }
       finally {
         popUIProcessor();
@@ -925,7 +945,6 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     public void fireReloadFromUI() {
       try {
         pushUIProcessor();
-        //
         reloadCalendarItems();
       }
       finally {
@@ -937,7 +956,6 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     public void fireComponentActionFromUI() {
       try {
         pushUIProcessor();
-        //
         fireCalendarComponentAction();
       }
       finally {
@@ -949,7 +967,6 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     public void fireComponentMovedFromUI(CalendarComponent comp, Date newDate) {
       try {
         pushUIProcessor();
-        //
         comp = resolveComponent(comp);
         if (comp != null) {
           try {

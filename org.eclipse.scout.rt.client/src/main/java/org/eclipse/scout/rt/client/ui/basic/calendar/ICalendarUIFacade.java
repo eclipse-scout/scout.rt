@@ -24,13 +24,16 @@ public interface ICalendarUIFacade {
 
   void fireReloadFromUI();
 
-  /**
-   * @param dateRange
-   */
-  void setVisibleRangeFromUI(Range<Date> dateRange);
+  void setViewRangeFromUI(Range<Date> viewRange);
 
-  void setVisibleRangeFromUI(Date minDate, Date maxDate);
+  void setViewRangeFromUI(Date from, Date to);
+
+  void setDisplayModeFromUI(int displayMode);
 
   void setSelectionFromUI(Date date, CalendarComponent comp);
+
+  // FIXME AWE: (calendar) talk about selection in new Html UI, currently we can only select an entire day, but not a single item (= component)
+  // depending on the outcome we must remove/refactor either this method or setSelectionFromUI
+  void setSelectedDateFromUI(Date date);
 
 }

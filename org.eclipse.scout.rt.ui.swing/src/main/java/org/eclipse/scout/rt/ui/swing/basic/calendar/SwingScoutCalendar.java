@@ -76,7 +76,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().setVisibleRangeFromUI(m_dateChooser.getViewDateStart(), m_dateChooser.getViewDateEnd());
+        getScoutObject().getUIFacade().setViewRangeFromUI(m_dateChooser.getViewDateStart(), m_dateChooser.getViewDateEnd());
       }
     };
     getSwingEnvironment().invokeScoutLater(t, 0);
@@ -351,7 +351,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
             @Override
             public void run() {
               getScoutObject().setDisplayMode(m);
-              getScoutObject().getUIFacade().setVisibleRangeFromUI(minDate, maxDate);
+              getScoutObject().getUIFacade().setViewRangeFromUI(minDate, maxDate);
             }
           };
 
@@ -366,7 +366,7 @@ public class SwingScoutCalendar extends SwingScoutComposite<ICalendar> {
           Runnable t = new Runnable() {
             @Override
             public void run() {
-              getScoutObject().getUIFacade().setVisibleRangeFromUI(minDate, maxDate);
+              getScoutObject().getUIFacade().setViewRangeFromUI(minDate, maxDate);
             }
           };
 
