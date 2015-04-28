@@ -15,11 +15,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.Range;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarAdapter;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarListener;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
+import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarUIFacade;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -33,6 +36,8 @@ import org.json.JSONObject;
 
 public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObserver<T> {
 
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonCalendar.class);
+
   // from model
   public static final String EVENT_CALENDAR_CHANGED = "calendarChanged";
   public static final String EVENT_CALENDAR_CHANGED_BATCH = "calendarChangedBatch";
@@ -41,9 +46,9 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   private static final String EVENT_COMPONENT_ACTION = "componentAction";
   private static final String EVENT_COMPONENT_MOVED = "componentMoved";
   private static final String EVENT_RELOAD = "reload";
-  private static final String EVENT_SET_VISIBLE_RANGE = "setVisibleRange"; // FIXME AWE: (calendar) rename to viewRange, also on UI_Facade
   private static final String EVENT_SET_SELECTION = "setSelection";
-  private static final String EVENT_SET_DISPLAY_MODE = "setDisplayMode";
+  private static final String EVENT_VIEW_RANGE_CHANGED = "viewRangeChanged";
+  private static final String EVENT_MODEL_CHANGED = "modelChanged";
 
   private CalendarListener m_calendarListener;
 
@@ -204,14 +209,14 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     else if (EVENT_RELOAD.equals(event.getType())) {
       handleUiReload(event);
     }
-    else if (EVENT_SET_VISIBLE_RANGE.equals(event.getType())) {
-      handleUiSetVisibleRange(event);
-    }
     else if (EVENT_SET_SELECTION.equals(event.getType())) {
       handleUiSetSelection(event);
     }
-    else if (EVENT_SET_DISPLAY_MODE.equals(event.getType())) {
-      handleUiSetDisplayMode(event);
+    else if (EVENT_MODEL_CHANGED.equals(event.getType())) {
+      handleUiModelChanged(event);
+    }
+    else if (EVENT_VIEW_RANGE_CHANGED.equals(event.getType())) {
+      handleUiViewRangeChanged(event);
     }
     else {
       super.handleUiEvent(event);
@@ -230,8 +235,9 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   }
 
   protected void handleUiComponentMoved(JsonEvent event) {
+    JSONObject data = event.getData();
+    Date newDate = toJavaDate(data, "newDate");
     JsonCalendarComponent<CalendarComponent> comp = resolveCalendarComponent(event.getData().optString("component"));
-    Date newDate = new JsonDate(event.getData().optString("newDate")).asJavaDate();
     getModel().getUIFacade().fireComponentMovedFromUI(comp.getModel(), newDate);
   }
 
@@ -239,23 +245,45 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     getModel().getUIFacade().fireReloadFromUI();
   }
 
-  protected void handleUiSetVisibleRange(JsonEvent event) {
-    JSONObject dateRange = event.getData().optJSONObject("dateRange");
-    Date fromDate = new JsonDate(dateRange.optString("from")).asJavaDate();
-    Date toDate = new JsonDate(dateRange.optString("to")).asJavaDate();
-    getModel().getUIFacade().setVisibleRangeFromUI(fromDate, toDate);
-  }
-
   protected void handleUiSetSelection(JsonEvent event) {
-    Date date = new JsonDate(event.getData().optString("date")).asJavaDate();
-    JsonCalendarComponent<CalendarComponent> comp = resolveCalendarComponent(event.getData().optString("component"));
+    // FIXME AWE: (calendar) currently the UI does not support selection of components, only an entire day can be selected
+    JSONObject data = event.getData();
+    Date date = toJavaDate(data, "date");
+    JsonCalendarComponent<CalendarComponent> comp = resolveCalendarComponent(data.optString("component"));
     getModel().getUIFacade().setSelectionFromUI(date, comp.getModel());
   }
 
-  protected void handleUiSetDisplayMode(JsonEvent event) {
-    int displayMode = event.getData().optInt("displayMode");
-    // TODO BSH Calendar | Check if we should add this method to the UI facade
-    getModel().setDisplayMode(displayMode);
+  protected void handleUiModelChanged(JsonEvent event) {
+    JSONObject data = event.getData();
+    int displayMode = data.optInt("displayMode");
+    ICalendarUIFacade uiFacade = getModel().getUIFacade();
+    uiFacade.setDisplayModeFromUI(displayMode);
+    Range<Date> viewRange = extractViewRange(data);
+    uiFacade.setViewRangeFromUI(viewRange);
+    Date selectedDate = extractSelectedDate(data);
+    uiFacade.setSelectedDateFromUI(selectedDate);
+    LOG.debug("displayMode=" + displayMode + " viewRange=" + viewRange + " selectedDate=" + selectedDate);
+  }
+
+  protected void handleUiViewRangeChanged(JsonEvent event) {
+    Range<Date> viewRange = extractViewRange(event.getData());
+    getModel().getUIFacade().setViewRangeFromUI(viewRange);
+    LOG.debug("viewRange=" + viewRange);
+  }
+
+  private Range<Date> extractViewRange(JSONObject data) {
+    JSONObject viewRange = data.optJSONObject("viewRange");
+    Date fromDate = toJavaDate(viewRange, "from");
+    Date toDate = toJavaDate(viewRange, "to");
+    return new Range<Date>(fromDate, toDate);
+  }
+
+  private Date extractSelectedDate(JSONObject data) {
+    return toJavaDate(data, "selectedDate");
+  }
+
+  private Date toJavaDate(JSONObject data, String propertyName) {
+    return new JsonDate(data.optString(propertyName)).asJavaDate();
   }
 
   protected class P_CalendarListener extends CalendarAdapter {

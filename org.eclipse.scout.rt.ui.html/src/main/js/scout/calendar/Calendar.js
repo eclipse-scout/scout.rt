@@ -69,14 +69,9 @@ scout.Calendar.prototype.init = function(model, session) {
   this._exactRange = this._calcExactRange();
   this.viewRange = this._calcViewRange();
 
-  // FIXME AWE: improve this and do it client-side? currently we're playing ping-pong
-  // with the UI because the client cannot determine its view-range itself
-  this.session.send(this.id, 'setVisibleRange', {
-    dateRange: {
-      from: scout.dates.toJsonDate(this.viewRange.from),
-      to: scout.dates.toJsonDate(this.viewRange.to)
-    }
-  });
+  // FIXME AWE: (calendar) improve this and do it client-side? currently we're playing
+  // ping-pong with the UI because the client cannot determine its view-range itself
+  this._sendViewRangeChanged();
 };
 
 scout.Calendar.prototype._syncSelectedDate = function(dateString) {
@@ -151,9 +146,6 @@ scout.Calendar.prototype._render = function($parent) {
 
   // click event on all day and children elements
   $('.calendar-day', this.$grid).click(this._onClickDay.bind(this));
-
-  // should be done by server?
-  this._updateModel(false);
   this._updateScreen();
 };
 
@@ -168,6 +160,9 @@ scout.Calendar.prototype._renderViewRange = function() {
 };
 
 scout.Calendar.prototype._renderDisplayMode = function() {
+};
+
+scout.Calendar.prototype._renderSelectedDate = function() {
 };
 
 /* -- basics, events -------------------------------------------- */
@@ -195,7 +190,7 @@ scout.Calendar.prototype._dateParts = function(date, modulo) {
 
 scout.Calendar.prototype._navigateDate = function(direction) {
   this.selectedDate = this._calcSelectedDate(direction);
-  this._updateModel2();
+  this._updateModel();
 };
 
 // FIXME AWE: (calendar) discuss with C.GU - should this really be calculated in the UI?
@@ -214,10 +209,10 @@ scout.Calendar.prototype._calcSelectedDate = function(direction) {
   }
 };
 
-scout.Calendar.prototype._updateModel2 = function() {
+scout.Calendar.prototype._updateModel = function() {
   this._exactRange = this._calcExactRange();
   this.viewRange = this._calcViewRange();
-  this._updateModel();
+  this._sendModelChanged();
   this._updateScreen();
 };
 
@@ -288,12 +283,11 @@ scout.Calendar.prototype._calcViewRange = function() {
 
 scout.Calendar.prototype._onClickToday = function(event) {
   this.selectedDate = new Date();
-  this._updateModel2();
+  this._updateModel();
 };
 
 scout.Calendar.prototype._onClickDisplayMode = function(event) {
   this.displayMode = $(event.target).data('mode');
-
   if (this._isWork()) {
     // change date if selectedDate is on a weekend
     var p = this._dateParts(this.selectedDate, true);
@@ -301,10 +295,7 @@ scout.Calendar.prototype._onClickDisplayMode = function(event) {
       this.selectedDate = new Date(p.year, p.month, p.date - p.day + 4);
     }
   }
-
-  // this._sendDisplayModeChanged(); // FIXME AWE: (calendar) send to server
-  // this._sendViewRangeChanged();
-  this._updateModel2();
+  this._updateModel();
 };
 
 scout.Calendar.prototype._onClickYear = function(event) {
@@ -337,23 +328,25 @@ scout.Calendar.prototype._onClickDay = function(event) {
 
 /* --  set display mode and range ------------------------------------- */
 
-// FIXME AWE: rename to something with "send..."
 // FIXME AWE: nur noch ein request, nur die properties die geändert haben
-scout.Calendar.prototype._updateModel = function(notifyServer) {
-  notifyServer = notifyServer === undefined ? true : notifyServer;
-  if (notifyServer) {
-    // set range...
-    this.session.send(this.id, 'setVisibleRange', {
-      dateRange: {
-        from: scout.dates.toJsonDate(this.viewRange.from),
-        to: scout.dates.toJsonDate(this.viewRange.to)
-      }
-    });
-    // ... and mode on server
-    this.session.send(this.id, 'setDisplayMode', {
-      displayMode: this.displayMode
-    });
-  }
+scout.Calendar.prototype._sendModelChanged = function() {
+  var data = {
+    viewRange: this._jsonViewRange(),
+    selectedDate: scout.dates.toJsonDate(this.selectedDate),
+    displayMode: this.displayMode
+  };
+  this.session.send(this.id, 'modelChanged', data);
+};
+
+scout.Calendar.prototype._sendViewRangeChanged = function() {
+  this.session.send(this.id, 'viewRangeChanged', {viewRange: this._jsonViewRange()});
+};
+
+scout.Calendar.prototype._jsonViewRange = function() {
+  return {
+    from: scout.dates.toJsonDate(this.viewRange.from),
+    to: scout.dates.toJsonDate(this.viewRange.to)
+  };
 };
 
 scout.Calendar.prototype._updateScreen = function() {
@@ -485,9 +478,9 @@ scout.Calendar.prototype.layoutLabel = function() {
     exTo = this._exactRange.to;
 
   // set range text
-  if (this.displayMode === scout.Calendar.DisplayMode.DAY) {
+  if (this._isDay()) {
     text = this._dateFormat(exFrom, 'd. MMMM yyyy');
-  } else if (this.displayMode ===  scout.Calendar.DisplayMode.WORK || this.displayMode ===  scout.Calendar.DisplayMode.WEEK) {
+  } else if (this._isWork() || this._isWeek()) {
     if (exFrom.getMonth() === exTo.getMonth()) {
       text = this._dateFormat(exFrom, 'd.') + ' bis ' + this._dateFormat(exTo, 'd. MMMM yyyy');
     } else if (exFrom.getFullYear() === exTo.getFullYear()) {
@@ -639,12 +632,12 @@ scout.Calendar.prototype._onYearClick = function(event) {
     month = this.selectedDate.getMonth(),
     date = this.selectedDate.getDate();
   this.selectedDate = new Date(year + diff, month, date);
-  this._updateModel2();
+  this._updateModel();
 };
 
 scout.Calendar.prototype._onYearDayClick = function(event) {
   this.selectedDate = $('.year-hover-day', this.$year).data('date');
-  this._updateModel2();
+  this._updateModel();
 };
 
 scout.Calendar.prototype._onYearHoverIn = function(event) {
@@ -673,7 +666,6 @@ scout.Calendar.prototype._onYearHoverIn = function(event) {
   } else if (this._isWork()) {
     startHover = new Date(year, month, date - day);
     endHover = new Date(year, month, date - day + 4);
-
     // in case of work week: selected date has to be opart of range
     if (date1 > endHover) {
       date1 = endHover;
@@ -712,7 +704,7 @@ scout.Calendar.prototype.drawList = function() {
   // set title to selected day
   this.$list.appendDiv('list-title', this._dateFormat($selected.data('date'), 'd. MMMM yyyy'));
 
-  // show all components of selcted day, add links and set full text
+  // show all components of selected day, add links and set full text
   for (i = 0; i < $components.length; i++) {
     $c = $components.eq(i);
     $c.clone()
