@@ -268,6 +268,8 @@
         iconId = iconId.substr(5);
       } else {
         // FIXME BSH Handle URL icons. Check also: Button.js
+        // scout.helpers.dynamicResourceUrl(this, this.iconId)
+        return;
       }
       this.attr('data-icon', iconId);
     } else {
