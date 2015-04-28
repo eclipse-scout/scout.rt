@@ -22,7 +22,7 @@ scout.MessageBox.prototype.render = function($parent) {
     throw new Error('Missing argument $parent');
   }
 
-  this._$glassPane = scout.fields.new$Glasspane().appendTo($parent);
+  this._$glassPane = scout.fields.new$Glasspane(this._session.uiSessionId).appendTo($parent);
   this.$container = this._$glassPane.appendDiv('messagebox');
 
   var $handle = this.$container.appendDiv('drag-handle');

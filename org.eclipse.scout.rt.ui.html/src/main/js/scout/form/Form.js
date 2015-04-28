@@ -11,7 +11,7 @@ scout.Form.prototype._render = function($parent) {
   if (this.isDialog()) {
     this.rootGroupBox.menuBarPosition = 'bottom';
     // FIXME BSH Try to consolidate management of glasspanes in desktop (but: Session.showFatalMessage())
-    this._$glassPane = scout.fields.new$Glasspane().appendTo($parent);
+    this._$glassPane = scout.fields.new$Glasspane(this.session.uiSessionId).appendTo($parent);
     $parent = this._$glassPane;
   }
 

@@ -6,8 +6,14 @@ scout.fields = {
       .disableSpellcheck();
   },
 
-  new$Glasspane: function() {
-    return $.makeDiv('glasspane');
+  new$Glasspane: function(uiSessionId) {
+    var $glassPane = $.makeDiv('glasspane');
+    var keyStrokeAdapter = new scout.GlassPaneKeyStrokeAdapter($glassPane, uiSessionId);
+    scout.keyStrokeManager.installAdapter($glassPane, keyStrokeAdapter);
+    $glassPane.on("remove", function () {
+      scout.keyStrokeManager.uninstallAdapter(keyStrokeAdapter);
+    });
+    return $glassPane;
   }
 
 };

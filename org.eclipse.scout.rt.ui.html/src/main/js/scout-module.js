@@ -55,6 +55,7 @@ __include("scout/action/Action.js");
 __include("scout/action/keystroke/AbstractKeyStrokeAdapter.js");
 __include("scout/action/keystroke/KeyStroke.js");
 __include("scout/action/keystroke/MnemonicKeyStroke.js");
+__include("scout/action/keystroke/GlasspaneKeyStrokeAdapter.js");
 __include("scout/menu/menus.js");
 __include("scout/menu/Menu.js");
 __include("scout/menu/MenuBar.js");

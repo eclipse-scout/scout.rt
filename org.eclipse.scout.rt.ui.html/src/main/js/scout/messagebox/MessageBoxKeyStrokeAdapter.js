@@ -3,6 +3,7 @@ scout.MessageBoxKeyStrokeAdapter = function(field) {
   this._$container = field.$container;
   this.uiSessionId(field._session.uiSessionId);
   this.keyStrokes.push(new scout.BoxNavKeyStrokes(this._$container));
+  this.anchorKeyStrokeAdapter=true;
 };
 
 scout.inherits(scout.MessageBoxKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);

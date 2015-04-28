@@ -9,6 +9,7 @@ scout.AbstractKeyStrokeAdapter = function(field) {
   if(this._field && this._field.session){
     this._uiSessionId = this._field.session.uiSessionId;
   }
+  this.anchorKeyStrokeAdapter=false;
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeys) {

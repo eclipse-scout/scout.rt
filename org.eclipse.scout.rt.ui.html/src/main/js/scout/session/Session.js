@@ -633,7 +633,7 @@ scout.Session.prototype._renderBusyGlasspane = function() {
   // cancelled again if the busy state returns to false in the meantime).
   this._busyGlasspaneTimeoutId = setTimeout(function() {
     // Create busy glasspane
-    this._$busyGlasspane = scout.fields.new$Glasspane()
+    this._$busyGlasspane = scout.fields.new$Glasspane(this.uiSessionId)
       .addClass('busy')
       .appendTo(this.$entryPoint);
     $('.taskbar-logo').addClass('animated');

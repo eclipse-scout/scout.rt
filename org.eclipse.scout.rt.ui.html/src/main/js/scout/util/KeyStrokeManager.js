@@ -60,7 +60,9 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
   var controller = function(event) {
     var i, keyStroke;
     var bubbleUp = true;
-
+    if(event.originalEvent.anchorReached){
+      return;
+    }
     //Trace adapter if it is affected when key pressed.
     that._adaptersToDraw.push(adapter);
 
@@ -77,6 +79,10 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
           adapter.removeKeyBox();
         }
       }
+    }
+    if(adapter.anchorKeyStrokeAdapter){
+      //append information about anchor reached to original event to provide information to all listeners upwards.
+      event.originalEvent.anchorReached = true;
     }
     if (!bubbleUp || adapter.preventBubbleUp(event)) {
       adapter.removeKeyBox();
