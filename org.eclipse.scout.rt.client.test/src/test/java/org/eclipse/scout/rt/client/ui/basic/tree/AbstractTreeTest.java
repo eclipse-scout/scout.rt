@@ -103,12 +103,13 @@ public class AbstractTreeTest {
       m_node.getCellForUpdate().setBackgroundColor("FFFF00");
       m_node.getCellForUpdate().setForegroundColor("00FF00");
       m_node.getCellForUpdate().setFont(new FontSpec("Arial", FontSpec.STYLE_BOLD, 7));
+      m_node.setEnabled(false); // <-- all other fire NODE_CHANGED event, this fires NODES_UPDATED event
       assertNotifications(0, 0);
     }
     finally {
       m_node.getTree().setTreeChanging(false);
     }
-    assertNotifications(1, 5);
+    assertNotifications(1, 2);
   }
 
   @Test
