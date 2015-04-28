@@ -526,4 +526,8 @@ Keystrokes:
 -Mnemonics werden höher Priorisiert als konfigurierte Keystrokes.
 
 AppLink-Handling
-TODO CGU describe
+Damit keine Primary-Keys ins HTML geschrieben werden müssen, sollten die Links umgewandelt werden. Damit diese Umwandlung möglichst transparent erfolgt, soll es der JSON-Layer übernehmen.
+Jeder (App-Link fähige) JsonAdapter könnte das HTML parsen, IDS für die Links erzeugen und diese in einer lokalen Map abspeichern. Bei der Aktivierung des Links könnte er dann auf die Map den Lookup machen.
+Vielleicht könnte man auch gleich die Adapter-Registry dafür verwenden und einen Adapter pro Link erzeugen?
+Für die BeanFields/Columns: Dort muss kein HTML geparsed werden, dafür jedoch muss anhand des Properties erkannt werden, ob es sich um ein App-Link-Ref handelt. Falls ja -> Umwandeln. Diese Erkennung könnte anhand eines AppLink-Beans erfolgen.
+Also anstatt zwei Properties mit Ref und Name erstellt man ein AppLink-Property.

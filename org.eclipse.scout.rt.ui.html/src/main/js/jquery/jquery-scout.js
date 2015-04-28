@@ -526,4 +526,23 @@
     return _oldhide.apply(this, arguments);
   };
 
+  // === helpers for projects, may not necesserily be used by scout itself ===
+  $.fn.appendAppLink = function(appLinkBean, func) {
+    return this.appendSpan().appLink(appLinkBean, func);
+  };
+
+  /**
+   * @param func Either a function to be called when the app link has been clicked.
+   * Or an object with a method named _onAppLinkAction (e.g. an instance of BeanField).
+   */
+  $.fn.appLink = function(appLinkBean, func) {
+    if (typeof func === 'object' && func._onAppLinkAction) {
+      func = func._onAppLinkAction.bind(func);
+    }
+    return this.addClass('app-link')
+      .text(appLinkBean.name)
+      .attr('data-ref', appLinkBean.ref)
+      .on('click', func);
+  };
+
 }(jQuery));
