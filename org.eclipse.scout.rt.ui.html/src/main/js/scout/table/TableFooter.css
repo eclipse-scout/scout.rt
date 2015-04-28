@@ -25,6 +25,7 @@
 .control-container {
   position: absolute;
   overflow: hidden;
+  outline: none;
   background-color: @body-background-color;
   bottom: @table-footer-height;
   width: 100%;
