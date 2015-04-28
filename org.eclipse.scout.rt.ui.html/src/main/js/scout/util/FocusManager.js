@@ -29,13 +29,20 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
 };
 
 scout.FocusManager.prototype.focusFirstElement = function($container) {
-  var $focusableElementsValid = $container.find(':focusable:not(:parent((.menubar))');
-  if ($focusableElementsValid && $focusableElementsValid.length > 0) {
-    $focusableElementsValid.first().focus();
-  } else {
-    $focusableElementsValid = $container.find(':focusable');
-    if ($focusableElementsValid && $focusableElementsValid.length > 0) {
-      $focusableElementsValid.first().focus();
+  var focused = false;
+  var $focusableElements = $container.find(':focusable');
+  for(var i = 0; i<$focusableElements.length; i++){
+    var menuParents = $($focusableElements[i]).parents('.menubar');
+    if(menuParents.length===0){
+      focused = true;
+      $focusableElements.get(i).focus();
+      break;
+    }
+  }
+
+  if (!focused) {
+    if ($focusableElements && $focusableElements.length > 0) {
+      $focusableElements.first().focus();
     }
     else{
       //if nothing is found to focus then focus root container
