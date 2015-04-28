@@ -247,47 +247,47 @@ beforeEach(function() {
 
 //JQuery extensions for testing purpose
 $.fn.triggerRightClick = function() {
-  $(this).trigger({
+  this.trigger({
     type: 'mousedown',
     which: 3
   });
-  $(this).trigger({
+  this.trigger({
     type: 'mouseup',
     which: 3
   });
-  return $(this);
+  return this;
 };
 
 $.fn.triggerKeyDown = function(key, modifier) {
-  var event = jQuery.Event("keydown");
+  var event = new jQuery.Event("keydown");
+  event.originalEvent = {}; // create dummy object
   event.which = key;
   event.altKey = modifier === 'alt';
   event.ctrlKey = modifier === 'ctrl';
   event.shiftKey = modifier === 'shift';
-  (this).trigger(event);
+  this.trigger(event);
 };
 
 $.fn.triggerMouseDown = function(clicks) {
-  return $(this).triggerWithDetail('mousedown', clicks);
+  return this.triggerWithDetail('mousedown', clicks);
 };
 
 $.fn.triggerMouseUp = function(clicks) {
-  return $(this).triggerWithDetail('mouseup', clicks);
+  return this.triggerWithDetail('mouseup', clicks);
 };
 
 $.fn.triggerMouseMove = function(position) {
-  return $(this).triggerWithPosition('mousemove', position);
+  return this.triggerWithPosition('mousemove', position);
 };
 
 $.fn.triggerWithDetail = function(event, clicks) {
-  var $this = $(this),
-    pos = $this.position();
+  var pos = this.position();
 
   if (!clicks) {
     clicks = 1;
   }
 
-  $this.trigger({
+  this.trigger({
     type: event,
     originalEvent: {
       detail: clicks
@@ -295,37 +295,34 @@ $.fn.triggerWithDetail = function(event, clicks) {
     pageX: pos.left,
     pageY: pos.right
   });
-  return $this;
+  return this;
 };
 
 $.fn.triggerWithPosition = function(event, position) {
-  var $this = $(this);
-
   if (!position) {
-    position = $this.position();
+    position = this.position();
   }
 
-  $this.trigger({
+  this.trigger({
     type: event,
     pageX: position.left,
     pageY: position.right
   });
-  return $this;
+  return this;
 };
 
 $.fn.triggerContextMenu = function() {
-  var $this = $(this),
-    pos = $this.position(),
+  var pos = this.position(),
     clicks = 1;
 
-  $this.triggerMouseDown(clicks);
-  $this.triggerMouseUp(clicks);
-  $this.trigger({
+  this.triggerMouseDown(clicks);
+  this.triggerMouseUp(clicks);
+  this.trigger({
     type: 'contextmenu',
     pageX: pos.left,
     pageY: pos.top
   });
-  return $this;
+  return this;
 };
 
 /**
@@ -334,35 +331,32 @@ $.fn.triggerContextMenu = function() {
  * @param clicks the number of clicks. If not set 1 is used.
  */
 $.fn.triggerClick = function(clicks) {
-  var $this = $(this);
-
   if (!clicks) {
     clicks = 1;
   }
 
-  $this.triggerMouseDown(clicks);
-  $this.triggerMouseUp(clicks);
-  $this.trigger({
+  this.triggerMouseDown(clicks);
+  this.triggerMouseUp(clicks);
+  this.trigger({
     type: 'click',
     originalEvent: {
       detail: clicks
     }
   });
 
-  return $this;
+  return this;
 };
 
 $.fn.triggerDoubleClick = function() {
-  var $this = $(this);
   var clicks = 2;
 
-  $this.triggerClick();
-  $this.triggerClick(2);
-  $this.trigger({
+  this.triggerClick();
+  this.triggerClick(2);
+  this.trigger({
     type: 'dblclick',
     originalEvent: {
       detail: clicks
     }
   });
-  return $this;
+  return this;
 };

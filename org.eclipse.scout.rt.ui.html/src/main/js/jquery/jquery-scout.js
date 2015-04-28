@@ -522,7 +522,7 @@
 
   var _oldhide = $.fn.hide;
   $.fn.hide = function(speed, callback) {
-    $(this).trigger('hide');
+    this.trigger('hide');
     return _oldhide.apply(this, arguments);
   };
 

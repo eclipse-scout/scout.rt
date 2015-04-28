@@ -56,22 +56,20 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
     return;
   }
 
-  var that = this;
   var controller = function(event) {
-    var i, keyStroke;
-    var bubbleUp = true;
-    if(event.originalEvent.anchorReached){
+    if (event.originalEvent.anchorReached) {
       return;
     }
     //Trace adapter if it is affected when key pressed.
-    that._adaptersToDraw.push(adapter);
+    this._adaptersToDraw.push(adapter);
 
     //if bubble up should be prevented then continue and prevent bubble up also if no key strokes are registered
     if ((!adapter.keyStrokes || !adapter.accept(event)) && !adapter.preventBubbleUp(event)) {
       return;
     }
-    for (i = 0; i < adapter.keyStrokes.length; i++) {
-      keyStroke = adapter.keyStrokes[i];
+    var bubbleUp = true;
+    for (var i = 0; i < adapter.keyStrokes.length; i++) {
+      var keyStroke = adapter.keyStrokes[i];
       if (keyStroke.accept && keyStroke.accept(event)) {
         keyStroke.handle(event);
         bubbleUp = bubbleUp && keyStroke.bubbleUp;
@@ -80,17 +78,17 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
         }
       }
     }
-    if(adapter.anchorKeyStrokeAdapter){
+    if (adapter.anchorKeyStrokeAdapter) {
       //append information about anchor reached to original event to provide information to all listeners upwards.
       event.originalEvent.anchorReached = true;
     }
     if (!bubbleUp || adapter.preventBubbleUp(event)) {
       adapter.removeKeyBox();
-      that._adaptersToDraw = [];
+      this._adaptersToDraw = [];
       event.stopPropagation();
       scout.focusManager.validateFocus(adapter.uiSessionId(), 'KeyStrokeManager');
     }
-  };
+  }.bind(this);
 
   this._adapters.push(adapter);
   adapter.$target = $element;
