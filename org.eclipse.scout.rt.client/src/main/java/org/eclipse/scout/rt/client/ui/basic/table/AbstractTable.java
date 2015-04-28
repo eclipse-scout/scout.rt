@@ -80,6 +80,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TableContextMenu;
@@ -1855,6 +1856,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return getContextMenu().getChildActions();
   }
 
+  @Override
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+    return MenuUtility.getMenuByClass(this, menuType);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public <T extends IMenu> T getMenu(final Class<T> menuType) {
     IContextMenu contextMenu = getContextMenu();

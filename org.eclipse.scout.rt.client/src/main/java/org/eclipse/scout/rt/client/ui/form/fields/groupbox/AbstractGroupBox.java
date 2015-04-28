@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.IGroupBoxEx
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
@@ -374,6 +375,11 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public List<IMenu> getMenus() {
     return getContextMenu().getChildActions();
+  }
+
+  @Override
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+    return MenuUtility.getMenuByClass(this, menuType);
   }
 
   protected List<Class<? extends IMenu>> getDeclaredMenus() {

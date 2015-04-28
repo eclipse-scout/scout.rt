@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.activitymap.ActivityMapCha
 import org.eclipse.scout.rt.client.extension.ui.basic.activitymap.IActivityMapExtension;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IActivityMapContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.ActivityMapContextMenu;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -714,6 +715,11 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   @Override
   public List<IMenu> getMenus() {
     return getContextMenu().getChildActions();
+  }
+
+  @Override
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+    return MenuUtility.getMenuByClass(this, menuType);
   }
 
   private void fireCellAction(RI resourceId, MinorTimeColumn column, ActivityCell<RI, AI> activityCell) {

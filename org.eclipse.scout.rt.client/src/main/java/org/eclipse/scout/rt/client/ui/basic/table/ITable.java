@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
@@ -38,17 +38,13 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
 /**
- * The table is by default multi-select Columns are defined as inner classes for
- * every inner column class there is a generated getXYColumn method directly on
- * the table use isValueChangeTriggerEnabled() when formfieldata is being loaded
+ * The table is by default multi-select.
  * <p>
- * You can write html into the table cells.
+ * Columns are defined as inner classes.
  * <p>
- * You can use local urls that call back to the table itself and can be handled by overriding
- * {@link AbstractTable#execAppLinkAction(URL, String, boolean)}. A local URL is one of the form http://local/...
- * <p>
+ * For every inner column class there is a generated getXYColumn method directly on the table.
  */
-public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId, IAppLinkCapable {
+public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId, IAppLinkCapable, IContextMenuOwner {
 
   /**
    * String
@@ -326,7 +322,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   /**
    * Convenience to find a menu, uses {@link org.eclipse.scout.rt.client.ui.action.ActionFinder ActionFinder}
+   *
+   * @deprecated Use {@link #getMenuByClass(Class)} instead. This method is error-prone, because it does not throw an
+   *             exception if the given menu type is ambiguous. It will be removed in the O-Release (7.0).
    */
+  @Deprecated
   <T extends IMenu> T getMenu(Class<T> menuType);
 
   List<IKeyStroke> getKeyStrokes();
@@ -894,14 +894,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    */
   void addMenu(IMenu menu);
 
-  /**
-   * @return the child list of {@link #getContextMenu()}
-   */
-  List<IMenu> getMenus();
-
-  /**
-   * @return the invisible root menu container of all table menus.
-   */
+  @Override
   ITableContextMenu getContextMenu();
 
   /**

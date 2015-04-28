@@ -18,12 +18,13 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IActivityMapContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld;
 
 /**
  * The activity map is a specialized model which contains a set of {@link ActivityCell}s that are grouped by resourceId.
  */
-public interface IActivityMap<RI, AI> extends IPropertyObserver {
+public interface IActivityMap<RI, AI> extends IPropertyObserver, IContextMenuOwner {
 
   /**
    * {@link java.util.Date}[] truncated to day using {@link com.bsiag.DateUtility#truncDate(Date)}
@@ -346,17 +347,8 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
    */
   void addMenu(IMenu menu);
 
-  /**
-   * @return the child list of {@link #getContextMenu()}
-   */
-  List<IMenu> getMenus();
-
-  /**
-   * @return the invisible root menu container of all menus.
-   */
-
+  @Override
   IActivityMapContextMenu getContextMenu();
 
   IActivityMapUIFacade getUIFacade();
-
 }

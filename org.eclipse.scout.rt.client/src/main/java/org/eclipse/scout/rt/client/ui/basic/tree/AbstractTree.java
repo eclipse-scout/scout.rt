@@ -59,6 +59,7 @@ import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TreeContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -692,6 +693,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return getContextMenu().getChildActions();
   }
 
+  @Override
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+    return MenuUtility.getMenuByClass(this, menuType);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException {
     // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required

@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.TimeScale;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
@@ -27,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldO
  *
  * @since 5.1
  */
-public interface IPlanner<RI, AI> extends IPropertyObserver {
+public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
 
   /**
    * {@link java.util.Date}[] truncated to day using {@link com.bsiag.DateUtility#truncDate(Date)}
@@ -348,15 +349,7 @@ public interface IPlanner<RI, AI> extends IPropertyObserver {
    */
   void addMenu(IMenu menu);
 
-  /**
-   * @return the child list of {@link #getContextMenu()}
-   */
-  List<IMenu> getMenus();
-
-  /**
-   * @return the invisible root menu container of all menus.
-   */
-
+  @Override
   IPlannerContextMenu getContextMenu();
 
   AbstractEventBuffer<PlannerEvent> createEventBuffer();

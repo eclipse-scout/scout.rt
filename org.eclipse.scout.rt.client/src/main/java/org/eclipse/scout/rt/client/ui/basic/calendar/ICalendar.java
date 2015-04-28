@@ -17,15 +17,15 @@ import java.util.Set;
 import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 
-public interface ICalendar extends IPropertyObserver {
+public interface ICalendar extends IPropertyObserver, IContextMenuOwner {
 
   // never change final constants (properties files might have references)
   int DISPLAY_MODE_DAY = 1;
@@ -275,17 +275,10 @@ public interface ICalendar extends IPropertyObserver {
   ICalendarUIFacade getUIFacade();
 
   /**
-   * @return An unmodifiable list of all menus defined for this calendar.
-   */
-  List<IMenu> getMenus();
-
-  /**
    * @return An unmodifiable list of all {@link ICalendarItemProvider}s defined for this calendar.
    */
   List<ICalendarItemProvider> getCalendarItemProviders();
 
-  /**
-   * @return the invisible root menu container of all table menus.
-   */
+  @Override
   ICalendarContextMenu getContextMenu();
 }

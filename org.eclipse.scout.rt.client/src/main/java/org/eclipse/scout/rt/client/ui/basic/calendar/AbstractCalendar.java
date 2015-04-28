@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.calendar.ICalendarExtensio
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.CalendarMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.CalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
@@ -507,11 +508,6 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     fireCalendarEventBatchInternal(coalescedEvents);
   }
 
-  @Override
-  public List<IMenu> getMenus() {
-    return getContextMenu().getChildActions();
-  }
-
   protected void setContextMenu(ICalendarContextMenu contextMenu) {
     propertySupport.setProperty(PROP_CONTEXT_MENU, contextMenu);
   }
@@ -519,6 +515,16 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   @Override
   public ICalendarContextMenu getContextMenu() {
     return (ICalendarContextMenu) propertySupport.getProperty(PROP_CONTEXT_MENU);
+  }
+
+  @Override
+  public List<IMenu> getMenus() {
+    return getContextMenu().getChildActions();
+  }
+
+  @Override
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+    return MenuUtility.getMenuByClass(this, menuType);
   }
 
   @Override

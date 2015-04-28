@@ -10,11 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import java.util.List;
-
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
 
 /**
@@ -23,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
  * @see ITextField, ISmartField, INumberField, IDateField, IFileChooser,
  *      IListBox, ITreeBox, ICheckBox, IRadioButton, IToogleButton
  */
-public interface IValueField<VALUE> extends IFormField, IHolder<VALUE> {
+public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContextMenuOwner {
   /*
    * Properties
    */
@@ -123,14 +121,7 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE> {
    */
   void fireValueChanged();
 
-  /**
-   * @return the child list of {@link #getContextMenu()}
-   */
-  List<IMenu> getMenus();
-
-  /**
-   * @return the invisible root menu container of all value field menus.
-   */
+  @Override
   IValueFieldContextMenu getContextMenu();
 
   /**

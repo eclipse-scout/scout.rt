@@ -10,11 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
@@ -144,4 +149,42 @@ public final class MenuUtility {
     }
   }
 
+  /**
+   * @return the sub-menu of the given context menu owner that implements the given type. If no implementation is found,
+   *         <code>null</code> is returned. Note: This method uses instance-of checks, hence the menu replacement
+   *         mapping is not required.
+   * @throws IllegalArgumentException
+   *           when more than one menu implements the given type
+   * @throws IllegalArgumentException
+   *           when no context menu owner is provided.
+   */
+  public static <T extends IMenu> T getMenuByClass(IContextMenuOwner contextMenuOwner, final Class<T> menuType) {
+    if (contextMenuOwner == null) {
+      throw new IllegalArgumentException("Argument 'contextMenuOwner' must not be null");
+    }
+    IContextMenu contextMenu = contextMenuOwner.getContextMenu();
+
+    final List<T> collectedMenus = new ArrayList<T>();
+    if (contextMenu != null && menuType != null) {
+      contextMenu.acceptVisitor(new IActionVisitor() {
+        @Override
+        public int visit(IAction action) {
+          if (menuType.isAssignableFrom(action.getClass())) {
+            @SuppressWarnings("unchecked")
+            T menu = (T) action;
+            collectedMenus.add(menu);
+          }
+          return CONTINUE;
+        }
+      });
+    }
+
+    if (collectedMenus.isEmpty()) {
+      return null;
+    }
+    if (collectedMenus.size() == 1) {
+      return collectedMenus.get(0);
+    }
+    throw new IllegalStateException("Ambiguous menu type " + menuType.getName() + "! More than one implementation was found: " + CollectionUtility.format(collectedMenus));
+  }
 }

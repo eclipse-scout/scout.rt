@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.planner.PlannerChains.Plan
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.PlannerContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
@@ -707,6 +708,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     return getContextMenu().getChildActions();
   }
 
+  @Override
+  public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
+    return MenuUtility.getMenuByClass(this, menuType);
+  }
+
 //  private void fireCellAction(Resource<RI> resource, Activity<RI, AI> activityCell) {
 //    // single observer
 //    try {
@@ -1050,8 +1056,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
           if (CompareUtility.equals(cell.getBeginTime(), beginTime) &&
               (CompareUtility.equals(cell.getEndTime(), endTime)
-              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-              || (cell != null
+                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+                  || (cell != null
                   && cell.getEndTime() != null
                   && endTime != null
                   && cell.getEndTime().getTime() == endTime.getTime() + 1))) {

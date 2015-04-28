@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -32,7 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 
-public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable {
+public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, IContextMenuOwner {
 
   String PROP_TITLE = "title";
   String PROP_ENABLED = "enabled";
@@ -77,20 +78,16 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable {
 
   void requestFocus();
 
-  /**
-   * @return the child list of {@link #getContextMenu()}
-   */
-  List<IMenu> getMenus();
-
-  /**
-   * @return the invisible root menu container of all tree menus.
-   */
-
+  @Override
   ITreeContextMenu getContextMenu();
 
   /**
    * Convenience to find a menu, uses {@link ActionFinder}
+   *
+   * @deprecated Use {@link #getMenuByClass(Class)} instead. This method is error-prone, because it does not throw an
+   *             exception if the given menu type is ambiguous. It will be removed in the O-Release (7.0).
    */
+  @Deprecated
   <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException;
 
   /**
