@@ -23,14 +23,14 @@ import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonCompositeField;
-import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONObject;
 
 /**
  * This class creates JSON output for an <code>IGroupBox</code>.
  */
-public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFormField> implements IContextMenuOwner {
+public class JsonGroupBox<T extends IGroupBox> extends JsonCompositeField<T, IFormField> implements IJsonContextMenuOwner {
 
   // from UI
   public static final String EVENT_EXPANDED = "expanded";

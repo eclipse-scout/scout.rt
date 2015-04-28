@@ -23,12 +23,12 @@ import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
-public class JsonButton<T extends IButton> extends JsonFormField<T> implements IContextMenuOwner {
+public class JsonButton<T extends IButton> extends JsonFormField<T> implements IJsonContextMenuOwner {
 
   public static final String PROP_SYSTEM_TYPE = "systemType";
   public static final String PROP_PROCESS_BUTTON = "processButton";

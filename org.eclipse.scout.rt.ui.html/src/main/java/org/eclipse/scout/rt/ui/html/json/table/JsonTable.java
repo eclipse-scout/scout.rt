@@ -48,13 +48,13 @@ import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.ICellValueReader;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
-import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
+public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IJsonContextMenuOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTable.class);
 
   public static final String EVENT_ROW_CLICKED = "rowClicked";

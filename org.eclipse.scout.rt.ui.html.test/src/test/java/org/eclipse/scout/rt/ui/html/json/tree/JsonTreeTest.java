@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
-import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.rt.ui.html.json.tree.fixtures.Tree;
@@ -236,7 +236,7 @@ public class JsonTreeTest {
     assertTrue(jsonMenu1.isInitialized());
 
     JSONArray jsonMenus = JsonTestUtility.extractProperty(
-        m_uiSession.currentJsonResponse(), jsonTree.getId(), IContextMenuOwner.PROP_MENUS);
+        m_uiSession.currentJsonResponse(), jsonTree.getId(), IJsonContextMenuOwner.PROP_MENUS);
 
     assertNotNull(jsonMenus);
     assertEquals(1, jsonMenus.length());

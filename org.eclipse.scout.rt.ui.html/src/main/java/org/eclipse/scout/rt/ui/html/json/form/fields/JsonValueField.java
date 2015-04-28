@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
-import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONObject;
 
@@ -32,7 +32,7 @@ import org.json.JSONObject;
  *
  * @param <T>
  */
-public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> implements IContextMenuOwner {
+public abstract class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> implements IJsonContextMenuOwner {
 
   /**
    * This event is used when display-text has changed after field loses focus or when the display-text has changed
