@@ -168,7 +168,7 @@ scout.MenuBarPopup.prototype.remove = function() {
   this._uninstallKeyStrokeAdapter();
 };
 
-scout.PopupMenuItem.prototype._createKeyStrokeAdapter = function() {
+scout.MenuBarPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.PopupMenuItemKeyStrokeAdapter(this);
 };
 
