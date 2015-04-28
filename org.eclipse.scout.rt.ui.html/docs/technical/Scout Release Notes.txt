@@ -236,3 +236,8 @@ Added default behaviour to AbstractForm#execCreateFormData
 The method now creates a new instance of the form data based on the form data annotation.
 Also added createFormData to the IForm interface.
 Migration: If execCreateFormData was implemented and just used the default constructor of the corresponding form data class, the method may be removed.
+
+
+ASA 28.04.2015 [Bug 464770]
+removed AbstractDoubleField and AbstractDoubleColumn
+--> use AbstractBigDecimalField and AbstractBigDecimalColumn instead
