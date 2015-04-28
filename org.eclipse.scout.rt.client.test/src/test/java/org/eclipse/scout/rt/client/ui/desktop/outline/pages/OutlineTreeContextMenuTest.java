@@ -106,7 +106,7 @@ public class OutlineTreeContextMenuTest {
     IPageWithTable<?> activePage = (IPageWithTable<?>) outline.getActivePage();
 
     for (Class<? extends IMenu> menuClass : menuClasses) {
-      IMenu menu = activePage.getTable().getMenu(menuClass);
+      IMenu menu = activePage.getTable().getMenuByClass(menuClass);
       assertNotNull(menu);
 
       resolvedMenus.add(menu);

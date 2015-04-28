@@ -137,7 +137,7 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
     List<IMenu> resolvedMenus = new LinkedList<IMenu>();
 
     for (Class<? extends IMenu> menuClass : menuClasses) {
-      IMenu menu = page.getTable().getMenu(menuClass);
+      IMenu menu = page.getTable().getMenuByClass(menuClass);
       assertNotNull(menu);
 
       resolvedMenus.add(menu);

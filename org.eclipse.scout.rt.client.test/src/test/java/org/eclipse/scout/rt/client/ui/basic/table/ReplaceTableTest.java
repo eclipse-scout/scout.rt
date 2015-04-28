@@ -154,8 +154,8 @@ public class ReplaceTableTest {
     assertSame(form.getTableExField().getTableEx().getThirdMenu(), form.getTableField().getTable().getMenus().get(1));
     assertSame(form.getTableExField().getTableEx().getSecondMenu(), form.getTableField().getTable().getMenus().get(2));
 
-    assertSame(form.getTableExField().getTableEx().getFirstExMenu(), form.getTableField().getTable().getMenu(BaseForm.MainBox.FirstGroupBox.TableField.Table.FirstMenu.class));
-    assertSame(form.getTableExField().getTableEx().getFirstExMenu(), form.getTableField().getTable().getMenu(ExtendedForm.TableExField.TableEx.FirstExMenu.class));
+    assertSame(form.getTableExField().getTableEx().getFirstExMenu(), form.getTableField().getTable().getMenuByClass(BaseForm.MainBox.FirstGroupBox.TableField.Table.FirstMenu.class));
+    assertSame(form.getTableExField().getTableEx().getFirstExMenu(), form.getTableField().getTable().getMenuByClass(ExtendedForm.TableExField.TableEx.FirstExMenu.class));
   }
 
   @Test
@@ -172,8 +172,8 @@ public class ReplaceTableTest {
     assertSame(form.getTableFieldEx1().getTableEx1().getThirdMenu1(), form.getTableField1().getTable().getMenus().get(1));
     assertSame(form.getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenus().get(2));
 
-    assertSame(form.getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenu(BaseFormUsingTemplates.MainBox.TabBox.FirstGroupBox.TableField1.Table1.SecondMenu.class));
-    assertSame(form.getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenu(ExtendedFormUsingTemplates.TableFieldEx1.TableEx1.SecondMenuEx1.class));
+    assertSame(form.getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenuByClass(BaseFormUsingTemplates.MainBox.TabBox.FirstGroupBox.TableField1.Table1.SecondMenu.class));
+    assertSame(form.getTableFieldEx1().getTableEx1().getSecondMenuEx1(), form.getTableField1().getTable().getMenuByClass(ExtendedFormUsingTemplates.TableFieldEx1.TableEx1.SecondMenuEx1.class));
 
     // Form.MainBox.TabBox.<AbstractTableBox>.<AbstractTemplateTableField>
     assertEquals(4, form.getSecondGroupBox().getInnerTableField().getTable().getMenus().size());
@@ -183,8 +183,8 @@ public class ReplaceTableTest {
     assertSame(form.getSecondGroupBox().getInnerTableField().getTable().getFirstMenu(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus().get(1));
     assertSame(form.getInnerTableFieldEx1().getInnerTableEx1().getThirdMenu2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenus().get(2));
 
-    assertSame(form.getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenu(BaseFormUsingTemplates.MainBox.TabBox.SecondGroupBox.InnerTableField.InnerTable.SecondMenu.class));
-    assertSame(form.getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenu(ExtendedFormUsingTemplates.InnerTableFieldEx1.InnerTableEx1.SecondMenuEx2.class));
+    assertSame(form.getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenuByClass(BaseFormUsingTemplates.MainBox.TabBox.SecondGroupBox.InnerTableField.InnerTable.SecondMenu.class));
+    assertSame(form.getInnerTableFieldEx1().getInnerTableEx1().getSecondMenuEx2(), form.getSecondGroupBox().getInnerTableField().getTable().getMenuByClass(ExtendedFormUsingTemplates.InnerTableFieldEx1.InnerTableEx1.SecondMenuEx2.class));
   }
 
   @Test
@@ -308,11 +308,11 @@ public class ReplaceTableTest {
             }
 
             public FirstMenu getFirstMenu() throws ProcessingException {
-              return getMenu(FirstMenu.class);
+              return getMenuByClass(FirstMenu.class);
             }
 
             public SecondMenu getSecondMenu() throws ProcessingException {
-              return getMenu(SecondMenu.class);
+              return getMenuByClass(SecondMenu.class);
             }
 
             @Order(10)
@@ -367,11 +367,11 @@ public class ReplaceTableTest {
         }
 
         public FirstExMenu getFirstExMenu() throws ProcessingException {
-          return getMenu(FirstExMenu.class);
+          return getMenuByClass(FirstExMenu.class);
         }
 
         public ThirdMenu getThirdMenu() throws ProcessingException {
-          return getMenu(ThirdMenu.class);
+          return getMenuByClass(ThirdMenu.class);
         }
 
         @Replace
@@ -431,12 +431,12 @@ public class ReplaceTableTest {
 
       @SuppressWarnings("unchecked")
       public FirstMenu getFirstMenu() throws ProcessingException {
-        return getMenu(FirstMenu.class);
+        return getMenuByClass(FirstMenu.class);
       }
 
       @SuppressWarnings("unchecked")
       public SecondMenu getSecondMenu() throws ProcessingException {
-        return getMenu(SecondMenu.class);
+        return getMenuByClass(SecondMenu.class);
       }
 
       @Order(10)
@@ -544,11 +544,11 @@ public class ReplaceTableTest {
       public class TableEx1 extends MainBox.TabBox.FirstGroupBox.TableField1.Table1 {
 
         public SecondMenuEx1 getSecondMenuEx1() throws ProcessingException {
-          return getMenu(SecondMenuEx1.class);
+          return getMenuByClass(SecondMenuEx1.class);
         }
 
         public ThirdMenu1 getThirdMenu1() throws ProcessingException {
-          return getMenu(ThirdMenu1.class);
+          return getMenuByClass(ThirdMenu1.class);
         }
 
         @Order(160)
@@ -582,11 +582,11 @@ public class ReplaceTableTest {
       public class InnerTableEx1 extends MainBox.TabBox.SecondGroupBox.InnerTableField.InnerTable {
 
         public SecondMenuEx2 getSecondMenuEx2() throws ProcessingException {
-          return getMenu(SecondMenuEx2.class);
+          return getMenuByClass(SecondMenuEx2.class);
         }
 
         public ThirdMenu2 getThirdMenu2() throws ProcessingException {
-          return getMenu(ThirdMenu2.class);
+          return getMenuByClass(ThirdMenu2.class);
         }
 
         @Order(1)

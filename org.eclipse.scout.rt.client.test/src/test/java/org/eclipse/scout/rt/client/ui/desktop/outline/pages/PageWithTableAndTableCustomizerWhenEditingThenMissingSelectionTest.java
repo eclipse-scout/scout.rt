@@ -75,7 +75,7 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
     table.selectRow(1);
     assertSelection(table, CollectionUtility.arrayList(2));
     //
-    table.getMenu(PageWithTable.Table.EditAccountMenu.class).doAction();
+    table.getMenuByClass(PageWithTable.Table.EditAccountMenu.class).doAction();
     assertSelection(table, CollectionUtility.arrayList(2));
   }
 
@@ -92,7 +92,7 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
     table.selectRow(1);
     assertSelection(table, CollectionUtility.arrayList(2));
     //
-    table.getMenu(PageWithTable.Table.EditAccountMenu.class).doAction();
+    table.getMenuByClass(PageWithTable.Table.EditAccountMenu.class).doAction();
     assertSelection(table, CollectionUtility.arrayList(2));
   }
 
