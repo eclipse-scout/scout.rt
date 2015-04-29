@@ -236,7 +236,8 @@ scout.Planner.prototype._layoutRange = function() {
 
 scout.Planner.prototype._layoutScale  = function() {
   var $timelineLarge,
-    $timelineSmall;
+    $timelineSmall,
+    width;
 
   // empty scale
   this.$scale.empty();
@@ -276,11 +277,11 @@ scout.Planner.prototype._layoutScale  = function() {
     }
 
     // set sizes
-    var w = 100 / $timelineSmall.children().length;
+    width = 100 / $timelineSmall.children().length;
     $timelineLarge.children().each(function () {
-      $(this).css('width', $(this).data('count') * w + '%');
+      $(this).css('width', $(this).data('count') * width + '%');
     });
-    $timelineSmall.children().css('width', w + '%');
+    $timelineSmall.children().css('width', width + '%');
 
   } else if (this.displayMode === this.YEAR) {
     var month = new Date(this.startDate.valueOf()),
@@ -298,14 +299,12 @@ scout.Planner.prototype._layoutScale  = function() {
     }
 
     // set sizes
-    var w = 100 / $timelineSmall.children().length;
+    width = 100 / $timelineSmall.children().length;
     $timelineLarge.children().each(function () {
-      $(this).css('width', $(this).data('count') * w + '%');
+      $(this).css('width', $(this).data('count') * width + '%');
     });
-    $timelineSmall.children().css('width', w + '%');
+    $timelineSmall.children().css('width', width + '%');
   }
-
-
 };
 
 

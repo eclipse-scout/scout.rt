@@ -109,10 +109,11 @@ scout.RichTextField.prototype._onCommandClick = function(event) {
 scout.RichTextField.prototype._onChange = function(event) {
   // update scrollbar
   scout.scrollbars.update(this.$field);
+
+/* FIXME CRU Check if the following code is needed. If yes, use it! If no, remove it.
+
   // maybe necessary scroll to selection
   //  scout.scrollbars.scrollTo(this.$field, $divAtCursor);
-
-  return;
 
   // store selection
   var selection = window.getSelection(),
@@ -157,19 +158,19 @@ scout.RichTextField.prototype._onChange = function(event) {
       $.l(c);
 
       // remove all styles but background-color
-      /*if (c.removeAttribute) {
-        c.removeAttribute('style');
-      }*/
+//      if (c.removeAttribute) {
+//        c.removeAttribute('style');
+//      }
 
       // remove empty text nodes
       if (c.nodeType === 3 && c.length === 0) {
         c.parentElement.removeChild(c);
       }
 
-      /*if (c.nodeType === 1 && c.nodeName === 'SPAN' && c !== markerStart && c !== markerEnd) {
-        t = document.createTextNode(c.innerText);
-        c.parentNode.replaceChild(t, c);
-      }*/
+//      if (c.nodeType === 1 && c.nodeName === 'SPAN' && c !== markerStart && c !== markerEnd) {
+//        t = document.createTextNode(c.innerText);
+//        c.parentNode.replaceChild(t, c);
+//      }
 
       // recursive call
       if (c.childNodes.length > 0) {
@@ -177,7 +178,7 @@ scout.RichTextField.prototype._onChange = function(event) {
       }
 
     }
-
   }
 
+ */
 };

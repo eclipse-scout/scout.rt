@@ -391,6 +391,8 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
     getModel().getUIFacade().setDaysFromUI(days);
   }
 
+  // FIXME CGU Fix generics
+  @SuppressWarnings("unchecked")
   protected void handleUiSetSelectedActivityCells(JsonEvent event) {
     Activity<?, ?> activityCell = null;
     // TODO Map data from JSON
@@ -399,10 +401,10 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   }
 
   protected void handleCellAction(JsonEvent event) {
-    Resource resource = null;
+//    Resource resource = null;
     // TODO Map data from JSON
 
-    Activity<?, ?> activityCell = null;
+//    Activity<?, ?> activityCell = null;
     // TODO Map data from JSON
 
 //    getModel().getUIFacade().fireCellActionFromUI(resource, activityCell);
