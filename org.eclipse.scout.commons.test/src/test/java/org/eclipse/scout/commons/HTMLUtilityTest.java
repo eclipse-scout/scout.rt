@@ -22,6 +22,7 @@ import org.junit.Test;
 /**
  * JUnit for {@link HTMLUtility}
  */
+@SuppressWarnings("deprecation")
 public class HTMLUtilityTest {
 
   @Test

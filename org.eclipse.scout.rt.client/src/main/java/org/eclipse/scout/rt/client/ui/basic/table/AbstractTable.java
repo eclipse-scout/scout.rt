@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.CollectionUtility;
@@ -34,7 +32,6 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
@@ -561,22 +558,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     StringBuilder plainText = new StringBuilder();
-    StringBuilder htmlText = new StringBuilder("<html>");
-    // Adding the following MS-office specific style information will cause Excel
-    // to put all line-break-delimited entries of a <td> cell into a single Excel cell,
-    // instead of one sub-cell for each <br />
-    htmlText.append("<head><style type=\"text/css\"> br {mso-data-placement:same-cell;} </style></head>");
-    htmlText.append("<body><table border=\"0\">");
 
     List<IColumn<?>> columns = getColumnSet().getVisibleColumns();
-    Pattern patternHtmlCheck = Pattern.compile(".*?<\\s*html.*?>.*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
-    Pattern patternBodyContent = Pattern.compile("<\\s*body.*?>(.*?)<\\s*/\\s*body\\s*>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
     boolean firstRow = true;
     for (ITableRow row : rows) {
-      // text/html
-      htmlText.append("<tr>");
-      // text/plain
       if (!firstRow) {
         plainText.append(System.getProperty("line.separator"));
       }
@@ -598,29 +584,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
         plainText.append(StringUtility.emptyIfNull(StringUtility.unwrapText(text)));
 
-        // text/html
-        String html = null;
-        if (patternHtmlCheck.matcher(text).matches()) {
-          // ensure proper HTML and extract body content
-          Matcher matcher = patternBodyContent.matcher(HTMLUtility.cleanupHtml(text, false, false, null));
-          if (matcher.find()) {
-            html = matcher.group(1);
-          }
-        }
-        if (html == null) {
-          html = StringUtility.htmlEncode(text);
-        }
-        htmlText.append("<td>");
-        htmlText.append(html);
-        htmlText.append("</td>");
         firstColumn = false;
       }
-      htmlText.append("</tr>");
       firstRow = false;
     }
-    htmlText.append("</table></body></html>");
 
-    TextTransferObject transferObject = new TextTransferObject(plainText.toString(), htmlText.toString());
+    TextTransferObject transferObject = new TextTransferObject(plainText.toString());
     return transferObject;
   }
 

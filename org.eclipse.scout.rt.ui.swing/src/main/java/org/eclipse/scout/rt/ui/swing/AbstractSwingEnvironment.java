@@ -127,6 +127,7 @@ import org.eclipse.scout.rt.ui.swing.window.messagebox.ISwingScoutMessageBox;
 import org.eclipse.scout.rt.ui.swing.window.messagebox.SwingScoutMessageBox;
 import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutPopup;
 
+@SuppressWarnings("deprecation")
 public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwingEnvironment.class);
 

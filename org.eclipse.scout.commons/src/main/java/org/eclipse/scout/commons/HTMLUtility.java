@@ -46,7 +46,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * Utility to manipulate HTML documents regardless of ui .
+ * Utility to manipulate HTML documents regardless of ui.
  */
 public final class HTMLUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HTMLUtility.class);
@@ -120,6 +120,10 @@ public final class HTMLUtility {
     return doc;
   }
 
+  /**
+   * @deprecated Will be removed with scout 7.
+   */
+  @Deprecated
   public static String toHtmlText(HTMLDocument doc) {
     String htmlText = "";
     if (doc == null) {
@@ -140,7 +144,9 @@ public final class HTMLUtility {
 
   /**
    * @see #cleanupHtml(String, boolean, boolean, DefaultFont, Color)
+   * @deprecated Will be removed with scout 7.
    */
+  @Deprecated
   public static String cleanupHtml(String rawHtml, boolean ensureContentType, boolean cleanupCss, DefaultFont defaultFont) {
     return cleanupHtml(rawHtml, ensureContentType, cleanupCss, defaultFont, null);
   }
@@ -163,7 +169,9 @@ public final class HTMLUtility {
    * @param defaultHyperlinkColor
    *          the default color used for hyperlinks (&lt;a&gt; elements) - used for CSS cleanup only
    * @return the formatted HTML document
+   * @deprecated Will be removed with scout 7.
    */
+  @Deprecated
   public static String cleanupHtml(String rawHtml, boolean ensureContentType, boolean cleanupCss, DefaultFont defaultFont, Color defaultHyperlinkColor) {
     rawHtml = StringUtility.nvl(rawHtml, "");
 
@@ -288,7 +296,10 @@ public final class HTMLUtility {
 
   /**
    * HTML has several troubles with some CSS and tag style concepts.
+   *
+   * @deprecated Will be removed with scout 7.
    */
+  @Deprecated
   public static HTMLDocument cleanupCss(HTMLDocument htmlDoc, DefaultFont defaultFont) {
     if (htmlDoc == null) {
       return htmlDoc;
@@ -415,7 +426,10 @@ public final class HTMLUtility {
    * Mail HTML may contain cid:xxxx URLs for local contents. This method
    * replaces such local cid URLs by real file URLs (normally a temporary
    * folder)
+   *
+   * @deprecated Will be removed with scout 7.
    */
+  @Deprecated
   public static HTMLDocument replaceContendIDs(HTMLDocument htmlDoc, final Map<String, URL> cidToUrlMapping) {
     if (htmlDoc == null) {
       return htmlDoc;
@@ -473,6 +487,10 @@ public final class HTMLUtility {
     return htmlDoc;
   }
 
+  /**
+   * @deprecated Will be removed with scout 7.
+   */
+  @Deprecated
   public static HTMLDocument copyReferencedFilesToCache(HTMLDocument htmlDoc, final File cacheDir) {
     if (htmlDoc == null) {
       return htmlDoc;
@@ -580,7 +598,9 @@ public final class HTMLUtility {
    * @param html
    *          input HTML code as string.
    * @return plain text as string
+   * @deprecated Will be removed with scout 7.
    */
+  @Deprecated
   public static String toPlainTextWithTable(String html) {
     String s = html;
     if (s == null || s.length() == 0) {
@@ -631,7 +651,9 @@ public final class HTMLUtility {
   /**
    * @return encoded text, ready to be included in a html text
    *         <xmp>replaces &, ", ', <, > and all whitespace</xmp>
+   * @deprecated Will be removed with scout 7. Use {@link StringUtility#htmlEncode(String, boolean)}
    */
+  @Deprecated
   public static String encodeText(String s) {
     return StringUtility.htmlEncode(s, true);
   }
@@ -639,7 +661,9 @@ public final class HTMLUtility {
   /**
    * @return decoded text, ready to be printed as text
    *         <xmp>replaces &, ", ', <, > and all whitespace</xmp>
+   * @deprecated Will be removed with scout 7. Use {@link StringUtility#htmlDecode(String)}
    */
+  @Deprecated
   public static String decodeText(String s) {
     return StringUtility.htmlDecode(s);
   }
@@ -971,6 +995,10 @@ public final class HTMLUtility {
     void visitAttribute(Element elem, AttributeSet atts, Object nm, Object value);
   }
 
+  /**
+   * @deprecated Will be removed with scout 7.
+   */
+  @Deprecated
   public static class DefaultFont {
     private String[] m_families;
     private int m_size;

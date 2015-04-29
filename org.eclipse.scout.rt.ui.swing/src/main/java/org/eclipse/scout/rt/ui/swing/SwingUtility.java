@@ -452,7 +452,7 @@ public final class SwingUtility {
     }
     else if (scoutT instanceof TextTransferObject) {
       TextTransferObject textTransferObject = (TextTransferObject) scoutT;
-      return new TextTransferable(textTransferObject.getPlainText(), textTransferObject.getHtmlText());
+      return new TextTransferable(textTransferObject.getPlainText(), null);
     }
     else if (scoutT instanceof ImageTransferObject) {
       ImageTransferObject imgTransferObject = (ImageTransferObject) scoutT;

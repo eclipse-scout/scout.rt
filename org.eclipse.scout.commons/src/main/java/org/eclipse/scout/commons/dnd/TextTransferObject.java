@@ -16,15 +16,9 @@ package org.eclipse.scout.commons.dnd;
 
 public class TextTransferObject extends TransferObject {
   private String m_plainText;
-  private String m_htmlText;
 
   public TextTransferObject(String plainText) {
-    this(plainText, null);
-  }
-
-  public TextTransferObject(String plainText, String htmlText) {
     m_plainText = plainText;
-    m_htmlText = htmlText;
   }
 
   @Override
@@ -36,12 +30,8 @@ public class TextTransferObject extends TransferObject {
     return m_plainText;
   }
 
-  public String getHtmlText() {
-    return m_htmlText;
-  }
-
   @Override
   public String toString() {
-    return "TextTransferObject[text=" + m_plainText + ";html=" + m_htmlText + "]";
+    return "TextTransferObject[text=" + m_plainText + "]";
   }
 }
