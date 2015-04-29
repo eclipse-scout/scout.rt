@@ -15,6 +15,8 @@ import static org.junit.Assert.assertNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.junit.Test;
@@ -22,6 +24,22 @@ import org.junit.Test;
 public class NumberUtilityTest {
 
   private static final double EPSILON = 0.01;
+
+  private static Number[] NUMBER_ARRAY = new Number[]{Long.valueOf(100),
+      new BigInteger("1000000000000000000000000000000000000000000000000000000"),
+      BigDecimal.ONE,
+      BigDecimal.ZERO,
+      Double.valueOf(2.225d),
+      null,
+      Float.NaN,
+      1f,
+      0.1d,
+      -4.1f,
+      1,
+      2l,
+      Float.NEGATIVE_INFINITY,
+      Double.POSITIVE_INFINITY,
+      Integer.valueOf(45)};
 
   /**
    * Test method for {@link org.eclipse.scout.commons.NumberUtility#numberToBigDecimal(java.lang.Number)}.
@@ -55,17 +73,45 @@ public class NumberUtilityTest {
   }
 
   @Test
-  public void testSumNumbers() {
+  public void testSumNumbersVararg() {
     assertEquals(new BigDecimal("1000000000000000000000000000000000000000000000000000148.225"),
         NumberUtility.sum(Long.valueOf(100),
             new BigInteger("1000000000000000000000000000000000000000000000000000000"),
             BigDecimal.ONE,
             BigDecimal.ZERO,
             Double.valueOf(2.225d),
+            null,
             Float.NaN,
             Float.NEGATIVE_INFINITY,
             Double.POSITIVE_INFINITY,
             Integer.valueOf(45)));
+  }
+
+  @Test
+  public void testSumNumbersIntAutoBox() {
+    assertEquals(new BigDecimal("503"),
+        NumberUtility.sum(1, 2, 500));
+  }
+
+  @Test
+  public void testSumNumbersFloatDoubleAutoBox() {
+    assertEquals(new BigDecimal("1.234456"),
+        NumberUtility.sum(1.111f, 0.123456d));
+  }
+
+  @Test
+  public void testSumNumbersArray() {
+
+    assertEquals(new BigDecimal("1000000000000000000000000000000000000000000000000000148.225"),
+        NumberUtility.sum(NUMBER_ARRAY));
+  }
+
+  @Test
+  public void testSumNumbersCollection() {
+    List<Number> numberCollection = Arrays.asList(NUMBER_ARRAY);
+
+    assertEquals(new BigDecimal("1000000000000000000000000000000000000000000000000000148.225"),
+        NumberUtility.sum(numberCollection));
   }
 
   /**

@@ -130,27 +130,6 @@ public final class NumberUtility {
   }
 
   /**
-   * Computes the average value of a vararg of doubles.
-   *
-   * @param The
-   *          vararg of doubles.
-   * @return The average value. Returns 0 if the parameter is null or an empty array.
-   */
-  public static double avg(double... a) {
-    if (a == null) {
-      return 0;
-    }
-    long count = a.length;
-    double sum = sum(a);
-    if (count > 0) {
-      return sum / count;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  /**
    * Computes the median of a vararg of doubles.
    *
    * @param The
@@ -196,31 +175,8 @@ public final class NumberUtility {
   }
 
   /**
-   * Computes the sum of a vararg of doubles.
-   *
-   * @param The
-   *          vararg of doubles.
-   * @return The sum. Returns 0 if the parameter is null or the length of the vararg is 0.
-   */
-  public static double sum(double... a) {
-    if (a == null) {
-      return 0;
-    }
-    if (a.length == 0) {
-      return 0;
-    }
-    double sum = 0;
-    for (double d : a) {
-      sum += d;
-    }
-    return sum;
-  }
-
-  /**
-   * Computes the sum of a Collection of Numbers. Is <code>null</code> lenient.
-   *
-   * @param numbers
-   * @return the sum of all numbers passed in the given list. Null elements are not considered.
+   * Calculates the sum of a Collection of Numbers. Elements that have no valid BigDecimal
+   * representation (e.g. Double.NaN, null, ...) are treated as <code>BigDecimal.ZERO</code>
    */
   public static BigDecimal sum(Collection<? extends Number> numbers) {
     BigDecimal sum = BigDecimal.ZERO;
@@ -236,8 +192,7 @@ public final class NumberUtility {
   }
 
   /**
-   * Calculates the sum over an array of numbers. Array elements that have no valid BigDecimal representation (e.g.
-   * Double.NaN) are treated as <code>BigDecimal.ZERO</code>.
+   * Convenience override that delegates to {@link NumberUtility#sum(Collection)}
    */
   public static BigDecimal sum(Number... a) {
     if (a == null) {
@@ -246,33 +201,7 @@ public final class NumberUtility {
     if (a.length == 0) {
       return BigDecimal.ZERO;
     }
-    BigDecimal sum = BigDecimal.ZERO;
-    for (Number d : a) {
-      BigDecimal augend = numberToBigDecimal(d);
-      sum = sum.add(augend == null ? BigDecimal.ZERO : augend);
-    }
-    return sum;
-  }
-
-  /**
-   * Computes the sum of a vararg of longs.
-   *
-   * @param The
-   *          vararg of longs.
-   * @return The sum. Returns 0 if the parameter is null or the length of the vararg is 0.
-   */
-  public static long sum(long... a) {
-    if (a == null) {
-      return 0;
-    }
-    if (a.length == 0) {
-      return 0;
-    }
-    long sum = 0;
-    for (long d : a) {
-      sum += d;
-    }
-    return sum;
+    return sum(Arrays.asList(a));
   }
 
   /**
@@ -552,23 +481,4 @@ public final class NumberUtility {
     }
   }
 
-  /**
-   * Divides two double values, NPE save.
-   *
-   * @param numerator
-   * @param denominator
-   * @return null if the numerator is null or the denominator is null or 0.0.
-   *         Else it returns the division result.
-   */
-  public static Double divide(Double numerator, Double denominator) {
-    if (numerator == null || denominator == null || denominator.equals(0.0)) {
-      return null;
-    }
-    else if (numerator.equals(0.0)) {
-      return 0d;
-    }
-    else {
-      return numerator / denominator;
-    }
-  }
 }
