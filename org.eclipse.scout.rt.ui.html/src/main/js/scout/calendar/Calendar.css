@@ -178,7 +178,7 @@
       width: 100%;
       content: attr(data-title);
       font-size: 17px;
-      color: @palette-green-5;
+      color: @palette-green-4;
     }
 
     & .year-day{
@@ -199,7 +199,7 @@
     }
 
     & .year-range-day{
-      background-color: @palette-green-4;
+      background-color: @palette-green-3;
     }
 
     & .year-hover{

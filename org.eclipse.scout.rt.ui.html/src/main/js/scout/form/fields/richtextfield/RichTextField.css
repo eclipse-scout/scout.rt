@@ -173,7 +173,7 @@
   }
 
   & .rich-text-bar-green {
-    .rich-text-color(@palette-green-4);
+    .rich-text-color(@palette-green-3);
   }
 
   & .rich-text-bar-plain {
