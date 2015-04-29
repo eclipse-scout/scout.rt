@@ -162,6 +162,20 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     return 0;
   }
 
+  /**
+   * Configures, if HTML rendering is enabled for this field.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}. Make sure that any user input (or other insecure
+   * input) is encoded (security), if this property is enabled.
+   *
+   * @return {@code true}, if HTML rendering is enabled for this field.{@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(420)
+  protected boolean getConfiguredHtmlEnabled() {
+    return false;
+  }
+
   @ConfigOperation
   @Order(500)
   protected TransferObject execDragRequest() {
@@ -213,6 +227,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
       configuredDropType = 0;
     }
     setDropType(configuredDropType);
+    setHtmlEnabled(getConfiguredHtmlEnabled());
   }
 
   @Override
@@ -491,12 +506,22 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     m_monitorSpelling = Boolean.valueOf(monitorSpelling);
   }
 
+  @Override
+  public void setHtmlEnabled(boolean enabled) {
+    propertySupport.setPropertyBool(PROP_HTML_ENABLED, enabled);
+  }
+
+  @Override
+  public boolean isHtmlEnabled() {
+    return propertySupport.getPropertyBool(PROP_HTML_ENABLED);
+  }
+
   /**
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
   protected static class LocalStringFieldExtension<OWNER_FIELD extends AbstractStringField> extends AbstractBasicField.LocalBasicFieldExtension<String, OWNER_FIELD>
-  implements IStringFieldExtension<OWNER_FIELD> {
+      implements IStringFieldExtension<OWNER_FIELD> {
 
     public LocalStringFieldExtension(OWNER_FIELD owner) {
       super(owner);

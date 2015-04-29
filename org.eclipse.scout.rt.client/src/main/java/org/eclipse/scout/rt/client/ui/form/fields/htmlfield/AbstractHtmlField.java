@@ -132,6 +132,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     m_htmlEditor = getConfiguredHtmlEditor();
     m_scrollBarEnabled = getConfiguredScrollBarEnabled();
     setMaxLength(getConfiguredMaxLength());
+    setHtmlEnabled(true);
   }
 
   @Override
@@ -314,6 +315,16 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
    */
   public void setSpellCheckAsYouTypeEnabled(boolean monitorSpelling) {
     m_monitorSpelling = Boolean.valueOf(monitorSpelling);
+  }
+
+  @Override
+  public void setHtmlEnabled(boolean enabled) {
+    propertySupport.setPropertyBool(PROP_HTML_ENABLED, enabled);
+  }
+
+  @Override
+  public boolean isHtmlEnabled() {
+    return propertySupport.getPropertyBool(PROP_HTML_ENABLED);
   }
 
   protected final void interceptAppLinkAction(String ref) throws ProcessingException {

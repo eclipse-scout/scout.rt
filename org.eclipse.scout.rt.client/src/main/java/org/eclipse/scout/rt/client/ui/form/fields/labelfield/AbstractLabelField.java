@@ -44,11 +44,26 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
     return true;
   }
 
+  /**
+   * Configures, if HTML rendering is enabled for this field.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}. Make sure that any user input (or other insecure
+   * input) is encoded (security), if this property is enabled.
+   *
+   * @return {@code true}, if HTML rendering is enabled for this field.{@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(270)
+  protected boolean getConfiguredHtmlEnabled() {
+    return false;
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
     setWrapText(getConfiguredWrapText());
     setSelectable(getConfiguredSelectable());
+    setHtmlEnabled(getConfiguredHtmlEnabled());
   }
 
   @Override
@@ -80,6 +95,16 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
   @Override
   public boolean isSelectable() {
     return propertySupport.getPropertyBool(PROP_SELECTABLE);
+  }
+
+  @Override
+  public void setHtmlEnabled(boolean enabled) {
+    propertySupport.setPropertyBool(PROP_HTML_ENABLED, enabled);
+  }
+
+  @Override
+  public boolean isHtmlEnabled() {
+    return propertySupport.getPropertyBool(PROP_HTML_ENABLED);
   }
 
   /**
