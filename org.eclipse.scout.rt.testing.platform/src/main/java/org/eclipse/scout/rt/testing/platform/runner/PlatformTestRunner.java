@@ -23,8 +23,11 @@ import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatem
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.ThrowHandledExceptionStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.TimesStatement;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
@@ -99,42 +102,49 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
       return statement;
     }
 
-    final List<Throwable> errors = new ArrayList<Throwable>();
-    Statement afterClassStatement = new Statement() {
+    final List<Throwable> errors = new ArrayList<>();
+    final Statement afterClassStatement = new RunAftersStatement(afters, null, errors);
+    final Statement interceptedAfterClassStatement = interceptAfterClassStatement(afterClassStatement, getTestClass().getJavaClass());
+    return new InterceptedAfterStatement(statement, interceptedAfterClassStatement, errors);
+  }
+
+  @Override
+  protected Statement withBefores(final FrameworkMethod method, final Object target, final Statement statement) {
+    final List<FrameworkMethod> befores = getTestClass().getAnnotatedMethods(Before.class);
+    if (befores.isEmpty()) {
+      return statement;
+    }
+
+    Statement beforeStatement = new Statement() {
       @Override
       public void evaluate() throws Throwable {
-        for (FrameworkMethod each : afters) {
-          try {
-            each.invokeExplosively(null);
-          }
-          catch (Throwable e) {
-            errors.add(e);
-          }
+        for (FrameworkMethod each : befores) {
+          each.invokeExplosively(target);
         }
       }
     };
 
-    final Statement interceptedAfterClassStatement = interceptAfterClassStatement(afterClassStatement, getTestClass().getJavaClass());
+    final Statement interceptedBeforeStatement = interceptBeforeStatement(beforeStatement, getTestClass().getJavaClass(), method.getMethod());
     return new Statement() {
       @Override
       public void evaluate() throws Throwable {
-        try {
-          statement.evaluate();
-        }
-        catch (Throwable e) {
-          errors.add(e);
-        }
-        finally {
-          try {
-            interceptedAfterClassStatement.evaluate();
-          }
-          catch (Throwable e) {
-            errors.add(e);
-          }
-        }
-        MultipleFailureException.assertEmpty(errors);
+        interceptedBeforeStatement.evaluate();
+        statement.evaluate();
       }
     };
+  }
+
+  @Override
+  protected Statement withAfters(final FrameworkMethod method, final Object target, final Statement statement) {
+    final List<FrameworkMethod> afters = getTestClass().getAnnotatedMethods(After.class);
+    if (afters.isEmpty()) {
+      return statement;
+    }
+
+    final List<Throwable> errors = new ArrayList<>();
+    final Statement afterStatement = new RunAftersStatement(afters, target, errors);
+    final Statement interceptedAfterStatement = interceptAfterStatement(afterStatement, getTestClass().getJavaClass(), method.getMethod());
+    return new InterceptedAfterStatement(statement, interceptedAfterStatement, errors);
   }
 
   @Override
@@ -150,6 +160,14 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   protected Statement interceptAfterClassStatement(Statement beforeClassStatement, Class<?> javaClass) {
     return interceptClassLevelStatement(beforeClassStatement, javaClass);
+  }
+
+  protected Statement interceptBeforeStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
+    return next;
+  }
+
+  protected Statement interceptAfterStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
+    return next;
   }
 
   /**
@@ -233,5 +251,72 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
   protected Statement possiblyExpectingExceptions(FrameworkMethod method, Object test, Statement next) {
     // install statement to re-throw the first exception handled by JUnitExceptionHandler.
     return super.possiblyExpectingExceptions(method, test, new ThrowHandledExceptionStatement(next));
+  }
+
+  protected long getTimeoutMillis(Method method) {
+    Test annotation = ReflectionUtility.getAnnotation(Test.class, method);
+    return annotation == null ? 0 : annotation.timeout();
+  }
+
+  protected boolean hasNoTimeout(Method method) {
+    return getTimeoutMillis(method) <= 0;
+  }
+
+  protected static class RunAftersStatement extends Statement {
+
+    private final List<FrameworkMethod> m_afters;
+    private final Object m_target;
+    private final List<Throwable> m_errors;
+
+    public RunAftersStatement(List<FrameworkMethod> afters, Object target, List<Throwable> errors) {
+      m_afters = afters;
+      m_target = target;
+      m_errors = errors;
+    }
+
+    @Override
+    public void evaluate() throws Throwable {
+      for (FrameworkMethod each : m_afters) {
+        try {
+          each.invokeExplosively(m_target);
+        }
+        catch (Throwable e) {
+          m_errors.add(e);
+        }
+      }
+    }
+  }
+
+  protected static class InterceptedAfterStatement extends Statement {
+
+    private final Statement m_statement;
+    private final Statement m_interceptedAfterStatement;
+    private final List<Throwable> m_errors;
+
+    public InterceptedAfterStatement(Statement statement, Statement interceptedAfterStatement, List<Throwable> errors) {
+      super();
+      m_statement = statement;
+      m_interceptedAfterStatement = interceptedAfterStatement;
+      m_errors = errors;
+    }
+
+    @Override
+    public void evaluate() throws Throwable {
+      try {
+        m_statement.evaluate();
+      }
+      catch (Throwable e) {
+        m_errors.add(e);
+      }
+      finally {
+        try {
+          m_interceptedAfterStatement.evaluate();
+        }
+        catch (Throwable e) {
+          m_errors.add(e);
+        }
+      }
+      MultipleFailureException.assertEmpty(m_errors);
+    }
   }
 }

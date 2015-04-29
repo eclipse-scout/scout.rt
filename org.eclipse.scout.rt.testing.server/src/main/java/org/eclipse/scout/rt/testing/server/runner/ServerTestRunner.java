@@ -18,8 +18,12 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.statement.ClearServerRunContextStatement;
 import org.eclipse.scout.rt.testing.server.runner.statement.ServerRunContextStatement;
+import org.eclipse.scout.rt.testing.server.runner.statement.TimeoutServerRunContextStatement;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.Test.None;
+import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
@@ -52,6 +56,9 @@ import org.junit.runners.model.Statement;
  * {@link ServerSessionProvider} or a custom provider to {@link RunWithServerSession#provider()}.</li>
  * <li>'beforeClass' and 'afterClass' are executed in the same transaction.</li>
  * </ul>
+ * <b>Note</b>: Usually, all {@link Before}, the {@link Test}-annotated method and all {@link After} methods are invoked
+ * in a single transaction. But if the {@link Test}-annotated method uses the timeout feature (i.e.
+ * {@link Test#timeout()}), the three parts are executed in different transactions.
  *
  * @see RunWithServerSession
  * @see RunWithSubject
@@ -82,5 +89,33 @@ public class ServerTestRunner extends PlatformTestRunner {
     final Statement s2 = super.interceptMethodLevelStatement(s3, testClass, testMethod);
     final Statement s1 = new ClearServerRunContextStatement(s2);
     return s1;
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
+  protected Statement withPotentialTimeout(FrameworkMethod method, Object test, Statement next) {
+    long timeoutMillis = getTimeoutMillis(method.getMethod());
+    if (timeoutMillis <= 0) {
+      return next;
+    }
+    return new TimeoutServerRunContextStatement(next, timeoutMillis);
+  }
+
+  @Override
+  protected Statement interceptBeforeStatement(Statement next, Class<?> testClass, Method testMethod) {
+    Statement interceptedBeforeStatement = super.interceptBeforeStatement(next, testClass, testMethod);
+    if (hasNoTimeout(testMethod)) {
+      return interceptedBeforeStatement;
+    }
+    return new TimeoutServerRunContextStatement(interceptedBeforeStatement, 0);
+  }
+
+  @Override
+  protected Statement interceptAfterStatement(Statement next, Class<?> testClass, Method testMethod) {
+    Statement interceptedAfterStatement = super.interceptAfterStatement(next, testClass, testMethod);
+    if (hasNoTimeout(testMethod)) {
+      return interceptedAfterStatement;
+    }
+    return new TimeoutServerRunContextStatement(interceptedAfterStatement, 0);
   }
 }
