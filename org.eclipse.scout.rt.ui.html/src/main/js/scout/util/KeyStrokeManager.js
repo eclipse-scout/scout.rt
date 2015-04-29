@@ -57,7 +57,7 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
   }
 
   var controller = function(event) {
-    if (event.originalEvent.anchorReached) {
+    if (event.originalEvent&&event.originalEvent.anchorReached) {
       return;
     }
     //Trace adapter if it is affected when key pressed.
