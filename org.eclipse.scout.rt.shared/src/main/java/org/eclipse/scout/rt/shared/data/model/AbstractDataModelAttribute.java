@@ -232,15 +232,15 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
       setCodeTypeClass(getConfiguredCodeType());
     }
     // lazy lookup decorator
-    Class<? extends ILookupCall<?>> lsCls = getConfiguredLookupCall();
-    if (lsCls != null) {
+    Class<? extends ILookupCall<?>> lookupCallClass = getConfiguredLookupCall();
+    if (lookupCallClass != null) {
       ILookupCall<?> call;
       try {
-        call = lsCls.newInstance();
+        call = BEANS.get(lookupCallClass);
         setLookupCall(call);
       }
       catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + lsCls.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + lookupCallClass.getName() + "'.", e));
       }
     }
     injectOperators();

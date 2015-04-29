@@ -41,8 +41,10 @@ import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.lookup.TestingLookupService;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -57,8 +59,20 @@ public class SmartFieldTest {
   public static final String ICON_BOOKMARK = "bookmark";
   public static final String ICON_FILE = "file";
 
+  private static List<IBean<?>> m_beans;
+
   protected TestForm m_form;
   private List<IBean<?>> m_reg;
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    m_beans = TestingUtility.registerBeans(new BeanMetaData(StyleLookupCall.class));
+  }
+
+  @AfterClass
+  public static void afterClass() {
+    TestingUtility.unregisterBeans(m_beans);
+  }
 
   public static class TestForm extends AbstractForm {
 
@@ -192,7 +206,7 @@ public class SmartFieldTest {
   public void setUp() throws Throwable {
     m_reg = TestingUtility.registerBeans(
         new BeanMetaData(StyleLookupService.class).
-            applicationScoped(true)
+        applicationScoped(true)
         );
     m_form = new TestForm();
     m_form.startForm();

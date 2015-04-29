@@ -167,7 +167,7 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
     if (lookupCallClass != null) {
       ILookupCall<LOOKUP_TYPE> call;
       try {
-        call = lookupCallClass.newInstance();
+        call = BEANS.get(lookupCallClass);
         setLookupCall(call);
       }
       catch (Exception e) {

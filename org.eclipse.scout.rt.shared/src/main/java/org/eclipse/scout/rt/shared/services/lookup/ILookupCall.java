@@ -15,11 +15,13 @@ import java.util.List;
 
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
  *
  */
+@Bean
 public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
 
   /**

@@ -356,13 +356,15 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredTree().getName() + "'.", e));
     }
     getTree().setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
-    if (getConfiguredLookupCall() != null) {
+
+    Class<? extends ILookupCall<T>> lookupCallClass = getConfiguredLookupCall();
+    if (lookupCallClass != null) {
       try {
-        ILookupCall<T> call = getConfiguredLookupCall().newInstance();
+        ILookupCall<T> call = BEANS.get(lookupCallClass);
         setLookupCall(call);
       }
       catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredLookupCall().getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + lookupCallClass.getName() + "'.", e));
       }
     }
     // code type

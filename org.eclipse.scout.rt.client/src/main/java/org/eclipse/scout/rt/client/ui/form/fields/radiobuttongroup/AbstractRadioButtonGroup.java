@@ -151,7 +151,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     Class<? extends ILookupCall<T>> lookupCallClass = getConfiguredLookupCall();
     if (lookupCallClass != null) {
       try {
-        ILookupCall<T> call = lookupCallClass.newInstance();
+        ILookupCall<T> call = BEANS.get(lookupCallClass);
         setLookupCall(call);
       }
       catch (Exception e) {

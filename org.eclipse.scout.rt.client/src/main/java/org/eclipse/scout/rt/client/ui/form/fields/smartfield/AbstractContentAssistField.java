@@ -442,14 +442,14 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       setCodeTypeClass(getConfiguredCodeType());
     }
     // lookup call
-    Class<? extends ILookupCall<LOOKUP_KEY>> lsCls = getConfiguredLookupCall();
-    if (lsCls != null) {
+    Class<? extends ILookupCall<LOOKUP_KEY>> lookupCallClass = getConfiguredLookupCall();
+    if (lookupCallClass != null) {
       try {
-        ILookupCall<LOOKUP_KEY> call = lsCls.newInstance();
+        ILookupCall<LOOKUP_KEY> call = BEANS.get(lookupCallClass);
         setLookupCall(call);
       }
       catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + lsCls.getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + lookupCallClass.getName() + "'.", e));
       }
     }
   }

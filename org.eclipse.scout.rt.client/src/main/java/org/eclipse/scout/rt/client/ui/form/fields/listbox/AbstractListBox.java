@@ -336,14 +336,16 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredTable().getName() + "'.", e));
     }
+
     // lookup call
-    if (getConfiguredLookupCall() != null) {
+    Class<? extends ILookupCall<KEY>> lookupCallClass = getConfiguredLookupCall();
+    if (lookupCallClass != null) {
       try {
-        ILookupCall<KEY> call = getConfiguredLookupCall().newInstance();
+        ILookupCall<KEY> call = BEANS.get(lookupCallClass);
         setLookupCall(call);
       }
       catch (Exception e) {
-        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + getConfiguredLookupCall().getName() + "'.", e));
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + lookupCallClass.getName() + "'.", e));
       }
     }
     // code type
