@@ -263,7 +263,7 @@ removed methods:
 - NumberUtility.sum(double...) --> use sum(Number...)
 - NumberUtility.sum(long...) --> use sum(Number...)
 
-ASA 29.04.2015
+ASA 29.04.2015 [bug 465797]
 removed:
 TextTransferObject(String plainText, String htmlText)
 TextTransferObject.getHtmlText()
@@ -280,12 +280,5 @@ HTMLUtility.replaceContendIDs(...)
 HTMLUtility.toHtmlText(...)
 HTMLUtility.toPlainTextWithTable(...)
 
-
-
-
-
-
-
-
-
-
+30.04.2015 [bug 465826]
+ILabelField, IHtmlField and IStringField are now IHtmlCapable
