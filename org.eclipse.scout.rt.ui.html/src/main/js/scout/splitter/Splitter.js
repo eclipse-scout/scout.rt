@@ -1,32 +1,26 @@
 scout.Splitter = function(options) {
+  scout.Splitter.parent.call(this);
   options = options || {};
   this.splitHorizontal = options.splitHorizontal !== undefined ? options.splitHorizontal : true;
   this.$anchor = options.$anchor;
-  this.events = new scout.EventSupport();
+  this._addEventSupport();
 };
+scout.inherits(scout.Splitter, scout.Widget);
 
-scout.Splitter.prototype.render = function($parent) {
+scout.Splitter.prototype._render = function($parent) {
   this.$parent = $parent;
 
-  this.$splitter = $parent.appendDiv('splitter')
+  this.$container = $parent.appendDiv('splitter')
     .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis')
     .on('mousedown', this._onMouseDown.bind(this));
 
   this.position();
 };
 
-scout.Splitter.prototype.on = function(type, func) {
-  return this.events.on(type, func);
-};
-
-scout.Splitter.prototype.off = function(type, func) {
-  this.events.off(type, func);
-};
-
 scout.Splitter.prototype.position = function() {
   var anchor = scout.graphics.offsetBounds(this.$anchor);
   if (this.splitHorizontal) {
-    this.$splitter.cssLeft(anchor.x + anchor.width);
+    this.$container.cssLeft(anchor.x + anchor.width);
   }
 };
 
@@ -39,12 +33,12 @@ scout.Splitter.prototype._onMouseDown = function(event) {
   // Ensure the correct cursor is always shown while moving
   $('body').addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
 
-  this.events.trigger('resizestart', event);
+  this.trigger('resizestart', event);
   return false;
 };
 
 scout.Splitter.prototype._onMouseMove = function(event) {
-  this.events.trigger('resize', event);
+  this.trigger('resize', event);
   this.position();
 };
 
@@ -53,5 +47,5 @@ scout.Splitter.prototype._onMouseUp = function(event) {
   $(window).off('mousemove.splitter');
   $('body').removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
 
-  this.events.trigger('resizeend', event);
+  this.trigger('resizeend', event);
 };

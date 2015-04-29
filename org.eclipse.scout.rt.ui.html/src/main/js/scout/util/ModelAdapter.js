@@ -1,21 +1,14 @@
 scout.ModelAdapter = function() {
+  scout.ModelAdapter.parent.call(this);
   this.session;
+  this._adapterProperties = [];
+  this.ui;
 
   // Adapter structure
   this.owner;
   this.ownedAdapters = [];
-
-  // Model structure
-  this.parent;
-  this.children = [];
-
-  this._adapterProperties = [];
-  this.rendered = false;
-  this.destroyed = false;
-  this.$container;
-
-  this.ui;
 };
+scout.inherits(scout.ModelAdapter, scout.Widget);
 
 scout.ModelAdapter.prototype.init = function(model, session) {
   this.session = session;
@@ -30,38 +23,37 @@ scout.ModelAdapter.prototype.init = function(model, session) {
     this[propertyName] = value;
   }.bind(this));
 
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
   // Fill in the missing default values
   scout.defaultValues.applyTo(this);
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 
 scout.ModelAdapter.prototype.render = function($parent) {
-  $.log.trace('render model adapter: ' + this);
-  if (this.rendered || this.ui) {
+  if (this.ui) {
     throw new Error('Already rendered: ' + this);
   }
-  if (this.destroyed) {
-    throw new Error('Object is destroyed: ' + this);
-  }
-  this.ui = this._createUi();
-  if (this.ui) {
-    this.ui.render($parent);
-  } else {
-    this._render($parent);
-    this._renderProperties();
-  }
-  if (this.$container && this.modelClass) {
-    this.$container.attr('data-modelClass', this.modelClass);
-  }
-  this._installKeyStrokeAdapter();
-  this.rendered = true;
+  scout.ModelAdapter.parent.prototype.render.call(this, $parent);
   if (this.session.offline) {
     this.goOffline();
   }
 };
 
-// FIXME BSH/AWE/CGU: konzept für 'widgets' ohne model-adapter bzw. ohne server-kommunikation erarbeiten
-// evtl. könnte auch ein strategy-pattern eingesetzt werden um server-calls zu ersetzen.
+scout.ModelAdapter.prototype._renderInternal = function($parent) {
+  this.ui = this._createUi();
+  if (this.ui) {
+    this.ui.render($parent);
+  } else {
+    scout.ModelAdapter.parent.prototype._renderInternal.call(this, $parent);
+  }
+};
+
+scout.ModelAdapter.prototype._remove = function() {
+  scout.ModelAdapter.parent.prototype._remove.call(this);
+  if (this.ui) {
+    this.ui.remove();
+    this.ui = undefined;
+  }
+};
 
 /**
  * @returns the UI widget to use when rendering the model adapter
@@ -81,54 +73,6 @@ scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
   } else {
     this._adapterProperties.push(properties);
   }
-};
-
-/**
- * This method creates the UI through DOM manipulation. At this point we should not apply model
- * properties on the UI, since sub-classes may need to contribute to the DOM first. You must not
- * apply model values to the UI here, since this is done in the _renderProperties method later.
- * The default impl. does nothing.
- */
-scout.ModelAdapter.prototype._render = function() {
-  // NOP
-};
-
-/**
- * This method calls the UI setter methods after the _render method has been executed.
- * Here values of the model are applied to the DOM / UI. The default impl. does nothing.
- */
-scout.ModelAdapter.prototype._renderProperties = function() {
-  // NOP
-};
-
-scout.ModelAdapter.prototype.remove = function() {
-  $.log.trace('remove model adapter: ' + this);
-  if (this.rendered) {
-    for (var i = 0; i < this.children.length; i++) {
-      var child = this.children[i];
-      child.remove();
-    }
-
-    this._remove();
-    this._uninstallKeyStrokeAdapter();
-    this.rendered = false;
-  }
-  this.dispose();
-};
-
-scout.ModelAdapter.prototype._remove = function() {
-  if (this.$container) {
-    this.$container.remove();
-    this.$container = null;
-  }
-  if (this.ui) {
-    this.ui.remove();
-    this.ui = undefined;
-  }
-};
-
-scout.ModelAdapter.prototype.dispose = function() {
-  // NOP implement to free resources
 };
 
 scout.ModelAdapter.prototype.destroy = function() {
@@ -154,22 +98,6 @@ scout.ModelAdapter.prototype.destroy = function() {
   this.destroyed = true;
 };
 
-scout.ModelAdapter.prototype._createKeyStrokeAdapter = function() {
-  // to be implemented by subclass
-};
-
-scout.ModelAdapter.prototype._installKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
-  }
-};
-
-scout.ModelAdapter.prototype._uninstallKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
-  }
-};
-
 scout.ModelAdapter.prototype.addOwnedAdapter = function(ownedAdapter) {
   $.log.trace('addOwnedAdapter(' + ownedAdapter + ') to ' + this);
   this.ownedAdapters.push(ownedAdapter);
@@ -178,16 +106,6 @@ scout.ModelAdapter.prototype.addOwnedAdapter = function(ownedAdapter) {
 scout.ModelAdapter.prototype.removeOwnedAdapter = function(ownedAdapter) {
   $.log.trace('removeOwnedAdapter(' + ownedAdapter + ') from ' + this);
   scout.arrays.remove(this.ownedAdapters, ownedAdapter);
-};
-
-scout.ModelAdapter.prototype.addChild = function(childAdapter) {
-  $.log.trace('addChild(' + childAdapter + ') to ' + this);
-  this.children.push(childAdapter);
-};
-
-scout.ModelAdapter.prototype.removeChild = function(childAdapter) {
-  $.log.trace('removeChild(' + childAdapter + ') from ' + this);
-  scout.arrays.remove(this.children, childAdapter);
 };
 
 /**
@@ -333,15 +251,15 @@ scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldPro
       if (!funcTarget[renderFuncName]) {
         throw new Error('Render function ' + renderFuncName + ' does not exist in ' + (funcTarget === this ? 'model adapter' : 'UI'));
       } // FIXME AWE/CGU: value and oldValue should be switched to conform with other functions.
-        // Or better create remove function as it is done with adapters? currently only "necessary" for AnalysisTableControl
-        // Input von 08.04.15: z.Z. wird die _renderXxx Methode sehr uneinheitlich verwendet. Manche mit ohne Parameter, andere mit
-        // 1 oder 2 Parameter. Dann gibt es noch Fälle (DateField.js) bei denen es nötig ist, render aufzurufen, aber mit einem
-        // anderen Wert für xxx als this.xxx. Nur wenige benötigen den 2. Parameter für old-value (FormField#_renderCssClass).
-        // Vorgeschlagene Lösung:
-        // - renderXxx() ist grundsätzlich Parameterlos und verwendet this.xxx
-        // - wenn jemand den old-value von this.xxx braucht, muss er sich diesen selber auf dem adapter merken
-        // - wenn jemand die render methode mit anderen werten als this.xxx aufrufen können muss, implementiert er für
-        //   diesen speziellen fall: function renderXxx(xxx) { xxx = xxx || this.xxx; ...
+      // Or better create remove function as it is done with adapters? currently only "necessary" for AnalysisTableControl
+      // Input von 08.04.15: z.Z. wird die _renderXxx Methode sehr uneinheitlich verwendet. Manche mit ohne Parameter, andere mit
+      // 1 oder 2 Parameter. Dann gibt es noch Fälle (DateField.js) bei denen es nötig ist, render aufzurufen, aber mit einem
+      // anderen Wert für xxx als this.xxx. Nur wenige benötigen den 2. Parameter für old-value (FormField#_renderCssClass).
+      // Vorgeschlagene Lösung:
+      // - renderXxx() ist grundsätzlich Parameterlos und verwendet this.xxx
+      // - wenn jemand den old-value von this.xxx braucht, muss er sich diesen selber auf dem adapter merken
+      // - wenn jemand die render methode mit anderen werten als this.xxx aufrufen können muss, implementiert er für
+      //   diesen speziellen fall: function renderXxx(xxx) { xxx = xxx || this.xxx; ...
       funcTarget[renderFuncName](newValue, oldValue);
     }
   }.bind(this));

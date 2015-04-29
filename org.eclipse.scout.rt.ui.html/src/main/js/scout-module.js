@@ -7,6 +7,7 @@ __include("jquery/jquery-scout.js");
 (function(scout, $, undefined) {
 __include("scout/main.js");
 __include("scout/objectFactories.js");
+__include("scout/widget/Widget.js");
 // Basic utilities
 __include("scout/util/arrays.js");
 __include("scout/util/dates.js");

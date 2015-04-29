@@ -1,4 +1,5 @@
 scout.Tooltip = function(options) {
+  scout.Tooltip.parent.call(this);
   options = options || {};
   this.text = options.text || '';
   this.arrowPosition = options.arrowPosition !== undefined ? options.arrowPosition : 50;
@@ -13,8 +14,9 @@ scout.Tooltip = function(options) {
   this.tooltipPosition = options.position || 'top';
   this.$content;
 };
+scout.inherits(scout.Tooltip, scout.Widget);
 
-scout.Tooltip.prototype.render = function($parent) {
+scout.Tooltip.prototype._render = function($parent) {
   // Auto-detect parent
   $parent = $parent || (this.$origin && this.$origin.closest('.desktop,.glasspane')) || $('body');
 
@@ -41,7 +43,14 @@ scout.Tooltip.prototype.render = function($parent) {
       scout.scrollbars.attachScrollHandlers(this.$origin, this.remove.bind(this));
     }
   }
-  this.rendered = true;
+};
+
+scout.Tooltip.prototype._remove = function() {
+  $(document).off('mousedown.tooltip keydown.tooltip');
+  if (this.$origin) {
+    scout.scrollbars.detachScrollHandlers(this.$origin);
+  }
+  scout.Tooltip.parent.prototype._remove.call(this);
 };
 
 scout.Tooltip.prototype.renderText = function(text) {
@@ -96,15 +105,6 @@ scout.Tooltip.prototype.position = function() {
   this.$container
     .cssLeft(left)
     .cssTop(top);
-};
-
-scout.Tooltip.prototype.remove = function() {
-  $(document).off('mousedown.tooltip keydown.tooltip');
-  if (this.$origin) {
-    scout.scrollbars.detachScrollHandlers(this.$origin);
-  }
-  this.$container.remove();
-  this.rendered = false;
 };
 
 scout.Tooltip.prototype._onTooltipClicked = function(event) {
