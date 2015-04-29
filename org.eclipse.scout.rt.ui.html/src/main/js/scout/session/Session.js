@@ -530,8 +530,7 @@ scout.Session.prototype.showFatalMessage = function(options) {
     cancelButtonText: options.cancelButtonText
   };
   var ui = new scout.MessageBox(model, this);
-
-  model.onButtonClicked = function($button, event) {
+  ui.on('buttonClick', function($button, event) {
     var option = $button.data('option');
     // Close message box
     ui.remove();
@@ -543,7 +542,7 @@ scout.Session.prototype.showFatalMessage = function(options) {
     } else if (option === 'cancel' && options.cancelButtonAction) {
       options.cancelButtonAction.apply(this);
     }
-  }.bind(this);
+  }.bind(this));
 
   this._setApplicationLoading(false);
   ui.render(this.$entryPoint);

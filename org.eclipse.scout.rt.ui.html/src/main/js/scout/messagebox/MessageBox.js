@@ -1,5 +1,9 @@
-scout.MessageBox = function(modelAdapter, session) {
-  this.modelAdapter = modelAdapter || {};
+scout.MessageBox = function(model, session) {
+  scout.MessageBox.parent.call(this);
+  if (!(model instanceof scout.ModelAdapter)) {
+    // If message box is used gui only, otherwise the model gets written by the model adapter.
+    $.extend(this, model);
+  }
   this.$container;
   this.$content;
   this.$title;
@@ -14,10 +18,11 @@ scout.MessageBox = function(modelAdapter, session) {
   this.focusListener;
   this._$glassPane;
   this._session = session;
-  this.keyStrokeAdapter;
+  this._addEventSupport();
 };
+scout.inherits(scout.MessageBox, scout.Widget);
 
-scout.MessageBox.prototype.render = function($parent) {
+scout.MessageBox.prototype._render = function($parent) {
   if (!$parent) {
     throw new Error('Missing argument $parent');
   }
@@ -32,23 +37,22 @@ scout.MessageBox.prototype.render = function($parent) {
   this.$title = this.$content.appendDiv('messagebox-label');
   this.$introText = this.$content.appendDiv('messagebox-label messagebox-intro-text');
   this.$actionText = this.$content.appendDiv('messagebox-label messagebox-action-text');
-
   this.$buttons = this.$container.appendDiv('messagebox-buttons');
 
-  if (this.modelAdapter.yesButtonText) {
-    this.$yesButton = this._createButton('yes', this.modelAdapter.yesButtonText);
+  if (this.yesButtonText) {
+    this.$yesButton = this._createButton('yes', this.yesButtonText);
     if (!this.$defaultButton) {
       this.$defaultButton = this.$yesButton;
     }
   }
-  if (this.modelAdapter.noButtonText) {
-    this.$noButton = this._createButton('no', this.modelAdapter.noButtonText);
+  if (this.noButtonText) {
+    this.$noButton = this._createButton('no', this.noButtonText);
     if (!this.$defaultButton) {
       this.$defaultButton = this.$noButton;
     }
   }
-  if (this.modelAdapter.cancelButtonText) {
-    this.$cancelButton = this._createButton('cancel', this.modelAdapter.cancelButtonText);
+  if (this.cancelButtonText) {
+    this.$cancelButton = this._createButton('cancel', this.cancelButtonText);
     if (!this.$defaultButton) {
       this.$defaultButton = this.$cancelButton;
     }
@@ -65,24 +69,24 @@ scout.MessageBox.prototype.render = function($parent) {
   }.bind(this));
 
   // Render properties
-  this._renderTitle(this.modelAdapter.title);
-  this._renderIconId(this.modelAdapter.iconId);
-  this._renderSeverity(this.modelAdapter.severity);
-  this._renderIntroText(this.modelAdapter.introText);
-  this._renderActionText(this.modelAdapter.actionText);
+  this._renderTitle(this.title);
+  this._renderIconId(this.iconId);
+  this._renderSeverity(this.severity);
+  this._renderIntroText(this.introText);
+  this._renderActionText(this.actionText);
 
   // Now that all texts are set, we can calculate the position
   this._position();
-  this.keyStrokeAdapter = new scout.MessageBoxKeyStrokeAdapter(this);
-  this._installKeyStrokeAdapter();
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 
-scout.MessageBox.prototype.remove = function() {
-  if (this.$container) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
-    this._$glassPane.fadeOutAndRemove();
-    this.$container = null;
-  }
+scout.MessageBox.prototype._remove = function() {
+  scout.MessageBox.parent.prototype._remove.call(this);
+  this._$glassPane.fadeOutAndRemove();
+};
+
+scout.MessageBox.prototype._createKeyStrokeAdapter = function() {
+  return new scout.MessageBoxKeyStrokeAdapter(this);
 };
 
 scout.MessageBox.prototype._position = function() {
@@ -100,9 +104,9 @@ scout.MessageBox.prototype._createButton = function(option, text) {
 
 scout.MessageBox.prototype._onButtonClicked = function(event) {
   var $button = $(event.target);
-  if (this.modelAdapter.onButtonClicked) {
-    this.modelAdapter.onButtonClicked($button, event);
-  }
+  this.trigger('buttonClick', {
+    option: $button.data('option')
+  });
 };
 
 scout.MessageBox.prototype._renderTitle = function(title) {
@@ -145,10 +149,4 @@ scout.MessageBox.prototype._updateButtonWidths = function() {
   $($visibleButtons).each(function() {
     this.css('width', width + '%');
   });
-};
-
-scout.MessageBox.prototype._installKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
-  }
 };
