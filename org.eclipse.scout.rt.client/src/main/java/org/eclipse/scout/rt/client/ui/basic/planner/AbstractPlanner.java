@@ -557,7 +557,10 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
       //FIXME CGU copy?
       for (Resource<RI> resource : resources) {
         for (Activity<?, ?> activity : resource.getActivities()) {
-          decorateActivityCell((Activity<RI, AI>) activity);
+          @SuppressWarnings("unchecked")
+          // FIXME CGU Fix generics
+          Activity<RI, AI> castedActivity = (Activity<RI, AI>) activity;
+          decorateActivityCell(castedActivity);
         }
         m_resources.add(resource);
       }
@@ -1056,8 +1059,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
           if (CompareUtility.equals(cell.getBeginTime(), beginTime) &&
               (CompareUtility.equals(cell.getEndTime(), endTime)
-                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-                  || (cell != null
+              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+              || (cell != null
                   && cell.getEndTime() != null
                   && endTime != null
                   && cell.getEndTime().getTime() == endTime.getTime() + 1))) {

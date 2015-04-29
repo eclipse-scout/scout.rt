@@ -20,8 +20,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.IPlannerFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldLoadResourcesChain;
@@ -35,7 +33,6 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 @ClassId("9520b5cc-221e-4d0f-8cc3-5c4a1ba06b77")
 public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> extends AbstractFormField implements IPlannerField<P> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPlannerField.class);
 
   private IPlannerFieldUIFacade m_uiFacade;
   private P m_planner;

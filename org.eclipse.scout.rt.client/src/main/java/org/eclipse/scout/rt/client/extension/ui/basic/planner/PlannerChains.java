@@ -37,7 +37,6 @@ public final class PlannerChains {
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }
-
     }
   }
 
@@ -58,7 +57,6 @@ public final class PlannerChains {
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }
-
     }
   }
 
@@ -79,7 +77,6 @@ public final class PlannerChains {
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }
-
     }
   }
 
@@ -100,7 +97,6 @@ public final class PlannerChains {
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }
-
     }
   }
 
@@ -110,7 +106,7 @@ public final class PlannerChains {
       super(extensions);
     }
 
-    public void execCellAction(final Resource resource, final Activity<RI, AI> activityCell) throws ProcessingException {
+    public void execCellAction(final Resource<RI> resource, final Activity<RI, AI> activityCell) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>> next) throws ProcessingException {
@@ -121,8 +117,6 @@ public final class PlannerChains {
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }
-
     }
   }
-
 }
