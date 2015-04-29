@@ -29,7 +29,7 @@ scout.GroupBoxMenuItemsOrder = {
 
     return {
       left: leftButtons.concat(leftMenus),
-      right: rightMenus.concat(rightButtons)
+      right: rightButtons.concat(rightMenus)
     };
   }
 

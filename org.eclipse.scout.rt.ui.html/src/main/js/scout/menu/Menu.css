@@ -39,7 +39,6 @@
 }
 
 .menu-item {
-  /* vertical-align:middle only works with line-height */
   height: @menu-item-height;
   line-height: @menu-item-height;
   white-space: nowrap;

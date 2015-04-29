@@ -9,13 +9,13 @@
   & > div {
     position: relative; /* reset a possible different value (e.g. set by .form-field) which might cause 'display: inline-block' to be ignored for the computed style */
     display: inline-block;
+    height: @menubar-height;
+    line-height: @menubar-height;
     vertical-align: middle;
   }
 
   & .button button {
     min-width: 110px;
-    margin-top: 6px;
-    margin-bottom: 3px;
     margin-right: @menu-item-margin-right;
   }
   & .button.last.right-aligned button {
@@ -49,7 +49,14 @@
 
     &[data-icon]::before {
       font-size: 18px;
-      line-height: @logical-grid-height;
+      height: @logical-grid-height;
+      line-height: @logical-grid-height - 4px;
+      /* Prepare for focus border: */
+      border: 1px solid transparent;
+      margin-left: -2px;
+      margin-right: -2px;
+      padding-left: 2px;
+      padding-right: 2px;
     }
   }
 
@@ -63,14 +70,9 @@
   margin-left: @bench-margin-x;
   margin-right: @bench-margin-x;
   height: 55px;
-  padding: 6px 0 10px 0;
+  padding-top: 11px;
 
-  & > .menu-item {
-    height: @menu-item-height;
-    line-height: @menu-item-height;
-
-    &[data-icon]::before {
-      font-size: 22px;
-    }
+  & > .menu-item[data-icon]::before {
+    font-size: 22px;
   }
 }
