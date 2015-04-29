@@ -52,15 +52,13 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
   this._renderMenuItems(orderedMenuItems.right, true);
   this._renderMenuItems(orderedMenuItems.left, false);
 
-  //Add tabindex to first valid MenuItem
+  // Add tabindex 0 to first valid MenuItem so that it can be focused. All other items
+  // are not tabbable. They can be selected with the arrow keys.
   for (var i = 0; i < this.menuItems.length; i++) {
-    var actualItem = this.menuItems[i];
-    if ((actualItem instanceof scout.Button || (actualItem instanceof scout.Menu && !actualItem.separator)) && actualItem.visible && actualItem.enabled) {
-      if (actualItem instanceof scout.Button) {
-        actualItem.$field.attr('tabindex', 0);
-      } else {
-        actualItem.$container.attr('tabindex', 0);
-      }
+    var item = this.menuItems[i];
+    if ((item instanceof scout.Button || (item instanceof scout.Menu && !item.separator)) && item.visible && item.enabled) {
+      var $target = (item instanceof scout.Button ? item.$field : item.$container);
+      $target.attr('tabindex', 0);
       break;
     }
   }
@@ -135,9 +133,13 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     item.menuBar = this; // link to menuBar
     item.$container.removeClass('form-field');
 
-    if (item instanceof scout.Button) {
+    // Ensure all all items are non-tabbable by default. One of the items will get a tabindex
+    // assigned again later in updateItems().
+    if (item instanceof scout.Button && item.$field.is('button')) {
+      // <button>s are tabbable by default, therefore explicitly disable it by setting the tabindex to -1
       item.$field.attr('tabindex', -1);
     } else {
+      // For all other items we can just remove the attribute to make them non-tabbable
       item.$container.removeAttr('tabindex');
     }
 
