@@ -37,7 +37,7 @@ public class JsonCompositeField<T extends ICompositeField, F extends IFormField>
 
   @Override
   public JSONObject toJson() {
-    return putAdapterIdsProperty(super.toJson(), getModelFieldsName(), getModelFields(), new DisplayableFormFieldFilter<F>());
+    return putAdapterIdsProperty(super.toJson(), getModelFieldsPropertyName(), getModelFields(), new DisplayableFormFieldFilter<F>());
   }
 
   @SuppressWarnings("unchecked")
@@ -45,7 +45,7 @@ public class JsonCompositeField<T extends ICompositeField, F extends IFormField>
     return (List<F>) getModel().getFields();
   }
 
-  protected String getModelFieldsName() {
+  protected String getModelFieldsPropertyName() {
     return "fields";
   }
 

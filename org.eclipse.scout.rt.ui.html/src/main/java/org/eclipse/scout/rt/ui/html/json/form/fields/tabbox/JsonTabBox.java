@@ -57,7 +57,7 @@ public class JsonTabBox<T extends ITabBox> extends JsonCompositeField<T, IGroupB
   }
 
   @Override
-  protected String getModelFieldsName() {
+  protected String getModelFieldsPropertyName() {
     return "tabItems";
   }
 
