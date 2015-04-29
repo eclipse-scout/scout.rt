@@ -262,3 +262,30 @@ removed methods:
 - NumberUtility.divide(double, double) --> no replacement
 - NumberUtility.sum(double...) --> use sum(Number...)
 - NumberUtility.sum(long...) --> use sum(Number...)
+
+ASA 29.04.2015
+removed:
+TextTransferObject(String plainText, String htmlText)
+TextTransferObject.getHtmlText()
+
+deprecated:
+HTMLUtility.DefaultFont
+HTMLUtility.cleanupCss(...)
+HTMLUtility.cleanupHtml(...)
+HTMLUtility.cleanupHtml(...)
+HTMLUtility.copyReferencedFilesToCache(...)
+HTMLUtility.decodeText(...)
+HTMLUtility.encodeText(...)
+HTMLUtility.replaceContendIDs(...)
+HTMLUtility.toHtmlText(...)
+HTMLUtility.toPlainTextWithTable(...)
+
+
+
+
+
+
+
+
+
+
