@@ -511,7 +511,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
           // This must happen synchronized (as it always is, in a model-job) to avoid concurrency issues
           // FIXME AWE: (json-layer) ausprobieren, ob die currentResponse auch im Fall von einer Exception zurück gesetzt werden muss.
           m_currentJsonResponse = createJsonResponse();
-          LOG.debug("Created new instance of current JSON response. New instance=" + m_clientSessionId);
           return json;
         }
       });
