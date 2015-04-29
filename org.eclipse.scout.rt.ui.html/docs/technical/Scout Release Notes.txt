@@ -255,3 +255,10 @@ that the old behavior is not exactly reproduced in a special case: When more tha
 class T was found, the old method just returned the first instance found. The new method throws an exception in
 this case, because the order of the instances is not really defined. If you really want to find _any_ instance
 of the given class, retrieve the list of all instances using getMenus() and apply the filtering by yourself.
+
+ASA 29.04.2015 [bug 458535: NumberUtility.sum() is ambiguous]
+removed methods:
+- NumberUtility.avg(double...) --> no replacement
+- NumberUtility.divide(double, double) --> no replacement
+- NumberUtility.sum(double...) --> use sum(Number...)
+- NumberUtility.sum(long...) --> use sum(Number...)
