@@ -131,7 +131,9 @@ public final class NumberUtility {
    * @param The
    *          vararg of doubles.
    * @return The average value. Returns 0 if the parameter is null or an empty array.
+   * @deprecated will be removed in 5.1.0; no replacement
    */
+  @Deprecated
   public static double avg(double... a) {
     if (a == null) {
       return 0;
@@ -197,7 +199,9 @@ public final class NumberUtility {
    * @param The
    *          vararg of doubles.
    * @return The sum. Returns 0 if the parameter is null or the length of the vararg is 0.
+   * @deprecated use {@link NumberUtility#sum(Number...)} instead; will be removed in 5.1.0;
    */
+  @Deprecated
   public static double sum(double... a) {
     if (a == null) {
       return 0;
@@ -256,7 +260,9 @@ public final class NumberUtility {
    * @param The
    *          vararg of longs.
    * @return The sum. Returns 0 if the parameter is null or the length of the vararg is 0.
+   * @deprecated use {@link NumberUtility#sum(Number...)} instead; will be removed in 5.1.0;
    */
+  @Deprecated
   public static long sum(long... a) {
     if (a == null) {
       return 0;
@@ -555,7 +561,9 @@ public final class NumberUtility {
    * @param denominator
    * @return null if the numerator is null or the denominator is null or 0.0.
    *         Else it returns the division result.
+   * @deprecated will be removed in 5.1.0; no replacement
    */
+  @Deprecated
   public static Double divide(Double numerator, Double denominator) {
     if (numerator == null || denominator == null || denominator.equals(0.0)) {
       return null;
