@@ -58,41 +58,41 @@ public class ServerRunContextChainTest {
   public void testCallableChain() throws Exception {
     ICallable<Void> actualCallable = new ServerRunContext().interceptCallable(m_targetCallable);
 
-    // 0. RunMonitorCallable
-    RunMonitorCallable c0 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
+    // 1. RunMonitorCallable
+    RunMonitorCallable c1 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
 
-    // 1. SubjectCallable
-    SubjectCallable c1 = getNextAndAssert(c0, SubjectCallable.class);
+    // 3. SubjectCallable
+    SubjectCallable c2 = getNextAndAssert(c1, SubjectCallable.class);
 
-    // 2. InitThreadLocalCallable for NlsLocale.CURRENT
-    InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c2).getThreadLocal());
-
-    // 3. InitThreadLocalCallable for PropertyMap.CURRENT
+    // 3. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c3 = getNextAndAssert(c2, InitThreadLocalCallable.class);
-    assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c3).getThreadLocal());
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c3).getThreadLocal());
 
-    // 4. InitThreadLocalCallable for OfflineState.CURRENT
+    // 4. InitThreadLocalCallable for PropertyMap.CURRENT
     InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
-    assertSame(OfflineState.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
+    assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
 
-    // 5. InitThreadLocalCallable for ISession.CURRENT
+    // 5. InitThreadLocalCallable for OfflineState.CURRENT
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
+    assertSame(OfflineState.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    // 6. InitThreadLocalCallable for UserAgent.CURRENT
+    // 6. InitThreadLocalCallable for ISession.CURRENT
     InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(UserAgent.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
+    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. InitThreadLocalCallable for ScoutTexts.CURRENT
+    // 7. InitThreadLocalCallable for UserAgent.CURRENT
     InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
-    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
+    assertSame(UserAgent.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
 
-    // 8. TwoPhaseTransactionBoundaryCallable
-    TwoPhaseTransactionBoundaryCallable c8 = getNextAndAssert(c7, TwoPhaseTransactionBoundaryCallable.class);
+    // 8. InitThreadLocalCallable for ScoutTexts.CURRENT
+    InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
+    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
 
-    // 9. Target
-    assertSame(m_targetCallable, c8.getNext());
+    // 9. TwoPhaseTransactionBoundaryCallable
+    TwoPhaseTransactionBoundaryCallable c9 = getNextAndAssert(c8, TwoPhaseTransactionBoundaryCallable.class);
+
+    // 10. Target
+    assertSame(m_targetCallable, c9.getNext());
   }
 
   /**
@@ -113,47 +113,47 @@ public class ServerRunContextChainTest {
 
     ICallable<Void> actualCallable = serverRunContext.interceptCallable(m_targetCallable);
 
-    // 0. RunMonitorCallable
-    RunMonitorCallable c0 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
+    // 1. RunMonitorCallable
+    RunMonitorCallable c1 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
 
-    // 1. SubjectCallable
-    SubjectCallable c1 = getNextAndAssert(c0, SubjectCallable.class);
+    // 2. SubjectCallable
+    SubjectCallable c2 = getNextAndAssert(c1, SubjectCallable.class);
 
-    // 2. InitThreadLocalCallable for NlsLocale.CURRENT
-    InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c2).getThreadLocal());
-
-    // 3. InitThreadLocalCallable for PropertyMap.CURRENT
+    // 3. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c3 = getNextAndAssert(c2, InitThreadLocalCallable.class);
-    assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c3).getThreadLocal());
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c3).getThreadLocal());
 
-    // 4. InitThreadLocalCallable for OfflineState.CURRENT
+    // 4. InitThreadLocalCallable for PropertyMap.CURRENT
     InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
-    assertSame(OfflineState.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
+    assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
 
-    // 5. InitThreadLocalCallable for ISession.CURRENT
+    // 5. InitThreadLocalCallable for OfflineState.CURRENT
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
+    assertSame(OfflineState.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    // 6. InitThreadLocalCallable for UserAgent.CURRENT
+    // 6. InitThreadLocalCallable for ISession.CURRENT
     InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(UserAgent.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
+    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. InitThreadLocalCallable for ScoutTexts.CURRENT
+    // 7. InitThreadLocalCallable for UserAgent.CURRENT
     InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
-    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
+    assertSame(UserAgent.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
 
-    // 8. TwoPhaseTransactionBoundaryCallable
-    TwoPhaseTransactionBoundaryCallable c8 = getNextAndAssert(c7, TwoPhaseTransactionBoundaryCallable.class);
+    // 8. InitThreadLocalCallable for ScoutTexts.CURRENT
+    InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
+    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
 
-    // 9. Contribution1
-    Contribution1 c9 = getNextAndAssert(c8, Contribution1.class);
+    // 9. TwoPhaseTransactionBoundaryCallable
+    TwoPhaseTransactionBoundaryCallable c9 = getNextAndAssert(c8, TwoPhaseTransactionBoundaryCallable.class);
 
-    // 10. Contribution2
-    Contribution2 c10 = getNextAndAssert(c9, Contribution2.class);
+    // 10. Contribution1
+    Contribution1 c10 = getNextAndAssert(c9, Contribution1.class);
 
-    // 11. Target
-    assertSame(m_targetCallable, c10.getNext());
+    // 11. Contribution2
+    Contribution2 c11 = getNextAndAssert(c10, Contribution2.class);
+
+    // 12. Target
+    assertSame(m_targetCallable, c11.getNext());
   }
 
   /**
@@ -180,41 +180,41 @@ public class ServerRunContextChainTest {
     // 2. Contribution2
     Contribution2 c2 = getNextAndAssert(c1, Contribution2.class);
 
-    // 2a. SubjectCallable
-    RunMonitorCallable c2a = getNextAndAssert(c2, RunMonitorCallable.class);
-
     // 3. SubjectCallable
-    SubjectCallable c3 = getNextAndAssert(c2a, SubjectCallable.class);
+    RunMonitorCallable c3 = getNextAndAssert(c2, RunMonitorCallable.class);
 
-    // 4. InitThreadLocalCallable for NlsLocale.CURRENT
-    InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
+    // 4. SubjectCallable
+    SubjectCallable c4 = getNextAndAssert(c3, SubjectCallable.class);
 
-    // 5. InitThreadLocalCallable for PropertyMap.CURRENT
+    // 5. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    // 6. InitThreadLocalCallable for OfflineState.CURRENT
+    // 6. InitThreadLocalCallable for PropertyMap.CURRENT
     InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(OfflineState.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
+    assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. InitThreadLocalCallable for ISession.CURRENT
+    // 7. InitThreadLocalCallable for OfflineState.CURRENT
     InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
-    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
+    assertSame(OfflineState.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
 
-    // 8. InitThreadLocalCallable for UserAgent.CURRENT
+    // 8. InitThreadLocalCallable for ISession.CURRENT
     InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
-    assertSame(UserAgent.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
+    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
 
-    // 9. InitThreadLocalCallable for ScoutTexts.CURRENT
+    // 9. InitThreadLocalCallable for UserAgent.CURRENT
     InitThreadLocalCallable c9 = getNextAndAssert(c8, InitThreadLocalCallable.class);
-    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c9).getThreadLocal());
+    assertSame(UserAgent.CURRENT, ((InitThreadLocalCallable) c9).getThreadLocal());
 
-    // 10. TwoPhaseTransactionBoundaryCallable
-    TwoPhaseTransactionBoundaryCallable c10 = getNextAndAssert(c9, TwoPhaseTransactionBoundaryCallable.class);
+    // 10. InitThreadLocalCallable for ScoutTexts.CURRENT
+    InitThreadLocalCallable c10 = getNextAndAssert(c9, InitThreadLocalCallable.class);
+    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c10).getThreadLocal());
 
-    // 11. Target
-    assertSame(m_targetCallable, c10.getNext());
+    // 11. TwoPhaseTransactionBoundaryCallable
+    TwoPhaseTransactionBoundaryCallable c11 = getNextAndAssert(c10, TwoPhaseTransactionBoundaryCallable.class);
+
+    // 12. Target
+    assertSame(m_targetCallable, c11.getNext());
   }
 
   @SuppressWarnings("unchecked")

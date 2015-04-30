@@ -17,21 +17,19 @@ import org.eclipse.scout.rt.platform.job.IFuture;
  * <p>
  * Note that a {@link IFuture} represents itself a {@link IRunMonitor}
  *
- * @since 5.0
+ * @since 5.1
  */
 public interface ICancellable {
 
   /**
    * Attempts to cancel the execution of the associated run phase (maybe inside a job). This attempt will be ignored if
-   * the job has already
-   * completed or was cancelled. If not running yet, the job will never run. If the job has already started, then the
-   * <code>interruptIfRunning</code> parameter determines whether the thread executing this job should be interrupted in
-   * an attempt to stop the job.
+   * the job has already completed or was cancelled. If not running yet, the job will never run. If the job has already
+   * started, then the <code>interruptIfRunning</code> parameter determines whether the thread executing this job should
+   * be interrupted in an attempt to stop the job.
    *
    * @param interruptIfRunning
    *          <code>true</code> if the thread executing this run phase (maybe inside a job) should be interrupted;
-   *          otherwise, in-progress jobs are
-   *          allowed to complete.
+   *          otherwise, in-progress jobs are allowed to complete.
    * @return <code>false</code> if the job could not be cancelled, typically because it has already completed normally.
    */
   boolean cancel(boolean interruptIfRunning);
@@ -41,5 +39,4 @@ public interface ICancellable {
    *         normally.
    */
   boolean isCancelled();
-
 }

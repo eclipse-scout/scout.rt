@@ -50,7 +50,7 @@ public interface IJobManager {
    *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
    *          job.
    * @param input
-   *          describes the job to be executed.
+   *          describes the job to be executed; must not be <code>null</code>.
    * @return Future to wait for the job's completion or to cancel the job's execution.
    */
   <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, JobInput input);
@@ -72,7 +72,7 @@ public interface IJobManager {
    * @param delayUnit
    *          the time unit of the <code>delay</code> argument.
    * @param input
-   *          describes the job to be executed.
+   *          describes the job to be executed; must not be <code>null</code>.
    * @return Future to wait for the job's completion or to cancel the job's execution.
    */
   <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, JobInput input);
@@ -93,7 +93,7 @@ public interface IJobManager {
    * @param unit
    *          the time unit of the <code>initialDelay</code> and <code>period</code> arguments.
    * @param input
-   *          describes the job to be executed.
+   *          describes the job to be executed; must not be <code>null</code>.
    * @return Future to cancel the periodic action.
    */
   IFuture<Void> scheduleAtFixedRate(IRunnable runnable, long initialDelay, long period, TimeUnit unit, JobInput input);
@@ -113,7 +113,7 @@ public interface IJobManager {
    * @param unit
    *          the time unit of the <code>initialDelay</code> and <code>period</code> arguments.
    * @param input
-   *          describes the job to be executed.
+   *          describes the job to be executed; must not be <code>null</code>.
    * @return Future to cancel the periodic action.
    */
   IFuture<Void> scheduleWithFixedDelay(IRunnable runnable, long initialDelay, long delay, TimeUnit unit, JobInput input);

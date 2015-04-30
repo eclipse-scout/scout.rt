@@ -19,14 +19,15 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 /**
  * Default implementation of a {@link IRunMonitor}
  *
- * @since 5.0
+ * @since 5.1
  */
 public class RunMonitor implements IRunMonitor {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RunMonitor.class);
 
   private final Object m_lock = new Object();
-  private final HashSet<ICancellable> m_set = new HashSet<>();
-  private boolean m_cancelled;
+  private final Set<ICancellable> m_cancellables = new HashSet<>();
+  private volatile boolean m_cancelled;
 
   @Override
   public boolean isCancelled() {
@@ -34,15 +35,15 @@ public class RunMonitor implements IRunMonitor {
   }
 
   @Override
-  public boolean cancel(boolean interruptIfRunning) {
-    Set<ICancellable> tmp;
+  public boolean cancel(final boolean interruptIfRunning) {
+    Set<ICancellable> cancellablesCopyList;
     synchronized (m_lock) {
       m_cancelled = true;
-      tmp = new HashSet<>(m_set);
+      cancellablesCopyList = new HashSet<>(m_cancellables);
     }
     boolean success = true;
-    for (ICancellable c : tmp) {
-      if (!invokeCancel(c, interruptIfRunning)) {
+    for (final ICancellable cancellable : cancellablesCopyList) {
+      if (!invokeCancel(cancellable, interruptIfRunning)) {
         success = false;
       }
     }
@@ -50,32 +51,39 @@ public class RunMonitor implements IRunMonitor {
   }
 
   @Override
-  public void registerCancellable(ICancellable c) {
+  public void registerCancellable(final ICancellable cancellable) {
     synchronized (m_lock) {
-      m_set.add(c);
+      m_cancellables.add(cancellable);
     }
     if (isCancelled()) {
-      invokeCancel(c, true);
+      invokeCancel(cancellable, true);
     }
   }
 
   @Override
-  public void unregisterCancellable(ICancellable c) {
+  public void unregisterCancellable(final ICancellable cancellable) {
     synchronized (m_lock) {
-      m_set.remove(c);
+      m_cancellables.remove(cancellable);
     }
   }
 
-  protected boolean invokeCancel(ICancellable c, boolean interruptIfRunning) {
+  protected boolean invokeCancel(final ICancellable c, final boolean interruptIfRunning) {
     try {
       if (!c.isCancelled()) {
         return c.cancel(interruptIfRunning);
       }
       return true;
     }
-    catch (Throwable t) {
+    catch (final Throwable t) {
       LOG.error("Cancelling " + c, t);
       return false;
     }
+  }
+
+  /**
+   * Used for testing purpose.
+   */
+  public boolean isEmpty() {
+    return m_cancellables.isEmpty();
   }
 }

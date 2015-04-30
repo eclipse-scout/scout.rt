@@ -10,29 +10,32 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.context;
 
-import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.rt.platform.Bean;
 
 /**
- * The {@link IRunMonitor} is active during the phase of a {@link RunContext#run(org.eclipse.scout.commons.IRunnable)}
+ * The {@link IRunMonitor} is active during the phase of a {@link RunContext#run(IRunnable)} or running inside a job.
  * <p>
  * Its sole purpose is to control the cancel of an active run phase or job (if running inside a job).
  *
- * @since 5.0
+ * @since 5.1
  */
+@Bean
 public interface IRunMonitor extends ICancellable {
   /**
-   * The {@link IFuture} which is currently associated with the current thread.
+   * The {@link IRunMonitor} which is currently associated with the current thread; is never <code>null</code> if
+   * running within a {@link RunContext} or job.
    */
   ThreadLocal<IRunMonitor> CURRENT = new ThreadLocal<>();
 
-  @Override
-  boolean cancel(boolean interruptIfRunning);
+  /**
+   * Registers the given {@link ICancellable} to be cancelled once this monitor get cancelled.
+   */
+  void registerCancellable(ICancellable cancellable);
 
-  @Override
-  boolean isCancelled();
-
-  void registerCancellable(ICancellable c);
-
-  void unregisterCancellable(ICancellable c);
+  /**
+   * Unregisters the given {@link ICancellable}.
+   */
+  void unregisterCancellable(ICancellable cancellable);
 
 }

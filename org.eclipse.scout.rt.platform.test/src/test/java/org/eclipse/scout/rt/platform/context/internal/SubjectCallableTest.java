@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.context;
+package org.eclipse.scout.rt.platform.context.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

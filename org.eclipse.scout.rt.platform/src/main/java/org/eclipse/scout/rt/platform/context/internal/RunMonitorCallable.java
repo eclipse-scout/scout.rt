@@ -15,13 +15,14 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.IRunMonitor;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
 
 /**
- * Processor to run the subsequent sequence of actions inside a {@link IRunMonitor}
+ * Processor to run the subsequent sequence of actions inside a {@link IRunMonitor}.
  * <p>
- * If there is already a {@link IRunMonitor} on the current thread {@link IRunMonitor#CURRENT}, nothing is done.
+ * If there is already a {@link IRunMonitor} on the current thread {@link IRunMonitor#CURRENT} and no explicit monitor
+ * is given, nothing is done.
  *
  * @param <RESULT>
  *          the result type of the job's computation.
@@ -50,26 +51,22 @@ public class RunMonitorCallable<RESULT> implements ICallable<RESULT>, IChainable
 
   @Override
   public RESULT call() throws Exception {
-    IRunMonitor oldMonitor = IRunMonitor.CURRENT.get();
+    final IRunMonitor oldMonitor = IRunMonitor.CURRENT.get();
     if (oldMonitor != null && m_monitor == null) {
       return m_next.call();
     }
-    else if (oldMonitor != null /* && m_monitor!=null */) {
-      IRunMonitor.CURRENT.set(m_monitor);
+    else {
+      IRunMonitor.CURRENT.set(m_monitor != null ? m_monitor : BEANS.get(IRunMonitor.class));
       try {
         return m_next.call();
       }
       finally {
-        IRunMonitor.CURRENT.set(oldMonitor);
-      }
-    }
-    else/* oldMonitor==null */{
-      try {
-        IRunMonitor.CURRENT.set(m_monitor != null ? m_monitor : new RunMonitor());
-        return m_next.call();
-      }
-      finally {
-        IRunMonitor.CURRENT.remove();
+        if (oldMonitor == null) {
+          IRunMonitor.CURRENT.remove();
+        }
+        else {
+          IRunMonitor.CURRENT.set(oldMonitor);
+        }
       }
     }
   }

@@ -31,6 +31,7 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobAllowCoreThreadTimeoutProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobCorePoolSizeProperty;
@@ -38,7 +39,6 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobDispatch
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobKeepAliveTimeProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobMaximumPoolSizeProperty;
 import org.eclipse.scout.rt.platform.context.IRunMonitor;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -183,11 +183,14 @@ public class JobManager implements IJobManager {
     m_listeners.remove(listener);
   }
 
+  /**
+   * Returns the monitor from the given input, or a new one if not set.
+   */
   protected IRunMonitor createRunMonitor(JobInput input) {
-    if (input != null && input.runContext() != null && input.runContext().runMonitor() != null) {
+    if (input.runContext() != null && input.runContext().runMonitor() != null) {
       return input.runContext().runMonitor();
     }
-    return new RunMonitor();
+    return BEANS.get(IRunMonitor.class);
   }
 
   /**
@@ -255,6 +258,7 @@ public class JobManager implements IJobManager {
           return;
         }
 
+        monitor.unregisterCancellable(this);
         m_futures.remove(this);
         m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.DONE, this));
 
@@ -266,9 +270,11 @@ public class JobManager implements IJobManager {
       @Override
       public boolean cancel(boolean mayInterruptIfRunning) {
         boolean result = super.cancel(mayInterruptIfRunning);
-        monitor.unregisterCancellable(this);
 
+        // Cancel the monitor with all its associated 'Cancellables'. Thereto, unregister the Future first to prevent a cancellation loop.
+        monitor.unregisterCancellable(this);
         monitor.cancel(mayInterruptIfRunning);
+
         return result;
       }
     };

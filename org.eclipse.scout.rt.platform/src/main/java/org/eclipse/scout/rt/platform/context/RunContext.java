@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.platform.job.PropertyMap;
  * <li>{@link PropertyMap#CURRENT}</li>
  * </ul>
  * Implementers:<br/>
- * Internally, the context is obtained by <code>OBJ.one(Context.class)</code>, meaning that the context can be
+ * Internally, the context is obtained by <code>BEANS.get(RunContext.class)</code>, meaning that the context can be
  * intercepted, or replaced. Thereto, the method {@link #interceptCallable(ICallable)} can be overwritten to contribute
  * some additional behavior.
  *
@@ -53,7 +53,7 @@ public class RunContext {
 
   protected PreferredValue<Subject> m_subject = new PreferredValue<>(null, false);
   protected PreferredValue<Locale> m_locale = new PreferredValue<>(null, false);
-  protected PropertyMap m_propertyMap;
+  protected PropertyMap m_propertyMap = new PropertyMap();
   protected IRunMonitor m_runMonitor;
 
   /**
