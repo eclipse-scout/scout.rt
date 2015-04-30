@@ -121,7 +121,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     betweenMap.put(IDataModelAttribute.TYPE_INTEGER, getFieldByClass(BetweenIntegerField.class));
     betweenMap.put(IDataModelAttribute.TYPE_LONG, getFieldByClass(BetweenLongField.class));
     betweenMap.put(IDataModelAttribute.TYPE_PERCENT, getFieldByClass(BetweenBigDecimalField.class));
-    betweenMap.put(IDataModelAttribute.TYPE_PLAIN_DOUBLE, getFieldByClass(BetweenBigDecimalField.class));
+    betweenMap.put(IDataModelAttribute.TYPE_PLAIN_BIG_DECIMAL, getFieldByClass(BetweenBigDecimalField.class));
     betweenMap.put(IDataModelAttribute.TYPE_PLAIN_INTEGER, getFieldByClass(BetweenIntegerField.class));
     betweenMap.put(IDataModelAttribute.TYPE_PLAIN_LONG, getFieldByClass(BetweenLongField.class));
     betweenMap.put(IDataModelAttribute.TYPE_TIME, getFieldByClass(BetweenTimeField.class));
@@ -141,7 +141,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     defaultMap.put(IDataModelAttribute.TYPE_CODE_TREE, getFieldByClass(TreeBoxField.class));
     defaultMap.put(IDataModelAttribute.TYPE_LONG, getFieldByClass(LongField.class));
     defaultMap.put(IDataModelAttribute.TYPE_PERCENT, getFieldByClass(BigDecimalField.class));
-    defaultMap.put(IDataModelAttribute.TYPE_PLAIN_DOUBLE, getFieldByClass(BigDecimalField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_PLAIN_BIG_DECIMAL, getFieldByClass(BigDecimalField.class));
     defaultMap.put(IDataModelAttribute.TYPE_PLAIN_INTEGER, getFieldByClass(IntegerField.class));
     defaultMap.put(IDataModelAttribute.TYPE_PLAIN_LONG, getFieldByClass(LongField.class));
     defaultMap.put(IDataModelAttribute.TYPE_STRING, getFieldByClass(StringField.class));
@@ -732,7 +732,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           setPercent(true);
           break;
         }
-        case IDataModelAttribute.TYPE_PLAIN_DOUBLE: {
+        case IDataModelAttribute.TYPE_PLAIN_BIG_DECIMAL: {
           setGroupingUsed(false);
           setPercent(false);
           break;
