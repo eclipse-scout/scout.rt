@@ -15,9 +15,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import java.util.Locale;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
@@ -36,7 +36,7 @@ public class JobsTest {
     NlsLocale.set(Locale.CANADA_FRENCH);
 
     // Test schedule
-    IFuture<?> actualFuture = Jobs.schedule(new ICallable<IFuture<?>>() {
+    IFuture<?> actualFuture = Jobs.schedule(new Callable<IFuture<?>>() {
 
       @Override
       public IFuture<?> call() throws Exception {
@@ -47,7 +47,7 @@ public class JobsTest {
     assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().runContext().locale());
 
     // schedule with delay
-    actualFuture = Jobs.schedule(new ICallable<IFuture<?>>() {
+    actualFuture = Jobs.schedule(new Callable<IFuture<?>>() {
 
       @Override
       public IFuture<?> call() throws Exception {
@@ -89,7 +89,7 @@ public class JobsTest {
     NlsLocale.set(Locale.CANADA_FRENCH);
 
     // Test schedule
-    IFuture<?> actualFuture = Jobs.schedule(new ICallable<IFuture<?>>() {
+    IFuture<?> actualFuture = Jobs.schedule(new Callable<IFuture<?>>() {
 
       @Override
       public IFuture<?> call() throws Exception {
@@ -100,7 +100,7 @@ public class JobsTest {
     assertNull(actualFuture.getJobInput().runContext());
 
     // schedule with delay
-    actualFuture = Jobs.schedule(new ICallable<IFuture<?>>() {
+    actualFuture = Jobs.schedule(new Callable<IFuture<?>>() {
 
       @Override
       public IFuture<?> call() throws Exception {

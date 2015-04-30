@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.client;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.fixture.MockServerProcessingCancelService;
@@ -77,11 +77,11 @@ public class ClientJobCancelTest {
     m_session.setServiceTunnel(tunnel);
     m_serviceReg = TestingUtility.registerBeans(
         new BeanMetaData(MockPingService.class).
-            initialInstance(new MockPingService()).
-            applicationScoped(true),
+        initialInstance(new MockPingService()).
+        applicationScoped(true),
         new BeanMetaData(MockServerProcessingCancelService.class).
-            initialInstance(new MockServerProcessingCancelService(tunnel)).
-            applicationScoped(true).order(-1)
+        initialInstance(new MockServerProcessingCancelService(tunnel)).
+        applicationScoped(true).order(-1)
         );
   }
 
@@ -109,7 +109,7 @@ public class ClientJobCancelTest {
   protected String testInternal(long delay, boolean interrupt) throws Exception {
     pingServiceDelay = delay;
     //
-    IFuture<String> future = ClientJobs.schedule(new ICallable<String>() {
+    IFuture<String> future = ClientJobs.schedule(new Callable<String>() {
       @Override
       public String call() throws Exception {
         IPingService serviceProxy = ServiceTunnelUtility.createProxy(IPingService.class, m_session.getServiceTunnel());

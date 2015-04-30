@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.server.services.common.offline;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -75,7 +75,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
    * Method invoked to delegate the request to the 'process service'.
    */
   protected IServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
-    return serverRunContext.call(new ICallable<IServiceTunnelResponse>() {
+    return serverRunContext.call(new Callable<IServiceTunnelResponse>() {
 
       @Override
       public IServiceTunnelResponse call() throws Exception {

@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.context.internal;
 
+import java.util.concurrent.Callable;
+
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.IRunMonitor;
@@ -29,9 +30,9 @@ import org.eclipse.scout.rt.platform.context.IRunMonitor;
  * @since 5.1
  * @see <i>design pattern: chain of responsibility</i>
  */
-public class RunMonitorCallable<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
+public class RunMonitorCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
 
-  protected final ICallable<RESULT> m_next;
+  protected final Callable<RESULT> m_next;
   protected final IRunMonitor m_monitor;
 
   /**
@@ -44,7 +45,7 @@ public class RunMonitorCallable<RESULT> implements ICallable<RESULT>, IChainable
    *          {@link Subject} on behalf of which to run the following processors; use <code>null</code> if not to be run
    *          in privileged mode.
    */
-  public RunMonitorCallable(final ICallable<RESULT> next, final IRunMonitor monitor) {
+  public RunMonitorCallable(final Callable<RESULT> next, final IRunMonitor monitor) {
     m_next = Assertions.assertNotNull(next);
     m_monitor = monitor;
   }
@@ -72,7 +73,7 @@ public class RunMonitorCallable<RESULT> implements ICallable<RESULT>, IChainable
   }
 
   @Override
-  public ICallable<RESULT> getNext() {
+  public Callable<RESULT> getNext() {
     return m_next;
   }
 }

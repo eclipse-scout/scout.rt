@@ -11,10 +11,10 @@
 package org.eclipse.scout.rt.client.context;
 
 import java.util.Locale;
+import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.PreferredValue;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -56,11 +56,11 @@ public class ClientRunContext extends RunContext {
   protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
 
   @Override
-  protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next) {
-    final ICallable<RESULT> c4 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
-    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(c4, UserAgent.CURRENT, userAgent());
-    final ICallable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, session());
-    final ICallable<RESULT> c1 = super.interceptCallable(c2);
+  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
+    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
+    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, UserAgent.CURRENT, userAgent());
+    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, session());
+    final Callable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;
   }

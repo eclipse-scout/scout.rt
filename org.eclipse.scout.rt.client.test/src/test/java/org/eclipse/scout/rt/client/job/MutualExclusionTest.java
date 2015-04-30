@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -663,25 +664,28 @@ public class MutualExclusionTest {
       }
     }).when(executorMock).execute(any(Runnable.class));
 
-    final IFuture<Void> future1 = jobManager.schedule(new IRunnable() {
+    final IFuture<Void> future1 = jobManager.schedule(new Callable<Void>() {
 
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         protocol.add("running-job-1");
+        return null;
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
-    final IFuture<Void> future2 = jobManager.schedule(new IRunnable() {
+    final IFuture<Void> future2 = jobManager.schedule(new Callable<Void>() {
 
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         protocol.add("running-job-2");
+        return null;
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
-    IFuture<Void> future3 = jobManager.schedule(new IRunnable() {
+    IFuture<Void> future3 = jobManager.schedule(new Callable<Void>() {
 
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         protocol.add("running-job-3");
+        return null;
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
@@ -792,10 +796,10 @@ public class MutualExclusionTest {
 
     final IBlockingCondition BC = jobManager.createBlockingCondition("bc", true);
 
-    IFuture<Void> future1 = jobManager.schedule(new IRunnable() {
+    IFuture<Void> future1 = jobManager.schedule(new Callable<Void>() {
 
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         try {
           protocol.add("running-job-1 (a)");
           BC.waitFor();
@@ -808,36 +812,43 @@ public class MutualExclusionTest {
         if (ModelJobs.isModelThread()) {
           protocol.add("running-job-1 (e) [model-thread]");
         }
+        return null;
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("job-1"));
 
-    IFuture<Void> future2 = jobManager.schedule(new IRunnable() {
+    IFuture<Void> future2 = jobManager.schedule(new Callable<Void>() {
 
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         protocol.add("running-job-2 (a)");
         BC.setBlocking(false);
 
         // Wait until job-1 tried to re-acquire the mutex.
         waitForPermitsAcquired(jobManager.getMutexSemaphores(), m_clientSession, 4); // 4 = job1(re-acquiring), job2(owner), job3, job4
         protocol.add("running-job-2 (b)");
+        return null;
       }
+
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("job-2"));
 
-    IFuture<Void> future3 = jobManager.schedule(new IRunnable() {
+    IFuture<Void> future3 = jobManager.schedule(new Callable<Void>() {
 
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         protocol.add("running-job-3");
         job3RunningLatch.countDownAndBlock();
+        return null;
+
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("job-3"));
 
-    IFuture<Void> future4 = jobManager.schedule(new IRunnable() {
+    IFuture<Void> future4 = jobManager.schedule(new Callable<Void>() {
 
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         protocol.add("running-job-4");
+        return null;
+
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).logOnError(false).name("job-4"));
 

@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal.future;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -49,7 +49,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   private final MutexSemaphores m_mutexSemaphores;
   private final FutureDoneListener<RESULT> m_futureListener;
 
-  public JobFutureTask(final JobInput input, final boolean periodic, final MutexSemaphores mutexSemaphores, final ICallable<RESULT> callable) {
+  public JobFutureTask(final JobInput input, final boolean periodic, final MutexSemaphores mutexSemaphores, final Callable<RESULT> callable) {
     super(callable);
     m_futureListener = new FutureDoneListener<>(this);
     m_input = input;

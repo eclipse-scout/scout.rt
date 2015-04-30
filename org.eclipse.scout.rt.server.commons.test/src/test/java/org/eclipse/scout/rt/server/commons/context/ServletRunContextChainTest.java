@@ -13,7 +13,8 @@ package org.eclipse.scout.rt.server.commons.context;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.commons.ICallable;
+import java.util.concurrent.Callable;
+
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
@@ -32,7 +33,7 @@ import org.mockito.MockitoAnnotations;
 public class ServletRunContextChainTest {
 
   @Mock
-  private ICallable<Void> m_targetCallable;
+  private Callable<Void> m_targetCallable;
 
   @Before
   public void before() {
@@ -44,7 +45,7 @@ public class ServletRunContextChainTest {
    */
   @Test
   public void testCallableChain() throws Exception {
-    ICallable<Void> actualCallable = new ServletRunContext().interceptCallable(m_targetCallable);
+    Callable<Void> actualCallable = new ServletRunContext().interceptCallable(m_targetCallable);
 
     // 0. RunMonitorCallable
     RunMonitorCallable c0 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
@@ -80,15 +81,15 @@ public class ServletRunContextChainTest {
     ServletRunContext serverRunContext = new ServletRunContext() {
 
       @Override
-      protected <RESULT> ICallable<RESULT> interceptCallable(ICallable<RESULT> next) {
-        ICallable<RESULT> p2 = new Contribution2<>(next); // executed 3th
-        ICallable<RESULT> p1 = new Contribution1<>(p2); // executed 2nd
-        ICallable<RESULT> head = super.interceptCallable(p1); // executed 1st
+      protected <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next) {
+        Callable<RESULT> p2 = new Contribution2<>(next); // executed 3th
+        Callable<RESULT> p1 = new Contribution1<>(p2); // executed 2nd
+        Callable<RESULT> head = super.interceptCallable(p1); // executed 1st
         return head;
       }
     };
 
-    ICallable<Void> actualCallable = serverRunContext.interceptCallable(m_targetCallable);
+    Callable<Void> actualCallable = serverRunContext.interceptCallable(m_targetCallable);
 
     // 0. RunMonitorCallable
     RunMonitorCallable c0 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
@@ -130,15 +131,15 @@ public class ServletRunContextChainTest {
     ServletRunContext serverRunContext = new ServletRunContext() {
 
       @Override
-      protected <RESULT> ICallable<RESULT> interceptCallable(ICallable<RESULT> next) {
-        ICallable<RESULT> p2 = super.interceptCallable(next); // executed 3th
-        ICallable<RESULT> p1 = new Contribution2<>(p2); // executed 2nd
-        ICallable<RESULT> head = new Contribution1<>(p1); // executed 1st
+      protected <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next) {
+        Callable<RESULT> p2 = super.interceptCallable(next); // executed 3th
+        Callable<RESULT> p1 = new Contribution2<>(p2); // executed 2nd
+        Callable<RESULT> head = new Contribution1<>(p1); // executed 1st
         return head;
       }
     };
 
-    ICallable<Void> actualCallable = serverRunContext.interceptCallable(m_targetCallable);
+    Callable<Void> actualCallable = serverRunContext.interceptCallable(m_targetCallable);
 
     // 1. Contribution1
     Contribution1 c1 = getFirstAndAssert(actualCallable, Contribution1.class);
@@ -173,23 +174,23 @@ public class ServletRunContextChainTest {
   }
 
   @SuppressWarnings("unchecked")
-  private static <RESULT, TYPE> TYPE getFirstAndAssert(ICallable<RESULT> first, Class<TYPE> expectedType) {
+  private static <RESULT, TYPE> TYPE getFirstAndAssert(Callable<RESULT> first, Class<TYPE> expectedType) {
     assertTrue(expectedType.equals(first.getClass()));
     return (TYPE) first;
   }
 
   @SuppressWarnings("unchecked")
   private static <RESULT, TYPE> TYPE getNextAndAssert(IChainable<?> c, Class<TYPE> expectedType) {
-    ICallable<?> next = (ICallable<?>) c.getNext();
+    Callable<?> next = (Callable<?>) c.getNext();
     assertTrue(expectedType.equals(next.getClass()));
     return (TYPE) next;
   }
 
-  private static class Contribution1<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
+  private static class Contribution1<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
 
-    private final ICallable<RESULT> m_next;
+    private final Callable<RESULT> m_next;
 
-    public Contribution1(ICallable<RESULT> next) {
+    public Contribution1(Callable<RESULT> next) {
       m_next = next;
     }
 
@@ -199,16 +200,16 @@ public class ServletRunContextChainTest {
     }
 
     @Override
-    public ICallable<RESULT> getNext() {
+    public Callable<RESULT> getNext() {
       return m_next;
     }
   }
 
-  private static class Contribution2<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
+  private static class Contribution2<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
 
-    private final ICallable<RESULT> m_next;
+    private final Callable<RESULT> m_next;
 
-    public Contribution2(ICallable<RESULT> next) {
+    public Contribution2(Callable<RESULT> next) {
       m_next = next;
     }
 
@@ -218,7 +219,7 @@ public class ServletRunContextChainTest {
     }
 
     @Override
-    public ICallable<RESULT> getNext() {
+    public Callable<RESULT> getNext() {
       return m_next;
     }
   }

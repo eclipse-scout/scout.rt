@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.platform.context.internal;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
 
 /**
@@ -28,9 +28,9 @@ import org.eclipse.scout.commons.IChainable;
  * @since 5.1
  * @see <i>design pattern: chain of responsibility</i>
  */
-public class SubjectCallable<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
+public class SubjectCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
 
-  protected final ICallable<RESULT> m_next;
+  protected final Callable<RESULT> m_next;
   protected final Subject m_subject;
 
   /**
@@ -42,7 +42,7 @@ public class SubjectCallable<RESULT> implements ICallable<RESULT>, IChainable<IC
    *          {@link Subject} on behalf of which to run the following processors; use <code>null</code> if not to be run
    *          in privileged mode.
    */
-  public SubjectCallable(final ICallable<RESULT> next, final Subject subject) {
+  public SubjectCallable(final Callable<RESULT> next, final Subject subject) {
     m_next = Assertions.assertNotNull(next);
     m_subject = subject;
   }
@@ -69,7 +69,7 @@ public class SubjectCallable<RESULT> implements ICallable<RESULT>, IChainable<IC
   }
 
   @Override
-  public ICallable<RESULT> getNext() {
+  public Callable<RESULT> getNext() {
     return m_next;
   }
 }

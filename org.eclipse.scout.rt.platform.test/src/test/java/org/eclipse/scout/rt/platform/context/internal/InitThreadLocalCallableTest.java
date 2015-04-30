@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.platform.context.internal;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.scout.commons.ICallable;
+import java.util.concurrent.Callable;
+
 import org.eclipse.scout.commons.holders.StringHolder;
-import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.junit.Test;
 
 public class InitThreadLocalCallableTest {
@@ -25,7 +25,7 @@ public class InitThreadLocalCallableTest {
   public void test() throws Exception {
     final StringHolder actualValue = new StringHolder();
 
-    ICallable<Void> next = new ICallable<Void>() {
+    Callable<Void> next = new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {

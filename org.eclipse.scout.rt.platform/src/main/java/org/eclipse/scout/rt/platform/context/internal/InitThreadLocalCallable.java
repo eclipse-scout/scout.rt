@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.context.internal;
 
+import java.util.concurrent.Callable;
+
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
 
 /**
@@ -24,9 +25,9 @@ import org.eclipse.scout.commons.IChainable;
  * @since 5.1
  * @see <i>design pattern: chain of responsibility</i>
  */
-public class InitThreadLocalCallable<RESULT, THREAD_LOCAL> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
+public class InitThreadLocalCallable<RESULT, THREAD_LOCAL> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
 
-  protected final ICallable<RESULT> m_next;
+  protected final Callable<RESULT> m_next;
   protected final ThreadLocal<THREAD_LOCAL> m_threadLocal;
   protected final THREAD_LOCAL m_value;
 
@@ -40,7 +41,7 @@ public class InitThreadLocalCallable<RESULT, THREAD_LOCAL> implements ICallable<
    * @param value
    *          value to be bound.
    */
-  public InitThreadLocalCallable(final ICallable<RESULT> next, final ThreadLocal<THREAD_LOCAL> threadLocal, final THREAD_LOCAL value) {
+  public InitThreadLocalCallable(final Callable<RESULT> next, final ThreadLocal<THREAD_LOCAL> threadLocal, final THREAD_LOCAL value) {
     m_next = Assertions.assertNotNull(next);
     m_threadLocal = Assertions.assertNotNull(threadLocal);
     m_value = value;
@@ -69,7 +70,7 @@ public class InitThreadLocalCallable<RESULT, THREAD_LOCAL> implements ICallable<
   }
 
   @Override
-  public ICallable<RESULT> getNext() {
+  public Callable<RESULT> getNext() {
     return m_next;
   }
 }

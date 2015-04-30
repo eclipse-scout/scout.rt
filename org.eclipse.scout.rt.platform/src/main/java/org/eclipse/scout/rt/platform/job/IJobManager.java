@@ -10,11 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectorVisitor;
-import org.eclipse.scout.commons.ICallable;
-import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
@@ -46,14 +45,13 @@ public interface IJobManager {
    * immediately block waiting for the job to complete, you can use constructions of the form
    * <code>result = Jobs.schedule(...).awaitDone();</code>.
    *
-   * @param executable
-   *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
-   *          job.
+   * @param callable
+   *          the callable to be executed
    * @param input
    *          describes the job to be executed; must not be <code>null</code>.
    * @return Future to wait for the job's completion or to cancel the job's execution.
    */
-  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, JobInput input);
+  <RESULT> IFuture<RESULT> schedule(Callable<RESULT> callable, JobInput input);
 
   /**
    * Runs the given job asynchronously on behalf of a worker thread after the specified delay has elapsed. The caller of
@@ -64,9 +62,8 @@ public interface IJobManager {
    * immediately block waiting for the job to complete, you can use constructions of the form
    * <code>result = Jobs.schedule(...).awaitDone();</code>.
    *
-   * @param executable
-   *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
-   *          job.
+   * @param callable
+   *          the runnable to be executed
    * @param delay
    *          the delay after which the job should commence execution.
    * @param delayUnit
@@ -75,7 +72,7 @@ public interface IJobManager {
    *          describes the job to be executed; must not be <code>null</code>.
    * @return Future to wait for the job's completion or to cancel the job's execution.
    */
-  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, JobInput input);
+  <RESULT> IFuture<RESULT> schedule(Callable<RESULT> callable, long delay, TimeUnit delayUnit, JobInput input);
 
   /**
    * Periodically runs the given job on behalf of a worker thread.<br/>

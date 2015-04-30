@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 import javax.xml.namespace.QName;
@@ -24,7 +25,6 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.security.SimplePrincipal;
@@ -126,7 +126,7 @@ public class WsseUsernameTokenAuthenticationHandler implements IAuthenticationHa
       serverRunContext.subject(authSubject);
       serverRunContext.session(lookupServerSession(authSubject));
 
-      return serverRunContext.call(new ICallable<Boolean>() {
+      return serverRunContext.call(new Callable<Boolean>() {
 
         @Override
         public Boolean call() throws Exception {

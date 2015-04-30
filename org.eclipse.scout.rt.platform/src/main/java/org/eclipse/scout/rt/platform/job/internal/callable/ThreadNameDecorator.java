@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal.callable;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
@@ -30,9 +30,9 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
  * @since 5.1
  * @see <i>design pattern: chain of responsibility</i>
  */
-public class ThreadNameDecorator<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
+public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
 
-  private final ICallable<RESULT> m_next;
+  private final Callable<RESULT> m_next;
   private final String m_threadName;
   private final String m_jobName;
 
@@ -46,7 +46,7 @@ public class ThreadNameDecorator<RESULT> implements ICallable<RESULT>, IChainabl
    * @param jobName
    *          the job's identifier to be appended to the thread-name.
    */
-  public ThreadNameDecorator(final ICallable<RESULT> next, final String threadName, final String jobName) {
+  public ThreadNameDecorator(final Callable<RESULT> next, final String threadName, final String jobName) {
     m_next = Assertions.assertNotNull(next);
     m_threadName = threadName;
     m_jobName = jobName;
@@ -96,7 +96,7 @@ public class ThreadNameDecorator<RESULT> implements ICallable<RESULT>, IChainabl
   }
 
   @Override
-  public ICallable<RESULT> getNext() {
+  public Callable<RESULT> getNext() {
     return m_next;
   }
 }

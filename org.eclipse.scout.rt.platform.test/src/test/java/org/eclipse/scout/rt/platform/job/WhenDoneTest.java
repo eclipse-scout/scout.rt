@@ -20,10 +20,10 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
@@ -55,7 +55,7 @@ public class WhenDoneTest {
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
-    final IFuture<String> future = Jobs.schedule(new ICallable<String>() {
+    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -99,7 +99,7 @@ public class WhenDoneTest {
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
-    final IFuture<String> future = Jobs.schedule(new ICallable<String>() {
+    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -145,7 +145,7 @@ public class WhenDoneTest {
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
     final ProcessingException pe = new ProcessingException();
 
-    final IFuture<String> future = Jobs.schedule(new ICallable<String>() {
+    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -190,7 +190,7 @@ public class WhenDoneTest {
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
     final ProcessingException pe = new ProcessingException();
 
-    final IFuture<String> future = Jobs.schedule(new ICallable<String>() {
+    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -239,7 +239,7 @@ public class WhenDoneTest {
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
-    final IFuture<String> future = Jobs.schedule(new ICallable<String>() {
+    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -283,7 +283,7 @@ public class WhenDoneTest {
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
-    final IFuture<String> future = Jobs.schedule(new ICallable<String>() {
+    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {

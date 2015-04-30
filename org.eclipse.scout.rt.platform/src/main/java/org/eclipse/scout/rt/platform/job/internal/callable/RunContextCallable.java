@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal.callable;
 
+import java.util.concurrent.Callable;
+
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.rt.platform.context.RunContext;
 
@@ -23,9 +24,9 @@ import org.eclipse.scout.rt.platform.context.RunContext;
  * @since 5.1
  * @see <i>design pattern: chain of responsibility</i>
  */
-public class RunContextCallable<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
+public class RunContextCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
 
-  private final ICallable<RESULT> m_next;
+  private final Callable<RESULT> m_next;
   private final RunContext m_runContext;
 
   /**
@@ -34,7 +35,7 @@ public class RunContextCallable<RESULT> implements ICallable<RESULT>, IChainable
    * @param runContext
    *          <code>RunContext</code> or <code>null</code> to not run on behalf a <code>RunContext</code>.
    */
-  public RunContextCallable(final ICallable<RESULT> next, final RunContext runContext) {
+  public RunContextCallable(final Callable<RESULT> next, final RunContext runContext) {
     m_next = Assertions.assertNotNull(next);
     m_runContext = runContext;
   }
@@ -50,7 +51,7 @@ public class RunContextCallable<RESULT> implements ICallable<RESULT>, IChainable
   }
 
   @Override
-  public ICallable<RESULT> getNext() {
+  public Callable<RESULT> getNext() {
     return m_next;
   }
 }

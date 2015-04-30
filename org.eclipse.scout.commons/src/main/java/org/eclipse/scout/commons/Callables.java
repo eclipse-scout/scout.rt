@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import java.util.concurrent.Callable;
+
 import org.eclipse.scout.commons.annotations.Internal;
 
 /**
@@ -25,38 +27,27 @@ public final class Callables {
   }
 
   /**
-   * Returns a callable object that represents the given {@link IExecutable}.
-   *
-   * @throws AssertionError
-   *           is thrown if the given {@link IExecutable} is not of the type {@link IRunnable} or {@link ICallable}.
+   * Returns a callable object that represents the given {@link IRunnable}.
    */
-  public static <RESULT> ICallable<RESULT> callable(final IExecutable<RESULT> executable) {
-    if (executable instanceof ICallable) {
-      return (ICallable<RESULT>) executable;
-    }
-    else if (executable instanceof IRunnable) {
-      return new ICallable<RESULT>() {
+  public static Callable<Void> callable(final IRunnable runnable) {
+    return new Callable<Void>() {
 
-        @Override
-        public RESULT call() throws Exception {
-          ((IRunnable) executable).run();
-          return null;
-        }
-      };
-    }
-    else {
-      return Assertions.fail("Illegal executable provided: must be a '%s' or '%s'", IRunnable.class.getSimpleName(), ICallable.class.getSimpleName());
-    }
+      @Override
+      public Void call() throws Exception {
+        runnable.run();
+        return null;
+      }
+    };
   }
 
   /**
    * @return callable that does nothing when being called.
    */
-  public static <RESULT> ICallable<Void> nullCallable() {
+  public static <RESULT> Callable<Void> nullCallable() {
     return NULL_CALLABLE;
   }
 
-  private static final ICallable<Void> NULL_CALLABLE = new ICallable<Void>() {
+  private static final Callable<Void> NULL_CALLABLE = new Callable<Void>() {
 
     @Override
     public Void call() throws Exception {

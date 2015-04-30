@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
@@ -231,7 +231,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
             final ILookupCall<LOOKUP_KEY> call = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractMixedSmartField.this));
             prepareKeyLookup(call, interceptConvertValueToKey(validKey));
 
-            m_backgroundJobFuture.set(ClientJobs.schedule(new ICallable<List<ILookupRow<LOOKUP_KEY>>>() {
+            m_backgroundJobFuture.set(ClientJobs.schedule(new Callable<List<ILookupRow<LOOKUP_KEY>>>() {
               @Override
               public List<ILookupRow<LOOKUP_KEY>> call() throws Exception {
                 List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(call.getDataByKey());
@@ -300,7 +300,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
         }
         if (proposalChooser != null &&
             (StringUtility.equalsIgnoreNewLines(text, proposalChooser.getSearchText()) ||
-            StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
+                StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(text), StringUtility.emptyIfNull(currentValidText)))) {
           /*
            * empty text means null
            */

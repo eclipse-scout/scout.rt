@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.session;
 
+import java.util.concurrent.Callable;
+
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -39,7 +40,7 @@ public class ClientSessionProvider {
    *           is thrown if the {@link IClientSession} could not be created or initialized.
    */
   public <SESSION extends IClientSession> SESSION provide(final ClientRunContext runContext) throws ProcessingException {
-    return runContext.call(new ICallable<SESSION>() {
+    return runContext.call(new Callable<SESSION>() {
 
       @Override
       public SESSION call() throws Exception {

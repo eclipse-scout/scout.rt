@@ -17,6 +17,7 @@ import java.lang.reflect.Proxy;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.Handler;
@@ -24,7 +25,6 @@ import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.jaxws.annotation.ScoutTransaction;
@@ -137,7 +137,7 @@ public class ScoutTubelineAssembler implements TubelineAssembler {
           final MessageContext messageContext = Assertions.assertNotNull((MessageContext) args[0], "message context must not be null");
           final IServerSession serverSession = Assertions.assertNotNull(JaxWsHelper.getContextSession(messageContext), "Missig server-session on message context [messageContext=%s]", messageContext);
 
-          return ServerRunContexts.copyCurrent().session(serverSession).call(new ICallable<Object>() {
+          return ServerRunContexts.copyCurrent().session(serverSession).call(new Callable<Object>() {
 
             @Override
             public Object call() throws Exception {

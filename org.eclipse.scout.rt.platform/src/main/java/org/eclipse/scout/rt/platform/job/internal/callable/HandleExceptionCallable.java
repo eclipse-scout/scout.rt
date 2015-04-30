@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal.callable;
 
+import java.util.concurrent.Callable;
+
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -28,10 +29,10 @@ import org.eclipse.scout.rt.platform.job.JobInput;
  * @since 5.1
  * @see <i>design pattern: chain of responsibility</i>
  */
-public class HandleExceptionCallable<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
+public class HandleExceptionCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
 
   @Internal
-  protected final ICallable<RESULT> m_next;
+  protected final Callable<RESULT> m_next;
   @Internal
   protected final JobInput m_input;
 
@@ -43,7 +44,7 @@ public class HandleExceptionCallable<RESULT> implements ICallable<RESULT>, IChai
    * @param input
    *          input that describes the job.
    */
-  public HandleExceptionCallable(final ICallable<RESULT> next, final JobInput input) {
+  public HandleExceptionCallable(final Callable<RESULT> next, final JobInput input) {
     m_input = input;
     m_next = Assertions.assertNotNull(next);
   }
@@ -69,7 +70,7 @@ public class HandleExceptionCallable<RESULT> implements ICallable<RESULT>, IChai
   }
 
   @Override
-  public ICallable<RESULT> getNext() {
+  public Callable<RESULT> getNext() {
     return m_next;
   }
 }

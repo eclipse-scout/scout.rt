@@ -17,9 +17,9 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -51,11 +51,12 @@ public class ScheduleDelayedTest {
     long tStartNano = System.nanoTime();
     long assertToleranceNano = TimeUnit.MILLISECONDS.toNanos(200);
 
-    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+    IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
 
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         protocol.add(System.nanoTime());
+        return null;
       }
     }, delayNano, TimeUnit.NANOSECONDS, Jobs.newInput(RunContexts.empty()));
 

@@ -17,10 +17,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
@@ -50,12 +50,13 @@ public class AwaitDoneTest {
   public void testAwaitAllDone() throws InterruptedException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
-    m_jobManager.schedule(new IRunnable() {
+    m_jobManager.schedule(new Callable<Void>() {
 
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         Thread.sleep(1000);
         protocol.add("run-1");
+        return null;
       }
     }, Jobs.newInput(RunContexts.copyCurrent()));
 
@@ -68,12 +69,13 @@ public class AwaitDoneTest {
   public void testAwaitFutureDone1() throws InterruptedException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
-    final IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
+    final IFuture<Void> future1 = m_jobManager.schedule(new Callable<Void>() {
 
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         Thread.sleep(1000);
         protocol.add("run-1");
+        return null;
       }
     }, Jobs.newInput(RunContexts.copyCurrent()));
 
@@ -89,21 +91,23 @@ public class AwaitDoneTest {
 
     final BlockingCountDownLatch latchJob2 = new BlockingCountDownLatch(1);
 
-    final IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
+    final IFuture<Void> future1 = m_jobManager.schedule(new Callable<Void>() {
 
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         Thread.sleep(1000);
         protocol.add("run-1");
+        return null;
       }
     }, Jobs.newInput(RunContexts.copyCurrent()));
 
-    m_jobManager.schedule(new IRunnable() {
+    m_jobManager.schedule(new Callable<Void>() {
 
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         latchJob2.await();
         protocol.add("run-2");
+        return null;
       }
     }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
 
@@ -125,14 +129,15 @@ public class AwaitDoneTest {
 
     final IBlockingCondition bc = m_jobManager.createBlockingCondition("bc", true);
 
-    m_jobManager.schedule(new IRunnable() {
+    m_jobManager.schedule(new Callable<Void>() {
 
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         Thread.sleep(1000);
         protocol.add("before-1");
         bc.waitFor();
         protocol.add("after-2");
+        return null;
       }
     }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
 

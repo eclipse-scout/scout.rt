@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +24,6 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.security.SimplePrincipal;
@@ -125,7 +125,7 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
       serverRunContext.subject(authSubject);
       serverRunContext.session(lookupServerSession(authSubject));
 
-      return serverRunContext.call(new ICallable<Boolean>() {
+      return serverRunContext.call(new Callable<Boolean>() {
 
         @Override
         public Boolean call() throws Exception {

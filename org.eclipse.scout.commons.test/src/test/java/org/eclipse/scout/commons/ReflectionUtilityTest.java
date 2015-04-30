@@ -29,7 +29,7 @@ public class ReflectionUtilityTest {
     assertEquals(emptyHashSet(), hashSet(ReflectionUtility.getInterfaces(Object.class)));
     assertEquals(hashSet(Runnable.class), hashSet(ReflectionUtility.getInterfaces(Runnable.class)));
     assertEquals(hashSet(Callable.class), hashSet(ReflectionUtility.getInterfaces(Callable.class)));
-    assertEquals(hashSet(ICallable.class), hashSet(ReflectionUtility.getInterfaces(ICallable.class)));
+    assertEquals(hashSet(Callable.class), hashSet(ReflectionUtility.getInterfaces(Callable.class)));
     assertEquals(emptyHashSet(), hashSet(ReflectionUtility.getInterfaces(Top.class)));
     assertEquals(hashSet(Runnable.class, Serializable.class), hashSet(ReflectionUtility.getInterfaces(Middle.class)));
     assertEquals(hashSet(Callable.class, Runnable.class, Serializable.class), hashSet(ReflectionUtility.getInterfaces(Bottom.class)));

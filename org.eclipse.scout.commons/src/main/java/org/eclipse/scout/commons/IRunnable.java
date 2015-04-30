@@ -17,7 +17,7 @@ package org.eclipse.scout.commons;
  * @see Runnable
  * @see 5.1
  */
-public interface IRunnable extends IExecutable<Void> {
+public interface IRunnable {
 
   /**
    * Computes a result, or throws an exception if unable to do so.

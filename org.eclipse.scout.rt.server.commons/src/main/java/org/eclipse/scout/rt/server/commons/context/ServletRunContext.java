@@ -11,13 +11,13 @@
 package org.eclipse.scout.rt.server.commons.context;
 
 import java.util.Locale;
+import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -52,10 +52,10 @@ public class ServletRunContext extends RunContext {
   protected HttpServletResponse m_servletResponse;
 
   @Override
-  protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next) {
-    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(next, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, servletResponse());
-    final ICallable<RESULT> c2 = new InitThreadLocalCallable<>(c3, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, servletRequest());
-    final ICallable<RESULT> c1 = super.interceptCallable(c2);
+  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
+    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(next, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, servletResponse());
+    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, servletRequest());
+    final Callable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;
   }

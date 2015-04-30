@@ -9,9 +9,9 @@ import java.awt.event.HierarchyListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -294,7 +294,7 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
   }
 
   protected boolean fireBeforeLocationChangedFromSwt(final String location) {
-    IFuture<Boolean> future = ModelJobs.schedule(new ICallable<Boolean>() {
+    IFuture<Boolean> future = ModelJobs.schedule(new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
         return getScoutObject().getUIFacade().fireBeforeLocationChangedFromUI(location);

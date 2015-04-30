@@ -16,11 +16,11 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobListeners;
@@ -64,9 +64,10 @@ public class JobListenerTest {
     m_jobManager.addListener(Jobs.newEventFilter().eventTypes(JobEventType.SHUTDOWN), shutdownListener);
 
     IFuture<Void> future = null;
-    future = m_jobManager.schedule(new IRunnable() {
+    future = m_jobManager.schedule(new Callable<Void>() {
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
+        return null;
       }
     }, Jobs.newInput(RunContexts.empty()));
     m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 1, TimeUnit.MINUTES);
@@ -98,10 +99,11 @@ public class JobListenerTest {
     m_jobManager.addListener(Jobs.newEventFilter().eventTypes(JobEventType.SHUTDOWN), shutdownListener);
 
     final BooleanHolder hasStarted = new BooleanHolder(Boolean.FALSE);
-    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+    IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
       @Override
-      public void run() throws Exception {
+      public Void call() throws Exception {
         hasStarted.setValue(Boolean.TRUE);
+        return null;
       }
     }, 200, TimeUnit.MILLISECONDS, Jobs.newInput(RunContexts.empty()));
     future.cancel(true);

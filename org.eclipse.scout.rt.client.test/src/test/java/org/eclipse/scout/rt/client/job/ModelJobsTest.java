@@ -17,9 +17,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -111,7 +111,7 @@ public class ModelJobsTest {
     ISession.CURRENT.set(m_clientSession);
 
     // Test schedule
-    IFuture<?> actualFuture = ModelJobs.schedule(new ICallable<IFuture<?>>() {
+    IFuture<?> actualFuture = ModelJobs.schedule(new Callable<IFuture<?>>() {
 
       @Override
       public IFuture<?> call() throws Exception {
@@ -123,7 +123,7 @@ public class ModelJobsTest {
     assertFalse(ClientJobs.isClientJob(actualFuture));
 
     // Test schedule with delay
-    actualFuture = ModelJobs.schedule(new ICallable<IFuture<?>>() {
+    actualFuture = ModelJobs.schedule(new Callable<IFuture<?>>() {
 
       @Override
       public IFuture<?> call() throws Exception {

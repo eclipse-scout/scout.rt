@@ -16,12 +16,11 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
 import java.security.AccessController;
+import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
 import org.junit.Test;
 
 public class SubjectCallableTest {
@@ -32,7 +31,7 @@ public class SubjectCallableTest {
   public void test() throws Exception {
     final Holder<Subject> actualSubject = new Holder<>();
 
-    ICallable<String> callable = new ICallable<String>() {
+    Callable<String> callable = new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -54,7 +53,7 @@ public class SubjectCallableTest {
   public void testWithoutSubject() throws Exception {
     final Holder<Subject> actualSubject = new Holder<>();
 
-    ICallable<String> callable = new ICallable<String>() {
+    Callable<String> callable = new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -78,7 +77,7 @@ public class SubjectCallableTest {
 
     final Exception exception = new Exception("error");
 
-    ICallable<String> callable = new ICallable<String>() {
+    Callable<String> callable = new Callable<String>() {
 
       @Override
       public String call() throws Exception {
@@ -106,7 +105,7 @@ public class SubjectCallableTest {
 
     final RuntimeException runtimeException = new RuntimeException("error");
 
-    ICallable<String> callable = new ICallable<String>() {
+    Callable<String> callable = new Callable<String>() {
 
       @Override
       public String call() throws Exception {

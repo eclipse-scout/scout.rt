@@ -14,9 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -59,7 +59,7 @@ public class ThreadNameDecoratorTest {
   public void testThreadName() throws Exception {
     final StringHolder threadName = new StringHolder();
 
-    ICallable<Void> next = new ICallable<Void>() {
+    Callable<Void> next = new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {
@@ -79,7 +79,7 @@ public class ThreadNameDecoratorTest {
   public void testThreadNameWithEmptyJobIdentifier() throws Exception {
     final StringHolder threadName = new StringHolder();
 
-    ICallable<Void> next = new ICallable<Void>() {
+    Callable<Void> next = new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {
@@ -106,7 +106,7 @@ public class ThreadNameDecoratorTest {
     final Holder<ThreadInfo> threadInfoJob1Holder = new Holder<>();
 
     // Job-1 (same mutex as job-2)
-    IFuture<Boolean> future1 = Jobs.schedule(new ICallable<Boolean>() {
+    IFuture<Boolean> future1 = Jobs.schedule(new Callable<Boolean>() {
 
       @Override
       public Boolean call() throws Exception {
@@ -137,7 +137,7 @@ public class ThreadNameDecoratorTest {
     }, Jobs.newInput(RunContexts.copyCurrent()).name("job-1").mutex(mutexObject));
 
     // Job-2 (same mutex as job-1)
-    IFuture<Boolean> future2 = Jobs.schedule(new ICallable<Boolean>() {
+    IFuture<Boolean> future2 = Jobs.schedule(new Callable<Boolean>() {
 
       @Override
       public Boolean call() throws Exception {

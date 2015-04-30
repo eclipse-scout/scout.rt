@@ -15,6 +15,7 @@ import java.io.InterruptedIOException;
 import java.net.SocketException;
 import java.security.AccessController;
 import java.util.Locale;
+import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletConfig;
@@ -23,7 +24,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -166,7 +166,7 @@ public class ServiceTunnelServlet extends HttpServlet {
    * Method invoked to delegate the HTTP request to the 'process service'.
    */
   protected IServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final IServiceTunnelRequest serviceTunnelRequest) throws ProcessingException {
-    return serverRunContext.call(new ICallable<IServiceTunnelResponse>() {
+    return serverRunContext.call(new Callable<IServiceTunnelResponse>() {
 
       @Override
       public IServiceTunnelResponse call() throws Exception {

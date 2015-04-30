@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.context;
 
+import java.util.concurrent.Callable;
+
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -38,14 +39,14 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  * @since 5.1
  * @see <i>design pattern: chain of responsibility</i>
  */
-public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
+public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TwoPhaseTransactionBoundaryCallable.class);
 
-  protected final ICallable<RESULT> m_next;
+  protected final Callable<RESULT> m_next;
   protected final TransactionScope m_transactionScope;
 
-  public TwoPhaseTransactionBoundaryCallable(final ICallable<RESULT> next, final TransactionScope transactionScope) {
+  public TwoPhaseTransactionBoundaryCallable(final Callable<RESULT> next, final TransactionScope transactionScope) {
     m_next = Assertions.assertNotNull(next);
     m_transactionScope = (transactionScope != null ? transactionScope : TransactionScope.REQUIRES_NEW);
   }
@@ -154,7 +155,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
   }
 
   @Override
-  public ICallable<RESULT> getNext() {
+  public Callable<RESULT> getNext() {
     return m_next;
   }
 

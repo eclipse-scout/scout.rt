@@ -13,12 +13,12 @@ package org.eclipse.scout.jaxws.internal.resolver;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
+import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 import javax.xml.ws.WebServiceException;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.jaxws.internal.JaxWsHelper;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -101,7 +101,7 @@ public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
      * Method invoked to invoke the port-type method on behalf of the given <code>RunContext</code>.
      */
     protected Object invokePortTypeMethod(ServerRunContext runContext, final T portType, final Method method, final Object... args) throws ProcessingException {
-      return runContext.call(new ICallable<Object>() {
+      return runContext.call(new Callable<Object>() {
 
         @Override
         public Object call() throws Exception {

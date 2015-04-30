@@ -14,7 +14,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-import org.eclipse.scout.commons.ICallable;
+import java.util.concurrent.Callable;
+
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
@@ -35,7 +36,7 @@ public class RunMonitorCallableTest {
     final RunMonitor explicitMonitor = new RunMonitor();
 
     RunMonitor.CURRENT.set(currentMonitor);
-    new RunMonitorCallable<>(new ICallable<Void>() {
+    new RunMonitorCallable<>(new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {
@@ -51,7 +52,7 @@ public class RunMonitorCallableTest {
     final RunMonitor explicitMonitor = new RunMonitor();
 
     RunMonitor.CURRENT.remove();
-    new RunMonitorCallable<>(new ICallable<Void>() {
+    new RunMonitorCallable<>(new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {
@@ -67,7 +68,7 @@ public class RunMonitorCallableTest {
     final RunMonitor currentMonitor = new RunMonitor();
 
     RunMonitor.CURRENT.set(currentMonitor);
-    new RunMonitorCallable<>(new ICallable<Void>() {
+    new RunMonitorCallable<>(new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {
@@ -81,7 +82,7 @@ public class RunMonitorCallableTest {
   @Test
   public void testNoCurrentAndNoExplicitMonitor() throws Exception {
     RunMonitor.CURRENT.remove();
-    new RunMonitorCallable<>(new ICallable<Void>() {
+    new RunMonitorCallable<>(new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {

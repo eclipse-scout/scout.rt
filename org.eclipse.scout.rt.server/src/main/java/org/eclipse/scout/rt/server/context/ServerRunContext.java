@@ -11,11 +11,11 @@
 package org.eclipse.scout.rt.server.context;
 
 import java.util.Locale;
+import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.BooleanUtility;
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.PreferredValue;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.OfflineState;
@@ -72,13 +73,13 @@ public class ServerRunContext extends RunContext {
   protected boolean m_offline;
 
   @Override
-  protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next) {
-    final ICallable<RESULT> c6 = new TwoPhaseTransactionBoundaryCallable<>(next, transactionScope());
-    final ICallable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
-    final ICallable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, userAgent());
-    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(c4, ISession.CURRENT, session());
-    final ICallable<RESULT> c2 = new InitThreadLocalCallable<>(c3, OfflineState.CURRENT, offline());
-    final ICallable<RESULT> c1 = super.interceptCallable(c2);
+  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
+    final Callable<RESULT> c6 = new TwoPhaseTransactionBoundaryCallable<>(next, transactionScope());
+    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
+    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, userAgent());
+    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, ISession.CURRENT, session());
+    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, OfflineState.CURRENT, offline());
+    final Callable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;
   }

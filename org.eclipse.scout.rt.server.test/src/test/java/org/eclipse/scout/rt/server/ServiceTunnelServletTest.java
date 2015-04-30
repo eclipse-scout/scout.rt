@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,8 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ICallable;
-import org.eclipse.scout.commons.IExecutable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -169,9 +168,9 @@ public class ServiceTunnelServletTest {
 
     doAnswer(slowCreateTestsession(testServerSession)).when(m_serverSessionProviderSpy).provide(any(ServerRunContext.class));
 
-    List<HttpSessionLookupRunnable> jobs = new ArrayList<>();
+    List<HttpSessionLookupCallable> jobs = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
-      jobs.add(new HttpSessionLookupRunnable(m_testServiceTunnelServlet, requestMock, m_responseMock));
+      jobs.add(new HttpSessionLookupCallable(m_testServiceTunnelServlet, requestMock, m_responseMock));
     }
 
     List<IFuture<?>> futures = scheduleAndJoinJobs(jobs);
@@ -220,10 +219,10 @@ public class ServiceTunnelServletTest {
     };
   }
 
-  private List<IFuture<?>> scheduleAndJoinJobs(List<? extends IExecutable<?>> jobs) throws ProcessingException {
+  private List<IFuture<?>> scheduleAndJoinJobs(List<? extends Callable<?>> jobs) throws ProcessingException {
     List<IFuture<?>> futures = new ArrayList<>();
 
-    for (IExecutable<?> job : jobs) {
+    for (Callable<?> job : jobs) {
       futures.add(Jobs.schedule(job));
     }
 
@@ -234,13 +233,13 @@ public class ServiceTunnelServletTest {
     return futures;
   }
 
-  private static class HttpSessionLookupRunnable implements ICallable<IServerSession> {
+  private static class HttpSessionLookupCallable implements Callable<IServerSession> {
 
     private final ServiceTunnelServlet m_serviceTunnelServlet;
     private final HttpServletRequest m_request;
     private final HttpServletResponse m_response;
 
-    public HttpSessionLookupRunnable(ServiceTunnelServlet serviceTunnelServlet, HttpServletRequest request, HttpServletResponse response) {
+    public HttpSessionLookupCallable(ServiceTunnelServlet serviceTunnelServlet, HttpServletRequest request, HttpServletResponse response) {
       m_serviceTunnelServlet = serviceTunnelServlet;
       m_request = request;
       m_response = response;
@@ -248,7 +247,7 @@ public class ServiceTunnelServletTest {
 
     @Override
     public IServerSession call() throws Exception {
-      return ServletRunContexts.empty().servletRequest(m_request).servletResponse(m_response).call(new ICallable<IServerSession>() {
+      return ServletRunContexts.empty().servletRequest(m_request).servletResponse(m_response).call(new Callable<IServerSession>() {
 
         @Override
         public IServerSession call() throws Exception {

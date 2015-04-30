@@ -11,10 +11,10 @@
 package org.eclipse.scout.rt.server.session;
 
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -41,7 +41,7 @@ public class ServerSessionProvider {
    *           is thrown if the {@link IServerSession} could not be created or initialized.
    */
   public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext) throws ProcessingException {
-    return serverRunContext.copy().call(new ICallable<SESSION>() {
+    return serverRunContext.copy().call(new Callable<SESSION>() {
 
       @Override
       public SESSION call() throws Exception {

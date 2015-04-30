@@ -13,7 +13,8 @@ package org.eclipse.scout.rt.platform.job;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.commons.ICallable;
+import java.util.concurrent.Callable;
+
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
@@ -31,7 +32,7 @@ import org.mockito.MockitoAnnotations;
 public class JobCallableChainTest {
 
   @Mock
-  private ICallable<Void> m_targetCallable;
+  private Callable<Void> m_targetCallable;
 
   @Before
   public void before() {
@@ -43,7 +44,7 @@ public class JobCallableChainTest {
    */
   @Test
   public void testCallableChain() throws Exception {
-    ICallable<Void> actualCallable = new _JobManager().interceptCallable(m_targetCallable, Jobs.newInput(RunContexts.empty()));
+    Callable<Void> actualCallable = new _JobManager().interceptCallable(m_targetCallable, Jobs.newInput(RunContexts.empty()));
 
     // 1. HandleExceptionCallable
     HandleExceptionCallable c1 = getFirstAndAssert(actualCallable, HandleExceptionCallable.class);
@@ -65,15 +66,15 @@ public class JobCallableChainTest {
   public void testCallableChainWithContributionsAfter() throws Exception {
     _JobManager jobManager = new _JobManager() {
       @Override
-      public <RESULT> ICallable<RESULT> interceptCallable(ICallable<RESULT> next, JobInput input) {
-        ICallable<RESULT> p2 = new Contribution2<>(next); // executed 3th
-        ICallable<RESULT> p1 = new Contribution1<>(p2); // executed 2nd
-        ICallable<RESULT> head = super.interceptCallable(p1, input); // executed 1st
+      public <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next, JobInput input) {
+        Callable<RESULT> p2 = new Contribution2<>(next); // executed 3th
+        Callable<RESULT> p1 = new Contribution1<>(p2); // executed 2nd
+        Callable<RESULT> head = super.interceptCallable(p1, input); // executed 1st
         return head;
       }
     };
 
-    ICallable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, Jobs.newInput(RunContexts.empty()));
+    Callable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, Jobs.newInput(RunContexts.empty()));
 
     // 1. HandleExceptionCallable
     HandleExceptionCallable c1 = getFirstAndAssert(actualCallable, HandleExceptionCallable.class);
@@ -101,15 +102,15 @@ public class JobCallableChainTest {
   public void testCallableChainWithContributionsBefore() throws Exception {
     _JobManager jobManager = new _JobManager() {
       @Override
-      public <RESULT> ICallable<RESULT> interceptCallable(ICallable<RESULT> next, JobInput input) {
-        ICallable<RESULT> p2 = super.interceptCallable(next, input); // executed 3th
-        ICallable<RESULT> p1 = new Contribution2<>(p2); // executed 2nd
-        ICallable<RESULT> head = new Contribution1<>(p1); // executed 1st
+      public <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next, JobInput input) {
+        Callable<RESULT> p2 = super.interceptCallable(next, input); // executed 3th
+        Callable<RESULT> p1 = new Contribution2<>(p2); // executed 2nd
+        Callable<RESULT> head = new Contribution1<>(p1); // executed 1st
         return head;
       }
     };
 
-    ICallable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, Jobs.newInput(RunContexts.empty()));
+    Callable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, Jobs.newInput(RunContexts.empty()));
 
     // 1. Contribution1
     Contribution1 c1 = getFirstAndAssert(actualCallable, Contribution1.class);
@@ -131,23 +132,23 @@ public class JobCallableChainTest {
   }
 
   @SuppressWarnings("unchecked")
-  private static <RESULT, TYPE> TYPE getFirstAndAssert(ICallable<RESULT> first, Class<TYPE> expectedType) {
+  private static <RESULT, TYPE> TYPE getFirstAndAssert(Callable<RESULT> first, Class<TYPE> expectedType) {
     assertTrue(expectedType.equals(first.getClass()));
     return (TYPE) first;
   }
 
   @SuppressWarnings("unchecked")
   private static <RESULT, TYPE> TYPE getNextAndAssert(IChainable<?> c, Class<TYPE> expectedType) {
-    ICallable<?> next = (ICallable<?>) c.getNext();
+    Callable<?> next = (Callable<?>) c.getNext();
     assertTrue(expectedType.equals(next.getClass()));
     return (TYPE) next;
   }
 
-  private static class Contribution1<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
+  private static class Contribution1<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
 
-    private final ICallable<RESULT> m_next;
+    private final Callable<RESULT> m_next;
 
-    public Contribution1(ICallable<RESULT> next) {
+    public Contribution1(Callable<RESULT> next) {
       m_next = next;
     }
 
@@ -157,16 +158,16 @@ public class JobCallableChainTest {
     }
 
     @Override
-    public ICallable<RESULT> getNext() {
+    public Callable<RESULT> getNext() {
       return m_next;
     }
   }
 
-  private static class Contribution2<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
+  private static class Contribution2<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
 
-    private final ICallable<RESULT> m_next;
+    private final Callable<RESULT> m_next;
 
-    public Contribution2(ICallable<RESULT> next) {
+    public Contribution2(Callable<RESULT> next) {
       m_next = next;
     }
 
@@ -176,7 +177,7 @@ public class JobCallableChainTest {
     }
 
     @Override
-    public ICallable<RESULT> getNext() {
+    public Callable<RESULT> getNext() {
       return m_next;
     }
   }
@@ -184,7 +185,7 @@ public class JobCallableChainTest {
   private class _JobManager extends JobManager {
 
     @Override
-    public <RESULT> ICallable<RESULT> interceptCallable(ICallable<RESULT> next, JobInput input) {
+    public <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next, JobInput input) {
       return super.interceptCallable(next, input);
     }
 
