@@ -48,6 +48,15 @@
 
   &[data-icon]::before {
     .menu-icon(attr(data-icon));
+    font-size: 18px;
+    height: @logical-grid-height;
+    line-height: @logical-grid-height - 4px;
+    /* Prepare for focus border: */
+    border: 1px solid transparent;
+    margin-left: -2px;
+    margin-right: -2px;
+    padding-left: 2px;
+    padding-right: 2px;
   }
 
   &[data-icon]:hover::before {
@@ -69,6 +78,21 @@
 
   &:not(.last) {
     margin-right: @menu-item-margin-right;
+  }
+
+  &:focus {
+    outline: none;
+    text-decoration: underline;
+    color: @focus-color;
+  }
+
+  &:focus::before {
+    color: @focus-color;
+  }
+
+  /* Draw border for icon only items */
+  &:not(.menu-textandicon):focus:before {
+    .focus-border;
   }
 
   &.menu-open {
