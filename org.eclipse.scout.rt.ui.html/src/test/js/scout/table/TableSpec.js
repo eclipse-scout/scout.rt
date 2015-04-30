@@ -993,15 +993,15 @@ describe("Table", function() {
       var model = helper.createModelFixture(2, 4);
       var table = helper.createTable(model);
       table.selectionHandler.mouseMoveSelectionEnabled = false;
-      verifyMouseMoveSelectionIsDisabled(model, table);
+      verifyMouseMoveSelectionIsDisabled(model, table, false);
 
       model = helper.createModelFixture(2, 4);
       table = helper.createTable(model);
       table.multiSelect = false;
-      verifyMouseMoveSelectionIsDisabled(model, table);
+      verifyMouseMoveSelectionIsDisabled(model, table, true);
     });
 
-    function verifyMouseMoveSelectionIsDisabled(model, table) {
+    function verifyMouseMoveSelectionIsDisabled(model, table, selectionMovable) {
       table.render(session.$entryPoint);
 
       var $rows = table.$data.children('.table-row');
@@ -1017,16 +1017,21 @@ describe("Table", function() {
       $row2.trigger('mousemove');
       $row2.triggerMouseUp();
 
-      expect($row0).toHaveClass('selected');
-      expect($row1).not.toHaveClass('selected');
-      expect($row2).not.toHaveClass('selected');
-      expect($row3).not.toHaveClass('selected');
+      var expectedSelectedRowIndex = (selectionMovable ? 2 : 0);
+      for (var i = 0; i < $rows.length; i++) {
+        if (i === expectedSelectedRowIndex) {
+          expect($rows.eq(i)).toHaveClass('selected');
+        }
+        else {
+          expect($rows.eq(i)).not.toHaveClass('selected');
+        }
+      }
 
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
       var event = new scout.Event(table.id, 'rowsSelected', {
-        rowIds: [model.rows[0].id]
+        rowIds: [model.rows[expectedSelectedRowIndex].id]
       });
       expect(requestData).toContainEvents(event);
     }
