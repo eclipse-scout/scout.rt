@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -219,10 +220,40 @@ public class DataModelAttributeTest {
   }
 
   @Test
-  public void testFormatAttributeTypeDouble() {
-    IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_DOUBLE);
+  public void testFormatAttributeTypeBigDecimal() {
+    IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_BIG_DECIMAL);
     assertNull(att.formatValue(null));
+    NlsLocale.set(new Locale("de", "CH"));
+    assertEquals("10.00", att.formatValue(BigDecimal.valueOf(10)));
+    assertEquals("-1.00", att.formatValue(BigDecimal.valueOf(-1)));
+    assertEquals("1'000.00", att.formatValue(BigDecimal.valueOf(1000)));
+    assertEquals("-1'000.00", att.formatValue(BigDecimal.valueOf(-1000)));
+    assertEquals("1'000.35", att.formatValue(BigDecimal.valueOf(1000.35)));
+    assertEquals("-1'000.46", att.formatValue(BigDecimal.valueOf(-1000.46)));
+    assertEquals("1'000.50", att.formatValue(BigDecimal.valueOf(1000.495)));
+    assertEquals("-1'000.50", att.formatValue(BigDecimal.valueOf(-1000.495)));
 
+    NlsLocale.set(new Locale("de", "DE"));
+    assertEquals("10,00", att.formatValue(BigDecimal.valueOf(10)));
+    assertEquals("-1,00", att.formatValue(BigDecimal.valueOf(-1)));
+    assertEquals("1.000,00", att.formatValue(BigDecimal.valueOf(1000)));
+    assertEquals("-1.000,00", att.formatValue(BigDecimal.valueOf(-1000)));
+    assertEquals("1.000,35", att.formatValue(BigDecimal.valueOf(1000.35)));
+    assertEquals("-1.000,46", att.formatValue(BigDecimal.valueOf(-1000.46)));
+    assertEquals("1.000,50", att.formatValue(BigDecimal.valueOf(1000.495)));
+    assertEquals("-1.000,50", att.formatValue(BigDecimal.valueOf(-1000.495)));
+
+    NlsLocale.set(new Locale("en", "US"));
+    assertEquals("10.00", att.formatValue(BigDecimal.valueOf(10)));
+    assertEquals("-1.00", att.formatValue(BigDecimal.valueOf(-1)));
+    assertEquals("1,000.00", att.formatValue(BigDecimal.valueOf(1000)));
+    assertEquals("-1,000.00", att.formatValue(BigDecimal.valueOf(-1000)));
+    assertEquals("1,000.35", att.formatValue(BigDecimal.valueOf(1000.35)));
+    assertEquals("-1,000.46", att.formatValue(BigDecimal.valueOf(-1000.46)));
+    assertEquals("1,000.50", att.formatValue(BigDecimal.valueOf(1000.495)));
+    assertEquals("-1,000.50", att.formatValue(BigDecimal.valueOf(-1000.495)));
+
+    // same results expected when called with Double values
     NlsLocale.set(new Locale("de", "CH"));
     assertEquals("10.00", att.formatValue(Double.valueOf(10)));
     assertEquals("-1.00", att.formatValue(Double.valueOf(-1)));
@@ -252,6 +283,7 @@ public class DataModelAttributeTest {
     assertEquals("-1,000.46", att.formatValue(Double.valueOf(-1000.46)));
     assertEquals("1,000.50", att.formatValue(Double.valueOf(1000.495)));
     assertEquals("-1,000.50", att.formatValue(Double.valueOf(-1000.495)));
+
   }
 
   @Test
@@ -303,10 +335,41 @@ public class DataModelAttributeTest {
   }
 
   @Test
-  public void testFormatAttributeTypePlainDouble() {
-    IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_PLAIN_DOUBLE);
+  public void testFormatAttributeTypePlainBigDecimal() {
+    IDataModelAttribute att = new DynamicDataModelAttribute(DataModelConstants.TYPE_PLAIN_BIG_DECIMAL);
     assertNull(att.formatValue(null));
 
+    NlsLocale.set(new Locale("de", "CH"));
+    assertEquals("10.00", att.formatValue(BigDecimal.valueOf(10)));
+    assertEquals("-1.00", att.formatValue(BigDecimal.valueOf(-1)));
+    assertEquals("1000.00", att.formatValue(BigDecimal.valueOf(1000)));
+    assertEquals("-1000.00", att.formatValue(BigDecimal.valueOf(-1000)));
+    assertEquals("1000.35", att.formatValue(BigDecimal.valueOf(1000.35)));
+    assertEquals("-1000.46", att.formatValue(BigDecimal.valueOf(-1000.46)));
+    assertEquals("1000.50", att.formatValue(BigDecimal.valueOf(1000.495)));
+    assertEquals("-1000.50", att.formatValue(BigDecimal.valueOf(-1000.495)));
+
+    NlsLocale.set(new Locale("de", "DE"));
+    assertEquals("10,00", att.formatValue(BigDecimal.valueOf(10)));
+    assertEquals("-1,00", att.formatValue(BigDecimal.valueOf(-1)));
+    assertEquals("1000,00", att.formatValue(BigDecimal.valueOf(1000)));
+    assertEquals("-1000,00", att.formatValue(BigDecimal.valueOf(-1000)));
+    assertEquals("1000,35", att.formatValue(BigDecimal.valueOf(1000.35)));
+    assertEquals("-1000,46", att.formatValue(BigDecimal.valueOf(-1000.46)));
+    assertEquals("1000,50", att.formatValue(BigDecimal.valueOf(1000.495)));
+    assertEquals("-1000,50", att.formatValue(BigDecimal.valueOf(-1000.495)));
+
+    NlsLocale.set(new Locale("en", "US"));
+    assertEquals("10.00", att.formatValue(BigDecimal.valueOf(10)));
+    assertEquals("-1.00", att.formatValue(BigDecimal.valueOf(-1)));
+    assertEquals("1000.00", att.formatValue(BigDecimal.valueOf(1000)));
+    assertEquals("-1000.00", att.formatValue(BigDecimal.valueOf(-1000)));
+    assertEquals("1000.35", att.formatValue(BigDecimal.valueOf(1000.35)));
+    assertEquals("-1000.46", att.formatValue(BigDecimal.valueOf(-1000.46)));
+    assertEquals("1000.50", att.formatValue(BigDecimal.valueOf(1000.495)));
+    assertEquals("-1000.50", att.formatValue(BigDecimal.valueOf(-1000.495)));
+
+    // same results expected when called with Double values
     NlsLocale.set(new Locale("de", "CH"));
     assertEquals("10.00", att.formatValue(Double.valueOf(10)));
     assertEquals("-1.00", att.formatValue(Double.valueOf(-1)));

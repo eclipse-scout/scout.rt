@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.data.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.security.Permission;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -531,16 +532,16 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
         return formatInteger(rawValue, true);
       case IDataModelAttribute.TYPE_LONG:
         return formatLong(rawValue, true);
-      case IDataModelAttribute.TYPE_DOUBLE:
-        return formatDouble(rawValue, true, false);
+      case IDataModelAttribute.TYPE_BIG_DECIMAL:
+        return formatBigDecimal(rawValue, true, false);
       case IDataModelAttribute.TYPE_PLAIN_INTEGER:
         return formatInteger(rawValue, false);
       case IDataModelAttribute.TYPE_PLAIN_LONG:
         return formatLong(rawValue, false);
-      case IDataModelAttribute.TYPE_PLAIN_DOUBLE:
-        return formatDouble(rawValue, false, false);
+      case IDataModelAttribute.TYPE_PLAIN_BIG_DECIMAL:
+        return formatBigDecimal(rawValue, false, false);
       case IDataModelAttribute.TYPE_PERCENT:
-        return formatDouble(rawValue, true, true);
+        return formatBigDecimal(rawValue, true, true);
       case IDataModelAttribute.TYPE_STRING:
       case IDataModelAttribute.TYPE_FULL_TEXT:
         return formatString(rawValue);
@@ -609,8 +610,8 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    *          True if a percent number format should be used for formatting
    * @return Formatted value: raw value casted to Double, number format with 2 fraction digits
    */
-  protected String formatDouble(Object rawValue, boolean groupingUsed, boolean percent) {
-    Double value = TypeCastUtility.castValue(rawValue, Double.class);
+  protected String formatBigDecimal(Object rawValue, boolean groupingUsed, boolean percent) {
+    BigDecimal value = TypeCastUtility.castValue(rawValue, BigDecimal.class);
 
     NumberFormat fmt = null;
     if (percent) {

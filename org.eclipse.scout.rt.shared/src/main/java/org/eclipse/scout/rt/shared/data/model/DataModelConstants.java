@@ -41,7 +41,12 @@ public interface DataModelConstants {
   int TYPE_BIG_DECIMAL = 10;
   int TYPE_PLAIN_INTEGER = 11;
   int TYPE_PLAIN_LONG = 12;
+  /**
+   * @deprecated will be removed with scout 7: use {@link DataModelConstants#TYPE_PLAIN_BIG_DECIMAL} instead
+   */
+  @Deprecated
   int TYPE_PLAIN_DOUBLE = 13;
+  int TYPE_PLAIN_BIG_DECIMAL = 13;
   int TYPE_PERCENT = 14;
   int TYPE_STRING = 15;
   int TYPE_SMART = 16;

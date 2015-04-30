@@ -146,10 +146,10 @@ public class DataModelAttributeInjector implements DataModelConstants {
       }
       case IDataModelAttribute.TYPE_INTEGER:
       case IDataModelAttribute.TYPE_LONG:
-      case IDataModelAttribute.TYPE_DOUBLE:
+      case IDataModelAttribute.TYPE_BIG_DECIMAL:
       case IDataModelAttribute.TYPE_PLAIN_INTEGER:
       case IDataModelAttribute.TYPE_PLAIN_LONG:
-      case IDataModelAttribute.TYPE_PLAIN_DOUBLE:
+      case IDataModelAttribute.TYPE_PLAIN_BIG_DECIMAL:
       case IDataModelAttribute.TYPE_PERCENT: {
         opList.add(DataModelAttributeOp.create(OPERATOR_EQ));
         if (attribute.isNotOperatorEnabled()) {
@@ -237,10 +237,10 @@ public class DataModelAttributeInjector implements DataModelConstants {
         }
         case IDataModelAttribute.TYPE_INTEGER:
         case IDataModelAttribute.TYPE_LONG:
-        case IDataModelAttribute.TYPE_DOUBLE:
+        case IDataModelAttribute.TYPE_BIG_DECIMAL:
         case IDataModelAttribute.TYPE_PLAIN_INTEGER:
         case IDataModelAttribute.TYPE_PLAIN_LONG:
-        case IDataModelAttribute.TYPE_PLAIN_DOUBLE:
+        case IDataModelAttribute.TYPE_PLAIN_BIG_DECIMAL:
         case IDataModelAttribute.TYPE_PERCENT: {
           agList.add(AGGREGATION_SUM);
           agList.add(AGGREGATION_MIN);
