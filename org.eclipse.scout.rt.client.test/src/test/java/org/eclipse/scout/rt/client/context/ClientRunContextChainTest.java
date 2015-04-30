@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
+import org.eclipse.scout.rt.platform.context.internal.RunMonitorCallable;
 import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.shared.ISession;
@@ -56,8 +57,11 @@ public class ClientRunContextChainTest {
   public void testCallableChain() throws Exception {
     ICallable<Void> actualCallable = new ClientRunContext().interceptCallable(m_targetCallable);
 
+    //0. RunMonitorCallable
+    RunMonitorCallable c0 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
+
     // 1. SubjectCallable
-    SubjectCallable c1 = getFirstAndAssert(actualCallable, SubjectCallable.class);
+    SubjectCallable c1 = getNextAndAssert(c0, SubjectCallable.class);
 
     // 2. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
@@ -101,8 +105,11 @@ public class ClientRunContextChainTest {
 
     ICallable<Void> actualCallable = clientRunContext.interceptCallable(m_targetCallable);
 
+    //0. RunMonitorCallable
+    RunMonitorCallable c0 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
+
     // 1. SubjectCallable
-    SubjectCallable c1 = getFirstAndAssert(actualCallable, SubjectCallable.class);
+    SubjectCallable c1 = getNextAndAssert(c0, SubjectCallable.class);
 
     // 2. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
@@ -158,8 +165,11 @@ public class ClientRunContextChainTest {
     // 2. Contribution2
     Contribution2 c2 = getNextAndAssert(c1, Contribution2.class);
 
+    // 2a. RunMonitorCallable
+    RunMonitorCallable c2a = getNextAndAssert(c2, RunMonitorCallable.class);
+
     // 3. SubjectCallable
-    SubjectCallable c3 = getNextAndAssert(c2, SubjectCallable.class);
+    SubjectCallable c3 = getNextAndAssert(c2a, SubjectCallable.class);
 
     // 4. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
