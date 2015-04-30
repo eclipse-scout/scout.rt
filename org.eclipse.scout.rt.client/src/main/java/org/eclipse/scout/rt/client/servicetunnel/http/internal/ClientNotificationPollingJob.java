@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.job.IProgressMonitor;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 
 public class ClientNotificationPollingJob implements IRunnable {
@@ -22,7 +22,7 @@ public class ClientNotificationPollingJob implements IRunnable {
 
   @Override
   public void run() throws Exception {
-    if (IProgressMonitor.CURRENT.get().isCancelled()) {
+    if (IFuture.CURRENT.get().isCancelled()) {
       return;
     }
 

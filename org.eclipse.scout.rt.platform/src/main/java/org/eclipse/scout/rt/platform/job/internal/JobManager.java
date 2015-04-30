@@ -40,7 +40,6 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobMaximumP
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -232,12 +231,10 @@ public class JobManager implements IJobManager {
         m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.ABOUT_TO_RUN, this));
 
         IFuture.CURRENT.set(this);
-        IProgressMonitor.CURRENT.set(getProgressMonitor());
       }
 
       @Override
       protected void afterExecute() {
-        IProgressMonitor.CURRENT.remove();
         IFuture.CURRENT.remove();
 
         if (isPeriodic() && !isDone()) {

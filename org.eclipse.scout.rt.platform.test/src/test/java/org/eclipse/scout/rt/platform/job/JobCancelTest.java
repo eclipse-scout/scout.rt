@@ -79,7 +79,7 @@ public class JobCancelTest {
 
       @Override
       public void run() throws Exception {
-        if (IProgressMonitor.CURRENT.get().isCancelled()) {
+        if (IFuture.CURRENT.get().isCancelled()) {
           protocol.add("cancelled-before");
         }
 
@@ -90,7 +90,7 @@ public class JobCancelTest {
           protocol.add("interrupted");
         }
 
-        if (IProgressMonitor.CURRENT.get().isCancelled()) {
+        if (IFuture.CURRENT.get().isCancelled()) {
           protocol.add("cancelled-after");
         }
 
@@ -128,7 +128,7 @@ public class JobCancelTest {
 
       @Override
       public void run() throws Exception {
-        if (IProgressMonitor.CURRENT.get().isCancelled()) {
+        if (IFuture.CURRENT.get().isCancelled()) {
           protocol.add("cancelled-before");
         }
 
@@ -139,7 +139,7 @@ public class JobCancelTest {
           protocol.add("interrupted");
         }
 
-        if (IProgressMonitor.CURRENT.get().isCancelled()) {
+        if (IFuture.CURRENT.get().isCancelled()) {
           protocol.add("cancelled-after");
         }
 
@@ -336,7 +336,7 @@ public class JobCancelTest {
             if (IFuture.CURRENT.get().isCancelled()) {
               protocol.add("job-2-cancelled (future)");
             }
-            if (IProgressMonitor.CURRENT.get().isCancelled()) {
+            if (IFuture.CURRENT.get().isCancelled()) {
               protocol.add("job-2-cancelled (monitor)");
             }
             verifyLatch.countDown();
@@ -352,7 +352,7 @@ public class JobCancelTest {
         if (IFuture.CURRENT.get().isCancelled()) {
           protocol.add("job-1-cancelled (future)");
         }
-        if (IProgressMonitor.CURRENT.get().isCancelled()) {
+        if (IFuture.CURRENT.get().isCancelled()) {
           protocol.add("job-1-cancelled (monitor)");
         }
         job1DoneLatch.countDown();

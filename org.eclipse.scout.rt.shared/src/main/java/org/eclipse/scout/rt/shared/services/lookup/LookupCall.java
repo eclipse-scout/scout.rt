@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IProgressMonitor;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.shared.job.IRunContextProvider;
 import org.eclipse.scout.rt.shared.validate.annotations.MaxLength;
@@ -326,12 +326,12 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
         public void run() throws Exception {
           try {
             List<? extends ILookupRow<KEY_TYPE>> rows = getDataByKey();
-            if (!IProgressMonitor.CURRENT.get().isCancelled()) {
+            if (!IFuture.CURRENT.get().isCancelled()) {
               caller.dataFetched(rows, null);
             }
           }
           catch (ProcessingException e) {
-            if (!e.isInterruption() && !IProgressMonitor.CURRENT.get().isCancelled()) {
+            if (!e.isInterruption() && !IFuture.CURRENT.get().isCancelled()) {
               caller.dataFetched(null, e);
             }
           }
@@ -383,12 +383,12 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
         public void run() throws Exception {
           try {
             List<? extends ILookupRow<KEY_TYPE>> rows = getDataByText();
-            if (!IProgressMonitor.CURRENT.get().isCancelled()) {
+            if (!IFuture.CURRENT.get().isCancelled()) {
               caller.dataFetched(rows, null);
             }
           }
           catch (ProcessingException e) {
-            if (!e.isInterruption() && !IProgressMonitor.CURRENT.get().isCancelled()) {
+            if (!e.isInterruption() && !IFuture.CURRENT.get().isCancelled()) {
               caller.dataFetched(null, e);
             }
           }
@@ -440,12 +440,12 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
         public void run() throws Exception {
           try {
             List<? extends ILookupRow<KEY_TYPE>> rows = getDataByAll();
-            if (!IProgressMonitor.CURRENT.get().isCancelled()) {
+            if (!IFuture.CURRENT.get().isCancelled()) {
               caller.dataFetched(rows, null);
             }
           }
           catch (ProcessingException e) {
-            if (!e.isInterruption() && !IProgressMonitor.CURRENT.get().isCancelled()) {
+            if (!e.isInterruption() && !IFuture.CURRENT.get().isCancelled()) {
               caller.dataFetched(null, e);
             }
           }
@@ -496,12 +496,12 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
         public void run() throws Exception {
           try {
             List<? extends ILookupRow<KEY_TYPE>> rows = getDataByRec();
-            if (!IProgressMonitor.CURRENT.get().isCancelled()) {
+            if (!IFuture.CURRENT.get().isCancelled()) {
               caller.dataFetched(rows, null);
             }
           }
           catch (ProcessingException e) {
-            if (!e.isInterruption() && !IProgressMonitor.CURRENT.get().isCancelled()) {
+            if (!e.isInterruption() && !IFuture.CURRENT.get().isCancelled()) {
               caller.dataFetched(null, e);
             }
           }

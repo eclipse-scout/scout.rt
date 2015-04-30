@@ -31,11 +31,6 @@ public interface IFuture<RESULT> {
   ThreadLocal<IFuture<?>> CURRENT = new ThreadLocal<>();
 
   /**
-   * @return {@link IProgressMonitor} which belongs to this Future to track progress.
-   */
-  IProgressMonitor getProgressMonitor();
-
-  /**
    * @return {@link JobInput} the job was instrumented with.
    */
   JobInput getJobInput();

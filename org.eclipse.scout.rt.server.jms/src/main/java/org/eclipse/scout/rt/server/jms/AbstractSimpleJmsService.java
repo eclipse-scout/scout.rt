@@ -28,7 +28,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IProgressMonitor;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.jms.JmsConfigProperties.JmsRequestTimeoutProperty;
 import org.eclipse.scout.rt.server.jms.context.JmsRunContexts;
@@ -177,7 +177,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
       m_connection.start();
       try {
-        while (!IProgressMonitor.CURRENT.get().isCancelled()) {
+        while (!IFuture.CURRENT.get().isCancelled()) {
           try {
             final Message jmsMessage = m_consumer.receive(m_receiveTimeout);
             if (jmsMessage != null) {

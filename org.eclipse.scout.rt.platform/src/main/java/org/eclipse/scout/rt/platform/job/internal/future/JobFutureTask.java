@@ -25,10 +25,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IProgressMonitor;
 import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.platform.job.ProgressMonitorProvider;
 import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
 
 /**
@@ -45,7 +43,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final JobInput m_input;
   protected final Long m_expirationDate;
   private volatile boolean m_blocked;
-  private final IProgressMonitor m_progressMonitor;
   private final boolean m_periodic;
 
   private final MutexSemaphores m_mutexSemaphores;
@@ -57,7 +54,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_input = input;
     m_periodic = periodic;
     m_mutexSemaphores = mutexSemaphores;
-    m_progressMonitor = BEANS.get(ProgressMonitorProvider.class).provide(this);
     m_expirationDate = (input.expirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.expirationTimeMillis() : null);
 
     postConstruct();
@@ -168,11 +164,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public IProgressMonitor getProgressMonitor() {
-    return m_progressMonitor;
-  }
-
-  @Override
   public RESULT awaitDoneAndGet() throws ProcessingException {
     try {
       return get();
@@ -219,7 +210,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     builder.attr("periodic", m_periodic);
     builder.attr("blocked", m_blocked);
     builder.attr("expirationDate", m_expirationDate);
-    builder.ref("progressMonitor", m_progressMonitor);
     builder.ref("mutexSemaphores", m_mutexSemaphores);
     return builder.toString();
   }
