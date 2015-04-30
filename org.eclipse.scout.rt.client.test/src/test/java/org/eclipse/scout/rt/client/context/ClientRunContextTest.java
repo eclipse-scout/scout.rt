@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,6 +52,11 @@ public class ClientRunContextTest {
     NlsLocale.CURRENT.remove();
     ScoutTexts.CURRENT.remove();
     UserAgent.CURRENT.remove();
+  }
+
+  @After
+  public void after() {
+    ISession.CURRENT.remove();
   }
 
   @Test

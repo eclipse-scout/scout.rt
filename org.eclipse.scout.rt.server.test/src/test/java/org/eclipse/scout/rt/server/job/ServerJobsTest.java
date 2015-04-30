@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -70,6 +71,11 @@ public class ServerJobsTest {
 
     when(future.getJobInput()).thenReturn(new JobInput().runContext(new ServerRunContext()).mutex(mock(IServerSession.class)));
     assertTrue(ServerJobs.isServerJob(future));
+  }
+
+  @After
+  public void after() {
+    ISession.CURRENT.remove();
   }
 
   @Test

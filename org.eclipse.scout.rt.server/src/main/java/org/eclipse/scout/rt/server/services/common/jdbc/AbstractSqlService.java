@@ -131,7 +131,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
 
     // load code and permission names
     m_permissionNameToDescriptor = new HashMap<>();
-    IPermissionService psvc = BEANS.get(IPermissionService.class);
+    IPermissionService psvc = BEANS.opt(IPermissionService.class);
     if (psvc != null) {
       for (Class<? extends Permission> d : psvc.getAllPermissionClasses()) {
         List<Class<?>> list = m_permissionNameToDescriptor.get(d.getSimpleName());
@@ -151,7 +151,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     }
 
     m_codeNameToDescriptor = new HashMap<>();
-    ICodeService csvc = BEANS.get(ICodeService.class);
+    ICodeService csvc = BEANS.opt(ICodeService.class);
     if (csvc != null) {
       for (Class<?> d : csvc.getAllCodeTypeClasses("")) {
         List<Class<?>> list = m_codeNameToDescriptor.get(d.getSimpleName());

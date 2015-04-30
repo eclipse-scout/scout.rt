@@ -35,7 +35,7 @@ public class SelectIntoTest {
   private List<IBean<?>> m_beans;
 
   @Before
-  public void setup() throws Exception {
+  public void before() throws Exception {
     SqlServiceMock sqlService = new SqlServiceMock();
     m_beans = TestingUtility.registerBeans(new BeanMetaData(ISqlService.class).initialInstance(sqlService).applicationScoped(true));
   }

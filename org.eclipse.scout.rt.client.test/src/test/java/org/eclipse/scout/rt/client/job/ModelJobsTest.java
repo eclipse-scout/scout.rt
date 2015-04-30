@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,6 +46,11 @@ public class ModelJobsTest {
   @Before
   public void before() {
     MockitoAnnotations.initMocks(this);
+  }
+
+  @After
+  public void after() {
+    ISession.CURRENT.remove();
   }
 
   @Test

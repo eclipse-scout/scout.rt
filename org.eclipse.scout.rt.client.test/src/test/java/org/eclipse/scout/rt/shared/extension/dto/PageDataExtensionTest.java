@@ -25,7 +25,9 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigPageWithTableData.O
 import org.eclipse.scout.rt.shared.extension.dto.fixture.ThirdIntegerColumn;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.ThirdIntegerColumnData;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -34,40 +36,33 @@ import org.mockito.Mockito;
  */
 public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
 
-  @Test
-  public void testPageDataSingleExtensionExplicit() throws Exception {
-    setupSession();
-    try {
-      BEANS.get(IExtensionRegistry.class).register(ThirdIntegerColumn.class, OrigPageWithTable.Table.class);
-      BEANS.get(IExtensionRegistry.class).register(ThirdIntegerColumnData.class, OrigPageWithTableRowData.class);
-      doTestSingle();
-    }
-    finally {
-      ISession.CURRENT.set(null);
-      System.clearProperty("user.area");
-    }
-  }
-
-  @Test
-  public void testPageDataMultipleExtensionAnnotation() throws Exception {
-    setupSession();
-    try {
-      BEANS.get(IExtensionRegistry.class).register(MultiColumnExtension.class);
-      BEANS.get(IExtensionRegistry.class).register(MultiColumnExtensionData.class);
-      doTestMulti();
-    }
-    finally {
-      ISession.CURRENT.set(null);
-      System.clearProperty("user.area");
-    }
-  }
-
-  private void setupSession() {
+  @Before
+  public void before() {
     final IClientSession session = Mockito.mock(IClientSession.class);
     System.setProperty("user.area", "@user.home/test");
     Mockito.when(session.getUserId()).thenReturn("userid");
     Mockito.when(session.getUserAgent()).thenReturn(UserAgent.createDefault());
     ISession.CURRENT.set(session);
+  }
+
+  @After
+  public void after() {
+    ISession.CURRENT.remove();
+    System.clearProperty("user.area");
+  }
+
+  @Test
+  public void testPageDataSingleExtensionExplicit() throws Exception {
+    BEANS.get(IExtensionRegistry.class).register(ThirdIntegerColumn.class, OrigPageWithTable.Table.class);
+    BEANS.get(IExtensionRegistry.class).register(ThirdIntegerColumnData.class, OrigPageWithTableRowData.class);
+    doTestSingle();
+  }
+
+  @Test
+  public void testPageDataMultipleExtensionAnnotation() throws Exception {
+    BEANS.get(IExtensionRegistry.class).register(MultiColumnExtension.class);
+    BEANS.get(IExtensionRegistry.class).register(MultiColumnExtensionData.class);
+    doTestMulti();
   }
 
   private void doTestMulti() throws Exception {

@@ -25,6 +25,7 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.servicetunnel.http.MultiSessionCookieStore;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,6 +52,11 @@ public class MultiSessionCookieStoreTest {
 
   @Before
   public void before() {
+    ISession.CURRENT.remove();
+  }
+
+  @After
+  public void after() {
     ISession.CURRENT.remove();
   }
 

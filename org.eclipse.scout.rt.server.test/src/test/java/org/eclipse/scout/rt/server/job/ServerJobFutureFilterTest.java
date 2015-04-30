@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,6 +52,11 @@ public class ServerJobFutureFilterTest {
 
     JobInput jobInput = Jobs.newInput(RunContexts.empty());
     when(m_jobFuture.getJobInput()).thenReturn(jobInput);
+  }
+
+  @After
+  public void after() {
+    ISession.CURRENT.remove();
   }
 
   @Test
