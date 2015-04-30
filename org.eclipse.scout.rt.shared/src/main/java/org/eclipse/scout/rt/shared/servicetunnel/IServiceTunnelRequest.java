@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Set;
 
-import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
+import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
@@ -26,7 +26,7 @@ public interface IServiceTunnelRequest extends Serializable {
    * @return the request sequence for this session
    *         <p>
    *         The sequence can be used to find and manipulate transactions of the same session. Such a scenario is used
-   *         when cancelling "old" lookup requests using {@link IServerProcessingCancelService#cancel(long)}
+   *         when cancelling "old" lookup requests using {@link IRunMonitorCancelService#cancel(long)}
    */
   long getRequestSequence();
 

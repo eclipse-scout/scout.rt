@@ -97,7 +97,9 @@ public class PlatformImplementor implements IPlatform {
 
   protected void validateConfiguration() {
     if (!ConfigIniUtility.isInitialized()) {
-      LOG.warn(": No " + ConfigIniUtility.CONFIG_INI + " found. Running with empty configuration.", new Exception("origin"));
+      if (LOG.isInfoEnabled()) {
+        LOG.info(": No " + ConfigIniUtility.CONFIG_INI + " found. Running with empty configuration.");
+      }
     }
 
     List<IConfigPropertyWithStatus> configs = BEANS.all(IConfigPropertyWithStatus.class);

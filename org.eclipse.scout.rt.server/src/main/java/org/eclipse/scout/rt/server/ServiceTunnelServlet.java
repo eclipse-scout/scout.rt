@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.config.WebXmlConfigManager;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.server.context.ActiveRunMonitorRegistry;
+import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -112,8 +112,7 @@ public class ServiceTunnelServlet extends HttpServlet {
 
           //enable cancel
           RunMonitor runMonitor = new RunMonitor();
-          String cancelId=(serviceRequest.getRequestSequence() != 0L?""+serviceRequest.getRequestSequence():null);
-          BEANS.get(ActiveRunMonitorRegistry.class).register(cancelId, runMonitor);
+          BEANS.get(RunMonitorCancelRegistry.class).register(serviceRequest.getRequestSequence(), runMonitor);
 
           ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
           serverRunContext.locale(serviceRequest.getLocale());
@@ -123,7 +122,7 @@ public class ServiceTunnelServlet extends HttpServlet {
 
           IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
 
-          BEANS.get(ActiveRunMonitorRegistry.class).unregister(cancelId);
+          BEANS.get(RunMonitorCancelRegistry.class).unregister(serviceRequest.getRequestSequence());
 
           serializeServiceResponse(serviceResponse);
         }

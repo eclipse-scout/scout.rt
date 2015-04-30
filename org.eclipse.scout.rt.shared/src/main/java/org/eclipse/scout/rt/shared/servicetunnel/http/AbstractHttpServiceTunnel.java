@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
-import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
+import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -116,7 +116,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
    */
   protected boolean sendCancelRequest(long requestSequence) {
     try {
-      IServiceTunnelRequest cancelCall = createServiceTunnelRequest(IServerProcessingCancelService.class, IServerProcessingCancelService.class.getMethod("cancel", long.class), new Object[]{requestSequence});
+      IServiceTunnelRequest cancelCall = createServiceTunnelRequest(IRunMonitorCancelService.class, IRunMonitorCancelService.class.getMethod("cancel", long.class), new Object[]{requestSequence});
       IHttpBackgroundExecutable executor = createHttpBackgroundExecutor(cancelCall, new Object());
       IFuture<?> future = schedule(executor, cancelCall);
       try {

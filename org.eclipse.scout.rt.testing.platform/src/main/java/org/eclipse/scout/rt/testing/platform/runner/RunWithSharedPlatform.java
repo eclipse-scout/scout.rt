@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 import org.eclipse.scout.rt.platform.IPlatform;
 
 /**
- * Annotation to execute test-methods using a new {@link IPlatform}. This annotation requires to be executed by the
+ * Annotation to execute test-methods using a shared {@link IPlatform}. This annotation requires to be executed by the
  * {@link PlatformTestRunner} ore one of its subclasses.
  *
  * @since 5.1
@@ -27,7 +27,5 @@ import org.eclipse.scout.rt.platform.IPlatform;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
-public @interface RunWithPrivatePlatform {
-
-  boolean value() default true;
+public @interface RunWithSharedPlatform {
 }

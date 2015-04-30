@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.fixture.VerboseMock;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -36,19 +37,20 @@ import org.junit.runner.RunWith;
 @RunWithServerSession(TestServerSession.class)
 @RunWithSubject("default")
 public class BindValueTest {
-  protected SqlServiceMock sqlService = new SqlServiceMock();
+  private SqlServiceMock m_sqlService;
 
-  public BindValueTest() {
-    sqlService = new SqlServiceMock();
+  @Before
+  public void before() {
+    m_sqlService = new SqlServiceMock();
   }
 
   @Test
   public void testNullBindWithLong() throws Exception {
-    sqlService.clearProtocol();
+    m_sqlService.clearProtocol();
 
     //actual behaviour
-    sqlService.select("SELECT A FROM T WHERE A = :a", new NVPair("a", null));
-    String actual = sqlService.getProtocol().toString();
+    m_sqlService.select("SELECT A FROM T WHERE A = :a", new NVPair("a", null));
+    String actual = m_sqlService.getProtocol().toString();
 
     //expected behaviour
     VerboseMock m = new VerboseMock(new StringBuffer());
@@ -66,11 +68,11 @@ public class BindValueTest {
 
   @Test
   public void testNullBindWithLongAndNullType() throws Exception {
-    sqlService.clearProtocol();
+    m_sqlService.clearProtocol();
 
     //actual behaviour
-    sqlService.select("SELECT A FROM T WHERE A = :a", new NVPair("a", null, Long.class));
-    String actual = sqlService.getProtocol().toString();
+    m_sqlService.select("SELECT A FROM T WHERE A = :a", new NVPair("a", null, Long.class));
+    String actual = m_sqlService.getProtocol().toString();
 
     //expected behaviour
     VerboseMock m = new VerboseMock(new StringBuffer());
@@ -88,11 +90,11 @@ public class BindValueTest {
 
   @Test
   public void testNullBindWithLongHolder() throws Exception {
-    sqlService.clearProtocol();
+    m_sqlService.clearProtocol();
 
     //actual behaviour
-    sqlService.select("SELECT A FROM T WHERE A = :a", new NVPair("a", new LongHolder()));
-    String actual = sqlService.getProtocol().toString();
+    m_sqlService.select("SELECT A FROM T WHERE A = :a", new NVPair("a", new LongHolder()));
+    String actual = m_sqlService.getProtocol().toString();
 
     //expected behaviour
     VerboseMock m = new VerboseMock(new StringBuffer());

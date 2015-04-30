@@ -25,30 +25,15 @@ import org.eclipse.scout.rt.server.session.ServerSessionProvider;
  * Cache the {@link IRunMonitor} per session in order to allow cancelling
  */
 @ApplicationScoped
-public class ActiveRunMonitorRegistry {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ActiveRunMonitorRegistry.class);
-  private static final String SESSION_STATE_KEY = "activeTransactions";
+public class RunMonitorCancelRegistry {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RunMonitorCancelRegistry.class);
+  protected static final String SESSION_STATE_KEY = "activeTransactions";
 
-  public ActiveRunMonitorRegistry() {
+  public RunMonitorCancelRegistry() {
   }
 
-  private SessionState getSessionState(boolean autoCreate) {
-    IServerSession session = ServerSessionProvider.currentSession();
-    if (session == null) {
-      return null;
-    }
-    synchronized (session) {
-      SessionState state = (SessionState) session.getData(SESSION_STATE_KEY);
-      if (state == null && autoCreate) {
-        state = new SessionState();
-        session.setData(SESSION_STATE_KEY, state);
-      }
-      return state;
-    }
-  }
-
-  public void register(String id, IRunMonitor monitor) {
-    if (id == null) {
+  public void register(long id, IRunMonitor monitor) {
+    if (id == 0L) {
       return;
     }
     SessionState state = getSessionState(true);
@@ -61,8 +46,8 @@ public class ActiveRunMonitorRegistry {
     }
   }
 
-  public void unregister(String id) {
-    if (id == null) {
+  public void unregister(long id) {
+    if (id == 0L) {
       return;
     }
     SessionState state = getSessionState(false);
@@ -77,8 +62,8 @@ public class ActiveRunMonitorRegistry {
   /**
    * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
    */
-  public boolean cancel(String id) {
-    if (id == null) {
+  public boolean cancel(long id) {
+    if (id == 0L) {
       return false;
     }
     SessionState state = getSessionState(false);
@@ -99,8 +84,23 @@ public class ActiveRunMonitorRegistry {
     return monitor.cancel(true);
   }
 
-  private static class SessionState {
+  protected SessionState getSessionState(boolean autoCreate) {
+    IServerSession session = ServerSessionProvider.currentSession();
+    if (session == null) {
+      return null;
+    }
+    synchronized (session) {
+      SessionState state = (SessionState) session.getData(SESSION_STATE_KEY);
+      if (state == null && autoCreate) {
+        state = new SessionState();
+        session.setData(SESSION_STATE_KEY, state);
+      }
+      return state;
+    }
+  }
+
+  protected static class SessionState {
     final Object m_txMapLock = new Object();
-    final Map<String, WeakReference<IRunMonitor>> m_txMap = new HashMap<>();
+    final Map<Long, WeakReference<IRunMonitor>> m_txMap = new HashMap<>();
   }
 }

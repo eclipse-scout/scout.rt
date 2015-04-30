@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.services.common.processing;
+package org.eclipse.scout.rt.shared.services.common.context;
 
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -17,10 +18,11 @@ import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 
 @TunnelToServer
-public interface IServerProcessingCancelService extends IService {
+public interface IRunMonitorCancelService extends IService {
 
   /**
-   * Cancels a backend job with its associated transaction which was originally initiated by a client-server request.<br/>
+   * Cancels a {@link RunContext}with its associated transaction which was originally initiated by a client-server
+   * request.<br/>
    * Also, any nested 'runNow'-style jobs, which where run on behalf of that job and did not complete yet, are
    * cancelled, as well as any associated transactions. In order to be cancelled, the session of the cancel-request must
    * be the same as the job's session.

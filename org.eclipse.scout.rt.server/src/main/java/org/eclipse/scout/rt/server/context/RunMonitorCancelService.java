@@ -8,19 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.common.processing;
+package org.eclipse.scout.rt.server.context;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.server.Server;
-import org.eclipse.scout.rt.server.context.ActiveRunMonitorRegistry;
-import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
+import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 
 @Server
-public class ServerProcessingCancelService extends AbstractService implements IServerProcessingCancelService {
+public class RunMonitorCancelService extends AbstractService implements IRunMonitorCancelService {
 
   @Override
   public boolean cancel(long requestSequence) {
-    return BEANS.get(ActiveRunMonitorRegistry.class).cancel("" + requestSequence);
+    return BEANS.get(RunMonitorCancelRegistry.class).cancel(requestSequence);
   }
 }

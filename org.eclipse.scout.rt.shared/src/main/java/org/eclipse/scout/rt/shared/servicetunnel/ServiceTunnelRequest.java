@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
+import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 public class ServiceTunnelRequest implements IServiceTunnelRequest {
@@ -50,7 +50,7 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
    * @return the request sequence for this session
    *         <p>
    *         The sequence can be used to find and manipulate transactions of the same session. Such a scenario is used
-   *         when cancelling "old" lookup requests using {@link IServerProcessingCancelService#cancel(long)}
+   *         when cancelling "old" lookup requests using {@link IRunMonitorCancelService#cancel(long)}
    */
   @Override
   public long getRequestSequence() {

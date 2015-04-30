@@ -66,7 +66,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement classBlock(final RunNotifier notifier) {
-    return new PlatformStatement(super.classBlock(notifier), ReflectionUtility.getAnnotation(RunWithPrivatePlatform.class, getTestClass().getJavaClass()));
+    return new PlatformStatement(super.classBlock(notifier), ReflectionUtility.getAnnotation(RunWithSharedPlatform.class, getTestClass().getJavaClass()));
   }
 
   @Override

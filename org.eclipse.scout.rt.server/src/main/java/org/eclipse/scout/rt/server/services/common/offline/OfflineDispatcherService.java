@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.context.ActiveRunMonitorRegistry;
+import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -39,8 +39,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     try {
       //enable cancel
       RunMonitor runMonitor = new RunMonitor();
-      String cancelId = (serviceRequest.getRequestSequence() != 0L ? "" + serviceRequest.getRequestSequence() : null);
-      BEANS.get(ActiveRunMonitorRegistry.class).register(cancelId, runMonitor);
+      BEANS.get(RunMonitorCancelRegistry.class).register(serviceRequest.getRequestSequence(), runMonitor);
 
       ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
       serverRunContext.offline(true);
@@ -51,7 +50,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
 
       final IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
 
-      BEANS.get(ActiveRunMonitorRegistry.class).unregister(cancelId);
+      BEANS.get(RunMonitorCancelRegistry.class).unregister(serviceRequest.getRequestSequence());
 
       if (serviceResponse != null) {
         return serviceResponse;

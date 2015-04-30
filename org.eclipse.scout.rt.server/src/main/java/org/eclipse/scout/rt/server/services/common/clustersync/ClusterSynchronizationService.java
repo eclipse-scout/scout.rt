@@ -101,12 +101,16 @@ public class ClusterSynchronizationService extends AbstractService implements IC
         // use random number
         nodeId = UUID.randomUUID().toString();
       }
-
-      // in development on same machine there might run multiple instances on different ports (usecase when testing cluster sync)
-      // therefore we use in this case the port jetty port too
-      String port = ConfigIniUtility.getProperty("scout.jetty.port"); // see org.eclipse.scout.dev.jetty.JettyServer.SERVER_PORT_KEY
-      if (StringUtility.hasText(port)) {
-        nodeId = StringUtility.join(":", hostname, port);
+      else {
+        // in development on same machine there might run multiple instances on different ports (usecase when testing cluster sync)
+        // therefore we use in this case the jetty port too
+        String port = ConfigIniUtility.getProperty("scout.jetty.port"); // see org.eclipse.scout.dev.jetty.JettyServer.SERVER_PORT_KEY
+        if (StringUtility.hasText(port)) {
+          nodeId = StringUtility.join(":", hostname, port);
+        }
+        else {
+          nodeId = StringUtility.join(":", hostname, 8080);
+        }
       }
     }
     return nodeId;

@@ -42,26 +42,27 @@ import org.junit.runner.RunWith;
 public class ClusterSynchronizationServiceTest {
   private static final String TEST_NODE = "node";
   private static final String TEST_USER = "user";
+
   private ClusterNotificationMessage m_message;
-  private List<IBean<?>> regs = new ArrayList<>();
+  private List<IBean<?>> m_beans = new ArrayList<>();
 
   @Before
-  public void setup() {
+  public void before() {
     m_message = mock(ClusterNotificationMessage.class);
     when(m_message.getProperties()).thenReturn(new ClusterNotificationMessageProperties(TEST_NODE, TEST_USER));
 
     final IPublishSubscribeMessageService ps = mock(IPublishSubscribeMessageService.class);
-    regs.add(
+    m_beans.add(
         TestingUtility.registerBean(
             new BeanMetaData(IPublishSubscribeMessageService.class).
-            initialInstance(ps).
-            applicationScoped(true)
+                initialInstance(ps).
+                applicationScoped(true)
             ));
   }
 
   @After
   public void tearDown() {
-    TestingUtility.unregisterBeans(regs);
+    TestingUtility.unregisterBeans(m_beans);
   }
 
   /**

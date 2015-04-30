@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.runner.RunWithPrivatePlatform;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSharedPlatform;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -58,48 +58,49 @@ import org.junit.runners.model.Statement;
  * @since 5.1
  */
 public class PlatformStatement extends Statement {
+  private static IPlatform s_sharedPlatform;
 
   private final Statement m_next;
-  private final RunWithPrivatePlatform m_runWithPrivatePlatform;
+  private final RunWithSharedPlatform m_runWithSharedPlatform;
 
-  public PlatformStatement(Statement next, RunWithPrivatePlatform runWithPrivatePlatform) {
+  public PlatformStatement(Statement next, RunWithSharedPlatform runWithSharedPlatform) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
-    m_runWithPrivatePlatform = runWithPrivatePlatform;
+    m_runWithSharedPlatform = runWithSharedPlatform;
   }
 
   @Override
   public void evaluate() throws Throwable {
-    if (m_runWithPrivatePlatform != null && m_runWithPrivatePlatform.value()) {
-      evaluateWithPrivatePlatform();
+    if (m_runWithSharedPlatform == null) {
+      evaluateWithNewPlatform();
     }
     else {
       evaluateWithSharedPlatform();
     }
   }
 
-  protected void evaluateWithPrivatePlatform() throws Throwable {
-    IPlatform platformBackup = Platform.get();
+  protected void evaluateWithNewPlatform() throws Throwable {
+    Platform.setDefault();
     try {
-      Platform.setDefault();
-      try {
-        Platform.get().start();
-        m_next.evaluate();
-      }
-      finally {
-        Platform.get().stop();
-      }
+      Platform.get().start();
+      m_next.evaluate();
     }
     finally {
-      Platform.set(platformBackup);
+      Platform.get().stop();
     }
   }
 
   protected void evaluateWithSharedPlatform() throws Throwable {
-    // ensure platform is started
-    if (Platform.get() == null) {
+    if (s_sharedPlatform == null) {
       Platform.setDefault();
       Platform.get().start();
+      s_sharedPlatform = Platform.get();
     }
-    m_next.evaluate();
+    Platform.set(s_sharedPlatform);
+    try {
+      m_next.evaluate();
+    }
+    finally {
+      Platform.set(null);
+    }
   }
 }
