@@ -10,7 +10,8 @@ scout.MenuBarPopup = function(menu, session) {
 };
 scout.inherits(scout.MenuBarPopup, scout.Popup);
 
-scout.MenuBarPopup.prototype.renderContent = function() {
+scout.MenuBarPopup.prototype._render = function($parent) {
+  scout.MenuBarPopup.parent.prototype._render.call(this, $parent);
   this.$head = $.makeDiv('popup-head');
   this.$deco = $.makeDiv('popup-deco');
   this.$container
@@ -51,7 +52,6 @@ scout.MenuBarPopup.prototype.renderContent = function() {
       .on('click', '', this.onMenuItemClicked.bind(this, menu));
   }
   this.alignTo();
-  return this.$container;
 };
 
 scout.MenuBarPopup.prototype.onMenuItemClicked = function(menu) {

@@ -1,37 +1,33 @@
 // ---- Popup ----
 
 scout.Popup = function(session) {
+  scout.Popup.parent.call(this);
   this.$container;
   this.$body;
   this.session = session;
   this._mouseDownHandler;
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
+scout.inherits(scout.Popup, scout.Widget);
 
 /**
  * The popup is always appended to the HTML document body.
  * That way we never have z-index issues with the rendered popups.
  */
-scout.Popup.prototype.render = function() {
+scout.Popup.prototype.render = function($parent) {
+  scout.Popup.parent.prototype.render.call(this, $parent);
+  setTimeout(function() {
+    this.$container.installFocusContext('auto', this.session.uiSessionId);
+  }.bind(this), 0);
+  this._attachCloseHandler();
+};
+
+scout.Popup.prototype._render = function() {
   var $docBody = this.session.$entryPoint;
   this.$body = $.makeDiv('popup-body');
   this.$container = $.makeDiv('popup')
     .append(this.$body)
     .appendTo($docBody);
-  this._attachCloseHandler();
-
-  this.renderContent();
-
-  setTimeout(function() {
-    this.$container.installFocusContext('auto', this.session.uiSessionId);
-  }.bind(this), 0);
-  this._installKeyStrokeAdapter();
-
-  return this.$container;
-};
-
-scout.Popup.prototype.renderContent = function() {
-  //empty Popup, do nothing
 };
 
 scout.Popup.prototype.closePopup = function() {
@@ -72,18 +68,6 @@ scout.Popup.prototype._onMouseDownOutside = function(event) {
   this.closePopup();
 };
 
-scout.Popup.prototype._installKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
-  }
-};
-
-scout.Popup.prototype._uninstallKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
-  }
-};
-
 scout.Popup.prototype.appendToBody = function($element) {
   this.$body.append($element);
 };
@@ -93,11 +77,10 @@ scout.Popup.prototype.addClassToBody = function(clazz) {
 };
 
 scout.Popup.prototype.remove = function() {
+  this.$container.uninstallFocusContext(this.session.uiSessionId);
+  scout.Popup.parent.prototype.remove.call(this);
   // remove all clean-up handlers
   this._detachCloseHandler();
-  this.$container.uninstallFocusContext(this.session.uiSessionId);
-  this._uninstallKeyStrokeAdapter();
-  this.$container.remove();
 };
 
 scout.Popup.prototype.setLocation = function(location) {

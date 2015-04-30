@@ -14,10 +14,6 @@ scout.MenuControlKeyStrokes.prototype.handle = function(event) {
   var $selectedMenuItem = this._popup.$body.find('.'+this._menuItemClass+'.selected');
   var keycode = event.which;
   var $newSelection;
-  if (keycode === scout.keys.ESC) {
-    this._popup.remove();
-  }
-
   if ((keycode === scout.keys.SPACE || keycode === scout.keys.ENTER) && $selectedMenuItem.length > 0) {
     $selectedMenuItem.trigger('click');
   }
@@ -73,7 +69,7 @@ scout.MenuControlKeyStrokes.prototype.checkAndDrawKeyBox = function($container, 
  */
 scout.MenuControlKeyStrokes.prototype.accept = function(event) {
   return event &&
-    $.inArray(event.which, [scout.keys.UP, scout.keys.DOWN, scout.keys.SPACE, scout.keys.ENTER, scout.keys.ESC]) >= 0 &&
+    $.inArray(event.which, [scout.keys.UP, scout.keys.DOWN, scout.keys.SPACE, scout.keys.ENTER]) >= 0 &&
     event.ctrlKey === this.ctrl &&
     event.altKey === this.alt &&
     event.shiftKey === this.shift;

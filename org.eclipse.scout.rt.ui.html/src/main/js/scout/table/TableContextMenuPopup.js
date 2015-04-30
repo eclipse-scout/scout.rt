@@ -7,7 +7,8 @@ scout.TableContextMenuPopup = function(table, session, menuItems) {
 };
 scout.inherits(scout.TableContextMenuPopup, scout.Popup);
 
-scout.TableContextMenuPopup.prototype.renderContent = function() {
+scout.TableContextMenuPopup.prototype._render = function($parent) {
+  scout.TableContextMenuPopup.parent.prototype._render.call(this, $parent);
   var menus = this.menuItems;
   if (!menus || menus.length === 0) {
     return;
@@ -28,8 +29,6 @@ scout.TableContextMenuPopup.prototype.renderContent = function() {
       .on('click', '', this.onMenuItemClicked.bind(this, menu))
       .one(scout.menus.CLOSING_EVENTS, $.suppressEvent);
   }
-
-  return this.$container;
 };
 
 scout.TableContextMenuPopup.prototype.onMenuItemClicked = function(menu) {

@@ -12,7 +12,8 @@ scout.DesktopNavigationPopup = function(desktopNavigation, session) {
 };
 scout.inherits(scout.DesktopNavigationPopup, scout.Popup);
 
-scout.DesktopNavigationPopup.prototype.renderContent = function($parent) {
+scout.DesktopNavigationPopup.prototype._render = function($parent) {
+  scout.DesktopNavigationPopup.parent.prototype._render.call(this, $parent);
   this.$head = $.makeDiv('popup-head');
   this.$deco = $.makeDiv('popup-deco');
   this.$container
@@ -39,7 +40,6 @@ scout.DesktopNavigationPopup.prototype.renderContent = function($parent) {
       .on('click', '', onMenuItemClicked.bind(this, menu));
   }
   this.alignTo();
-  return this.$container;
 };
 
 scout.DesktopNavigationPopup.prototype._copyCssClass = function(className) {

@@ -7,7 +7,8 @@ scout.FormToolPopup = function(formToolButton, session) {
 };
 scout.inherits(scout.FormToolPopup, scout.Popup);
 
-scout.FormToolPopup.prototype.renderContent = function() {
+scout.FormToolPopup.prototype._render = function($parent) {
+  scout.FormToolPopup.parent.prototype._render.call(this, $parent);
   this.$head = $.makeDiv('popup-head');
   this.$deco = $.makeDiv('popup-deco');
   this.$container
@@ -29,7 +30,6 @@ scout.FormToolPopup.prototype.renderContent = function() {
   this.formToolButton.form.htmlComp.pixelBasedSizing = true;
   this.formToolButton.form.htmlComp.pack();
   this.alignTo();
-  return this.$container;
 };
 
 scout.FormToolPopup.prototype._copyCssClass = function(className) {

@@ -12,7 +12,8 @@ scout.CellEditorPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.CellEditorPopupKeyStrokeAdapter(this);
 };
 
-scout.CellEditorPopup.prototype.renderContent = function() {
+scout.CellEditorPopup.prototype._render = function($parent) {
+  scout.CellEditorPopup.parent.prototype._render.call(this, $parent);
   this.$container.addClass('cell-editor-popup');
   this.$container.data('popup', this);
   this.$body.addClass('cell-editor-popup-body');
@@ -42,8 +43,7 @@ scout.CellEditorPopup.prototype.renderContent = function() {
   scout.HtmlComponent.get(field.$container).layout();
 };
 
-scout.CellEditorPopup.prototype.remove = function() {
-  scout.CellEditorPopup.parent.prototype.remove.call(this);
+scout.CellEditorPopup.prototype._remove = function() {
   this.cell.field.remove();
 };
 
