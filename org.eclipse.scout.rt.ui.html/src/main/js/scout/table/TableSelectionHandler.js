@@ -10,9 +10,13 @@ scout.TableSelectionHandler = function(table) {
   this._mouseDown;
   this._$selectedRows;
   this._$allRows;
+
+  // Index of the row that got a 'mouseover' event previously (needed to determine if the user is going up or down)
+  this._prevSelectedRowIndex;
+  // The index of the selected row with the greatest distance to fromIndex (needed to efficiently clear the selection)
+  this._maxSelectedRowIndex;
 };
 
-// TODO BSH Table Selection | Improve selection handling (up, down)
 // TODO BSH Table Selection | Try to merge this with TableKeystrokeAdapter
 scout.TableSelectionHandler.prototype.onMouseDown = function(event, $row) {
   var fromIndex, toIndex,
@@ -30,35 +34,86 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event, $row) {
   } else {
     // Click on the already selected row must not clear the selection it to avoid another selection event sent to the server
     // Right click on already selected rows must not clear the selection
-    if (!$row.isSelected() ||
-      (this._$selectedRows.length > 1 && event.which !== 3)) {
+    if (!$row.isSelected() || (this._$selectedRows.length > 1 && event.which !== 3)) {
       this._$selectedRows.select(false);
       this._clearSelectionBorder(this._$selectedRows);
     }
   }
-
-  if (fromIndex === undefined) {
+  if (fromIndex === undefined || fromIndex < 0) {
     fromIndex = this._$allRows.index($row);
   }
 
   // just a click... right click do not select if clicked in selection
   if (event.which !== 3 || !$row.is(this._$selectedRows)) {
     toIndex = this._$allRows.index($row);
-    this._selectRange(fromIndex, toIndex, select);
+    handleSelection.call(this);
   }
 
-  if (this.table.multiSelect && this.mouseMoveSelectionEnabled) {
-    // ...or movement with held mouse button
-    this._$allRows.one('mousemove.selectionHandler', function(event) {
+  this.table.notifyRowsSelected(this._$selectedRows, true);
+
+  if (this.mouseMoveSelectionEnabled) {
+    // Handle movement with held mouse button. Each event gets only fired once (to prevent event firing when moving
+    // inside the same row), but when the mouse leaves the row, the listener is re-attached (see below).
+    this._$allRows.not($row).one('mousemove.selectionHandler', onMouseMove.bind(this));
+    this._$allRows.on('mouseleave.selectionHandler', function(event) {
       var $row = $(event.delegateTarget);
-      toIndex = this._$allRows.index($row);
-      this._selectRange(fromIndex, toIndex, select);
-      this.table.notifyRowsSelected(this._$selectedRows, true);
+      $row.one('mousemove.selectionHandler', onMouseMove.bind(this));
     }.bind(this));
 
     // This additionally window listener is necessary to track the clicks outside of a table row.
     // If the mouse is released on a table row, onMouseUp gets called by the table's mouseUp listener.
     $(window).one('mouseup.selectionHandler', this.onMouseUp.bind(this));
+  }
+
+  // --- Helper functions ---
+
+  function onMouseMove(event) {
+    var $row = $(event.delegateTarget);
+    toIndex = this._$allRows.index($row);
+    handleSelection.call(this);
+  }
+
+  function handleSelection() {
+    var $rowsToUnselect;
+    if (this.table.multiSelect) {
+      // Multi-selection -> expand/shrink selection
+      var thisIndex = toIndex;
+      var goingUp = (thisIndex < this._prevSelectedRowIndex);
+      var goingDown = (thisIndex > this._prevSelectedRowIndex);
+      var beforeFromSelection = (this._prevSelectedRowIndex < fromIndex);
+      var afterFromSelection = (this._prevSelectedRowIndex > fromIndex);
+
+      // In 'ctrlKey' mode, the unselection is done via 'select=false'
+      if (!event.ctrlKey) {
+        // If we are going _towards_ the startIndex, unselect all rows between the current row and the
+        // selected row with the greatest distance (this._maxSelectedRowIndex).
+        if (goingUp && afterFromSelection) {
+          $rowsToUnselect = this._$allRows.slice(thisIndex + 1, this._maxSelectedRowIndex + 1);
+        }
+        if (goingDown && beforeFromSelection) {
+          $rowsToUnselect = this._$allRows.slice(this._maxSelectedRowIndex, thisIndex);
+        }
+      }
+      // Adjust the indexes
+      this._maxSelectedRowIndex = (goingUp ? Math.min(this._maxSelectedRowIndex, thisIndex) : (goingDown ? Math.max(this._maxSelectedRowIndex, thisIndex) : thisIndex));
+      this._prevSelectedRowIndex = thisIndex;
+    } else {
+      // Single selection -> unselect previously selected row
+      $rowsToUnselect = this._$allRows.eq(fromIndex);
+
+      // Adjust the indexes
+      fromIndex = toIndex;
+    }
+
+    // Unselect rows outside the selection
+    if ($rowsToUnselect) {
+      $rowsToUnselect.select(false);
+      this._clearSelectionBorder($rowsToUnselect);
+    }
+
+    // Set the new selection
+    this._selectRange(fromIndex, toIndex, select);
+    this.table.notifyRowsSelected(this._$selectedRows, true);
   }
 };
 
@@ -89,7 +144,7 @@ scout.TableSelectionHandler.prototype.onMouseUp = function(event) {
   this.table.notifyRowsSelected(this._$selectedRows);
 
   // TODO BSH Table Selection | This is way too inefficient for many rows!
-  this._$allRows.off('mousemove.selectionHandler');
+  this._$allRows.off('.selectionHandler');
   this._$allRows = null;
   this._$selectedRows = null;
 };
