@@ -96,14 +96,14 @@ public class ClientJobTest {
             actualThreadName2.setValue(Thread.currentThread().getName());
             setupLatch.countDown();
           }
-        }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).id("200").name("XYZ"));
+        }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("XYZ"));
       }
-    }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).id("100").name("ABC"));
+    }, ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("ABC"));
 
     assertTrue(setupLatch.await());
 
-    assertTrue(actualThreadName1.getValue().matches("scout-client-thread-(\\d)+ \\[Running\\] 100:ABC"));
-    assertTrue(actualThreadName2.getValue().matches("scout-client-thread-(\\d)+ \\[Running\\] 200:XYZ"));
+    assertTrue(actualThreadName1.getValue().matches("scout-client-thread-(\\d)+ \\[Running\\] ABC"));
+    assertTrue(actualThreadName2.getValue().matches("scout-client-thread-(\\d)+ \\[Running\\] XYZ"));
     assertEquals("main", Thread.currentThread().getName());
   }
 }

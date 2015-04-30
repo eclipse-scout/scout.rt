@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
  * Translator for exceptions into {@link ProcessingException}s.
@@ -84,8 +83,8 @@ public class ExceptionTranslator {
 
     // Add the current job to the context message.
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
-    if (currentFuture != null && !JobInput.N_A.equals(currentFuture.getJobInput().identifier())) {
-      final String job = "job=" + currentFuture.getJobInput().identifier();
+    if (currentFuture != null && !StringUtility.isNullOrEmpty(currentFuture.getJobInput().name())) {
+      final String job = "job=" + currentFuture.getJobInput().name();
       if (!status.getContextMessages().contains(job)) {
         pe.addContextMessage(job);
       }

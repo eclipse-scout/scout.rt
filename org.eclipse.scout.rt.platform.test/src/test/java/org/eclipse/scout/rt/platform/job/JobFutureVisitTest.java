@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.IVisitor;
@@ -71,7 +72,7 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().name());
         bc1.waitFor();
       }
-    }, Jobs.newInput(RunContexts.empty()).id("session1").name("mutex1_job1").mutex(m_mutexObject1).logOnError(false));
+    }, Jobs.newInput(RunContexts.empty()).name("mutex1_job1").mutex(m_mutexObject1).logOnError(false));
 
     // SESSION 1 (JOB-2)
     m_jobManager.schedule(new IRunnable() {
@@ -81,7 +82,7 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().name());
         latch.countDownAndBlock();
       }
-    }, Jobs.newInput(RunContexts.empty()).id("session1").name("mutex1_job2").mutex(m_mutexObject1).logOnError(false));
+    }, Jobs.newInput(RunContexts.empty()).name("mutex1_job2").mutex(m_mutexObject1).logOnError(false));
 
     // SESSION 1 (JOB-3)
     m_jobManager.schedule(new IRunnable() {
@@ -90,7 +91,7 @@ public class JobFutureVisitTest {
       public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().name());
       }
-    }, Jobs.newInput(RunContexts.empty()).id("session1").name("mutex1_job3").mutex(m_mutexObject1));
+    }, Jobs.newInput(RunContexts.empty()).name("mutex1_job3").mutex(m_mutexObject1));
 
     // =========
     // SESSION 2 (JOB-1)
@@ -100,7 +101,7 @@ public class JobFutureVisitTest {
       public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().name());
       }
-    }, Jobs.newInput(RunContexts.empty()).id("session2").name("mutex2_job1").mutex(m_mutexObject2));
+    }, Jobs.newInput(RunContexts.empty()).name("mutex2_job1").mutex(m_mutexObject2));
 
     // SESSION 2 (JOB-2)
     m_jobManager.schedule(new IRunnable() {
@@ -110,7 +111,7 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().name());
         bc2.waitFor();
       }
-    }, Jobs.newInput(RunContexts.empty()).id("session2").name("mutex2_job2").mutex(m_mutexObject2).logOnError(false));
+    }, Jobs.newInput(RunContexts.empty()).name("mutex2_job2").mutex(m_mutexObject2).logOnError(false));
 
     // SESSION 2  (JOB-3)
     m_jobManager.schedule(new IRunnable() {
@@ -124,7 +125,7 @@ public class JobFutureVisitTest {
 
         latch.countDownAndBlock();
       }
-    }, Jobs.newInput(RunContexts.empty()).id("session2").name("mutex2_job3").mutex(m_mutexObject2).logOnError(false));
+    }, Jobs.newInput(RunContexts.empty()).name("mutex2_job3").mutex(m_mutexObject2).logOnError(false));
 
     // SESSION 2  (JOB-4)
     m_jobManager.schedule(new IRunnable() {
@@ -133,7 +134,7 @@ public class JobFutureVisitTest {
       public void run() throws Exception {
         protocol.add(IFuture.CURRENT.get().getJobInput().name());
       }
-    }, Jobs.newInput(RunContexts.empty()).id("session2").name("mutex2_job4").mutex(m_mutexObject2));
+    }, Jobs.newInput(RunContexts.empty()).name("mutex2_job4").mutex(m_mutexObject2));
 
     // =========
     // SESSION 3 (JOB-1)
@@ -144,7 +145,7 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().name());
         latch.countDownAndBlock();
       }
-    }, Jobs.newInput(RunContexts.empty()).id("session3").name("mutex3_job1").mutex(m_mutexObject3).logOnError(false));
+    }, Jobs.newInput(RunContexts.empty()).name("mutex3_job1").mutex(m_mutexObject3).logOnError(false));
 
     assertTrue(latch.await());
   }
@@ -264,7 +265,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitSession1Filter() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(Jobs.newFutureFilter().ids("session1"), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(Jobs.newFutureFilter().nameRegex(Pattern.compile("mutex1_.*")), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -287,7 +288,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitSession2Filter() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(Jobs.newFutureFilter().ids("session2"), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(Jobs.newFutureFilter().nameRegex(Pattern.compile("mutex2_.*")), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {
@@ -310,7 +311,7 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitSessionFilterAndBlocked() throws InterruptedException {
     final Set<String> visitedFutures = new HashSet<>();
-    m_jobManager.visit(new AndFilter<IFuture<?>>(Jobs.newFutureFilter().ids("session1").blocked()), new IVisitor<IFuture<?>>() {
+    m_jobManager.visit(new AndFilter<IFuture<?>>(Jobs.newFutureFilter().nameRegex(Pattern.compile("mutex1_.*")).blocked()), new IVisitor<IFuture<?>>() {
 
       @Override
       public boolean visit(IFuture<?> future) {

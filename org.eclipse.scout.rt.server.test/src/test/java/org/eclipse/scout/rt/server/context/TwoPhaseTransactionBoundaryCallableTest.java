@@ -12,14 +12,11 @@ package org.eclipse.scout.rt.server.context;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -29,8 +26,10 @@ import java.util.List;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.server.transaction.ITransactionProvider;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -52,8 +51,6 @@ public class TwoPhaseTransactionBoundaryCallableTest {
   private List<IBean<?>> m_beans;
 
   @Mock
-  private ITransactionProvider m_transactionProvider;
-  @Mock
   private ITransaction m_transaction;
   @Mock
   private ICallable<?> m_next;
@@ -65,9 +62,12 @@ public class TwoPhaseTransactionBoundaryCallableTest {
     MockitoAnnotations.initMocks(this);
 
     m_txErrors = new ArrayList<>();
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(ITransactionProvider.class).initialInstance(m_transactionProvider).order(-1000));
-
-    when(m_transactionProvider.provide(anyLong())).thenReturn(m_transaction);
+    m_beans = TestingUtility.registerBeans(new BeanMetaData(ITransaction.class).order(-1000).producer(new IBeanInstanceProducer<ITransaction>() {
+      @Override
+      public ITransaction produce(IBean<ITransaction> bean) {
+        return m_transaction;
+      }
+    }));
 
     // mock the transaction
     // ITransaction.commitPhase1
@@ -91,10 +91,13 @@ public class TwoPhaseTransactionBoundaryCallableTest {
         return !m_txErrors.isEmpty();
       }
     }).when(m_transaction).hasFailures();
+
+    IRunMonitor.CURRENT.set(new RunMonitor());
   }
 
   @After
   public void after() {
+    IRunMonitor.CURRENT.remove();
     TestingUtility.unregisterBeans(m_beans);
     m_beans.clear();
     m_txErrors.clear();
@@ -103,12 +106,12 @@ public class TwoPhaseTransactionBoundaryCallableTest {
   @Test(expected = TransactionRequiredException.class)
   public void testMandatoryWithoutExistingTransaction() throws Exception {
     ITransaction.CURRENT.remove();
-    new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.MANDATORY, 1L).call();
+    new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.MANDATORY).call();
   }
 
   @Test
   public void testMandatoryWithExistingTransactionAndSuccess() throws Exception {
-    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.MANDATORY, 1L);
+    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.MANDATORY);
     ITransaction currentTransaction = mock(ITransaction.class);
     ITransaction.CURRENT.set(currentTransaction);
 
@@ -116,13 +119,13 @@ public class TwoPhaseTransactionBoundaryCallableTest {
     callable.call();
 
     // verify
-    verifyZeroInteractions(m_transactionProvider);
+    verifyZeroInteractions(m_transaction);
     verifyZeroInteractions(currentTransaction);
   }
 
   @Test
   public void testMandatoryWithExistingTransactionAndError() throws Exception {
-    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.MANDATORY, 1L);
+    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.MANDATORY);
     ITransaction currentTransaction = mock(ITransaction.class);
     ITransaction.CURRENT.set(currentTransaction);
     when(m_next.call()).thenThrow(new RuntimeException());
@@ -134,7 +137,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
     }
     catch (Exception e) {
       // verify
-      verifyZeroInteractions(m_transactionProvider);
+      verifyZeroInteractions(m_transaction);
 
       verify(currentTransaction, never()).commitPhase1();
       verify(currentTransaction, never()).commitPhase2();
@@ -146,15 +149,14 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Test
   public void testRequiresNewWithoutExistingTransactionAndSuccess() throws Exception {
-    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRES_NEW, 1L);
+    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRES_NEW);
     ITransaction.CURRENT.remove();
 
     // run the test
     callable.call();
 
     // verify
-    verify(m_transactionProvider, times(1)).provide(eq(1L));
-    verifyNoMoreInteractions(m_transactionProvider);
+    verify(m_transaction, times(1)).release();
 
     InOrder inOrder = Mockito.inOrder(m_transaction);
 
@@ -166,7 +168,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Test
   public void testRequiresNewWithoutExistingTransactionAndError() throws Exception {
-    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRES_NEW, 1L);
+    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRES_NEW);
     ITransaction.CURRENT.remove();
     when(m_next.call()).thenThrow(new RuntimeException());
 
@@ -178,8 +180,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
     catch (Exception e) {
 
       // verify
-      verify(m_transactionProvider, times(1)).provide(eq(1L));
-      verifyNoMoreInteractions(m_transactionProvider);
+      verify(m_transaction, times(1)).release();
 
       InOrder inOrder = Mockito.inOrder(m_transaction);
 
@@ -192,7 +193,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Test
   public void testRequiresNewWithExistingTransactionAndSuccess() throws Exception {
-    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRES_NEW, 1L);
+    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRES_NEW);
     ITransaction currentTransaction = mock(ITransaction.class);
     ITransaction.CURRENT.set(currentTransaction);
 
@@ -201,8 +202,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
     // verify
     verifyZeroInteractions(currentTransaction);
-    verify(m_transactionProvider, times(1)).provide(eq(1L));
-    verifyNoMoreInteractions(m_transactionProvider);
+    verify(m_transaction, times(1)).release();
 
     InOrder inOrder = Mockito.inOrder(m_transaction);
 
@@ -214,7 +214,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Test
   public void testRequiresNewWithExistingTransactionAndError() throws Exception {
-    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRES_NEW, 1L);
+    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRES_NEW);
     ITransaction currentTransaction = mock(ITransaction.class);
     ITransaction.CURRENT.set(currentTransaction);
     when(m_next.call()).thenThrow(new RuntimeException());
@@ -227,8 +227,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
     catch (Exception e) {
       // verify
       verifyZeroInteractions(currentTransaction);
-      verify(m_transactionProvider, times(1)).provide(eq(1L));
-      verifyNoMoreInteractions(m_transactionProvider);
+      verify(m_transaction, times(1)).release();
 
       InOrder inOrder = Mockito.inOrder(m_transaction);
 
@@ -241,15 +240,14 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Test
   public void testRequiredWithoutExistingTransactionAndSuccess() throws Exception {
-    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRED, 1L);
+    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRED);
     ITransaction.CURRENT.remove();
 
     // run the test
     callable.call();
 
     // verify
-    verify(m_transactionProvider, times(1)).provide(eq(1L));
-    verifyNoMoreInteractions(m_transactionProvider);
+    verify(m_transaction, times(1)).release();
 
     InOrder inOrder = Mockito.inOrder(m_transaction);
 
@@ -261,7 +259,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Test
   public void testRequiredWithoutExistingTransactionAndError() throws Exception {
-    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRED, 1L);
+    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRED);
     ITransaction.CURRENT.remove();
     when(m_next.call()).thenThrow(new RuntimeException());
 
@@ -273,8 +271,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
     catch (Exception e) {
 
       // verify
-      verify(m_transactionProvider, times(1)).provide(eq(1L));
-      verifyNoMoreInteractions(m_transactionProvider);
+      verify(m_transaction, times(1)).release();
 
       InOrder inOrder = Mockito.inOrder(m_transaction);
 
@@ -287,7 +284,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Test
   public void testRequiredWithExistingTransactionAndSuccess() throws Exception {
-    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRED, 1L);
+    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRED);
     ITransaction currentTransaction = mock(ITransaction.class);
     ITransaction.CURRENT.set(currentTransaction);
 
@@ -295,13 +292,13 @@ public class TwoPhaseTransactionBoundaryCallableTest {
     callable.call();
 
     // verify
-    verifyZeroInteractions(m_transactionProvider);
+    verifyZeroInteractions(m_transaction);
     verifyZeroInteractions(currentTransaction);
   }
 
   @Test
   public void testRequiredWithExistingTransactionAndError() throws Exception {
-    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRED, 1L);
+    ICallable<?> callable = new TwoPhaseTransactionBoundaryCallable<>(m_next, TransactionScope.REQUIRED);
     ITransaction currentTransaction = mock(ITransaction.class);
     ITransaction.CURRENT.set(currentTransaction);
     when(m_next.call()).thenThrow(new RuntimeException());
@@ -313,7 +310,7 @@ public class TwoPhaseTransactionBoundaryCallableTest {
     }
     catch (Exception e) {
       // verify
-      verifyZeroInteractions(m_transactionProvider);
+      verifyZeroInteractions(m_transaction);
 
       verify(currentTransaction, never()).commitPhase1();
       verify(currentTransaction, never()).commitPhase2();

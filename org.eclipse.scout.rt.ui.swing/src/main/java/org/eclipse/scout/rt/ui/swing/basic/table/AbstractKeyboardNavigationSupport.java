@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
 
 /**
  *
@@ -65,7 +66,7 @@ public abstract class AbstractKeyboardNavigationSupport {
     public void run() throws Exception {
       String pattern;
       synchronized (navigationLock) {
-        if (IFuture.CURRENT.get().isCancelled() || StringUtility.isNullOrEmpty(m_filterText)) {
+        if (IRunMonitor.CURRENT.get().isCancelled() || StringUtility.isNullOrEmpty(m_filterText)) {
           return;
         }
         pattern = StringUtility.toRegExPattern(m_filterText.toLowerCase());

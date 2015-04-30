@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -163,7 +162,7 @@ public class ExceptionTranslatorTest {
     subject.getPrincipals().add(new SimplePrincipal("anna"));
     subject.getPrincipals().add(new SimplePrincipal("john"));
 
-    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).id("7").name("do-something"));
+    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).name("do-something"));
     pe = Subject.doAs(subject, new PrivilegedAction<ProcessingException>() {
 
       @Override
@@ -171,7 +170,7 @@ public class ExceptionTranslatorTest {
         return exceptionTranslator.translate(new ProcessingException());
       }
     });
-    assertEquals(CollectionUtility.hashSet("job=7:do-something", "user=anna, john"), new HashSet<>(pe.getStatus().getContextMessages()));
+    assertEquals(CollectionUtility.hashSet("job=do-something", "user=anna, john"), new HashSet<>(pe.getStatus().getContextMessages()));
   }
 
   @Test
@@ -184,7 +183,7 @@ public class ExceptionTranslatorTest {
     Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal("anna"));
 
-    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).id("7").name("do-something"));
+    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).name("do-something"));
     ProcessingException actualException = Subject.doAs(subject, new PrivilegedAction<ProcessingException>() {
 
       @Override
@@ -196,7 +195,7 @@ public class ExceptionTranslatorTest {
     });
 
     assertEquals(2, actualException.getStatus().getContextMessages().size()); // not 3 entries
-    assertEquals(CollectionUtility.hashSet("job=7:do-something", "user=anna"), new HashSet<>(actualException.getStatus().getContextMessages()));
+    assertEquals(CollectionUtility.hashSet("job=do-something", "user=anna"), new HashSet<>(actualException.getStatus().getContextMessages()));
   }
 
   @Test
@@ -209,17 +208,17 @@ public class ExceptionTranslatorTest {
     Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal("anna"));
 
-    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).id("7").name("do-something"));
+    when(future.getJobInput()).thenReturn(Jobs.newInput(RunContexts.empty()).name("do-something"));
     ProcessingException actualException = Subject.doAs(subject, new PrivilegedAction<ProcessingException>() {
 
       @Override
       public ProcessingException run() {
         ProcessingException cause = new ProcessingException();
-        cause.addContextMessage("job=7:do-something");
+        cause.addContextMessage("job=do-something");
         return exceptionTranslator.translate(cause);
       }
     });
     assertEquals(2, actualException.getStatus().getContextMessages().size()); // not 3 entries
-    assertEquals(CollectionUtility.hashSet("job=7:do-something", "user=anna"), new HashSet<>(actualException.getStatus().getContextMessages()));
+    assertEquals(CollectionUtility.hashSet("job=do-something", "user=anna"), new HashSet<>(actualException.getStatus().getContextMessages()));
   }
 }

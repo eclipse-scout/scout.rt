@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.job;
 
 import java.util.Collection;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.filter.NotFilter;
@@ -49,8 +50,13 @@ public final class ServerJobFutureFilters {
     }
 
     @Override
-    public Filter ids(final String... ids) {
-      return (Filter) super.ids(ids);
+    public Filter names(final String... names) {
+      return (Filter) super.names(names);
+    }
+
+    @Override
+    public Filter nameRegex(final Pattern regex) {
+      return (Filter) super.nameRegex(regex);
     }
 
     @Override

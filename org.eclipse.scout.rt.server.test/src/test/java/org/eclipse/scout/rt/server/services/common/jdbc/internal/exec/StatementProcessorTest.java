@@ -18,19 +18,24 @@ import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.commons.holders.LongHolder;
 import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
+import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
+import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * Unit Test for {@link StatementProcessor}
  */
-@RunWith(PlatformTestRunner.class)
+@RunWith(ServerTestRunner.class)
+@RunWithServerSession(TestServerSession.class)
+@RunWithSubject("default")
 public class StatementProcessorTest {
 
   @Test
@@ -49,7 +54,7 @@ public class StatementProcessorTest {
             " FROM PERSON P " +
             " WHERE P.PERSON_NR=:key " +
             " AND P.NAME like '%'||:text||'%'",
-        new Object[]{call});
+            new Object[]{call});
     sp.simulate();
 
     String sqlPlainTextDump = sp.createSqlDump(false, true);
@@ -89,7 +94,7 @@ public class StatementProcessorTest {
             "AND :name like '%Me%' " +
             "AND :{addressTable.street} like '%Park%' " +
             "INTO :countConcurrent ",
-        new Object[]{formData, new NVPair("countConcurrent", countConcurrent)});
+            new Object[]{formData, new NVPair("countConcurrent", countConcurrent)});
     sp.simulate();
 
     String sqlPlainTextDump = sp.createSqlDump(false, true);

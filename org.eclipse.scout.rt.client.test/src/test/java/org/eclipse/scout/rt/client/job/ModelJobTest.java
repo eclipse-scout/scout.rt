@@ -96,14 +96,14 @@ public class ModelJobTest {
             actualThreadName2.setValue(Thread.currentThread().getName());
             setupLatch.countDown();
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).id("200").name("XYZ"));
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("XYZ"));
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).id("100").name("ABC"));
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).name("ABC"));
 
     assertTrue(setupLatch.await());
 
-    assertTrue(actualThreadName1.getValue().matches("scout-model-thread-(\\d)+ \\[Running\\] 100:ABC"));
-    assertTrue(actualThreadName2.getValue().matches("scout-model-thread-(\\d)+ \\[Running\\] 200:XYZ"));
+    assertTrue(actualThreadName1.getValue().matches("scout-model-thread-(\\d)+ \\[Running\\] ABC"));
+    assertTrue(actualThreadName2.getValue().matches("scout-model-thread-(\\d)+ \\[Running\\] XYZ"));
     assertEquals("main", Thread.currentThread().getName());
   }
 }

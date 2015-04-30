@@ -13,11 +13,14 @@ package org.eclipse.scout.rt.server.commons.cache;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link SerializedCacheService}
  */
+@RunWith(PlatformTestRunner.class)
 public class SerializedCacheStoreServiceTest extends AbstractHttpSessionCacheServiceTest {
 
   @Test

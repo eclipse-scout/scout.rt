@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
@@ -65,10 +66,18 @@ public final class JobFutureFilters {
     }
 
     /**
-     * To accept only jobs of the given job id's.
+     * To accept only jobs of the given job names.
      */
-    public Filter ids(final String... ids) {
-      andFilter(new JobIdFilter(ids));
+    public Filter names(final String... names) {
+      andFilter(new JobNameFilter(names));
+      return this;
+    }
+
+    /**
+     * To accept only jobs of the given job name regex.
+     */
+    public Filter nameRegex(final Pattern regex) {
+      andFilter(new JobNameRegexFilter(regex));
       return this;
     }
 
@@ -227,21 +236,43 @@ public final class JobFutureFilters {
   }
 
   /**
-   * Filter which discards all Futures which do not belong to the given job id's.
+   * Filter which accepts all Futures which do belong to the given job names.
    *
    * @since 5.1
    */
-  public static class JobIdFilter implements IFilter<IFuture<?>> {
+  public static class JobNameFilter implements IFilter<IFuture<?>> {
 
-    private final Set<String> m_ids;
+    private final Set<String> m_names;
 
-    public JobIdFilter(final String... id) {
-      m_ids = CollectionUtility.hashSet(id);
+    public JobNameFilter(final String... names) {
+      m_names = CollectionUtility.hashSet(names);
     }
 
     @Override
     public boolean accept(final IFuture<?> future) {
-      return m_ids.contains(future.getJobInput().id());
+      return m_names.contains(future.getJobInput().name());
+    }
+  }
+
+  /**
+   * Filter which accepts all Futures which have a name matching the regex.
+   *
+   * @since 5.1
+   */
+  public static class JobNameRegexFilter implements IFilter<IFuture<?>> {
+
+    private final Pattern m_regex;
+
+    public JobNameRegexFilter(final Pattern regex) {
+      m_regex = regex;
+    }
+
+    @Override
+    public boolean accept(final IFuture<?> future) {
+      if (future.getJobInput().name() == null) {
+        return false;
+      }
+      return m_regex.matcher(future.getJobInput().name()).matches();
     }
   }
 

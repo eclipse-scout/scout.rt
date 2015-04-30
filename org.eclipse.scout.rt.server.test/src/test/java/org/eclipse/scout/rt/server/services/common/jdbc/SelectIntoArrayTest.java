@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.ITableBeanHolder;
 import org.eclipse.scout.commons.holders.ITableHolder;
 import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.ContainerBean;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.FormDataWithArray;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.FormDataWithSet;
@@ -34,7 +35,9 @@ import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldBeanDa
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
+import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -45,19 +48,21 @@ import org.junit.runner.RunWith;
  * - {@link ISqlService#selectInto(String, Object...)}.
  * With different types of arrays used as output bind.
  */
-@RunWith(PlatformTestRunner.class)
+@RunWith(ServerTestRunner.class)
+@RunWithServerSession(TestServerSession.class)
+@RunWithSubject("default")
 public class SelectIntoArrayTest {
 
   private static final Object[][] DATA = new Object[][]{
-    new Object[]{true, 1, "abc"},
-    new Object[]{null, 1, "abc"},
-    new Object[]{true, null, "abc"},
-    new Object[]{true, 1, null},
+      new Object[]{true, 1, "abc"},
+      new Object[]{null, 1, "abc"},
+      new Object[]{true, null, "abc"},
+      new Object[]{true, 1, null},
   };
   private static final Object[][] ROLES_DATA = new Object[][]{
-    new Object[]{3L},
-    new Object[]{5L},
-    new Object[]{7L}
+      new Object[]{3L},
+      new Object[]{5L},
+      new Object[]{7L}
   };
 
   @Test

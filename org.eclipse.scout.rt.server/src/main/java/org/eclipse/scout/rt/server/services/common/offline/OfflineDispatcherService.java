@@ -17,9 +17,11 @@ import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.ServiceUtility;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.context.ActiveRunMonitorRegistry;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -35,14 +37,22 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
   @Override
   public IServiceTunnelResponse dispatch(final IServiceTunnelRequest serviceRequest) {
     try {
+      //enable cancel
+      RunMonitor runMonitor = new RunMonitor();
+      String cancelId = (serviceRequest.getRequestSequence() != 0L ? "" + serviceRequest.getRequestSequence() : null);
+      BEANS.get(ActiveRunMonitorRegistry.class).register(cancelId, runMonitor);
+
       ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
       serverRunContext.offline(true);
       serverRunContext.locale(serviceRequest.getLocale());
       serverRunContext.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
-      serverRunContext.transactionId(serviceRequest.getRequestSequence());
+      serverRunContext.runMonitor(runMonitor);
       serverRunContext.session(provideServerSession(serverRunContext.copy()));
 
       final IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+
+      BEANS.get(ActiveRunMonitorRegistry.class).unregister(cancelId);
+
       if (serviceResponse != null) {
         return serviceResponse;
       }

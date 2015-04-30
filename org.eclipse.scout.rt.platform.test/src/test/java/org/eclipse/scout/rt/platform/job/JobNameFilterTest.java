@@ -23,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(PlatformTestRunner.class)
-public class JobIdFilterTest {
+public class JobNameFilterTest {
 
   @Mock
   private IFuture<Object> m_future;
@@ -35,41 +35,41 @@ public class JobIdFilterTest {
 
   @Test
   public void test1() {
-    JobInput input = Jobs.newInput(RunContexts.empty()).id(null);
+    JobInput input = Jobs.newInput(RunContexts.empty()).name(null);
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertTrue(Jobs.newFutureFilter().ids(new String[]{null}).accept(m_future));
+    assertTrue(Jobs.newFutureFilter().names(new String[]{null}).accept(m_future));
   }
 
   @Test
   public void test2() {
-    JobInput input = Jobs.newInput(RunContexts.empty()).id(null);
+    JobInput input = Jobs.newInput(RunContexts.empty()).name(null);
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertFalse(Jobs.newFutureFilter().ids("ABC").accept(m_future));
+    assertFalse(Jobs.newFutureFilter().names("ABC").accept(m_future));
   }
 
   @Test
   public void test3() {
-    JobInput input = Jobs.newInput(RunContexts.empty()).id("ABC");
+    JobInput input = Jobs.newInput(RunContexts.empty()).name("ABC");
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertFalse(Jobs.newFutureFilter().ids("abc").accept(m_future));
+    assertFalse(Jobs.newFutureFilter().names("abc").accept(m_future));
   }
 
   @Test
   public void test4() {
-    JobInput input = Jobs.newInput(RunContexts.empty()).id("ABC");
+    JobInput input = Jobs.newInput(RunContexts.empty()).name("ABC");
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertTrue(Jobs.newFutureFilter().ids("ABC").accept(m_future));
+    assertTrue(Jobs.newFutureFilter().names("ABC").accept(m_future));
   }
 
   @Test
   public void test5() {
-    JobInput input = Jobs.newInput(RunContexts.empty()).id("XYZ");
+    JobInput input = Jobs.newInput(RunContexts.empty()).name("XYZ");
     when(m_future.getJobInput()).thenReturn(input);
 
-    assertTrue(Jobs.newFutureFilter().ids("ABC", "XYZ").accept(m_future));
+    assertTrue(Jobs.newFutureFilter().names("ABC", "XYZ").accept(m_future));
   }
 }

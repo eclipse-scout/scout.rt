@@ -18,14 +18,13 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.InitThreadLocalCallable;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.server.transaction.ITransactionProvider;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
-import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
 
 /**
  * Depending on the {@link TransactionScope} and the existence of a caller transaction, this processor starts a new
@@ -44,13 +43,11 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TwoPhaseTransactionBoundaryCallable.class);
 
   protected final ICallable<RESULT> m_next;
-  protected final long m_transactionId;
   protected final TransactionScope m_transactionScope;
 
-  public TwoPhaseTransactionBoundaryCallable(final ICallable<RESULT> next, final TransactionScope transactionScope, final long transactionId) {
+  public TwoPhaseTransactionBoundaryCallable(final ICallable<RESULT> next, final TransactionScope transactionScope) {
     m_next = Assertions.assertNotNull(next);
     m_transactionScope = (transactionScope != null ? transactionScope : TransactionScope.REQUIRES_NEW);
-    m_transactionId = transactionId;
   }
 
   @Override
@@ -87,15 +84,15 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
    */
   @Internal
   protected RESULT runRequiresNewTxBoundary() throws Exception {
-    final ITransaction transaction = BEANS.get(ITransactionProvider.class).provide(m_transactionId);
+    final ITransaction transaction = BEANS.get(ITransaction.class);
 
-    ActiveTransactionRegistry.register(transaction);
+    IRunMonitor.CURRENT.get().registerCancellable(transaction);
     try {
       return initTxThreadLocalAndContinueChain(transaction);
     }
     finally {
       endTransactionSafe(transaction);
-      ActiveTransactionRegistry.unregister(transaction);
+      IRunMonitor.CURRENT.get().unregisterCancellable(transaction);
     }
   }
 
@@ -230,7 +227,7 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements ICallable<RE
   protected String getCurrentJobName() {
     final IFuture<?> future = IFuture.CURRENT.get();
     if (future != null) {
-      return future.getJobInput().identifier();
+      return future.getJobInput().name();
     }
     else {
       return "";

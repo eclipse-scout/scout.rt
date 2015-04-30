@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.holders.ITableHolder;
 import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.commons.holders.TableBeanHolderFilter;
 import org.eclipse.scout.commons.holders.TableHolderFilter;
+import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.ContainerBean;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.FormDataWithArray;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.FormDataWithSet;
@@ -33,7 +34,9 @@ import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldBeanDa
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldBeanData.TableFieldBeanDataRowData;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
+import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -41,7 +44,9 @@ import org.junit.runner.RunWith;
  * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}).
  * Different types of arrays used as input bind.
  */
-@RunWith(PlatformTestRunner.class)
+@RunWith(ServerTestRunner.class)
+@RunWithServerSession(TestServerSession.class)
+@RunWithSubject("default")
 public class SelectInputBindTest {
 
   /**

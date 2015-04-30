@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.filter.AndFilter;
@@ -77,10 +78,18 @@ public final class JobEventFilters {
     }
 
     /**
-     * To accept only events which belong to jobs of the given job id's.
+     * To accept only events which belong to jobs of the given job name's.
      */
-    public Filter ids(final String... ids) {
-      andFilter(new FutureEventFilterDelegate(new JobFutureFilters.JobIdFilter(ids)));
+    public Filter names(final String... names) {
+      andFilter(new FutureEventFilterDelegate(new JobFutureFilters.JobNameFilter(names)));
+      return this;
+    }
+
+    /**
+     * To accept only events which belong to jobs of the given job name's regex.
+     */
+    public Filter nameRegex(final Pattern regex) {
+      andFilter(new FutureEventFilterDelegate(new JobFutureFilters.JobNameRegexFilter(regex)));
       return this;
     }
 

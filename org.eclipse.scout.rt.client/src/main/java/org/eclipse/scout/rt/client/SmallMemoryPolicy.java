@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ClientJobs;
@@ -44,9 +46,9 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
     String gcJobId = getClass().getName();
 
     // Cancel already running GC job
-    Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().ids(gcJobId).currentSession(), true);
+    Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().nameRegex(Pattern.compile(Pattern.quote(gcJobId) + ":.*")).currentSession(), true);
     // Schedule new GC job
-    ClientJobs.schedule(new ForceGCJob(), ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("release memory").id(gcJobId));
+    ClientJobs.schedule(new ForceGCJob(), ClientJobs.newInput(ClientRunContexts.copyCurrent()).name(gcJobId + ":release memory"));
 
     if (page.getTable() != null) {
       page.getTable().discardAllRows();

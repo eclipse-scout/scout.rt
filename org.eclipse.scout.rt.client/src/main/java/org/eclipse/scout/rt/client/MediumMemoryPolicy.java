@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -187,9 +188,9 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
       String gcJobId = getClass().getName();
 
       // Cancel already running GC job
-      Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().currentSession().ids(gcJobId), true);
+      Jobs.getJobManager().cancel(ClientJobs.newFutureFilter().currentSession().nameRegex(Pattern.compile(Pattern.quote(gcJobId) + ":.*")), true);
       // Schedule new GC job
-      ClientJobs.schedule(new ForceGCJob(), ClientJobs.newInput(ClientRunContexts.copyCurrent()).name("release memory").id(gcJobId));
+      ClientJobs.schedule(new ForceGCJob(), ClientJobs.newInput(ClientRunContexts.copyCurrent()).name(gcJobId + ":release memory"));
 
       m_release = false;
     }

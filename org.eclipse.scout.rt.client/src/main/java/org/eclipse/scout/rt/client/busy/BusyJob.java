@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.client.busy;
 
 import org.eclipse.scout.commons.IRunnable;
-import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
 
 /**
  * This is the default busy job that runs the process of showing busy marker, blocking and canceling.
@@ -63,7 +63,7 @@ public class BusyJob implements IRunnable {
         if (!h.isBusy()) {
           return;
         }
-        if (!m_cancelApplied && IFuture.CURRENT.get().isCancelled()) {
+        if (!m_cancelApplied && IRunMonitor.CURRENT.get().isCancelled()) {
           m_cancelApplied = true;
           h.cancel();
         }
@@ -88,7 +88,7 @@ public class BusyJob implements IRunnable {
         if (!h.isBusy()) {
           return;
         }
-        if (!m_cancelApplied && IFuture.CURRENT.get().isCancelled()) {
+        if (!m_cancelApplied && IRunMonitor.CURRENT.get().isCancelled()) {
           m_cancelApplied = true;
           h.cancel();
         }

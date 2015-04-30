@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.ICancellable;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -36,7 +37,7 @@ import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
  * @since 5.1
  */
 @Internal
-public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFutureTask<RESULT>, IFuture<RESULT> {
+public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFutureTask<RESULT>, IFuture<RESULT>, ICancellable {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobFutureTask.class);
 
@@ -172,7 +173,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return null; // Cancellation does not result in an exception.
     }
     catch (final InterruptedException e) {
-      throw new JobException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.identifier()), e);
+      throw new JobException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.name()), e);
     }
     catch (final Throwable t) {
       throw BEANS.get(ExceptionTranslator.class).translate(t);
@@ -188,10 +189,10 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return null; // Cancellation does not result in an exception.
     }
     catch (final InterruptedException e) {
-      throw new JobException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.identifier()), e);
+      throw new JobException(String.format("Interrupted while waiting for the job to complete. [job=%s]", m_input.name()), e);
     }
     catch (final TimeoutException e) {
-      throw new JobException(String.format("Failed to wait for the job to complete because it took longer than %sms [job=%s]", unit.toMillis(timeout), m_input.identifier()), e);
+      throw new JobException(String.format("Failed to wait for the job to complete because it took longer than %sms [job=%s]", unit.toMillis(timeout), m_input.name()), e);
     }
     catch (final Throwable t) {
       throw BEANS.get(ExceptionTranslator.class).translate(t);

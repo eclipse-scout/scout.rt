@@ -11,55 +11,39 @@
 package org.eclipse.scout.rt.server.transaction;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.context.ICancellable;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
+import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlTransactionMember;
-import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
-import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 
 /**
- * Whenever a remote service call is handled by the ServiceTunnelServlet it is dispatched to a
- * DefaultTransactionDelegate that runs a ITransaction as a ServerJob.
- * That transaction does {@link ActiveTransactionRegistry#register(ITransaction)} /
- * {@link ActiveTransactionRegistry#unregister(ITransaction)} with the requestId as the {@link ITransaction#getId()
- * transaction id}. Resources such as jdbc connections take part on the
- * transaction as {@link ITransactionMember}s.
- * Whenever a sql statement is run, it registers/unregisters on the
+ * Whenever a remote service call is handled by the {@link ServiceTunnelServlet} it is dispatched to a
+ * {@link DefaultTransactionDelegate} that runs in a {@link RunContext} with a {@link ITransaction}.
+ * <p>
+ * Cancelling is done using {@link IRunMonitor#cancel(boolean)} on {@link IRunMonitor#CURRENT}
+ * <p>
+ * Whenever for example a sql statement is run, it registers/unregisters on the
  * {@link AbstractSqlTransactionMember#registerActiveStatement(java.sql.Statement)} /
  * {@link AbstractSqlTransactionMember#unregisterActiveStatement(java.sql.Statement)}.
+ * <p>
  * Thus canceling a {@link ITransaction#cancel()} also cancels all its members {@link ITransactionMember#cancel()} and
  * that cancels the (potentially) running statement.
+ * <p>
  * A canceled transaction can only do a rollback and does not accept new members.
+ * <p>
  *
  * @since 3.4
  */
-public interface ITransaction {
+@Bean
+public interface ITransaction extends ICancellable {
 
   /**
    * The {@link ITransaction} which is currently associated with the current thread.
    */
   ThreadLocal<ITransaction> CURRENT = new ThreadLocal<>();
-
-  /**
-   * Default transaction-id if the transaction is not to be registered within the {@link IServerSession} and therefore
-   * provides no 'cancellation' support.
-   */
-  long TX_ZERO_ID = 0L;
-
-  /**
-   * @deprecated use {@link #getId()} instead; will be removed in 5.2.0;
-   */
-  @Deprecated
-  long getTransactionSequence();
-
-  /**
-   * This method returns the <code>id</code> to identify this transaction uniquely among the {@link IServerSession}.
-   *
-   * @return unique transaction <code>id</code> among the {@link IServerSession} or {@link ITransaction#TX_ZERO_ID} if
-   *         not to be registered within the {@link IServerSession}; is primarily used to identify the transaction if
-   *         the user likes to cancel a transaction.
-   * @see IServerProcessingCancelService#cancel(long)
-   */
-  long getId();
 
   /**
    * register the member (even if the transaction is canceled)
@@ -117,6 +101,10 @@ public interface ITransaction {
    */
   boolean cancel();
 
+  @Override
+  boolean cancel(boolean mayInterruptIfRunning);
+
+  @Override
   boolean isCancelled();
 
 }

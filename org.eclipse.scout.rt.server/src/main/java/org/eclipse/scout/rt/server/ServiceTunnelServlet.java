@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.ServerConfigProperties.HttpServerDebugProperty;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
@@ -37,6 +38,7 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.config.WebXmlConfigManager;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.context.ActiveRunMonitorRegistry;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -108,13 +110,20 @@ public class ServiceTunnelServlet extends HttpServlet {
         public void run() throws Exception {
           IServiceTunnelRequest serviceRequest = deserializeServiceRequest();
 
+          //enable cancel
+          RunMonitor runMonitor = new RunMonitor();
+          String cancelId=(serviceRequest.getRequestSequence() != 0L?""+serviceRequest.getRequestSequence():null);
+          BEANS.get(ActiveRunMonitorRegistry.class).register(cancelId, runMonitor);
+
           ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
           serverRunContext.locale(serviceRequest.getLocale());
           serverRunContext.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
-          serverRunContext.transactionId(serviceRequest.getRequestSequence());
+          serverRunContext.runMonitor(runMonitor);
           serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
           IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+
+          BEANS.get(ActiveRunMonitorRegistry.class).unregister(cancelId);
 
           serializeServiceResponse(serviceResponse);
         }

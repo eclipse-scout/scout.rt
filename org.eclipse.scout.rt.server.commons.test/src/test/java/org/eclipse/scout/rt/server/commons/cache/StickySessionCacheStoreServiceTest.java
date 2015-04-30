@@ -15,11 +15,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link StickySessionCacheService}
  */
+@RunWith(PlatformTestRunner.class)
 public class StickySessionCacheStoreServiceTest extends AbstractHttpSessionCacheServiceTest {
 
   @Test

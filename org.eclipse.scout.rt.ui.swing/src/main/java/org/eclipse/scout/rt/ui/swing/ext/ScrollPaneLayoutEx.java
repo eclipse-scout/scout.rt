@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -37,13 +37,13 @@ public class ScrollPaneLayoutEx extends ScrollPaneLayout {
     Dimension sizeOfView = null;
     Component viewComponent = null;
     if (viewport != null) {
-      //WORKAROUND imo, 16.08.2010
+      //layout fix, 16.08.2010
       sizeOfExtent = viewport.getExtentSize();
       sizeOfView = viewport.getPreferredSize();
       viewComponent = viewport.getView();
       //end
     }
-    //WORKAROUND imo, 16.08.2010
+    //layout fix, 16.08.2010
     if (sizeOfView != null) {
       prefW += sizeOfView.width;
       prefH += sizeOfView.height;

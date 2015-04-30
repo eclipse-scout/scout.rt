@@ -10,16 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.processing;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.server.Server;
-import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
+import org.eclipse.scout.rt.server.context.ActiveRunMonitorRegistry;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 
 @Server
 public class ServerProcessingCancelService extends AbstractService implements IServerProcessingCancelService {
 
   @Override
-  public boolean cancel(final long requestSequence) {
-    return ActiveTransactionRegistry.cancel(requestSequence);
+  public boolean cancel(long requestSequence) {
+    return BEANS.get(ActiveRunMonitorRegistry.class).cancel("" + requestSequence);
   }
 }

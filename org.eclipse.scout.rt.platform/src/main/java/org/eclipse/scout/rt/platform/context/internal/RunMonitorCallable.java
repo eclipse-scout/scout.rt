@@ -8,33 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.context;
-
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
+package org.eclipse.scout.rt.platform.context.internal;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 
 /**
- * Processor to run the subsequent sequence of actions on behalf of the given {@link Subject}.
+ * Processor to run the subsequent sequence of actions inside a {@link IRunMonitor}
+ * <p>
+ * If there is already a {@link IRunMonitor} on the current thread {@link IRunMonitor#CURRENT}, nothing is done.
  *
  * @param <RESULT>
  *          the result type of the job's computation.
  * @since 5.1
  * @see <i>design pattern: chain of responsibility</i>
  */
-public class SubjectCallable<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
+public class RunMonitorCallable<RESULT> implements ICallable<RESULT>, IChainable<ICallable<RESULT>> {
 
   protected final ICallable<RESULT> m_next;
-  protected final Subject m_subject;
+  protected final IRunMonitor m_monitor;
 
   /**
-   * Creates a processor to run the subsequent sequence of actions on behalf of the given {@link Subject}.
+   * Creates a processor to run the subsequent sequence of actions inside a {@link IRunMonitor}, if none exists yet on
+   * the current thread {@link IRunMonitor#CURRENT}
    *
    * @param next
    *          next processor in the chain; must not be <code>null</code>.
@@ -42,28 +43,33 @@ public class SubjectCallable<RESULT> implements ICallable<RESULT>, IChainable<IC
    *          {@link Subject} on behalf of which to run the following processors; use <code>null</code> if not to be run
    *          in privileged mode.
    */
-  public SubjectCallable(final ICallable<RESULT> next, final Subject subject) {
+  public RunMonitorCallable(final ICallable<RESULT> next, final IRunMonitor monitor) {
     m_next = Assertions.assertNotNull(next);
-    m_subject = subject;
+    m_monitor = monitor;
   }
 
   @Override
   public RESULT call() throws Exception {
-    if (m_subject == null || m_subject.equals(Subject.getSubject(AccessController.getContext()))) {
+    IRunMonitor oldMonitor = IRunMonitor.CURRENT.get();
+    if (oldMonitor != null && m_monitor == null) {
       return m_next.call();
     }
-    else {
+    else if (oldMonitor != null /* && m_monitor!=null */) {
+      IRunMonitor.CURRENT.set(m_monitor);
       try {
-        return Subject.doAs(m_subject, new PrivilegedExceptionAction<RESULT>() {
-
-          @Override
-          public RESULT run() throws Exception {
-            return m_next.call();
-          }
-        });
+        return m_next.call();
       }
-      catch (final PrivilegedActionException e) {
-        throw e.getException();
+      finally {
+        IRunMonitor.CURRENT.set(oldMonitor);
+      }
+    }
+    else/* oldMonitor==null */{
+      try {
+        IRunMonitor.CURRENT.set(m_monitor != null ? m_monitor : new RunMonitor());
+        return m_next.call();
+      }
+      finally {
+        IRunMonitor.CURRENT.remove();
       }
     }
   }

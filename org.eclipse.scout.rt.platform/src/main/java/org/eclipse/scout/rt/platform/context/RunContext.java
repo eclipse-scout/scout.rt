@@ -24,6 +24,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
+import org.eclipse.scout.rt.platform.context.internal.RunMonitorCallable;
+import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 
@@ -51,6 +54,7 @@ public class RunContext {
   protected PreferredValue<Subject> m_subject = new PreferredValue<>(null, false);
   protected PreferredValue<Locale> m_locale = new PreferredValue<>(null, false);
   protected PropertyMap m_propertyMap;
+  protected IRunMonitor m_runMonitor;
 
   /**
    * Runs the given runnable on behalf of this {@link RunContext}. Use this method if you run code that does not return
@@ -116,9 +120,10 @@ public class RunContext {
    * @return the head of the chain to be invoked first.
    */
   protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next) {
-    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, propertyMap());
-    final ICallable<RESULT> c2 = new InitThreadLocalCallable<>(c3, NlsLocale.CURRENT, locale());
-    final ICallable<RESULT> c1 = new SubjectCallable<>(c2, subject());
+    final ICallable<RESULT> c4 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, propertyMap());
+    final ICallable<RESULT> c3 = new InitThreadLocalCallable<>(c4, NlsLocale.CURRENT, locale());
+    final ICallable<RESULT> c2 = new SubjectCallable<>(c3, subject());
+    final ICallable<RESULT> c1 = new RunMonitorCallable<>(c2, runMonitor());
 
     return c1;
   }
@@ -151,11 +156,24 @@ public class RunContext {
     return m_propertyMap;
   }
 
+  public IRunMonitor runMonitor() {
+    return m_runMonitor;
+  }
+
+  /**
+   * Set a specific {@link IRunMonitor}
+   */
+  public RunContext runMonitor(final IRunMonitor runMonitor) {
+    m_runMonitor = runMonitor;
+    return this;
+  }
+
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.ref("subject", subject());
     builder.attr("locale", locale());
+    builder.attr("runMonitor", runMonitor());
     return builder.toString();
   }
 
@@ -166,6 +184,7 @@ public class RunContext {
     m_subject = origin.m_subject.copy();
     m_locale = origin.m_locale.copy();
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
+    m_runMonitor = origin.m_runMonitor;
   }
 
   /**
@@ -175,6 +194,7 @@ public class RunContext {
     m_subject = new PreferredValue<>(Subject.getSubject(AccessController.getContext()), false);
     m_locale = new PreferredValue<>(NlsLocale.CURRENT.get(), false);
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
+    m_runMonitor = IRunMonitor.CURRENT.get();
   }
 
   /**
@@ -184,6 +204,7 @@ public class RunContext {
     m_subject = new PreferredValue<>(null, true); // null as preferred Subject
     m_locale = new PreferredValue<>(null, true); // null as preferred Locale
     m_propertyMap = new PropertyMap();
+    m_runMonitor = null;
   }
 
   /**

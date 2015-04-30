@@ -19,14 +19,22 @@ import java.sql.Types;
 
 import org.eclipse.scout.commons.holders.LongHolder;
 import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.VerboseMock;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
+import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}).
  * Use {@link NVPair} to test different configuration of binds.
  */
+@RunWith(ServerTestRunner.class)
+@RunWithServerSession(TestServerSession.class)
+@RunWithSubject("default")
 public class BindValueTest {
   protected SqlServiceMock sqlService = new SqlServiceMock();
 

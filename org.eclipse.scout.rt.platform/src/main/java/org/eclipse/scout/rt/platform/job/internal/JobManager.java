@@ -37,6 +37,8 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobCorePool
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobDispatcherThreadCountProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobKeepAliveTimeProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobMaximumPoolSizeProperty;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -181,6 +183,13 @@ public class JobManager implements IJobManager {
     m_listeners.remove(listener);
   }
 
+  protected IRunMonitor createRunMonitor(JobInput input) {
+    if (input != null && input.runContext() != null && input.runContext().runMonitor() != null) {
+      return input.runContext().runMonitor();
+    }
+    return new RunMonitor();
+  }
+
   /**
    * Creates the Future to interact with the executable once being executed.
    *
@@ -200,6 +209,8 @@ public class JobManager implements IJobManager {
 
     // Create the Callable to be given to the executor.
     final ICallable<RESULT> callable = interceptCallable(Callables.callable(executable), input);
+
+    final IRunMonitor monitor = createRunMonitor(input);
 
     // Create the Future to be returned to the caller.
     final JobFutureTask<RESULT> futureTask = new JobFutureTask<RESULT>(input, periodic, m_mutexSemaphores, callable) {
@@ -231,10 +242,12 @@ public class JobManager implements IJobManager {
         m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.ABOUT_TO_RUN, this));
 
         IFuture.CURRENT.set(this);
+        IRunMonitor.CURRENT.set(monitor);
       }
 
       @Override
       protected void afterExecute() {
+        IRunMonitor.CURRENT.remove();
         IFuture.CURRENT.remove();
 
         if (isPeriodic() && !isDone()) {
@@ -249,7 +262,17 @@ public class JobManager implements IJobManager {
           m_mutexSemaphores.passMutexToNextTask(this);
         }
       }
+
+      @Override
+      public boolean cancel(boolean mayInterruptIfRunning) {
+        boolean result = super.cancel(mayInterruptIfRunning);
+        monitor.unregisterCancellable(this);
+
+        monitor.cancel(mayInterruptIfRunning);
+        return result;
+      }
     };
+    monitor.registerCancellable(futureTask);
 
     return interceptFuture(futureTask);
   }
@@ -339,7 +362,7 @@ public class JobManager implements IJobManager {
    */
   protected <RESULT> ICallable<RESULT> interceptCallable(final ICallable<RESULT> next, final JobInput input) {
     final ICallable<RESULT> c3 = new RunContextCallable<RESULT>(next, input.runContext());
-    final ICallable<RESULT> c2 = new ThreadNameDecorator<RESULT>(c3, input.threadName(), input.identifier());
+    final ICallable<RESULT> c2 = new ThreadNameDecorator<RESULT>(c3, input.threadName(), input.name());
     final ICallable<RESULT> c1 = new HandleExceptionCallable<>(c2, input);
 
     return c1;

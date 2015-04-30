@@ -75,14 +75,14 @@ public class ServerJobTest {
             actualThreadName2.setValue(Thread.currentThread().getName());
             setupLatch.countDown();
           }
-        }, ServerJobs.newInput(ServerRunContexts.copyCurrent()).id("200").name("XYZ"));
+        }, ServerJobs.newInput(ServerRunContexts.copyCurrent()).name("XYZ"));
       }
-    }, ServerJobs.newInput(ServerRunContexts.copyCurrent()).id("100").name("ABC"));
+    }, ServerJobs.newInput(ServerRunContexts.copyCurrent()).name("ABC"));
 
     assertTrue(setupLatch.await());
 
-    assertTrue(actualThreadName1.getValue().matches("scout-server-thread-(\\d)+ \\[Running\\] 100:ABC"));
-    assertTrue(actualThreadName2.getValue().matches("scout-server-thread-(\\d)+ \\[Running\\] 200:XYZ"));
+    assertTrue(actualThreadName1.getValue().matches("scout-server-thread-(\\d)+ \\[Running\\] ABC"));
+    assertTrue(actualThreadName2.getValue().matches("scout-server-thread-(\\d)+ \\[Running\\] XYZ"));
     assertEquals("main", Thread.currentThread().getName());
   }
 }

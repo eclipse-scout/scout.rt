@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.holders.StringHolder;
+import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.junit.Test;
 
 public class InitThreadLocalCallableTest {

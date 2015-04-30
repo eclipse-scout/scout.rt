@@ -19,13 +19,13 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
+@Bean
 public class BasicTransaction implements ITransaction {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BasicTransaction.class);
 
-  private final long m_id;
   private final Object m_memberMapLock = new Object();
   private final Map<String, ITransactionMember> m_memberMap = new LinkedHashMap<String, ITransactionMember>();
   private List<Throwable> m_failures = new ArrayList<Throwable>();
@@ -33,29 +33,6 @@ public class BasicTransaction implements ITransaction {
   private boolean m_cancelled;
 
   public BasicTransaction() {
-    this(0L);
-  }
-
-  /**
-   * @param id
-   *          unique transaction <code>id</code> among the {@link IServerSession} or {@link ITransaction#TX_ZERO_ID} if
-   *          not to be registered within the {@link IServerSession}; is primarily used to identify the transaction if
-   *          the user likes to cancel a transaction.
-   */
-  public BasicTransaction(long id) {
-    m_id = id;
-  }
-
-  @Override
-  public long getId() {
-    return m_id;
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public long getTransactionSequence() {
-    return getId();
   }
 
   @Override
@@ -226,6 +203,11 @@ public class BasicTransaction implements ITransaction {
 
   @Override
   public synchronized boolean cancel() {
+    return cancel(true);
+  }
+
+  @Override
+  public boolean cancel(boolean mayInterruptIfRunning) {
     synchronized (m_memberMapLock) {
       if (m_commitPhase) {
         return false;

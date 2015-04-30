@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
 
@@ -42,7 +41,7 @@ public class ServerSessionProvider {
    *           is thrown if the {@link IServerSession} could not be created or initialized.
    */
   public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext) throws ProcessingException {
-    return serverRunContext.copy().transactionId(ITransaction.TX_ZERO_ID).call(new ICallable<SESSION>() {
+    return serverRunContext.copy().call(new ICallable<SESSION>() {
 
       @Override
       public SESSION call() throws Exception {

@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
@@ -69,10 +68,8 @@ public class ThreadNameDecoratorTest {
       }
     };
 
-    JobInput input = Jobs.newInput(RunContexts.empty()).id("123").name("job1");
-
     ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
-    new ThreadNameDecorator<Void>(next, "scout-client-thread", input.identifier()).call();
+    new ThreadNameDecorator<Void>(next, "scout-client-thread", "123:job1").call();
     assertEquals("scout-client-thread-5 [Running] 123:job1", threadName.getValue());
     assertEquals("scout-thread-5 [Idle]", Thread.currentThread().getName());
     ThreadInfo.CURRENT.remove();
@@ -91,17 +88,16 @@ public class ThreadNameDecoratorTest {
       }
     };
 
-    JobInput input = Jobs.newInput(RunContexts.empty());
-
     ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "scout-thread", 5));
-    new ThreadNameDecorator<Void>(next, "scout-client-thread", input.identifier()).call();
+    new ThreadNameDecorator<Void>(next, "scout-client-thread", null).call();
     assertEquals("scout-client-thread-5 [Running]", threadName.getValue());
     assertEquals("scout-thread-5 [Idle]", Thread.currentThread().getName());
     ThreadInfo.CURRENT.remove();
   }
 
   @Test
-  @Times(50) // This test is executed 50 times (regression)
+  @Times(50)
+  // This test is executed 50 times (regression)
   public void testThreadNameBlocking() throws Exception {
     final Object mutexObject = new Object();
     final IBlockingCondition BC = Jobs.getJobManager().createBlockingCondition("blocking-condition", true);

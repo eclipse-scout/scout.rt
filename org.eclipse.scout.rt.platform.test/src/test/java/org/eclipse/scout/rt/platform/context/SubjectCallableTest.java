@@ -21,6 +21,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
 import org.junit.Test;
 
 public class SubjectCallableTest {

@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ICallable;
 import org.eclipse.scout.commons.IChainable;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
@@ -50,7 +49,7 @@ public class ThreadNameDecorator<RESULT> implements ICallable<RESULT>, IChainabl
   public ThreadNameDecorator(final ICallable<RESULT> next, final String threadName, final String jobName) {
     m_next = Assertions.assertNotNull(next);
     m_threadName = threadName;
-    m_jobName = JobInput.N_A.equals(jobName) ? null : jobName;
+    m_jobName = jobName;
   }
 
   @Override

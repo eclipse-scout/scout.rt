@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.transaction.internal;
+package org.eclipse.scout.rt.server.context;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -16,21 +16,23 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
 
 /**
- * Cache the transactions per session to enable for cancelling
+ * Cache the {@link IRunMonitor} per session in order to allow cancelling
  */
-public class ActiveTransactionRegistry {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ActiveTransactionRegistry.class);
+@ApplicationScoped
+public class ActiveRunMonitorRegistry {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ActiveRunMonitorRegistry.class);
   private static final String SESSION_STATE_KEY = "activeTransactions";
 
-  private ActiveTransactionRegistry() {
+  public ActiveRunMonitorRegistry() {
   }
 
-  private static SessionState getSessionState(boolean autoCreate) {
+  private SessionState getSessionState(boolean autoCreate) {
     IServerSession session = ServerSessionProvider.currentSession();
     if (session == null) {
       return null;
@@ -45,8 +47,8 @@ public class ActiveTransactionRegistry {
     }
   }
 
-  public static void register(ITransaction tx) {
-    if (tx == null || tx.getId() == ITransaction.TX_ZERO_ID) {
+  public void register(String id, IRunMonitor monitor) {
+    if (id == null) {
       return;
     }
     SessionState state = getSessionState(true);
@@ -55,12 +57,12 @@ public class ActiveTransactionRegistry {
       return;
     }
     synchronized (state.m_txMapLock) {
-      state.m_txMap.put(tx.getId(), new WeakReference<ITransaction>(tx));
+      state.m_txMap.put(id, new WeakReference<IRunMonitor>(monitor));
     }
   }
 
-  public static void unregister(ITransaction tx) {
-    if (tx == null || tx.getId() == ITransaction.TX_ZERO_ID) {
+  public void unregister(String id) {
+    if (id == null) {
       return;
     }
     SessionState state = getSessionState(false);
@@ -68,37 +70,37 @@ public class ActiveTransactionRegistry {
       return;
     }
     synchronized (state.m_txMapLock) {
-      state.m_txMap.remove(tx.getId());
+      state.m_txMap.remove(id);
     }
   }
 
   /**
    * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
    */
-  public static boolean cancel(long transactionSequence) {
-    if (transactionSequence == ITransaction.TX_ZERO_ID) {
+  public boolean cancel(String id) {
+    if (id == null) {
       return false;
     }
     SessionState state = getSessionState(false);
     if (state == null) {
       return false;
     }
-    ITransaction tx;
+    IRunMonitor monitor;
     synchronized (state.m_txMapLock) {
-      WeakReference<ITransaction> ref = state.m_txMap.get(transactionSequence);
+      WeakReference<IRunMonitor> ref = state.m_txMap.get(id);
       if (ref == null) {
         return false;
       }
-      tx = ref.get();
-      if (tx == null) {
+      monitor = ref.get();
+      if (monitor == null) {
         return false;
       }
     }
-    return tx.cancel();
+    return monitor.cancel(true);
   }
 
   private static class SessionState {
     final Object m_txMapLock = new Object();
-    final Map<Long, WeakReference<ITransaction>> m_txMap = new HashMap<>();
+    final Map<String, WeakReference<IRunMonitor>> m_txMap = new HashMap<>();
   }
 }

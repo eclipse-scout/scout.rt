@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform.job;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
@@ -31,34 +30,18 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 @Bean
 public class JobInput {
 
-  public static final String N_A = "n/a";
-
   /**
    * Indicates that an executable always commence execution regardless of how long it was waiting for its execution to
    * start.
    */
   public static final long INFINITE_EXPIRATION = 0;
 
-  protected String m_id;
   protected String m_name;
   protected Object m_mutexObject;
   protected long m_expirationTime = INFINITE_EXPIRATION;
   protected boolean m_logOnError = true;
   protected String m_threadName = "scout-thread";
   protected RunContext m_runContext;
-
-  public String id() {
-    return m_id;
-  }
-
-  /**
-   * Sets the <code>id</code> of a job. Optional, does not have to be unique. Is primarily used for logging purposes, to
-   * decorate the worker thread's name and to identify the job's Future.
-   */
-  public JobInput id(final String id) {
-    m_id = id;
-    return this;
-  }
 
   public String name() {
     return m_name;
@@ -151,23 +134,9 @@ public class JobInput {
     return runContext().propertyMap();
   }
 
-  /***
-   * @return the job's identifier consisting of the job's 'id' and 'name', or {@link JobInput#N_A} if not set.
-   */
-  public String identifier() {
-    final String identifier = StringUtility.join(":", m_id, m_name);
-    if (identifier.isEmpty()) {
-      return JobInput.N_A;
-    }
-    else {
-      return identifier;
-    }
-  }
-
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("id", id());
     builder.attr("name", name());
     builder.ref("mutexObject", mutex());
     builder.attr("expirationTime", expirationTimeMillis());
@@ -183,7 +152,6 @@ public class JobInput {
    */
   public JobInput copy() {
     final JobInput copy = BEANS.get(JobInput.class);
-    copy.id(m_id);
     copy.name(m_name);
     copy.mutex(m_mutexObject);
     copy.expirationTime(m_expirationTime, TimeUnit.MILLISECONDS);
