@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.inventory;
 
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Inherited;
 import java.lang.reflect.Modifier;
 
 /**
- *
+ * @since 5.1
  */
 public interface IClassInfo {
 
@@ -37,6 +39,15 @@ public interface IClassInfo {
   int flags();
 
   boolean hasNoArgsConstructor();
+
+  /**
+   * Returns <code>true</code> if the class represented by this class info is <b>directly</b> annotated with the given
+   * annotation. Otherwise <code>false</code>.
+   * </p>
+   * <b>Note</b>: Other than {@link Class#isAnnotationPresent(Class)} this method does not respect the {@link Inherited}
+   * annotation.
+   */
+  boolean hasAnnotation(Class<? extends Annotation> annotationType);
 
   Class<?> resolveClass();
 

@@ -55,6 +55,15 @@ public class JandexClassInventory implements IClassInventory {
     return convertAnnotationInstance(annotationInstances);
   }
 
+  public IClassInfo getClassInfo(Class<?> queryClass) {
+    Assertions.assertNotNull(queryClass);
+    ClassInfo ci = m_index.getClassByName(DotName.createSimple(queryClass.getName()));
+    if (ci == null) {
+      return null;
+    }
+    return new JandexClassInfo(ci);
+  }
+
   protected Set<IClassInfo> convertClassInfos(Collection<ClassInfo> classInfos) {
     Set<IClassInfo> result = new HashSet<IClassInfo>(classInfos.size());
     for (ClassInfo classInfo : classInfos) {

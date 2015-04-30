@@ -6,6 +6,7 @@ import java.util.Set;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.SuppressBean;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 
@@ -74,6 +75,12 @@ public class BeanFilter {
   }
 
   private void collect(IClassInfo ci, Set<Class> collector) {
+    if (ci.hasAnnotation(SuppressBean.class)) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Skipping bean candidate '{0}' because it is annotated with '{1}'.", ci.name(), SuppressBean.class.getSimpleName());
+      }
+      return;
+    }
     if (!ci.isInstanciable()) {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Skipping bean candidate '{0}' because it is not instanciable.", ci.name());

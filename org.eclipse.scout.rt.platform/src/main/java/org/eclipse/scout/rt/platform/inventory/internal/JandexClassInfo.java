@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.inventory.internal;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
@@ -19,6 +20,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.jboss.jandex.ClassInfo;
+import org.jboss.jandex.DotName;
 
 /**
  *
@@ -73,6 +75,11 @@ public class JandexClassInfo implements IClassInfo {
   public boolean hasNoArgsConstructor() {
     ensureClassLoaded();
     return m_hasNoArgsConstructor;
+  }
+
+  @Override
+  public boolean hasAnnotation(Class<? extends Annotation> annotationType) {
+    return m_classInfo.annotations().containsKey(DotName.createSimple(annotationType.getName()));
   }
 
   @Override
