@@ -530,11 +530,11 @@ scout.Session.prototype.showFatalMessage = function(options) {
     cancelButtonText: options.cancelButtonText
   };
   var ui = new scout.MessageBox(model, this);
-  ui.on('buttonClick', function($button, event) {
-    var option = $button.data('option');
+  ui.on('buttonClick', function(event) {
     // Close message box
     ui.remove();
     // Custom actions
+    var option = event.option;
     if (option === 'yes' && options.yesButtonAction) {
       options.yesButtonAction.apply(this);
     } else if (option === 'no' && options.noButtonAction) {
