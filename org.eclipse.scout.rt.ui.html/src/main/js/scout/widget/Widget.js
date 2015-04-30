@@ -32,7 +32,7 @@ scout.Widget.prototype._renderInternal = function($parent) {
  * apply model values to the UI here, since this is done in the _renderProperties method later.
  * The default impl. does nothing.
  */
-scout.Widget.prototype._render = function() {
+scout.Widget.prototype._render = function($parent) {
   // NOP
 };
 

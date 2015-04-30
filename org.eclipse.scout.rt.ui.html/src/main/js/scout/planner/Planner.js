@@ -18,7 +18,8 @@ scout.Planner = function() {
   this.WEEK = 2;
   this.MONTH = 3;
   this.WORK = 4;
-  this.YEAR = 5;
+  this.CALENDAR_WEEK = 5;
+  this.YEAR = 6;
 
   // additional modes; should be stored in model
   this.showYear = false;
@@ -30,8 +31,8 @@ scout.Planner.prototype.init = function(model, session) {
   for (var i = 0; i < this.resources.length; i++) {
     this._initResource(this.resources[i]);
   }
-  // this.selectedResources contains ids -> map to actual resources
-  this.selectedResources = this._resourcesByIds(this.selectedResources);
+  this._syncViewRange(this.viewRange);
+  this._syncSelectedResources(this.selectedResources);
 };
 
 scout.Planner.prototype._initResource = function(resource) {
@@ -66,11 +67,11 @@ scout.Planner.prototype._render = function($parent) {
   this.$commands = this.$header.appendDiv('planner-commands');
   this.$commands.appendDiv('planner-today').click(this._onClickToday.bind(this));
   this.$commands.appendDiv('planner-separator');
-  this.$commands.appendDiv('planner-mode-day planner-mode').attr('data-mode', this.DAY).click(this._onClickMode.bind(this));
-  this.$commands.appendDiv('planner-mode-work planner-mode').attr('data-mode', this.WORK).click(this._onClickMode.bind(this));
-  this.$commands.appendDiv('planner-mode-week planner-mode').attr('data-mode', this.WEEK).click(this._onClickMode.bind(this));
-  this.$commands.appendDiv('planner-mode-month planner-mode').attr('data-mode', this.MONTH).click(this._onClickMode.bind(this));
-  this.$commands.appendDiv('planner-mode-year planner-mode').attr('data-mode', this.YEAR).click(this._onClickMode.bind(this));
+  this.$commands.appendDiv('planner-mode-day planner-mode').attr('data-mode', this.DAY).click(this._onClickDisplayMode.bind(this));
+  this.$commands.appendDiv('planner-mode-work planner-mode').attr('data-mode', this.WORK).click(this._onClickDisplayMode.bind(this));
+  this.$commands.appendDiv('planner-mode-week planner-mode').attr('data-mode', this.WEEK).click(this._onClickDisplayMode.bind(this));
+  this.$commands.appendDiv('planner-mode-month planner-mode').attr('data-mode', this.MONTH).click(this._onClickDisplayMode.bind(this));
+  this.$commands.appendDiv('planner-mode-year planner-mode').attr('data-mode', this.YEAR).click(this._onClickDisplayMode.bind(this));
   this.$commands.appendDiv('planner-separator');
   this.$commands.appendDiv('planner-toggle-year').click(this._onClickYear.bind(this));
 
@@ -139,13 +140,9 @@ scout.Planner.prototype._onClickToday = function(event) {
   this._updateScreen();
 };
 
-scout.Planner.prototype._onClickMode = function(event) {
-  // set new mode
-  this.displayMode = $(event.target).data('mode');
-
-  // update calendar
-  this._updateModel();
-  this._updateScreen();
+scout.Planner.prototype._onClickDisplayMode = function(event) {
+  var displayMode = $(event.target).data('mode');
+  this.setDisplayMode(displayMode);
 };
 
 scout.Planner.prototype._onClickYear = function(event) {
@@ -171,27 +168,23 @@ scout.Planner.prototype._updateScreen = function() {
   $('.planner-mode', this.$commands).select(false);
   $("[data-mode='" + this.displayMode +"']", this.$modes).select(true);
 
-  // find range, should be part of model?
-  this.startDate = scout.dates.parseJsonDate(this.days[0]);
-  this.endDate = scout.dates.parseJsonDate(this.days[this.days.length - 1]);
-
-  // testdata - mdoe = year
-  if (this.displayMode === this.DAY) {
-    this.startDate = scout.dates.parseJsonDate("2015-04-01 00:00:00.000");
-    this.endDate = scout.dates.parseJsonDate("2015-04-01 00:00:00.000");
-  } else if (this.displayMode ===  this.WORK) {
-    this.startDate = scout.dates.parseJsonDate("2015-03-30 00:00:00.000");
-    this.endDate = scout.dates.parseJsonDate("2015-04-03 00:00:00.000");
-  } else if  (this.displayMode ===  this.WEEK) {
-    this.startDate = scout.dates.parseJsonDate("2015-03-30 00:00:00.000");
-    this.endDate = scout.dates.parseJsonDate("2015-04-05 00:00:00.000");
-  } else if (this.displayMode === this.MONTH) {
-    this.startDate = scout.dates.parseJsonDate("2015-07-01 00:00:00.000");
-    this.endDate = scout.dates.parseJsonDate("2016-02-01 00:00:00.000");
-  } else if (this.displayMode === this.YEAR) {
-    this.startDate = scout.dates.parseJsonDate("2015-04-01 00:00:00.000");
-    this.endDate = scout.dates.parseJsonDate("2016-03-01 00:00:00.000");
-  }
+  // testdata - mode = year
+//  if (this.displayMode === this.DAY) {
+//    this.viewRange.from = scout.dates.parseJsonDate("2015-04-01 00:00:00.000");
+//    this.viewRange.to = scout.dates.parseJsonDate("2015-04-01 00:00:00.000");
+//  } else if (this.displayMode ===  this.WORK) {
+//    this.viewRange.from = scout.dates.parseJsonDate("2015-03-30 00:00:00.000");
+//    this.viewRange.to = scout.dates.parseJsonDate("2015-04-03 00:00:00.000");
+//  } else if  (this.displayMode ===  this.WEEK) {
+//    this.viewRange.from = scout.dates.parseJsonDate("2015-03-30 00:00:00.000");
+//    this.viewRange.to = scout.dates.parseJsonDate("2015-04-05 00:00:00.000");
+//  } else if (this.displayMode === this.MONTH) {
+//    this.viewRange.from = scout.dates.parseJsonDate("2015-07-01 00:00:00.000");
+//    this.viewRange.to = scout.dates.parseJsonDate("2016-02-01 00:00:00.000");
+//  } else if (this.displayMode === this.YEAR) {
+//    this.viewRange.from = scout.dates.parseJsonDate("2015-04-01 00:00:00.000");
+//    this.viewRange.to = scout.dates.parseJsonDate("2016-03-01 00:00:00.000");
+//  }
 
   // update
   this._layoutRange();
@@ -212,21 +205,21 @@ scout.Planner.prototype._layoutRange = function() {
     toText = ' bis ';
 
   // find range text
-  if (scout.dates.isSameDay(this.startDate, this.endDate)) {
-    text = this._dateFormat(this.startDate, 'd. MMMM yyyy');
-  } else if (this.startDate.getMonth() == this.endDate.getMonth()) {
-    text = this._dateFormat(this.startDate, 'd.') + toText + this._dateFormat(this.endDate, 'd. MMMM yyyy');
-  } else if (this.startDate.getFullYear() === this.endDate.getFullYear()) {
+  if (scout.dates.isSameDay(this.viewRange.from, this.viewRange.to)) {
+    text = this._dateFormat(this.viewRange.from, 'd. MMMM yyyy');
+  } else if (this.viewRange.from.getMonth() == this.viewRange.to.getMonth()) {
+    text = this._dateFormat(this.viewRange.from, 'd.') + toText + this._dateFormat(this.viewRange.to, 'd. MMMM yyyy');
+  } else if (this.viewRange.from.getFullYear() === this.viewRange.to.getFullYear()) {
     if (this.displayMode === this.MONTH || this.displayMode === this.YEAR) {
-      text = this._dateFormat(this.startDate, 'MMMM yyyy') + toText + this._dateFormat(this.endDate, 'MMMM yyyy');
+      text = this._dateFormat(this.viewRange.from, 'MMMM yyyy') + toText + this._dateFormat(this.viewRange.to, 'MMMM yyyy');
     } else {
-      text = this._dateFormat(this.startDate, 'd.  MMMM') + toText + this._dateFormat(this.endDate, 'd. MMMM yyyy');
+      text = this._dateFormat(this.viewRange.from, 'd.  MMMM') + toText + this._dateFormat(this.viewRange.to, 'd. MMMM yyyy');
     }
   } else {
     if (this.displayMode === this.MONTH || this.displayMode === this.YEAR) {
-      text = this._dateFormat(this.startDate, 'MMMM yyyy') + toText + this._dateFormat(this.endDate, 'MMMM yyyy');
+      text = this._dateFormat(this.viewRange.from, 'MMMM yyyy') + toText + this._dateFormat(this.viewRange.to, 'MMMM yyyy');
     } else {
-      text = this._dateFormat(this.startDate, 'd.  MMMM yyyy') +toText + this._dateFormat(this.endDate, 'd. MMMM yyyy');
+      text = this._dateFormat(this.viewRange.from, 'd.  MMMM yyyy') +toText + this._dateFormat(this.viewRange.to, 'd. MMMM yyyy');
     }
   }
 
@@ -259,12 +252,12 @@ scout.Planner.prototype._layoutScale  = function() {
     // days
     // hours
   } else if (this.displayMode === this.MONTH) {
-    var week = new Date(this.startDate.valueOf());
+    var week = new Date(this.viewRange.from.valueOf());
 
     // from start to end
-    while (week <= this.endDate) {
-      if ((week.getDate() < 8 ) || (week.valueOf() == this.startDate.valueOf())) {
-        if ((week.getMonth() === 0) || (week.valueOf() == this.startDate.valueOf())) {
+    while (week <= this.viewRange.to) {
+      if ((week.getDate() < 8 ) || (week.valueOf() == this.viewRange.from.valueOf())) {
+        if ((week.getMonth() === 0) || (week.valueOf() == this.viewRange.from.valueOf())) {
           $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(week, 'MMMM yyyy')).data('count', 0);
         } else {
           $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(week, 'MMMM')).data('count', 0);
@@ -284,12 +277,12 @@ scout.Planner.prototype._layoutScale  = function() {
     $timelineSmall.children().css('width', width + '%');
 
   } else if (this.displayMode === this.YEAR) {
-    var month = new Date(this.startDate.valueOf()),
+    var month = new Date(this.viewRange.from.valueOf()),
       $divLarge;
 
     // from start to end
-    while (month <= this.endDate) {
-      if ((month.getMonth() === 0) || (month.valueOf() == this.startDate.valueOf())) {
+    while (month <= this.viewRange.to) {
+      if ((month.getMonth() === 0) || (month.valueOf() == this.viewRange.from.valueOf())) {
         $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(month, 'yyyy')).data('count', 0);
       }
 
@@ -347,7 +340,9 @@ scout.Planner.prototype._build$Activity = function(activity) {
     level = 100 - Math.min(activity.level * 100, 100),
     levelColor = scout.helpers.modelToCssColor(activity.levelColor);
 
-  $activity.text(activity.text);
+  $activity.text(activity.text)
+    .data('activity', activity)
+    .on('click', this._onActivityClick.bind(this));
   if (activity.cssClass) {
     $activity.addClass(activity.cssClass);
   }
@@ -357,6 +352,7 @@ scout.Planner.prototype._build$Activity = function(activity) {
   // the background-color represents the fill level and not the image. This makes it easier to change the color using a css class
   $activity.css('background-image', 'linear-gradient(to bottom, #fff 0%, #fff ' + level + '%, transparent ' + level + '%, transparent 100% )');
 
+  activity.$activity = $activity;
   return $activity;
 };
 
@@ -364,7 +360,7 @@ scout.Planner.prototype._build$Activity = function(activity) {
 
 scout.Planner.prototype.drawYear = function() {
   // init vars
-  var year = this.start.getFullYear(),
+  var year = this.viewRange.from.getFullYear(),
     first, $month, day, $day;
 
   // set title
@@ -518,6 +514,21 @@ scout.Planner.prototype._onYearHoverOut = function(event) {
   $('.year-day.year-hover, .year-day.year-hover-day', this.$year).removeClass('year-hover year-hover-day');
 };
 
+scout.Planner.prototype._onResourceMousedown = function(event) {
+  var $resource = $(event.delegateTarget),
+  resource = $resource.data('resource');
+
+  this.selectResource(resource);
+};
+
+scout.Planner.prototype._onActivityClick = function(event) {
+  var $activity = $(event.delegateTarget),
+    activity = $activity.data('activity');
+
+  $.l(activity);
+};
+
+
 /* -- helper ---------------------------------------------------- */
 
 scout.Planner.prototype._dateFormat = function(date, pattern) {
@@ -527,17 +538,12 @@ scout.Planner.prototype._dateFormat = function(date, pattern) {
   return dateFormat.format(d);
 };
 
-
 /* -----------  Scout  -------------------------------*/
 
-scout.Planner.prototype._onResourceMousedown = function(event) {
-  var $resource = $(event.delegateTarget),
-    resource = $resource.data('resource');
-
-  this.selectResource(resource);
+scout.Planner.prototype._renderViewRange = function() {
+  //FIXME CGU/CRU always redraw whole screen? what if several properties change?
+  this._updateScreen();
 };
-
-scout.Planner.prototype._renderDays = function() {};
 
 scout.Planner.prototype._renderWorkDayCount = function() {};
 
@@ -554,6 +560,13 @@ scout.Planner.prototype._renderDisplayMode = function() {};
 scout.Planner.prototype._renderSelectedBeginTime = function() {};
 
 scout.Planner.prototype._renderSelectedEndTime = function() {};
+
+scout.Planner.prototype._syncViewRange = function(viewRange) {
+  this.viewRange = {
+    from: scout.dates.create(viewRange.from),
+    to: scout.dates.create(viewRange.to)
+  };
+};
 
 scout.Planner.prototype._syncSelectedResources = function(selectedResources) {
   this.selectedResources = this._resourcesByIds(selectedResources);
@@ -581,6 +594,14 @@ scout.Planner.prototype._resourcesByIds = function(ids) {
 
 scout.Planner.prototype._resourceById = function(id) {
   return this.resourceMap[id];
+};
+
+scout.Planner.prototype.setDisplayMode = function(displayMode) {
+  this.displayMode = displayMode;
+  this._sendSetDisplayMode(displayMode);
+
+  //FIXME CGU/CRU currently only triggered by server, because end time is not known here
+//  this._updateScreen();
 };
 
 scout.Planner.prototype.selectResource = function(resource) {
@@ -630,6 +651,12 @@ scout.Planner.prototype._deleteAllResources = function() {
   // Update model
   this.resources = [];
   this.resourcesMap = {};
+};
+
+scout.Planner.prototype._sendSetDisplayMode = function(displayMode) {
+  this.session.send(this.id, 'setDisplayMode', {
+    displayMode: displayMode
+  });
 };
 
 scout.Planner.prototype._sendSetSelection = function(resourceIds, beginTime, endTime) {

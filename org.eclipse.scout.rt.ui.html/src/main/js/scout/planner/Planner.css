@@ -286,6 +286,7 @@
 .planner-grid {
   display: inline-block;
   height: calc(~"100%" - 2 * @planner-header-height);
+  width: 100%;
   overflow: hidden;
   position: absolute;
 

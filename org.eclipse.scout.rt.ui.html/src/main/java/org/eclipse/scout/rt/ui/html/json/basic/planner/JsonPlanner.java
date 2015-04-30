@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
@@ -26,7 +27,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyObserver<P> {
+public class JsonPlanner<T extends IPlanner<?, ?>> extends AbstractJsonPropertyObserver<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonPlanner.class);
 
   // from model
@@ -37,8 +38,8 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   public static final String EVENT_ALL_RESOURCES_DELETED = "allResourcesDeleted";
 
   // from UI
+  private static final String EVENT_SET_DISPLAY_MODE = "setDisplayMode";
   private static final String EVENT_SET_SELECTION = "setSelection";
-  private static final String EVENT_SET_DAYS = "setDays";
   private static final String EVENT_SET_SELECTED_ACTIVITY_CELLS = "setSelectedActivityCells";
   private static final String EVENT_CELL_ACTION = "cellAction";
 
@@ -49,7 +50,7 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   private final Map<Resource<?>, String> m_resourceIds;
   private final AbstractEventBuffer<PlannerEvent> m_eventBuffer;
 
-  public JsonPlanner(P model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonPlanner(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
     m_cells = new HashMap<>();
     m_cellIds = new HashMap<>();
@@ -84,18 +85,18 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
   }
 
   @Override
-  protected void initJsonProperties(P model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_DISPLAY_MODE, model) {
+    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_DISPLAY_MODE, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getDisplayMode();
       }
     });
-    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_DAYS, model) {
+    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_VIEW_RANGE, model) {
       @Override
-      protected Date[] modelValue() {
-        return getModel().getDays();
+      protected Range<Date> modelValue() {
+        return getModel().getViewRange();
       }
 
       @Override
@@ -103,47 +104,48 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
         if (value == null) {
           return null;
         }
-        JSONArray jsonArray = new JSONArray();
-        for (Date date : (Date[]) value) {
-          jsonArray.put(new JsonDate(date).asJsonString());
-        }
-        return jsonArray;
+        @SuppressWarnings("unchecked")
+        Range<Date> modelValue = (Range<Date>) value;
+        JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+        json.put("from", new JsonDate(modelValue.getFrom()).asJsonString());
+        json.put("to", new JsonDate(modelValue.getTo()).asJsonString());
+        return json;
       }
     });
     //FIXME CGU remove
-//    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_WORK_DAY_COUNT, model) {
+//    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_WORK_DAY_COUNT, model) {
 //      @Override
 //      protected Integer modelValue() {
 //        return getModel().getWorkDayCount();
 //      }
 //    });
     //FIXME CGU not part of planner mode?
-//    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_WORK_DAYS_ONLY, model) {
+//    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_WORK_DAYS_ONLY, model) {
 //      @Override
 //      protected Boolean modelValue() {
 //        return getModel().isWorkDaysOnly();
 //      }
 //    });
     //FIXME CGU needed?
-//    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_FIRST_HOUR_OF_DAY, model) {
+//    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_FIRST_HOUR_OF_DAY, model) {
 //      @Override
 //      protected Integer modelValue() {
 //        return getModel().getFirstHourOfDay();
 //      }
 //    });
-//    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_LAST_HOUR_OF_DAY, model) {
+//    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_LAST_HOUR_OF_DAY, model) {
 //      @Override
 //      protected Integer modelValue() {
 //        return getModel().getLastHourOfDay();
 //      }
 //    });
-//    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_INTRADAY_INTERVAL, model) {
+//    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_INTRADAY_INTERVAL, model) {
 //      @Override
 //      protected Long modelValue() {
 //        return getModel().getIntradayInterval();
 //      }
 //    });
-    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_SELECTED_BEGIN_TIME, model) {
+    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTED_BEGIN_TIME, model) {
       @Override
       protected Date modelValue() {
         return getModel().getSelectedBeginTime();
@@ -154,7 +156,7 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
         return new JsonDate((Date) value).asJsonString();
       }
     });
-    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_SELECTED_END_TIME, model) {
+    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTED_END_TIME, model) {
       @Override
       protected Date modelValue() {
         return getModel().getSelectedEndTime();
@@ -165,7 +167,7 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
         return new JsonDate((Date) value).asJsonString();
       }
     });
-    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_SELECTED_RESOURCES, model) {
+    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTED_RESOURCES, model) {
       @Override
       protected List<?> modelValue() {
         return getModel().getSelectedResources();
@@ -179,7 +181,7 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
         return resourceIdsToJson(resources, new P_GetOrCreateResourceIdProvider());
       }
     });
-    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_SELECTED_ACTIVITY_CELL, model) {
+    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_SELECTED_ACTIVITY_CELL, model) {
       @Override
       protected Activity<?, ?> modelValue() {
         return getModel().getSelectedActivityCell();
@@ -191,7 +193,7 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
         return new P_GetOrCreateCellIdProvider().getId(activityCell);
       }
     });
-    putJsonProperty(new JsonProperty<P>(IPlanner.PROP_DRAW_SECTIONS, model) {
+    putJsonProperty(new JsonProperty<T>(IPlanner.PROP_DRAW_SECTIONS, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isDrawSections();
@@ -355,11 +357,11 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_SET_SELECTION.equals(event.getType())) {
-      handleUiSetSelection(event);
+    if (EVENT_SET_DISPLAY_MODE.equals(event.getType())) {
+      handleUiSetDisplayMode(event);
     }
-    else if (EVENT_SET_DAYS.equals(event.getType())) {
-      handleUiSetDays(event);
+    else if (EVENT_SET_SELECTION.equals(event.getType())) {
+      handleUiSetSelection(event);
     }
     else if (EVENT_SET_SELECTED_ACTIVITY_CELLS.equals(event.getType())) {
       handleUiSetSelectedActivityCells(event);
@@ -372,6 +374,12 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
     }
   }
 
+  protected void handleUiSetDisplayMode(JsonEvent event) {
+    JSONObject data = event.getData();
+    int displayMode = data.getInt("displayMode");
+    getModel().getUIFacade().setDisplayModeFromUI(displayMode);
+  }
+
   @SuppressWarnings("unchecked")
   protected void handleUiSetSelection(JsonEvent event) {
     Date beginTime = new JsonDate(event.getData().optString("beginTime")).asJavaDate();
@@ -379,16 +387,6 @@ public class JsonPlanner<P extends IPlanner<?, ?>> extends AbstractJsonPropertyO
     List<Resource<?>> resources = extractResources(event.getData());
     addPropertyEventFilterCondition(IPlanner.PROP_SELECTED_RESOURCES, resources);
     getModel().getUIFacade().setSelectionFromUI(resources, beginTime, endTime);
-  }
-
-  protected void handleUiSetDays(JsonEvent event) {
-    JSONArray jsonDays = event.getData().optJSONArray("days");
-    Date[] days = new Date[jsonDays.length()];
-    for (int i = 0; i < jsonDays.length(); i++) {
-      days[i] = new JsonDate(jsonDays.optString(i)).asJavaDate();
-    }
-
-    getModel().getUIFacade().setDaysFromUI(days);
   }
 
   // FIXME CGU Fix generics
