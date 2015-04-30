@@ -295,6 +295,8 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   if (this._groupColumn()) {
     this._group();
   }
+
+  this.selectionHandler.renderSelection();
 };
 
 /**
@@ -318,8 +320,6 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
   };
   if (sorted) {
     this.session.send(this.id, 'rowsSorted', data);
-
-    this.clearSelection();
     this._renderRowOrderChanges();
   } else {
     // Delegate sorting to server when it is not possible on client side
