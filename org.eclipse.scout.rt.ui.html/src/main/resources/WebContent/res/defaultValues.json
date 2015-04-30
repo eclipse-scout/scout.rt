@@ -76,6 +76,7 @@
     },
     "Planner": {
       "resources": [],
+      "viewRange": {},
       "selectedResources": []
     },
     "Resource": {
