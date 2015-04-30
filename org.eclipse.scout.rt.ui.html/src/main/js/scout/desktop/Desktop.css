@@ -5,15 +5,12 @@
   left: 0;
   bottom: 0;
   right: 0;
-  &:
-  focus
-  {
-  outline
-  :
-  none;
+
+  &:focus {
+    outline: none;
+  }
 }
 
-}
 .desktop-bench {
   position: absolute;
   top: @desktop-taskbar-height;
@@ -26,33 +23,21 @@
 .desktop-tool-container {
   position: absolute;
   top: @desktop-taskbar-height;
-  z-index: 1; . menu-context;
+  z-index: 1;
+  .menu-context;
   background-color: @background-color;
   border-top: 1px solid transparent;
 }
 
 /* taskbar */
+
 .desktop-taskbar {
   position: absolute;
   top: 0px;
   left: @size-desktop-navigation;
   right: 0px;
   height: @desktop-taskbar-height;
-  border-bottom: 1px solid@border-color;
-}
-
-.taskbar-tabs, .taskbar-tools {
-  display: inline-block;
-  word-wrap: none;
-  vertical-align: top;
-}
-
-.taskbar-tools {
-  float: right;
-}
-
-.taskbar.menu-textandicon[data-icon]::before {
-  padding-right: @taskbar-menu-textandicon-padding-right;
+  border-bottom: 1px solid @border-color;
 }
 
 .popup-head.taskbar-tool-item.selected {
@@ -68,116 +53,115 @@
 .popup-head[data-icon].taskbar-tool-item.selected::before {
   font-size: 17px;
 }
+.taskbar-tabs, .taskbar-tools {
+  display:inline-block;
+  word-wrap: none;
+  vertical-align:top;
+}
 
-.taskbar-tab-item, .taskbar-tool-item {
+.taskbar-tools {
+   float: right;
+}
+
+.taskbar.menu-textandicon[data-icon]::before {
+  padding-right: @taskbar-menu-textandicon-padding-right;
+}
+
+.taskbar-tab-item,
+.taskbar-tool-item {
   position: relative;
   vertical-align: top;
   display: inline-block;
   height: @desktop-taskbar-height;
   padding: 6px 20px 0 20px;
+
   cursor: pointer;
   background-color: @panel-background-color;
   color: @text-color;
-  border-bottom: 1px solid@border-color;
-  &:
-  hover
-  {
-  color
-  :
-  @
-  hover-color;
+  border-bottom: 1px solid @border-color;
+
+  &:hover {
+    color: @hover-color;
+  }
+
+  &.disabled {
+    color: @disabled-color;
+    cursor: default;
+  }
+
+  &.selected {
+    cursor: default;
+    background-color: @background-color;
+    color: @active-color;
+    border-bottom: 1px solid @background-color;
+  }
+
+  &> div {
+    .overflow-ellipsis-nowrap;
+  }
+
+  &> .title {
+    .font-text-large;
+  }
+
+  &> .sub-title {
+    .font-text-normal;
+  }
 }
 
-&
-.disabled {
-  color: @disabled-color;
-  cursor: default;
-}
-
-&
-.selected {
-  cursor: default;
-  background-color: @background-color;
-  color: @active-color;
-  border-bottom: 1px solid@background-color;
-}
-
-&>
-div { .overflow-ellipsis-nowrap;
-
-}
-
-&>
-.title { .font-text-large;
-
-}
-
-&>
-.sub-title { .font-text-normal;
-
-}
-
-}
 .taskbar-tab-item {
-  border-right: 1px solid@border-color;
+  border-right: 1px solid @border-color;
   width: 220px;
 }
 
-@
-taskbar-menu-textandicon-padding-right: 11px ;
+@taskbar-menu-textandicon-padding-right: 11px;
 
 .taskbar-tool-item {
-  position: relative; . font-text-plus;
+  position: relative;
+  .font-text-plus;
   background-color: @palette-white;
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
-  padding-top: 16px; &:: before { .font-icon;
-  color: @icon-color;
-  font-size: 17px;
-  vertical-align: -3px;
-  padding-right: @taskbar-menu-textandicon-padding-right;
-  content: attr(data-icon);
+  padding-top:16px;
+
+  &::before {
+    .font-icon;
+    color: @icon-color;
+    font-size: 17px;
+    vertical-align: -3px;
+    padding-right: @taskbar-menu-textandicon-padding-right;
+    content: attr(data-icon);
+  }
+
+  &:hover::before {
+    color: @hover-color;
+  }
+
+  &.selected {
+    border-left: 1px solid @border-color;
+    border-right: 1px solid @border-color;
+    border-bottom: 1px solid @background-color;
+    cursor: pointer;
+
+    &::before {
+      color: @active-color;
+    }
+  }
+
+  &.disabled::before {
+    color: @disabled-color;
+  }
 }
 
-&
-:hover::before {
-  color: @hover-color;
-}
-
-&
-.selected {
-  border-left: 1px solid@border-color;
-  border-right: 1px solid@border-color;
-  border-bottom: 1px solid@background-color;
-  cursor: pointer;
-  &::
-  before
-  {
-  color
-  :
-  @
-  active-color;
-}
-
-}
-&
-.disabled::before {
-  color: @disabled-color;
-}
-
-}
-.taskbar-tab-item .key-box, .taskbar-tool-item .key-box {
+.taskbar-tab-item .key-box,
+.taskbar-tool-item .key-box {
   top: 8px;
-  &.
-  disabled
-  {
-  background-color
-  :
-  @
-  disabled-color;
+
+  &.disabled {
+    background-color: @disabled-color;
+  }
 }
 
-}
 .taskbar-logo {
   float: right;
   margin-top: 8px;
@@ -188,97 +172,89 @@ taskbar-menu-textandicon-padding-right: 11px ;
   background: url('logo.png');
   background-size: contain;
   background-repeat: no-repeat;
-  &.
-  animated
-  {
-  .animation-name(pulse-opacity);
-  .
-  animation-duration
-  (1.5s);
-  .
-  animation-timing-function
-  (ease-in-out);
-  .
-  animation-iteration-count
-  (infinite);
-}
 
+  &.animated {
+    .animation-name(pulse-opacity);
+    .animation-duration(1.5s);
+    .animation-timing-function(ease-in-out);
+    .animation-iteration-count(infinite);
+  }
 }
 
 /* bench */
-@
-desktop-table-header-padding-y: @table-header-padding-y+ 6; @desktop-table-row-padding-y:
-  @table-row-padding-y+ 6; .desktop-bench>.table { &:focus { outline:none;
 
-}
+@desktop-table-header-padding-y: @table-header-padding-y + 6;
+@desktop-table-row-padding-y: @table-row-padding-y + 6;
 
-&
->
-.table-header>.header-item {
-  padding-top: @desktop-table-header-padding-y;
-  padding-bottom: @desktop-table-header-padding-y;
-}
+.desktop-bench > .table {
+  &:focus {
+    outline: none;
+  }
 
-&
->
-.table-header, & > .table-data {
-  margin-left: @bench-margin-x;
-  margin-right: @bench-margin-x;
-}
+  & > .table-header > .header-item {
+    padding-top: @desktop-table-header-padding-y;
+    padding-bottom: @desktop-table-header-padding-y;
+  }
 
-&
->
-.table-data { & > .table-row , & > .table-row-sum {
-  /* Desktop table has a 2px border. For this we create a div which spans the full row and has */
-  /* border-top/bottom set to 1px. Middle rows don't have 2px border so no need to do it for those. */
-  border-left-width:2px;
-  border-right-width: 2px; &. selected { background-color : @
-  item-selection-background-color;
-  border-color: @item-selection-border-color;
-}
+  & > .table-header,
+  & > .table-data {
+    margin-left: @bench-margin-x;
+    margin-right: @bench-margin-x;
+  }
 
-&
-.select-single::before, &.select-top::before, &.select-bottom::before {
-  .overlay;
-  /* Make sure overlay does not get target of mouse events, necessary for links inside table-cell.
+  & > .table-data {
+
+    & > .table-row,
+    & > .table-row-sum {
+      /* Desktop table has a 2px border. For this we create a div which spans the full row and has */
+      /* border-top/bottom set to 1px. Middle rows don't have 2px border so no need to do it for those. */
+      border-left-width: 2px;
+      border-right-width: 2px;
+
+      &.selected {
+        background-color: @item-selection-background-color;
+        border-color: @item-selection-border-color;
+      }
+
+      &.select-single::before,
+      &.select-top::before,
+      &.select-bottom::before {
+        .overlay;
+        /* Make sure overlay does not get target of mouse events, necessary for links inside table-cell.
         FIXME CGU verify if this really works with IE 9 */
-  pointer-events: none;
-}
+        pointer-events: none;
+      }
 
-&
-.select-top::before {
-  border-top: 1px solid@item-selection-border-color;
-}
+      &.select-top::before {
+        border-top: 1px solid @item-selection-border-color;
+      }
 
-&
-.select-bottom::before {
-  border-bottom: 1px solid@item-selection-border-color;
-}
+      &.select-bottom::before {
+        border-bottom: 1px solid @item-selection-border-color;
+      }
 
-&
-.select-single::before {
-  border-top: 1px solid@item-selection-border-color;
-  border-bottom: 1px solid@item-selection-border-color;
-}
+      &.select-single::before {
+        border-top: 1px solid @item-selection-border-color;
+        border-bottom: 1px solid @item-selection-border-color;
+      }
 
-&
->
-.table-cell {
-  padding-top: @desktop-table-row-padding-y;
-  padding-bottom: @desktop-table-row-padding-y; &. checkable {
-  padding-top : @ desktop-table-row-padding-y - @
-  checkable-cell-padding-adjustment;
-  padding-bottom: @desktop-table-row-padding-y- @checkable-cell-padding-adjustment;
-}
+      & > .table-cell {
+        padding-top: @desktop-table-row-padding-y;
+        padding-bottom: @desktop-table-row-padding-y;
 
-}
-}
-}
+        &.checkable {
+          padding-top: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment;
+          padding-bottom: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment;
+        }
+      }
+    }
+  }
 }
 
 /* base desktop */
+
 .offline-message {
-  border: 1px solid@palette-blue-4;
+  border: 1px solid @palette-blue-4;
   background-color: @palette-gray-3;
   padding: 6px 5px;
   margin: 20px auto;
@@ -289,7 +265,7 @@ desktop-table-header-padding-y: @table-header-padding-y+ 6; @desktop-table-row-p
 }
 
 .offline-message.reconnect-successful {
-  border: 1px solid@palette-green-4;
+  border: 1px solid @palette-green-4;
   background-color: @palette-green-1;
 }
 
@@ -298,7 +274,8 @@ desktop-table-header-padding-y: @table-header-padding-y+ 6; @desktop-table-row-p
   float: right;
 }
 
-.reconnect-animated::before { .animation (rotation 0.9s linear infinite);
+.reconnect-animated::before {
+  .animation(rotation 0.9s linear infinite);
   content: '';
   display: inline-block;
   vertical-align: middle;
@@ -318,22 +295,23 @@ desktop-table-header-padding-y: @table-header-padding-y+ 6; @desktop-table-row-p
   left: 0;
   bottom: 0;
   right: 0;
-  background-color: rgba(0, 0, 0, 0.2); . animation (fadeIn ease-in 1); .
-  animation-duration (0.25s);
+  background-color: rgba(0, 0, 0, 0.2);
+  .animation(fadeIn ease-in 1);
+  .animation-duration(0.25s);
   outline: none;
-  z-index: 9; &. busy {
-  /* Make glasspane transparent and disable animation */ opacity : 0.0; .
-  animation (none);
-  cursor: wait; &. dark { opacity : 1.0;
-  background-color: rgba(0, 0, 0, 0.1);
-  .
-  animation
-  (fadeIn
-  ease-in
-  1);
-  .
-  animation-duration
-  (0.25s);
-}
-}
+  z-index: 9;
+
+  &.busy {
+    /* Make glasspane transparent and disable animation */
+    opacity: 0.0;
+    .animation(none);
+    cursor: wait;
+
+    &.dark {
+      opacity: 1.0;
+      background-color: rgba(0, 0, 0, 0.1);
+      .animation(fadeIn ease-in 1);
+      .animation-duration(0.25s);
+    }
+  }
 }
