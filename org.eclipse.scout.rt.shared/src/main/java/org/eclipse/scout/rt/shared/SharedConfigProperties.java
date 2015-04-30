@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.rt.platform.config.AbstractBinaryConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.shared.TierState.Tier;
@@ -61,6 +62,23 @@ public final class SharedConfigProperties {
     @Override
     public String getKey() {
       return "scout.auth.publickey";
+    }
+  }
+
+  /**
+   * Number of cycles to hash for auth token. Only relevant if {@link AuthTokenHashContentProperty} is set to
+   * <code>true</code>. More cycles lead to less performance but better security.
+   */
+  public static class AuthTokenNumHashCyclesProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public Integer getDefaultValue() {
+      return Integer.valueOf(13);
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.auth.token.hash.cycles";
     }
   }
 

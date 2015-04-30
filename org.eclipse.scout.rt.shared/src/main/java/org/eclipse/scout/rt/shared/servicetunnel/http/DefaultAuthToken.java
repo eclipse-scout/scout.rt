@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenHashContentProperty;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenNumHashCyclesProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLifeProperty;
@@ -40,6 +41,7 @@ public class DefaultAuthToken {
   protected static final byte[] PRIVATE_KEY = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
   protected static final byte[] PUBLIC_KEY = CONFIG.getPropertyValue(AuthTokenPublicKeyProperty.class);
   protected static final long TOKEN_TTL = CONFIG.getPropertyValue(AuthTokenTimeToLifeProperty.class);
+  protected static final int NUM_HASH_CYCLES = CONFIG.getPropertyValue(AuthTokenNumHashCyclesProperty.class);
   protected static final boolean USE_CONTENT_HASH = CONFIG.getPropertyValue(AuthTokenHashContentProperty.class);
 
   private final String m_userId;
@@ -102,7 +104,7 @@ public class DefaultAuthToken {
       return null;
     }
 
-    return SecurityUtility.hash(content, SALT);
+    return SecurityUtility.hash(content, SALT, NUM_HASH_CYCLES);
   }
 
   public static boolean isActive() {
