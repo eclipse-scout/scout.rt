@@ -13,7 +13,7 @@ scout.GlassPaneKeyStrokeAdapter.prototype.drawKeyBox = function(drawedKeyStrokes
 scout.GlassPaneKeyStrokeAdapter.prototype.removeKeyBox = function() {
   //nop
 };
-scout.AbstractKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
+scout.GlassPaneKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
   //nop
 };
 
