@@ -13,22 +13,15 @@ package org.eclipse.scout.rt.client.ui.basic.planner;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.List;
-import java.util.Random;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -192,6 +185,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @ConfigOperation
+  @Order(40)
+  protected void execDisplayModeChanged(int displayMode) throws ProcessingException {
+  }
+
+  @ConfigOperation
   @Order(50)
   protected void execResourcesSelected(List<Resource<RI>> resources) throws ProcessingException {
   }
@@ -289,6 +287,15 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
           List<Resource<RI>> resources = (List<Resource<RI>>) e.getNewValue();
           try {
             interceptResourcesSelected(resources);
+          }
+          catch (Exception t) {
+            BEANS.get(ExceptionHandler.class).handle(t);
+          }
+        }
+        else if (e.getPropertyName().equals(PROP_DISPLAY_MODE)) {
+          try {
+            //FIXME CGU add interceptor
+            execDisplayModeChanged((int) e.getNewValue());
           }
           catch (Exception t) {
             BEANS.get(ExceptionHandler.class).handle(t);
@@ -839,112 +846,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
-  public Date getBeginTime() {
-    Calendar cal = Calendar.getInstance();
-    Date[] a = getDays();
-    if (a.length > 0) {
-      cal.setTime(a[0]);
-    }
-    else {
-      cal.setTime(DateUtility.truncDate(new Date()));
-    }
-    switch (getDisplayMode()) {
-      case DISPLAY_MODE_INTRADAY: {
-        cal.set(Calendar.HOUR_OF_DAY, getFirstHourOfDay());
-        break;
-      }
-      case DISPLAY_MODE_DAY: {
-        break;
-      }
-      case DISPLAY_MODE_WEEK: {
-        break;
-      }
-    }
-    return cal.getTime();
-  }
-
-  @Override
-  public Date getEndTime() {
-    Calendar cal = Calendar.getInstance();
-    Date[] a = getDays();
-    if (a.length > 0) {
-      cal.setTime(a[a.length - 1]);
-    }
-    else {
-      cal.setTime(DateUtility.truncDate(new Date()));
-    }
-    switch (getDisplayMode()) {
-      case DISPLAY_MODE_INTRADAY: {
-        cal.set(Calendar.HOUR_OF_DAY, getLastHourOfDay());
-        break;
-      }
-      case DISPLAY_MODE_DAY: {
-        cal.add(Calendar.DATE, 1);
-        break;
-      }
-      case DISPLAY_MODE_WEEK: {
-        cal.add(Calendar.DATE, 7);
-        break;
-      }
-    }
-    return cal.getTime();
-  }
-
-  @Override
-  public void addDay(Date day) {
-    day = DateUtility.truncDate(day);
-    if (day != null) {
-      TreeSet<Date> set = new TreeSet<Date>();
-      set.addAll(Arrays.asList(getDays()));
-      set.add(day);
-      setDaysInternal(set);
-    }
-  }
-
-  @Override
-  public void removeDay(Date day) {
-    day = DateUtility.truncDate(day);
-    if (day != null) {
-      TreeSet<Date> set = new TreeSet<Date>();
-      set.addAll(Arrays.asList(getDays()));
-      set.remove(day);
-      setDaysInternal(set);
-    }
-  }
-
-  @Override
-  public void setDay(Date day) {
-    day = DateUtility.truncDate(day);
-    TreeSet<Date> set = new TreeSet<Date>();
-    if (day != null) {
-      set.add(day);
-    }
-    setDaysInternal(set);
-  }
-
-  @Override
-  public void setDays(Date[] days) {
-    TreeSet<Date> set = new TreeSet<Date>();
-    for (Date d : days) {
-      set.add(DateUtility.truncDate(d));
-    }
-    setDaysInternal(set);
-  }
-
-  private void setDaysInternal(TreeSet<Date> set) {
-    propertySupport.setProperty(PROP_DAYS, set.toArray(new Date[set.size()]));
-  }
-
-  @Override
-  public Date[] getDays() {
-    Date[] a = (Date[]) propertySupport.getProperty(PROP_DAYS);
-    if (a == null) {
-      a = new Date[0];
-    }
-    return a;
-  }
-
-  @Override
   public int getWorkDayCount() {
     return propertySupport.getPropertyInt(PROP_WORK_DAY_COUNT);
   }
@@ -1031,6 +932,28 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
+  public Range<Date> getViewRange() {
+    @SuppressWarnings("unchecked")
+    Range<Date> propValue = (Range<Date>) propertySupport.getProperty(PROP_VIEW_RANGE);
+    // return a copy
+    return new Range<Date>(propValue);
+  }
+
+  @Override
+  public void setViewRange(Date minDate, Date maxDate) {
+    setViewRangeInternal(new Range<Date>(minDate, maxDate));
+  }
+
+  @Override
+  public void setViewRange(Range<Date> viewRange) {
+    setViewRangeInternal(new Range<Date>(viewRange));
+  }
+
+  private void setViewRangeInternal(Range<Date> viewRange) {
+    propertySupport.setProperty(PROP_VIEW_RANGE, viewRange);
+  }
+
+  @Override
   public Date getSelectedBeginTime() {
     return (Date) propertySupport.getProperty(PROP_SELECTED_BEGIN_TIME);
   }
@@ -1059,8 +982,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
           if (CompareUtility.equals(cell.getBeginTime(), beginTime) &&
               (CompareUtility.equals(cell.getEndTime(), endTime)
-              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
-              || (cell != null
+                  // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+                  || (cell != null
                   && cell.getEndTime() != null
                   && endTime != null
                   && cell.getEndTime().getTime() == endTime.getTime() + 1))) {
@@ -1108,146 +1031,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
-  public MultiTimeRange calculateSelectedTimeRanges(Date earliestBeginTime, Date latestEndTime) {
-    MultiTimeRange multiRange = new MultiTimeRange();
-    Calendar cal = Calendar.getInstance();
-    for (Date d : getDays()) {
-      cal.setTime(d);
-      cal.set(Calendar.HOUR_OF_DAY, getFirstHourOfDay());
-      Date from = cal.getTime();
-      cal.set(Calendar.HOUR_OF_DAY, getLastHourOfDay());
-      cal.add(Calendar.HOUR_OF_DAY, 1);
-      Date to = cal.getTime();
-      multiRange.add(from, to);
-    }
-    // remove too early and too late timeranges
-    Date min = multiRange.getBeginDate();
-    if (min != null && min.before(earliestBeginTime)) {
-      multiRange.remove(min, earliestBeginTime);
-    }
-    Date max = multiRange.getEndDate();
-    if (max != null && max.after(latestEndTime)) {
-      multiRange.remove(latestEndTime, max);
-    }
-    return multiRange;
-  }
-
-  @Override
-  public void planActivityForSelectedResources(boolean singleMatch, boolean chooseRandom, Date earliestBeginTime, Date latestEndTime, long preferredDuration) {
-    earliestBeginTime = DateUtility.toUtilDate(earliestBeginTime);
-    latestEndTime = DateUtility.toUtilDate(latestEndTime);
-    if (earliestBeginTime == null) {
-      earliestBeginTime = new Date();
-    }
-    if (latestEndTime == null) {
-      // at most 10 years in future
-      latestEndTime = new Date(System.currentTimeMillis() + 10L * 365L * 24L * 3600L * 1000L);
-    }
-    if (preferredDuration <= 0) {
-      preferredDuration = 30L * 60L * 1000L;
-    }
-    //
-    setSelectedTime(null, null);
-    if (singleMatch) {
-      planActivityForSelectedResourcesSingleInternal(chooseRandom, earliestBeginTime, latestEndTime, preferredDuration);
-    }
-    else {
-      planActivityForSelectedResourcesMultiInternal(earliestBeginTime, latestEndTime, preferredDuration);
-    }
-  }
-
-  /**
-   * step through all resources and collect best activities with a scoring
-   * algorithm<br>
-   * build a sorted map<br>
-   * the key is either (startDate-now) in minutes [if duration is ok] otherwise
-   * the key is 1000000-duration in minutes [if duration is at least 15 minutes]
-   * <p>
-   * the value is the plannedActivity for that resource
-   */
-  private void planActivityForSelectedResourcesSingleInternal(boolean chooseRandom, Date earliestBeginTime, Date latestEndTime, long preferredDuration) {
-    MultiTimeRange multiTimeRange = calculateSelectedTimeRanges(earliestBeginTime, latestEndTime);
-    if (multiTimeRange.isEmpty()) {
-      return;
-    }
-    SortedMap<CompositeObject, Activity<Integer, Integer>> sortMap = new TreeMap<>();
-    Random rnd = new Random();
-    int resourceIndex = 0;
-    for (Resource<RI> resource : getSelectedResources()) {
-      MultiTimeRange localTimeRanges = (MultiTimeRange) multiTimeRange.clone();
-      for (Activity<?, ?> a : resource.getActivities()) {
-        localTimeRanges.remove(a.getBeginTime(), a.getEndTime());
-      }
-      // now only available time ranges for that Resource<RI> are left
-      for (TimeRange tr : localTimeRanges.getTimeRanges()) {
-        long durationMillis = tr.getDurationMillis();
-        long sortNo = chooseRandom ? rnd.nextLong() : resourceIndex;
-        if (durationMillis >= preferredDuration) {
-          Activity<Integer, Integer> a = new Activity<Integer, Integer>(0, 0);
-          a.setBeginTime(tr.getFrom());
-          a.setEndTime(new Date(tr.getFrom().getTime() + preferredDuration));
-          sortMap.put(new CompositeObject(0, a.getBeginTime().getTime(), sortNo), a);
-        }
-        else if (durationMillis >= 15L * 60L * 1000L) {// at least 15 minutes
-          Activity<Integer, Integer> a = new Activity<Integer, Integer>(0, 0);
-          a.setBeginTime(tr.getFrom());
-          a.setEndTime(new Date(tr.getFrom().getTime() + durationMillis));
-          sortMap.put(new CompositeObject(1, -durationMillis, sortNo), a);
-        }
-      }
-      resourceIndex++;
-    }
-    // the top entry of the sort map is the one with best score (lowest number)
-    if (!sortMap.isEmpty()) {
-      Activity<Integer, Integer> a = sortMap.get(sortMap.firstKey());
-      setSelectedTime(a.getBeginTime(), a.getEndTime());
-    }
-  }
-
-  /**
-   * step through all resources and collect best activities with a scoring
-   * algorithm<br>
-   * build a sorted map<br>
-   * the key is either (startDate-now) in minutes [if duration is ok] otherwise
-   * the key is 1000000-duration in minutes [if duration is at least 15 minutes]
-   * <p>
-   * the value is the plannedActivity for that resource
-   */
-  private void planActivityForSelectedResourcesMultiInternal(Date earliestBeginTime, Date latestEndTime, long preferredDuration) {
-    MultiTimeRange multiTimeRange = calculateSelectedTimeRanges(earliestBeginTime, latestEndTime);
-    if (multiTimeRange.isEmpty()) {
-      return;
-    }
-    TreeMap<CompositeObject, Activity<Integer, Integer>> sortMap = new TreeMap<CompositeObject, Activity<Integer, Integer>>();
-    for (Resource<RI> resource : getSelectedResources()) {
-      for (Activity<?, ?> a : resource.getActivities()) {
-        multiTimeRange.remove(a.getBeginTime(), a.getEndTime());
-      }
-    }
-    // now only available time ranges for that resource are left
-    for (TimeRange tr : multiTimeRange.getTimeRanges()) {
-      long durationMillis = tr.getDurationMillis();
-      if (durationMillis >= preferredDuration) {
-        Activity<Integer, Integer> a = new Activity<Integer, Integer>(0, 0);
-        a.setBeginTime(tr.getFrom());
-        a.setEndTime(new Date(tr.getFrom().getTime() + preferredDuration));
-        sortMap.put(new CompositeObject(0, a.getBeginTime().getTime()), a);
-      }
-      else if (durationMillis >= 15L * 60L * 1000L) {// at least 15 minutes
-        Activity<Integer, Integer> a = new Activity<Integer, Integer>(0, 0);
-        a.setBeginTime(tr.getFrom());
-        a.setEndTime(new Date(tr.getFrom().getTime() + durationMillis));
-        sortMap.put(new CompositeObject(1, -durationMillis), a);
-      }
-    }
-    // the top entry of the sort map is the one with best score (lowest number)
-    if (!sortMap.isEmpty()) {
-      Activity<Integer, Integer> a = sortMap.get(sortMap.firstKey());
-      setSelectedTime(a.getBeginTime(), a.getEndTime());
-    }
-  }
-
-  @Override
   public IPlannerUIFacade getUIFacade() {
     return m_activityMapUIFacade;
   }
@@ -1283,8 +1066,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     }
 
     @Override
-    public void setDaysFromUI(Date[] days) {
-      setDays(days);
+    public void setDisplayModeFromUI(int displayMode) {
+      setDisplayMode(displayMode);
     }
 
     @Override

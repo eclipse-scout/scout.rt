@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
 
 public interface IPlannerUIFacade<RI, AI> {
 
-  void setDaysFromUI(Date[] days);
+  void setDisplayModeFromUI(int displayMode);
 
   void setSelectedActivityCellFromUI(Activity<RI, AI> cell);
 

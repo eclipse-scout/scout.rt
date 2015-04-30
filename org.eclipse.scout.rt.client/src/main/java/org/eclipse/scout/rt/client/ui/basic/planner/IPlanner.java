@@ -13,13 +13,13 @@ package org.eclipse.scout.rt.client.ui.basic.planner;
 import java.util.Date;
 import java.util.List;
 
+import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.TimeScale;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.Resource;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld;
 
@@ -31,9 +31,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldO
 public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
 
   /**
-   * {@link java.util.Date}[] truncated to day using {@link com.bsiag.DateUtility#truncDate(Date)}
+   * type {@link Date}[2]
    */
-  String PROP_DAYS = "days";
+  String PROP_VIEW_RANGE = "viewRange";
+
   /**
    * {@link Integer}
    */
@@ -60,10 +61,6 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
    */
   String PROP_DISPLAY_MODE = "displayMode";
   /**
-   * {@link Long}[]
-   */
-  String PROP_RESOURCE_IDS = "resources";
-  /**
    * {@link Date}
    */
   String PROP_SELECTED_BEGIN_TIME = "selectedBeginTime";
@@ -80,10 +77,6 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
    */
   String PROP_SELECTED_ACTIVITY_CELL = "selectedActivityCell";
   /**
-   * {@link TimeScale}
-   */
-  String PROP_TIME_SCALE = "timeScale";
-  /**
    * {@link Boolean}
    */
   String PROP_DRAW_SECTIONS = "drawSections";
@@ -99,6 +92,8 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
   int DISPLAY_MODE_WEEK = 2;
   int DISPLAY_MODE_MONTH = 3;
   int DISPLAY_MODE_WORKWEEK = 4;
+  int DISPLAY_MODE_CALENDAR_WEEK = 5;
+  int DISPLAY_MODE_YEAR = 6;
 
   void initPlanner() throws ProcessingException;
 
@@ -126,36 +121,13 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
   void setPlannerChanging(boolean b);
 
   /**
-   * All the days which are display in the activity map.<br>
-   * Ordered ascending
+   * @return a Date tupel [begin, end]
    */
-  Date[] getDays();
+  Range<Date> getViewRange();
 
-  void setDays(Date[] days);
+  void setViewRange(Date viewDateStart, Date viewDateEnd);
 
-  void addDay(Date day);
-
-  void removeDay(Date day);
-
-  void setDay(Date day);
-
-  /**
-   * @return begin time of activity map
-   *         <p>
-   *         Intraday: This is the first hour of the first day<br>
-   *         Day: This is the first day at 00:00<br>
-   *         Week: This is the first day at 00:00 of the first week
-   */
-  Date getBeginTime();
-
-  /**
-   * @return end time of activity map
-   *         <p>
-   *         Intraday: This is the last hour +1 of the first day<br>
-   *         Day: This is the day after the last day at 00:00<br>
-   *         Week: This is the monday of the week after the last week at 00:00
-   */
-  Date getEndTime();
+  void setViewRange(Range<Date> dateRange);
 
   int getWorkDayCount();
 
@@ -223,34 +195,6 @@ public interface IPlanner<RI, AI> extends IPropertyObserver, IContextMenuOwner {
   void setSelectedTime(Date beginTime, Date endTime);
 
   void decorateActivityCell(Activity<RI, AI> p);
-
-  /**
-   * collect all selected days from starthour to endhour and intersect with
-   * earliest and latest time range
-   */
-  MultiTimeRange calculateSelectedTimeRanges(Date earliestBeginTime, Date latestEndTime);
-
-  /**
-   * Create a planned activity that includes one of the selected persons.
-   *
-   * @param singleMatch
-   *          true=plan an activity for only one of the selected resource.
-   *          false=plan an activity for all of the selected resources
-   * @param chooseRandom
-   *          only used in combination with singleMatch=true. true=a random
-   *          person is chosen, false=the first matching Resource<RI> is chosen
-   * @param earliestBeginTime
-   *          consider only matches that start after this time; {@link System#currentTimeMillis()} is used when null is
-   *          passed
-   * @param latestEndTime
-   *          consider only matches that end before this time; {@link System#currentTimeMillis()}+10 years is used when
-   *          null is
-   *          passed
-   * @param preferredDuration
-   *          (in milliseconds) the preferred duration of the planned activity;
-   *          30 minutes is used when 0 is passed
-   */
-  void planActivityForSelectedResources(boolean singleMatch, boolean chooseRandom, Date earliestBeginTime, Date latestEndTime, long preferredDuration);
 
   void replaceResources(List<Resource<RI>> resources);
 
