@@ -4,6 +4,8 @@ scout.Popup = function(session) {
   this.$container;
   this.$body;
   this.session = session;
+  this._mouseDownHandler;
+  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 
 /**
@@ -18,16 +20,67 @@ scout.Popup.prototype.render = function() {
     .appendTo($docBody);
   this._attachCloseHandler();
 
+  this.renderContent();
+
+  setTimeout(function() {
+    this.$container.installFocusContext('auto', this.session.uiSessionId);
+  }.bind(this), 0);
+  this._installKeyStrokeAdapter();
+
   return this.$container;
 };
 
+scout.Popup.prototype.renderContent = function() {
+  //empty Popup, do nothing
+};
+
+scout.Popup.prototype.closePopup = function() {
+  this.remove();
+};
+
 /**
- * Every user action will close menu. menu is removed in 'click' event,
+ * click outside container, scroll down closes popup
  */
 scout.Popup.prototype._attachCloseHandler = function() {
-  $(document).one( /*scout.menus.CLOSING_EVENTS*/ 'mousedown.popupContextMenu', this.remove.bind(this));
+  this._mouseDownHandler = this._onMouseDown.bind(this);
+  $(document).on('mousedown', this._mouseDownHandler);
+
   if (this.$origin) {
     scout.scrollbars.attachScrollHandlers(this.$origin, this.remove.bind(this));
+  }
+};
+
+scout.Popup.prototype._detachCloseHandler = function() {
+  if (this.$origin) {
+    scout.scrollbars.detachScrollHandlers(this.$origin);
+  }
+  if (this._mouseDownHandler) {
+    $(document).off('mousedown', this._mouseDownHandler);
+    this._mouseDownHandler = null;
+  }
+};
+
+scout.Popup.prototype._onMouseDown = function(event) {
+  var $target = $(event.target);
+  // close the popup only if the click happened outside of the popup
+  if (this.$container.has($target).length === 0) {
+    this._onMouseDownOutside(event);
+  }
+};
+
+scout.Popup.prototype._onMouseDownOutside = function(event) {
+  this.closePopup();
+};
+
+scout.Popup.prototype._installKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
+  }
+};
+
+scout.Popup.prototype._uninstallKeyStrokeAdapter = function() {
+  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
+    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
   }
 };
 
@@ -40,13 +93,11 @@ scout.Popup.prototype.addClassToBody = function(clazz) {
 };
 
 scout.Popup.prototype.remove = function() {
-  this.$container.remove();
-  this.$container = undefined;
   // remove all clean-up handlers
-  $(document).off('.popupContextMenu');
-  if (this.$origin) {
-    scout.scrollbars.detachScrollHandlers(this.$origin);
-  }
+  this._detachCloseHandler();
+  this.$container.uninstallFocusContext(this.session.uiSessionId);
+  this._uninstallKeyStrokeAdapter();
+  this.$container.remove();
 };
 
 scout.Popup.prototype.setLocation = function(location) {
@@ -55,120 +106,6 @@ scout.Popup.prototype.setLocation = function(location) {
     .css('top', location.y);
 };
 
-// ---- MenuBarPopup ----
-
-/**
- * The MenuBarPopup is a special Popup that is used in the menu-bar. It is tightly coupled with a menu-item and shows a header
- * which has a different size than the popup-body.
- */
-scout.MenuBarPopup = function($menuItem, session) {
-  scout.MenuBarPopup.parent.call(this, session);
-  this.$menuItem = $menuItem;
-  this.$head;
-  this.$deco;
-  this.keyStrokeAdapter = this._createKeyStrokeAdapter();
-};
-scout.inherits(scout.MenuBarPopup, scout.Popup);
-
-scout.MenuBarPopup.prototype._createKeyStrokeAdapter = function() {
+scout.Popup.prototype._createKeyStrokeAdapter = function() {
   return new scout.PopupKeyStrokeAdapter(this);
 };
-
-scout.MenuBarPopup.prototype._installKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
-  }
-};
-
-scout.MenuBarPopup.prototype._uninstallKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
-  }
-};
-
-scout.MenuBarPopup.prototype.render = function($parent) {
-  scout.MenuBarPopup.parent.prototype.render.call(this, $parent);
-  this.$head = $.makeDiv('popup-head');
-  this.$deco = $.makeDiv('popup-deco');
-  this.$container
-    .prepend(this.$head)
-    .append(this.$deco);
-
-  var text = this.$menuItem.text(),
-    dataIcon = this.$menuItem.attr('data-icon');
-
-  this.$head.text(text);
-  if (dataIcon) {
-    this.$head.attr('data-icon', dataIcon);
-  }
-  if (dataIcon && text) {
-    this.$head.addClass('menu-textandicon');
-  }
-  this._copyCssClass('has-submenu');
-  this._copyCssClass('taskbar');
-  this._copyCssClass('button');
-
-  this._installKeyStrokeAdapter();
-  setTimeout(function() {
-    this.$container.installFocusContext('auto', this.session.uiSessionId);
-    this.$container.focus();
-  }.bind(this), 0);
-
-  return this.$container;
-};
-
-scout.MenuBarPopup.prototype._copyCssClass = function(className) {
-  if (this.$menuItem.hasClass(className)) {
-    this.$head.addClass(className);
-  }
-};
-
-scout.MenuBarPopup.prototype.alignTo = function() {
-  var pos = this.$menuItem.offset(),
-    headSize = scout.graphics.getSize(this.$head, true),
-    bodyWidth = scout.graphics.getSize(this.$body, true).width;
-
-  // body min-width
-  if (bodyWidth < headSize.width) {
-    this.$body.width(headSize.width - 2);
-    bodyWidth = headSize.width;
-  }
-
-  // horiz. alignment
-  var left = pos.left,
-    top = pos.top,
-    headInsets = scout.graphics.getInsets(this.$head),
-    bodyTop = headSize.height;
-
-  $.log.debug('bodyWidth=' + bodyWidth + ' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +
-    ' headInsets=' + headInsets + ' left=' + left + ' top=' + top);
-  this.$body.cssTop(bodyTop);
-  this.$deco.cssTop(bodyTop);
-  if (this.$menuItem.hasClass('right-aligned')) {
-    // when we use float:right, browser uses fractions of pixels, that's why we must
-    // use the subPixelCorr variable. It corrects some visual pixel-shifting issues.
-    var widthDiff = bodyWidth - headSize.width,
-      subPixelCorr = left - Math.floor(left);
-    left -= widthDiff + headInsets.left;
-    this.$head.cssLeft(widthDiff);
-    this.$body.cssLeft(subPixelCorr);
-    this.$deco.cssLeft(widthDiff + 1).width(headSize.width - 2 + subPixelCorr);
-    $.log.debug('right alignment: widthDiff=' + widthDiff + ' subPixelCorr=' + subPixelCorr);
-  } else {
-    left -= headInsets.left;
-    this.$head.cssLeft(0);
-    this.$deco.cssLeft(1).width(headSize.width - 2);
-  }
-
-  this.setLocation(new scout.Point(left, top));
-};
-
-scout.MenuBarPopup.prototype.remove = function() {
-  scout.MenuBarPopup.parent.prototype.remove.call(this);
-  this._uninstallKeyStrokeAdapter();
-};
-
-scout.MenuBarPopup.prototype._createKeyStrokeAdapter = function() {
-  return new scout.PopupMenuItemKeyStrokeAdapter(this);
-};
-

@@ -64,7 +64,9 @@ __include("scout/menu/MenuBarKeyStrokeAdapter.js");
 __include("scout/menu/MenuKeyStrokeAdapter.js");
 __include("scout/menu/Popup.js");
 __include("scout/menu/MenuControlKeyStrokes.js");
-__include("scout/menu/PopupCloseKeyStrokes.js");
+__include("scout/menu/MenuPopupCloseKeyStrokes.js");
+__include("scout/menu/MenuBarPopup.js");
+__include("scout/menu/PopupCloseKeyStroke.js");
 __include("scout/menu/PopupKeyStrokeAdapter.js");
 __include("scout/menu/PopupMenuItemKeyStrokeAdapter.js");
 __include("scout/menu/DesktopNavigationPopupKeyStrokeAdapter.js");
@@ -87,6 +89,7 @@ __include("scout/table/control/ChartTableControlMatrix.js"); // requires TableCo
 __include("scout/table/control/GraphTableControl.js"); // requires TableControl.js
 __include("scout/table/control/MapTableControl.js"); // requires TableControl.js
 __include("scout/table/Table.js");
+__include("scout/table/TableContextMenuPopup.js");
 __include("scout/table/TableFooter.js");
 __include("scout/table/TableControlKeyStrokeAdapter.js");
 __include("scout/table/TableAdditionalControlsKeyStrokes.js");
@@ -119,6 +122,7 @@ __include("scout/desktop/DesktopTableKeyStrokeAdapter.js");
 __include("scout/desktop/ViewTabAutoKeyStroke.js");
 __include("scout/desktop/DesktopNavigation.js");
 __include("scout/desktop/FormToolButton.js");
+__include("scout/desktop/FormToolPopup.js");
 __include("scout/desktop/Outline.js");
 __include("scout/desktop/OutlineKeyStrokeAdapter.js");
 __include("scout/desktop/OutlineViewButton.js");

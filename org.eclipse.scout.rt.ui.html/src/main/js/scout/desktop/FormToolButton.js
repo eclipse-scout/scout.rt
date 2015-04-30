@@ -2,6 +2,7 @@ scout.FormToolButton = function() {
   scout.FormToolButton.parent.call(this);
   this.desktop;
   this.$storage;
+  this.popup;
   this._addAdapterProperties('form');
 };
 scout.inherits(scout.FormToolButton, scout.Action);
@@ -18,7 +19,7 @@ scout.FormToolButton.prototype.toggle = function() {
   }
 };
 
-scout.FormToolButton.prototype._onMouseDown = function() {
+scout.FormToolButton.prototype._onMouseDown = function(event) {
   this.toggle();
 };
 
@@ -37,42 +38,19 @@ scout.FormToolButton.prototype.setSelected = function(selected) {
 };
 
 scout.FormToolButton.prototype._openContainer = function() {
-
-  var containerOffsetBounds = scout.graphics.offsetBounds(this.$container),
-    right = this.desktop.$parent.outerWidth() - containerOffsetBounds.x - containerOffsetBounds.width;
-
-  // Tool container has to be visible before rendering and layouting, otherwise sizes cannot be read
-  this.desktop.$toolContainer
-    .css('right', right)
-    .show();
-
-  if (this.$storage && this.$storage.length > 0) {
-    this.desktop.$toolContainer.append(this.$storage);
-  } else if (this.form) {
-    this.form.rootGroupBox.menuBarPosition = 'bottom';
-    this.form.render(this.desktop.$toolContainer);
-    this.form.htmlComp.pixelBasedSizing = true;
-    this.form.htmlComp.pack();
+  if (!this.popup) {
+    this.popup = new scout.FormToolPopup(this, this.session);
+    this.popup.render();
+  } else {
+    this.popup.attach();
   }
-  this.desktop.$toolContainer.data('toolButton', this);
 
-  setTimeout(function() {
-    this.desktop.$toolContainer.installFocusContext('auto', this.session.uiSessionId);
-    this.desktop.$toolContainer.focus();
-  }.bind(this), 0);
 };
 
 scout.FormToolButton.prototype._closeContainer = function() {
-  if (this.desktop.$toolContainer.data('toolButton') !== this) {
-    //Don't close container of other buttons
-    return;
+  if (this.popup) {
+    this.popup.detach();
   }
-
-  this.$storage = this.desktop.$toolContainer.children();
-  this.desktop.$toolContainer.children().detach();
-  this.desktop.$toolContainer.hide();
-  this.desktop.$toolContainer.removeData('toolButton');
-  this.desktop.$toolContainer.uninstallFocusContext(this.session.uiSessionId);
 };
 
 /* event handling */
@@ -86,8 +64,6 @@ scout.FormToolButton.prototype._renderForm = function() {
 };
 
 scout.FormToolButton.prototype._renderSelected = function(selected) {
-  this.$container.select(selected);
-
   if (selected) {
     if (this.form) {
       this._openContainer();

@@ -39,7 +39,7 @@ describe("FormToolButton", function() {
   }
 
   function findToolContainer() {
-    return $('.desktop-tool-container');
+    return $('.popup');
   }
 
   describe("onModelPropertyChange", function() {
@@ -49,7 +49,7 @@ describe("FormToolButton", function() {
       it("opens and closes the tool container", function() {
         var action = createAction(createModel());
         action.render(session.$entryPoint);
-        expect(findToolContainer()).toBeHidden();
+        expect(findToolContainer()).not.toExist();
 
         var event = createPropertyChangeEvent(action, {
           "selected": true
@@ -61,7 +61,7 @@ describe("FormToolButton", function() {
           "selected": false
         });
         action.onModelPropertyChange(event);
-        expect(findToolContainer()).toBeHidden();
+        expect(findToolContainer()).not.toExist();
       });
 
     });

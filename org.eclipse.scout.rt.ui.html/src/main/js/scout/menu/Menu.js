@@ -37,17 +37,14 @@ scout.Menu.prototype._renderItem = function($parent) {
     this.$container.addClass('has-submenu');
   }
 
-  if (this.visible && this.enabled) {
-    this._registerKeyStrokeAdapter();
-  }
-
-  // --- Helper functions ---
-
   function onClicked(event) {
     if (!this.$container.isEnabled()) {
       return;
     }
     this._onMenuClicked(event);
+  }
+  if (this.visible && this.enabled) {
+    this._registerKeyStrokeAdapter();
   }
 };
 
@@ -55,9 +52,6 @@ scout.Menu.prototype._onMenuClicked = function(event) {
   this.doAction($(event.target));
 };
 
-/**
- * @override
- */
 scout.Menu.prototype._renderEnabled = function(enabled) {
   scout.Menu.parent.prototype._renderEnabled.call(this, enabled);
   if (enabled) {
@@ -67,35 +61,20 @@ scout.Menu.prototype._renderEnabled = function(enabled) {
   }
 };
 
-/**
- * @override
- */
-scout.Menu.prototype._renderVisible = function(visible) {
-  scout.Menu.parent.prototype._renderVisible.call(this, visible);
-  if (visible) {
+scout.Menu.prototype._renderVisible = function(enabled) {
+  scout.Menu.parent.prototype._renderVisible.call(this, enabled);
+  if (enabled) {
     this._registerKeyStrokeAdapter();
-    if (this.menuBar && !this.$container.hasClass('last')) {
-      this.menuBar.updateLastItemMarker();
-    }
   } else {
     this._unregisterKeyStrokeAdapter();
-    if (this.menuBar && this.$container.hasClass('last')) {
-      this.menuBar.updateLastItemMarker();
-    }
   }
 };
 
-/**
- * @override
- */
 scout.Menu.prototype._renderText = function(text) {
   scout.Menu.parent.prototype._renderText.call(this, text);
   this._updateIconAndTextStyle();
 };
 
-/**
- * @override
- */
 scout.Menu.prototype._renderIconId = function(iconId) {
   scout.Menu.parent.prototype._renderIconId.call(this, iconId);
   this._updateIconAndTextStyle();
@@ -108,27 +87,18 @@ scout.Menu.prototype._updateIconAndTextStyle = function() {
 
 scout.Menu.prototype.doAction = function($target) {
   if (this.childActions.length > 0) {
-    this.popup = new scout.MenuBarPopup(this.$container, this.session);
+    this.popup = new scout.MenuBarPopup(this, this.session);
     this.popup.render();
-    scout.menus.appendMenuItems(this.popup, this.childActions);
-    this.popup.alignTo();
   } else {
     this.sendDoAction();
   }
 };
 
 scout.Menu.prototype.handle = function(event) {
-  if (this.popup && this.popup.$container) {
-    return;
-  }
   this.doAction(this.$container);
   if (this.preventDefaultOnEvent) {
     event.preventDefault();
   }
-};
-
-scout.Menu.prototype.ignore = function(event) {
-  return this.popup && this.popup.$container;
 };
 
 scout.Menu.prototype._drawKeyBox = function($container) {

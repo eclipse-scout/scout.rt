@@ -12,24 +12,7 @@ scout.DesktopNavigationPopup = function(desktopNavigation, session) {
 };
 scout.inherits(scout.DesktopNavigationPopup, scout.Popup);
 
-scout.DesktopNavigationPopup.prototype._createKeyStrokeAdapter = function() {
-  return new scout.PopupKeyStrokeAdapter(this);
-};
-
-scout.DesktopNavigationPopup.prototype._installKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
-  }
-};
-
-scout.DesktopNavigationPopup.prototype._uninstallKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
-  }
-};
-
-scout.DesktopNavigationPopup.prototype.render = function($parent) {
-  scout.DesktopNavigationPopup.parent.prototype.render.call(this, $parent);
+scout.DesktopNavigationPopup.prototype.renderContent = function($parent) {
   this.$head = $.makeDiv('popup-head');
   this.$deco = $.makeDiv('popup-deco');
   this.$container
@@ -40,11 +23,22 @@ scout.DesktopNavigationPopup.prototype.render = function($parent) {
   this.$head.addClass('navigation-header');
   this._copyCssClass('navigation-tab-outline-button');
   this._copyCssClass('.navigation-header');
-  this._installKeyStrokeAdapter();
-  setTimeout(function() {
-    this.$container.installFocusContext('auto', this.session.uiSessionId);
-    this.$container.focus();
-  }.bind(this), 0);
+
+  if (!this.desktopNavigation.desktop.viewButtons || this.desktopNavigation.desktop.viewButtons.length === 0) {
+    return;
+  }
+  var i,
+    onMenuItemClicked = function(menu) {
+      menu.doAction();
+      this.remove();
+    };
+  for (i = 0; i < this.desktopNavigation.desktop.viewButtons.length; i++) {
+    var menu = this.desktopNavigation.desktop.viewButtons[i];
+    menu.$container = this.$body.appendDiv('outline-menu-item')
+      .text(menu.text)
+      .on('click', '', onMenuItemClicked.bind(this, menu));
+  }
+  this.alignTo();
   return this.$container;
 };
 
@@ -64,16 +58,11 @@ scout.DesktopNavigationPopup.prototype.alignTo = function() {
   $.log.debug(' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize + ' left=' + left + ' top=' + top);
   this.$body.cssTop(bodyTop);
   var offsetBounds = scout.graphics.offsetBounds(this.desktopNavigation.activeTab.$tab);
-  this.$body.cssWidth(offsetBounds.width-2);
+  this.$body.cssWidth(offsetBounds.width - 2);
   this.$deco.cssTop(bodyTop);
-    this.$head.cssLeft(0);
-    this.$deco.cssLeft(1).width(headSize.width - 2);
+  this.$head.cssLeft(0);
+  this.$deco.cssLeft(1).width(headSize.width - 2);
   this.setLocation(new scout.Point(left, top));
-};
-
-scout.DesktopNavigationPopup.prototype.remove = function() {
-  scout.DesktopNavigationPopup.parent.prototype.remove.call(this);
-  this._uninstallKeyStrokeAdapter();
 };
 
 scout.DesktopNavigationPopup.prototype._createKeyStrokeAdapter = function() {

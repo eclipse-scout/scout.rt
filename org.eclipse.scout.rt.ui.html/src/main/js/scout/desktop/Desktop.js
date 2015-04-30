@@ -6,7 +6,6 @@ scout.Desktop = function() {
   this.$tabbar;
   this.$toolbar;
   this.$bench;
-  this.$toolContainer;
 
   this._allTabs = [];
   this._selectedTab;
@@ -61,7 +60,6 @@ scout.Desktop.prototype._render = function($parent) {
   this.$toolbar = this.$bar.appendDiv('taskbar-tools');
   this.$bench = this.$parent.appendDiv('desktop-bench');
   new scout.HtmlComponent(this.$bench, this.session);
-  this.$toolContainer = this.$parent.appendDiv('desktop-tool-container').hide();
 
   this._outlineTab = new scout.Desktop.TabAndContent();
 
@@ -79,7 +77,9 @@ scout.Desktop.prototype._render = function($parent) {
   if (action) {
     action.$container.addClass('last');
   }
-
+  if (this.selectedTool) {
+    this.selectedTool.popup.alignTo();
+  }
   this.navigation.onOutlineChanged(this.outline);
 
   this.views.forEach(this._renderView.bind(this));
@@ -210,7 +210,7 @@ scout.Desktop.prototype._selectTab = function(tab) {
     htmlComp.setSize(htmlParent.getSize());
   }
 
-  scout.focusManager.validateFocus(this.session.uiSessionId,'desktop');
+  scout.focusManager.validateFocus(this.session.uiSessionId, 'desktop');
 };
 
 scout.Desktop.prototype._unselectTab = function(tab) {

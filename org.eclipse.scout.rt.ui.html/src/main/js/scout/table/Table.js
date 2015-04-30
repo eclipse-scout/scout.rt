@@ -516,7 +516,7 @@ scout.Table.prototype._installRows = function($rows) {
       y = event.pageY;
 
     if ($selectedRows.length > 0) {
-      waitForServer(that.session, showMenuPopup.bind(that));
+      waitForServer(that.session, showMenuPopup.bind(that, event));
     }
 
     /* TODO AWE/CGU: (scout, menu) try to get rid of aboutToShow, than delete this method
@@ -541,13 +541,12 @@ scout.Table.prototype._installRows = function($rows) {
       }
     }
 
-    function showMenuPopup() {
+    function showMenuPopup(event) {
       var menuItems = that._filterMenus('', true);
       if (menuItems.length > 0) {
-        var popup = new scout.Popup(this.session);
+        var popup = new scout.TableContextMenuPopup(this, this.session, menuItems);
         popup.$origin = this.$data;
         popup.render();
-        scout.menus.appendMenuItems(popup, menuItems);
         popup.setLocation(new scout.Point(x, y));
       }
     }

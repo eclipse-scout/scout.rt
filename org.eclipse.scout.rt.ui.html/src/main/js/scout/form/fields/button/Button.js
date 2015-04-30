@@ -87,10 +87,8 @@ scout.Button.prototype.doAction = function($target) {
       selected: this.selected
     });
   } else if (this.menus.length > 0) {
-    this.popup = new scout.MenuBarPopup(this.$container, this.session);
+    this.popup = new scout.MenuBarPopup(this, this.session);
     this.popup.render();
-    scout.menus.appendMenuItems(this.popup, this.menus);
-    this.popup.alignTo();
   } else {
     this.session.send(this.id, 'clicked');
   }

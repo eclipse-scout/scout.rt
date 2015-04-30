@@ -79,38 +79,14 @@ scout.DesktopNavigation.prototype._createOutlinesTab = function() {
 };
 
 scout.DesktopNavigation.prototype._onMenuButtonClicked = function(event) {
-    this._openMenu();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
+  this._openMenu();
+  event.stopPropagation();
+  event.stopImmediatePropagation();
 };
 
 scout.DesktopNavigation.prototype._openMenu = function(event) {
   this.popup = new scout.DesktopNavigationPopup(this, this.session);
   this.popup.render();
-  this.appendMenuItems(this.popup);
-  this.popup.alignTo();
-};
-
-scout.DesktopNavigation.prototype.appendMenuItems = function(popup){
-  if (!this.desktop.viewButtons || this.desktop.viewButtons.length === 0) {
-    return;
-  }
-  var i,
-    onMenuItemClicked = function(menu) {
-      menu.doAction();
-
-      popup.remove();
-    };
-    for (i = 0; i < this.desktop.viewButtons.length; i++) {
-    var menu = this.desktop.viewButtons[i];
-    menu.$container = $.makeDiv('outline-menu-item')
-    .text(menu.text)
-    .data('menu', menu)
-    .on('click', '', onMenuItemClicked.bind(this, menu))
-    .one(scout.menus.CLOSING_EVENTS, $.suppressEvent);
-
-    popup.appendToBody(menu.$container);
-  }
 };
 
 scout.DesktopNavigation.prototype._createSearchTab = function() {

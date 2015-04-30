@@ -74,43 +74,6 @@ scout.menus = {
     }
   },
 
-  /**
-   * Appends menu items to the given popup and attaches event-handlers on the appended menu items. Invisible items are not appended.
-   *
-   * @param $parent Parent to which the popup is appended
-   * @param menus Menus added to the popup
-   * @returns
-   */
-  appendMenuItems: function(popup, menus) {
-    if (!menus || menus.length === 0) {
-      return;
-    }
-    var i,
-      onMenuItemClicked = function() {
-        var menu = $(this).data('menu');
-        popup.remove();
-        menu.sendDoAction();
-      };
-
-    for (i = 0; i < menus.length; i++) {
-      var menu = menus[i];
-      if (!menu.visible) {
-        continue;
-      }
-      if (menu.separator) {
-        continue;
-      }
-      menu.sendAboutToShow();
-      popup.appendToBody(
-        $.makeDiv('menu-item')
-        .text(menu.text)
-        .data('menu', menu)
-        .on('click', '', onMenuItemClicked)
-        .one(scout.menus.CLOSING_EVENTS, $.suppressEvent)
-      );
-    }
-  },
-
   isButton: function(obj) {
     return obj instanceof scout.Button;
   }

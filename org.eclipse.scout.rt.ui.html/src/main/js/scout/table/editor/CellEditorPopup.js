@@ -12,21 +12,7 @@ scout.CellEditorPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.CellEditorPopupKeyStrokeAdapter(this);
 };
 
-scout.CellEditorPopup.prototype._installKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && !scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.installAdapter(this.$container, this.keyStrokeAdapter);
-  }
-};
-
-scout.CellEditorPopup.prototype._uninstallKeyStrokeAdapter = function() {
-  if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
-    scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
-  }
-};
-
-scout.CellEditorPopup.prototype.render = function($parent) {
-  scout.CellEditorPopup.parent.prototype.render.call(this, $parent);
-
+scout.CellEditorPopup.prototype.renderContent = function() {
   this.$container.addClass('cell-editor-popup');
   this.$container.data('popup', this);
   this.$body.addClass('cell-editor-popup-body');
@@ -54,47 +40,11 @@ scout.CellEditorPopup.prototype.render = function($parent) {
   scout.graphics.setSize(this.$container, offsetBounds.width, rowOffsetBounds.height);
   scout.graphics.setSize(field.$container, offsetBounds.width, rowOffsetBounds.height);
   scout.HtmlComponent.get(field.$container).layout();
-
-  setTimeout(function() {
-    //FIXME CGU Maybe null if removed directly after render, better remove $container = undefined in popup.js?
-    if (this.$container) {
-      this.$container.installFocusContext('auto', this.table.session.uiSessionId);
-    }
-  }.bind(this), 0);
-  this._installKeyStrokeAdapter();
 };
 
 scout.CellEditorPopup.prototype.remove = function() {
   scout.CellEditorPopup.parent.prototype.remove.call(this);
   this.cell.field.remove();
-  if (this._mouseDownHandler) {
-    $(document).off('mousedown', this._mouseDownHandler);
-    this._mouseDownHandler = null;
-  }
-  this._uninstallKeyStrokeAdapter();
-};
-
-scout.CellEditorPopup.prototype._attachCloseHandler = function() {
-  //FIXME CGU merge with popup.js
-  this._mouseDownHandler = this._onMouseDown.bind(this);
-  $(document).on('mousedown', this._mouseDownHandler);
-
-  if (this.$origin) {
-    scout.scrollbars.attachScrollHandlers(this.$origin, this.remove.bind(this));
-  }
-};
-
-scout.CellEditorPopup.prototype._onMouseDown = function(event) {
-  var $target = $(event.target);
-  //FIXME CGU only necessary if popup would open with mousedown?
-//  if ($target.is(this.$container)) {
-//    return;
-//  }
-
-  // close the popup only if the click happened outside of the popup
-  if (this.$container.has($target).length === 0) {
-    this._onMouseDownOutside();
-  }
 };
 
 scout.CellEditorPopup.prototype._onMouseDownOutside = function(event) {
