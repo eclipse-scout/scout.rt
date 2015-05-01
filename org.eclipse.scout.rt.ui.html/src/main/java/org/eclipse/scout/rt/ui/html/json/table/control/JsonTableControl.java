@@ -17,7 +17,9 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonGlobalAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 
 public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
   protected boolean m_contentLoaded = false;
@@ -29,7 +31,12 @@ public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonGlobalAdapterProperty<ITableControl>(ITableControl.PROP_FORM, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<ITableControl>(ITableControl.PROP_FORM, model, getUiSession()) {
+      @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return JsonAdapterPropertyConfigBuilder.globalConfig();
+      }
+
       @Override
       protected IForm modelValue() {
         return getModel().getForm();

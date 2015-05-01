@@ -19,6 +19,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 
 public abstract class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<T> {
@@ -97,7 +99,12 @@ public abstract class JsonAction<T extends IAction> extends AbstractJsonProperty
       }
     });
 
-    putJsonProperty(new JsonAdapterProperty<T>(IActionNode.PROP_CHILD_ACTIONS, model, getUiSession(), new DisplayableActionFilter<IAction>()) {
+    putJsonProperty(new JsonAdapterProperty<T>(IActionNode.PROP_CHILD_ACTIONS, model, getUiSession()) {
+      @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<IAction>()).build();
+      }
+
       @Override
       protected Object modelValue() {
         if (getModel() instanceof IActionNode) {

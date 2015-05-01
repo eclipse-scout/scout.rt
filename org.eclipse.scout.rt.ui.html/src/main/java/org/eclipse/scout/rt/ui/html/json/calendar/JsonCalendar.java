@@ -31,6 +31,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -46,7 +48,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   private static final String EVENT_COMPONENT_ACTION = "componentAction";
   private static final String EVENT_COMPONENT_MOVED = "componentMoved";
   private static final String EVENT_RELOAD = "reload";
-  private static final String EVENT_SET_SELECTION = "setSelection";
+  private static final String EVENT_SELECTION_CHANGED = "selectionChanged";
   private static final String EVENT_VIEW_RANGE_CHANGED = "viewRangeChanged";
   private static final String EVENT_MODEL_CHANGED = "modelChanged";
 
@@ -72,6 +74,11 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   }
 
   @Override
+  protected void attachChildAdapters() {
+    attachAdapters(getModel().getComponents());
+  }
+
+  @Override
   protected void detachModel() {
     super.detachModel();
     if (m_calendarListener == null) {
@@ -83,7 +90,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   @Override
   protected void initJsonProperties(T model) {
-    //FIXME CGU/BSH improve adapter-property so that components are not disposed when changed?
+    // FIXME CGU/BSH improve adapter-property so that components are not disposed when changed?
     putJsonProperty(new JsonAdapterProperty<T>(ICalendar.PROP_COMPONENTS, model, getUiSession()) {
       @Override
       protected Set<? extends CalendarComponent> modelValue() {
@@ -94,6 +101,11 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
       @Override
       protected CalendarComponent modelValue() {
         return getModel().getSelectedComponent();
+      }
+
+      @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return new JsonAdapterPropertyConfigBuilder().disposeOnChange(false).build();
       }
     });
     putJsonProperty(new JsonProperty<T>(ICalendar.PROP_DISPLAY_MODE, model) {
@@ -187,15 +199,15 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
       }
     });
 
-    // TODO BSH | Calendar String PROP_CONTEXT_MENU = "contextMenus";
+    // FIXME BSH | Calendar String PROP_CONTEXT_MENU = "contextMenus";
   }
 
   @SuppressWarnings("unchecked")
-  public <C extends CalendarComponent> JsonCalendarComponent<C> resolveCalendarComponent(String id) {
-    if (id == null) {
+  public <C extends CalendarComponent> JsonCalendarComponent<C> resolveCalendarComponent(String adapterId) {
+    if (adapterId == null) {
       return null;
     }
-    return (JsonCalendarComponent<C>) getUiSession().getJsonAdapter(id);
+    return (JsonCalendarComponent<C>) getUiSession().getJsonAdapter(adapterId);
   }
 
   @Override
@@ -209,8 +221,8 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     else if (EVENT_RELOAD.equals(event.getType())) {
       handleUiReload(event);
     }
-    else if (EVENT_SET_SELECTION.equals(event.getType())) {
-      handleUiSetSelection(event);
+    else if (EVENT_SELECTION_CHANGED.equals(event.getType())) {
+      handleUiSelectionChanged(event);
     }
     else if (EVENT_MODEL_CHANGED.equals(event.getType())) {
       handleUiModelChanged(event);
@@ -223,12 +235,13 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     }
   }
 
-  // TODO BSH Check if we need event filter here, as in the following example
-//  protected void handleUiSelected(JsonEvent event) {
-//    boolean selected = JsonObjectUtility.getBoolean(event.getData(), IAction.PROP_SELECTED);
-//    addPropertyEventFilterCondition(IAction.PROP_SELECTED, selected);
-//    getModel().getUIFacade().setSelectedFromUI(selected);
-//  }
+//   FIXME BSH Check if we need event filter here, as in the following example
+//   FIXME AWE: (calendar) check how the selected property is used in swing UI, decide if we can remove the property/event
+//    protected void handleUiSelectionChanged(JsonEvent event) {
+//      boolean selected = JsonObjectUtility.getBoolean(event.getData(), IAction.PROP_SELECTED);
+//      addPropertyEventFilterCondition(IAction.PROP_SELECTED, selected);
+//      getModel().getUIFacade().setSelectedFromUI(selected);
+//    }
 
   protected void handleUiComponentAction(JsonEvent event) {
     getModel().getUIFacade().fireComponentActionFromUI();
@@ -245,12 +258,17 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     getModel().getUIFacade().fireReloadFromUI();
   }
 
-  protected void handleUiSetSelection(JsonEvent event) {
+  // FIXME AWE: (calendar) replace selectedDate with selectionRange(from/to)
+
+  protected void handleUiSelectionChanged(JsonEvent event) {
     // FIXME AWE: (calendar) currently the UI does not support selection of components, only an entire day can be selected
     JSONObject data = event.getData();
     Date date = toJavaDate(data, "date");
-    JsonCalendarComponent<CalendarComponent> comp = resolveCalendarComponent(data.optString("component"));
-    getModel().getUIFacade().setSelectionFromUI(date, comp.getModel());
+    String componentId = data.optString("componentId");
+    JsonCalendarComponent<CalendarComponent> component = resolveCalendarComponent(componentId);
+    addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_COMPONENT, component.getModel());
+    getModel().getUIFacade().setSelectionFromUI(date, component.getModel());
+    LOG.debug("date=" + date + " componentId=" + componentId);
   }
 
   protected void handleUiModelChanged(JsonEvent event) {
@@ -300,7 +318,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
         jsonArray.put(new JsonCalendarEvent(JsonCalendar.this, event).toJson());
       }
       JSONObject json = new JSONObject();
-      JsonObjectUtility.putProperty(json, "batch", jsonArray); // TODO BSH Calendar | Check if this works
+      JsonObjectUtility.putProperty(json, "batch", jsonArray); // FIXME BSH: Calendar | Check if this works
       addActionEvent(EVENT_CALENDAR_CHANGED_BATCH, json);
     }
   }

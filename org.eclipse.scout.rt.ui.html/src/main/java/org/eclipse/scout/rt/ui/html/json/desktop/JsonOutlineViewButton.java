@@ -8,7 +8,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonGlobalAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 
 public class JsonOutlineViewButton<T extends IOutlineViewButton> extends JsonAction<T> {
 
@@ -24,7 +26,12 @@ public class JsonOutlineViewButton<T extends IOutlineViewButton> extends JsonAct
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonGlobalAdapterProperty<T>("outline", model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<T>("outline", model, getUiSession()) {
+      @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return JsonAdapterPropertyConfigBuilder.globalConfig();
+      }
+
       @Override
       protected IOutline modelValue() {
         return getModel().getOutline();

@@ -27,6 +27,14 @@ scout.Calendar = function() {
    */
   this._exactRange;
 
+  this._$selectedComponent;
+
+  /**
+   * Key: component ID
+   * Value: Array of DOM $components that belong to the calendar-component.
+   */
+  this._$componentMap = {};
+
   this._addAdapterProperties(['components', 'selectedComponent']);
 };
 scout.inherits(scout.Calendar, scout.ModelAdapter);
@@ -150,7 +158,92 @@ scout.Calendar.prototype._render = function($parent) {
 };
 
 scout.Calendar.prototype._renderComponents = function() {
-  this.layoutComponents();
+  var i, j, c, itemId, $component, d, $day,
+    fromDate, toDate, $componentList,
+    countTask = 5;
+
+  // remove all existing items
+  $('.calendar-component', this.$grid).remove();
+  this._$componentMap = {};
+
+  // main loop
+  for (i = 0; i < this.components.length; i++) {
+    c = this.components[i];
+    fromDate = scout.dates.parseJsonDate(c.fromDate);
+    toDate = scout.dates.parseJsonDate(c.toDate);
+
+    $componentList = [];
+    this._$componentMap[c.item.itemId] = $componentList;
+    // FIXME AWE: (calendar) check if item-ID is unique enough -
+    // otherwise we must add an UID in the json layer.
+
+    // loop covered days
+    for (j = 0; j < c.coveredDays.length; j++) {
+      d = scout.dates.parseJsonDate(c.coveredDays[j]);
+
+      // day in shown month?
+      $day = this._findDay(d);
+
+      // if not: continue
+      if ($day === undefined) {
+        continue;
+      }
+
+      // draw component
+      $component = $day.appendDiv('calendar-component')
+        .html('<b>' + c.item.subject + '</b>')
+        .addClass(c.item.cssClass)
+        .data('component', c)
+        .click(this._onComponentClick.bind(this));
+      $componentList.push($component);
+
+      // adapt design if mode not month
+      if (!this._isMonth()) {
+        if (c.fullDay) {
+          // task
+          $component
+            .addClass('component-task')
+            .css('top', 'calc(' + this._dayPosition(-1) + '% + ' + countTask + 'px)');
+          countTask += 25;
+
+        } else {
+          var fromHours = fromDate.getHours(),
+            fromMinutes = fromDate.getMinutes(),
+            toHours = toDate.getHours(),
+            toMinutes = toDate.getMinutes();
+
+          // appointment
+          $component
+            .addClass('component-day')
+            .unbind('mouseenter mouseleave')
+            .mouseenter(this._onComponentDayHoverIn.bind(this))
+            .mouseleave(this._onComponentDayHoverOut.bind(this));
+
+          // position and height depending on start and end date
+          if (c.coveredDays.length === 1) {
+            $component.css('top', this._dayPosition(fromHours + fromMinutes / 60) + '%')
+              .css('height', this._dayPosition(toHours + toMinutes / 60) - this._dayPosition(fromHours + fromMinutes / 60) + '%');
+          } else if (scout.dates.isSameDay(d, fromDate)) {
+            $component.css('top', this._dayPosition(fromHours + fromMinutes / 60) + '%')
+              .css('height', this._dayPosition(24) - this._dayPosition(fromHours + fromMinutes / 60) + '%')
+              .addClass('component-open-bottom');
+          } else if (scout.dates.isSameDay(d, toDate)) {
+            $component.css('top', this._dayPosition(0) + '%')
+              .css('height', this._dayPosition(fromHours + fromMinutes / 60) - this._dayPosition(0) + '%')
+              .addClass('component-open-top');
+          } else {
+            $component.css('top', this._dayPosition(1) + '%')
+              .css('height', this._dayPosition(24) - this._dayPosition(1) + '%')
+              .addClass('component-open-top')
+              .addClass('component-open-bottom');
+          }
+        }
+      }
+    }
+  }
+
+  // find nice arragmenent :)
+  this._arrangeComponents();
 };
 
 scout.Calendar.prototype._renderLoadInProgress = function() {
@@ -164,6 +257,8 @@ scout.Calendar.prototype._renderDisplayMode = function() {
 
 scout.Calendar.prototype._renderSelectedDate = function() {
 };
+
+// FIXME continue: weitermachen mit selection einzelner items
 
 /* -- basics, events -------------------------------------------- */
 
@@ -339,7 +434,14 @@ scout.Calendar.prototype._sendModelChanged = function() {
 };
 
 scout.Calendar.prototype._sendViewRangeChanged = function() {
-  this.session.send(this.id, 'viewRangeChanged', {viewRange: this._jsonViewRange()});
+  this.session.send(this.id, 'viewRangeChanged', {
+    viewRange: this._jsonViewRange()});
+};
+
+scout.Calendar.prototype._sendSelectionChanged = function() {
+  this.session.send(this.id, 'selectionChanged', {
+    date: scout.dates.toJsonDate(this.selectedDate),
+    componentId: this.selectedComponent.id});
 };
 
 scout.Calendar.prototype._jsonViewRange = function() {
@@ -360,7 +462,7 @@ scout.Calendar.prototype._updateScreen = function() {
   // layout grid
   this.layoutLabel();
   this.layoutSize();
-  this.layoutComponents();
+  this._renderComponents();
   this.layoutAxis();
 
   // if year shown and changed, redraw year
@@ -876,7 +978,7 @@ scout.Calendar.prototype._onComponentDayHoverOut = function(event) {
 
 /* -- components, arrangement------------------------------------ */
 
-scout.Calendar.prototype._arrangeComponent = function() {
+scout.Calendar.prototype._arrangeComponents = function() {
   var k, $day, $children,
     $days = $('.calendar-day', this.grid);
 

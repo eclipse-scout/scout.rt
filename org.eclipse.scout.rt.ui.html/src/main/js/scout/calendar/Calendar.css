@@ -439,9 +439,9 @@
     min-height: 20px;
     margin-left: 32px;
     width: calc(~"100%" - 38px);
-    background-color: @palette-orange-1;
+    background-color: @palette-gray-8;
     margin-bottom: -3px;
-    border-left: 4px solid @palette-orange-2;
+    border-left: 4px solid @palette-gray-5;
     text-align: left;
     margin-top: 6px;
 
@@ -510,3 +510,36 @@
     }
   }
 }
+
+.calendar-component {
+  &.calendar-appointment {
+    background-color: @palette-orange-disabled;
+    border-left-color: @palette-orange-normal;
+
+    &:hover {
+      background-color: @palette-orange-normal;
+      border-left-color: @palette-orange-active;
+    }
+
+    &.comp-selected {
+      background-color: @palette-orange-normal;
+      border-left-color: @palette-orange-active;
+    }
+  }
+
+  &.calendar-task {
+    background-color: @palette-cyan-disabled;
+    border-left-color: @palette-cyan-normal;
+
+    &:hover {
+      background-color: @palette-cyan-normal;
+      border-left-color: @palette-cyan-active;
+    }
+
+    &.comp-selected {
+      background-color: @palette-cyan-normal;
+      border-left-color: @palette-cyan-active;
+    }
+  }
+}
+

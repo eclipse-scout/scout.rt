@@ -29,7 +29,7 @@ public class JsonCalendarItem implements IJsonObject {
     JsonObjectUtility.putProperty(json, "owner", m_item.getOwner());
     JsonObjectUtility.putProperty(json, "subject", m_item.getSubject());
     JsonObjectUtility.putProperty(json, "body", m_item.getBody());
-    JsonObjectUtility.putProperty(json, "color", m_item.getColor());
+    JsonObjectUtility.putProperty(json, "cssClass", m_item.getCssClass());
     JsonObjectUtility.putProperty(json, "recurrencePattern", new JsonRecurrencePattern(m_item.getRecurrencePattern()).toJson());
     return json;
   }

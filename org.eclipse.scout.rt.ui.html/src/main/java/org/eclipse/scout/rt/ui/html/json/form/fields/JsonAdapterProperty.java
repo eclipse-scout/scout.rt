@@ -23,24 +23,21 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
   private IUiSession m_uiSession;
   private boolean m_global;
+  private boolean m_disposeOnChange;
   private IFilter<Object> m_filter;
   private Set<IJsonAdapter> m_ownedAdapters = new HashSet<IJsonAdapter>();
 
   public JsonAdapterProperty(String propertyName, T model, IUiSession session) {
-    this(propertyName, model, session, false, null);
-  }
-
-  public JsonAdapterProperty(String propertyName, T model, IUiSession session, IFilter<?> filter) {
-    this(propertyName, model, session, false, filter);
-  }
-
-  public JsonAdapterProperty(String propertyName, T model, IUiSession session, boolean global, IFilter<?> filter) {
     super(propertyName, model);
     m_uiSession = session;
-    m_global = global;
-    @SuppressWarnings("unchecked")
-    IFilter<Object> castedFilter = (IFilter<Object>) filter;
-    m_filter = castedFilter;
+    JsonAdapterPropertyConfig config = createConfig();
+    m_global = config.isGlobal();
+    m_disposeOnChange = config.isDisposeOnChange();
+    m_filter = config.getFilter();
+  }
+
+  protected JsonAdapterPropertyConfig createConfig() {
+    return JsonAdapterPropertyConfigBuilder.defaultConfig();
   }
 
   public IUiSession getUiSession() {
@@ -49,7 +46,7 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
 
   @Override
   public void handlePropertyChange(Object oldValue, Object newValue) {
-    if (!m_global) {
+    if (m_disposeOnChange) {
       disposeAdapters(newValue);
     }
     createAdapters(newValue);

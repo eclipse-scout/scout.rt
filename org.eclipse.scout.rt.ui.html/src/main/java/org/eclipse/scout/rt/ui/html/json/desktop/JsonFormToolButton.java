@@ -15,7 +15,9 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonGlobalAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 
 public class JsonFormToolButton<T extends IFormToolButton<IForm>> extends JsonAction<T> {
 
@@ -32,10 +34,15 @@ public class JsonFormToolButton<T extends IFormToolButton<IForm>> extends JsonAc
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonGlobalAdapterProperty<IFormToolButton<IForm>>(IFormToolButton.PROP_FORM, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<IFormToolButton<IForm>>(IFormToolButton.PROP_FORM, model, getUiSession()) {
       @Override
       protected IForm modelValue() {
         return getModel().getForm();
+      }
+
+      @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return JsonAdapterPropertyConfigBuilder.globalConfig();
       }
     });
   }

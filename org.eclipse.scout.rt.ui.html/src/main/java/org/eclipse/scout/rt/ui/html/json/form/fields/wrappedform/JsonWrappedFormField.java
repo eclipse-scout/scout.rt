@@ -14,8 +14,10 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonGlobalAdapterProperty;
 
 public class JsonWrappedFormField<T extends IWrappedFormField<? extends IForm>> extends JsonFormField<T> {
 
@@ -31,7 +33,12 @@ public class JsonWrappedFormField<T extends IWrappedFormField<? extends IForm>> 
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonGlobalAdapterProperty<T>(IWrappedFormField.PROP_INNER_FORM, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<T>(IWrappedFormField.PROP_INNER_FORM, model, getUiSession()) {
+      @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return JsonAdapterPropertyConfigBuilder.globalConfig();
+      }
+
       @Override
       protected IForm modelValue() {
         return getModel().getInnerForm();
