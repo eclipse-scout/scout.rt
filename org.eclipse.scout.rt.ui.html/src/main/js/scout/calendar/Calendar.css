@@ -513,32 +513,32 @@
 
 .calendar-component {
   &.calendar-appointment {
-    background-color: @palette-orange-disabled;
-    border-left-color: @palette-orange-normal;
+    background-color: @palette-orange-1;
+    border-left-color: @palette-orange-2;
 
     &:hover {
-      background-color: @palette-orange-normal;
-      border-left-color: @palette-orange-active;
+      background-color: @palette-orange-2;
+      border-left-color: @palette-orange-3;
     }
 
     &.comp-selected {
-      background-color: @palette-orange-normal;
-      border-left-color: @palette-orange-active;
+      background-color: @palette-orange-3;
+      border-left-color: @palette-orange-4;
     }
   }
 
   &.calendar-task {
-    background-color: @palette-cyan-disabled;
-    border-left-color: @palette-cyan-normal;
+    background-color: @palette-cyan-1;
+    border-left-color: @palette-cyan-2;
 
     &:hover {
-      background-color: @palette-cyan-normal;
-      border-left-color: @palette-cyan-active;
+      background-color: @palette-cyan-2;
+      border-left-color: @palette-cyan-3;
     }
 
     &.comp-selected {
-      background-color: @palette-cyan-normal;
-      border-left-color: @palette-cyan-active;
+      background-color: @palette-cyan-3;
+      border-left-color: @palette-cyan-4;
     }
   }
 }
