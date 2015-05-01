@@ -22,7 +22,7 @@ import org.junit.Test;
 
 /**
  * Test for {@link ICalendarItem}.
- * 
+ *
  * @since 3.8.3
  */
 public class CalendarItemTest {
@@ -112,8 +112,8 @@ public class CalendarItemTest {
     assertEquals("appointment subject", "1", app.getSubject());
     assertNotNull(app.getBody());
     assertEquals("appointment body", "2", app.getBody());
-    assertNotNull(app.getColor());
-    assertEquals("appointment color", "3", app.getColor());
+    assertNotNull(app.getCssClass());
+    assertEquals("appointment color", "3", app.getCssClass());
   }
 
   @Test
