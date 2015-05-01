@@ -17,6 +17,8 @@ import java.util.Set;
 import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarAdapter;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
@@ -30,13 +32,16 @@ import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
+import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObserver<T> {
+public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObserver<T> implements IJsonContextMenuOwner {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonCalendar.class);
 
@@ -75,7 +80,9 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   @Override
   protected void attachChildAdapters() {
+    super.attachChildAdapters();
     attachAdapters(getModel().getComponents());
+    attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
   }
 
   @Override
@@ -302,6 +309,22 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   private Date toJavaDate(JSONObject data, String propertyName) {
     return new JsonDate(data.optString(propertyName)).asJavaDate();
+  }
+
+  @Override
+  public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
+    addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
+  }
+
+  // FIXME AWE: (calendar) discuss with C.GU: this is copy&paste. See other impl. if IJsonContextMenuOwner
+  @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
+    if (jsonContextMenu != null) {
+      JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
+    }
+    return json;
   }
 
   protected class P_CalendarListener extends CalendarAdapter {

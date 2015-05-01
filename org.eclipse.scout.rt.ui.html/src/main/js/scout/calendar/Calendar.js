@@ -36,7 +36,7 @@ scout.Calendar = function() {
    */
   this._$componentMap = {};
 
-  this._addAdapterProperties(['components', 'selectedComponent']);
+  this._addAdapterProperties(['components', 'menus', 'selectedComponent']);
 };
 scout.inherits(scout.Calendar, scout.ModelAdapter);
 
@@ -147,8 +147,11 @@ scout.Calendar.prototype._render = function($parent) {
       } else if (w > 0 && d === 0) {
         $d.addClass('calendar-week-name');
       } else if (w > 0 && d > 0) {
+        // FIXME AWE: (calendar) we must also select the clicked day and update the model
         $d.addClass('calendar-day')
-          .data('day', d).data('week', w);
+          .data('day', d)
+          .data('week', w)
+          .on('contextmenu', this._onDayContextMenu.bind(this));
       }
     }
   }
@@ -195,9 +198,10 @@ scout.Calendar.prototype._renderComponents = function() {
         .html('<b>' + c.item.subject + '</b>')
         .addClass(c.item.cssClass)
         .data('component', c)
-        .click(this._onComponentClick.bind(this))
+        .mousedown(this._onComponentMousedown.bind(this))
         .mouseenter(this._onComponentHoverIn.bind(this))
-        .mouseleave(this._onComponentHoverOut.bind(this));
+        .mouseleave(this._onComponentHoverOut.bind(this))
+        .on('contextmenu', this._onComponentContextMenu.bind(this));
       $componentList.push($component);
 
       // adapt design if mode not month
@@ -261,7 +265,9 @@ scout.Calendar.prototype._renderDisplayMode = function() {
 scout.Calendar.prototype._renderSelectedDate = function() {
 };
 
-// FIXME continue: weitermachen mit selection einzelner items
+scout.Calendar.prototype._renderMenus = function() {
+  // FIXME AWE: (calendar) here we should update the menu-bar (see Table.js)
+};
 
 /* -- basics, events -------------------------------------------- */
 
@@ -850,13 +856,31 @@ scout.Calendar.prototype._updateSelectedComponent = function(component) {
   this._sendSelectionChanged();
 };
 
-scout.Calendar.prototype._onComponentClick = function(event) {
+scout.Calendar.prototype._onComponentMousedown = function(event) {
   var $comp = $(event.currentTarget),
     $clone = $comp.clone(),
     component = $comp.data('component'),
     $day = $comp.parent();
 
   this._updateSelectedComponent(component);
+};
+
+scout.Calendar.prototype._onComponentContextMenu = function(event) {
+  this._showContextMenu(event, 'Calendar.CalendarComponent');
+};
+
+scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
+  event.preventDefault();
+  event.stopPropagation();
+  var filteredMenus = scout.menus.filter(this.menus, [allowedType]),
+  // FIXME AWE: (calendar) rename TableContextMenuPopup to something more generic
+  popup = new scout.TableContextMenuPopup(this, this.session, filteredMenus),
+    $comp = $(event.currentTarget),
+    x = event.pageX,
+    y = event.pageY;
+  popup.$origin = $comp;
+  popup.render();
+  popup.setLocation(new scout.Point(x, y));
 };
 
 /**
@@ -886,6 +910,10 @@ scout.Calendar.prototype._onComponentHoverOut = function(event) {
     tooltip.remove();
     $comp.removeData('tooltip');
   }
+};
+
+scout.Calendar.prototype._onDayContextMenu = function(event) {
+  this._showContextMenu(event, 'Calendar.EmptySpace');
 };
 
 scout.Calendar.prototype._onComponentDayHoverIn = function(event) {
