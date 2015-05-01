@@ -26,9 +26,21 @@ public interface ICalendarItem {
 
   void setLastModified(long b);
 
+  /**
+   * @deprecated use getCssClass instead.
+   */
+  @Deprecated
   String getColor();
 
+  /**
+   * @deprecated use setCssClass instead.
+   */
+  @Deprecated
   void setColor(String hex);
+
+  String getCssClass();
+
+  void setCssClass(String cssClass);
 
   /**
    * @return true iff this item covers or intersects the range [minDate,maxDate]

@@ -34,6 +34,7 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
   private String m_subject;
   private String m_body;
   private String m_color;
+  private String m_cssClass;
   private RecurrencePattern m_recurrencyPattern;
 
   public AbstractCalendarItem() {
@@ -55,6 +56,7 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
       a.m_subject = this.m_subject;
       a.m_body = this.m_body;
       a.m_color = this.m_color;
+      a.m_cssClass = this.m_cssClass;
       a.m_recurrencyPattern = this.m_recurrencyPattern;
       return a;
     }
@@ -64,13 +66,25 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public String getColor() {
     return m_color;
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void setColor(String hex) {
     m_color = hex;
+  }
+
+  @Override
+  public String getCssClass() {
+    return m_cssClass;
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    m_cssClass = cssClass;
   }
 
   @Override

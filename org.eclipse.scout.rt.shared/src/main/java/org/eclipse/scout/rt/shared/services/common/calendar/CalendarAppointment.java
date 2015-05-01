@@ -42,9 +42,9 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
    * @param fullDay
    * @param subject
    * @param body
-   * @param color
+   * @param cssClass
    */
-  public CalendarAppointment(Object itemId, Object person, Date startDate, Date endDate, boolean fullDay, String subject, String body, String color) {
+  public CalendarAppointment(Object itemId, Object person, Date startDate, Date endDate, boolean fullDay, String subject, String body, String cssClass) {
     setItemId(itemId);
     setPerson(person);
     setStart(startDate);
@@ -52,7 +52,7 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
     setFullDay(fullDay);
     setSubject(subject);
     setBody(body);
-    setColor(color);
+    setCssClass(cssClass);
   }
 
   /**
@@ -63,7 +63,7 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
    * @param fullDay
    * @param subject
    * @param body
-   * @param color
+   * @param cssClass
    */
   public CalendarAppointment(Object[] data) {
     if (data != null) {
@@ -99,7 +99,7 @@ public class CalendarAppointment extends AbstractCalendarItem implements ICalend
               break;
             }
             case 7: {
-              setColor((String) data[i]);
+              setCssClass((String) data[i]);
               break;
             }
           }
