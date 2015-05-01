@@ -282,3 +282,7 @@ HTMLUtility.toPlainTextWithTable(...)
 
 30.04.2015 [bug 465826]
 ILabelField, IHtmlField and IStringField are now IHtmlCapable
+
+AWE 01.05.2015
+Removed get/setColor() from ICalenderItem, replaced with get/setCssClass().
+

@@ -511,6 +511,10 @@
   }
 }
 
+/* FIXME AWE: (calendar) CSS-klassen für Status Open, Done und vielleicht Default.
+ * Namen von CRM Entitäten in Scout.
+ */
+
 .calendar-component {
   &.calendar-appointment {
     background-color: @palette-orange-1;

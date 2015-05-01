@@ -12,6 +12,7 @@ scout.Tooltip = function(options) {
   this.$context = options.$context;
   this.cssClass = options.cssClass;
   this.tooltipPosition = options.position || 'top';
+  this.htmlEnabled = options.htmlEnabled !== undefined ? options.htmlEnabled : false;
   this.$content;
 };
 scout.inherits(scout.Tooltip, scout.Widget);
@@ -31,7 +32,8 @@ scout.Tooltip.prototype._render = function($parent) {
   }
 
   this.$arrow = $.makeDiv('tooltip-arrow').appendTo(this.$container);
-  this.$content = $.makeDiv('tooltip-content').appendTo(this.$container).text(this.text);
+  this.$content = $.makeDiv('tooltip-content').appendTo(this.$container);
+  this.renderText(this.text);
   this.position();
   this.$container.show();
 
@@ -54,7 +56,11 @@ scout.Tooltip.prototype._remove = function() {
 };
 
 scout.Tooltip.prototype.renderText = function(text) {
-  this.$content.text(text);
+  if (this.htmlEnabled) {
+    this.$content.html(text);
+  } else {
+    this.$content.text(text);
+  }
 };
 
 scout.Tooltip.prototype.position = function() {
@@ -71,13 +77,13 @@ scout.Tooltip.prototype.position = function() {
   y = origin.y;
 
   arrowDivWidth = this.$arrow.outerWidth();
-  //Arrow is a div rotated by 45 deg -> visible height is half the div
+  // Arrow is a div rotated by 45 deg -> visible height is half the div
   arrowHeight = scout.Tooltip.computeHypotenuse(arrowDivWidth) / 2;
 
   tooltipHeight = this.$container.outerHeight();
   tooltipWidth = this.$container.outerWidth();
 
-  //Compute actual arrow position if position is provided in percentage
+  // Compute actual arrow position if position is provided in percentage
   if (this.arrowPositionUnit === '%') {
     this.arrowPosition = tooltipWidth * this.arrowPosition / 100;
   }
@@ -87,13 +93,17 @@ scout.Tooltip.prototype.position = function() {
   overlapX = left + tooltipWidth + this.windowPaddingX - $(window).width();
   overlapY = top - this.windowPaddingY;
 
-  //Move tooltip to the left until it gets fully visible
+  // Move tooltip to the left until it gets fully visible
   if (overlapX > 0) {
     left -= overlapX;
     this.arrowPosition = x - left;
   }
 
-  //Move tooltip to the bottom, arrow on top
+  // FIXME AWE: (tooltip) discuss with C.GU/C.RU: also support left/right position for tooltip?
+  // FIXME AWE: (tooltip) discuss with C.GU/C.RU: always use the same BG-color for tooltips?
+  //   when custom BG-color is allowed, styling is a bit complicated because of arrow-'hack'
+
+  // Move tooltip to the bottom, arrow on top
   if (this.tooltipPosition === 'bottom' || overlapY < 0) {
     this.$arrow.addClass('arrow-top');
     top = y + origin.height + arrowHeight;

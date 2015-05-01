@@ -28,6 +28,7 @@ scout.Calendar = function() {
   this._exactRange;
 
   this._$selectedComponent;
+  this._tooltipDelay;
 
   /**
    * Key: component ID
@@ -194,7 +195,9 @@ scout.Calendar.prototype._renderComponents = function() {
         .html('<b>' + c.item.subject + '</b>')
         .addClass(c.item.cssClass)
         .data('component', c)
-        .click(this._onComponentClick.bind(this));
+        .click(this._onComponentClick.bind(this))
+        .mouseenter(this._onComponentHoverIn.bind(this))
+        .mouseleave(this._onComponentHoverOut.bind(this));
       $componentList.push($component);
 
       // adapt design if mode not month
@@ -416,7 +419,7 @@ scout.Calendar.prototype._onClickDay = function(event) {
   // if day list shown, redraw it
   if (this.showList) {
     this.$list.empty();
-    this.drawList();
+    this._renderComponentPanel();
   }
 
 };
@@ -473,7 +476,7 @@ scout.Calendar.prototype._updateScreen = function() {
   // if list shown and changed, redraw year
   if (this.showList) {
     this.$list.empty();
-    this.drawList();
+    this._renderComponentPanel();
   }
 
   this.colorYear();
@@ -793,8 +796,10 @@ scout.Calendar.prototype._onYearHoverOut = function(event) {
   $('.year-day.year-hover, .year-day.year-hover-day', this.$year).removeClass('year-hover year-hover-day');
 };
 
-/* -- list, draw ---------------------------------------------------- */
-scout.Calendar.prototype.drawList = function() {
+/**
+ * Renders the panel on the left, showing all components of the selected date.
+ */
+scout.Calendar.prototype._renderComponentPanel = function() {
   var $c, i,
     $selected = $('.selected', this.$grid),
     $components = $selected.children('.calendar-component:not(.clone)');
@@ -852,28 +857,35 @@ scout.Calendar.prototype._onComponentClick = function(event) {
     $day = $comp.parent();
 
   this._updateSelectedComponent(component);
+};
 
-// FIXME AWE: (calendar) do we need this clone stuff? use tooltip instead?
-//  // should not be possible, but in any case...
-//  $('.clone', this.$grid).remove();
+/**
+ * Show tooltip with delay, so user is not flooded with tooltips when filled with many items.
+ */
+scout.Calendar.prototype._onComponentHoverIn = function(event) {
+  this._tooltipDelay = setTimeout(function() {
+    var $comp = $(event.currentTarget),
+      component = $comp.data('component'),
+      tooltip = new scout.Tooltip({
+      text: this._fullHtml(component),
+      $origin: $comp,
+      arrowPosition: 15,
+      arrowPositionUnit: '%',
+      htmlEnabled: true
+    });
+    $comp.data('tooltip', tooltip);
+    tooltip.render();
+  }.bind(this), 350);
+};
 
-//  // build the perfect clone
-//  $clone.addClass('clone comp-selected')
-//    .css('position', 'fixed')
-//    .css('top', $comp.offset().top + 'px')
-//    .css('left', $comp.offset().left + 'px')
-//    .css('height', $comp.outerHeight() + 'px')
-//    .css('width', $comp.outerWidth() + 'px')
-//    .css('margin', 0)
-//    .html(this._fullHtml(component))
-//    .css('z-index', 2)
-//    .data('component', component)
-//    .mouseleave(this._onComponentHoverOut.bind(this))
-//    .insertAfter($comp);
-//    .animateAVCSD('height', '100px');
-//
-//  // add element to open component in new tab
-//  $clone.appendDiv('component-link', 'öffnen');
+scout.Calendar.prototype._onComponentHoverOut = function(event) {
+  var $comp = $(event.currentTarget),
+    tooltip = $comp.data('tooltip');
+  clearTimeout(this._tooltipDelay);
+  if (tooltip) {
+    tooltip.remove();
+    $comp.removeData('tooltip');
+  }
 };
 
 scout.Calendar.prototype._onComponentDayHoverIn = function(event) {
@@ -901,11 +913,6 @@ scout.Calendar.prototype._onComponentDayHoverIn = function(event) {
   }
 };
 
-// close element
-scout.Calendar.prototype._onComponentHoverOut = function(event) {
-  var $element = $(event.currentTarget);
-  $element.animateAVCSD('height', 0, $.removeThis);
-};
 
 // restore element
 // FIXME cru: sometime fails?
