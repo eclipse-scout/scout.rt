@@ -423,7 +423,6 @@ scout.Calendar.prototype._onClickDay = function(event) {
 
 /* --  set display mode and range ------------------------------------- */
 
-// FIXME AWE: nur noch ein request, nur die properties die geändert haben
 scout.Calendar.prototype._sendModelChanged = function() {
   var data = {
     viewRange: this._jsonViewRange(),
@@ -821,122 +820,63 @@ scout.Calendar.prototype.drawList = function() {
   }
 };
 
-/* -- components, draw---------------------------------------------- */
-
-scout.Calendar.prototype.layoutComponents = function() {
-  var i, j, c, $component, d, $day,
-    fromDate, toDate,
-    countTask = 5;
-
-  // remove all existing items
-  $('.calendar-component', this.$grid).remove();
-
-  // main loop
-  for (i = 0; i < this.components.length; i++) {
-    c = this.components[i];
-    fromDate = scout.dates.parseJsonDate(c.fromDate);
-    toDate = scout.dates.parseJsonDate(c.toDate);
-
-    // loop covered days
-    for (j = 0; j < c.coveredDays.length; j++) {
-      d = scout.dates.parseJsonDate(c.coveredDays[j]);
-
-      // day in shown month?
-      $day = this._findDay(d);
-
-      // if not: continue
-      if ($day === undefined) {
-        continue;
-      }
-
-      // draw component
-      $component = $day.appendDiv('calendar-component')
-        .html('<b>' + c.item.subject + '</b>')
-        .css('background-color', $.ColorOpacity(c.item.color, 0.3))
-        .css('border-color', '#' + c.item.color)
-        .data('component', c)
-        .mouseenter(this._onComponentHoverIn.bind(this));
-
-      // adapt design if mode not month
-      if (!this._isMonth()) {
-        if (c.fullDay) {
-          // task
-          $component
-            .addClass('component-task')
-            .css('top', 'calc(' + this._dayPosition(-1)  + '% + ' + countTask + 'px)');
-          countTask += 25;
-
-        } else {
-          var fromHours = fromDate.getHours(),
-            fromMinutes = fromDate.getMinutes(),
-            toHours = toDate.getHours(),
-            toMinutes = toDate.getMinutes();
-
-          // appointment
-          $component
-            .addClass('component-day')
-            .unbind('mouseenter mouseleave')
-            .mouseenter(this._onComponentDayHoverIn.bind(this))
-            .mouseleave(this._onComponentDayHoverOut.bind(this));
-
-          // position and height depending on start and end date
-          if (c.coveredDays.length === 1) {
-            $component.css('top',  this._dayPosition(fromHours + fromMinutes / 60) + '%')
-              .css('height', this._dayPosition(toHours + toMinutes / 60) - this._dayPosition(fromHours + fromMinutes / 60) + '%');
-          } else if (scout.dates.isSameDay(d, fromDate)) {
-            $component.css('top',  this._dayPosition(fromHours + fromMinutes / 60) + '%')
-              .css('height', this._dayPosition(24) - this._dayPosition(fromHours + fromMinutes / 60) + '%')
-              .addClass('component-open-bottom');
-          } else if (scout.dates.isSameDay(d, toDate)) {
-            $component.css('top',  this._dayPosition(0) + '%')
-              .css('height', this._dayPosition(fromHours + fromMinutes / 60) - this._dayPosition(0) + '%')
-              .addClass('component-open-top');
-          } else {
-            $component.css('top',  this._dayPosition(1) + '%')
-              .css('height', this._dayPosition(24) - this._dayPosition(1) + '%')
-              .addClass('component-open-top')
-              .addClass('component-open-bottom');
-          }
-        }
-      }
-    }
-  }
-
-  // find nice arragmenent :)
-  this._arrangeComponent();
-};
-
 /* -- components, events-------------------------------------------- */
 
-scout.Calendar.prototype._onComponentHoverIn = function (event) {
+scout.Calendar.prototype._updateSelectedComponent = function(component) {
+  var itemId, $compList;
+
+  // remove selected state from previously selected components
+  if (this.selectedComponent) {
+    itemId = this.selectedComponent.item.itemId;
+    $compList = this._$componentMap[itemId];
+    $compList.forEach(function($comp) {
+      $comp.removeClass('comp-selected');
+    });
+  }
+
+  // set selected state on new components
+  this.selectedComponent = component;
+  itemId = component.item.itemId;
+  $compList = this._$componentMap[itemId];
+  $compList.forEach(function($comp) {
+    $comp.addClass('comp-selected');
+  });
+
+  this._sendSelectionChanged();
+};
+
+scout.Calendar.prototype._onComponentClick = function(event) {
   var $comp = $(event.currentTarget),
     $clone = $comp.clone(),
     component = $comp.data('component'),
     $day = $comp.parent();
 
-  // should not be possible, but in any case...
-  $('.clone', this.$grid).remove();
+  this._updateSelectedComponent(component);
 
-  // build the perfect clone
-  $clone.addClass('clone')
-    .css('position', 'fixed')
-    .css('top', $comp.offset().top + 'px')
-    .css('left', $comp.offset().left + 'px')
-    .css('height', $comp.outerHeight() + 'px')
-    .css('width', $comp.outerWidth() + 'px')
-    .css('margin', 0)
-    .html(this._fullHtml(component))
-    .css('z-index', 2)
-    .data('component', component)
-    .mouseleave(this._onComponentHoverOut.bind(this))
-    .insertAfter($comp)
-    .animateAVCSD('height', '100px');
+// FIXME AWE: (calendar) do we need this clone stuff? use tooltip instead?
+//  // should not be possible, but in any case...
+//  $('.clone', this.$grid).remove();
 
-  // add element to open component in new tab
-  $clone.appendDiv('component-link', 'öffnen');
+//  // build the perfect clone
+//  $clone.addClass('clone comp-selected')
+//    .css('position', 'fixed')
+//    .css('top', $comp.offset().top + 'px')
+//    .css('left', $comp.offset().left + 'px')
+//    .css('height', $comp.outerHeight() + 'px')
+//    .css('width', $comp.outerWidth() + 'px')
+//    .css('margin', 0)
+//    .html(this._fullHtml(component))
+//    .css('z-index', 2)
+//    .data('component', component)
+//    .mouseleave(this._onComponentHoverOut.bind(this))
+//    .insertAfter($comp);
+//    .animateAVCSD('height', '100px');
+//
+//  // add element to open component in new tab
+//  $clone.appendDiv('component-link', 'öffnen');
 };
 
-scout.Calendar.prototype._onComponentDayHoverIn = function (event) {
+scout.Calendar.prototype._onComponentDayHoverIn = function(event) {
   var $comp = $(event.currentTarget),
     component = $comp.data('component'),
     oldHeight = $comp.outerHeight(),

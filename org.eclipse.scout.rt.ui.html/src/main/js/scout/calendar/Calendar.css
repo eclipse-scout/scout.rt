@@ -439,9 +439,9 @@
     min-height: 20px;
     margin-left: 32px;
     width: calc(~"100%" - 38px);
-    background-color: @palette-gray-8;
+    background-color: @palette-gray-5;
     margin-bottom: -3px;
-    border-left: 4px solid @palette-gray-5;
+    border-left: 4px solid @palette-gray-8;
     text-align: left;
     margin-top: 6px;
 
