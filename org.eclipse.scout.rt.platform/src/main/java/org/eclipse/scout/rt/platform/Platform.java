@@ -10,11 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import org.eclipse.scout.rt.platform.internal.PlatformImplementor;
+import java.util.ServiceLoader;
 
 /**
  * This is the main scout platform, typically installed {@link Platform#setDefault()} and started
  * {@link IPlatform#start(Class)} from within a servlet listener.
+ * <p>
+ * If there exists a java service config at META-INF/services/org.eclipse.scout.rt.platform.IPlatform then the platform
+ * is automatically started on the first hit of this {@link Platform} class by the class initializer. See also
+ * {@link #get()}
  * <p>
  * Tests use a PlatformTestRunner
  * <p>
@@ -36,6 +40,16 @@ public final class Platform {
 
   /**
    * @return active platform
+   *         <p>
+   *         If there exists a java service config at META-INF/services/org.eclipse.scout.rt.platform.IPlatform then the
+   *         platform is automatically started on the first hit of this {@link Platform} class by the class initializer.
+   *         <p>
+   *         Such a auto-start file is typically placed inside the webapp project at
+   *         src/main/resources/META-INF/services/org.eclipse.scout.rt.platform.IPlatform
+   *         <p>
+   *         The default platform entry is <code>org.eclipse.scout.rt.platform.DefaultPlatform</code>
+   *         <p>
+   *         see also {@link ServiceLoader#load(Class)}
    */
   public static IPlatform get() {
     return platform;
@@ -49,7 +63,7 @@ public final class Platform {
    * Typically the servlet context creator.
    */
   public static void setDefault() {
-    set(new PlatformImplementor());
+    set(new DefaultPlatform());
   }
 
   /**
@@ -61,5 +75,17 @@ public final class Platform {
    */
   public static void set(IPlatform p) {
     platform = p;
+  }
+
+  /*
+   * static initializer used for optional autostart, see {@link #get()}
+   */
+  static {
+    ServiceLoader<IPlatform> loader = ServiceLoader.load(IPlatform.class);
+    for (IPlatform autostartPlatform : loader) {
+      set(autostartPlatform);
+      autostartPlatform.start();
+      break;
+    }
   }
 }
