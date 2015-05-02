@@ -98,22 +98,6 @@ public final class SharedConfigProperties {
     }
   }
 
-  /**
-   * Specifies if the request content should be hashed to ensure integrity. Default is <code>true</code>.
-   */
-  public static class AuthTokenHashContentProperty extends AbstractBooleanConfigProperty {
-
-    @Override
-    public Boolean getDefaultValue() {
-      return Boolean.TRUE;
-    }
-
-    @Override
-    public String getKey() {
-      return "scout.auth.token.hash.content";
-    }
-  }
-
   public static class ServiceTunnelTargetUrlProperty extends AbstractStringConfigProperty {
 
     @Override

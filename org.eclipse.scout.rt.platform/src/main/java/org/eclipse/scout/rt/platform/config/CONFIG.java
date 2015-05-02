@@ -25,19 +25,19 @@ public final class CONFIG {
 
   /**
    * Gets the {@link IConfigProperty} instance for the given class
-   * 
+   *
    * @param clazz
    *          The config class
    * @return the {@link IConfigProperty} instance or null if it cannot be found in the {@link IBeanManager}.
    */
-  public static <CFGCLASS extends IConfigProperty<?>> CFGCLASS getProperty(Class<CFGCLASS> clazz) {
+  public static <DATA_TYPE, CFGCLASS extends IConfigProperty<DATA_TYPE>> IConfigProperty<DATA_TYPE> getProperty(Class<CFGCLASS> clazz) {
     return BEANS.get(clazz);
   }
 
   /**
    * Gets the configured value of the given {@link IConfigProperty}. If no value is configured the default of the
    * property is returned ({@link IConfigProperty#getDefaultValue()}).
-   * 
+   *
    * @param clazz
    *          the config class
    * @return The value of the given {@link IConfigProperty}.
@@ -50,7 +50,7 @@ public final class CONFIG {
    * Gets the configured value of the given {@link IConfigProperty}. If no value is configured the default of the
    * property is returned ({@link IConfigProperty#getDefaultValue()}). If even the default value is <code>null</code>
    * the given defaultValue is returned.
-   * 
+   *
    * @param clazz
    *          the config class
    * @return The value of the given {@link IConfigProperty}.

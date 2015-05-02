@@ -17,6 +17,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.UriUtility;
@@ -24,6 +25,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.shared.ISession;
@@ -59,7 +61,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
   }
 
   protected static URL getConfiguredServerUrl() {
-    ServiceTunnelTargetUrlProperty targetUrlProperty = CONFIG.getProperty(ServiceTunnelTargetUrlProperty.class);
+    IConfigProperty<String> targetUrlProperty = CONFIG.getProperty(ServiceTunnelTargetUrlProperty.class);
     String url = targetUrlProperty.getValue();
     try {
       URL targetUrl = UriUtility.toUrl(url);
@@ -168,7 +170,8 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
     if (!DefaultAuthToken.isActive()) {
       return null;
     }
-    return new DefaultAuthToken(getSession(), callData).toSignedString();
+    String userId = CollectionUtility.firstElement(getSession().getSubject().getPrincipals()).getName();
+    return new DefaultAuthToken(userId).toString();
   }
 
   /**

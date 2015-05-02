@@ -19,9 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.rt.server.commons.BufferedServletRequestWrapper;
 import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
 
@@ -44,14 +42,14 @@ public class ServiceTunnelAccessTokenFilter implements Filter {
     HttpServletRequest req = (HttpServletRequest) in;
 
     if (!DefaultAuthToken.isActive()) {
-      fail(out);
+      chain.doFilter(in, out);
       return;
     }
 
     String tokenString = req.getHeader(AbstractHttpServiceTunnel.TOKEN_AUTH_HTTP_HEADER);
-    DefaultAuthToken token = DefaultAuthToken.fromSignedString(tokenString);
+    DefaultAuthToken token = DefaultAuthToken.parse(tokenString);
     if (token == null) {
-      fail(out);
+      chain.doFilter(in, out);
       return;
     }
 
@@ -67,27 +65,11 @@ public class ServiceTunnelAccessTokenFilter implements Filter {
       return;
     }
 
-    try {
-      // check signature
-      if (!token.isSignatureValid()) {
-        fail(out);
-        return;
-      }
-
-      if (token.getContentHash() != null) {
-        // check content hash
-        BufferedServletRequestWrapper bufferedReq = new BufferedServletRequestWrapper(req);
-        req = bufferedReq;
-        if (!token.isContentHashValid(bufferedReq.getData())) {
-          fail(out);
-          return;
-        }
-      }
+    // check signature
+    if (!token.isValid()) {
+      fail(out);
+      return;
     }
-    catch (ProcessingException e) {
-      throw new ServletException("Error validating the signature.", e);
-    }
-
     continueChainWithPrincipal(token.getUserId(), req, out, chain);
   }
 

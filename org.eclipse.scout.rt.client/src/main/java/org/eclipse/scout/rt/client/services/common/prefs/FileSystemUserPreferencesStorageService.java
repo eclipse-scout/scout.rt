@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientConfigProperties.UserAreaProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.shared.services.common.prefs.AbstractUserPreferencesStorageService;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 
@@ -161,7 +162,7 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
   }
 
   protected String getBaseFolder() {
-    UserAreaProperty userAreaProperty = CONFIG.getProperty(UserAreaProperty.class);
+    IConfigProperty<String> userAreaProperty = CONFIG.getProperty(UserAreaProperty.class);
     String location = userAreaProperty.getValue();
     if (location == null) {
       // legacy
