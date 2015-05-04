@@ -235,7 +235,7 @@
   }
 
   &.selected + .header-filter {
-    border-top: 1px solid transparent;
+    border-top: 1px solid @table-header-menu-background-color;
   }
 
   &.selected:last-child {
