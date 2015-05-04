@@ -32,6 +32,36 @@ scout.Popup.prototype._render = function() {
     .appendTo($docBody);
 };
 
+scout.Popup.prototype.rerenderHead = function() {
+  this._removeHead();
+  this._renderHead();
+};
+
+/**
+ * Will not be called by this._render, sub classes have explicitly call this method
+ */
+scout.Popup.prototype._renderHead = function() {
+  this.$head = $.makeDiv('popup-head');
+  this.$deco = $.makeDiv('popup-deco');
+  this.$container
+    .prepend(this.$head)
+    .append(this.$deco);
+  this.$head.on('mousedown', '', this._onHeadMouseDown.bind(this));
+  this.$head.text(this.headText);
+  if (this.headIcon) {
+    this.$head.attr('data-icon', this.headIcon);
+  }
+};
+
+scout.Popup.prototype._removeHead = function() {
+  if (this.$head){
+    this.$head.remove();
+  }
+  if( this.$deco){
+    this.$deco.remove();
+  }
+};
+
 scout.Popup.prototype.closePopup = function() {
   this.remove();
 };
@@ -68,6 +98,12 @@ scout.Popup.prototype._onMouseDown = function(event) {
 
 scout.Popup.prototype._onMouseDownOutside = function(event) {
   this.closePopup();
+};
+
+scout.Popup.prototype._onHeadMouseDown = function(event) {
+  if (this.$head && this.$head[0] === event.target) {
+    this.closePopup();
+  }
 };
 
 scout.Popup.prototype.appendToBody = function($element) {

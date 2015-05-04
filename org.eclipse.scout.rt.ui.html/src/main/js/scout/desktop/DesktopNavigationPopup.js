@@ -1,7 +1,3 @@
-/** ---- DesktopNavigationPopup ----
- * A popup as used in the menu-bar. The popup is tightly coupled with a menu-item and shows a header
- * which has a different size than the popup-body.
- */
 scout.DesktopNavigationPopup = function(desktopNavigation, session) {
   scout.DesktopNavigationPopup.parent.call(this, session);
   this.desktopNavigation = desktopNavigation;
@@ -14,36 +10,28 @@ scout.inherits(scout.DesktopNavigationPopup, scout.Popup);
 
 scout.DesktopNavigationPopup.prototype._render = function($parent) {
   scout.DesktopNavigationPopup.parent.prototype._render.call(this, $parent);
-  this.$head = $.makeDiv('popup-head');
-  this.$deco = $.makeDiv('popup-deco');
-  this.$container
-    .prepend(this.$head)
-    .append(this.$deco);
+  this._renderHead();
 
-  this.$head.on('mousedown','', this.buttonMouseDown.bind(this));
-  this.$head.attr('data-icon', '\uF0C9');
-  this.$head.addClass('navigation-header');
-  this._copyCssClass('navigation-tab-outline-button');
-  this._copyCssClass('.navigation-header');
-
-  if (!this.desktopNavigation.desktop.viewButtons || this.desktopNavigation.desktop.viewButtons.length === 0) {
-    return;
-  }
-  var i,
-    onMenuItemClicked = function(menu) {
-      menu.doAction();
-      this.remove();
-    };
-  for (i = 0; i < this.desktopNavigation.desktop.viewButtons.length; i++) {
-    var menu = this.desktopNavigation.desktop.viewButtons[i];
-    menu.$container = this.$body.appendDiv('outline-menu-item')
-      .text(menu.text)
-      .on('click', '', onMenuItemClicked.bind(this, menu));
-  }
+  this.desktopNavigation.desktop.viewButtons.forEach(function(viewButton) {
+    viewButton.render(this.$body);
+    viewButton.$container.on('click', '', this._onViewButtonClick.bind(this, viewButton));
+    this.addChild(viewButton);
+  }.bind(this));
   this.alignTo();
 };
 
-scout.DesktopNavigationPopup.prototype._copyCssClass = function(className) {
+scout.DesktopNavigationPopup.prototype._onViewButtonClick = function(viewButton) {
+  viewButton.doAction();
+  this.remove();
+};
+
+scout.DesktopNavigationPopup.prototype._renderHead = function() {
+  scout.DesktopNavigationPopup.parent.prototype._renderHead.call(this);
+  this._copyCssClassToHead('navigation-tab-outline-button');
+  this.$head.addClass('navigation-header');
+};
+
+scout.DesktopNavigationPopup.prototype._copyCssClassToHead = function(className) {
   if (this.$menuItem.hasClass(className)) {
     this.$head.addClass(className);
   }
@@ -68,10 +56,4 @@ scout.DesktopNavigationPopup.prototype.alignTo = function() {
 
 scout.DesktopNavigationPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.DesktopNavigationPopupKeyStrokeAdapter(this);
-};
-
-scout.DesktopNavigationPopup.prototype.buttonMouseDown = function(event) {
-  if(this.$head && this.$head[0]===event.target){
-    this.closePopup();
-  }
 };

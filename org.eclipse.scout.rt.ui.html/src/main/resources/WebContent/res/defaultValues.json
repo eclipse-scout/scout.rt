@@ -119,6 +119,7 @@
     "Desktop": {
       "dialogs": [],
       "views": [],
+      "viewButtons": [],
       "messageBoxes": []
     },
     "Form": {

@@ -17,7 +17,6 @@ scout.FormToolPopup.prototype._render = function($parent) {
   scout.FormToolPopup.parent.prototype._render.call(this, $parent);
 
   this._renderHead($parent);
-
   this.formToolButton.form.rootGroupBox.menuBarPosition = 'bottom';
   this.formToolButton.form.render(this.$body);
   this.formToolButton.form.htmlComp.pixelBasedSizing = true;
@@ -25,33 +24,17 @@ scout.FormToolPopup.prototype._render = function($parent) {
   this.alignTo();
 };
 
-scout.FormToolPopup.prototype._copyCssClass = function(className) {
+scout.FormToolPopup.prototype._copyCssClassToHead = function(className) {
   if (this.$formToolButton.hasClass(className)) {
     this.$head.addClass(className);
   }
 };
 
-scout.FormToolPopup.prototype._renderHead = function($parent) {
-  if(this.$head){
-    this.$head.remove();
-  }
-  if(this.$deco){
-    this.$deco.remove();
-  }
-  this.$head = $.makeDiv('popup-head');
-  this.$deco = $.makeDiv('popup-deco');
-  this.$container
-    .prepend(this.$head)
-    .append(this.$deco);
-  this.$head.on('mousedown', '', this.buttonMouseDown.bind(this));
-  var text = this.$formToolButton.text(),
-    dataIcon = this.$formToolButton.attr('data-icon');
-
-  this.$head.text(text);
-  if (dataIcon) {
-    this.$head.attr('data-icon', dataIcon);
-  }
-  this._copyCssClass('taskbar-tool-item');
+scout.FormToolPopup.prototype._renderHead = function() {
+  this.headText = this.$formToolButton.text();
+  this.headIcon = this.$formToolButton.attr('data-icon');
+  scout.FormToolPopup.parent.prototype._renderHead.call(this);
+  this._copyCssClassToHead('taskbar-tool-item');
   this.$head.addClass('selected');
 };
 
@@ -111,10 +94,4 @@ scout.FormToolPopup.prototype.alignTo = function() {
 
 scout.FormToolPopup.prototype.closePopup = function() {
   this.formToolButton.setSelected(false);
-};
-
-scout.FormToolPopup.prototype.buttonMouseDown = function(event) {
-  if (this.$head && this.$head[0] === event.target) {
-    this.closePopup();
-  }
 };

@@ -98,8 +98,8 @@ scout.FormToolButton.prototype.handle = function(event) {
 
 scout.FormToolButton.prototype._renderText = function(text) {
   scout.FormToolButton.parent.prototype._renderText.call(this, text);
-  if(this.popup){
-    this.popup._renderHead();
+  if (this.popup) {
+    this.popup.rerenderHead();
     this.popup.alignTo();
   }
 };

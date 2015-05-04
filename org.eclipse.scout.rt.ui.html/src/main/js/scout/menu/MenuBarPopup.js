@@ -12,26 +12,7 @@ scout.inherits(scout.MenuBarPopup, scout.Popup);
 
 scout.MenuBarPopup.prototype._render = function($parent) {
   scout.MenuBarPopup.parent.prototype._render.call(this, $parent);
-  this.$head = $.makeDiv('popup-head');
-  this.$deco = $.makeDiv('popup-deco');
-  this.$container
-    .prepend(this.$head)
-    .append(this.$deco);
-
-  this.$head.on('mousedown','', this.buttonMouseDown.bind(this));
-  var text = this.menu.$container.text(),
-    dataIcon = this.menu.$container.attr('data-icon');
-
-  this.$head.text(text);
-  if (dataIcon) {
-    this.$head.attr('data-icon', dataIcon);
-  }
-  if (dataIcon && text) {
-    this.$head.addClass('menu-textandicon');
-  }
-  this._copyCssClass('has-submenu');
-  this._copyCssClass('taskbar');
-  this._copyCssClass('button');
+  this._renderHead();
 
   var menus = this.menu.childActions || this.menu.menus;
   if (!menus || menus.length === 0) {
@@ -55,12 +36,24 @@ scout.MenuBarPopup.prototype._render = function($parent) {
   this.alignTo();
 };
 
+scout.MenuBarPopup.prototype._renderHead = function() {
+  this.headText = this.menu.$container.text();
+  this.headIcon = this.menu.$container.attr('data-icon');
+  scout.MenuBarPopup.parent.prototype._renderHead.call(this);
+  if (this.headIcon && this.headText) {
+    this.$head.addClass('menu-textandicon');
+  }
+  this._copyCssClassToHead('has-submenu');
+  this._copyCssClassToHead('taskbar');
+  this._copyCssClassToHead('button');
+};
+
 scout.MenuBarPopup.prototype.onMenuItemClicked = function(menu) {
   this.closePopup();
   menu.sendDoAction();
 };
 
-scout.MenuBarPopup.prototype._copyCssClass = function(className) {
+scout.MenuBarPopup.prototype._copyCssClassToHead = function(className) {
   if (this.menu.$container.hasClass(className)) {
     this.$head.addClass(className);
   }
@@ -79,11 +72,11 @@ scout.MenuBarPopup.prototype.alignTo = function() {
 
   // horiz. alignment
   var left = pos.left,
-    top = pos.top-5,
+    top = pos.top - 5,
     headInsets = scout.graphics.getInsets(this.$head),
     bodyTop = headSize.height;
 
-  if(this.menu.$container.hasClass('taskbar')){
+  if (this.menu.$container.hasClass('taskbar')) {
     top = pos.top;
   }
 
@@ -112,10 +105,4 @@ scout.MenuBarPopup.prototype.alignTo = function() {
 
 scout.MenuBarPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.PopupMenuItemKeyStrokeAdapter(this);
-};
-
-scout.MenuBarPopup.prototype.buttonMouseDown = function(event) {
-  if(this.$head && this.$head[0]===event.target){
-    this.closePopup();
-  }
 };

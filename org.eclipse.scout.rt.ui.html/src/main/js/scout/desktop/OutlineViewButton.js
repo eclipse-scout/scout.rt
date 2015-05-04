@@ -7,6 +7,10 @@ scout.OutlineViewButton = function() {
 };
 scout.inherits(scout.OutlineViewButton, scout.Action);
 
+scout.OutlineViewButton.prototype._render = function($parent) {
+  this.$container = $parent.appendDiv('outline-menu-item');
+};
+
 scout.OutlineViewButton.prototype._renderOutline = function(outline) {
   // nop
 };
