@@ -7,7 +7,9 @@ scout.inherits(scout.TableOrganizeMenu, scout.Menu);
 // FIXME CGU: finalize ;)
 scout.TableOrganizeMenu.prototype._onMenuClicked = function(event) {
   // basic frame
-  var popup = new scout.MenuBarPopup($(event.target), this.session);
+  var popup = new scout.MenuBarPopup({
+    $container: $(event.target)
+  }, this.session);
   popup.render();
   popup.addClassToBody('table-menu-organize');
 
