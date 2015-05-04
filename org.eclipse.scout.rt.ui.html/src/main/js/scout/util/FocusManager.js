@@ -31,22 +31,29 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
 scout.FocusManager.prototype.focusFirstElement = function($container) {
   var focused = false;
   var $focusableElements = $container.find(':focusable');
+  var $firstDefaultButton;
   for(var i = 0; i<$focusableElements.length; i++){
     var menuParents = $($focusableElements[i]).parents('.menubar');
-    if(menuParents.length===0){
+    var tabParents = $($focusableElements[i]).parents('.tab-area');
+    if(!$firstDefaultButton && $($focusableElements[i]).is('.default-button')){
+      $firstDefaultButton = $focusableElements[i];
+    }
+    if(menuParents.length===0 && tabParents.length===0){
       focused = true;
-      $focusableElements.get(i).focus();
-      break;
+      return $focusableElements.get(i).focus();
     }
   }
 
   if (!focused) {
-    if ($focusableElements && $focusableElements.length > 0) {
-      $focusableElements.first().focus();
+    if($firstDefaultButton){
+      $firstDefaultButton.focus();
+    }
+    else if ($focusableElements && $focusableElements.length > 0) {
+     return $focusableElements.first().focus();
     }
     else{
       //if nothing is found to focus then focus root container
-      $container.focus();
+      return $container.focus();
     }
   }
 };
@@ -59,7 +66,7 @@ scout.FocusManager.prototype.installFocusContext = function($container, uiSessio
 
   // Set initial focus
   if ($firstFocusElement === 'auto') {
-    $firstFocusElement = $container.find(':focusable').first();
+    $firstFocusElement = this.focusFirstElement($container);
   }
   var focusContext = new scout.FocusContext($container, $firstFocusElement, uiSessionId, isRoot);
 
@@ -208,6 +215,7 @@ scout.FocusContext.prototype._validateFocusInEvent = function(event) {
 
 scout.FocusContext.prototype.bindHideListener = function() {
   //ensure only one of each listenertype exists.
+  //TODO nbu on/off verwenden
   var $focusedElement = this._$focusedElement;
   $focusedElement.unbind('hide.focusContext');
   $focusedElement.bind('hide.focusContext', scout.focusManager.validateFocus.bind(scout.focusManager, this._uiSessionId, 'hide'));
