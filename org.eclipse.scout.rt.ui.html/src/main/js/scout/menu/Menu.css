@@ -138,7 +138,7 @@
   & > .popup-head {
     position: absolute;
     line-height: @menu-item-height;
-    padding: 0 13px;
+    padding: 0px 13px 0 13px;
     white-space: nowrap;
     background-color: white;
     border: solid 1px @border-color;

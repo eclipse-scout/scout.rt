@@ -79,9 +79,13 @@ scout.MenuBarPopup.prototype.alignTo = function() {
 
   // horiz. alignment
   var left = pos.left,
-    top = pos.top,
+    top = pos.top-5,
     headInsets = scout.graphics.getInsets(this.$head),
     bodyTop = headSize.height;
+
+  if(this.menu.$container.hasClass('taskbar')){
+    top = pos.top;
+  }
 
   $.log.debug('bodyWidth=' + bodyWidth + ' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +
     ' headInsets=' + headInsets + ' left=' + left + ' top=' + top);
