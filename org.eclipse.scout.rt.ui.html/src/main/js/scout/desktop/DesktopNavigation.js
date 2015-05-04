@@ -80,9 +80,11 @@ scout.DesktopNavigation.prototype._createOutlinesTab = function() {
 };
 
 scout.DesktopNavigation.prototype._onMenuButtonClicked = function(event) {
-  this._openMenu();
-  event.stopPropagation();
-  event.stopImmediatePropagation();
+  if (this.activeTab === this.outlineTab) {
+    this._openMenu();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+  }
 };
 
 scout.DesktopNavigation.prototype._openMenu = function(event) {
