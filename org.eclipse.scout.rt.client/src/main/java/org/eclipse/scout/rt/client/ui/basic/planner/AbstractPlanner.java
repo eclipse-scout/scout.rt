@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.planner;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -185,8 +187,41 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @ConfigOperation
-  @Order(40)
+  @Order(30)
   protected void execDisplayModeChanged(int displayMode) throws ProcessingException {
+    Calendar from = Calendar.getInstance();
+    DateUtility.truncCalendar(from);
+    Calendar to = Calendar.getInstance();
+    DateUtility.truncCalendar(to);
+    switch (displayMode) {
+      case IPlanner.DISPLAY_MODE_INTRADAY:
+      case IPlanner.DISPLAY_MODE_DAY:
+        to.add(Calendar.DAY_OF_WEEK, 1);
+        break;
+      case IPlanner.DISPLAY_MODE_WEEK:
+        from.set(Calendar.DAY_OF_WEEK, from.getFirstDayOfWeek());
+        to.add(Calendar.DAY_OF_WEEK, 7);
+        break;
+      case IPlanner.DISPLAY_MODE_WORKWEEK:
+        from.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        to.add(Calendar.DAY_OF_WEEK, 5);
+        break;
+      case IPlanner.DISPLAY_MODE_MONTH:
+        to.add(Calendar.MONTH, 2);
+        break;
+      case IPlanner.DISPLAY_MODE_CALENDAR_WEEK:
+        to.add(Calendar.MONTH, 9);
+        break;
+      case IPlanner.DISPLAY_MODE_YEAR:
+        to.add(Calendar.YEAR, 2);
+        break;
+    }
+    setViewRange(from.getTime(), to.getTime());
+  }
+
+  @ConfigOperation
+  @Order(40)
+  protected void execViewRangeChanged(Range<Date> viewRange) throws ProcessingException {
   }
 
   @ConfigOperation
@@ -296,6 +331,15 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
           try {
             //FIXME CGU add interceptor
             execDisplayModeChanged((int) e.getNewValue());
+          }
+          catch (Exception t) {
+            BEANS.get(ExceptionHandler.class).handle(t);
+          }
+        }
+        else if (e.getPropertyName().equals(PROP_VIEW_RANGE)) {
+          try {
+            //FIXME CGU add interceptor
+            execViewRangeChanged((Range) e.getNewValue());
           }
           catch (Exception t) {
             BEANS.get(ExceptionHandler.class).handle(t);
@@ -950,6 +994,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   private void setViewRangeInternal(Range<Date> viewRange) {
+    LOG.info("Set view range to " + viewRange);
     propertySupport.setProperty(PROP_VIEW_RANGE, viewRange);
   }
 
