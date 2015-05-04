@@ -35,6 +35,7 @@ scout.ProposalChooser.prototype._renderProperties = function() {
  * calling the JQuery trigger method.
  */
 scout.ProposalChooser.prototype.delegateEvent = function(event) {
+  event.originalEvent.smartFieldEvent = true;
   this.model.$container.trigger(event);
 };
 

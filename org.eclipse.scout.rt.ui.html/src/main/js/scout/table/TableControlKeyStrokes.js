@@ -192,7 +192,9 @@ scout.TableControlKeyStrokes.prototype.checkAndDrawKeyBox = function($container,
 scout.TableControlKeyStrokes.prototype.accept = function(event) {
   var elementType = document.activeElement.tagName.toLowerCase();
 
-  if (document.activeElement.className !== 'control-filter' &&(elementType === 'textarea' || elementType === 'input')) {
+  if (document.activeElement.className !== 'control-filter' &&
+      (elementType === 'textarea' || elementType === 'input') &&
+      (!event.originalEvent || (event.originalEvent && !event.originalEvent.smartFieldEvent))) {
     return false;
   }
 
