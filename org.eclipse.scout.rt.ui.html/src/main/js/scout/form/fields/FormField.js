@@ -108,9 +108,6 @@ scout.FormField.prototype._renderTooltipText = function(tooltipText) {
 };
 
 scout.FormField.prototype._renderVisible = function(visible) {
-  if (!this.$container) {
-    return;
-  }
   this.$container.setVisible(visible);
   if (this.rendered) {
     var htmlComp = scout.HtmlComponent.get(this.$container).getParent();

@@ -24,6 +24,7 @@ scout.CellEditorPopup.prototype._render = function($parent) {
 
   field.render(this.$container);
   field.$container.addClass('cell-editor');
+  this.addChild(field);
 
   // remove mandatory and status indicators (popup should 'fill' the whole cell)
   if (field.$mandatory) {
@@ -41,10 +42,6 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   scout.graphics.setSize(this.$container, offsetBounds.width, rowOffsetBounds.height);
   scout.graphics.setSize(field.$container, offsetBounds.width, rowOffsetBounds.height);
   scout.HtmlComponent.get(field.$container).layout();
-};
-
-scout.CellEditorPopup.prototype._remove = function() {
-  this.cell.field.remove();
 };
 
 scout.CellEditorPopup.prototype._onMouseDownOutside = function(event) {

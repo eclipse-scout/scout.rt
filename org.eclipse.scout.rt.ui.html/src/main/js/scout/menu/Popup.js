@@ -17,7 +17,10 @@ scout.inherits(scout.Popup, scout.Widget);
 scout.Popup.prototype.render = function($parent) {
   scout.Popup.parent.prototype.render.call(this, $parent);
   setTimeout(function() {
-    this.$container.installFocusContext('auto', this.session.uiSessionId);
+    // $container maybe null if removed directly after render
+    if (this.$container) {
+      this.$container.installFocusContext('auto', this.session.uiSessionId);
+    }
   }.bind(this), 0);
   this._attachCloseHandler();
 };
