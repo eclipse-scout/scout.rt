@@ -32,13 +32,12 @@ scout.MenuBarPopup.prototype._render = function($parent) {
   this._copyCssClass('taskbar');
   this._copyCssClass('button');
 
-  var menus = this.menu.childActions;
-
+  var menus = this.menu.childActions || this.menu.menus;
   if (!menus || menus.length === 0) {
     return;
   }
-  var i;
-  for (i = 0; i < menus.length; i++) {
+
+  for (var i = 0; i < menus.length; i++) {
     var menu = menus[i];
     if (!menu.visible) {
       continue;
@@ -51,6 +50,7 @@ scout.MenuBarPopup.prototype._render = function($parent) {
       .text(menu.text)
       .on('click', '', this.onMenuItemClicked.bind(this, menu));
   }
+
   this.alignTo();
 };
 
