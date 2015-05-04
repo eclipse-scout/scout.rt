@@ -14,6 +14,7 @@ scout.DesktopNavigation = function(desktop) {
   this.previousOutline;
   this.breadcrumbSwitchWidth = 190;
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+  this.searchFieldKeyStrokeAdapter;
 };
 
 scout.DesktopNavigation.prototype.render = function($parent) {
@@ -104,6 +105,15 @@ scout.DesktopNavigation.prototype._createSearchTab = function() {
   // create button
   $tab.appendDiv('navigation-tab-search-button')
     .on('click', this._onSearchButtonClick.bind(this));
+
+  //add keystroke adapter for search field.
+  if(!this.searchFieldKeyStrokeAdapter){
+    this.searchFieldKeyStrokeAdapter = new scout.SearchFieldKeyStrokeAdapter(this);
+  }
+  //reinstall
+  scout.keyStrokeManager.uninstallAdapter(this.searchFieldKeyStrokeAdapter);
+  scout.keyStrokeManager.installAdapter(this.$queryField, this.searchFieldKeyStrokeAdapter);
+
   return $tab;
 };
 
