@@ -95,3 +95,11 @@ scout.FormToolButton.prototype.handle = function(event) {
     event.preventDefault();
   }
 };
+
+scout.FormToolButton.prototype._renderText = function(text) {
+  scout.FormToolButton.parent.prototype._renderText.call(this, text);
+  if(this.popup){
+    this.popup._renderHead();
+    this.popup.alignTo();
+  }
+};
