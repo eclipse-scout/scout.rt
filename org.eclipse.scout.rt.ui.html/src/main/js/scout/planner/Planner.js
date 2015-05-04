@@ -75,19 +75,17 @@ scout.Planner.prototype._render = function($parent) {
   this.$commands.appendDiv('planner-separator');
   this.$commands.appendDiv('planner-toggle-year').click(this._onClickYear.bind(this));
 
-  // should be done by server?
-  this.displayMode = this.MONTH;
   this._updateModel();
   this._updateScreen();
 };
 
-//TODO CGU/CRU vermutlich nicht nötig, da in updateScreen gemacht
-//scout.Planner.prototype._renderProperties = function() {
-//  scout.Planner.parent.prototype._renderProperties.call(this);
+scout.Planner.prototype._renderProperties = function() {
+  scout.Planner.parent.prototype._renderProperties.call(this);
 
+  //TODO CGU/CRU vermutlich nicht nötig, da in updateScreen gemacht
   //this._renderSelectedResources();
-//  this._renderDisplayMode();
-//};
+  this._renderDisplayMode();
+};
 
 /* -- basics, events -------------------------------------------- */
 
@@ -163,10 +161,6 @@ scout.Planner.prototype._updateScreen = function() {
   }
   this._renderResources();
   this._renderSelectedResources();
-
-  // select mode
-  $('.planner-mode', this.$commands).select(false);
-  $("[data-mode='" + this.displayMode +"']", this.$modes).select(true);
 
   // update
   this._layoutRange();
@@ -554,7 +548,10 @@ scout.Planner.prototype._renderLastHourOfDay = function() {};
 
 scout.Planner.prototype._renderIntradayInterval = function() {};
 
-scout.Planner.prototype._renderDisplayMode = function() {};
+scout.Planner.prototype._renderDisplayMode = function() {
+  $('.planner-mode', this.$commands).select(false);
+  $("[data-mode='" + this.displayMode +"']", this.$commands).select(true);
+};
 
 scout.Planner.prototype._renderSelectedBeginTime = function() {};
 
