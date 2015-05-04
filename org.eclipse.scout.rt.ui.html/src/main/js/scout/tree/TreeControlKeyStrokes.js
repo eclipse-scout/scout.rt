@@ -67,7 +67,7 @@ scout.TreeControlKeyStrokes.prototype._drawKeyBox = function($container, drawedK
   var $upNode, $downNode;
   var offset = 4;
 
-  if (currentNode) {
+//  if (currentNode) {
     if ($currentNode.length === 0) {
       $upNode = this._field.$nodes().last();
     } else {
@@ -84,12 +84,12 @@ scout.TreeControlKeyStrokes.prototype._drawKeyBox = function($container, drawedK
     if ($downNode && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.DOWN)) {
       scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '↓', $downNode, this.ctrl, this.alt, this.shift, true);
     }
-    if (currentNode.expanded && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.LEFT)) {
+    if (currentNode && currentNode.expanded && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.LEFT)) {
       scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '-', $currentNode, this.ctrl, this.alt, this.shift, true);
-    } else if (!currentNode.expanded && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.RIGHT)) {
+    } else if (currentNode &&  !currentNode.expanded && !scout.keyStrokeBox.keyStrokeAlreadyDrawnAndDraw(drawedKeys, this.ctrl, this.alt, this.shift, scout.keys.RIGHT)) {
       scout.keyStrokeBox.drawSingleKeyBoxItem(offset, '+', $currentNode, this.ctrl, this.alt, this.shift, true);
     }
-  }
+//  }
 };
 
 /**
