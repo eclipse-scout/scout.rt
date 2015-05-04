@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.platform.context.IRunMonitor;
 public class RunMonitorCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
 
   protected final Callable<RESULT> m_next;
+  protected final IRunMonitor m_parentMonitor;
   protected final IRunMonitor m_monitor;
 
   /**
@@ -45,29 +46,31 @@ public class RunMonitorCallable<RESULT> implements Callable<RESULT>, IChainable<
    *          {@link Subject} on behalf of which to run the following processors; use <code>null</code> if not to be run
    *          in privileged mode.
    */
-  public RunMonitorCallable(final Callable<RESULT> next, final IRunMonitor monitor) {
+  public RunMonitorCallable(final Callable<RESULT> next, final IRunMonitor parentMonitor, final IRunMonitor monitor) {
     m_next = Assertions.assertNotNull(next);
-    m_monitor = monitor;
+    m_parentMonitor = parentMonitor;
+    m_monitor = monitor != null ? monitor : BEANS.get(IRunMonitor.class);
   }
 
   @Override
   public RESULT call() throws Exception {
-    final IRunMonitor oldMonitor = IRunMonitor.CURRENT.get();
-    if (oldMonitor != null && m_monitor == null) {
+    IRunMonitor oldMonitor = IRunMonitor.CURRENT.get();
+    IRunMonitor.CURRENT.set(m_monitor);
+    if (m_parentMonitor != null) {
+      m_parentMonitor.registerCancellable(m_monitor);
+    }
+    try {
       return m_next.call();
     }
-    else {
-      IRunMonitor.CURRENT.set(m_monitor != null ? m_monitor : BEANS.get(IRunMonitor.class));
-      try {
-        return m_next.call();
+    finally {
+      if (m_parentMonitor != null) {
+        m_parentMonitor.unregisterCancellable(m_monitor);
       }
-      finally {
-        if (oldMonitor == null) {
-          IRunMonitor.CURRENT.remove();
-        }
-        else {
-          IRunMonitor.CURRENT.set(oldMonitor);
-        }
+      if (oldMonitor == null) {
+        IRunMonitor.CURRENT.remove();
+      }
+      else {
+        IRunMonitor.CURRENT.set(oldMonitor);
       }
     }
   }

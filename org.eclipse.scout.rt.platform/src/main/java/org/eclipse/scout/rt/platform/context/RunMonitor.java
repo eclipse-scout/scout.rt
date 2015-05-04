@@ -13,21 +13,18 @@ package org.eclipse.scout.rt.platform.context;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-
 /**
  * Default implementation of a {@link IRunMonitor}
  *
  * @since 5.1
  */
 public class RunMonitor implements IRunMonitor {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RunMonitor.class);
-
   private final Object m_lock = new Object();
   private final Set<ICancellable> m_cancellables = new HashSet<>();
   private volatile boolean m_cancelled;
+
+  public RunMonitor() {
+  }
 
   @Override
   public boolean isCancelled() {
@@ -38,8 +35,8 @@ public class RunMonitor implements IRunMonitor {
   public boolean cancel(final boolean interruptIfRunning) {
     Set<ICancellable> cancellablesCopyList;
     synchronized (m_lock) {
-      m_cancelled = true;
       cancellablesCopyList = new HashSet<>(m_cancellables);
+      m_cancelled = true;
     }
     boolean success = true;
     for (final ICancellable cancellable : cancellablesCopyList) {
@@ -67,6 +64,10 @@ public class RunMonitor implements IRunMonitor {
     }
   }
 
+  protected Set<ICancellable> getCancellables() {
+    return m_cancellables;
+  }
+
   protected boolean invokeCancel(final ICancellable c, final boolean interruptIfRunning) {
     try {
       if (!c.isCancelled()) {
@@ -75,15 +76,7 @@ public class RunMonitor implements IRunMonitor {
       return true;
     }
     catch (final Throwable t) {
-      LOG.error("Cancelling " + c, t);
       return false;
     }
-  }
-
-  /**
-   * Used for testing purpose.
-   */
-  public boolean isEmpty() {
-    return m_cancellables.isEmpty();
   }
 }

@@ -183,16 +183,6 @@ public class JobManager implements IJobManager {
   }
 
   /**
-   * Returns the monitor from the given input, or a new one if not set.
-   */
-  protected IRunMonitor createRunMonitor(JobInput input) {
-    if (input.runContext() != null && input.runContext().runMonitor() != null) {
-      return input.runContext().runMonitor();
-    }
-    return BEANS.get(IRunMonitor.class);
-  }
-
-  /**
    * Creates the Future to interact with the executable once being executed.
    *
    * @param callable
@@ -203,16 +193,23 @@ public class JobManager implements IJobManager {
    *          <code>true</code> if this is a periodic action, <code>false</code> if executed only once.
    */
   @Internal
-  protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final Callable<RESULT> callable, JobInput input, final boolean periodic) {
-    Assertions.assertNotNull(input, "'JobInput' must not be null");
+  protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final Callable<RESULT> callable, final JobInput input0, final boolean periodic) {
+    Assertions.assertNotNull(input0, "'JobInput' must not be null");
+
+    final JobInput input = input0.copy();
 
     // Ensure a job name to be set.
-    input = input.copy().name(StringUtility.nvl(input.name(), callable.getClass().getName()));
+    input.name(StringUtility.nvl(input.name(), callable.getClass().getName()));
+
+    // Ensure runMonitor IF RunContext is set
+    if (input.runContext() != null) {
+      if (input.runContext().runMonitor() == null) {
+        input.runContext().runMonitor(input.runContext().parentRunMonitor(), BEANS.get(IRunMonitor.class));
+      }
+    }
 
     // Create the Callable to be given to the executor.
     final Callable<RESULT> task = interceptCallable(callable, input);
-
-    final IRunMonitor monitor = createRunMonitor(input);
 
     // Create the Future to be returned to the caller.
     final JobFutureTask<RESULT> futureTask = new JobFutureTask<RESULT>(input, periodic, m_mutexSemaphores, task) {
@@ -244,12 +241,10 @@ public class JobManager implements IJobManager {
         m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.ABOUT_TO_RUN, this));
 
         IFuture.CURRENT.set(this);
-        IRunMonitor.CURRENT.set(monitor);
       }
 
       @Override
       protected void afterExecute() {
-        IRunMonitor.CURRENT.remove();
         IFuture.CURRENT.remove();
 
         if (isPeriodic() && !isDone()) {
@@ -257,7 +252,6 @@ public class JobManager implements IJobManager {
           return;
         }
 
-        monitor.unregisterCancellable(this);
         m_futures.remove(this);
         m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.DONE, this));
 
@@ -265,19 +259,7 @@ public class JobManager implements IJobManager {
           m_mutexSemaphores.passMutexToNextTask(this);
         }
       }
-
-      @Override
-      public boolean cancel(boolean mayInterruptIfRunning) {
-        boolean result = super.cancel(mayInterruptIfRunning);
-
-        // Cancel the monitor with all its associated 'Cancellables'. Thereto, unregister the Future first to prevent a cancellation loop.
-//        monitor.unregisterCancellable(this);
-//        monitor.cancel(mayInterruptIfRunning);
-
-        return result;
-      }
     };
-    monitor.registerCancellable(futureTask);
 
     return interceptFuture(futureTask);
   }

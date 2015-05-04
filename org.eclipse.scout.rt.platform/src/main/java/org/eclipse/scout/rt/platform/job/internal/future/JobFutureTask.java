@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.ICancellable;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -37,7 +38,7 @@ import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
  * @since 5.1
  */
 @Internal
-public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFutureTask<RESULT>, IFuture<RESULT>, ICancellable {
+public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFutureTask<RESULT>, IFuture<RESULT> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobFutureTask.class);
 
@@ -45,6 +46,10 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final Long m_expirationDate;
   private volatile boolean m_blocked;
   private final boolean m_periodic;
+
+  private final IRunMonitor m_runMonitor;
+  private final ICancellable m_cancellable;
+  private boolean m_cancellingFromCancellable;
 
   private final MutexSemaphores m_mutexSemaphores;
   private final FutureDoneListener<RESULT> m_futureListener;
@@ -57,12 +62,47 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_mutexSemaphores = mutexSemaphores;
     m_expirationDate = (input.expirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.expirationTimeMillis() : null);
 
+    if (input.runContext() != null && input.runContext().runMonitor() != null) {
+      m_runMonitor = input.runContext().runMonitor();
+    }
+    else {
+      m_runMonitor = BEANS.get(IRunMonitor.class);
+    }
+
+    m_cancellable = new ICancellable() {
+      @Override
+      public boolean isCancelled() {
+        return JobFutureTask.this.isCancelled();
+      }
+
+      @Override
+      public boolean cancel(boolean interruptIfRunning) {
+        //cancel is called by monitor, set the flag to prevent re-calling m_cancellable.cancel() from within the Future.cancel override
+        if (!m_cancellingFromCancellable) {
+          try {
+            m_cancellingFromCancellable = true;
+            return JobFutureTask.this.cancel(interruptIfRunning);
+          }
+          finally {
+            m_cancellingFromCancellable = false;
+          }
+        }
+        return true;
+      }
+    };
+
     postConstruct();
   }
 
   @Override
   @Internal
   public void run() {
+    boolean noRunMonitorOnInput = m_input.runContext() == null || m_input.runContext().runMonitor() == null;
+
+    m_runMonitor.registerCancellable(m_cancellable);
+    if (noRunMonitorOnInput) {
+      IRunMonitor.CURRENT.set(m_runMonitor);
+    }
     beforeExecuteSafe();
 
     // delegate control to the 'FutureTask' which in turn calls 'call' on the given Callable.
@@ -76,6 +116,10 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     }
     finally {
       afterExecuteSafe();
+      if (noRunMonitorOnInput) {
+        IRunMonitor.CURRENT.remove();
+      }
+      m_runMonitor.unregisterCancellable(m_cancellable);
     }
   }
 
@@ -131,6 +175,20 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   @Override
   public final void reject() {
     rejected();
+  }
+
+  @Override
+  public boolean cancel(boolean mayInterruptIfRunning) {
+    if (!m_cancellingFromCancellable) {
+      try {
+        m_cancellingFromCancellable = true;
+        m_runMonitor.cancel(mayInterruptIfRunning);
+      }
+      finally {
+        m_cancellingFromCancellable = false;
+      }
+    }
+    return super.cancel(mayInterruptIfRunning);
   }
 
   /**

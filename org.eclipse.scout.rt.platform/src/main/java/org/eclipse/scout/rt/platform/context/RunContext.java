@@ -54,6 +54,7 @@ public class RunContext {
   protected PreferredValue<Subject> m_subject = new PreferredValue<>(null, false);
   protected PreferredValue<Locale> m_locale = new PreferredValue<>(null, false);
   protected PropertyMap m_propertyMap = new PropertyMap();
+  protected IRunMonitor m_parentRunMonitor;
   protected IRunMonitor m_runMonitor;
 
   /**
@@ -123,7 +124,7 @@ public class RunContext {
     final Callable<RESULT> c4 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, propertyMap());
     final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, NlsLocale.CURRENT, locale());
     final Callable<RESULT> c2 = new SubjectCallable<>(c3, subject());
-    final Callable<RESULT> c1 = new RunMonitorCallable<>(c2, runMonitor());
+    final Callable<RESULT> c1 = new RunMonitorCallable<>(c2, parentRunMonitor(), runMonitor());
 
     return c1;
   }
@@ -160,10 +161,16 @@ public class RunContext {
     return m_runMonitor;
   }
 
+  public IRunMonitor parentRunMonitor() {
+    return m_parentRunMonitor;
+  }
+
   /**
-   * Set a specific {@link IRunMonitor}
+   * Set a specific {@link IRunMonitor} and its optional parent.
+   * If the parent is set, then runMonitor adds itself as a child {@link IRunMonitor#registerCancellable(ICancellable)}
    */
-  public RunContext runMonitor(final IRunMonitor runMonitor) {
+  public RunContext runMonitor(final IRunMonitor parentRunMonitor, final IRunMonitor runMonitor) {
+    m_parentRunMonitor = parentRunMonitor;
     m_runMonitor = runMonitor;
     return this;
   }
@@ -173,6 +180,7 @@ public class RunContext {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.ref("subject", subject());
     builder.attr("locale", locale());
+    builder.attr("parentRunMonitor", parentRunMonitor());
     builder.attr("runMonitor", runMonitor());
     return builder.toString();
   }
@@ -184,6 +192,7 @@ public class RunContext {
     m_subject = origin.m_subject.copy();
     m_locale = origin.m_locale.copy();
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
+    m_parentRunMonitor = origin.m_parentRunMonitor;
     m_runMonitor = origin.m_runMonitor;
   }
 
@@ -194,7 +203,8 @@ public class RunContext {
     m_subject = new PreferredValue<>(Subject.getSubject(AccessController.getContext()), false);
     m_locale = new PreferredValue<>(NlsLocale.CURRENT.get(), false);
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
-    m_runMonitor = IRunMonitor.CURRENT.get();
+    //if there is a parent run monitor, attach this instance as child
+    m_parentRunMonitor = IRunMonitor.CURRENT.get();
   }
 
   /**
@@ -204,7 +214,6 @@ public class RunContext {
     m_subject = new PreferredValue<>(null, true); // null as preferred Subject
     m_locale = new PreferredValue<>(null, true); // null as preferred Locale
     m_propertyMap = new PropertyMap();
-    m_runMonitor = null;
   }
 
   /**
