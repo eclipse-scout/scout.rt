@@ -35,3 +35,7 @@ scout.TableContextMenuPopup.prototype.onMenuItemClicked = function(menu) {
   this.closePopup();
   menu.sendDoAction();
 };
+
+scout.TableContextMenuPopup.prototype._createKeyStrokeAdapter = function() {
+  return new scout.PopupMenuItemKeyStrokeAdapter(this);
+};
