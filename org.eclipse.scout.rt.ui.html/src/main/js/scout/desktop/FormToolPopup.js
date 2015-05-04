@@ -4,6 +4,12 @@ scout.FormToolPopup = function(formToolButton, session) {
   this.formToolButton = formToolButton;
   this.$head;
   this.$deco;
+  if(formToolButton.keyStroke){
+    var closeKeyStroke = new scout.PopupCloseKeyStroke(this);
+    closeKeyStroke.keyStroke = formToolButton.keyStroke;
+    closeKeyStroke.initKeyStrokeParts();
+    this.keyStrokeAdapter.registerKeyStroke(closeKeyStroke);
+  }
 };
 scout.inherits(scout.FormToolPopup, scout.Popup);
 
@@ -14,7 +20,7 @@ scout.FormToolPopup.prototype._render = function($parent) {
   this.$container
     .prepend(this.$head)
     .append(this.$deco);
-
+  this.$head.on('mousedown','', this.buttonMouseDown.bind(this));
   var text = this.$formToolButton.text(),
     dataIcon = this.$formToolButton.attr('data-icon');
 
@@ -96,7 +102,7 @@ scout.FormToolPopup.prototype.closePopup = function() {
   this.formToolButton.setSelected(false);
 };
 
-scout.FormToolPopup.prototype._onMouseDown = function(event) {
+scout.FormToolPopup.prototype.buttonMouseDown = function(event) {
   if(this.$head && this.$head[0]===event.target){
     this.closePopup();
   }

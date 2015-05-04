@@ -11,6 +11,7 @@ scout.inherits(scout.MenuPopupCloseKeyStrokes, scout.KeyStroke);
  */
 scout.MenuPopupCloseKeyStrokes.prototype.handle = function(event) {
   this._popup.remove();
+  event.preventDefault();
 };
 
 /**

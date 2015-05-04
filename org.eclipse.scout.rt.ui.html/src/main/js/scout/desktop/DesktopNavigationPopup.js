@@ -20,6 +20,7 @@ scout.DesktopNavigationPopup.prototype._render = function($parent) {
     .prepend(this.$head)
     .append(this.$deco);
 
+  this.$head.on('mousedown','', this.buttonMouseDown.bind(this));
   this.$head.attr('data-icon', '\uF0C9');
   this.$head.addClass('navigation-header');
   this._copyCssClass('navigation-tab-outline-button');
@@ -69,7 +70,7 @@ scout.DesktopNavigationPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.DesktopNavigationPopupKeyStrokeAdapter(this);
 };
 
-scout.DesktopNavigationPopup.prototype._onMouseDown = function(event) {
+scout.DesktopNavigationPopup.prototype.buttonMouseDown = function(event) {
   if(this.$head && this.$head[0]===event.target){
     this.closePopup();
   }

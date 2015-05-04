@@ -18,6 +18,7 @@ scout.MenuBarPopup.prototype._render = function($parent) {
     .prepend(this.$head)
     .append(this.$deco);
 
+  this.$head.on('mousedown','', this.buttonMouseDown.bind(this));
   var text = this.menu.$container.text(),
     dataIcon = this.menu.$container.attr('data-icon');
 
@@ -109,7 +110,7 @@ scout.MenuBarPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.PopupMenuItemKeyStrokeAdapter(this);
 };
 
-scout.MenuBarPopup.prototype._onMouseDown = function(event) {
+scout.MenuBarPopup.prototype.buttonMouseDown = function(event) {
   if(this.$head && this.$head[0]===event.target){
     this.closePopup();
   }

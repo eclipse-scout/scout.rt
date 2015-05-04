@@ -2,7 +2,6 @@
 
 scout.Popup = function(session) {
   scout.Popup.parent.call(this);
-  this.$container;
   this.$body;
   this.session = session;
   this._mouseDownHandler;
