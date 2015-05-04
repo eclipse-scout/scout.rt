@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.annotations.Replace;
  * <li>class is top level or static inner type</li>
  * <li>class has annotation {@link Bean} (directly or indirectly by on of its super classes or interfaces) or an
  * annotation that itself has the qualifier {@link Bean} (such as {@link ApplicationScoped})</li>
- * <li>class is not directly annotated with {@link SuppressBean}</li>
+ * <li>class is not directly annotated with {@link IgnoreBean}</li>
  * </ol>
  * <p>
  * <h2>Important feature of scout bean handling</h2> When dealing with re-use of code and custom code that changes
@@ -49,7 +49,7 @@ import org.eclipse.scout.commons.annotations.Replace;
  * Without that annotation {@link IBeanManager} considers both the subclassed and the subclassing class as two beans
  * that are available at runtime.
  * 
- * @see SuppressBean
+ * @see IgnoreBean
  */
 @Inherited
 @Documented

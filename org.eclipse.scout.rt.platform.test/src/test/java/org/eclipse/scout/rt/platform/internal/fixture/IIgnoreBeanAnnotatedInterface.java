@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.internal.fixture;
 
-import org.eclipse.scout.rt.platform.SuppressBean;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 
 /**
  * @since 5.1
  */
-@SuppressBean
-public interface ISuppressBeanAnnotatedInterface {
+@IgnoreBean
+public interface IIgnoreBeanAnnotatedInterface {
 
 }

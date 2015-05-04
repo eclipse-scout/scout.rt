@@ -16,19 +16,19 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.SuppressBean;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.internal.fixture.BeanAnnotatedAnnotation;
 import org.eclipse.scout.rt.platform.internal.fixture.DirectlyAnnotatedBean;
 import org.eclipse.scout.rt.platform.internal.fixture.IBeanAnnotatedInterface;
-import org.eclipse.scout.rt.platform.internal.fixture.ISuppressBeanAnnotatedInterface;
+import org.eclipse.scout.rt.platform.internal.fixture.IIgnoreBeanAnnotatedInterface;
 import org.eclipse.scout.rt.platform.internal.fixture.IndirectlyAnnotatedByBeanAnnotatedAnnotationBean;
 import org.eclipse.scout.rt.platform.internal.fixture.IndirectlyAnnotatedByInterfaceBean;
 import org.eclipse.scout.rt.platform.internal.fixture.IndirectlyAnnotatedBySuperclassBean;
-import org.eclipse.scout.rt.platform.internal.fixture.SuppressBeanAnnotatedAnnotation;
-import org.eclipse.scout.rt.platform.internal.fixture.SuppressBeanBean;
-import org.eclipse.scout.rt.platform.internal.fixture.SuppressBeanOnAnnotationBean;
-import org.eclipse.scout.rt.platform.internal.fixture.SuppressBeanOnInterfaceBean;
-import org.eclipse.scout.rt.platform.internal.fixture.SuppressBeanOnSuperclassBean;
+import org.eclipse.scout.rt.platform.internal.fixture.IgnoreBeanAnnotatedAnnotation;
+import org.eclipse.scout.rt.platform.internal.fixture.IgnoreBeanBean;
+import org.eclipse.scout.rt.platform.internal.fixture.IgnoreBeanOnAnnotationBean;
+import org.eclipse.scout.rt.platform.internal.fixture.IgnoreBeanOnInterfaceBean;
+import org.eclipse.scout.rt.platform.internal.fixture.IgnoreBeanOnSuperclassBean;
 import org.jboss.jandex.Indexer;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,13 +45,13 @@ public class JandexClassInfoTest {
     Indexer indexer = new Indexer();
     indexClass(indexer, BeanAnnotatedAnnotation.class);
     indexClass(indexer, DirectlyAnnotatedBean.class);
-    indexClass(indexer, SuppressBeanAnnotatedAnnotation.class);
-    indexClass(indexer, SuppressBeanBean.class);
-    indexClass(indexer, SuppressBeanOnAnnotationBean.class);
-    indexClass(indexer, SuppressBeanOnInterfaceBean.class);
-    indexClass(indexer, SuppressBeanOnSuperclassBean.class);
+    indexClass(indexer, IgnoreBeanAnnotatedAnnotation.class);
+    indexClass(indexer, IgnoreBeanBean.class);
+    indexClass(indexer, IgnoreBeanOnAnnotationBean.class);
+    indexClass(indexer, IgnoreBeanOnInterfaceBean.class);
+    indexClass(indexer, IgnoreBeanOnSuperclassBean.class);
     indexClass(indexer, IBeanAnnotatedInterface.class);
-    indexClass(indexer, ISuppressBeanAnnotatedInterface.class);
+    indexClass(indexer, IIgnoreBeanAnnotatedInterface.class);
     indexClass(indexer, IndirectlyAnnotatedByBeanAnnotatedAnnotationBean.class);
     indexClass(indexer, IndirectlyAnnotatedByInterfaceBean.class);
     indexClass(indexer, IndirectlyAnnotatedBySuperclassBean.class);
@@ -65,40 +65,40 @@ public class JandexClassInfoTest {
   @Test
   public void testHasAnnotation() {
     assertHasAnnotation(true, BeanAnnotatedAnnotation.class, Bean.class);
-    assertHasAnnotation(false, BeanAnnotatedAnnotation.class, SuppressBean.class);
+    assertHasAnnotation(false, BeanAnnotatedAnnotation.class, IgnoreBean.class);
 
     assertHasAnnotation(true, DirectlyAnnotatedBean.class, Bean.class);
-    assertHasAnnotation(false, DirectlyAnnotatedBean.class, SuppressBean.class);
+    assertHasAnnotation(false, DirectlyAnnotatedBean.class, IgnoreBean.class);
 
-    assertHasAnnotation(false, SuppressBeanAnnotatedAnnotation.class, Bean.class);
-    assertHasAnnotation(true, SuppressBeanAnnotatedAnnotation.class, SuppressBean.class);
+    assertHasAnnotation(false, IgnoreBeanAnnotatedAnnotation.class, Bean.class);
+    assertHasAnnotation(true, IgnoreBeanAnnotatedAnnotation.class, IgnoreBean.class);
 
-    assertHasAnnotation(true, SuppressBeanBean.class, Bean.class);
-    assertHasAnnotation(true, SuppressBeanBean.class, SuppressBean.class);
+    assertHasAnnotation(true, IgnoreBeanBean.class, Bean.class);
+    assertHasAnnotation(true, IgnoreBeanBean.class, IgnoreBean.class);
 
-    assertHasAnnotation(false, SuppressBeanOnAnnotationBean.class, Bean.class);
-    assertHasAnnotation(false, SuppressBeanOnAnnotationBean.class, SuppressBean.class);
+    assertHasAnnotation(false, IgnoreBeanOnAnnotationBean.class, Bean.class);
+    assertHasAnnotation(false, IgnoreBeanOnAnnotationBean.class, IgnoreBean.class);
 
-    assertHasAnnotation(false, SuppressBeanOnInterfaceBean.class, Bean.class);
-    assertHasAnnotation(false, SuppressBeanOnInterfaceBean.class, SuppressBean.class);
+    assertHasAnnotation(false, IgnoreBeanOnInterfaceBean.class, Bean.class);
+    assertHasAnnotation(false, IgnoreBeanOnInterfaceBean.class, IgnoreBean.class);
 
-    assertHasAnnotation(false, SuppressBeanOnSuperclassBean.class, Bean.class);
-    assertHasAnnotation(false, SuppressBeanOnSuperclassBean.class, SuppressBean.class);
+    assertHasAnnotation(false, IgnoreBeanOnSuperclassBean.class, Bean.class);
+    assertHasAnnotation(false, IgnoreBeanOnSuperclassBean.class, IgnoreBean.class);
 
     assertHasAnnotation(true, IBeanAnnotatedInterface.class, Bean.class);
-    assertHasAnnotation(false, IBeanAnnotatedInterface.class, SuppressBean.class);
+    assertHasAnnotation(false, IBeanAnnotatedInterface.class, IgnoreBean.class);
 
-    assertHasAnnotation(false, ISuppressBeanAnnotatedInterface.class, Bean.class);
-    assertHasAnnotation(true, ISuppressBeanAnnotatedInterface.class, SuppressBean.class);
+    assertHasAnnotation(false, IIgnoreBeanAnnotatedInterface.class, Bean.class);
+    assertHasAnnotation(true, IIgnoreBeanAnnotatedInterface.class, IgnoreBean.class);
 
     assertHasAnnotation(false, IndirectlyAnnotatedByBeanAnnotatedAnnotationBean.class, Bean.class);
-    assertHasAnnotation(false, IndirectlyAnnotatedByBeanAnnotatedAnnotationBean.class, SuppressBean.class);
+    assertHasAnnotation(false, IndirectlyAnnotatedByBeanAnnotatedAnnotationBean.class, IgnoreBean.class);
 
     assertHasAnnotation(true, IndirectlyAnnotatedByInterfaceBean.class, Bean.class);
-    assertHasAnnotation(false, IndirectlyAnnotatedByInterfaceBean.class, SuppressBean.class);
+    assertHasAnnotation(false, IndirectlyAnnotatedByInterfaceBean.class, IgnoreBean.class);
 
     assertHasAnnotation(false, IndirectlyAnnotatedBySuperclassBean.class, Bean.class);
-    assertHasAnnotation(false, IndirectlyAnnotatedBySuperclassBean.class, SuppressBean.class);
+    assertHasAnnotation(false, IndirectlyAnnotatedBySuperclassBean.class, IgnoreBean.class);
   }
 
   protected static void assertHasAnnotation(boolean expectedAvailable, Class<?> annotatedClass, Class<? extends Annotation> annotationClass) {

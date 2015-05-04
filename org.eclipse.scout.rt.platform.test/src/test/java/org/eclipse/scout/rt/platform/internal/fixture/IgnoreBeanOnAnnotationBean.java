@@ -14,7 +14,7 @@ package org.eclipse.scout.rt.platform.internal.fixture;
 /**
  * @since 5.1
  */
-@SuppressBeanAnnotatedAnnotation
-public class SuppressBeanOnAnnotationBean extends DirectlyAnnotatedBean {
+@IgnoreBeanAnnotatedAnnotation
+public class IgnoreBeanOnAnnotationBean extends DirectlyAnnotatedBean {
 
 }

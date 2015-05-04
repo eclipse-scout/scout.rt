@@ -10,9 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.internal.fixture;
 
+import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.IgnoreBean;
+
 /**
  * @since 5.1
  */
-public class SuppressBeanOnSuperclassBean extends SuppressBeanBean {
+@Bean
+@IgnoreBean
+public class IgnoreBeanBean {
 
 }

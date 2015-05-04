@@ -13,6 +13,6 @@ package org.eclipse.scout.rt.platform.internal.fixture;
 /**
  * @since 5.1
  */
-public class SuppressBeanOnInterfaceBean extends DirectlyAnnotatedBean implements ISuppressBeanAnnotatedInterface {
+public class IgnoreBeanOnInterfaceBean extends DirectlyAnnotatedBean implements IIgnoreBeanAnnotatedInterface {
 
 }

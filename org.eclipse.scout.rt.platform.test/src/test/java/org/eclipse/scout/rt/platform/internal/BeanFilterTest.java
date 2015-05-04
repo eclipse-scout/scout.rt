@@ -15,13 +15,13 @@ import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.internal.fixture.DirectlyAnnotatedBean;
+import org.eclipse.scout.rt.platform.internal.fixture.IgnoreBeanBean;
+import org.eclipse.scout.rt.platform.internal.fixture.IgnoreBeanOnAnnotationBean;
+import org.eclipse.scout.rt.platform.internal.fixture.IgnoreBeanOnInterfaceBean;
+import org.eclipse.scout.rt.platform.internal.fixture.IgnoreBeanOnSuperclassBean;
 import org.eclipse.scout.rt.platform.internal.fixture.IndirectlyAnnotatedByBeanAnnotatedAnnotationBean;
 import org.eclipse.scout.rt.platform.internal.fixture.IndirectlyAnnotatedByInterfaceBean;
 import org.eclipse.scout.rt.platform.internal.fixture.IndirectlyAnnotatedBySuperclassBean;
-import org.eclipse.scout.rt.platform.internal.fixture.SuppressBeanBean;
-import org.eclipse.scout.rt.platform.internal.fixture.SuppressBeanOnAnnotationBean;
-import org.eclipse.scout.rt.platform.internal.fixture.SuppressBeanOnInterfaceBean;
-import org.eclipse.scout.rt.platform.internal.fixture.SuppressBeanOnSuperclassBean;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,22 +53,22 @@ public class BeanFilterTest {
   }
 
   @Test
-  public void testSuppressBean() {
-    assertNull(BEANS.opt(SuppressBeanBean.class));
+  public void testIgnoreBean() {
+    assertNull(BEANS.opt(IgnoreBeanBean.class));
   }
 
   @Test
-  public void testSuppressBeanOnSuperclass() {
-    assertNotNull(BEANS.opt(SuppressBeanOnSuperclassBean.class));
+  public void testIgnoreBeanOnSuperclass() {
+    assertNotNull(BEANS.opt(IgnoreBeanOnSuperclassBean.class));
   }
 
   @Test
-  public void testSuppressBeanOnInterface() {
-    assertNotNull(BEANS.opt(SuppressBeanOnInterfaceBean.class));
+  public void testIgnoreBeanOnInterface() {
+    assertNotNull(BEANS.opt(IgnoreBeanOnInterfaceBean.class));
   }
 
   @Test
-  public void testSuppressBeanOnAnnotation() {
-    assertNotNull(BEANS.opt(SuppressBeanOnAnnotationBean.class));
+  public void testIgnoreBeanOnAnnotation() {
+    assertNotNull(BEANS.opt(IgnoreBeanOnAnnotationBean.class));
   }
 }
