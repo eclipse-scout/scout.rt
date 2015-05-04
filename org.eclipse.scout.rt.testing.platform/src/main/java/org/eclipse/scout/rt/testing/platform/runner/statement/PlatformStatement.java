@@ -11,10 +11,11 @@
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.rt.platform.DefaultPlatform;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.runner.RunWithSharedPlatform;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -58,49 +59,40 @@ import org.junit.runners.model.Statement;
  * @since 5.1
  */
 public class PlatformStatement extends Statement {
-  private static IPlatform s_sharedPlatform;
-
   private final Statement m_next;
-  private final RunWithSharedPlatform m_runWithSharedPlatform;
+  private final RunWithNewPlatform m_runWithNewPlatform;
 
-  public PlatformStatement(Statement next, RunWithSharedPlatform runWithSharedPlatform) {
+  public PlatformStatement(Statement next, RunWithNewPlatform runWithNewPlatform) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
-    m_runWithSharedPlatform = runWithSharedPlatform;
+    m_runWithNewPlatform = runWithNewPlatform;
   }
 
   @Override
   public void evaluate() throws Throwable {
-    if (m_runWithSharedPlatform == null) {
+    if (m_runWithNewPlatform != null) {
       evaluateWithNewPlatform();
     }
     else {
-      evaluateWithSharedPlatform();
+      evaluateWithGlobalPlatform();
     }
   }
 
   protected void evaluateWithNewPlatform() throws Throwable {
-    Platform.setDefault();
+    IPlatform old = Platform.get();
+    Platform.set(new DefaultPlatform());
     try {
       Platform.get().start();
       m_next.evaluate();
     }
     finally {
       Platform.get().stop();
+      Platform.set(old);
     }
   }
 
-  protected void evaluateWithSharedPlatform() throws Throwable {
-    if (s_sharedPlatform == null) {
-      Platform.setDefault();
-      Platform.get().start();
-      s_sharedPlatform = Platform.get();
-    }
-    Platform.set(s_sharedPlatform);
-    try {
-      m_next.evaluate();
-    }
-    finally {
-      Platform.set(null);
-    }
+  protected void evaluateWithGlobalPlatform() throws Throwable {
+    //ensure started
+    Platform.get();
+    m_next.evaluate();
   }
 }

@@ -19,13 +19,13 @@ import java.lang.annotation.Target;
 import org.eclipse.scout.rt.platform.IPlatform;
 
 /**
- * Annotation to execute test-methods using a shared {@link IPlatform}. This annotation requires to be executed by the
- * {@link PlatformTestRunner} ore one of its subclasses.
+ * Annotation to execute test-methods using a new {@link IPlatform}, not the globally shared Platform. This annotation
+ * requires to be executed by the {@link PlatformTestRunner} ore one of its subclasses.
  *
  * @since 5.1
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
-public @interface RunWithSharedPlatform {
+public @interface RunWithNewPlatform {
 }

@@ -22,7 +22,7 @@ public class ApplicationTest {
     IPlatform backup = Platform.get();
     try {
       try {
-        Platform.setDefault();
+        Platform.set(new DefaultPlatform());
         Platform.get().start();
 
         Assert.assertEquals(TestApplication.getInstance().getClass(), TestApplication.class);

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.testing.platform.runner.parameterized;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.IPlatform;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.runner.Description;
 import org.junit.runners.Parameterized;
@@ -89,12 +88,6 @@ public class ParameterizedPlatformTestRunner extends PlatformTestRunner {
 
   @Override
   protected List<FrameworkMethod> getChildren() {
-    // ensure platform is started
-    if (Platform.get() == null) {
-      Platform.setDefault();
-      Platform.get().start();
-    }
-
     m_parameterList = ParameterizedTestRunnerExtension.loadParameterList(getTestClass());
     return ParameterizedTestRunnerExtension.createTestMethods(super.getChildren(), m_parameterList.size());
   }

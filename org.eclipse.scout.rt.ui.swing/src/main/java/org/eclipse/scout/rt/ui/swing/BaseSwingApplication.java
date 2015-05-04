@@ -16,6 +16,7 @@ import java.io.PrintStream;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.util.Locale;
+import java.util.concurrent.Executors;
 
 import javax.security.auth.Subject;
 import javax.swing.JOptionPane;
@@ -25,6 +26,7 @@ import org.eclipse.scout.commons.LocaleUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.UserInterruptedException;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
@@ -119,8 +121,7 @@ abstract class BaseSwingApplication implements IPlatformListener {
       try {
         if (Subject.getSubject(AccessController.getContext()) != null) {
           // there is a subject context
-          startInSubject();
-          exit();
+          scheduleExit(startInSubject());
         }
         else {
           Subject subject = new Subject();
@@ -128,8 +129,7 @@ abstract class BaseSwingApplication implements IPlatformListener {
           Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
             @Override
             public Object run() throws Exception {
-              startInSubject();
-              exit();
+              scheduleExit(startInSubject());
               return null;
             }
           });
@@ -141,16 +141,49 @@ abstract class BaseSwingApplication implements IPlatformListener {
     }
   }
 
-  abstract void startInSubject() throws Exception;
+  abstract IClientSession startInSubject() throws Exception;
+
+  /**
+   * Blocks the main thread as as the client session is active.
+   */
+  private void scheduleExit(final IClientSession clientSession) {
+    if (clientSession == null) {
+      exit(0);
+      return;
+    }
+    Executors.newSingleThreadExecutor().execute(new Runnable() {
+      @Override
+      public void run() {
+        Object stateLock = clientSession.getStateLock();
+        while (true) {
+          synchronized (stateLock) {
+            if (clientSession.isActive()) {
+              try {
+                stateLock.wait();
+              }
+              catch (InterruptedException e) {
+                exit(-1);
+                return;
+              }
+            }
+            else {
+              exit(clientSession.getExitCode());
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
 
   /**
    * Exit delegate to handle os-specific exit behavior.
    * <p>
    * Mac OS X normally only closes the window, but we want to close the app (with Quit).
    */
-  protected void exit() {
+  protected void exit(int code) {
 //    if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-//      System.exit(0);
+    System.exit(code);
 //    }
   }
 

@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.IPlatform;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedFrameworkMethod;
@@ -94,12 +93,6 @@ public class ParameterizedClientTestRunner extends ClientTestRunner {
 
   @Override
   protected List<FrameworkMethod> getChildren() {
-    // ensure platform is started
-    if (Platform.get() == null) {
-      Platform.setDefault();
-      Platform.get().start();
-    }
-
     m_parameterList = ParameterizedTestRunnerExtension.loadParameterList(getTestClass());
     return ParameterizedTestRunnerExtension.createTestMethods(super.getChildren(), m_parameterList.size());
   }

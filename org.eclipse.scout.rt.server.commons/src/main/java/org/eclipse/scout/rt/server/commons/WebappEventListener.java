@@ -25,12 +25,7 @@ import org.eclipse.scout.rt.platform.Platform;
 public class WebappEventListener implements ServletContextListener {
   @Override
   public void contextInitialized(ServletContextEvent sce) {
-    if (Platform.get() != null) {
-      //platform is already started, probably Platform class initializer
-      return;
-    }
-    Platform.setDefault();
-    Platform.get().start();
+    Platform.get();
   }
 
   @Override

@@ -17,7 +17,6 @@ import java.util.List;
 import org.eclipse.scout.commons.ReflectionUtility;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.platform.runner.statement.PlatformStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.RegisterBeanStatement;
 import org.eclipse.scout.rt.testing.platform.runner.statement.SubjectStatement;
@@ -36,8 +35,7 @@ import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 /**
- * Use this Runner to run tests which require the platform to be started.
- * The {@link Platform#setDefault()} is started {@link IPlatform#start(Class)} without an application.
+ * Use this Runner to run tests which require the scout {@link IPlatform}
  * <p/>
  * Use {@link RunWithPrivatePlatform} to control whether the platform used for this test execution is shared or private.
  * Default is shared.
@@ -66,7 +64,7 @@ public class PlatformTestRunner extends BlockJUnit4ClassRunner {
 
   @Override
   protected Statement classBlock(final RunNotifier notifier) {
-    return new PlatformStatement(super.classBlock(notifier), ReflectionUtility.getAnnotation(RunWithSharedPlatform.class, getTestClass().getJavaClass()));
+    return new PlatformStatement(super.classBlock(notifier), ReflectionUtility.getAnnotation(RunWithNewPlatform.class, getTestClass().getJavaClass()));
   }
 
   @Override

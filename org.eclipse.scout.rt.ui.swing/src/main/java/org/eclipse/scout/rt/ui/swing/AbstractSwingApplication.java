@@ -37,7 +37,7 @@ public abstract class AbstractSwingApplication extends BaseSwingApplication {
   }
 
   @Override
-  protected void startInSubject() throws Exception {
+  protected IClientSession startInSubject() throws Exception {
     initialize();
 
     final IClientSession clientSession;
@@ -47,7 +47,7 @@ public abstract class AbstractSwingApplication extends BaseSwingApplication {
     catch (Exception e) {
       LOG.warn("Unexpected error while getting client session", e);
       showLoadError(e);
-      return;
+      return null;
     }
     // Post-condition: session is active and loaded
     stopSplashScreen();
@@ -66,24 +66,7 @@ public abstract class AbstractSwingApplication extends BaseSwingApplication {
       LOG.warn("Error Starting GUI", e);
       System.exit(0);
     }
-    runWhileActive(clientSession);
-  }
-
-  /**
-   * Blocks the main thread as as the client session is active.
-   */
-  private int runWhileActive(IClientSession clientSession) throws InterruptedException {
-    Object stateLock = clientSession.getStateLock();
-    while (true) {
-      synchronized (stateLock) {
-        if (clientSession.isActive()) {
-          stateLock.wait();
-        }
-        else {
-          return clientSession.getExitCode();
-        }
-      }
-    }
+    return clientSession;
   }
 
   /**

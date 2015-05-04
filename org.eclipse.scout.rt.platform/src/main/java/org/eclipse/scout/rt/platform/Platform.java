@@ -11,14 +11,11 @@
 package org.eclipse.scout.rt.platform;
 
 import java.util.ServiceLoader;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * This is the main scout platform, typically installed {@link Platform#setDefault()} and started
- * {@link IPlatform#start(Class)} from within a servlet listener.
- * <p>
- * If there exists a java service config at META-INF/services/org.eclipse.scout.rt.platform.IPlatform then the platform
- * is automatically started on the first hit of this {@link Platform} class by the class initializer. See also
- * {@link #get()}
+ * This is the main scout platform, automatically started
+ * on first access to this class.
  * <p>
  * Tests use a PlatformTestRunner
  * <p>
@@ -30,9 +27,7 @@ import java.util.ServiceLoader;
  */
 public final class Platform {
 
-  /**
-   * Singleton instance.
-   */
+  private static final ReentrantReadWriteLock INIT_LOCK = new ReentrantReadWriteLock(true);
   private static IPlatform platform;
 
   private Platform() {
@@ -52,18 +47,13 @@ public final class Platform {
    *         see also {@link ServiceLoader#load(Class)}
    */
   public static IPlatform get() {
-    return platform;
-  }
-
-  /**
-   * Set the active platform using the default implementor (highly recommended).
-   * <p>
-   * Be careful when using this method. It should only be called by the one and only initializer.
-   * <p>
-   * Typically the servlet context creator.
-   */
-  public static void setDefault() {
-    set(new DefaultPlatform());
+    INIT_LOCK.readLock().lock();
+    try {
+      return platform;
+    }
+    finally {
+      INIT_LOCK.readLock().unlock();
+    }
   }
 
   /**
@@ -74,18 +64,33 @@ public final class Platform {
    * Typically the servlet context creator.
    */
   public static void set(IPlatform p) {
-    platform = p;
+    INIT_LOCK.writeLock().lock();
+    try {
+      platform = p;
+    }
+    finally {
+      INIT_LOCK.writeLock().unlock();
+    }
   }
 
   /*
    * static initializer used for optional autostart, see {@link #get()}
    */
   static {
-    ServiceLoader<IPlatform> loader = ServiceLoader.load(IPlatform.class);
-    for (IPlatform autostartPlatform : loader) {
-      set(autostartPlatform);
-      autostartPlatform.start();
-      break;
+    INIT_LOCK.writeLock().lock();
+    try {
+      ServiceLoader<IPlatform> loader = ServiceLoader.load(IPlatform.class);
+      for (IPlatform p : loader) {
+        platform = p;
+        break;
+      }
+      if (platform == null) {
+        platform = new DefaultPlatform();
+      }
+      platform.start();
+    }
+    finally {
+      INIT_LOCK.writeLock().unlock();
     }
   }
 }
