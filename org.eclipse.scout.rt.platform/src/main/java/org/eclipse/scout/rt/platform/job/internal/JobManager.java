@@ -271,8 +271,8 @@ public class JobManager implements IJobManager {
         boolean result = super.cancel(mayInterruptIfRunning);
 
         // Cancel the monitor with all its associated 'Cancellables'. Thereto, unregister the Future first to prevent a cancellation loop.
-        monitor.unregisterCancellable(this);
-        monitor.cancel(mayInterruptIfRunning);
+//        monitor.unregisterCancellable(this);
+//        monitor.cancel(mayInterruptIfRunning);
 
         return result;
       }
