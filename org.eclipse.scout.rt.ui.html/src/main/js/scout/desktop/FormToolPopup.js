@@ -95,3 +95,9 @@ scout.FormToolPopup.prototype.alignTo = function() {
 scout.FormToolPopup.prototype.closePopup = function() {
   this.formToolButton.setSelected(false);
 };
+
+scout.FormToolPopup.prototype._onMouseDown = function(event) {
+  if(this.$head && this.$head[0]===event.target){
+    this.closePopup();
+  }
+};

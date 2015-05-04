@@ -68,3 +68,9 @@ scout.DesktopNavigationPopup.prototype.alignTo = function() {
 scout.DesktopNavigationPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.DesktopNavigationPopupKeyStrokeAdapter(this);
 };
+
+scout.DesktopNavigationPopup.prototype._onMouseDown = function(event) {
+  if(this.$head && this.$head[0]===event.target){
+    this.closePopup();
+  }
+};

@@ -108,3 +108,9 @@ scout.MenuBarPopup.prototype.alignTo = function() {
 scout.MenuBarPopup.prototype._createKeyStrokeAdapter = function() {
   return new scout.PopupMenuItemKeyStrokeAdapter(this);
 };
+
+scout.MenuBarPopup.prototype._onMouseDown = function(event) {
+  if(this.$head && this.$head[0]===event.target){
+    this.closePopup();
+  }
+};
