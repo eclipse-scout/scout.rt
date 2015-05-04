@@ -195,7 +195,7 @@
     }
 
     & .year-range{
-      background-color: @palette-green-1;
+      background-color: @palette-green-0;
     }
 
     & .year-range-day{
@@ -203,7 +203,7 @@
     }
 
     & .year-hover{
-      background-color: @palette-orange-1 !important;
+      background-color: @palette-orange-0 !important;
     }
 
     & .year-hover-day{
@@ -315,7 +315,7 @@
     }
 
     &.ui-selected {
-      background-color: @palette-cyan-1;
+      background-color: @palette-cyan-0;
     }
   }
 
@@ -517,7 +517,7 @@
 
 .calendar-component {
   &.calendar-appointment {
-    background-color: @palette-orange-1;
+    background-color: @palette-orange-0;
     border-left-color: @palette-orange-2;
 
     &:hover {
@@ -532,7 +532,7 @@
   }
 
   &.calendar-task {
-    background-color: @palette-cyan-1;
+    background-color: @palette-cyan-0;
     border-left-color: @palette-cyan-2;
 
     &:hover {

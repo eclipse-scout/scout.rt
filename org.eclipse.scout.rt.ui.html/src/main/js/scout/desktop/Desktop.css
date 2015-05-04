@@ -266,7 +266,7 @@
 
 .offline-message.reconnect-successful {
   border: 1px solid @palette-green-4;
-  background-color: @palette-green-1;
+  background-color: @palette-green-0;
 }
 
 .reconnect {

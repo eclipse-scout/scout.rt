@@ -86,12 +86,12 @@
   }
 
   &.date-box-now {
-    background-color: @palette-orange-1;
+    background-color: @palette-orange-0;
     border: 1px solid @palette-orange-2;
   }
 
   &.date-box-selected {
-    background-color: @palette-blue-1;
+    background-color: @palette-blue-0;
     border: 1px solid @palette-blue-2 ;
   }
 }
