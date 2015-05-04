@@ -39,7 +39,6 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     try {
       //enable cancel
       IRunMonitor runMonitor = BEANS.get(IRunMonitor.class);
-      BEANS.get(RunMonitorCancelRegistry.class).register(serviceRequest.getRequestSequence(), runMonitor);
 
       ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
       serverRunContext.offline(true);
@@ -48,9 +47,13 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
       serverRunContext.runMonitor(runMonitor);
       serverRunContext.session(provideServerSession(serverRunContext.copy()));
 
+      IServerSession session = serverRunContext.session();
+
+      BEANS.get(RunMonitorCancelRegistry.class).register(session, serviceRequest.getRequestSequence(), runMonitor);
+
       final IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
 
-      BEANS.get(RunMonitorCancelRegistry.class).unregister(serviceRequest.getRequestSequence());
+      BEANS.get(RunMonitorCancelRegistry.class).unregister(session, serviceRequest.getRequestSequence());
 
       if (serviceResponse != null) {
         return serviceResponse;

@@ -110,9 +110,7 @@ public class ServiceTunnelServlet extends HttpServlet {
         public void run() throws Exception {
           IServiceTunnelRequest serviceRequest = deserializeServiceRequest();
 
-          //enable cancel
           IRunMonitor runMonitor = BEANS.get(IRunMonitor.class);
-          BEANS.get(RunMonitorCancelRegistry.class).register(serviceRequest.getRequestSequence(), runMonitor);
 
           ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
           serverRunContext.locale(serviceRequest.getLocale());
@@ -120,9 +118,13 @@ public class ServiceTunnelServlet extends HttpServlet {
           serverRunContext.runMonitor(runMonitor);
           serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
+          //enable cancel
+          IServerSession session = serverRunContext.session();
+          BEANS.get(RunMonitorCancelRegistry.class).register(session, serviceRequest.getRequestSequence(), runMonitor);
+
           IServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
 
-          BEANS.get(RunMonitorCancelRegistry.class).unregister(serviceRequest.getRequestSequence());
+          BEANS.get(RunMonitorCancelRegistry.class).unregister(session, serviceRequest.getRequestSequence());
 
           serializeServiceResponse(serviceResponse);
         }

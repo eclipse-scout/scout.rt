@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 
 /**
  * Cache the {@link IRunMonitor} per session in order to allow cancelling
@@ -32,47 +31,47 @@ public class RunMonitorCancelRegistry {
   public RunMonitorCancelRegistry() {
   }
 
-  public void register(long id, IRunMonitor monitor) {
+  public void register(IServerSession session, long id, IRunMonitor monitor) {
     if (id == 0L) {
       return;
     }
-    SessionState state = getSessionState(true);
+    SessionState state = getSessionState(session, true);
     if (state == null) {
       LOG.error("failed to register transaction due to missing session");
       return;
     }
-    synchronized (state.m_txMapLock) {
-      state.m_txMap.put(id, new WeakReference<IRunMonitor>(monitor));
+    synchronized (state.m_mapLock) {
+      state.m_map.put(id, new WeakReference<IRunMonitor>(monitor));
     }
   }
 
-  public void unregister(long id) {
+  public void unregister(IServerSession session, long id) {
     if (id == 0L) {
       return;
     }
-    SessionState state = getSessionState(false);
+    SessionState state = getSessionState(session, false);
     if (state == null) {
       return;
     }
-    synchronized (state.m_txMapLock) {
-      state.m_txMap.remove(id);
+    synchronized (state.m_mapLock) {
+      state.m_map.remove(id);
     }
   }
 
   /**
    * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
    */
-  public boolean cancel(long id) {
+  public boolean cancel(IServerSession session, long id) {
     if (id == 0L) {
       return false;
     }
-    SessionState state = getSessionState(false);
+    SessionState state = getSessionState(session, false);
     if (state == null) {
       return false;
     }
     IRunMonitor monitor;
-    synchronized (state.m_txMapLock) {
-      WeakReference<IRunMonitor> ref = state.m_txMap.get(id);
+    synchronized (state.m_mapLock) {
+      WeakReference<IRunMonitor> ref = state.m_map.get(id);
       if (ref == null) {
         return false;
       }
@@ -84,8 +83,7 @@ public class RunMonitorCancelRegistry {
     return monitor.cancel(true);
   }
 
-  protected SessionState getSessionState(boolean autoCreate) {
-    IServerSession session = ServerSessionProvider.currentSession();
+  protected SessionState getSessionState(IServerSession session, boolean autoCreate) {
     if (session == null) {
       return null;
     }
@@ -100,7 +98,7 @@ public class RunMonitorCancelRegistry {
   }
 
   protected static class SessionState {
-    final Object m_txMapLock = new Object();
-    final Map<Long, WeakReference<IRunMonitor>> m_txMap = new HashMap<>();
+    final Object m_mapLock = new Object();
+    final Map<Long, WeakReference<IRunMonitor>> m_map = new HashMap<>();
   }
 }
