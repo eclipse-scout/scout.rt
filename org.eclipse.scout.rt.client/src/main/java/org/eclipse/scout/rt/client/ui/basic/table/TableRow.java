@@ -301,6 +301,13 @@ public class TableRow implements ITableRow {
   }
 
   @Override
+  public void setCssClass(String cssClass) {
+    for (int i = 0; i < m_cells.size(); i++) {
+      m_cells.get(i).setCssClass(cssClass);
+    }
+  }
+
+  @Override
   public void setFont(FontSpec f) {
     for (int i = 0; i < m_cells.size(); i++) {
       m_cells.get(i).setFont(f);

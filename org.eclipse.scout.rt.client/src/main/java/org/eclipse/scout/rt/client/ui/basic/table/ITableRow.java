@@ -139,6 +139,11 @@ public interface ITableRow {
   void setForegroundColor(String c);
 
   /**
+   * Convenience method for setting css class on all cells of this row
+   */
+  void setCssClass(String cssClass);
+
+  /**
    * Convenience method for setting font on all cells of this row
    */
   void setFont(FontSpec f);

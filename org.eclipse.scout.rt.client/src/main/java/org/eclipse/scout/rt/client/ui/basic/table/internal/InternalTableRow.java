@@ -376,6 +376,20 @@ public class InternalTableRow implements ITableRow, ICellObserver {
   }
 
   @Override
+  public void setCssClass(String cssClass) {
+    try {
+      setRowChanging(true);
+      //
+      for (Cell cell : m_cells) {
+        cell.setCssClass(cssClass);
+      }
+    }
+    finally {
+      setRowChanging(false);
+    }
+  }
+
+  @Override
   public void setFont(FontSpec f) {
     try {
       setRowChanging(true);
