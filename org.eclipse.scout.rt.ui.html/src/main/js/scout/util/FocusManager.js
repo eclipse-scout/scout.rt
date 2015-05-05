@@ -11,7 +11,8 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
   };
 
   // Set default options
-  if (options.focusFirstPart === undefined) {options.focusFirstPart = true;
+  if (options.focusFirstPart === undefined) {
+    options.focusFirstPart = true;
   }
 
   var $container = session.$entryPoint;
@@ -28,33 +29,38 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
 
 };
 
-scout.FocusManager.prototype.focusFirstElement = function($container) {
+scout.FocusManager.prototype.getFirstFocusableElement = function($container) {
   var focused = false;
   var $focusableElements = $container.find(':focusable');
   var $firstDefaultButton;
-  for(var i = 0; i<$focusableElements.length; i++){
+  for (var i = 0; i < $focusableElements.length; i++) {
     var menuParents = $($focusableElements[i]).parents('.menubar');
     var tabParents = $($focusableElements[i]).parents('.tab-area');
-    if(!$firstDefaultButton && $($focusableElements[i]).is('.default-button')){
+    if (!$firstDefaultButton && $($focusableElements[i]).is('.default-button')) {
       $firstDefaultButton = $focusableElements[i];
     }
-    if(menuParents.length===0 && tabParents.length===0){
+    if (menuParents.length === 0 && tabParents.length === 0) {
       focused = true;
-      return $focusableElements.get(i).focus();
+      return $focusableElements.get(i);
     }
   }
 
   if (!focused) {
-    if($firstDefaultButton){
+    if ($firstDefaultButton) {
       $firstDefaultButton.focus();
-    }
-    else if ($focusableElements && $focusableElements.length > 0) {
-     return $focusableElements.first().focus();
-    }
-    else{
+    } else if ($focusableElements && $focusableElements.length > 0) {
+      return $focusableElements.first();
+    } else {
       //if nothing is found to focus then focus root container
-      return $container.focus();
+      return $container;
     }
+  }
+};
+
+scout.FocusManager.prototype.focusFirstElement = function($container) {
+  var focusableElement = this.getFirstFocusableElement($container);
+  if (focusableElement) {
+    focusableElement.focus();
   }
 };
 
@@ -66,7 +72,7 @@ scout.FocusManager.prototype.installFocusContext = function($container, uiSessio
 
   // Set initial focus
   if ($firstFocusElement === 'auto') {
-    $firstFocusElement = this.focusFirstElement($container);
+    $firstFocusElement = $(this.getFirstFocusableElement($container));
   }
   var focusContext = new scout.FocusContext($container, $firstFocusElement, uiSessionId, isRoot);
 
@@ -116,6 +122,9 @@ scout.FocusManager.prototype._findFocusContext = function($container, uiSessionI
 };
 
 scout.FocusManager.prototype.uninstallFocusContext = function(focusContext, uiSessionId) {
+  if (focusContext.isUninstalled) {
+    return;
+  }
   var focusContexts = this._sessionFocusContexts[uiSessionId].focusContexts;
 
   var index = focusContexts.indexOf(focusContext);
@@ -130,7 +139,7 @@ scout.FocusManager.prototype.uninstallFocusContext = function(focusContext, uiSe
     setTimeout(function() {
       $.log.warn('activated runned after timeout');
       prevFocusContext.activate(false);
-    }.bind(this),0);
+    }.bind(this), 0);
   }
 };
 
@@ -153,14 +162,24 @@ scout.FocusContext = function($container, $focusedElement, uiSessionId, isRoot) 
   this._$focusedElement = $focusedElement;
   this._uiSessionId = uiSessionId;
   this._isRoot = isRoot;
+  this.isUninstalled = false;
   this._$container.bind('focusin.focusContext', this._validateFocusInEvent.bind(this));
   this._$container.bind('remove', this.uninstall.bind(this));
 };
 
 scout.FocusContext.prototype.uninstall = function(event) {
+  if(this.isUninstalled){
+    return;
+  }
   this._$container.unbind('keydown.focusContext');
   this._$container.unbind('focusin.focusContext');
+  if (this._$focusedElement) {
+    this._$focusedElement.unbind('hide.focusContext');
+    this._$focusedElement.unbind('remove.focusContext');
+    this._$focusedElement.unbind('focusout.unbindListener.focusContext');
+  }
   scout.focusManager.uninstallFocusContext(this, this._uiSessionId);
+  this.isUninstalled = true;
 };
 
 scout.FocusContext.prototype.dispose = function() {
@@ -294,8 +313,7 @@ scout.FocusContext.prototype._validateFocus = function() {
       $.log.warn(' ...set focus on first element ' + ' context: ' + this.name);
       scout.focusManager.focusFirstElement($focusContext);
     }
-  }
-  else if(!$(activeElement).is(':focusable')){
+  } else if (!$(activeElement).is(':focusable')) {
     $.log.warn('bla');
   }
   //if active element is no longer focusable
