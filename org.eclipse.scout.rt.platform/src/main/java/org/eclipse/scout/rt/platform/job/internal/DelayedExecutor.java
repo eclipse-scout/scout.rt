@@ -18,6 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.job.JobException;
@@ -50,9 +51,10 @@ class DelayedExecutor {
    * @param threadName
    *          the thread-name of the 'Dispatch-Loop-Runnable'.
    * @param dispatcherThreadCount
-   *          the number of threads used to dispatch delayed jobs.
+   *          the number of threads used to dispatch delayed jobs; must be > 0.
    */
   public DelayedExecutor(final ExecutorService executor, final String threadName, final int dispatcherThreadCount) {
+    Assertions.assertGreater(dispatcherThreadCount, 0);
     m_executor = executor;
     m_threadName = threadName;
 

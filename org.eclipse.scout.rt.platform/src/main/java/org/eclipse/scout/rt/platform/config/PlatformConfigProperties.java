@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
 
 /**
  *
@@ -161,17 +159,6 @@ public final class PlatformConfigProperties {
     @Override
     public String getKey() {
       return "org.eclipse.scout.job.dispatcherThreadCount";
-    }
-
-    @Override
-    protected IProcessingStatus getStatus(Integer value) {
-      if (value == null) {
-        return ProcessingStatus.OK_STATUS;
-      }
-      if (value.intValue() > 0) {
-        return ProcessingStatus.OK_STATUS;
-      }
-      return new ProcessingStatus("invalid number for property '" + getKey() + "'. Value must be > 0.");
     }
   }
 }
