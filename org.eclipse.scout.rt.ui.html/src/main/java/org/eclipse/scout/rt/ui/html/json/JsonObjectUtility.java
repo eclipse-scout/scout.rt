@@ -444,6 +444,9 @@ public final class JsonObjectUtility {
         catch (NoSuchElementException nse) {
           //nop
         }
+        catch (NoSuchFieldException nse) {
+          //nop
+        }
       }
       if (missingNames.size() > 0) {
         FastBeanInfo beanInfo = new FastBeanInfo(type, Object.class);
