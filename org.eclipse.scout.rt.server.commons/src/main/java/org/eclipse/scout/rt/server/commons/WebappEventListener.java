@@ -17,14 +17,16 @@ import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
 
 /**
- * Start the platform when the servlet context starts.
+ * Ensures that the platform is started, when the servlet context is ready. Likewise, the platform is stopped,
+ * when the servlet context is destroyed.
  * <p>
- * If an even earlier platform start is required, check the javadoc of {@link Platform#get()} which uses the
- * META-INF/services/org.eclipse.scout.rt.platform.IPlatform
+ * If an even earlier platform start is required, check the javadoc of {@link Platform}.
  */
 public class WebappEventListener implements ServletContextListener {
+
   @Override
   public void contextInitialized(ServletContextEvent sce) {
+    // Accessing the class activates the platform if it is not yet initialized
     Platform.get();
   }
 
