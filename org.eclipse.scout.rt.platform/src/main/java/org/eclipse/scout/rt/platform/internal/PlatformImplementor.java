@@ -61,20 +61,20 @@ public class PlatformImplementor implements IPlatform {
   @Override
   public IBeanManager getBeanManager() {
     // use lock to ensure the caller waits until the platform has been started completely
-    m_startLock.readLock().lock();
+//    m_startLock.readLock().lock();
     try {
       return m_beanContext;
     }
     finally {
-      m_startLock.readLock().unlock();
+//      m_startLock.readLock().unlock();
     }
   }
 
   @Override
   public synchronized void start() {
-    if (m_startLock.writeLock().getHoldCount() == 0) {
-      throw new PlatformException("Cannot start an already started platform");
-    }
+//    if (m_startLock.writeLock().getHoldCount() == 0) {
+//      throw new PlatformException("Cannot start an already started platform");
+//    }
     // start lock was acquired in constructor or at end of stop [*]
     try {
       changeState(State.PlatformStopped, true);
@@ -92,7 +92,7 @@ public class PlatformImplementor implements IPlatform {
       startCreateImmediatelyBeans();
     }
     finally {
-      m_startLock.writeLock().unlock();
+//      m_startLock.writeLock().unlock();
     }
 
     // last event is outside lock to allow the listeners to use the bean context and the inventory
@@ -184,9 +184,9 @@ public class PlatformImplementor implements IPlatform {
 
   @Override
   public synchronized void stop() {
-    if (m_startLock.writeLock().getHoldCount() != 0) {
-      throw new PlatformException("Cannot stop an already stopped platform");
-    }
+//    if (m_startLock.writeLock().getHoldCount() != 0) {
+//      throw new PlatformException("Cannot stop an already stopped platform");
+//    }
     m_startLock.writeLock().lock();
     try {
       changeState(State.PlatformStopping, false);
