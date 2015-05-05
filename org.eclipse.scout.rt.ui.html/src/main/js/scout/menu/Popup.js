@@ -1,5 +1,3 @@
-// ---- Popup ----
-
 scout.Popup = function(session) {
   scout.Popup.parent.call(this);
   this.$body;
@@ -24,12 +22,21 @@ scout.Popup.prototype.render = function($parent) {
   this._attachCloseHandler();
 };
 
-scout.Popup.prototype._render = function() {
-  var $docBody = this.session.$entryPoint;
+scout.Popup.prototype.remove = function() {
+  this.$container.uninstallFocusContext(this.session.uiSessionId);
+  scout.Popup.parent.prototype.remove.call(this);
+  // remove all clean-up handlers
+  this._detachCloseHandler();
+};
+
+scout.Popup.prototype._render = function($parent) {
+  if (!$parent) {
+    $parent = this.session.$entryPoint;
+  }
   this.$body = $.makeDiv('popup-body');
   this.$container = $.makeDiv('popup')
     .append(this.$body)
-    .appendTo($docBody);
+    .appendTo($parent);
 };
 
 scout.Popup.prototype.rerenderHead = function() {
@@ -54,10 +61,10 @@ scout.Popup.prototype._renderHead = function() {
 };
 
 scout.Popup.prototype._removeHead = function() {
-  if (this.$head){
+  if (this.$head) {
     this.$head.remove();
   }
-  if( this.$deco){
+  if (this.$deco) {
     this.$deco.remove();
   }
 };
@@ -73,14 +80,14 @@ scout.Popup.prototype._attachCloseHandler = function() {
   this._mouseDownHandler = this._onMouseDown.bind(this);
   $(document).on('mousedown', this._mouseDownHandler);
 
-  if (this.$origin) {
-    scout.scrollbars.attachScrollHandlers(this.$origin, this.remove.bind(this));
+  if (this.$anchor) {
+    scout.scrollbars.attachScrollHandlers(this.$anchor, this._onAnchorScroll.bind(this));
   }
 };
 
 scout.Popup.prototype._detachCloseHandler = function() {
-  if (this.$origin) {
-    scout.scrollbars.detachScrollHandlers(this.$origin);
+  if (this.$anchor) {
+    scout.scrollbars.detachScrollHandlers(this.$anchor);
   }
   if (this._mouseDownHandler) {
     $(document).off('mousedown', this._mouseDownHandler);
@@ -106,19 +113,16 @@ scout.Popup.prototype._onHeadMouseDown = function(event) {
   }
 };
 
+scout.Popup.prototype._onAnchorScroll = function(event) {
+  this.remove();
+};
+
 scout.Popup.prototype.appendToBody = function($element) {
   this.$body.append($element);
 };
 
 scout.Popup.prototype.addClassToBody = function(clazz) {
   this.$body.addClass(clazz);
-};
-
-scout.Popup.prototype.remove = function() {
-  this.$container.uninstallFocusContext(this.session.uiSessionId);
-  scout.Popup.parent.prototype.remove.call(this);
-  // remove all clean-up handlers
-  this._detachCloseHandler();
 };
 
 scout.Popup.prototype.setLocation = function(location) {

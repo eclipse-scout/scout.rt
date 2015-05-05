@@ -93,7 +93,7 @@ scout.Action.prototype._showTooltip = function() {
 scout.Action.prototype._configureTooltip = function() {
   return {
     text: this.tooltipText,
-    $origin: this.$container,
+    $anchor: this.$container,
     arrowPosition: 50,
     arrowPositionUnit: '%',
     position: this.tooltipPosition

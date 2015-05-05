@@ -7,7 +7,7 @@ scout.Tooltip = function(options) {
   this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
   this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;
   this.origin = options.origin;
-  this.$origin = options.$origin;
+  this.$anchor = options.$anchor;
   this.autoRemove = options.autoRemove !== undefined ? options.autoRemove : true;
   this.$context = options.$context;
   this.cssClass = options.cssClass;
@@ -19,7 +19,7 @@ scout.inherits(scout.Tooltip, scout.Widget);
 
 scout.Tooltip.prototype._render = function($parent) {
   // Auto-detect parent
-  $parent = $parent || (this.$origin && this.$origin.closest('.desktop,.glasspane')) || $('body');
+  $parent = $parent || (this.$anchor && this.$anchor.closest('.desktop,.glasspane')) || $('body');
 
   this.$container = $.makeDiv('tooltip')
     .hide()
@@ -41,16 +41,16 @@ scout.Tooltip.prototype._render = function($parent) {
     // Every user action will remove the tooltip
     $(document).on('mousedown.tooltip', this._onTooltipClicked.bind(this));
     $(document).on('keydown.tooltip', this.remove.bind(this));
-    if (this.$origin) {
-      scout.scrollbars.attachScrollHandlers(this.$origin, this.remove.bind(this));
+    if (this.$anchor) {
+      scout.scrollbars.attachScrollHandlers(this.$anchor, this.remove.bind(this));
     }
   }
 };
 
 scout.Tooltip.prototype._remove = function() {
   $(document).off('mousedown.tooltip keydown.tooltip');
-  if (this.$origin) {
-    scout.scrollbars.detachScrollHandlers(this.$origin);
+  if (this.$anchor) {
+    scout.scrollbars.detachScrollHandlers(this.$anchor);
   }
   scout.Tooltip.parent.prototype._remove.call(this);
 };
@@ -71,7 +71,7 @@ scout.Tooltip.prototype.position = function() {
     origin = this.origin;
     x = origin.x;
   } else {
-    origin = this.$origin && scout.graphics.offsetBounds(this.$origin);
+    origin = this.$anchor && scout.graphics.offsetBounds(this.$anchor);
     x = origin.x + origin.width / 2;
   }
   y = origin.y;
@@ -118,10 +118,10 @@ scout.Tooltip.prototype.position = function() {
 };
 
 scout.Tooltip.prototype._onTooltipClicked = function(event) {
-  // Only remove the tooltip if the click is outside of the container or the $origin (= status icon)
+  // Only remove the tooltip if the click is outside of the container or the $anchor (= status icon)
   var $target = $(event.target);
   if ($target[0] === this.$container[0] || this.$container.children().is($target) ||
-      $target[0] === this.$origin[0] || this.$origin.children().is($target)) {
+      $target[0] === this.$anchor[0] || this.$anchor.children().is($target)) {
     return;
   }
   this.remove();

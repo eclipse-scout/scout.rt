@@ -217,7 +217,7 @@ scout.FormField.prototype._showStatusMessage = function(options) {
     var form = this.getForm(),
       opts = {
         text: text,
-        $origin: this.$status,
+        $anchor: this.$status,
         $context: (form && form.$container)
       };
     $.extend(opts, options);

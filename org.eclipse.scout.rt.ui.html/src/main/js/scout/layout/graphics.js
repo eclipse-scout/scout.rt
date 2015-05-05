@@ -35,7 +35,7 @@ scout.graphics = {
    * Precondition: $elem and it's parents must not be hidden (display: none. Visibility: hidden would be ok
    * because in this case the browser reserves the space the element would be using).
    */
-  prefSize: function($elem, includeMargins) {
+  prefSize: function($elem, includeMargin) {
     var prefSize,
       props = $elem.css(['width', 'height', 'white-space']);
 
@@ -47,7 +47,7 @@ scout.graphics = {
     });
 
     // measure
-    prefSize = scout.graphics.getSize($elem, includeMargins);
+    prefSize = scout.graphics.getSize($elem, includeMargin);
 
     // reset the modified properties
     $elem.css(props);
@@ -60,15 +60,15 @@ scout.graphics = {
    */
   /**
    * Returns the size of the component, insets included.
-   * @param includeMargins when set to true, returned dimensions include margins of component
+   * @param includeMargin when set to true, returned dimensions include margins of component
    */
-  getSize: function($comp, includeMargins) {
-    if (includeMargins === undefined) {
-      includeMargins = false;
+  getSize: function($comp, includeMargin) {
+    if (includeMargin === undefined) {
+      includeMargin = false;
     }
     return new scout.Dimension(
-      $comp.outerWidth(includeMargins),
-      $comp.outerHeight(includeMargins));
+      $comp.outerWidth(includeMargin),
+      $comp.outerHeight(includeMargin));
   },
 
   setSize: function($comp, vararg, height) {
@@ -160,12 +160,27 @@ scout.graphics = {
       .cssTop(point.y);
   },
 
-  offsetBounds: function($elem, includeMargins) {
-    if (includeMargins === undefined) {
-      includeMargins = false;
+  bounds: function($elem, includeSizeMargin, includePosMargin) {
+    //FIXME CGU merge with getBounds, ask awe why parseCssPosition is used, or rename getBounds to cssBounds
+    return scout.graphics._bounds($elem, $elem.position(), includeSizeMargin, includePosMargin);
+  },
+
+  offsetBounds: function($elem, includeSizeMargin, includePosMargin) {
+    return scout.graphics._bounds($elem, $elem.offset(), includeSizeMargin, includePosMargin);
+  },
+
+  _bounds: function($elem, pos, includeSizeMargin, includePosMargin) {
+    if (includeSizeMargin === undefined) {
+      includeSizeMargin = false;
     }
-    var pos = $elem.offset();
-    return new scout.Rectangle(pos.left, pos.top, $elem.outerWidth(includeMargins), $elem.outerHeight(includeMargins));
+    if (includePosMargin === undefined) {
+      includePosMargin = false;
+    }
+    if (includePosMargin) {
+      pos.left += $elem.cssMarginLeft();
+      pos.top += $elem.cssMarginTop();
+    }
+    return new scout.Rectangle(pos.left, pos.top, $elem.outerWidth(includeSizeMargin), $elem.outerHeight(includeSizeMargin));
   },
 
   debugOutput: function($comp) {

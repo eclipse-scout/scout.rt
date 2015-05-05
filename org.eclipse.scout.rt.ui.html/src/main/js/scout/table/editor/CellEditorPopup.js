@@ -14,13 +14,10 @@ scout.CellEditorPopup.prototype._createKeyStrokeAdapter = function() {
 
 scout.CellEditorPopup.prototype._render = function($parent) {
   scout.CellEditorPopup.parent.prototype._render.call(this, $parent);
+  var field = this.cell.field;
   this.$container.addClass('cell-editor-popup');
   this.$container.data('popup', this);
   this.$body.addClass('cell-editor-popup-body');
-  var offsetBounds, rowOffsetBounds,
-    field = this.cell.field,
-    $row = this.row.$row,
-    $cell = this.table.$cell(this.column, $row);
 
   field.render(this.$container);
   field.$container.addClass('cell-editor');
@@ -35,17 +32,23 @@ scout.CellEditorPopup.prototype._render = function($parent) {
     field.$status.remove();
     field.$status = null;
   }
-
-  offsetBounds = scout.graphics.offsetBounds($cell);
-  rowOffsetBounds = scout.graphics.offsetBounds($row);
-  this.setLocation(new scout.Point(offsetBounds.x, rowOffsetBounds.y));
-  scout.graphics.setSize(this.$container, offsetBounds.width, rowOffsetBounds.height);
-  scout.graphics.setSize(field.$container, offsetBounds.width, rowOffsetBounds.height);
-  scout.HtmlComponent.get(field.$container).layout();
+  this.alignTo();
 };
 
-scout.CellEditorPopup.prototype._onMouseDownOutside = function(event) {
-  this.completeEdit();
+scout.CellEditorPopup.prototype.alignTo = function(event) {
+  //FIXME CGU eigentlich in PopupLayout, hier invalidate aufrufen?
+  var cellBounds, rowBounds,
+    $tableData = this.table.$data,
+    field = this.cell.field,
+    $row = this.row.$row,
+    $cell = this.table.$cell(this.column, $row);
+
+  cellBounds = scout.graphics.bounds($cell, false, true);
+  rowBounds = scout.graphics.bounds($row, false, true);
+  this.setLocation(new scout.Point($tableData.scrollLeft() + cellBounds.x, $tableData.scrollTop() + rowBounds.y));
+  scout.graphics.setSize(this.$container, cellBounds.width, rowBounds.height);
+  scout.graphics.setSize(field.$container, cellBounds.width, rowBounds.height);
+  scout.HtmlComponent.get(field.$container).layout();
 };
 
 scout.CellEditorPopup.prototype.completeEdit = function() {
@@ -62,4 +65,12 @@ scout.CellEditorPopup.prototype.completeEdit = function() {
 scout.CellEditorPopup.prototype.cancelEdit = function() {
   this.table.sendCancelCellEdit(this.cell.field.id);
   this.remove();
+};
+
+scout.CellEditorPopup.prototype._onMouseDownOutside = function(event) {
+  this.completeEdit();
+};
+
+scout.CellEditorPopup.prototype._onAnchorScroll = function(event) {
+  this.alignTo();
 };

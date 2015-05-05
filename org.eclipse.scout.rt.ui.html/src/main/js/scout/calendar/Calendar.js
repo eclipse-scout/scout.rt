@@ -878,7 +878,7 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
     $comp = $(event.currentTarget),
     x = event.pageX,
     y = event.pageY;
-  popup.$origin = $comp;
+  popup.$anchor = $comp;
   popup.render();
   popup.setLocation(new scout.Point(x, y));
 };
@@ -892,7 +892,7 @@ scout.Calendar.prototype._onComponentHoverIn = function(event) {
       component = $comp.data('component'),
       tooltip = new scout.Tooltip({
       text: this._fullHtml(component),
-      $origin: $comp,
+      $anchor: $comp,
       arrowPosition: 15,
       arrowPositionUnit: '%',
       htmlEnabled: true

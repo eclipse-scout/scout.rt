@@ -76,12 +76,12 @@ scout.scrollbars = {
   },
 
   /**
-   * Attaches the given handler to each scrollable parent, including $origin if it is scrollable as well.<p>
+   * Attaches the given handler to each scrollable parent, including $anchor if it is scrollable as well.<p>
    * Make sure you remove the handlers when not needed anymore using detachScrollHandlers.
    */
-  attachScrollHandlers: function($origin, handler) {
+  attachScrollHandlers: function($anchor, handler) {
     var $scrollParents = [],
-      $elem = $origin;
+      $elem = $anchor;
 
     while ($elem.length > 0) {
       if ($elem.data('scrollable')) {
@@ -91,11 +91,11 @@ scout.scrollbars = {
       }
       $elem = $elem.parent();
     }
-    $origin.data('scrollParents', $scrollParents);
+    $anchor.data('scrollParents', $scrollParents);
   },
 
-  detachScrollHandlers: function($origin) {
-    var $scrollParents = $origin.data('scrollParents');
+  detachScrollHandlers: function($anchor) {
+    var $scrollParents = $anchor.data('scrollParents');
     if (!$scrollParents) {
       return;
     }
@@ -105,7 +105,7 @@ scout.scrollbars = {
       $elem.off('scroll', handler);
       $elem.removeData('scrollHandler');
     }
-    $origin.removeData('scrollParents');
+    $anchor.removeData('scrollParents');
   }
 
 };

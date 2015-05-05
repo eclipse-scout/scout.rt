@@ -1,5 +1,9 @@
 describe("scout.Dimension", function() {
 
+  beforeEach(function() {
+    setFixtures(sandbox());
+  });
+
   describe("Ctor", function() {
 
     it("accepts two numbers as width and height arguments", function() {
@@ -20,12 +24,12 @@ describe("scout.Dimension", function() {
 
   describe("getBounds", function() {
 
-    var $div = $('<div>').
-      css('left', '6px').
-      css('top', '7px').
-      css('width', '8px').
-      css('height', '9px').
-      css('margin', '10px');
+    var $div = $('<div>')
+      .css('left', '6px')
+      .css('top', '7px')
+      .css('width', '8px')
+      .css('height', '9px')
+      .css('margin', '10px');
 
     it("returns JQuery.outerWidth/Height(true)", function() {
       var rect = scout.graphics.getBounds($div);
@@ -36,12 +40,53 @@ describe("scout.Dimension", function() {
     });
 
     it("returns 0 when left/right is set to auto", function() {
-      $div.
-        css('left', 'auto').
-        css('top', 'auto');
+      $div
+        .css('left', 'auto')
+        .css('top', 'auto');
       var rect = scout.graphics.getBounds($div);
       expect(rect.x).toBe(0);
       expect(rect.y).toBe(0);
+    });
+
+  });
+
+  describe("bounds", function() {
+    var $div;
+
+    beforeEach(function() {
+      $div = $('<div>')
+        .css('position', 'absolute')
+        .css('left', '6px')
+        .css('top', '7px')
+        .css('width', '8px')
+        .css('height', '9px')
+        .css('margin', '10px')
+        .appendTo($('#sandbox'));
+    });
+
+    it("returns rectangle with position from JQuery.position()", function() {
+      var rect = scout.graphics.bounds($div);
+      expect(rect.x).toBe(6);
+      expect(rect.y).toBe(7);
+    });
+
+
+    it("returns rectangle with position from JQuery.position() including margin if includePosMargin is true", function() {
+      var rect = scout.graphics.bounds($div, false, true);
+      expect(rect.x).toBe(6 + 10);
+      expect(rect.y).toBe(7 + 10);
+    });
+
+    it("returns rectangle with size from JQuery.outerWidth/Height", function() {
+      var rect = scout.graphics.bounds($div);
+      expect(rect.width).toBe(8);
+      expect(rect.height).toBe(9);
+    });
+
+    it("returns rectangle with size from  JQuery.outerWidth/Height() including margin if includeSizeMargin is true", function() {
+      var rect = scout.graphics.bounds($div, true);
+      expect(rect.width).toBe(8 + 2 * 10);
+      expect(rect.height).toBe(9 + 2 * 10);
     });
 
   });

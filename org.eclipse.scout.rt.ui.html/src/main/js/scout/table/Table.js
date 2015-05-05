@@ -545,7 +545,7 @@ scout.Table.prototype._installRows = function($rows) {
       var menuItems = that._filterMenus('', true);
       if (menuItems.length > 0) {
         var popup = new scout.TableContextMenuPopup(this, this.session, menuItems);
-        popup.$origin = this.$data;
+        popup.$anchor = this.$data;
         popup.render();
         popup.setLocation(new scout.Point(x, y));
       }
