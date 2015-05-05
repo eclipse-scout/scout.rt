@@ -34,7 +34,8 @@ scout.Splitter.prototype._onMouseDown = function(event) {
   $('body').addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
 
   this.trigger('resizestart', event);
-  return false;
+  // Prevent text selection in a form
+  event.preventDefault();
 };
 
 scout.Splitter.prototype._onMouseMove = function(event) {
