@@ -1,6 +1,6 @@
 @planner-header-height: 45px;
 @planner-resource-minheight: 30px;
-@planner-resource-cell-width: 150px;
+@planner-resource-title-width: 150px;
 
 .planner-icon(@icon, @size) {
   .font-icon;
@@ -84,10 +84,15 @@
       .planner-icon("31", 20px);
      }
 
+     & .planner-mode-cw::before {
+      .planner-icon("52", 20px);
+     }
+
      & .planner-mode-year::before {
       .planner-icon("365", 20px);
       padding: 0 35px 0px 8px;
      }
+
 
     & .planner-toggle-year::before {
       .planner-icon(@icon-clock, 20px);
@@ -227,14 +232,14 @@
     font-size: 17px;
     color: @palette-gray-6;
     line-height: @calendar-header-height;
-    width: @planner-resource-cell-width;
+    width: @planner-resource-title-width;
     border-right:  1px solid @palette-gray-4;
   }
 
   & .timeline-large {
     height: 50%;
     float: right;
-    width: calc(~"100%" - @planner-resource-cell-width);
+    width: calc(~"100%" - @planner-resource-title-width);
     background-color: @palette-gray-2;
     line-height: @calendar-header-height / 2;
 
@@ -259,7 +264,7 @@
   & .timeline-small {
     height: 50%;
     float: right;
-    width: calc(~"100%" - @planner-resource-cell-width);
+    width: calc(~"100%" - @planner-resource-title-width);
     //background-color: @palette-gray-1;
     line-height: @calendar-header-height / 2;
 
@@ -284,37 +289,81 @@
 }
 
 .planner-grid {
+  position: relative;
   display: inline-block;
   height: calc(~"100%" - 2 * @planner-header-height);
   width: 100%;
   overflow: hidden;
   position: absolute;
 
-  & .resource {
-    display: table-row;
-    white-space: nowrap;
+  & .selector {
+    position: absolute;
+    border-top: 2px solid @item-selection-border-color;
+    border-bottom: 2px solid @item-selection-border-color;
+    z-index: 2;
+    top: 0;
 
-    &.selected {
+    & .selector-resize-left {
+      background-color: @palette-white;
+      border-left: 2px solid @item-selection-border-color;
+      border-right: 2px solid @item-selection-border-color;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 6px;
+      height: 100%;
+      cursor: col-resize;
+    }
+
+    & .selector-resize-right {
+      background-color: @palette-white;
+      border-left: 2px solid @item-selection-border-color;
+      border-right: 2px solid @item-selection-border-color;
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      width: 6px;
+      height: 100%;
+      cursor: col-resize;
+    }
+
+  }
+
+  & .resource {
+    height: @planner-resource-minheight;
+    width: 100%;
+    border-bottom: 1px solid @palette-gray-4;
+
+    &.selected .resource-title{
       background-color: lightblue;
     }
   }
 
-  & .resource-cell {
-    display: table-cell;
-    vertical-align: middle;
-    min-height: @planner-resource-minheight;
-    padding: 8px;
-    width: @planner-resource-cell-width;
+  & .resource-title {
+    line-height: @planner-resource-minheight;
+    height: 100%;
+    width: @planner-resource-title-width;
+    float:left;
   }
 
-  & .activity {
-    display: table-cell;
-    min-height: @planner-resource-minheight;
-    vertical-align: middle;
-    border-bottom: 1px solid black;
-    background-color: @palette-cyan-4;
-    padding: 8px;
+  & .resource-cells {
+    position: relative;
+    height: 100%;
+    width: calc(~"100%" - @planner-resource-title-width);
+    float: left;
+
+    & .activity {
+      position: absolute;
+      top: 0px;
+      width: 0px;
+      height: @planner-resource-minheight;
+      line-height: @planner-resource-minheight;
+      background-color: @palette-cyan-4;
+      text-align: center;
+    }
+
   }
+
 }
 
 

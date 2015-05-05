@@ -5,6 +5,9 @@ scout.Planner = function() {
   scout.Planner.parent.call(this);
   this.resourceMap = [];
 
+  // visual
+  this._resourceTitleWidth = 20;
+
   // main elements
   this.$container;
   this.$header;
@@ -20,6 +23,10 @@ scout.Planner = function() {
   this.WORK = 4;
   this.CALENDAR_WEEK = 5;
   this.YEAR = 6;
+
+  // scale calculator
+  this.transformLeft = function (t) { return t; };
+  this.transformWidth = function (t) { return t; };
 
   // additional modes; should be stored in model
   this.showYear = false;
@@ -54,7 +61,7 @@ scout.Planner.prototype._render = function($parent) {
   this.$header = this.$container.appendDiv('planner-header');
   this.$scale = this.$container.appendDiv('planner-scale');
   this.$year = this.$container.appendDiv('planner-year-container').appendDiv('planner-year');
-  this.$grid = this.$container.appendDiv('planner-grid');
+  this.$grid = this.$container.appendDiv('planner-grid').mousedown(this._onCellMousedown.bind(this));
   scout.scrollbars.install(this.$grid);
 
   // header contains all controls
@@ -71,6 +78,7 @@ scout.Planner.prototype._render = function($parent) {
   this.$commands.appendDiv('planner-mode-work planner-mode').attr('data-mode', this.WORK).click(this._onClickDisplayMode.bind(this));
   this.$commands.appendDiv('planner-mode-week planner-mode').attr('data-mode', this.WEEK).click(this._onClickDisplayMode.bind(this));
   this.$commands.appendDiv('planner-mode-month planner-mode').attr('data-mode', this.MONTH).click(this._onClickDisplayMode.bind(this));
+  this.$commands.appendDiv('planner-mode-cw planner-mode').attr('data-mode', this.CALENDAR_WEEK).click(this._onClickDisplayMode.bind(this));
   this.$commands.appendDiv('planner-mode-year planner-mode').attr('data-mode', this.YEAR).click(this._onClickDisplayMode.bind(this));
   this.$commands.appendDiv('planner-separator');
   this.$commands.appendDiv('planner-toggle-year').click(this._onClickYear.bind(this));
@@ -159,12 +167,13 @@ scout.Planner.prototype._updateScreen = function() {
   if (this.rendered) {
     this._removeAllResources();
   }
-  this._renderResources();
-  this._renderSelectedResources();
 
   // update
   this._layoutRange();
   this._layoutScale();
+
+  this._renderResources();
+  this._renderSelectedResources();
 
   // if year shown and changed, redraw year
   if (this.showYear) {
@@ -178,24 +187,25 @@ scout.Planner.prototype._updateScreen = function() {
 
 scout.Planner.prototype._layoutRange = function() {
   var text,
+    toDate = new Date(this.viewRange.to.valueOf() - 1),
     toText = ' bis ';
 
   // find range text
-  if (scout.dates.isSameDay(this.viewRange.from, this.viewRange.to)) {
+  if (scout.dates.isSameDay(this.viewRange.from, toDate)) {
     text = this._dateFormat(this.viewRange.from, 'd. MMMM yyyy');
-  } else if (this.viewRange.from.getMonth() == this.viewRange.to.getMonth()) {
-    text = this._dateFormat(this.viewRange.from, 'd.') + toText + this._dateFormat(this.viewRange.to, 'd. MMMM yyyy');
-  } else if (this.viewRange.from.getFullYear() === this.viewRange.to.getFullYear()) {
-    if (this.displayMode === this.MONTH || this.displayMode === this.YEAR) {
-      text = this._dateFormat(this.viewRange.from, 'MMMM yyyy') + toText + this._dateFormat(this.viewRange.to, 'MMMM yyyy');
+  } else if (this.viewRange.from.getMonth() == toDate.getMonth() && this.viewRange.from.getFullYear() == toDate.getFullYear()) {
+    text = this._dateFormat(this.viewRange.from, 'd.') + toText + this._dateFormat(toDate, 'd. MMMM yyyy');
+  } else if (this.viewRange.from.getFullYear() === toDate.getFullYear()) {
+    if (this.displayMode == this.YEAR) {
+      text = this._dateFormat(this.viewRange.from, 'MMMM') + toText + this._dateFormat(toDate, 'MMMM yyyy');
     } else {
-      text = this._dateFormat(this.viewRange.from, 'd.  MMMM') + toText + this._dateFormat(this.viewRange.to, 'd. MMMM yyyy');
+      text = this._dateFormat(this.viewRange.from, 'd.  MMMM') + toText + this._dateFormat(toDate, 'd. MMMM yyyy');
     }
   } else {
-    if (this.displayMode === this.MONTH || this.displayMode === this.YEAR) {
-      text = this._dateFormat(this.viewRange.from, 'MMMM yyyy') + toText + this._dateFormat(this.viewRange.to, 'MMMM yyyy');
+    if (this.displayMode == this.YEAR) {
+      text = this._dateFormat(this.viewRange.from, 'MMMM yyyy') + toText + this._dateFormat(toDate, 'MMMM yyyy');
     } else {
-      text = this._dateFormat(this.viewRange.from, 'd.  MMMM yyyy') +toText + this._dateFormat(this.viewRange.to, 'd. MMMM yyyy');
+      text = this._dateFormat(this.viewRange.from, 'd.  MMMM yyyy') + toText + this._dateFormat(toDate, 'd. MMMM yyyy');
     }
   }
 
@@ -207,6 +217,7 @@ scout.Planner.prototype._layoutScale  = function() {
     $timelineSmall,
     loop,
     $divLarge,
+    $divSmall,
     width;
 
   // empty scale
@@ -219,6 +230,7 @@ scout.Planner.prototype._layoutScale  = function() {
 
   // fill timeline large depending on mode
   // TODO: depending on screen size: smaller or large representation
+  // TODO: change to swift
   if (this.displayMode === this.DAY) {
     loop = new Date(this.viewRange.from.valueOf());
 
@@ -228,8 +240,13 @@ scout.Planner.prototype._layoutScale  = function() {
         $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'HH')).data('count', 0);
       }
 
-      $timelineSmall.appendDiv('scale-item', this._dateFormat(loop, ':mm'));
+      $divSmall = $timelineSmall
+        .appendDiv('scale-item', this._dateFormat(loop, ':mm'))
+        .data('date-from', new Date(loop.valueOf()));
+
       loop.setMinutes(loop.getMinutes() + 30);
+      $divSmall.data('date-to', new Date(loop.valueOf()));
+
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
   } else if ((this.displayMode === this.WORK) || (this.displayMode === this.WEEK)) {
@@ -247,12 +264,41 @@ scout.Planner.prototype._layoutScale  = function() {
         }
       }
 
-      $timelineSmall.appendDiv('scale-item', this._dateFormat(loop, 'HH:mm'));
+      $divSmall = $timelineSmall
+        .appendDiv('scale-item', this._dateFormat(loop, 'HH:mm'))
+        .data('date-from', new Date(loop.valueOf()));
+
       loop.setHours(loop.getHours() + 6);
+      $divSmall.data('date-to', new Date(loop.valueOf()));
+
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
 
   } else if (this.displayMode === this.MONTH) {
+    loop = new Date(this.viewRange.from.valueOf());
+
+    // from start to end
+    while (loop < this.viewRange.to) {
+      if ((loop.getDate() == 1 ) || (loop.valueOf() == this.viewRange.from.valueOf())) {
+        if ((loop.getMonth() === 0) || (loop.valueOf() == this.viewRange.from.valueOf())) {
+          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM yyyy')).data('count', 0);
+        } else {
+          $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM')).data('count', 0);
+        }
+      }
+
+      $divSmall = $timelineSmall
+        .appendDiv('scale-item', this._dateFormat(loop, 'dd'))
+        .data('date-from', new Date(loop.valueOf()));
+
+      loop.setDate(loop.getDate() + 1);
+      $divSmall.data('date-to', new Date(loop.valueOf()));
+
+      $divLarge.data('count', $divLarge.data('count') + 1);
+    }
+
+
+  } else if (this.displayMode === this.CALENDAR_WEEK) {
     loop = new Date(this.viewRange.from.valueOf());
 
     // from start to end
@@ -265,8 +311,13 @@ scout.Planner.prototype._layoutScale  = function() {
         }
       }
 
-      $timelineSmall.appendDiv('scale-item', scout.dates.weekInYear(loop));
+      $divSmall = $timelineSmall
+        .appendDiv('scale-item', scout.dates.weekInYear(loop))
+        .data('date-from', new Date(loop.valueOf()));
+
       loop.setDate(loop.getDate() + 7);
+      $divSmall.data('date-to', new Date(loop.valueOf()));
+
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
 
@@ -279,8 +330,13 @@ scout.Planner.prototype._layoutScale  = function() {
         $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'yyyy')).data('count', 0);
       }
 
-      $timelineSmall.appendDiv('scale-item', this._dateFormat(loop, 'MMMM'));
+      $divSmall = $timelineSmall
+        .appendDiv('scale-item', this._dateFormat(loop, 'MMMM'))
+        .data('date-from', new Date(loop.valueOf()));
+
       loop.setMonth(loop.getMonth() + 1);
+      $divSmall.data('date-to', new Date(loop.valueOf()));
+
       $divLarge.data('count', $divLarge.data('count') + 1);
     }
   }
@@ -292,6 +348,18 @@ scout.Planner.prototype._layoutScale  = function() {
   });
   $timelineSmall.children().css('width', width + '%');
 
+  // find transfer function
+  var beginScale = $timelineSmall.children().first().data('date-from').valueOf(),
+    endScale = $timelineSmall.children().last().data('date-to').valueOf();
+
+
+  this.transformLeft = function (begin, end) {
+        return function (t) { return (t - begin) / (end - begin) * 100; };
+      }(beginScale, endScale);
+
+  this.transformWidth = function (begin, end) {
+      return function (t) { return t / (end - begin) * 100; };
+    }(beginScale, endScale);
 };
 
 /* --  render essources, activities --------------------------------- */
@@ -319,10 +387,11 @@ scout.Planner.prototype._renderResources = function(resources) {
 scout.Planner.prototype._build$Resource = function(resource) {
   var i, $activity,
     $resource = $.makeDiv('resource');
-  $resource.appendSpan('resource-cell').text(resource.resourceCell.text);
+  $resource.appendDiv('resource-title').text(resource.resourceCell.text);
+  var $cells = $resource.appendDiv('resource-cells');
   for (i = 0; i < resource.activities.length; i++) {
     $activity = this._build$Activity(resource.activities[i]);
-    $activity.appendTo($resource);
+    $activity.appendTo($cells);
   }
   return $resource;
 };
@@ -331,11 +400,16 @@ scout.Planner.prototype._build$Activity = function(activity) {
   var i,
     $activity = $.makeDiv('activity'),
     level = 100 - Math.min(activity.level * 100, 100),
-    levelColor = scout.helpers.modelToCssColor(activity.levelColor);
+    levelColor = scout.helpers.modelToCssColor(activity.levelColor),
+    begin = scout.dates.parseJsonDate(activity.beginTime).valueOf(),
+    end = scout.dates.parseJsonDate(activity.endTime).valueOf();
 
   $activity.text(activity.text)
     .data('activity', activity)
-    .on('click', this._onActivityClick.bind(this));
+    .on('click', this._onActivityClick.bind(this))
+    .css('left', this.transformLeft(begin) + '%')
+    .css('width', this.transformWidth(end - begin) + '%');
+
   if (activity.cssClass) {
     $activity.addClass(activity.cssClass);
   }
@@ -348,6 +422,134 @@ scout.Planner.prototype._build$Activity = function(activity) {
   activity.$activity = $activity;
   return $activity;
 };
+
+
+/* -- grid, events-------------------------------------------------- */
+
+scout.Planner.prototype._onResourceMousedown = function(event) {
+  var $resource = $(event.delegateTarget),
+  resource = $resource.data('resource');
+
+  this.selectResource(resource);
+};
+
+scout.Planner.prototype._onActivityClick = function(event) {
+  var $activity = $(event.delegateTarget),
+    activity = $activity.data('activity');
+};
+
+/* -- selector -------------------------------------------------- */
+
+scout.Planner.prototype._onCellMousedown = function(event) {
+  // init selector
+  this.$startRow = this._findRow(event.pageY);
+  this.$lastRow = this.$startRow;
+
+  // find range on scale
+  this.startRange = this._findScale(event.pageX);
+  this.lastRange = this.startRange;
+
+  // draw
+  this._drawSelector(event);
+
+  // event
+  $(document)
+    .on('mousemove', this._onCellMousemove.bind(this))
+    .one('mouseup', this._onCellMouseup.bind(this));
+
+};
+
+scout.Planner.prototype._onResizeMousedown = function(event) {
+  var swap;
+
+  // find range on scale
+  if (($(event.target).hasClass('selector-resize-right') && this.startRange.to > this.lastRange.to) ||
+      ($(event.target).hasClass('selector-resize-left') && this.startRange.to < this.lastRange.to)) {
+    swap = this.startRange;
+    this.startRange = this.lastRange;
+    this.lastRange = swap;
+  }
+
+  $('body').addClass('col-resize');
+
+  $(document)
+    .on('mousemove', this._onResizeMousemove.bind(this))
+    .one('mouseup', this._onCellMouseup.bind(this));
+
+  return false;
+
+};
+
+
+scout.Planner.prototype._onCellMousemove = function(event) {
+  this.$lastRow = this._findRow(event.pageY);
+  this.lastRange = this._findScale(event.pageX);
+
+  this._drawSelector(event);
+};
+
+scout.Planner.prototype._onResizeMousemove = function(event) {
+  this.lastRange = this._findScale(event.pageX);
+
+  this._drawSelector(event);
+};
+
+
+scout.Planner.prototype._onCellMouseup = function(event) {
+  $('body').removeClass('col-resize');
+  $(document)
+    .off('mousemove');
+};
+
+
+scout.Planner.prototype._drawSelector = function(event) {
+  if (this.$startRow === null || this.$lastRow === null || this.startRange === null || this.lastRange === null) {
+    return;
+  }
+
+  // remove old selector
+  if (this.$selector) {
+    this.$selector.remove();
+  }
+
+  // top and height
+  var $parent = (this.$startRow[0].offsetTop <= this.$lastRow[0].offsetTop) ? this.$startRow : this.$lastRow;
+  this.$selector = $parent.children('.resource-cells').appendDiv('selector');
+  this.$selector.css('height', this.$startRow.outerHeight() + Math.abs(this.$lastRow[0].offsetTop - this.$startRow[0].offsetTop));
+  this.$selector.appendDiv('selector-resize-left').mousedown(this._onResizeMousedown.bind(this));
+  this.$selector.appendDiv('selector-resize-right').mousedown(this._onResizeMousedown.bind(this));
+
+  // left and with
+  var from = Math.min(this.lastRange.from, this.startRange.from),
+    to = Math.max(this.lastRange.to, this.startRange.to);
+
+  this.$selector
+    .css('left', 'calc(' + this.transformLeft(from) + '% - 6px)')
+    .css('width', 'calc(' + this.transformWidth(to - from) + '% + 12px)');
+};
+
+scout.Planner.prototype._findRow = function(y) {
+    var x =  this.$grid.offset().left + 10,
+      $row = $(document.elementFromPoint(x, y)).parent();
+
+    if ($row.hasClass('resource')) {
+      return $row;
+    } else {
+      return null;
+    }
+};
+
+scout.Planner.prototype._findScale= function(x) {
+  var y =  this.$scale.offset().top + this.$scale.height() * 0.75,
+    $scale = $(document.elementFromPoint(event.pageX, y));
+
+  if ($scale.data('date-from') !== undefined) {
+    return {from: $scale.data('date-from').valueOf(), to: $scale.data('date-to').valueOf()};
+  } else {
+    return null;
+  }
+};
+
 
 /* -- year, draw and color ---------------------------------------- */
 
@@ -505,20 +707,6 @@ scout.Planner.prototype._onYearHoverIn = function(event) {
 scout.Planner.prototype._onYearHoverOut = function(event) {
   // remove all hover effects
   $('.year-day.year-hover, .year-day.year-hover-day', this.$year).removeClass('year-hover year-hover-day');
-};
-
-scout.Planner.prototype._onResourceMousedown = function(event) {
-  var $resource = $(event.delegateTarget),
-  resource = $resource.data('resource');
-
-  this.selectResource(resource);
-};
-
-scout.Planner.prototype._onActivityClick = function(event) {
-  var $activity = $(event.delegateTarget),
-    activity = $activity.data('activity');
-
-  $.l(activity);
 };
 
 
