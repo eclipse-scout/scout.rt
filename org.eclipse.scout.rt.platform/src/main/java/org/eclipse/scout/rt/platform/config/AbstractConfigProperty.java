@@ -39,11 +39,8 @@ public abstract class AbstractConfigProperty<DATA_TYPE> implements IConfigProper
     IProcessingStatus status = getStatusRaw(prop);
     if (status.isOK()) {
       DATA_TYPE ret = parse(prop);
-      if (ret != null) {
-        status = getStatus(ret);
-        if (status.isOK()) {
-          return ret;
-        }
+      if (ret != null && getStatus(ret).isOK()) {
+        return ret;
       }
     }
 
