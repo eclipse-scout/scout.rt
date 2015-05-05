@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.internal;
 
-import java.util.concurrent.CountDownLatch;
-
 import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.PlatformStateLatch;
 
 /**
  * Starts the main platform
@@ -21,15 +20,15 @@ import org.eclipse.scout.rt.platform.IPlatform;
  */
 public class PlatformStarter extends Thread {
   private final IPlatform m_platform;
-  private final CountDownLatch m_waitForStartLockAcquire;
+  private final PlatformStateLatch m_platformStateLatch;
 
-  public PlatformStarter(IPlatform platform, CountDownLatch waitForStartLockAcquire) {
+  public PlatformStarter(IPlatform platform, PlatformStateLatch platformStateLatch) {
     m_platform = platform;
-    m_waitForStartLockAcquire = waitForStartLockAcquire;
+    m_platformStateLatch = platformStateLatch;
   }
 
   @Override
   public void run() {
-    m_platform.start(m_waitForStartLockAcquire);
+    m_platform.start(m_platformStateLatch);
   }
 }

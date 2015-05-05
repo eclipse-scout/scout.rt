@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import java.util.concurrent.CountDownLatch;
-
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
@@ -54,16 +52,33 @@ public interface IPlatform {
     PlatformStopped
   }
 
-  /**
-   * @return
-   */
   State getState();
 
   IBeanManager getBeanManager();
 
-  void start(CountDownLatch waitForStartLockAcquire) throws PlatformException;
+  void start() throws PlatformException;
 
-  void stop(CountDownLatch waitForStartLockAcquire) throws PlatformException;
+  /**
+   * @param stateLatch
+   *          an optional object that can be used to wait for the internal platform lock to be acquired. Consumers of
+   *          this method may call {@link PlatformStateLatch#await()} to be blocked until the {@link IPlatform}
+   *          implementor has acquired it's internal lock.
+   *          <p>
+   *          If no such synchronization is required, use {@link #start()}.
+   */
+  void start(PlatformStateLatch stateLatch) throws PlatformException;
+
+  void stop() throws PlatformException;
+
+  /**
+   * @param stateLatch
+   *          an optional object that can be used to wait for the internal platform lock to be acquired. Consumers of
+   *          this method may call {@link PlatformStateLatch#await()} to be blocked until the {@link IPlatform}
+   *          implementor has acquired it's internal lock.
+   *          <p>
+   *          If no such synchronization is required, use {@link #stop()}.
+   */
+  void stop(PlatformStateLatch stateLatch) throws PlatformException;
 
   boolean inDevelopmentMode();
 }

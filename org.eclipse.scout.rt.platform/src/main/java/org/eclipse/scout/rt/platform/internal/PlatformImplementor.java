@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.platform.internal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.BeanUtility;
@@ -29,6 +28,7 @@ import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.PlatformStateLatch;
 import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -44,8 +44,7 @@ import org.eclipse.scout.rt.platform.service.IService;
 public class PlatformImplementor implements IPlatform {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PlatformImplementor.class);
 
-  private final ReentrantReadWriteLock m_startLock = new ReentrantReadWriteLock(true);
-  private boolean m_started;
+  private final ReentrantReadWriteLock m_platformLock = new ReentrantReadWriteLock(true);
   private volatile State m_state; // may be read at any time by any thread
   private BeanManagerImplementor m_beanContext;
 
@@ -61,24 +60,34 @@ public class PlatformImplementor implements IPlatform {
   @Override
   public IBeanManager getBeanManager() {
     // use lock to ensure the caller waits until the platform has been started completely
-    m_startLock.readLock().lock();
+    m_platformLock.readLock().lock();
     try {
       return m_beanContext;
     }
     finally {
-      m_startLock.readLock().unlock();
+      m_platformLock.readLock().unlock();
     }
   }
 
   @Override
-  public void start(CountDownLatch waitForStartLockAcquire) {
-    m_startLock.writeLock().lock();
+  public void start() throws PlatformException {
+    start(null);
+  }
+
+  @Override
+  public void start(PlatformStateLatch stateLatch) {
+    m_platformLock.writeLock().lock();
     try {
-      waitForStartLockAcquire.countDown();
-      changeState(State.PlatformStopped, true);
+      if (stateLatch != null) {
+        stateLatch.release();
+      }
+
+      if (m_state != State.PlatformStopped) {
+        throw new PlatformException("Platform is not stopped [m_state=" + m_state + "]");
+      }
+
       m_beanContext = createBeanManager();
       //now all IPlatformListener are registered and can receive platform events
-
       changeState(State.BeanManagerPrepared, true);
 
       //validateBeanManager();
@@ -90,8 +99,7 @@ public class PlatformImplementor implements IPlatform {
       startCreateImmediatelyBeans();
     }
     finally {
-      m_started = true;
-      m_startLock.writeLock().unlock();
+      m_platformLock.writeLock().unlock();
     }
 
     // last event is outside lock to allow the listeners to use the bean context and the inventory
@@ -182,13 +190,22 @@ public class PlatformImplementor implements IPlatform {
   }
 
   @Override
-  public void stop(CountDownLatch waitForStartLockAcquire) {
-    m_startLock.writeLock().lock();
+  public void stop() throws PlatformException {
+    stop(null);
+  }
+
+  @Override
+  public void stop(PlatformStateLatch stateLatch) {
+    m_platformLock.writeLock().lock();
     try {
-      waitForStartLockAcquire.countDown();
-      if (!m_started) {
-        throw new PlatformException("Cannot stop an already stopped platform");
+      if (stateLatch != null) {
+        stateLatch.release();
       }
+
+      if (m_state != State.PlatformStarted) {
+        throw new PlatformException("Platform is not started [m_state=" + m_state + "]");
+      }
+
       changeState(State.PlatformStopping, false);
       if (Platform.get() == this) {
         Platform.set(null);
@@ -197,8 +214,7 @@ public class PlatformImplementor implements IPlatform {
       destroyBeanManager();
     }
     finally {
-      m_started = false;
-      m_startLock.writeLock().unlock();
+      m_platformLock.writeLock().unlock();
     }
   }
 

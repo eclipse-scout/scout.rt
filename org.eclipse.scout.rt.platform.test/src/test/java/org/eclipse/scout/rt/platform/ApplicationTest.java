@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import java.util.concurrent.CountDownLatch;
-
 import org.eclipse.scout.rt.platform.fixture.TestApplication;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,12 +23,12 @@ public class ApplicationTest {
     try {
       try {
         Platform.set(new DefaultPlatform());
-        Platform.get().start(new CountDownLatch(1));
+        Platform.get().start();
 
         Assert.assertEquals(TestApplication.getInstance().getClass(), TestApplication.class);
       }
       finally {
-        Platform.get().stop(new CountDownLatch(1));
+        Platform.get().stop();
       }
       // Platform.get() is null after stopping it
       Assert.assertNull(Platform.get());

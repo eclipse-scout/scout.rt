@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons;
 
-import java.util.concurrent.CountDownLatch;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -36,7 +34,7 @@ public class WebappEventListener implements ServletContextListener {
   public void contextDestroyed(ServletContextEvent sce) {
     IPlatform platform = Platform.get();
     if (platform != null) {
-      platform.stop(new CountDownLatch(1));
+      platform.stop();
     }
   }
 }
