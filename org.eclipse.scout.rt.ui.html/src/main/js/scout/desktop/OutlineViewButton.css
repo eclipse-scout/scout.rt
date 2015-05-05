@@ -19,24 +19,14 @@
     cursor: default;
   }
 
-/*   &.selected { */
-/*     color: @active-color; */
-/*     background-color: @item-selection-background-color; */
-/*     cursor: default; */
-/*   } */
-
   &.selected {
       border-top: 1px solid @item-selection-border-color;
       background-color: @item-selection-background-color;
       border-color: @item-selection-border-color;
   }
 
-  &.selected + .outline-menu-item{
+  &.selected + .outline-menu-item {
     border-top-color: @item-selection-border-color;
-  }
-
-  &.selected:first-child {
-/*     border-top: 1px solid @item-selection-border-color; */
   }
 
   &.selected:last-child {
