@@ -48,4 +48,5 @@ public class JsonUtilityTest {
     json = IOUtility.getContentUtf8(ResourceBase.class.getResourceAsStream("json/DefaultValuesFilterTest_defaults_withComments.json"));
     assertEquals("{\n  \"defaults\": {\n    \"FormField\": {\n      \"enabled\": true\n    }\n  }\n}\n", JsonUtility.stripCommentsFromJson(json));
   }
+
 }
