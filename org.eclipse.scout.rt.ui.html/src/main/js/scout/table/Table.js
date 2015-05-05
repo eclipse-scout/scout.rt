@@ -454,7 +454,7 @@ scout.Table.prototype._installRows = function($rows) {
     $row.on('mousedown', '', onMouseDown)
       .on('mouseup', '', onMouseUp)
       .on('dblclick', '', onDoubleClick)
-      .on('contextmenu', onContextMenu); // mouseup is used instead of click to make sure the event is fired before mouseup in table selection handler
+      .on('contextmenu', onContextMenu);
   });
 
   // update info and scrollbar
@@ -468,31 +468,37 @@ scout.Table.prototype._installRows = function($rows) {
 
   // ----- inline methods: --------
 
-  var $mouseDownRow;
+  var $mouseDownRow, mouseDownColumn;
 
   function onMouseDown(event) {
     $mouseDownRow = $(event.delegateTarget);
+    mouseDownColumn = that._columnAtX(event.pageX);
     that.selectionHandler.onMouseDown(event, $mouseDownRow);
   }
 
   function onMouseUp(event) {
+    var $row, $mouseUpRow, column, $appLink;
     if (event.originalEvent.detail > 1) {
       // Don't execute on double click events
       return;
     }
 
-    var $mouseUpRow = $(event.delegateTarget);
+    $mouseUpRow = $(event.delegateTarget);
     that.selectionHandler.onMouseUp(event, $mouseUpRow);
 
     if ($mouseDownRow && $mouseDownRow[0] !== $mouseUpRow[0]) {
       return;
     }
 
-    var $row = $mouseUpRow;
-    var column = that._columnAtX(event.pageX);
+    $row = $mouseUpRow;
+    column = that._columnAtX(event.pageX);
+    if (column !== mouseDownColumn) {
+      // Don't execute click / appLinks when the mouse gets pressed and moved outside of a cell
+      return;
+    }
     column.onMouseUp(event, $row);
 
-    var $appLink = that._find$AppLink(event);
+    $appLink = that._find$AppLink(event);
     if ($appLink) {
       that.sendAppLinkAction(column.id, $appLink.data('ref'));
     } else if (column.guiOnlyCheckBoxColumn) {
@@ -562,7 +568,7 @@ scout.Table.prototype._columnAtX = function(x) {
 
   return scout.arrays.find(this.columns, function(column) {
     columnOffsetRight = offsetLeft + column.width;
-    if (x >= offsetLeft && x <= columnOffsetRight) {
+    if (x >= offsetLeft && x < columnOffsetRight) {
       return true;
     }
     offsetLeft = columnOffsetRight;

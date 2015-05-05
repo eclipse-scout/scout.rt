@@ -57,9 +57,8 @@ describe("CheckBoxColumn", function() {
       model.rows[0].checked = true;
       model.rows[1].checked = false;
       var table = helper.createTable(model);
-      var $rows = table.$rows();
-
       table.render(session.$entryPoint);
+      var $rows = table.$rows();
       var checked = table.columns[0].$checkBox($rows.eq(0)).prop('checked');
       expect(checked).toBe(true);
       checked = table.columns[0].$checkBox($rows.eq(1)).prop('checked');
@@ -76,9 +75,8 @@ describe("CheckBoxColumn", function() {
       model.rows[0].cells[0].value = true;
       model.rows[1].cells[0].value = false;
       var table = helper.createTable(model);
-      var $rows = table.$rows();
-
       table.render(session.$entryPoint);
+      var $rows = table.$rows();
       var checked = table.columns[0].$checkBox($rows.eq(0)).prop('checked');
       expect(checked).toBe(true);
       checked = table.columns[0].$checkBox($rows.eq(1)).prop('checked');

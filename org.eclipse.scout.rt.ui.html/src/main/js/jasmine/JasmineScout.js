@@ -281,7 +281,7 @@ $.fn.triggerMouseMove = function(position) {
 };
 
 $.fn.triggerWithDetail = function(event, clicks) {
-  var pos = this.position();
+  var pos = this.offset();
 
   if (!clicks) {
     clicks = 1;
@@ -300,7 +300,7 @@ $.fn.triggerWithDetail = function(event, clicks) {
 
 $.fn.triggerWithPosition = function(event, position) {
   if (!position) {
-    position = this.position();
+    position = this.offset();
   }
 
   this.trigger({
@@ -312,7 +312,7 @@ $.fn.triggerWithPosition = function(event, position) {
 };
 
 $.fn.triggerContextMenu = function() {
-  var pos = this.position(),
+  var pos = this.offset(),
     clicks = 1;
 
   this.triggerMouseDown(clicks);

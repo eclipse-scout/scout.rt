@@ -148,9 +148,7 @@ TableSpecHelper.prototype.createModelFixture = function(colCount, rowCount) {
 
 TableSpecHelper.prototype.createTable = function(model) {
   var table = new scout.Table();
-  var $div = $('<div>');
   table.init(model, this.session);
-  table._render($div);
   return table;
 };
 
@@ -158,6 +156,22 @@ TableSpecHelper.prototype.createMobileTable = function(model) {
   var table = new scout.MobileTable();
   table.init(model, this.session);
   return table;
+};
+
+/**
+ * Applies display style on rows and cells so that cells are positioned correctly in a row.<br>
+ * Necessary because the stylesheet is not applied when running the specs.
+ */
+TableSpecHelper.prototype.applyDisplayStyle = function(table) {
+  table.$data.css('position', 'relative');
+  table.$rows().each(function() {
+    var $row = $(this);
+    $row.css('display', 'table-row');
+    $row.children('.table-cell').each(function() {
+      var $cell = $(this);
+      $cell.css('display', 'table-cell');
+    });
+  });
 };
 
 TableSpecHelper.prototype.getRowIds = function(rows) {

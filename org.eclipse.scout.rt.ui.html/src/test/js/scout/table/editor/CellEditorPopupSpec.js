@@ -49,16 +49,18 @@ describe("CellEditor", function() {
   }
 
   describe("mouse click", function() {
-    var table, model, $rows, $cells0, $cells1, $cell0_0, $cell1_0;
+    var table, model, $rows, $cells0, $cells1, $cell0_0, $cell0_1, $cell1_0;
 
     beforeEach(function() {
       model = helper.createModelFixture(2, 2);
       table = helper.createTable(model);
       table.render(session.$entryPoint);
+      helper.applyDisplayStyle(table);
       $rows = table.$rows();
       $cells0 = $rows.eq(0).find('.table-cell');
       $cells1 = $rows.eq(1).find('.table-cell');
       $cell0_0 = $cells0.eq(0);
+      $cell0_1 = $cells0.eq(1);
       $cell1_0 = $cells1.eq(0);
     });
 
@@ -96,6 +98,16 @@ describe("CellEditor", function() {
 
       spyOn(table, 'sendPrepareCellEdit');
       $cell0_0.triggerClick();
+      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+    });
+
+    it("does not start cell edit if mouse down and up happened on different cells", function() {
+      table.rows[0].cells[0].editable = true;
+      table.rows[0].cells[0].editable = true;
+
+      spyOn(table, 'sendPrepareCellEdit');
+      $cell0_1.triggerMouseDown();
+      $cell0_0.triggerMouseUp();
       expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
     });
 
