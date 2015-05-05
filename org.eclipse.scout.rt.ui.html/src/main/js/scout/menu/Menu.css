@@ -104,7 +104,7 @@
   }
 
   &.taskbar {
-    padding: 6px 0;
+    padding: 5px 0;
     /* TODO AWE: (menu) this margin property is a hack for UGM. We must treat and style toolbar-item
      * and menu-item in the taskbar the same way. Additionally we must also use Popup.js to display
      * tool-forms.
@@ -148,8 +148,8 @@
     /* alternate styling for popup-head when used in taskbar */
     &.taskbar {
       border-top: none;
-      padding-top: 6px;
-      padding-bottom: 4px;
+      padding-top: 4px;
+      padding-bottom: 6px;
     }
   }
 
@@ -158,10 +158,13 @@
   }
 }
 
+.popup-body.menu-bar-popup {
+  border-bottom: none;
+}
+
 .popup-body {
   position: absolute;
   border: solid 1px @border-color;
-  border-bottom: none;
   background-color: @palette-white;
   .drop-shadow();
 
@@ -212,6 +215,11 @@
   &[data-icon]::before {
     .menu-icon(attr(data-icon));
     color: @active-color;
+     border: 1px solid transparent;
+    margin-left: -2px;
+    margin-right: -2px;
+    padding-left: 2px;
+    padding-right: 2px;
   }
 }
 
