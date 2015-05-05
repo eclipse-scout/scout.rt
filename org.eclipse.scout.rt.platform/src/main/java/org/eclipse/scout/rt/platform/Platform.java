@@ -11,74 +11,62 @@
 package org.eclipse.scout.rt.platform;
 
 import java.util.ServiceLoader;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.eclipse.scout.rt.platform.internal.PlatformStarter;
 
 /**
- * This is the main scout platform, automatically started on first access to this class.
+ * This is the main scout platform, automatically started
+ * on first access to this class.
  * <p>
- * The default platform implementor is the {@link DefaultPlatform}. A different platform instance can be set by
- * registering the fully qualified class name in a java service config at
- * <i>META-INF/services/org.eclipse.scout.rt.platform.IPlatform</i> (see {@link ServiceLoader#load(Class)}). Such a file
- * is typically placed inside the webapp project at <i>rc/main/resources/META-INF/...</i>. <b>Warning:</b> if multiple
- * config files are present on the classpath, only one of them is used to automatically initialize the platform.
+ * Tests use a PlatformTestRunner
  * <p>
- * Tests use a PlatformTestRunner.
+ * When running in workspace, the jandex class scanner used in scout is automatically creating and caching the
+ * target/classes/META-INF/jandex.idx files.
+ * <p>
+ * Use the system property <code>jandex.rebuild=true</code> in order to force a rebuild in case some beans were changed,
+ * added or removed from the source code.
  */
 public final class Platform {
-  private static final ReentrantReadWriteLock INIT_LOCK = new ReentrantReadWriteLock(true);
+
   private static IPlatform platform;
 
   private Platform() {
   }
 
   /**
-   * @return the active platform. It is automatically started when accessing this class (static initializer).
+   * @return active platform
+   *         <p>
+   *         The platform is automatically started on the first hit of this {@link Platform} class by the class initializer.
+   *         <p>
+   *         The default platform entry is <code>org.eclipse.scout.rt.platform.DefaultPlatform</code>
    */
   public static IPlatform get() {
-    INIT_LOCK.readLock().lock();
-    try {
-      return platform;
-    }
-    finally {
-      INIT_LOCK.readLock().unlock();
-    }
+    return platform;
   }
 
   /**
    * Set the active platform using a custom implementor (not recommended).
    * <p>
-   * Be careful when using this method. It should only be called by the one and only initializer. In most cases,
-   * replacing the platform should not be necessary. If needed, the use of a java service config file is recommended
-   * (see class documentation for details).
-   *
-   * @see Platform
+   * Be careful when using this method. It should only be called by the one and only initializer.
+   * <p>
+   * Typically the servlet context creator.
    */
   public static void set(IPlatform p) {
-    INIT_LOCK.writeLock().lock();
-    try {
-      platform = p;
-    }
-    finally {
-      INIT_LOCK.writeLock().unlock();
-    }
+    platform = p;
   }
 
-  // static initializer used for platform auto-start
+  /*
+   * static initializer used for autostart, see {@link #get()}
+   */
   static {
-    INIT_LOCK.writeLock().lock();
-    try {
-      ServiceLoader<IPlatform> loader = ServiceLoader.load(IPlatform.class);
-      for (IPlatform p : loader) {
-        platform = p;
-        break;
-      }
-      if (platform == null) {
-        platform = new DefaultPlatform();
-      }
-      platform.start();
+    ServiceLoader<IPlatform> loader = ServiceLoader.load(IPlatform.class);
+    for (IPlatform p : loader) {
+      platform = p;
+      break;
     }
-    finally {
-      INIT_LOCK.writeLock().unlock();
+    if (platform == null) {
+      platform = new DefaultPlatform();
     }
+    new PlatformStarter(platform).start();
   }
 }
