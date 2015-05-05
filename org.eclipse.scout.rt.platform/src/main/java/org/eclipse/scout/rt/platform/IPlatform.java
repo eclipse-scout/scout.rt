@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
+import java.util.concurrent.CountDownLatch;
+
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
@@ -59,12 +61,9 @@ public interface IPlatform {
 
   IBeanManager getBeanManager();
 
-  void start() throws PlatformException;
+  void start(CountDownLatch waitForStartLockAcquire) throws PlatformException;
 
-  /**
-   *
-   */
-  void stop() throws PlatformException;
+  void stop(CountDownLatch waitForStartLockAcquire) throws PlatformException;
 
   boolean inDevelopmentMode();
 }

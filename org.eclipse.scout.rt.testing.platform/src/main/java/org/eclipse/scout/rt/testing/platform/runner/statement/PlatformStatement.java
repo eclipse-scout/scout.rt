@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
+import java.util.concurrent.CountDownLatch;
+
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.DefaultPlatform;
 import org.eclipse.scout.rt.platform.IPlatform;
@@ -81,11 +83,11 @@ public class PlatformStatement extends Statement {
     IPlatform old = Platform.get();
     Platform.set(new DefaultPlatform());
     try {
-      Platform.get().start();
+      Platform.get().start(new CountDownLatch(1));
       m_next.evaluate();
     }
     finally {
-      Platform.get().stop();
+      Platform.get().stop(new CountDownLatch(1));
       Platform.set(old);
     }
   }

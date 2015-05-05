@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.internal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.BeanUtility;
@@ -44,13 +45,12 @@ public class PlatformImplementor implements IPlatform {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PlatformImplementor.class);
 
   private final ReentrantReadWriteLock m_startLock = new ReentrantReadWriteLock(true);
+  private boolean m_started;
   private volatile State m_state; // may be read at any time by any thread
   private BeanManagerImplementor m_beanContext;
 
   public PlatformImplementor() {
     m_state = State.PlatformStopped;
-    //see all [*] markers
-    m_startLock.writeLock().lock();
   }
 
   @Override
@@ -61,22 +61,20 @@ public class PlatformImplementor implements IPlatform {
   @Override
   public IBeanManager getBeanManager() {
     // use lock to ensure the caller waits until the platform has been started completely
-//    m_startLock.readLock().lock();
+    m_startLock.readLock().lock();
     try {
       return m_beanContext;
     }
     finally {
-//      m_startLock.readLock().unlock();
+      m_startLock.readLock().unlock();
     }
   }
 
   @Override
-  public synchronized void start() {
-//    if (m_startLock.writeLock().getHoldCount() == 0) {
-//      throw new PlatformException("Cannot start an already started platform");
-//    }
-    // start lock was acquired in constructor or at end of stop [*]
+  public void start(CountDownLatch waitForStartLockAcquire) {
+    m_startLock.writeLock().lock();
     try {
+      waitForStartLockAcquire.countDown();
       changeState(State.PlatformStopped, true);
       m_beanContext = createBeanManager();
       //now all IPlatformListener are registered and can receive platform events
@@ -92,7 +90,8 @@ public class PlatformImplementor implements IPlatform {
       startCreateImmediatelyBeans();
     }
     finally {
-//      m_startLock.writeLock().unlock();
+      m_started = true;
+      m_startLock.writeLock().unlock();
     }
 
     // last event is outside lock to allow the listeners to use the bean context and the inventory
@@ -183,12 +182,13 @@ public class PlatformImplementor implements IPlatform {
   }
 
   @Override
-  public synchronized void stop() {
-//    if (m_startLock.writeLock().getHoldCount() != 0) {
-//      throw new PlatformException("Cannot stop an already stopped platform");
-//    }
+  public void stop(CountDownLatch waitForStartLockAcquire) {
     m_startLock.writeLock().lock();
     try {
+      waitForStartLockAcquire.countDown();
+      if (!m_started) {
+        throw new PlatformException("Cannot stop an already stopped platform");
+      }
       changeState(State.PlatformStopping, false);
       if (Platform.get() == this) {
         Platform.set(null);
@@ -197,7 +197,8 @@ public class PlatformImplementor implements IPlatform {
       destroyBeanManager();
     }
     finally {
-      //keep the write lock [*]
+      m_started = false;
+      m_startLock.writeLock().unlock();
     }
   }
 
