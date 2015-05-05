@@ -15,16 +15,15 @@ import java.util.ServiceLoader;
 import org.eclipse.scout.rt.platform.internal.PlatformStarter;
 
 /**
- * This is the main scout platform, automatically started
- * on first access to this class.
+ * This is the main scout platform, automatically started on first access to this class.
  * <p>
- * Tests use a PlatformTestRunner
+ * The default platform implementor is the {@link DefaultPlatform}. A different platform instance can be set by
+ * registering the fully qualified class name in a java service config at
+ * <i>META-INF/services/org.eclipse.scout.rt.platform.IPlatform</i> (see {@link ServiceLoader#load(Class)}). Such a file
+ * is typically placed inside the webapp project at <i>src/main/resources/META-INF/...</i>. <b>Warning:</b> if multiple
+ * config files are present on the classpath, only one of them is used to automatically initialize the platform.
  * <p>
- * When running in workspace, the jandex class scanner used in scout is automatically creating and caching the
- * target/classes/META-INF/jandex.idx files.
- * <p>
- * Use the system property <code>jandex.rebuild=true</code> in order to force a rebuild in case some beans were changed,
- * added or removed from the source code.
+ * Tests use a PlatformTestRunner.
  */
 public final class Platform {
 
@@ -34,11 +33,7 @@ public final class Platform {
   }
 
   /**
-   * @return active platform
-   *         <p>
-   *         The platform is automatically started on the first hit of this {@link Platform} class by the class initializer.
-   *         <p>
-   *         The default platform entry is <code>org.eclipse.scout.rt.platform.DefaultPlatform</code>
+   * @return the active platform. It is automatically started when accessing this class (static initializer).
    */
   public static IPlatform get() {
     return platform;
@@ -47,17 +42,17 @@ public final class Platform {
   /**
    * Set the active platform using a custom implementor (not recommended).
    * <p>
-   * Be careful when using this method. It should only be called by the one and only initializer.
-   * <p>
-   * Typically the servlet context creator.
+   * Be careful when using this method. It should only be called by the one and only initializer. In most cases,
+   * replacing the platform should not be necessary. If needed, the use of a java service config file is recommended
+   * (see class documentation for details).
+   *
+   * @see Platform
    */
   public static void set(IPlatform p) {
     platform = p;
   }
 
-  /*
-   * static initializer used for autostart, see {@link #get()}
-   */
+  // static initializer used for platform auto-start
   static {
     ServiceLoader<IPlatform> loader = ServiceLoader.load(IPlatform.class);
     for (IPlatform p : loader) {
@@ -67,6 +62,7 @@ public final class Platform {
     if (platform == null) {
       platform = new DefaultPlatform();
     }
+    // Start in separate thread (because access to the static methods is blocked during static initializer)
     new PlatformStarter(platform).start();
   }
 }
