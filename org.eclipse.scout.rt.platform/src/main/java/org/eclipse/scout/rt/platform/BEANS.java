@@ -39,7 +39,7 @@ public final class BEANS {
   /**
    * @return the single instance of this type with respect to {@link Order} and {@link Replace}. See also {@link Bean}
    *         <p>
-   *         returns null when no instance is available
+   *         returns <code>null</code> when no instance is available
    * @throws AssertionException
    *           when multiple instances are registered
    */
@@ -52,11 +52,11 @@ public final class BEANS {
   }
 
   /**
-   * @return all instances of this type ordered by {@link Order}
+   * @return all instances of this type ordered by {@link Order} (never <code>null</code>)
    */
   public static <T> List<T> all(Class<T> beanClazz) {
     List<IBean<T>> beans = Platform.get().getBeanManager().getBeans(beanClazz);
-    ArrayList<T> instances = new ArrayList<T>(beans.size());
+    List<T> instances = new ArrayList<T>(beans.size());
     for (IBean<T> bean : beans) {
       T instance = bean.getInstance(beanClazz);
       if (instance != null) {
