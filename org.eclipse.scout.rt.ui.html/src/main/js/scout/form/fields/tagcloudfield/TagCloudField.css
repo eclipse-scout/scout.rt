@@ -19,10 +19,10 @@
   }
 
   & text.tag-text-3 {
-    fill: @palette-gray-7;
+    fill: @palette-gray-6;
   }
 
   & text.tag-text-4 {
-    fill: @palette-gray-5;
+    fill: @palette-gray-4;
   }
 }

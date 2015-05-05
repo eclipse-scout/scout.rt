@@ -256,7 +256,7 @@
 
 .offline-message {
   border: 1px solid @palette-blue-4;
-  background-color: @palette-gray-3;
+  background-color: @palette-gray-2;
   padding: 6px 5px;
   margin: 20px auto;
   z-index: 1;

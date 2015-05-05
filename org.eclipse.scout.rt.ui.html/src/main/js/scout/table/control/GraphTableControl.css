@@ -14,8 +14,8 @@
   cursor: pointer;
 
   &.center { fill: @highlight-color; }
-  &.internal { fill: @palette-gray-5; }
-  &.person { fill:@palette-gray-6; }
+  &.internal { fill: @palette-gray-4; }
+  &.person { fill:@palette-gray-5; }
   &.department { fill: @palette-blue-2 ; }
   &.company { fill: @palette-orange-2; }
 }
@@ -31,12 +31,12 @@
 }
 
 .graph-link {
-  stroke: @palette-gray-5;
+  stroke: @palette-gray-4;
   stroke-width: 2;
 }
 
 .graph-link-text {
-  fill:@palette-gray-6;
+  fill:@palette-gray-5;
   text-anchor: middle;
   dy: 20px;
 }

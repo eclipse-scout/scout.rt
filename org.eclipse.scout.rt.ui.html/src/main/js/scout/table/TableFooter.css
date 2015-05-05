@@ -60,7 +60,7 @@
       }
 
       &.marked:not(.selected) {
-        border-top-color: @palette-gray-6;
+        border-top-color: @palette-gray-5;
       }
     }
   }

@@ -20,7 +20,7 @@
     left: 1px;
     .font-icon;
     font-size: 22px;
-    color: @palette-gray-6;
+    color: @palette-gray-5;
     content: @icon;
   }
 }
@@ -115,7 +115,7 @@
   & .rich-text-bar {
     position: absolute;
     top: 0;
-    background-color: @palette-gray-3;
+    background-color: @palette-gray-2;
     border: 1px solid transparent;
     border-left: 1px solid @border-color;
     border-top-right-radius: @border-radius;

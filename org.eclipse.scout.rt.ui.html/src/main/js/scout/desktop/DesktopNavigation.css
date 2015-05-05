@@ -58,7 +58,7 @@
   }
 
   &:not(.tab-active) {
-    background-color: @palette-gray-5;
+    background-color: @palette-gray-4;
     color: @text-color;
     width: @navigation-tab-button-size;
   }
@@ -145,7 +145,7 @@
   margin: 10px 2px 10px 12px;
   width: calc(~"100%" - (@navigation-tab-button-size + 2px + 12x));
   display: none;
-  background-color: @palette-gray-3;
+  background-color: @palette-gray-2;
   .tab-active > & {
     display: block;
   }

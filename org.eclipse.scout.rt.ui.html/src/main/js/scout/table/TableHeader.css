@@ -14,7 +14,7 @@
   margin-top: -2px;
   right: 6px;
   content: @icon;
-  color: @palette-gray-7;
+  color: @palette-gray-6;
 }
 
 .header-item {

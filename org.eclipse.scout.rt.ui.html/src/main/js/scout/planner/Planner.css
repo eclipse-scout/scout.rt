@@ -136,16 +136,16 @@
       padding-right: 15px;
       line-height: 45px;
       font-size: 17px;
-      color: @palette-gray-5;
+      color: @palette-gray-4;
       cursor: pointer;
 
       &.selected {
-        color: @palette-gray-7;
+        color: @palette-gray-6;
         cursor: default;
       }
 
       &:hover {
-        color: @palette-gray-7;
+        color: @palette-gray-6;
       }
     }
 
@@ -157,7 +157,7 @@
       left: 0px;
       bottom: -1px;
       content: " ";
-      background-color: @palette-gray-5;
+      background-color: @palette-gray-4;
     }
 
     & .year-month{
@@ -189,7 +189,7 @@
       float: left;
       width: 15px;
       text-align: right;
-      color: @palette-gray-7;
+      color: @palette-gray-6;
       font-size: 10px;
       height: 12px;
       padding: 1px;
@@ -218,24 +218,24 @@
 
 .planner-scale {
   height: @planner-header-height;
-  border-bottom:  1px solid @palette-gray-5;
+  border-bottom:  1px solid @palette-gray-4;
 
   & .planner-scale-title {
     height: 100%;
     float: left;
     padding: 0px 10px;
     font-size: 17px;
-    color: @palette-gray-7;
+    color: @palette-gray-6;
     line-height: @calendar-header-height;
     width: @planner-resource-cell-width;
-    border-right:  1px solid @palette-gray-5;
+    border-right:  1px solid @palette-gray-4;
   }
 
   & .timeline-large {
     height: 50%;
     float: right;
     width: calc(~"100%" - @planner-resource-cell-width);
-    background-color: @palette-gray-3;
+    background-color: @palette-gray-2;
     line-height: @calendar-header-height / 2;
 
     & .scale-item {
@@ -251,7 +251,7 @@
       left: 0px;
       top: 0px;
       content: " ";
-      background-color: @palette-gray-5;
+      background-color: @palette-gray-4;
       z-index: 2;
     }
   }
@@ -260,7 +260,7 @@
     height: 50%;
     float: right;
     width: calc(~"100%" - @planner-resource-cell-width);
-    //background-color: @palette-gray-2;
+    //background-color: @palette-gray-1;
     line-height: @calendar-header-height / 2;
 
     & .scale-item {
@@ -277,7 +277,7 @@
       top: 0px;
       content: " ";
       z-index: 1;
-      background-color: @palette-gray-4;
+      background-color: @palette-gray-3;
     }
   }
 

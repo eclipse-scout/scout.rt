@@ -1,4 +1,4 @@
-@color-messagebox-border: @palette-gray-5;
+@color-messagebox-border: @palette-gray-4;
 @messagebox-label-padding: 20px;
 
 .messagebox {
@@ -41,7 +41,7 @@
   & button {
     position: relative;
     padding: 12px;
-    background-color: @palette-gray-3;
+    background-color: @palette-gray-2;
     border: 1px solid @color-messagebox-border;
     cursor: pointer;
     .overflow-ellipsis-nowrap;

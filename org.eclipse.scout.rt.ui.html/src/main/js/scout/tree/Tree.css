@@ -139,10 +139,10 @@
     }
 
     .disabled & {
-      color: @palette-gray-6;
+      color: @palette-gray-5;
     }
     .disabled .tree-node-control:hover& {
-      color: @palette-gray-8;
+      color: @palette-gray-7;
     }
   }
 

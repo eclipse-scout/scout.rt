@@ -130,7 +130,7 @@
 }
 
 .checkboxLabelBeforeDisabled {
-  color: @palette-gray-6;
+  color: @palette-gray-5;
   background-color: @control-disabled-background-color;
 }
 
