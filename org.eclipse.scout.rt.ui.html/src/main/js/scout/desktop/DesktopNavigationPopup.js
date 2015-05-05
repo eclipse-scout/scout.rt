@@ -38,6 +38,8 @@ scout.DesktopNavigationPopup.prototype._copyCssClassToHead = function(className)
 };
 
 scout.DesktopNavigationPopup.prototype.alignTo = function() {
+
+
   var pos = this.$menuItem.offset(),
     headSize = scout.graphics.getSize(this.$head, true);
   // horiz. alignment
@@ -46,11 +48,21 @@ scout.DesktopNavigationPopup.prototype.alignTo = function() {
     bodyTop = headSize.height;
   $.log.debug(' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize + ' left=' + left + ' top=' + top);
   this.$body.cssTop(bodyTop);
-  var offsetBounds = scout.graphics.offsetBounds(this.desktopNavigation.activeTab.$tab);
+  var offsetBounds;
+  if(this.$menuItem.parents('.navigation-breadcrumb').length > 0){
+    offsetBounds = scout.graphics.offsetBounds(this.desktopNavigation.activeTab.$tab.parent());
+    this.$head.cssWidth(offsetBounds.width/2);
+    this.$deco.cssWidth(offsetBounds.width/2-2);
+  }
+  else{
+    offsetBounds = scout.graphics.offsetBounds(this.desktopNavigation.activeTab.$tab);
+    this.$deco.cssWidth(headSize.width - 2);
+  }
+
   this.$body.cssWidth(offsetBounds.width - 2);
   this.$deco.cssTop(bodyTop);
   this.$head.cssLeft(0);
-  this.$deco.cssLeft(1).width(headSize.width - 2);
+  this.$deco.cssLeft(1);
   this.setLocation(new scout.Point(left, top));
 };
 

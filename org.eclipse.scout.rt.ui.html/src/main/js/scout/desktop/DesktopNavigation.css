@@ -83,6 +83,7 @@
   width: @navigation-tab-button-size;
   line-height: @navigation-tab-button-size;
   .font-text-large;
+  border-top: none;
 
   &::before {
     .font-icon;
