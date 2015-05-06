@@ -1762,7 +1762,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
              * A cleaner way is to fire a table update event like in {@link AbstractTable#fireRowsUpdated(List<ITableRow> rows)}
              * to propagate the new error status and value.
              */
-            cell.clearErrorStatus();
+        	  //FIXME CGU/JGU what is this for?
+//            cell.clearErrorStatus();
             cell.setValue(value);
             decorateCellInternal(cell, row);
             ITable table = getTable();

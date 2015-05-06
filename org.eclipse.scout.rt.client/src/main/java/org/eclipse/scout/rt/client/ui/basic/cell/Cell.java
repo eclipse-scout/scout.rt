@@ -161,9 +161,6 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
 
   @Override
   public String getTooltipText() {
-    if (getErrorStatus() != null) {
-      return getErrorStatus().getMessage();
-    }
     return m_cellSpecialization.getTooltipText();
   }
 
