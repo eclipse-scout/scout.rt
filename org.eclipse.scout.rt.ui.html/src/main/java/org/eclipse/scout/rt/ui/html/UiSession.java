@@ -38,14 +38,13 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.client.job.ClientJobFutureFilters.ModelJobFilter;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
-import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.shared.ui.IUiLayer;
@@ -105,14 +104,28 @@ public class UiSession implements IUiSession, HttpSessionBindingListener, IJobLi
     m_rootJsonAdapter = new P_RootAdapter(this);
     m_jsonEventProcessor = createJsonEventProcessor();
 
-    Jobs.getJobManager().addListener(ModelJobs.newEventFilter().eventTypes(JobEventType.DONE).andFilter(new IFilter<JobEvent>() {
-
+    Jobs.getJobManager().addListener(new IFilter<JobEvent>() {
       @Override
       public boolean accept(JobEvent event) {
+        if (!ModelJobFilter.INSTANCE.accept(event.getFuture())) {
+          return false;
+        }
+
+        switch (event.getType()) {
+          case BLOCKED:
+          case DONE:
+          case REJECTED:
+          case SHUTDOWN:
+            //continue
+            break;
+          default:
+            return false;
+        }
+
         ClientRunContext runContext = (ClientRunContext) event.getFuture().getJobInput().runContext();
         return runContext.session() == getClientSession() && !isProcessingClientRequest();
       }
-    }), this);
+    }, this);
   }
 
   protected boolean isInitialized() {
