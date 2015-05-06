@@ -23,6 +23,9 @@ scout.Popup.prototype.render = function($parent) {
 };
 
 scout.Popup.prototype.remove = function() {
+  if (!this.rendered) {
+    return;
+  }
   this.$container.uninstallFocusContext(this.session.uiSessionId);
   scout.Popup.parent.prototype.remove.call(this);
   // remove all clean-up handlers
@@ -87,6 +90,7 @@ scout.Popup.prototype._attachCloseHandler = function() {
 
 scout.Popup.prototype._detachCloseHandler = function() {
   if (this.$anchor) {
+    //FIXME CGU does not work if the popup has been closed -> scrollParents have to be remembered
     scout.scrollbars.detachScrollHandlers(this.$anchor);
   }
   if (this._mouseDownHandler) {

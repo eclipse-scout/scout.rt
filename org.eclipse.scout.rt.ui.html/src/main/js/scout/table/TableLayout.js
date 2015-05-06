@@ -27,6 +27,10 @@ scout.TableLayout.prototype.layout = function($container) {
   if (this.table.autoResizeColumns) {
     this._layoutColumns();
   }
+  // Make sure tooltips are at correct position after layouting, if there are some
+  this.table.tooltips.forEach(function(tooltip) {
+    tooltip.position();
+  }.bind(this));
   scout.scrollbars.update(this.table.$data);
 };
 

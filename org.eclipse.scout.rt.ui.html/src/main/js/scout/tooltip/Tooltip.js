@@ -19,7 +19,7 @@ scout.inherits(scout.Tooltip, scout.Widget);
 
 scout.Tooltip.prototype._render = function($parent) {
   // Auto-detect parent
-  $parent = $parent || (this.$anchor && this.$anchor.closest('.desktop,.glasspane')) || $('body');
+  $parent = $parent || (this.$anchor && this.$anchor.closest('.desktop,.glasspane'));
 
   this.$container = $.makeDiv('tooltip')
     .hide()

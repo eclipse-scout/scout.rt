@@ -5,7 +5,7 @@ describe("CellEditor", function() {
   var formHelper;
 
   beforeEach(function() {
-    setFixtures(sandbox());
+    setFixtures(sandboxDesktop());
     session = new scout.Session($('#sandbox'), '1.1');
     helper = new TableSpecHelper(session);
     formHelper = new FormSpecHelper(session);
@@ -193,6 +193,37 @@ describe("CellEditor", function() {
         fieldId: popup.cell.field.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+  });
+
+  describe("validation", function() {
+    var table, model, cell0_0, $tooltip;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(2, 2);
+      table = helper.createTable(model);
+      cell0_0 = table.rows[0].cells[0];
+    });
+
+    it("shows a tooltip if field has an error", function() {
+      cell0_0.editable = true;
+      cell0_0.errorStatus = 'Validation error';
+      $tooltip = $('.tooltip');
+
+      expect($tooltip.length).toBe(0);
+      table.render(session.$entryPoint);
+      $tooltip = $('.tooltip');
+      expect($tooltip.length).toBe(1);
+    });
+
+    it("does not sho a tooltip if field has no error", function() {
+      cell0_0.editable = true;
+      $tooltip = $('.tooltip');
+
+      expect($tooltip.length).toBe(0);
+      table.render(session.$entryPoint);
+      $tooltip = $('.tooltip');
+      expect($tooltip.length).toBe(0);
     });
   });
 

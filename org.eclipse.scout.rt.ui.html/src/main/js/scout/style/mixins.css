@@ -175,5 +175,9 @@
   height: 0;
   border-style: solid;
   border-width: @size @size 0 0;
+  .triangle-top-left-color(@color);
+}
+
+.triangle-top-left-color(@color) {
   border-color: @color transparent transparent transparent;
 }

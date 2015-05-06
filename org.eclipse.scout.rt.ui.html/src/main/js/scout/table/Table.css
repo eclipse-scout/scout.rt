@@ -104,6 +104,10 @@
     .triangle-top-left(5px, @border-color);
   }
 
+  .table:not(.disabled) > .table-data > .table-row:not(.disabled) > &.editable.has-error:before {
+    .triangle-top-left-color(@error-color);
+  }
+
   &.checkable {
     padding-top: @table-row-padding-y - @checkable-cell-padding-adjustment;
     padding-bottom: @table-row-padding-y - @checkable-cell-padding-adjustment;

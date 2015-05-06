@@ -18,6 +18,7 @@ scout.Table = function() {
   this.events = new scout.EventSupport();
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this._filterMap = {};
+  this.tooltips = [];
   this.selectedRowIds = [];
   this.animationRowLimit = 25;
   this.menuBar;
@@ -448,6 +449,11 @@ scout.Table.prototype._installRows = function($rows) {
   var $selectedRows,
     that = this;
 
+  this.tooltips.forEach(function(tooltip) {
+    tooltip.remove();
+  }.bind(this));
+  this.tooltips = [];
+
   // Attach listeners
   $rows.each(function() {
     var $row = $(this);
@@ -455,6 +461,12 @@ scout.Table.prototype._installRows = function($rows) {
       .on('mouseup', '', onMouseUp)
       .on('dblclick', '', onDoubleClick)
       .on('contextmenu', onContextMenu);
+    if ($row.data('row').hasError) {
+      that._showCellErrorForRow($row);
+      //FIXME CGU check whether it is necessary to remove the tooltips when the table gets removed (scrollhandlers detaching)
+      // Scroll handler does not seem to work
+      // Tooltip need to be removed when getting detached (see also context for forms)
+    }
   });
 
   // update info and scrollbar
@@ -557,6 +569,33 @@ scout.Table.prototype._installRows = function($rows) {
       }
     }
   }
+};
+
+scout.Table.prototype._showCellErrorForRow = function($row) {
+ var $cells = this.$cellsForRow($row),
+   that = this;
+
+ $cells.each(function(index) {
+   var $cell = $(this);
+   var cell = that.cellByCellIndex(index, $row.data('row'));
+   if (cell.errorStatus) {
+     that._showCellError($cell, cell.errorStatus);
+   }
+ });
+};
+
+scout.Table.prototype._showCellError = function($cell, errorStatus) {
+  var tooltip, opts,
+    text = errorStatus.message;
+
+  opts = {
+    text: text,
+    autoRemove: false,
+    $anchor: $cell
+  };
+  tooltip = new scout.Tooltip(opts);
+  tooltip.render();
+  this.tooltips.push(tooltip);
 };
 
 /**
@@ -715,8 +754,15 @@ scout.Table.prototype.sendReload = function() {
   this.session.send(this.id, 'reload');
 };
 
+/**
+ * @columnIndex column.index is expected and not the index of the column in this.columns
+ */
 scout.Table.prototype.cell = function(columnIndex, row) {
   return row.cells[columnIndex];
+};
+
+scout.Table.prototype.cellByCellIndex = function(cellIndex, row) {
+  return this.cell(this.columns[cellIndex].index, row);
 };
 
 scout.Table.prototype.cellValue = function(column, row) {
@@ -1220,6 +1266,10 @@ scout.Table.prototype.$cellsForColIndex = function(colIndex, includeSumRows) {
     selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ' )';
   }
   return this.$data.find(selector);
+};
+
+scout.Table.prototype.$cellsForRow = function($row) {
+  return $row.children('.table-cell');
 };
 
 scout.Table.prototype.$cell = function(column, $row) {

@@ -67,6 +67,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     //TODO CGU remove this properties, they get sent by cell, or change behaviour in model, see also todo in Column.js
     JsonObjectUtility.putProperty(json, IColumn.PROP_FIXED_WIDTH, getColumn().isFixedWidth());
     JsonObjectUtility.putProperty(json, IColumn.PROP_EDITABLE, getColumn().isEditable());
+    JsonObjectUtility.putProperty(json, "mandatory", getColumn().isMandatory());
     JsonObjectUtility.putProperty(json, IColumn.PROP_HTML_ENABLED, getColumn().isHtmlEnabled());
     JsonObjectUtility.putProperty(json, IColumn.PROP_CSS_CLASS, getColumn().getCssClass());
     JsonObjectUtility.putProperty(json, "headerCssClass", getColumn().getHeaderCell().getCssClass());

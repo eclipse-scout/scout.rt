@@ -6,6 +6,12 @@ function mostRecentJsonRequest() {
   }
 }
 
+function sandboxDesktop() {
+  var $sandbox = window.sandbox();
+  $sandbox.addClass('desktop');
+  return $sandbox;
+}
+
 var adapterSeq = 1;
 
 function createUniqueAdapterId() {

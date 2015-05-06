@@ -29,6 +29,9 @@ scout.Column.prototype.buildCell = function(row) {
   cssClass = this._cssClass(row, cell);
   tooltipText = this.table.cellTooltipText(this, row);
   tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
+  if (cell.errorStatus) {
+    row.hasError = true;
+  }
 
   return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + text + '</div>';
 };
@@ -41,6 +44,12 @@ scout.Column.prototype._cssClass = function(row, cell) {
   }
   if (cell.editable) {
     cssClass += ' editable';
+  }
+  if (cell.errorStatus) {
+    cssClass += ' has-error';
+  }
+  if (this.mandatory) {
+    cssClass += ' mandatory';
   }
   //TODO CGU cssClass is actually only sent for cells, should we change this in model? discuss with jgu
   if (cell.cssClass) {

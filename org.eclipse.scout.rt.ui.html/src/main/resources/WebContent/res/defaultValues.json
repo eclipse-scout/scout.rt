@@ -151,7 +151,8 @@
     "Cell": {
       "horizontalAlignment": -1,
       "htmlEnabled": false,
-      "editable": false
+      "editable": false,
+      "errorStatus": ""
     },
     "TableRow": {
       "checked": false,
@@ -159,15 +160,16 @@
     },
     "Column": {
       "editable": false,
+      "fixedWidth": false,
       "horizontalAlignment": -1,
       "htmlEnabled": false,
+      "mandatory": false,
       "sortActive": false,
       "sortAscending": true,
       "sortIndex": -1,
       "summary": false,
       "type": "text",
-      "width": 60,
-      "fixedWidth": false
+      "width": 60
     },
     "TreeNode": {
       "checked": false,

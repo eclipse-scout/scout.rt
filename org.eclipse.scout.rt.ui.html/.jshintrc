@@ -20,6 +20,7 @@
     "sandbox": false,
     "expect": false,
     "spyOn": false,
+    "sandboxDesktop": false,
     "mostRecentJsonRequest": false,
     "createUniqueAdapterId": false,
     "sendQueuedAjaxCalls": false,

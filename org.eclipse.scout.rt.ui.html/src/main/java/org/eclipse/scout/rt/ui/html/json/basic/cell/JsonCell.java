@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.basic.cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
@@ -55,6 +56,10 @@ public class JsonCell implements IJsonObject {
     JsonObjectUtility.putProperty(json, "text", m_cellText);
     JsonObjectUtility.putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(m_cell.getIconId()));
     JsonObjectUtility.putProperty(json, "tooltipText", m_cell.getTooltipText());
+    JsonObjectUtility.putProperty(json, "errorStatus", JsonStatus.toJson(m_cell.getErrorStatus()));
+    if (m_cell.getErrorStatus() != null) {
+      System.out.println("asdf");
+    }
     JsonObjectUtility.putProperty(json, "cssClass", m_cell.getCssClass());
     JsonObjectUtility.putProperty(json, "horizontalAlignment", m_cell.getHorizontalAlignment());
     JsonObjectUtility.putProperty(json, "foregroundColor", m_cell.getForegroundColor());
