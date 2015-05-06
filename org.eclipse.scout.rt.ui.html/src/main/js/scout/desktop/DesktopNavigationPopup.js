@@ -10,9 +10,7 @@ scout.inherits(scout.DesktopNavigationPopup, scout.Popup);
 
 scout.DesktopNavigationPopup.prototype._render = function($parent) {
   scout.DesktopNavigationPopup.parent.prototype._render.call(this, $parent);
-  this.$body.addClass('desktop-navigation-popup');
   this._renderHead();
-
 
   this.desktopNavigation.desktop.viewButtons.forEach(function(viewButton) {
     viewButton.render(this.$body);

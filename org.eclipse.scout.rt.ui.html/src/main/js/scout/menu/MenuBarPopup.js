@@ -13,7 +13,7 @@ scout.inherits(scout.MenuBarPopup, scout.Popup);
 scout.MenuBarPopup.prototype._render = function($parent) {
   scout.MenuBarPopup.parent.prototype._render.call(this, $parent);
   this._renderHead();
-  this.$body.addClass('menu-bar-popup');
+
   var menus = this.menu.childActions || this.menu.menus;
   if (!menus || menus.length === 0) {
     return;
