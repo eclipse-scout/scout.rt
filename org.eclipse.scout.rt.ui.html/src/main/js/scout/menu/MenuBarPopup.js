@@ -40,12 +40,16 @@ scout.MenuBarPopup.prototype._renderHead = function() {
   this.headText = this.menu.$container.text();
   this.headIcon = this.menu.$container.attr('data-icon');
   scout.MenuBarPopup.parent.prototype._renderHead.call(this);
-  if (this.headIcon && this.headText) {
-    this.$head.addClass('menu-textandicon');
+  if ( 'taskbar' === this.menu.menuStyle) {
+    this._copyCssClassToHead('taskbar-tool-item');
+    this.$head.addClass('selected');
+  } else {
+    if (this.headIcon && this.headText) {
+      this.$head.addClass('menu-textandicon');
+    }
+    this._copyCssClassToHead('button');
   }
   this._copyCssClassToHead('has-submenu');
-  this._copyCssClassToHead('taskbar');
-  this._copyCssClassToHead('button');
 };
 
 scout.MenuBarPopup.prototype.onMenuItemClicked = function(menu) {
@@ -76,10 +80,6 @@ scout.MenuBarPopup.prototype.alignTo = function() {
     headInsets = scout.graphics.getInsets(this.$head),
     bodyTop = headSize.height;
 
-  if (this.menu.$container.hasClass('taskbar')) {
-    top = pos.top;
-  }
-
   $.log.debug('bodyWidth=' + bodyWidth + ' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +
     ' headInsets=' + headInsets + ' left=' + left + ' top=' + top);
   this.$body.cssTop(bodyTop);
@@ -94,12 +94,17 @@ scout.MenuBarPopup.prototype.alignTo = function() {
     this.$body.cssLeft(subPixelCorr);
     this.$deco.cssLeft(widthDiff + 1).width(headSize.width - 2 + subPixelCorr);
     $.log.debug('right alignment: widthDiff=' + widthDiff + ' subPixelCorr=' + subPixelCorr);
+  } else if (this.menu.$container.hasClass('taskbar-tool-item')) {
+    top = pos.top;
+    bodyTop = headSize.height - 1;
+    this.$body.cssTop(bodyTop);
+    this.$deco.cssTop(bodyTop);
   } else {
     left -= headInsets.left;
-    this.$head.cssLeft(0);
-    this.$deco.cssLeft(1).width(headSize.width - 2);
   }
 
+  this.$head.cssLeft(0);
+  this.$deco.cssLeft(1).width(headSize.width - 2);
   this.setLocation(new scout.Point(left, top));
 };
 

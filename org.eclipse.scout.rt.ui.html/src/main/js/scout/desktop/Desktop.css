@@ -51,9 +51,15 @@
   line-height: normal;
 }
 
+.popup-head[data-icon].taskbar-tool-item.has-submenu::after {
+  top: 0px;
+}
+
 .popup-head[data-icon].taskbar-tool-item.selected::before {
   font-size: 17px;
+  vertical-align:0px;
 }
+
 .taskbar-tabs, .taskbar-tools {
   display:inline-block;
   word-wrap: none;
@@ -108,6 +114,12 @@
   &> .sub-title {
     .font-text-normal;
   }
+
+  &.has-submenu::after {
+   .sub-menu-icon;
+   top: 0px;
+  }
+
 }
 
 .taskbar-tab-item {
@@ -129,7 +141,6 @@
     .font-icon;
     color: @icon-color;
     font-size: 17px;
-    vertical-align: -3px;
     padding-right: @taskbar-menu-textandicon-padding-right;
     content: attr(data-icon);
   }

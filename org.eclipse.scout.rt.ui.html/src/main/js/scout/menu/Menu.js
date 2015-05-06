@@ -24,15 +24,15 @@ scout.Menu.prototype._renderSeparator = function($parent) {
 };
 
 scout.Menu.prototype._renderItem = function($parent) {
-  this.$container = $parent
-    .appendDiv('menu-item')
-    .on('click', '', onClicked.bind(this));
-
   if ('taskbar' === this.menuStyle) {
-    this.$container.addClass('taskbar');
+    this.$container = $parent
+    .appendDiv('taskbar-tool-item');
   } else {
-    this.$container.attr('tabindex', 0);
+    this.$container = $parent
+    .appendDiv('menu-item')
+    .attr('tabindex', 0);
   }
+  this.$container.on('click', '', onClicked.bind(this));
   if (this.childActions.length > 0 && this.text) {
     this.$container.addClass('has-submenu');
   }
@@ -81,6 +81,9 @@ scout.Menu.prototype._renderIconId = function(iconId) {
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {
+  if('taskbar' === this.menuStyle){
+    return;
+  }
   var textAndIcon = (this.text && this.text.length > 0 && this.iconId);
   this.$container.toggleClass('menu-textandicon', !! textAndIcon);
 };
