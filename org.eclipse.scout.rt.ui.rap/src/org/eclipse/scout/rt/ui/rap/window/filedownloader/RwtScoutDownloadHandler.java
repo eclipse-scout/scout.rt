@@ -24,10 +24,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.internal.protocol.ClientMessageConst;
 import org.eclipse.rap.rwt.internal.service.ContextProvider;
 import org.eclipse.rap.rwt.internal.service.ServiceManagerImpl;
 import org.eclipse.rap.rwt.internal.service.UISessionImpl;
-import org.eclipse.rap.rwt.internal.service.UrlParameters;
 import org.eclipse.rap.rwt.service.ServiceHandler;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -95,7 +95,7 @@ public class RwtScoutDownloadHandler implements ServiceHandler {
     String connectionId = ((UISessionImpl) ContextProvider.getUISession()).getConnectionId();
     if (connectionId != null) {
       url.append('&');
-      url.append(UrlParameters.PARAM_CONNECTION_ID);
+      url.append(ClientMessageConst.CONNECTION_ID);
       url.append('=');
       url.append(connectionId);
     }
