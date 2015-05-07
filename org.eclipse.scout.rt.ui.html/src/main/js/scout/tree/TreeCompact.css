@@ -1,61 +1,60 @@
 .compact-tree {
-  & .process {
-    cursor: pointer;
-    line-height: 18px;
 
-    &:hover {
-      color:@hover-color;
-    }
-
-    &.selected {
-      text-decoration:underline;
-      color:@active-color;
-    }
+  .tree-field > & {
+    margin-left: @mandatory-indicator-width;
   }
 
-  & input {
+  & > input {
     width: 100%;
     height: @logical-grid-height;
   }
 
-  /* This wrapper DIV is required because CSS3 column flow does not work
-   * when height is fixed and DIV is scrollable vertically.
-   */
-  & .nodes-wrapper {
+  & > .nodes-wrapper {
     position: relative;
     overflow: hidden;
     margin-top: 10px;
-    width: 360px;
-    height: 168px;
-  }
 
-  & .nodes {
-    columns: 105px 2;
-    -moz-columns: 105px 2;
-    -webkit-columns: 105px 2;
+    & > .nodes {
+      .vendor(column-count, 2);
+      .vendor(column-gap, 24px);
 
-    column-gap: 24px;
-    -moz-column-gap: 24px;
-  }
+      & > .section {
+        margin-bottom: 16px;
 
-  & .section {
-    -webkit-column-break-inside: avoid;
-    -moz-column-break-inside: avoid;
-    -o-column-break-inside: avoid;
-    -ms-column-break-inside: avoid;
-    column-break-inside: avoid;
+        &:last-child {
+          margin-bottom: 0;
+        }
 
-    /* Hack for FF, because column-break-inside does not yet work for all elements, only for tables
-   * see: https://bugzilla.mozilla.org/show_bug.cgi?id=549114
-   */
-    display: table;
-    width:125px;
-    margin-bottom: 16px;
+        .vendor(column-break-inside, avoid);
+        break-inside: avoid-column;
+        page-break-inside: avoid;
 
-    & .title {
-      line-height: 18px;
-      font-weight: bold;
+        /* Hack for FF, because column-break-inside does not yet work for all elements, only for tables */
+        /* see: https://bugzilla.mozilla.org/show_bug.cgi?id=549114 */
+        display: table;
+
+        & > .title {
+          line-height: 18px;
+          font-weight: bold;
+        }
+
+        & > .process {
+          cursor: pointer;
+          line-height: 18px;
+          /* Hanging indents: */
+          padding-left: 10px;
+          text-indent: -10px;
+
+          &:hover {
+            color:@hover-color;
+          }
+
+          &.selected {
+            text-decoration:underline;
+            color:@active-color;
+          }
+        }
+      }
     }
   }
-
 }

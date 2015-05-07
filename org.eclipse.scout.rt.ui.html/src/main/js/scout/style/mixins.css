@@ -1,5 +1,13 @@
 @text-field-padding: 10px;
 
+.vendor(@property, @value) {
+  -webkit-@{property}: @value;
+  -moz-@{property}: @value;
+  -ms-@{property}: @value;
+  -o-@{property}: @value;
+  @{property}: @value;
+}
+
 .glow(@color, @radius: 5px) {
   box-shadow: 0 0 @radius @color;
 }

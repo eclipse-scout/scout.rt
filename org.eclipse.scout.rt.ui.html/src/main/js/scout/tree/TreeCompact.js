@@ -3,17 +3,19 @@
 
 scout.TreeCompact = function() {
   scout.TreeCompact.parent.call(this);
-  this._$filter;
-  this._$nodesDiv;
-  this._$nodesWrapperDiv;
+  this.$filter;
+  this.$nodesWrapper;
+  this.$nodes;
   this._domMap = {};
-  this._selectedNode = -1;
+  this._selectedNodeIndex = -1;
 };
 scout.inherits(scout.TreeCompact, scout.ModelAdapter);
 
 scout.TreeCompact.prototype._render = function($parent) {
+  this.$parent = $parent;
   this.$container = $parent.appendDiv('compact-tree');
-  this._$filter = $('<input>').
+
+  this.$filter = $('<input>').
     attr('type', 'text').
     placeholder(this.session.text('FilterBy_')).
     addClass('text-field').
@@ -21,22 +23,26 @@ scout.TreeCompact.prototype._render = function($parent) {
     on('input', this._onInput.bind(this)).
     keydown(this._onKeyDown.bind(this));
 
-  this._$nodesWrapperDiv = $.makeDiv('nodes-wrapper').appendTo(this.$container);
-  scout.scrollbars.install(this._$nodesWrapperDiv, {invertColors:true, borderless:true});
-  this.session.detachHelper.pushScrollable(this._$nodesWrapperDiv);
-  this._$nodesDiv = $.makeDiv('nodes').appendTo(this._$nodesWrapperDiv);
+  var layout = new scout.TreeCompactLayout(this);
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(layout);
+
+  this.$nodesWrapper = $.makeDiv('nodes-wrapper').appendTo(this.$container);
+  scout.scrollbars.install(this.$nodesWrapper, {invertColors:true, borderless:true});
+  this.session.detachHelper.pushScrollable(this.$nodesWrapper);
+  this.$nodes = $.makeDiv('nodes').appendTo(this.$nodesWrapper);
   this._renderNodes();
 };
 
 scout.TreeCompact.prototype._remove = function() {
-  this.session.detachHelper.removeScrollable(this._$nodesWrapperDiv);
+  this.session.detachHelper.removeScrollable(this.$nodesWrapper);
 };
 
 scout.TreeCompact.prototype._renderNodes = function(filter) {
   var i, j, node, $node, childNode, $childNode;
   for (i=0; i<this.nodes.length; i++) {
     node = this.nodes[i];
-    $node = $.makeDiv('section').appendTo(this._$nodesDiv);
+    $node = $.makeDiv('section').appendTo(this.$nodes);
     $.makeDiv('title').appendTo($node).text(node.text);
     this._domMap[node.id] = $node;
     for (j=0; j<node.childNodes.length; j++) {
@@ -66,20 +72,23 @@ scout.TreeCompact.prototype._updateNodes = function() {
       }
     }
   }
-  scout.scrollbars.update(this._$nodesWrapperDiv);
+  scout.scrollbars.update(this.$nodesWrapper);
 };
 
 scout.TreeCompact.prototype._onInput = function(event) {
-  var filter = this._$filter.val();
-  if (filter) {
-    $.log.debug('filter nodes='+filter);
-    this._filterNodes(filter);
+  this._applyFilter(this.$filter.val());
+};
+
+scout.TreeCompact.prototype._applyFilter = function(filterText) {
+  if (filterText) {
+    $.log.debug('filter nodes='+filterText);
+    this._filterNodes(filterText);
   } else {
     $.log.debug('expand all nodes');
     this._expandAllNodes();
   }
-  this._selectedNode = -1;
-  this._$nodesDiv.find('.selected').removeClass('selected');
+  this._selectedNodeIndex = -1;
+  this.$nodes.find('.selected').removeClass('selected');
   this._updateNodes();
 };
 
@@ -92,8 +101,8 @@ scout.TreeCompact.prototype._onKeyDown = function(event) {
       this._moveSelection(1);
       return false;
     case scout.keys.ENTER:
-      if (this._selectedNode !== -1) {
-        var node = this._$nodesDiv.find('.selected').data('node');
+      if (this._selectedNodeIndex !== -1) {
+        var node = this.$nodes.find('.selected').data('node');
         this._selectNode(node);
       }
       return false;
@@ -103,20 +112,20 @@ scout.TreeCompact.prototype._onKeyDown = function(event) {
 };
 
 scout.TreeCompact.prototype._moveSelection = function(diff) {
-  var oldSelectedNode = this._selectedNode,
-    tmpSelectedNode = this._selectedNode + diff,
-    $nodes = this._$nodesDiv.find('.process:visible'),
+  var oldSelectedNodeIndex = this._selectedNodeIndex,
+    tmpSelectedNodeIndex = this._selectedNodeIndex + diff,
+    $nodes = this.$nodes.find('.process:visible'),
     numNodes = $nodes.length;
-  if (tmpSelectedNode >= numNodes) {
-    tmpSelectedNode = 0;
-  } else if (tmpSelectedNode < 0) {
-    tmpSelectedNode = numNodes - 1;
+  if (tmpSelectedNodeIndex >= numNodes) {
+    tmpSelectedNodeIndex = 0;
+  } else if (tmpSelectedNodeIndex < 0) {
+    tmpSelectedNodeIndex = numNodes - 1;
   }
-  if (oldSelectedNode !== tmpSelectedNode) {
-    $.log.debug('_moveSelection to node with index='+ tmpSelectedNode);
-    this._selectedNode = tmpSelectedNode;
-    $($nodes[oldSelectedNode]).removeClass('selected');
-    $($nodes[tmpSelectedNode]).addClass('selected');
+  if (oldSelectedNodeIndex !== tmpSelectedNodeIndex) {
+    $.log.debug('_moveSelection to node with index='+ tmpSelectedNodeIndex);
+    this._selectedNodeIndex = tmpSelectedNodeIndex;
+    $($nodes[oldSelectedNodeIndex]).removeClass('selected');
+    $($nodes[tmpSelectedNodeIndex]).addClass('selected');
   }
 };
 
@@ -181,9 +190,14 @@ scout.TreeCompact.prototype._onNodeClick = function(event) {
 
 scout.TreeCompact.prototype._selectNode = function(node) {
   $.log.debug('_selectNode id=' + node.id + ' text=' + node.text);
+
+  // Reset filter (small delay, wait for form detach)
+  setTimeout(function() {
+    this.$filter.val('');
+    this._applyFilter('');
+  }.bind(this), 100);
+
   this.session.send(this.id, 'nodeAction', {
     nodeId: node.id
   });
 };
-
-

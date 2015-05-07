@@ -109,6 +109,7 @@ __include("scout/table/editor/CellEditorPopupKeyStrokeAdapter.js");
 __include("scout/tree/Tree.js");
 __include("scout/tree/TreeCompact.js");
 __include("scout/tree/TreeLayout.js");
+__include("scout/tree/TreeCompactLayout.js");
 __include("scout/tree/TreeControlKeyStrokes.js");
 __include("scout/tree/TreeKeyStrokeAdapter.js");
 __include("scout/tree/TreeMenuItemsOrder.js");
