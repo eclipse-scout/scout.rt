@@ -1,0 +1,75 @@
+describe("DetachHelper", function() {
+  var $sandbox;
+
+  beforeEach(function() {
+    setFixtures(sandbox());
+    $sandbox = $('#sandbox');
+  });
+
+  it("restores sticky tooltips", function() {
+    var $tooltip,
+      detachHelper = new scout.DetachHelper(),
+      $div = $('<div>').appendTo($sandbox),
+      $anchor = $('<div>').appendTo($div)
+        .cssLeft(50)
+        .cssTop(50)
+        .width(20)
+        .height(20);
+
+    var tooltip = new scout.Tooltip({
+      text: 'hello',
+      $anchor: $anchor
+    });
+    tooltip.render($sandbox);
+
+    $tooltip = $('.tooltip');
+    expect($tooltip.length).toBe(1);
+
+    detachHelper.beforeDetach($div);
+    $div.detach();
+    $tooltip = $('.tooltip');
+    expect($tooltip.length).toBe(0);
+
+    $div.appendTo($sandbox);
+    detachHelper.afterAttach($div);
+    $tooltip = $('.tooltip');
+    expect($tooltip.length).toBe(1);
+  });
+
+  it("considers the context of $anchor -> only removes tooltips in that context", function() {
+    var $tooltip,
+      detachHelper = new scout.DetachHelper(),
+      $div = $('<div>').appendTo($sandbox),
+      $topLevelAnchor = $('<div>').appendTo($sandbox),
+      $anchor = $('<div>').appendTo($div)
+        .cssLeft(50)
+        .cssTop(50)
+        .width(20)
+        .height(20);
+
+    var topLevelTooltip = new scout.Tooltip({
+      text: 'top level',
+      $anchor: $topLevelAnchor
+    });
+    topLevelTooltip.render($sandbox);
+
+    var tooltip = new scout.Tooltip({
+      text: 'hello',
+      $anchor: $anchor
+    });
+    tooltip.render($sandbox);
+
+    $tooltip = $('.tooltip');
+    expect($tooltip.length).toBe(2);
+
+    detachHelper.beforeDetach($div);
+    $div.detach();
+    $tooltip = $('.tooltip');
+    expect($tooltip.length).toBe(1);
+
+    $div.appendTo($sandbox);
+    detachHelper.afterAttach($div);
+    $tooltip = $('.tooltip');
+    expect($tooltip.length).toBe(2);
+  });
+});

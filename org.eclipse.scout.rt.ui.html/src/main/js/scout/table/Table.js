@@ -596,6 +596,8 @@ scout.Table.prototype._showCellError = function($cell, errorStatus) {
   tooltip = new scout.Tooltip(opts);
   tooltip.render();
   this.tooltips.push(tooltip);
+  // link so that it gets removed when table gets removed
+  this.addChild(tooltip);
 };
 
 /**

@@ -84,10 +84,10 @@ scout.FormField.prototype._renderMandatory = function(mandatory) {
 
 scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
   errorStatus = this.errorStatusUi || this.errorStatus;
-  this.$container.toggleClass('has-error', !!errorStatus);
+  this.$container.toggleClass('has-error', !! errorStatus);
 
   if (this.$field) {
-    this.$field.toggleClass('has-error', !!errorStatus);
+    this.$field.toggleClass('has-error', !! errorStatus);
   }
 
   if (errorStatus) {
@@ -100,10 +100,10 @@ scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
 };
 
 scout.FormField.prototype._renderTooltipText = function(tooltipText) {
-  this.$container.toggleClass('has-tooltip', !!tooltipText);
+  this.$container.toggleClass('has-tooltip', !! tooltipText);
 
   if (this.$field) {
-    this.$field.toggleClass('has-tooltip', !!tooltipText);
+    this.$field.toggleClass('has-tooltip', !! tooltipText);
   }
 };
 
@@ -202,7 +202,8 @@ scout.FormField.prototype._onStatusClick = function() {
 };
 
 scout.FormField.prototype._showStatusMessage = function(options) {
-  var text = this.tooltipText;
+  var opts,
+    text = this.tooltipText;
   if (this.errorStatusUi) {
     text = this.errorStatusUi.message;
   } else if (this.errorStatus) {
@@ -214,12 +215,10 @@ scout.FormField.prototype._showStatusMessage = function(options) {
     this.tooltip.renderText(text);
   } else {
     // create new tooltip
-    var form = this.getForm(),
-      opts = {
-        text: text,
-        $anchor: this.$status,
-        $context: (form && form.$container)
-      };
+    opts = {
+      text: text,
+      $anchor: this.$status
+    };
     $.extend(opts, options);
     this.tooltip = new scout.Tooltip(opts);
     this.tooltip.render();

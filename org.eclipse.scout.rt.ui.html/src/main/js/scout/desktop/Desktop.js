@@ -221,7 +221,6 @@ scout.Desktop.prototype._unselectTab = function(tab) {
 
   tab.$storage = this.$bench.children();
   if (tab.$storage.length > 0) {
-    scout.Tooltip.removeTooltips(tab.$storage);
     this.session.detachHelper.beforeDetach(tab.$storage);
     tab.$storage.detach();
   }

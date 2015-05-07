@@ -9,24 +9,26 @@ scout.DetachHelper = function() {
 
 scout.DetachHelper.prototype.beforeDetach = function($container) {
   this._storeScrollPositions($container);
+  this._storeTooltips($container);
   this._storeFocus($container);
 };
 
 scout.DetachHelper.prototype.afterAttach = function($container) {
   this._restoreScrollPositions($container);
+  this._restoreTooltips($container);
   this._restoreFocus($container);
 };
 
 scout.DetachHelper.prototype._storeFocus = function($container) {
-  if($container.find(':focus')){
-    var $focusedElement =$container.find(':focus');
+  if ($container.find(':focus')) {
+    var $focusedElement = $container.find(':focus');
     $container.data('lastFocus', $focusedElement);
     $.log.debug('Stored focus ' + $focusedElement.attr('class'));
   }
 };
 
 scout.DetachHelper.prototype._restoreFocus = function($container) {
-  if($container.data('lastFocus')){
+  if ($container.data('lastFocus')) {
     $container.data('lastFocus').focus();
     $.log.debug('Restored focus on ' + $container.data('lastFocus').attr('class'));
   }
@@ -90,4 +92,20 @@ scout.DetachHelper.prototype.removeScrollable = function($container) {
   if (initLength === this._$scrollables.length) {
     throw new Error('scrollable could not be removed. Potential memory leak. ' + $container.attr('class'));
   }
+};
+
+scout.DetachHelper.prototype._storeTooltips = function($container) {
+  var tooltips = scout.Tooltip.findTooltips($container);
+  tooltips.forEach(function(tooltip) {
+    tooltip.remove();
+  });
+  $container.data('tooltips', tooltips);
+};
+
+scout.DetachHelper.prototype._restoreTooltips = function($container) {
+  var tooltips = $container.data('tooltips');
+  tooltips.forEach(function(tooltip) {
+    tooltip.render(tooltip.$parent);
+  });
+  $container.data('tooltips', null);
 };

@@ -9,7 +9,6 @@ scout.Tooltip = function(options) {
   this.origin = options.origin;
   this.$anchor = options.$anchor;
   this.autoRemove = options.autoRemove !== undefined ? options.autoRemove : true;
-  this.$context = options.$context;
   this.cssClass = options.cssClass;
   this.tooltipPosition = options.position || 'top';
   this.htmlEnabled = options.htmlEnabled !== undefined ? options.htmlEnabled : false;
@@ -19,12 +18,13 @@ scout.inherits(scout.Tooltip, scout.Widget);
 
 scout.Tooltip.prototype._render = function($parent) {
   // Auto-detect parent
-  $parent = $parent || (this.$anchor && this.$anchor.closest('.desktop,.glasspane'));
+  $parent = $parent || (this.$anchor && this.$anchor.closest('.desktop'));
+  // Remember parent (necessary for detach helper)
+  this.$parent = $parent;
 
   this.$container = $.makeDiv('tooltip')
     .hide()
     .data('tooltip', this)
-    .data('tooltipContext', this.$context)
     .appendTo($parent);
 
   if (this.cssClass) {
@@ -137,24 +137,20 @@ scout.Tooltip.computeHypotenuse = function(x) {
 };
 
 /**
- * Removes every tooltip which belongs to one of the given $contexts
+ * Finds every tooltip whose $anchor belongs to $context.
  *
  * @memberOf scout.Tooltip
  */
-scout.Tooltip.removeTooltips = function($contexts, $parent) {
-  var $context, $tooltips, i, j;
-  if (!$parent) {
-    $parent = $('body');
-  }
-  $tooltips = $parent.find('.tooltip');
+scout.Tooltip.findTooltips = function($context) {
+  var $tooltips, i, tooltip,
+    tooltips = [];
+  $tooltips = $('.tooltip');
 
   for (i = 0; i < $tooltips.length; i++) {
-    for (j = 0; j < $contexts.length; j++) {
-      $context = $tooltips.eq(i).data('tooltipContext');
-
-      if ($context[0] === $contexts.eq(j)[0]) {
-        $tooltips.eq(i).data('tooltip').remove();
-      }
+    tooltip = $tooltips.eq(i).data('tooltip');
+    if ($context.has(tooltip.$anchor).length > 0) {
+      tooltips.push(tooltip);
     }
   }
+  return tooltips;
 };
