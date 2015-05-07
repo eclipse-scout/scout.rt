@@ -125,6 +125,11 @@
 .taskbar-tab-item {
   border-right: 1px solid @border-color;
   width: 220px;
+
+  &:first-of-type {
+    display: none;
+  }
+
 }
 
 @taskbar-menu-textandicon-padding-right: 11px;
