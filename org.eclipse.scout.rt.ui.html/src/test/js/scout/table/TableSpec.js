@@ -909,28 +909,6 @@ describe("Table", function() {
       expect($menu.find('.menu-item').length).toBe(1);
     });
 
-    it("and sends aboutToShow for every menu item", function() {
-      var model = helper.createModelFixture(2, 2);
-      var table = helper.createTable(model);
-      table.render(session.$entryPoint);
-
-      var menuModel = helper.createMenuModel('menu');
-      //register adapter
-      helper.menuHelper.createMenu(menuModel);
-      table.menus = [session.getModelAdapter(menuModel.id)];
-      var $row0 = table.$data.children('.table-row').eq(0);
-      $row0.triggerContextMenu();
-
-      sendQueuedAjaxCalls();
-
-      //Again, since the previous responses are awaited before opening the context menu, see showContextMenuWithWait in menus.js
-      sendQueuedAjaxCalls();
-
-      var requestData = mostRecentJsonRequest();
-      var event = new scout.Event(menuModel.id, 'aboutToShow');
-      expect(requestData).toContainEvents(event);
-    });
-
   });
 
   describe("row mouse down / move / up", function() {
