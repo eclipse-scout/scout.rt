@@ -91,7 +91,8 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
    * actually validated and set, the model does not get notified about changes of the display text in the UI.
    * <p>
    * When set to <code>true</code> the property {@link IValueField#PROP_DISPLAY_TEXT} is kept in sync with the UI while
-   * the user is editing the field.
+   * the user is editing the field. Usually this is used in combination with
+   * {@link AbstractBasicField#execChangedDisplayText()}.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(315)
@@ -120,7 +121,7 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
    * any further chain elements.
    */
   protected static class LocalBasicFieldExtension<VALUE_TYPE, OWNER_FIELD extends AbstractBasicField<VALUE_TYPE>> extends AbstractValueField.LocalValueFieldExtension<VALUE_TYPE, OWNER_FIELD>
-  implements IBasicFieldExtension<VALUE_TYPE, OWNER_FIELD> {
+      implements IBasicFieldExtension<VALUE_TYPE, OWNER_FIELD> {
 
     public LocalBasicFieldExtension(OWNER_FIELD owner) {
       super(owner);
