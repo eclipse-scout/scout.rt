@@ -1,8 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-// FIXME AWE: (calendar) mit C.RU besprechen, der kalender braucht menüs!
-
+// FIXME AWE: (calendar) check bug reported from Michael: switch month when items are still loading (async)
 scout.Calendar = function() {
   scout.Calendar.parent.call(this);
 
@@ -873,8 +872,7 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
   event.preventDefault();
   event.stopPropagation();
   var filteredMenus = scout.menus.filter(this.menus, [allowedType]),
-  // FIXME AWE: (calendar) rename TableContextMenuPopup to something more generic
-  popup = new scout.TableContextMenuPopup(this, this.session, filteredMenus),
+  popup = new scout.ContextMenuPopup(this.session, filteredMenus),
     $comp = $(event.currentTarget),
     x = event.pageX,
     y = event.pageY;

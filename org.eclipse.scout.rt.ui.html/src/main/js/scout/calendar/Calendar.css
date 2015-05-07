@@ -439,9 +439,8 @@
     min-height: 20px;
     margin-left: 32px;
     width: calc(~"100%" - 38px);
-    background-color: @palette-gray-4;
     margin-bottom: -3px;
-    border-left: 4px solid @palette-gray-7;
+    border-left: 4px solid;
     text-align: left;
     margin-top: 6px;
 
@@ -456,7 +455,7 @@
       right: 6px;
       cursor: pointer;
 
-      &:hover{
+      &:hover {
         color: @hover-color;
       }
     }
@@ -511,11 +510,23 @@
   }
 }
 
-/* FIXME AWE: (calendar) CSS-klassen für Status Open, Done und vielleicht Default.
- * Namen von CRM Entitäten in Scout.
- */
-
 .calendar-component {
+
+  /* Default colors used when component has no specific class */
+  background-color: @palette-blue-1;
+  border-left-color:  @palette-blue-2;
+
+  &:hover {
+    background-color: @palette-blue-2;
+    border-left-color: @palette-blue-3;
+  }
+
+  &.comp-selected {
+    background-color: @palette-blue-3;
+    border-left-color: @palette-blue-4;
+  }
+
+  /* Colors for type Appointment */
   &.calendar-appointment {
     background-color: @palette-orange-0;
     border-left-color: @palette-orange-2;
@@ -531,6 +542,7 @@
     }
   }
 
+  /* Colors for type Task */
   &.calendar-task {
     background-color: @palette-cyan-0;
     border-left-color: @palette-cyan-2;
