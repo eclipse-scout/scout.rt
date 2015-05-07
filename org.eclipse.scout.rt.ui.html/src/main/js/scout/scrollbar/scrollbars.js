@@ -75,37 +75,40 @@ scout.scrollbars = {
     $scrollable.scrollTop($scrollable[0].scrollHeight - $scrollable[0].offsetHeight);
   },
 
+  //FIXME cgu implement for tooltip when getting scrolled outside of the scrollable
+//  isVisible: function($scrollable, $elem) {
+//    var scrollTop = $scrollable.scrollTop(),
+//      offset = $elem.offset();
+//
+//  },
+
   /**
    * Attaches the given handler to each scrollable parent, including $anchor if it is scrollable as well.<p>
-   * Make sure you remove the handlers when not needed anymore using detachScrollHandlers.
+   * Make sure you remove the handlers when not needed anymore using offScroll.
    */
-  attachScrollHandlers: function($anchor, handler) {
+  onScroll: function($anchor, handler) {
     var $scrollParents = [],
       $elem = $anchor;
 
+    handler.$scrollParents = [];
     while ($elem.length > 0) {
       if ($elem.data('scrollable')) {
-        $elem.scroll(handler);
-        $elem.data('scrollHandler', handler);
-        $scrollParents.push($elem);
+        $elem.on('scroll', handler);
+        handler.$scrollParents.push($elem);
       }
       $elem = $elem.parent();
     }
-    $anchor.data('scrollParents', $scrollParents);
   },
 
-  detachScrollHandlers: function($anchor) {
-    var $scrollParents = $anchor.data('scrollParents');
+  offScroll: function(handler) {
+    var $scrollParents = handler.$scrollParents;
     if (!$scrollParents) {
-      return;
+      throw new Error('$scrollParents are not defined');
     }
     for (var i=0; i < $scrollParents.length; i++) {
       var $elem = $scrollParents[i];
-      var handler = $elem.data('scrollHandler');
       $elem.off('scroll', handler);
-      $elem.removeData('scrollHandler');
     }
-    $anchor.removeData('scrollParents');
   }
 
 };

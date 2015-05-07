@@ -21,7 +21,7 @@ describe("scrollbars", function() {
       .appendTo($parent);
   }
 
-  describe("attachScrollHandlers", function() {
+  describe("onScroll", function() {
 
     it("attaches handler to scrolling parents which execute when scrolling", function() {
       var exec = false;
@@ -31,14 +31,14 @@ describe("scrollbars", function() {
       var $content = scout.scrollbars.install($container);
       var $element = createContent($content);
 
-      scout.scrollbars.attachScrollHandlers($element, handler);
+      scout.scrollbars.onScroll($element, handler);
       $container.scroll();
       expect(exec).toBe(true);
     });
 
   });
 
-  describe("detachScrollHandlers", function() {
+  describe("offScroll", function() {
 
     it("detaches handler from scrolling parents", function() {
       var exec = false;
@@ -48,12 +48,12 @@ describe("scrollbars", function() {
       var $content = scout.scrollbars.install($container);
       var $element = createContent($content);
 
-      scout.scrollbars.attachScrollHandlers($element, handler);
+      scout.scrollbars.onScroll($element, handler);
       $container.scroll();
       expect(exec).toBe(true);
 
       exec = false;
-      scout.scrollbars.detachScrollHandlers($element, handler);
+      scout.scrollbars.offScroll(handler);
       $container.scroll();
       expect(exec).toBe(false);
     });

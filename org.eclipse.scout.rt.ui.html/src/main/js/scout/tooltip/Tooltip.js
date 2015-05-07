@@ -11,6 +11,7 @@ scout.Tooltip = function(options) {
   this.autoRemove = options.autoRemove !== undefined ? options.autoRemove : true;
   this.cssClass = options.cssClass;
   this.tooltipPosition = options.position || 'top';
+  this.scrollType = options.scrollType || 'remove';
   this.htmlEnabled = options.htmlEnabled !== undefined ? options.htmlEnabled : false;
   this.$content;
 };
@@ -41,16 +42,25 @@ scout.Tooltip.prototype._render = function($parent) {
     // Every user action will remove the tooltip
     $(document).on('mousedown.tooltip', this._onTooltipClicked.bind(this));
     $(document).on('keydown.tooltip', this.remove.bind(this));
-    if (this.$anchor) {
-      scout.scrollbars.attachScrollHandlers(this.$anchor, this.remove.bind(this));
+  }
+
+  if (this.$anchor) {
+    if (this.scrollType === 'position') {
+      this._scrollHandler = this.position.bind(this);
+    } else if (this.scrollType === 'remove') {
+      this._scrollHandler = this.remove.bind(this);
+    }
+    if (this._scrollHandler) {
+      scout.scrollbars.onScroll(this.$anchor, this._scrollHandler);
     }
   }
 };
 
 scout.Tooltip.prototype._remove = function() {
   $(document).off('mousedown.tooltip keydown.tooltip');
-  if (this.$anchor) {
-    scout.scrollbars.detachScrollHandlers(this.$anchor);
+  if (this._scrollHandler) {
+    scout.scrollbars.offScroll(this._scrollHandler);
+    this._scrollHandler = null;
   }
   scout.Tooltip.parent.prototype._remove.call(this);
 };
@@ -121,7 +131,7 @@ scout.Tooltip.prototype._onTooltipClicked = function(event) {
   // Only remove the tooltip if the click is outside of the container or the $anchor (= status icon)
   var $target = $(event.target);
   if ($target[0] === this.$container[0] || this.$container.children().is($target) ||
-      $target[0] === this.$anchor[0] || this.$anchor.children().is($target)) {
+    $target[0] === this.$anchor[0] || this.$anchor.children().is($target)) {
     return;
   }
   this.remove();

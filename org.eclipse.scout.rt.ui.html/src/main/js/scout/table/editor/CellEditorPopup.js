@@ -33,6 +33,18 @@ scout.CellEditorPopup.prototype._render = function($parent) {
     field.$status = null;
   }
   this.alignTo();
+
+  this._rowOrderChangingFunc = function(event) {
+    if (event.$row.data('row') === this.row) {
+      this.alignTo();
+    }
+  }.bind(this);
+  this.table.events.on('rowOrderChanging', this._rowOrderChangingFunc);
+};
+
+scout.CellEditorPopup.prototype._remove = function() {
+  scout.CellEditorPopup.parent.prototype._remove.call(this);
+  this.table.events.off('rowOrderChanging', this._rowOrderChangingFunc);
 };
 
 scout.CellEditorPopup.prototype.alignTo = function(event) {

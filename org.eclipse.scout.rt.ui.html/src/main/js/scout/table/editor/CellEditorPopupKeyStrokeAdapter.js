@@ -61,15 +61,19 @@ scout.inherits(scout.CellEditorTabKeyStroke, scout.KeyStroke);
 scout.CellEditorTabKeyStroke.prototype.handle = function(event) {
   var pos,
     backwards = event.shiftKey,
+    table = this._popup.table,
     column = this._popup.column,
     row = this._popup.row;
 
   this._popup.completeEdit();
 
-  pos = this._popup.table.nextEditableCellPos(column, row, backwards);
-  if (pos) {
-    this._popup.table.sendPrepareCellEdit(pos.row.id, pos.column.id);
-  }
+  // Await server events before opening the next popup, otherwise the cell may be removed in the meantime -> popup loses its anchor
+  this._popup.session.listen().done(function() {
+    pos = table.nextEditableCellPos(column, row, backwards);
+    if (pos) {
+      table.sendPrepareCellEdit(pos.row.id, pos.column.id);
+    }
+  }.bind(this));
 
   // Prevent default tabbing
   event.preventDefault();

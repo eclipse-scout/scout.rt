@@ -247,9 +247,10 @@ scout.Table.prototype._prepareColumnsForSorting = function(sortColumns) {
 };
 
 scout.Table.prototype._renderRowOrderChanges = function() {
-  var $row, oldTop, i, rowWasInserted, animate, that = this;
-  var $rows = this.$rows();
-  var $sortedRows = $();
+  var $row, oldTop, i, rowWasInserted, animate,
+    that = this,
+    $rows = this.$rows(),
+    $sortedRows = $();
 
   //store old position
   if ($rows.length < that.animationRowLimit) {
@@ -286,8 +287,12 @@ scout.Table.prototype._renderRowOrderChanges = function() {
       $row = $(this);
       oldTop = $row.data('old-top');
       if (oldTop !== undefined) {
-        $row.css('top', oldTop - $row.offset().top)
-          .animateAVCSD('top', 0);
+        $row.css('top', oldTop - $row.offset().top).animate({
+          top: 0
+        }, {
+          //FIXME CGU fire as well if animation is disabled
+          progress: that._triggerRowOrderChanging.bind(that, $row)
+        });
       }
     });
   }
@@ -561,6 +566,7 @@ scout.Table.prototype._showCellError = function($cell, errorStatus) {
   opts = {
     text: text,
     autoRemove: false,
+    scrollType: 'position',
     $anchor: $cell
   };
   tooltip = new scout.Tooltip(opts);
@@ -1585,6 +1591,13 @@ scout.Table.prototype._triggerRowsFiltered = function(numRows, filterName) {
 scout.Table.prototype._triggerFilterResetted = function() {
   var type = scout.Table.GUI_EVENT_FILTER_RESETTED;
   this.events.trigger(type);
+};
+
+scout.Table.prototype._triggerRowOrderChanging = function($row) {
+  var event = {
+    $row: $row
+  };
+  this.events.trigger('rowOrderChanging', event);
 };
 
 scout.Table.prototype._renderHeaderVisible = function() {

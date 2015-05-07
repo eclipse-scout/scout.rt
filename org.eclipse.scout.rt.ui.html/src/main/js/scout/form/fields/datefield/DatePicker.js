@@ -24,7 +24,8 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
       .mousedown(this._onMouseDown.bind(this))
       .appendTo($parent);
 
-    scout.scrollbars.attachScrollHandlers(this._dateField.$field, this.close.bind(this));
+    this._scrollHandler = this.close.bind(this);
+    scout.scrollbars.onScroll(this._dateField.$field, this._scrollHandler);
 
     this._$header = this._createHeader().appendTo(this.$popup);
     this._$header.find('.date-box-left-y, .date-box-left-m, .date-box-right-m, .date-box-right-y').mousedown(this._onNavigationMouseDown.bind(this));
@@ -160,7 +161,10 @@ scout.DatePicker.prototype.close = function() {
     this.$popup.remove();
     this.$popup = null;
   }
-  scout.scrollbars.detachScrollHandlers(this._dateField.$field);
+  if (this._scrollHandler) {
+    scout.scrollbars.offScroll(this._scrollHandler);
+    this._scrollHandler = null;
+  }
 };
 
 scout.DatePicker.prototype.isOpen = function() {

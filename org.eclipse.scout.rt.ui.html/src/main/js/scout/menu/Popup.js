@@ -84,14 +84,15 @@ scout.Popup.prototype._attachCloseHandler = function() {
   $(document).on('mousedown', this._mouseDownHandler);
 
   if (this.$anchor) {
-    scout.scrollbars.attachScrollHandlers(this.$anchor, this._onAnchorScroll.bind(this));
+    this._scrollHandler = this._onAnchorScroll.bind(this);
+    scout.scrollbars.onScroll(this.$anchor, this._scrollHandler);
   }
 };
 
 scout.Popup.prototype._detachCloseHandler = function() {
-  if (this.$anchor) {
-    //FIXME CGU does not work if the popup has been closed -> scrollParents have to be remembered
-    scout.scrollbars.detachScrollHandlers(this.$anchor);
+  if (this._scrollHandler) {
+    scout.scrollbars.offScroll(this._scrollHandler);
+    this._$scrollParents = null;
   }
   if (this._mouseDownHandler) {
     $(document).off('mousedown', this._mouseDownHandler);
