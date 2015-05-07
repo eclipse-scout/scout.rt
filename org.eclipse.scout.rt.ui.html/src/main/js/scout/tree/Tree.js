@@ -4,7 +4,6 @@
 scout.Tree = function() {
   scout.Tree.parent.call(this);
   this.$data;
-  this.menuBar;
   this.selectedNodeIds = [];
   this.nodes = []; // top-level nodes
   this.nodesMap = {}; // all nodes by id
@@ -87,6 +86,7 @@ scout.Tree.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
+
   this.$data = this.$container.appendDiv('tree-data');
   scout.scrollbars.install(this.$data);
   this.session.detachHelper.pushScrollable(this.$data);

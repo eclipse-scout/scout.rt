@@ -44,7 +44,6 @@ scout.FormToolButton.prototype._openContainer = function() {
   } else {
     this.popup.attach();
   }
-
 };
 
 scout.FormToolButton.prototype._closeContainer = function() {

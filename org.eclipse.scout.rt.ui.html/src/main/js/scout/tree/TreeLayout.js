@@ -13,9 +13,9 @@ scout.TreeLayout.prototype.layout = function($container) {
     height += scout.graphics.getSize(menuBar.$container).height;
   }
   height += $data.cssMarginTop() + $data.cssMarginBottom();
-  $data.css('height', 'calc(100% - ' + height + 'px)');
 
-  scout.scrollbars.update(this.tree.$data);
+  $data.css('height', 'calc(100% - ' + height + 'px)');
+  scout.scrollbars.update($data);
 };
 
 scout.TreeLayout.prototype.preferredLayoutSize = function($comp) {

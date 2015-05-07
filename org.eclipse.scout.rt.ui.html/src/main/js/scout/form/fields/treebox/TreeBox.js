@@ -9,9 +9,10 @@ scout.inherits(scout.TreeBox, scout.ValueField);
 
 scout.TreeBox.prototype._render = function($parent) {
   this.addContainer($parent, 'tree-box');
-
   this.addLabel();
   this.addMandatoryIndicator();
+  this.addStatus();
+
   this.addFieldContainer($('<div>'));
   var htmlComp = new scout.HtmlComponent(this.$fieldContainer, this.session);
   htmlComp.setLayout(new scout.TreeBoxLayout(this, this.tree, this.filterBox));
@@ -23,8 +24,6 @@ scout.TreeBox.prototype._render = function($parent) {
     // TODO BSH Tree | Only render when filter active
     this._renderFilterBox();
   }
-
-  this.addStatus();
 };
 
 scout.TreeBox.prototype._renderTree = function($fieldContainer) {
