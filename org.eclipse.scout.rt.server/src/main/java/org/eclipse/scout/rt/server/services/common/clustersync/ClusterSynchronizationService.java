@@ -134,16 +134,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     return getListenerList().getListeners(IClusterNotificationListener.class);
   }
 
-  /**
-   * @deprecated use {@link #getStatusInfo()}
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public ClusterNodeStatusInfo getClusterNodeStatusInfo() {
-    return m_statusInfo;
-  }
-
   @Override
   public IClusterNodeStatusInfo getStatusInfo() {
     return m_statusInfo.getStatus();

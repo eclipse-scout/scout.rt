@@ -30,13 +30,6 @@ public interface IClusterSynchronizationService extends IService {
 
   /**
    * @return info about sent and received messages
-   * @deprecated use {@link #getStatusInfo()}
-   */
-  @Deprecated
-  ClusterNodeStatusInfo getClusterNodeStatusInfo();
-
-  /**
-   * @return info about sent and received messages
    */
   IClusterNodeStatusInfo getStatusInfo();
 

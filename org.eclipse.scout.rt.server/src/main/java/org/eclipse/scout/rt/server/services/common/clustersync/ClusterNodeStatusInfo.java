@@ -87,30 +87,13 @@ public class ClusterNodeStatusInfo {
       return m_sentMessageCount;
     }
 
-    /**
-     * @param delta
-     */
-    public void incReveivedMessageCount(long delta) {
-      m_receivedMessageCount += delta;
-    }
-
     public void incSentMessageCount() {
       m_sentMessageCount++;
-    }
-
-    @Deprecated
-    void incSentMessageCount(long delta) {
-      m_sentMessageCount += delta;
     }
 
     @Override
     public long getReceivedMessageCount() {
       return m_receivedMessageCount;
-    }
-
-    @Deprecated
-    void incReceivedMessageCount(long delta) {
-      m_receivedMessageCount += delta;
     }
 
     public void incReceivedMessageCount() {
@@ -159,142 +142,6 @@ public class ClusterNodeStatusInfo {
       return "ClusterNodeStatusBean [sentMessageCount=" + m_sentMessageCount + ", receivedMessageCount=" + m_receivedMessageCount + ", lastChangedDate=" + m_lastChangedDate + ", lastChangedUserId=" + m_lastChangedUserId + ", lastChangedOriginNodeId=" + m_lastChangedOriginNodeId + "]";
     }
 
-  }
-
-  /**
-   * @return number of sent messages
-   * @deprecated use {@link #getStatus().getSentMessageCount}
-   */
-  @Deprecated
-  public long getSentMessageCount() {
-    synchronized (m_lock) {
-      return m_info.getSentMessageCount();
-    }
-  }
-
-  /**
-   * @deprecated use {@link #getStatus().getReceivedMessageCount}
-   */
-  @Deprecated
-  public long getReceivedMessageCount() {
-    synchronized (m_lock) {
-      return m_info.getReceivedMessageCount();
-    }
-  }
-
-  /**
-   * @deprecated use {@link #getStatus().getLastChangedDate}
-   */
-  @Deprecated
-  public Date getLastChangedDate() {
-    synchronized (m_lock) {
-      return m_info.getLastChangedDate();
-    }
-  }
-
-  /**
-   * @deprecated use {@link #getStatus().getLastChangedUserId}
-   */
-  @Deprecated
-  public String getLastChangedUserId() {
-    synchronized (m_lock) {
-      return m_info.getLastChangedUserId();
-    }
-  }
-
-  /**
-   * @deprecated use {@link #getStatus().getLastChangedOriginNodeId}
-   */
-  @Deprecated
-  public String getLastChangedOriginNodeId() {
-    synchronized (m_lock) {
-      return m_info.getLastChangedOriginNodeId();
-    }
-  }
-
-  /**
-   * @deprecated use {@link #updateLastChanged(IClusterNotificationMessage)}
-   */
-  @Deprecated
-  public void setLastChangedDate(Date lastChangedDate) {
-    synchronized (m_lock) {
-      m_info.setLastChangedDate(lastChangedDate);
-    }
-  }
-
-  /**
-   * @deprecated use {@link #updateLastChanged(IClusterNotificationMessage)}
-   */
-  @Deprecated
-  public void setLastChangedUserId(String lastChangedUserId) {
-    synchronized (m_lock) {
-      m_info.setLastChangedUserId(lastChangedUserId);
-    }
-  }
-
-  /**
-   * @deprecated use {@link #updateReceiveStatus(IClusterNotificationMessage)}
-   */
-  @Deprecated
-  public long incrementReceivedMessageCount() {
-    synchronized (m_lock) {
-      m_info.incReceivedMessageCount();
-      return m_info.getReceivedMessageCount();
-    }
-  }
-
-  /**
-   * @deprecated use {@link #updateReceiveStatus(IClusterNotificationMessage)}
-   */
-  @Deprecated
-  public long incrementReceivedMessageCount(long delta) {
-    synchronized (m_lock) {
-      m_info.incReceivedMessageCount(delta);
-      return m_info.getReceivedMessageCount();
-    }
-  }
-
-  /**
-   * @deprecated use {@link #updateSentStatus(IClusterNotificationMessage)}
-   */
-  @Deprecated
-  public long incrementSentMessageCount() {
-    synchronized (m_lock) {
-      m_info.incSentMessageCount();
-      return m_info.getSentMessageCount();
-    }
-  }
-
-  /**
-   * @deprecated use {@link #updateSentStatus(IClusterNotificationMessage)}
-   */
-  @Deprecated
-  public long addSentMessageCount(long delta) {
-    synchronized (m_lock) {
-      m_info.incSentMessageCount(delta);
-      return m_info.getSentMessageCount();
-    }
-  }
-
-  /**
-   * @deprecated use {@link #updateReceiveStatus(IClusterNotificationMessage)}
-   */
-  @Deprecated
-  public long addReceivedMessageCount(long delta) {
-    synchronized (m_lock) {
-      m_info.incReveivedMessageCount(delta);
-      return m_info.getReceivedMessageCount();
-    }
-  }
-
-  /**
-   * @deprecated use {@link #updateLastChanged(IClusterNotificationMessage)} Will be removed in the N Release.
-   */
-  @Deprecated
-  public void setLastChangedOriginNodeId(String originNode) {
-    synchronized (m_lock) {
-      m_info.setLastChangedOriginNodeId(originNode);
-    }
   }
 
 }
