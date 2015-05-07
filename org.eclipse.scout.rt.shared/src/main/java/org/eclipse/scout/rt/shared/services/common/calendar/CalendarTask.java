@@ -35,9 +35,9 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
    * @param completeDate
    * @param subject
    * @param body
-   * @param color
+   * @param cssClass
    */
-  public CalendarTask(Object id, Object responsibleId, Date startDate, Date dueDate, Date completeDate, String subject, String body, String color) {
+  public CalendarTask(Object id, Object responsibleId, Date startDate, Date dueDate, Date completeDate, String subject, String body, String cssClass) {
     setItemId(id);
     setResponsible(responsibleId);
     setStart(startDate);
@@ -45,7 +45,7 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
     setComplete(completeDate);
     setSubject(subject);
     setBody(body);
-    setColor(color);
+    setCssClass(cssClass);
   }
 
   /**
@@ -56,7 +56,7 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
    * @param completeDate
    * @param subject
    * @param body
-   * @param color
+   * @param cssClass
    */
   public CalendarTask(Object[] data) {
     if (data != null) {
@@ -92,7 +92,7 @@ public class CalendarTask extends AbstractCalendarItem implements ICalendarTask,
               break;
             }
             case 7: {
-              setColor((String) data[i]);
+              setCssClass((String) data[i]);
               break;
             }
           }
