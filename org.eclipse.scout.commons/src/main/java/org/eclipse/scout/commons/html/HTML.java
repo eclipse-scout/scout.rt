@@ -13,6 +13,7 @@ package org.eclipse.scout.commons.html;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.commons.html.internal.EmptyHtmlNodeBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlContentBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlDocumentBuilder;
 import org.eclipse.scout.commons.html.internal.HtmlImageBuilder;
@@ -102,7 +103,7 @@ public final class HTML {
    * </p>
    */
   public static IHtmlElement br() {
-    return new HtmlNodeBuilder("br");
+    return new EmptyHtmlNodeBuilder("br");
   }
 
   /**

@@ -10,16 +10,33 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.html.internal;
 
-import org.eclipse.scout.commons.html.IHtmlElement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * Builder for a html image.
+ * An empty HTML tag without a closing tag (e.g. br)
  */
-public class HtmlImageBuilder extends EmptyHtmlNodeBuilder implements IHtmlElement {
+public class EmptyHtmlNodeBuilder extends HtmlNodeBuilder {
 
-  public HtmlImageBuilder(CharSequence path) {
-    super("img");
-    addAttribute("src", path);
+  public EmptyHtmlNodeBuilder(String tag, CharSequence... texts) {
+    this(tag, Arrays.asList(texts));
+  }
+
+  public EmptyHtmlNodeBuilder(String tag) {
+    this(tag, new ArrayList<String>());
+  }
+
+  public EmptyHtmlNodeBuilder(String tag, List<? extends CharSequence> texts) {
+    super(tag, texts);
+  }
+
+  @Override
+  public void build() {
+    appendStartTag();
+    if (getTexts().size() > 0) {
+      appendText();
+    }
   }
 
 }

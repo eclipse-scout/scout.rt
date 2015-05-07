@@ -48,11 +48,11 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
     appendStartTag();
     if (getTexts().size() > 0) {
       appendText();
-      appendEndTag();
     }
+    appendEndTag();
   }
 
-  private void appendStartTag() {
+  protected void appendStartTag() {
     append("<");
     append(getTag());
     appendAttributes();

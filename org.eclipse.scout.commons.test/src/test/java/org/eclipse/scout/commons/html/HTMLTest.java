@@ -107,7 +107,7 @@ public class HTMLTest {
   public void testTableAttributesNoBinds() {
     final IHtmlTable table = HTML.table(
         row(
-            cell(BIND_TEXT))
+        cell(BIND_TEXT))
         );
     assertEquals("<table><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", table.toEncodedHtml());
   }
@@ -249,6 +249,12 @@ public class HTMLTest {
 
     String exp = "<div><h2>h2</h2>" + createTableString("0") + "</div>";
     assertEquals(exp, html.toEncodedHtml());
+  }
+
+  @Test
+  public void testNullValues() {
+    String encodedNullDiv = HTML.div((String) null).toEncodedHtml();
+    assertEquals("<div></div>", encodedNullDiv);
   }
 
   @Test

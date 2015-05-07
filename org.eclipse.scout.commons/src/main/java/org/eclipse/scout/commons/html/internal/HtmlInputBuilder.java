@@ -13,7 +13,7 @@ package org.eclipse.scout.commons.html.internal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.html.IHtmlInput;
 
-public class HtmlInputBuilder extends HtmlNodeBuilder implements IHtmlInput {
+public class HtmlInputBuilder extends EmptyHtmlNodeBuilder implements IHtmlInput {
 
   public HtmlInputBuilder() {
     super("input");
