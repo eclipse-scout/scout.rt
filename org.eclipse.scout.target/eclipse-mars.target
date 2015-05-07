@@ -83,8 +83,8 @@
 <repository id="orbit_S" location="http://download.eclipse.org/tools/orbit/downloads/drops/S20141129202728/repository"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<repository id="rap_3.0" location="http://download.eclipse.org/rt/rap/3.0/M3-20141110-1349.mars"/>
 <unit id="org.eclipse.rap.feature.feature.group" version="0.0.0"/>
+<repository location="http://download.eclipse.org/rt/rap/2.3/R-20140610-0925/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.rap.fileupload.feature.feature.group" version="0.0.0"/>
