@@ -7,10 +7,6 @@ scout.Menu = function() {
 };
 scout.inherits(scout.Menu, scout.Action);
 
-scout.Menu.prototype.sendAboutToShow = function(event) {
-  this.session.send(this.id, 'aboutToShow');
-};
-
 scout.Menu.prototype._render = function($parent) {
   if (this.separator) {
     this._renderSeparator($parent);
@@ -49,7 +45,9 @@ scout.Menu.prototype._renderItem = function($parent) {
 };
 
 scout.Menu.prototype._onMenuClicked = function(event) {
-  this.doAction($(event.target));
+  if (this.$container.isEnabled()) {
+    this.doAction($(event.target));
+  }
 };
 
 scout.Menu.prototype._renderEnabled = function(enabled) {

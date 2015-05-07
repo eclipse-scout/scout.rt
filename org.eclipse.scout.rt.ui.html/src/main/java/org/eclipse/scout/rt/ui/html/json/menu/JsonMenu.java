@@ -17,13 +17,11 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 
 public class JsonMenu<T extends IMenu> extends JsonAction<T> {
 
-  public static final String EVENT_ABOUT_TO_SHOW = "aboutToShow";
   public static final String PROP_SEPARATOR = "separator";
   public static final String PROP_SYSTEM_TYPE = "systemType";
 
@@ -65,17 +63,4 @@ public class JsonMenu<T extends IMenu> extends JsonAction<T> {
     });
   }
 
-  @Override
-  public void handleUiEvent(JsonEvent event) {
-    if (EVENT_ABOUT_TO_SHOW.equals(event.getType())) {
-      handleUiMenuAboutToShow(event);
-    }
-    else {
-      super.handleUiEvent(event);
-    }
-  }
-
-  public void handleUiMenuAboutToShow(JsonEvent event) {
-    getModel().aboutToShow();
-  }
 }

@@ -19,6 +19,7 @@ scout.MenuBarPopup.prototype._render = function($parent) {
     return;
   }
 
+  // FIXME AWE: (menu) refactor see ContextMenuPopup
   for (var i = 0; i < menus.length; i++) {
     var menu = menus[i];
     if (!menu.visible) {
@@ -27,7 +28,6 @@ scout.MenuBarPopup.prototype._render = function($parent) {
     if (menu.separator) {
       continue;
     }
-    menu.sendAboutToShow();
     this.$body.appendDiv('menu-item')
       .text(menu.text)
       .on('click', '', this.onMenuItemClicked.bind(this, menu));

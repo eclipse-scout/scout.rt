@@ -27,6 +27,17 @@
     border-bottom: 0;
   }
 
+  & > .menu-item {
+    &:focus:not(.disabled) {
+      text-decoration: underline;
+      color: @focus-color;
+
+      &::before {
+        color: @focus-color;
+      }
+    }
+  }
+
   & > .menu-item,
   & > .link-button > .menu-item {
     height: @menubar-height;

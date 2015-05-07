@@ -521,51 +521,21 @@ scout.Table.prototype._installRows = function($rows) {
   }
 
   function onDoubleClick(event) {
-    var $row = $(event.delegateTarget);
-    var column = that._columnAtX(event.pageX);
+    var $row = $(event.delegateTarget),
+      column = that._columnAtX(event.pageX);
     that.sendRowAction($row, column.id);
   }
 
   function onContextMenu(event) {
+    var menuItems, popup;
     event.preventDefault();
-
-    var $selectedRows = that.$selectedRows(),
-      x = event.pageX,
-      y = event.pageY;
-
-    if ($selectedRows.length > 0) {
-      waitForServer(that.session, showMenuPopup.bind(that, event));
-    }
-
-    /* TODO AWE/CGU: (scout, menu) try to get rid of aboutToShow, than delete this method
-     * or move to a better suited location if we cannot remove it. Reason: with the new UI
-     * menu-items are added to the menu-bar. There, all items are visible from the start.
-     * So there's no point in time where it makes sense to execute the aboutToShow() method
-     * which was called when a context menu was about to open. As a replacement for aboutTo
-     * Show we could use a listener to enabled/disable menu-items.
-     *
-     * When aboutToShow is deleted, we can simplify the code here. waitForServer is no longer
-     * needed.
-     */
-    function waitForServer(session, func) {
-      if (session.offline) {
-        // don't show context menus in offline mode, they won't work
-        return;
-      }
-      if (session.areRequestsPending() || session.areEventsQueued()) {
-        session.listen().done(func);
-      } else {
-        func();
-      }
-    }
-
-    function showMenuPopup(event) {
-      var menuItems = that._filterMenus('', true);
+    if (that.$selectedRows().length > 0) {
+      menuItems = that._filterMenus('', true);
       if (menuItems.length > 0) {
-        var popup = new scout.ContextMenuPopup(this.session, menuItems);
-        popup.$anchor = this.$data;
+        popup = new scout.ContextMenuPopup(that.session, menuItems);
+        popup.$anchor = that.$data;
         popup.render();
-        popup.setLocation(new scout.Point(x, y));
+        popup.setLocation(new scout.Point(event.pageX, event.pageY));
       }
     }
   }
