@@ -118,7 +118,6 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    *             {@link AbstractBasicField#execChangedDisplayText()} instead; will be removed in 5.1.0;
    */
   @Deprecated
-  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(180)
   protected boolean getConfiguredValidateOnAnyKey() {
     return false;

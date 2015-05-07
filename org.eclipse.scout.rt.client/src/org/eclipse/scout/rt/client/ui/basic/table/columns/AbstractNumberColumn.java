@@ -86,7 +86,6 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
    * <p>
    * Be careful when using this property since this can influence performance and the characteristics of text input.
    */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(160)
   protected boolean getConfiguredValidateOnAnyKey() {
     return false;

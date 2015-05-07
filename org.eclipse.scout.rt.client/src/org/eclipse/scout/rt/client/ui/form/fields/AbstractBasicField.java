@@ -85,7 +85,6 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
    *             {@link AbstractBasicField#execChangedDisplayText()} instead; will be removed in 5.1.0;
    */
   @Deprecated
-  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
   protected boolean getConfiguredValidateOnAnyKey() {
     return false;
@@ -100,7 +99,8 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
    * actually validated and set, the model does not get notified about changes of the display text in the UI.
    * <p>
    * When set to <code>true</code> the property {@link IValueField#PROP_DISPLAY_TEXT} is kept in sync with the UI while
-   * the user is editing the field.
+   * the user is editing the field. Usually this is used in combination with
+   * {@link AbstractBasicField#execChangedDisplayText()}.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(315)
