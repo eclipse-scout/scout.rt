@@ -20,27 +20,6 @@ public final class MenuChains {
     }
   }
 
-  public static class MenuAboutToShowChain extends AbstractMenuChain {
-
-    public MenuAboutToShowChain(List<? extends IActionExtension<? extends AbstractAction>> extensions) {
-      super(extensions);
-    }
-
-    public void execAboutToShow() throws ProcessingException {
-      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
-        @Override
-        protected void callMethod(IMenuExtension<? extends AbstractMenu> next) throws ProcessingException {
-          next.execAboutToShow(MenuAboutToShowChain.this);
-        }
-      };
-      callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
-    }
-  }
-
   public static class MenuOwnerValueChangedChain extends AbstractMenuChain {
 
     public MenuOwnerValueChangedChain(List<? extends IActionExtension<? extends AbstractAction>> extensions) {

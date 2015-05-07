@@ -41,7 +41,7 @@ public class CalendarItemTest {
     assertNull(task.getComplete());
     assertNull(task.getSubject());
     assertNull(task.getBody());
-    assertNull(task.getColor());
+    assertNull(task.getCssClass());
   }
 
   @Test
@@ -69,8 +69,8 @@ public class CalendarItemTest {
     assertEquals("task subject", "1", task.getSubject());
     assertNotNull(task.getBody());
     assertEquals("task body", "2", task.getBody());
-    assertNotNull(task.getColor());
-    assertEquals("task color", "3", task.getColor());
+    assertNotNull(task.getCssClass());
+    assertEquals("task color", "3", task.getCssClass());
   }
 
   @Test
@@ -84,7 +84,7 @@ public class CalendarItemTest {
     assertFalse(app.isFullDay());
     assertNull(app.getSubject());
     assertNull(app.getBody());
-    assertNull(app.getColor());
+    assertNull(app.getCssClass());
   }
 
   @Test

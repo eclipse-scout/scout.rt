@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
@@ -305,13 +304,6 @@ public interface IDesktop extends IPropertyObserver {
    * Convenience to find a menu in the desktop, uses {@link ActionFinder}
    */
   <T extends IMenu> T getMenu(Class<? extends T> searchType);
-
-  /**
-   * Prepare all (menubar) menus on the desktop.<br>
-   * Calls {@link AbstractMenu#execPrepareAction()} on every menu in the menu
-   * tree recursively
-   */
-  void prepareAllMenus();
 
   /**
    * @return all actions including keyStroke, menu, toolButton and viewButton

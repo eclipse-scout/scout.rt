@@ -147,22 +147,6 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
     }
   }
 
-  @Override
-  public void callAboutToShow(final IActionFilter filter) {
-    acceptVisitor(new IActionVisitor() {
-      @SuppressWarnings("deprecation")
-      @Override
-      public int visit(IAction action) {
-        if (action instanceof IMenu && (filter == null || filter.accept(action))) {
-          IMenu menu = (IMenu) action;
-          menu.aboutToShow();
-          menu.prepareAction();
-        }
-        return CONTINUE;
-      }
-    });
-  }
-
   protected void calculateLocalVisibility() {
 
     final IActionFilter activeFilter = ActionUtility.createMenuFilterMenuTypes(getCurrentMenuTypes(), true);

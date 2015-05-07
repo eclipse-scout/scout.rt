@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer;
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -229,17 +228,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   @ConfigOperation
   @Order(10)
   protected void execInitAction() throws ProcessingException {
-  }
-
-  /**
-   * called by prepareAction before action is added to list or used<br>
-   * this way a menu can be made dynamically visible / enabled
-   *
-   * @deprecated use {@link AbstractMenu#execOwnerValueChanged}
-   */
-  @Deprecated
-  @Order(20)
-  protected void execPrepareAction() throws ProcessingException {
   }
 
   /**
@@ -685,27 +673,8 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   @Override
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public final void prepareAction() {
-    try {
-      prepareActionInternal();
-      execPrepareAction();
-    }
-    catch (Exception t) {
-      LOG.warn("Action " + getClass().getName(), t);
-    }
-  }
-
-  @Override
   public IActionUIFacade getUIFacade() {
     return m_uiFacade;
-  }
-
-  /**
-   * do not use this method, it is used internally by subclasses
-   */
-  protected void prepareActionInternal() throws ProcessingException {
   }
 
   @Override

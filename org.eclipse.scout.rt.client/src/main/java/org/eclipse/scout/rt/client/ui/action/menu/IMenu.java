@@ -33,15 +33,9 @@ public interface IMenu extends IActionNode<IMenu> {
   Set<IMenuType> getMenuTypes();
 
   /**
-   * called from the UI before the menu is displayed.
-   *
-   * @see AbstractMenu#execAboutToShow()
-   */
-  void aboutToShow();
-
-  /**
    * @param newValue
    * @throws ProcessingException
    */
   void handleOwnerValueChanged(Object newValue) throws ProcessingException;
+
 }

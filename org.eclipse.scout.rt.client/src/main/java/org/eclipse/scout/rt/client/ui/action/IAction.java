@@ -16,7 +16,6 @@ import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 /**
  * Actions have a trigger scope that is a combination of the "locations" {@link #isSingleSelectionAction()},
@@ -188,15 +187,6 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered {
   void setToggleAction(boolean b);
 
   char getMnemonic();
-
-  /**
-   * called before this action is used
-   *
-   * @deprecated will be removed with V 5.0 use prepare on {@link IMenu} instead (for all not menus prepare does not
-   *             make any sense).
-   */
-  @Deprecated
-  void prepareAction();
 
   /**
    * UI processes

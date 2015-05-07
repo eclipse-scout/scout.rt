@@ -554,10 +554,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       @Override
       protected void execInitAction() throws ProcessingException {
         setVisiblePermission(getUpdatePermission());
-      }
-
-      @Override
-      protected void execAboutToShow() throws ProcessingException {
         setEnabled(!isProtected());
       }
 
@@ -597,12 +593,12 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       @Override
       protected void execInitAction() throws ProcessingException {
         setVisiblePermission(getDeletePermission());
+        setEnabled(!isProtected());
+        setText(getConfiguredText());
       }
 
       @Override
-      protected void execAboutToShow() throws ProcessingException {
-        setEnabled(!isProtected());
-        setText(getConfiguredText());
+      protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
         for (ITreeNode node : getTree().getSelectedNodes()) {
           if (!(node instanceof FolderNode)) {
             setText(ScoutTexts.get("DeleteMenu"));
@@ -666,13 +662,9 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     private boolean isProtected() {
-      ITreeNode node = FolderNode.this;
-      BookmarkFolder bmFolder = (BookmarkFolder) node.getCell().getValue();
-      if (Bookmark.INBOX_FOLDER_NAME.equals(bmFolder.getTitle())
-          || Bookmark.SPOOL_FOLDER_NAME.equals(bmFolder.getTitle())) {
-        return true;
-      }
-      return false;
+      BookmarkFolder bmFolder = (BookmarkFolder) FolderNode.this.getCell().getValue();
+      return Bookmark.INBOX_FOLDER_NAME.equals(bmFolder.getTitle())
+          || Bookmark.SPOOL_FOLDER_NAME.equals(bmFolder.getTitle());
     }
 
   }
@@ -734,7 +726,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execAboutToShow() throws ProcessingException {
+      protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
         List<Bookmark> bookmarks = new ArrayList<Bookmark>();
         ITree tree = getTree();
         for (ITreeNode node : tree.getSelectedNodes()) {
@@ -814,7 +806,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execAboutToShow() throws ProcessingException {
+      protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
         // The permission to use the "update bookmark" function
         // is the same as to delete one:
         ArrayList<Bookmark> bookmarks = new ArrayList<Bookmark>();
@@ -856,7 +848,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execAboutToShow() throws ProcessingException {
+      protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
         List<Bookmark> bookmarks = new ArrayList<Bookmark>();
         ITree tree = getTree();
         for (ITreeNode node : tree.getSelectedNodes()) {

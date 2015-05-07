@@ -265,6 +265,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     }
   }
 
+  @SuppressWarnings("deprecation")
   protected void decorateCellInternal(Cell cell, ICalendarItem item) {
     if (item instanceof ICalendarAppointment) {
       ICalendarAppointment app = (ICalendarAppointment) item;

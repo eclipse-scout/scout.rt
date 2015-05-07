@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.IMenuExtension;
-import org.eclipse.scout.rt.client.extension.ui.action.menu.MenuChains.MenuAboutToShowChain;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.MenuChains.MenuOwnerValueChangedChain;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -109,38 +108,6 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   @Order(50.0)
   protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
 
-  }
-
-  /**
-   * this method is called before a menu will be displayed. This method should only be used to update the text, icon or
-   * other display styles. <h3>NOTE</h3> <b>Do not change visibility or structure of a
-   * menu in this method unless it is no other option available!</b> <br>
-   * Menus are considered to listen whatever changes of the application model to update their visibility and structure.
-   * This is the only way a GUI layer can reflect menu changes immediately.
-   *
-   * @throws ProcessingException
-   */
-  @ConfigOperation
-  @Order(60.0)
-  protected void execAboutToShow() throws ProcessingException {
-
-  }
-
-  @Override
-  public final void aboutToShow() {
-    try {
-      aboutToShowInternal();
-      interceptAboutToShow();
-    }
-    catch (Exception t) {
-      LOG.warn("Action " + getClass().getName(), t);
-    }
-  }
-
-  /**
-   * do not use this method, it is used internally by subclasses
-   */
-  protected void aboutToShowInternal() {
   }
 
   /**
@@ -266,12 +233,6 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     propertySupport.setProperty(PROP_MENU_TYPES, CollectionUtility.<IMenuType> hashSet(menuTypes));
   }
 
-  protected final void interceptAboutToShow() throws ProcessingException {
-    List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
-    MenuAboutToShowChain chain = new MenuAboutToShowChain(extensions);
-    chain.execAboutToShow();
-  }
-
   protected final void interceptOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
     List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
     MenuOwnerValueChangedChain chain = new MenuOwnerValueChangedChain(extensions);
@@ -282,11 +243,6 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
     public LocalMenuExtension(OWNER owner) {
       super(owner);
-    }
-
-    @Override
-    public void execAboutToShow(MenuAboutToShowChain chain) throws ProcessingException {
-      getOwner().execAboutToShow();
     }
 
     @Override

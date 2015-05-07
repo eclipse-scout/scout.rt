@@ -37,30 +37,25 @@ public abstract class AbstractAddAttributeMenu extends AbstractMenu {
     return ScoutTexts.get("ExtendedSearchAddAttributeMenu");
   }
 
-  /**
-   * replace with listener in execInitAction and updateVisibility support. Therefore the parentNode must be held as a
-   * property on {@link ITreeNode}
-   */
-  @SuppressWarnings("deprecation")
   @Override
-  protected void execPrepareAction() throws ProcessingException {
-    EntityNode eNode = null;
-    ITreeNode n = m_parentNode;
-    while (n != null) {
-      if (n instanceof EntityNode) {
-        eNode = (EntityNode) n;
+  protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
+    EntityNode entityNode = null;
+    ITreeNode treeNode = m_parentNode;
+    while (treeNode != null) {
+      if (treeNode instanceof EntityNode) {
+        entityNode = (EntityNode) treeNode;
         break;
       }
-      n = n.getParentNode();
+      treeNode = treeNode.getParentNode();
     }
-    List<IDataModelAttribute> atts;
-    if (eNode != null) {
-      atts = eNode.getEntity().getAttributes();
+    List<IDataModelAttribute> attributes;
+    if (entityNode != null) {
+      attributes = entityNode.getEntity().getAttributes();
     }
     else {
-      atts = m_field.getAttributes();
+      attributes = m_field.getAttributes();
     }
-    setVisible(atts.size() > 0);
+    setVisible(attributes.size() > 0);
   }
 
   @Override

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.action.menu.root;
 import java.util.Set;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 
@@ -38,7 +37,5 @@ public interface IContextMenu extends IMenu {
   void addContextMenuListener(ContextMenuListener listener);
 
   void removeContextMenuListener(ContextMenuListener listener);
-
-  void callAboutToShow(IActionFilter filter);
 
 }

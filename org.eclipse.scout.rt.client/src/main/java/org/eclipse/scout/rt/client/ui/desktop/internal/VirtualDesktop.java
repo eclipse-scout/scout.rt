@@ -521,11 +521,6 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void prepareAllMenus() {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
   public void printDesktop(PrintDevice device, Map<String, Object> parameters) {
     throw createUnsupportedOperationException();
   }

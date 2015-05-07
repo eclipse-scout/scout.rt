@@ -80,11 +80,6 @@ public class OutlineMenuWrapper implements IMenu {
   }
 
   @Override
-  public void aboutToShow() {
-    m_wrappedMenu.aboutToShow();
-  }
-
-  @Override
   public IMenu getParent() {
     return m_wrappedMenu.getParent();
   }
@@ -322,12 +317,6 @@ public class OutlineMenuWrapper implements IMenu {
   @Override
   public char getMnemonic() {
     return m_wrappedMenu.getMnemonic();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void prepareAction() {
-    m_wrappedMenu.prepareAction();
   }
 
   @Override

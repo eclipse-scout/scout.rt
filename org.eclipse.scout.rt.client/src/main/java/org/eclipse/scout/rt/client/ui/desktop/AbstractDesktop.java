@@ -617,9 +617,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   public void initDesktop() throws ProcessingException {
     if (!m_desktopInited) {
       m_desktopInited = true;
-      //local
-      prepareAllMenus();
-      //extensions
+      // extensions
       for (IDesktopExtension ext : getDesktopExtensions()) {
         try {
           ContributionCommand cc = ext.initDelegate();
@@ -1116,21 +1114,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public List<IMenu> getMenus() {
     return CollectionUtility.arrayList(m_menus);
-  }
-
-  @Override
-  public void prepareAllMenus() {
-    for (IMenu child : getMenus()) {
-      prepareMenuRec(child);
-    }
-  }
-
-  @SuppressWarnings("deprecation")
-  private void prepareMenuRec(IMenu menu) {
-    menu.prepareAction();
-    for (IMenu child : menu.getChildActions()) {
-      prepareMenuRec(child);
-    }
   }
 
   @Override
@@ -1672,7 +1655,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
-  @SuppressWarnings("deprecation")
   private void addLocalPopupMenus(DesktopEvent event) {
     try {
       List<IMenu> list = new ArrayList<IMenu>();
@@ -1686,11 +1668,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
         catch (Exception ex) {
           LOG.error("extension " + ext, ex);
-        }
-      }
-      for (IMenu m : list) {
-        if (m != null) {
-          m.prepareAction();
         }
       }
       for (IMenu m : list) {
@@ -1867,10 +1844,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return false;
   }
 
-  @SuppressWarnings("deprecation")
   private boolean runMenuRec(IMenu m, Class<? extends IMenu> menuType) throws ProcessingException {
     if (m.getClass() == menuType) {
-      m.prepareAction();
       if (m.isVisible() && m.isEnabled()) {
         m.doAction();
         return true;

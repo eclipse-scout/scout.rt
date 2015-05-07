@@ -73,7 +73,6 @@ public class BookmarkService extends AbstractService implements IBookmarkService
     });
   }
 
-  @SuppressWarnings("deprecation")
   protected void handleBookmarksChangedInternal(BookmarkServiceEvent e) {
     switch (e.getType()) {
       case BookmarkServiceEvent.TYPE_CHANGED: {
@@ -108,9 +107,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
             }
           }
           for (Bookmark b : list) {
-            ActivateBookmarkKeyStroke k = new ActivateBookmarkKeyStroke(b);
-            k.prepareAction();
-            newKeyStrokes.add(k);
+            newKeyStrokes.add(new ActivateBookmarkKeyStroke(b));
           }
           desktop.setKeyStrokes(newKeyStrokes);
         }

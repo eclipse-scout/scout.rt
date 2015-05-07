@@ -1854,7 +1854,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return null;
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException {
     Class<? extends IMenu> c = getReplacingMenuClass(menuType);
@@ -1864,8 +1863,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           return false;
         }
         if ((!m.isInheritAccessibility()) || isEnabled()) {
-          m.prepareAction();
-          m.aboutToShow();
           if (m.isVisible() && m.isEnabled()) {
             m.doAction();
             return true;
