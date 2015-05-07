@@ -51,8 +51,9 @@
   line-height: normal;
 }
 
-.popup-head[data-icon].taskbar-tool-item.has-submenu::after {
-  top: 0px;
+.popup-head.taskbar-tool-item.has-submenu:after {
+  font-size: 17px;
+  top:0px;
 }
 
 .popup-head[data-icon].taskbar-tool-item.selected::before {
@@ -81,7 +82,6 @@
   display: inline-block;
   height: @desktop-taskbar-height;
   padding: 6px 20px 0 20px;
-
   cursor: pointer;
   background-color: @panel-background-color;
   color: @text-color;
@@ -116,8 +116,14 @@
   }
 
   &.has-submenu::after {
-   .sub-menu-icon;
-   top: 0px;
+    display: inline-block;
+    position: relative;
+    left: 0px;
+    .font-icon;
+    line-height: 17px;
+    font-size: 17px;
+    padding-left: 10px;
+    content: @icon-angle-down;
   }
 
 }
