@@ -306,8 +306,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     switch (type) {
       case TreeEvent.TYPE_NODES_SELECTED:
       case TreeEvent.TYPE_BEFORE_NODES_SELECTED:
-      case TreeEvent.TYPE_SCROLL_TO_SELECTION:
-      case TreeEvent.TYPE_NODE_FILTER_CHANGED: {
+      case TreeEvent.TYPE_SCROLL_TO_SELECTION: {
         return true;
       }
       default: {
@@ -352,6 +351,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       case TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED:
       case TreeEvent.TYPE_NODE_ENSURE_VISIBLE:
       case TreeEvent.TYPE_NODE_EXPANDED:
+      case TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE:
       case TreeEvent.TYPE_NODE_FILTER_CHANGED: {
         // Single node
         return true;
