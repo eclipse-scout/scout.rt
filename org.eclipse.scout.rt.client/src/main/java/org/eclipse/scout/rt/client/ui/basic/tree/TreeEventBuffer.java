@@ -60,7 +60,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         //remove all previous events of the same type
         remove(type, events.subList(0, i));
       }
-      else if (type == TreeEvent.TYPE_NODES_DELETED) {
+      else if (type == TreeEvent.TYPE_NODES_DELETED || type == TreeEvent.TYPE_ALL_CHILD_NODES_DELETED) {
         List<ITreeNode> remainingNodes = removeNodesFromPreviousEvents(event.getNodes(), events.subList(0, i), TreeEvent.TYPE_NODES_INSERTED);
         events.set(i, replaceNodesInEvent(event, remainingNodes));
       }
@@ -71,7 +71,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   }
 
   /**
-   * Removes the given 'nodesToRemove' from all 'events'. The event list is traversed backwards.
+   * Removes the given 'nodesToRemove' from all 'events'. Recursive child nodes are also removed (but will not be
+   * returned). The event list is traversed backwards.
    *
    * @return a list with the same nodes as 'nodesToRemove', except those that were removed from an
    *         event whose type matches one of the 'creationTypes'. This allows for completely removing
@@ -82,16 +83,26 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     List<ITreeNode> remainingNodes = new ArrayList<ITreeNode>();
 
     for (ITreeNode nodeToRemove : nodesToRemove) {
+      Collection<ITreeNode> allChildNodes = collectAllNodesRec(nodeToRemove.getChildNodes());
       boolean nodeRemovedFromCreationEvent = false;
 
       for (ListIterator<TreeEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
         TreeEvent event = it.previous();
+
+        // Remove the current node from the event and check if was removed from a creation event
         TreeEvent newEvent = removeNode(event, nodeToRemove);
-        it.set(newEvent);
         boolean removed = (event.getNodes().size() != newEvent.getNodes().size());
         if (removed && creationTypesList.contains(event.getType())) {
           nodeRemovedFromCreationEvent = true;
         }
+
+        // Now remove all recursive children (without considering them for the 'remainingNodes' list)
+        for (ITreeNode childNode : allChildNodes) {
+          newEvent = removeNode(newEvent, childNode);
+        }
+
+        // Replace the updated event
+        it.set(newEvent);
       }
 
       if (!nodeRemovedFromCreationEvent) {
@@ -179,6 +190,18 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       }
     }
     return false;
+  }
+
+  /**
+   * @return all the given nodes, including their recursive child nodes.
+   */
+  protected Collection<ITreeNode> collectAllNodesRec(Collection<ITreeNode> nodes) {
+    List<ITreeNode> result = new ArrayList<ITreeNode>();
+    for (ITreeNode node : nodes) {
+      result.add(node);
+      result.addAll(collectAllNodesRec(node.getChildNodes()));
+    }
+    return result;
   }
 
   /**

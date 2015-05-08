@@ -12,15 +12,19 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -248,6 +252,92 @@ public class TreeEventBufferTest {
     assertEquals(5, coalesced.size());
   }
 
+  /**
+   * Remove deleted nodes from previous events
+   */
+  @Test
+  public void testRemoveDeletedNodesFromPreviousEvents() {
+    // A
+    // +-B
+    // | +-E
+    // |   +-F
+    // +-C
+    //   +-G
+    // +-D
+    ITreeNode nodeA = mockNode("A");
+    ITreeNode nodeB = mockNode("B");
+    ITreeNode nodeC = mockNode("C");
+    ITreeNode nodeD = mockNode("D");
+    ITreeNode nodeE = mockNode("E");
+    ITreeNode nodeF = mockNode("F");
+    ITreeNode nodeG = mockNode("G");
+    installChildNodes(nodeA, nodeB, nodeC, nodeD);
+    installChildNodes(nodeB, nodeE);
+    installChildNodes(nodeE, nodeF);
+    installChildNodes(nodeC, nodeG);
+
+    // NODES_DELETED
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeB));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeE));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODES_UPDATED, nodeF));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_COLLAPSED, nodeG));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODES_DELETED, nodeB, nodeC));
+
+    List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(1, coalesced.size());
+    assertEquals(TreeEvent.TYPE_NODES_DELETED, coalesced.get(0).getType());
+    assertEquals(2, coalesced.get(0).getChildNodes().size());
+
+    // ALL_CHILD_NODES_DELETED
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeB));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeE));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODES_UPDATED, nodeF));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_COLLAPSED, nodeG));
+    m_testBuffer.add(mockEventParentChildren(TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeA, nodeB, nodeC, nodeD));
+
+    coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(1, coalesced.size());
+    assertEquals(TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, coalesced.get(0).getType());
+    assertEquals(3, coalesced.get(0).getChildNodes().size());
+  }
+
+  /**
+   * Tests the utility method "collectAllNodesRec"
+   */
+  @Test
+  public void testCollectAllChildNodesRec() {
+    // A
+    // +-B
+    // | +-E
+    // |   +-F
+    // +-C
+    //   +-G
+    // +-D
+    ITreeNode nodeA = mockNode("A");
+    ITreeNode nodeB = mockNode("B");
+    ITreeNode nodeC = mockNode("C");
+    ITreeNode nodeD = mockNode("D");
+    ITreeNode nodeE = mockNode("E");
+    ITreeNode nodeF = mockNode("F");
+    ITreeNode nodeG = mockNode("G");
+    installChildNodes(nodeA, nodeB, nodeC, nodeD);
+    installChildNodes(nodeB, nodeE);
+    installChildNodes(nodeE, nodeF);
+    installChildNodes(nodeC, nodeG);
+    Collection<ITreeNode> allNodes = new ArrayList<ITreeNode>();
+    allNodes.add(nodeA);
+    allNodes.add(nodeB);
+    allNodes.add(nodeC);
+    allNodes.add(nodeD);
+    allNodes.add(nodeE);
+    allNodes.add(nodeF);
+    allNodes.add(nodeG);
+
+    Collection<ITreeNode> allCollectedNodes = m_testBuffer.collectAllNodesRec(Collections.singletonList(nodeA));
+    assertEquals(7, allCollectedNodes.size());
+    assertTrue(CollectionUtility.equalsCollection(allCollectedNodes, allNodes));
+  }
+
   @SuppressWarnings("unused")
   private TreeEvent mockEvent(int type) {
     return mockEvent(type, 0);
@@ -272,8 +362,16 @@ public class TreeEventBufferTest {
     return mockEvent(type, Arrays.asList(nodes));
   }
 
+  private TreeEvent mockEventParentChildren(int type, ITreeNode parentNode, ITreeNode... childNodes) {
+    return mockEventParentChildren(type, parentNode, Arrays.asList(childNodes));
+  }
+
   private TreeEvent mockEvent(int type, List<ITreeNode> nodes) {
     return new TreeEvent(mock(ITree.class), type, nodes);
+  }
+
+  private TreeEvent mockEventParentChildren(int type, ITreeNode parentNode, List<ITreeNode> childNodes) {
+    return new TreeEvent(mock(ITree.class), type, parentNode, childNodes);
   }
 
   private List<ITreeNode> mockNodes(String... nodeIds) {
