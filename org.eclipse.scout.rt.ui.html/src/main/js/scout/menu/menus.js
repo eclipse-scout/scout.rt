@@ -18,25 +18,23 @@ scout.menus = {
     var filteredMenus = [],
       separatorCount = 0;
 
-    for (var i = 0; i < menus.length; i++) {
-      var menu = menus[i];
+
+    menus.forEach(function(menu) {
       var childMenus = menu.childActions;
       if (childMenus.length > 0) {
         childMenus = scout.menus.filter(childMenus, types);
         if (childMenus.length === 0) {
-          continue;
+          return;
         }
       } // Don't check the menu type for a group
       else if (!scout.menus._checkType(menu, types)) {
-        continue;
+        return;
       }
-
       if (menu.separator) {
         separatorCount++;
       }
-
       filteredMenus.push(menu);
-    }
+    });
 
     // Ignore menus with only separators
     if (separatorCount === filteredMenus.length) {
@@ -48,12 +46,10 @@ scout.menus = {
 
   checkType: function(menu, types) {
     types = scout.arrays.ensure(types);
-
     if (menu.childActions.length > 0) {
       var childMenus = scout.menus.filter(menu.childActions, types);
       return (childMenus.length > 0);
     }
-
     return scout.menus._checkType(menu, types);
   },
 

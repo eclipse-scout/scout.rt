@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.IChartTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IGraphTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IMapTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
@@ -141,7 +140,6 @@ import org.eclipse.scout.rt.ui.html.json.table.JsonDateColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonNumberColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
-import org.eclipse.scout.rt.ui.html.json.table.JsonTableOrganizeMenu;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonAnalysisTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonChartTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonGraphTableControl;
@@ -277,9 +275,6 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (model instanceof IContextMenu) {
       return new JsonContextMenu<IContextMenu>((IContextMenu) model, session, id, parent);
-    }
-    if (model instanceof TableOrganizeMenu) { // needs to be before IMenu
-      return new JsonTableOrganizeMenu<TableOrganizeMenu>((TableOrganizeMenu) model, session, id, parent);
     }
     if (model instanceof IMenu) {
       return new JsonMenu<IMenu>((IMenu) model, session, id, parent);

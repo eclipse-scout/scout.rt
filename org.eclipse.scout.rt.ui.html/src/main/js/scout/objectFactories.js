@@ -77,11 +77,6 @@ scout.defaultObjectFactories = [{
     return new scout.TableControl();
   }
 }, {
-  objectType: 'TableOrganizeMenu',
-  create: function() {
-    return new scout.TableOrganizeMenu();
-  }
-}, {
   objectType: 'Tree',
   create: function() {
     return new scout.Tree();

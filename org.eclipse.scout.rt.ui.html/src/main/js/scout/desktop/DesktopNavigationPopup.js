@@ -2,8 +2,6 @@ scout.DesktopNavigationPopup = function(desktopNavigation, session) {
   scout.DesktopNavigationPopup.parent.call(this, session);
   this.desktopNavigation = desktopNavigation;
   this.$menuItem = desktopNavigation.$menuButton;
-  this.$head;
-  this.$deco;
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
 };
 scout.inherits(scout.DesktopNavigationPopup, scout.Popup);

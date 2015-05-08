@@ -2,8 +2,6 @@ scout.FormToolPopup = function(formToolButton, session) {
   scout.FormToolPopup.parent.call(this, session);
   this.$formToolButton = formToolButton.$container;
   this.formToolButton = formToolButton;
-  this.$head;
-  this.$deco;
   if (formToolButton.keyStroke) {
     var closeKeyStroke = new scout.PopupCloseKeyStroke(this);
     closeKeyStroke.keyStroke = formToolButton.keyStroke;

@@ -5,34 +5,21 @@
 scout.MenuBarPopup = function(menu, session) {
   scout.MenuBarPopup.parent.call(this, session);
   this.menu = menu;
-  this.$head;
-  this.$deco;
 };
-scout.inherits(scout.MenuBarPopup, scout.Popup);
+scout.inherits(scout.MenuBarPopup, scout.ContextMenuPopup);
 
-scout.MenuBarPopup.prototype._render = function($parent) {
-  scout.MenuBarPopup.parent.prototype._render.call(this, $parent);
+// @override
+scout.MenuBarPopup.prototype._getMenuItems = function() {
+  return this.menu.childActions || this.menu.menus;
+};
+
+// @override
+scout.MenuBarPopup.prototype._beforeRenderMenuItems = function() {
   this._renderHead();
+};
 
-  var menus = this.menu.childActions || this.menu.menus;
-  if (!menus || menus.length === 0) {
-    return;
-  }
-
-  // FIXME AWE: (menu) refactor see ContextMenuPopup
-  for (var i = 0; i < menus.length; i++) {
-    var menu = menus[i];
-    if (!menu.visible) {
-      continue;
-    }
-    if (menu.separator) {
-      continue;
-    }
-    this.$body.appendDiv('menu-item')
-      .text(menu.text)
-      .on('click', '', this.onMenuItemClicked.bind(this, menu));
-  }
-
+// @override
+scout.MenuBarPopup.prototype._afterRenderMenuItems = function() {
   this.alignTo();
 };
 
@@ -40,7 +27,7 @@ scout.MenuBarPopup.prototype._renderHead = function() {
   this.headText = this.menu.$container.text();
   this.headIcon = this.menu.$container.attr('data-icon');
   scout.MenuBarPopup.parent.prototype._renderHead.call(this);
-  if ( 'taskbar' === this.menu.menuStyle) {
+  if ('taskbar' === this.menu.menuStyle) {
     this._copyCssClassToHead('taskbar-tool-item');
     this.$head.addClass('selected');
   } else {

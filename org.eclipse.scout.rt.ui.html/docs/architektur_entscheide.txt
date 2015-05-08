@@ -515,7 +515,6 @@ Probleme mit aktuellem Ansatz:
 2. Es ist zur Zeit nötig, eine Versions-Nummer zu verwenden beim import von js oder css Dateien, die aber gar nichts bewirkt -> optional machen.
 3. Wir sollten überlegen, ob es Namespaces für Includes braucht. Oder genügt es über den Filenamen? z.B. colors.css, bsiwidgets-colors.css vs. scout/colors.css, bsiwidgets/colors.css
 
-
 Keystrokes:
 -Einzige Erweiterung im Model ist das Ein- und Ausschalten von automatischer KeyStrokezuteilung für Views.
 -Die von Chris vorgeschlagene Steuerung von TablePage und OutlineTree soll direkt im CRM implementiert werden und nicht im Scout.
@@ -531,3 +530,11 @@ Jeder (App-Link fähige) JsonAdapter könnte das HTML parsen, IDS für die Links
 Vielleicht könnte man auch gleich die Adapter-Registry dafür verwenden und einen Adapter pro Link erzeugen?
 Für die BeanFields/Columns: Dort muss kein HTML geparsed werden, dafür jedoch muss anhand des Properties erkannt werden, ob es sich um ein App-Link-Ref handelt. Falls ja -> Umwandeln. Diese Erkennung könnte anhand eines AppLink-Beans erfolgen.
 Also anstatt zwei Properties mit Ref und Name erstellt man ein AppLink-Property.
+
+JavaScript: Trennung zwischen Adapter und Widgets (Views)
+Im Falle der Menüs haben wir gesehen, dass es schön wäre, wenn es eine Trennung zwischen adpater und widgets gäbe.
+Aktuell ist die Beziehung Adpater/Widget 1:1 - bei den Menüs wäre es aber gut, wenn ein Adapter mehrere Widgets
+(im Sinne von MVC: Views) haben könnte. So wäre es möglich, dass das selbe Menü in der Menü-Bar gerendert wird
+aber auch in einem Popup-Menü (Rechtsklick). Aktuell ist es aber so gelöst, dass man einen Wegwerf-Clone vom
+Adapter/Widget erzeugt, wenn das Popup-Menü geöffnet wird, da die Impl. davon viel weniger aufwändig ist als eine
+generelle Konzeptänderung.

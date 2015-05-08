@@ -1,9 +1,11 @@
 scout.Popup = function(session) {
   scout.Popup.parent.call(this);
   this.$body;
-  this.session = session;
+  this.$head;
+  this.$deco;
   this._mouseDownHandler;
   this.keyStrokeAdapter = this._createKeyStrokeAdapter();
+  this.session = session;
 };
 scout.inherits(scout.Popup, scout.Widget);
 

@@ -102,6 +102,19 @@ scout.Menu.prototype.handle = function(event) {
   }
 };
 
+/**
+ * Creates a shallow copy of the current menu instance, all references to DOM elements are removed
+ * and the rendered property is set to false. Thus the method can be used to render an already rendered
+ * menu again, as required when a pop-up menu is opened in a table or in a tree (where the same item
+ * is already rendered in the menu-bar).
+ */
+scout.Menu.prototype.clone = function() {
+  var clone = $.extend({}, this);
+  clone.rendered = false;
+  clone.$container = null;
+  return clone;
+};
+
 scout.Menu.prototype._drawKeyBox = function($container) {
   scout.Menu.parent.prototype._drawKeyBox.call(this, $container);
 };

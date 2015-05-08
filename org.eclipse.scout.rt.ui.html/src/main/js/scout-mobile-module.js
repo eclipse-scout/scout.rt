@@ -99,7 +99,6 @@ __include("scout/table/TableKeyStrokeAdapter.js");
 __include("scout/table/FilterInputKeyStrokeAdapter.js");
 __include("scout/table/TableLayout.js");
 __include("scout/table/TableMenuItemsOrder.js");
-__include("scout/table/TableOrganizeMenu.js");
 __include("scout/table/TableSelectionHandler.js");
 __include("scout/table/TableControlKeyStrokes.js");
 __include("scout/table/TableFilterControlKeyStrokes.js");
