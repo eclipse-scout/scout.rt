@@ -128,7 +128,7 @@ public final class JobFutureFilters {
     }
 
     /**
-     * To accept only jobs which are not waiting for a blocking condition to fall.
+     * To accept only jobs which are not in blocked state, meaning not waiting for a blocking condition to fall.
      *
      * @see IBlockingCondition
      */

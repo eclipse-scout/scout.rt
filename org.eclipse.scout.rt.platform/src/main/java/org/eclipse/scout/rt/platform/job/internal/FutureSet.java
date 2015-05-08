@@ -21,9 +21,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ConditionAwaiter;
 import org.eclipse.scout.commons.IVisitor;
-import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.Filters;
@@ -39,7 +37,6 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
  *
  * @since 5.1
  */
-@Internal
 public class FutureSet implements IJobListener {
 
   private final Set<IFuture<?>> m_futures;
@@ -143,17 +140,22 @@ public class FutureSet implements IJobListener {
    *           if the current thread is interrupted while waiting.
    */
   public boolean awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException {
-    final IFilter<IFuture<?>> f = Filters.alwaysFilterIfNull(filter);
+    final IFilter<IFuture<?>> futureFilter = Filters.alwaysFilterIfNull(filter);
     Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout=%s]", timeout);
 
     // Wait until all Futures matching the filter are 'done' or the deadline is passed.
-    return new ConditionAwaiter(m_writeLock, m_changedCondition) {
-
-      @Override
-      protected boolean evaluateCondition() {
-        return isDone(f);
+    m_writeLock.lockInterruptibly();
+    try {
+      long nanos = unit.toNanos(timeout);
+      while (!isDone(futureFilter) && nanos > 0L) {
+        nanos = m_changedCondition.awaitNanos(nanos);
       }
-    }.await(timeout, unit) > 0L;
+
+      return (nanos > 0L);
+    }
+    finally {
+      m_writeLock.unlock();
+    }
   }
 
   /**

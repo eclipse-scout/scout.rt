@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.IVisitor;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.filter.Filters;
 import org.eclipse.scout.commons.filter.IFilter;
@@ -369,103 +368,14 @@ public class JobManager implements IJobManager {
 
   @Override
   public IBlockingCondition createBlockingCondition(final String name, final boolean blocking) {
-    return new BlockingCondition(name, blocking);
+    return new BlockingCondition(name, blocking, this);
   }
 
-  /**
-   * @see IBlockingCondition
-   */
-  @Internal
-  protected class BlockingCondition implements IBlockingCondition {
+  MutexSemaphores getMutexSemaphores() {
+    return m_mutexSemaphores;
+  }
 
-    private volatile boolean m_blocking;
-    private final String m_name;
-
-    protected BlockingCondition(final String name, final boolean blocking) {
-      m_name = StringUtility.nvl(name, "n/a");
-      m_blocking = blocking;
-    }
-
-    @Override
-    public String getName() {
-      return m_name;
-    }
-
-    @Override
-    public boolean isBlocking() {
-      return m_blocking;
-    }
-
-    @Override
-    public void setBlocking(final boolean blocking) {
-      if (m_blocking != blocking) {
-        synchronized (BlockingCondition.this) {
-          if (m_blocking != blocking) {
-            m_blocking = blocking;
-            if (!blocking) {
-              BlockingCondition.this.notifyAll();
-            }
-          }
-        }
-      }
-    }
-
-    @Override
-    public void waitFor() {
-      // Get the current FutureTask. If not available, this blocking condition is used from a thread not managed by this job manager.
-      final JobFutureTask<?> currentTask = (JobFutureTask<?>) (IFuture.CURRENT.get() != null ? IFuture.CURRENT.get() : null);
-
-      synchronized (BlockingCondition.this) {
-        if (!m_blocking) {
-          return; // the blocking condition is not armed yet.
-        }
-
-        try {
-          if (currentTask != null) {
-            currentTask.setBlocked(true);
-            m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.BLOCKED, currentTask, this));
-
-            // Pass the mutex to next task if being a mutex task.
-            if (currentTask.isMutexTask()) {
-              Assertions.assertTrue(currentTask.isMutexOwner(), "Unexpected inconsistency: Current FutureTask must be mutex owner [task=%s, thread=%s]", currentTask, Thread.currentThread().getName());
-              m_mutexSemaphores.passMutexToNextTask(currentTask);
-            }
-          }
-
-          // Block the calling thread until the blocking condition falls.
-          while (m_blocking) {
-            try {
-              BlockingCondition.this.wait();
-            }
-            catch (final InterruptedException e) {
-              Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
-              throw new JobException(String.format("Interrupted while waiting for a blocking condition to fall. [blockingCondition=%s, thread=%s]", m_name, Thread.currentThread().getName()), e);
-            }
-          }
-        }
-        finally {
-          if (currentTask != null) {
-            currentTask.setBlocked(false);
-            m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.UNBLOCKED, currentTask, this));
-          }
-        }
-      }
-
-      if (currentTask != null) {
-        // Acquire the mutex anew if being a mutex task.
-        if (currentTask.isMutexTask()) {
-          m_mutexSemaphores.acquire(currentTask); // Wait until acquired the mutex anew.
-        }
-        m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.RESUMED, currentTask, this));
-      }
-    }
-
-    @Override
-    public String toString() {
-      final ToStringBuilder builder = new ToStringBuilder(this);
-      builder.attr("name", m_name);
-      builder.attr("blocking", m_blocking);
-      return builder.toString();
-    }
+  JobListeners getJobListeners() {
+    return m_listeners;
   }
 }
