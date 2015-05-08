@@ -67,13 +67,10 @@ scout.CellEditorTabKeyStroke.prototype.handle = function(event) {
 
   this._popup.completeEdit();
 
-  // Await server events before opening the next popup, otherwise the cell may be removed in the meantime -> popup loses its anchor
-  this._popup.session.listen().done(function() {
-    pos = table.nextEditableCellPos(column, row, backwards);
-    if (pos) {
-      table.sendPrepareCellEdit(pos.row.id, pos.column.id);
-    }
-  }.bind(this));
+  pos = table.nextEditableCellPos(column, row, backwards);
+  if (pos) {
+    table.sendPrepareCellEdit(pos.row.id, pos.column.id);
+  }
 
   // Prevent default tabbing
   event.preventDefault();

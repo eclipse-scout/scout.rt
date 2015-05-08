@@ -32,6 +32,7 @@ scout.Table.GUI_EVENT_ROWS_SELECTED = 'rowsSelected';
 scout.Table.GUI_EVENT_ROWS_UPDATED = 'rowsUpdated';
 scout.Table.GUI_EVENT_ROWS_FILTERED = 'rowsFiltered';
 scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
+scout.Table.GUI_EVENT_ROW_ORDER_CHANGED= 'rowOrderChanged';
 
 scout.Table.prototype.init = function(model, session) {
   scout.Table.parent.prototype.init.call(this, model, session);
@@ -290,8 +291,7 @@ scout.Table.prototype._renderRowOrderChanges = function() {
         $row.css('top', oldTop - $row.offset().top).animate({
           top: 0
         }, {
-          //FIXME CGU fire as well if animation is disabled
-          progress: that._triggerRowOrderChanging.bind(that, $row)
+          progress: that._triggerRowOrderChanged.bind(that, $row.data('row'), true)
         });
       }
     });
@@ -327,6 +327,7 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
   if (sorted) {
     this.session.send(this.id, 'rowsSorted', data);
     this._renderRowOrderChanges();
+    this._triggerRowOrderChanged();
   } else {
     // Delegate sorting to server when it is not possible on client side
     this.session.send(this.id, 'sortRows', data);
@@ -461,16 +462,21 @@ scout.Table.prototype._installRows = function($rows) {
 
   // Attach listeners
   $rows.each(function() {
-    var $row = $(this);
+    var editorField,
+      $row = $(this),
+      row = $row.data('row');
     $row.on('mousedown', '', onMouseDown)
       .on('mouseup', '', onMouseUp)
       .on('dblclick', '', onDoubleClick)
       .on('contextmenu', onContextMenu);
-    if ($row.data('row').hasError) {
-      that._showCellErrorForRow($row);
-      //FIXME CGU check whether it is necessary to remove the tooltips when the table gets removed (scrollhandlers detaching)
-      // Scroll handler does not seem to work
-      // Tooltip need to be removed when getting detached (see also context for forms)
+    if (row.hasError) {
+      that._showCellErrorForRow(row);
+    }
+    // Reopen editor popup with cell because state of popup (row, $anchor etc.) is not valid anymore
+    if (that.cellEditorPopup && that.cellEditorPopup.row.id === row.id) {
+      that.cellEditorPopup.remove();
+      editorField = that.cellEditorPopup.cell.field;
+      that._startCellEdit(that.cellEditorPopup.column, row, editorField.id);
     }
   });
 
@@ -546,20 +552,20 @@ scout.Table.prototype._installRows = function($rows) {
   }
 };
 
-scout.Table.prototype._showCellErrorForRow = function($row) {
- var $cells = this.$cellsForRow($row),
+scout.Table.prototype._showCellErrorForRow = function(row) {
+ var $cells = this.$cellsForRow(row.$row),
    that = this;
 
  $cells.each(function(index) {
    var $cell = $(this);
-   var cell = that.cellByCellIndex(index, $row.data('row'));
+   var cell = that.cellByCellIndex(index, row);
    if (cell.errorStatus) {
-     that._showCellError($cell, cell.errorStatus);
+     that._showCellError(row, $cell, cell.errorStatus);
    }
  });
 };
 
-scout.Table.prototype._showCellError = function($cell, errorStatus) {
+scout.Table.prototype._showCellError = function(row, $cell, errorStatus) {
   var tooltip, opts,
     text = errorStatus.message;
 
@@ -567,10 +573,13 @@ scout.Table.prototype._showCellError = function($cell, errorStatus) {
     text: text,
     autoRemove: false,
     scrollType: 'position',
-    $anchor: $cell
+    $anchor: $cell,
+    table: this
   };
-  tooltip = new scout.Tooltip(opts);
+  tooltip = new scout.TableTooltip(opts);
   tooltip.render();
+  // link to be able to remove it when row gets deleted
+  tooltip.row = row;
   this.tooltips.push(tooltip);
   // link so that it gets removed when table gets removed
   this.addChild(tooltip);
@@ -1108,60 +1117,60 @@ scout.Table.prototype.checkRow = function(row, checked) {
   }
 };
 
-scout.Table.prototype._onRowsInserted = function(rows) {
-  // Update model
-  for (var i = 0; i < rows.length; i++) {
-    var row = rows[i];
-    this._initRow(row);
-    // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
-    this.rows.push(row);
-  }
+scout.Table.prototype._deleteRows = function(rows) {
+  var invalidate, i;
 
-  // Update HTML
-  if (this.rendered) {
-    // Remember inserted rows for future events like rowOrderChanged
-    if (!this._insertedRows) {
-      this._insertedRows = rows;
-      setTimeout(function() {
-        this._insertedRows = null;
-      }.bind(this), 0);
-    } else {
-      scout.arrays.pushAll(this._insertedRows, rows);
-    }
-
-    this.drawData();
-    this.htmlComp.invalidateTree();
-  }
-};
-
-scout.Table.prototype._onRowsDeleted = function(rowIds) {
-  // Update model
-  for (var i = 0; i < rowIds.length; i++) {
-    var row = this.rowsMap[rowIds[i]];
+  rows.forEach(function(row) {
+    //Update model
     scout.arrays.remove(this.rows, row);
-    delete this.rowsMap[rowIds[i]];
+    delete this.rowsMap[row.id];
+
     // Update HTML
     if (this.rendered) {
+      // Cancel cell editing if cell editor belongs to a cell of the deleted row
+      if (this.cellEditorPopup && this.cellEditorPopup.row.id === row.id) {
+        this.cellEditorPopup.cancelEdit();
+      }
+      // Remove tooltips for the deleted row
+      for(i = this.tooltips.length -1; i >= 0 ; i--){
+        if (this.tooltips[i].row === row) {
+          this.tooltips[i].remove();
+          this.tooltips.splice(i, 1);
+        }
+      }
+
       row.$row.remove();
       delete row.$row;
+      invalidate = true;
     }
-  }
-  // Update HTML
-  if (this.rendered) {
+  }.bind(this));
+
+  if (invalidate) {
     this.htmlComp.invalidateTree();
   }
 };
 
-scout.Table.prototype._onAllRowsDeleted = function() {
+scout.Table.prototype._deleteAllRows = function() {
   // Update model
   this.rows = [];
   this.rowsMap = {};
 
   // Update HTML
   if (this.rendered) {
+    // Cancel cell editing
+    if (this.cellEditorPopup) {
+      this.cellEditorPopup.cancelEdit();
+    }
+
     this.drawData();
     this.htmlComp.invalidateTree();
   }
+};
+
+scout.Table.prototype._startCellEdit = function(column, row, fieldId) {
+  var popup = column.startCellEdit(row, fieldId);
+  this.cellEditorPopup = popup;
+  return popup;
 };
 
 scout.Table.prototype.scrollTo = function($selection) {
@@ -1170,6 +1179,10 @@ scout.Table.prototype.scrollTo = function($selection) {
 
 scout.Table.prototype.rowById = function(id) {
   return this.rowsMap[id];
+};
+
+scout.Table.prototype._rowsByIds = function(ids) {
+  return ids.map(this.rowById.bind(this));
 };
 
 scout.Table.prototype.selectRowsByIds = function(rowIds) {
@@ -1593,11 +1606,12 @@ scout.Table.prototype._triggerFilterResetted = function() {
   this.events.trigger(type);
 };
 
-scout.Table.prototype._triggerRowOrderChanging = function($row) {
+scout.Table.prototype._triggerRowOrderChanged = function(row, animating) {
   var event = {
-    $row: $row
+    row: row,
+    animating: animating
   };
-  this.events.trigger('rowOrderChanging', event);
+  this.events.trigger(scout.Table.GUI_EVENT_ROW_ORDER_CHANGED, event);
 };
 
 scout.Table.prototype._renderHeaderVisible = function() {
@@ -1698,6 +1712,42 @@ scout.Table.prototype.injectKeyStrokeAdapter = function(adapter, target) {
   scout.keyStrokeManager.installAdapter(target, this.keyStrokeAdapter);
 };
 
+scout.Table.prototype._onRowsInserted = function(rows) {
+  // Update model
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    this._initRow(row);
+    // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
+    this.rows.push(row);
+  }
+
+  // Update HTML
+  if (this.rendered) {
+    // Remember inserted rows for future events like rowOrderChanged
+    if (!this._insertedRows) {
+      this._insertedRows = rows;
+      setTimeout(function() {
+        this._insertedRows = null;
+      }.bind(this), 0);
+    } else {
+      scout.arrays.pushAll(this._insertedRows, rows);
+    }
+
+    this.drawData();
+    this.htmlComp.invalidateTree();
+  }
+};
+
+scout.Table.prototype._onRowsDeleted = function(rowIds) {
+  var rows = this._rowsByIds(rowIds);
+  this._deleteRows(rows);
+};
+
+scout.Table.prototype._onAllRowsDeleted = function() {
+  this._deleteAllRows();
+};
+
+
 scout.Table.prototype._onRowOrderChanged = function(rowIds) {
   var newPos, rows, row;
   if (rowIds.length !== this.rows.length) {
@@ -1712,6 +1762,7 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
     rows[newPos] = row;
   }
   this.rows = rows;
+  this._triggerRowOrderChanged();
 
   if (this.rendered) {
     this._renderRowOrderChanges();
@@ -1778,14 +1829,15 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
 };
 
 scout.Table.prototype._onStartCellEdit = function(columnId, rowId, fieldId) {
-  var column = this.columnById(columnId);
-  var row = this.rowById(rowId);
-  column.startCellEdit(row, fieldId);
+  var column = this.columnById(columnId),
+    row = this.rowById(rowId);
+  this._startCellEdit(column, row, fieldId);
 };
 
 scout.Table.prototype._onEndCellEdit = function(fieldId) {
   var field = this.session.getModelAdapter(fieldId);
   field.destroy();
+  this.cellEditorPopup = null;
 };
 
 scout.Table.prototype.onModelAction = function(event) {

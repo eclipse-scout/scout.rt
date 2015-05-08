@@ -37,15 +37,23 @@ describe("CellEditor", function() {
     return $findPopup().data('popup');
   }
 
-  function startCellEdit() {
+  function createTableAndStartCellEdit() {
     var model = helper.createModelFixture(2, 2);
     model.rows[0].cells[0].editable = true;
     var table = helper.createTable(model);
     table.render(session.$entryPoint);
 
     var field = createField('StringField', table);
-    table.columns[0].startCellEdit(table.rows[0], field.id);
+    table._startCellEdit(table.columns[0], table.rows[0], field.id);
     return findPopup();
+  }
+
+  function startAndAssertCellEdit(table, column, row) {
+    var field = createField('StringField', table);
+    var popup = table._startCellEdit(column, row, field.id);
+    expect($findPopup().length).toBe(1);
+    expect($findPopup().find('.form-field').length).toBe(1);
+    expect(popup.cell.field.rendered).toBe(true);
   }
 
   describe("mouse click", function() {
@@ -116,7 +124,7 @@ describe("CellEditor", function() {
   describe("startCellEdit event", function() {
 
     it("opens popup with field", function() {
-      var popup = startCellEdit();
+      var popup = createTableAndStartCellEdit();
       expect($findPopup().length).toBe(1);
       expect($findPopup().find('.form-field').length).toBe(1);
       expect(popup.cell.field.rendered).toBe(true);
@@ -135,7 +143,7 @@ describe("CellEditor", function() {
     }
 
     it("destroys the field", function() {
-      var popup = startCellEdit();
+      var popup = createTableAndStartCellEdit();
       var field = popup.cell.field;
 
       var message = {
@@ -152,7 +160,7 @@ describe("CellEditor", function() {
   describe("completeEdit", function() {
 
     it("removes the popup and its field", function() {
-      var popup = startCellEdit();
+      var popup = createTableAndStartCellEdit();
       popup.completeEdit();
 
       expect($findPopup().length).toBe(0);
@@ -161,7 +169,7 @@ describe("CellEditor", function() {
     });
 
     it("sends completeCellEdit", function() {
-      var popup = startCellEdit();
+      var popup = createTableAndStartCellEdit();
       popup.completeEdit();
       sendQueuedAjaxCalls();
 
@@ -176,7 +184,7 @@ describe("CellEditor", function() {
   describe("cancelEdit", function() {
 
     it("removes the popup and its field", function() {
-      var popup = startCellEdit();
+      var popup = createTableAndStartCellEdit();
       popup.cancelEdit();
 
       expect($findPopup().length).toBe(0);
@@ -185,7 +193,7 @@ describe("CellEditor", function() {
     });
 
     it("sends cancelCellEdit", function() {
-      var popup = startCellEdit();
+      var popup = createTableAndStartCellEdit();
       popup.cancelEdit();
       sendQueuedAjaxCalls();
 
@@ -227,4 +235,104 @@ describe("CellEditor", function() {
     });
   });
 
+  describe("popup recovery", function() {
+
+    var model, table, row0, $cells0, $cell0_0;
+
+    function createRowsUpdatedEvent(model, rows) {
+      return {
+        target: model.id,
+        rows: rows,
+        type: 'rowsUpdated'
+      };
+    }
+
+    beforeEach(function() {
+      model = helper.createModelFixture(2, 3);
+      table = helper.createTable(model);
+      row0 = model.rows[0];
+    });
+
+    it("reopens popup if row gets updated", function() {
+      row0.cells[0].editable = true;
+      table.render(session.$entryPoint);
+      $cells0 = table.$cellsForRow(row0.$row);
+      $cell0_0 = $cells0.eq(0);
+      startAndAssertCellEdit(table, table.columns[0], row0);
+      expect(table.cellEditorPopup.row).toBe(row0);
+      expect(table.cellEditorPopup.$anchor[0]).toBe($cell0_0[0]);
+
+      var updatedRows = helper.createModelRows(2, 1);
+      updatedRows[0].id = row0.id;
+      var message = {
+        events: [createRowsUpdatedEvent(model, updatedRows)]
+      };
+      session._processSuccessResponse(message);
+
+      // Check if popup is correctly linked to updated row and new $cell
+      row0 = updatedRows[0];
+      $cells0 = table.$cellsForRow(row0.$row);
+      $cell0_0 = $cells0.eq(0);
+      expect($findPopup().length).toBe(1);
+      expect(table.cellEditorPopup.row).toBe(row0);
+      expect(table.cellEditorPopup.$anchor[0]).toBe($cell0_0[0]);
+    });
+
+    it("closes popup if row gets deleted", function() {
+      row0.cells[0].editable = true;
+      table.render(session.$entryPoint);
+      startAndAssertCellEdit(table, table.columns[0], row0);
+      spyOn(table, 'sendCancelCellEdit');
+
+      table._deleteRows([row0]);
+
+      // Check if popup is closed
+      expect($findPopup().length).toBe(0);
+
+      // Check whether cancel edit has been sent
+      expect(table.sendCancelCellEdit).toHaveBeenCalled();
+    });
+
+    it("closes popup if all rows get deleted", function() {
+      row0.cells[0].editable = true;
+      table.render(session.$entryPoint);
+      startAndAssertCellEdit(table, table.columns[0], row0);
+      spyOn(table, 'sendCancelCellEdit');
+
+      table._deleteAllRows();
+
+      // Check if popup is closed
+      expect($findPopup().length).toBe(0);
+
+      // Check whether cancel edit has been sent
+      expect(table.sendCancelCellEdit).toHaveBeenCalled();
+    });
+
+  });
+
+  describe("tooltip recovery", function() {
+
+    var model, table, row0;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(2, 3);
+      table = helper.createTable(model);
+      row0 = model.rows[0];
+    });
+
+    it("removes tooltip if row gets deleted", function() {
+      row0.cells[0].editable = true;
+      row0.cells[0].errorStatus = 'Validation error';
+
+      table.render(session.$entryPoint);
+      expect($('.tooltip').length).toBe(1);
+      expect(table.tooltips.length).toBe(1);
+
+      table._deleteRows([row0]);
+
+      expect($('.tooltip').length).toBe(0);
+      expect(table.tooltips.length).toBe(0);
+    });
+
+  });
 });

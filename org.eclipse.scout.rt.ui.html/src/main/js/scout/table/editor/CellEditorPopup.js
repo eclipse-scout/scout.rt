@@ -34,17 +34,22 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   }
   this.alignTo();
 
-  this._rowOrderChangingFunc = function(event) {
-    if (event.$row.data('row') === this.row) {
+  this._rowOrderChangedFunc = function(event) {
+    if (event.animating) {
+      // row is only set while animating
+      if (event.row === this.row) {
+        this.alignTo();
+      }
+    } else {
       this.alignTo();
     }
   }.bind(this);
-  this.table.events.on('rowOrderChanging', this._rowOrderChangingFunc);
+  this.table.events.on(scout.Table.GUI_EVENT_ROW_ORDER_CHANGED, this._rowOrderChangedFunc);
 };
 
 scout.CellEditorPopup.prototype._remove = function() {
   scout.CellEditorPopup.parent.prototype._remove.call(this);
-  this.table.events.off('rowOrderChanging', this._rowOrderChangingFunc);
+  this.table.events.off(scout.Table.GUI_EVENT_ROW_ORDER_CHANGED, this._rowOrderChangedFunc);
 };
 
 scout.CellEditorPopup.prototype.alignTo = function(event) {
