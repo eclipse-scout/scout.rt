@@ -626,28 +626,48 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleModelTableEvent(TableEvent event) {
-    /* FIXME CGU we need to coalesce the events during the same request (something like AbstractTable.processEventBuffer). I don't think the developer should be responsible for this (using setTableChanging(true))
-     * Example: The developer calls addRow several times for the same table -> must generate only one json event -> reduces data and improves redrawing performance on client
-     * Another usecase: If a table row gets edited the developer typically reloads the whole table -> transmits every row again -> actually only the difference needs to be sent. Not sure if this is easy to solve
-     *
-     * Detected by A.WE: when the Firma-Node is loaded the following happens:
-     * - event rowsInserted (3 rows)
-     * - event allRowsDeleted
-     * - event rowsInserted again (the same 3 rows)
-     *
-     * Only one rowsInserted event should be sent. Must analyze what happens in the model.
-     *
-     * FIXME BSH Table | AbstractTable's coalesce seems to be broken!
-     * Example: "UpdateRow", "DeleteAllRows" --> Gets reordered to "DeleteAllRows", "UpdateRow",
-     * which is wrong, because the UpdateRow event refers a row that does not exist anymore!
-     */
     event = m_tableEventFilter.filter(event);
     if (event == null) {
       return;
     }
     // Add event to buffer instead of handling it immediately. (This allows coalescing the events at JSON response level.)
-    m_eventBuffer.add(event);
+    bufferModelEvent(event);
     registerAsBufferedEventsAdapter();
+  }
+
+  protected void bufferModelEvent(TableEvent event) {
+    switch (event.getType()) {
+      case TableEvent.TYPE_ROW_FILTER_CHANGED: {
+        // Convert the "filter changed" event to a ROWS_DELETED and a ROWS_INSERTED event. This prevents sending unnecessary
+        // data to the UI. We convert the event before adding it to the event buffer to allow coalescing on UI-level.
+        // NOTE: This may lead to a temporary inconsistent situation, where row events exist in the buffer after the
+        // row itself is deleted. This is because the row is not really deleted from the model. However, when processing
+        // the buffered events, the "wrong" events will be ignored and everything is fixed again.
+        List<ITableRow> rowsToInsert = new ArrayList<>();
+        List<ITableRow> rowsToDelete = new ArrayList<>();
+        for (ITableRow row : getModel().getRows()) {
+          String existingRowId = m_tableRowIds.get(row);
+          if (row.isFilterAccepted()) {
+            if (existingRowId == null) {
+              // Row is not filtered but JsonTable does not know it yet --> handle as insertion event
+              rowsToInsert.add(row);
+            }
+          }
+          else {
+            if (existingRowId != null) {
+              // Row is filtered, but JsonTable has it in its list --> handle as deletion event
+              rowsToDelete.add(row);
+            }
+          }
+        }
+        m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_DELETED, rowsToDelete));
+        m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_INSERTED, rowsToInsert));
+        break;
+      }
+      default: {
+        m_eventBuffer.add(event);
+      }
+    }
   }
 
   @Override
@@ -694,8 +714,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         handleModelRowsChecked(event.getRows());
         break;
       case TableEvent.TYPE_ROW_FILTER_CHANGED:
-        handleModelRowFilterChanged();
-        break;
+        // See special handling in bufferModelEvent()
+        throw new IllegalStateException("Unsupported event type: " + event);
       default:
         // NOP
     }
@@ -716,28 +736,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROWS, jsonRows);
     addActionEvent(EVENT_ROWS_INSERTED, jsonEvent);
-  }
-
-  protected void handleModelRowFilterChanged() {
-    List<ITableRow> rowsToInsert = new ArrayList<>();
-    List<ITableRow> rowsToDelete = new ArrayList<>();
-    for (ITableRow row : getModel().getRows()) {
-      String existingRowId = m_tableRowIds.get(row);
-      if (row.isFilterAccepted()) {
-        if (existingRowId == null) {
-          // Row is not filtered but JsonTable does not know it yet --> handle as insertion event
-          rowsToInsert.add(row);
-        }
-      }
-      else {
-        if (existingRowId != null) {
-          // Row is filtered, but JsonTable has it in its list --> handle as deletion event
-          rowsToDelete.add(row);
-        }
-      }
-    }
-    handleModelRowsDeleted(rowsToDelete);
-    handleModelRowsInserted(rowsToInsert);
   }
 
   protected void handleModelRowsUpdated(Collection<ITableRow> modelRows) {

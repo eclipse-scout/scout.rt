@@ -445,6 +445,52 @@ public class JsonTreeTest {
     assertEquals(true, events.get(0).getData().optBoolean("recursive"));
   }
 
+  @Test
+  public void testMultipleFilterChanged() throws Exception {
+    // (root)
+    //   +-(node)
+    //   |   +-(node)
+    //   |   |   +-(node)
+    //   |   |   +-(node)
+    //   |   +-(node)
+    //   +-(node)
+    //   |   +-(node)
+    //   +-(node)
+    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    ITree tree = createTree(nodes);
+    tree.addChildNode(tree.getRootNode().getChildNode(0), new TreeNode());
+    tree.addChildNode(tree.getRootNode().getChildNode(0), new TreeNode());
+    tree.addChildNode(tree.getRootNode().getChildNode(0).getChildNode(0), new TreeNode());
+    tree.addChildNode(tree.getRootNode().getChildNode(0).getChildNode(0), new TreeNode());
+    tree.addChildNode(tree.getRootNode().getChildNode(1), new TreeNode());
+
+    IJsonAdapter<? super ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
+    m_uiSession.currentJsonResponse().addAdapter(jsonTree);
+    JSONObject response = m_uiSession.currentJsonResponse().toJson();
+    System.out.println("Response #1: " + response);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // --------------------------------------
+
+    // 3 events: filterChanged, nodeChanged, filterChanged
+    // filterChanged events are converted to allNodesDeleted + nodesInserted events in JsonTree. Because of coalesce,
+    // the nodeChanged event will be removed (it is obsolete, because nodes are deleted and re-inserted later).
+    tree.applyNodeFilters();
+    tree.getRootNode().getChildNode(0).getChildNode(0).getCellForUpdate().setText("Test-Text");
+    tree.applyNodeFilters();
+
+    response = m_uiSession.currentJsonResponse().toJson();
+    System.out.println("Response #2: " + response);
+
+    List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
+    assertEquals(2, events.size());
+    assertEquals("allNodesDeleted", events.get(0).getType());
+    assertEquals("nodesInserted", events.get(1).getType());
+  }
+
   public static JsonEvent createJsonSelectedEvent(String nodeId) throws JSONException {
     String desktopId = "x"; // never used
     JSONObject data = new JSONObject();
