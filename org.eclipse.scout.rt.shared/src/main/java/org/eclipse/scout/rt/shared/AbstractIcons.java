@@ -45,6 +45,7 @@ public abstract class AbstractIcons implements Serializable {
   public static final String NavigationCurrent = "navigation_current";
   public static final String Palette = "colorpicker_browse";
   public static final String SmartFieldBrowse = "smartfield_browse";
+  public static final String ProposalFieldBrowse = "proposalfield_browse";
 
   public static final String StatusError = "status_error";
   public static final String StatusInfo = "status_info";
