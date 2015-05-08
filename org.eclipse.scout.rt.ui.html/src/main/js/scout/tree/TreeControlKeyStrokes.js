@@ -5,6 +5,7 @@ scout.TreeControlKeyStrokes = function(field) {
   this.initKeyStrokeParts();
 };
 scout.inherits(scout.TreeControlKeyStrokes, scout.KeyStroke);
+
 /**
  * @Override scout.KeyStroke
  */
@@ -98,6 +99,7 @@ scout.TreeControlKeyStrokes.prototype._drawKeyBox = function($container, drawedK
 scout.TreeControlKeyStrokes.prototype.checkAndDrawKeyBox = function($container, drawedKeys) {
   this._drawKeyBox($container, drawedKeys);
 };
+
 /**
  * @Override scout.KeyStroke
  */
