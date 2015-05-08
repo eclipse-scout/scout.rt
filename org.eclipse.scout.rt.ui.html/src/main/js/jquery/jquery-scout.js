@@ -310,6 +310,36 @@
     return $.contains(document.documentElement, this[0]);
   };
 
+  /**
+   * Returns the first parent which is scrollable
+   */
+  $.fn.scrollParent = function() {
+    var $elem = this;
+    while ($elem.length > 0) {
+      if ($elem.data('scrollable')) {
+        return $elem;
+      }
+      $elem = $elem.parent();
+    }
+    return $();
+  },
+
+  /**
+   * Returns every parent which is scrollable
+   */
+  $.fn.scrollParents = function() {
+    var $scrollParents = $(),
+      $elem = this;
+
+    while ($elem.length > 0) {
+      if ($elem.data('scrollable')) {
+        $scrollParents.push($elem);
+      }
+      $elem = $elem.parent();
+    }
+    return $scrollParents;
+  },
+
   // most used animate
   $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
     var properties = {};

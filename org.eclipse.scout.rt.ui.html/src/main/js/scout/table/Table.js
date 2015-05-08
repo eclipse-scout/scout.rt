@@ -1762,11 +1762,11 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
     rows[newPos] = row;
   }
   this.rows = rows;
-  this._triggerRowOrderChanged();
 
   if (this.rendered) {
     this._renderRowOrderChanges();
   }
+  this._triggerRowOrderChanged();
 };
 
 scout.Table.prototype._onColumnStructureChanged = function(columns) {

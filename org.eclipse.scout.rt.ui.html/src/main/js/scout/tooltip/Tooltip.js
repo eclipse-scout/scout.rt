@@ -75,7 +75,7 @@ scout.Tooltip.prototype.renderText = function(text) {
 
 scout.Tooltip.prototype.position = function() {
   var top, left, arrowHeight, overlapX, overlapY, x, y, origin,
-    tooltipWidth, tooltipHeight, arrowDivWidth;
+    tooltipWidth, tooltipHeight, arrowDivWidth, inView;
 
   if (this.origin) {
     origin = this.origin;
@@ -85,6 +85,12 @@ scout.Tooltip.prototype.position = function() {
     x = origin.x + origin.width / 2;
   }
   y = origin.y;
+
+  if (!this.autoRemove) {
+    // Sticky tooltip must only be visible if the location where the tooltip points is in view
+    inView = scout.scrollbars.isLocationInView(origin, this.$anchor.scrollParent());
+    this.$container.setVisible(inView);
+  }
 
   arrowDivWidth = this.$arrow.outerWidth();
   // Arrow is a div rotated by 45 deg -> visible height is half the div

@@ -20,10 +20,10 @@ scout.scrollbars = {
     }
     if (nativeScrollbars) {
       $.log.debug('use native scrollbars for container ' + scout.graphics.debugOutput($container));
-      $container.
-        css('overflow-x', 'hidden').
-        css('overflow-y', 'auto').
-        css('-webkit-overflow-scrolling', 'touch');
+      $container
+        .css('overflow-x', 'hidden')
+        .css('overflow-y', 'auto')
+        .css('-webkit-overflow-scrolling', 'touch');
     } else {
       $.log.debug('installing JS-scrollbars for container ' + scout.graphics.debugOutput($container));
       scrollbar = new scout.Scrollbar($container, options);
@@ -75,29 +75,35 @@ scout.scrollbars = {
     $scrollable.scrollTop($scrollable[0].scrollHeight - $scrollable[0].offsetHeight);
   },
 
-  //FIXME cgu implement for tooltip when getting scrolled outside of the scrollable
-//  isVisible: function($scrollable, $elem) {
-//    var scrollTop = $scrollable.scrollTop(),
-//      offset = $elem.offset();
-//
-//  },
+  /**
+   * Returns true if the location is visible in the current viewport of the $scrollable
+   */
+  isLocationInView: function(location, $scrollable) {
+    if (!$scrollable || $scrollable.length === 0) {
+      return;
+    }
+    var inViewY, inViewX,
+      scrollableOffsetBounds = scout.graphics.offsetBounds($scrollable);
+
+    inViewY = location.y >= scrollableOffsetBounds.y &&
+      location.y < scrollableOffsetBounds.y + scrollableOffsetBounds.height;
+    inViewX = location.x >= scrollableOffsetBounds.x &&
+      location.x < scrollableOffsetBounds.x + scrollableOffsetBounds.width;
+
+    return inViewY && inViewX;
+  },
 
   /**
    * Attaches the given handler to each scrollable parent, including $anchor if it is scrollable as well.<p>
    * Make sure you remove the handlers when not needed anymore using offScroll.
    */
   onScroll: function($anchor, handler) {
-    var $scrollParents = [],
-      $elem = $anchor;
-
     handler.$scrollParents = [];
-    while ($elem.length > 0) {
-      if ($elem.data('scrollable')) {
-        $elem.on('scroll', handler);
-        handler.$scrollParents.push($elem);
-      }
-      $elem = $elem.parent();
-    }
+    $anchor.scrollParents().each(function() {
+      var $scrollParent = $(this);
+      $scrollParent.on('scroll', handler);
+      handler.$scrollParents.push($scrollParent);
+    });
   },
 
   offScroll: function(handler) {
@@ -105,7 +111,7 @@ scout.scrollbars = {
     if (!$scrollParents) {
       throw new Error('$scrollParents are not defined');
     }
-    for (var i=0; i < $scrollParents.length; i++) {
+    for (var i = 0; i < $scrollParents.length; i++) {
       var $elem = $scrollParents[i];
       $elem.off('scroll', handler);
     }

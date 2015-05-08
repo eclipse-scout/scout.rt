@@ -319,12 +319,12 @@ scout.ModelAdapter.prototype.onChildAdapterCreated = function(propertyName) {
 
 scout.ModelAdapter.prototype.goOffline = function() {
   var i;
-  for (i = 0; i < this.children.length; i++) {
-    if (!this.children[i].rendered) {
+  for (i = 0; i < this.ownedAdapters.length; i++) {
+    if (!this.ownedAdapters[i].rendered) {
       //going offline must not modify model state -> only necessary to inform rendered objects
       continue;
     }
-    this.children[i].goOffline();
+    this.ownedAdapters[i].goOffline();
   }
   this._goOffline();
 };
@@ -335,12 +335,12 @@ scout.ModelAdapter.prototype._goOffline = function() {
 
 scout.ModelAdapter.prototype.goOnline = function() {
   var i;
-  for (i = 0; i < this.children.length; i++) {
-    if (!this.children[i].rendered) {
+  for (i = 0; i < this.ownedAdapters.length; i++) {
+    if (!this.ownedAdapters[i].rendered) {
       //going offline must not modify model state -> only necessary to inform rendered objects
       continue;
     }
-    this.children[i].goOnline();
+    this.ownedAdapters[i].goOnline();
   }
   this._goOnline();
 };
