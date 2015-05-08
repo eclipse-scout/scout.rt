@@ -61,16 +61,7 @@ scout.ProposalChooser.prototype._updateStatus = function() {
  * Replaces an ellipsis (...) at the end of the message-text with a CSS animation.
  */
 scout.ProposalChooser.prototype._setStatusMessage = function(message) {
-  if (scout.strings.endsWith(message, '...')) {
-    var $elipsis = $('<span>').addClass('elipsis');
-    for (var i=0; i<3; i++) {
-      $elipsis.append($('<span>').text('.').addClass('animate-dot').addClass('delay-' + i));
-    }
-    message = message.substring(0, message.length - 3);
-    this._$status.empty().text(message).append($elipsis);
-  } else {
-    this._$status.text(message);
-  }
+  scout.status.animateStatusMessage(this._$status, message);
 };
 
 scout.ProposalChooser.prototype._appendOption = function($parent, value, text) {

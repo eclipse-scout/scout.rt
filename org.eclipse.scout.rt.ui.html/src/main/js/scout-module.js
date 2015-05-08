@@ -24,6 +24,7 @@ __include("scout/util/ModelAdapter.js");
 __include("scout/util/numbers.js");
 __include("scout/util/ObjectFactory.js");
 __include("scout/util/objects.js");
+__include("scout/util/status.js");
 __include("scout/util/strings.js");
 __include("scout/util/URL.js");
 // Session related

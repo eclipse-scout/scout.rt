@@ -22,6 +22,7 @@
 .calendar-header {
   height: @calendar-header-height;
   min-width: 420px;
+  text-align: center;
 
   & .calendar-range {
     float: left;
@@ -558,4 +559,9 @@
     }
   }
 }
+
+.calendar-progress {
+  margin-top: 5px;
+  display: inline;
+};
 

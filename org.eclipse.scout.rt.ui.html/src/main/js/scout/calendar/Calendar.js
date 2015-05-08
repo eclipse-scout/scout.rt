@@ -13,6 +13,7 @@ scout.Calendar = function() {
   this.$year;
   this.$grid;
   this.$list;
+  this.$progress;
 
   // additional modes; should be stored in model
   this.showYear = false;
@@ -94,6 +95,8 @@ scout.Calendar.prototype._syncViewRange = function(viewRange) {
 };
 
 scout.Calendar.prototype._render = function($parent) {
+  $.log.debug('(Calendar#_render)');
+
   var w, $w, d, $d,
     layout = new scout.CalendarLayout(this);
 
@@ -111,6 +114,7 @@ scout.Calendar.prototype._render = function($parent) {
   this.$list = this.$container.appendDiv('calendar-list-container').appendDiv('calendar-list');
 
   // header contains all controls
+  this.$progress = this.$header.appendDiv('calendar-progress').text('Lade Kalender-Einträge...'); // FIXME AWE: (calendar) i18n
   this.$range = this.$header.appendDiv('calendar-range');
   this.$range.appendDiv('calendar-previous').click(this._onClickPrevious.bind(this));
   this.$range.appendDiv('calendar-next').click(this._onClickNext.bind(this));
@@ -160,7 +164,19 @@ scout.Calendar.prototype._render = function($parent) {
   this._updateScreen();
 };
 
+scout.Calendar.prototype._renderProperties = function() {
+  this._renderComponents();
+  this._renderLoadInProgress();
+  this._renderMenus();
+  this._renderDisplayMode();
+  this._renderSelectedDate();
+  this._renderViewRange();
+};
+
 scout.Calendar.prototype._renderComponents = function() {
+
+  $.log.debug('(Calendar#_renderComponents) impl.');
+
   var i, j, c, itemId, $component, d, $day,
     fromDate, toDate, $componentList,
     countTask = 5;
@@ -248,24 +264,32 @@ scout.Calendar.prototype._renderComponents = function() {
     }
   }
 
-  // find nice arragmenent :)
   this._arrangeComponents();
 };
 
 scout.Calendar.prototype._renderLoadInProgress = function() {
+  $.log.debug('(Calendar#_renderLoadInProgress) impl.');
+  this.$progress.setVisible(this.loadInProgress);
+  if (this.loadInProgress) {
+    scout.status.animateStatusMessage(this.$progress, 'Lade Kalender-Einträge...');
+  }
 };
 
 scout.Calendar.prototype._renderViewRange = function() {
+  $.log.debug('(Calendar#_renderViewRange) impl.');
 };
 
 scout.Calendar.prototype._renderDisplayMode = function() {
+  $.log.debug('(Calendar#_renderDisplayMode) impl.');
 };
 
 scout.Calendar.prototype._renderSelectedDate = function() {
+  $.log.debug('(Calendar#_renderSelectedDate) impl.');
 };
 
 scout.Calendar.prototype._renderMenus = function() {
   // FIXME AWE: (calendar) here we should update the menu-bar (see Table.js)
+  $.log.debug('(Calendar#_renderMenus) impl.');
 };
 
 /* -- basics, events -------------------------------------------- */
@@ -459,6 +483,9 @@ scout.Calendar.prototype._jsonViewRange = function() {
 };
 
 scout.Calendar.prototype._updateScreen = function() {
+
+  $.log.info('(Calendar#_updateScreen)');
+
   // select mode
   $('.calendar-mode', this.$commands).select(false);
   $("[data-mode='" + this.displayMode +"']", this.$modes).select(true);
@@ -469,7 +496,10 @@ scout.Calendar.prototype._updateScreen = function() {
   // layout grid
   this.layoutLabel();
   this.layoutSize();
-  this._renderComponents();
+  //  this._renderComponents();
+  // FIXME AWE: (calendar) check if it's Ok to skip renderComponents here
+  $('.calendar-component', this.$grid).remove();
+
   this.layoutAxis();
 
   // if year shown and changed, redraw year
@@ -941,7 +971,7 @@ scout.Calendar.prototype._onComponentDayHoverIn = function(event) {
 
 
 // restore element
-// FIXME cru: sometime fails?
+// FIXME CRU: sometime fails?
 scout.Calendar.prototype._onComponentDayHoverOut = function(event) {
   var $comp = $(event.currentTarget);
   $comp
@@ -1003,7 +1033,7 @@ scout.Calendar.prototype._arrangeComponentInitialW = function($children) {
 };
 
 scout.Calendar.prototype._arrangeComponentFindPlacement = function($children) {
-  // FIXME cru: placement may be improved, test cases needed
+  // FIXME CRU: placement may be improved, test cases needed
   // 1: change x if column on the left side free
   // 2: change w if place on the right side not used
   // -> then find new w (just use _arrangeComponentInitialW)

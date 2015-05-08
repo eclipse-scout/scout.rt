@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -97,7 +98,11 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   @Override
   protected void initJsonProperties(T model) {
-    // FIXME CGU/BSH improve adapter-property so that components are not disposed when changed?
+
+    // FIXME AWE: (calendar) wird können hier nich einfach ein property change werfen, weil die item-provider
+    // die items async liefern, müssen sie inkrementell nachgeliefert werden, wir müssen uns merken ob wir
+    // bereits components ans UI geschickt haben
+
     putJsonProperty(new JsonAdapterProperty<T>(ICalendar.PROP_COMPONENTS, model, getUiSession()) {
       @Override
       protected Set<? extends CalendarComponent> modelValue() {
@@ -205,8 +210,6 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
         return getModel().getMarkOutOfMonthDays();
       }
     });
-
-    // FIXME BSH | Calendar String PROP_CONTEXT_MENU = "contextMenus";
   }
 
   @SuppressWarnings("unchecked")
@@ -268,7 +271,6 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   // FIXME AWE: (calendar) replace selectedDate with selectionRange(from/to)
 
   protected void handleUiSelectionChanged(JsonEvent event) {
-    // FIXME AWE: (calendar) currently the UI does not support selection of components, only an entire day can be selected
     JSONObject data = event.getData();
     Date date = toJavaDate(data, "date");
     String componentId = data.optString("componentId");
@@ -280,18 +282,31 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   protected void handleUiModelChanged(JsonEvent event) {
     JSONObject data = event.getData();
+
     int displayMode = data.optInt("displayMode");
+    addPropertyEventFilterCondition(ICalendar.PROP_DISPLAY_MODE, displayMode);
     ICalendarUIFacade uiFacade = getModel().getUIFacade();
     uiFacade.setDisplayModeFromUI(displayMode);
+
     Range<Date> viewRange = extractViewRange(data);
+    addPropertyEventFilterCondition(ICalendar.PROP_VIEW_RANGE, viewRange);
     uiFacade.setViewRangeFromUI(viewRange);
+
     Date selectedDate = extractSelectedDate(data);
+    addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_DATE, selectedDate);
     uiFacade.setSelectedDateFromUI(selectedDate);
+
     LOG.debug("displayMode=" + displayMode + " viewRange=" + viewRange + " selectedDate=" + selectedDate);
   }
 
+  /**
+   * The current calendar model has a strange behavior (bug?): when the view-range changes 
+   * 
+   * 
+   */
   protected void handleUiViewRangeChanged(JsonEvent event) {
     Range<Date> viewRange = extractViewRange(event.getData());
+    addPropertyEventFilterCondition(ICalendar.PROP_VIEW_RANGE, viewRange);
     getModel().getUIFacade().setViewRangeFromUI(viewRange);
     LOG.debug("viewRange=" + viewRange);
   }
