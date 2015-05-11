@@ -35,6 +35,14 @@ public final class BinaryResource implements Serializable {
 
   private final long m_fingerprint;
 
+  private BinaryResource(String filename, String contentType, byte[] content, long lastModified, long fingerprint) {
+    m_filename = filename;
+    m_contentType = contentType;
+    m_content = content;
+    m_lastModified = lastModified;
+    m_fingerprint = fingerprint;
+  }
+
   /**
    * @param filename
    *          A valid file name (with or without path information), preferably with file extension to allow automatic
@@ -135,6 +143,13 @@ public final class BinaryResource implements Serializable {
    */
   public long getFingerprint() {
     return m_fingerprint;
+  }
+
+  /**
+   * @return a new {@link BinaryResource} that represents the same content, but has another name
+   */
+  public BinaryResource createAlias(String newName) {
+    return new BinaryResource(newName, m_contentType, m_content, m_lastModified, m_fingerprint);
   }
 
   @Override
