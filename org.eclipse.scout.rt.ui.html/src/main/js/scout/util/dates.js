@@ -305,6 +305,12 @@ scout.dates = {
       return date;
     }
     return undefined;
+  },
+
+  format: function(date, locale, pattern) {
+    var dateClone = new Date(date.valueOf()),
+      dateFormat = new scout.DateFormat(locale, pattern);
+    return dateFormat.format(dateClone);
   }
 
 };
