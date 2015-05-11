@@ -323,8 +323,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       case TreeEvent.TYPE_NODES_UPDATED:
       case TreeEvent.TYPE_NODES_INSERTED:
       case TreeEvent.TYPE_NODES_DELETED:
-      case TreeEvent.TYPE_NODES_CHECKED:
-      case TreeEvent.TYPE_NODE_CHANGED: {
+      case TreeEvent.TYPE_NODES_CHECKED: {
         return true;
       }
       default: {
@@ -347,6 +346,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       case TreeEvent.TYPE_NODE_CHANGED:
       case TreeEvent.TYPE_NODE_CLICK:
       case TreeEvent.TYPE_NODE_COLLAPSED:
+      case TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE:
       case TreeEvent.TYPE_NODE_DROP_ACTION:
       case TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED:
       case TreeEvent.TYPE_NODE_ENSURE_VISIBLE:

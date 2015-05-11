@@ -120,8 +120,10 @@ public class TreeEvent extends EventObject implements IModelEvent {
   public static final int TYPE_SCROLL_TO_SELECTION = 830;
 
   /**
-   * Node has changed in a way that may affect its presentation (e.g. text, font, color...) but no structural changes
-   * occurred
+   * valid attributes are node
+   * <p>
+   * A <i>single</i> node has changed in a way that may affect its presentation (e.g. text, font, color...) but no
+   * structural changes occurred.
    *
    * @since 3.10.0-M5
    */

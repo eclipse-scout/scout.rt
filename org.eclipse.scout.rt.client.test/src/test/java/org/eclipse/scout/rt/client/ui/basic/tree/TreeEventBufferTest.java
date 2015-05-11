@@ -103,6 +103,88 @@ public class TreeEventBufferTest {
   }
 
   /**
+   * Insert[A], Delete[A], Insert[B] has to result in a single Insert[B] (not A!)
+   */
+  @Test
+  public void testInsertCoalesce() {
+    // A
+    // +-B
+    // | +-E
+    // |   +-F
+    // +-C
+    //   +-G
+    // +-D
+    ITreeNode nodeA = mockNode("A");
+    ITreeNode nodeB = mockNode("B");
+    ITreeNode nodeC = mockNode("C");
+    ITreeNode nodeD = mockNode("D");
+    ITreeNode nodeE = mockNode("E");
+    ITreeNode nodeF = mockNode("F");
+    ITreeNode nodeG = mockNode("G");
+    installChildNodes(nodeA, nodeB, nodeC, nodeD);
+    installChildNodes(nodeB, nodeE);
+    installChildNodes(nodeE, nodeF);
+    installChildNodes(nodeC, nodeG);
+
+    final TreeEvent e1 = mockEvent(TreeEvent.TYPE_NODES_INSERTED, nodeE);
+    final TreeEvent e2 = mockEvent(TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeA);
+    final TreeEvent e3 = mockEvent(TreeEvent.TYPE_NODES_INSERTED, nodeC);
+
+    m_testBuffer.add(e1);
+    m_testBuffer.add(e2);
+    m_testBuffer.add(e3);
+    final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(2, coalesced.size());
+    assertEquals(TreeEvent.TYPE_NODES_INSERTED, coalesced.get(1).getType());
+    assertEquals(1, coalesced.get(1).getNodes().size());
+  }
+
+  /**
+   * Consecutive "node changed" events are coalesced
+   */
+  @Test
+  public void testNodeChangedCoalesce() {
+    final TreeEvent e1 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "A");
+    final TreeEvent e2 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "B");
+    final TreeEvent e3 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "C");
+    final TreeEvent e4 = mockEvent(TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, "C", "B", "A");
+    final TreeEvent e5 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "B");
+    final TreeEvent e6 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "E");
+    final TreeEvent e7 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "C");
+    final TreeEvent e8 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "B"); // B is twice in the list, but this cannot be coalesced at the moment
+    final TreeEvent e9 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "D");
+    m_testBuffer.add(e1);
+    m_testBuffer.add(e2);
+    m_testBuffer.add(e3);
+    m_testBuffer.add(e4);
+    m_testBuffer.add(e5);
+    m_testBuffer.add(e6);
+    m_testBuffer.add(e7);
+    m_testBuffer.add(e8);
+    m_testBuffer.add(e9);
+    final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(9, coalesced.size());
+    assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(0).getType());
+    assertEquals(1, coalesced.get(0).getNodes().size());
+    assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(1).getType());
+    assertEquals(1, coalesced.get(1).getNodes().size());
+    assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(2).getType());
+    assertEquals(1, coalesced.get(2).getNodes().size());
+    assertEquals(TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, coalesced.get(3).getType());
+    assertEquals(3, coalesced.get(3).getNodes().size());
+    assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(4).getType());
+    assertEquals(1, coalesced.get(4).getNodes().size());
+    assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(5).getType());
+    assertEquals(1, coalesced.get(5).getNodes().size());
+    assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(6).getType());
+    assertEquals(1, coalesced.get(6).getNodes().size());
+    assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(7).getType());
+    assertEquals(1, coalesced.get(7).getNodes().size());
+    assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(8).getType());
+    assertEquals(1, coalesced.get(8).getNodes().size());
+  }
+
+  /**
    * Updates are merged into insert
    */
   @Test
@@ -302,7 +384,7 @@ public class TreeEventBufferTest {
   }
 
   /**
-   * Tests the utility method "collectAllNodesRec"
+   * Test for the utility method "collectAllNodesRec"
    */
   @Test
   public void testCollectAllChildNodesRec() {
