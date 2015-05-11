@@ -125,7 +125,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   }
 
   @Override
-  protected void handleOtherTreeEvent(TreeEvent event) {
+  protected void handleModelOtherTreeEvent(TreeEvent event) {
     switch (event.getType()) {
       case OutlineEvent.TYPE_PAGE_CHANGED:
         handleModelPageChanged((OutlineEvent) event);

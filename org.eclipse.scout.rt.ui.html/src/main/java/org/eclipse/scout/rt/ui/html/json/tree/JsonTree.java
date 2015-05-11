@@ -276,7 +276,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
         handleModelChildNodeOrderChanged(event);
         break;
       default:
-        handleOtherTreeEvent(event);
+        handleModelOtherTreeEvent(event);
         break;
     }
     // TODO Tree | Events not yet implemented:
@@ -297,7 +297,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   /**
    * Default impl. does nothing. Override this method to handle custom tree-events.
    */
-  protected void handleOtherTreeEvent(TreeEvent event) {
+  protected void handleModelOtherTreeEvent(TreeEvent event) {
   }
 
   protected void handleModelNodeExpanded(ITreeNode modelNode, boolean recursive) {
