@@ -18,7 +18,6 @@
   min-height: 400px;
 }
 
-
 .calendar-header {
   height: @calendar-header-height;
   min-width: 420px;
@@ -101,9 +100,68 @@
     & .selected::before, & .selected {
       color: @hover-color;
     }
+  }
+}
 
+.calendar-component {
+
+  position: relative;
+  float: left;
+  font-size: 10px;
+  line-height: 20px;
+  height: 20px;
+  padding-left: 4px;
+  .overflow-ellipsis;
+  min-height: 20px;
+  width: calc(~"100%" - 38px);
+  border-left: 4px solid;
+  text-align: left;
+
+  /* Default colors used when component has no specific class */
+  background-color: @palette-blue-1;
+  border-left-color:  @palette-blue-2;
+
+  &:hover {
+    background-color: @palette-blue-2;
+    border-left-color: @palette-blue-3;
   }
 
+  &.comp-selected {
+    background-color: @palette-blue-3;
+    border-left-color: @palette-blue-4;
+  }
+
+  /* Colors for type Appointment */
+  &.calendar-appointment {
+    background-color: @palette-orange-0;
+    border-left-color: @palette-orange-2;
+
+    &:hover {
+      background-color: @palette-orange-2;
+      border-left-color: @palette-orange-3;
+    }
+
+    &.comp-selected {
+      background-color: @palette-orange-3;
+      border-left-color: @palette-orange-4;
+    }
+  }
+
+  /* Colors for type Task */
+  &.calendar-task {
+    background-color: @palette-cyan-0;
+    border-left-color: @palette-cyan-2;
+
+    &:hover {
+      background-color: @palette-cyan-2;
+      border-left-color: @palette-cyan-3;
+    }
+
+    &.comp-selected {
+      background-color: @palette-cyan-3;
+      border-left-color: @palette-cyan-4;
+    }
+  }
 }
 
 .calendar-year-container {
@@ -235,7 +293,7 @@
       font-size: 17px;
       color: @palette-gray-6;
 
-      &:after{
+      &:after {
         position: absolute;
         height: 1px;
         width: 100%;
@@ -247,19 +305,10 @@
     }
 
     & .calendar-component {
-      position: relative;
-      float: left;
-      font-size: 10px;
-      line-height: 20px;
       height: auto;
-      padding-left: 4px;
-      .overflow-ellipsis;
-      min-height: 20px;
-      margin-top: 12px;
       width: calc(~"100%" - 10px);
-      background-color:  @palette-white !important;
-      border-left: 4px solid  @palette-gray-4;
-      text-align: left;
+      background-color: @palette-white !important;
+      margin-top: 12px;
 
       & .component-link {
         position: absolute;
@@ -267,11 +316,10 @@
         right: 6px;
         cursor: pointer;
 
-        &:hover{
+        &:hover {
           color: @hover-color;
         }
       }
-
     }
   }
 }
@@ -430,19 +478,8 @@
   }
 
   & .calendar-component {
-    position: relative;
-    float: left;
-    font-size: 10px;
-    line-height: 20px;
-    height: 20px;
-    padding-left: 4px;
-    .overflow-ellipsis;
-    min-height: 20px;
     margin-left: 32px;
-    width: calc(~"100%" - 38px);
     margin-bottom: -3px;
-    border-left: 4px solid;
-    text-align: left;
     margin-top: 6px;
 
     &.many-items {
@@ -507,55 +544,6 @@
       bottom: -10px;
       transform: rotate(45deg);
       background-color: inherit;
-    }
-  }
-}
-
-.calendar-component {
-
-  /* Default colors used when component has no specific class */
-  background-color: @palette-blue-1;
-  border-left-color:  @palette-blue-2;
-
-  &:hover {
-    background-color: @palette-blue-2;
-    border-left-color: @palette-blue-3;
-  }
-
-  &.comp-selected {
-    background-color: @palette-blue-3;
-    border-left-color: @palette-blue-4;
-  }
-
-  /* Colors for type Appointment */
-  &.calendar-appointment {
-    background-color: @palette-orange-0;
-    border-left-color: @palette-orange-2;
-
-    &:hover {
-      background-color: @palette-orange-2;
-      border-left-color: @palette-orange-3;
-    }
-
-    &.comp-selected {
-      background-color: @palette-orange-3;
-      border-left-color: @palette-orange-4;
-    }
-  }
-
-  /* Colors for type Task */
-  &.calendar-task {
-    background-color: @palette-cyan-0;
-    border-left-color: @palette-cyan-2;
-
-    &:hover {
-      background-color: @palette-cyan-2;
-      border-left-color: @palette-cyan-3;
-    }
-
-    &.comp-selected {
-      background-color: @palette-cyan-3;
-      border-left-color: @palette-cyan-4;
     }
   }
 }

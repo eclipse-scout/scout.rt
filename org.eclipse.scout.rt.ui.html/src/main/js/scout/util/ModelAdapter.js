@@ -1,3 +1,18 @@
+/**
+ * A ModelAdapter has a these naming-based contracts. Each property the model (=JSON data) has, is automatically
+ * synchronized with the property with the same name in the ModelAdapter. When a property is synchronized it
+ * happens in this defined order:
+ *
+ * <ol>
+ * <li><b>_sync[propertyName](newValue, oldValue) method</b> [optional] if this method is present, it is called with the new- and the old value.
+ *   Use this method to perform required conversions on the values provided by the model (for instance, convert a date-string into a date object),
+ *   or use it when you have to do something based on the old-value.</li>
+ * <li><b>Set property [propertyName]</b> if a _sync method is not present, the property is simply set. If the property is an adapter, as specified
+ *   by the <code>_adapterProperties</code> list, the property is automatically transformed to an adapter instance.</li>
+ * <li><b>_render[propertyName] method</b> at the point the _render method is called, the property is already set, so you can access its value
+ *   by using this.[propertyName]. The _render method is required to update the UI based on the new property-value.</li>
+ * </ol>
+ */
 scout.ModelAdapter = function() {
   scout.ModelAdapter.parent.call(this);
   this.session;
@@ -217,7 +232,7 @@ scout.ModelAdapter.prototype.onModelAction = function(event) {
 
 scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldProperties, newProperties) {
   this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
-    var onFuncName = '_sync' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName),
+    var syncFuncName = '_sync' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName),
       oldValue = this[propertyName],
       target = this.ui || this;
     oldProperties[propertyName] = oldValue;
@@ -231,8 +246,8 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldPrope
       }
     }
 
-    if (target[onFuncName]) {
-      target[onFuncName](value);
+    if (target[syncFuncName]) {
+      target[syncFuncName](value, oldValue);
     } else {
       target[propertyName] = value;
     }

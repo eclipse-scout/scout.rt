@@ -88,10 +88,9 @@ scout.Calendar.prototype._syncSelectedDate = function(dateString) {
 };
 
 scout.Calendar.prototype._syncViewRange = function(viewRange) {
-  this.viewRange = {
-    from: scout.dates.create(viewRange.from),
-    to: scout.dates.create(viewRange.to)
-  };
+  this.viewRange = new scout.Range(
+    scout.dates.create(viewRange.from),
+    scout.dates.create(viewRange.to));
 };
 
 scout.Calendar.prototype._render = function($parent) {
@@ -183,7 +182,6 @@ scout.Calendar.prototype._renderComponents = function() {
 
   // remove all existing items
   $('.calendar-component', this.$grid).remove();
-  this._$componentMap = {};
 
   // main loop
   for (i = 0; i < this.components.length; i++) {
@@ -338,9 +336,20 @@ scout.Calendar.prototype._calcSelectedDate = function(direction) {
 
 scout.Calendar.prototype._updateModel = function() {
   this._exactRange = this._calcExactRange();
-  this.viewRange = this._calcViewRange();
+  var newViewRange = this._calcViewRange();
+  this._resetComponentMap(newViewRange);
+  this.viewRange = newViewRange;
   this._sendModelChanged();
   this._updateScreen();
+};
+
+scout.Calendar.prototype._resetComponentMap = function(newViewRange) {
+  var oldViewRange = this.viewRange;
+  if (!newViewRange.equals(oldViewRange)) {
+    $.log.debug('viewRange has changed to ' + newViewRange + '. Reset $componentMap cache');
+    $('.calendar-component', this.$grid).remove();
+    this._$componentMap = {};
+  }
 };
 
 /**
@@ -364,10 +373,7 @@ scout.Calendar.prototype._calcExactRange = function() {
     to = new Date(p.year, p.month, p.date - p.day + 4);
   }
 
-  return {
-    from: from,
-    to: to
-  };
+  return new scout.Range(from, to);
 };
 
 /**
@@ -379,15 +385,13 @@ scout.Calendar.prototype._calcViewRange = function() {
   if (this._isMonth()) {
     var viewFrom = _calcViewFromDate(this._exactRange.from),
       viewTo = _calcViewToDate(viewFrom);
-    return {
-      from: viewFrom,
-      to: viewTo
-    };
+    return new scout.Range(viewFrom, viewTo);
   } else {
     return this._exactRange;
   }
 
   // FIXME AWE: (calendar) do date calculations in java with a proper Calendar impl.?
+  // --> use dates.js here
   function _calcViewFromDate(fromDate) {
     var i, tmpDate = new Date(fromDate.valueOf());
     for (i = 0; i < 42; i++){
@@ -432,6 +436,10 @@ scout.Calendar.prototype._onClickYear = function(event) {
 scout.Calendar.prototype._onClickList = function(event) {
   this.showList = !this.showList;
   this._updateScreen();
+//  if (this.showList) {
+//    this.$list.empty();
+//    this._renderComponentPanel();
+//  }
 };
 
 scout.Calendar.prototype._onClickDay = function(event) {
@@ -483,7 +491,6 @@ scout.Calendar.prototype._jsonViewRange = function() {
 };
 
 scout.Calendar.prototype._updateScreen = function() {
-
   $.log.info('(Calendar#_updateScreen)');
 
   // select mode
@@ -496,10 +503,7 @@ scout.Calendar.prototype._updateScreen = function() {
   // layout grid
   this.layoutLabel();
   this.layoutSize();
-  //  this._renderComponents();
-  // FIXME AWE: (calendar) check if it's Ok to skip renderComponents here
-  $('.calendar-component', this.$grid).remove();
-
+  this._renderComponents();
   this.layoutAxis();
 
   // if year shown and changed, redraw year
