@@ -211,7 +211,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         offset += 1;
         continue;
       }
-
       JsonColumn jsonColumn = (JsonColumn) MainJsonObjectFactory.get().createJsonObject(column);
       jsonColumn.setUiSession(getUiSession());
       jsonColumn.setColumnIndexOffset(offset);
@@ -219,6 +218,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
+  /**
+   * Calls {@link #disposeColumn(IColumn)} for all columns in the model.
+   *
+   * @throws IllegalStateException
+   *           when not all column mappings are gone afterwards (potential memory leak)
+   */
   protected void disposeColumns() {
     for (IColumn<?> column : getModel().getColumns()) {
       disposeColumn(column);
@@ -229,10 +234,24 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
+  /**
+   * Removes all JsonColumn mappings without querying the model. Can be useful when the
+   * model is already updated (e.g. while handling the "column structure changed" event).
+   */
+  protected void disposeAllColumns() {
+    m_jsonColumns.clear();
+  }
+
   protected void disposeColumn(IColumn<?> column) {
     m_jsonColumns.remove(column);
   }
 
+  /**
+   * Calls {@link #disposeRow(ITableRow)} for all rows in the model.
+   *
+   * @throws IllegalStateException
+   *           when not all row mappings are gone afterwards (potential memory leak)
+   */
   protected void disposeRows() {
     for (ITableRow row : getModel().getRows()) {
       disposeRow(row);
@@ -832,8 +851,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleModelColumnStructureChanged() {
-    disposeColumns();
+    disposeAllColumns();
     attachColumns();
+
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
     addActionEvent("columnStructureChanged", jsonEvent);
