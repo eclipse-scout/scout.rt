@@ -2,10 +2,14 @@ scout.CalendarComponent = function() {
   scout.CalendarComponent.parent.call(this);
 
   this.selected = false;
+  this._tooltip;
 };
 scout.inherits(scout.CalendarComponent, scout.ModelAdapter);
 
 scout.CalendarComponent.prototype._render = function($parent) {
+
+  $.log.debug('(CalendarComponent#_render)');
+
   this.$container = $parent.appendDiv('calendar-component')
     .html('<b>' + this.item.subject + '</b>')
     .addClass(this.item.cssClass)
@@ -21,7 +25,11 @@ scout.CalendarComponent.prototype._renderProperties = function() {
 };
 
 scout.CalendarComponent.prototype._renderSelected = function() {
-  this.$container.toggleClass('comp-selected', this.selected);
+  // the rendered check is required because the selected component may be
+  // off-screen. in that case it is not rendered.
+  if (this.rendered) {
+    this.$container.toggleClass('comp-selected', this.selected);
+  }
 };
 
 scout.CalendarComponent.prototype.setSelected = function(selected) {
@@ -55,28 +63,25 @@ scout.CalendarComponent.prototype._showContextMenu = function(event, allowedType
  * Because of the asynchronous nature of the Calendar,
  */
 scout.CalendarComponent.prototype._onHoverIn = function(event) {
-  var $comp = $(event.currentTarget),
-    component = $comp.data('component');
   this._tooltipDelay = setTimeout(function() {
-    var tooltip = new scout.Tooltip({
+    this._tooltip = new scout.Tooltip({
       text: this._description(),
-      $anchor: $comp,
+      $anchor: this.$container,
       arrowPosition: 15,
       arrowPositionUnit: '%',
       htmlEnabled: true
     });
-    $comp.data('tooltip', tooltip);
-    tooltip.render();
+    this._tooltip.render();
   }.bind(this), 350);
 };
 
+// FIXME AWE: remove tooltip when component is removed/disposed!
+
 scout.CalendarComponent.prototype._onHoverOut = function(event) {
-  var $comp = $(event.currentTarget),
-    tooltip = $comp.data('tooltip');
   clearTimeout(this._tooltipDelay);
-  if (tooltip) {
-    tooltip.remove();
-    $comp.removeData('tooltip');
+  if (this._tooltip) {
+    this._tooltip.remove();
+    this._tooltip = null;
   }
 };
 

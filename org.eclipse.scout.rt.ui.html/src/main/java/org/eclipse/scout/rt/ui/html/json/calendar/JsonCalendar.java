@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.Range;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -82,6 +81,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
+    attachAdapter(getModel().getSelectedComponent());
     attachAdapters(getModel().getComponents());
     attachAdapter(getModel().getContextMenu(), new DisplayableActionFilter<IMenu>());
   }
@@ -300,9 +300,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   }
 
   /**
-   * The current calendar model has a strange behavior (bug?): when the view-range changes 
-   * 
-   * 
+   * The current calendar model has a strange behavior (bug?): when the view-range changes
    */
   protected void handleUiViewRangeChanged(JsonEvent event) {
     Range<Date> viewRange = extractViewRange(event.getData());

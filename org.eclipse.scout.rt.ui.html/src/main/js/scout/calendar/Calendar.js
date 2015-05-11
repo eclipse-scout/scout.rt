@@ -159,6 +159,7 @@ scout.Calendar.prototype._render = function($parent) {
 
 scout.Calendar.prototype._renderProperties = function() {
   this._renderComponents();
+  this._renderSelectedComponent();
   this._renderLoadInProgress();
   this._renderMenus();
   this._renderDisplayMode();
@@ -167,15 +168,15 @@ scout.Calendar.prototype._renderProperties = function() {
 };
 
 scout.Calendar.prototype._renderComponents = function() {
-
-  $.log.debug('(Calendar#_renderComponents) impl.');
+  $.log.debug('(Calendar#_renderComponents)');
 
   var i, j, c, itemId, $component, d, $day,
     fromDate, toDate,
     countTask = 5;
 
   // remove all existing items
-  this._removeComponents();
+// XXX
+//  this._removeComponents();
 
   // main loop
   for (i = 0; i < this.components.length; i++) {
@@ -248,8 +249,15 @@ scout.Calendar.prototype._renderComponents = function() {
   this._arrangeComponents();
 };
 
+scout.Calendar.prototype._renderSelectedComponent = function() {
+  $.log.debug('(Calendar#_renderSelectedComponent)');
+  if (this.selectedComponent) {
+    this.selectedComponent.setSelected(true);
+  }
+};
+
 scout.Calendar.prototype._renderLoadInProgress = function() {
-  $.log.debug('(Calendar#_renderLoadInProgress) impl.');
+  $.log.debug('(Calendar#_renderLoadInProgress)');
   this.$progress.setVisible(this.loadInProgress);
   if (this.loadInProgress) {
     scout.status.animateStatusMessage(this.$progress, 'Lade Kalender-Einträge...');
@@ -319,24 +327,9 @@ scout.Calendar.prototype._calcSelectedDate = function(direction) {
 
 scout.Calendar.prototype._updateModel = function() {
   this._exactRange = this._calcExactRange();
-  var newViewRange = this._calcViewRange();
-  this._resetComponentMap(newViewRange);
-  this.viewRange = newViewRange;
+  this.viewRange = this._calcViewRange();
   this._sendModelChanged();
   this._updateScreen();
-};
-
-scout.Calendar.prototype._resetComponentMap = function(newViewRange) {
-  var oldViewRange = this.viewRange;
-  if (!newViewRange.equals(oldViewRange)) {
-    $.log.debug('viewRange has changed to ' + newViewRange + '. Reset $componentMap cache');
-    this._removeComponents();
-    this._$componentMap = {};
-  }
-};
-
-scout.Calendar.prototype._removeComponents = function() {
-  $('.calendar-component', this.$grid).remove();
 };
 
 /**
