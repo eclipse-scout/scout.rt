@@ -324,6 +324,7 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
     this._outlineTab.content.remove();
     // Also remove storage to make sure selectTab does not restore the content
     this._outlineTab.$storage = null;
+    this._outlineTab.content.tab = null;
   }
 
   // Remove tab completely if no content is available (neither a table nor a form)
@@ -333,6 +334,7 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   }
 
   this._outlineTab._update(content, title, subTitle);
+  content.tab = this._outlineTab;
   if (!this._isTabVisible(this._outlineTab)) {
     this._addTab(this._outlineTab, true);
   }
@@ -372,13 +374,17 @@ scout.Desktop.prototype.changeOutline = function(outline) {
 
 scout.Desktop.prototype.removeForm = function(id) {
   var form = this.session.getOrCreateModelAdapter(id, this);
+  if (!form.rendered) {
+    // Form has already been removed (either by form close or form removed event) -> no need to do it twice
+    return;
+  }
   if (this._isDialog(form)) {
     scout.arrays.remove(this.dialogs, form);
   } else {
-    var removed = scout.arrays.remove(this.views, form);
-    if (removed) {
-      this._removeTab(form.tab);
-    }
+    scout.arrays.remove(this.views, form);
+  }
+  if (form.tab) {
+    this._removeTab(form.tab);
   }
   form.remove();
 };
