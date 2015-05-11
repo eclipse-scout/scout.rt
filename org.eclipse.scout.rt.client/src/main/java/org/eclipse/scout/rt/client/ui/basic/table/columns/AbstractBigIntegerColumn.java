@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IBigIntegerColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.AbstractBigIntegerField;
+import org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.IBigIntegerField;
 
 /**
  * Column holding {@link BigInteger}
@@ -65,7 +66,7 @@ public abstract class AbstractBigIntegerColumn extends AbstractNumberColumn<BigI
   }
 
   @Override
-  protected AbstractBigIntegerField getEditorField() {
+  protected IBigIntegerField createDefaultEditor() {
     return new AbstractBigIntegerField() {
     };
   }

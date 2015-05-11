@@ -36,7 +36,7 @@ import org.mockito.Mockito;
 public class AbstractDecimalColumnTest extends AbstractDecimalColumn<BigDecimal> {
 
   @Override
-  protected IDecimalField<BigDecimal> getEditorField() {
+  protected IDecimalField<BigDecimal> createDefaultEditor() {
     return new AbstractBigDecimalField() {
     };
   }

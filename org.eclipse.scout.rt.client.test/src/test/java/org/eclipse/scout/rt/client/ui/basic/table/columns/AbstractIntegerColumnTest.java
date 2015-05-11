@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.text.DecimalFormat;
 import java.util.Locale;
@@ -18,6 +19,7 @@ import java.util.Locale;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +43,16 @@ public class AbstractIntegerColumnTest extends AbstractIntegerColumn {
       decorateCellInternal(cell, row);
       assertEquals("cell text not formatted as expected", df.format(testValue), cell.getText());
     }
+  }
+
+  @Test
+  public void testPrepareEditInternal() throws ProcessingException {
+    AbstractIntegerColumn column = new AbstractIntegerColumn() {
+    };
+    column.setMandatory(true);
+    ITableRow row = mock(ITableRow.class);
+    IIntegerField field = (IIntegerField) column.prepareEditInternal(row);
+    assertEquals("mandatory property to be progagated to field", column.isMandatory(), field.isMandatory());
   }
 
 }

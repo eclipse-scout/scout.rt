@@ -46,7 +46,7 @@ public class AbstractNumberColumnTest extends AbstractNumberColumn<Integer> {
   }
 
   @Override
-  protected AbstractNumberField<Integer> getEditorField() {
+  protected AbstractNumberField<Integer> createDefaultEditor() {
     return new AbstractIntegerField() {
     };
   }

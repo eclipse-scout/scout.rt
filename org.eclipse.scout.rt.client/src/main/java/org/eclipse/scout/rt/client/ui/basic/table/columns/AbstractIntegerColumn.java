@@ -75,7 +75,7 @@ public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer
   }
 
   @Override
-  protected IIntegerField getEditorField() {
+  protected IIntegerField createDefaultEditor() {
     return new AbstractIntegerField() {
     };
   }

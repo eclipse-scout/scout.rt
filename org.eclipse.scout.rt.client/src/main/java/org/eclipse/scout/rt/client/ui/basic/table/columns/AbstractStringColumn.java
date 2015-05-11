@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 
@@ -207,30 +208,20 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     return validValue;
   }
 
-  protected IFormField prepareEditInternalOld(ITableRow row) throws ProcessingException {
-    AbstractStringField f = new AbstractStringField() {
-      @Override
-      protected void initConfig() {
-        super.initConfig();
-        propertySupport.putPropertiesMap(AbstractStringColumn.this.propertySupport.getPropertiesMap());
-      }
-
-    };
-    boolean multi = (getTable() != null ? getTable().isMultilineText() : isTextWrap());
-    f.setMultilineText(multi);
-    f.setWrapText(true); // avoid to have an horizontal scroll bar
+  @Override
+  protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
+    IValueField<String> f = getDefaultEditor();
+    mapEditorFieldProperties((IStringField) f);
     return f;
   }
 
   @Override
-  protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
-    AbstractStringField f = new AbstractStringField() {
+  protected IStringField createDefaultEditor() {
+    return new AbstractStringField() {
     };
-    mapEditorFieldProperties(f);
-    return f;
   }
 
-  protected void mapEditorFieldProperties(AbstractStringField f) {
+  protected void mapEditorFieldProperties(IStringField f) {
     super.mapEditorFieldProperties(f);
     f.setInputMasked(isInputMasked());
     f.setFormat(getDisplayFormat());

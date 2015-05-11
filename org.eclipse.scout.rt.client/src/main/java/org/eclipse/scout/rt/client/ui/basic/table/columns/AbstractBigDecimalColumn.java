@@ -67,7 +67,7 @@ public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<Big
   }
 
   @Override
-  protected IBigDecimalField getEditorField() {
+  protected IBigDecimalField createDefaultEditor() {
     return new AbstractBigDecimalField() {
     };
   }

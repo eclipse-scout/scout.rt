@@ -70,7 +70,7 @@ public abstract class AbstractLongColumn extends AbstractNumberColumn<Long> impl
   }
 
   @Override
-  protected ILongField getEditorField() {
+  protected ILongField createDefaultEditor() {
     return new AbstractLongField() {
     };
   }

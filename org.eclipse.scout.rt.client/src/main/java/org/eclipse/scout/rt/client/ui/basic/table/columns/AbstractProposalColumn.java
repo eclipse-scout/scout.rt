@@ -16,7 +16,9 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IProposalCol
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -45,24 +47,19 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
 
   @Override
   protected IFormField prepareEditInternal(final ITableRow row) throws ProcessingException {
-    AbstractProposalField<LOOKUP_TYPE> f = new AbstractProposalField<LOOKUP_TYPE>() {
-      @Override
-      protected void initConfig() {
-        super.initConfig();
-        propertySupport.putPropertiesMap(AbstractProposalColumn.this.propertySupport.getPropertiesMap());
-      }
+    ProposalEditorField f = (ProposalEditorField) getDefaultEditor();
+    f.setRow(row);
+    mapEditorFieldProperties(f);
+    return f;
+  }
 
-      @Override
-      public Class<String> getHolderType() {
-        return String.class;
-      }
+  @Override
+  protected IValueField<String> createDefaultEditor() {
+    return new ProposalEditorField();
+  }
 
-      @Override
-      protected void execPrepareLookup(ILookupCall<LOOKUP_TYPE> call) throws ProcessingException {
-        AbstractProposalColumn.this.interceptPrepareLookup(call, row);
-      }
-    };
-
+  protected void mapEditorFieldProperties(IProposalField<LOOKUP_TYPE> f) {
+    super.mapEditorFieldProperties(f);
     f.setCodeTypeClass(getCodeTypeClass());
     f.setLookupCall(getLookupCall());
     f.setBrowseHierarchy(getConfiguredBrowseHierarchy());
@@ -70,7 +67,6 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
     f.setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
     f.setBrowseAutoExpandAll(getConfiguredBrowseAutoExpandAll());
     f.setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
-    return f;
   }
 
   @Override
@@ -103,4 +99,36 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
   protected IProposalColumnExtension<LOOKUP_TYPE, ? extends AbstractProposalColumn<LOOKUP_TYPE>> createLocalExtension() {
     return new LocalProposalColumnExtension<LOOKUP_TYPE, AbstractProposalColumn<LOOKUP_TYPE>>(this);
   }
+
+  /**
+   * Internal editor field
+   */
+  protected class ProposalEditorField extends AbstractProposalField<LOOKUP_TYPE> {
+    private ITableRow m_row;
+
+    protected ITableRow getRow() {
+      return m_row;
+    }
+
+    protected void setRow(ITableRow row) {
+      m_row = row;
+    }
+
+    @Override
+    protected void initConfig() {
+      super.initConfig();
+      propertySupport.putPropertiesMap(AbstractProposalColumn.this.propertySupport.getPropertiesMap());
+    }
+
+    @Override
+    public Class<String> getHolderType() {
+      return String.class;
+    }
+
+    @Override
+    protected void execPrepareLookup(ILookupCall<LOOKUP_TYPE> call) throws ProcessingException {
+      AbstractProposalColumn.this.interceptPrepareLookup(call, getRow());
+    }
+  }
+
 }

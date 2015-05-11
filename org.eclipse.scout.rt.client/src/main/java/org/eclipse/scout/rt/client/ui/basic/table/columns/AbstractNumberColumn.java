@@ -249,11 +249,9 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
     return m_validateOnAnyKey;
   }
 
-  protected abstract INumberField<NUMBER> getEditorField();
-
   @Override
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
-    INumberField<NUMBER> f = getEditorField();
+    INumberField<NUMBER> f = (INumberField<NUMBER>) getDefaultEditor();
     mapEditorFieldProperties(f);
     return f;
   }

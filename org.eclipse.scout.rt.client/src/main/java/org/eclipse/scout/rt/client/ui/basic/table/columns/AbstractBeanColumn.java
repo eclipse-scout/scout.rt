@@ -13,6 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 /**
  * This column may be used if the value is relevant for the gui, and not just the display text.
  */
-public class AbstractBeanColumn<VALUE> extends AbstractColumn<VALUE> implements IBeanColumn<VALUE> {
+public abstract class AbstractBeanColumn<VALUE> extends AbstractColumn<VALUE> implements IBeanColumn<VALUE> {
 
 }

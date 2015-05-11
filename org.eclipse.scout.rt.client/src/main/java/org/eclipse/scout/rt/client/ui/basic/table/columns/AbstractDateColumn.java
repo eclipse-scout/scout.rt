@@ -24,7 +24,9 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IDateColumnE
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
+import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 
 /**
  * Column holding Date
@@ -195,13 +197,18 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
 
   @Override
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
-    AbstractDateField f = new AbstractDateField() {
-    };
+    IDateField f = (IDateField) getDefaultEditor();
     mapEditorFieldProperties(f);
     return f;
   }
 
-  protected void mapEditorFieldProperties(AbstractDateField f) {
+  @Override
+  protected IValueField<Date> createDefaultEditor() {
+    return new AbstractDateField() {
+    };
+  }
+
+  protected void mapEditorFieldProperties(IDateField f) {
     super.mapEditorFieldProperties(f);
     f.setFormat(getFormat());
     f.setHasDate(isHasDate());

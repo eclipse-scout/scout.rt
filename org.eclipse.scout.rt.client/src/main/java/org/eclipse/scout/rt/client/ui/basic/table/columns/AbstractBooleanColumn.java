@@ -16,7 +16,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IBooleanColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
 
 /**
@@ -66,11 +66,9 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   }
 
   @Override
-  protected IFormField prepareEditInternal(final ITableRow row) throws ProcessingException {
-    AbstractBooleanField f = new AbstractBooleanField() {
+  protected IValueField<Boolean> createDefaultEditor() {
+    return new AbstractBooleanField() {
     };
-    super.mapEditorFieldProperties(f);
-    return f;
   }
 
   /**

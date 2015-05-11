@@ -198,14 +198,14 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
   }
 
   @Override
-  protected abstract IDecimalField<NUMBER> getEditorField();
-
-  @Override
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
-    IDecimalField<NUMBER> f = getEditorField();
+    IDecimalField<NUMBER> f = createDefaultEditor();
     mapEditorFieldProperties(f);
     return f;
   }
+
+  @Override
+  protected abstract IDecimalField<NUMBER> createDefaultEditor();
 
   protected void mapEditorFieldProperties(IDecimalField<NUMBER> f) {
     super.mapEditorFieldProperties(f);

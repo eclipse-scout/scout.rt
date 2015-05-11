@@ -98,6 +98,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private boolean m_initialSortAscending;
   private boolean m_initialAlwaysIncludeSortAtBegin;
   private boolean m_initialAlwaysIncludeSortAtEnd;
+
+  private IValueField<VALUE> m_defaultEditor;
   /**
    * Used for mutable tables to keep last valid value per row and column.
    */
@@ -1361,8 +1363,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * do not use or override this internal method
    */
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
-    AbstractValueField<VALUE> f = new AbstractValueField<VALUE>() {
-    };
+    IValueField<VALUE> f = getDefaultEditor();
     mapEditorFieldProperties(f);
     return f;
   }
@@ -1372,6 +1373,25 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     f.setForegroundColor(getForegroundColor());
     f.setFont(getFont());
     f.setMandatory(isMandatory());
+  }
+
+  /**
+   * @return a default editor for this column (the same for all rows).
+   */
+  protected final IValueField<VALUE> getDefaultEditor() {
+    if (m_defaultEditor == null) {
+      m_defaultEditor = createDefaultEditor();
+    }
+    return m_defaultEditor;
+  }
+
+  /**
+   * @return a default editor independent of the current row.
+   *         Should only be created once for performance reasons.
+   */
+  protected IValueField<VALUE> createDefaultEditor() {
+    return new AbstractValueField<VALUE>() {
+    };
   }
 
   /**
@@ -1762,7 +1782,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
              * A cleaner way is to fire a table update event like in {@link AbstractTable#fireRowsUpdated(List<ITableRow> rows)}
              * to propagate the new error status and value.
              */
-        	  //FIXME CGU/JGU what is this for?
+            //FIXME CGU/JGU what is this for?
 //            cell.clearErrorStatus();
             cell.setValue(value);
             decorateCellInternal(cell, row);

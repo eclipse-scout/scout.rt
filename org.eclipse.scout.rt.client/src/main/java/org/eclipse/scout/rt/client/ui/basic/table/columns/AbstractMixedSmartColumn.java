@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IMixedSmartField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -145,51 +146,14 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
 
   @Override
   protected IFormField prepareEditInternal(final ITableRow row) throws ProcessingException {
-    AbstractMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> f = new AbstractMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>() {
-      @Override
-      protected void initConfig() {
-        super.initConfig();
-        propertySupport.putPropertiesMap(AbstractMixedSmartColumn.this.propertySupport.getPropertiesMap());
-      }
+    MixedSmartEditorField f = (MixedSmartEditorField) getDefaultEditor();
+    f.setRow(row);
+    mapEditorFieldProperties(f);
+    return f;
+  }
 
-      @Override
-      public Class<VALUE_TYPE> getHolderType() {
-        return AbstractMixedSmartColumn.this.getDataType();
-      }
-
-      @Override
-      protected void execPrepareLookup(ILookupCall<LOOKUP_CALL_KEY_TYPE> call) throws ProcessingException {
-        AbstractMixedSmartColumn.this.interceptPrepareLookup(call, row);
-      }
-
-      @Override
-      protected LOOKUP_CALL_KEY_TYPE execConvertValueToKey(VALUE_TYPE value) {
-        return AbstractMixedSmartColumn.this.interceptConvertValueToKey(value);
-      }
-
-      @Override
-      protected VALUE_TYPE execConvertKeyToValue(LOOKUP_CALL_KEY_TYPE key) {
-        return AbstractMixedSmartColumn.this.interceptConvertKeyToValue(key);
-      }
-
-      @Override
-      protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
-        Class[] menuCandidates = ConfigurationUtility.getDeclaredPublicClasses(AbstractMixedSmartColumn.this.getClass());
-        List<Class<IMenu>> menuClazzes = ConfigurationUtility.filterClasses(menuCandidates, IMenu.class);
-        for (Class<? extends IMenu> menuClazz : menuClazzes) {
-          try {
-            menus.addOrdered(ConfigurationUtility.newInnerInstance(AbstractMixedSmartColumn.this, menuClazz));
-          }
-          catch (Exception e) {
-            BEANS.get(ExceptionHandler.class).handle(new ProcessingException(this.getClass().getSimpleName(), e));
-          }
-        }
-
-        List<IMenu> contributedMenus = AbstractMixedSmartColumn.this.m_contributionHolder.getContributionsByClass(IMenu.class);
-        menus.addAllOrdered(contributedMenus);
-      }
-    };
-
+  protected void mapEditorFieldProperties(IMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> f) {
+    super.mapEditorFieldProperties(f);
     f.setCodeTypeClass(getCodeTypeClass());
     f.setLookupCall(getLookupCall());
     f.setBrowseHierarchy(getConfiguredBrowseHierarchy());
@@ -198,8 +162,11 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
     f.setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
     f.setBrowseAutoExpandAll(getConfiguredBrowseAutoExpandAll());
     f.setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
+  }
 
-    return f;
+  @Override
+  protected MixedSmartEditorField createDefaultEditor() {
+    return new MixedSmartEditorField();
   }
 
   @Override
@@ -252,5 +219,63 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
   @Override
   protected IMixedSmartColumnExtension<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE, ? extends AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>> createLocalExtension() {
     return new LocalMixedSmartColumnExtension<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE, AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>>(this);
+  }
+
+  /**
+   * Internal editor field
+   */
+  protected class MixedSmartEditorField extends AbstractMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> {
+    private ITableRow m_row;
+
+    protected ITableRow getRow() {
+      return m_row;
+    }
+
+    protected void setRow(ITableRow row) {
+      m_row = row;
+    }
+
+    @Override
+    protected void initConfig() {
+      super.initConfig();
+      propertySupport.putPropertiesMap(AbstractMixedSmartColumn.this.propertySupport.getPropertiesMap());
+    }
+
+    @Override
+    public Class<VALUE_TYPE> getHolderType() {
+      return AbstractMixedSmartColumn.this.getDataType();
+    }
+
+    @Override
+    protected void execPrepareLookup(ILookupCall<LOOKUP_CALL_KEY_TYPE> call) throws ProcessingException {
+      AbstractMixedSmartColumn.this.interceptPrepareLookup(call, getRow());
+    }
+
+    @Override
+    protected LOOKUP_CALL_KEY_TYPE execConvertValueToKey(VALUE_TYPE value) {
+      return AbstractMixedSmartColumn.this.interceptConvertValueToKey(value);
+    }
+
+    @Override
+    protected VALUE_TYPE execConvertKeyToValue(LOOKUP_CALL_KEY_TYPE key) {
+      return AbstractMixedSmartColumn.this.interceptConvertKeyToValue(key);
+    }
+
+    @Override
+    protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
+      Class[] menuCandidates = ConfigurationUtility.getDeclaredPublicClasses(AbstractMixedSmartColumn.this.getClass());
+      List<Class<IMenu>> menuClazzes = ConfigurationUtility.filterClasses(menuCandidates, IMenu.class);
+      for (Class<? extends IMenu> menuClazz : menuClazzes) {
+        try {
+          menus.addOrdered(ConfigurationUtility.newInnerInstance(AbstractMixedSmartColumn.this, menuClazz));
+        }
+        catch (Exception e) {
+          BEANS.get(ExceptionHandler.class).handle(new ProcessingException(this.getClass().getSimpleName(), e));
+        }
+      }
+
+      List<IMenu> contributedMenus = AbstractMixedSmartColumn.this.m_contributionHolder.getContributionsByClass(IMenu.class);
+      menus.addAllOrdered(contributedMenus);
+    }
   }
 }
