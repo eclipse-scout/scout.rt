@@ -38,6 +38,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
@@ -45,6 +47,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.job.JobEx;
@@ -97,7 +100,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
     JTextComponent textField = createTextField(container);
     Document doc = textField.getDocument();
     if (doc instanceof AbstractDocument) {
-      ((AbstractDocument) doc).setDocumentFilter(new BasicDocumentFilter(2000));
+      ((AbstractDocument) doc).setDocumentFilter(new P_SwingDocumentFilter());
     }
     doc.addDocumentListener(
         new DocumentListener() {
@@ -717,6 +720,35 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<ISmartFi
       }
     }
     return b.toString();
+  }
+
+  private class P_SwingDocumentFilter extends BasicDocumentFilter {
+
+    private P_SwingDocumentFilter() {
+      super(2000);
+    }
+
+    @Override
+    public void insertString(FilterBypass fb, int offset, String s, AttributeSet a) throws BadLocationException {
+      s = ensureConfiguredTextFormat(s);
+      super.insertString(fb, offset, s, a);
+    }
+
+    @Override
+    public void replace(FilterBypass fb, int offset, int length, String s, AttributeSet a) throws BadLocationException {
+      s = ensureConfiguredTextFormat(s);
+      super.replace(fb, offset, length, s, a);
+    }
+
+    private String ensureConfiguredTextFormat(String s) {
+      s = StringUtility.emptyIfNull(s);
+
+      // omit leading and trailing newlines
+      s = StringUtility.trimNewLines(s);
+      // replace newlines by spaces
+      s = s.replaceAll("\r\n", " ").replaceAll("[\r\n]", " ");
+      return s;
+    }
   }
 
   private class P_ScoutActionPropertyChangeListener extends AbstractSwingScoutActionPropertyChangeListener {
