@@ -109,7 +109,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     viewer.addDoubleClickListener(new P_RwtDoubleClickListener());
 
     P_RwtTreeListener treeListener = new P_RwtTreeListener();
-    viewer.getTree().addListener(SWT.MouseDown, treeListener);
+    viewer.getTree().addListener(SWT.Selection, treeListener);
     viewer.getTree().addListener(SWT.MouseUp, treeListener);
     viewer.getTree().addListener(SWT.MenuDetect, treeListener);
 
@@ -387,7 +387,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
 
   /**
    * Update the given node.
-   * 
+   *
    * @since 3.10.0-M5
    */
   protected void updateTreeNode(ITreeNode node) {
@@ -785,7 +785,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     @Override
     public void handleEvent(Event event) {
       switch (event.type) {
-        case SWT.MouseUp: {
+        case SWT.Selection: {
           ViewerCell cell = getUiTreeViewer().getCell(new Point(event.x, event.y));
           if (cell != null && cell.getBounds().contains(event.x, event.y) && cell.getElement() instanceof ITreeNode) {
             ITreeNode nodeToClick = (ITreeNode) cell.getElement();
