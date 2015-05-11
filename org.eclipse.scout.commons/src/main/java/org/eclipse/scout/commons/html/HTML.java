@@ -82,6 +82,20 @@ public final class HTML {
   }
 
   /**
+   * Create a html element with encoded text for &lt;i&gt;text&lt;/i&gt;.
+   * <p>
+   * Example:<br>
+   * String encodedHtml = HTML.italic("text").toEncodedHtml(); <br>
+   * </p>
+   *
+   * @param text
+   *          text as bind
+   */
+  public static IHtmlElement italic(CharSequence... text) {
+    return new HtmlNodeBuilder("i", text);
+  }
+
+  /**
    * Create a html element with encoded text for &lt;p&gt;text&lt;/p&gt;.
    * <p>
    * Example:<br>

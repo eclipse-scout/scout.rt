@@ -13,6 +13,7 @@ package org.eclipse.scout.commons.html;
 import static org.eclipse.scout.commons.html.HTML.bold;
 import static org.eclipse.scout.commons.html.HTML.cell;
 import static org.eclipse.scout.commons.html.HTML.div;
+import static org.eclipse.scout.commons.html.HTML.italic;
 import static org.eclipse.scout.commons.html.HTML.link;
 import static org.eclipse.scout.commons.html.HTML.row;
 import static org.junit.Assert.assertEquals;
@@ -46,6 +47,7 @@ public class HTMLTest {
     assertEncodedText("h5", HTML.h5(BIND_TEXT).toEncodedHtml());
     assertEncodedText("h6", HTML.h6(BIND_TEXT).toEncodedHtml());
     assertEncodedText("b", bold(BIND_TEXT).toEncodedHtml());
+    assertEncodedText("i", italic(BIND_TEXT).toEncodedHtml());
     assertEncodedText("td", cell(BIND_TEXT).toEncodedHtml());
     assertEncodedText("div", div(BIND_TEXT).toEncodedHtml());
     assertEncodedText("p", HTML.p(BIND_TEXT).toEncodedHtml());
@@ -107,7 +109,7 @@ public class HTMLTest {
   public void testTableAttributesNoBinds() {
     final IHtmlTable table = HTML.table(
         row(
-        cell(BIND_TEXT))
+            cell(BIND_TEXT))
         );
     assertEquals("<table><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", table.toEncodedHtml());
   }
@@ -235,6 +237,7 @@ public class HTMLTest {
     String plainLinkString = String.format("%s<span class=\"app-link\" data-ref=\"REF\">%s</span>", BIND_TEXT, ENCODED_BIND_TEXT);
     assertEquals(String.format(plainLinkString, BIND_TEXT, ENCODED_BIND_TEXT), plainLink.toEncodedHtml());
     assertEquals(String.format("<b>%s</b>", plainLinkString), HTML.bold(plainLink).toEncodedHtml());
+    assertEquals(String.format("<i>%s</i>", plainLinkString), HTML.italic(plainLink).toEncodedHtml());
   }
 
   @Test
