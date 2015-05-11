@@ -12,17 +12,17 @@ function sandboxDesktop() {
   return $sandbox;
 }
 
-var adapterSeq = 1;
+var _uniqueSeq = 0;
 
-function createUniqueAdapterId() {
-  return "" + adapterSeq++;
+function createUniqueId() {
+  _uniqueSeq++;
+  return _uniqueSeq + '';
 }
 
 function createSimpleModel(objectType, id) {
   if (id === undefined) {
-    id = createUniqueAdapterId();
+    id = createUniqueId();
   }
-
   return {
     id: id,
     objectType: objectType

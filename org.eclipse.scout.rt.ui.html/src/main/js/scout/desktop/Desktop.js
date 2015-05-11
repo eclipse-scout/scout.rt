@@ -34,6 +34,9 @@ scout.Desktop.prototype._render = function($parent) {
   var i, action;
 
   this.$parent = $parent;
+  this._renderUniqueId($parent);
+  this._renderModelClass($parent);
+
   this.navigation = new scout.DesktopNavigation(this);
   this.navigation.render($parent);
 

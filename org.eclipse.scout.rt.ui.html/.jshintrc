@@ -22,7 +22,7 @@
     "spyOn": false,
     "sandboxDesktop": false,
     "mostRecentJsonRequest": false,
-    "createUniqueAdapterId": false,
+    "createUniqueId": false,
     "sendQueuedAjaxCalls": false,
     "uninstallUnloadHandlers": false,
     "createPropertyChangeEvent": false,

@@ -32,7 +32,7 @@ scout.Table.GUI_EVENT_ROWS_SELECTED = 'rowsSelected';
 scout.Table.GUI_EVENT_ROWS_UPDATED = 'rowsUpdated';
 scout.Table.GUI_EVENT_ROWS_FILTERED = 'rowsFiltered';
 scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
-scout.Table.GUI_EVENT_ROW_ORDER_CHANGED= 'rowOrderChanged';
+scout.Table.GUI_EVENT_ROW_ORDER_CHANGED = 'rowOrderChanged';
 
 scout.Table.prototype.init = function(model, session) {
   scout.Table.parent.prototype.init.call(this, model, session);
@@ -261,7 +261,7 @@ scout.Table.prototype._renderRowOrderChanges = function() {
       //Prevent the order animation for newly inserted rows (to not confuse the user)
       rowWasInserted = false;
       for (var i in that._insertedRows) {
-        if (that._insertedRows[i].id === $row.attr('id')) {
+        if (that._insertedRows[i].id === $row.data('row').id) {
           rowWasInserted = true;
           break;
         }
@@ -389,7 +389,7 @@ scout.Table.prototype._buildRowDiv = function(row) {
   if (!row.enabled) {
     rowClass += ' disabled';
   }
-  var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute + '>';
+  var rowDiv = '<div class="' + rowClass + '" data-rowid="' + row.id + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute + '>';
   for (var c = 0; c < this.columns.length; c++) {
     rowDiv += this.columns[c].buildCell(row);
   }
@@ -555,16 +555,16 @@ scout.Table.prototype._installRows = function($rows) {
 };
 
 scout.Table.prototype._showCellErrorForRow = function(row) {
- var $cells = this.$cellsForRow(row.$row),
-   that = this;
+  var $cells = this.$cellsForRow(row.$row),
+    that = this;
 
- $cells.each(function(index) {
-   var $cell = $(this);
-   var cell = that.cellByCellIndex(index, row);
-   if (cell.errorStatus) {
-     that._showCellError(row, $cell, cell.errorStatus);
-   }
- });
+  $cells.each(function(index) {
+    var $cell = $(this);
+    var cell = that.cellByCellIndex(index, row);
+    if (cell.errorStatus) {
+      that._showCellError(row, $cell, cell.errorStatus);
+    }
+  });
 };
 
 scout.Table.prototype._showCellError = function(row, $cell, errorStatus) {
@@ -644,7 +644,7 @@ scout.Table.prototype.notifyRowsSelected = function($selectedRows, whileSelectin
   var rowIds = [];
   if ($selectedRows) {
     $selectedRows.each(function() {
-      rowIds.push($(this).attr('id'));
+      rowIds.push($(this).data('row').id);
     });
   }
 
@@ -674,7 +674,7 @@ scout.Table.prototype.onResize = function() {
 
 scout.Table.prototype.sendRowClicked = function($row, mouseButton, columnId) {
   var data = {
-    rowId: $row.attr('id'),
+    rowId: $row.data('row').id,
     mouseButton: mouseButton
   };
   if (columnId !== undefined) {
@@ -728,7 +728,7 @@ scout.Table.prototype.sendRowsSelected = function(rowIds) {
 
 scout.Table.prototype.sendRowAction = function($row, columnId) {
   this.session.send(this.id, 'rowAction', {
-    rowId: $row.attr('id'),
+    rowId: $row.data('row').id,
     columnId: columnId
   });
 };
@@ -1135,7 +1135,7 @@ scout.Table.prototype._deleteRows = function(rows) {
         this.cellEditorPopup.cancelEdit();
       }
       // Remove tooltips for the deleted row
-      for(i = this.tooltips.length -1; i >= 0 ; i--){
+      for (i = this.tooltips.length - 1; i >= 0; i--) {
         if (this.tooltips[i].row === row) {
           this.tooltips[i].remove();
           this.tooltips.splice(i, 1);
@@ -1330,7 +1330,7 @@ scout.Table.prototype.filter = function() {
     var $row = $(this);
     that.hideRow($row, useAnimation);
     // Remove hidden rows from the map of previously selected rows
-    var rowId = $row.attr('id');
+    var rowId = $row.data('row').id;
     if (oldSelectedRowIds[rowId]) {
       oldSelectedRowIds[rowId] = false;
     }
@@ -1750,7 +1750,6 @@ scout.Table.prototype._onRowsDeleted = function(rowIds) {
 scout.Table.prototype._onAllRowsDeleted = function() {
   this._deleteAllRows();
 };
-
 
 scout.Table.prototype._onRowOrderChanged = function(rowIds) {
   var newPos, rows, row;

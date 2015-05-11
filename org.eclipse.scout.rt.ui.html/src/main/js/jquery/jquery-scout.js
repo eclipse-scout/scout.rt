@@ -264,7 +264,7 @@
 
   $.fn.icon = function(iconId) {
     if (iconId) {
-      if (scout.strings.startsWith(iconId, "font:")) {
+      if (scout.strings.startsWith(iconId, 'font:')) {
         iconId = iconId.substr(5);
       } else {
         // FIXME BSH Handle URL icons. Check also: Button.js
@@ -508,17 +508,17 @@
   $.fn.makeDraggable = function($handle) {
     var $draggable = this;
     $handle = $handle || $draggable;
-    return $handle.on("mousedown.draggable", function(event) {
+    return $handle.on('mousedown.draggable', function(event) {
       var orig_offset = $draggable.offset();
       var orig_event = event;
       $handle.parents()
-        .on("mousemove.dragging", function(event) {
+        .on('mousemove.dragging', function(event) {
           $draggable.offset({
             top: orig_offset.top + (event.pageY - orig_event.pageY),
             left: orig_offset.left + (event.pageX - orig_event.pageX)
           });
         })
-        .on("mouseup.dragging", function(e) {
+        .on('mouseup.dragging', function(e) {
           $handle.parents().off('.dragging');
         });
       event.preventDefault();

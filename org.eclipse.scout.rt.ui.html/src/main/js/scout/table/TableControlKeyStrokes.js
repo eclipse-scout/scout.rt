@@ -90,7 +90,7 @@ scout.TableControlKeyStrokes.prototype.handle = function(event) {
       $newRowSelection = $rowsSelected.add($newRowSelection);
     }
     for (i = 0; $newRowSelection[i] !== undefined; i++) {
-      rowIds.push($newRowSelection[i].getAttribute('id'));
+      rowIds.push($($newRowSelection[i]).data('row').id);
     }
     this._field.selectRowsByIds(rowIds);
   }

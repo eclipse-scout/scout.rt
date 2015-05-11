@@ -62,6 +62,18 @@ scout.ModelAdapter.prototype._renderInternal = function($parent) {
   } else {
     scout.ModelAdapter.parent.prototype._renderInternal.call(this, $parent);
   }
+  this._renderUniqueId();
+};
+
+scout.ModelAdapter.prototype._renderUniqueId = function(qualifier, $target) {
+  if (typeof suffix !== 'string' && $target === undefined) {
+    $target = qualifier;
+    qualifier = undefined;
+  }
+  $target = $target || this.$container || (this.ui && this.ui.$container);
+  if ($target && !$target.attr('id')) { // don't overwrite
+    $target.attr('id', this.uniqueId(qualifier));
+  }
 };
 
 scout.ModelAdapter.prototype._remove = function() {
@@ -365,16 +377,21 @@ scout.ModelAdapter.prototype._goOnline = function() {
 };
 
 /**
- * Creates an id based on a class name. E.g.: smart-field -> SmartField-13
+ * Returns a unique identifier for the modelAdapter, consisting of the object type,
+ * the session's partId and the adapter ID. An optional qualifier argument allows
+ * generation of multiple unique IDs per adapter.
+ *
+ * The return value is suitable for use in the HTML 'id' attribute.
+ *
+ * @see http://www.w3.org/TR/html5/dom.html#the-id-attribute
  */
-scout.ModelAdapter.prototype._generateId = function(cssClass) {
-  var i,
-    idParts = cssClass.split('-');
-
-  for (i = 0; i < idParts.length; i++) {
-    idParts[i] = idParts[i].charAt(0).toUpperCase() + idParts[i].substring(1);
+scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
+  var s = 'scout.' + this.objectType;
+  if (qualifier) {
+    s += '@' + qualifier;
   }
-  return idParts.join('') + '-' + this.id;
+  s +=  '[' + this.session.partId + '-' + this.id + ']';
+  return s.replace(/\s/g, '');
 };
 
 scout.ModelAdapter.prototype.toString = function() {

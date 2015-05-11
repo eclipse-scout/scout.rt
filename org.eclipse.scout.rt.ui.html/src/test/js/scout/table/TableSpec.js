@@ -294,7 +294,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var rowIds = ['0', '4'];
+      var rowIds = [model.rows[0].id, model.rows[4].id];
       table.selectRowsByIds(rowIds);
 
       sendQueuedAjaxCalls();
@@ -696,8 +696,8 @@ describe("Table", function() {
     var $colHeaders, $header0, $header1;
 
     function prepareTable() {
-      columns = [helper.createModelColumn(createUniqueAdapterId(), 'col1'),
-                 helper.createModelColumn(createUniqueAdapterId(), 'col2', 'number')];
+      columns = [helper.createModelColumn(createUniqueId(), 'col1'),
+                 helper.createModelColumn(createUniqueId(), 'col2', 'number')];
       columns[0].index = 0;
       columns[1].index = 1;
       rows = helper.createModelRows(2, 3);
@@ -1123,9 +1123,9 @@ describe("Table", function() {
         session._processSuccessResponse(message);
 
         expect(table.$rows().length).toBe(2);
-        expect(table.$data.find('#'+row0.id).length).toBe(0);
-        expect(table.$data.find('#'+row1.id).length).toBe(1);
-        expect(table.$data.find('#'+row2.id).length).toBe(1);
+        expect(table.$data.find('[data-rowid="' + row0.id + '"]').length).toBe(0);
+        expect(table.$data.find('[data-rowid="' + row1.id + '"]').length).toBe(1);
+        expect(table.$data.find('[data-rowid="' + row2.id + '"]').length).toBe(1);
 
         message = {
           events: [createRowsDeletedEvent(model, [row1.id, row2.id])]
@@ -1252,9 +1252,9 @@ describe("Table", function() {
         session._processSuccessResponse(message);
 
         var $rows = table.$rows();
-        expect($rows.eq(0).attr('id')).toBe(model.rows[2].id);
-        expect($rows.eq(1).attr('id')).toBe(model.rows[1].id);
-        expect($rows.eq(2).attr('id')).toBe(model.rows[0].id);
+        expect($rows.eq(0).attr('data-rowid')).toBe(model.rows[2].id);
+        expect($rows.eq(1).attr('data-rowid')).toBe(model.rows[1].id);
+        expect($rows.eq(2).attr('data-rowid')).toBe(model.rows[0].id);
       });
 
       it("does not animate ordering for newly inserted rows", function() {
@@ -1262,8 +1262,8 @@ describe("Table", function() {
         expect(table.rows.length).toBe(3);
 
         var newRows = [
-          helper.createModelRow('3', helper.createModelCells(2)),
-          helper.createModelRow('4', helper.createModelCells(2))
+          helper.createModelRow(createUniqueId(), helper.createModelCells(2)),
+          helper.createModelRow(createUniqueId(), helper.createModelCells(2))
         ];
 
         //Insert new rows and switch rows 0 and 1
@@ -1284,7 +1284,7 @@ describe("Table", function() {
         $rows.each(function() {
           var $row = $(this);
           var oldTop = $row.data('old-top');
-          var rowId = $row.attr('id');
+          var rowId = $row.attr('data-rowid');
           if (rowId  === newRows[0].id || rowId === newRows[1].id) {
             expect(oldTop).toBeUndefined();
           } else {

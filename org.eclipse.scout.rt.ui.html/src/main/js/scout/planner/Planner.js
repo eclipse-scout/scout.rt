@@ -70,7 +70,7 @@ scout.Planner.prototype._initResource = function(resource) {
 scout.Planner.prototype._render = function($parent) {
   //basics, layout etc.
   this._$parent = $parent;
-  this.$container = this._$parent.appendDiv('planner').attr('id', this._generateId('planner'));
+  this.$container = this._$parent.appendDiv('planner');
   var layout = new scout.PlannerLayout(this);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(layout);
@@ -842,7 +842,7 @@ scout.Planner.prototype._renderIntradayInterval = function() {};
 
 scout.Planner.prototype._renderDisplayMode = function() {
   $('.planner-mode', this.$commands).select(false);
-  $("[data-mode='" + this.displayMode +"']", this.$commands).select(true);
+  $('[data-mode="' + this.displayMode + '"]', this.$commands).select(true);
 };
 
 scout.Planner.prototype._renderSelectedBeginTime = function() {};

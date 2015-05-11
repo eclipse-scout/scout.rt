@@ -2,7 +2,7 @@ scout.Outline = function() {
   scout.Outline.parent.call(this);
   this._addAdapterProperties('defaultDetailForm');
   this.navigateUpInProgress = false; // see NavigateUpButton.js
-  this.containerClasses += ' outline';
+  this._additionalContainerClasses += ' outline';
   this._treeItemPaddingLeft = 37;
   this._treeItemPaddingLevel = 20;
   this._tableSelectionListener;

@@ -10,7 +10,7 @@ scout.Tree = function() {
   this._breadcrumb = false;
   this.events = new scout.EventSupport();
   this._addAdapterProperties('menus');
-  this.containerClasses = ''; // may be set if additional classes are required
+  this._additionalContainerClasses = ''; // may be used by subclasses to set additional CSS classes
   this._treeItemPaddingLeft = 23;
   this._treeItemCheckBoxPaddingLeft = 29;
   this._treeItemPaddingLevel = 15;
@@ -78,8 +78,8 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
 scout.Tree.prototype._render = function($parent) {
   this.$parent = $parent;
   this.$container = $parent.appendDiv('tree');
-  if (this.containerClasses) {
-    this.$container.addClass(this.containerClasses);
+  if (this._additionalContainerClasses) {
+    this.$container.addClass(this._additionalContainerClasses);
   }
 
   var layout = new scout.TreeLayout(this);
@@ -108,7 +108,6 @@ scout.Tree.prototype._renderProperties = function() {
   this._renderEnabled();
   this._renderMenus();
 };
-
 
 scout.Tree.prototype._renderMenus = function() {
   var menuItems = this._filterMenus(['Tree.EmptySpace']);
@@ -684,8 +683,8 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
     $parentNode = (parentNode ? parentNode.$node : undefined);
   }
   if ($parentNode) {
-    var childNodes = $parentNode.data('node').childNodes;
-    if (!childNodes || childNodes.length === 0) {
+    var childNodesOfParent = $parentNode.data('node').childNodes;
+    if (!childNodesOfParent || childNodesOfParent.length === 0) {
       $parentNode.removeClass('expanded');
     }
   }
@@ -727,10 +726,10 @@ scout.Tree.prototype._$buildNode = function(node, $parent) {
   var level = $parent ? parseFloat($parent.attr('data-level')) + 1 : 0;
 
   var $node = $.makeDiv('tree-node')
-    .attr('id', node.id)
     .on('click', '', this._onNodeClick.bind(this))
     .on('dblclick', '', this._onNodeDoubleClick.bind(this))
     .data('node', node)
+    .attr('data-nodeid', node.id)
     .attr('data-level', level)
     .css('padding-left', this._computeTreeItemPaddingLeft(level));
   node.$node = $node;
@@ -883,8 +882,7 @@ scout.Tree.prototype._onNodeClick = function(event) {
   }
 
   var $node = $(event.currentTarget),
-    nodeId = $node.attr('id'),
-    node = this.nodesMap[nodeId];
+    node = $node.data('node');
 
   this.setNodesSelected(node);
 
@@ -893,7 +891,7 @@ scout.Tree.prototype._onNodeClick = function(event) {
   }
 
   this.session.send(this.id, 'nodeClicked', {
-    nodeId: nodeId
+    nodeId: node.id
   });
 };
 
@@ -904,16 +902,15 @@ scout.Tree.prototype._isCheckboxClicked = function(event) {
 
 scout.Tree.prototype._onNodeDoubleClick = function(event) {
   var $node = $(event.currentTarget),
-    nodeId = $node.attr('id'),
-    expanded = !$node.hasClass('expanded'),
-    node = this.nodesMap[nodeId];
+    node = $node.data('node'),
+    expanded = !$node.hasClass('expanded');
 
   if (this._breadcrumb) {
     return;
   }
 
   this.session.send(this.id, 'nodeAction', {
-    nodeId: nodeId
+    nodeId: node.id
   });
 
   this.setNodeExpanded(node, expanded);

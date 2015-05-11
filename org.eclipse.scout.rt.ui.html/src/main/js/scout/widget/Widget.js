@@ -44,6 +44,13 @@ scout.Widget.prototype._renderProperties = function() {
   // NOP
 };
 
+scout.Widget.prototype._renderModelClass = function($target) {
+  $target = $target || this.$container;
+  if ($target && this.modelClass) {
+    $target.attr('data-modelClass', this.modelClass);
+  }
+};
+
 scout.Widget.prototype.remove = function() {
   $.log.trace('Removing widget: ' + this);
   if (!this.rendered) {
@@ -66,12 +73,6 @@ scout.Widget.prototype._remove = function() {
   }
 };
 
-scout.Widget.prototype._renderModelClass = function() {
-  if (this.$container && this.modelClass) {
-    this.$container.attr('data-modelClass', this.modelClass);
-  }
-};
-
 /**
  * Call this function in the constructor of your widget if you need event support.
  **/
@@ -79,7 +80,18 @@ scout.Widget.prototype._addEventSupport = function() {
   this.events = new scout.EventSupport();
 };
 
-/* --- Convenience delegation functions to this.events------------------------------------------ */
+scout.Widget.prototype.addChild = function(child) {
+  $.log.trace('addChild(' + child + ') to ' + this);
+  this.children.push(child);
+};
+
+scout.Widget.prototype.removeChild = function(child) {
+  $.log.trace('removeChild(' + child + ') from ' + this);
+  scout.arrays.remove(this.children, child);
+};
+
+// --- Convenience delegation functions to this.events -------------------
+
 scout.Widget.prototype.trigger = function(type, event) {
   this.events.trigger(type, event);
 };
@@ -92,7 +104,8 @@ scout.Widget.prototype.off = function(type, func) {
   this.events.off(type, func);
 };
 
-/* --- KeyStrokeAdapter functions ------------------------------------------------------------- */
+// --- KeyStrokeAdapter functions ----------------------------------------
+
 scout.Widget.prototype._createKeyStrokeAdapter = function() {
   // to be implemented by subclass
 };
@@ -107,18 +120,4 @@ scout.Widget.prototype._uninstallKeyStrokeAdapter = function() {
   if (this.keyStrokeAdapter && scout.keyStrokeManager.isAdapterInstalled(this.keyStrokeAdapter)) {
     scout.keyStrokeManager.uninstallAdapter(this.keyStrokeAdapter);
   }
-};
-
-scout.Widget.prototype.addChild = function(child) {
-  $.log.trace('addChild(' + child + ') to ' + this);
-  this.children.push(child);
-};
-
-scout.Widget.prototype.removeChild = function(child) {
-  $.log.trace('removeChild(' + child + ') from ' + this);
-  scout.arrays.remove(this.children, child);
-};
-
-scout.Widget.prototype.toString = function() {
-  return this.objectType + '[' + this.id + ']';
 };

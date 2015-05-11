@@ -156,7 +156,7 @@ scout.TableSelectionHandler.prototype.renderSelection = function() {
   var selectedRows = [];
   for (var i = 0; i < rowIds.length; i++) {
     var rowId = rowIds[i];
-    var $row = $('#' + rowId, this.table.$data);
+    var $row = this.table.rowsMap[rowId].$row;
     $row.select(true);
     selectedRows.push($row);
   }

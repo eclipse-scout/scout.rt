@@ -36,7 +36,7 @@ scout.FormField.LABEL_POSITION_TOP = 4;
 
 scout.FormField.prototype.init = function(model, session) {
   scout.FormField.parent.prototype.init.call(this, model, session);
-  this.refFieldId = this.session.getUniqueFieldIdPrefix() + this.id;
+  this.refFieldId = this.uniqueId('ref');
 };
 
 scout.FormField.prototype._createKeyStrokeAdapter = function() {
@@ -328,19 +328,18 @@ scout.FormField.prototype._onIconClick = function(event) {
  * Applies (logical) grid-data and FormFieldLayout to this.$container.
  *
  * @param $parent to which container is appended
- * @param typeName typeName of scout component used as class name and ID attribute. ID is only used for debug purpose so don't rely on it.
+ * @param cssClass cssClass to add to the new container DIV
  * @param layout when layout is undefined, scout.FormFieldLayout() is set
  *
  * @return The HtmlComponent created for this.$container
  */
-scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
-  this.$container = $.makeDiv('form-field')
+scout.FormField.prototype.addContainer = function($parent, cssClass, layout) {
+  this.$container = $.makeDiv()
+    .addClass('form-field')
     .appendTo($parent);
 
-  if (typeName) {
-    this.$container
-      .addClass(typeName)
-      .attr('id', this._generateId(typeName));
+  if (cssClass) {
+    this.$container.addClass(cssClass);
   }
 
   var htmlComp = new scout.HtmlComponent(this.$container, this.session);

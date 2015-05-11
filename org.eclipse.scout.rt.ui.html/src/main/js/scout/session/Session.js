@@ -10,6 +10,10 @@ scout.BackgroundJobPollingStatus = {
 /**
  * $entryPoint and uiSessionId are required to create a new session.
  *
+ * The argument partId is optional (default is '0'). It is only necessary when
+ * multiple sessions are managed in the same VM (portlet support). Each session's
+ * partId must be unique!
+ *
  * The 'options' argument holds all optional values that may be used during
  * initialization (it is the same object passed to the scout.init() function).
  * The following 'options' properties are read by this constructor function:
@@ -23,7 +27,12 @@ scout.BackgroundJobPollingStatus = {
  *   [objectFactories]
  *     Factories to build model adapters. Default: scout.defaultObjectFactories.
  */
-scout.Session = function($entryPoint, uiSessionId, options) {
+scout.Session = function($entryPoint, uiSessionId, partId, options) {
+  if (typeof partId === 'object') { // partId is optional --> if it is an object, use it as 'options' argument
+    options = partId;
+    partId = undefined;
+  }
+  partId = partId || '0';
   options = options || {};
 
   // Prepare clientSessionId
@@ -39,6 +48,7 @@ scout.Session = function($entryPoint, uiSessionId, options) {
   // Set members
   this.$entryPoint = $entryPoint;
   this.uiSessionId = uiSessionId;
+  this.partId = partId;
   this.parentUiSession;
   this.clientSessionId = clientSessionId;
   this.userAgent = options.userAgent || new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
@@ -61,7 +71,6 @@ scout.Session = function($entryPoint, uiSessionId, options) {
   this._busyCounter = 0; //  >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper();
-  this.partId = uiSessionId.substring(0, uiSessionId.indexOf(':')); // FIXME BSH Improve this, maybe pass partId as argument
   this._backgroundJobPollingEnabled = false;
   this._backgroundJobPollingStatus = scout.BackgroundJobPollingStatus.STOPPED;
 
@@ -827,8 +836,4 @@ scout.Session.prototype.optText = function(textKey, defaultValue) {
 
 scout.Session.prototype.textExists = function(textKey) {
   return this._texts.exists(textKey);
-};
-
-scout.Session.prototype.getUniqueFieldIdPrefix = function() {
-  return 'scout-' + this.partId + '-';
 };
