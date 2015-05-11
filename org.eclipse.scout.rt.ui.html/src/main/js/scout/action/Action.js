@@ -60,8 +60,12 @@ scout.Action.prototype._renderSelected = function(selected) {
 };
 
 scout.Action.prototype._renderKeyStroke = function(keyStroke) {
-  keyStroke = keyStroke || '';
-  this.$container.attr('data-shortcut', keyStroke);
+  if (keyStroke === undefined) {
+    this.$container.removeAttr('data-shortcut');
+  }
+  else {
+    this.$container.attr('data-shortcut', keyStroke);
+  }
 };
 
 scout.Action.prototype._renderTooltipText = function(tooltipText) {
