@@ -68,15 +68,12 @@ scout.DesktopNavigation.prototype._createOutlinesTab = function() {
     .on('mousedown', this._onMenuButtonClicked.bind(this));
 
   // create title of active outline
-  var $outlineTitle = $tab.appendDiv('navigation-tab-outline-title')
-    .on('mousedown', this._onMenuButtonClicked.bind(this));
+  var $outlineTitle = $tab.appendDiv('navigation-tab-outline-title');
 
-  // TODO: find other solution for collapsing the outline
-  /*
   $outlineTitle.click(function() {
     that.outline.clearSelection();
     that.outline.collapseAll();
-  });*/
+  });
 
   // save and return
   this.$outlineTitle = $outlineTitle;
