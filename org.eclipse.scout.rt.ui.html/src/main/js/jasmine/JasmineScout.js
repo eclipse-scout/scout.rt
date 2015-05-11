@@ -274,32 +274,41 @@ $.fn.triggerKeyDown = function(key, modifier) {
   this.trigger(event);
 };
 
-$.fn.triggerMouseDown = function(clicks) {
-  return this.triggerWithDetail('mousedown', clicks);
+$.fn.triggerMouseDown = function(opts) {
+  return this.triggerMouseAction('mousedown', opts);
 };
 
-$.fn.triggerMouseUp = function(clicks) {
-  return this.triggerWithDetail('mouseup', clicks);
+$.fn.triggerMouseUp = function(opts) {
+  return this.triggerMouseAction('mouseup', opts);
 };
 
 $.fn.triggerMouseMove = function(position) {
-  return this.triggerWithPosition('mousemove', position);
+  return this.triggerWithPosition('mousemove', {
+    position: position
+  });
 };
 
-$.fn.triggerWithDetail = function(event, clicks) {
-  var pos = this.offset();
+$.fn.triggerMouseAction = function(eventType, opts) {
+  opts = opts || {};
 
-  if (!clicks) {
-    clicks = 1;
+  if (!opts.position) {
+    opts.position = this.offset();
+  }
+  if (!opts.clicks) {
+    opts.clicks = 1;
+  }
+  if (!opts.which) {
+    opts.which = 1;
   }
 
   this.trigger({
-    type: event,
+    type: eventType,
+    which: opts.which,
     originalEvent: {
-      detail: clicks
+      detail: opts.clicks
     },
-    pageX: pos.left,
-    pageY: pos.right
+    pageX: opts.position.left,
+    pageY: opts.position.right
   });
   return this;
 };
@@ -318,15 +327,17 @@ $.fn.triggerWithPosition = function(event, position) {
 };
 
 $.fn.triggerContextMenu = function() {
-  var pos = this.offset(),
-    clicks = 1;
+  var opts = {
+    position: this.offset(),
+    which: 3
+  };
 
-  this.triggerMouseDown(clicks);
-  this.triggerMouseUp(clicks);
+  this.triggerMouseDown(opts);
+  this.triggerMouseUp(opts);
   this.trigger({
     type: 'contextmenu',
-    pageX: pos.left,
-    pageY: pos.top
+    pageX: opts.position.left,
+    pageY: opts.position.top
   });
   return this;
 };
@@ -336,17 +347,18 @@ $.fn.triggerContextMenu = function() {
  * Also sets the detail property of the originalEvent which contains the numbers of clicks.
  * @param clicks the number of clicks. If not set 1 is used.
  */
-$.fn.triggerClick = function(clicks) {
-  if (!clicks) {
-    clicks = 1;
+$.fn.triggerClick = function(opts) {
+  opts = opts || {};
+  if (!opts.clicks) {
+    opts.clicks = 1;
   }
 
-  this.triggerMouseDown(clicks);
-  this.triggerMouseUp(clicks);
+  this.triggerMouseDown(opts);
+  this.triggerMouseUp(opts);
   this.trigger({
     type: 'click',
     originalEvent: {
-      detail: clicks
+      detail: opts.clicks
     }
   });
 
@@ -366,7 +378,9 @@ $.fn.triggerDoubleClick = function() {
   var clicks = 2;
 
   this.triggerClick();
-  this.triggerClick(2);
+  this.triggerClick({
+    clicks: 2
+  });
   this.trigger({
     type: 'dblclick',
     originalEvent: {

@@ -354,7 +354,19 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     ArrayList<ITableRow> rows = new ArrayList<ITableRow>();
     rows.add(tableRow);
     getModel().getUIFacade().setContextColumnFromUI(column);
-    getModel().getUIFacade().fireRowClickFromUI(tableRow, MouseButton.Left);
+    MouseButton mouseButton = extractMouseButton(event.getData());
+    getModel().getUIFacade().fireRowClickFromUI(tableRow, mouseButton);
+  }
+
+  protected MouseButton extractMouseButton(JSONObject json) {
+    int mouseButton = json.getInt("mouseButton");
+    switch (mouseButton) {
+      case 1:
+        return MouseButton.Left;
+      case 3:
+        return MouseButton.Right;
+    }
+    return MouseButton.Unknown;
   }
 
   protected void handleUiRowChecked(JsonEvent event) {

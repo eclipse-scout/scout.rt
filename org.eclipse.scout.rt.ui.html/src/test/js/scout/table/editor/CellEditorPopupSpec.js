@@ -111,11 +111,29 @@ describe("CellEditor", function() {
 
     it("does not start cell edit if mouse down and up happened on different cells", function() {
       table.rows[0].cells[0].editable = true;
-      table.rows[0].cells[0].editable = true;
+      table.rows[0].cells[1].editable = true;
 
       spyOn(table, 'sendPrepareCellEdit');
       $cell0_1.triggerMouseDown();
       $cell0_0.triggerMouseUp();
+      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+    });
+
+    it("does not start cell edit if right mouse button was pressed", function() {
+      table.rows[0].cells[0].editable = true;
+
+      spyOn(table, 'sendPrepareCellEdit');
+      $cell0_0.triggerMouseDown({which: 3});
+      $cell0_0.triggerMouseUp({which: 3});
+      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+    });
+
+    it("does not start cell edit if middle mouse button was pressed", function() {
+      table.rows[0].cells[0].editable = true;
+
+      spyOn(table, 'sendPrepareCellEdit');
+      $cell0_0.triggerMouseDown({which: 2});
+      $cell0_0.triggerMouseUp({which: 2});
       expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
     });
 

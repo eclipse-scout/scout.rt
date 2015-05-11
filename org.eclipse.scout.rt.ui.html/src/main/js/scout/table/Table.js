@@ -500,7 +500,8 @@ scout.Table.prototype._installRows = function($rows) {
   }
 
   function onMouseUp(event) {
-    var $row, $mouseUpRow, column, $appLink;
+    var $row, $mouseUpRow, column, $appLink,
+      mouseButton = event.which;
     if (event.originalEvent.detail > 1) {
       // Don't execute on double click events
       return;
@@ -519,15 +520,16 @@ scout.Table.prototype._installRows = function($rows) {
       // Don't execute click / appLinks when the mouse gets pressed and moved outside of a cell
       return;
     }
-    column.onMouseUp(event, $row);
-
-    $appLink = that._find$AppLink(event);
+    if (mouseButton === 1) {
+      column.onMouseUp(event, $row);
+      $appLink = that._find$AppLink(event);
+    }
     if ($appLink) {
       that.sendAppLinkAction(column.id, $appLink.data('ref'));
     } else if (column.guiOnlyCheckBoxColumn) {
-      that.sendRowClicked($row);
+      that.sendRowClicked($row, mouseButton);
     } else {
-      that.sendRowClicked($row, column.id);
+      that.sendRowClicked($row, mouseButton, column.id);
     }
   }
 
@@ -670,9 +672,10 @@ scout.Table.prototype.onResize = function() {
   this.htmlComp.revalidate();
 };
 
-scout.Table.prototype.sendRowClicked = function($row, columnId) {
+scout.Table.prototype.sendRowClicked = function($row, mouseButton, columnId) {
   var data = {
-    rowId: $row.attr('id')
+    rowId: $row.attr('id'),
+    mouseButton: mouseButton
   };
   if (columnId !== undefined) {
     data.columnId = columnId;
