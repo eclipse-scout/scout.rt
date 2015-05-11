@@ -128,4 +128,9 @@ public class ScriptSource {
   public ScriptSource.NodeType getNodeType() {
     return m_nodeType;
   }
+
+  @Override
+  public String toString() {
+    return m_nodeType + " [" + m_fileType + "] " + m_requestPath + " (at " + m_url + ")";
+  }
 }
