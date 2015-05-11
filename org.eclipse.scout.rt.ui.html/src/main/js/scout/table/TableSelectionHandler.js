@@ -18,6 +18,7 @@ scout.TableSelectionHandler = function(table) {
 };
 
 // TODO BSH Table Selection | Try to merge this with TableKeystrokeAdapter
+//FIXME CGU refactor, this handler should not directly render the selection, instead it should call table.selectRows which updates model and calls renderSelection.
 scout.TableSelectionHandler.prototype.onMouseDown = function(event, $row) {
   var fromIndex, toIndex,
     select = true;

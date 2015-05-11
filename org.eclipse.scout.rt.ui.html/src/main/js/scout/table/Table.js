@@ -1195,6 +1195,7 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
 
   $selectedRows = this.selectionHandler.renderSelection();
   this._triggerRowsSelected($selectedRows);
+  this._renderMenus();
 };
 
 scout.Table.prototype.$selectedRows = function() {
