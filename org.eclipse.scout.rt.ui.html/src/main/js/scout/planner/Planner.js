@@ -8,6 +8,9 @@ scout.Planner = function() {
   // visual
   this._resourceTitleWidth = 20;
 
+  // tooltip handling
+  this._tooltipDelay;
+
   // main elements
   this.$container;
   this.$header;
@@ -16,13 +19,22 @@ scout.Planner = function() {
   this.$year;
   this.$grid;
 
-  // mode
+  // display mode
   this.DAY = 1;
   this.WEEK = 2;
   this.MONTH = 3;
   this.WORK = 4;
   this.CALENDAR_WEEK = 5;
   this.YEAR = 6;
+
+  // selection mode
+  this.NONE = 1;
+  this.ACTIVITY = 2;
+  this.SELECTOR_ONE = 3;
+  this.SELECTOR_MORE = 4;
+
+  // test
+  this.selecMode = 4;
 
   // scale calculator
   this.transformLeft = function (t) { return t; };
@@ -31,6 +43,13 @@ scout.Planner = function() {
   // additional modes; should be stored in model
   this.showYear = false;
 };
+
+scout.Planner.Direction = {
+    BACKWARD: -1,
+    FORWARD: 1
+  };
+
+
 scout.inherits(scout.Planner, scout.ModelAdapter);
 
 scout.Planner.prototype.init = function(model, session) {
@@ -66,8 +85,8 @@ scout.Planner.prototype._render = function($parent) {
 
   // header contains all controls
   this.$range = this.$header.appendDiv('planner-range');
-  this.$range.appendDiv('planner-minus').click(this._onClickMinus.bind(this));
-  this.$range.appendDiv('planner-plus').click(this._onClickPlus.bind(this));
+  this.$range.appendDiv('planner-minus').click(this._onClickPrevious.bind(this));
+  this.$range.appendDiv('planner-plus').click(this._onClickNext.bind(this));
   this.$range.appendDiv('planner-select');
 
   // ... and modes
@@ -97,45 +116,37 @@ scout.Planner.prototype._renderProperties = function() {
 
 /* -- basics, events -------------------------------------------- */
 
-scout.Planner.prototype._onClickMinus = function(event) {
-  var year = this.selected.getFullYear(),
-    month = this.selected.getMonth(),
-    date = this.selected.getDate(),
-    day = this.selected.getDay();
+scout.Planner.prototype._onClickPrevious = function(event) {
+  this._navigateDate(scout.Planner.Direction.BACKWARD);
+};
 
-  // find new selected date
-  if (this.displayMode === this.DAY) {
-    this.selected = new Date(year, month, date - 1);
-  } else if (this.displayMode === this.WEEK || this.displayMode === this.WORK) {
-    this.selected = new Date(year, month, date - 7);
-  } else if (this.displayMode === this.MONTH) {
-    this.selected = new Date(year, month - 1, date);
+scout.Planner.prototype._onClickNext = function(event) {
+  this._navigateDate(scout.Planner.Direction.FORWARD);
+};
+
+scout.Planner.prototype._navigateDate = function(direction) {
+  if (this.displayMode == this.DAY) {
+    this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction);
+    this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction);
+  } else if (this.displayMode == this.WEEK || this.displayMode == this.WORK) {
+    this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction * 7);
+    this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction * 7);
+  } else if (this.displayMode == this.MONTH) {
+    this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
+    this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
+  } else if (this.displayMode == this.CALENDAR_WEEK) {
+    this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
+    this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
+  } else if (this.displayMode == this.YEAR) {
+    this.viewRange.from = scout.dates.shift(this.viewRange.from, 0, 3 * direction, 0);
+    this.viewRange.to = scout.dates.shift(this.viewRange.to, 0, 3 * direction, 0);
   }
 
-  // update calendar
   this._updateModel();
   this._updateScreen();
 };
 
-scout.Planner.prototype._onClickPlus = function(event) {
-  var year = this.selected.getFullYear(),
-    month = this.selected.getMonth(),
-    date = this.selected.getDate(),
-    day = this.selected.getDay();
 
-  // find new selected date
-  if (this.displayMode === this.DAY) {
-    this.selected = new Date(year, month, date + 1);
-  } else if (this.displayMode === this.WEEK || this.displayMode === this.WORK) {
-    this.selected = new Date(year, month, date + 7);
-  } else if (this.displayMode === this.MONTH) {
-    this.selected = new Date(year, month + 1, date);
-  }
-
-  // update calendar
-  this._updateModel();
-  this._updateScreen();
-};
 
 scout.Planner.prototype._onClickToday = function(event) {
   // new selected date
@@ -230,7 +241,7 @@ scout.Planner.prototype._layoutScale  = function() {
 
   // fill timeline large depending on mode
   // TODO: depending on screen size: smaller or large representation
-  // TODO: change to swift
+  // TODO: change to shift
   if (this.displayMode === this.DAY) {
     loop = new Date(this.viewRange.from.valueOf());
 
@@ -313,7 +324,9 @@ scout.Planner.prototype._layoutScale  = function() {
 
       $divSmall = $timelineSmall
         .appendDiv('scale-item', scout.dates.weekInYear(loop))
-        .data('date-from', new Date(loop.valueOf()));
+        .data('date-from', new Date(loop.valueOf()))
+        .mouseenter(this._onScaleHoverIn.bind(this))
+        .mouseleave(this._onScaleHoverOut.bind(this));
 
       loop.setDate(loop.getDate() + 7);
       $divSmall.data('date-to', new Date(loop.valueOf()));
@@ -362,6 +375,49 @@ scout.Planner.prototype._layoutScale  = function() {
     }(beginScale, endScale);
 };
 
+
+/* -- scale events --------------------------------------------------- */
+
+scout.Planner.prototype._onScaleHoverIn = function(event) {
+  this._tooltipDelay = setTimeout(function() {
+    var $scale = $(event.currentTarget),
+      tooltip,
+      text,
+      toText = ' bis ',
+      from = new Date($scale.data('date-from').valueOf()),
+      to = new Date($scale.data('date-to').valueOf());
+
+    if (from.getMonth() == to.getMonth()) {
+      text = this._dateFormat(from, 'd.') + toText + this._dateFormat(to, 'd. MMMM yyyy');
+    } else if (from.getFullYear() === to.getFullYear()) {
+      text = this._dateFormat(from, 'd. MMMM') + toText + this._dateFormat(to, 'd. MMMM yyyy');
+    } else {
+      text = this._dateFormat(from, 'd. MMMM yyyy') + toText + this._dateFormat(to, 'd. MMMM yyyy');
+    }
+
+    tooltip = new scout.Tooltip({
+        text: text,
+        $anchor: $scale,
+        arrowPosition: 25,
+        arrowPositionUnit: '%',
+        htmlEnabled: true
+      });
+
+    $scale.data('tooltip', tooltip);
+    tooltip.render();
+  }.bind(this), 350);
+};
+
+scout.Planner.prototype._onScaleHoverOut = function(event) {
+  var $scale = $(event.currentTarget),
+    tooltip = $scale.data('tooltip');
+  clearTimeout(this._tooltipDelay);
+  if (tooltip) {
+    tooltip.remove();
+    $scale.removeData('tooltip');
+  }
+};
+
 /* --  render essources, activities --------------------------------- */
 
 scout.Planner.prototype._removeAllResources = function() {
@@ -407,14 +463,15 @@ scout.Planner.prototype._build$Activity = function(activity) {
   $activity.text(activity.text)
     .data('activity', activity)
     .on('click', this._onActivityClick.bind(this))
-    .css('left', this.transformLeft(begin) + '%')
-    .css('width', this.transformWidth(end - begin) + '%');
+    .css('left', 'calc(' + this.transformLeft(begin) + '% + 2px)')
+    .css('width', 'calc(' + this.transformWidth(end - begin) + '% - 4px');
 
   if (activity.cssClass) {
     $activity.addClass(activity.cssClass);
   }
   if (levelColor) {
     $activity.css('background-color', levelColor);
+    $activity.css('border-color', levelColor);
   }
   // the background-color represents the fill level and not the image. This makes it easier to change the color using a css class
   $activity.css('background-image', 'linear-gradient(to bottom, #fff 0%, #fff ' + level + '%, transparent ' + level + '%, transparent 100% )');
@@ -426,37 +483,53 @@ scout.Planner.prototype._build$Activity = function(activity) {
 
 /* -- grid, events-------------------------------------------------- */
 
-scout.Planner.prototype._onResourceMousedown = function(event) {
-  var $resource = $(event.delegateTarget),
-  resource = $resource.data('resource');
 
-  this.selectResource(resource);
+scout.Planner.prototype._onResourceMousedown = function(event) {
+//  var $resource = $(event.delegateTarget),
+//  resource = $resource.data('resource');
+
+//  this.selectResource(resource);
 };
 
 scout.Planner.prototype._onActivityClick = function(event) {
-  var $activity = $(event.delegateTarget),
-    activity = $activity.data('activity');
+//  var $activity = $(event.delegateTarget),
+//    activity = $activity.data('activity');
 };
 
 /* -- selector -------------------------------------------------- */
 
 scout.Planner.prototype._onCellMousedown = function(event) {
-  // init selector
-  this.$startRow = this._findRow(event.pageY);
-  this.$lastRow = this.$startRow;
+  var $activity,
+    $resource;
 
-  // find range on scale
-  this.startRange = this._findScale(event.pageX);
-  this.lastRange = this.startRange;
+  if (this.selecMode == this.NONE) {
+  } else if (this.selecMode == this.ACTIVITY) {
+    $activity = $(document.elementFromPoint(event.pageX, event.pageY));
 
-  // draw
-  this._drawSelector(event);
+    if ($activity.hasClass('activity')) {
+      $('.selected', this.$grid).removeClass('selected');
+      $activity.addClass('selected');
 
-  // event
-  $(document)
-    .on('mousemove', this._onCellMousemove.bind(this))
-    .one('mouseup', this._onCellMouseup.bind(this));
+      $resource = $activity.parent().parent();
+      this.selectResources([$resource.data('resource')]);
+    }
+  } else {
+    // init selector
+    this.$startRow = this._findRow(event.pageY);
+    this.$lastRow = this.$startRow;
 
+    // find range on scale
+    this.startRange = this._findScale(event.pageX);
+    this.lastRange = this.startRange;
+
+    // draw
+    this._drawSelector(event);
+
+    // event
+    $(document)
+      .on('mousemove', this._onCellMousemove.bind(this))
+      .one('mouseup', this._onCellMouseup.bind(this));
+  }
 };
 
 scout.Planner.prototype._onResizeMousedown = function(event) {
@@ -512,6 +585,11 @@ scout.Planner.prototype._drawSelector = function(event) {
     this.$selector.remove();
   }
 
+  // in case of singel selectioon
+  if (this.selecMode == this.SELECTOR_ONE) {
+    this.$lastRow = this.$startRow;
+  }
+
   // top and height
   var $parent = (this.$startRow[0].offsetTop <= this.$lastRow[0].offsetTop) ? this.$startRow : this.$lastRow;
   this.$selector = $parent.children('.resource-cells').appendDiv('selector');
@@ -526,6 +604,32 @@ scout.Planner.prototype._drawSelector = function(event) {
   this.$selector
     .css('left', 'calc(' + this.transformLeft(from) + '% - 6px)')
     .css('width', 'calc(' + this.transformWidth(to - from) + '% + 12px)');
+
+  // colorize scale
+  $('.selected', this.$scale).removeClass('selected');
+  var $scaleItems = $('.timeline-small', this.$scale).children();
+  for (var i = 0; i< $scaleItems.length; i++) {
+    var $item = $scaleItems.eq(i);
+    if ($item.data('date-from') >= from && $item.data('date-to') <= to) {
+      $item.addClass('selected');
+    }
+  }
+
+  // select rows
+  var $upperRow = (this.$startRow[0].offsetTop <= this.$lastRow[0].offsetTop) ? this.$startRow : this.$lastRow,
+    $lowerRow = (this.$startRow[0].offsetTop > this.$lastRow[0].offsetTop) ? this.$startRow : this.$lastRow,
+    resources = $('.resource', this.$grid).toArray(),
+    top = $upperRow[0].offsetTop,
+    low = $lowerRow[0].offsetTop;
+
+  for (var r = resources.length - 1; r >= 0; r--) {
+    var row = resources[r];
+    if ((row.offsetTop < top && row.offsetTop < low) || (row.offsetTop > top && row.offsetTop > low)) {
+      resources.splice(r, 1);
+    }
+  }
+
+  this.selectResources(resources.map(function(i) { return $(i).data('resource'); }));
 };
 
 scout.Planner.prototype._findRow = function(y) {
@@ -788,11 +892,12 @@ scout.Planner.prototype.setDisplayMode = function(displayMode) {
 //  this._updateScreen();
 };
 
-scout.Planner.prototype.selectResource = function(resource) {
-  var oldSelection = this.selectedResources;
-  this.selectedResources = [resource];
-  // FIXME CRU set begin and end time
-  this._sendSetSelection([resource.id]);
+scout.Planner.prototype.selectResources = function(resources) {
+  var oldSelection = this.selectedResources,
+    ressourceIds = resources.map(function(r) {return r.id; });
+
+  this.selectedResources = resources;
+  this._sendSetSelection(ressourceIds);
   this._renderSelectedResources('', oldSelection);
 };
 
