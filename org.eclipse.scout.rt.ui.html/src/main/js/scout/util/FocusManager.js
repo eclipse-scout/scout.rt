@@ -163,27 +163,34 @@ scout.FocusContext = function($container, $focusedElement, uiSessionId, isRoot) 
   this._uiSessionId = uiSessionId;
   this._isRoot = isRoot;
   this.isUninstalled = false;
-  this._$container.bind('focusin.focusContext', this._validateFocusInEvent.bind(this));
-  this._$container.bind('remove', this.uninstall.bind(this));
+  this.focusinListener = this._validateFocusInEvent.bind(this);
+  this._$container.on('focusin', this.focusinListener);
+  this.removeContainerListener = this.uninstall.bind(this);
+  this._$container.on('remove', this.removeContainerListener);
+  this.removeListener;
+  this.hideListener;
+  this.focusOutListener;
+  this.keyDownListener;
 };
 
 scout.FocusContext.prototype.uninstall = function(event) {
-  if(this.isUninstalled){
+  if (this.isUninstalled) {
     return;
   }
-  this._$container.unbind('keydown.focusContext');
-  this._$container.unbind('focusin.focusContext');
+  this._$container.off('keydown', this.keyDownListener);
+  this._$container.off('focusin', this.focusinListener);
   if (this._$focusedElement) {
-    this._$focusedElement.unbind('hide.focusContext');
-    this._$focusedElement.unbind('remove.focusContext');
-    this._$focusedElement.unbind('focusout.unbindListener.focusContext');
+    this._$focusedElement.off('hide', this.hideListener);
+    this._$focusedElement.off('remove', this.removeListener);
+    this._$focusedElement.off('focusout', this.focusoutListener);
   }
+  this._$container.off('remove', this.removeContainerListener);
   scout.focusManager.uninstallFocusContext(this, this._uiSessionId);
   this.isUninstalled = true;
 };
 
 scout.FocusContext.prototype.dispose = function() {
-  this._$container.unbind('keydown.focusContext');
+  this._$container.unbind('keydown', this.keyDownListener);
 };
 
 scout.FocusContext.prototype.handleTab = function(event) {
@@ -213,7 +220,8 @@ scout.FocusContext.prototype.handleTab = function(event) {
 };
 
 scout.FocusContext.prototype.activate = function(disposeOld) {
-  this._$container.bind('keydown.focusContext', this.handleTab.bind(this));
+  this.keyDownListener = this.handleTab.bind(this);
+  this._$container.on('keydown', this.keyDownListener);
   $.log.warn('activate event focus context: ' + this.name);
   if (disposeOld) {
     scout.focusManager.disposeActiveFocusContext(this._uiSessionId);
@@ -232,23 +240,36 @@ scout.FocusContext.prototype._validateFocusInEvent = function(event) {
   $.suppressEvent(event);
 };
 
+scout.FocusContext.prototype.onRemoveField = function() {
+  scout.focusManager.validateFocus.bind(scout.focusManager, this._uiSessionId, 'remove');
+};
+scout.FocusContext.prototype.onHideField = function() {
+  scout.focusManager.validateFocus.bind(scout.focusManager, this._uiSessionId, 'hide');
+};
+
 scout.FocusContext.prototype.bindHideListener = function() {
   //ensure only one of each listenertype exists.
   //TODO nbu on/off verwenden
   var $focusedElement = this._$focusedElement;
-  $focusedElement.unbind('hide.focusContext');
-  $focusedElement.bind('hide.focusContext', scout.focusManager.validateFocus.bind(scout.focusManager, this._uiSessionId, 'hide'));
-  $focusedElement.unbind('remove.focusContext');
-  $focusedElement.bind('remove.focusContext', scout.focusManager.validateFocus.bind(scout.focusManager, this._uiSessionId, 'remove'));
-  $focusedElement.unbind('focusout.unbindListener.focusContext');
-  $focusedElement.bind('focusout.unbindListener.focusContext', function() {
-    $.log.warn('hidelistner unbound on ' + $focusedElement.attr('class'));
-    $focusedElement.unbind('remove.focusContext');
-    $focusedElement.unbind('hide.focusContext');
-    $focusedElement.unbind('focusout.unbindListener.focusContext');
-  });
+  $focusedElement.off('hide', this.hideListener);
+  this.hideListener = this.onHideField.bind(this);
+  $focusedElement.on('hide', this.hideListener);
+  $focusedElement.off('remove', this.removeListener);
+  this.removeListener = this.onRemoveField.bind(this);
+  $focusedElement.on('remove', this.removeListener);
+  $focusedElement.off('focusout', this.focusoutListener);
+  this.focusoutListener = this.onFieldFocusOff.bind(this, $focusedElement);
+  $focusedElement.on('focusout', this.focusoutListener);
   $.log.warn('hidelistner bound on ' + $focusedElement.attr('class') + ' context: ' + this.name);
 };
+
+scout.FocusContext.prototype.onFieldFocusOff = function($focusedElement) {
+  $.log.warn('hidelistner unbound on ' + $focusedElement.attr('class'));
+  $focusedElement.off('hide', this.hideListener);
+  $focusedElement.off('remove', this.removeListener);
+  $focusedElement.off('focusout', this.focusoutListener);
+};
+
 scout.FocusContext.prototype._validateFocus = function() {
   if (scout.focusManager.validatingFocus) {
     return;
