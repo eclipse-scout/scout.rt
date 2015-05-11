@@ -399,6 +399,19 @@ public class TableEventBufferTest {
     assertEquals(0, events.get(0).getRows().get(6).getRowIndex());
   }
 
+  @Test
+  public void testCoalesceIdenticalEvents() {
+    List<ITableRow> mockRows = mockRows(0, 1, 2, 3, 4);
+    final TableEvent event1 = new TableEvent(mock(ITable.class), TableEvent.TYPE_TABLE_POPULATED, mockRows);
+    final TableEvent event2 = new TableEvent(mock(ITable.class), TableEvent.TYPE_TABLE_POPULATED, mockRows);
+    m_testBuffer.add(event1);
+    m_testBuffer.add(event2);
+    final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(1, events.size());
+    assertEquals(TableEvent.TYPE_TABLE_POPULATED, events.get(0).getType());
+    assertEquals(5, events.get(0).getRowCount());
+  }
+
   private TableEvent createTestUpdateEvent() {
     return new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(0, 1));
   }

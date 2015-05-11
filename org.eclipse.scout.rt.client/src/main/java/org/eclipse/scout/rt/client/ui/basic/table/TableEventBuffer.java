@@ -21,6 +21,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
@@ -46,6 +48,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     coalesceSameType(events);
     applyRowOrderChangedToRowsInserted(events);
     removeEmptyEvents(events);
+    removeIdenticalEvents(events);
     return events;
   }
 
@@ -328,6 +331,49 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         it.remove();
       }
     }
+  }
+
+  /**
+   * Removes identical events (same type and content) when they occur consecutively. The oldest event is preserved.
+   */
+  protected void removeIdenticalEvents(List<TableEvent> events) {
+    // Please note: In contrast to all other methods in this class, this method loops through the
+    // list in FORWARD direction (so the oldest event will be kept).
+    for (int i = 0; i < events.size(); i++) {
+      TableEvent event = events.get(i);
+
+      List<TableEvent> subList = events.subList(i + 1, events.size());
+      for (Iterator<TableEvent> it = subList.iterator(); it.hasNext();) {
+        TableEvent next = it.next();
+        if (next.getType() != event.getType()) {
+          // Stop when a node of different type occurs
+          break;
+        }
+        if (isIdentical(event, next)) {
+          it.remove();
+        }
+      }
+    }
+  }
+
+  protected boolean isIdentical(TableEvent event1, TableEvent event2) {
+    if (event1 == null && event2 == null) {
+      return true;
+    }
+    if (event1 == null || event2 == null) {
+      return false;
+    }
+    boolean identical = (event1.getType() == event2.getType()
+        && CollectionUtility.equalsCollection(event1.getRows(), event2.getRows(), true)
+        && CollectionUtility.equalsCollection(event1.getPopupMenus(), event2.getPopupMenus())
+        && event1.isConsumed() == event2.isConsumed()
+        && CompareUtility.equals(event1.getDragObject(), event2.getDragObject())
+        && CompareUtility.equals(event1.getDropObject(), event2.getDropObject())
+        && CompareUtility.equals(event1.getCopyObject(), event2.getCopyObject())
+        && CompareUtility.equals(event1.getColumns(), event2.getColumns())
+        && event1.isSortInMemoryAllowed() == event2.isSortInMemoryAllowed()
+        );
+    return identical;
   }
 
   /**
