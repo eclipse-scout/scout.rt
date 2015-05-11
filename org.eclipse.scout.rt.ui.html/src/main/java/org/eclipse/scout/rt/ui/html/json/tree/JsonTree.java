@@ -354,9 +354,9 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void handleModelNodesDeleted(TreeEvent event) {
     Collection<ITreeNode> nodes = event.getNodes();
     JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
-    // Small optimization: If no nodes remain, just send "all" instead of every single nodeId. (However, the
-    // nodes must be disposed individually.) This does only work when no nodes were inserted again in the same
-    // "tree changing" scope.
+    // Small optimization: If there is no parent node (i.e. the root node was deleted) or no nodes remain, just
+    // send "all" instead of every single nodeId. (However, the nodes must be disposed individually.)
+    // Caveat: This can only be optimized when no nodes were inserted again in the same "tree changing" scope.
     if (event.getCommonParentNode() == null || event.getCommonParentNode().getFilteredChildNodes().size() == 0) {
       addActionEvent(EVENT_ALL_NODES_DELETED, jsonEvent);
     }
