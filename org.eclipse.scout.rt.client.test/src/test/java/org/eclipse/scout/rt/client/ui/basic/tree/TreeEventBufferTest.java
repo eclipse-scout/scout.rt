@@ -151,7 +151,7 @@ public class TreeEventBufferTest {
     final TreeEvent e5 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "B");
     final TreeEvent e6 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "E");
     final TreeEvent e7 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "C");
-    final TreeEvent e8 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "B"); // B is twice in the list, but this cannot be coalesced at the moment
+    final TreeEvent e8 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "B"); // B is twice in the list (actually three times, but there is a different event in between)
     final TreeEvent e9 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, "D");
     m_testBuffer.add(e1);
     m_testBuffer.add(e2);
@@ -163,7 +163,7 @@ public class TreeEventBufferTest {
     m_testBuffer.add(e8);
     m_testBuffer.add(e9);
     final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
-    assertEquals(9, coalesced.size());
+    assertEquals(8, coalesced.size());
     assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(0).getType());
     assertEquals(1, coalesced.get(0).getNodes().size());
     assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(1).getType());
@@ -180,8 +180,6 @@ public class TreeEventBufferTest {
     assertEquals(1, coalesced.get(6).getNodes().size());
     assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(7).getType());
     assertEquals(1, coalesced.get(7).getNodes().size());
-    assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(8).getType());
-    assertEquals(1, coalesced.get(8).getNodes().size());
   }
 
   /**

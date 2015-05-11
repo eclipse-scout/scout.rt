@@ -32,6 +32,7 @@ import org.junit.runner.RunWith;
 public class AbstractTreeTest {
 
   private AbstractTreeNode m_node;
+  private AbstractTreeNode m_node2;
   private P_TreeListener m_treeListener;
   private P_Tree m_tree;
 
@@ -40,7 +41,10 @@ public class AbstractTreeTest {
     m_tree = new P_Tree();
     m_node = new AbstractTreeNode() {
     };
+    m_node2 = new AbstractTreeNode() {
+    };
     m_tree.addChildNode(m_tree.getRootNode(), m_node);
+    m_tree.addChildNode(m_tree.getRootNode(), m_node2);
     m_treeListener = new P_TreeListener();
     m_tree.addTreeListener(m_treeListener);
   }
@@ -100,6 +104,7 @@ public class AbstractTreeTest {
       // expected no notification after setting same value again
       m_node.getCellForUpdate().setText("foo");
       m_node.getCellForUpdate().setText("foo2");
+      m_node2.getCellForUpdate().setText("foo2"); // <-- must NOT be coalesced (different node)
       m_node.getCellForUpdate().setBackgroundColor("FFFF00");
       m_node.getCellForUpdate().setForegroundColor("00FF00");
       m_node.getCellForUpdate().setFont(new FontSpec("Arial", FontSpec.STYLE_BOLD, 7));
@@ -109,7 +114,18 @@ public class AbstractTreeTest {
     finally {
       m_node.getTree().setTreeChanging(false);
     }
-    assertNotifications(1, 2);
+    // custom check "assertNotification(1, 3)" because different nodes are involved
+    assertEquals("wrong number of notifications", 1, m_treeListener.m_notificationCounter);
+    assertEquals("wrong number of events", 3, m_treeListener.m_treeEvents.size());
+    for (int i = 0; i < m_treeListener.m_treeEvents.size(); i++) {
+      TreeEvent e = m_treeListener.m_treeEvents.get(i);
+      if (i == 1) {
+        Assert.assertSame("expected node to be included in tree event", m_node2, e.getNode());
+      }
+      else {
+        Assert.assertSame("expected node to be included in tree event", m_node, e.getNode());
+      }
+    }
   }
 
   @Test

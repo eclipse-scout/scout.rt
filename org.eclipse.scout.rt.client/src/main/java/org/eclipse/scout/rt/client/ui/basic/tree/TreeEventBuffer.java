@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 
 /**
@@ -42,6 +44,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     removeNodesContainedInPreviousEvents(events, TreeEvent.TYPE_NODES_INSERTED, TreeEvent.TYPE_NODES_INSERTED);
     coalesceSameType(events);
     removeEmptyEvents(events);
+    removeIdenticalEvents(events);
     return events;
   }
 
@@ -286,6 +289,48 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         it.remove();
       }
     }
+  }
+
+  /**
+   * Removes identical events (same type and content) when they occur consecutively. The oldest event is preserved.
+   */
+  protected void removeIdenticalEvents(List<TreeEvent> events) {
+    // Please note: In contrast to all other methods in this class, this method loops through the
+    // list in FORWARD direction (so the oldest event will be kept).
+    for (int i = 0; i < events.size(); i++) {
+      TreeEvent event = events.get(i);
+
+      List<TreeEvent> subList = events.subList(i + 1, events.size());
+      for (Iterator<TreeEvent> it = subList.iterator(); it.hasNext();) {
+        TreeEvent next = it.next();
+        if (next.getType() != event.getType()) {
+          // Stop when a node of different type occurs
+          break;
+        }
+        if (isIdentical(event, next)) {
+          it.remove();
+        }
+      }
+    }
+  }
+
+  protected boolean isIdentical(TreeEvent event1, TreeEvent event2) {
+    if (event1 == null && event2 == null) {
+      return true;
+    }
+    if (event1 == null || event2 == null) {
+      return false;
+    }
+    boolean identical = (event1.getType() == event2.getType()
+        && hasSameCommonParentNode(event1, event2)
+        && CollectionUtility.equalsCollection(event1.getNodes(), event2.getNodes(), true)
+        && CollectionUtility.equalsCollection(event1.getDeselectedNodes(), event2.getDeselectedNodes(), true)
+        && CollectionUtility.equalsCollection(event1.getNewSelectedNodes(), event2.getNewSelectedNodes(), true)
+        && CollectionUtility.equalsCollection(event1.getPopupMenus(), event2.getPopupMenus())
+        && event1.isConsumed() == event2.isConsumed()
+        && CompareUtility.equals(event1.getDragObject(), event2.getDragObject())
+        && CompareUtility.equals(event1.getDropObject(), event2.getDropObject()));
+    return identical;
   }
 
   protected List<Integer> getExpansionRelatedEvents() {
