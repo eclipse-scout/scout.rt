@@ -31,3 +31,29 @@ FormSpecHelper.prototype.createFieldModel = function(objectType) {
 FormSpecHelper.prototype.createGroupBoxModel = function() {
   return this.createFieldModel('GroupBox');
 };
+
+FormSpecHelper.prototype.createFormXFields = function(x, session, isModal, parentId) {
+  var form = isModal ? this.createFormModelWithDisplayHint('dialog') : this.createFormModelWithDisplayHint('view');
+  var rootGroupBox = this.createGroupBoxModel();
+  var fields = [];
+  var fieldIds = [];
+  var field;
+  for(var i=0; i<x ;i++){
+    field = this.createFieldModel();
+    fields.push(field);
+    fieldIds.push(field.id);
+  }
+  rootGroupBox.fields = fieldIds;
+  form.rootGroupBox = rootGroupBox.id;
+  form.owner = parentId || session.rootAdapter.id;
+  fields.push(rootGroupBox);
+  return createAdapter(form, session, fields);
+};
+
+FormSpecHelper.prototype.createFormModelWithDisplayHint = function(displayHint) {
+  var model = createSimpleModel('Form');
+  $.extend(model, {
+    'displayHint': displayHint
+  });
+  return model;
+};

@@ -353,6 +353,15 @@ $.fn.triggerClick = function(clicks) {
   return this;
 };
 
+var _oldFocus = $.fn.focus;
+$.fn.focus = function() {
+  var activeElement =  document.activeElement;
+  $(activeElement).trigger('focusout');
+  _oldFocus.apply(this, arguments);
+  this.trigger('focusin');
+  return this;
+};
+
 $.fn.triggerDoubleClick = function() {
   var clicks = 2;
 
