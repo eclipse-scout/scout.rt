@@ -201,8 +201,9 @@ scout.AbstractSmartField.prototype._proposalTyped = function() {
 };
 
 scout.AbstractSmartField.prototype._onPopupMousedown = function(event) {
-  // Make sure field blur won't be triggered -> pop-up must _not_ be closed on mouse down
-  event.preventDefault();
+  // Make sure field blur won't be triggered (using preventDefault).
+  // Also makes sure event does not get propagated (and handled by another mouse down handler, e.g. the one from CellEditorPopup.js)
+  return false;
 };
 
 /**
