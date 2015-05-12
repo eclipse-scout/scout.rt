@@ -384,8 +384,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return MouseButton.Left;
       case 3:
         return MouseButton.Right;
+      default:
+        return MouseButton.Unknown;
     }
-    return MouseButton.Unknown;
   }
 
   protected void handleUiRowChecked(JsonEvent event) {

@@ -35,8 +35,8 @@ scout.CheckBoxColumn.prototype.$checkBox = function($row) {
   return $cell.children('input');
 };
 
-scout.CheckBoxColumn.prototype._cssClass = function(row) {
-  var cssClass = scout.CheckBoxColumn.parent.prototype._cssClass.call(this, row);
+scout.CheckBoxColumn.prototype._cssClass = function(row, cell) {
+  var cssClass = scout.CheckBoxColumn.parent.prototype._cssClass.call(this, row, cell);
   cssClass = cssClass.replace(' editable', '');
   cssClass += ' checkable';
   return cssClass;

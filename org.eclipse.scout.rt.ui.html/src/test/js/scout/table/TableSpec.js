@@ -117,6 +117,27 @@ describe("Table", function() {
       expect($cells1.eq(1)).not.toHaveClass('abc');
     });
 
+    it("considers custom css class of a column, as well for checkbox columns", function() {
+      var model = helper.createModelFixture(3, 2);
+      model.columns[0].cssClass = 'abc';
+      model.columns[0].objectType = 'BooleanColumn';
+
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $headerItems = table.header.$container.find('.header-item');
+      var $headerItem0 = $headerItems.eq(0);
+      var $rows = table.$rows();
+      var $cells0 = $rows.eq(0).find('.table-cell');
+      var $cells1 = $rows.eq(1).find('.table-cell');
+
+      expect($headerItem0).not.toHaveClass('abc');
+      expect($cells0.eq(0)).toHaveClass('abc');
+      expect($cells0.eq(1)).not.toHaveClass('abc');
+      expect($cells1.eq(0)).toHaveClass('abc');
+      expect($cells1.eq(1)).not.toHaveClass('abc');
+    });
+
     it("considers custom css class of a cell, if both are set only the cell class is used", function() {
       var model = helper.createModelFixture(3, 2);
       model.columns[0].cssClass = 'abc';
