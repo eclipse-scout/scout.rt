@@ -24,14 +24,14 @@ describe("TableKeyStrokeAdapter", function() {
       var table = helper.createTable(model);
       var row2 = table.rows[2];
       table.render(session.$entryPoint);
-      helper.selectRowsAndAssert(table, [row2.id]);
+      helper.selectRowsAndAssert(table, [row2]);
 
       table.$data.triggerKeyDown(scout.keys.UP);
-      helper.assertSelection(table, [table.rows[1].id]);
+      helper.assertSelection(table, [table.rows[1]]);
       table.$data.triggerKeyDown(scout.keys.UP);
-      helper.assertSelection(table, [table.rows[0].id]);
+      helper.assertSelection(table, [table.rows[0]]);
       table.$data.triggerKeyDown(scout.keys.UP);
-      helper.assertSelection(table, [table.rows[0].id]);
+      helper.assertSelection(table, [table.rows[0]]);
     });
 
     it("adds the row above to the selection if shift is used as modifier", function() {
@@ -39,14 +39,14 @@ describe("TableKeyStrokeAdapter", function() {
       var table = helper.createTable(model);
       var row2 = table.rows[2];
       table.render(session.$entryPoint);
-      helper.selectRowsAndAssert(table, [row2.id]);
+      helper.selectRowsAndAssert(table, [row2]);
 
       table.$data.triggerKeyDown(scout.keys.UP, 'shift');
-      helper.assertSelection(table, [row2.id, table.rows[1].id]);
+      helper.assertSelection(table, [row2, table.rows[1]]);
       table.$data.triggerKeyDown(scout.keys.UP, 'shift');
-      helper.assertSelection(table, [row2.id, table.rows[1].id, table.rows[0].id]);
+      helper.assertSelection(table, [row2, table.rows[1], table.rows[0]]);
       table.$data.triggerKeyDown(scout.keys.UP, 'shift');
-      helper.assertSelection(table, [row2.id, table.rows[1].id, table.rows[0].id]);
+      helper.assertSelection(table, [row2, table.rows[1], table.rows[0]]);
     });
 
   });
@@ -58,14 +58,14 @@ describe("TableKeyStrokeAdapter", function() {
       var table = helper.createTable(model);
       var row2 = table.rows[2];
       table.render(session.$entryPoint);
-      helper.selectRowsAndAssert(table, [row2.id]);
+      helper.selectRowsAndAssert(table, [row2]);
 
       table.$data.triggerKeyDown(scout.keys.DOWN);
-      helper.assertSelection(table, [table.rows[3].id]);
+      helper.assertSelection(table, [table.rows[3]]);
       table.$data.triggerKeyDown(scout.keys.DOWN);
-      helper.assertSelection(table, [table.rows[4].id]);
+      helper.assertSelection(table, [table.rows[4]]);
       table.$data.triggerKeyDown(scout.keys.DOWN);
-      helper.assertSelection(table, [table.rows[4].id]);
+      helper.assertSelection(table, [table.rows[4]]);
     });
 
     it("adds the row below to the selection if shift is used as modifier", function() {
@@ -73,14 +73,14 @@ describe("TableKeyStrokeAdapter", function() {
       var table = helper.createTable(model);
       var row2 = table.rows[2];
       table.render(session.$entryPoint);
-      helper.selectRowsAndAssert(table, [row2.id]);
+      helper.selectRowsAndAssert(table, [row2]);
 
       table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
-      helper.assertSelection(table, [row2.id, table.rows[3].id]);
+      helper.assertSelection(table, [row2, table.rows[3]]);
       table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
-      helper.assertSelection(table, [row2.id, table.rows[3].id, table.rows[4].id]);
+      helper.assertSelection(table, [row2, table.rows[3], table.rows[4]]);
       table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
-      helper.assertSelection(table, [row2.id, table.rows[3].id, table.rows[4].id]);
+      helper.assertSelection(table, [row2, table.rows[3], table.rows[4]]);
     });
 
   });

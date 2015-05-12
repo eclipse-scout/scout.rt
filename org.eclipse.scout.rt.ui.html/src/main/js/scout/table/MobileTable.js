@@ -69,7 +69,7 @@ scout.MobileTable.prototype._buildRowDiv = function(row) {
   if (numColumnsUsed === 1) {
     rowClass += 'table-row-single ';
   }
-  if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
+  if (this.selectedRows.indexOf(row) > -1) {
     rowClass += 'selected ';
   }
 

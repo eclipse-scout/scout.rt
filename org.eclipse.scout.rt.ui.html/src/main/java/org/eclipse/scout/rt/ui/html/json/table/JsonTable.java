@@ -85,7 +85,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String PROP_COLUMN_ID = "columnId";
   public static final String PROP_COLUMN_IDS = "columnIds";
   public static final String PROP_COLUMNS = "columns";
-  public static final String PROP_SELECTED_ROW_IDS = "selectedRowIds";
+  public static final String PROP_SELECTED_ROWS = "selectedRows";
 
   private TableListener m_tableListener;
   private final Map<String, ITableRow> m_tableRows;
@@ -314,7 +314,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (jsonContextMenu != null) {
       JsonObjectUtility.putProperty(json, PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
-    putProperty(json, PROP_SELECTED_ROW_IDS, rowIdsToJson(getModel().getSelectedRows()));
+    putProperty(json, PROP_SELECTED_ROWS, rowIdsToJson(getModel().getSelectedRows()));
     return json;
   }
 

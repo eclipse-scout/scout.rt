@@ -182,22 +182,22 @@ TableSpecHelper.prototype.getRowIds = function(rows) {
   return rowIds;
 };
 
-TableSpecHelper.prototype.selectRowsAndAssert = function(table, rowIds) {
-  table.selectRowsByIds(rowIds);
-  this.assertSelection(table, rowIds);
+TableSpecHelper.prototype.selectRowsAndAssert = function(table, rows) {
+  table.selectRows(rows);
+  this.assertSelection(table, rows);
 };
 
-TableSpecHelper.prototype.assertSelection = function(table, rowIds) {
+TableSpecHelper.prototype.assertSelection = function(table, rows) {
   var $selectedRows = table.$selectedRows();
-  expect($selectedRows.length).toBe(rowIds.length);
+  expect($selectedRows.length).toBe(rows.length);
 
-  var selectedRowIds = [];
+  var selectedRows = [];
   $selectedRows.each(function() {
-    selectedRowIds.push($(this).data('row').id);
+    selectedRows.push($(this).data('row'));
   });
 
-  expect(scout.arrays.equalsIgnoreOrder(rowIds, selectedRowIds)).toBeTruthy();
-  expect(scout.arrays.equalsIgnoreOrder(rowIds, table.selectedRowIds)).toBeTruthy();
+  expect(scout.arrays.equalsIgnoreOrder(rows, selectedRows)).toBeTruthy();
+  expect(scout.arrays.equalsIgnoreOrder(rows, table.selectedRows)).toBeTruthy();
 };
 
 /**

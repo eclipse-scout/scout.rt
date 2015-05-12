@@ -187,7 +187,7 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
  * the first selected row is returned.
  */
 scout.Outline.prototype.selectedRow = function() {
-  var table, rowId, node, nodes = this.selectedNodes();
+  var table, node, nodes = this.selectedNodes();
   if (nodes.length === 0) {
     return null;
   }
@@ -196,11 +196,10 @@ scout.Outline.prototype.selectedRow = function() {
     return null;
   }
   table = node.detailTable;
-  if (!table.selectedRowIds || table.selectedRowIds.length === 0) {
+  if (table.selectedRows.length === 0) {
     return null;
   }
-  rowId = table.selectedRowIds[0];
-  return table.rowById(rowId);
+  return table.selectedRows[0];
 };
 
 /* event handling */

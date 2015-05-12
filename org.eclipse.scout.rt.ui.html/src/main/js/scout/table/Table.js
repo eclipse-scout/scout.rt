@@ -19,7 +19,6 @@ scout.Table = function() {
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this._filterMap = {};
   this.tooltips = [];
-  this.selectedRowIds = [];
   this.animationRowLimit = 25;
   this.menuBar;
   this.menuBarPosition = 'bottom';
@@ -41,6 +40,7 @@ scout.Table.prototype.init = function(model, session) {
   for (var i = 0; i < this.rows.length; i++) {
     this._initRow(this.rows[i]);
   }
+  this._syncSelectedRows(this.selectedRows);
 };
 
 scout.Table.prototype._initRow = function(row) {
@@ -383,7 +383,7 @@ scout.Table.prototype.drawData = function() {
 scout.Table.prototype._buildRowDiv = function(row) {
   var rowWidth = this._rowWidth;
   var rowClass = 'table-row';
-  if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
+  if (this.selectedRows.indexOf(row) > -1) {
     rowClass += ' selected';
   }
   if (!row.enabled) {
@@ -626,9 +626,9 @@ scout.Table.prototype._filterMenus = function(allowedTypes) {
     //if no header is visible header menues should not be displayed
     delete allowedTypes[allowedTypes.indexOf('Table.Header')];
   }
-  if (this.selectedRowIds.length === 1) {
+  if (this.selectedRows.length === 1) {
     allowedTypes.push('Table.SingleSelection');
-  } else if (this.selectedRowIds.length > 1) {
+  } else if (this.selectedRows.length > 1) {
     allowedTypes.push('Table.MultiSelection');
   }
   return scout.menus.filter(this.menus, allowedTypes);
@@ -641,20 +641,20 @@ scout.Table.prototype._renderMenus = function() {
 };
 
 scout.Table.prototype.notifyRowsSelected = function($selectedRows, whileSelecting) {
-  var rowIds = [];
+  var rows = [];
   if ($selectedRows) {
     $selectedRows.each(function() {
-      rowIds.push($(this).data('row').id);
+      rows.push($(this).data('row'));
     });
   }
 
-  if (!scout.arrays.equalsIgnoreOrder(rowIds, this.selectedRowIds)) {
-    this.selectedRowIds = rowIds;
+  if (!scout.arrays.equalsIgnoreOrder(rows, this.selectedRows)) {
+    this.selectedRows = rows;
     this._sendRowsPending = true;
   }
   // Don't send event if user is still selecting (using mouse move selection)
   if (!whileSelecting && this._sendRowsPending) {
-    this.sendRowsSelected(rowIds);
+    this.sendRowsSelected(this._rowsToIds(rows));
     this._sendRowsPending = false;
   }
   this._triggerRowsSelected($selectedRows);
@@ -1039,7 +1039,7 @@ scout.Table.prototype.colorData = function(column, mode) {
 
 scout.Table.prototype._onRowsSelected = function(rowIds) {
   var $selectedRows;
-  this.selectedRowIds = rowIds;
+  this._syncSelectedRows(rowIds);
 
   if (this.rendered) {
     $selectedRows = this.selectionHandler.renderSelection();
@@ -1188,12 +1188,18 @@ scout.Table.prototype._rowsByIds = function(ids) {
   return ids.map(this.rowById.bind(this));
 };
 
-scout.Table.prototype.selectRowsByIds = function(rowIds) {
+scout.Table.prototype._rowsToIds = function(rows) {
+  return rows.map(function(row) {
+    return row.id;
+  });
+};
+
+scout.Table.prototype.selectRows = function(rows) {
   var $selectedRows;
-  if (!scout.arrays.equalsIgnoreOrder(rowIds, this.selectedRowIds)) {
-    this.selectedRowIds = rowIds;
+  if (!scout.arrays.equalsIgnoreOrder(rows, this.selectedRows)) {
+    this.selectedRows = rows;
     // FIXME CGU send delayed in case of key navigation
-    this.sendRowsSelected(rowIds);
+    this.sendRowsSelected(this._rowsToIds(rows));
   }
 
   $selectedRows = this.selectionHandler.renderSelection();
@@ -1287,11 +1293,9 @@ scout.Table.prototype.filter = function() {
   this.$sumRows().hide();
 
   // Remember current selection
-  var oldSelectedRowIds = {};
-  if (this.selectedRowIds) {
-    for (i = 0; i < this.selectedRowIds.length; i++) {
-      oldSelectedRowIds[this.selectedRowIds[i]] = true;
-    }
+  var oldSelectedRows = {};
+  for (i = 0; i < this.selectedRows.length; i++) {
+    oldSelectedRows[this.selectedRows[i]] = true;
   }
 
   // Filter rows
@@ -1330,9 +1334,9 @@ scout.Table.prototype.filter = function() {
     var $row = $(this);
     that.hideRow($row, useAnimation);
     // Remove hidden rows from the map of previously selected rows
-    var rowId = $row.data('row').id;
-    if (oldSelectedRowIds[rowId]) {
-      oldSelectedRowIds[rowId] = false;
+    var row = $row.data('row');
+    if (oldSelectedRows[row]) {
+      oldSelectedRows[row] = false;
     }
   });
   $(rowsToShow).each(function() {
@@ -1340,13 +1344,13 @@ scout.Table.prototype.filter = function() {
   });
 
   // Restore selection
-  var newSelectedRowIds = [];
-  for (var rowId in oldSelectedRowIds) {
-    if (oldSelectedRowIds[rowId]) {
-      newSelectedRowIds.push(rowId);
+  var newSelectedRows = [];
+  for (var row in oldSelectedRows) {
+    if (oldSelectedRows[row]) {
+      newSelectedRows.push(row);
     }
   }
-  this.selectRowsByIds(newSelectedRowIds); // this will update the server model if necessary
+  this.selectRows(newSelectedRows); // this will update the server model if necessary
 
   // Used by table footer
   this.filteredRowCount = rowCount;
@@ -1632,6 +1636,10 @@ scout.Table.prototype._syncCheckable = function(checkable) {
     scout.arrays.remove(this.columns, column);
     this.checkableColumn = null;
   }
+};
+
+scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
+  this.selectedRows = this._rowsByIds(selectedRowIds);
 };
 
 scout.Table.prototype._renderCheckable = function() {

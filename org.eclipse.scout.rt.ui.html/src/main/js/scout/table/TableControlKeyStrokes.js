@@ -10,7 +10,7 @@ scout.inherits(scout.TableControlKeyStrokes, scout.KeyStroke);
  * @Override scout.KeyStroke
  */
 scout.TableControlKeyStrokes.prototype.handle = function(event) {
-  var $newRowSelection, $prev, $next, i, rowIds;
+  var $newRowSelection, $prev, $next, i, rows;
   var keycode = event.which;
   var $rowsAll = this._field.$rows();
   var $rowsSelected = this._field.$selectedRows();
@@ -84,15 +84,15 @@ scout.TableControlKeyStrokes.prototype.handle = function(event) {
 
   // apply selection
   if ($newRowSelection.length > 0) {
-    rowIds = [];
+    rows = [];
     // FIXME CGU: Handling of shift key not perfect, yet... (must remember first selected row)
     if (event.shiftKey) {
       $newRowSelection = $rowsSelected.add($newRowSelection);
     }
     for (i = 0; $newRowSelection[i] !== undefined; i++) {
-      rowIds.push($($newRowSelection[i]).data('row').id);
+      rows.push($($newRowSelection[i]).data('row'));
     }
-    this._field.selectRowsByIds(rowIds);
+    this._field.selectRows(rows);
   }
 
   // scroll selection into scrollable (if not visible)

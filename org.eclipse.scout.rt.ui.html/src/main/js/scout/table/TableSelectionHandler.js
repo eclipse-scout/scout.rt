@@ -152,16 +152,16 @@ scout.TableSelectionHandler.prototype.onMouseUp = function(event) {
 
 scout.TableSelectionHandler.prototype.renderSelection = function() {
   this.clearSelection(true);
-  var rowIds = this.table.selectedRowIds;
-  var selectedRows = [];
-  for (var i = 0; i < rowIds.length; i++) {
-    var rowId = rowIds[i];
-    var $row = this.table.rowsMap[rowId].$row;
+  var selectedRows = this.table.selectedRows;
+  var selected$Rows = [];
+  for (var i = 0; i < selectedRows.length; i++) {
+    var selectedRow = selectedRows[i];
+    var $row = selectedRow.$row;
     $row.select(true);
-    selectedRows.push($row);
+    selected$Rows.push($row);
   }
 
-  var $selectedRows = $(selectedRows);
+  var $selectedRows = $(selected$Rows);
   this._renderSelectionBorder($selectedRows);
   return $selectedRows;
 };
@@ -231,7 +231,7 @@ scout.TableSelectionHandler.prototype.selectAll = function() {
 };
 
 scout.TableSelectionHandler.prototype.toggleSelection = function() {
-  if (this.table.selectedRowIds && this.table.selectedRowIds.length === this.table.rows.length) {
+  if (this.table.selectedRows.length === this.table.rows.length) {
     this.clearSelection();
   } else {
     this.selectAll();

@@ -154,7 +154,7 @@ scout.TableFooter.prototype._updateInfoSelection = function(numSelectedRows, all
   var selectAllText, info;
 
   if (numSelectedRows === undefined) {
-    numSelectedRows = this._table.selectedRowIds.length;
+    numSelectedRows = this._table.selectedRows.length;
   }
   if (all === undefined) {
     all = numRows === numSelectedRows;

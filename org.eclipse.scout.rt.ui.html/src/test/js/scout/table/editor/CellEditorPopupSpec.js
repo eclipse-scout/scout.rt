@@ -143,7 +143,7 @@ describe("CellEditor", function() {
 
       spyOn(table, 'sendPrepareCellEdit');
       // row 0 is selected, user presses shift and clicks row 2
-      table.selectRowsByIds([table.rows[0].id]);
+      table.selectRows([table.rows[0]]);
       $cell1_0.triggerClick({modifier: 'shift'});
       expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
 

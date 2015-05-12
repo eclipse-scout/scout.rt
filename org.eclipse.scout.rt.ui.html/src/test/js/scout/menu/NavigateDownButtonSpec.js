@@ -5,7 +5,9 @@ describe("NavigateDownButton", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
-    outline = {session: session};
+    outline = {
+      session: session
+    };
     menu = new scout.NavigateDownButton(outline, node);
   });
 
@@ -53,7 +55,7 @@ describe("NavigateDownButton", function() {
     });
 
     it("is enabled when node is not a leaf and we're currently displaying the detail", function() {
-      node.leaf = false;  // node is not a leaf
+      node.leaf = false; // node is not a leaf
       menu._isDetail = function() { // currently we're displaying the detail-form
         return true;
       };
@@ -65,10 +67,14 @@ describe("NavigateDownButton", function() {
       menu._isDetail = function() { // currently we're not displaying the detail-form
         return false;
       };
-      node.detailTable = {selectedRowIds: []};
+      node.detailTable = {
+        selectedRows: []
+      };
       expect(menu._buttonEnabled()).toBe(false);
 
-      node.detailTable.selectedRowIds = [1];
+      node.detailTable.selectedRows = [{
+        id: '1'
+      }];
       expect(menu._buttonEnabled()).toBe(true);
     });
   });
@@ -76,14 +82,14 @@ describe("NavigateDownButton", function() {
   it("_drill drills down to first selected row in the detail table", function() {
     var drillNode = {};
     node.detailTable = {
-      selectedRowIds: ['123'],
-      rowById: function(rowIds) {
-        return {
-          nodeId: '123'
-        };
-      }
+      selectedRows: [{
+        id: '123',
+        nodeId: '123'
+      }]
     };
-    outline.nodesMap = {'123': drillNode};
+    outline.nodesMap = {
+      '123': drillNode
+    };
     outline.setNodesSelected = function(node) {};
     outline.setNodeExpanded = function(node, expanded) {};
 

@@ -29,7 +29,7 @@ scout.NavigateDownButton.prototype._buttonEnabled = function() {
   // when it's not a leaf and not a detail - the button is only enabled when a single row is selected
   var table = this.node.detailTable;
   if (table) {
-    return table.selectedRowIds.length === 1;
+    return table.selectedRows.length === 1;
   } else {
     return true;
   }
@@ -39,9 +39,9 @@ scout.NavigateDownButton.prototype._drill = function() {
   var drillNode;
 
   if (this.node.detailTable) {
-    var rowIds = this.node.detailTable.selectedRowIds;
-    if (rowIds && rowIds.length > 0) {
-      var row = this.node.detailTable.rowById(rowIds[0]);
+    var rows = this.node.detailTable.selectedRows;
+    if (rows.length > 0) {
+      var row = rows[0];
       drillNode = this.outline.nodesMap[row.nodeId];
     }
   } else {

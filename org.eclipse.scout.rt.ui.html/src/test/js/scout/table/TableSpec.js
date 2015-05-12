@@ -175,7 +175,7 @@ describe("Table", function() {
 
   });
 
-  describe("selectRowsByIds", function() {
+  describe("selectRows", function() {
 
     it("selects rows and unselects others", function() {
       var model = helper.createModelFixture(2, 5);
@@ -185,8 +185,8 @@ describe("Table", function() {
       var $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
-      helper.selectRowsAndAssert(table, [model.rows[0].id, model.rows[4].id]);
-      helper.selectRowsAndAssert(table, [model.rows[2].id]);
+      helper.selectRowsAndAssert(table, [model.rows[0], model.rows[4]]);
+      helper.selectRowsAndAssert(table, [model.rows[2]]);
     });
 
     it("sends selection event containing rowIds", function() {
@@ -194,15 +194,15 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var rowIds = [model.rows[0].id, model.rows[4].id];
-      table.selectRowsByIds(rowIds);
+      var rows = [table.rows[0], table.rows[4]];
+      table.selectRows(rows);
 
       sendQueuedAjaxCalls();
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       var event = new scout.Event(table.id, 'rowsSelected', {
-        rowIds: rowIds
+        rowIds: helper.getRowIds(rows)
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -212,10 +212,10 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var rowIds = [model.rows[0].id, model.rows[4].id];
-      table.selectRowsByIds(rowIds);
+      var rows = [table.rows[0], model.rows[4]];
+      table.selectRows(rows);
 
-      expect(table.selectedRowIds).toEqual(rowIds);
+      expect(table.selectedRows).toEqual(rows);
     });
 
   });
@@ -230,7 +230,7 @@ describe("Table", function() {
       expect($selectedRows.length).toBe(0);
 
       table.toggleSelection();
-      helper.assertSelection(table, helper.getRowIds(model.rows));
+      helper.assertSelection(table, model.rows);
       sendQueuedAjaxCalls();
       helper.assertSelectionEvent(model.id, helper.getRowIds(model.rows));
     });
@@ -243,7 +243,7 @@ describe("Table", function() {
       var $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
-      helper.selectRowsAndAssert(table, helper.getRowIds(model.rows));
+      helper.selectRowsAndAssert(table, table.rows);
 
       table.toggleSelection();
       helper.assertSelection(table, []);
@@ -251,9 +251,9 @@ describe("Table", function() {
       helper.assertSelectionEvent(model.id, []);
 
       table.toggleSelection();
-      helper.assertSelection(table, helper.getRowIds(model.rows));
+      helper.assertSelection(table, table.rows);
       sendQueuedAjaxCalls();
-      helper.assertSelectionEvent(model.id, helper.getRowIds(model.rows));
+      helper.assertSelectionEvent(model.id, helper.getRowIds(table.rows));
     });
   });
 
@@ -697,7 +697,7 @@ describe("Table", function() {
       clickRowAndAssertSelection(table, $rows.eq(1));
       clickRowAndAssertSelection(table, $rows.eq(2));
 
-      helper.selectRowsAndAssert(table, [model.rows[0].id, model.rows[4].id]);
+      helper.selectRowsAndAssert(table, [model.rows[0], model.rows[4]]);
       clickRowAndAssertSelection(table, $rows.eq(4));
     });
 
