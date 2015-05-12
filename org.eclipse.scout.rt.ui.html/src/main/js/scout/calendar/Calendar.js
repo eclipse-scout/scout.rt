@@ -331,12 +331,6 @@ scout.Calendar.prototype._onClickDisplayMode = function(event) {
       this.selectedDate = new Date(p.year, p.month, p.date - p.day + 4);
     }
   }
-
-  // FIXME AWE: extract method
-  this.components.forEach(function(component) {
-    component._displayModeChanged();
-  });
-
   this._updateModel();
 };
 
@@ -347,10 +341,6 @@ scout.Calendar.prototype._onClickYear = function(event) {
 scout.Calendar.prototype._onClickList = function(event) {
   this.showList = !this.showList;
   this._updateScreen();
-//  if (this.showList) {
-//    this.$list.empty();
-//    this._renderComponentPanel();
-//  }
 };
 
 scout.Calendar.prototype._onClickDay = function(event) {
@@ -787,6 +777,19 @@ scout.Calendar.prototype._selectedComponentChanged = function(component) {
 
 scout.Calendar.prototype._onDayContextMenu = function(event) {
   this._showContextMenu(event, 'Calendar.EmptySpace');
+};
+
+scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
+  event.preventDefault();
+  event.stopPropagation();
+  var filteredMenus = scout.menus.filter(this.menus, [allowedType]),
+  popup = new scout.ContextMenuPopup(this.session, filteredMenus),
+    $part = $(event.currentTarget),
+    x = event.pageX,
+    y = event.pageY;
+  popup.$anchor = $part;
+  popup.render();
+  popup.setLocation(new scout.Point(x, y));
 };
 
 /* -- components, arrangement------------------------------------ */

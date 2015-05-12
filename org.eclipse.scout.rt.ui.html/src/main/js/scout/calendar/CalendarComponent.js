@@ -11,10 +11,6 @@ scout.CalendarComponent = function() {
 };
 scout.inherits(scout.CalendarComponent, scout.ModelAdapter);
 
-scout.CalendarComponent.prototype._displayModeChanged = function() {
-
-};
-
 /**
  * @override ModelAdapter.js
  */
@@ -145,25 +141,13 @@ scout.CalendarComponent.prototype._onMousedown = function(event) {
 };
 
 scout.CalendarComponent.prototype._onContextMenu = function(event) {
-  this._showContextMenu(event, 'Calendar.CalendarComponent');
-};
-
-scout.CalendarComponent.prototype._showContextMenu = function(event, allowedType) {
-  event.preventDefault();
-  event.stopPropagation();
-  var filteredMenus = scout.menus.filter(this.parent.menus, [allowedType]),
-  popup = new scout.ContextMenuPopup(this.session, filteredMenus),
-    $part = $(event.currentTarget),
-    x = event.pageX,
-    y = event.pageY;
-  popup.$anchor = $part;
-  popup.render();
-  popup.setLocation(new scout.Point(x, y));
+  this.parent._showContextMenu(event, 'Calendar.CalendarComponent');
 };
 
 /**
  * Show tooltip with delay, so user is not flooded with tooltips when filled with many items.
- * Because of the asynchronous nature of the Calendar,
+ * Because of the asynchronous nature of the Calendar, the component may be removed and
+ * created again, while the user hovers over a component.
  */
 scout.CalendarComponent.prototype._onHoverIn = function(event) {
   var $part = $(event.target);
