@@ -56,11 +56,9 @@ scout.Widget.prototype.remove = function() {
   if (!this.rendered) {
     return;
   }
-
-  for (var i = 0; i < this.children.length; i++) {
-    var child = this.children[i];
+  this.children.forEach(function(child) {
     child.remove();
-  }
+  });
   this._remove();
   this._uninstallKeyStrokeAdapter();
   this.rendered = false;

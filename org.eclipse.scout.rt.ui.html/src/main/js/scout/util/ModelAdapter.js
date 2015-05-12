@@ -76,6 +76,9 @@ scout.ModelAdapter.prototype._renderUniqueId = function(qualifier, $target) {
   }
 };
 
+/**
+ * @override Widget.js
+ */
 scout.ModelAdapter.prototype._remove = function() {
   scout.ModelAdapter.parent.prototype._remove.call(this);
   if (this.ui) {
@@ -105,11 +108,9 @@ scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
 
 scout.ModelAdapter.prototype.destroy = function() {
   var ownedAdapters = this.ownedAdapters.slice();
-  for (var i = 0; i < ownedAdapters.length; i++) {
-    var ownedAdapter = ownedAdapters[i];
+  ownedAdapters.forEach(function(ownedAdapter) {
     ownedAdapter.destroy();
-  }
-
+  });
   this.remove();
   this.session.unregisterModelAdapter(this);
 

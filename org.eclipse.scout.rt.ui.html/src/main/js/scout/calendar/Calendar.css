@@ -309,17 +309,6 @@
       width: calc(~"100%" - 10px);
       background-color: @palette-white !important;
       margin-top: 12px;
-
-      & .component-link {
-        position: absolute;
-        top: 0px;
-        right: 6px;
-        cursor: pointer;
-
-        &:hover {
-          color: @hover-color;
-        }
-      }
     }
   }
 }
@@ -486,17 +475,6 @@
       width: calc(~"50%" - 38px);
       margin-right: -20px;
     }
-
-    & .component-link {
-      position: absolute;
-      top: 0px;
-      right: 6px;
-      cursor: pointer;
-
-      &:hover {
-        color: @hover-color;
-      }
-    }
   }
 
   & .component-day,
@@ -512,11 +490,6 @@
   & .component-open-top {
     overflow: visible !important;
     padding-top: 10px;
-
-    & .component-link {
-      top: 10px;
-    }
-
 
     &:before {
       position: absolute;

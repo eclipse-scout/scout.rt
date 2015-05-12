@@ -98,11 +98,6 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   @Override
   protected void initJsonProperties(T model) {
-
-    // FIXME AWE: (calendar) wird können hier nich einfach ein property change werfen, weil die item-provider
-    // die items async liefern, müssen sie inkrementell nachgeliefert werden, wir müssen uns merken ob wir
-    // bereits components ans UI geschickt haben
-
     putJsonProperty(new JsonAdapterProperty<T>(ICalendar.PROP_COMPONENTS, model, getUiSession()) {
       @Override
       protected Set<? extends CalendarComponent> modelValue() {
