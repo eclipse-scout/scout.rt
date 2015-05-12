@@ -861,18 +861,30 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleModelColumnOrderChanged() {
+    // Ignore columns that are not currently attached. They will be later
+    // attached with the event COLUMN_STRUCTURE_CHANGED.
+    List<IColumn<?>> filteredColumns = filterAttachedColumns(getColumnsInViewOrder());
+    if (filteredColumns.isEmpty()) {
+      return;
+    }
+
     JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_COLUMN_IDS, columnIdsToJson(getColumnsInViewOrder()));
+    putProperty(jsonEvent, PROP_COLUMN_IDS, columnIdsToJson(filteredColumns));
     addActionEvent(EVENT_COLUMN_ORDER_CHANGED, jsonEvent);
   }
 
   protected void handleModelColumnHeadersUpdated(Collection<IColumn<?>> columns) {
     JSONObject jsonEvent = new JSONObject();
     Collection<IColumn<?>> visibleColumns = filterVisibleColumns(columns);
-    if (visibleColumns.size() > 0) {
-      putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(visibleColumns));
-      addActionEvent(EVENT_COLUMN_HEADERS_UPDATED, jsonEvent);
+    // Ignore columns that are not currently attached. They will be later
+    // attached with the event COLUMN_STRUCTURE_CHANGED.
+    List<IColumn<?>> filteredColumns = filterAttachedColumns(visibleColumns);
+    if (filteredColumns.isEmpty()) {
+      return;
     }
+
+    putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(filteredColumns));
+    addActionEvent(EVENT_COLUMN_HEADERS_UPDATED, jsonEvent);
   }
 
   protected Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {
@@ -883,6 +895,23 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       }
     }
     return visibleColumns;
+  }
+
+  /**
+   * @return returns a new list with all columns of the given list that are attached to the model adapter. If a column
+   *         is not (yet) attached, it will not be returned.
+   */
+  protected List<IColumn<?>> filterAttachedColumns(Collection<IColumn<?>> columns) {
+    if (columns == null) {
+      return null;
+    }
+    List<IColumn<?>> result = new ArrayList<>();
+    for (IColumn<?> column : columns) {
+      if (m_jsonColumns.containsKey(column)) {
+        result.add(column);
+      }
+    }
+    return result;
   }
 
   @Override
