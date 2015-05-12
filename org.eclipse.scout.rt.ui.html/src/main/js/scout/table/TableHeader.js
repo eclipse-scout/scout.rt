@@ -65,7 +65,8 @@ scout.TableHeader = function(table, session) {
       .one('mouseup', resizeEnd);
     $('body').addClass('col-resize');
 
-    return false;
+    // Prevent text selection in a form, don't stop propagation to allow others (e.g. cell editor) to react
+    event.preventDefault();
 
     function resizeMove(event) {
       var diff = event.pageX - startX,
