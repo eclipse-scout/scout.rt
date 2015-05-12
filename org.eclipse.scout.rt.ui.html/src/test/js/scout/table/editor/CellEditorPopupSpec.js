@@ -137,6 +137,20 @@ describe("CellEditor", function() {
       expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
     });
 
+    it("does not open cell editor if a ctrl or shift is pressed, because the user probably wants to do row selection rather than cell editing", function() {
+      table.rows[0].cells[0].editable = true;
+      table.rows[1].cells[0].editable = true;
+
+      spyOn(table, 'sendPrepareCellEdit');
+      // row 0 is selected, user presses shift and clicks row 2
+      table.selectRowsByIds([table.rows[0].id]);
+      $cell1_0.triggerClick({modifier: 'shift'});
+      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+
+      $cell1_0.triggerClick({modifier: 'ctrl'});
+      expect(table.sendPrepareCellEdit).not.toHaveBeenCalled();
+    });
+
   });
 
   describe("startCellEdit event", function() {

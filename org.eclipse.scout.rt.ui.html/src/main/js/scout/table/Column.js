@@ -68,7 +68,7 @@ scout.Column.prototype.onMouseUp = function(event, $row) {
   var row = $row.data('row'),
     cell = this.table.cell(this.index, row);
 
-  if (this.table.enabled && row.enabled && cell.editable) {
+  if (this.table.enabled && row.enabled && cell.editable && !event.ctrlKey && !event.shiftKey) {
     this.table.sendPrepareCellEdit(row.id, this.id);
   }
 };

@@ -268,11 +268,15 @@ $.fn.triggerKeyDown = function(key, modifier) {
   var event = new jQuery.Event("keydown");
   event.originalEvent = {}; // create dummy object
   event.which = key;
+  extendEventWithModifier(event, modifier);
+  this.trigger(event);
+};
+
+function extendEventWithModifier(event, modifier) {
   event.altKey = modifier === 'alt';
   event.ctrlKey = modifier === 'ctrl';
   event.shiftKey = modifier === 'shift';
-  this.trigger(event);
-};
+}
 
 $.fn.triggerMouseDown = function(opts) {
   return this.triggerMouseAction('mousedown', opts);
@@ -289,6 +293,7 @@ $.fn.triggerMouseMove = function(position) {
 };
 
 $.fn.triggerMouseAction = function(eventType, opts) {
+  var event;
   opts = opts || {};
 
   if (!opts.position) {
@@ -300,8 +305,7 @@ $.fn.triggerMouseAction = function(eventType, opts) {
   if (!opts.which) {
     opts.which = 1;
   }
-
-  this.trigger({
+  event = {
     type: eventType,
     which: opts.which,
     originalEvent: {
@@ -309,7 +313,12 @@ $.fn.triggerMouseAction = function(eventType, opts) {
     },
     pageX: opts.position.left,
     pageY: opts.position.right
-  });
+  };
+  if (opts.modifier) {
+    extendEventWithModifier(event, opts.modifier);
+  }
+
+  this.trigger(event);
   return this;
 };
 
@@ -355,12 +364,7 @@ $.fn.triggerClick = function(opts) {
 
   this.triggerMouseDown(opts);
   this.triggerMouseUp(opts);
-  this.trigger({
-    type: 'click',
-    originalEvent: {
-      detail: opts.clicks
-    }
-  });
+  this.triggerMouseAction('click', opts);
 
   return this;
 };
