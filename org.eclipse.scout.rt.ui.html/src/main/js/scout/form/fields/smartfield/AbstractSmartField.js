@@ -105,6 +105,10 @@ scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
     e.which === scout.keys.DOWN;
 };
 
+scout.AbstractSmartField.prototype._isFunctionKey = function(e) {
+  return e.which >= scout.keys.F1 && e.which<scout.keys.F12;
+};
+
 scout.AbstractSmartField.prototype._onClick = function(e) {
   if (!this._$popup) {
     this._openProposal(this.BROWSE_ALL, true);
@@ -177,7 +181,7 @@ scout.AbstractSmartField.prototype._onKeyUp = function(e) {
   // ensure pop-up is opened for following operations
   if (this._$popup || this._proposalRequested) {
     this._proposalTyped();
-  } else if (this._browseOnce) {
+  } else if (this._browseOnce && !this._isFunctionKey(e)) {
     this._browseOnce = false;
     this._openProposal(this._searchText(), false);
   }
