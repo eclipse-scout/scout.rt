@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
@@ -52,6 +53,12 @@ public class ServletRunContext extends RunContext {
   protected HttpServletResponse m_servletResponse;
 
   @Override
+  public ServletRunContext runMonitor(IRunMonitor parentRunMonitor, IRunMonitor runMonitor) {
+    super.runMonitor(parentRunMonitor, runMonitor);
+    return this;
+  }
+
+  @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
     final Callable<RESULT> c3 = new InitThreadLocalCallable<>(next, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, servletResponse());
     final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, servletRequest());
@@ -62,12 +69,14 @@ public class ServletRunContext extends RunContext {
 
   @Override
   public ServletRunContext subject(final Subject subject) {
-    return (ServletRunContext) super.subject(subject);
+    super.subject(subject);
+    return this;
   }
 
   @Override
   public ServletRunContext locale(final Locale locale) {
-    return (ServletRunContext) super.locale(locale);
+    super.locale(locale);
+    return this;
   }
 
   public HttpServletRequest servletRequest() {
@@ -129,4 +138,5 @@ public class ServletRunContext extends RunContext {
     copy.copyValues(this);
     return copy;
   }
+
 }

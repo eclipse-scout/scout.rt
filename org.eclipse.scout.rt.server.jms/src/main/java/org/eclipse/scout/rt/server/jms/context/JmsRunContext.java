@@ -18,6 +18,7 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 
@@ -49,13 +50,21 @@ public class JmsRunContext extends RunContext {
   protected Message m_jmsMessage;
 
   @Override
+  public JmsRunContext runMonitor(IRunMonitor parentRunMonitor, IRunMonitor runMonitor) {
+    super.runMonitor(parentRunMonitor, runMonitor);
+    return this;
+  }
+
+  @Override
   public JmsRunContext subject(final Subject subject) {
-    return (JmsRunContext) super.subject(subject);
+    super.subject(subject);
+    return this;
   }
 
   @Override
   public JmsRunContext locale(final Locale locale) {
-    return (JmsRunContext) super.locale(locale);
+    super.locale(locale);
+    return this;
   }
 
   public JmsRunContext jmsMessage(final Message jmsMessage) {
@@ -104,4 +113,5 @@ public class JmsRunContext extends RunContext {
     copy.copyValues(this);
     return copy;
   }
+
 }

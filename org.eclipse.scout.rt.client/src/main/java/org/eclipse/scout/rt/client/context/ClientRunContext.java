@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
@@ -54,6 +55,12 @@ public class ClientRunContext extends RunContext {
 
   protected IClientSession m_session;
   protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
+
+  @Override
+  public ClientRunContext runMonitor(IRunMonitor parentRunMonitor, IRunMonitor runMonitor) {
+    super.runMonitor(parentRunMonitor, runMonitor);
+    return this;
+  }
 
   @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
@@ -93,12 +100,14 @@ public class ClientRunContext extends RunContext {
 
   @Override
   public ClientRunContext subject(final Subject subject) {
-    return (ClientRunContext) super.subject(subject);
+    super.subject(subject);
+    return this;
   }
 
   @Override
   public ClientRunContext locale(final Locale locale) {
-    return (ClientRunContext) super.locale(locale);
+    super.locale(locale);
+    return this;
   }
 
   @Override
@@ -142,4 +151,5 @@ public class ClientRunContext extends RunContext {
     copy.copyValues(this);
     return copy;
   }
+
 }

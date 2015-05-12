@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.PreferredValue;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
@@ -88,6 +89,12 @@ public class ServerRunContext extends RunContext {
     return m_session;
   }
 
+  @Override
+  public ServerRunContext runMonitor(IRunMonitor parentRunMonitor, IRunMonitor runMonitor) {
+    super.runMonitor(parentRunMonitor, runMonitor);
+    return this;
+  }
+
   /**
    * Sets the session with its {@link Subject} if not set yet. The session's {@link Locale} and {@link UserAgent} are
    * not set.
@@ -142,12 +149,14 @@ public class ServerRunContext extends RunContext {
 
   @Override
   public ServerRunContext subject(final Subject subject) {
-    return (ServerRunContext) super.subject(subject);
+    super.subject(subject);
+    return this;
   }
 
   @Override
   public ServerRunContext locale(final Locale locale) {
-    return (ServerRunContext) super.locale(locale);
+    super.locale(locale);
+    return this;
   }
 
   @Override
@@ -199,4 +208,5 @@ public class ServerRunContext extends RunContext {
     copy.copyValues(this);
     return copy;
   }
+
 }
