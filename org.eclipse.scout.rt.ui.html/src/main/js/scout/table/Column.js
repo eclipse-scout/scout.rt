@@ -51,6 +51,10 @@ scout.Column.prototype._cssClass = function(row, cell) {
   if (this.mandatory) {
     cssClass += ' mandatory';
   }
+  if (!this.table.multilineText || !this.textWrap) {
+    cssClass += ' white-space-nowrap';
+  }
+
   //TODO CGU cssClass is actually only sent for cells, should we change this in model? discuss with jgu
   if (cell.cssClass) {
     cssClass += ' ' + cell.cssClass;

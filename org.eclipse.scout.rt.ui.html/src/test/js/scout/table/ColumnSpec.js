@@ -1,0 +1,179 @@
+/* global TableSpecHelper */
+describe("Column", function() {
+  var session;
+  var helper;
+
+  beforeEach(function() {
+    setFixtures(sandbox());
+    session = new scout.Session($('#sandbox'), '1.1');
+    helper = new TableSpecHelper(session);
+    jasmine.Ajax.install();
+    jasmine.clock().install();
+  });
+
+  afterEach(function() {
+    session = null;
+    jasmine.Ajax.uninstall();
+    jasmine.clock().uninstall();
+  });
+
+
+  /**
+   * Test assumes that default values for horiz. alignment are set on cell object.
+   */
+  it("considers horizontal alignment", function() {
+    var model = helper.createModelFixture(3, 2);
+    model.columns[1].horizontalAlignment = 0;
+    model.columns[2].horizontalAlignment = 1;
+
+    model.rows[0].cells[1].horizontalAlignment = 0;
+    model.rows[0].cells[2].horizontalAlignment = 1;
+
+    model.rows[1].cells[1].horizontalAlignment = 0;
+    model.rows[1].cells[2].horizontalAlignment = 1;
+
+    var table = helper.createTable(model);
+    table.render(session.$entryPoint);
+
+    var $headerItems = table.header.$container.find('.header-item');
+    var $headerItem0 = $headerItems.eq(0);
+    var $headerItem1 = $headerItems.eq(1);
+    var $headerItem2 = $headerItems.eq(2);
+    var $rows = table.$rows();
+    var $cells0 = $rows.eq(0).find('.table-cell');
+    var $cells1 = $rows.eq(1).find('.table-cell');
+
+    //Default is different in every browser... (start chrome, webkit-auto phantomjs, left IE)
+    expect($headerItem0.css('text-align')).toMatch('start|webkit-auto|left');
+    expect($cells0.eq(0).css('text-align')).toMatch('start|webkit-auto|left');
+    expect($cells1.eq(0).css('text-align')).toMatch('start|webkit-auto|left');
+
+    expect($headerItem1.css('text-align')).toBe('center');
+    expect($cells0.eq(1).css('text-align')).toBe('center');
+    expect($cells1.eq(1).css('text-align')).toBe('center');
+
+    expect($headerItem2.css('text-align')).toBe('right');
+    expect($cells0.eq(2).css('text-align')).toBe('right');
+    expect($cells1.eq(2).css('text-align')).toBe('right');
+  });
+
+  it("considers custom css class of a column", function() {
+    var model = helper.createModelFixture(3, 2);
+    model.columns[0].cssClass = 'abc';
+
+    var table = helper.createTable(model);
+    table.render(session.$entryPoint);
+
+    var $headerItems = table.header.$container.find('.header-item');
+    var $headerItem0 = $headerItems.eq(0);
+    var $rows = table.$rows();
+    var $cells0 = $rows.eq(0).find('.table-cell');
+    var $cells1 = $rows.eq(1).find('.table-cell');
+
+    expect($headerItem0).not.toHaveClass('abc');
+    expect($cells0.eq(0)).toHaveClass('abc');
+    expect($cells0.eq(1)).not.toHaveClass('abc');
+    expect($cells1.eq(0)).toHaveClass('abc');
+    expect($cells1.eq(1)).not.toHaveClass('abc');
+  });
+
+  it("considers custom css class of a column, as well for checkbox columns", function() {
+    var model = helper.createModelFixture(3, 2);
+    model.columns[0].cssClass = 'abc';
+    model.columns[0].objectType = 'BooleanColumn';
+
+    var table = helper.createTable(model);
+    table.render(session.$entryPoint);
+
+    var $headerItems = table.header.$container.find('.header-item');
+    var $headerItem0 = $headerItems.eq(0);
+    var $rows = table.$rows();
+    var $cells0 = $rows.eq(0).find('.table-cell');
+    var $cells1 = $rows.eq(1).find('.table-cell');
+
+    expect($headerItem0).not.toHaveClass('abc');
+    expect($cells0.eq(0)).toHaveClass('abc');
+    expect($cells0.eq(1)).not.toHaveClass('abc');
+    expect($cells1.eq(0)).toHaveClass('abc');
+    expect($cells1.eq(1)).not.toHaveClass('abc');
+  });
+
+  it("considers custom css class of a cell, if both are set only the cell class is used", function() {
+    var model = helper.createModelFixture(3, 2);
+    model.columns[0].cssClass = 'abc';
+    model.rows[0].cells[0].cssClass = 'custom-cell-0';
+
+    var table = helper.createTable(model);
+    table.render(session.$entryPoint);
+
+    var $headerItems = table.header.$container.find('.header-item');
+    var $headerItem0 = $headerItems.eq(0);
+    var $rows = table.$rows();
+    var $cells0 = $rows.eq(0).find('.table-cell');
+    var $cells1 = $rows.eq(1).find('.table-cell');
+
+    expect($headerItem0).not.toHaveClass('abc');
+    expect($cells0.eq(0)).not.toHaveClass('abc');
+    expect($cells0.eq(0)).toHaveClass('custom-cell-0');
+    expect($cells0.eq(1)).not.toHaveClass('abc');
+    expect($cells1.eq(0)).toHaveClass('abc');
+    expect($cells1.eq(0)).not.toHaveClass('custom-cell-0');
+    expect($cells1.eq(1)).not.toHaveClass('abc');
+  });
+
+  it("considers htmlEnabled of a cell", function() {
+    var model = helper.createModelFixture(3, 2);
+    model.rows[0].cells[0].text = '<b>hi</b>';
+    model.rows[0].cells[0].htmlEnabled = false;
+    model.rows[0].cells[1].text = '<b>hi</b>';
+    model.rows[0].cells[1].htmlEnabled = true;
+
+    var table = helper.createTable(model);
+    table.render(session.$entryPoint);
+
+    var $rows = table.$rows();
+    var $cells0 = $rows.eq(0).find('.table-cell');
+
+    expect($cells0.eq(0).text()).toBe('<b>hi</b>');
+    expect($cells0.eq(1).text()).toBe('hi');
+  });
+
+  describe("TextWrap", function() {
+    var table, model, $rows, $cells0, $cell0_0, $cell0_1;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(2, 2);
+      table = helper.createTable(model);
+    });
+
+    it("wraps text if column.textWrap and table.multilineText are true", function() {
+      table.multilineText = true;
+      table.columns[0].textWrap = true;
+      table.render(session.$entryPoint);
+      $rows = table.$rows();
+      $cells0 = $rows.eq(0).find('.table-cell');
+      $cell0_0 = $cells0.eq(0);
+      expect($cell0_0).not.toHaveClass('white-space-nowrap');
+    });
+
+    it("does not wrap text if column.textWrap is false and table.multilineText is true", function() {
+      table.multilineText = true;
+      table.columns[0].textWrap = false;
+      table.render(session.$entryPoint);
+      $rows = table.$rows();
+      $cells0 = $rows.eq(0).find('.table-cell');
+      $cell0_0 = $cells0.eq(0);
+      expect($cell0_0).toHaveClass('white-space-nowrap');
+    });
+
+    it("does not wrap text if column.textWrap is true and table.multilineText is false", function() {
+      table.multilineText = false;
+      table.columns[0].textWrap = true;
+      table.render(session.$entryPoint);
+      $rows = table.$rows();
+      $cells0 = $rows.eq(0).find('.table-cell');
+      $cell0_0 = $cells0.eq(0);
+      expect($cell0_0).toHaveClass('white-space-nowrap');
+    });
+  });
+});
