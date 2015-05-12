@@ -349,14 +349,15 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
           // Stop when a node of different type occurs
           break;
         }
-        if (isIdentical(event, next)) {
+        if (isIdenticalEvent(event, next)) {
           it.remove();
         }
       }
     }
   }
 
-  protected boolean isIdentical(TableEvent event1, TableEvent event2) {
+  @Override
+  protected boolean isIdenticalEvent(TableEvent event1, TableEvent event2) {
     if (event1 == null && event2 == null) {
       return true;
     }

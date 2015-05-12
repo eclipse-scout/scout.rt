@@ -307,14 +307,15 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
           // Stop when a node of different type occurs
           break;
         }
-        if (isIdentical(event, next)) {
+        if (isIdenticalEvent(event, next)) {
           it.remove();
         }
       }
     }
   }
 
-  protected boolean isIdentical(TreeEvent event1, TreeEvent event2) {
+  @Override
+  protected boolean isIdenticalEvent(TreeEvent event1, TreeEvent event2) {
     if (event1 == null && event2 == null) {
       return true;
     }

@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -36,9 +37,18 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractEventBuffer.class);
 
   private List<T> m_buffer = new LinkedList<>();
+  private T m_lastAddedEvent = null;
 
   protected List<T> getBufferInternal() {
     return m_buffer;
+  }
+
+  protected T getLastAddedEventInternal() {
+    return m_lastAddedEvent;
+  }
+
+  protected void setLastAddedEventInternal(T lastAddedEvent) {
+    m_lastAddedEvent = lastAddedEvent;
   }
 
   /**
@@ -58,11 +68,18 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
   /**
    * Add a new event to the buffer
    */
-  public void add(T e) {
+  public void add(T event) {
     if (LOG.isDebugEnabled()) {
-      LOG.debug(String.format("Adding '%1$s'", e));
+      LOG.debug(String.format("Adding '%1$s'", event));
     }
-    m_buffer.add(e);
+    // Optimization: If the new event is completely identical to the last
+    // inserted one, don't add it. This helps preventing large lists
+    // of buffered events which are expensive to coalesce.
+    if (isIdenticalEvent(m_lastAddedEvent, event)) {
+      return;
+    }
+    m_buffer.add(event);
+    m_lastAddedEvent = event;
   }
 
   /**
@@ -84,6 +101,7 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
   protected List<T> consume() {
     List<T> list = m_buffer;
     m_buffer = new LinkedList<T>();
+    m_lastAddedEvent = null;
     return list;
   }
 
@@ -116,6 +134,10 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
         it.remove();
       }
     }
+  }
+
+  protected boolean isIdenticalEvent(T event1, T event2) {
+    return CompareUtility.equals(event1, event2);
   }
 
   @Override
