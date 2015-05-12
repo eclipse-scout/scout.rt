@@ -626,7 +626,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           }
         }
         catch (Exception t) {
-          LOG.error("extension " + ext);
+          LOG.error("extension " + ext + " failed", t);
         }
       }
       // init actions
