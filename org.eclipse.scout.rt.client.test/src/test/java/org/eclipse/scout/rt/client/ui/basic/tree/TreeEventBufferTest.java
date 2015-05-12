@@ -76,7 +76,7 @@ public class TreeEventBufferTest {
     final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(2, coalesced.size());
     assertSame(e2, coalesced.get(0));
-    assertSame(e4, coalesced.get(1));
+    assertSame(e3, coalesced.get(1));
   }
 
   /**

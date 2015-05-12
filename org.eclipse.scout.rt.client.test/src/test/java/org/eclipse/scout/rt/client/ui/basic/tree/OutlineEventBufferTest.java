@@ -45,6 +45,6 @@ public class OutlineEventBufferTest {
     m_testBuffer.add(e2);
     final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(1, coalesced.size());
-    assertSame(e2, coalesced.get(0));
+    assertSame(e1, coalesced.get(0));
   }
 }
