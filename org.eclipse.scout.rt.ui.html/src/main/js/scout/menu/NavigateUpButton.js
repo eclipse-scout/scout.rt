@@ -2,7 +2,7 @@ scout.NavigateUpButton = function(outline, node) {
   scout.NavigateUpButton.parent.call(this, outline, node);
   this._text1 = 'Back';
   this._text2 = 'Up';
-  this.id = 'NavigateUpButton';
+  this.objectType = 'NavigateUpButton';
   this.keyStroke = 'BACKSPACE';
 };
 scout.inherits(scout.NavigateUpButton, scout.AbstractNavigationButton);

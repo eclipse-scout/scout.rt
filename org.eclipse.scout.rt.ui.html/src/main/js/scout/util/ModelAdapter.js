@@ -387,11 +387,17 @@ scout.ModelAdapter.prototype._goOnline = function() {
  * @see http://www.w3.org/TR/html5/dom.html#the-id-attribute
  */
 scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
-  var s = 'scout.' + this.objectType;
-  if (qualifier) {
-    s += '@' + qualifier;
+  var s = 'scout.';
+  if (!this.objectType && qualifier) {
+    s += qualifier;
   }
-  s +=  '[' + this.session.partId + '-' + this.id + ']';
+  else {
+    s += scout.strings.nvl(this.objectType, 'NO_TYPE');
+    if (qualifier) {
+      s += '@' + qualifier;
+    }
+  }
+  s +=  '[' + this.session.partId + '-' + scout.strings.nvl(this.id, 'NO_ID') + ']';
   return s.replace(/\s/g, '');
 };
 

@@ -3,7 +3,7 @@ scout.NavigateDownButton = function(outline, node) {
   this._text1 = 'Continue';
   this._text2 = 'Show';
   this.systemType = scout.Button.SYSTEM_TYPE.OK;
-  this.id = 'NavigateDownButton';
+  this.objectType = 'NavigateDownButton';
   this.keyStroke = 'Enter';
 };
 scout.inherits(scout.NavigateDownButton, scout.AbstractNavigationButton);
@@ -19,11 +19,11 @@ scout.NavigateDownButton.prototype._toggleDetail = function() {
 };
 
 scout.NavigateDownButton.prototype._buttonEnabled = function() {
-  if (this.node.leaf) {
-    return false;
-  }
   if (this._isDetail()) {
     return true;
+  }
+  if (this.node.leaf) {
+    return false;
   }
 
   // when it's not a leaf and not a detail - the button is only enabled when a single row is selected
