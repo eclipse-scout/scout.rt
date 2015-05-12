@@ -87,6 +87,9 @@ scout.TableControl.prototype.renderContent = function() {
 };
 
 scout.TableControl.prototype.onControlContainerClosed = function() {
+  setTimeout(function() {
+    this.tableFooter.$controlContainer.uninstallFocusContext(this.tableFooter._table.session.uiSessionId);
+  }.bind(this));
   this.removeContent();
 };
 
@@ -132,9 +135,7 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   var that = this;
   if (!selected){
     scout.keyStrokeManager.uninstallAdapter(this.tableControlKeyStrokeAdapter);
-    setTimeout(function() {
-      that.tableFooter.$controlContainer.uninstallFocusContext(that.tableFooter._table.session.uiSessionId);
-    });
+
   }
 };
 
@@ -156,6 +157,9 @@ scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnsel
         this.tableFooter.closeControlContainer(this);
         this.tableFooter.selectedControl = null;
       } else {
+        setTimeout(function() {
+          this.tableFooter.$controlContainer.uninstallFocusContext(this.tableFooter._table.session.uiSessionId);
+        }.bind(this));
         this.removeContent();
       }
 
