@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -18,6 +19,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.scout.commons.Base64Utility;
+import org.eclipse.scout.commons.annotations.IgnoreProperty;
+import org.eclipse.scout.commons.annotations.IgnoreProperty.Context;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -94,6 +97,22 @@ public class JsonBeanTest {
     assertEquals(5000, jsonArray.optLong(2));
   }
 
+  @Test
+  public void testBeanWithIgnoredProperty() {
+    BeanWithIgnoredProperty bean = new BeanWithIgnoredProperty();
+    bean.setProperty("property");
+    bean.setIgnoredProperty("Ignored property");
+    bean.setIgnoredDefault("Ignored default property");
+
+    MainJsonObjectFactory factory = new MainJsonObjectFactory();
+    IJsonObject jsonObj = factory.createJsonObject(bean);
+
+    JSONObject json = (JSONObject) jsonObj.toJson();
+    assertEquals("property", json.optString("property"));
+    assertNull(json.optString("ignoredProperty", null));
+    assertNull(json.optString("ignoredDefault", null));
+  }
+
   public static class BeanWithPrimitives {
     private long m_long;
     private String m_string;
@@ -150,6 +169,39 @@ public class JsonBeanTest {
 
     public void setBytes(byte[] bytes) {
       m_bytes = bytes;
+    }
+
+  }
+
+  public static class BeanWithIgnoredProperty {
+    private String m_property;
+    private String m_ignoredProperty;
+    private String m_ignoredDefault;
+
+    public String getProperty() {
+      return m_property;
+    }
+
+    public void setProperty(String property) {
+      m_property = property;
+    }
+
+    @IgnoreProperty(Context.GUI)
+    public String getIgnoredProperty() {
+      return m_ignoredProperty;
+    }
+
+    public void setIgnoredProperty(String ignoredProperty) {
+      m_ignoredProperty = ignoredProperty;
+    }
+
+    @IgnoreProperty
+    public String getIgnoredDefault() {
+      return m_ignoredDefault;
+    }
+
+    public void setIgnoredDefault(String ignoredDefault) {
+      m_ignoredDefault = ignoredDefault;
     }
 
   }

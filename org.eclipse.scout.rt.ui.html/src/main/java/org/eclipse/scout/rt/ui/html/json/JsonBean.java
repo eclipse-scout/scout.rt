@@ -16,6 +16,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 
+import org.eclipse.scout.commons.annotations.IgnoreProperty;
+import org.eclipse.scout.commons.annotations.IgnoreProperty.Context;
 import org.eclipse.scout.commons.beans.FastBeanInfo;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.json.JSONArray;
@@ -94,6 +96,11 @@ public class JsonBean implements IJsonObject {
       for (FastPropertyDescriptor desc : beanInfo.getPropertyDescriptors()) {
         Method m = desc.getReadMethod();
         if (m == null) {
+          continue;
+        }
+        // skip ignored annotated getters with context GUI
+        IgnoreProperty ignoredPropertyAnnotation = m.getAnnotation(IgnoreProperty.class);
+        if (ignoredPropertyAnnotation != null && Context.GUI.equals(ignoredPropertyAnnotation.value())) {
           continue;
         }
         String key = desc.getName();
