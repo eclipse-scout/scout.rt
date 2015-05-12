@@ -162,7 +162,12 @@ public class JobManager implements IJobManager {
     m_futures.clear();
     m_mutexSemaphores.clear();
     m_executor.shutdownNow();
-
+    try {
+      m_executor.awaitTermination(1, TimeUnit.MINUTES);
+    }
+    catch (InterruptedException e) {
+      //nop
+    }
     m_listeners.fireEvent(new JobEvent(this, JobEventType.SHUTDOWN, null));
   }
 
