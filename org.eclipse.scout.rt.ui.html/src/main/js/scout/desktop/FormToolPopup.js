@@ -13,12 +13,14 @@ scout.inherits(scout.FormToolPopup, scout.Popup);
 
 scout.FormToolPopup.prototype._render = function($parent) {
   scout.FormToolPopup.parent.prototype._render.call(this, $parent);
+  this.$container.addClass('form-tool');
 
   this._renderHead($parent);
   this.formToolButton.form.rootGroupBox.menuBarPosition = 'bottom';
   this.formToolButton.form.render(this.$body);
   this.formToolButton.form.htmlComp.pixelBasedSizing = true;
   this.formToolButton.form.htmlComp.pack();
+
   this.alignTo();
 };
 
