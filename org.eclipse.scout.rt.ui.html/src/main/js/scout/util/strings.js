@@ -26,6 +26,9 @@ scout.strings = {
     return text;
   },
 
+  /**
+   * @returns true if the given string contains any non-space characters
+   */
   hasText: function(text) {
     if (typeof text !== 'string' || text.length === 0) {
       return false;
@@ -58,6 +61,9 @@ scout.strings = {
     return z.slice(-padding);
   },
 
+  /**
+   * If the given string 's' is undefined or null, the given defaultValue is returned. Otherwise, s is returned.
+   */
   nvl: function(s, defaultValue) {
     if (s === undefined || s === null) {
       return defaultValue;
@@ -104,5 +110,43 @@ scout.strings = {
     }
     var $div = $('<div>');
     return $div.text(string).html();
+  },
+
+  /**
+   * Joins a list of strings to a single string using the given separator. Elements that are
+   * not defined or have zero length are ignored. The default return value is the empty string.
+   *
+   * @param separator String to use as separator
+   * @param varargs List of strings to join
+   */
+  join: function(separator) {
+    var s = '';
+    for (var i = 1; i < arguments.length; i++ ) {
+      if (arguments[i]) {
+        if (s && separator) {
+          s += separator;
+        }
+        s += arguments[i];
+      }
+    }
+    return s;
+  },
+
+  /**
+   * If the given 'string' has text, it is returned with the 'prefix' and 'suffix'
+   * prepended and appended, respectively. Otherwise, the empty string is returned.
+   */
+  box: function(prefix, string, suffix) {
+    var s = '';
+    if (this.hasText(string)) {
+      if (prefix) {
+        s += prefix;
+      }
+      s += string;
+      if (suffix) {
+        s += suffix;
+      }
+    }
+    return s;
   }
 };

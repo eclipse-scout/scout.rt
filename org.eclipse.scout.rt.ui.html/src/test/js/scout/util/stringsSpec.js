@@ -161,4 +161,43 @@ describe("scout.strings", function() {
 
   });
 
+  describe("join", function() {
+
+    it("joins strings", function() {
+      expect(scout.strings.join()).toBe('');
+      expect(scout.strings.join('')).toBe('');
+      expect(scout.strings.join(' ')).toBe('');
+      expect(scout.strings.join('hello')).toBe('');
+      expect(scout.strings.join('hello', undefined)).toBe('');
+      expect(scout.strings.join('hello', 'world')).toBe('world');
+      expect(scout.strings.join('hello', 'world', '!')).toBe('worldhello!');
+      expect(scout.strings.join(' ', 'hello', 'world', '!')).toBe('hello world !');
+      expect(scout.strings.join(' ', 'hello', undefined, '!')).toBe('hello !');
+      expect(scout.strings.join(' ', 'hello', null, '!')).toBe('hello !');
+      expect(scout.strings.join(' ', 'hello', '', '!')).toBe('hello !');
+      expect(scout.strings.join('  ', ' ', '', ' ')).toBe('    ');
+      expect(scout.strings.join(undefined, 'one', 'two', 'three')).toBe('onetwothree');
+      expect(scout.strings.join('', 'one', 'two', 'three')).toBe('onetwothree');
+    });
+
+  });
+
+  describe("box", function() {
+
+    it("boxes strings", function() {
+      expect(scout.strings.box()).toBe('');
+      expect(scout.strings.box('(')).toBe('');
+      expect(scout.strings.box('(', undefined)).toBe('');
+      expect(scout.strings.box('(', 'x')).toBe('(x');
+      expect(scout.strings.box(undefined, 'x')).toBe('x');
+      expect(scout.strings.box('(', 'x', ')')).toBe('(x)');
+      expect(scout.strings.box('   (', 'x ', ')')).toBe('   (x )');
+      expect(scout.strings.box(' (', 'x  ')).toBe(' (x  ');
+      expect(scout.strings.box('(', 'x', ')', 'y')).toBe('(x)');
+      expect(scout.strings.box('', 'x', '')).toBe('x');
+      expect(scout.strings.box('a', ' ', 'b')).toBe('');
+    });
+
+  });
+
 });
