@@ -16,6 +16,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,7 +77,7 @@ public final class FastBeanUtility {
    * @return a map of property to its {@link InternalPropertyDescriptor}
    */
   public static Map<String/*propertyName*/, FastPropertyDescriptor> createPropertyDescriptorMap(Class<?> beanClazz, Class<?> stopClazz) {
-    HashMap<String, FastPropertyDescriptor> map = new HashMap<String, FastPropertyDescriptor>();
+    Map<String, FastPropertyDescriptor> map = new HashMap<>();
     for (Class cl = beanClazz; cl != null && cl != stopClazz; cl = cl.getSuperclass()) {
       Method[] methods = getDeclaredPublicMethods(cl);
       contributePropertyDescriptors(beanClazz, cl, methods, map);
@@ -136,7 +137,7 @@ public final class FastBeanUtility {
       }
     });
     //clear non-public methods:
-    ArrayList<Method> methodsList = new ArrayList<Method>();
+    List<Method> methodsList = new ArrayList<>();
     if (methods != null) {
       for (int i = 0; i < methods.length; i++) {
         Method method = methods[i];
