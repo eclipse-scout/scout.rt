@@ -138,6 +138,8 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     if (item instanceof scout.Button && item.$field.is('button')) {
       // <button>s are tabbable by default, therefore explicitly disable it by setting the tabindex to -1
       item.$field.attr('tabindex', -1);
+    } else if (item instanceof scout.Button){
+      item.$field.removeAttr('tabindex');
     } else {
       // For all other items we can just remove the attribute to make them non-tabbable
       item.$container.removeAttr('tabindex');
