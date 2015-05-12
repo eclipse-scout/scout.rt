@@ -38,6 +38,12 @@ scout.Column.prototype.buildCell = function(row) {
 
 scout.Column.prototype._cssClass = function(row, cell) {
   var cssClass = 'table-cell';
+  if (this.mandatory) {
+    cssClass += ' mandatory';
+  }
+  if (!this.table.multilineText || !this.textWrap) {
+    cssClass += ' white-space-nowrap';
+  }
   if (!cell) {
     // gui only columns don't have cells
     return cssClass;
@@ -47,12 +53,6 @@ scout.Column.prototype._cssClass = function(row, cell) {
   }
   if (cell.errorStatus) {
     cssClass += ' has-error';
-  }
-  if (this.mandatory) {
-    cssClass += ' mandatory';
-  }
-  if (!this.table.multilineText || !this.textWrap) {
-    cssClass += ' white-space-nowrap';
   }
 
   //TODO CGU cssClass is actually only sent for cells, should we change this in model? discuss with jgu
