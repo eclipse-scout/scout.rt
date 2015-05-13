@@ -42,13 +42,11 @@ class ArrayInput implements IBindInput {
       }
       if (m_target.isPlainValue() || m_target.isPlainSql()) {
         // if the op is = or <> change it to IN or NOT IN
-        if (m_target.getParsedOp() != null) {
-          if ("=".equals(m_target.getParsedOp())) {
-            m_target.setParsedOp("IN");
-          }
-          else { // != or <>
-            m_target.setParsedOp("NOT IN");
-          }
+        if ("=".equals(m_target.getParsedOp())) {
+          m_target.setParsedOp("IN");
+        }
+        else if ("!=".equals(m_target.getParsedOp()) || "<>".equals(m_target.getParsedOp())) {
+          m_target.setParsedOp("NOT IN");
         }
       }
     }
@@ -141,7 +139,7 @@ class ArrayInput implements IBindInput {
       m_target.setParsedAttribute(null);
       m_target.setParsedOp(null);
       if (op.equalsIgnoreCase("IN") || op.equalsIgnoreCase("=")) {
-          m_target.setReplaceToken(sqlStyle.createInList(att, plain, m_array));
+        m_target.setReplaceToken(sqlStyle.createInList(att, plain, m_array));
       }
       else {
         m_target.setReplaceToken(sqlStyle.createNotInList(att, plain, m_array));
