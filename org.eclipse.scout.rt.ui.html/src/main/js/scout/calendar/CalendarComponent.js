@@ -86,6 +86,12 @@ scout.CalendarComponent.prototype._render = function($parent) {
   }
 };
 
+scout.CalendarComponent.prototype.removeParts = function() {
+  this._$parts.forEach(function($part) {
+    $part.remove();
+  });
+};
+
 // FIXME CRU: tuning
 scout.CalendarComponent.prototype._findDayInGrid = function(date) {
   var $day;

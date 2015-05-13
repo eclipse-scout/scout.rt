@@ -171,6 +171,7 @@ scout.Calendar.prototype._renderComponents = function() {
   var taskOffset = 5;
 
   this.components.forEach(function(component) {
+    component.rendered = false; // XXX AWE: HACK HACK HACK
     component.render(this.$container);
     if (component._isTask()) {
       component._arrangeTask(taskOffset);
@@ -326,15 +327,28 @@ scout.Calendar.prototype._onClickToday = function(event) {
 };
 
 scout.Calendar.prototype._onClickDisplayMode = function(event) {
-  this.displayMode = $(event.target).data('mode');
-  if (this._isWork()) {
-    // change date if selectedDate is on a weekend
-    var p = this._dateParts(this.selectedDate, true);
-    if (p.day > 4) {
-      this.selectedDate = new Date(p.year, p.month, p.date - p.day + 4);
+  var p, displayMode,
+    oldDisplayMode = this.displayMode;
+
+  displayMode = $(event.target).data('mode');
+  if (oldDisplayMode != displayMode) {
+    this.displayMode = displayMode;
+    if (this._isWork()) {
+      // change date if selectedDate is on a weekend
+      p = this._dateParts(this.selectedDate, true);
+      if (p.day > 4) {
+        this.selectedDate = new Date(p.year, p.month, p.date - p.day + 4);
+      }
     }
+
+    this.components.forEach(function(component) {
+      component.removeParts();
+    });
+
+    this._updateModel();
+
+    this._renderComponents();
   }
-  this._updateModel();
 };
 
 scout.Calendar.prototype._onClickYear = function(event) {
