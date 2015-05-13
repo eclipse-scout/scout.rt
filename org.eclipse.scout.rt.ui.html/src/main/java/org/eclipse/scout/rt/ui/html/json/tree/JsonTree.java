@@ -210,6 +210,8 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
         // the buffered events, the "wrong" events will be ignored and everything is fixed again.
         m_eventBuffer.add(new TreeEvent(event.getTree(), TreeEvent.TYPE_NODES_DELETED, event.getTree().getRootNode()));
         m_eventBuffer.add(new TreeEvent(event.getTree(), TreeEvent.TYPE_NODES_INSERTED, getTopLevelNodes(true)));
+        m_eventBuffer.add(new TreeEvent(event.getTree(), TreeEvent.TYPE_NODES_SELECTED, event.getTree().getSelectedNodes()));
+        m_eventBuffer.add(new TreeEvent(event.getTree(), TreeEvent.TYPE_NODES_CHECKED, event.getTree().getCheckedNodes()));
         break;
       }
       default: {
