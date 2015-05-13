@@ -118,6 +118,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected void done() {
     m_jobManager.unregisterFuture(this);
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.DONE, this));
+    // IMPORTANT: do not pass mutex here because invoked immediately upon cancellation.
   }
 
   /**
@@ -144,9 +145,10 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   public void run() {
     try {
       if (isExpired()) {
-        cancel(true); // to enter 'DONE' state.
+        cancel(true); // to enter 'DONE' state and to interrupt a potential waiting submitter.
       }
-      else if (m_periodic) {
+
+      if (m_periodic) {
         super.runAndReset(); // periodic action
       }
       else {

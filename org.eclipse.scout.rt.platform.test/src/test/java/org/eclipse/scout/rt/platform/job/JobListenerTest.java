@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -113,8 +114,8 @@ public class JobListenerTest {
     m_jobManager.removeListener(shutdownListener);
 
     Assert.assertFalse(hasStarted.getValue().booleanValue());
-    assertEquals(Collections.singletonList(JobEventType.SCHEDULED), listener.m_eventTypes); // cancelled tasks are in state 'done' --> same behavior as Java Futures
-    assertEquals(Collections.singletonList(future), listener.m_futures);
+    assertEquals(Arrays.asList(JobEventType.SCHEDULED, JobEventType.DONE), listener.m_eventTypes);
+    assertEquals(Arrays.asList(future, future), listener.m_futures);
     assertTrue(future.isCancelled());
 
     assertTrue(shutdownListener.m_shutdown.get());
