@@ -10,59 +10,56 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.context.internal;
 
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
+import java.security.Principal;
 import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IChainable;
+import org.slf4j.MDC;
 
 /**
- * Processor to run the subsequent sequence of actions on behalf of the given {@link Subject}.
+ * Provides the {@link MDC#put(String, String)} properties {@value #SCOUT_USER_NAME}
  *
  * @param <RESULT>
  *          the result type of the job's computation.
  * @since 5.1
  * @see <i>design pattern: chain of responsibility</i>
  */
-public class SubjectCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
+public class SubjectLogCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
+  public static final String SUBJECT_PRINCIPAL_NAME = "subject.principal.name";
+
   protected final Callable<RESULT> m_next;
   protected final Subject m_subject;
 
-  /**
-   * Creates a processor to run the subsequent sequence of actions on behalf of the given {@link Subject}.
-   *
-   * @param next
-   *          next processor in the chain; must not be <code>null</code>.
-   * @param subject
-   *          {@link Subject} on behalf of which to run the following processors; use <code>null</code> if not to be run
-   *          in privileged mode.
-   */
-  public SubjectCallable(final Callable<RESULT> next, final Subject subject) {
+  public SubjectLogCallable(final Callable<RESULT> next, final Subject subject) {
     m_next = Assertions.assertNotNull(next);
     m_subject = subject;
   }
 
   @Override
   public RESULT call() throws Exception {
-    if (m_subject == null || m_subject.equals(Subject.getSubject(AccessController.getContext()))) {
+    String name = null;
+    if (m_subject != null && !m_subject.getPrincipals().isEmpty()) {
+      Principal p = m_subject.getPrincipals().iterator().next();
+      if (p != null) {
+        name = p.getName();
+      }
+    }
+
+    String oldUserName = MDC.get(SUBJECT_PRINCIPAL_NAME);
+    try {
+      MDC.put(SUBJECT_PRINCIPAL_NAME, name);
+      //
       return m_next.call();
     }
-    else {
-      try {
-        return Subject.doAs(m_subject, new PrivilegedExceptionAction<RESULT>() {
-
-          @Override
-          public RESULT run() throws Exception {
-            return m_next.call();
-          }
-        });
+    finally {
+      if (oldUserName != null) {
+        MDC.put(SUBJECT_PRINCIPAL_NAME, oldUserName);
       }
-      catch (final PrivilegedActionException e) {
-        throw e.getException();
+      else {
+        MDC.remove(SUBJECT_PRINCIPAL_NAME);
       }
     }
   }

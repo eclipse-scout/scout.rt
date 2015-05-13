@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.context.internal.RunMonitorCallable;
 import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
+import org.eclipse.scout.rt.platform.context.internal.SubjectLogCallable;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 
@@ -121,9 +122,10 @@ public class RunContext {
    * @return the head of the chain to be invoked first.
    */
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, propertyMap());
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, NlsLocale.CURRENT, locale());
-    final Callable<RESULT> c2 = new SubjectCallable<>(c3, subject());
+    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, propertyMap());
+    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, NlsLocale.CURRENT, locale());
+    final Callable<RESULT> c3 = new SubjectCallable<>(c4, subject());
+    final Callable<RESULT> c2 = new SubjectLogCallable<>(c3, subject());
     final Callable<RESULT> c1 = new RunMonitorCallable<>(c2, parentRunMonitor(), runMonitor());
 
     return c1;

@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.logging.Logger;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.internal.java.JavaScoutLogManager;
+import org.eclipse.scout.commons.logger.internal.slf4j.Slf4jScoutLogManager;
 
 /**
  * The default factory to create {@link IScoutLogger} objects.
@@ -53,7 +53,7 @@ public final class ScoutLogManager {
       e.printStackTrace(); // NOSONAR
     }
 
-    return new JavaScoutLogManager();
+    return new Slf4jScoutLogManager();
   }
 
   /**

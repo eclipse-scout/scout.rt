@@ -27,8 +27,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.jms.JmsConfigProperties.JmsRequestTimeoutProperty;
 import org.eclipse.scout.rt.server.jms.context.JmsRunContexts;
@@ -112,7 +112,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
   protected synchronized void startMessageConsumer() throws ProcessingException {
     stopMessageConsumer();
-    m_messageConsumerFuture = Jobs.schedule(createMessageConsumerRunnable());
+    m_messageConsumerFuture = Jobs.schedule(createMessageConsumerRunnable(), Jobs.newInput(null).name("JmsMessageConsumer"));
   }
 
   protected synchronized void stopMessageConsumer() throws ProcessingException {

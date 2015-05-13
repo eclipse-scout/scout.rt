@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.PreferredValue;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.internal.ClientSessionLogCallable;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.IRunMonitor;
@@ -64,9 +65,10 @@ public class ClientRunContext extends RunContext {
 
   @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, UserAgent.CURRENT, userAgent());
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, session());
+    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
+    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, userAgent());
+    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, ISession.CURRENT, session());
+    final Callable<RESULT> c2 = new ClientSessionLogCallable<>(c3, session());
     final Callable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;

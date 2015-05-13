@@ -25,6 +25,8 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.context.internal.ServerSessionLogCallable;
+import org.eclipse.scout.rt.server.context.internal.TwoPhaseTransactionBoundaryCallable;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
@@ -76,10 +78,11 @@ public class ServerRunContext extends RunContext {
 
   @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c6 = new TwoPhaseTransactionBoundaryCallable<>(next, transaction(), transactionScope());
-    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, userAgent());
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, ISession.CURRENT, session());
+    final Callable<RESULT> c7 = new TwoPhaseTransactionBoundaryCallable<>(next, transactionScope());
+    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
+    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, UserAgent.CURRENT, userAgent());
+    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, ISession.CURRENT, session());
+    final Callable<RESULT> c3 = new ServerSessionLogCallable<>(c4, session());
     final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, OfflineState.CURRENT, offline());
     final Callable<RESULT> c1 = super.interceptCallable(c2);
 

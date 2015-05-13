@@ -45,6 +45,8 @@ public class JavaLogFormatter extends Formatter {
     }
     buf.append(levelText);
     buf.append(" ");
+    buf.append(Thread.currentThread().getName());
+    buf.append(" ");
     if (record.getSourceClassName() != null) {
       buf.append(record.getSourceClassName());
       if (record.getSourceMethodName() != null) {
