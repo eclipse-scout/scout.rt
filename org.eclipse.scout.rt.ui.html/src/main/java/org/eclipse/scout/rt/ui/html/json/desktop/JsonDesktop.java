@@ -231,7 +231,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     String fileName = handler.getResource().getFilename();
     m_downloads.put(fileName, handler);
     String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, fileName);
-    handleModelOpenUri(downloadUrl, TargetWindow.AUTO);
+    handleModelOpenUri(downloadUrl, TargetWindow.BLANK);//FIXME awe (from imo) AUTO causes in
   }
 
   @Override
