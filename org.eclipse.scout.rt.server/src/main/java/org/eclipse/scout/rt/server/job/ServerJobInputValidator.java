@@ -14,7 +14,6 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
  * Validator for {@link JobInput} used for server jobs.
@@ -36,6 +35,5 @@ public class ServerJobInputValidator {
 
     final ServerRunContext serverRunContext = (ServerRunContext) input.runContext();
     Assertions.assertNotNull(serverRunContext.session(), "For server jobs, 'serverSession' must not be null");
-    Assertions.assertEquals(TransactionScope.REQUIRES_NEW, serverRunContext.transactionScope(), "For server jobs, transaction scope must be 'REQUIRES_NEW' [actual=%s]", serverRunContext.transactionScope());
   }
 }

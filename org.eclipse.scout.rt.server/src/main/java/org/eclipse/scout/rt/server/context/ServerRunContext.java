@@ -71,11 +71,12 @@ public class ServerRunContext extends RunContext {
   protected IServerSession m_session;
   protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
   protected TransactionScope m_transactionScope;
+  protected ITransaction m_transaction;
   protected boolean m_offline;
 
   @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c6 = new TwoPhaseTransactionBoundaryCallable<>(next, transactionScope());
+    final Callable<RESULT> c6 = new TwoPhaseTransactionBoundaryCallable<>(next, transaction(), transactionScope());
     final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
     final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, userAgent());
     final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, ISession.CURRENT, session());
@@ -90,7 +91,7 @@ public class ServerRunContext extends RunContext {
   }
 
   @Override
-  public ServerRunContext runMonitor(IRunMonitor parentRunMonitor, IRunMonitor runMonitor) {
+  public ServerRunContext runMonitor(final IRunMonitor parentRunMonitor, final IRunMonitor runMonitor) {
     super.runMonitor(parentRunMonitor, runMonitor);
     return this;
   }
@@ -135,6 +136,15 @@ public class ServerRunContext extends RunContext {
     return this;
   }
 
+  public ITransaction transaction() {
+    return m_transaction;
+  }
+
+  public ServerRunContext transaction(final ITransaction transaction) {
+    m_transaction = transaction;
+    return this;
+  }
+
   public boolean offline() {
     return m_offline;
   }
@@ -166,6 +176,7 @@ public class ServerRunContext extends RunContext {
     builder.attr("locale", locale());
     builder.ref("session", session());
     builder.attr("userAgent", userAgent());
+    builder.ref("transaction", transaction());
     builder.attr("transactionScope", transactionScope());
     builder.attr("offline", offline());
     return builder.toString();
@@ -181,6 +192,7 @@ public class ServerRunContext extends RunContext {
     m_session = originRunContext.m_session;
     m_userAgent = originRunContext.m_userAgent.copy();
     m_transactionScope = originRunContext.m_transactionScope;
+    m_transaction = originRunContext.m_transaction;
     m_offline = originRunContext.m_offline;
   }
 
@@ -189,6 +201,7 @@ public class ServerRunContext extends RunContext {
     super.fillCurrentValues();
     m_userAgent = new PreferredValue<>(UserAgent.CURRENT.get(), false);
     m_transactionScope = TransactionScope.REQUIRES_NEW;
+    m_transaction = ITransaction.CURRENT.get();
     m_offline = BooleanUtility.nvl(OfflineState.CURRENT.get(), false);
     session(ServerSessionProvider.currentSession()); // method call to derive other values.
   }
@@ -198,6 +211,7 @@ public class ServerRunContext extends RunContext {
     super.fillEmptyValues();
     m_userAgent = new PreferredValue<>(null, true); // null as preferred UserAgent
     m_transactionScope = TransactionScope.REQUIRES_NEW;
+    m_transaction = null;
     m_offline = false;
     session(null); // method call to derive other values.
   }

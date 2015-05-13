@@ -17,7 +17,6 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,26 +48,5 @@ public class ServerJobInputValidatorTest {
   @Test(expected = AssertionError.class)
   public void testNullServerSession2() {
     new ServerJobInputValidator().validate(new JobInput().runContext(ServerRunContexts.empty().session(null)));
-  }
-
-  @Test
-  public void testTransactionScopeRequiresNew() {
-    new ServerJobInputValidator().validate(new JobInput().runContext(ServerRunContexts.empty().session(mock(IServerSession.class)).transactionScope(TransactionScope.REQUIRES_NEW)));
-    assertTrue(true);
-  }
-
-  @Test(expected = AssertionError.class)
-  public void testTransactionScopeRequired() {
-    new ServerJobInputValidator().validate(new JobInput().runContext(ServerRunContexts.empty().session(mock(IServerSession.class)).transactionScope(TransactionScope.REQUIRED)));
-  }
-
-  @Test(expected = AssertionError.class)
-  public void testTransactionScopeMandatory() {
-    new ServerJobInputValidator().validate(new JobInput().runContext(ServerRunContexts.empty().session(mock(IServerSession.class)).transactionScope(TransactionScope.MANDATORY)));
-  }
-
-  @Test(expected = AssertionError.class)
-  public void testTransactionScopeNull() {
-    new ServerJobInputValidator().validate(new JobInput().runContext(ServerRunContexts.empty().session(mock(IServerSession.class)).transactionScope(null)));
   }
 }

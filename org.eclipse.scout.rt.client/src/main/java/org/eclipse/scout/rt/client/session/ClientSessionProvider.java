@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -55,7 +56,7 @@ public class ClientSessionProvider {
             beforeStartSession(clientSession);
             clientSession.startSession();
           }
-        }, ModelJobs.newInput(runContext.copy().session(clientSession)).name("initialize ClientSession [user=%s]", runContext.subject())).awaitDoneAndGet();
+        }, ModelJobs.newInput(ClientRunContexts.copyCurrent().session(clientSession)).name("initialize ClientSession [user=%s]", runContext.subject())).awaitDoneAndGet();
 
         return clientSession;
       }

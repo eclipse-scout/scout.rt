@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
+import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
 
@@ -50,7 +51,7 @@ public class ServerSessionProvider {
         serverSession.setIdInternal(String.format("%s-%s", serverSession.getClass().getName(), UUID.randomUUID()));
 
         // 2. Load the session.
-        serverRunContext.copy().session(serverSession).transactionScope(TransactionScope.MANDATORY).run(new IRunnable() {
+        ServerRunContexts.copyCurrent().session(serverSession).transactionScope(TransactionScope.MANDATORY).run(new IRunnable() {
 
           @Override
           public void run() throws Exception {
