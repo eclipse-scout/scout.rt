@@ -1360,7 +1360,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
       contrib.getFromParts().add(fromPart);
     }
     switch (attributeStrategy) {
-    //select ... where
+      //select ... where
       case BuildQueryOfAttributeAndConstraintOfContext: {
         //select
         if (attPart != null) {
@@ -1840,9 +1840,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
       case OPERATOR_IN: {
         if (!plainBind) {
           addBinds(names, values);
-          return m_sqlStyle.createIn(sql, names[0]);
         }
-        return m_sqlStyle.createInList(sql, values[0]);
+        return m_sqlStyle.createInList(sql, plainBind, values[0]);
       }
       case OPERATOR_CONTAINS: {
         if (!plainBind) {
@@ -1859,9 +1858,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
       case OPERATOR_NOT_IN: {
         if (!plainBind) {
           addBinds(names, values);
-          return m_sqlStyle.createNotIn(sql, names[0]);
         }
-        return m_sqlStyle.createNotInList(sql, values[0]);
+        return m_sqlStyle.createNotInList(sql, plainBind, values[0]);
       }
       case OPERATOR_NOT_CONTAINS: {
         if (!plainBind) {
