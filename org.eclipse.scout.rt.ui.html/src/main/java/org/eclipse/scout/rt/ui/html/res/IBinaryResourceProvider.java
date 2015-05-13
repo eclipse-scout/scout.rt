@@ -2,7 +2,7 @@ package org.eclipse.scout.rt.ui.html.res;
 
 import java.net.URL;
 
-import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 
 /**

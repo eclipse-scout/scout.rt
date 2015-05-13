@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.html.cache;
 
 import java.io.Serializable;
 
-import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
+import org.eclipse.scout.commons.resource.BinaryResource;
 
 /**
  * Used in {@link IHttpCacheControl}
