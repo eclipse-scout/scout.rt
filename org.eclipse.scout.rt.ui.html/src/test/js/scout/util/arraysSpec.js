@@ -307,4 +307,34 @@ describe("scout.arrays", function() {
 
   });
 
+  describe("first", function() {
+
+    it("finds first array element", function() {
+      expect(scout.arrays.first()).toBe(undefined);
+      expect(scout.arrays.first('test')).toBe('test');
+      expect(scout.arrays.first({x: 'y'})).toEqual({x: 'y'});
+      expect(scout.arrays.first([])).toBe(undefined);
+      expect(scout.arrays.first([undefined])).toBe(undefined);
+      expect(scout.arrays.first(['a', 'b', 'c'])).toBe('a');
+      expect(scout.arrays.first([null, undefined, 123])).toBe(null);
+      expect(scout.arrays.first(['', 'b', 'c'])).toBe('');
+    });
+
+  });
+
+  describe("last", function() {
+
+    it("finds last array element", function() {
+      expect(scout.arrays.last()).toBe(undefined);
+      expect(scout.arrays.last('test')).toBe('test');
+      expect(scout.arrays.last({x: 'y'})).toEqual({x: 'y'});
+      expect(scout.arrays.last([])).toBe(undefined);
+      expect(scout.arrays.last([undefined])).toBe(undefined);
+      expect(scout.arrays.last(['a', 'b', 'c'])).toBe('c');
+      expect(scout.arrays.last([123, undefined, null])).toBe(null);
+      expect(scout.arrays.last(['a', 'b', ''])).toBe('');
+    });
+
+  });
+
 });

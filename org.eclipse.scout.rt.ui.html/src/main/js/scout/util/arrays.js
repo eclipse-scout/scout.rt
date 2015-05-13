@@ -62,6 +62,20 @@ scout.arrays = {
     return true;
   },
 
+  first: function(arr) {
+    if (Array.isArray(arr)) {
+      return arr[0];
+    }
+    return arr;
+  },
+
+  last: function(arr) {
+    if (Array.isArray(arr)) {
+      return arr[arr.length - 1];
+    }
+    return arr;
+  },
+
   pushAll: function(arr, arr2) {
     arr.push.apply(arr, arr2);
   },
