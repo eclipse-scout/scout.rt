@@ -648,7 +648,8 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     return super.isContentValid() && isMandatoryFulfilled();
   }
 
-  private boolean isMandatoryFulfilled() {
+  @Override
+  public boolean isMandatoryFulfilled() {
     return !isMandatory() || getValue() != null;
   }
 

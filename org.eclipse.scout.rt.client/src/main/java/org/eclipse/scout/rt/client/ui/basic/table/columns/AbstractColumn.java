@@ -33,7 +33,8 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.IMultiStatus;
+import org.eclipse.scout.commons.status.MultiStatus;
 import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnCompleteEditChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateCellChain;
@@ -61,7 +62,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -1757,23 +1757,11 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
           }
         }
         if (editor != null) {
-          IStatus errorStatus = editor.getErrorStatus();
-          boolean editorValid = editor.isContentValid() && errorStatus == null;
           Cell cell = row.getCellForUpdate(this);
-          if (!editorValid) {
-            if (isDisplayable() && !isVisible()) {
-              //column should become visible
-              setVisible(true);
-            }
-            cell.setErrorStatus(errorStatus);
-            if (errorStatus instanceof ParsingFailedStatus) {
-              cell.setText(((ParsingFailedStatus) errorStatus).getParseInputString());
-            }
-            else {
-              cell.setErrorStatus(new Status(ScoutTexts.get("FormEmptyMandatoryFieldsMessage")));
-              cell.setText("");
-            }
-            return;
+          IMultiStatus status = getEditorErrorIncludingMandatory((IValueField<VALUE>) editor);
+          if (!status.isOK()) {
+            cell.setErrorStatus(status);
+            cell.setText(((IValueField<VALUE>) editor).getDisplayText());
           }
           else {
             /*
@@ -1791,6 +1779,12 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
               ((AbstractTable) table).wasEverValid(row);
             }
           }
+
+          //displayable column with invalid values should become visible
+          if (!cell.isContentValid() && isDisplayable() && !isVisible()) {
+            setVisible(true);
+          }
+
         }
       }
       catch (Exception e) {
@@ -1804,6 +1798,18 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       removeValidatedValue(row);
     }
 
+  }
+
+  /**
+   * @return error in editor field, including mandatory error, if no value is set.
+   */
+  private IMultiStatus getEditorErrorIncludingMandatory(IValueField<VALUE> editor) {
+    IMultiStatus editorError = editor.getErrorStatus();
+    MultiStatus status = editorError == null ? new MultiStatus() : new MultiStatus(editorError);
+    if (!editor.isMandatoryFulfilled()) {
+      status.add(new Status(ScoutTexts.get("FormEmptyMandatoryFieldsMessage")));
+    }
+    return status;
   }
 
   /**
