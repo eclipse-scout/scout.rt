@@ -26,6 +26,10 @@ scout.Column.prototype.buildCell = function(row) {
   if (this.table.multilineText) {
     text = scout.strings.nl2br(text, false);
   }
+  if (!text) {
+    // If every cell of a row is empty the row would collapse, using nbsp makes sure the row is as height as the others even if it is empty
+    text = '&nbsp;';
+  }
   cssClass = this._cssClass(row, cell);
   tooltipText = this.table.cellTooltipText(this, row);
   tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');

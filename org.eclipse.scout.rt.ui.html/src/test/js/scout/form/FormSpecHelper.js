@@ -38,7 +38,7 @@ FormSpecHelper.prototype.createFormXFields = function(x, session, isModal, paren
   var fields = [];
   var fieldIds = [];
   var field;
-  for(var i=0; i<x ;i++){
+  for (var i = 0; i < x; i++) {
     field = this.createFieldModel();
     fields.push(field);
     fieldIds.push(field.id);

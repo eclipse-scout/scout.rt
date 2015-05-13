@@ -1,17 +1,22 @@
+/* global FormSpecHelper */
 describe("FormField", function() {
-
   var session;
-  var formField;
-  var model = {id:'2'};
+  var helper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
-    formField = new scout.FormField();
-    formField.init(model, session);
+    helper = new FormSpecHelper(session);
   });
 
   describe("inheritance", function() {
+    var formField, model;
+
+    beforeEach(function() {
+      model = helper.createFieldModel();
+      formField = new scout.FormField();
+      formField.init(model, session);
+    });
 
     it("inherits from ModelAdapter", function() {
       expect(scout.ModelAdapter.prototype.isPrototypeOf(formField)).toBe(true);
@@ -19,7 +24,65 @@ describe("FormField", function() {
 
   });
 
+  describe("property label position", function() {
+    var formField, model;
+
+    beforeEach(function() {
+      model = helper.createFieldModel();
+      formField = new scout.StringField();
+      formField.init(model, session);
+    });
+
+    describe("position on_field", function() {
+
+      beforeEach(function() {
+        formField.label = 'labelName';
+        formField.labelPosition = scout.FormField.LABEL_POSITION_ON_FIELD;
+      });
+
+      it("sets the label as placeholder", function() {
+        formField.render(session.$entryPoint);
+        expect(formField.$label.html()).toBeFalsy();
+        expect(formField.$field.attr('placeholder')).toBe(formField.label);
+      });
+
+      it("does not call field._renderLabelPosition initially", function() {
+        formField.render(session.$entryPoint);
+        expect(formField.$label.html()).toBeFalsy();
+        expect(formField.$field.attr('placeholder')).toBe(formField.label);
+
+        spyOn(formField, '_renderLabelPosition');
+        expect(formField._renderLabelPosition).not.toHaveBeenCalled();
+      });
+
+    });
+
+    describe("position top", function() {
+
+      beforeEach(function() {
+        formField.label = 'labelName';
+        formField.labelPosition = scout.FormField.LABEL_POSITION_TOP;
+      });
+
+      it("guarantees a minimum height if label is empty", function() {
+        formField.label = '';
+        formField.render(session.$entryPoint);
+        expect(formField.$label.html()).toBe('&nbsp;');
+        expect(formField.$label).toBeVisible();
+      });
+
+    });
+
+  });
+
   describe("onModelPropertyChange", function() {
+    var formField, model;
+
+    beforeEach(function() {
+      model = helper.createFieldModel();
+      formField = new scout.FormField();
+      formField.init(model, session);
+    });
 
     it("event should update model", function() {
       // Note: normally an event for ID 123 would never be applied
@@ -38,7 +101,7 @@ describe("FormField", function() {
       formField.onModelPropertyChange(event);
       expect(formField.errorStatus).toBe('foo');
       // never apply id, type, properties on model
-      expect(formField.id).toBe('2');
+      expect(formField.id).toBe(model.id);
       expect(formField.hasOwnProperty('type')).toBe(false);
       expect(formField.hasOwnProperty('properties')).toBe(false);
     });

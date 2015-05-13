@@ -39,7 +39,7 @@ describe("Table", function() {
         var $row0 = table.$rows().eq(0);
         var $cells = $row0.find('.table-cell');
         expect($cells.eq(0).text()).toBe('cell1');
-        expect($cells.eq(1).text()).toBe('');
+        expect($cells.eq(1).html()).toBe('&nbsp;');
         expect($cells.eq(2).text()).toBe('0');
       });
 
@@ -52,7 +52,7 @@ describe("Table", function() {
         var $row0 = table.$rows().eq(0);
         var $cells = $row0.find('.table-cell');
         expect($cells.eq(0).text()).toBe('cell1');
-        expect($cells.eq(1).text()).toBe('');
+        expect($cells.eq(1).html()).toBe('&nbsp;');
         expect($cells.eq(2).text()).toBe('0');
       });
 

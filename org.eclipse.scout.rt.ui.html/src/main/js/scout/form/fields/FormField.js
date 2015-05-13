@@ -117,18 +117,22 @@ scout.FormField.prototype._renderVisible = function(visible) {
   }
 };
 
-scout.FormField.prototype._renderLabel = function(label) {
-  if (!label) {
-    label = '';
-  }
+scout.FormField.prototype._renderLabel = function() {
+  var label = this.label;
   if (this.labelPosition === scout.FormField.LABEL_POSITION_ON_FIELD) {
     this._renderPlaceholder();
     if (this.$label) {
-      this.$label.html('');
+      this.$label.text('');
     }
   } else if (this.$label) {
     this._removePlaceholder();
-    this.$label.html(this.label ? scout.strings.removeAmpersand(this.label) : '');
+    label = scout.strings.removeAmpersand(label);
+    if (!label) {
+      // Make sure an empty label is as height as the other labels, especially important for top labels
+      this.$label.html('&nbsp;');
+    } else {
+      this.$label.text(label);
+    }
 
     // Invalidate layout if label width depends on its content
     if (this.labelUseUiWidth && this.rendered) {
@@ -169,7 +173,7 @@ scout.FormField.prototype._renderChildVisible = function($child, visible) {
 
 // Don't include in renderProperties, it is not necessary to execute it initially because the positioning is done by _renderLabel
 scout.FormField.prototype._renderLabelPosition = function(position) {
-  this._renderLabel(this.label);
+  this._renderLabel();
 };
 
 scout.FormField.prototype._renderEnabled = function() {
