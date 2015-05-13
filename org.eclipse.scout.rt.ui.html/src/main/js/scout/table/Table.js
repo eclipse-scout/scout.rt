@@ -68,6 +68,19 @@ scout.Table.prototype._createKeyStrokeAdapter = function() {
   return new scout.TableKeyStrokeAdapter(this);
 };
 
+scout.Table.prototype._syncMenus = function(menus){
+  var i;
+  for (i= 0; i < this.menus.length; i++) {
+    this.keyStrokeAdapter.unregisterKeyStroke(this.menus[i]);
+  }
+ this.menus = menus;
+ for (i = 0; i < this.menus.length; i++) {
+   if(this.menus[i].enabled){
+     this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
+   }
+ }
+};
+
 scout.Table.prototype._insertCheckBoxColumn = function() {
   var column = new scout.CheckBoxColumn(),
     columnWidth = 30;

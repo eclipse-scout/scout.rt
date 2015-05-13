@@ -32,7 +32,9 @@ scout.Tree.prototype._syncMenus = function(menus){
    }
   this.menus = menus;
   for (i = 0; i < this.menus.length; i++) {
-    this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
+    if(this.menus[i].enabled){
+      this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
+    }
   }
 };
 

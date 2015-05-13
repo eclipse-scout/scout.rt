@@ -19,11 +19,20 @@ scout.ValueField.prototype._createKeyStrokeAdapter = function() {
 scout.ValueField.prototype._renderProperties = function() {
   scout.ValueField.parent.prototype._renderProperties.call(this);
   this._renderDisplayText(this.displayText);
-  if (this.menus) {
-    for (var j = 0; j < this.menus.length; j++) {
-      this.keyStrokeAdapter.registerKeyStroke(this.menus[j]);
-    }
+};
+
+
+scout.ValueField.prototype._syncMenus = function(menus){
+  var i;
+  for (i= 0; i < this.menus.length; i++) {
+    this.keyStrokeAdapter.unregisterKeyStroke(this.menus[i]);
   }
+ this.menus = menus;
+ for (i = 0; i < this.menus.length; i++) {
+   if(this.menus[i].enabled){
+     this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
+   }
+ }
 };
 
 scout.ValueField.prototype._renderDisplayText = function(displayText) {
