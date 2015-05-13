@@ -78,7 +78,7 @@ public final class SVGUtility {
    * Parses a SVG document read by the given input stream. The document returned can be modified on XML-level. If you
    * need to perform any CSS, text size and and bounding box operations use
    * {@link #readSVGDocumentForGraphicalModification(InputStream)} instead.
-   * 
+   *
    * @param in
    *          input stream the SVG document is read from.
    * @return Returns the SVG document.
@@ -124,7 +124,7 @@ public final class SVGUtility {
    * as soon as the bridge or the document it references is not required anymore.
    * <p/>
    * If the documents needs not be manipulated, use {@link #readSVGDocument(InputStream)} instead.
-   * 
+   *
    * @param in
    *          input stream the SVG document is read from.
    * @return Returns a bridge context that holds references to the SVG document as well as to the GVT tree wrapping
@@ -215,7 +215,7 @@ public final class SVGUtility {
   /**
    * Set the text content of a text element, in case it contains newlines then add tspan elements.
    * Requires the GVT tree to be attached to the svg document.
-   * 
+   *
    * @param textElement
    * @param value
    * @param rowGap
@@ -289,7 +289,7 @@ public final class SVGUtility {
 
   /**
    * This feature is experimental as a convenience since svg does not support native text operations.
-   * 
+   *
    * @param contextElement
    *          is the {@link SVGTextContentElement} containing optional style and font information context for the
    *          wrapping algorithm
@@ -401,7 +401,7 @@ public final class SVGUtility {
 
   /**
    * This feature is experimental as a convenience since svg does not support native text operations.
-   * 
+   *
    * @param contextElement
    *          is the {@link SVGTextContentElement} containing optional style and font information context for the
    *          wrapping algorithm
@@ -453,7 +453,7 @@ public final class SVGUtility {
 
   /**
    * This feature is experimental as a convenience since svg does not support native text operations.
-   * 
+   *
    * @param contextElement
    *          is the {@link SVGTextContentElement} containing optional style and font information context for the
    *          wrapping algorithm
@@ -542,6 +542,77 @@ public final class SVGUtility {
           nnmap.removeNamedItemNS(a.getNamespaceURI(), a.getLocalName());
         }
       }
+    }
+  }
+
+  /**
+   * removes the link that was set on this element, i.e. removes the PARENT a-tag
+   */
+  public static void removeHyperlink(Element e) {
+    if (e.getParentNode() instanceof SVGAElement) {
+      removeHyperlink((SVGAElement) e.getParentNode());
+    }
+  }
+
+  /**
+   * A link is enclosed to the main element
+   * <p>
+   * Moves move all inner elements out of the link element and removes the link element
+   */
+  public static void removeHyperlink(SVGAElement e) {
+    if (SVGConstants.SVG_A_TAG.equals(e.getTagName())) {
+      NodeList nodes = e.getChildNodes();
+      for (int i = 0, n = nodes.getLength(); i < n; i++) {
+        Node node = nodes.item(i);
+        if (node instanceof Element) {
+          e.getParentNode().insertBefore(nodes.item(i), e);
+        }
+      }
+      e.getParentNode().removeChild(e);
+    }
+  }
+
+  /**
+   * Add an app-link to the specified element. </br>
+   * This is done by adding a class attribute (or enrich its if already present) and adding a data-ref attribute. </br>
+   * If class "app-link" is already present, only the data-ref attribute is added or updated.
+   */
+  public static void addAppLink(Element e, String ref) {
+
+    if (e.hasAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE)) {
+      if (!e.getAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE).contains("app-link")) {
+        //class attribute present, but does not define class "app-link"
+        e.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, e.getAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE) + " " + "app-link");
+      }
+
+      //"app-link" class present, do nothing
+    }
+    else {
+      //no class attribute present
+      e.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, "app-link");
+    }
+
+    //add data-ref attribute
+    e.setAttribute("data-ref", ref);
+  }
+
+  /**
+   * Removes an app link.
+   * This is done by removing class "app-link" and, if the former was present, the attribute "data-ref" </br>
+   * If no "app-link" class is present, this method does nothing (i.e. does not change the presence of a "data-ref"
+   * attribute)
+   */
+  public static void removeAppLink(Element e) {
+
+    if (e.hasAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE) && e.getAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE).contains("app-link")) {
+      String newValue = StringUtility.cleanup(StringUtility.replace(e.getAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE), "app-link", ""));
+      if (StringUtility.isNullOrEmpty(newValue)) {
+        e.removeAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
+      }
+      else {
+        e.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, newValue);
+      }
+      e.removeAttribute("data-ref");
     }
   }
 

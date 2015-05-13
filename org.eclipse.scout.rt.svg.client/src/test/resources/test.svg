@@ -1,0 +1,11 @@
+<?xml-stylesheet href="style.css" type="text/css"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <g id="outerGroup">
+    <rect id="outerRect" width="400" height="400" fill="black"/>
+    <circle id="outerCircle" cx="200" cy="200" r="200" fill="red"/>
+    <g id="inner">
+      <rect id="innerRect" class="rectangleClass" x="100" y="100" width="200" height="200"/>
+      <circle id="innerCircle" class="circleClass" cx="200" cy="200" r="50"/>
+    </g>
+  </g>
+</svg>
