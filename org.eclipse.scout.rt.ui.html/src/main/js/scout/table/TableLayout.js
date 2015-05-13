@@ -27,10 +27,13 @@ scout.TableLayout.prototype.layout = function($container) {
   if (this.table.autoResizeColumns) {
     this._layoutColumns();
   }
-  // Make sure tooltips are at correct position after layouting, if there are some
+  // Make sure tooltips and editor popup are at correct position after layouting (e.g after window resizing)
   this.table.tooltips.forEach(function(tooltip) {
     tooltip.position();
   }.bind(this));
+  if (this.table.cellEditorPopup) {
+    this.table.cellEditorPopup.alignTo();
+  }
   scout.scrollbars.update(this.table.$data);
 };
 
