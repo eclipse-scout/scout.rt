@@ -355,10 +355,13 @@ scout.Tree.prototype.setNodesSelected = function(nodes) {
     nodeIds[i] = nodes[i].id;
   }
   if (!scout.arrays.equalsIgnoreOrder(nodeIds, this.selectedNodeIds)) {
+    this._removeSelection();
     this.selectedNodeIds = nodeIds;
+
     this.session.send(this.id, 'nodesSelected', {
       nodeIds: nodeIds
     });
+
     // FIXME BSH Keystroke | "scroll into view"
     this._renderSelection();
     this._renderMenus();
@@ -392,8 +395,6 @@ scout.Tree.prototype._renderSelection = function() {
     $nodes.push($node);
   }
 
-  this.$data.children().select(false);
-
   // render selection
   for (i = 0; i < $nodes.length; i++) {
     $node = $nodes[i];
@@ -406,6 +407,16 @@ scout.Tree.prototype._renderSelection = function() {
   }
 
   this._updateItemPath();
+};
+
+scout.Tree.prototype._removeSelection = function() {
+  for (var i = 0; i < this.selectedNodeIds.length; i++) {
+    var node = this.nodesMap[this.selectedNodeIds[i]];
+    var $node = node.$node;
+    if ($node) { // TODO BSH Check if $node can be undefined
+      $node.select(false);
+    }
+  }
 };
 
 scout.Tree.prototype._computeTreeItemPaddingLeft = function(level, selected) {
