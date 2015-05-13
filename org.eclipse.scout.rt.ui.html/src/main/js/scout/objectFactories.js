@@ -71,6 +71,11 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.BeanColumn();
   }
+},  {
+  objectType: 'IconColumn',
+  create: function() {
+    return new scout.IconColumn();
+  }
 }, {
   objectType: 'TableControl',
   create: function() {

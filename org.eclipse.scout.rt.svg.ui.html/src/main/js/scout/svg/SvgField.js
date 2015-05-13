@@ -26,7 +26,7 @@ scout.SvgField.prototype._renderSvgDocument = function() {
 };
 
 scout.SvgField.prototype._onAppLinkAction = function(event) {
-  var $target = $(event.target);
+  var $target = $(event.delegateTarget);
   var ref = $target.data('ref');
   this._sendAppLinkAction(ref);
   event.preventDefault();

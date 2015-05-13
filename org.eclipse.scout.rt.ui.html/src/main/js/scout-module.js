@@ -88,6 +88,7 @@ __include("scout/planner/PlannerLayout.js");
 __include("scout/table/Column.js");
 __include("scout/table/BeanColumn.js"); // requires Column.js
 __include("scout/table/CheckBoxColumn.js"); // requires Column.js
+__include("scout/table/IconColumn.js"); //requires Column.js
 __include("scout/table/control/TableControl.js");
 __include("scout/table/control/AnalysisTableControl.js"); // requires TableControl.js
 __include("scout/table/control/ChartTableControl.js"); // requires TableControl.js

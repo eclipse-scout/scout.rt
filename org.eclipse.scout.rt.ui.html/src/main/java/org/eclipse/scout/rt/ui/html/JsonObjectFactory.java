@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IBeanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IIconColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IAnalysisTableControl;
@@ -138,6 +139,7 @@ import org.eclipse.scout.rt.ui.html.json.table.JsonBeanColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonBooleanColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonDateColumn;
+import org.eclipse.scout.rt.ui.html.json.table.JsonIconColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonNumberColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.table.JsonStringColumn;
@@ -373,6 +375,9 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     }
     if (object instanceof IBeanColumn<?>) {
       return new JsonBeanColumn((IBeanColumn<?>) object);
+    }
+    if (object instanceof IIconColumn) {
+      return new JsonIconColumn((IIconColumn) object);
     }
     if (object instanceof IColumn<?>) {
       return new JsonColumn((IColumn<?>) object);
