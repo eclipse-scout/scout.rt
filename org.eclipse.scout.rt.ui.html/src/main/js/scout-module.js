@@ -74,6 +74,7 @@ __include("scout/menu/PopupMenuItemKeyStrokeAdapter.js");
 __include("scout/menu/DesktopNavigationPopupKeyStrokeAdapter.js");
 __include("scout/calendar/Calendar.js");
 __include("scout/calendar/CalendarComponent.js");
+__include("scout/calendar/CalendarListComponent.js");
 __include("scout/calendar/CalendarLayout.js");
 __include("scout/calendar/Range.js");
 __include("scout/messagebox/MessageBox.js");

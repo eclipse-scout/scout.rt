@@ -16,8 +16,8 @@ scout.Calendar = function() {
   this.$progress;
 
   // additional modes; should be stored in model
-  this.showYear = false;
-  this.showList = false;
+  this._showYearPanel = false;
+  this._showListPanel = false;
 
   /**
    * The narrow view range is different from the regular view range.
@@ -27,8 +27,11 @@ scout.Calendar = function() {
    */
   this._exactRange;
 
-  this._$selectedComponent;
-
+  /**
+   * When the list panel is shown, this list contains the scout.CalenderListComponent
+   * items visible on the list.
+   */
+  this._listComponents = [];
 
   this._addAdapterProperties(['components', 'menus', 'selectedComponent']);
 };
@@ -335,31 +338,27 @@ scout.Calendar.prototype._onClickDisplayMode = function(event) {
 };
 
 scout.Calendar.prototype._onClickYear = function(event) {
-  this.showYear = !this.showYear;
+  this._showYearPanel = !this._showYearPanel;
   this._updateScreen();
 };
 scout.Calendar.prototype._onClickList = function(event) {
-  this.showList = !this.showList;
+  this._showListPanel = !this._showListPanel;
   this._updateScreen();
 };
 
 scout.Calendar.prototype._onClickDay = function(event) {
-  var $clicked = $(event.currentTarget);
+  var selectedDate,
+    oldSelectedDate = this.selectedDate,
+    $clicked = $(event.currentTarget);
 
-  // select clicked day
-  $('.selected', this.$grid).select(false);
-  $clicked.select(true);
-  this.selectedDate = $clicked.data('date');
-
-  // change selected day in year picker
-  this.colorYear();
-
-  // if day list shown, redraw it
-  if (this.showList) {
-    this.$list.empty();
-    this._renderComponentPanel();
+  selectedDate = $clicked.data('date');
+  if (scout.dates.compare(oldSelectedDate, selectedDate) !== 0) {
+    this.selectedDate = selectedDate;
+    $('.selected', this.$grid).select(false);
+    $clicked.select(true);
+    this.colorYear();
+    this._updateListPanel();
   }
-
 };
 
 /* --  set display mode and range ------------------------------------- */
@@ -409,18 +408,13 @@ scout.Calendar.prototype._updateScreen = function() {
   this.layoutAxis();
 
   // if year shown and changed, redraw year
-  if (this.selectedDate.getFullYear() !== $('.year-title', this.$year).data('year') && this.showYear) {
+  if (this.selectedDate.getFullYear() !== $('.year-title', this.$year).data('year') && this._showYearPanel) {
     this.$year.empty();
     this.drawYear();
   }
 
-  // if list shown and changed, redraw year
-  if (this.showList) {
-    this.$list.empty();
-    this._renderComponentPanel();
-  }
-
   this.colorYear();
+  this._updateListPanel();
 };
 
 scout.Calendar.prototype.layoutSize = function() {
@@ -434,8 +428,8 @@ scout.Calendar.prototype.layoutSize = function() {
     gridW = this.$container.width();
 
   // show or hide year
-  $('.calendar-toggle-year', this.$modes).select(this.showYear);
-  if (this.showYear) {
+  $('.calendar-toggle-year', this.$modes).select(this._showYearPanel);
+  if (this._showYearPanel) {
     this.$year.parent().data('new-width', 270);
     gridW -= 270;
   } else {
@@ -443,8 +437,8 @@ scout.Calendar.prototype.layoutSize = function() {
   }
 
   // show or hide work list
-  $('.calendar-toggle-list', this.$modes).select(this.showList);
-  if (this.showList) {
+  $('.calendar-toggle-list', this.$modes).select(this._showListPanel);
+  if (this._showListPanel) {
     this.$list.parent().data('new-width', 270);
     gridW -= 270;
   } else {
@@ -644,7 +638,7 @@ scout.Calendar.prototype.drawYear = function() {
 
 scout.Calendar.prototype.colorYear = function() {
   // color is only needed if visible
-  if (!this.showYear) {
+  if (!this._showYearPanel) {
     return;
   }
 
@@ -737,31 +731,53 @@ scout.Calendar.prototype._onYearHoverOut = function(event) {
   $('.year-day.year-hover, .year-day.year-hover-day', this.$year).removeClass('year-hover year-hover-day');
 };
 
+
+scout.Calendar.prototype._updateListPanel = function() {
+  if (this._showListPanel) {
+
+    // remove old list-components
+    this._listComponents.forEach(function(listComponent) {
+      listComponent.remove();
+    });
+
+    this._listComponents = [];
+    this._renderListPanel();
+  }
+};
+
 /**
  * Renders the panel on the left, showing all components of the selected date.
  */
-scout.Calendar.prototype._renderComponentPanel = function() {
-  var $c, i,
-    $selected = $('.selected', this.$grid),
-    $components = $selected.children('.calendar-component:not(.clone)');
+scout.Calendar.prototype._renderListPanel = function() {
+  var listComponent, components = [];
 
-  // sort based on screen position
-  $components.sort(this._sortTop);
+  // find components to display on the list panel
+  this.components.forEach(function(component) {
+    if (belongsToSelectedDate.call(this, component)) {
+      components.push(component);
+    }
+  }.bind(this));
 
-  // set title to selected day
-  this.$list.appendDiv('list-title', this._format($selected.data('date'), 'd. MMMM yyyy'));
-
-  // show all components of selected day, add links and set full text
-  for (i = 0; i < $components.length; i++) {
-    $c = $components.eq(i);
-    $c.clone()
-      .appendTo(this.$list)
-      .css('width', '')
-      .css('height', '')
-      .css('top', '')
-      .css('left', '')
-      .html($c.data('component')._description());
+  // work with for-loop instead of forEach because of return statement
+  function belongsToSelectedDate(component) {
+    var i, date;
+    for (i = 0; i < component.coveredDays.length; i++) {
+      date = scout.dates.parseJsonDate(component.coveredDays[i]);
+      if (scout.dates.isSameDay(this.selectedDate, date)) {
+        return true;
+      }
+    }
+    return false;
   }
+
+  // FIXME AWE: (calendar) sort components in list-panel?
+  // $components.sort(this._sortTop);
+
+  components.forEach(function(component) {
+    listComponent = new scout.CalendarListComponent(component);
+    listComponent.render(this.$list);
+    this._listComponents.push(listComponent);
+  }.bind(this));
 };
 
 /* -- components, events-------------------------------------------- */
@@ -794,6 +810,7 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
 
 /* -- components, arrangement------------------------------------ */
 
+// FIXME AWE/CRU: arrange methods should work on the model, not on the DOM
 scout.Calendar.prototype._arrangeComponents = function() {
   var k, $day, $children,
     $days = $('.calendar-day', this.$grid);

@@ -311,6 +311,13 @@ scout.dates = {
     var dateClone = new Date(date.valueOf()),
       dateFormat = new scout.DateFormat(locale, pattern);
     return dateFormat.format(dateClone);
+  },
+
+  compare: function(a, b) {
+    var diff = a.valueOf() - b.valueOf();
+    if (diff < -1) { return -1; }
+    if (diff >  1) { return 1;  }
+    return diff;
   }
 
 };

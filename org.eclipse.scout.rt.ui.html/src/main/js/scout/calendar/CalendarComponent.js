@@ -1,9 +1,12 @@
 scout.CalendarComponent = function() {
   scout.CalendarComponent.parent.call(this);
 
+  this.events = new scout.EventSupport();
 
-  $.log.debug('(CalendarComponent#ctor)');
-  this.selected = false;
+  /**
+   * Selected is a GUI only property (the model doesn't have it)
+   */
+  this._selected = false;
   this._tooltip;
   this._tooltipDelay;
   this._$parts = [];
@@ -15,6 +18,9 @@ scout.inherits(scout.CalendarComponent, scout.ModelAdapter);
  * @override ModelAdapter.js
  */
 scout.CalendarComponent.prototype._remove = function() {
+  // list-components must be informed, that their source has been removed
+  this.events.trigger('removed');
+
   // remove $parts and tooltip, because they're not children of this.$container
   if (this._tooltip) {
     this._tooltip.remove();
@@ -28,7 +34,6 @@ scout.CalendarComponent.prototype._remove = function() {
 scout.CalendarComponent.prototype._render = function($parent) {
   $.log.debug('(CalendarComponent#_render)');
   var i, partDay, $day, $part;
-
 
   for (i = 0; i < this.coveredDays.length; i++) {
     // check if day is in visible view range
@@ -124,7 +129,7 @@ scout.CalendarComponent.prototype._renderSelected = function() {
   // the rendered check is required because the selected component may be
   // off-screen. in that case it is not rendered.
   if (this.rendered) {
-    var selected = this.selected;
+    var selected = this._selected;
     this._$parts.forEach(function($part) {
       $part.toggleClass('comp-selected', selected);
     });
@@ -132,8 +137,12 @@ scout.CalendarComponent.prototype._renderSelected = function() {
 };
 
 scout.CalendarComponent.prototype.setSelected = function(selected) {
-  this.selected = selected;
-  this._renderSelected();
+  var oldSelected = this._selected;
+  this._selected = selected;
+  if (oldSelected != selected) {
+    this.events.trigger('selected', {selected: selected});
+    this._renderSelected();
+  }
 };
 
 scout.CalendarComponent.prototype._onMousedown = function(event) {
@@ -160,7 +169,7 @@ scout.CalendarComponent.prototype._onHoverIn = function(event) {
       htmlEnabled: true
     });
     this._tooltip.render();
-  }.bind(this), 350);
+  }.bind(this), 750);
 };
 
 scout.CalendarComponent.prototype._onHoverOut = function(event) {
