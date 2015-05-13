@@ -23,9 +23,15 @@ scout.inherits(scout.Tree, scout.ModelAdapter);
 scout.Tree.prototype.init = function(model, session) {
   scout.Tree.parent.prototype.init.call(this, model, session);
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
+};
 
-  //FIXME NBU menus may change dynamically. Move this code to this._syncMenus and please create a test. Same on table and other controls.
-  for (var i = 0; i < this.menus.length; i++) {
+scout.Tree.prototype._syncMenus = function(menus){
+  var i;
+   for (i= 0; i < this.menus.length; i++) {
+     this.keyStrokeAdapter.unregisterKeyStroke(this.menus[i]);
+   }
+  this.menus = menus;
+  for (i = 0; i < this.menus.length; i++) {
     this.keyStrokeAdapter.registerKeyStroke(this.menus[i]);
   }
 };
@@ -606,7 +612,7 @@ scout.Tree.prototype._onNodesChecked = function(nodes) {
     this.nodesMap[nodes[i].id].checked = nodes[i].checked;
     this._updateMarkChildrenChecked(this.nodesMap[nodes[i].id], false, nodes[i].checked, true);
     if (this.rendered) {
-      this._renderNodeChecked(nodes[i]);
+      this._renderNodeChecked(this.nodesMap[nodes[i].id]);
     }
   }
 };
@@ -810,7 +816,7 @@ scout.Tree.prototype.checkNode = function(node, checked, suppressSend) {
   node.checked = checked;
   updatedNodes.push(node);
   this._updateMarkChildrenChecked(node, false, checked, true);
-  updatedNodes = updatedNodes.concat(this.checkChildren(node));
+  updatedNodes = updatedNodes.concat(this.checkChildren(node, checked));
   if (!suppressSend) {
     this.sendNodesChecked(updatedNodes);
   }
@@ -820,11 +826,11 @@ scout.Tree.prototype.checkNode = function(node, checked, suppressSend) {
   return updatedNodes;
 };
 
-scout.Tree.prototype.checkChildren = function(node) {
+scout.Tree.prototype.checkChildren = function(node, checked) {
   var updatedNodes = [];
-  if (this.autoCheckChildren && node && node.checked) {
+  if (this.autoCheckChildren && node ) {
     for (var i = 0; i < node.childNodes.length; i++) {
-      updatedNodes = updatedNodes.concat(this.checkNode(node.childNodes[i], node.checked, true));
+      updatedNodes = updatedNodes.concat(this.checkNode(node.childNodes[i], checked, true));
     }
   }
   return updatedNodes;

@@ -1,6 +1,8 @@
 describe("Tree", function() {
   var session;
 
+  //TODO NBU-> write test for dynamical keystroke(menu) update.
+
   beforeEach(function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
