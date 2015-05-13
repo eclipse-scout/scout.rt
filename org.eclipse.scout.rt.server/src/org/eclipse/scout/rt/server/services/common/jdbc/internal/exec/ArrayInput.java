@@ -46,7 +46,7 @@ class ArrayInput implements IBindInput {
           if (m_target.getParsedOp().equals("=")) {
             m_target.setParsedOp("IN");
           }
-          else { // != or <>
+          else if (m_target.getParsedOp().equals("!=") || !m_target.getParsedOp().equals("<>")) {
             m_target.setParsedOp("NOT IN");
           }
         }
@@ -141,7 +141,7 @@ class ArrayInput implements IBindInput {
       m_target.setParsedAttribute(null);
       m_target.setParsedOp(null);
       if (op.equalsIgnoreCase("IN") || op.equalsIgnoreCase("=")) {
-          m_target.setReplaceToken(sqlStyle.createInList(att, plain, m_array));
+        m_target.setReplaceToken(sqlStyle.createInList(att, plain, m_array));
       }
       else {
         m_target.setReplaceToken(sqlStyle.createNotInList(att, plain, m_array));
