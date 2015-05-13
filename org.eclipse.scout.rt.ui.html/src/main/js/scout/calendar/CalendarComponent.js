@@ -1,8 +1,6 @@
 scout.CalendarComponent = function() {
   scout.CalendarComponent.parent.call(this);
 
-  this.events = new scout.EventSupport();
-
   /**
    * Selected is a GUI only property (the model doesn't have it)
    */
@@ -10,7 +8,7 @@ scout.CalendarComponent = function() {
   this._tooltip;
   this._tooltipDelay;
   this._$parts = [];
-
+  this.events = new scout.EventSupport();
 };
 scout.inherits(scout.CalendarComponent, scout.ModelAdapter);
 
@@ -84,12 +82,6 @@ scout.CalendarComponent.prototype._render = function($parent) {
       }
     }
   }
-};
-
-scout.CalendarComponent.prototype.removeParts = function() {
-  this._$parts.forEach(function($part) {
-    $part.remove();
-  });
 };
 
 // FIXME CRU: tuning

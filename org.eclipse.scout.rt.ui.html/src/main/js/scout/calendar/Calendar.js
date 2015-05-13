@@ -171,7 +171,7 @@ scout.Calendar.prototype._renderComponents = function() {
   var taskOffset = 5;
 
   this.components.forEach(function(component) {
-    component.rendered = false; // XXX AWE: HACK HACK HACK
+    component.remove();
     component.render(this.$container);
     if (component._isTask()) {
       component._arrangeTask(taskOffset);
@@ -179,6 +179,7 @@ scout.Calendar.prototype._renderComponents = function() {
     }
   });
   this._arrangeComponents();
+  this._updateListPanel();
 };
 
 scout.Calendar.prototype._renderSelectedComponent = function() {
@@ -341,12 +342,7 @@ scout.Calendar.prototype._onClickDisplayMode = function(event) {
       }
     }
 
-    this.components.forEach(function(component) {
-      component.removeParts();
-    });
-
     this._updateModel();
-
     this._renderComponents();
   }
 };
