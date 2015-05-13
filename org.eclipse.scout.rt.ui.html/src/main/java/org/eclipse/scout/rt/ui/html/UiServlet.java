@@ -112,18 +112,15 @@ public class UiServlet extends HttpServlet {
   protected abstract class P_AbstractRequestHandler implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final String m_requestType;
-
-    protected P_AbstractRequestHandler(String requestType) {
-      m_requestType = requestType;
+    protected P_AbstractRequestHandler() {
     }
 
     protected void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
       long start = System.nanoTime();
-      if (LOG.isDebugEnabled()) {
-        LOG.debug(m_requestType + " request " + req.getRequestURI() + " started");
-      }
       try {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("started");
+        }
         List<IServletRequestInterceptor> interceptors = BEANS.all(IServletRequestInterceptor.class);
         for (IServletRequestInterceptor interceptor : interceptors) {
           if (intercept(interceptor, req, resp)) {
@@ -132,12 +129,12 @@ public class UiServlet extends HttpServlet {
         }
       }
       catch (Exception t) {
-        LOG.error("Exception while processing " + m_requestType + " request " + req.getRequestURI(), t);
+        LOG.error("Exception while processing", t);
         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
       finally {
         if (LOG.isDebugEnabled()) {
-          LOG.debug(m_requestType + " request " + req.getRequestURI() + " completed in " + DateUtility.formatNanos(System.nanoTime() - start) + " ms");
+          LOG.debug("completed in " + DateUtility.formatNanos(System.nanoTime() - start) + " ms");
         }
       }
     }
@@ -149,7 +146,6 @@ public class UiServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected P_RequestHandlerGet() {
-      super("GET");
     }
 
     @Override
@@ -177,7 +173,6 @@ public class UiServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected P_RequestHandlerPost() {
-      super("POST");
     }
 
     @Override

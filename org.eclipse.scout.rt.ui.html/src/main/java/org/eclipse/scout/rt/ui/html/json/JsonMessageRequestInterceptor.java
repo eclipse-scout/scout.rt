@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -31,13 +32,19 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.MDC;
 
 /**
  * This interceptor contributes to the {@link UiServlet} as the default POST handler
+ * <p>
+ * Provides the {@link MDC#put(String, String)} properties {@value #SCOUT_SESSION_ID}
  */
 @Order(10)
 public class JsonMessageRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestInterceptor.class);
+
+  public static final String SCOUT_SESSION_ID = "scout.session.id";
+  public static final String SCOUT_UI_SESSION_ID = "scout.ui.session.id";
 
   @Override
   public boolean interceptGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -71,29 +78,64 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
         return true;
       }
 
-      if (jsonReq.isPollForBackgroundJobsRequest()) {
-        // Blocks the current thread until:
-        // - a model job terminates
-        // - the max. wait time has exceeded
-        uiSession.waitForBackgroundJobs();
-      }
-
-      // GUI requests for the same session must be processed consecutively
-      uiSession.uiSessionLock().lock();
+      long start = System.nanoTime();
+      String oldScoutSessionId = MDC.get(SCOUT_SESSION_ID);
+      String oldScoutUiSessionId = MDC.get(SCOUT_UI_SESSION_ID);
       try {
-        if (uiSession.currentJsonResponse() == null) {
-          // Missing current JSON response, probably because the UiSession is disposed -> send empty answer
-          writeResponse(httpResp, createSessionTerminatedResponse());
-          return true;
+        MDC.put(SCOUT_SESSION_ID, uiSession.getClientSessionId());
+        MDC.put(SCOUT_UI_SESSION_ID, uiSession.getUiSessionId());
+
+        if (jsonReq.isPollForBackgroundJobsRequest()) {
+          // Blocks the current thread until:
+          // - a model job terminates
+          // - the max. wait time has exceeded
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("polling begin");
+          }
+          uiSession.waitForBackgroundJobs();
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("polling end after " + DateUtility.formatNanos(System.nanoTime() - start) + " ms");
+          }
         }
-        JSONObject jsonResp = uiSession.processRequest(httpReq, jsonReq);
-        if (jsonResp == null) {
-          jsonResp = createEmptyResponse();
+
+        // GUI requests for the same session must be processed consecutively
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("started");
         }
-        writeResponse(httpResp, jsonResp);
+        uiSession.uiSessionLock().lock();
+        try {
+          if (uiSession.currentJsonResponse() == null) {
+            // Missing current JSON response, probably because the UiSession is disposed -> send empty answer
+            writeResponse(httpResp, createSessionTerminatedResponse());
+            return true;
+          }
+          JSONObject jsonResp = uiSession.processRequest(httpReq, jsonReq);
+          if (jsonResp == null) {
+            jsonResp = createEmptyResponse();
+          }
+          writeResponse(httpResp, jsonResp);
+        }
+        finally {
+          uiSession.uiSessionLock().unlock();
+        }
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("completed in " + DateUtility.formatNanos(System.nanoTime() - start) + " ms");
+        }
+
       }
       finally {
-        uiSession.uiSessionLock().unlock();
+        if (oldScoutSessionId != null) {
+          MDC.put(SCOUT_SESSION_ID, oldScoutSessionId);
+        }
+        else {
+          MDC.remove(SCOUT_SESSION_ID);
+        }
+        if (oldScoutUiSessionId != null) {
+          MDC.put(SCOUT_UI_SESSION_ID, oldScoutUiSessionId);
+        }
+        else {
+          MDC.remove(SCOUT_UI_SESSION_ID);
+        }
       }
     }
     catch (Exception e) {
