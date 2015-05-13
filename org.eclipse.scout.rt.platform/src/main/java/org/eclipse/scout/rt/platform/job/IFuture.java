@@ -108,10 +108,9 @@ public interface IFuture<RESULT> {
 
   /**
    * Registers the given <code>callback</code> to be notified once the Future enters 'done' state. That is once the
-   * associated job completes successfully or with an exception, or was cancelled.
-   * <p/>
-   * If the job is already in 'done' state when the callback is registered, the callback is invoked immediately.
-   * However, the callback is invoked in any thread with no {@code RunContext} set.
+   * associated job completes successfully or with an exception, or was cancelled. Thereby, the callback is invoked in
+   * any thread with no {@code RunContext} set. If the job is already in 'done' state when the callback is registered,
+   * the callback is invoked immediately.
    * <p/>
    * The following code snippet illustrates its usage:
    *

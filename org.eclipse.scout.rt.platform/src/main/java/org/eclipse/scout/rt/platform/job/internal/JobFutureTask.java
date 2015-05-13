@@ -54,7 +54,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   private final ICancellable m_cancellable;
   private boolean m_cancellingFromCancellable;
 
-  private final FutureDoneListener<RESULT> m_futureListener;
+  private final DonePromise<RESULT> m_donePremise;
 
   /**
    * Factory method to create a {@link JobFutureTask} for the given {@link Callable}.
@@ -77,7 +77,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   private JobFutureTask(final JobManager jobManager, final JobInput input, final boolean periodic, final Callable<RESULT> callable) {
     super(callable);
     m_jobManager = jobManager;
-    m_futureListener = new FutureDoneListener<>(this);
+    m_donePremise = new DonePromise<>(this);
     m_input = input;
     m_periodic = periodic;
     m_expirationDate = (input.expirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.expirationTimeMillis() : null);
@@ -118,6 +118,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected void done() {
     m_jobManager.unregisterFuture(this);
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.DONE, this));
+    m_donePremise.onDone();
+
     // IMPORTANT: do not pass mutex here because invoked immediately upon cancellation.
   }
 
@@ -278,7 +280,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public void whenDone(final IDoneCallback<RESULT> callback) {
-    m_futureListener.whenDone(callback);
+    m_donePremise.whenDone(callback);
   }
 
   @Override
