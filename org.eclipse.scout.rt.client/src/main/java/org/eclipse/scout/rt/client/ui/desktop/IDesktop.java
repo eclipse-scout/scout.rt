@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -39,7 +40,6 @@ import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
-import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 

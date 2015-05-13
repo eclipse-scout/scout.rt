@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
-import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
+import org.eclipse.scout.commons.resource.BinaryResource;
 
 public class DownloadHandler implements IDownloadHandler {
 

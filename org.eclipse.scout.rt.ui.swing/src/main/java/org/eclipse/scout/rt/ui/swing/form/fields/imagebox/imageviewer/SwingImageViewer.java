@@ -33,7 +33,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.event.EventListenerList;
 
-import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
 
 public class SwingImageViewer extends JComponent {

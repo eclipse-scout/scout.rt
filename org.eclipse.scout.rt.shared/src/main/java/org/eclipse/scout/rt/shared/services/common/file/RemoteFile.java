@@ -34,7 +34,7 @@ import java.util.Map;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.nls.NlsLocale;
-import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
+import org.eclipse.scout.commons.resource.BinaryResource;
 
 /**
  * file path with / as delimiter

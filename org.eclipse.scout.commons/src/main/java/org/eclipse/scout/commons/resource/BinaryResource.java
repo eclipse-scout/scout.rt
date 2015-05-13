@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.data.basic;
+package org.eclipse.scout.commons.resource;
 
 import java.io.File;
 import java.io.Serializable;
