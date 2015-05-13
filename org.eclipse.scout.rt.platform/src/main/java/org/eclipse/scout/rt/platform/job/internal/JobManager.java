@@ -47,7 +47,6 @@ import org.eclipse.scout.rt.platform.job.internal.callable.HandleExceptionCallab
 import org.eclipse.scout.rt.platform.job.internal.callable.RunContextCallable;
 import org.eclipse.scout.rt.platform.job.internal.callable.ThreadNameDecorator;
 import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
-import org.eclipse.scout.rt.platform.job.internal.future.JobFutureTask;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
@@ -83,7 +82,7 @@ public class JobManager implements IJobManager {
     m_futures = new FutureSet();
     m_mutexSemaphores = Assertions.assertNotNull(createMutexSemaphores(m_executor));
     m_listeners = Assertions.assertNotNull(createJobListeners(m_executor));
-    int dispatcherThreadCount = CONFIG.getPropertyValue(JobDispatcherThreadCountProperty.class);
+    final int dispatcherThreadCount = CONFIG.getPropertyValue(JobDispatcherThreadCountProperty.class);
     m_delayedExecutor = new DelayedExecutor(m_executor, "internal-dispatcher", dispatcherThreadCount);
 
     addListener(Jobs.newEventFilter().eventTypes(JobEventType.SCHEDULED, JobEventType.DONE, JobEventType.BLOCKED, JobEventType.UNBLOCKED, JobEventType.SHUTDOWN), m_futures);
@@ -165,8 +164,8 @@ public class JobManager implements IJobManager {
     try {
       m_executor.awaitTermination(1, TimeUnit.MINUTES);
     }
-    catch (InterruptedException e) {
-      //nop
+    catch (final InterruptedException e) {
+      // NOOP
     }
     m_listeners.fireEvent(new JobEvent(this, JobEventType.SHUTDOWN, null));
   }
@@ -197,75 +196,23 @@ public class JobManager implements IJobManager {
    *          <code>true</code> if this is a periodic action, <code>false</code> if executed only once.
    */
   @Internal
-  protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final Callable<RESULT> callable, final JobInput input0, final boolean periodic) {
-    Assertions.assertNotNull(input0, "'JobInput' must not be null");
+  protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final Callable<RESULT> callable, final JobInput input, final boolean periodic) {
+    Assertions.assertNotNull(input, "'JobInput' must not be null");
 
-    final JobInput input = input0.copy();
+    final JobInput inputCopy = input.copy();
 
     // Ensure a job name to be set.
-    input.name(StringUtility.nvl(input.name(), callable.getClass().getName()));
+    inputCopy.name(StringUtility.nvl(inputCopy.name(), callable.getClass().getName()));
 
     // Ensure runMonitor IF RunContext is set
-    if (input.runContext() != null) {
-      if (input.runContext().runMonitor() == null) {
-        input.runContext().runMonitor(input.runContext().parentRunMonitor(), BEANS.get(IRunMonitor.class));
+    if (inputCopy.runContext() != null) {
+      if (inputCopy.runContext().runMonitor() == null) {
+        inputCopy.runContext().runMonitor(inputCopy.runContext().parentRunMonitor(), BEANS.get(IRunMonitor.class));
       }
     }
 
-    // Create the Callable to be given to the executor.
-    final Callable<RESULT> task = interceptCallable(callable, input);
-
     // Create the Future to be returned to the caller.
-    final JobFutureTask<RESULT> futureTask = new JobFutureTask<RESULT>(input, periodic, m_mutexSemaphores, task) {
-
-      @Override
-      protected void postConstruct() {
-        m_futures.add(this);
-        m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.SCHEDULED, this));
-      }
-
-      @Override
-      protected void rejected() {
-        cancel(true); // to interrupt the submitter if waiting for the job to complete.
-        m_futures.remove(this);
-        m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.REJECTED, this));
-
-        if (isMutexTask()) {
-          m_mutexSemaphores.passMutexToNextTask(this);
-        }
-      }
-
-      @Override
-      protected void beforeExecute() {
-        // Check, if the Future is expired and therefore should not be executed. The FutureTask ensures that 'cancelled' Futures do not commence execution.
-        if (isExpired()) {
-          cancel(true);
-        }
-
-        m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.ABOUT_TO_RUN, this));
-
-        IFuture.CURRENT.set(this);
-      }
-
-      @Override
-      protected void afterExecute() {
-        IFuture.CURRENT.remove();
-
-        if (isPeriodic() && !isDone()) {
-          // NOOP: periodic action which is not finished yet but re-scheduled for a next execution.
-          return;
-        }
-
-        m_futures.remove(this);
-        m_listeners.fireEvent(new JobEvent(JobManager.this, JobEventType.DONE, this));
-
-        if (isMutexTask() && isMutexOwner()) { // the current task is not the mutex owner if being interrupted while waiting for a blocking condition to fall.
-          m_mutexSemaphores.passMutexToNextTask(this);
-        }
-      }
-    };
-
-    return interceptFuture(futureTask);
+    return interceptFuture(JobFutureTask.create(this, inputCopy, periodic, interceptCallable(callable, inputCopy)));
   }
 
   /**
@@ -376,11 +323,38 @@ public class JobManager implements IJobManager {
     return new BlockingCondition(name, blocking, this);
   }
 
-  MutexSemaphores getMutexSemaphores() {
+  @Internal
+  protected MutexSemaphores getMutexSemaphores() {
     return m_mutexSemaphores;
   }
 
-  JobListeners getJobListeners() {
-    return m_listeners;
+  @Internal
+  protected void fireEvent(final JobEvent eventToFire) {
+    m_listeners.fireEvent(eventToFire);
+  }
+
+  @Internal
+  protected void registerFuture(final IFuture<?> future) {
+    m_futures.add(future);
+  }
+
+  @Internal
+  protected void unregisterFuture(final IFuture<?> future) {
+    m_futures.remove(future);
+  }
+
+  /**
+   * Passes the mutex to the next pending task, unless the given task is not a mutex task, or not the mutex owner.
+   */
+  @Internal
+  protected void passMutexIfMutexOwner(final JobFutureTask<?> task) {
+    if (task.isMutexTask() && task.isMutexOwner()) {
+      m_mutexSemaphores.passMutexToNextTask(task);
+    }
+  }
+
+  @Internal
+  protected boolean isMutexOwner(final JobFutureTask<?> task) {
+    return m_mutexSemaphores.isMutexOwner(task);
   }
 }

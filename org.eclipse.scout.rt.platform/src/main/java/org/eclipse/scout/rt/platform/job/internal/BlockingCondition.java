@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
-import org.eclipse.scout.rt.platform.job.internal.future.JobFutureTask;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
@@ -122,7 +121,7 @@ public class BlockingCondition implements IBlockingCondition {
       }
 
       registerAndMarkAsBlocked(jobTask);
-      m_jobManager.getJobListeners().fireEvent(new JobEvent(m_jobManager, JobEventType.BLOCKED, jobTask, this));
+      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.BLOCKED, jobTask, this));
 
       // Pass the mutex to next task if being a mutex task.
       if (jobTask.isMutexTask()) {
@@ -158,7 +157,7 @@ public class BlockingCondition implements IBlockingCondition {
       // Note: If released gracefully, the job's blocking-state is unset by the releaser.
 
       m_lock.unlock();
-      m_jobManager.getJobListeners().fireEvent(new JobEvent(m_jobManager, JobEventType.UNBLOCKED, jobTask, this));
+      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.UNBLOCKED, jobTask, this));
     }
 
     // Acquire the mutex anew if being a mutex task.
@@ -166,7 +165,7 @@ public class BlockingCondition implements IBlockingCondition {
       m_jobManager.getMutexSemaphores().acquire(jobTask); // Wait until the mutex is acquired.
     }
 
-    m_jobManager.getJobListeners().fireEvent(new JobEvent(m_jobManager, JobEventType.RESUMED, jobTask, this));
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.RESUMED, jobTask, this));
   }
 
   /**

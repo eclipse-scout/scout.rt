@@ -14,6 +14,7 @@ import java.util.concurrent.RunnableFuture;
 
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 
 /**
  * FutureTask to be given to the executor for execution.

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job.internal.future;
+package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;

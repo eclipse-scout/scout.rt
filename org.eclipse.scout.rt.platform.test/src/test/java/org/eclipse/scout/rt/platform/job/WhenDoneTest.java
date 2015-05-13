@@ -22,8 +22,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
@@ -275,6 +277,50 @@ public class WhenDoneTest {
     assertNull(eventHolder.getValue().getResult());
     assertTrue(eventHolder.getValue().isCancelled());
     assertFalse(eventHolder.getValue().isFailed());
+  }
+
+  /**
+   * Tests that 'Future.whenDone' returns once the Future is cancelled, even if that job is still runnning.
+   */
+  @Test
+  public void testCancelButStillRunning() throws InterruptedException {
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch continueRunningLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch onDoneFinishedLatch = new BlockingCountDownLatch(1);
+
+    final IFuture<Void> future = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        try {
+          setupLatch.countDownAndBlock();
+        }
+        catch (InterruptedException e) {
+          continueRunningLatch.countDownAndBlock(); // continue running
+        }
+      }
+    });
+
+    assertTrue(setupLatch.await());
+
+    // run the test.
+    future.cancel(true);
+
+    // verify that whenDone immediately returns even if not completed yet.
+    final AtomicBoolean onDone = new AtomicBoolean(false);
+
+    future.whenDone(new IDoneCallback<Void>() {
+
+      @Override
+      public void onDone(DoneEvent<Void> event) {
+        onDone.set(true);
+        onDoneFinishedLatch.countDown();
+      }
+    });
+
+    assertTrue(onDoneFinishedLatch.await());
+    assertTrue(onDone.get());
+    continueRunningLatch.release();
   }
 
   @Test

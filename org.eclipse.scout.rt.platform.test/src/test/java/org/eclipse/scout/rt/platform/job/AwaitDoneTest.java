@@ -21,6 +21,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.IRunnable;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
@@ -142,5 +144,51 @@ public class AwaitDoneTest {
     }, Jobs.newInput(RunContexts.copyCurrent()).logOnError(false));
 
     assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().notBlocked(), 10, TimeUnit.SECONDS));
+  }
+
+  /**
+   * Tests that 'JobManager.awaitDone' returns once the Future is cancelled, even if that job is still runnning.
+   */
+  @Test
+  public void testAwaitDoneWithCancelledJob() throws InterruptedException, ProcessingException {
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch continueRunningLatch = new BlockingCountDownLatch(1);
+
+    final IFuture<Void> future = m_jobManager.schedule(new Callable<Void>() {
+
+      @Override
+      public Void call() throws Exception {
+        try {
+          setupLatch.countDownAndBlock();
+        }
+        catch (InterruptedException e) {
+          continueRunningLatch.countDownAndBlock(); // continue running
+        }
+        return null;
+      }
+    }, Jobs.newInput(null));
+
+    assertTrue(setupLatch.await());
+
+    Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        // cancel the Future in 1 second
+        Jobs.schedule(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            // run the test.
+            future.cancel(true);
+          }
+        }, 1, TimeUnit.SECONDS);
+
+        // start waiting for the job to complete or until cancelled
+        assertTrue(m_jobManager.awaitDone(Jobs.newFutureFilter().futures(future), 5, TimeUnit.SECONDS));
+      }
+    }, Jobs.newInput(null)).awaitDoneAndGet();
+
+    continueRunningLatch.release();
   }
 }

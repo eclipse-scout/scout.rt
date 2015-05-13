@@ -8,19 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job.internal.future;
+package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.ICancellable;
 import org.eclipse.scout.rt.platform.context.IRunMonitor;
@@ -29,7 +28,9 @@ import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobException;
 import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
+import org.eclipse.scout.rt.platform.job.internal.future.IFutureTask;
+import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
 /**
  * Future to be given to the executor for execution. This class combines both, the Executable and its Future.
@@ -40,7 +41,7 @@ import org.eclipse.scout.rt.platform.job.internal.MutexSemaphores;
 @Internal
 public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFutureTask<RESULT>, IFuture<RESULT> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobFutureTask.class);
+  protected final JobManager m_jobManager;
 
   protected final JobInput m_input;
   protected final Long m_expirationDate;
@@ -48,26 +49,41 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   private final boolean m_periodic;
 
   private final IRunMonitor m_runMonitor;
+  private final boolean m_runMonitorOnInput;
+
   private final ICancellable m_cancellable;
   private boolean m_cancellingFromCancellable;
 
-  private final MutexSemaphores m_mutexSemaphores;
   private final FutureDoneListener<RESULT> m_futureListener;
 
-  public JobFutureTask(final JobInput input, final boolean periodic, final MutexSemaphores mutexSemaphores, final Callable<RESULT> callable) {
+  /**
+   * Factory method to create a {@link JobFutureTask} for the given {@link Callable}.
+   */
+  public static <RESULT> JobFutureTask<RESULT> create(final JobManager jobManager, final JobInput input, final boolean periodic, final Callable<RESULT> callable) {
+    final AtomicReference<JobFutureTask<RESULT>> holder = new AtomicReference<>();
+
+    // Provide a wrapped Callable to the FutureTask to control its execution.
+    final JobFutureTask<RESULT> task = new JobFutureTask<>(jobManager, input, periodic, new Callable<RESULT>() {
+
+      @Override
+      public RESULT call() throws Exception {
+        return holder.get().invoke(callable);
+      }
+    });
+    holder.set(task);
+    return task;
+  }
+
+  private JobFutureTask(final JobManager jobManager, final JobInput input, final boolean periodic, final Callable<RESULT> callable) {
     super(callable);
+    m_jobManager = jobManager;
     m_futureListener = new FutureDoneListener<>(this);
     m_input = input;
     m_periodic = periodic;
-    m_mutexSemaphores = mutexSemaphores;
     m_expirationDate = (input.expirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.expirationTimeMillis() : null);
 
-    if (input.runContext() != null && input.runContext().runMonitor() != null) {
-      m_runMonitor = input.runContext().runMonitor();
-    }
-    else {
-      m_runMonitor = BEANS.get(IRunMonitor.class);
-    }
+    m_runMonitorOnInput = m_input.runContext() != null && m_input.runContext().runMonitor() != null;
+    m_runMonitor = (m_runMonitorOnInput ? input.runContext().runMonitor() : BEANS.get(IRunMonitor.class));
 
     m_cancellable = new ICancellable() {
       @Override
@@ -76,7 +92,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       }
 
       @Override
-      public boolean cancel(boolean interruptIfRunning) {
+      public boolean cancel(final boolean interruptIfRunning) {
         //cancel is called by monitor, set the flag to prevent re-calling m_cancellable.cancel() from within the Future.cancel override
         if (!m_cancellingFromCancellable) {
           try {
@@ -91,35 +107,75 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       }
     };
 
-    postConstruct();
+    m_jobManager.registerFuture(this);
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.SCHEDULED, this));
   }
 
+  /**
+   * Method invoked once this task completed execution or is cancelled.
+   */
   @Override
-  @Internal
+  protected void done() {
+    m_jobManager.unregisterFuture(this);
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.DONE, this));
+  }
+
+  /**
+   * Method invoked if the executor rejected this task from being scheduled. This may occur when no more threads or
+   * queue slots are available because their bounds would be exceeded, or upon shutdown of the executor. This method is
+   * invoked from the thread that scheduled this task. When being invoked and this task is a mutex task, this task is
+   * the mutex owner.
+   */
+  @Override
+  public final void reject() {
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.REJECTED, this));
+    cancel(true); // to enter 'DONE' state and to interrupt a potential waiting submitter.
+    m_jobManager.passMutexIfMutexOwner(this);
+  }
+
+  /**
+   * Method invoked if this task was accepted by the executor immediately before this task is executed. This method is
+   * also invoked for <code>cancelled</code> tasks which are not subject for execution. This method is invoked by the
+   * thread that will execute this task. When being invoked and this task is a mutex task, this task is the mutex owner.
+   *
+   * @see #invoke(Callable)
+   */
+  @Override
   public void run() {
-    boolean noRunMonitorOnInput = m_input.runContext() == null || m_input.runContext().runMonitor() == null;
-
-    m_runMonitor.registerCancellable(m_cancellable);
-    if (noRunMonitorOnInput) {
-      IRunMonitor.CURRENT.set(m_runMonitor);
-    }
-    beforeExecuteSafe();
-
-    // delegate control to the 'FutureTask' which in turn calls 'call' on the given Callable.
     try {
-      if (m_periodic) {
-        super.runAndReset(); // reset the FutureTask's state after execution so it can be executed anew once the period expires.
+      if (isExpired()) {
+        cancel(true); // to enter 'DONE' state.
+      }
+      else if (m_periodic) {
+        super.runAndReset(); // periodic action
       }
       else {
-        super.run();
+        super.run(); // one shot action
       }
     }
     finally {
-      afterExecuteSafe();
-      if (noRunMonitorOnInput) {
-        IRunMonitor.CURRENT.remove();
-      }
+      m_jobManager.passMutexIfMutexOwner(this);
+    }
+  }
+
+  /**
+   * Method invoked to finally execute the {@link Callable}.
+   *
+   * @see #run
+   */
+  protected RESULT invoke(final Callable<RESULT> callable) throws Exception {
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, this));
+
+    IFuture.CURRENT.set(this);
+    IRunMonitor.CURRENT.set(m_runMonitorOnInput ? null : m_runMonitor);
+    m_runMonitor.registerCancellable(m_cancellable);
+    try {
+      return callable.call();
+    }
+    finally {
       m_runMonitor.unregisterCancellable(m_cancellable);
+      IRunMonitor.CURRENT.remove();
+      IFuture.CURRENT.remove();
     }
   }
 
@@ -150,7 +206,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public boolean isMutexOwner() {
-    return m_mutexSemaphores.isMutexOwner(this);
+    return m_jobManager.isMutexOwner(this);
   }
 
   /**
@@ -169,16 +225,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     return (m_expirationDate == null ? false : System.currentTimeMillis() > m_expirationDate);
   }
 
-  /**
-   * Invoke this method if the Future was rejected for execution.
-   */
   @Override
-  public final void reject() {
-    rejected();
-  }
-
-  @Override
-  public boolean cancel(boolean mayInterruptIfRunning) {
+  public boolean cancel(final boolean mayInterruptIfRunning) {
     if (!m_cancellingFromCancellable) {
       try {
         m_cancellingFromCancellable = true;
@@ -189,37 +237,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       }
     }
     return super.cancel(mayInterruptIfRunning);
-  }
-
-  /**
-   * Method invoked after construction.
-   */
-  protected void postConstruct() {
-  }
-
-  /**
-   * Method invoked if the executor rejected this task from being scheduled. This may occur when no more threads or
-   * queue slots are available because their bounds would be exceeded, or upon shutdown of the executor. This method is
-   * invoked from the thread that scheduled this task. When being invoked and this task is a mutex task, this task is
-   * the mutex owner.
-   */
-  protected void rejected() {
-  }
-
-  /**
-   * Method invoked if this task was accepted by the executor immediately before this task is executed. This method is
-   * also invoked for <code>cancelled</code> tasks. This method is invoked by the thread that will execute this task.
-   * When being invoked and this task is a mutex task, this task is the mutex owner.
-   */
-  protected void beforeExecute() {
-  }
-
-  /**
-   * Method invoked after executing this task. If the task was <code>cancelled</code> before running, this method is
-   * called immediately after {@link #beforeExecute()}. This method is invoked by the thread that executed this task.
-   * When being invoked and this task is a mutex task, this task is still the mutex owner.
-   */
-  protected void afterExecute() {
   }
 
   @Override
@@ -269,25 +286,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     builder.attr("periodic", m_periodic);
     builder.attr("blocked", m_blocked);
     builder.attr("expirationDate", m_expirationDate);
-    builder.ref("mutexSemaphores", m_mutexSemaphores);
     return builder.toString();
-  }
-
-  private void beforeExecuteSafe() {
-    try {
-      beforeExecute();
-    }
-    catch (final RuntimeException e) {
-      LOG.error("Unexpected error in 'beforeExecute'", e);
-    }
-  }
-
-  private void afterExecuteSafe() {
-    try {
-      afterExecute();
-    }
-    catch (final RuntimeException e) {
-      LOG.error("Unexpected error in 'afterExecute'", e);
-    }
   }
 }
