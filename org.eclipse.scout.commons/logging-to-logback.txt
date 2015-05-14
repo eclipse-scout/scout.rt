@@ -30,9 +30,9 @@ replace: ERROR
 
   <appender name="CONSOLE"
     class="ch.qos.logback.core.ConsoleAppender">
-    <layout class="ch.qos.logback.classic.PatternLayout">
-      <Pattern>%d{HH:mm:ss.SSS} %X{http.session.id} %thread %-5level %logger{36} - %m [majorPrincipal: %X{subject.principal.name}]%n</Pattern>
-    </layout>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg %n</pattern>
+    </encoder>
   </appender>
 
   <root level="INFO">
@@ -53,7 +53,7 @@ available variables are
 %thread
 %-5level
 %logger{36}
-%m
+%msg
 %n
 %X{scout.ui.session.id}
 %X{scout.session.id}
@@ -63,5 +63,7 @@ available variables are
 %X{scout.user.name}
 %X{subject.principal.name}
 
-Default server pattern: %d{HH:mm:ss.SSS} %X{http.session.id} %thread %-5level %logger{36} - %m [majorPrincipal: %X{subject.principal.name}]%n
-Default ui.html pattern: %d{HH:mm:ss.SSS} %X{scout.ui.session.id} %X{http.request.method} %X{http.request.uri} %-5level %logger{36} - %m [majorPrincipal: %X{subject.principal.name}]%n
+Default ui.html pattern
+      <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg [%X{subject.principal.name} @ %X{http.request.method} %X{http.request.uri} %X{scout.ui.session.id}]%n</pattern>
+Default server pattern
+      <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg [%X{subject.principal.name} @ %X{http.session.id} in %thread ]%n</pattern>
