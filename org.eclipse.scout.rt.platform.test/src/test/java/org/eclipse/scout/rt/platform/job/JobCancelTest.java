@@ -488,8 +488,8 @@ public class JobCancelTest {
 
     final String commonJobName = "777";
 
-    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(5);
-    final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(3);
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(6);
+    final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(6);
 
     // Job-1 (common-id)
     m_jobManager.schedule(new Callable<Void>() {
@@ -539,6 +539,7 @@ public class JobCancelTest {
             catch (InterruptedException e) {
               protocol.add("job-3a-interrupted");
             }
+            verifyLatch.countDown();
             return null;
           }
         }, Jobs.newInput(RunContexts.copyCurrent()).name("otherName").logOnError(false));
@@ -553,6 +554,7 @@ public class JobCancelTest {
             catch (InterruptedException e) {
               protocol.add("job-3b-interrupted");
             }
+            verifyLatch.countDown();
             return null;
           }
         }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(null)).name("otherName").logOnError(false));
@@ -579,6 +581,7 @@ public class JobCancelTest {
         catch (InterruptedException e) {
           protocol.add("job-4-interrupted");
         }
+        verifyLatch.countDown();
         return null;
       }
     }, Jobs.newInput(RunContexts.copyCurrent()).name(commonJobName).mutex(new Object()).logOnError(false));
@@ -586,6 +589,7 @@ public class JobCancelTest {
     assertTrue(setupLatch.await());
     m_jobManager.cancel(jobNameAndMutexFilter(commonJobName, null), true);
 
+    setupLatch.unblock();
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.hashSet("job-1-interrupted", "job-2-interrupted", "job-3-interrupted", "job-3a-interrupted"), protocol);
