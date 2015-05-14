@@ -58,8 +58,8 @@ public class ClientRunContext extends RunContext {
   protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
 
   @Override
-  public ClientRunContext runMonitor(IRunMonitor parentRunMonitor, IRunMonitor runMonitor) {
-    super.runMonitor(parentRunMonitor, runMonitor);
+  public ClientRunContext runMonitor(IRunMonitor runMonitor) {
+    super.runMonitor(runMonitor);
     return this;
   }
 

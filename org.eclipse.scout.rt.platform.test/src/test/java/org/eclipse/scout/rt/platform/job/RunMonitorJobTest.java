@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.rt.platform.context.ICancellable;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
@@ -45,37 +46,37 @@ public class RunMonitorJobTest {
 
       @Override
       public void run() throws Exception {
+        assertEquals(1, currentMonitor.getChildCount());//+1 from RunContexts.copyCurrent
+        assertEquals(1, explicitMonitor.getChildCount());//+1 from job cancellable
         assertSame(explicitMonitor, RunMonitorEx.CURRENT.get());
-        assertFalse(explicitMonitor.isEmpty());
-        assertTrue(currentMonitor.isEmpty());
       }
-    }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(null, explicitMonitor)));
+    }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(explicitMonitor)));
 
     assertSame(currentMonitor, RunMonitorEx.CURRENT.get());
 
     awaitFutureDone(future); // do not wait on Future via 'awaitDoneAndGet' because cleanup is done shortly after 'done' (JobManager implementation detail).
-    assertTrue(currentMonitor.isEmpty());
-    assertTrue(explicitMonitor.isEmpty());
+    assertEquals(1, currentMonitor.getChildCount());//+1 from RunContexts.copyCurrent
+    assertEquals(0, explicitMonitor.getChildCount());
   }
 
   @Test
   public void testNoCurrentAndExplicitMonitor() throws Exception {
     final RunMonitorEx explicitMonitor = new RunMonitorEx();
 
-    RunMonitorEx.CURRENT.remove();
+    IRunMonitor.CURRENT.remove();
     IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
+        assertEquals(1, explicitMonitor.getChildCount());//+1 from job cancellable
         assertSame(explicitMonitor, RunMonitorEx.CURRENT.get());
-        assertFalse(explicitMonitor.isEmpty());
       }
-    }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(null, explicitMonitor)));
+    }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(explicitMonitor)));
 
     assertNull(RunMonitorEx.CURRENT.get());
 
     awaitFutureDone(future); // do not wait on Future via 'awaitDoneAndGet' because cleanup is done shortly after 'done' (JobManager implementation detail).
-    assertTrue(explicitMonitor.isEmpty());
+    assertEquals(0, explicitMonitor.getChildCount());
   }
 
   @Times(200)
@@ -95,7 +96,7 @@ public class RunMonitorJobTest {
     assertSame(currentMonitor, RunMonitorEx.CURRENT.get());
 
     awaitFutureDone(future); // do not wait on Future via 'awaitDoneAndGet' because cleanup is done shortly after 'done' (JobManager implementation detail).
-    assertTrue(currentMonitor.isEmpty());
+    assertEquals(1, currentMonitor.getChildCount());//+1 from RunContexts.copyCurrent
   }
 
   @Test
@@ -125,8 +126,8 @@ public class RunMonitorJobTest {
   }
 
   private static class RunMonitorEx extends RunMonitor {
-    public boolean isEmpty() {
-      return getCancellables().isEmpty();
+    public int getChildCount() {
+      return getCancellables().size();
     }
 
     public boolean containsCancellable(ICancellable c) {

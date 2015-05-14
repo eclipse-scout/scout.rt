@@ -18,6 +18,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.context.ICancellable;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
@@ -29,7 +31,7 @@ public class RunMonitorCallableTest {
 
   @After
   public void after() {
-    RunMonitor.CURRENT.remove();
+    IRunMonitor.CURRENT.remove();
   }
 
   @Test
@@ -37,64 +39,58 @@ public class RunMonitorCallableTest {
     final RunMonitorEx currentMonitor = new RunMonitorEx();
     final RunMonitorEx explicitMonitor = new RunMonitorEx();
 
-    RunMonitor.CURRENT.set(currentMonitor);
-    new RunMonitorCallable<>(new Callable<Void>() {
-
+    IRunMonitor.CURRENT.set(currentMonitor);
+    RunContexts.copyCurrent().runMonitor(explicitMonitor).call(new Callable<Void>() {
       @Override
       public Void call() throws Exception {
-        assertSame(explicitMonitor, RunMonitor.CURRENT.get());
-        assertTrue(currentMonitor.containsCancellable(RunMonitor.CURRENT.get()));
+        assertSame(explicitMonitor, IRunMonitor.CURRENT.get());
+        assertFalse(currentMonitor.containsCancellable(IRunMonitor.CURRENT.get()));
         return null;
       }
-    }, currentMonitor, explicitMonitor).call();
-    assertSame(currentMonitor, RunMonitor.CURRENT.get());
+    });
+    assertSame(currentMonitor, IRunMonitor.CURRENT.get());
   }
 
   @Test
   public void testNoCurrentAndExplicitMonitor() throws Exception {
-    final RunMonitorEx currentMonitor = new RunMonitorEx();
     final RunMonitorEx explicitMonitor = new RunMonitorEx();
 
-    new RunMonitorCallable<>(new Callable<Void>() {
+    IRunMonitor.CURRENT.set(null);
+    RunContexts.copyCurrent().runMonitor(explicitMonitor).call(new Callable<Void>() {
       @Override
       public Void call() throws Exception {
-        assertSame(explicitMonitor, RunMonitor.CURRENT.get());
-        assertFalse(currentMonitor.containsCancellable(RunMonitor.CURRENT.get()));
+        assertSame(explicitMonitor, IRunMonitor.CURRENT.get());
         return null;
       }
-    }, null, explicitMonitor).call();
-    assertNull(RunMonitor.CURRENT.get());
+    });
+    assertNull(IRunMonitor.CURRENT.get());
   }
 
   @Test
   public void testCurrentAndNoExplicitMonitor() throws Exception {
     final RunMonitorEx currentMonitor = new RunMonitorEx();
 
-    RunMonitor.CURRENT.set(currentMonitor);
-    new RunMonitorCallable<>(new Callable<Void>() {
-
+    IRunMonitor.CURRENT.set(currentMonitor);
+    RunContexts.copyCurrent().call(new Callable<Void>() {
       @Override
       public Void call() throws Exception {
-        assertTrue(currentMonitor.containsCancellable(RunMonitor.CURRENT.get()));
+        assertTrue(currentMonitor.containsCancellable(IRunMonitor.CURRENT.get()));
         return null;
       }
-    }, currentMonitor, null).call();
-    assertSame(currentMonitor, RunMonitor.CURRENT.get());
+    });
+    assertSame(currentMonitor, IRunMonitor.CURRENT.get());
   }
 
   @Test
   public void testNoCurrentAndNoExplicitMonitor() throws Exception {
-    final RunMonitorEx currentMonitor = new RunMonitorEx();
-
-    new RunMonitorCallable<>(new Callable<Void>() {
-
+    IRunMonitor.CURRENT.set(null);
+    RunContexts.copyCurrent().call(new Callable<Void>() {
       @Override
       public Void call() throws Exception {
-        assertFalse(currentMonitor.containsCancellable(RunMonitor.CURRENT.get()));
         return null;
       }
-    }, null, null).call();
-    assertNull(RunMonitor.CURRENT.get());
+    });
+    assertNull(IRunMonitor.CURRENT.get());
   }
 
   private static class RunMonitorEx extends RunMonitor {

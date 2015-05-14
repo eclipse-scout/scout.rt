@@ -50,8 +50,8 @@ public class JmsRunContext extends RunContext {
   protected Message m_jmsMessage;
 
   @Override
-  public JmsRunContext runMonitor(IRunMonitor parentRunMonitor, IRunMonitor runMonitor) {
-    super.runMonitor(parentRunMonitor, runMonitor);
+  public JmsRunContext runMonitor(IRunMonitor runMonitor) {
+    super.runMonitor(runMonitor);
     return this;
   }
 

@@ -48,8 +48,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   private volatile boolean m_blocked;
   private final boolean m_periodic;
 
+  private final boolean m_hasRunContext;
   private final IRunMonitor m_runMonitor;
-  private final boolean m_runMonitorOnInput;
 
   private final ICancellable m_cancellable;
   private boolean m_cancellingFromCancellable;
@@ -82,8 +82,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_periodic = periodic;
     m_expirationDate = (input.expirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.expirationTimeMillis() : null);
 
-    m_runMonitorOnInput = m_input.runContext() != null && m_input.runContext().runMonitor() != null;
-    m_runMonitor = (m_runMonitorOnInput ? input.runContext().runMonitor() : BEANS.get(IRunMonitor.class));
+    m_hasRunContext = m_input.runContext() != null;
+    m_runMonitor = (m_hasRunContext ? m_input.runContext().runMonitor() : BEANS.get(IRunMonitor.class));
 
     m_cancellable = new ICancellable() {
       @Override
@@ -171,7 +171,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, this));
 
     IFuture.CURRENT.set(this);
-    IRunMonitor.CURRENT.set(m_runMonitorOnInput ? null : m_runMonitor);
+    IRunMonitor.CURRENT.set(m_hasRunContext ? null : m_runMonitor);
     m_runMonitor.registerCancellable(m_cancellable);
     try {
       return callable.call();

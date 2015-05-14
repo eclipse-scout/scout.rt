@@ -443,7 +443,7 @@ public class JobCancelTest {
             verifyLatch.countDown();
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(null, null)).name("job-3").logOnError(false));
+        }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(null)).name("job-3").logOnError(false));
 
         try {
           setupLatch.countDownAndBlock();
@@ -555,7 +555,7 @@ public class JobCancelTest {
             }
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(null, null)).name("otherName").logOnError(false));
+        }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(null)).name("otherName").logOnError(false));
 
         try {
           setupLatch.countDownAndBlock();

@@ -207,7 +207,7 @@ public class JobManager implements IJobManager {
     // Ensure runMonitor IF RunContext is set
     if (inputCopy.runContext() != null) {
       if (inputCopy.runContext().runMonitor() == null) {
-        inputCopy.runContext().runMonitor(inputCopy.runContext().parentRunMonitor(), BEANS.get(IRunMonitor.class));
+        inputCopy.runContext().runMonitor(BEANS.get(IRunMonitor.class));
       }
     }
 

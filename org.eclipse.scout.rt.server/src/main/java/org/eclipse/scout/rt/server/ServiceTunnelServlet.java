@@ -115,7 +115,7 @@ public class ServiceTunnelServlet extends HttpServlet {
           ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
           serverRunContext.locale(serviceRequest.getLocale());
           serverRunContext.userAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
-          serverRunContext.runMonitor(null, runMonitor);
+          serverRunContext.runMonitor(runMonitor);
           serverRunContext.session(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
           //enable cancel

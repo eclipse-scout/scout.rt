@@ -10,20 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.basic.tree;
 
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.awt.Point;
-import java.util.logging.LogManager;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 import javax.swing.JTree;
 import javax.swing.tree.TreeCellRenderer;
 
-import org.eclipse.scout.rt.testing.shared.HandlerAdapter;
-import org.eclipse.scout.rt.ui.swing.basic.AbstractHtmlLinkDetector;
 import org.junit.Test;
 
 /**
@@ -45,10 +39,13 @@ public class TreeHtmlLinkDetectorTest {
   }
 
   private void installLogInterceptor() {
-    Logger logger = LogManager.getLogManager().getLogger(AbstractHtmlLinkDetector.class.getName());
+    /*
+    Logger logger = LoggerFactory.getLogger(AbstractHtmlLinkDetector.class.getName());
     logger.addHandler(new P_LogHandler());
+     */
   }
 
+  /*
   private class P_LogHandler extends HandlerAdapter {
 
     @Override
@@ -58,4 +55,5 @@ public class TreeHtmlLinkDetectorTest {
       }
     }
   }
+   */
 }

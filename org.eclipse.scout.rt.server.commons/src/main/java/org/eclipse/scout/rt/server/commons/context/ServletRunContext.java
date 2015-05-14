@@ -54,8 +54,8 @@ public class ServletRunContext extends RunContext {
   protected HttpServletResponse m_servletResponse;
 
   @Override
-  public ServletRunContext runMonitor(IRunMonitor parentRunMonitor, IRunMonitor runMonitor) {
-    super.runMonitor(parentRunMonitor, runMonitor);
+  public ServletRunContext runMonitor(IRunMonitor runMonitor) {
+    super.runMonitor(runMonitor);
     return this;
   }
 

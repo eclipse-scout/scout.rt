@@ -56,8 +56,8 @@ public class RestRunContext extends RunContext {
   // TODO [dwi]: implement this class
 
   @Override
-  public RestRunContext runMonitor(IRunMonitor parentRunMonitor, IRunMonitor runMonitor) {
-    super.runMonitor(parentRunMonitor, runMonitor);
+  public RestRunContext runMonitor(IRunMonitor runMonitor) {
+    super.runMonitor(runMonitor);
     return this;
   }
 

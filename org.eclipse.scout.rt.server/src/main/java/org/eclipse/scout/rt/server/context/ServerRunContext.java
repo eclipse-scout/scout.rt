@@ -94,8 +94,8 @@ public class ServerRunContext extends RunContext {
   }
 
   @Override
-  public ServerRunContext runMonitor(final IRunMonitor parentRunMonitor, final IRunMonitor runMonitor) {
-    super.runMonitor(parentRunMonitor, runMonitor);
+  public ServerRunContext runMonitor(final IRunMonitor runMonitor) {
+    super.runMonitor(runMonitor);
     return this;
   }
 
