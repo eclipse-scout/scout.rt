@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  * transaction for the subsequent sequence of actions and ends the transaction according to the XA specification
  * (eXtended Architecture) upon completion. Thereto, the <code>2-phase-commit-protocol (2PC)</code> is applied in order
  * to successfully commit the transaction consistently over all involved transaction members like relational databases,
- * message queues and so on.
+ * message queues, webservice consumers and so on.
  *
  * @param <RESULT>
  *          the result type of the job's computation.
@@ -45,10 +45,12 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RES
 
   protected final Callable<RESULT> m_next;
   protected final TransactionScope m_transactionScope;
+  protected final ITransaction m_transaction;
 
-  public TwoPhaseTransactionBoundaryCallable(final Callable<RESULT> next, final TransactionScope transactionScope) {
+  public TwoPhaseTransactionBoundaryCallable(final Callable<RESULT> next, final ITransaction transaction, final TransactionScope transactionScope) {
     m_next = Assertions.assertNotNull(next);
     m_transactionScope = (transactionScope != null ? transactionScope : TransactionScope.REQUIRES_NEW);
+    m_transaction = transaction;
   }
 
   @Override
@@ -70,13 +72,11 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RES
    */
   @Internal
   protected RESULT runMandatoryTxBoundary() throws Exception {
-    final ITransaction callerTransaction = ITransaction.CURRENT.get();
-
-    if (callerTransaction == null) {
+    if (m_transaction == null) {
       throw new TransactionRequiredException();
     }
     else {
-      return initTxThreadLocalAndContinueChain(callerTransaction);
+      return initTxThreadLocalAndContinueChain(m_transaction);
     }
   }
 
@@ -85,15 +85,15 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RES
    */
   @Internal
   protected RESULT runRequiresNewTxBoundary() throws Exception {
-    final ITransaction transaction = BEANS.get(ITransaction.class);
+    final ITransaction newTransaction = BEANS.get(ITransaction.class);
 
-    IRunMonitor.CURRENT.get().registerCancellable(transaction);
+    IRunMonitor.CURRENT.get().registerCancellable(newTransaction);
     try {
-      return initTxThreadLocalAndContinueChain(transaction);
+      return initTxThreadLocalAndContinueChain(newTransaction);
     }
     finally {
-      endTransactionSafe(transaction);
-      IRunMonitor.CURRENT.get().unregisterCancellable(transaction);
+      endTransactionSafe(newTransaction);
+      IRunMonitor.CURRENT.get().unregisterCancellable(newTransaction);
     }
   }
 
@@ -103,10 +103,8 @@ public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RES
    */
   @Internal
   protected RESULT runRequiredTxBoundary() throws Exception {
-    final ITransaction callerTransaction = ITransaction.CURRENT.get();
-
-    if (callerTransaction != null) {
-      return initTxThreadLocalAndContinueChain(callerTransaction);
+    if (m_transaction != null) {
+      return initTxThreadLocalAndContinueChain(m_transaction);
     }
     else {
       return runRequiresNewTxBoundary();

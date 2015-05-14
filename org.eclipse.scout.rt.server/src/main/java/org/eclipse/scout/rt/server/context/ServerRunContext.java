@@ -78,7 +78,7 @@ public class ServerRunContext extends RunContext {
 
   @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c7 = new TwoPhaseTransactionBoundaryCallable<>(next, transactionScope());
+    final Callable<RESULT> c7 = new TwoPhaseTransactionBoundaryCallable<>(next, transaction(), transactionScope());
     final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
     final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, UserAgent.CURRENT, userAgent());
     final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, ISession.CURRENT, session());

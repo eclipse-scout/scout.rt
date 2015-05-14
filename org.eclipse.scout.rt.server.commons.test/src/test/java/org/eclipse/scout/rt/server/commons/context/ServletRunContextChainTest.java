@@ -20,7 +20,9 @@ import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.context.internal.RunMonitorCallable;
 import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
+import org.eclipse.scout.rt.platform.context.internal.SubjectLogCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
+import org.eclipse.scout.rt.server.commons.context.internal.ServletLogCallable;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
@@ -51,7 +53,8 @@ public class ServletRunContextChainTest {
     RunMonitorCallable c0 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
 
     // 1. SubjectCallable
-    SubjectCallable c1 = getNextAndAssert(c0, SubjectCallable.class);
+    SubjectLogCallable c1i = getNextAndAssert(c0, SubjectLogCallable.class);
+    SubjectCallable c1 = getNextAndAssert(c1i, SubjectCallable.class);
 
     // 2. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
@@ -61,8 +64,10 @@ public class ServletRunContextChainTest {
     InitThreadLocalCallable c3 = getNextAndAssert(c2, InitThreadLocalCallable.class);
     assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c3).getThreadLocal());
 
+    ServletLogCallable c4i = getNextAndAssert(c3, ServletLogCallable.class);
+
     // 4. InitThreadLocalCallable for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST
-    InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
+    InitThreadLocalCallable c4 = getNextAndAssert(c4i, InitThreadLocalCallable.class);
     assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, ((InitThreadLocalCallable) c4).getThreadLocal());
 
     // 5. InitThreadLocalCallable for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE
@@ -95,7 +100,8 @@ public class ServletRunContextChainTest {
     RunMonitorCallable c0 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
 
     // 1. SubjectCallable
-    SubjectCallable c1 = getNextAndAssert(c0, SubjectCallable.class);
+    SubjectLogCallable c1i = getNextAndAssert(c0, SubjectLogCallable.class);
+    SubjectCallable c1 = getNextAndAssert(c1i, SubjectCallable.class);
 
     // 2. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
@@ -105,8 +111,10 @@ public class ServletRunContextChainTest {
     InitThreadLocalCallable c3 = getNextAndAssert(c2, InitThreadLocalCallable.class);
     assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c3).getThreadLocal());
 
+    ServletLogCallable c4i = getNextAndAssert(c3, ServletLogCallable.class);
+
     // 4. InitThreadLocalCallable for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST
-    InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
+    InitThreadLocalCallable c4 = getNextAndAssert(c4i, InitThreadLocalCallable.class);
     assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, ((InitThreadLocalCallable) c4).getThreadLocal());
 
     // 5. InitThreadLocalCallable for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE
@@ -151,7 +159,8 @@ public class ServletRunContextChainTest {
     RunMonitorCallable c2a = getNextAndAssert(c2, RunMonitorCallable.class);
 
     // 3. SubjectCallable
-    SubjectCallable c3 = getNextAndAssert(c2a, SubjectCallable.class);
+    SubjectLogCallable c2i = getNextAndAssert(c2a, SubjectLogCallable.class);
+    SubjectCallable c3 = getNextAndAssert(c2i, SubjectCallable.class);
 
     // 4. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
@@ -161,8 +170,10 @@ public class ServletRunContextChainTest {
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
     assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
+    ServletLogCallable c6i = getNextAndAssert(c5, ServletLogCallable.class);
+
     // 6. InitThreadLocalCallable for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST
-    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
+    InitThreadLocalCallable c6 = getNextAndAssert(c6i, InitThreadLocalCallable.class);
     assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, ((InitThreadLocalCallable) c6).getThreadLocal());
 
     // 7. InitThreadLocalCallable for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE

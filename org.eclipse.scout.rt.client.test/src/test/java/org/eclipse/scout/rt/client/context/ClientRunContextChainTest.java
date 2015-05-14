@@ -19,9 +19,11 @@ import java.util.concurrent.Callable;
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.internal.ClientSessionLogCallable;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.context.internal.RunMonitorCallable;
 import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
+import org.eclipse.scout.rt.platform.context.internal.SubjectLogCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -62,7 +64,8 @@ public class ClientRunContextChainTest {
     RunMonitorCallable c1 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
 
     // 2. SubjectCallable
-    SubjectCallable c2 = getNextAndAssert(c1, SubjectCallable.class);
+    SubjectLogCallable c2i = getNextAndAssert(c1, SubjectLogCallable.class);
+    SubjectCallable c2 = getNextAndAssert(c2i, SubjectCallable.class);
 
     // 3. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c3 = getNextAndAssert(c2, InitThreadLocalCallable.class);
@@ -73,7 +76,8 @@ public class ClientRunContextChainTest {
     assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
 
     // 5. InitThreadLocalCallable for ISession.CURRENT
-    InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
+    ClientSessionLogCallable c5i = getNextAndAssert(c4, ClientSessionLogCallable.class);
+    InitThreadLocalCallable c5 = getNextAndAssert(c5i, InitThreadLocalCallable.class);
     assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
     // 6. InitThreadLocalCallable for UserAgent.CURRENT
@@ -110,7 +114,8 @@ public class ClientRunContextChainTest {
     RunMonitorCallable c1 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
 
     // 2. SubjectCallable
-    SubjectCallable c2 = getNextAndAssert(c1, SubjectCallable.class);
+    SubjectLogCallable c2i = getNextAndAssert(c1, SubjectLogCallable.class);
+    SubjectCallable c2 = getNextAndAssert(c2i, SubjectCallable.class);
 
     // 3. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c3 = getNextAndAssert(c2, InitThreadLocalCallable.class);
@@ -121,7 +126,8 @@ public class ClientRunContextChainTest {
     assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
 
     // 5. InitThreadLocalCallable for ISession.CURRENT
-    InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
+    ClientSessionLogCallable c5i = getNextAndAssert(c4, ClientSessionLogCallable.class);
+    InitThreadLocalCallable c5 = getNextAndAssert(c5i, InitThreadLocalCallable.class);
     assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
     // 6. InitThreadLocalCallable for UserAgent.CURRENT
@@ -170,7 +176,8 @@ public class ClientRunContextChainTest {
     RunMonitorCallable c3 = getNextAndAssert(c2, RunMonitorCallable.class);
 
     // 4. SubjectCallable
-    SubjectCallable c4 = getNextAndAssert(c3, SubjectCallable.class);
+    SubjectLogCallable c4i = getNextAndAssert(c3, SubjectLogCallable.class);
+    SubjectCallable c4 = getNextAndAssert(c4i, SubjectCallable.class);
 
     // 5. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
@@ -181,7 +188,8 @@ public class ClientRunContextChainTest {
     assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
 
     // 7. InitThreadLocalCallable for ISession.CURRENT
-    InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
+    ClientSessionLogCallable c7i = getNextAndAssert(c6, ClientSessionLogCallable.class);
+    InitThreadLocalCallable c7 = getNextAndAssert(c7i, InitThreadLocalCallable.class);
     assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
 
     // 8. InitThreadLocalCallable for UserAgent.CURRENT
