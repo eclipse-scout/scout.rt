@@ -347,25 +347,35 @@ scout.Tree.prototype.clearSelection = function() {
 };
 
 scout.Tree.prototype.setNodesSelected = function(nodes) {
-  var i,
-    nodeIds = scout.arrays.init(nodes.length);
-
   nodes = scout.arrays.ensure(nodes);
-  for (i = 0; i < nodes.length; i++) {
+  var nodeIds = scout.arrays.init(nodes.length);
+  for (var i = 0; i < nodes.length; i++) {
     nodeIds[i] = nodes[i].id;
   }
-  if (!scout.arrays.equalsIgnoreOrder(nodeIds, this.selectedNodeIds)) {
-    this._removeSelection();
-    this.selectedNodeIds = nodeIds;
+  this._updateSelectedNodeIds(nodeIds, true);
+};
 
-    this.session.send(this.id, 'nodesSelected', {
-      nodeIds: nodeIds
-    });
+scout.Tree.prototype._updateSelectedNodeIds = function(selectedNodeIds, notifyServer) {
+  if (!scout.arrays.equalsIgnoreOrder(selectedNodeIds, this.selectedNodeIds)) {
+    if (this.rendered) {
+      this._removeSelection();
+    }
+
+    this.selectedNodeIds = selectedNodeIds;
+
+    notifyServer = (notifyServer === undefined ? true : notifyServer);
+    if (notifyServer) {
+      this.session.send(this.id, 'nodesSelected', {
+        nodeIds: selectedNodeIds
+      });
+    }
 
     // FIXME BSH Keystroke | "scroll into view"
-    this._renderSelection();
-    this._renderMenus();
-    this._triggerNodesSelected(nodeIds);
+    if (this.rendered) {
+      this._renderSelection();
+      this._renderMenus();
+    }
+    this._triggerNodesSelected(selectedNodeIds);
   }
 };
 
@@ -576,12 +586,7 @@ scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
 };
 
 scout.Tree.prototype._onNodesSelected = function(nodeIds) {
-  this.selectedNodeIds = nodeIds;
-  if (this.rendered) {
-    this._renderSelection();
-    this._renderMenus();
-  }
-  this._triggerNodesSelected(nodeIds);
+  this._updateSelectedNodeIds(nodeIds, false);
 };
 
 scout.Tree.prototype._onNodeExpanded = function(nodeId, expanded, recursive) {
