@@ -13,7 +13,8 @@
     right: 3px;
   }
 
-  &:focus {
+  &:focus,
+  &.focused {
     & .table-row.selected {
       background-color: @item-selection-background-color;
       border-color: @item-selection-border-color;

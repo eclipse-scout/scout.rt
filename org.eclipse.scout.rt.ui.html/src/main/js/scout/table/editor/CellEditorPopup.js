@@ -45,11 +45,15 @@ scout.CellEditorPopup.prototype._render = function($parent) {
     }
   }.bind(this);
   this.table.events.on(scout.Table.GUI_EVENT_ROW_ORDER_CHANGED, this._rowOrderChangedFunc);
+  // Set table style to focused, so that it looks as it still has the focus.
+  // This prevents flickering if the cell editor gets opened, especially when tabbing to the next cell editor.
+  this.table.$container.addClass('focused');
 };
 
 scout.CellEditorPopup.prototype._remove = function() {
   scout.CellEditorPopup.parent.prototype._remove.call(this);
   this.table.events.off(scout.Table.GUI_EVENT_ROW_ORDER_CHANGED, this._rowOrderChangedFunc);
+  this.table.$container.removeClass('focused');
 };
 
 scout.CellEditorPopup.prototype.alignTo = function(event) {
