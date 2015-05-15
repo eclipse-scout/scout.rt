@@ -292,7 +292,7 @@ public class JsonDesktopTest {
     List<JsonEvent> events = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "openUri");
     JSONObject data = events.get(0).getData();
     assertEquals("dynamic/null/2/foo.txt", data.getString("uri"));
-    assertEquals("AUTO", data.getString("uriTarget"));
+    assertEquals("BLANK", data.getString("uriTarget"));
   }
 
 }
