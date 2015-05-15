@@ -869,6 +869,10 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
   var cell, column, predicate;
 
   predicate = function(column) {
+    if (column.guiOnlyCheckBoxColumn) {
+      // does not support tabbing and does not have a cell -> would throw an exception
+      return false;
+    }
     cell = this.cell(column.index, row);
     return this.enabled && row.enabled && cell.editable;
   }.bind(this);
