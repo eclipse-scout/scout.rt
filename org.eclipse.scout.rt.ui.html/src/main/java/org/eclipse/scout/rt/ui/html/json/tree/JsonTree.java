@@ -44,6 +44,8 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   public static final String EVENT_NODE_CHANGED = "nodeChanged";
   public static final String EVENT_CHILD_NODE_ORDER_CHANGED = "childNodeOrderChanged";
   public static final String EVENT_NODES_CHECKED = "nodesChecked";
+  public static final String EVENT_REQUEST_FOCUS = "requestFocus";
+  public static final String EVENT_SCROLL_TO_SELECTION = "scrollToSelection";
 
   public static final String PROP_NODE_ID = "nodeId";
   public static final String PROP_NODE_IDS = "nodeIds";
@@ -277,6 +279,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED:
         handleModelChildNodeOrderChanged(event);
         break;
+      case TreeEvent.TYPE_REQUEST_FOCUS:
+        handleModelRequestFocus(event);
+        break;
+      case TreeEvent.TYPE_SCROLL_TO_SELECTION:
+        handleModelScrollToSelection(event);
+        break;
       default:
         handleModelOtherTreeEvent(event);
         break;
@@ -285,8 +293,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     // - TYPE_BEFORE_NODES_SELECTED
     // - TYPE_NODE_REQUEST_FOCUS
     // - TYPE_NODE_ENSURE_VISIBLE
-    // - TYPE_REQUEST_FOCUS
-    // - TYPE_SCROLL_TO_SELECTION
     // Probabely not needed:
     // - TYPE_NODE_ACTION
     // - TYPE_NODES_DRAG_REQUEST
@@ -435,6 +441,14 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     if (hasNodeIds) {
       addActionEvent(EVENT_CHILD_NODE_ORDER_CHANGED, jsonEvent);
     }
+  }
+
+  protected void handleModelRequestFocus(TreeEvent event) {
+    addActionEvent(EVENT_REQUEST_FOCUS);
+  }
+
+  protected void handleModelScrollToSelection(TreeEvent event) {
+    addActionEvent(EVENT_SCROLL_TO_SELECTION);
   }
 
   @Override

@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilte
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
@@ -78,6 +79,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_PREPARE_CELL_EDIT = "prepareCellEdit";
   public static final String EVENT_COMPLETE_CELL_EDIT = "completeCellEdit";
   public static final String EVENT_CANCEL_CELL_EDIT = "cancelCellEdit";
+  public static final String EVENT_REQUEST_FOCUS = "requestFocus";
+  public static final String EVENT_SCROLL_TO_SELECTION = "scrollToSelection";
 
   public static final String PROP_ROWS = "rows";
   public static final String PROP_ROW_IDS = "rowIds";
@@ -748,6 +751,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       case TableEvent.TYPE_ROW_FILTER_CHANGED:
         // See special handling in bufferModelEvent()
         throw new IllegalStateException("Unsupported event type: " + event);
+      case TreeEvent.TYPE_REQUEST_FOCUS:
+        handleModelRequestFocus(event);
+        break;
+      case TreeEvent.TYPE_SCROLL_TO_SELECTION:
+        handleModelScrollToSelection(event);
+        break;
       default:
         // NOP
     }
@@ -885,6 +894,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
     putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(filteredColumns));
     addActionEvent(EVENT_COLUMN_HEADERS_UPDATED, jsonEvent);
+  }
+
+  protected void handleModelRequestFocus(TableEvent event) {
+    addActionEvent(EVENT_REQUEST_FOCUS);
+  }
+
+  protected void handleModelScrollToSelection(TableEvent event) {
+    addActionEvent(EVENT_SCROLL_TO_SELECTION);
   }
 
   protected Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {

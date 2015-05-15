@@ -1864,6 +1864,14 @@ scout.Table.prototype._onEndCellEdit = function(fieldId) {
   this.cellEditorPopup = null;
 };
 
+scout.Table.prototype._onRequestFocus = function() {
+  this.$container.focus();
+};
+
+scout.Table.prototype._onScrollToSelection = function() {
+  // TODO BSH Implement
+};
+
 scout.Table.prototype.onModelAction = function(event) {
   // _drawData() might not have drawn all rows yet, therefore postpone the
   // execution of this method to prevent conflicts on the row objects.
@@ -1901,6 +1909,10 @@ scout.Table.prototype.onModelAction = function(event) {
     this._onStartCellEdit(event.columnId, event.rowId, event.fieldId);
   } else if (event.type === 'endCellEdit') {
     this._onEndCellEdit(event.fieldId);
+  } else if (event.type === 'requestFocus') {
+    this._onRequestFocus();
+  } else if (event.type === 'scrollToSelection') {
+    this._onScrollToSelection();
   } else {
     $.log.warn('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');
   }

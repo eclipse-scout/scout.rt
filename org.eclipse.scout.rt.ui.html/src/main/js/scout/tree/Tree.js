@@ -1044,6 +1044,14 @@ scout.Tree.prototype.selectedNodes = function() {
   return nodes;
 };
 
+scout.Tree.prototype._onRequestFocus = function() {
+  this.$container.focus();
+};
+
+scout.Tree.prototype._onScrollToSelection = function() {
+  // TODO BSH Implement
+};
+
 scout.Tree.prototype.onModelAction = function(event) {
   if (event.type === 'nodesInserted') {
     this._onNodesInserted(event.nodes, event.commonParentNodeId);
@@ -1063,6 +1071,10 @@ scout.Tree.prototype.onModelAction = function(event) {
     this._onNodesChecked(event.nodes);
   } else if (event.type === 'childNodeOrderChanged') {
     this._onChildNodeOrderChanged(event.parentNodeId, event.childNodeIds);
+  } else if (event.type === 'requestFocus') {
+    this._onRequestFocus();
+  } else if (event.type === 'scrollToSelection') {
+    this._onScrollToSelection();
   } else {
     $.log.warn('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
   }
