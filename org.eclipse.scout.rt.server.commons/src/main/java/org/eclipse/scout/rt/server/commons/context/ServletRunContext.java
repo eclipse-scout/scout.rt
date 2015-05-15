@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
-import org.eclipse.scout.rt.server.commons.context.internal.ServletLogCallable;
+import org.eclipse.scout.rt.server.commons.context.internal.CurrentHttpServletRequestLogCallable;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 
 /**
@@ -38,7 +38,8 @@ import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
  * characteristics:
  * <ul>
- * <li>{@link Subject}</li>
+ * <li>{@link IRunMonitor#CURRENT}</li>
+ * <li>{@link Subject#getSubject(java.security.AccessControlContext)}</li>
  * <li>{@link NlsLocale#CURRENT}</li>
  * <li>{@link PropertyMap#CURRENT}</li>
  * <li>{@link IHttpServletRoundtrip#CURRENT}</li>
@@ -54,19 +55,19 @@ public class ServletRunContext extends RunContext {
   protected HttpServletResponse m_servletResponse;
 
   @Override
-  public ServletRunContext runMonitor(IRunMonitor runMonitor) {
-    super.runMonitor(runMonitor);
-    return this;
-  }
-
-  @Override
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(next, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, servletResponse());
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, servletRequest());
-    final Callable<RESULT> c2 = new ServletLogCallable<>(c3, servletRequest(), servletResponse());
+    final Callable<RESULT> c4 = new CurrentHttpServletRequestLogCallable<>(next);
+    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, servletResponse());
+    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, servletRequest());
     final Callable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;
+  }
+
+  @Override
+  public ServletRunContext runMonitor(final IRunMonitor runMonitor) {
+    super.runMonitor(runMonitor);
+    return this;
   }
 
   @Override

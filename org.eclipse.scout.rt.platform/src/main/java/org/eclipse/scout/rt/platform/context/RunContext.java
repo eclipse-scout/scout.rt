@@ -16,6 +16,7 @@ import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.Callables;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.PreferredValue;
@@ -24,21 +25,22 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.context.internal.CurrentSubjectLogCallable;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.context.internal.RunMonitorCallable;
 import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
-import org.eclipse.scout.rt.platform.context.internal.SubjectLogCallable;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 
 /**
- * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
- * state among different threads, or allows temporary state changes to be done for the time of executing some code.
+ * A context typically represents a "snapshot" of the current calling state and is always associated with a
+ * {@link RunMonitor}. This class facilitates propagation of that state among different threads, or allows temporary
+ * state changes to be done for the time of executing some code.
  * <p/>
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
  * characteristics:
  * <ul>
- * <li>{@link Subject}</li>
+ * <li>{@link IRunMonitor#CURRENT}</li>
+ * <li>{@link Subject#getSubject(java.security.AccessControlContext)}</li>
  * <li>{@link NlsLocale#CURRENT}</li>
  * <li>{@link PropertyMap#CURRENT}</li>
  * </ul>
@@ -52,10 +54,10 @@ import org.eclipse.scout.rt.platform.job.PropertyMap;
 @Bean
 public class RunContext {
 
+  protected IRunMonitor m_runMonitor = BEANS.get(IRunMonitor.class);
   protected PreferredValue<Subject> m_subject = new PreferredValue<>(null, false);
   protected PreferredValue<Locale> m_locale = new PreferredValue<>(null, false);
   protected PropertyMap m_propertyMap = new PropertyMap();
-  protected IRunMonitor m_runMonitorX;
 
   /**
    * Runs the given runnable on behalf of this {@link RunContext}. Use this method if you run code that does not return
@@ -123,11 +125,45 @@ public class RunContext {
   protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
     final Callable<RESULT> c5 = new InitThreadLocalCallable<>(next, PropertyMap.CURRENT, propertyMap());
     final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, NlsLocale.CURRENT, locale());
-    final Callable<RESULT> c3 = new SubjectCallable<>(c4, subject());
-    final Callable<RESULT> c2 = new SubjectLogCallable<>(c3, subject());
-    final Callable<RESULT> c1 = new RunMonitorCallable<>(c2, runMonitor());
+    final Callable<RESULT> c3 = new CurrentSubjectLogCallable<>(c4);
+    final Callable<RESULT> c2 = new SubjectCallable<>(c3, subject());
+    final Callable<RESULT> c1 = new InitThreadLocalCallable<>(c2, RunMonitor.CURRENT, Assertions.assertNotNull(runMonitor()));
 
     return c1;
+  }
+
+  /**
+   * @return {@link RunMonitor} to be used, is never <code>null</code>.
+   */
+  public IRunMonitor runMonitor() {
+    return m_runMonitor;
+  }
+
+  /**
+   * Set a specific {@link IRunMonitor} to be used, which must not be <code>null</code>. However, even if there is a
+   * current {@link IRunMonitor}, it is NOT registered as child monitor, meaning that it will not be cancelled once the
+   * current {@link IRunMonitor} is cancelled. If such a linking is needed, you have to do that yourself:
+   *
+   * <pre>
+   * <code>
+   *     IRunMonitor monitor = BEANS.get(IRunMonitor.class);
+   * 
+   *     // Register your monitor to be cancelled as well
+   *     IRunMonitor.CURRENT.get().registerCancellable(monitor);
+   * 
+   *     RunContexts.copyCurrent().runMonitor(monitor).run(new IRunnable() {
+   * 
+   *       &#064;Override
+   *       public void run() throws Exception {
+   *         // do something
+   *       }
+   *     });
+   * </code>
+   * </pre>
+   */
+  public RunContext runMonitor(final IRunMonitor runMonitor) {
+    m_runMonitor = Assertions.assertNotNull(runMonitor, "RunMonitor must not be null");
+    return this;
   }
 
   public Subject subject() {
@@ -135,7 +171,7 @@ public class RunContext {
   }
 
   /**
-   * Set the Subject to run code under a particular user.
+   * Sets a specific {@link Subject} as preferred value, meaning that is not updated by other values like the session.
    */
   public RunContext subject(final Subject subject) {
     m_subject.set(subject, true);
@@ -147,7 +183,7 @@ public class RunContext {
   }
 
   /**
-   * Set a specific Locale.
+   * Sets a specific {@link Locale} as preferred value, meaning that is not updated by other values like the session.
    */
   public RunContext locale(final Locale locale) {
     m_locale.set(locale, true);
@@ -158,24 +194,12 @@ public class RunContext {
     return m_propertyMap;
   }
 
-  public IRunMonitor runMonitor() {
-    return m_runMonitorX;
-  }
-
-  /**
-   * Set a specific {@link IRunMonitor}
-   */
-  public RunContext runMonitor(final IRunMonitor runMonitor) {
-    m_runMonitorX = runMonitor;
-    return this;
-  }
-
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.ref("runMonitor", runMonitor());
     builder.ref("subject", subject());
     builder.attr("locale", locale());
-    builder.attr("runMonitor", runMonitor());
     return builder.toString();
   }
 
@@ -183,32 +207,50 @@ public class RunContext {
    * Method invoked to fill this {@link RunContext} with values from the given {@link RunContext}.
    */
   protected void copyValues(final RunContext origin) {
+    m_runMonitor = origin.m_runMonitor;
     m_subject = origin.m_subject.copy();
     m_locale = origin.m_locale.copy();
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
-    m_runMonitorX = origin.m_runMonitorX;
   }
 
   /**
    * Method invoked to fill this {@link RunContext} with values from the current calling {@link RunContext}.
+   *
+   * @RunMonitor a new {@link IRunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
+   *             it is also registered within that {@link IRunMonitor}. That makes the <i>returned</i>
+   *             {@link RunContext} to be cancelled as well once the current calling {@link RunContext} is cancelled,
+   *             but DOES NOT cancel the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is
+   *             cancelled.
+   * @Subject current {@link Subject} as non-preferred value, meaning that it will be updated by other values like the
+   *          session.
+   * @Locale current {@link Locale} as non-preferred value, meaning that it will be updated by other values like the
+   *         session.
    */
   protected void fillCurrentValues() {
     m_subject = new PreferredValue<>(Subject.getSubject(AccessController.getContext()), false);
     m_locale = new PreferredValue<>(NlsLocale.CURRENT.get(), false);
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
-    //if there is a parent run monitor, attach this instance as child
+    m_runMonitor = BEANS.get(IRunMonitor.class);
     if (IRunMonitor.CURRENT.get() != null) {
-      m_runMonitorX = BEANS.get(IRunMonitor.class);
-      IRunMonitor.CURRENT.get().registerCancellable(m_runMonitorX);
+      IRunMonitor.CURRENT.get().registerCancellable(m_runMonitor);
     }
   }
 
   /**
    * Method invoked to fill this {@link RunContext} with empty values.
+   *
+   * @RunMonitor a new {@link IRunMonitor} is created. However, even if there is a current {@link IRunMonitor}, it is
+   *             NOT registered as child monitor, meaning that it will not be cancelled once the current
+   *             {@link IRunMonitor} is cancelled.
+   * @Subject <code>null</code> {@link Subject} as preferred value, meaning that it will not be set by other values like
+   *          the session.
+   * @Locale <code>null</code> {@link Locale} as preferred value, meaning that it will not be set by other values like
+   *         the session.
    */
   protected void fillEmptyValues() {
     m_subject = new PreferredValue<>(null, true); // null as preferred Subject
     m_locale = new PreferredValue<>(null, true); // null as preferred Locale
+    m_runMonitor = BEANS.get(IRunMonitor.class);
     m_propertyMap = new PropertyMap();
   }
 

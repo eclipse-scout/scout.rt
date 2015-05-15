@@ -15,6 +15,9 @@ import java.util.Locale;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
@@ -45,9 +48,17 @@ public final class ClientRunContexts {
   }
 
   /**
-   * Creates an empty {@link ClientRunContext} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
-   * {@link UserAgent}. Preferred means, that those values will not be derived from other values, e.g. when setting the
-   * session, but must be set explicitly instead.
+   * Creates an empty {@link ClientRunContext}.
+   *
+   * @RunMonitor a new {@link IRunMonitor} is created. However, even if there is a current {@link IRunMonitor}, it is
+   *             NOT registered as child monitor, meaning that it will not be cancelled once the current
+   *             {@link IRunMonitor} is cancelled.
+   * @Subject <code>null</code> {@link Subject} as preferred value, meaning that it will not be set by other values like
+   *          the session.
+   * @Locale <code>null</code> {@link Locale} as preferred value, meaning that it will not be set by other values like
+   *         the session.
+   * @UserAgent current {@link UserAgent} as non-preferred value, meaning that it will be updated by other values like
+   *            the session.
    */
   public static final ClientRunContext empty() {
     final ClientRunContext runContext = BEANS.get(ClientRunContext.class);
@@ -57,6 +68,17 @@ public final class ClientRunContexts {
 
   /**
    * Creates a "snapshot" of the current calling client context.
+   *
+   * @RunMonitor a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
+   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext}
+   *             to be cancelled as well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel
+   *             the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
+   * @Subject current {@link Subject} as non-preferred value, meaning that it will be updated by other values like the
+   *          session.
+   * @Locale current {@link Locale} as non-preferred value, meaning that it will be updated by other values like the
+   *         session.
+   * @UserAgent current {@link UserAgent} as non-preferred value, meaning that it will be updated by other values like
+   *            the session.
    */
   public static ClientRunContext copyCurrent() {
     final ClientRunContext runContext = BEANS.get(ClientRunContext.class);

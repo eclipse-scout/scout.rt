@@ -17,12 +17,12 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.internal.CurrentSubjectLogCallable;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.context.internal.RunMonitorCallable;
 import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
-import org.eclipse.scout.rt.platform.context.internal.SubjectLogCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
-import org.eclipse.scout.rt.server.commons.context.internal.ServletLogCallable;
+import org.eclipse.scout.rt.server.commons.context.internal.CurrentHttpServletRequestLogCallable;
 import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
@@ -49,33 +49,11 @@ public class ServletRunContextChainTest {
   public void testCallableChain() throws Exception {
     Callable<Void> actualCallable = new ServletRunContext().interceptCallable(m_targetCallable);
 
-    // 0. RunMonitorCallable
-    RunMonitorCallable c0 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
+    // 1. Callable Chain
+    IChainable<?> last = assertCallableChain((IChainable<?>) actualCallable);
 
-    // 1. SubjectCallable
-    SubjectLogCallable c1i = getNextAndAssert(c0, SubjectLogCallable.class);
-    SubjectCallable c1 = getNextAndAssert(c1i, SubjectCallable.class);
-
-    // 2. InitThreadLocalCallable for NlsLocale.CURRENT
-    InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c2).getThreadLocal());
-
-    // 3. InitThreadLocalCallable for PropertyMap.CURRENT
-    InitThreadLocalCallable c3 = getNextAndAssert(c2, InitThreadLocalCallable.class);
-    assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c3).getThreadLocal());
-
-    ServletLogCallable c4i = getNextAndAssert(c3, ServletLogCallable.class);
-
-    // 4. InitThreadLocalCallable for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST
-    InitThreadLocalCallable c4 = getNextAndAssert(c4i, InitThreadLocalCallable.class);
-    assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, ((InitThreadLocalCallable) c4).getThreadLocal());
-
-    // 5. InitThreadLocalCallable for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE
-    InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, ((InitThreadLocalCallable) c5).getThreadLocal());
-
-    // 6. Target
-    assertSame(m_targetCallable, c5.getNext());
+    // 2. Target
+    assertSame(m_targetCallable, last.getNext());
   }
 
   /**
@@ -83,7 +61,7 @@ public class ServletRunContextChainTest {
    */
   @Test
   public void testCallableChainWithContributionsAfter() throws Exception {
-    ServletRunContext serverRunContext = new ServletRunContext() {
+    ServletRunContext servletRunContext = new ServletRunContext() {
 
       @Override
       protected <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next) {
@@ -94,41 +72,19 @@ public class ServletRunContextChainTest {
       }
     };
 
-    Callable<Void> actualCallable = serverRunContext.interceptCallable(m_targetCallable);
+    Callable<Void> actualCallable = servletRunContext.interceptCallable(m_targetCallable);
 
-    // 0. RunMonitorCallable
-    RunMonitorCallable c0 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
+    // 1. Callable Chain
+    IChainable<?> last = assertCallableChain((IChainable<?>) actualCallable);
 
-    // 1. SubjectCallable
-    SubjectLogCallable c1i = getNextAndAssert(c0, SubjectLogCallable.class);
-    SubjectCallable c1 = getNextAndAssert(c1i, SubjectCallable.class);
+    // 2. Contribution1
+    Contribution1 contribution1 = getNextAndAssert(last, Contribution1.class);
 
-    // 2. InitThreadLocalCallable for NlsLocale.CURRENT
-    InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c2).getThreadLocal());
+    // 3. Contribution2
+    Contribution2 contribution2 = getNextAndAssert(contribution1, Contribution2.class);
 
-    // 3. InitThreadLocalCallable for PropertyMap.CURRENT
-    InitThreadLocalCallable c3 = getNextAndAssert(c2, InitThreadLocalCallable.class);
-    assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c3).getThreadLocal());
-
-    ServletLogCallable c4i = getNextAndAssert(c3, ServletLogCallable.class);
-
-    // 4. InitThreadLocalCallable for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST
-    InitThreadLocalCallable c4 = getNextAndAssert(c4i, InitThreadLocalCallable.class);
-    assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, ((InitThreadLocalCallable) c4).getThreadLocal());
-
-    // 5. InitThreadLocalCallable for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE
-    InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, ((InitThreadLocalCallable) c5).getThreadLocal());
-
-    // 6. Contribution1
-    Contribution1 c6 = getNextAndAssert(c5, Contribution1.class);
-
-    // 7. Contribution2
-    Contribution2 c7 = getNextAndAssert(c6, Contribution2.class);
-
-    // 8. Target
-    assertSame(m_targetCallable, c7.getNext());
+    // 4. Target
+    assertSame(m_targetCallable, contribution2.getNext());
   }
 
   /**
@@ -136,7 +92,7 @@ public class ServletRunContextChainTest {
    */
   @Test
   public void testCallableChainWithContributionsBefore() throws Exception {
-    ServletRunContext serverRunContext = new ServletRunContext() {
+    ServletRunContext servletRunContext = new ServletRunContext() {
 
       @Override
       protected <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next) {
@@ -147,20 +103,32 @@ public class ServletRunContextChainTest {
       }
     };
 
-    Callable<Void> actualCallable = serverRunContext.interceptCallable(m_targetCallable);
+    @SuppressWarnings("unchecked")
+    IChainable<Void> actualCallable = (IChainable<Void>) servletRunContext.interceptCallable(m_targetCallable);
 
     // 1. Contribution1
-    Contribution1 c1 = getFirstAndAssert(actualCallable, Contribution1.class);
+    assertTrue(Contribution1.class.equals(actualCallable.getClass()));
 
     // 2. Contribution2
-    Contribution2 c2 = getNextAndAssert(c1, Contribution2.class);
+    Contribution2 contribution2 = getNextAndAssert(actualCallable, Contribution2.class);
 
-    // 3. RunMonitorCallable
-    RunMonitorCallable c2a = getNextAndAssert(c2, RunMonitorCallable.class);
+    // 3. Callable Chain
+    IChainable<?> last = assertCallableChain((IChainable<?>) contribution2.getNext());
 
-    // 3. SubjectCallable
-    SubjectLogCallable c2i = getNextAndAssert(c2a, SubjectLogCallable.class);
-    SubjectCallable c3 = getNextAndAssert(c2i, SubjectCallable.class);
+    // 4. Target
+    assertSame(m_targetCallable, last.getNext());
+  }
+
+  private IChainable<?> assertCallableChain(IChainable<?> c1) throws Exception {
+    // 1. InitThreadLocalCallable for IRunMonitor.CURRENT
+    assertTrue(InitThreadLocalCallable.class.equals(c1.getClass()));
+    assertSame(IRunMonitor.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
+
+    // 2. SubjectCallable
+    SubjectCallable c2 = getNextAndAssert(c1, SubjectCallable.class);
+
+    // 3. SubjectLogCallable
+    CurrentSubjectLogCallable c3 = getNextAndAssert(c2, CurrentSubjectLogCallable.class);
 
     // 4. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
@@ -170,24 +138,18 @@ public class ServletRunContextChainTest {
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
     assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    ServletLogCallable c6i = getNextAndAssert(c5, ServletLogCallable.class);
-
-    // 6. InitThreadLocalCallable for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST
-    InitThreadLocalCallable c6 = getNextAndAssert(c6i, InitThreadLocalCallable.class);
+    // 6. InitThreadLocalCallable for PropertyMap.CURRENT
+    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
     assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. InitThreadLocalCallable for IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE
+    // 7. InitThreadLocalCallable for PropertyMap.CURRENT
     InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
     assertSame(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, ((InitThreadLocalCallable) c7).getThreadLocal());
 
-    // 8. Target
-    assertSame(m_targetCallable, c7.getNext());
-  }
+    // 8. CurrentHttpServletRequestLogCallable
+    CurrentHttpServletRequestLogCallable c8 = getNextAndAssert(c7, CurrentHttpServletRequestLogCallable.class);
 
-  @SuppressWarnings("unchecked")
-  private static <RESULT, TYPE> TYPE getFirstAndAssert(Callable<RESULT> first, Class<TYPE> expectedType) {
-    assertTrue(expectedType.equals(first.getClass()));
-    return (TYPE) first;
+    return c8;
   }
 
   @SuppressWarnings("unchecked")

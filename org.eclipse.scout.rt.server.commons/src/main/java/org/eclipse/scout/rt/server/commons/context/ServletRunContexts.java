@@ -10,11 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons.context;
 
+import java.util.Locale;
+
+import javax.security.auth.Subject;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 
 /**
  * Factory methods to create new {@link ServletRunContext} objects to propagate {@link Servlet} state like
@@ -42,6 +48,14 @@ public final class ServletRunContexts {
 
   /**
    * Creates an empty {@link ServletRunContext}.
+   *
+   * @RunMonitor a new {@link IRunMonitor} is created. However, even if there is a current {@link IRunMonitor}, it is
+   *             NOT registered as child monitor, meaning that it will not be cancelled once the current
+   *             {@link IRunMonitor} is cancelled.
+   * @Subject <code>null</code> {@link Subject} as preferred value, meaning that it will not be set by other values like
+   *          the session.
+   * @Locale <code>null</code> {@link Locale} as preferred value, meaning that it will not be set by other values like
+   *         the session.
    */
   public static final ServletRunContext empty() {
     final ServletRunContext runContext = BEANS.get(ServletRunContext.class);
@@ -50,7 +64,16 @@ public final class ServletRunContexts {
   }
 
   /**
-   * Creates a "snapshot" of the current calling <code>ServletRunContext</code>.
+   * Creates a "snapshot" of the current calling context.<br/>
+   *
+   * @RunMonitor a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
+   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext}
+   *             to be cancelled as well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel
+   *             the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
+   * @Subject current {@link Subject} as non-preferred value, meaning that it will be updated by other values like the
+   *          session.
+   * @Locale current {@link Locale} as non-preferred value, meaning that it will be updated by other values like the
+   *         session.
    */
   public static ServletRunContext copyCurrent() {
     final ServletRunContext runContext = BEANS.get(ServletRunContext.class);

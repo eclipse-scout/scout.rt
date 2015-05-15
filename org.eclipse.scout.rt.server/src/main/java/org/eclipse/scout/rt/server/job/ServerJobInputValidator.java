@@ -35,5 +35,7 @@ public class ServerJobInputValidator {
 
     final ServerRunContext serverRunContext = (ServerRunContext) input.runContext();
     Assertions.assertNotNull(serverRunContext.session(), "For server jobs, 'serverSession' must not be null");
+
+    Assertions.assertNotNull(input.runContext().runMonitor(), "For server jobs, 'RunMonitor' on 'RunContext' must not be null");
   }
 }

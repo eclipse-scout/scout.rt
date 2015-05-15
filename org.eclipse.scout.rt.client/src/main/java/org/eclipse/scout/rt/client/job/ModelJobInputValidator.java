@@ -37,5 +37,7 @@ public class ModelJobInputValidator {
     final IClientSession clientSession = ((ClientRunContext) input.runContext()).session();
     Assertions.assertNotNull(clientSession, "For model jobs, 'clientSession' must not be null");
     Assertions.assertSame(clientSession, input.mutex(), "For model jobs, mutex object must be the 'clientSession'");
+
+    Assertions.assertNotNull(input.runContext().runMonitor(), "For model jobs, 'RunMonitor' on 'RunContext' must not be null");
   }
 }

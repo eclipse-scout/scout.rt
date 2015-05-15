@@ -18,13 +18,13 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.IChainable;
 import org.eclipse.scout.commons.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.internal.CurrentSubjectLogCallable;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
-import org.eclipse.scout.rt.platform.context.internal.RunMonitorCallable;
 import org.eclipse.scout.rt.platform.context.internal.SubjectCallable;
-import org.eclipse.scout.rt.platform.context.internal.SubjectLogCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.context.internal.ServerSessionLogCallable;
+import org.eclipse.scout.rt.server.context.internal.CurrentSessionLogCallable;
 import org.eclipse.scout.rt.server.context.internal.TwoPhaseTransactionBoundaryCallable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.OfflineState;
@@ -62,43 +62,11 @@ public class ServerRunContextChainTest {
   public void testCallableChain() throws Exception {
     Callable<Void> actualCallable = new ServerRunContext().interceptCallable(m_targetCallable);
 
-    // 1. RunMonitorCallable
-    RunMonitorCallable c1 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
+    // 1. Callable Chain
+    IChainable<?> last = assertCallableChain((IChainable<?>) actualCallable);
 
-    // 3. SubjectCallable
-    SubjectLogCallable c2i = getNextAndAssert(c1, SubjectLogCallable.class);
-    SubjectCallable c2 = getNextAndAssert(c2i, SubjectCallable.class);
-
-    // 3. InitThreadLocalCallable for NlsLocale.CURRENT
-    InitThreadLocalCallable c3 = getNextAndAssert(c2, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c3).getThreadLocal());
-
-    // 4. InitThreadLocalCallable for PropertyMap.CURRENT
-    InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
-    assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
-
-    // 5. InitThreadLocalCallable for OfflineState.CURRENT
-    InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(OfflineState.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
-
-    // 6. InitThreadLocalCallable for ISession.CURRENT
-    ServerSessionLogCallable c6i = getNextAndAssert(c5, ServerSessionLogCallable.class);
-    InitThreadLocalCallable c6 = getNextAndAssert(c6i, InitThreadLocalCallable.class);
-    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
-
-    // 7. InitThreadLocalCallable for UserAgent.CURRENT
-    InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
-    assertSame(UserAgent.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
-
-    // 8. InitThreadLocalCallable for ScoutTexts.CURRENT
-    InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
-    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
-
-    // 9. TwoPhaseTransactionBoundaryCallable
-    TwoPhaseTransactionBoundaryCallable c9 = getNextAndAssert(c8, TwoPhaseTransactionBoundaryCallable.class);
-
-    // 10. Target
-    assertSame(m_targetCallable, c9.getNext());
+    // 2. Target
+    assertSame(m_targetCallable, last.getNext());
   }
 
   /**
@@ -119,49 +87,17 @@ public class ServerRunContextChainTest {
 
     Callable<Void> actualCallable = serverRunContext.interceptCallable(m_targetCallable);
 
-    // 1. RunMonitorCallable
-    RunMonitorCallable c1 = getFirstAndAssert(actualCallable, RunMonitorCallable.class);
+    // 1. Callable Chain
+    IChainable<?> last = assertCallableChain((IChainable<?>) actualCallable);
 
-    // 2. SubjectCallable
-    SubjectLogCallable c2i = getNextAndAssert(c1, SubjectLogCallable.class);
-    SubjectCallable c2 = getNextAndAssert(c2i, SubjectCallable.class);
+    // 2. Contribution1
+    Contribution1 contribution1 = getNextAndAssert(last, Contribution1.class);
 
-    // 3. InitThreadLocalCallable for NlsLocale.CURRENT
-    InitThreadLocalCallable c3 = getNextAndAssert(c2, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c3).getThreadLocal());
+    // 3. Contribution2
+    Contribution2 contribution2 = getNextAndAssert(contribution1, Contribution2.class);
 
-    // 4. InitThreadLocalCallable for PropertyMap.CURRENT
-    InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
-    assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
-
-    // 5. InitThreadLocalCallable for OfflineState.CURRENT
-    InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(OfflineState.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
-
-    // 6. InitThreadLocalCallable for ISession.CURRENT
-    ServerSessionLogCallable c6i = getNextAndAssert(c5, ServerSessionLogCallable.class);
-    InitThreadLocalCallable c6 = getNextAndAssert(c6i, InitThreadLocalCallable.class);
-    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
-
-    // 7. InitThreadLocalCallable for UserAgent.CURRENT
-    InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
-    assertSame(UserAgent.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
-
-    // 8. InitThreadLocalCallable for ScoutTexts.CURRENT
-    InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
-    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
-
-    // 9. TwoPhaseTransactionBoundaryCallable
-    TwoPhaseTransactionBoundaryCallable c9 = getNextAndAssert(c8, TwoPhaseTransactionBoundaryCallable.class);
-
-    // 10. Contribution1
-    Contribution1 c10 = getNextAndAssert(c9, Contribution1.class);
-
-    // 11. Contribution2
-    Contribution2 c11 = getNextAndAssert(c10, Contribution2.class);
-
-    // 12. Target
-    assertSame(m_targetCallable, c11.getNext());
+    // 4. Target
+    assertSame(m_targetCallable, contribution2.getNext());
   }
 
   /**
@@ -180,37 +116,50 @@ public class ServerRunContextChainTest {
       }
     };
 
-    Callable<Void> actualCallable = serverRunContext.interceptCallable(m_targetCallable);
+    @SuppressWarnings("unchecked")
+    IChainable<Void> actualCallable = (IChainable<Void>) serverRunContext.interceptCallable(m_targetCallable);
 
     // 1. Contribution1
-    Contribution1 c1 = getFirstAndAssert(actualCallable, Contribution1.class);
+    assertTrue(Contribution1.class.equals(actualCallable.getClass()));
 
     // 2. Contribution2
-    Contribution2 c2 = getNextAndAssert(c1, Contribution2.class);
+    Contribution2 contribution2 = getNextAndAssert(actualCallable, Contribution2.class);
 
-    // 3. SubjectCallable
-    RunMonitorCallable c3 = getNextAndAssert(c2, RunMonitorCallable.class);
+    // 3. Callable Chain
+    IChainable<?> last = assertCallableChain((IChainable<?>) contribution2.getNext());
 
-    // 4. SubjectCallable
-    SubjectLogCallable c4i = getNextAndAssert(c3, SubjectLogCallable.class);
-    SubjectCallable c4 = getNextAndAssert(c4i, SubjectCallable.class);
+    // 4. Target
+    assertSame(m_targetCallable, last.getNext());
+  }
 
-    // 5. InitThreadLocalCallable for NlsLocale.CURRENT
+  private IChainable<?> assertCallableChain(IChainable<?> c1) throws Exception {
+    // 1. InitThreadLocalCallable for IRunMonitor.CURRENT
+    assertTrue(InitThreadLocalCallable.class.equals(c1.getClass()));
+    assertSame(IRunMonitor.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
+
+    // 2. SubjectCallable
+    SubjectCallable c2 = getNextAndAssert(c1, SubjectCallable.class);
+
+    // 3. CurrentSubjectLogCallable
+    CurrentSubjectLogCallable c3 = getNextAndAssert(c2, CurrentSubjectLogCallable.class);
+
+    // 4. InitThreadLocalCallable for NlsLocale.CURRENT
+    InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
+
+    // 5. InitThreadLocalCallable for PropertyMap.CURRENT
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
+    assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    // 6. InitThreadLocalCallable for PropertyMap.CURRENT
+    // 6. InitThreadLocalCallable for OfflineState.CURRENT
     InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(PropertyMap.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
+    assertSame(OfflineState.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. InitThreadLocalCallable for OfflineState.CURRENT
+    // 7. InitThreadLocalCallable for ISession.CURRENT
     InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
-    assertSame(OfflineState.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
 
-    // 8. InitThreadLocalCallable for ISession.CURRENT
-    ServerSessionLogCallable c8i = getNextAndAssert(c7, ServerSessionLogCallable.class);
-    InitThreadLocalCallable c8 = getNextAndAssert(c8i, InitThreadLocalCallable.class);
-    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
+    // 8. CurrentSessionLogCallable
+    CurrentSessionLogCallable c8 = getNextAndAssert(c7, CurrentSessionLogCallable.class);
 
     // 9. InitThreadLocalCallable for UserAgent.CURRENT
     InitThreadLocalCallable c9 = getNextAndAssert(c8, InitThreadLocalCallable.class);
@@ -223,14 +172,7 @@ public class ServerRunContextChainTest {
     // 11. TwoPhaseTransactionBoundaryCallable
     TwoPhaseTransactionBoundaryCallable c11 = getNextAndAssert(c10, TwoPhaseTransactionBoundaryCallable.class);
 
-    // 12. Target
-    assertSame(m_targetCallable, c11.getNext());
-  }
-
-  @SuppressWarnings("unchecked")
-  private static <RESULT, TYPE> TYPE getFirstAndAssert(Callable<RESULT> first, Class<TYPE> expectedType) {
-    assertTrue(expectedType.equals(first.getClass()));
-    return (TYPE) first;
+    return c11;
   }
 
   @SuppressWarnings("unchecked")

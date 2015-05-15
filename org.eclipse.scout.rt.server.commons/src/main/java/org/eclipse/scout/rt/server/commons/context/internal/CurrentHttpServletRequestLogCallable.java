@@ -13,41 +13,44 @@ package org.eclipse.scout.rt.server.commons.context.internal;
 import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.IChainable;
+import org.eclipse.scout.rt.server.commons.servletfilter.IHttpServletRoundtrip;
 import org.slf4j.MDC;
 
 /**
  * Provides the {@link MDC#put(String, String)} properties {@value #HTTP_SESSION_ID}, {@value #HTTP_REQUEST_METHOD},
- * {@value #HTTP_REQUEST_URI}
+ * {@value #HTTP_REQUEST_URI} with values from the ongoing HTTP request.
+ *
+ * @param <RESULT>
+ *          the result type of the job's computation.
+ * @since 5.1
+ * @see <i>design pattern: chain of responsibility</i>
  */
-public class ServletLogCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
+public class CurrentHttpServletRequestLogCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
   public static final String HTTP_SESSION_ID = "http.session.id";
   public static final String HTTP_REQUEST_METHOD = "http.request.method";
   public static final String HTTP_REQUEST_URI = "http.request.uri";
 
   protected final Callable<RESULT> m_next;
-  protected final HttpServletRequest m_request;
-  protected final HttpServletResponse m_response;
 
-  public ServletLogCallable(Callable<RESULT> next, HttpServletRequest request, HttpServletResponse response) {
+  public CurrentHttpServletRequestLogCallable(final Callable<RESULT> next) {
     m_next = next;
-    m_request = request;
-    m_response = response;
   }
 
   @Override
   public RESULT call() throws Exception {
-    String oldSessionId = MDC.get(HTTP_SESSION_ID);
-    String oldRequestMethod = MDC.get(HTTP_REQUEST_METHOD);
-    String oldRequestUri = MDC.get(HTTP_REQUEST_URI);
-    HttpSession session = m_request.getSession(false);
+    final HttpServletRequest currentServletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+
+    final String oldSessionId = MDC.get(HTTP_SESSION_ID);
+    final String oldRequestMethod = MDC.get(HTTP_REQUEST_METHOD);
+    final String oldRequestUri = MDC.get(HTTP_REQUEST_URI);
+    final HttpSession session = currentServletRequest.getSession(false);
     try {
       MDC.put(HTTP_SESSION_ID, session != null ? session.getId() : null);
-      MDC.put(HTTP_REQUEST_METHOD, m_request.getMethod());
-      MDC.put(HTTP_REQUEST_URI, m_request.getRequestURI());
+      MDC.put(HTTP_REQUEST_METHOD, currentServletRequest.getMethod());
+      MDC.put(HTTP_REQUEST_URI, currentServletRequest.getRequestURI());
       //
       return m_next.call();
     }

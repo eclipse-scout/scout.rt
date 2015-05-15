@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.PreferredValue;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.internal.ClientSessionLogCallable;
+import org.eclipse.scout.rt.client.context.internal.CurrentSessionLogCallable;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.IRunMonitor;
@@ -40,7 +40,8 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
  * characteristics:
  * <ul>
- * <li>{@link Subject}</li>
+ * <li>{@link IRunMonitor#CURRENT}</li>
+ * <li>{@link Subject#getSubject(java.security.AccessControlContext)}</li>
  * <li>{@link NlsLocale#CURRENT}</li>
  * <li>{@link PropertyMap#CURRENT}</li>
  * <li>{@link ISession#CURRENT}</li>
@@ -58,20 +59,32 @@ public class ClientRunContext extends RunContext {
   protected PreferredValue<UserAgent> m_userAgent = new PreferredValue<>(null, false);
 
   @Override
-  public ClientRunContext runMonitor(IRunMonitor runMonitor) {
+  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
+    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
+    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, userAgent());
+    final Callable<RESULT> c3 = new CurrentSessionLogCallable<>(c4);
+    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, session());
+    final Callable<RESULT> c1 = super.interceptCallable(c2);
+
+    return c1;
+  }
+
+  @Override
+  public ClientRunContext runMonitor(final IRunMonitor runMonitor) {
     super.runMonitor(runMonitor);
     return this;
   }
 
   @Override
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next) {
-    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, UserAgent.CURRENT, userAgent());
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, ISession.CURRENT, session());
-    final Callable<RESULT> c2 = new ClientSessionLogCallable<>(c3, session());
-    final Callable<RESULT> c1 = super.interceptCallable(c2);
+  public ClientRunContext subject(final Subject subject) {
+    super.subject(subject);
+    return this;
+  }
 
-    return c1;
+  @Override
+  public ClientRunContext locale(final Locale locale) {
+    super.locale(locale);
+    return this;
   }
 
   public IClientSession session() {
@@ -101,20 +114,9 @@ public class ClientRunContext extends RunContext {
   }
 
   @Override
-  public ClientRunContext subject(final Subject subject) {
-    super.subject(subject);
-    return this;
-  }
-
-  @Override
-  public ClientRunContext locale(final Locale locale) {
-    super.locale(locale);
-    return this;
-  }
-
-  @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.ref("runMonitor", runMonitor());
     builder.attr("subject", subject());
     builder.attr("locale", locale());
     builder.ref("session", session());

@@ -15,6 +15,9 @@ import java.util.Locale;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
@@ -50,9 +53,18 @@ public final class ServerRunContexts {
   }
 
   /**
-   * Creates an empty {@link ServerRunContext} with <code>null</code> as preferred {@link Subject}, {@link Locale} and
-   * {@link UserAgent}. Preferred means, that those values will not be derived from other values, e.g. when setting the
-   * session, but must be set explicitly instead.
+   * Creates an empty {@link ServerRunContext}.
+   *
+   * @RunMonitor a new {@link IRunMonitor} is created. However, even if there is a current {@link IRunMonitor}, it is
+   *             NOT registered as child monitor, meaning that it will not be cancelled once the current
+   *             {@link IRunMonitor} is cancelled.
+   * @TransactionScope {@link TransactionScope#REQUIRES_NEW}.
+   * @Subject <code>null</code> {@link Subject} as preferred value, meaning that it will not be set by other values like
+   *          the session.
+   * @Locale <code>null</code> {@link Locale} as preferred value, meaning that it will not be set by other values like
+   *         the session.
+   * @UserAgent current {@link UserAgent} as non-preferred value, meaning that it will be updated by other values like
+   *            the session.
    */
   public static final ServerRunContext empty() {
     final ServerRunContext runContext = BEANS.get(ServerRunContext.class);
@@ -62,6 +74,23 @@ public final class ServerRunContexts {
 
   /**
    * Creates a "snapshot" of the current calling server context.
+   *
+   * @RunMonitor a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
+   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext}
+   *             to be cancelled as well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel
+   *             the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
+   * @Transaction the {@link RunContext} returned contains the transaction of the current calling context. However, by
+   *              default, {@link TransactionScope} is set to {@link TransactionScope#REQUIRES_NEW}, meaning that when
+   *              executing the runnable, a new transaction is created, and therefore committed or rolled back upon
+   *              completion. To work on behalf of the current transaction, set the scope to
+   *              {@link TransactionScope#MANDATORY}.
+   * @TransactionScope {@link TransactionScope#REQUIRES_NEW}.
+   * @Subject current {@link Subject} as non-preferred value, meaning that it will be updated by other values like the
+   *          session.
+   * @Locale current {@link Locale} as non-preferred value, meaning that it will be updated by other values like the
+   *         session.
+   * @UserAgent current {@link UserAgent} as non-preferred value, meaning that it will be updated by other values like
+   *            the session.
    */
   public static ServerRunContext copyCurrent() {
     final ServerRunContext runContext = BEANS.get(ServerRunContext.class);

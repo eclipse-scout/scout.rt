@@ -8,42 +8,48 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.context.internal;
+package org.eclipse.scout.rt.server.context.internal;
 
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.IChainable;
-import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.shared.ISession;
 import org.slf4j.MDC;
 
 /**
- * Provides the {@link MDC#put(String, String)} properties {@value #SCOUT_USER_NAME}
+ * Provides the {@link MDC#put(String, String)} properties {@value #SESSION_USER_ID} with the username of the current
+ * session.
+ *
+ * @param <RESULT>
+ *          the result type of the job's computation.
+ * @since 5.1
+ * @see <i>design pattern: chain of responsibility</i>
  */
-public class ClientSessionLogCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
-  public static final String SCOUT_USER_NAME = "scout.user.name";
+public class CurrentSessionLogCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
+  public static final String SESSION_USER_ID = "session.userId";
 
   protected final Callable<RESULT> m_next;
-  protected final IClientSession m_session;
 
-  public ClientSessionLogCallable(Callable<RESULT> next, IClientSession session) {
+  public CurrentSessionLogCallable(final Callable<RESULT> next) {
     m_next = next;
-    m_session = session;
   }
 
   @Override
   public RESULT call() throws Exception {
-    String oldUserName = MDC.get(SCOUT_USER_NAME);
+    final ISession currentSession = ISession.CURRENT.get();
+
+    final String oldSessionUserId = MDC.get(SESSION_USER_ID);
     try {
-      MDC.put(SCOUT_USER_NAME, m_session != null ? m_session.getUserId() : null);
+      MDC.put(SESSION_USER_ID, currentSession != null ? currentSession.getUserId() : null);
       //
       return m_next.call();
     }
     finally {
-      if (oldUserName != null) {
-        MDC.put(SCOUT_USER_NAME, oldUserName);
+      if (oldSessionUserId != null) {
+        MDC.put(SESSION_USER_ID, oldSessionUserId);
       }
       else {
-        MDC.remove(SCOUT_USER_NAME);
+        MDC.remove(SESSION_USER_ID);
       }
     }
   }
@@ -52,5 +58,4 @@ public class ClientSessionLogCallable<RESULT> implements Callable<RESULT>, IChai
   public Callable<RESULT> getNext() {
     return m_next;
   }
-
 }

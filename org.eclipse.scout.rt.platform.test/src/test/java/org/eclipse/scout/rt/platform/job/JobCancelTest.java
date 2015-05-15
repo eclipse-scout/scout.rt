@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.job;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -25,6 +26,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -34,7 +36,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.filter.AndFilter;
 import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -402,7 +406,6 @@ public class JobCancelTest {
 
       @Override
       public Void call() throws Exception {
-
         //re-use runmonitor -> nested cancel
         m_jobManager.schedule(new Callable<Void>() {
           @Override
@@ -443,7 +446,7 @@ public class JobCancelTest {
             verifyLatch.countDown();
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(null)).name("job-3").logOnError(false));
+        }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(new RunMonitor())).name("job-3").logOnError(false));
 
         try {
           setupLatch.countDownAndBlock();
@@ -557,7 +560,7 @@ public class JobCancelTest {
             verifyLatch.countDown();
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(null)).name("otherName").logOnError(false));
+        }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(new RunMonitor())).name("otherName").logOnError(false));
 
         try {
           setupLatch.countDownAndBlock();
@@ -593,6 +596,31 @@ public class JobCancelTest {
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.hashSet("job-1-interrupted", "job-2-interrupted", "job-3-interrupted", "job-3a-interrupted"), protocol);
+  }
+
+  /**
+   * Tests that a job is not run if the RunMonitor is already cancelled.
+   */
+  @Test
+  public void testCancelRunContextPriorSchedulingJob() throws ProcessingException {
+    RunContext runContext = RunContexts.copyCurrent();
+
+    // 1. Cancel the RunMonitor
+    runContext.runMonitor().cancel(false);
+
+    // 2. Schedule the job (should never)
+    final AtomicBoolean executed = new AtomicBoolean(false);
+    IFuture<Void> future = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        executed.set(true);
+      }
+    }, Jobs.newInput(runContext));
+
+    future.awaitDoneAndGet();
+    assertFalse(executed.get());
+    assertTrue(future.isCancelled());
   }
 
   private static AndFilter<IFuture<?>> jobNameAndMutexFilter(final String jobName, final Object mutex) {

@@ -29,14 +29,12 @@ import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobAllowCoreThreadTimeoutProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobCorePoolSizeProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobDispatcherThreadCountProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobKeepAliveTimeProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobMaximumPoolSizeProperty;
-import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -198,18 +196,12 @@ public class JobManager implements IJobManager {
   @Internal
   protected <RESULT> JobFutureTask<RESULT> createJobFutureTask(final Callable<RESULT> callable, final JobInput input, final boolean periodic) {
     Assertions.assertNotNull(input, "'JobInput' must not be null");
-
-    final JobInput inputCopy = input.copy();
+    if (input.runContext() != null) {
+      Assertions.assertNotNull(input.runContext().runMonitor(), "'RunMonitor' required if providing a 'RunContext'");
+    }
 
     // Ensure a job name to be set.
-    inputCopy.name(StringUtility.nvl(inputCopy.name(), callable.getClass().getName()));
-
-    // Ensure runMonitor IF RunContext is set
-    if (inputCopy.runContext() != null) {
-      if (inputCopy.runContext().runMonitor() == null) {
-        inputCopy.runContext().runMonitor(BEANS.get(IRunMonitor.class));
-      }
-    }
+    final JobInput inputCopy = input.copy().name(StringUtility.nvl(input.name(), callable.getClass().getName()));
 
     // Create the Future to be returned to the caller.
     return interceptFuture(JobFutureTask.create(this, inputCopy, periodic, interceptCallable(callable, inputCopy)));

@@ -44,8 +44,15 @@ public final class RunContexts {
   }
 
   /**
-   * Creates an empty {@link RunContext} with <code>null</code> as preferred {@link Subject} and {@link Locale}.
-   * Preferred means, that those values will not be derived from other values, but must be set explicitly instead.
+   * Creates an empty {@link RunContext}.
+   *
+   * @RunMonitor a new {@link IRunMonitor} is created. However, even if there is a current {@link IRunMonitor}, it is
+   *             NOT registered as child monitor, meaning that it will not be cancelled once the current
+   *             {@link IRunMonitor} is cancelled.
+   * @Subject <code>null</code> {@link Subject} as preferred value, meaning that it will not be set by other values like
+   *          the session.
+   * @Locale <code>null</code> {@link Locale} as preferred value, meaning that it will not be set by other values like
+   *         the session.
    */
   public static final RunContext empty() {
     final RunContext runContext = BEANS.get(RunContext.class);
@@ -54,7 +61,16 @@ public final class RunContexts {
   }
 
   /**
-   * Creates a "snapshot" of the current calling context.
+   * Creates a "snapshot" of the current calling context.<br/>
+   *
+   * @RunMonitor a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
+   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext}
+   *             to be cancelled as well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel
+   *             the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
+   * @Subject current {@link Subject} as non-preferred value, meaning that it will be updated by other values like the
+   *          session.
+   * @Locale current {@link Locale} as non-preferred value, meaning that it will be updated by other values like the
+   *         session.
    */
   public static RunContext copyCurrent() {
     final RunContext runContext = BEANS.get(RunContext.class);

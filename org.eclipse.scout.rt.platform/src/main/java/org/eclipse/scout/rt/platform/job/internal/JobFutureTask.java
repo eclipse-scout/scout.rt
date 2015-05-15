@@ -10,19 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.ICancellable;
 import org.eclipse.scout.rt.platform.context.IRunMonitor;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IDoneCallback;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -33,13 +41,23 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
 /**
- * Future to be given to the executor for execution. This class combines both, the Executable and its Future.
+ * {@link RunnableFuture} to be given to {@link ExecutorService} for execution. Basically, this class adds the following
+ * functionality to Java {@link FutureTask}:
+ * <ul>
+ * <li>registers/unregisters this task in {@link JobManager};</li>
+ * <li>fires a job lifecycle event when transitioning to another state;</li>
+ * <li>passes the mutex to the next queued task after job completion;</li>
+ * <li>ensures a {@link RunMonitor} to be set on <code>ThreadLocal</code>;</li>
+ * <li>combines cancellation of {@link RunMonitor} and {@link Future};</li>
+ * <li>ensures this {@link IFuture} to be set on <code>ThreadLocal</code>;</li>
+ * <li>adds functionality to await for the Future's completion (either synchronously or asynchronously);</li>
+ * </ul>
  *
  * @see FutureTask
  * @since 5.1
  */
 @Internal
-public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFutureTask<RESULT>, IFuture<RESULT> {
+public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFutureTask<RESULT>, IFuture<RESULT>, ICancellable {
 
   protected final JobManager m_jobManager;
 
@@ -48,11 +66,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   private volatile boolean m_blocked;
   private final boolean m_periodic;
 
-  private final boolean m_hasRunContext;
+  private final boolean m_runWithRunContext;
   private final IRunMonitor m_runMonitor;
-
-  private final ICancellable m_cancellable;
-  private boolean m_cancellingFromCancellable;
 
   private final DonePromise<RESULT> m_donePremise;
 
@@ -82,32 +97,12 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_periodic = periodic;
     m_expirationDate = (input.expirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.expirationTimeMillis() : null);
 
-    m_hasRunContext = m_input.runContext() != null;
-    m_runMonitor = (m_hasRunContext ? m_input.runContext().runMonitor() : BEANS.get(IRunMonitor.class));
-
-    m_cancellable = new ICancellable() {
-      @Override
-      public boolean isCancelled() {
-        return JobFutureTask.this.isCancelled();
-      }
-
-      @Override
-      public boolean cancel(final boolean interruptIfRunning) {
-        //cancel is called by monitor, set the flag to prevent re-calling m_cancellable.cancel() from within the Future.cancel override
-        if (!m_cancellingFromCancellable) {
-          try {
-            m_cancellingFromCancellable = true;
-            return JobFutureTask.this.cancel(interruptIfRunning);
-          }
-          finally {
-            m_cancellingFromCancellable = false;
-          }
-        }
-        return true;
-      }
-    };
+    m_runWithRunContext = m_input.runContext() != null;
+    m_runMonitor = (m_runWithRunContext ? m_input.runContext().runMonitor() : BEANS.get(IRunMonitor.class));
 
     m_jobManager.registerFuture(this);
+    m_runMonitor.registerCancellable(this); // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).
+
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.SCHEDULED, this));
   }
 
@@ -116,6 +111,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    */
   @Override
   protected void done() {
+    m_runMonitor.unregisterCancellable(this);
     m_jobManager.unregisterFuture(this);
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.DONE, this));
     m_donePremise.onDone();
@@ -167,20 +163,15 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    *
    * @see #run
    */
-  protected RESULT invoke(final Callable<RESULT> callable) throws Exception {
+  protected RESULT invoke(final Callable<RESULT> target) throws Exception {
     m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.ABOUT_TO_RUN, this));
 
-    IFuture.CURRENT.set(this);
-    IRunMonitor.CURRENT.set(m_hasRunContext ? null : m_runMonitor);
-    m_runMonitor.registerCancellable(m_cancellable);
-    try {
-      return callable.call();
-    }
-    finally {
-      m_runMonitor.unregisterCancellable(m_cancellable);
-      IRunMonitor.CURRENT.remove();
-      IFuture.CURRENT.remove();
-    }
+    // Callable to set the current RunMonitor. That is only required, if no RunContext is provided, because done by RunContext otherwise.
+    final Callable<RESULT> c2 = (m_runWithRunContext ? target : new InitThreadLocalCallable<>(target, IRunMonitor.CURRENT, m_runMonitor));
+    // Callable to set the current Future.
+    final Callable<RESULT> c1 = new InitThreadLocalCallable<>(c2, IFuture.CURRENT, this);
+
+    return c1.call();
   }
 
   @Override
@@ -230,17 +221,24 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public boolean cancel(final boolean mayInterruptIfRunning) {
-    if (!m_cancellingFromCancellable) {
-      try {
-        m_cancellingFromCancellable = true;
-        m_runMonitor.cancel(mayInterruptIfRunning);
-      }
-      finally {
-        m_cancellingFromCancellable = false;
-      }
+  public boolean cancel(final boolean interruptIfRunning) {
+    final Set<Boolean> status = CollectionUtility.hashSet(!isDone()); // Check for 'done' or 'cancel' to comply with Future.isCancelled semantic.
+
+    // 1. Unregister this 'Cancellable' from RunMonitor (to prevent multiple cancel invocations).
+    m_runMonitor.unregisterCancellable(this);
+
+    // 2. Cancel RunMonitor if not done yet.
+    //    Note: The Future should only be cancelled after the RunMonitor is cancelled, so that waiting threads (via Future.awaitDone) have a proper RunMonitor state.
+    if (!m_runMonitor.isCancelled()) {
+      status.add(m_runMonitor.cancel(interruptIfRunning));
     }
-    return super.cancel(mayInterruptIfRunning);
+
+    // 3. Cancel FutureTask if not done yet.
+    if (!JobFutureTask.this.isCancelled()) {
+      status.add(JobFutureTask.super.cancel(interruptIfRunning));
+    }
+
+    return Collections.singleton(Boolean.TRUE).equals(status);
   }
 
   @Override

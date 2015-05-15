@@ -35,5 +35,7 @@ public class ClientJobInputValidator {
     Assertions.assertTrue(input.runContext() instanceof ClientRunContext, "For client jobs, 'RunContext' must be of the type 'ClientRunContext'");
     Assertions.assertNotNull(((ClientRunContext) input.runContext()).session(), "For client jobs, 'clientSession' must not be null");
     Assertions.assertFalse(input.mutex() instanceof IClientSession, "For client jobs, mutex object must not be the 'clientSession' to not interfere with model jobs");
+
+    Assertions.assertNotNull(input.runContext().runMonitor(), "For client jobs, 'RunMonitor' on 'RunContext' must not be null");
   }
 }

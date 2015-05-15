@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.internal.InitThreadLocalCallable;
 import org.eclipse.scout.rt.platform.job.PropertyMap;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.context.internal.ServerSessionLogCallable;
+import org.eclipse.scout.rt.server.context.internal.CurrentSessionLogCallable;
 import org.eclipse.scout.rt.server.context.internal.TwoPhaseTransactionBoundaryCallable;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -55,7 +55,8 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  * The 'setter-methods' returns <code>this</code> in order to support for method chaining. The context has the following
  * characteristics:
  * <ul>
- * <li>{@link Subject}</li>
+ * <li>{@link IRunMonitor#CURRENT}</li>
+ * <li>{@link Subject#getSubject(java.security.AccessControlContext)}</li>
  * <li>{@link NlsLocale#CURRENT}</li>
  * <li>{@link PropertyMap#CURRENT}</li>
  * <li>{@link ISession#CURRENT}</li>
@@ -81,16 +82,12 @@ public class ServerRunContext extends RunContext {
     final Callable<RESULT> c7 = new TwoPhaseTransactionBoundaryCallable<>(next, transaction(), transactionScope());
     final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ScoutTexts.CURRENT, (session() != null ? session().getTexts() : ScoutTexts.CURRENT.get()));
     final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, UserAgent.CURRENT, userAgent());
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, ISession.CURRENT, session());
-    final Callable<RESULT> c3 = new ServerSessionLogCallable<>(c4, session());
+    final Callable<RESULT> c4 = new CurrentSessionLogCallable<>(c5);
+    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, ISession.CURRENT, session());
     final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, OfflineState.CURRENT, offline());
     final Callable<RESULT> c1 = super.interceptCallable(c2);
 
     return c1;
-  }
-
-  public IServerSession session() {
-    return m_session;
   }
 
   @Override
@@ -99,9 +96,24 @@ public class ServerRunContext extends RunContext {
     return this;
   }
 
+  @Override
+  public ServerRunContext subject(final Subject subject) {
+    super.subject(subject);
+    return this;
+  }
+
+  @Override
+  public ServerRunContext locale(final Locale locale) {
+    super.locale(locale);
+    return this;
+  }
+
+  public IServerSession session() {
+    return m_session;
+  }
+
   /**
-   * Sets the session with its {@link Subject} if not set yet. The session's {@link Locale} and {@link UserAgent} are
-   * not set.
+   * Sets the session, and the session's subject, but only if not set as explicit value yet.
    */
   public ServerRunContext session(final IServerSession session) {
     m_session = session;
@@ -125,13 +137,13 @@ public class ServerRunContext extends RunContext {
   }
 
   /**
-   * Sets the transaction scope to control in which transaction to run executables. By default, a new transaction is
-   * started, and committed or rolled back upon completion.
+   * Sets the transaction scope to control in which transaction boundary to run the runnable. By default, a new
+   * transaction is started, and committed or rolled back upon completion.
    * <ul>
-   * <li>Use {@link TransactionScope#REQUIRES_NEW} to run executables in a new transaction.</li>
-   * <li>Use {@link TransactionScope#REQUIRED} to only start a new transaction if not running in a transaction yet.</li>
-   * <li>Use {@link TransactionScope#MANDATORY} to enforce that the caller is already running in a transaction.
-   * Otherwise, a {@link TransactionRequiredException} is thrown.</li>
+   * <li>Use {@link TransactionScope#REQUIRES_NEW} to run in a new transaction.</li>
+   * <li>Use {@link TransactionScope#REQUIRED} to only start a new transaction if there is no transaction set.</li>
+   * <li>Use {@link TransactionScope#MANDATORY} to enforce running in the given transaction. Otherwise, a
+   * {@link TransactionRequiredException} is thrown.</li>
    * </ul>
    */
   public ServerRunContext transactionScope(final TransactionScope transactionScope) {
@@ -143,6 +155,11 @@ public class ServerRunContext extends RunContext {
     return m_transaction;
   }
 
+  /**
+   * Sets the transaction to be used. Has only an effect, if transaction scope is set to
+   * {@link TransactionScope#REQUIRED} or {@link TransactionScope#MANDATORY}. Normally, this property should not be set
+   * manually.
+   */
   public ServerRunContext transaction(final ITransaction transaction) {
     m_transaction = transaction;
     return this;
@@ -161,20 +178,9 @@ public class ServerRunContext extends RunContext {
   }
 
   @Override
-  public ServerRunContext subject(final Subject subject) {
-    super.subject(subject);
-    return this;
-  }
-
-  @Override
-  public ServerRunContext locale(final Locale locale) {
-    super.locale(locale);
-    return this;
-  }
-
-  @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.ref("runMonitor", runMonitor());
     builder.attr("subject", subject());
     builder.attr("locale", locale());
     builder.ref("session", session());
