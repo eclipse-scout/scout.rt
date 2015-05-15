@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.shared.ISession;
 import org.slf4j.MDC;
 
 /**
- * Provides the {@link MDC#put(String, String)} properties {@value #SESSION_USER_ID} with the username of the current
+ * Provides the {@link MDC#put(String, String)} properties {@value #SCOUT_USER_NAME} with the username of the current
  * session.
  *
  * @param <RESULT>
@@ -26,7 +26,7 @@ import org.slf4j.MDC;
  * @see <i>design pattern: chain of responsibility</i>
  */
 public class CurrentSessionLogCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
-  public static final String SESSION_USER_ID = "session.userId";
+  public static final String SCOUT_USER_NAME = "scout.user.name";
 
   protected final Callable<RESULT> m_next;
 
@@ -38,18 +38,18 @@ public class CurrentSessionLogCallable<RESULT> implements Callable<RESULT>, ICha
   public RESULT call() throws Exception {
     final ISession currentSession = ISession.CURRENT.get();
 
-    final String oldSessionUserId = MDC.get(SESSION_USER_ID);
+    final String oldUserName = MDC.get(SCOUT_USER_NAME);
     try {
-      MDC.put(SESSION_USER_ID, currentSession != null ? currentSession.getUserId() : null);
+      MDC.put(SCOUT_USER_NAME, currentSession != null ? currentSession.getUserId() : null);
       //
       return m_next.call();
     }
     finally {
-      if (oldSessionUserId != null) {
-        MDC.put(SESSION_USER_ID, oldSessionUserId);
+      if (oldUserName != null) {
+        MDC.put(SCOUT_USER_NAME, oldUserName);
       }
       else {
-        MDC.remove(SESSION_USER_ID);
+        MDC.remove(SCOUT_USER_NAME);
       }
     }
   }

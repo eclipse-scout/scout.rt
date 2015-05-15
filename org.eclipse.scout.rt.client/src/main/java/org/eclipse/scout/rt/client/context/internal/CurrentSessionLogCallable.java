@@ -26,7 +26,7 @@ import org.slf4j.MDC;
  * @see <i>design pattern: chain of responsibility</i>
  */
 public class CurrentSessionLogCallable<RESULT> implements Callable<RESULT>, IChainable<Callable<RESULT>> {
-  public static final String SESSION_USER_ID = "session.userId";
+  public static final String SCOUT_USER_NAME = "scout.user.name";
 
   protected final Callable<RESULT> m_next;
 
@@ -38,18 +38,18 @@ public class CurrentSessionLogCallable<RESULT> implements Callable<RESULT>, ICha
   public RESULT call() throws Exception {
     final ISession currentSession = ISession.CURRENT.get();
 
-    final String oldSessionUserId = MDC.get(SESSION_USER_ID);
+    final String oldSessionUserId = MDC.get(SCOUT_USER_NAME);
     try {
-      MDC.put(SESSION_USER_ID, currentSession != null ? currentSession.getUserId() : null);
+      MDC.put(SCOUT_USER_NAME, currentSession != null ? currentSession.getUserId() : null);
       //
       return m_next.call();
     }
     finally {
       if (oldSessionUserId != null) {
-        MDC.put(SESSION_USER_ID, oldSessionUserId);
+        MDC.put(SCOUT_USER_NAME, oldSessionUserId);
       }
       else {
-        MDC.remove(SESSION_USER_ID);
+        MDC.remove(SCOUT_USER_NAME);
       }
     }
   }

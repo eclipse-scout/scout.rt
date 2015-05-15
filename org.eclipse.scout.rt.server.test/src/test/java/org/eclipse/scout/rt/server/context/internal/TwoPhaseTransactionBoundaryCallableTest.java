@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.context;
+package org.eclipse.scout.rt.server.context.internal;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
