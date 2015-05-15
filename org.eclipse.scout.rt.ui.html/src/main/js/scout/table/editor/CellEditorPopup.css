@@ -1,0 +1,4 @@
+.cell-editor-field {
+  /* -1px correction is necessary because the table-cell does not have a border but the fields have */
+  padding: @table-row-padding-y @table-cell-padding-right - 1px @table-row-padding-y @table-cell-padding-left - 1px;
+}
