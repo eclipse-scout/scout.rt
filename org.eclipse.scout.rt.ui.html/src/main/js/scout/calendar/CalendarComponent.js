@@ -45,6 +45,7 @@ scout.CalendarComponent.prototype._render = function($parent) {
       .appendDiv('calendar-component')
       .addClass(this.item.cssClass)
       .data('component', this)
+      .data('partDay', partDay)
       .mousedown(this._onMousedown.bind(this))
       .mouseenter(this._onHoverIn.bind(this))
       .mouseleave(this._onHoverOut.bind(this))
@@ -144,7 +145,8 @@ scout.CalendarComponent.prototype.setSelected = function(selected) {
 };
 
 scout.CalendarComponent.prototype._onMousedown = function(event) {
-  this.parent._selectedComponentChanged(this);
+  var $part = $(event.delegateTarget);
+  this.parent._selectedComponentChanged(this, $part.data('partDay'));
 };
 
 scout.CalendarComponent.prototype._onContextMenu = function(event) {

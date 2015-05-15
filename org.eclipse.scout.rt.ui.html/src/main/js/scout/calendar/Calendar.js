@@ -153,7 +153,7 @@ scout.Calendar.prototype._render = function($parent) {
   }
 
   // click event on all day and children elements
-  $('.calendar-day', this.$grid).click(this._onClickDay.bind(this));
+  $('.calendar-day', this.$grid).mousedown(this._onMousedownDay.bind(this));
   this._updateScreen();
 };
 
@@ -341,7 +341,6 @@ scout.Calendar.prototype._onClickDisplayMode = function(event) {
         this.selectedDate = new Date(p.year, p.month, p.date - p.day + 4);
       }
     }
-
     this._updateModel();
     this._renderComponents();
   }
@@ -356,17 +355,54 @@ scout.Calendar.prototype._onClickList = function(event) {
   this._updateScreen();
 };
 
-scout.Calendar.prototype._onClickDay = function(event) {
-  var selectedDate,
-    oldSelectedDate = this.selectedDate,
-    $clicked = $(event.currentTarget);
+scout.Calendar.prototype._onMousedownDay = function(event) {
+  // we cannot use event.stopPropagation() in CalendarComponent.js because this would
+  // prevent context-menus from being closed. With this awkward if-statement we only
+  // process the event, when it is not bubbling up from somewhere else (= from mousedown
+  // event on component).
+  if (event.eventPhase === Event.AT_TARGET) {
+    var selectedDate = $(event.delegateTarget).data('date');
+    this._setSelection(selectedDate, null);
+  }
+};
 
-  selectedDate = $clicked.data('date');
-  if (scout.dates.compare(oldSelectedDate, selectedDate) !== 0) {
+/**
+ * @param selectedDate
+ * @param selectedComponent may be null when a day is selected
+ */
+scout.Calendar.prototype._setSelection = function(selectedDate, selectedComponent) {
+  var changed = false;
+
+  // selected date
+  if (scout.dates.compare(this.selectedDate, selectedDate) !== 0) {
+    changed = true;
+    $('.calendar-day').each(function(index, element) {
+      var $day = $(element),
+      date = $day.data('date');
+      if (scout.dates.compare(date, this.selectedDate) === 0) {
+        $day.select(false); // de-select old date
+      } else if (scout.dates.compare(date, selectedDate) === 0) {
+        $day.select(true);  // select new date
+      }
+    }.bind(this));
     this.selectedDate = selectedDate;
-    $('.selected', this.$grid).select(false);
-    $clicked.select(true);
-    this.colorYear();
+  }
+
+  // selected component / part (may be null)
+  if (this.selectedComponent != selectedComponent) {
+    changed = true;
+    if (this.selectedComponent) {
+      this.selectedComponent.setSelected(false);
+    }
+    if (selectedComponent) {
+      selectedComponent.setSelected(true);
+    }
+    this.selectedComponent = selectedComponent;
+  }
+
+  if (changed) {
+    this._sendSelectionChanged();
+    this._colorYear();
     this._updateListPanel();
   }
 };
@@ -389,9 +425,10 @@ scout.Calendar.prototype._sendViewRangeChanged = function() {
 };
 
 scout.Calendar.prototype._sendSelectionChanged = function() {
+  var selectedComponentId = this.selectedComponent ? this.selectedComponent.id : null;
   this.session.send(this.id, 'selectionChanged', {
     date: scout.dates.toJsonDate(this.selectedDate),
-    componentId: this.selectedComponent.id
+    componentId: selectedComponentId
   });
 };
 
@@ -423,7 +460,7 @@ scout.Calendar.prototype._updateScreen = function() {
     this.drawYear();
   }
 
-  this.colorYear();
+  this._colorYear();
   this._updateListPanel();
 };
 
@@ -646,7 +683,7 @@ scout.Calendar.prototype.drawYear = function() {
     .hover(this._onYearHoverIn.bind(this), this._onYearHoverOut.bind(this));
 };
 
-scout.Calendar.prototype.colorYear = function() {
+scout.Calendar.prototype._colorYear = function() {
   // color is only needed if visible
   if (!this._showYearPanel) {
     return;
@@ -784,7 +821,7 @@ scout.Calendar.prototype._renderListPanel = function() {
   // $components.sort(this._sortTop);
 
   components.forEach(function(component) {
-    listComponent = new scout.CalendarListComponent(component);
+    listComponent = new scout.CalendarListComponent(this.selectedDate, component);
     listComponent.render(this.$list);
     this._listComponents.push(listComponent);
   }.bind(this));
@@ -792,13 +829,8 @@ scout.Calendar.prototype._renderListPanel = function() {
 
 /* -- components, events-------------------------------------------- */
 
-scout.Calendar.prototype._selectedComponentChanged = function(component) {
-  if (this.selectedComponent) {
-    this.selectedComponent.setSelected(false);
-  }
-  component.setSelected(true);
-  this.selectedComponent = component;
-  this._sendSelectionChanged();
+scout.Calendar.prototype._selectedComponentChanged = function(component, partDay) {
+  this._setSelection(partDay, component);
 };
 
 scout.Calendar.prototype._onDayContextMenu = function(event) {

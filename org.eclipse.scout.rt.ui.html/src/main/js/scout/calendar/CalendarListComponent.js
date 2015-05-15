@@ -5,7 +5,8 @@
  * new instances of CalendarListComponent are created every time we click on a date
  * in the calendar, but the CalendarComponent instance is always the same.
  */
-scout.CalendarListComponent = function(source) {
+scout.CalendarListComponent = function(partDay, source) {
+  this.partDay = partDay;
   this.source = source;
   this.$container;
   this._selectedListener = source.events.on('selected', function(event) {
@@ -18,6 +19,7 @@ scout.CalendarListComponent.prototype.render = function($parent) {
   var source = this.source;
   this.$container = $parent
    .appendDiv('calendar-component')
+   .data('partDay', this.partDay)
    .addClass(source.item.cssClass)
    .toggleClass('comp-selected', source._selected)
    .mousedown(source._onMousedown.bind(source))

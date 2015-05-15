@@ -4,14 +4,12 @@
 // right : header menus
 scout.TableMenuItemsOrder = {
   order: function(items) {
-    var i, item,
-      buttons = [],
+    var buttons = [],
       emptySpaceItems = [],
       selectionItems = [],
       rightItems = [];
 
-    for (i = 0; i < items.length; i++) {
-      item = items[i];
+    items.forEach(function(item) {
       if (scout.menus.isButton(item)) {
         buttons.push(item);
       }
@@ -24,7 +22,7 @@ scout.TableMenuItemsOrder = {
       else if (scout.menus.checkType(item, ['Table.Header'])) {
         rightItems.push(item);
       }
-    }
+    });
 
     // add fixed separator between emptySpace and selection
     if (emptySpaceItems.length > 0 && selectionItems.length > 0) {

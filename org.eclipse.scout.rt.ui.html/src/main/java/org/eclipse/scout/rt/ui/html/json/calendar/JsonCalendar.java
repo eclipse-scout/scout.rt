@@ -267,12 +267,20 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   protected void handleUiSelectionChanged(JsonEvent event) {
     JSONObject data = event.getData();
-    Date date = toJavaDate(data, "date");
-    String componentId = data.optString("componentId");
-    JsonCalendarComponent<CalendarComponent> component = resolveCalendarComponent(componentId);
-    addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_COMPONENT, component.getModel());
-    getModel().getUIFacade().setSelectionFromUI(date, component.getModel());
-    LOG.debug("date=" + date + " componentId=" + componentId);
+    Date selectedDate = toJavaDate(data, "date");
+    String componentId = data.optString("componentId", null);
+
+    CalendarComponent selectedComponent = null;
+    if (componentId != null) {
+      JsonCalendarComponent<CalendarComponent> jsonComponent = resolveCalendarComponent(componentId);
+      selectedComponent = jsonComponent.getModel();
+      addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_COMPONENT, selectedComponent);
+    }
+
+    addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_DATE, selectedDate);
+
+    getModel().getUIFacade().setSelectionFromUI(selectedDate, selectedComponent);
+    LOG.debug("date=" + selectedDate + " componentId=" + componentId);
   }
 
   protected void handleUiModelChanged(JsonEvent event) {
