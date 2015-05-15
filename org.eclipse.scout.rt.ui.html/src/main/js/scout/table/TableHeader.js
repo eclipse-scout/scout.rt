@@ -28,11 +28,9 @@ scout.TableHeader = function(table, session) {
       $header.css('text-align', alignment);
     }
 
-    $separator = this.$container.appendDiv('header-resize');
     if (!column.fixedWidth) {
+      $separator = this.$container.appendDiv('header-resize');
       $separator.on('mousedown', '', resizeHeader);
-    } else {
-      $separator.addClass('fixed');
     }
   }
 
@@ -312,9 +310,11 @@ scout.TableHeader.prototype._decorateHeader = function(column, oldColumnState) {
 scout.TableHeader.prototype._applyColumnText = function($header, column) {
   var text = column.text;
   if (!text) {
-    text = '';
+    // Make sure empty header is as height as the others to make it properly clickable
+    $header.html('&nbsp;');
+  } else {
+    $header.text(text);
   }
-  $header.text(text);
 };
 
 scout.TableHeader.prototype._applyColumnSorting = function($header, column) {
