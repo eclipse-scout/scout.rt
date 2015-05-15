@@ -546,7 +546,9 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   private void detachSearchTableControl() {
     ITableControl searchControl = getTable().getTableControl(SearchFormTableControl.class);
-    getTable().removeTableControl(searchControl);
+    if (searchControl != null) {
+      getTable().removeTableControl(searchControl);
+    }
   }
 
   protected void disposeSearchForm() throws ProcessingException {

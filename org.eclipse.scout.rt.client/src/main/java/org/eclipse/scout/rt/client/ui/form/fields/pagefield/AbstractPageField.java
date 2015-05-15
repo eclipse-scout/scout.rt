@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield.IPageFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.control.SearchFormTableControl;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -84,26 +85,37 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
       m_outline = new SimpleOutline();
       m_outline.setRootNode(m_page);
       m_outline.selectNode(m_page);
-      m_outline.addPropertyChangeListener(
-          new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-              if (e.getPropertyName().equals(IOutline.PROP_DETAIL_FORM)) {
-                getDetailFormField().setInnerForm(((IOutline) e.getSource()).getDetailForm());
-              }
-              else if (e.getPropertyName().equals(IOutline.PROP_DETAIL_TABLE)) {
-                getTableField().setTable(((IOutline) e.getSource()).getDetailTable(), true);
-              }
-              else if (e.getPropertyName().equals(IOutline.PROP_SEARCH_FORM)) {
-                getSearchFormField().setInnerForm(((IOutline) e.getSource()).getSearchForm());
-              }
-            }
+      m_outline.addPropertyChangeListener(new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent e) {
+          if (e.getPropertyName().equals(IOutline.PROP_DETAIL_FORM)) {
+            getDetailFormField().setInnerForm(((IOutline) e.getSource()).getDetailForm());
           }
-          );
+          else if (e.getPropertyName().equals(IOutline.PROP_DETAIL_TABLE)) {
+            getTableField().setTable(detachSearchFormTableControl(((IOutline) e.getSource()).getDetailTable()), true);
+          }
+          else if (e.getPropertyName().equals(IOutline.PROP_SEARCH_FORM)) {
+            getSearchFormField().setInnerForm(((IOutline) e.getSource()).getSearchForm());
+          }
+        }
+      });
       getDetailFormField().setInnerForm(m_outline.getDetailForm());
-      getTableField().setTable(m_outline.getDetailTable(), true);
+      getTableField().setTable(detachSearchFormTableControl(m_outline.getDetailTable()), true);
       getSearchFormField().setInnerForm(m_outline.getSearchForm());
     }
+  }
+
+  /**
+   * If the given table has a table control of type {@link SearchFormTableControl}, this
+   * table control is removed. Otherwise, the form would be rendered twice (1x table control,
+   * 1x SearchFormField).
+   */
+  protected ITable detachSearchFormTableControl(ITable table) {
+    SearchFormTableControl searchControl = table.getTableControl(SearchFormTableControl.class);
+    if (searchControl != null) {
+      table.removeTableControl(searchControl);
+    }
+    return table;
   }
 
   @SuppressWarnings("unchecked")
@@ -126,6 +138,7 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
 
   @Order(10)
   public class SearchFormField extends AbstractWrappedFormField<IForm> {
+
     @Override
     protected int getConfiguredGridW() {
       return FULL_WIDTH;
@@ -144,6 +157,7 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
 
   @Order(20)
   public class TableField extends AbstractTableField<ITable> {
+
     @Override
     protected boolean getConfiguredLabelVisible() {
       return false;
@@ -163,11 +177,11 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
     protected double getConfiguredGridWeightY() {
       return 1;
     }
-
   }
 
   @Order(30)
   public class DetailFormField extends AbstractWrappedFormField<IForm> {
+
     @Override
     protected boolean getConfiguredVisible() {
       return true;
@@ -190,7 +204,6 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
     protected boolean getConfiguredRootNodeVisible() {
       return true;
     }
-
   }
 
   protected static class LocalPageFieldExtension<T extends IPage, OWNER extends AbstractPageField<T>> extends LocalGroupBoxExtension<OWNER> implements IPageFieldExtension<T, OWNER> {
@@ -204,5 +217,4 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
   protected IPageFieldExtension<T, ? extends AbstractPageField<T>> createLocalExtension() {
     return new LocalPageFieldExtension<T, AbstractPageField<T>>(this);
   }
-
 }
