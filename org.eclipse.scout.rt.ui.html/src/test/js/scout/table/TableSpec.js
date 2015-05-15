@@ -739,7 +739,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $checkbox = table.$rows().first().find('.checkable label').first();
+      var $checkbox = table.$rows().first().find('.check-box').first();
       $checkbox.triggerClick();
 
       sendQueuedAjaxCalls();

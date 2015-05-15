@@ -1112,7 +1112,7 @@ scout.Table.prototype._renderRowChecked = function(row) {
   }
 
   var $checkbox = this.checkableColumn.$checkBox(row.$row);
-  $checkbox.prop('checked', row.checked);
+  $checkbox.toggleClass('checked', row.checked);
 };
 
 scout.Table.prototype.checkRow = function(row, checked) {

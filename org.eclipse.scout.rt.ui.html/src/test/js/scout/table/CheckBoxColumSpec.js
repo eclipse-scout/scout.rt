@@ -59,10 +59,10 @@ describe("CheckBoxColumn", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
       var $rows = table.$rows();
-      var checked = table.columns[0].$checkBox($rows.eq(0)).prop('checked');
-      expect(checked).toBe(true);
-      checked = table.columns[0].$checkBox($rows.eq(1)).prop('checked');
-      expect(checked).toBe(false);
+      var $checkbox = table.columns[0].$checkBox($rows.eq(0));
+      expect($checkbox).toHaveClass('checked');
+      $checkbox = table.columns[0].$checkBox($rows.eq(1));
+      expect($checkbox).not.toHaveClass('checked');
     });
 
   });
@@ -77,10 +77,10 @@ describe("CheckBoxColumn", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
       var $rows = table.$rows();
-      var checked = table.columns[0].$checkBox($rows.eq(0)).prop('checked');
-      expect(checked).toBe(true);
-      checked = table.columns[0].$checkBox($rows.eq(1)).prop('checked');
-      expect(checked).toBe(false);
+      var $checkbox = table.columns[0].$checkBox($rows.eq(0));
+      expect($checkbox).toHaveClass('checked');
+      $checkbox = table.columns[0].$checkBox($rows.eq(1));
+      expect($checkbox).not.toHaveClass('checked');
     });
 
   });

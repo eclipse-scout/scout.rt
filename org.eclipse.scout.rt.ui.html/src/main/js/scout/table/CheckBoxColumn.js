@@ -4,7 +4,7 @@ scout.CheckBoxColumn = function() {
 scout.inherits(scout.CheckBoxColumn, scout.Column);
 
 scout.CheckBoxColumn.prototype.buildCell = function(row) {
-  var cell, style, content, tooltipText, tooltip, cssClass, checked;
+  var cell, style, content, tooltipText, tooltip, cssClass, checked, checkBoxCssClass;
   var enabled = this.table.enabled && row.enabled;
   if (this.isCheckableColumn()) {
     checked = row.checked;
@@ -18,21 +18,21 @@ scout.CheckBoxColumn.prototype.buildCell = function(row) {
   tooltipText = this.table.cellTooltipText(this, row);
   tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
 
-  content = '<input type="checkbox"';
+  checkBoxCssClass = 'check-box';
   if (checked) {
-    content += ' checked="checked" ';
+    checkBoxCssClass += ' checked';
   }
   if (!enabled) {
-    content += ' disabled="disabled" ';
+    checkBoxCssClass += ' disabled';
   }
-  content += '/><label>&nbsp;</label>';
+  content = '<div class="' + checkBoxCssClass + '"/>';
 
   return '<div class="' + cssClass + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + content + '</div>';
 };
 
 scout.CheckBoxColumn.prototype.$checkBox = function($row) {
   var $cell = this.table.$cell(this, $row);
-  return $cell.children('input');
+  return $cell.children('.check-box');
 };
 
 scout.CheckBoxColumn.prototype._cssClass = function(row, cell) {
@@ -47,7 +47,7 @@ scout.CheckBoxColumn.prototype.onMouseUp = function(event, $row) {
     $target = $(event.target);
 
   if (this.isCheckableColumn()) {
-    if ($target.is('label') && $target.parent().hasClass('checkable')) {
+    if ($target.is('.check-box') && $target.parent().hasClass('checkable')) {
       this.table.checkRow(row, !row.checked);
     }
   } else {

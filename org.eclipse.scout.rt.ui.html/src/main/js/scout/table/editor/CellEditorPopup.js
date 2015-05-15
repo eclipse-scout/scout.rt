@@ -34,6 +34,9 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   if (field.$container) {
     field.$container.addClass('cell-editor-form-field');
   }
+  if (field.$fieldContainer) {
+    field.$fieldContainer.css('text-align', scout.Table.parseHorizontalAlignment(this.cell.horizontalAlignment));
+  }
   if (field.$field) {
     field.$field.addClass('cell-editor-field');
   }
