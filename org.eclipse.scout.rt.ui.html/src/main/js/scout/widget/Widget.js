@@ -71,13 +71,6 @@ scout.Widget.prototype._remove = function() {
   }
 };
 
-/**
- * Call this function in the constructor of your widget if you need event support.
- **/
-scout.Widget.prototype._addEventSupport = function() {
-  this.events = new scout.EventSupport();
-};
-
 scout.Widget.prototype.addChild = function(child) {
   $.log.trace('addChild(' + child + ') to ' + this);
   this.children.push(child);
@@ -88,7 +81,24 @@ scout.Widget.prototype.removeChild = function(child) {
   scout.arrays.remove(this.children, child);
 };
 
-// --- Convenience delegation functions to this.events -------------------
+//--- Layouting / HtmlComponent methods ---
+
+scout.Widget.prototype.pack = function() {
+  this.htmlComp.pack();
+};
+
+scout.Widget.prototype.layout = function() {
+  this.htmlComp.layout();
+};
+
+//--- Event handling methods ---
+
+/**
+ * Call this function in the constructor of your widget if you need event support.
+ **/
+scout.Widget.prototype._addEventSupport = function() {
+  this.events = new scout.EventSupport();
+};
 
 scout.Widget.prototype.trigger = function(type, event) {
   this.events.trigger(type, event);
@@ -102,7 +112,7 @@ scout.Widget.prototype.off = function(type, func) {
   this.events.off(type, func);
 };
 
-// --- KeyStrokeAdapter functions ----------------------------------------
+// --- KeyStrokeAdapter methods ---
 
 scout.Widget.prototype._createKeyStrokeAdapter = function() {
   // to be implemented by subclass

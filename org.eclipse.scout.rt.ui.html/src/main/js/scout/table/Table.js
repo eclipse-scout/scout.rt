@@ -493,11 +493,10 @@ scout.Table.prototype._installRows = function($rows) {
     }
   });
 
-  // update info and scrollbar
   this._triggerRowsDrawn($rows);
   $selectedRows = this.selectionHandler.dataDrawn();
   this._triggerRowsSelected($selectedRows);
-  this.updateScrollbar();
+  this.htmlComp.invalidateTree();
 
   // update grouping if data was grouped
   this._group();
@@ -1764,7 +1763,6 @@ scout.Table.prototype._onRowsInserted = function(rows) {
     }
 
     this.drawData();
-    this.htmlComp.invalidateTree();
   }
 };
 

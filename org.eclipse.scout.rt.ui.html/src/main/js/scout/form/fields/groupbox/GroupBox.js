@@ -27,11 +27,11 @@ scout.GroupBox.prototype._createKeyStrokeAdapter = function() {
 
 scout.GroupBox.prototype._render = function($parent) {
   var htmlBody, i,
-    env = scout.HtmlEnvironment,
-    htmlComp = this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', new scout.GroupBoxLayout(this));
+    env = scout.HtmlEnvironment;
 
+  this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', new scout.GroupBoxLayout(this));
   if (this.mainBox) {
-    htmlComp.layoutData = null;
+    this.htmlComp.layoutData = null;
   }
 
   this.$label = $('<span>').html(this.label);

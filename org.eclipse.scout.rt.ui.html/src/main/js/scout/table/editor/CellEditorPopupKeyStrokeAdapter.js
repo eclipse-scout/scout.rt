@@ -70,6 +70,11 @@ scout.CellEditorTabKeyStroke.prototype.handle = function(event) {
 
   pos = table.nextEditableCellPos(column, row, backwards);
   if (pos) {
+    // if next editable cell is on another row then select it
+    // -> makes it more responsive because server selects it anyway
+    if (pos.row !== this._popup.row) {
+      table.selectRows([pos.row]);
+    }
     table.sendPrepareCellEdit(pos.row.id, pos.column.id);
   }
 

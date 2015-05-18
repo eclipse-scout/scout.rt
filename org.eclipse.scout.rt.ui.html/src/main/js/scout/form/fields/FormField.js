@@ -330,12 +330,12 @@ scout.FormField.prototype._onIconClick = function(event) {
 /**
  * Appends a DIV element as form-field container to $parent and sets the this.$container property.
  * Applies (logical) grid-data and FormFieldLayout to this.$container.
+ * Sets this.htmlComp to the HtmlComponent created for this.$container.
  *
  * @param $parent to which container is appended
  * @param cssClass cssClass to add to the new container DIV
  * @param layout when layout is undefined, scout.FormFieldLayout() is set
  *
- * @return The HtmlComponent created for this.$container
  */
 scout.FormField.prototype.addContainer = function($parent, cssClass, layout) {
   this.$container = $.makeDiv()
@@ -349,5 +349,5 @@ scout.FormField.prototype.addContainer = function($parent, cssClass, layout) {
   var htmlComp = new scout.HtmlComponent(this.$container, this.session);
   htmlComp.layoutData = new scout.LogicalGridData(this);
   htmlComp.setLayout(layout || new scout.FormFieldLayout(this));
-  return htmlComp;
+  this.htmlComp = htmlComp;
 };

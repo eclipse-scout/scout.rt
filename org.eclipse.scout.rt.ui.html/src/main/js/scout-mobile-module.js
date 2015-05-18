@@ -107,6 +107,7 @@ __include("scout/table/TableControlKeyStrokes.js");
 __include("scout/table/TableFilterControlKeyStrokes.js");
 __include("scout/table/TableTooltip.js");
 __include("scout/table/editor/CellEditorPopup.js");
+__include("scout/table/editor/CellEditorPopupLayout.js");
 __include("scout/table/editor/CellEditorPopupKeyStrokeAdapter.js");
 // Desktop
 __include("scout/tree/Tree.js");

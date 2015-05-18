@@ -18,6 +18,8 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   this.$container.addClass('cell-editor-popup');
   this.$container.data('popup', this);
   this.$body.addClass('cell-editor-popup-body');
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(new scout.CellEditorPopupLayout(this));
 
   field.render(this.$container);
   this.addChild(field);
@@ -40,7 +42,6 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   if (field.$field) {
     field.$field.addClass('cell-editor-field');
   }
-  this.alignTo();
 
   this._rowOrderChangedFunc = function(event) {
     if (event.animating) {
@@ -65,19 +66,14 @@ scout.CellEditorPopup.prototype._remove = function() {
 };
 
 scout.CellEditorPopup.prototype.alignTo = function(event) {
-  //FIXME CGU eigentlich in PopupLayout, hier invalidate aufrufen?
   var cellBounds, rowBounds,
     $tableData = this.table.$data,
-    field = this.cell.field,
     $row = this.row.$row,
     $cell = this.table.$cell(this.column, $row);
 
   cellBounds = scout.graphics.bounds($cell, false, true);
   rowBounds = scout.graphics.bounds($row, false, true);
   this.setLocation(new scout.Point($tableData.scrollLeft() + cellBounds.x, $tableData.scrollTop() + rowBounds.y));
-  scout.graphics.setSize(this.$container, cellBounds.width, rowBounds.height);
-  scout.graphics.setSize(field.$container, cellBounds.width, rowBounds.height);
-  scout.HtmlComponent.get(field.$container).layout();
 };
 
 scout.CellEditorPopup.prototype.completeEdit = function() {
