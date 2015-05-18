@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 import org.eclipse.scout.commons.beans.FastBeanInfo;
 
 /**
- * This annotation is used to mark bean properties to be ignored in certain translations. This annotation must be places
+ * This annotation is used to mark bean properties to be ignored in certain translations. This annotation must be placed
  * on the getter method of the bean property. Classes like {@link FastBeanInfo} do not have any knowledge about this
  * annotation. The user of {@link FastBeanInfo} and similar must check the annotation on the reader (getter) method.
  */
