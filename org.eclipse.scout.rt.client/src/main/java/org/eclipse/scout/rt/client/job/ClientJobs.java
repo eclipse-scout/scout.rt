@@ -293,13 +293,6 @@ public final class ClientJobs {
   }
 
   /**
-   * Returns <code>true</code> if the current Future belongs to a client job.
-   */
-  public static boolean isClientJob() {
-    return ClientJobs.isClientJob(IFuture.CURRENT.get());
-  }
-
-  /**
    * Returns <code>true</code> if the given Future belongs to a client job.
    */
   public static boolean isClientJob(final IFuture<?> future) {

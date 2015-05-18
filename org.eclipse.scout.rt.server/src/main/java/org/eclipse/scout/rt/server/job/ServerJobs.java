@@ -293,13 +293,6 @@ public final class ServerJobs {
   }
 
   /**
-   * Returns <code>true</code> if the current Future belongs to a server job.
-   */
-  public static boolean isServerJob() {
-    return ServerJobs.isServerJob(IFuture.CURRENT.get());
-  }
-
-  /**
    * Returns <code>true</code> if the given Future belongs to a server job.
    */
   public static boolean isServerJob(final IFuture<?> future) {

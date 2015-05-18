@@ -29,7 +29,7 @@ import javax.swing.JRootPane;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 
-import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 
 /**
@@ -113,7 +113,7 @@ public class SwingBusyIndicator {
    * <p>
    * This method is normally called while a {@link #showWhile(Runnable)} is running.
    */
-  public void startBlocking(IFuture<?> monitor) {
+  public void startBlocking(IRunMonitor monitor) {
     setBlocking(monitor);
   }
 
@@ -147,7 +147,7 @@ public class SwingBusyIndicator {
         });
   }
 
-  private void setBlocking(final IFuture<?> monitor) {
+  private void setBlocking(final IRunMonitor monitor) {
     SwingUtilities.invokeLater(
         new Runnable() {
           @Override
@@ -225,7 +225,7 @@ public class SwingBusyIndicator {
     return true;
   }
 
-  private void setBlocking0(RootPaneContainer r, IFuture<?> monitor) {
+  private void setBlocking0(RootPaneContainer r, IRunMonitor monitor) {
     JRootPane rootPane = r.getRootPane();
     if (rootPane == null) {
       return;
@@ -249,7 +249,7 @@ public class SwingBusyIndicator {
   private static class BusyGlassPane extends JPanel {
     private static final long serialVersionUID = 1L;
 
-    private IFuture<?> m_monitor;
+    private IRunMonitor m_monitor;
     private String m_blockingMessage;
     private Rectangle m_messageRect;
 
@@ -260,7 +260,7 @@ public class SwingBusyIndicator {
       addMouseListener(new MouseAdapter() {
         @Override
         public void mousePressed(MouseEvent e) {
-          IFuture<?> mon = m_monitor;
+          IRunMonitor mon = m_monitor;
           if (mon == null) {
             JComponent busyClickable = getBusyClickable(e);
             if (busyClickable != null) {
@@ -271,7 +271,7 @@ public class SwingBusyIndicator {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-          IFuture<?> mon = m_monitor;
+          IRunMonitor mon = m_monitor;
           if (mon == null) {
             JComponent busyClickable = getBusyClickable(e);
             if (busyClickable != null) {
@@ -282,7 +282,7 @@ public class SwingBusyIndicator {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-          IFuture<?> mon = m_monitor;
+          IRunMonitor mon = m_monitor;
           JComponent busyClickable = getBusyClickable(e);
           if (mon == null) {
             if (busyClickable != null) {
@@ -327,7 +327,7 @@ public class SwingBusyIndicator {
       c.dispatchEvent(retargetEvent);
     }
 
-    public void block(IFuture<?> monitor) {
+    public void block(IRunMonitor monitor) {
       m_monitor = monitor;
       m_blockingMessage = SwingUtility.getNlsText("BusyBlockingMessage");
       repaint();

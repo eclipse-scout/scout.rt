@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.busy.BusyJob;
 import org.eclipse.scout.rt.client.busy.IBusyHandler;
-import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.context.IRunMonitor;
 
 /**
  * Swing default shows the status bar using {@link IWorkbenchWindow#run(boolean, boolean, IRunnableWithProgress)} when
@@ -54,7 +54,7 @@ public class SwingBusyJob extends BusyJob {
 
   @Override
   protected void runBlocking() {
-    SwingBusyIndicator.getInstance().startBlocking(IFuture.CURRENT.get());
+    SwingBusyIndicator.getInstance().startBlocking(IRunMonitor.CURRENT.get());
     super.runBlocking();
   }
 }
