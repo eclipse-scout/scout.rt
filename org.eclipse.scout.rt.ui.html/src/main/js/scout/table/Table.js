@@ -1089,6 +1089,7 @@ scout.Table.prototype._onRowsUpdated = function(rows) {
     // Replace old row
     this._initRow(updatedRow);
     scout.arrays.replace(this.rows, oldRow, updatedRow);
+    scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
 
     // Replace old $row
     if (this.rendered && oldRow.$row) {

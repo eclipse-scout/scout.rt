@@ -1194,6 +1194,85 @@ describe("Table", function() {
       });
     });
 
+    describe("rowsUpdated event", function() {
+      var model, table, row0;
+
+      function createRowsUpdatedEvent(model, rows) {
+        return {
+          target: model.id,
+          rows: rows,
+          type: 'rowsUpdated'
+        };
+      }
+
+      beforeEach(function() {
+        model = helper.createModelFixture(2, 2);
+        model.rows[0].cells[0].text = 'cellText0';
+        model.rows[0].cells[1].text = 'cellText1';
+        table = helper.createTable(model);
+      });
+
+      it("updates the model cell texts", function() {
+        expect(table.rows[0].cells[0].text).toBe('cellText0');
+        expect(table.rows[0].cells[1].text).toBe('cellText1');
+
+        var row = {
+          id: table.rows[0].id,
+          cells: ['newCellText0', 'newCellText1']
+        };
+        var message = {
+          events: [createRowsUpdatedEvent(model, [row])]
+        };
+        session._processSuccessResponse(message);
+
+        expect(table.rows[0].cells[0].text).toBe('newCellText0');
+        expect(table.rows[0].cells[1].text).toBe('newCellText1');
+      });
+
+      it("updates the html cell texts", function() {
+        table.render(session.$entryPoint);
+        var $rows = table.$rows();
+        var $cells0 = table.$cellsForRow($rows.eq(0));
+        expect($cells0.eq(0).text()).toBe('cellText0');
+        expect($cells0.eq(1).text()).toBe('cellText1');
+
+        var row = {
+          id: table.rows[0].id,
+          cells: ['newCellText0', 'newCellText1']
+        };
+        var message = {
+          events: [createRowsUpdatedEvent(model, [row])]
+        };
+        session._processSuccessResponse(message);
+
+        $rows = table.$rows();
+        $cells0 = table.$cellsForRow($rows.eq(0));
+        expect($cells0.eq(0).text()).toBe('newCellText0');
+        expect($cells0.eq(1).text()).toBe('newCellText1');
+      });
+
+
+      it("does not destroy selection", function() {
+        table.selectedRows = [table.rows[0]];
+        table.render(session.$entryPoint);
+
+        expect($('.selected').length).toBe(1);
+        expect($('.selected')[0]).toBe(table.selectedRows[0].$row[0]);
+        var row = {
+          id: table.rows[0].id,
+          cells: ['newCellText0', 'newCellText1']
+        };
+        var message = {
+          events: [createRowsUpdatedEvent(model, [row])]
+        };
+        session._processSuccessResponse(message);
+
+        expect($('.selected').length).toBe(1);
+        expect($('.selected')[0]).toBe(table.selectedRows[0].$row[0]);
+      });
+
+    });
+
     describe("columnStructureChanged event", function() {
       var model, table, column0, column1, column2;
 
