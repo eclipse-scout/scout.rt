@@ -22,6 +22,7 @@
     <module>../org.eclipse.scout.commons</module>
     <module>../org.eclipse.scout.rt.server.commons</module>
     <module>../org.eclipse.scout.rt.server.jaxws</module>
+    <module>../org.eclipse.scout.jaxws.apt</module> <!-- Annotation processing to generate WS artefacts like PortTypeProxy or HandlerProxy -->
     <module>../org.eclipse.scout.jaxws216</module>
     <!-- FIXME abr the two modules depend on a particular java rt.jar. -->
     <!-- module>../org.eclipse.scout.jaxws216.jre17.fragment</module -->
