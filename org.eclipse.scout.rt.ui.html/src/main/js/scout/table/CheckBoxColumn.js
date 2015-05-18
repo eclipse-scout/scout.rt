@@ -47,9 +47,7 @@ scout.CheckBoxColumn.prototype.onMouseUp = function(event, $row) {
     $target = $(event.target);
 
   if (this.isCheckableColumn()) {
-    if ($target.is('.check-box') && $target.parent().hasClass('checkable')) {
-      this.table.checkRow(row, !row.checked);
-    }
+    this.table.checkRow(row, !row.checked);
   } else {
     // editable column behaviour -> server will handle the click, see AbstractTable#interceptRowClickSingleObserver
     // don't call super, no need to send a prepareEdit
@@ -64,7 +62,3 @@ scout.CheckBoxColumn.prototype.onMouseUp = function(event, $row) {
 scout.CheckBoxColumn.prototype.isCheckableColumn = function() {
   return this.table.checkableColumn === this;
 };
-
-//scout.CheckBoxColumn.prototype.startCellEdit = function(row, fieldId) {
-//FIXME CGU create checkbox celleditor popup, copy table-cell into popup and add space-listener.
-//};

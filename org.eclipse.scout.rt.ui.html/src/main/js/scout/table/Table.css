@@ -127,6 +127,12 @@
   &.checkable {
     /* same padding for left and right, it's by purpose */
     padding: @table-row-padding-y - @checkable-cell-padding-adjustment @table-cell-padding-left 0 @table-cell-padding-left;
+    cursor: pointer;
+  }
+
+  &.checkable.disabled,
+  .table.disabled > .table-data > .table-row > &.checkable {
+    cursor: default;
   }
 
   & > .check-box::before {
@@ -134,14 +140,12 @@
     display: inline-block;
     width: @check-box-size;
     height: @check-box-size;
-    cursor: pointer;
     .checkboxLabelBeforeBorder;
   }
   & > .check-box.checked::before {
     .checkboxLabelBeforeChecked;
   }
   & > .check-box.disabled::before {
-    cursor: default;
     .checkboxLabelBeforeDisabled;
   }
 }
