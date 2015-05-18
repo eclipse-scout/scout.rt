@@ -12,6 +12,7 @@ package org.eclipse.scout.jaxws.service;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -88,11 +90,10 @@ public abstract class AbstractWebServiceClient<S extends Service, P> extends Abs
   private Class<? extends Service> m_serviceClazz;
   private Class<?> m_portTypeClazz;
 
-  @SuppressWarnings("unchecked")
   @Override
   public void initializeService(ServiceRegistration registration) {
-    m_serviceClazz = (Class<? extends Service>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-    m_portTypeClazz = (Class<?>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+    m_serviceClazz = getConfiguredServiceClass();
+    m_portTypeClazz = getConfiguredPortClass();
     m_webServiceClientAnnotation = m_serviceClazz.getAnnotation(WebServiceClient.class);
 
     if (m_webServiceClientAnnotation == null) {
@@ -112,6 +113,22 @@ public abstract class AbstractWebServiceClient<S extends Service, P> extends Abs
     setPassword(getConfiguredPassword());
     setConnectTimeout(getConfiguredConnectTimeout());
     setRequestTimeout(getConfiguredRequestTimeout());
+  }
+
+  /**
+   * Overwrite to configure a specific service class. By default, the super hierarchy is looked for the service type in
+   * the generic type declaration.
+   */
+  protected Class<S> getConfiguredServiceClass() {
+    return this.<S> findGenericTypeArguments(getClass())[0];
+  }
+
+  /**
+   * Overwrite to configure a specific port class. By default, the super hierarchy is looked for the port type in
+   * the generic type declaration.
+   */
+  protected Class<P> getConfiguredPortClass() {
+    return this.<P> findGenericTypeArguments(getClass())[1];
   }
 
   /**
@@ -445,5 +462,26 @@ public abstract class AbstractWebServiceClient<S extends Service, P> extends Abs
   @Override
   public void setUrl(String url) {
     m_url = url;
+  }
+
+  /**
+   * Finds the generic type arguments in the super hierarchy of the actual class.
+   */
+  protected <T> Class<T>[] findGenericTypeArguments(final Type type) {
+    Type candidate = getClass().getGenericSuperclass();
+
+    // Find the class which declares the generic parameters.
+    while (!(candidate instanceof ParameterizedType)) {
+      candidate = ((Class<?>) candidate).getGenericSuperclass();
+    }
+
+    if (!(candidate instanceof ParameterizedType)) {
+      throw new IllegalArgumentException("Unexpected: no parameterized type found in super hierarchy of " + getClass().getName());
+
+    }
+
+    @SuppressWarnings("unchecked")
+    final Class<T>[] types = TypeCastUtility.castValue(((ParameterizedType) candidate).getActualTypeArguments(), Class[].class);
+    return types;
   }
 }
