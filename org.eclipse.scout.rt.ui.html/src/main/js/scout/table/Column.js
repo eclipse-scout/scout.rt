@@ -48,9 +48,6 @@ scout.Column.prototype._cssClass = function(row, cell) {
   if (!this.table.multilineText || !this.textWrap) {
     cssClass += ' white-space-nowrap';
   }
-  if (!row.enabled) {
-    cssClass +=' disabled';
-  }
   if (!cell) {
     // gui only columns don't have cells
     return cssClass;
