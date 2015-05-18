@@ -91,6 +91,15 @@ scout.Widget.prototype.layout = function() {
   this.htmlComp.layout();
 };
 
+/**
+ * Calls invalidateTree of this.htmlComp, but only if the widget is already rendered.
+ */
+scout.Widget.prototype.invalidateTree = function() {
+  if (this.rendered) {
+    this.htmlComp.invalidateTree();
+  }
+};
+
 //--- Event handling methods ---
 
 /**

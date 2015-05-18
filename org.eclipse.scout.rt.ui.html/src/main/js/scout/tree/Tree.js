@@ -161,7 +161,8 @@ scout.Tree.prototype.onResize = function() {
 
 scout.Tree.prototype.updateScrollbar = function() {
   scout.scrollbars.update(this.$data);
-  this.htmlComp.invalidateTree();
+  //FIXME do not call invalidateTree here, replace updateScrollbar with invalidateTree instead, see Table.js
+  this.invalidateTree();
 };
 
 scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, checkChildrenChecked) {

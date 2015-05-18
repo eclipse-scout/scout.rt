@@ -496,7 +496,7 @@ scout.Table.prototype._installRows = function($rows) {
   this._triggerRowsDrawn($rows);
   $selectedRows = this.selectionHandler.dataDrawn();
   this._triggerRowsSelected($selectedRows);
-  this.htmlComp.invalidateTree();
+  this.invalidateTree();
 
   // update grouping if data was grouped
   this._group();
@@ -1161,7 +1161,7 @@ scout.Table.prototype._deleteRows = function(rows) {
   }.bind(this));
 
   if (invalidate) {
-    this.htmlComp.invalidateTree();
+    this.invalidateTree();
   }
 };
 
@@ -1187,7 +1187,7 @@ scout.Table.prototype._deleteAllRows = function() {
     }
 
     this.drawData();
-    this.htmlComp.invalidateTree();
+    this.invalidateTree();
   }
 };
 
@@ -1683,9 +1683,7 @@ scout.Table.prototype._renderTableHeader = function() {
     this.header.remove();
     this.header = null;
   }
-  if (this.rendered) {
-    this.htmlComp.invalidateTree();
-  }
+  this.invalidateTree();
 };
 
 scout.Table.prototype._renderTableFooter = function() {
@@ -1700,9 +1698,7 @@ scout.Table.prototype._renderTableFooter = function() {
     this.footer.remove();
     this.footer = null;
   }
-  if (this.rendered) {
-    this.htmlComp.invalidateTree();
-  }
+  this.invalidateTree();
 };
 
 scout.Table.prototype._renderEnabled = function() {
@@ -1729,8 +1725,8 @@ scout.Table.prototype._renderMultilineText = function() {
 };
 
 scout.Table.prototype._renderAutoResizeColumns = function() {
-  if (this.autoResizeColumns && this.rendered) {
-    this.htmlComp.invalidateTree();
+  if (this.autoResizeColumns) {
+    this.invalidateTree();
   }
 };
 
