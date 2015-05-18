@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,7 @@ package org.eclipse.scout.jaxws.service;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -59,7 +61,7 @@ import com.sun.xml.internal.ws.client.BindingProviderProperties;
  * {@link AbstractWebServiceClient#getConfiguredUrl()}. If it is about a dynamic URL, it also can be set at runtime when
  * obtaining the port type.</li>
  * </ul>
- * 
+ *
  * @param <S>
  *          The service to be proxied. The service is unique among all services defined within in the enclosing WSDL
  *          document and groups a set of related ports together.
@@ -88,11 +90,10 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
   private Class<? extends Service> m_serviceClazz;
   private Class<?> m_portTypeClazz;
 
-  @SuppressWarnings("unchecked")
   @Override
   public void initializeService(ServiceRegistration registration) {
-    m_serviceClazz = (Class<? extends Service>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-    m_portTypeClazz = (Class<?>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+    m_serviceClazz = getConfiguredServiceClass();
+    m_portTypeClazz = getConfiguredPortClass();
     m_webServiceClientAnnotation = m_serviceClazz.getAnnotation(WebServiceClient.class);
 
     if (m_webServiceClientAnnotation == null) {
@@ -115,11 +116,27 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
   }
 
   /**
+   * Overwrite to configure a specific service class. By default, the super hierarchy is looked for the service type in
+   * the generic type declaration.
+   */
+  protected Class<S> getConfiguredServiceClass() {
+    return this.<S> findGenericTypeArguments(getClass())[0];
+  }
+
+  /**
+   * Overwrite to configure a specific port class. By default, the super hierarchy is looked for the port type in
+   * the generic type declaration.
+   */
+  protected Class<P> getConfiguredPortClass() {
+    return this.<P> findGenericTypeArguments(getClass())[1];
+  }
+
+  /**
    * To get the service stub specified by generic type parameter {@link S}.<br/>
    * Please be in mind, that the endpoint URL is set on port type level. Therefore, when working directly on the
    * service, you have to set the endpoint URL manually when calling the service. <br/>
    * By using {@link AbstractWebServiceClient#getPortType()}, the URL is set accordingly.
-   * 
+   *
    * @return
    */
   @SuppressWarnings("unchecked")
@@ -174,7 +191,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To get the port type specified by generic type parameter {@link P}.
-   * 
+   *
    * @return
    */
   public P getPortType() {
@@ -183,7 +200,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To get the port type specified by generic type parameter {@link P}.
-   * 
+   *
    * @param url
    *          {@link URL} to connect with endpoint. Do not use this method to distinguish between development and
    *          production {@link URL}. Use property in config.ini instead.
@@ -216,7 +233,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
   /**
    * To be overwritten if WSDL file is located somewhere else than specified in {@link WebServiceClient#wsdlLocation()}.
    * This location can be specified when generating the stub with the option -wsdllocation.
-   * 
+   *
    * @return URL to WSDL file
    */
   @ConfigProperty(ConfigProperty.OBJECT)
@@ -236,7 +253,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To configure a static endpoint URL
-   * 
+   *
    * @return
    */
   @ConfigProperty(ConfigProperty.STRING)
@@ -247,7 +264,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To be overwritten if service name to be called is different from {@link WebServiceClient#name()} in {@link Service}
-   * 
+   *
    * @return unqualified service name to be called.
    */
   @Order(40)
@@ -258,7 +275,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
   /**
    * To be overwritten if targetNamespace of service to be called is different from
    * {@link WebServiceClient#targetNamespace()} in {@link Service}
-   * 
+   *
    * @return
    */
   @Order(50)
@@ -268,7 +285,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To configure a static user's credential
-   * 
+   *
    * @return
    */
   @ConfigProperty(ConfigProperty.STRING)
@@ -279,7 +296,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To configure a static user's credential
-   * 
+   *
    * @return
    */
   @ConfigProperty(ConfigProperty.STRING)
@@ -290,7 +307,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To configure the maximum timeout in milliseconds to wait for the connection to be established.
-   * 
+   *
    * @See {@link HttpURLConnection#setConnectTimeout(int)}
    * @return the maximal timeout to wait for the connection to be established.
    */
@@ -302,7 +319,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To configure the maximum timeout in milliseconds to wait for response data to be ready to be read.
-   * 
+   *
    * @See {@link HttpURLConnection#setReadTimeout(int)}
    * @return the maximal timeout to wait for response data to be ready to be read.
    */
@@ -314,7 +331,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * Is called before the authentication handler is installed.
-   * 
+   *
    * @param authenticationHandler
    *          the authentication handler
    * @return true to install the authentication handler or false to not install it
@@ -328,7 +345,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * Add custom handlers to the handler chain
-   * 
+   *
    * @param handlers
    *          handlers to be installed
    * @throws ProcessingException
@@ -445,5 +462,26 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
   @Override
   public void setUrl(String url) {
     m_url = url;
+  }
+
+  /**
+   * Finds the generic type arguments in the super hierarchy of the actual class.
+   */
+  protected <T> Class<T>[] findGenericTypeArguments(final Type type) {
+    Type candidate = getClass().getGenericSuperclass();
+
+    // Find the class which declares the generic parameters.
+    while (!(candidate instanceof ParameterizedType)) {
+      candidate = ((Class<?>) candidate).getGenericSuperclass();
+    }
+
+    if (!(candidate instanceof ParameterizedType)) {
+      throw new IllegalArgumentException("Unexpected: no parameterized type found in super hierarchy of " + getClass().getName());
+
+    }
+
+    @SuppressWarnings("unchecked")
+    final Class<T>[] types = TypeCastUtility.castValue(((ParameterizedType) candidate).getActualTypeArguments(), Class[].class);
+    return types;
   }
 }
