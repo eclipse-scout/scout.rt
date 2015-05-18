@@ -9,7 +9,7 @@ scout.OutlineKeyStrokeAdapter = function(field) {
 scout.inherits(scout.OutlineKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
 scout.OutlineKeyStrokeAdapter.prototype.accept = function(event) {
-  if ($('.glasspane').length > 0) {
+  if ($('div.glasspane').length > 0) {
     return false;
   }
   return true;
