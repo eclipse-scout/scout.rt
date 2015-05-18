@@ -42,6 +42,8 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   if (field.$field) {
     field.$field.addClass('cell-editor-field');
   }
+  // Make sure cell content is not visible while the editor is open (especially necessary for transparent editors like checkboxes)
+  this.$anchor.css('visibility', 'hidden');
 
   this._rowOrderChangedFunc = function(event) {
     if (event.animating) {
@@ -63,13 +65,14 @@ scout.CellEditorPopup.prototype._remove = function() {
   scout.CellEditorPopup.parent.prototype._remove.call(this);
   this.table.events.off(scout.Table.GUI_EVENT_ROW_ORDER_CHANGED, this._rowOrderChangedFunc);
   this.table.$container.removeClass('focused');
+  this.$anchor.css('visibility', '');
 };
 
 scout.CellEditorPopup.prototype.alignTo = function(event) {
   var cellBounds, rowBounds,
     $tableData = this.table.$data,
     $row = this.row.$row,
-    $cell = this.table.$cell(this.column, $row);
+    $cell = this.$anchor;
 
   cellBounds = scout.graphics.bounds($cell, false, true);
   rowBounds = scout.graphics.bounds($row, false, true);

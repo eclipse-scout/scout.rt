@@ -19,7 +19,7 @@ scout.CellEditorPopupLayout.prototype.layout = function($container) {
 scout.CellEditorPopupLayout.prototype.preferredLayoutSize = function($container) {
   var cellBounds, rowBounds,
     $row = this.cellEditorPopup.row.$row,
-    $cell = this.cellEditorPopup.table.$cell(this.cellEditorPopup.column, $row);
+    $cell = this.cellEditorPopup.$anchor;
 
   cellBounds = scout.graphics.bounds($cell, false, true);
   rowBounds = scout.graphics.bounds($row, false, true);
