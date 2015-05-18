@@ -357,6 +357,25 @@ describe("Table", function() {
       expect(table.columns[1].width).toBe(350);
     });
 
+    it("does not make the column smaller than a minimum size", function() {
+      var model = helper.createModelFixture(2);
+      model.columns[0].initialWidth = 1000;
+      model.columns[1].initialWidth = 10;
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+      table.$data.width(450);
+
+      var event = createPropertyChangeEvent(table, {
+        "autoResizeColumns": true
+      });
+      table.onModelPropertyChange(event);
+
+      // Triggers TableLayout._layoutColumns()
+      session.layoutValidator.validate();
+
+      expect(table.columns[0].width).toBe(420);
+      expect(table.columns[1].width).toBe(scout.Table.COLUMN_MIN_WIDTH);
+    });
 
   });
 

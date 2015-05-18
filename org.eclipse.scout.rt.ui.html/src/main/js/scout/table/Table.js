@@ -33,6 +33,8 @@ scout.Table.GUI_EVENT_ROWS_FILTERED = 'rowsFiltered';
 scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
 scout.Table.GUI_EVENT_ROW_ORDER_CHANGED = 'rowOrderChanged';
 
+scout.Table.COLUMN_MIN_WIDTH = 30;
+
 scout.Table.prototype.init = function(model, session) {
   scout.Table.parent.prototype.init.call(this, model, session);
 
@@ -83,7 +85,7 @@ scout.Table.prototype._syncMenus = function(menus){
 
 scout.Table.prototype._insertCheckBoxColumn = function() {
   var column = new scout.CheckBoxColumn(),
-    columnWidth = 30;
+    columnWidth = scout.Table.COLUMN_MIN_WIDTH;
   column.init();
   column.table = this;
   column.fixedWidth = true;
