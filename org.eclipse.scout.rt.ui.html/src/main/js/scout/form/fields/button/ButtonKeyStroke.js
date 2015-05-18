@@ -19,6 +19,16 @@ scout.ButtonKeyStroke.prototype.handle = function(event) {
   }
 };
 
+/**
+ * @Override scout.Action
+ */
+scout.ButtonKeyStroke.prototype.accept = function(event){
+    if(!jQuery.contains(document.documentElement, this._button.$field[0])){
+      return false;
+    }
+    scout.ButtonKeyStroke.parent.prototype.accept.call(this, event);
+};
+
 scout.ButtonKeyStroke.prototype._drawKeyBox = function($container) {
   if (this._button.$container && this._button.enabled && this._button.visible) {
     var keyBoxText = scout.codesToKeys[this.keyStrokeKeyPart];
