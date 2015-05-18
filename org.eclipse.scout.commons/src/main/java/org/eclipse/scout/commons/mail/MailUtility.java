@@ -51,6 +51,7 @@ import org.eclipse.scout.commons.RFCWrapperPart;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.resource.BinaryResource;
 
 public class MailUtility {
 
@@ -382,6 +383,8 @@ public class MailUtility {
 
   /**
    * Adds the provided attachments to the existing mime message.
+   * <p>
+   * When working with {@link BinaryResource}, use {@link #addResourcesAsAttachments(MimeMessage, List)} instead.
    *
    * @param msg
    *          Mime message to attach files to
@@ -396,47 +399,7 @@ public class MailUtility {
     }
 
     try {
-      Object messageContent = msg.getContent();
-
-      Multipart multiPart = null;
-      if (messageContent instanceof Multipart && StringUtility.contains(((Multipart) messageContent).getContentType(), "multipart/mixed")) {
-        // already contains attachments
-        // use the existing multipart
-        multiPart = (Multipart) messageContent;
-      }
-      else if (messageContent instanceof Multipart) {
-        MimeBodyPart multiPartBody = new MimeBodyPart();
-        multiPartBody.setContent((Multipart) messageContent);
-
-        multiPart = new MimeMultipart(); //mixed
-        msg.setContent(multiPart);
-
-        multiPart.addBodyPart(multiPartBody);
-      }
-      else if (messageContent instanceof String) {
-        MimeBodyPart multiPartBody = new MimeBodyPart();
-        String message = (String) messageContent;
-
-        String contentTypeHeader = StringUtility.join(" ", msg.getHeader(CONTENT_TYPE_ID));
-        if (StringUtility.contains(contentTypeHeader, "html")) {
-          // html
-          multiPartBody.setContent(message, MailUtility.CONTENT_TYPE_TEXT_HTML);
-          multiPartBody.setHeader(CONTENT_TYPE_ID, MailUtility.CONTENT_TYPE_TEXT_HTML);
-          multiPartBody.setHeader(CONTENT_TRANSFER_ENCODING_ID, QUOTED_PRINTABLE);
-        }
-        else {
-          // plain text
-          multiPartBody.setText(message);
-        }
-
-        multiPart = new MimeMultipart(); //mixed
-        msg.setContent(multiPart);
-
-        multiPart.addBodyPart(multiPartBody);
-      }
-      else {
-        throw new ProcessingException("Unsupported mime message format. Unable to add attachments.");
-      }
+      Multipart multiPart = prepareMessageForAttachments(msg);
 
       for (File attachment : attachments) {
         MimeBodyPart bodyPart = new MimeBodyPart();
@@ -453,6 +416,98 @@ public class MailUtility {
     catch (IOException e) {
       throw new ProcessingException("Failed to add attachment to existing mime message", e);
     }
+  }
+
+  /**
+   * Adds the provided attachments to the existing mime message.
+   * <p>
+   * When working with {@link File}, use {@link #addAttachmentsToMimeMessage(MimeMessage, List)} instead.
+   *
+   * @param msg
+   *          Mime message to attach files to
+   * @param attachments
+   *          List of attachments (binary resources).
+   * @throws ProcessingException
+   * @since 6.0
+   */
+  public static void addResourcesAsAttachments(MimeMessage msg, List<BinaryResource> attachments) throws ProcessingException {
+    if (CollectionUtility.isEmpty(attachments)) {
+      return;
+    }
+
+    try {
+      Multipart multiPart = prepareMessageForAttachments(msg);
+
+      for (BinaryResource attachment : attachments) {
+        MimeBodyPart bodyPart = new MimeBodyPart();
+        DataSource source = new BinaryResourceDataSource(attachment);
+        bodyPart.setDataHandler(new DataHandler(source));
+        bodyPart.setFileName(MimeUtility.encodeText(attachment.getFilename(), "UTF-8", null));
+        multiPart.addBodyPart(bodyPart);
+      }
+      msg.saveChanges();
+    }
+    catch (MessagingException e) {
+      throw new ProcessingException("Failed to add attachment to existing mime message", e);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Failed to add attachment to existing mime message", e);
+    }
+  }
+
+  /**
+   * Prepares the mime message so that attachments can be added to the returned {@link Multipart}.
+   *
+   * @param msg
+   *          Mime message to prepare
+   * @return Multipart to which attachments can be added
+   * @throws IOException
+   * @throws MessagingException
+   * @throws ProcessingException
+   */
+  private static Multipart prepareMessageForAttachments(MimeMessage msg) throws IOException, MessagingException, ProcessingException {
+    Object messageContent = msg.getContent();
+
+    Multipart multiPart = null;
+    if (messageContent instanceof Multipart && StringUtility.contains(((Multipart) messageContent).getContentType(), "multipart/mixed")) {
+      // already contains attachments
+      // use the existing multipart
+      multiPart = (Multipart) messageContent;
+    }
+    else if (messageContent instanceof Multipart) {
+      MimeBodyPart multiPartBody = new MimeBodyPart();
+      multiPartBody.setContent((Multipart) messageContent);
+
+      multiPart = new MimeMultipart(); //mixed
+      msg.setContent(multiPart);
+
+      multiPart.addBodyPart(multiPartBody);
+    }
+    else if (messageContent instanceof String) {
+      MimeBodyPart multiPartBody = new MimeBodyPart();
+      String message = (String) messageContent;
+
+      String contentTypeHeader = StringUtility.join(" ", msg.getHeader(CONTENT_TYPE_ID));
+      if (StringUtility.contains(contentTypeHeader, "html")) {
+        // html
+        multiPartBody.setContent(message, MailUtility.CONTENT_TYPE_TEXT_HTML);
+        multiPartBody.setHeader(CONTENT_TYPE_ID, MailUtility.CONTENT_TYPE_TEXT_HTML);
+        multiPartBody.setHeader(CONTENT_TRANSFER_ENCODING_ID, QUOTED_PRINTABLE);
+      }
+      else {
+        // plain text
+        multiPartBody.setText(message);
+      }
+
+      multiPart = new MimeMultipart(); //mixed
+      msg.setContent(multiPart);
+
+      multiPart.addBodyPart(multiPartBody);
+    }
+    else {
+      throw new ProcessingException("Unsupported mime message format. Unable to add attachments.");
+    }
+    return multiPart;
   }
 
   /**
@@ -557,4 +612,5 @@ public class MailUtility {
       ScoutLogManager.getLogger(MailUtility.class).warn("Failed fixing MailcapComandMap string handling: " + t);
     }
   }
+
 }

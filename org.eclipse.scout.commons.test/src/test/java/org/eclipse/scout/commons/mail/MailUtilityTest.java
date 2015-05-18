@@ -39,6 +39,7 @@ import javax.mail.util.ByteArrayDataSource;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.resource.BinaryResource;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -229,6 +230,41 @@ public class MailUtilityTest {
     attachments.add(IOUtility.createTempFile("sample2.dat", sampleData));
     attachments.add(IOUtility.createTempFile("sample3_öüä.dat", sampleData));
     MailUtility.addAttachmentsToMimeMessage(message, attachments);
+
+    // verify added attachments in java instance
+    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", "UTF-8", null));
+
+    // store and recreate mime message (byte[])
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    message.writeTo(bos);
+    message = MailUtility.createMessageFromBytes(bos.toByteArray());
+
+    // verify new instance
+    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", "UTF-8", null));
+  }
+
+  @Test
+  public void testAddResourcesAsAttachments() throws ProcessingException, IOException, MessagingException {
+    // create html mime message without attachments
+    final String plainText = "plain text";
+    final String html = "<html><body><p>plain text</p></html>";
+    MailMessage definition = new MailMessage(plainText, html);
+    MimeMessage message = MailUtility.createMimeMessage(definition);
+    verifyMimeMessage(message, plainText, html /* no attachments*/);
+
+    // add no attachments
+    MailUtility.addAttachmentsToMimeMessage(message, null);
+    verifyMimeMessage(message, plainText, html);
+    MailUtility.addAttachmentsToMimeMessage(message, new ArrayList<File>());
+    verifyMimeMessage(message, plainText, html);
+
+    // add 3 attachments to mime message
+    final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
+    List<BinaryResource> attachments = new ArrayList<BinaryResource>();
+    attachments.add(new BinaryResource("sample1.dat", sampleData));
+    attachments.add(new BinaryResource("sample2.dat", sampleData));
+    attachments.add(new BinaryResource("sample3_öüä.dat", sampleData));
+    MailUtility.addResourcesAsAttachments(message, attachments);
 
     // verify added attachments in java instance
     verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", "UTF-8", null));
