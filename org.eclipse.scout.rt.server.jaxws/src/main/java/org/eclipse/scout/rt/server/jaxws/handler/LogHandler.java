@@ -1,0 +1,115 @@
+/*******************************************************************************
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.server.jaxws.handler;
+
+import java.util.Collections;
+import java.util.Set;
+
+import javax.xml.namespace.QName;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+
+import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConstants;
+import org.eclipse.scout.rt.server.jaxws.MessageContexts;
+
+/**
+ * Handler to log SOAP messages.
+ */
+@ApplicationScoped
+public class LogHandler implements SOAPHandler<SOAPMessageContext> {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LogHandler.class);
+
+  private boolean m_logDebug;
+
+  public LogHandler() {
+    initConfig();
+  }
+
+  protected void initConfig() {
+    m_logDebug = ConfigIniUtility.getPropertyBoolean(JaxWsConstants.CONFIG_PROP_LOGHANDLER_DEBUG, getConfiguredLogDebug());
+  }
+
+  @Override
+  public final boolean handleMessage(final SOAPMessageContext context) {
+    try {
+      handleLogMessage(context);
+    }
+    catch (final Exception e) {
+      LOG.error("Failed to log SOAP message", e);
+    }
+    return true;
+  }
+
+  @Override
+  public final boolean handleFault(final SOAPMessageContext context) {
+    try {
+      handleLogMessage(context);
+    }
+    catch (final Exception e) {
+      LOG.error("Failed to log SOAP message", e);
+    }
+    return true;
+  }
+
+  @Override
+  public final Set<QName> getHeaders() {
+    return Collections.emptySet();
+  }
+
+  @Override
+  public final void close(final MessageContext messageContext) {
+    // NOOP
+  }
+
+  protected void handleLogMessage(final SOAPMessageContext context) throws Exception {
+    if (!LOG.isDebugEnabled() && !LOG.isInfoEnabled()) {
+      return;
+    }
+    else if (m_logDebug && !LOG.isDebugEnabled()) {
+      return;
+    }
+
+    final String soapMessage = MessageContexts.getSoapMessage(context);
+    final String direction = (MessageContexts.isInboundMessage(context) ? "IN" : "OUT");
+    final QName service = (QName) context.get(SOAPMessageContext.WSDL_SERVICE);
+    final QName port = (QName) context.get(SOAPMessageContext.WSDL_PORT);
+    final QName operation = (QName) context.get(SOAPMessageContext.WSDL_OPERATION);
+
+    if (m_logDebug) {
+      LOG.debug("WS SOAP [service={}, port={}, operation={}, direction={}, message={}]", new Object[]{service, port, operation, direction, soapMessage});
+    }
+    else {
+      LOG.info("WS SOAP [service={}, port={}, operation={}, direction={}, message={}]", new Object[]{service, port, operation, direction, soapMessage});
+    }
+  }
+
+  public boolean isLogDebug() {
+    return m_logDebug;
+  }
+
+  public void setLogDebug(final boolean logDebug) {
+    m_logDebug = logDebug;
+  }
+
+  @Order(10.0)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredLogDebug() {
+    return true;
+  }
+}
