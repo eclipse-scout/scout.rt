@@ -11,9 +11,16 @@
 package org.eclipse.scout.dev.jetty;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Paths;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 public class JettyServer {
@@ -57,7 +64,7 @@ public class JettyServer {
   }
 
   protected WebAppContext createWebApp(File webappDir) throws Exception {
-    WebAppContext webAppContext = new WebAppContext();
+    WebAppContext webAppContext = new P_WebAppContext();
     webAppContext.setThrowUnavailableOnStartupException(true);
     webAppContext.setContextPath("/");
     webAppContext.setResourceBase(webappDir.getAbsolutePath());
@@ -73,5 +80,83 @@ public class JettyServer {
 
     webAppContext.configure();
     return webAppContext;
+  }
+
+  protected class P_WebAppContext extends WebAppContext {
+
+    public P_WebAppContext() {
+      _scontext = new P_Context();
+    }
+
+    /**
+     * Implementation hint: This class must not be an anonymous class and must have 'public' visibility. That is because
+     * some JAX-WS implementors like METRO uses reflection to access it's methods.
+     */
+    public class P_Context extends Context {
+
+      /**
+       * Overwritten to enable resolution of resources contained in other JARs. That is according to the method's
+       * JavaDoc specification: <i>The path must begin with a / and is interpreted as relative to the current
+       * context root, or relative to the /META-INF/resources directory of a JAR file inside the web application's
+       * /WEB-INF/lib directory.</>
+       * 
+       * @see javax.servlet.ServletContext.getResource(String)
+       */
+      @Override
+      public URL getResource(String path) throws MalformedURLException {
+        // 1. Look for a web application resource.
+        URL url = super.getResource(path);
+        if (url != null) {
+          return url;
+        }
+        else {
+          // 2. Look for a dependent JAR resource (relative to META-INF/resources).
+          return getClassLoader().getResource("META-INF/resources" + path);
+        }
+      }
+
+      /**
+       * Overwritten to enable resolution of resources contained in other JARs. That is according to the method's
+       * JavaDoc specification: <i>The path must begin with a / and is interpreted as relative to the current
+       * context root, or relative to the /META-INF/resources directory of a JAR file inside the web application's
+       * /WEB-INF/lib directory.</>
+       * 
+       * @see javax.servlet.ServletContext.getResourcePaths(String)
+       */
+      @Override
+      public Set<String> getResourcePaths(String path) {
+        Set<String> resources = new HashSet<>();
+
+        // Look for resources in the dependent JAR's resources relative to /META-INF/resources.
+        try {
+          Enumeration<URL> urls = getClassLoader().getResources("META-INF/resources" + path);
+          while (urls.hasMoreElements()) {
+            File resource = new File(urls.nextElement().getPath());
+            if (!resource.exists()) {
+              System.err.println("resource not found: " + resource);
+              continue;
+            }
+
+            if (resource.isDirectory()) {
+              String directoryPath = (path.endsWith(URIUtil.SLASH) ? path : path + URIUtil.SLASH);
+              for (String resourceName : resource.list()) {
+                resources.add(directoryPath + resourceName);
+              }
+            }
+            else {
+              resources.add(path);
+            }
+          }
+        }
+        catch (IOException e) {
+          System.err.println("Failed to resolve resources of JARs inside the web application's /WEB-INF/lib directory");
+          e.printStackTrace();
+        }
+
+        // Look for the resource in the web application's resources (higher precedence).
+        resources.addAll(super.getResourcePaths(path));
+        return resources;
+      }
+    }
   }
 }
