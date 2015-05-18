@@ -31,6 +31,10 @@
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
 
+  &.disabled {
+    cursor: default;
+  }
+
   &.sort-asc,
   &.sort-desc {
     /* make room form sort-icon */

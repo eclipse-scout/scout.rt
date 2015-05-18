@@ -36,7 +36,10 @@ scout.TableHeader = function(table, session) {
 
   function onHeaderClick(event) {
     var $header = $(this);
-
+    if ($header.data('column').guiOnlyCheckBoxColumn) {
+      // Header menu actions are not possible for the gui only checkbox column -> don't open it
+      return;
+    }
     if (that.dragging) {
       that.dragging = false;
     } else if (event.shiftKey || event.ctrlKey) {
@@ -85,7 +88,8 @@ scout.TableHeader = function(table, session) {
     var diff = 0,
       startX = event.pageX,
       $header = $(this),
-      oldPos = that.columnIndex($header),
+      column = $header.data('column'),
+      oldPos = that.table.columns.indexOf(column),
       newPos = oldPos,
       move = $header.outerWidth(),
       $otherHeaders = $header.siblings('.header-item');
@@ -163,7 +167,7 @@ scout.TableHeader = function(table, session) {
       var h = (diff < 0) ? $otherHeaders : $($otherHeaders.get().reverse());
       h.each(function(i) {
         if ($(this).css('left') !== '0px') {
-          newPos = that.columnIndex($(this));
+          newPos = that.table.columns.indexOf(($(this).data('column')));
           return false;
         }
       });
@@ -281,11 +285,6 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
   });
 };
 
-scout.TableHeader.prototype.columnIndex = function($header) {
-  // divide index by 2, because after each column $header, there is an additional header-resize div
-  return $header.index() / 2;
-};
-
 scout.TableHeader.prototype.findHeaderItems = function() {
   return this.$container.find('.header-item');
 };
@@ -303,6 +302,9 @@ scout.TableHeader.prototype._decorateHeader = function(column, oldColumnState) {
     $header.removeClass(oldColumnState.headerCssClass);
   }
   $header.addClass(column.headerCssClass);
+  if (column.guiOnlyCheckBoxColumn) {
+    $header.addClass('disabled');
+  }
   this._applyColumnText($header, column);
   this._applyColumnSorting($header, column);
 };

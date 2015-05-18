@@ -145,7 +145,8 @@
   & > .check-box.checked::before {
     .checkboxLabelBeforeChecked;
   }
-  & > .check-box.disabled::before {
+  & > .check-box.disabled::before,
+  .table.disabled > .table-data > .table-row > & > .check-box::before {
     .checkboxLabelBeforeDisabled;
   }
 }

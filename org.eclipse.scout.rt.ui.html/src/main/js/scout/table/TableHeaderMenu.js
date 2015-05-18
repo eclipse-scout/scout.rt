@@ -3,8 +3,8 @@
 
 // FIXME CRU: implement buttons to show/hide, add/remove columns depending on 'custom' property.
 scout.TableHeaderMenu = function(table, $header, x, y, session) {
-  var pos = table.header.columnIndex($header),
-    column = $header.data('column');
+  var column = $header.data('column'),
+    pos = table.columns.indexOf(column);
 
   // label title
   $header.addClass('menu-open');
@@ -227,22 +227,22 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   function moveTop() {
     table.moveColumn(column, pos, 0);
-    pos = table.header.columnIndex($header);
+    pos = table.columns.indexOf(column);
   }
 
   function moveUp() {
     table.moveColumn(column, pos, Math.max(pos - 1, 0));
-    pos = table.header.columnIndex($header);
+    pos = table.columns.indexOf(column);
   }
 
   function moveDown() {
     table.moveColumn(column, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
-    pos = table.header.columnIndex($header);
+    pos = table.columns.indexOf(column);
   }
 
   function moveBottom() {
     table.moveColumn(column, pos, table.header.findHeaderItems().length - 1);
-    pos = table.header.columnIndex($header);
+    pos = table.columns.indexOf(column);
   }
 
   function sort(direction, multiSort, remove) {

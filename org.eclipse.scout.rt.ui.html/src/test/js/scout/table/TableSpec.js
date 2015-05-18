@@ -928,21 +928,21 @@ describe("Table", function() {
       var $header1 = $colHeaders.eq(1);
       var $header2 = $colHeaders.eq(2);
 
-      expect(table.header.columnIndex($header0)).toBe(0);
-      expect(table.header.columnIndex($header1)).toBe(1);
-      expect(table.header.columnIndex($header2)).toBe(2);
+      expect(table.columns.indexOf($header0.data('column'))).toBe(0);
+      expect(table.columns.indexOf($header1.data('column'))).toBe(1);
+      expect(table.columns.indexOf($header2.data('column'))).toBe(2);
 
-      table.moveColumn($header0, 0, 2);
+      table.moveColumn($header0.data('column'), 0, 2);
 
-      expect(table.header.columnIndex($header1)).toBe(0);
-      expect(table.header.columnIndex($header2)).toBe(1);
-      expect(table.header.columnIndex($header0)).toBe(2);
+      expect(table.columns.indexOf($header1.data('column'))).toBe(0);
+      expect(table.columns.indexOf($header2.data('column'))).toBe(1);
+      expect(table.columns.indexOf($header0.data('column'))).toBe(2);
 
-      table.moveColumn($header2, 1, 0);
+      table.moveColumn($header2.data('column'), 1, 0);
 
-      expect(table.header.columnIndex($header2)).toBe(0);
-      expect(table.header.columnIndex($header1)).toBe(1);
-      expect(table.header.columnIndex($header0)).toBe(2);
+      expect(table.columns.indexOf($header2.data('column'))).toBe(0);
+      expect(table.columns.indexOf($header1.data('column'))).toBe(1);
+      expect(table.columns.indexOf($header0.data('column'))).toBe(2);
     });
 
   });

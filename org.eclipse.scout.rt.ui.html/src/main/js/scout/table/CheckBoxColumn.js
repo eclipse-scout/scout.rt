@@ -5,13 +5,13 @@ scout.inherits(scout.CheckBoxColumn, scout.Column);
 
 scout.CheckBoxColumn.prototype.buildCell = function(row) {
   var cell, style, content, tooltipText, tooltip, cssClass, checked, checkBoxCssClass;
-  var enabled = this.table.enabled && row.enabled;
+  var enabled = row.enabled;
   if (this.isCheckableColumn()) {
     checked = row.checked;
   } else {
     cell = this.table.cell(this.index, row);
     checked = cell.value;
-    enabled = enabled & cell.editable;
+    enabled = enabled && cell.editable;
   }
   style = this.table.cellStyle(this, row);
   cssClass = this._cssClass(row, cell);
