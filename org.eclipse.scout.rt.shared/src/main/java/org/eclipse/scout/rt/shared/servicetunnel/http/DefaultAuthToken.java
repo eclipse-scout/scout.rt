@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenNumHashCyclesProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLifeProperty;
@@ -37,7 +36,6 @@ public class DefaultAuthToken {
   protected static final byte[] PRIVATE_KEY = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
   protected static final byte[] PUBLIC_KEY = CONFIG.getPropertyValue(AuthTokenPublicKeyProperty.class);
   protected static final long TOKEN_TTL = CONFIG.getPropertyValue(AuthTokenTimeToLifeProperty.class);
-  protected static final int NUM_HASH_CYCLES = CONFIG.getPropertyValue(AuthTokenNumHashCyclesProperty.class);
 
   public static boolean isActive() {
     return PRIVATE_KEY != null || PUBLIC_KEY != null;
