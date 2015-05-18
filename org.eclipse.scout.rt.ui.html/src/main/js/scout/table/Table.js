@@ -468,11 +468,6 @@ scout.Table.prototype._installRows = function($rows) {
   var $selectedRows,
     that = this;
 
-  this.tooltips.forEach(function(tooltip) {
-    tooltip.remove();
-  }.bind(this));
-  this.tooltips = [];
-
   // Attach listeners
   $rows.each(function() {
     var editorField,
@@ -482,9 +477,12 @@ scout.Table.prototype._installRows = function($rows) {
       .on('mouseup', '', onMouseUp)
       .on('dblclick', '', onDoubleClick)
       .on('contextmenu', onContextMenu);
+
+    that._removeTooltipsForRow(row);
     if (row.hasError) {
       that._showCellErrorForRow(row);
     }
+
     // Reopen editor popup with cell because state of popup (row, $anchor etc.) is not valid anymore
     if (that.cellEditorPopup && that.cellEditorPopup.row.id === row.id) {
       that.cellEditorPopup.remove();
@@ -1152,12 +1150,7 @@ scout.Table.prototype._deleteRows = function(rows) {
         this.cellEditorPopup.cancelEdit();
       }
       // Remove tooltips for the deleted row
-      for (i = this.tooltips.length - 1; i >= 0; i--) {
-        if (this.tooltips[i].row === row) {
-          this.tooltips[i].remove();
-          this.tooltips.splice(i, 1);
-        }
-      }
+      this._removeTooltipsForRow(row);
 
       row.$row.remove();
       delete row.$row;
@@ -1167,6 +1160,15 @@ scout.Table.prototype._deleteRows = function(rows) {
 
   if (invalidate) {
     this.htmlComp.invalidateTree();
+  }
+};
+
+scout.Table.prototype._removeTooltipsForRow = function(row) {
+  for (var i = this.tooltips.length - 1; i >= 0; i--) {
+    if (this.tooltips[i].row.id === row.id) {
+      this.tooltips[i].remove();
+      this.tooltips.splice(i, 1);
+    }
   }
 };
 
