@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.filter.AlwaysFilter;
-import org.eclipse.scout.commons.filter.OrFilter;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -119,48 +118,54 @@ public class MultipleSessionTest {
   public void testCancel() throws InterruptedException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
-    final BlockingCountDownLatch latch1 = new BlockingCountDownLatch(2);
-    final BlockingCountDownLatch latch2 = new BlockingCountDownLatch(1);
-    final BlockingCountDownLatch interruptedLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch setupLatch1 = new BlockingCountDownLatch(2);
+    final BlockingCountDownLatch setupLatch2 = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch interruptedJob1_S1_Latch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch awaitAllCancelledLatch = new BlockingCountDownLatch(1);
 
+    // Session 1 (job1)
     ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add("job1-S1");
         try {
-          latch1.countDownAndBlock();
+          setupLatch1.countDownAndBlock();
         }
         catch (InterruptedException e) {
           protocol.add("job1-S1-interrupted");
         }
         finally {
-          interruptedLatch.countDown();
+          interruptedJob1_S1_Latch.countDown();
         }
+        awaitAllCancelledLatch.await();
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1)).name("job-1-S1").logOnError(false));
 
+    // Session 1 (job2) --> never starts running because cancelled while job1 is mutex-owner
     ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add("job2-S1");
         try {
-          latch2.countDownAndBlock();
+          setupLatch2.countDownAndBlock();
         }
         catch (InterruptedException e) {
+          System.err.println("WHY");
           protocol.add("job2-S1-interrupted");
         }
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession1)).name("job-2-S1").logOnError(false));
 
+    // Session 2 (job1)
     ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add("job1-S2");
         try {
-          latch1.countDownAndBlock();
+          setupLatch1.countDownAndBlock();
         }
         catch (InterruptedException e) {
           protocol.add("job1-S2-interrupted");
@@ -168,13 +173,14 @@ public class MultipleSessionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession2)).name("job-1-S2").logOnError(false));
 
+    // Session 2 (job2)
     ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add("job2-S2");
         try {
-          latch2.countDownAndBlock();
+          setupLatch2.countDownAndBlock();
         }
         catch (InterruptedException e) {
           protocol.add("job2-S2-interrupted");
@@ -182,18 +188,19 @@ public class MultipleSessionTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().session(m_clientSession2)).name("job-2-S2").logOnError(false));
 
-    assertTrue(latch1.await());
+    assertTrue(setupLatch1.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S2"), protocol);
 
-    Jobs.getJobManager().cancel(new OrFilter<>(ClientJobs.newFutureFilter().session(m_clientSession1), ModelJobs.newFutureFilter().session(m_clientSession1)), true); // cancel all jobs of session1
+    Jobs.getJobManager().cancel(ModelJobs.newFutureFilter().session(m_clientSession1), true); // cancels job-1-S1 and job-2-S1, meaning that job-2-S1 never starts running.
+    awaitAllCancelledLatch.unblock();
 
-    assertTrue(interruptedLatch.await());
+    assertTrue(interruptedJob1_S1_Latch.await());
 
-    latch1.unblock();
+    setupLatch1.unblock();
 
-    assertTrue(latch2.await());
+    assertTrue(setupLatch2.await());
     assertEquals(CollectionUtility.hashSet("job1-S1", "job1-S1-interrupted", "job1-S2", "job2-S2"), protocol);
-    latch2.unblock();
+    setupLatch2.unblock();
 
     assertTrue(Jobs.getJobManager().awaitDone(new AlwaysFilter<IFuture<?>>(), 30, TimeUnit.SECONDS));
   }

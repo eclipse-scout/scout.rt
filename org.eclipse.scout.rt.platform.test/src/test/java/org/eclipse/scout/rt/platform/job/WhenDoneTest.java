@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -56,8 +55,6 @@ public class WhenDoneTest {
   public void testSuccess() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
-    final Holder<Thread> threadHolder = new Holder<>();
-    final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
@@ -68,6 +65,7 @@ public class WhenDoneTest {
       }
     }, 1, TimeUnit.SECONDS); // delayed
 
+    final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
     future.whenDone(new IDoneCallback<String>() {
 
       @Override
@@ -80,18 +78,11 @@ public class WhenDoneTest {
           protocol.add("cancelled");
         }
         eventHolder.setValue(event);
-        threadHolder.setValue(Thread.currentThread());
-
-        try {
-          latch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-        }
+        verifyLatch.countDown();
       }
     });
+    assertTrue(verifyLatch.await());
 
-    assertTrue(latch.await());
-    assertNotSame(Thread.currentThread(), threadHolder.getValue());
     assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
     assertNull(eventHolder.getValue().getError());
     assertEquals("result", eventHolder.getValue().getResult());
@@ -103,7 +94,6 @@ public class WhenDoneTest {
   public void testSuccessWithJobAlreadyCompleted() throws InterruptedException, ProcessingException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
-    final Holder<Thread> threadHolder = new Holder<>();
 
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
@@ -115,6 +105,7 @@ public class WhenDoneTest {
     });
     future.awaitDoneAndGet();
 
+    final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
     future.whenDone(new IDoneCallback<String>() {
 
       @Override
@@ -127,11 +118,11 @@ public class WhenDoneTest {
           protocol.add("cancelled");
         }
         eventHolder.setValue(event);
-        threadHolder.setValue(Thread.currentThread());
+        verifyLatch.countDown();
       }
     });
+    assertTrue(verifyLatch.await());
 
-    assertSame(Thread.currentThread(), threadHolder.getValue());
     assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
     assertNull(eventHolder.getValue().getError());
     assertEquals("result", eventHolder.getValue().getResult());
@@ -143,8 +134,6 @@ public class WhenDoneTest {
   public void testError() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
-    final Holder<Thread> threadHolder = new Holder<>();
-    final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
     final ProcessingException pe = new ProcessingException();
 
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
@@ -156,6 +145,7 @@ public class WhenDoneTest {
       }
     }, 1, TimeUnit.SECONDS, Jobs.newInput(null).logOnError(false)); // delayed
 
+    final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
     future.whenDone(new IDoneCallback<String>() {
 
       @Override
@@ -168,18 +158,11 @@ public class WhenDoneTest {
           protocol.add("cancelled");
         }
         eventHolder.setValue(event);
-        threadHolder.setValue(Thread.currentThread());
-
-        try {
-          latch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-        }
+        verifyLatch.countDown();
       }
     });
+    assertTrue(verifyLatch.await());
 
-    assertTrue(latch.await());
-    assertNotSame(Thread.currentThread(), threadHolder.getValue());
     assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
     assertSame(pe, eventHolder.getValue().getError());
     assertNull(eventHolder.getValue().getResult());
@@ -191,7 +174,6 @@ public class WhenDoneTest {
   public void testErrorWithJobAlreadyCompleted() throws InterruptedException, ProcessingException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
-    final Holder<Thread> threadHolder = new Holder<>();
     final ProcessingException pe = new ProcessingException();
 
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
@@ -207,6 +189,7 @@ public class WhenDoneTest {
       fail("exception expected");
     }
     catch (ProcessingException e) {
+      final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
       future.whenDone(new IDoneCallback<String>() {
 
         @Override
@@ -219,11 +202,11 @@ public class WhenDoneTest {
             protocol.add("cancelled");
           }
           eventHolder.setValue(event);
-          threadHolder.setValue(Thread.currentThread());
+          verifyLatch.countDown();
         }
       });
 
-      threadHolder.setValue(Thread.currentThread());
+      assertTrue(verifyLatch.await());
       assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
       assertSame(pe, eventHolder.getValue().getError());
       assertNull(eventHolder.getValue().getResult());
@@ -236,7 +219,6 @@ public class WhenDoneTest {
   public void testCancel() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
-    final Holder<Thread> threadHolder = new Holder<>();
 
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
@@ -249,6 +231,7 @@ public class WhenDoneTest {
 
     future.cancel(true);
 
+    final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
     future.whenDone(new IDoneCallback<String>() {
 
       @Override
@@ -261,11 +244,11 @@ public class WhenDoneTest {
           protocol.add("cancelled");
         }
         eventHolder.setValue(event);
-        threadHolder.setValue(Thread.currentThread());
+        verifyLatch.countDown();
       }
     });
+    assertTrue(verifyLatch.await());
 
-    assertSame(Thread.currentThread(), threadHolder.getValue());
     assertEquals(CollectionUtility.arrayList("2", "done", "cancelled"), protocol);
     assertNull(eventHolder.getValue().getError());
     assertNull(eventHolder.getValue().getResult());
@@ -280,7 +263,6 @@ public class WhenDoneTest {
   public void testCancelButStillRunning() throws InterruptedException {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch continueRunningLatch = new BlockingCountDownLatch(1);
-    final BlockingCountDownLatch onDoneFinishedLatch = new BlockingCountDownLatch(1);
 
     final IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
@@ -303,16 +285,17 @@ public class WhenDoneTest {
     // verify that whenDone immediately returns even if not completed yet.
     final AtomicBoolean onDone = new AtomicBoolean(false);
 
+    final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
     future.whenDone(new IDoneCallback<Void>() {
 
       @Override
       public void onDone(DoneEvent<Void> event) {
         onDone.set(true);
-        onDoneFinishedLatch.countDown();
+        verifyLatch.countDown();
       }
     });
+    assertTrue(verifyLatch.await());
 
-    assertTrue(onDoneFinishedLatch.await());
     assertTrue(onDone.get());
     continueRunningLatch.release();
   }
@@ -321,7 +304,6 @@ public class WhenDoneTest {
   public void testCancelWithJobAlreadyCompleted() throws InterruptedException, ProcessingException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
-    final Holder<Thread> threadHolder = new Holder<>();
 
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
@@ -334,6 +316,7 @@ public class WhenDoneTest {
     future.awaitDoneAndGet();
     future.cancel(true);
 
+    final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
     future.whenDone(new IDoneCallback<String>() {
 
       @Override
@@ -346,11 +329,11 @@ public class WhenDoneTest {
           protocol.add("cancelled");
         }
         eventHolder.setValue(event);
-        threadHolder.setValue(Thread.currentThread());
+        verifyLatch.countDown();
       }
     });
+    verifyLatch.await();
 
-    threadHolder.setValue(Thread.currentThread());
     assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
     assertNull(eventHolder.getValue().getError());
     assertEquals("result", eventHolder.getValue().getResult());

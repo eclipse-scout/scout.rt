@@ -717,6 +717,7 @@ public class MutualExclusionTest {
         return executorMock;
       }
 
+      @Override
       public MutexSemaphores getMutexSemaphores() {
         return m_mutexSemaphores;
       }
@@ -1274,6 +1275,7 @@ public class MutualExclusionTest {
 
   private class P_JobManager extends JobManager {
 
+    @Override
     public MutexSemaphores getMutexSemaphores() {
       return m_mutexSemaphores;
     }
