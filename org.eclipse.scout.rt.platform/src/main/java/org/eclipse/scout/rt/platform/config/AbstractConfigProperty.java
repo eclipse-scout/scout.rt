@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.config;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
@@ -48,7 +48,7 @@ public abstract class AbstractConfigProperty<DATA_TYPE> implements IConfigProper
   }
 
   protected String getRawValue() {
-    return ConfigIniUtility.getProperty(getKey());
+    return ConfigUtility.getProperty(getKey());
   }
 
   @Override

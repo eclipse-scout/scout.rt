@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.jaxws;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
@@ -28,7 +28,7 @@ public class JaxWs216Module implements IPlatformListener {
   public void stateChanged(PlatformEvent event) throws PlatformException {
     if (event.getState() == IPlatform.State.BeanManagerPrepared) {
       // apply properties
-      boolean stacktraceEnabled = ConfigIniUtility.getPropertyBoolean(PROP_STACKTRACE, false);
+      boolean stacktraceEnabled = ConfigUtility.getPropertyBoolean(PROP_STACKTRACE, false);
       if (!stacktraceEnabled) {
         System.setProperty(SOAPFaultBuilder.class.getName() + ".disableCaptureStackTrace", "false");
       }

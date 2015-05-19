@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.handler.Handler;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -268,7 +268,7 @@ public class JaxWsEndpointService extends AbstractService implements IJaxWsEndpo
   }
 
   private void initResourceBundle() {
-    m_propResourcePath = ConfigIniUtility.getProperty(PROP_RESOURCE_PATH);
+    m_propResourcePath = ConfigUtility.getProperty(PROP_RESOURCE_PATH);
     if (!StringUtility.hasText(m_propResourcePath)) {
       m_propResourcePath = null;
     }

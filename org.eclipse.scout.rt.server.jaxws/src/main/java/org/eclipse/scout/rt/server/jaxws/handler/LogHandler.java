@@ -18,13 +18,13 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.server.jaxws.JaxWsConstants;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsLogHandlerDebugProperty;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 
 /**
@@ -42,7 +42,13 @@ public class LogHandler implements SOAPHandler<SOAPMessageContext> {
   }
 
   protected void initConfig() {
-    m_logDebug = ConfigIniUtility.getPropertyBoolean(JaxWsConstants.CONFIG_PROP_LOGHANDLER_DEBUG, getConfiguredLogDebug());
+    Boolean debug = CONFIG.getPropertyValue(JaxWsLogHandlerDebugProperty.class);
+    if (debug == null) {
+      m_logDebug = getConfiguredLogDebug();
+    }
+    else {
+      m_logDebug = debug.booleanValue();
+    }
   }
 
   @Override

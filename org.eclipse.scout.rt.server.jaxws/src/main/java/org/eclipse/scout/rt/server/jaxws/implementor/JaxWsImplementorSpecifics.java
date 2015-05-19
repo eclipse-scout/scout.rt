@@ -20,7 +20,8 @@ import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.server.jaxws.JaxWsConstants;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsImplementorProperty;
 
 /**
  * This class encapsulates functionality as defined by JAX-WS JSR 224 but may divergence among JAX-WS implementations.<br/>
@@ -86,20 +87,20 @@ public class JaxWsImplementorSpecifics {
    * Sets the given socket connect timeout.
    */
   public void setSocketConnectTimeout(final Map<String, Object> requestContext, final int timeoutMillis) {
-    LOG.warn("'socketConnectTimeout' not supported. Provide a '%s' and register it in 'config.ini' to support this feature.", JaxWsImplementorSpecifics.class.getSimpleName(), JaxWsConstants.CONFIG_PROP_JAXWS_IMPLEMENTOR);
+    LOG.warn("'socketConnectTimeout' not supported. To support this feature register a '%s' in 'config.properties' using property '%s'.", JaxWsImplementorSpecifics.class.getSimpleName(), CONFIG.getProperty(JaxWsImplementorProperty.class).getKey());
   }
 
   /**
    * Sets the given socket read timeout.
    */
   public void setSocketReadTimeout(final Map<String, Object> requestContext, final int timeoutMillis) {
-    LOG.warn("'socketReadTimeout' not supported. Provide a '%s' and register it in 'config.ini' to support this feature.", JaxWsImplementorSpecifics.class.getSimpleName(), JaxWsConstants.CONFIG_PROP_JAXWS_IMPLEMENTOR);
+    LOG.warn("'socketReadTimeout' not supported. To support this feature register a '%s' in 'config.properties' using property '%s'.", JaxWsImplementorSpecifics.class.getSimpleName(), CONFIG.getProperty(JaxWsImplementorProperty.class).getKey());
   }
 
   /**
    * Closes the Socket for the given port.
    */
   public void closeSocket(final Object port, final String operation) {
-    LOG.warn("'closeSocket' not supported. Provide a '%s' and register it in 'config.ini' to support this feature.", JaxWsImplementorSpecifics.class.getSimpleName(), JaxWsConstants.CONFIG_PROP_JAXWS_IMPLEMENTOR);
+    LOG.warn("'closeSocket' not supported. To support this feature register a '%s' in 'config.properties' using property '%s'.", JaxWsImplementorSpecifics.class.getSimpleName(), CONFIG.getProperty(JaxWsImplementorProperty.class).getKey());
   }
 }

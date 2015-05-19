@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
-
 /**
- * Utility to extract properties stored in the <code>config.ini</code> file of scout applications.
+ * Utility to extract properties stored in the <code>config.properties</code> file of scout applications.
  * <p>
- * The file is located on the classpath, typically in WEB-INF/classes/config.ini or in development src/main/resources
+ * The file is located on the classpath, typically in WEB-INF/classes/config.properties or in development
+ * src/main/resources
  * <p>
- * It can also be specified by setting the system property <code>-Dconfig.ini=path-to-config.ini-file</code>
+ * It can also be specified by setting the system property
+ * <code>-Dconfig.properties=path-to-config.properties-file</code>
  * <p>
  * Properties are simple key-value-pairs.<br>
  * Properties may contain placeholders for other variables: <code>${variableName}</code>. These variables are then
@@ -29,22 +30,22 @@ package org.eclipse.scout.commons;
  * </ul>
  * </code>
  */
-public final class ConfigIniUtility {
+public final class ConfigUtility {
 
   /**
    * Property to specify the configuration file. If not specified then {@link ClassLoader#getResource(String)} with
-   * "/config.ini" is used.
+   * "/config.properties" is used.
    */
-  public static final String CONFIG_INI = "config.ini";
+  public static final String CONFIG_FILE_NAME = "config.properties";
 
-  private final static PropertiesHelper INSTANCE = new PropertiesHelper(CONFIG_INI);
+  private final static PropertiesHelper INSTANCE = new PropertiesHelper(CONFIG_FILE_NAME);
 
   /**
    * Gets the property with given key. If there is no property with given key, <code>null</code> is returned.<br>
    * The given key is searched in the following order:
    * <ol>
    * <li>in the system properties ({@link System#getProperty(String)})</li>
-   * <li>in properties defined in a <code>config.ini</code>.</li>
+   * <li>in properties defined in a <code>config.properties</code>.</li>
    * <li>in the environment variables ({@link System#getenv(String)})</li>
    * </ol>
    *
@@ -61,7 +62,7 @@ public final class ConfigIniUtility {
    * The given key is searched in the following order:
    * <ol>
    * <li>in the system properties ({@link System#getProperty(String)})</li>
-   * <li>in properties defined in a <code>config.ini</code></li>
+   * <li>in properties defined in a <code>config.properties</code></li>
    * <li>in the environment variables ({@link System#getenv(String)})</li>
    * </ol>
    *
@@ -169,9 +170,9 @@ public final class ConfigIniUtility {
   }
 
   /**
-   * Specifies if a config.ini has been found and loaded.
+   * Specifies if a config.properties has been found and loaded.
    *
-   * @return <code>true</code> if a config.ini has been loaded, <code>false</code> otherwise.
+   * @return <code>true</code> if a config.properties has been loaded, <code>false</code> otherwise.
    */
   public static boolean isInitialized() {
     return INSTANCE.isInitialized();

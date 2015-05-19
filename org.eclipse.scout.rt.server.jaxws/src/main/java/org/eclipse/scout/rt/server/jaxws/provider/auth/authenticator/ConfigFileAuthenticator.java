@@ -14,27 +14,27 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.jaxws.JaxWsConstants;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.IConfigProperty;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthUsersProperty;
 
 /**
- * Authenticator to validate webservice requests against configured users in <code>config.ini</code> file. Multiple
- * credentials are separated with a semicolon, username and password with the 'equals' sign.
+ * Authenticator to validate webservice requests against configured users in <code>config.properties</code> file.
+ * Multiple credentials are separated with a semicolon, username and password with the 'equals' sign.
  * <p/>
- * Example: <code>jaxws.auth.users=jack\=XXXX;john\=XXXX;anna\=XXXX</code>
+ * Example: <code>jaxws.auth.users=anna\=XXXX;jack\=XXXX;john\=XXXX</code>
  */
-public class ConfigIniAuthenticator implements IAuthenticator {
+public class ConfigFileAuthenticator implements IAuthenticator {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ConfigIniAuthenticator.class);
-  protected static final String CONFIG_INI_EXAMPLE = String.format("%s=jack\\=XXXX;john\\=XXXX;anna\\=XXXX", JaxWsConstants.CONFIG_PROP_AUTH_USERS);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ConfigFileAuthenticator.class);
 
   private final Map<String, String> m_users;
 
-  public ConfigIniAuthenticator() {
+  public ConfigFileAuthenticator() {
     m_users = readUsers();
   }
 
@@ -44,11 +44,12 @@ public class ConfigIniAuthenticator implements IAuthenticator {
   }
 
   /**
-   * Method invoked to read the credentials from <code>config.ini</code>.
+   * Method invoked to read the credentials from <code>config.properties</code>.
    */
   @Internal
   protected Map<String, String> readUsers() {
-    final String credentialsRaw = ConfigIniUtility.getProperty(JaxWsConstants.CONFIG_PROP_AUTH_USERS);
+    IConfigProperty<String> usersProperty = CONFIG.getProperty(JaxWsAuthUsersProperty.class);
+    final String credentialsRaw = usersProperty.getValue();
     if (credentialsRaw == null) {
       return Collections.emptyMap();
     }
@@ -57,23 +58,24 @@ public class ConfigIniAuthenticator implements IAuthenticator {
 
     for (final String credentialRaw : credentialsRaw.split(";")) {
       final String[] credential = credentialRaw.split("=", 2);
+      final String configSample = String.format("%s=jack\\=XXXX;john\\=XXXX;anna\\=XXXX", usersProperty.getKey());
       if (credential.length == 2) {
         final String username = credential[0];
         if (!StringUtility.hasText(username)) {
-          LOG.warn("Configured username must not be empty. [example={}]", CONFIG_INI_EXAMPLE);
+          LOG.warn("Configured username must not be empty. [example={}]", configSample);
           continue;
         }
 
         final String password = credential[1];
         if (!StringUtility.hasText(password)) {
-          LOG.warn("Configured password must not be empty. [example={}]", CONFIG_INI_EXAMPLE);
+          LOG.warn("Configured password must not be empty. [example={}]", configSample);
           continue;
         }
 
         credentialMap.put(username.toLowerCase(), password);
       }
       else {
-        LOG.warn("Username and password must be separated with the 'equals' sign.  [example={}]", CONFIG_INI_EXAMPLE);
+        LOG.warn("Username and password must be separated with the 'equals' sign.  [example={}]", configSample);
       }
     }
 

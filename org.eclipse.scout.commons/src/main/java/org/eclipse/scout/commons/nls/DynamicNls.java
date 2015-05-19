@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 
 public class DynamicNls {
 
@@ -39,7 +39,7 @@ public class DynamicNls {
    * Setting the system property "scout.resourceBundle.checkContainsKey" to <code>false</code> is recommended for
    * affected environments.
    */
-  public static final boolean DO_CONTAINS_CHECK_IN_RESOURCE_BUNDLE = ConfigIniUtility.getPropertyBoolean(RESOURCE_BUNDLE_USE_CONTAINS_KEY, true);
+  public static final boolean DO_CONTAINS_CHECK_IN_RESOURCE_BUNDLE = ConfigUtility.getPropertyBoolean(RESOURCE_BUNDLE_USE_CONTAINS_KEY, true);
 
   public DynamicNls() {
     m_resourceBundles = new ArrayList<>();

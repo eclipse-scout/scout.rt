@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.Binding;
 import javax.xml.ws.http.HTTPBinding;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -129,7 +129,7 @@ public abstract class EndpointServlet extends HttpServlet {
   protected void publishStatusPage() {
     // do not use JAX-WS status page to display all endpoints together
     HttpAdapter.publishStatusPage = false;
-    m_publishStatusPage = ConfigIniUtility.getPropertyBoolean(JaxWs216Module.PROP_PUBLISH_STATUS_PAGE, true);
+    m_publishStatusPage = ConfigUtility.getPropertyBoolean(JaxWs216Module.PROP_PUBLISH_STATUS_PAGE, true);
   }
 
   protected ServletAdapter resolveServletAdapter(HttpServletRequest request) {

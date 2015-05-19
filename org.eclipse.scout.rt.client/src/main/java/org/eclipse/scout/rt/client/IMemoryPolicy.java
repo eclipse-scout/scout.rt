@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 /**
  * Handling of various framework aspects regarding memory allocation, caching and lazy-ness
  * <p>
- * The use of which profile to be used in {@link IClientSession} can be set in the config.ini as
+ * The use of which profile to be used in {@link IClientSession} can be set in the config.properties as
  * <code>org.eclipse.scout.memory=small | medium | large</code>
  * <ul>
  * <li>small: low profile hardware, citrix and alike, memory consumption below 256m, no caching where not explicitly

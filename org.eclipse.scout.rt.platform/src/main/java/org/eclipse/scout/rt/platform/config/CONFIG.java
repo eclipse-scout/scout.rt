@@ -43,23 +43,6 @@ public final class CONFIG {
    * @return The value of the given {@link IConfigProperty}.
    */
   public static <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz) {
-    return getPropertyValue(clazz, null);
-  }
-
-  /**
-   * Gets the configured value of the given {@link IConfigProperty}. If no value is configured the default of the
-   * property is returned ({@link IConfigProperty#getDefaultValue()}). If even the default value is <code>null</code>
-   * the given defaultValue is returned.
-   *
-   * @param clazz
-   *          the config class
-   * @return The value of the given {@link IConfigProperty}.
-   */
-  public static <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz, DATA_TYPE defaultValue) {
-    DATA_TYPE value = getProperty(clazz).getValue();
-    if (value == null) {
-      return defaultValue;
-    }
-    return value;
+    return getProperty(clazz).getValue();
   }
 }

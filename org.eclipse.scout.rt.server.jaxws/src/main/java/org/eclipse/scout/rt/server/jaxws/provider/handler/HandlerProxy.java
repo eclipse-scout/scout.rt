@@ -11,11 +11,13 @@
 package org.eclipse.scout.rt.server.jaxws.provider.handler;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.annotation.Resource;
+import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
@@ -24,11 +26,13 @@ import javax.xml.ws.http.HTTPException;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.server.jaxws.JaxWsConstants;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAnonymousUserProperty;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.ClazzUtil;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.InitParam;
@@ -48,6 +52,9 @@ import org.eclipse.scout.rt.server.jaxws.provider.context.RunContextProvider;
 public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CONTEXT> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HandlerProxy.class);
+
+  private static final Subject SUBJECT_ANONYMOUS = new Subject(true, Collections.singleton(new SimplePrincipal(CONFIG.getPropertyValue(JaxWsAnonymousUserProperty.class))),
+      Collections.emptySet(), Collections.emptySet());
 
   private final Handler<CONTEXT> m_handler;
 
@@ -105,8 +112,7 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
         return callable.call();
       }
       else {
-        return m_runContextProvider.provide(MessageContexts.getSubject(messageContext, JaxWsConstants.SUBJECT_ANONYMOUS)).call(new Callable<T>() {
-
+        return m_runContextProvider.provide(MessageContexts.getSubject(messageContext, SUBJECT_ANONYMOUS)).call(new Callable<T>() {
           @Override
           public T call() throws Exception {
             return callable.call();

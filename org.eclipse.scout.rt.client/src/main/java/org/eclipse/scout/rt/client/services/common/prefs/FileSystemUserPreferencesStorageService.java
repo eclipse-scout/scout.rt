@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -167,9 +167,9 @@ public class FileSystemUserPreferencesStorageService extends AbstractUserPrefere
     if (location == null) {
       // legacy
       String legacyUserArea = "osgi.user.area";
-      location = ConfigIniUtility.getProperty(legacyUserArea);
+      location = ConfigUtility.getProperty(legacyUserArea);
       if (location == null) {
-        location = new File(ConfigIniUtility.getProperty(PROP_USER_HOME), "user").getAbsolutePath();
+        location = new File(ConfigUtility.getProperty(PROP_USER_HOME), "user").getAbsolutePath();
         LOG.warn("No user area property found. Using '" + location + "' as fallback. Consider specifying a user area using property '" + userAreaProperty.getKey() + "'.");
       }
       else {

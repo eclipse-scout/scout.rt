@@ -20,10 +20,10 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.jaxws.JaxWsConstants;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsBasicAuthRealmProperty;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 
@@ -49,7 +49,7 @@ public class BasicAuthenticationMethod implements IAuthenticationMethod {
 
   public BasicAuthenticationMethod() {
     m_implementorSpecifics = BEANS.get(JaxWsImplementorSpecifics.class);
-    m_realm = ConfigIniUtility.getProperty(JaxWsConstants.CONFIG_PROP_BASIC_AUTH_REALM, "JAX-WS");
+    m_realm = CONFIG.getPropertyValue(JaxWsBasicAuthRealmProperty.class);
   }
 
   @Override

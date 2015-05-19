@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.shared;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
@@ -49,7 +49,7 @@ public final class SharedConfigProperties {
   }
 
   /**
-   * public key for {@link org.eclipse.scout.rt.shared.IConfigIniConstants#PRIVATE_KEY}
+   * public key for {@link AuthTokenPrivateKeyProperty}
    */
   public static class AuthTokenPublicKeyProperty extends AbstractBinaryConfigProperty {
 
@@ -84,7 +84,7 @@ public final class SharedConfigProperties {
 
     @Override
     public String getDefaultValue() {
-      return ConfigIniUtility.getProperty("server.url") /* legacy */;
+      return ConfigUtility.getProperty("server.url") /* legacy */;
     }
 
     @Override
@@ -114,7 +114,7 @@ public final class SharedConfigProperties {
 
     @Override
     public Tier getDefaultValue() {
-      return parse(ConfigIniUtility.getProperty("scout.osgi.tier")); // legacy
+      return parse(ConfigUtility.getProperty("scout.osgi.tier")); // legacy
     }
 
     @Override

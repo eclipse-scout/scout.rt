@@ -29,14 +29,11 @@ import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.
 
 /**
  * <h4>BasicSecurityFilter</h4> A simple security filter using username,password
- * tuples either set in the extension point or in the config ini.
+ * tuples defined in the config.properties file. The following properties are supported:
  * <ul>
- * <li><code>&lt;fully qualified name of class&gt;#active=true/false</code> <b>might be set in the extension point</b></li>
- * <li><code>&lt;fully qualified name of class&gt;#realm=abcde</code> <b>required</b></li>
- * <li><code>&lt;fully qualified name of class&gt;#failover=true/false</code> <b>default false</b></li>
- * <li>
- * <code>&lt;fully qualified name of class&gt;#users=username1\=password1,username2\=password2</code>
- * <b>required</b></li>
+ * <li><code>realm=abcde</code> <b>default: 'Default'</b></li>
+ * <li><code>failover=true/false</code> <b>default false</b></li>
+ * <li><code>users=username1\=password1,username2\=password2</code> <b>required</b></li>
  * </ul>
  * <p>
  *

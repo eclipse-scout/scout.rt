@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ImapHostProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ImapMailboxProperty;
@@ -47,13 +48,21 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
   private Store m_store;
 
   public AbstractIMAPService() {
-    m_host = CONFIG.getPropertyValue(ImapHostProperty.class, getConfiguredHost());
-    m_port = CONFIG.getPropertyValue(ImapPortProperty.class, getConfiguredPort());
-    m_mailbox = CONFIG.getPropertyValue(ImapMailboxProperty.class, getConfiguredMailbox());
-    m_username = CONFIG.getPropertyValue(ImapUsernameProperty.class, getConfiguredUserName());
-    m_password = CONFIG.getPropertyValue(ImapPasswordProperty.class, getConfiguredPassword());
-    m_sslProtocols = CONFIG.getPropertyValue(ImapSslProtocolsProperty.class, getConfiguredSslProtocols());
+    m_host = getPropertyValue(ImapHostProperty.class, getConfiguredHost());
+    m_port = getPropertyValue(ImapPortProperty.class, getConfiguredPort());
+    m_mailbox = getPropertyValue(ImapMailboxProperty.class, getConfiguredMailbox());
+    m_username = getPropertyValue(ImapUsernameProperty.class, getConfiguredUserName());
+    m_password = getPropertyValue(ImapPasswordProperty.class, getConfiguredPassword());
+    m_sslProtocols = getPropertyValue(ImapSslProtocolsProperty.class, getConfiguredSslProtocols());
     m_opened = false;
+  }
+
+  protected <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz, DATA_TYPE defaultValue) {
+    DATA_TYPE value = CONFIG.getPropertyValue(clazz);
+    if (value == null) {
+      return defaultValue;
+    }
+    return value;
   }
 
   @ConfigProperty(ConfigProperty.STRING)

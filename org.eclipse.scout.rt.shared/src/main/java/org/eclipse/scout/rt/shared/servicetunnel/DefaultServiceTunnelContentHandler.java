@@ -88,7 +88,7 @@ import org.eclipse.scout.rt.shared.SharedConfigProperties.CompressServiceTunnelR
  * }
  * </pre>
  *
- * In order to enable/disable content compression, use the system property or config.ini property:
+ * In order to enable/disable content compression, use the system property or config.properties property:
  * <code>org.eclipse.scout.serviceTunnel.compress=true</code>
  * <p>
  * If the client side sets this property to true, all client data is sent to the server with compressed data (false

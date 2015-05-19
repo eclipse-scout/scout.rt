@@ -14,15 +14,15 @@ import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * Service for caching server side data independent of the session
- * 
+ *
  * @since 4.0.0
  */
 public interface IGlobalServerCacheService extends IService {
 
   /**
    * stores the value in dependency of the key and independent of the requesting client or node, using default
-   * expiration time from config.ini
-   * 
+   * expiration time from config.properties
+   *
    * @param key
    *          Key for the value
    * @param value
@@ -32,7 +32,7 @@ public interface IGlobalServerCacheService extends IService {
 
   /**
    * stores the value in dependency of the key and independent of the requesting client or node
-   * 
+   *
    * @param key
    *          value identifying key
    * @param value
@@ -45,7 +45,7 @@ public interface IGlobalServerCacheService extends IService {
   /**
    * returns the value for the given key, independent from the requesting client or node. Updates the expiration time
    * with default expiration time
-   * 
+   *
    * @param key
    *          value identifying key
    * @return the value
@@ -54,7 +54,7 @@ public interface IGlobalServerCacheService extends IService {
 
   /**
    * returns the value for the given key, independent from the requesting client or node. Updates the expiration time
-   * 
+   *
    * @param key
    *          value identifying key
    * @param expiration
@@ -65,7 +65,7 @@ public interface IGlobalServerCacheService extends IService {
 
   /**
    * returns the value for the given key, independent from the requesting client or node
-   * 
+   *
    * @param key
    *          value identifying key
    * @return the value
@@ -74,14 +74,14 @@ public interface IGlobalServerCacheService extends IService {
 
   /**
    * updates the expiration time by default expiration time
-   * 
+   *
    * @param key
    */
   void touch(String key);
 
   /**
    * removes the data from the cache
-   * 
+   *
    * @param key
    *          value identifying key
    */

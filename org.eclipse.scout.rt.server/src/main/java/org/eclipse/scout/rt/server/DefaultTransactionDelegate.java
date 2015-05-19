@@ -57,7 +57,7 @@ import org.eclipse.scout.rt.shared.validate.OutputValidation;
  * validation. You may use {@link #defaultValidateInput(IValidationStrategy, Object, Method, Object[])} and
  * {@link #defaultValidateOutput(IValidationStrategy, Object, Method, Object, Object[])}
  * <p>
- * Set the config.ini properties to activate default validation:
+ * Set the config.properties to activate default validation:
  *
  * <pre>
  *   org.eclipse.scout.rt.server.validateInput=true

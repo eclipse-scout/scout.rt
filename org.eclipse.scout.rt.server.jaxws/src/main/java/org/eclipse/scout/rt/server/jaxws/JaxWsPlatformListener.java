@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.jaxws;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -20,7 +19,9 @@ import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsImplementorProperty;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 
 /**
@@ -41,7 +42,7 @@ public class JaxWsPlatformListener implements IPlatformListener {
   }
 
   private void installImplementorSpecifics(final IBeanManager beanManager) {
-    final String implementor = ConfigIniUtility.getProperty(JaxWsConstants.CONFIG_PROP_JAXWS_IMPLEMENTOR);
+    final String implementor = CONFIG.getPropertyValue(JaxWsImplementorProperty.class);
     if (implementor == null) {
       return;
     }

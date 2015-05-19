@@ -38,12 +38,7 @@ import org.junit.runner.RunWith;
  * The strategy is either defined by an annotation or by a policy according to the method name.
  */
 @RunWith(PlatformTestRunner.class)
-// TODO [dwi]: ask jgu whether to remove
 public abstract class AbstractInputValidationStrategyTest {
-
-  protected abstract String[] getConfiguredSharedBundles();
-
-  protected abstract String[] getConfiguredServerBundles();
 
   @Test
   public void validateServices() throws Exception {

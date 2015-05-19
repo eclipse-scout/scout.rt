@@ -32,6 +32,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.platform.service.IServiceInventory;
@@ -96,21 +97,21 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     if (tid == null) {
       tid = getClass().getSimpleName() + "." + "transaction";
     }
-    m_transactionMemberId = CONFIG.getPropertyValue(SqlTransactionMemberIdProperty.class, tid);
-    m_directJdbcConnection = CONFIG.getPropertyValue(SqlDirectJdbcConnectionProperty.class, getConfiguredDirectJdbcConnection());
-    m_defaultUser = CONFIG.getPropertyValue(SqlUsernameProperty.class, getConfiguredUsername());
-    m_defaultPass = CONFIG.getPropertyValue(SqlPasswordProperty.class, getConfiguredPassword());
-    m_jndiName = CONFIG.getPropertyValue(SqlJndiNameProperty.class, getConfiguredJndiName());
-    m_jndiInitialContextFactory = CONFIG.getPropertyValue(SqlJndiInitialContextFactoryProperty.class, getConfiguredJndiInitialContextFactory());
-    m_jndiProviderUrl = CONFIG.getPropertyValue(SqlJndiProviderUrlProperty.class, getConfiguredJndiProviderUrl());
-    m_jndiUrlPkgPrefixes = CONFIG.getPropertyValue(SqlJndiUrlPkgPrefixesProperty.class, getConfiguredJndiUrlPkgPrefixes());
-    m_jdbcMappingName = CONFIG.getPropertyValue(SqlJdbcMappingNameProperty.class, getConfiguredJdbcMappingName());
-    m_jdbcDriverName = CONFIG.getPropertyValue(SqlJdbcDriverNameProperty.class, getConfiguredJdbcDriverName());
-    m_jdbcProps = CONFIG.getPropertyValue(SqlJdbcPropertiesProperty.class, getConfiguredJdbcProperties());
-    m_queryCacheSize = CONFIG.getPropertyValue(SqlJdbcStatementCacheSizeProperty.class, getConfiguredJdbcStatementCacheSize());
-    m_jdbcPoolSize = CONFIG.getPropertyValue(SqlJdbcPoolSizeProperty.class, getConfiguredJdbcPoolSize());
-    m_jdbcPoolConnectionBusyTimeout = CONFIG.getPropertyValue(SqlJdbcPoolConnectionBusyTimeoutProperty.class, getConfiguredJdbcPoolConnectionBusyTimeout());
-    m_jdbcPoolConnectionLifetime = CONFIG.getPropertyValue(SqlJdbcPoolConnectionLifetimeProperty.class, getConfiguredJdbcPoolConnectionLifetime());
+    m_transactionMemberId = getPropertyValue(SqlTransactionMemberIdProperty.class, tid);
+    m_directJdbcConnection = getPropertyValue(SqlDirectJdbcConnectionProperty.class, getConfiguredDirectJdbcConnection());
+    m_defaultUser = getPropertyValue(SqlUsernameProperty.class, getConfiguredUsername());
+    m_defaultPass = getPropertyValue(SqlPasswordProperty.class, getConfiguredPassword());
+    m_jndiName = getPropertyValue(SqlJndiNameProperty.class, getConfiguredJndiName());
+    m_jndiInitialContextFactory = getPropertyValue(SqlJndiInitialContextFactoryProperty.class, getConfiguredJndiInitialContextFactory());
+    m_jndiProviderUrl = getPropertyValue(SqlJndiProviderUrlProperty.class, getConfiguredJndiProviderUrl());
+    m_jndiUrlPkgPrefixes = getPropertyValue(SqlJndiUrlPkgPrefixesProperty.class, getConfiguredJndiUrlPkgPrefixes());
+    m_jdbcMappingName = getPropertyValue(SqlJdbcMappingNameProperty.class, getConfiguredJdbcMappingName());
+    m_jdbcDriverName = getPropertyValue(SqlJdbcDriverNameProperty.class, getConfiguredJdbcDriverName());
+    m_jdbcProps = getPropertyValue(SqlJdbcPropertiesProperty.class, getConfiguredJdbcProperties());
+    m_queryCacheSize = getPropertyValue(SqlJdbcStatementCacheSizeProperty.class, getConfiguredJdbcStatementCacheSize());
+    m_jdbcPoolSize = getPropertyValue(SqlJdbcPoolSizeProperty.class, getConfiguredJdbcPoolSize());
+    m_jdbcPoolConnectionBusyTimeout = getPropertyValue(SqlJdbcPoolConnectionBusyTimeoutProperty.class, getConfiguredJdbcPoolConnectionBusyTimeout());
+    m_jdbcPoolConnectionLifetime = getPropertyValue(SqlJdbcPoolConnectionLifetimeProperty.class, getConfiguredJdbcPoolConnectionLifetime());
     m_nlsProvider = getConfiguredNlsProvider();
 
     // load sql style
@@ -169,6 +170,14 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
         list.add(d);
       }
     }
+  }
+
+  protected <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz, DATA_TYPE defaultValue) {
+    DATA_TYPE value = CONFIG.getPropertyValue(clazz);
+    if (value == null) {
+      return defaultValue;
+    }
+    return value;
   }
 
   /*

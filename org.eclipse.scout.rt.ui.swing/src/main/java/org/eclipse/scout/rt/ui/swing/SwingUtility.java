@@ -64,7 +64,7 @@ import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicHTML;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
 import org.eclipse.scout.commons.dnd.ImageTransferObject;
@@ -95,8 +95,8 @@ public final class SwingUtility {
 
   public static final boolean IS_JAVA_7_OR_GREATER = CompareUtility.compareTo(System.getProperty("java.version"), "1.7") >= 0;
   public static final boolean IS_JAVA_7_OR_LESS = CompareUtility.compareTo(System.getProperty("java.version"), "1.7") <= 0;
-  public static final boolean DO_RESET_COMPONENT_BOUNDS = ConfigIniUtility.getPropertyBoolean("scout.ui.layout.resetBoundsOnInvalidate", true);
-  public static final boolean VERIFY_INPUT_ON_WINDOW_CLOSED = ConfigIniUtility.getPropertyBoolean("scout.ui.verifyInputOnWindowClosed", false);
+  public static final boolean DO_RESET_COMPONENT_BOUNDS = ConfigUtility.getPropertyBoolean("scout.ui.layout.resetBoundsOnInvalidate", true);
+  public static final boolean VERIFY_INPUT_ON_WINDOW_CLOSED = ConfigUtility.getPropertyBoolean("scout.ui.verifyInputOnWindowClosed", false);
 
   private static Integer topMarginForField = null;
 
@@ -1252,7 +1252,7 @@ public final class SwingUtility {
   }
 
   public static boolean hasScoutLookAndFeelFrameAndDialog() {
-    return ConfigIniUtility.getPropertyBoolean("scout.laf.useLafFrameAndDialog", true);
+    return ConfigUtility.getPropertyBoolean("scout.laf.useLafFrameAndDialog", true);
   }
 
   /**
@@ -1263,7 +1263,7 @@ public final class SwingUtility {
    */
   public static int getTopMarginForField() {
     if (topMarginForField == null) {
-      topMarginForField = Integer.valueOf(ConfigIniUtility.getPropertyInt("scout.laf.topMarginForField", 4));
+      topMarginForField = Integer.valueOf(ConfigUtility.getPropertyInt("scout.laf.topMarginForField", 4));
     }
     return topMarginForField;
   }

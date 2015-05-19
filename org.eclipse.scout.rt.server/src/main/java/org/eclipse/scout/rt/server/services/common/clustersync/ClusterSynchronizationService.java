@@ -24,7 +24,7 @@ import java.util.UUID;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.StringUtility;
@@ -104,7 +104,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
       else {
         // in development on same machine there might run multiple instances on different ports (usecase when testing cluster sync)
         // therefore we use in this case the jetty port too
-        String port = ConfigIniUtility.getProperty("scout.jetty.port"); // see org.eclipse.scout.dev.jetty.JettyServer.SERVER_PORT_KEY
+        String port = ConfigUtility.getProperty("scout.jetty.port"); // see org.eclipse.scout.dev.jetty.JettyServer.SERVER_PORT_KEY
         if (StringUtility.hasText(port)) {
           nodeId = StringUtility.join(":", hostname, port);
         }

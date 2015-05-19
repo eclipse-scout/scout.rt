@@ -60,7 +60,7 @@ import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
  * </pre>
  * <p>
  * The legacy functionality supporting &...& binds - which can lead to sql injection if not carefully used - will be eliminated in future releases.
- * To avoid unexpected usages, a warning is thrown on every usage. Using the server-side config.ini property <b>org.eclipse.scout.commons.sqlplainbind=true|false</b>
+ * To avoid unexpected usages, a warning is thrown on every usage. Using the server-side config.properties property <b>org.eclipse.scout.commons.sqlplainbind=true|false</b>
  * true means activating the legacy functionality (which will be removed in future releases) and false throws an exception when using &...& binds.
  */
 public class BindParser {

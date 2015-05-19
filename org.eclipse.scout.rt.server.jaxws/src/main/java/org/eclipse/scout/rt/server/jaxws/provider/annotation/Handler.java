@@ -16,14 +16,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.server.jaxws.JaxWsConstants;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAnonymousUserProperty;
 
 /**
  * Describes a JAX-WS handler to be installed for an endpoint.
  * <p>
  * If the handler is annotated with <code>&#064;RunWithRunContext</code> annotation, it is executed on behalf of a
- * {@link RunContext} with the <code>Subject</code> of the authenticated webservice request, or if not, with
- * {@link JaxWsConstants#USER_ANONYMOUS}.
+ * {@link RunContext} with the <code>Subject</code> of the authenticated webservice request, or if not, with the
+ * anonymous user as defined by {@link JaxWsAnonymousUserProperty}.
  *
  * @since 5.1
  */

@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.ConfigIniAuthenticator;
+import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.ConfigFileAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.AuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticationMethod;
@@ -57,10 +57,10 @@ public @interface Authentication {
   Clazz method() default @Clazz(value = BasicAuthenticationMethod.class);
 
   /**
-   * Indicates against which data source credentials are to be validated. By default, {@link ConfigIniAuthenticator} is
+   * Indicates against which data source credentials are to be validated. By default, {@link ConfigFileAuthenticator} is
    * used.
    */
-  Clazz authenticator() default @Clazz(value = ConfigIniAuthenticator.class);
+  Clazz authenticator() default @Clazz(value = ConfigFileAuthenticator.class);
 
   /**
    * Indicates which {@link RunContextProvider} to use to provide a {@link RunContext} for authenticated requests. By

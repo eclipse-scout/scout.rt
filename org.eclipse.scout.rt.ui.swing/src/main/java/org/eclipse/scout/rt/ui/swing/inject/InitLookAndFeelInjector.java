@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.inject;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.rt.ui.swing.ILookAndFeelProvider;
 
 /**
@@ -22,12 +22,12 @@ public class InitLookAndFeelInjector {
   }
 
   public void inject() {
-    String scoutLaf = ConfigIniUtility.getProperty("scout.laf");
+    String scoutLaf = ConfigUtility.getProperty("scout.laf");
     if (!isStringEmpty(scoutLaf)) {
       initScoutLAF(scoutLaf);
       return;
     }
-    String defaultLaf = ConfigIniUtility.getProperty("swing.defaultlaf");
+    String defaultLaf = ConfigUtility.getProperty("swing.defaultlaf");
     if (!isStringEmpty(defaultLaf)) {
       initDefaultLAF(defaultLaf);
     }

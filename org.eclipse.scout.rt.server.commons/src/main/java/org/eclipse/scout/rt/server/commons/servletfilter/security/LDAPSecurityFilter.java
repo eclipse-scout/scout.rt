@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.
 import org.eclipse.scout.rt.server.commons.config.ServerCommonsConfigProperties.LdapFilterServerProperty;
 
 /**
- * <h4>LDAPSecurityFilter</h4> The following properties can be set in the <code>config.ini</code> file:
+ * <h4>LDAPSecurityFilter</h4> The following properties can be set in the <code>config.properties</code> file:
  * <ul>
  * <li><code>&lt;fully qualified name of class&gt;#active=true/false</code> <b>might be set in the extension point</b></li>
  * <li><code>&lt;fully qualified name of class&gt;#realm=abcde</code> <b>required</b></li>

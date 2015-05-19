@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.jaxws.provider.auth.handler;
 
 import java.security.AccessController;
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -23,8 +24,10 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.jaxws.JaxWsConstants;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthenticatorUserProperty;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication;
@@ -45,6 +48,8 @@ import org.eclipse.scout.rt.server.jaxws.provider.context.RunContextProvider;
 public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AuthenticationHandler.class);
+  protected static final Subject SUBJECT_AUTHENTICATOR = new Subject(true, Collections.singleton(new SimplePrincipal(CONFIG.getPropertyValue(JaxWsAuthenticatorUserProperty.class))),
+      Collections.emptySet(), Collections.emptySet());
 
   protected final IAuthenticationMethod m_authenticationMethod;
   protected final IAuthenticator m_authenticator;
@@ -114,7 +119,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
       return m_authenticationMethod.authenticate(context, m_authenticator);
     }
     else {
-      return m_authenticatorRunContextProvider.provide(JaxWsConstants.SUBJECT_AUTHENTICATOR).call(new Callable<Subject>() {
+      return m_authenticatorRunContextProvider.provide(SUBJECT_AUTHENTICATOR).call(new Callable<Subject>() {
 
         @Override
         public Subject call() throws Exception {

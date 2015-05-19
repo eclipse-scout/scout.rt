@@ -50,7 +50,7 @@ import javax.swing.plaf.ColorUIResource;
 import org.eclipse.scout.commons.CSSPatch;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.StringUtility;
@@ -691,7 +691,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
    * </pre>
    */
   protected void decorateAppZone(RootPaneContainer root) {
-    String zone = ConfigIniUtility.getProperty("app.zone");
+    String zone = ConfigUtility.getProperty("app.zone");
     if (zone == null) {
       //production
     }

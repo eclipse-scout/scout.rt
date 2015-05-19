@@ -272,7 +272,7 @@ public class HTMLTest {
   @Test
   public void testSpecialCharacters() {
     assertEquals("<p>Test$Class</p>", HTML.p("Test$Class").toEncodedHtml());
-    assertEquals("<p>C:\\Temp\\config.ini</p>", HTML.p("C:\\Temp\\config.ini").toEncodedHtml());
+    assertEquals("<p>C:\\Temp\\config.properties</p>", HTML.p("C:\\Temp\\config.properties").toEncodedHtml());
   }
 
   private String createTableString(String prefix) {

@@ -66,7 +66,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
     try {
       URL targetUrl = UriUtility.toUrl(url);
       if (targetUrl == null) {
-        throw new IllegalArgumentException("No target url configured. Please specify a target URL in the config.ini using property '" + targetUrlProperty.getKey() + "'.");
+        throw new IllegalArgumentException("No target url configured. Please specify a target URL in the config.properties using property '" + targetUrlProperty.getKey() + "'.");
       }
       return targetUrl;
     }

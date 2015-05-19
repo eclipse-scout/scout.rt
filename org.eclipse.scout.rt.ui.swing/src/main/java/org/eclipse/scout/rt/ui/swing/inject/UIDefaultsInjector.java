@@ -29,7 +29,7 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.InsetsUIResource;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -171,7 +171,7 @@ public class UIDefaultsInjector {
 
   protected IconUIResource getSplashUIResource() {
     IconUIResource iconresource = null;
-    String splashPathProp = ConfigIniUtility.getProperty("scout.splashPath");
+    String splashPathProp = ConfigUtility.getProperty("scout.splashPath");
     try {
       if (!StringUtility.isNullOrEmpty(splashPathProp)) {
         File f = new File(splashPathProp);
@@ -185,7 +185,7 @@ public class UIDefaultsInjector {
       }
     }
     catch (Exception e) {
-      LOG.error("could not find splash for config.ini property 'osgi.splashPath' -> value '" + splashPathProp + "'.", e);
+      LOG.error("could not find splash for config.properties property 'osgi.splashPath' -> value '" + splashPathProp + "'.", e);
     }
     if (iconresource == null) {
       iconresource = createIconUIResource(SwingIcons.Splash);

@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -54,7 +54,7 @@ public class ConfigIniAuthenticator implements IAuthenticator {
    */
   @Internal
   protected Map<String, String> readCredentialsFromConfigIni() {
-    final String credentialsRaw = ConfigIniUtility.getProperty(PROP_CREDENTIALS);
+    final String credentialsRaw = ConfigUtility.getProperty(PROP_CREDENTIALS);
     if (credentialsRaw == null) {
       return Collections.emptyMap();
     }

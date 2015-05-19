@@ -12,12 +12,12 @@ package org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.server.jaxws.JaxWsConstants;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAuthenticatorUserProperty;
 
 /**
- * Authenticator to authenticate webservice requests against a database, config.ini, LDAP or others. By annotating the
- * authenticator with <code>&#064;RunWithRunContext</code> annotation, this authenticator is invoked on behalf of a
- * {@link RunContext} with the user {@link JaxWsConstants#USER_AUTHENTICATOR}.
+ * Authenticator to authenticate webservice requests against a database, config.properties, LDAP or others. By
+ * annotating the authenticator with <code>&#064;RunWithRunContext</code> annotation, this authenticator is invoked on
+ * behalf of a {@link RunContext} with the user configured in {@link JaxWsAuthenticatorUserProperty}.
  *
  * @since 5.1
  */

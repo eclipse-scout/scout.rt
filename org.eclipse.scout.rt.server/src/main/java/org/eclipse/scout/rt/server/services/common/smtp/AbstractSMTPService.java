@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.service.AbstractService;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpDebugReceiverEmailProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.SmtpDefaultFromEmailProperty;
@@ -52,16 +53,24 @@ public abstract class AbstractSMTPService extends AbstractService implements ISM
   private final boolean m_useSmtps;
 
   public AbstractSMTPService() {
-    m_host = CONFIG.getPropertyValue(SmtpHostProperty.class, getConfiguredHost());
-    m_port = CONFIG.getPropertyValue(SmtpPortProperty.class, getConfiguredPort());
-    m_username = CONFIG.getPropertyValue(SmtpUsernameProperty.class, getConfiguredUsername());
-    m_password = CONFIG.getPropertyValue(SmtpPasswordProperty.class, getConfiguredPassword());
-    m_useAuthentication = CONFIG.getPropertyValue(SmtpUseAuthenticationProperty.class, getConfiguredUseAuthentication());
-    m_debugReceiverEmail = CONFIG.getPropertyValue(SmtpDebugReceiverEmailProperty.class, getConfiguredDefaultFromEmail());
-    m_subjectPrefix = CONFIG.getPropertyValue(SmtpSubjectPrefixProperty.class, getConfiguredSubjectPrefix());
-    m_defaultFromEmail = CONFIG.getPropertyValue(SmtpDefaultFromEmailProperty.class, getConfiguredDefaultFromEmail());
-    m_sslProtocols = CONFIG.getPropertyValue(SmtpSslProtocolsProperty.class, getConfiguredSslProtocols());
-    m_useSmtps = CONFIG.getPropertyValue(SmtpUseSmtpsProperty.class, getConfiguredUseSmtps());
+    m_host = getPropertyValue(SmtpHostProperty.class, getConfiguredHost());
+    m_port = getPropertyValue(SmtpPortProperty.class, getConfiguredPort());
+    m_username = getPropertyValue(SmtpUsernameProperty.class, getConfiguredUsername());
+    m_password = getPropertyValue(SmtpPasswordProperty.class, getConfiguredPassword());
+    m_useAuthentication = getPropertyValue(SmtpUseAuthenticationProperty.class, getConfiguredUseAuthentication());
+    m_debugReceiverEmail = getPropertyValue(SmtpDebugReceiverEmailProperty.class, getConfiguredDefaultFromEmail());
+    m_subjectPrefix = getPropertyValue(SmtpSubjectPrefixProperty.class, getConfiguredSubjectPrefix());
+    m_defaultFromEmail = getPropertyValue(SmtpDefaultFromEmailProperty.class, getConfiguredDefaultFromEmail());
+    m_sslProtocols = getPropertyValue(SmtpSslProtocolsProperty.class, getConfiguredSslProtocols());
+    m_useSmtps = getPropertyValue(SmtpUseSmtpsProperty.class, getConfiguredUseSmtps());
+  }
+
+  protected <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz, DATA_TYPE defaultValue) {
+    DATA_TYPE value = CONFIG.getPropertyValue(clazz);
+    if (value == null) {
+      return defaultValue;
+    }
+    return value;
   }
 
   // configuration

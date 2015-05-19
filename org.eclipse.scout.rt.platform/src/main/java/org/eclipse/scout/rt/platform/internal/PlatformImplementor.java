@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.BeanUtility;
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -107,9 +107,9 @@ public class PlatformImplementor implements IPlatform {
   }
 
   protected void validateConfiguration() {
-    if (!ConfigIniUtility.isInitialized()) {
+    if (!ConfigUtility.isInitialized()) {
       if (LOG.isInfoEnabled()) {
-        LOG.info(": No " + ConfigIniUtility.CONFIG_INI + " found. Running with empty configuration.");
+        LOG.info(": No " + ConfigUtility.CONFIG_FILE_NAME + " found. Running with empty configuration.");
       }
     }
 

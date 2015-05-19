@@ -24,7 +24,7 @@ import org.eclipse.scout.testing.client.menu.MenuItem;
  * <p>
  * The term "window" is used for frames, dialogs, swing internal frames.
  * <p>
- * The config.ini property "IGuiMock.treeNodeToExpandIconGap" defines the gap between a tree node and its
+ * The config.properties property "IGuiMock.treeNodeToExpandIconGap" defines the gap between a tree node and its
  * expand/collapse icon and is used in {@link #gotoTreeExpandIcon(int, String)}
  */
 public interface IGuiMock {

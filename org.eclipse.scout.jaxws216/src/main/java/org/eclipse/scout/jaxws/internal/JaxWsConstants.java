@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.jaxws.internal;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler;
 import org.eclipse.scout.jaxws.security.provider.IAuthenticator;
 
@@ -31,7 +31,7 @@ public interface JaxWsConstants {
    *
    * @see IAuthenticator
    */
-  String USER_AUTHENTICATOR = ConfigIniUtility.getProperty("org.eclipse.scout.jaxws.security.provider.Authenticator#user", "jaxws-authenticator");
+  String USER_AUTHENTICATOR = ConfigUtility.getProperty("org.eclipse.scout.jaxws.security.provider.Authenticator#user", "jaxws-authenticator");
 
   // === constants for BASIC authentication ===
   String AUTH_NONE_NAME = "NONE";

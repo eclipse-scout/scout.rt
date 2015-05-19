@@ -45,7 +45,7 @@ import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.ConfigUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
@@ -105,9 +105,9 @@ public class SwingMock extends AbstractGuiMock {
 
   public int getTreeNodeToExpandIconGap() {
     if (m_treeNodeToExpandIconGap <= 0) {
-      String s = ConfigIniUtility.getProperty("IGuiMock.treeNodeToExpandIconGap");
+      String s = ConfigUtility.getProperty("IGuiMock.treeNodeToExpandIconGap");
       if (s == null) {
-        LOG.warn("Missing config.ini property 'IGuiMock.treeNodeToExpandIconGap'; using default value of 4");
+        LOG.warn("Missing config.properties property 'IGuiMock.treeNodeToExpandIconGap'; using default value of 4");
         s = "4";
       }
       m_treeNodeToExpandIconGap = Integer.parseInt(s);

@@ -20,7 +20,7 @@ import javax.xml.ws.WebServiceClient;
 
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.ConfigIniAuthenticator;
+import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.ConfigFileAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.authenticator.IAuthenticator;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.AuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticationMethod;
@@ -89,7 +89,7 @@ public @interface JaxWsPortTypeDecorator {
   /**
    * The authentication mechanism to be installed on the webservice endpoint, and to specify in which {@link RunContext}
    * to run authenticated webservice requests. By default, {@link BasicAuthenticationMethod} with
-   * {@link ConfigIniAuthenticator} is used. Authentication can be disabled by setting <i>enabled</i> to
+   * {@link ConfigFileAuthenticator} is used. Authentication can be disabled by setting <i>enabled</i> to
    * <code>false</code>. If <i>enabled</i>, an {@link AuthenticationHandler} is generated at compile time (APT)
    * and registered in the handler chain as very first handler.
    * <ul>

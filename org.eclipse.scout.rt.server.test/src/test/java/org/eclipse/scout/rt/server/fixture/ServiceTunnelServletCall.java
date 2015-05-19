@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
- * Calls the /process servlet. Requires the config.ini variable <code>server.url</code>
+ * Calls the /process servlet. Requires the config.properties variable <code>server.url</code>
  */
 public class ServiceTunnelServletCall extends Thread {
   private IServiceTunnelRequest m_req;

@@ -48,8 +48,8 @@ public class PropertiesHelperTest {
 
   @BeforeClass
   public static void before() throws MalformedURLException {
-    URL url = new URL("configini", "localhost", 80, "config.ini", getConfigIniContent());
-    instance = new PropertiesHelper("config.ini");
+    URL url = new URL("configproperties", "localhost", 80, "config.properties", getConfigPropertiesContent());
+    instance = new PropertiesHelper("config.properties");
     instance.parse(url);
   }
 
@@ -112,7 +112,7 @@ public class PropertiesHelperTest {
     assertFalse(instance.getPropertyBoolean("unknown", false));
   }
 
-  private static URLStreamHandler getConfigIniContent() {
+  private static URLStreamHandler getConfigPropertiesContent() {
     String[][] input = new String[][]{
         {USER_HOME_KEY, USER_HOME_VALUE},
         {OTHER_PROP_KEY, OTHER_PROP_VALUE},
@@ -134,19 +134,19 @@ public class PropertiesHelperTest {
       sb.append('\n');
     }
 
-    return new P_ConfigIniTestHandler(sb.toString());
+    return new P_ConfigPropertiesTestHandler(sb.toString());
   }
 
   private static String escape(String input) {
     return input.replace(":", "\\:").replace("=", "\\=");
   }
 
-  private static final class P_ConfigIniTestHandler extends URLStreamHandler {
+  private static final class P_ConfigPropertiesTestHandler extends URLStreamHandler {
 
-    private final String m_configIniContent;
+    private final String m_configPropertiesContent;
 
-    private P_ConfigIniTestHandler(String configIniContent) {
-      m_configIniContent = configIniContent;
+    private P_ConfigPropertiesTestHandler(String configPropertiesContent) {
+      m_configPropertiesContent = configPropertiesContent;
     }
 
     @Override
@@ -155,7 +155,7 @@ public class PropertiesHelperTest {
 
         @Override
         public InputStream getInputStream() throws IOException {
-          return new ByteArrayInputStream(m_configIniContent.getBytes("UTF-8"));
+          return new ByteArrayInputStream(m_configPropertiesContent.getBytes("UTF-8"));
         }
 
         @Override
