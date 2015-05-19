@@ -294,7 +294,7 @@ scout.FocusContext.prototype._validateFocus = function() {
   // This is prevented by the following div.
   var $focusContext = this._$container;
   //TODO bsh if glasspane is consolidated in desktop use desktop to find glasspane
-  var $glasspanes = this._$container.find('div.glasspane');
+  var $glasspanes = this._$container.find('glasspane');
   if ($glasspanes.length > 0) {
     scout.focusManager.validatingFocus = false;
     return;
