@@ -323,7 +323,7 @@ scout.Tree.prototype._renderExpansion = function(node) {
       var $newNodes = scout.Tree.collectSubtree($node, false);
       if ($newNodes.length) {
         $wrapper = $newNodes.wrapAll('<div class="animationWrapper">').parent();
-        var h = $newNodes.height() * $newNodes.length;
+        var h = $newNodes.outerHeight() * $newNodes.length;
         var removeContainer = function() {
           $(this).replaceWith($(this).contents());
         };
