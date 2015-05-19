@@ -6,7 +6,7 @@ scout.StringFieldKeyStrokeAdapter = function(field) {
   this.keyStrokes.push(new scout.StringFieldBackspaceKeyStroke());
 };
 
-scout.inherits(scout.StringFieldKeyStrokeAdapter, scout.ValueFieldKeyStrokeAdapter);
+scout.inherits(scout.StringFieldKeyStrokeAdapter, scout.FormFieldKeyStrokeAdapter);
 
 scout.StringFieldEnterKeyStroke = function() {
   scout.StringFieldEnterKeyStroke.parent.call(this);

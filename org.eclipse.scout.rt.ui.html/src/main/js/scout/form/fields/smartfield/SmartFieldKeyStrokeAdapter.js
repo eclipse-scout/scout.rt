@@ -4,7 +4,7 @@ scout.SmartFieldKeyStrokeAdapter = function(field) {
   // FIXME AWE: (smart-field) key-strokes hier noch registrieren
   this.keyStrokes.push(new scout.SmartFieldBackspaceKeyStroke());
 };
-scout.inherits(scout.SmartFieldKeyStrokeAdapter, scout.ValueFieldKeyStrokeAdapter);
+scout.inherits(scout.SmartFieldKeyStrokeAdapter, scout.FormFieldKeyStrokeAdapter);
 
 
 scout.SmartFieldBackspaceKeyStroke = function() {

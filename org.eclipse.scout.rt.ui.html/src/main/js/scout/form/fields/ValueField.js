@@ -9,13 +9,6 @@ scout.ValueField = function() {
 };
 scout.inherits(scout.ValueField, scout.FormField);
 
-/**
- * @override
- */
-scout.ValueField.prototype._createKeyStrokeAdapter = function() {
-  return new scout.ValueFieldKeyStrokeAdapter(this);
-};
-
 scout.ValueField.prototype._renderProperties = function() {
   scout.ValueField.parent.prototype._renderProperties.call(this);
   this._renderDisplayText(this.displayText);
