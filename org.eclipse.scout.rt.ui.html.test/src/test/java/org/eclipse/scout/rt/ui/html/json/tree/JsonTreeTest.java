@@ -476,7 +476,7 @@ public class JsonTreeTest {
     // --------------------------------------
 
     // 3 events: filterChanged, nodeChanged, filterChanged
-    // filterChanged events are converted to allNodesDeleted + nodesInserted events in JsonTree. Because of coalesce,
+    // filterChanged events are converted to allNodesDeleted + nodesInserted + nodesSelected events in JsonTree. Because of coalesce,
     // the nodeChanged event will be removed (it is obsolete, because nodes are deleted and re-inserted later).
     tree.applyNodeFilters();
     tree.getRootNode().getChildNode(0).getChildNode(0).getCellForUpdate().setText("Test-Text");
@@ -486,9 +486,10 @@ public class JsonTreeTest {
     System.out.println("Response #2: " + response);
 
     List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
-    assertEquals(2, events.size());
+    assertEquals(3, events.size());
     assertEquals("allNodesDeleted", events.get(0).getType());
     assertEquals("nodesInserted", events.get(1).getType());
+    assertEquals("nodesSelected", events.get(2).getType());
   }
 
   public static JsonEvent createJsonSelectedEvent(String nodeId) throws JSONException {

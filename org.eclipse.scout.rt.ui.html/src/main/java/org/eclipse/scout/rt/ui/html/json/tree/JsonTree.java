@@ -389,9 +389,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   protected void handleModelNodesSelected(Collection<ITreeNode> modelNodes) {
     JSONArray jsonNodeIds = nodeIdsToJson(modelNodes);
-    if (jsonNodeIds.length() == 0) {
-      return;
-    }
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_IDS, jsonNodeIds);
     addActionEvent(EVENT_NODES_SELECTED, jsonEvent);
