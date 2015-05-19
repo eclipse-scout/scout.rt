@@ -34,12 +34,12 @@ scout.FocusManager.prototype.getFirstFocusableElement = function($container,$foc
   if(!$focusableElements){
     $focusableElements = $container.find(':focusable');
   }
-  var $firstDefaultButton;
+  var firstDefaultButton;
   for (var i = 0; i < $focusableElements.length; i++) {
     var menuParents = $($focusableElements[i]).parents('div.menubar');
     var tabParents = $($focusableElements[i]).parents('div.tab-area');
-    if (!$firstDefaultButton && $($focusableElements[i]).is('.default-button')) {
-      $firstDefaultButton = $focusableElements[i];
+    if (!firstDefaultButton && $($focusableElements[i]).is('.default-button')) {
+      firstDefaultButton = $focusableElements[i];
     }
     if (menuParents.length === 0 && tabParents.length === 0) {
       focused = true;
@@ -48,8 +48,8 @@ scout.FocusManager.prototype.getFirstFocusableElement = function($container,$foc
   }
 
   if (!focused) {
-    if ($firstDefaultButton) {
-      $firstDefaultButton[0].focus();
+    if (firstDefaultButton) {
+      firstDefaultButton.focus();
     } else if ($focusableElements && $focusableElements.length > 0) {
       return $focusableElements.first();
     } else {
