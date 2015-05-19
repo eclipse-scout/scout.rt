@@ -432,7 +432,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         setSearchForm(createSearchForm());
       }
       catch (Exception e) {
-        LOG.warn("unable to create SearchForm for '" + getClass().getName() + "'.", e);
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating search form for '" + getClass().getName() + "'.", e));
       }
     }
   }
@@ -469,7 +469,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         ensureSearchControlSelected();
       }
       catch (Exception e) {
-        LOG.warn(null, e);
+        BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating search form '" + m_searchForm.getClass().getName() + "' for page '" + getClass().getName() + "'.", e));
       }
     }
   }
@@ -522,7 +522,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       interceptInitSearchForm();
     }
     catch (Exception e) {
-      LOG.warn(null, e);
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating search form '" + m_searchForm.getClass().getName() + "' for page '" + getClass().getName() + "'.", e));
     }
   }
 
@@ -566,7 +566,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         policy.pageSearchFormStarted(this);
       }
     }
-    catch (Exception t) {
+    catch (ProcessingException t) {
       LOG.error("pageCreated " + getClass().getSimpleName(), t);
     }
   }

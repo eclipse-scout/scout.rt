@@ -18,8 +18,6 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithNodesExtension;
@@ -44,6 +42,8 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
@@ -54,8 +54,6 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  * itself AND its children
  */
 public abstract class AbstractPageWithNodes extends AbstractPage<ITable> implements IPageWithNodes {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPageWithNodes.class);
 
   public AbstractPageWithNodes() {
     this(true, null);
@@ -97,16 +95,17 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
 
   @Override
   protected ITable initTable() {
-    AbstractTable table = new P_Table();
-    table.setContainerInternal(this);
-    table.addTableListener(new P_TableListener());
-    table.setAutoDiscardOnDelete(true);
-    table.setReloadHandler(new PageReloadHandler(this));
+    P_Table table = null;
     try {
+      table = new P_Table();
+      table.setContainerInternal(this);
+      table.addTableListener(new P_TableListener());
+      table.setAutoDiscardOnDelete(true);
+      table.setReloadHandler(new PageReloadHandler(this));
       table.initTable();
     }
-    catch (Exception e) {
-      LOG.warn(null, e); // TODO AWE: (page) review with A.HO -> sollte m.m. die exception throwen und nicht schlucken!
+    catch (ProcessingException e) {
+      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating inner table of class '" + getClass().getName() + "'.", e));
     }
     return table;
   }
