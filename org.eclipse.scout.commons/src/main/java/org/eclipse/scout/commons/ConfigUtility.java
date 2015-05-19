@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Utility to extract properties stored in the <code>config.properties</code> file of scout applications.
  * <p>
@@ -153,6 +156,24 @@ public final class ConfigUtility {
    */
   public static double getPropertyDouble(String key, double defaultValue) {
     return INSTANCE.getPropertyDouble(key, defaultValue);
+  }
+
+  /**
+   * Gets all property key names defined in the loaded config.properties file.
+   *
+   * @return A {@link Set} copy containing all property key names.
+   */
+  public static Set<String> getAllPropertyNames() {
+    return INSTANCE.getAllPropertyNames();
+  }
+
+  /**
+   * Gets all properties and the corresponding values loaded from the config.properties file.
+   *
+   * @return A {@link Map} copy containing all entries.
+   */
+  public Map<String, String> getAllEntries() {
+    return INSTANCE.getAllEntries();
   }
 
   /**

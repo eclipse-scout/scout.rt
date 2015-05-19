@@ -112,6 +112,12 @@ public class PropertiesHelperTest {
     assertFalse(instance.getPropertyBoolean("unknown", false));
   }
 
+  @Test
+  public void testEntries() {
+    assertEquals(11, instance.getAllPropertyNames().size());
+    assertEquals(11, instance.getAllEntries().size());
+  }
+
   private static URLStreamHandler getConfigPropertiesContent() {
     String[][] input = new String[][]{
         {USER_HOME_KEY, USER_HOME_VALUE},

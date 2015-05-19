@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -257,6 +258,24 @@ public class PropertiesHelper {
       LOG.warn("Invalid double-value for property '{}' configured: {}", key, valueRaw);
       return defaultValue;
     }
+  }
+
+  /**
+   * Gets all property key names defined in the loaded .properties file.
+   *
+   * @return A {@link Set} copy containing all property key names.
+   */
+  public Set<String> getAllPropertyNames() {
+    return CollectionUtility.hashSet(m_configProperties.keySet());
+  }
+
+  /**
+   * Gets all properties and the corresponding values loaded from the .properties file.
+   * 
+   * @return A {@link Map} copy containing all entries.
+   */
+  public Map<String, String> getAllEntries() {
+    return CollectionUtility.copyMap(m_configProperties);
   }
 
   /**
