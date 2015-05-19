@@ -24,7 +24,9 @@ scout.SvgField.prototype._renderSvgDocument = function() {
   this.$field.html(this.svgDocument);
   this.$field.find('.app-link').on('click', this._onAppLinkAction.bind(this))
   //prevent focusvalidation on other field
-  .on('mousedown', function(event){event.preventDefault(); event.stopPropagation();});
+  .on('mousedown', function(event) {
+    event.preventDefault();
+  });
 };
 
 scout.SvgField.prototype._onAppLinkAction = function(event) {
