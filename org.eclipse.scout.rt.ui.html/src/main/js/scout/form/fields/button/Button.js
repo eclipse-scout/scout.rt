@@ -49,7 +49,11 @@ scout.Button.prototype._render = function($parent) {
   this.addContainer($parent, cssClass, new scout.ButtonLayout(this));
   this.addField($button);
 
-  $button.on('click', this._onClick.bind(this));
+  $button.on('click', this._onClick.bind(this))
+  //prevent focus validation on other field on mouse down. -> Safari workaround
+  .on('mousedown', function(event) {
+    event.preventDefault();
+  });
   if (this.systemType === scout.Button.SYSTEM_TYPE.OK ||
     this.systemType === scout.Button.SYSTEM_TYPE.SAVE_WITHOUT_MARKER_CHANGE) {
     $button.addClass('default-button');
