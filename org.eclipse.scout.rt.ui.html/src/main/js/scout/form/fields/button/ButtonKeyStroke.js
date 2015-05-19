@@ -26,7 +26,7 @@ scout.ButtonKeyStroke.prototype.accept = function(event){
     if(!jQuery.contains(document.documentElement, this._button.$field[0])){
       return false;
     }
-    scout.ButtonKeyStroke.parent.prototype.accept.call(this, event);
+    return scout.ButtonKeyStroke.parent.prototype.accept.call(this, event);
 };
 
 scout.ButtonKeyStroke.prototype._drawKeyBox = function($container) {
