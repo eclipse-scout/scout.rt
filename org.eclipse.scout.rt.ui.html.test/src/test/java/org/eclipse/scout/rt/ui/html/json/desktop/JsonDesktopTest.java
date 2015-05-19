@@ -25,8 +25,9 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistryTest;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithNonDisplayableActions;
@@ -43,6 +44,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -51,7 +53,7 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class JsonDesktopTest {
 
-  private IUiSession m_uiSession;
+  private UiSession m_uiSession;
 
   @Before
   public void setUp() {
@@ -59,9 +61,7 @@ public class JsonDesktopTest {
   }
 
   private JsonDesktop<IDesktop> createJsonDesktop(IDesktop desktop) {
-    JsonDesktop<IDesktop> jsonDesktop = new JsonDesktop<IDesktop>(desktop, m_uiSession, m_uiSession.createUniqueIdFor(null), null);
-    jsonDesktop.init();
-    return jsonDesktop;
+    return m_uiSession.newJsonAdapter(desktop, null);
   }
 
   @Test
@@ -135,6 +135,13 @@ public class JsonDesktopTest {
     // Remove event must only contain the id, no other properties
     assertEquals(jsonDesktop.getId(), event.getTarget());
     assertEquals(formAdapter.getId(), formId);
+  }
+
+  @Test
+  @Ignore
+  //FIXME this test will fail. Json event model necessary? desktop event buffer? needs close before addActionEvent in JsonForm
+  public void testFormOpenedAndClosedInSameRequest() throws ProcessingException, JSONException {
+    JsonAdapterRegistryTest.testFormOpenedAndClosedInSameRequest(m_uiSession);
   }
 
   @Test
