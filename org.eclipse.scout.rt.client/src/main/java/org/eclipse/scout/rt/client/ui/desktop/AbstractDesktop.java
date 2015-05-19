@@ -156,6 +156,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
 
+  // used to restore the outline state correctly in case a page unload is forced of changes in an other outline.
+  private Map<IOutline, Bookmark> m_bookmarkPerOutline = new HashMap<IOutline, Bookmark>();
+
   /**
    * do not instantiate a new desktop<br>
    * get it via {@code ClientScoutSession.getSession().getModelManager()}
@@ -965,7 +968,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         if (m_outline != null) {
           IPage<?> oldActivePage = m_outline.getActivePage();
           if (oldActivePage != null) {
-            BEANS.get(INavigationHistoryService.class).addStep(0, oldActivePage);
+            Bookmark bm = BEANS.get(INavigationHistoryService.class).addStep(0, oldActivePage);
+            /*
+             *  prevent the bookmark for the next visit of the outline. The bookmark is needed in case
+             *  a page on the path to the currently selected page is getting invalidated due to changes
+             *  in an other outline.
+             */
+            if (bm != null) {
+              m_bookmarkPerOutline.put(m_outline, bm);
+            }
           }
         }
         //
@@ -1017,7 +1028,18 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           IPage<?> newActivePage = m_outline.getActivePage();
           if (newActivePage == null && m_outline.getDefaultDetailForm() == null) {
             // if there is no active page and no default detail form, select the first page
-            activateFirstPage();
+            Bookmark bookmark = m_bookmarkPerOutline.get(m_outline);
+            if (bookmark != null && Boolean.TRUE) {
+              try {
+                activateBookmark(bookmark);
+              }
+              catch (ProcessingException e) {
+                LOG.warn(String.format("Could not activate bookmark '%s' for restoring state of outline '%s'.", bookmark.getText(), m_outline), e);
+              }
+            }
+            else {
+              activateFirstPage();
+            }
             newActivePage = m_outline.getActivePage();
           }
           if (newActivePage != null) {
