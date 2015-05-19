@@ -103,11 +103,80 @@ scout.Table.prototype._render = function($parent) {
   this.htmlComp.setLayout(new scout.TableLayout(this));
   this.htmlComp.pixelBasedSizing = false;
   this.$data = this.$container.appendDiv('table-data');
+  this.$data.on('mousedown', '.table-row', onMouseDown)
+  .on('mouseup', '.table-row', onMouseUp)
+  .on('dblclick', '.table-row', onDoubleClick)
+  .on('contextmenu','.table-row', onContextMenu);
   scout.scrollbars.install(this.$data);
   this.session.detachHelper.pushScrollable(this.$data);
   this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.TableMenuItemsOrder.order);
   this._updateRowWidth();
   this.drawData();
+
+//----- inline methods: --------
+
+  var $mouseDownRow, mouseDownColumn, that=this;
+
+  function onMouseDown(event) {
+    $mouseDownRow = $(event.currentTarget);
+    mouseDownColumn = that._columnAtX(event.pageX);
+    that.selectionHandler.onMouseDown(event, $mouseDownRow);
+  }
+
+  function onMouseUp(event) {
+    var $row, $mouseUpRow, column, $appLink,
+      mouseButton = event.which;
+    if (event.originalEvent.detail > 1) {
+      // Don't execute on double click events
+      return;
+    }
+
+    $mouseUpRow = $(event.currentTarget);
+    that.selectionHandler.onMouseUp(event, $mouseUpRow);
+
+    if ($mouseDownRow && $mouseDownRow[0] !== $mouseUpRow[0]) {
+      return;
+    }
+
+    $row = $mouseUpRow;
+    column = that._columnAtX(event.pageX);
+    if (column !== mouseDownColumn) {
+      // Don't execute click / appLinks when the mouse gets pressed and moved outside of a cell
+      return;
+    }
+    if (mouseButton === 1) {
+      column.onMouseUp(event, $row);
+      $appLink = that._find$AppLink(event);
+    }
+    if ($appLink) {
+      that.sendAppLinkAction(column.id, $appLink.data('ref'));
+    } else if (column.guiOnlyCheckBoxColumn) {
+      that.sendRowClicked($row, mouseButton);
+    } else {
+      that.sendRowClicked($row, mouseButton, column.id);
+    }
+  }
+
+  function onDoubleClick(event) {
+    var $row = $(event.currentTarget),
+      column = that._columnAtX(event.pageX);
+    that.sendRowAction($row, column.id);
+  }
+
+  function onContextMenu(event) {
+    var menuItems, popup;
+    event.preventDefault();
+    if (that.$selectedRows().length > 0) {
+      menuItems = that._filterMenus('', true);
+      if (menuItems.length > 0) {
+        popup = new scout.ContextMenuPopup(that.session, menuItems);
+        popup.$anchor = that.$data;
+        popup.render();
+        popup.setLocation(new scout.Point(event.pageX, event.pageY));
+      }
+    }
+  }
+
 };
 
 scout.Table.prototype._renderProperties = function() {
@@ -475,10 +544,10 @@ scout.Table.prototype._installRows = function($rows) {
     var editorField,
       $row = $(this),
       row = $row.data('row');
-    $row.on('mousedown', '', onMouseDown)
-      .on('mouseup', '', onMouseUp)
-      .on('dblclick', '', onDoubleClick)
-      .on('contextmenu', onContextMenu);
+//    $row.on('mousedown', '', onMouseDown)
+//      .on('mouseup', '', onMouseUp)
+//      .on('dblclick', '', onDoubleClick)
+//      .on('contextmenu', onContextMenu);
 
     that._removeTooltipsForRow(row);
     if (row.hasError) {
@@ -501,69 +570,7 @@ scout.Table.prototype._installRows = function($rows) {
   // update grouping if data was grouped
   this._group();
 
-  // ----- inline methods: --------
 
-  var $mouseDownRow, mouseDownColumn;
-
-  function onMouseDown(event) {
-    $mouseDownRow = $(event.delegateTarget);
-    mouseDownColumn = that._columnAtX(event.pageX);
-    that.selectionHandler.onMouseDown(event, $mouseDownRow);
-  }
-
-  function onMouseUp(event) {
-    var $row, $mouseUpRow, column, $appLink,
-      mouseButton = event.which;
-    if (event.originalEvent.detail > 1) {
-      // Don't execute on double click events
-      return;
-    }
-
-    $mouseUpRow = $(event.delegateTarget);
-    that.selectionHandler.onMouseUp(event, $mouseUpRow);
-
-    if ($mouseDownRow && $mouseDownRow[0] !== $mouseUpRow[0]) {
-      return;
-    }
-
-    $row = $mouseUpRow;
-    column = that._columnAtX(event.pageX);
-    if (column !== mouseDownColumn) {
-      // Don't execute click / appLinks when the mouse gets pressed and moved outside of a cell
-      return;
-    }
-    if (mouseButton === 1) {
-      column.onMouseUp(event, $row);
-      $appLink = that._find$AppLink(event);
-    }
-    if ($appLink) {
-      that.sendAppLinkAction(column.id, $appLink.data('ref'));
-    } else if (column.guiOnlyCheckBoxColumn) {
-      that.sendRowClicked($row, mouseButton);
-    } else {
-      that.sendRowClicked($row, mouseButton, column.id);
-    }
-  }
-
-  function onDoubleClick(event) {
-    var $row = $(event.delegateTarget),
-      column = that._columnAtX(event.pageX);
-    that.sendRowAction($row, column.id);
-  }
-
-  function onContextMenu(event) {
-    var menuItems, popup;
-    event.preventDefault();
-    if (that.$selectedRows().length > 0) {
-      menuItems = that._filterMenus('', true);
-      if (menuItems.length > 0) {
-        popup = new scout.ContextMenuPopup(that.session, menuItems);
-        popup.$anchor = that.$data;
-        popup.render();
-        popup.setLocation(new scout.Point(event.pageX, event.pageY));
-      }
-    }
-  }
 };
 
 scout.Table.prototype._showCellErrorForRow = function(row) {

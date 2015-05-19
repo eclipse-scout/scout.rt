@@ -244,7 +244,7 @@
         .overlay;
         /* Make sure overlay does not get target of mouse events, necessary for links inside table-cell.
         FIXME CGU verify if this really works with IE 9 */
-        pointer-events: none;
+/*         pointer-events: none; */
       }
 
       &.select-top::before {
