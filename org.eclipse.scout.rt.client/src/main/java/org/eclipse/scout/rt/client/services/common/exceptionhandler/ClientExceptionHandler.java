@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
 
 /**
  * {@code ClientExceptionHandler} is the central point for handling client-side exceptions. For processing exceptions,
@@ -36,6 +37,12 @@ public class ClientExceptionHandler extends ExceptionHandler {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientExceptionHandler.class);
   private static final String SESSION_DATA_KEY = "ClientExceptionHandler#loopDetectionSemaphore";
+
+  @Override
+  protected void handleThrowable(final Throwable t) {
+    // Same error handling for all exceptions, except InterruptedException which is ignored.
+    handleProcessingException(BEANS.get(ExceptionTranslator.class).translate(t));
+  }
 
   @Override
   protected void handleProcessingException(final ProcessingException pe) {
