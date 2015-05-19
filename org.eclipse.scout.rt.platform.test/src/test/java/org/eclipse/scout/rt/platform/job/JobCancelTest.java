@@ -33,8 +33,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IRunnable;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.filter.AndFilter;
-import org.eclipse.scout.commons.filter.IFilter;
 import org.eclipse.scout.rt.platform.context.IRunMonitor;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -42,6 +40,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -486,15 +485,16 @@ public class JobCancelTest {
    * Cancel multiple jobs with the same job-id.
    */
   @Test
-  public void testCancelMultipleJobsWithNameRegex() throws Exception {
+  @Times(20)
+  public void testCancelMultipleJobsByName() throws Exception {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>());
 
     final String commonJobName = "777";
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(6);
-    final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(6);
+    final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(4);
 
-    // Job-1 (common-id)
+    // Job-1 (common-id) => CANCEL
     m_jobManager.schedule(new Callable<Void>() {
 
       @Override
@@ -508,9 +508,9 @@ public class JobCancelTest {
         verifyLatch.countDown();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).name(commonJobName).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).name(commonJobName).mutex(null).logOnError(false));
 
-    // Job-2 (common-id)
+    // Job-2 (common-id) => CANCEL
     m_jobManager.schedule(new Callable<Void>() {
 
       @Override
@@ -524,15 +524,14 @@ public class JobCancelTest {
         verifyLatch.countDown();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).name(commonJobName).logOnError(false));
+    }, Jobs.newInput(RunContexts.copyCurrent()).name(commonJobName).mutex(null).logOnError(false));
 
-    // Job-3 (common-id)
+    // Job-3 (common-id) => CANCEL
     m_jobManager.schedule(new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {
-
-        // Job-3a (other name, same re-used runMonitor => cancels as well)
+        // Job-3a (other name, same re-used runMonitor => CANCEL AS WELL)
         m_jobManager.schedule(new Callable<Void>() {
           @Override
           public Void call() throws Exception {
@@ -545,9 +544,9 @@ public class JobCancelTest {
             verifyLatch.countDown();
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent()).name("otherName").logOnError(false));
+        }, Jobs.newInput(RunContexts.copyCurrent()).name("otherName").mutex(null).logOnError(false));
 
-        // Job-3a (other name, other runMonitor => no cancel)
+        // Job-3b (other name, other runMonitor => NO CANCEL)
         m_jobManager.schedule(new Callable<Void>() {
           @Override
           public Void call() throws Exception {
@@ -557,10 +556,9 @@ public class JobCancelTest {
             catch (InterruptedException e) {
               protocol.add("job-3b-interrupted");
             }
-            verifyLatch.countDown();
             return null;
           }
-        }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(new RunMonitor())).name("otherName").logOnError(false));
+        }, Jobs.newInput(RunContexts.copyCurrent().runMonitor(new RunMonitor())).name("otherName").mutex(null).logOnError(false));
 
         try {
           setupLatch.countDownAndBlock();
@@ -571,7 +569,7 @@ public class JobCancelTest {
         verifyLatch.countDown();
         return null;
       }
-    }, Jobs.newInput(RunContexts.copyCurrent()).name(commonJobName));
+    }, Jobs.newInput(RunContexts.copyCurrent()).name(commonJobName).mutex(null));
 
     // Job-4 (common-id, but not-null mutex)
     m_jobManager.schedule(new Callable<Void>() {
@@ -584,18 +582,16 @@ public class JobCancelTest {
         catch (InterruptedException e) {
           protocol.add("job-4-interrupted");
         }
-        verifyLatch.countDown();
         return null;
       }
     }, Jobs.newInput(RunContexts.copyCurrent()).name(commonJobName).mutex(new Object()).logOnError(false));
 
     assertTrue(setupLatch.await());
-    m_jobManager.cancel(jobNameAndMutexFilter(commonJobName, null), true);
-
-    setupLatch.unblock();
+    m_jobManager.cancel(Jobs.newFutureFilter().names(commonJobName).mutex(null), true);
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.hashSet("job-1-interrupted", "job-2-interrupted", "job-3-interrupted", "job-3a-interrupted"), protocol);
+    setupLatch.unblock(); // release not cancelled jobs
   }
 
   /**
@@ -621,17 +617,5 @@ public class JobCancelTest {
     future.awaitDoneAndGet();
     assertFalse(executed.get());
     assertTrue(future.isCancelled());
-  }
-
-  private static AndFilter<IFuture<?>> jobNameAndMutexFilter(final String jobName, final Object mutex) {
-    final IFilter<IFuture<?>> jobFilter = Jobs.newFutureFilter().names(jobName);
-    final IFilter<IFuture<?>> mutexFilter = new IFilter<IFuture<?>>() {
-      @Override
-      public boolean accept(IFuture<?> future) {
-        return future.getJobInput().mutex() == mutex;
-      }
-    };
-
-    return new AndFilter<>(jobFilter, mutexFilter);
   }
 }
