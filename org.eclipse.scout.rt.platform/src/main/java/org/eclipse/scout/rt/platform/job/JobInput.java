@@ -60,13 +60,18 @@ public class JobInput {
     return this;
   }
 
+  /**
+   * Returns the mutex object, if the job is to be run in sequence among other jobs with the same mutex object, or
+   * <code>null</code> to run the job at the next reasonable opportunity.
+   */
   public Object mutex() {
     return m_mutexObject;
   }
 
   /**
    * Sets the mutex object (mutual exclusion) for the job. This is used to run the job in sequence among other jobs
-   * with the same mutex object, so that no two such jobs are run in parallel at the same time.
+   * with the same mutex object, so that no two such jobs are run in parallel at the same time. A <code>null</code>
+   * mutex means that no mutex is applied (by default).
    */
   public JobInput mutex(final Object mutexObject) {
     m_mutexObject = mutexObject;
