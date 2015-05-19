@@ -120,6 +120,10 @@ scout.Action.prototype._goOnline = function() {
 };
 
 scout.Action.prototype.sendDoAction = function() {
+  var activeValueField = $(document.activeElement).data('valuefield');
+  if(activeValueField){
+    activeValueField.displayTextChanged();
+  }
   this.session.send(this.id, 'doAction');
 };
 

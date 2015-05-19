@@ -88,3 +88,8 @@ scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, while
     whileTyping: whileTyping});
 };
 
+scout.ValueField.prototype.addField = function($field) {
+  scout.ValueField.parent.prototype.addField.call(this, $field);
+  this.$field.data('valuefield', this);
+};
+
