@@ -161,7 +161,7 @@
       height: 1px;
       width: 100%;
       left: 0px;
-      bottom: -1px;
+      bottom: 0px;
       content: " ";
       background-color: @palette-gray-4;
     }
@@ -223,8 +223,13 @@
 }
 
 .planner-scale {
+  position: absolute;
+  right: 0px;
+  top: @planner-header-height;
+
   height: @planner-header-height;
   border-bottom:  1px solid @palette-gray-4;
+  width: 100%;
 
   & .planner-scale-title {
     height: 100%;
@@ -290,12 +295,13 @@
 }
 
 .planner-grid {
-  position: relative;
-  display: inline-block;
+  position: absolute;
+  right: 0px;
+  top: 2 * @planner-header-height;
+
   height: calc(~"100%" - 2 * @planner-header-height);
   width: 100%;
   overflow: hidden;
-  position: absolute;
 
   & .selector {
     position: absolute;

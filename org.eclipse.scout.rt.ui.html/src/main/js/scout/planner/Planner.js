@@ -78,8 +78,8 @@ scout.Planner.prototype._render = function($parent) {
 
   // main elements
   this.$header = this.$container.appendDiv('planner-header');
-  this.$scale = this.$container.appendDiv('planner-scale');
   this.$year = this.$container.appendDiv('planner-year-container').appendDiv('planner-year');
+  this.$scale = this.$container.appendDiv('planner-scale');
   this.$grid = this.$container.appendDiv('planner-grid').mousedown(this._onCellMousedown.bind(this));
   scout.scrollbars.install(this.$grid);
 
@@ -175,6 +175,7 @@ scout.Planner.prototype._onClickYear = function(event) {
 scout.Planner.prototype._updateModel = function() {};
 
 scout.Planner.prototype._updateScreen = function() {
+  // clear before draw
   if (this.rendered) {
     this._removeAllResources();
   }
@@ -190,6 +191,14 @@ scout.Planner.prototype._updateScreen = function() {
   if (this.showYear) {
     this.$year.empty();
     this.drawYear();
+
+    this.$year.parent().animateAVCSD('width', 270);
+    this.$grid.animateAVCSD('width', '-=270', function(){ this.$grid.css('width', 'calc(100% - 270px)'); }.bind(this)) ;
+    this.$scale.animateAVCSD('width', '-=270', function(){ this.$scale.css('width', 'calc(100% - 270px)'); }.bind(this)) ;
+  } if (this.$year.parent().width() !== 0) {
+    this.$year.parent().animateAVCSD('width', 0);
+    this.$grid.animateAVCSD('width', '100%');
+    this.$scale.animateAVCSD('width', '100%');
   }
 
   // color year
@@ -398,7 +407,7 @@ scout.Planner.prototype._onScaleHoverIn = function(event) {
     tooltip = new scout.Tooltip({
         text: text,
         $anchor: $scale,
-        arrowPosition: 25,
+        arrowPosition: 50,
         arrowPositionUnit: '%',
         htmlEnabled: true
       });
@@ -434,7 +443,6 @@ scout.Planner.prototype._renderResources = function(resources) {
     resource = resources[i];
     $resource = this._build$Resource(resource, this.$grid);
     $resource.data('resource', resource)
-      .on('mousedown', this._onResourceMousedown.bind(this))
       .appendTo(this.$grid);
     resource.$resource = $resource;
   }
@@ -462,7 +470,6 @@ scout.Planner.prototype._build$Activity = function(activity) {
 
   $activity.text(activity.text)
     .data('activity', activity)
-    .on('click', this._onActivityClick.bind(this))
     .css('left', 'calc(' + this.transformLeft(begin) + '% + 2px)')
     .css('width', 'calc(' + this.transformWidth(end - begin) + '% - 4px');
 
@@ -478,22 +485,6 @@ scout.Planner.prototype._build$Activity = function(activity) {
 
   activity.$activity = $activity;
   return $activity;
-};
-
-
-/* -- grid, events-------------------------------------------------- */
-
-
-scout.Planner.prototype._onResourceMousedown = function(event) {
-//  var $resource = $(event.delegateTarget),
-//  resource = $resource.data('resource');
-
-//  this.selectResource(resource);
-};
-
-scout.Planner.prototype._onActivityClick = function(event) {
-//  var $activity = $(event.delegateTarget),
-//    activity = $activity.data('activity');
 };
 
 /* -- selector -------------------------------------------------- */
@@ -709,7 +700,7 @@ scout.Planner.prototype.colorYear = function() {
   if (!this.showYear) {
     return;
   }
-
+/*
   // remove color information
   $('.year-day.year-range, .year-day.year-range-day', this.$year).removeClass('year-range year-range-day');
 
@@ -728,7 +719,7 @@ scout.Planner.prototype.colorYear = function() {
     if (scout.dates.isSameDay(date, that.selected)) {
       $day.addClass('year-range-day');
     }
-  });
+  });*/
 };
 
 /* -- year, events ---------------------------------------- */
