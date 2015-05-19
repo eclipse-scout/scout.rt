@@ -29,15 +29,17 @@ scout.FocusManager.prototype.installManagerForSession = function(session, option
 
 };
 
-scout.FocusManager.prototype.getFirstFocusableElement = function($container) {
+scout.FocusManager.prototype.getFirstFocusableElement = function($container,$focusableElements) {
   var focused = false;
-  var $focusableElements = $container.find(':focusable');
-  var firstDefaultButton;
+  if(!$focusableElements){
+    $focusableElements = $container.find(':focusable');
+  }
+  var $firstDefaultButton;
   for (var i = 0; i < $focusableElements.length; i++) {
     var menuParents = $($focusableElements[i]).parents('div.menubar');
     var tabParents = $($focusableElements[i]).parents('div.tab-area');
-    if (!firstDefaultButton && $($focusableElements[i]).is('.default-button')) {
-      firstDefaultButton = $focusableElements[i];
+    if (!$firstDefaultButton && $($focusableElements[i]).is('.default-button')) {
+      $firstDefaultButton = $focusableElements[i];
     }
     if (menuParents.length === 0 && tabParents.length === 0) {
       focused = true;
@@ -46,8 +48,8 @@ scout.FocusManager.prototype.getFirstFocusableElement = function($container) {
   }
 
   if (!focused) {
-    if (firstDefaultButton) {
-      firstDefaultButton.focus();
+    if ($firstDefaultButton) {
+      $firstDefaultButton[0].focus();
     } else if ($focusableElements && $focusableElements.length > 0) {
       return $focusableElements.first();
     } else {
@@ -57,8 +59,8 @@ scout.FocusManager.prototype.getFirstFocusableElement = function($container) {
   }
 };
 
-scout.FocusManager.prototype.focusFirstElement = function($container) {
-  var focusableElement = this.getFirstFocusableElement($container);
+scout.FocusManager.prototype.focusFirstElement = function($container,$focusableElements) {
+  var focusableElement = this.getFirstFocusableElement($container,$focusableElements);
   if (focusableElement) {
     focusableElement.focus();
   }
@@ -76,7 +78,7 @@ scout.FocusManager.prototype.installFocusContext = function($container, uiSessio
   }
   var focusContext = new scout.FocusContext($container, $firstFocusElement, uiSessionId, isRoot);
 
-  $.log.warn('install focuscontext ');
+  $.log.trace('install focuscontext ');
   focusContext.activate(true);
 
   return this;
@@ -100,21 +102,21 @@ scout.FocusManager.prototype.activateFocusContext = function(focusContext) {
   focusContexts.push(focusContext);
 };
 scout.FocusManager.prototype.uninstallFocusContextForContainer = function($container, uiSessionId) {
-  $.log.warn('focuscontext for container started');
+  $.log.trace('focuscontext for container started');
   var focusContext = this._findFocusContext($container, uiSessionId);
   if (focusContext) {
-    $.log.warn('focuscontext for container. uninstall now');
+    $.log.trace('focuscontext for container. uninstall now');
     focusContext.uninstall();
   }
 };
 
 scout.FocusManager.prototype._findFocusContext = function($container, uiSessionId) {
   var contexts = this._sessionFocusContexts[uiSessionId].focusContexts;
-  $.log.warn('find focuscontext for container');
+  $.log.trace('find focuscontext for container');
   if (contexts && contexts.length > 0) {
     for (var i = contexts.length - 1; i >= 0; i--) {
       if (contexts[i]._$container === $container) {
-        $.log.warn('find focuscontext for container. Context found.');
+        $.log.trace('find focuscontext for container. Context found.');
         return contexts[i];
       }
     }
@@ -135,9 +137,9 @@ scout.FocusManager.prototype.uninstallFocusContext = function(focusContext, uiSe
   var prevFocusContext = focusContexts[focusContexts.length - 1];
   if (index === oldLength - 1 && prevFocusContext) {
     //when focuscontext was on top(active) install old focusContext and set focus to focused element
-    $.log.warn('focuscontext uninstalled');
+    $.log.trace('focuscontext uninstalled');
     setTimeout(function() {
-      $.log.warn('activated runned after timeout');
+      $.log.trace('activated runned after timeout');
       prevFocusContext.activate(false);
     }.bind(this), 0);
   }
@@ -149,7 +151,7 @@ scout.FocusManager.prototype.checkFocusContextIsActive = function(focusContext) 
   return index === focusContexts.length - 1;
 };
 scout.FocusManager.prototype.validateFocus = function(uiSessionId, caller) {
-  $.log.warn('validate focus, caller: ' + caller);
+  $.log.trace('validate focus, caller: ' + caller);
   if (this._sessionFocusContexts[uiSessionId].focusContexts.length > 0) {
     var context = this._sessionFocusContexts[uiSessionId].focusContexts[this._sessionFocusContexts[uiSessionId].focusContexts.length - 1];
     context._validateFocus();
@@ -222,20 +224,20 @@ scout.FocusContext.prototype.handleTab = function(event) {
 scout.FocusContext.prototype.activate = function(disposeOld) {
   this.keyDownListener = this.handleTab.bind(this);
   this._$container.on('keydown', this.keyDownListener);
-  $.log.warn('activate event focus context: ' + this.name);
+  $.log.trace('activate event focus context: ' + this.name);
   if (disposeOld) {
     scout.focusManager.disposeActiveFocusContext(this._uiSessionId);
   }
   scout.focusManager.activateFocusContext(this);
   if (this._$focusedElement && this._$focusedElement.length > 0) {
 
-    $.log.warn('activated context: ' + this.name);
+    $.log.trace('activated context: ' + this.name);
   }
   this._validateFocus();
 };
 
 scout.FocusContext.prototype._validateFocusInEvent = function(event) {
-  $.log.warn('_validateFocusInEvent' + ' context: ' + this.name + ' eventTarget: ' + event.target);
+  $.log.trace('_validateFocusInEvent' + ' context: ' + this.name + ' eventTarget: ' + event.target);
   this._validateFocus();
   $.suppressEvent(event);
 };
@@ -249,7 +251,6 @@ scout.FocusContext.prototype.onHideField = function() {
 
 scout.FocusContext.prototype.bindHideListener = function() {
   //ensure only one of each listenertype exists.
-  //TODO nbu on/off verwenden
   var $focusedElement = this._$focusedElement;
   $focusedElement.off('hide', this.hideListener);
   this.hideListener = this.onHideField.bind(this);
@@ -260,11 +261,11 @@ scout.FocusContext.prototype.bindHideListener = function() {
   $focusedElement.off('focusout', this.focusoutListener);
   this.focusoutListener = this.onFieldFocusOff.bind(this, $focusedElement);
   $focusedElement.on('focusout', this.focusoutListener);
-  $.log.warn('hidelistner bound on ' + $focusedElement.attr('class') + ' context: ' + this.name);
+  $.log.trace('hidelistner bound on ' + $focusedElement.attr('class') + ' context: ' + this.name);
 };
 
 scout.FocusContext.prototype.onFieldFocusOff = function($focusedElement) {
-  $.log.warn('hidelistner unbound on ' + $focusedElement.attr('class'));
+  $.log.trace('hidelistner unbound on ' + $focusedElement.attr('class'));
   $focusedElement.off('hide', this.hideListener);
   $focusedElement.off('remove', this.removeListener);
   $focusedElement.off('focusout', this.focusoutListener);
@@ -275,17 +276,13 @@ scout.FocusContext.prototype._validateFocus = function() {
     return;
   }
   scout.focusManager.validatingFocus = true;
-  $.log.warn('_validate focus called');
+  $.log.trace('_validate focus called');
   //If somehow, this scout div gets the focus, ensure it is set to the correct focus context.
   // For example, if glasspanes are active, the focus should _only_ be applied to the top-most glasspane.
   var activeElement = document.activeElement;
-  if (this._$focusedElement && this._$focusedElement.length > 0) {
-
-    $.log.warn('_validate focus ' + this._$focusedElement.attr('class') + ' context: ' + this.name + ' activeElement =' + this._$focusedElement.attr('class'));
-  }
   //activate Context if it is not on top
   if (!scout.focusManager.checkFocusContextIsActive(this)) {
-    $.log.warn(this._$focusedElement ? 'set focus on top if its not on top' + this._$focusedElement.attr('class') + ' context: ' + this.name : 'set focus on top if its not on top context: ' + this.name);
+    $.log.trace(this._$focusedElement ? 'set focus on top if its not on top' + this._$focusedElement.attr('class') + ' context: ' + this.name : 'set focus on top if its not on top context: ' + this.name);
     this.activate(true);
   }
 
@@ -294,58 +291,56 @@ scout.FocusContext.prototype._validateFocus = function() {
   // This is prevented by the following div.
   var $focusContext = this._$container;
   //TODO bsh if glasspane is consolidated in desktop use desktop to find glasspane
-  var $glasspanes = this._$container.find('glasspane');
+  var $glasspanes = this._$container.find('.glasspane');
   if ($glasspanes.length > 0) {
     scout.focusManager.validatingFocus = false;
     return;
   }
 
   // If any non-focusable element inside the $container got the focus...
+  $.log.trace(!$(activeElement).is(':focusable') + ':' + $(activeElement).attr('class'));
+  var $focusableElements = this._$container.find(':focusable');
   if (activeElement === this._$container[0]) {
-    var $focusableElements = this._$container.find(':focusable');
-    $.log.warn('_fuu ' + ' context: ' + this.name);
+    $.log.trace('_fuu ' + ' context: ' + this.name);
     //if we are on scout div and there are elements on this div which can gain the focus then it's not allowed to focus scout div. focus last element
-    if (this._$focusedElement && this._$focusedElement.length > 0 && this.focusableElement(this._$focusedElement) ) {
+    if (this._$focusedElement && this._$focusedElement.length > 0 && this._$focusedElement.is(':focusable') ) {
       this._$focusedElement[0].focus();
-      $.log.warn(this._$focusedElement ? '_validate focus  focused ' + this._$focusedElement.attr('class') + ' context: ' + this.name : '_validate focus  focused context: ' + this.name);
+      $.log.trace(this._$focusedElement ? '_validate focus  focused ' + this._$focusedElement.attr('class') + ' context: ' + this.name : '_validate focus  focused context: ' + this.name);
     } else {
-      $.log.warn('_validate first focused ' + ' context: ' + this.name);
-      scout.focusManager.focusFirstElement($focusContext);
+      $.log.trace('_validate first focused ' + ' context: ' + this.name);
+      scout.focusManager.focusFirstElement($focusContext,$focusableElements);
     }
   }
   // If any non-focusable element inside the $focusContext got the focus...
   else if (activeElement === $focusContext[0]) {
     // ... do nothing and swallow the event
-    $.log.warn('... do nothing and swallow the event' + ' context: ' + this.name);
+    $.log.trace('... do nothing and swallow the event' + ' context: ' + this.name);
   }
   // If the active element is inside or equal to the focus context or if activeElement is no longer focusable.
-  else if (!$focusContext[0].contains(activeElement) || !this.focusableElement($(activeElement))) {
+  else if (!$focusContext[0].contains(activeElement) || !$(activeElement).is(':focusable')) {
     // ...set the focus to the first focusable element inside the context element
-    $.log.warn(this._$focusedElement ? 'If the active element is inside or equal to the focus context...   ' + this._$focusedElement.attr('class') + ' context: ' + this.name : 'If the active element is inside or equal to the focus context... ' + this.name);
-    $.log.warn(' ...set the focus to the first focusable element inside the context element ' + ' context: ' + this.name);
-    if ($focusContext.find(':focusable').length === 0) {
-      $.log.warn(' ...set focus on container ' + ' context: ' + this.name);
-
+    $.log.trace(this._$focusedElement ? 'If the active element is inside or equal to the focus context...   ' + this._$focusedElement.attr('class') + ' context: ' + this.name : 'If the active element is inside or equal to the focus context... ' + this.name);
+    $.log.trace(' ...set the focus to the first focusable element inside the context element ' + ' context: ' + this.name);
+    if ($focusableElements.length === 0) {
+      $.log.trace(' ...set focus on container ' + ' context: ' + this.name);
       $focusContext[0].focus();
-    } else if (this._$focusedElement && this._$focusedElement.length > 0 && this.focusableElement(this._$focusedElement)) {
-      $.log.warn(' ...reset focus ' + ' context: ' + this.name);
+    } else if (this._$focusedElement && this._$focusedElement.length > 0 && this._$focusedElement.is(':focusable')) {
+      $.log.trace(' ...reset focus ' + ' context: ' + this.name);
       this._$focusedElement[0].focus();
     } else {
-      $.log.warn(' ...set focus on first element ' + ' context: ' + this.name);
-      scout.focusManager.focusFirstElement($focusContext);
+      $.log.trace(' ...set focus on first element ' + ' context: ' + this.name);
+      scout.focusManager.focusFirstElement($focusContext,$focusableElements);
     }
-  } else if (!this.focusableElement($(activeElement))) {
-    $.log.warn('bla');
   }
   //if active element is no longer focusable
   else {
-    $.log.warn('do nothing');
+    $.log.trace('do nothing');
   }
-  if (this._$container.find(':focusable').filter(function() {
+  if ($focusableElements.filter(function() {
     return this === document.activeElement;
   }).length === 1) {
     this._$focusedElement = $(document.activeElement);
-    $.log.warn(this._$focusedElement ? 'focused element :' + this._$focusedElement.attr('class') : 'focused element with undefined class');
+    $.log.trace(this._$focusedElement ? 'focused element :' + this._$focusedElement.attr('class') : 'focused element with undefined class');
     this.bindHideListener();
   }
 //update scrollbar
@@ -355,27 +350,6 @@ scout.FocusContext.prototype._validateFocus = function() {
 //    scout.scrollbars.scrollTo(this._$container, this._$focusedElement);
   }
   scout.focusManager.validatingFocus = false;
-};
-
-scout.FocusContext.prototype.focusableElement = function( $element ) {
-  if ( this.elementIsHidden($element[0]) || $element[0].disabled) {
-      return false;
-  }
-
-  var tabIndex = +$element.attr( "tabindex" );
-  tabIndex = isNaN( tabIndex ) ? -1 : tabIndex;
-  return this.elementIsSelectableElement($element[0])|| tabIndex > -1;
-};
-
-scout.FocusContext.prototype.elementIsSelectableElement = function(element) {
-  if (element.tagName == "INPUT" || element.tagName == "TEXTAREA"|| element.tagName == "SELECT"|| element.tagName == "BUTTON" || element.tagName == "IFRAME" || element.tagName == "A" || element.tagName == "AREA") {
-    return true;
-  }
-  return false;
-};
-
-scout.FocusContext.prototype.elementIsHidden = function(element) {
-  return (element.offsetParent === null);
 };
 
 //Singleton
