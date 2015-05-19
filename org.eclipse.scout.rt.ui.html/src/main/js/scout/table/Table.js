@@ -64,6 +64,7 @@ scout.Table.prototype._initColumns = function() {
   if (this.checkable) {
     this._insertCheckBoxColumn();
   }
+  this._updateRowWidth();
 };
 
 scout.Table.prototype._createKeyStrokeAdapter = function() {
@@ -110,7 +111,6 @@ scout.Table.prototype._render = function($parent) {
   scout.scrollbars.install(this.$data);
   this.session.detachHelper.pushScrollable(this.$data);
   this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.TableMenuItemsOrder.order);
-  this._updateRowWidth();
   this.drawData();
 
 //----- inline methods: --------
@@ -1678,11 +1678,8 @@ scout.Table.prototype._renderCheckable = function() {
 };
 
 scout.Table.prototype._redraw = function() {
-  if (this.header) {
-    this.header.remove();
-    this.header = this._createHeader();
-  }
-  this._updateRowWidth();
+  this._removeTableHeader();
+  this._renderTableHeader();
   this.drawData();
 };
 
@@ -1690,10 +1687,16 @@ scout.Table.prototype._renderTableHeader = function() {
   if (this.headerVisible && !this.header) {
     this.header = this._createHeader();
   } else if (!this.headerVisible && this.header) {
+    this._removeTableHeader();
+  }
+  this.invalidateTree();
+};
+
+scout.Table.prototype._removeTableHeader = function() {
+  if (this.header) {
     this.header.remove();
     this.header = null;
   }
-  this.invalidateTree();
 };
 
 scout.Table.prototype._renderTableFooter = function() {
@@ -1806,12 +1809,17 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
   this._triggerRowOrderChanged();
 };
 
+/**
+ * Rebuilds the header.<br>
+ * Does not modify the rows, it expects a deleteAll and insert event to follow which will do the job.
+ */
 scout.Table.prototype._onColumnStructureChanged = function(columns) {
   this.columns = columns;
   this._initColumns();
 
   if (this.rendered) {
-    this._redraw();
+    this._removeTableHeader();
+    this._renderTableHeader();
   }
 };
 

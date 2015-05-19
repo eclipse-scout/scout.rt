@@ -1344,47 +1344,6 @@ describe("Table", function() {
         expect($colHeaders.eq(1).text()).toBe(column1.text);
         expect($colHeaders.eq(2).text()).toBe(column2.text);
       });
-
-      it("redraws the columns to reflect column order changes", function() {
-        table.render(session.$entryPoint);
-
-        var $colHeaders = table.header.findHeaderItems();
-        expect($colHeaders.length).toBe(3);
-        expect($colHeaders.eq(0).data('column').id).toBe(column0.id);
-        expect($colHeaders.eq(1).data('column').id).toBe(column1.id);
-        expect($colHeaders.eq(2).data('column').id).toBe(column2.id);
-
-        var $rows = table.$rows();
-        var $cells0 = $rows.eq(0).find('.table-cell');
-        var $cells1 = $rows.eq(1).find('.table-cell');
-
-        expect($cells0.eq(0).text()).toBe('0');
-        expect($cells0.eq(1).text()).toBe('1');
-        expect($cells0.eq(2).text()).toBe('2');
-        expect($cells1.eq(0).text()).toBe('0');
-        expect($cells1.eq(1).text()).toBe('1');
-        expect($cells1.eq(2).text()).toBe('2');
-
-        var message = {
-          events: [createColumnStructureChangedEvent(model, [column2, column1])]
-        };
-        session._processSuccessResponse(message);
-
-        //Check column header order
-        $colHeaders = table.header.findHeaderItems();
-        expect($colHeaders.length).toBe(2);
-        expect($colHeaders.eq(0).data('column').id).toBe(column2.id);
-        expect($colHeaders.eq(1).data('column').id).toBe(column1.id);
-
-        //Check cells order
-        $rows = table.$rows();
-        $cells0 = $rows.eq(0).find('.table-cell');
-        $cells1 = $rows.eq(1).find('.table-cell');
-        expect($cells0.eq(0).text()).toBe('2');
-        expect($cells0.eq(1).text()).toBe('1');
-        expect($cells1.eq(0).text()).toBe('2');
-        expect($cells1.eq(1).text()).toBe('1');
-      });
     });
 
     describe("columnOrderChanged event", function() {

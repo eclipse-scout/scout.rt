@@ -73,6 +73,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_RESET_COLUMNS = "resetColumns";
   public static final String EVENT_ROWS_CHECKED = "rowsChecked";
   public static final String EVENT_COLUMN_ORDER_CHANGED = "columnOrderChanged";
+  public static final String EVENT_COLUMN_STRUCTURE_CHANGED = "columnStructureChanged";
   public static final String EVENT_COLUMN_HEADERS_UPDATED = "columnHeadersUpdated";
   public static final String EVENT_START_CELL_EDIT = "startCellEdit";
   public static final String EVENT_END_CELL_EDIT = "endCellEdit";
@@ -699,6 +700,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_INSERTED, rowsToInsert));
         break;
       }
+      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
+        m_eventBuffer.add(event);
+        // If a column got visible it is necessary to resend all rows to inform the gui about the new cells of the new column
+        m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ALL_ROWS_DELETED));
+        m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_INSERTED, getModel().getRows()));
+        break;
+      }
       default: {
         m_eventBuffer.add(event);
       }
@@ -728,7 +736,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         handleModelRowsDeleted(event.getRows());
         break;
       case TableEvent.TYPE_ALL_ROWS_DELETED:
-        handleModelAllRowsDeleted(event.getRows());
+        handleModelAllRowsDeleted();
         break;
       case TableEvent.TYPE_ROWS_SELECTED:
         handleModelRowsSelected(event.getRows());
@@ -809,10 +817,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     addActionEvent(EVENT_ROWS_DELETED, jsonEvent);
   }
 
-  protected void handleModelAllRowsDeleted(Collection<ITableRow> modelRows) {
-    if (modelRows.isEmpty()) {
-      return;
-    }
+  protected void handleModelAllRowsDeleted() {
     m_tableRows.clear();
     m_tableRowIds.clear();
     addActionEvent(EVENT_ALL_ROWS_DELETED);
@@ -866,7 +871,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
-    addActionEvent("columnStructureChanged", jsonEvent);
+    addActionEvent(EVENT_COLUMN_STRUCTURE_CHANGED, jsonEvent);
   }
 
   protected void handleModelColumnOrderChanged() {

@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
@@ -301,6 +302,29 @@ public class JsonTableTest {
     responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTable.EVENT_COLUMN_HEADERS_UPDATED);
     assertTrue(responseEvents.size() == 1);
+  }
+
+  /**
+   * If column structure changes, we need to resend every row including its new cells.
+   */
+  @Test
+  public void testColumnStructureChangedEvent() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetDisplayableColumns();
+    table.getColumnSet().getColumn(0).setVisible(false);
+
+    m_uiSession.newJsonAdapter(table, null);
+    table.getColumnSet().getColumn(0).setVisible(true);
+
+    JsonResponse response = m_uiSession.currentJsonResponse();
+    response.fireProcessBufferedEvents();
+    List<JsonEvent> events = response.getEventList();
+    assertEquals(3, events.size());
+    assertEquals(JsonTable.EVENT_COLUMN_STRUCTURE_CHANGED, events.get(0).getType());
+    assertEquals(JsonTable.EVENT_ALL_ROWS_DELETED, events.get(1).getType());
+    assertEquals(JsonTable.EVENT_ROWS_INSERTED, events.get(2).getType());
   }
 
   /**
