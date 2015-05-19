@@ -157,6 +157,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
 
+  // used to restore the outline state correctly in case a page unload is forced of changes in an other outline.
+  private Map<IOutline, Bookmark> m_bookmarkPerOutline = new HashMap<IOutline, Bookmark>();
+
   /**
    * do not instantiate a new desktop<br>
    * get it via {@code ClientScoutSession.getSession().getModelManager()}
@@ -966,7 +969,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         if (m_outline != null) {
           IPage oldActivePage = m_outline.getActivePage();
           if (oldActivePage != null) {
-            SERVICES.getService(INavigationHistoryService.class).addStep(0, oldActivePage);
+            Bookmark bm = SERVICES.getService(INavigationHistoryService.class).addStep(0, oldActivePage);
+            /*
+             *  prevent the bookmark for the next visit of the outline. The bookmark is needed in case
+             *  a page on the path to the currently selected page is getting invalidated due to changes
+             *  in an other outline.
+             */
+            if (bm != null) {
+              m_bookmarkPerOutline.put(m_outline, bm);
+            }
           }
         }
         //
@@ -1017,22 +1028,35 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           m_outline.makeActivePageToContextPage();
           IPage newActivePage = m_outline.getActivePage();
           if (newActivePage == null) {
-            // if there is no active page, set it now
-            if (m_outline.isRootNodeVisible()) {
-              m_outline.selectNode(m_outline.getRootNode(), false);
+            // try to reload state of last outline visit.
+            Bookmark bookmark = m_bookmarkPerOutline.get(m_outline);
+            if (bookmark != null && Boolean.TRUE) {
+              try {
+                activateBookmark(bookmark, false);
+              }
+              catch (ProcessingException e) {
+                LOG.warn(String.format("Could not activate bookmark '%s' for restoring state of outline '%s'.", bookmark.getText(), m_outline), e);
+              }
             }
+            // default selection in outline
             else {
-              List<ITreeNode> children = m_outline.getRootNode().getChildNodes();
-              if (CollectionUtility.hasElements(children)) {
-                for (ITreeNode node : children) {
-                  if (node.isVisible() && node.isEnabled()) {
-                    m_outline.selectNode(node, false);
-                    break;
+              // if there is no active page, set it now
+              if (m_outline.isRootNodeVisible()) {
+                m_outline.selectNode(m_outline.getRootNode(), false);
+              }
+              else {
+                List<ITreeNode> children = m_outline.getRootNode().getChildNodes();
+                if (CollectionUtility.hasElements(children)) {
+                  for (ITreeNode node : children) {
+                    if (node.isVisible() && node.isEnabled()) {
+                      m_outline.selectNode(node, false);
+                      break;
+                    }
                   }
                 }
               }
+              newActivePage = m_outline.getActivePage();
             }
-            newActivePage = m_outline.getActivePage();
           }
           if (newActivePage != null) {
             SERVICES.getService(INavigationHistoryService.class).addStep(0, newActivePage);
