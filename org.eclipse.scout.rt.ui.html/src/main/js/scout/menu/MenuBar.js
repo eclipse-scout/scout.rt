@@ -1,13 +1,17 @@
-scout.MenuBar = function($parent, position, orderFunc) {
-  this.position = position;
-  this.orderFunc = orderFunc;
-  this.menuItems = [];
+scout.MenuBar = function($parent, position, session, menuSorter) {
   this.$parent = $parent;
+  this.position = position;
+  this.session = session;
+  this.menuSorter = menuSorter;
+  this.menuItems = [];
   this.keyStrokeAdapter;
 
-  // Create a menubar container and add it to the parent, but don't show it yet. It will
-  // be shown automatically when items are added to the menubar, see updateVisibility().
+  // Create a menu-bar container and add it to the parent, but don't show it yet. It will
+  // be shown automatically when items are added to the menu-bar, see updateVisibility().
   this.$container = $.makeDiv('menubar').hide();
+  var htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  htmlComp.setLayout(new scout.MenuBarLayout(this));
+
   if (this.position === 'top') {
     this.$parent.prepend(this.$container);
   } else {
@@ -25,12 +29,13 @@ scout.MenuBar.prototype.remove = function() {
   }
 };
 
-scout.MenuBar.prototype.updateItems = function(menuItems) {
+// FIXME AWE: (menu) check if the force parameter is really required
+scout.MenuBar.prototype.updateItems = function(menuItems, force) {
   menuItems = scout.arrays.ensure(menuItems);
 
   // stop if menus are the same as before
-  // remove separators before comparison, because orderFunc may add new separators (arrays.equals compares by reference (===))
-  if (scout.arrays.equals(this.menuItems.filter(notIsSeparator), menuItems.filter(notIsSeparator))) {
+  // remove separators before comparison, because menuSorter may add new separators (arrays.equals compares by reference (===))
+  if (!force && scout.arrays.equals(this.menuItems.filter(isNotSeparator), menuItems.filter(isNotSeparator))) {
     return;
   }
 
@@ -39,11 +44,11 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
     item.remove();
   });
 
-  // The orderFunc may add separators to the list of items, that's why we
-  // store the return value of orderFunc in this.menuItems and not the
+  // The menuSorter may add separators to the list of items, that's why we
+  // store the return value of menuSorter in this.menuItems and not the
   // menuItems passed to the updateItems method. We must do this because
   // otherwise we could not remove the added separator later.
-  var orderedMenuItems = this.orderFunc(menuItems);
+  var orderedMenuItems = this.menuSorter.order(menuItems);
   this.menuItems = orderedMenuItems.left.concat(orderedMenuItems.right);
 
   // Important: "right" items are rendered first! This is a fix for Firefox issue with
@@ -54,21 +59,26 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
 
   // Add tabindex 0 to first valid MenuItem so that it can be focused. All other items
   // are not tabbable. They can be selected with the arrow keys.
-  for (var i = 0; i < this.menuItems.length; i++) {
-    var item = this.menuItems[i];
-    if ((item instanceof scout.Button || (item instanceof scout.Menu && !item.separator)) && item.visible && item.enabled) {
+  this.menuItems.forEach(function(item) {
+    if (item.enabled && item.visible && (item instanceof scout.Button || isNotSeparator(item))) {
       var $target = (item instanceof scout.Button ? item.$field : item.$container);
       $target.attr('tabindex', 0);
-      break;
+      return true;
+    } else {
+      return false;
     }
-  }
+  });
 
   this.updateVisibility();
 
   // --- Helper functions ---
 
-  function notIsSeparator(menu) {
-    return !menu.separator;
+  function isNotSeparator(item) {
+    if (item instanceof scout.Menu) {
+      return !item.separator;
+    } else {
+      return true;
+    }
   }
 };
 
@@ -131,7 +141,7 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     item.tooltipPosition = tooltipPosition;
     item.render(this.$container);
     item.menuBar = this; // link to menuBar
-    item.$container.removeClass('form-field');
+    item.$container.removeClass('form-field'); // FIXME AWE: do this removeClass in Menu.js when menuBar is set
 
     // Ensure all all items are non-tabbable by default. One of the items will get a tabindex
     // assigned again later in updateItems().

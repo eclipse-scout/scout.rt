@@ -2,7 +2,7 @@ scout.Menu = function() {
   scout.Menu.parent.call(this);
   this.childActions = [];
   this._addAdapterProperties('childActions');
-  this.popup = undefined;
+  this.popup = undefined; // FIXME AWE: use this for different style?
   this.keyStrokeAdapter;
 };
 scout.inherits(scout.Menu, scout.Action);

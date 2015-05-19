@@ -793,10 +793,9 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var menuModel = helper.createMenuModel('menu');
-      //register adapter
-      helper.menuHelper.createMenu(menuModel);
-      table.menus = [session.getModelAdapter(menuModel.id)];
+      var menuModel = helper.createMenuModel('menu'),
+        menu = helper.menuHelper.createMenu(menuModel);
+      table.menus = [menu];
       var $row0 = table.$data.children('.table-row').eq(0);
       $row0.triggerContextMenu();
 
@@ -811,14 +810,13 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var menuModel = helper.createMenuModel('menu');
-      var menuModel2 = helper.createMenuModel('menu');
-      menuModel2.visible = false;
+      var menuModel1 = helper.createMenuModel('menu'),
+        menu1 = helper.menuHelper.createMenu(menuModel1),
+        menuModel2 = helper.createMenuModel('menu'),
+        menu2 = helper.menuHelper.createMenu(menuModel2);
+      menu2.visible = false;
 
-      // register adapter
-      helper.menuHelper.createMenu(menuModel);
-      helper.menuHelper.createMenu(menuModel2);
-      table.menus = [session.getModelAdapter(menuModel.id), session.getModelAdapter(menuModel2.id)];
+      table.menus = [menu1, menu2];
       var $row0 = table.$data.children('.table-row').eq(0);
       $row0.triggerContextMenu();
 

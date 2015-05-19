@@ -47,11 +47,10 @@ scout.GroupBox.prototype._render = function($parent) {
     this.session.detachHelper.pushScrollable(this.$body);
   }
   this._prepareFields();
-  for (i = 0; i < this.controls.length; i++) {
-    this.controls[i].render(this.$body);
-  }
-
-  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.GroupBoxMenuItemsOrder.order);
+  this.controls.forEach(function(control) {
+    control.render(this.$body);
+  }, this);
+  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, this.session, new scout.GroupBoxMenuItemsOrder());
   if (this.menuBar.position === 'top') {
     this._$groupBoxTitle.after(this.menuBar.$container);
   }

@@ -136,6 +136,11 @@ scout.Session.prototype.getModelAdapter = function(id) {
   return this.modelAdapterRegistry[id];
 };
 
+/**
+ * Creates a new adapter for the given ID or returns an existing instance.
+ * When a new adapter is created it will be automatically registered in the
+ * model-adpater registry.
+ */
 scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
   $.log.trace('getOrCreate(' + id + (parent ? ', ' + parent : '') + ')');
   if (!id) {
@@ -179,7 +184,7 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
     owner = parent;
   }
 
-  adapter = this.objectFactory.create(adapterData);
+  adapter =  this.objectFactory.create(adapterData);
   $.log.trace('created new adapter ' + adapter + ': owner = ' + owner + ', parent = ' + parent + ', adapterData.owner = ' + adapterData.owner);
   adapter.owner = owner;
   adapter.parent = parent;
@@ -187,6 +192,27 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
   parent.addChild(adapter);
 
   return adapter;
+};
+
+/**
+ * Creates a new object instance based on the given model by using the object-factory.
+ * This method should be used when you create Widgets or Adapters in the UI without a
+ * model from the server-side client.
+ *
+ * The minimum required properties are:
+ * - id
+ * - objectType
+ */
+scout.Session.prototype.createUiObject = function(model) {
+  // in case _registered is not set, set it to false
+  // but when it is already set (true or false) we don't change it.
+  if (model._registered === undefined) {
+    model._registered = false;
+  }
+  if (model.id === undefined) {
+    model.id = scout.createUniqueId();
+  }
+  return this.objectFactory.create(model);
 };
 
 scout.Session.prototype.getOrCreateModelAdapters = function(ids, parent) {
@@ -348,7 +374,7 @@ scout.Session.prototype._sendRequest = function(request) {
 
 scout.Session.prototype.defaultAjaxOptions = function(request, async) {
   request = request || {};
-  async = (async === undefined ? true : !!async);
+  async = scout.objects.whenUndefined(async, true);
   return {
     async: async,
     type: 'POST',

@@ -8,13 +8,22 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
     htmlGbBody = this._htmlGbBody(),
     htmlGbBodyContainer = this._htmlGbBodyContainer(),
+    htmlMenuBar = this._htmlMenuBar(),
+    menuBarSize,
     gbBodySize;
+
+  if (htmlMenuBar) {
+    menuBarSize = htmlMenuBar.getPreferredSize();
+    htmlMenuBar.setSize(menuBarSize);
+  } else {
+    menuBarSize = new scout.Dimension(0, 0);
+  }
 
   gbBodySize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets())
     .subtract(htmlGbBody.getMargins());
   gbBodySize.height -= this._titleHeight($container);
-  gbBodySize.height -= this._menuBarHeight($container);
+  gbBodySize.height -= menuBarSize.height;
 
   $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
   htmlGbBody.setSize(gbBodySize);
@@ -49,6 +58,14 @@ scout.GroupBoxLayout.prototype._titleHeight = function($container) {
 
 scout.GroupBoxLayout.prototype._menuBarHeight = function($container) {
   return scout.graphics.getVisibleSize($container.children('.menubar'), true).height;
+};
+
+scout.GroupBoxLayout.prototype._htmlMenuBar = function() {
+  if (this._groupBox.menuBar) {
+    return scout.HtmlComponent.get(this._groupBox.menuBar.$container);
+  } else {
+    return null;
+  }
 };
 
 scout.GroupBoxLayout.prototype._htmlGbBody = function() {

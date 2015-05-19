@@ -104,7 +104,8 @@ scout.Tree.prototype._render = function($parent) {
 
   scout.scrollbars.install(this.$data);
   this.session.detachHelper.pushScrollable(this.$data);
-  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.TreeMenuItemsOrder.order);
+  var menuSorter = new scout.MenuItemsOrder(this.session, this.objectType);
+  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, this.session, menuSorter);
   this._addNodes(this.nodes);
   if (this.selectedNodeIds.length > 0) {
     this._renderSelection();
@@ -370,7 +371,7 @@ scout.Tree.prototype._updateSelectedNodeIds = function(selectedNodeIds, notifySe
 
     this.selectedNodeIds = selectedNodeIds;
 
-    notifyServer = (notifyServer === undefined ? true : notifyServer);
+    notifyServer = scout.objects.whenUndefined(notifyServer, true);
     if (notifyServer) {
       this.session.send(this.id, 'nodesSelected', {
         nodeIds: selectedNodeIds

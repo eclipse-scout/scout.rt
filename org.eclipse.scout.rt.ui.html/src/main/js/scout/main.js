@@ -1,16 +1,28 @@
+// FIXME AWE/CGU: think about refactoring this code to a Scout.js class and use an
+// instance of that new class in scout-module.js for the last line of code:
+// }(window.scout = window.scout || {}, jQuery));
 scout.sessions = [];
+
+scout._uniqueIdSeqNo = 0;
+
+/**
+ * Returns a new unique ID to be used for Widgets/Adapters created by the UI
+ * without a model delivered by the server-side client.
+ *
+ */
+scout.createUniqueId = function() {
+  return ++scout._uniqueIdSeqNo;
+};
 
 scout.init = function(options) {
   this._installGlobalJavascriptErrorHandler();
-
   var tabId = scout.dates.timestamp();
   options = options || {};
   $('.scout').each(function() {
-    var $container = $(this);
-
-    var portletPartId = $container.data('partid') || '0';
-    var uiSessionId = [portletPartId, tabId].join(':');
-    var session = new scout.Session($container, uiSessionId, portletPartId, options);
+    var $container = $(this),
+      portletPartId = $container.data('partid') || '0',
+      uiSessionId = [portletPartId, tabId].join(':'),
+      session = new scout.Session($container, uiSessionId, portletPartId, options);
     session.init();
     scout.sessions.push(session);
   });

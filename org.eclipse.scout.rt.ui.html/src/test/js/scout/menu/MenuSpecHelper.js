@@ -2,20 +2,16 @@ var MenuSpecHelper = function(session) {
   this.session = session;
 };
 
-MenuSpecHelper.prototype.createModel = function(text, icon, types) {
+MenuSpecHelper.prototype.createModel = function(text, iconId, menuTypes) {
   var model = createSimpleModel('Menu');
   $.extend(model, {
-    "text": text,
-    "iconId": icon,
-    visible: true,
-    separator: false,
-    menuTypes: types
+    text: text,
+    iconId: iconId,
+    menuTypes: menuTypes
   });
   return model;
 };
 
 MenuSpecHelper.prototype.createMenu = function(model) {
-  var menu = new scout.Menu();
-  menu.init(model, this.session);
-  return menu;
+  return this.session.createUiObject(model);
 };

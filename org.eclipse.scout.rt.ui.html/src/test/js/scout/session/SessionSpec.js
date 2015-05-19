@@ -209,7 +209,6 @@ describe("Session", function() {
       });
     });
 
-
     it("check if correct text is returned", function() {
       expect(session.text('NoOptions')).toBe('Keine Übereinstimmung');
     });
@@ -248,6 +247,18 @@ describe("Session", function() {
 
     it("optText returns text if key found, with arguments", function() {
       expect(session.optText('NumOptions', '#Default', 7)).toBe('7 Optionen');
+    });
+
+  });
+
+  describe("createUiObject", function() {
+
+    it("sets the '_registered' and 'id' property correctly", function() {
+      var currentSeqNo = scout._uniqueIdSeqNo,
+        menu = createSession().createUiObject({objectType: 'Menu'});
+      expect(menu._registered).toBe(false);
+      expect(menu.id).toBe(currentSeqNo + 1);
+      expect(menu.id).toBe(scout._uniqueIdSeqNo);
     });
 
   });
