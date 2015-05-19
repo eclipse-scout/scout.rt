@@ -144,7 +144,7 @@ There are two options to install Scout's MultiSessionCookieStore:
 1. Set the default cookie manager programmatically somewhere in your code. This is the way provided by the JVM,
    see http://docs.oracle.com/javase/tutorial/networking/cookies/cookiemanager.html for details.
 2. Use Scout's auto-install mechanism by setting the property "org.eclipse.scout.rt.servicetunnel.multiSessionCookieStoreEnabled"
-   in your config.ini to "true". This is the recommended way.
+   in your config.properties to "true". This is the recommended way.
 
 NBU 05.03.2015
 AbstractDesktop: getConfiguredAutoTabKeyStrokesEnabled: In the HtmlUI it should be possible to change view Tabs with modifier+number.
