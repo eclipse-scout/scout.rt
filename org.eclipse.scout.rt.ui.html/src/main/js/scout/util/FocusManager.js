@@ -345,9 +345,10 @@ scout.FocusContext.prototype._validateFocus = function() {
   }
 //update scrollbar
   if(this._$focusedElement){
-    //TODO nbu update scrollbar.
-    scout.scrollbars.update(this._$focusedElement.parent().parent().parent().parent());
-//    scout.scrollbars.scrollTo(this._$container, this._$focusedElement);
+    var $scrollable = scout.scrollbars.nextScrollableUpwards(this._$focusedElement, $focusContext);
+    if($scrollable){
+      scout.scrollbars.update($scrollable);
+    }
   }
   scout.focusManager.validatingFocus = false;
 };
