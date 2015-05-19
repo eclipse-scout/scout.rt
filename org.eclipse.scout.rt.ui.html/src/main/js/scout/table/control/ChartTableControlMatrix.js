@@ -2,6 +2,7 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.ChartTableControlMatrix = function(table, session) {
+  this.session = session;
   this.locale = session.locale;
   this._allData = [];
   this._allAxis = [];
@@ -62,7 +63,8 @@ scout.ChartTableControlMatrix.prototype.addData = function(data, dataGroup) {
 //add x or y Axis
 scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
   var keyAxis = [],
-    locale = this.locale;
+    locale = this.locale,
+    emptyCell = this.session.text('EmptyCell');
 
   // collect all axis
   this._allAxis.push(keyAxis);
@@ -87,67 +89,108 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
   if (axis.type === 'date') {
     if (axisGroup === 0) {
       keyAxis.norm = function(f) {
-        if (f) {
+        if (f === null || f === '') {
+          return null;
+        } else {
           var date = scout.dates.parseJsonDate(f);
           return date.getTime();
         }
       };
       keyAxis.format = function(n) {
-        return locale.dateFormat.format(new Date(n));
+        if (n === null) {
+          return null;
+        } else {
+          return locale.dateFormat.format(new Date(n));
+        }
       };
     } else if (axisGroup === 1) {
       keyAxis.norm = function(f) {
-        if (f) {
+        if (f === null || f === '') {
+          return null;
+        } else {
           var date = scout.dates.parseJsonDate(f);
           var b = (date.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
           return b;
         }
       };
       keyAxis.format = function(n) {
-        return locale.dateFormatSymbols.weekdaysOrdered[n];
+        if (n === null) {
+          return null;
+        } else {
+          return locale.dateFormatSymbols.weekdaysOrdered[n];
+        }
       };
     } else if (axisGroup === 2) {
       keyAxis.norm = function(f) {
-        if (f) {
+        if (f === null || f === '') {
+          return null;
+        } else {
           var date = scout.dates.parseJsonDate(f);
           return date.getMonth();
         }
       };
       keyAxis.format = function(n) {
-        return locale.dateFormatSymbols.months[n];
+        if (n === null) {
+          return emptyCell;
+        } else {
+          return locale.dateFormatSymbols.months[n];
+        }
       };
     } else if (axisGroup === 3) {
       keyAxis.norm = function(f) {
-        if (f) {
+        if (f === null || f === '') {
+          return null;
+        } else {
           var date = scout.dates.parseJsonDate(f);
           return date.getFullYear();
         }
       };
       keyAxis.format = function(n) {
-        return String(n);
+        if (n === null) {
+          return emptyCell;
+        } else {
+          return String(n);
+        }
       };
     }
   } else if (axis.type === 'number') {
     keyAxis.norm = function(f) {
-      return parseFloat(f);
-    };
-    keyAxis.format = function(n) {
-      return locale.decimalFormat.format(n);
-    };
-  } else {
-    keyAxis.norm = function(f) {
-      var index = keyAxis.normTable.indexOf(f);
-      if (index === -1) {
-        return keyAxis.normTable.push(f) - 1;
+      if (isNaN(f) || f === null || f === '') {
+        return null;
       } else {
-        return index;
+        return parseFloat(f);
       }
     };
     keyAxis.format = function(n) {
-      return keyAxis.normTable[n];
+      if (isNaN(n) || n === null) {
+        return emptyCell;
+      } else {
+        return locale.decimalFormat.format(n);
+      }
     };
+  } else {
+    keyAxis.norm = function(f) {
+      if (f === null || f === '') {
+        return null;
+      } else {
+        var index = keyAxis.normTable.indexOf(f);
+        if (index === -1) {
+          return keyAxis.normTable.push(f) - 1;
+        } else {
+          return index;
+        }
+      }
+    };
+    keyAxis.format = function(n) {
+      if (n === null) {
+        return emptyCell;
+      } else {
+        return keyAxis.normTable[n];
+      }
+    };
+    var self = keyAxis;
     keyAxis.reorder = function() {
-      //FIXME implement
+      keyAxis.sort(function(a, b){ return (a === null ? 1 : keyAxis.format(a) > keyAxis.format(b)); });
     };
   }
 

@@ -18,6 +18,7 @@ public class UiTextContributor implements IUiTextContributor {
         "OneOption",
         "NumOptions",
         "InvalidDateFormat",
+        "EmptyCell",
         "FilterBy_",
         "SearchFor_",
         "TableRowCount0",

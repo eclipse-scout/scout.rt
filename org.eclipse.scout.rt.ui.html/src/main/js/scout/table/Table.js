@@ -1056,7 +1056,10 @@ scout.Table.prototype.colorData = function(column, mode) {
     row = filteredRows[i];
     value = this.cellValue(column, row);
     $cell = this.$cell(column, row.$row);
-    colorFunc($cell, value);
+
+    if (value !== '') {
+      colorFunc($cell, value);
+    }
   }
 };
 

@@ -369,6 +369,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     //  find filter
     $('.selected', $headerFilter).each(function() {
       var dX = parseFloat($(this).attr('data-xAxis'));
+      dX = isNaN(dX) ? null : dX;
       column.filter.push(dX);
     });
 
