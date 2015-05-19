@@ -95,7 +95,13 @@ scout.Tree.prototype._render = function($parent) {
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
 
-  this.$data = this.$container.appendDiv('tree-data');
+  this.$data = this.$container.appendDiv('tree-data')
+  .on('click', '.tree-node', this._onNodeClick.bind(this))
+  .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this))
+  .on('click', '.tree-node-control', this._onNodeControlClick.bind(this))
+  .on('dblclick', '.tree-node-control', this._onNodeControlClick.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
+
+
   scout.scrollbars.install(this.$data);
   this.session.detachHelper.pushScrollable(this.$data);
   this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.TreeMenuItemsOrder.order);
@@ -751,8 +757,6 @@ scout.Tree.prototype._$buildNode = function(node, $parent) {
   var level = $parent ? parseFloat($parent.attr('data-level')) + 1 : 0;
 
   var $node = $.makeDiv('tree-node')
-    .on('click', '', this._onNodeClick.bind(this))
-    .on('dblclick', '', this._onNodeDoubleClick.bind(this))
     .data('node', node)
     .attr('data-nodeid', node.id)
     .attr('data-level', level)
@@ -871,10 +875,7 @@ scout.Tree.prototype.sendNodesChecked = function(nodes) {
 };
 
 scout.Tree.prototype._renderTreeItemControl = function($node) {
-  var $control = $node.prependDiv('tree-node-control')
-    .on('click', '', this._onNodeControlClick.bind(this))
-    .on('dblclick', '', this._onNodeControlClick.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
-
+  var $control = $node.prependDiv('tree-node-control');
   if (this.checkable) {
     $control.addClass('checkable');
   }
