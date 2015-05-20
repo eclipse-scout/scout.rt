@@ -100,23 +100,17 @@ public class PortTypeProxyAnnotationProcessor extends AbstractProcessor {
   protected static final String JAXWS_RUN_CONTEXT_FIELD_NAME = "jaxwsRunContext";
   protected static final String HANDLER_RUN_CONTEXT_FIELD_NAME = "handlerRunContext";
 
-  protected boolean m_enabled = true;
-
   private Logger m_logger;
 
   @Override
   public synchronized void init(final ProcessingEnvironment env) {
-    m_enabled = Boolean.valueOf(env.getOptions().get("enabled"));
     m_logger = new Logger(env);
     super.init(env);
   }
 
   @Override
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
-    if (!m_enabled) {
-      m_logger.logInfo("Skipped creation of PortTypeProxy because disabled");
-      return true;
-    }
+    m_logger.logInfo("Annotation processing started...");
 
     if (roundEnv.processingOver()) {
       return true;
