@@ -6,7 +6,7 @@ describe("CellEditor", function() {
 
   beforeEach(function() {
     setFixtures(sandboxDesktop());
-    session = new scout.Session($('#sandbox'), '1.1');
+    session = sandboxSession();
     helper = new TableSpecHelper(session);
     formHelper = new FormSpecHelper(session);
     jasmine.Ajax.install();

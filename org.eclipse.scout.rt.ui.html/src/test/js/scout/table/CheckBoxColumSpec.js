@@ -5,7 +5,7 @@ describe("CheckBoxColumn", function() {
 
   beforeEach(function() {
     setFixtures(sandbox());
-    session = new scout.Session($('#sandbox'), '1.1');
+    session = sandboxSession();
     helper = new TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();

@@ -6,7 +6,7 @@ describe("TableField", function() {
 
   beforeEach(function() {
     setFixtures(sandbox());
-    session = new scout.Session($('#sandbox'), '1.1');
+    session = sandboxSession();
     tableHelper = new TableSpecHelper(session);
     helper = new FormSpecHelper(session);
     jasmine.Ajax.install();

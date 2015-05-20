@@ -12,7 +12,7 @@ describe("Session", function() {
 
   function createSession(userAgent) {
     setFixtures(sandbox());
-    return new scout.Session($('#sandbox'), '1.1', {'userAgent':userAgent});
+    return sandboxSession({'userAgent':userAgent});
   }
 
   describe("send", function() {

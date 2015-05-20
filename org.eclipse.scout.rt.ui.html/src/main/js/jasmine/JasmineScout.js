@@ -6,6 +6,14 @@ function mostRecentJsonRequest() {
   }
 }
 
+function sandboxSession(options) {
+  options=options || {};
+  options.uiSessionId = options.uiSessionId || '1.1';
+  options.portletPartId = options.portletPartId || '0';
+  options.backgroundJobPollingEnabled = false;
+  return new scout.Session($('#sandbox'), options);
+}
+
 function sandboxDesktop() {
   var $sandbox = window.sandbox();
   $sandbox.addClass('desktop');

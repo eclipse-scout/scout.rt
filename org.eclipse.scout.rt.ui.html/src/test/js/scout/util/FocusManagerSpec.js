@@ -9,7 +9,7 @@ describe("scout.Focusmanager", function() {
     formHelper = new FormSpecHelper(session);
     focusHelper = new FocusManagerSpecHelper();
     jasmine.Ajax.install();
-    session = new scout.Session($('#sandbox'), '1.1');
+    session = sandboxSession();
     session.init();
     focusContextsForSession = scout.focusManager._sessionFocusContexts[session.uiSessionId].focusContexts;
     uninstallUnloadHandlers(session);

@@ -5,7 +5,7 @@ describe("FormField", function() {
 
   beforeEach(function() {
     setFixtures(sandbox());
-    session = new scout.Session($('#sandbox'), '1.1');
+    session = sandboxSession();
     helper = new FormSpecHelper(session);
   });
 

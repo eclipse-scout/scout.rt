@@ -19,10 +19,10 @@ scout.init = function(options) {
   var tabId = scout.dates.timestamp();
   options = options || {};
   $('.scout').each(function() {
-    var $container = $(this),
-      portletPartId = $container.data('partid') || '0',
-      uiSessionId = [portletPartId, tabId].join(':'),
-      session = new scout.Session($container, uiSessionId, portletPartId, options);
+    var $container = $(this);
+    options.portletPartId = options.portletPartId || $container.data('partid') || '0';
+    options.uiSessionId = options.uiSessionId || [options.portletPartId, tabId].join(':');
+    var session = new scout.Session($container, options);
     session.init();
     scout.sessions.push(session);
   });

@@ -17,6 +17,10 @@ scout.BackgroundJobPollingStatus = {
  * The 'options' argument holds all optional values that may be used during
  * initialization (it is the same object passed to the scout.init() function).
  * The following 'options' properties are read by this constructor function:
+ *   [uiSessionId]
+ *     Never null!
+ *   [portletPartId]
+ *     Default 0
  *   [clientSessionId]
  *     Identifies the 'client instance' on the UI server. If the property is not set
  *     (which is the default case), the clientSessionId is taken from the browser's
@@ -30,13 +34,9 @@ scout.BackgroundJobPollingStatus = {
  *     Unless websockets is used, this property turns on (default) or off background
  *     polling using an async ajax call together with setTimeout()
  */
-scout.Session = function($entryPoint, uiSessionId, partId, options) {
-  if (typeof partId === 'object') { // partId is optional --> if it is an object, use it as 'options' argument
-    options = partId;
-    partId = undefined;
-  }
-  partId = partId || '0';
+scout.Session = function($entryPoint, options) {
   options = options || {};
+  options.portletPartId = options.portletPartId || '0';
 
   // Prepare clientSessionId
   var clientSessionId = options.clientSessionId;
@@ -50,8 +50,8 @@ scout.Session = function($entryPoint, uiSessionId, partId, options) {
 
   // Set members
   this.$entryPoint = $entryPoint;
-  this.uiSessionId = uiSessionId;
-  this.partId = partId;
+  this.uiSessionId = options.uiSessionId;
+  this.partId = options.portletPartId;
   this.parentUiSession;
   this.clientSessionId = clientSessionId;
   this.userAgent = options.userAgent || new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
@@ -91,7 +91,7 @@ scout.Session = function($entryPoint, uiSessionId, partId, options) {
     this.parentUiSession = parentUiSession; // TODO BSH Detach | Get from options instead?
   }
 
-  this.modelAdapterRegistry[uiSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
+  this.modelAdapterRegistry[options.uiSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
     id: '1',

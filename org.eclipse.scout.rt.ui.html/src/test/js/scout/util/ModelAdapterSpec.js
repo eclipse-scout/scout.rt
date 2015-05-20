@@ -8,7 +8,7 @@ describe("ModelAdapter", function() {
     jasmine.Ajax.install();
     jasmine.clock().install();
 
-    session = new scout.Session($('#sandbox'), '1.1');
+    session = sandboxSession();
     session.init();
     uninstallUnloadHandlers(session);
 

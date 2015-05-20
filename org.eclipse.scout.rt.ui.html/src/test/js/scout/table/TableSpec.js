@@ -5,7 +5,7 @@ describe("Table", function() {
 
   beforeEach(function() {
     setFixtures(sandbox());
-    session = new scout.Session($('#sandbox'), '1.1');
+    session = sandboxSession();
     session.locale = new LocaleSpecHelper().createLocale('de-CH');
     helper = new TableSpecHelper(session);
     jasmine.Ajax.install();
