@@ -10,7 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws;
 
+import java.util.concurrent.TimeUnit;
+
+import javax.security.auth.Subject;
+
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.server.jaxws.handler.LogHandler;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
@@ -20,7 +26,7 @@ import org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticatio
 import org.eclipse.scout.rt.server.jaxws.provider.handler.HandlerProxy;
 
 /**
- *
+ * 'config.properties' used in JAX-WS RT.
  */
 public final class JaxWsConfigProperties {
 
@@ -28,18 +34,35 @@ public final class JaxWsConfigProperties {
   }
 
   /**
-   * Technical user to validate user's credentials; used by {@link IAuthenticator}.
+   * Technical {@link Subject} used to authenticate webservice requests; used by {@link IAuthenticator}.
    */
-  public static class JaxWsAuthenticatorUserProperty extends AbstractStringConfigProperty {
-
-    @Override
-    public String getDefaultValue() {
-      return "jaxws-authenticator";
-    }
+  public static class JaxWsAuthenticatorSubjectProperty extends AbstractSubjectConfigProperty {
 
     @Override
     public String getKey() {
       return "jaxws.user.authenticator";
+    }
+
+    @Override
+    public Subject getDefaultValue() {
+      return convertToSubject("jaxws-authenticator");
+    }
+  }
+
+  /**
+   * Technical {@link Subject} used to invoke JAX-WS handlers if the request is not authenticated yet; used by
+   * {@link HandlerProxy}.
+   */
+  public static class JaxWsHandlerSubjectProperty extends AbstractSubjectConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "jaxws.user.handler";
+    }
+
+    @Override
+    public Subject getDefaultValue() {
+      return convertToSubject("jaxws-handler");
     }
   }
 
@@ -49,13 +72,13 @@ public final class JaxWsConfigProperties {
   public static class JaxWsLogHandlerDebugProperty extends AbstractBooleanConfigProperty {
 
     @Override
-    public Boolean getDefaultValue() {
-      return null;
+    public String getKey() {
+      return "jaxws.loghandler.debug";
     }
 
     @Override
-    public String getKey() {
-      return "jaxws.loghandler.debug";
+    public Boolean getDefaultValue() {
+      return null;
     }
   }
 
@@ -65,13 +88,13 @@ public final class JaxWsConfigProperties {
   public static class JaxWsImplementorProperty extends AbstractStringConfigProperty {
 
     @Override
-    public String getDefaultValue() {
-      return null;
+    public String getKey() {
+      return "jaxws.implementor";
     }
 
     @Override
-    public String getKey() {
-      return "jaxws.implementor";
+    public String getDefaultValue() {
+      return null;
     }
   }
 
@@ -81,13 +104,13 @@ public final class JaxWsConfigProperties {
   public static class JaxWsAuthUsersProperty extends AbstractStringConfigProperty {
 
     @Override
-    public String getDefaultValue() {
-      return null;
+    public String getKey() {
+      return "jaxws.authentication.users";
     }
 
     @Override
-    public String getKey() {
-      return "jaxws.authentication.users";
+    public String getDefaultValue() {
+      return null;
     }
   }
 
@@ -97,29 +120,108 @@ public final class JaxWsConfigProperties {
   public static class JaxWsBasicAuthRealmProperty extends AbstractStringConfigProperty {
 
     @Override
-    public String getDefaultValue() {
-      return "JAX-WS";
+    public String getKey() {
+      return "jaxws.authentication.basic.realm";
     }
 
     @Override
-    public String getKey() {
-      return "jaxws.authentication.basic.realm";
+    public String getDefaultValue() {
+      return "JAX-WS";
     }
   }
 
   /**
-   * Technical user to invoke JAX-WS handlers; used by {@link HandlerProxy}.
+   * To indicate whether to use a preemptive port cache for webservice clients.
+   * <p>
+   * Depending on the implementor used, cached ports may increase performance, because port creation is an expensive
+   * operation due to WSDL and schema validation. The cache is based on a 'corePoolSize', meaning that that number of
+   * ports is created on a preemptive basis. If more ports than that number is required, they are are created on demand
+   * and also added to the cache until expired, which is useful at a high load.
+   *
+   * @see JaxWsPortCacheCorePoolSizeProperty
+   * @see JaxWsPortCacheTTLProperty
    */
-  public static class JaxWsAnonymousUserProperty extends AbstractStringConfigProperty {
-
-    @Override
-    public String getDefaultValue() {
-      return "jaxws-anonymous";
-    }
+  public static class JaxWsPortCacheEnabledProperty extends AbstractBooleanConfigProperty {
 
     @Override
     public String getKey() {
-      return "jaxws.user.anonymous";
+      return "jaxws.consumer.portCache.enabled";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return Boolean.TRUE;
+    }
+  }
+
+  /**
+   * Number of ports to be preemptively cached to speed up webservice calls.
+   *
+   * @see JaxWsPortCacheEnabledProperty
+   */
+  public static class JaxWsPortCacheCorePoolSizeProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "jaxws.consumer.portCache.corePoolSize";
+    }
+
+    @Override
+    public Integer getDefaultValue() {
+      return 10;
+    }
+  }
+
+  /**
+   * Maximum time [ms] to retain ports in the cache if the 'corePoolSize' is exceeded. That typically occurs at high
+   * load, or if 'corePoolSize' is undersized.
+   *
+   * @see JaxWsPortCacheEnabledProperty
+   */
+  public static class JaxWsPortCacheTTLProperty extends AbstractPositiveLongConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "jaxws.consumer.portCache.ttl";
+    }
+
+    @Override
+    public Long getDefaultValue() {
+      return TimeUnit.MINUTES.toMillis(15);
+    }
+  }
+
+  /**
+   * Connect timeout [ms] to abort a webservice request, if establishment of the HTTP connection takes longer than this
+   * timeout. A timeout of <code>null</code> means an infinite timeout.
+   */
+  public static class JaxWsConnectTimeoutProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "jaxws.consumer.connectTimeout";
+    }
+
+    @Override
+    public Integer getDefaultValue() {
+      return null; // infinite timeout
+    }
+  }
+
+  /**
+   * Read timeout [ms] to abort a webservice request, if it takes longer than this timeout for data to be available for
+   * read. A timeout of <code>null</code> means an infinite timeout.
+   */
+  public static class JaxWsReadTimeoutProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "jaxws.consumer.readTimeout";
+    }
+
+    @Override
+    public Integer getDefaultValue() {
+      return null; // infinite timeout
     }
   }
 }

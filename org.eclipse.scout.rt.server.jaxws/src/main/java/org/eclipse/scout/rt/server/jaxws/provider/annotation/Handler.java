@@ -15,15 +15,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAnonymousUserProperty;
-
 /**
- * Describes a JAX-WS handler to be installed for an endpoint.
- * <p>
- * If the handler is annotated with <code>&#064;RunWithRunContext</code> annotation, it is executed on behalf of a
- * {@link RunContext} with the <code>Subject</code> of the authenticated webservice request, or if not, with the
- * anonymous user as defined by {@link JaxWsAnonymousUserProperty}.
+ * Describes a JAX-WS handler to intercept webservice requests.
  *
  * @since 5.1
  */
@@ -41,7 +34,7 @@ public @interface Handler {
    * Optional <i>init-parameters</i> to instrument the handler.
    * <p>
    * In order to work, the handler must declare a field of the type <code>Map&lt;String, String&gt;</code> annotated
-   * with &#064;Resource. At construction time, the parameters are injected into that field.
+   * with @Resource. At construction time, the parameters are injected into that field.
    * <p>
    * Example:
    *

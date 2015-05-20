@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.jaxws.provider.handler;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -26,13 +25,12 @@ import javax.xml.ws.http.HTTPException;
 import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsAnonymousUserProperty;
+import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsHandlerSubjectProperty;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.ClazzUtil;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.InitParam;
@@ -53,8 +51,7 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HandlerProxy.class);
 
-  private static final Subject SUBJECT_ANONYMOUS = new Subject(true, Collections.singleton(new SimplePrincipal(CONFIG.getPropertyValue(JaxWsAnonymousUserProperty.class))),
-      Collections.emptySet(), Collections.emptySet());
+  private static final Subject SUBJECT_ANONYMOUS = CONFIG.getPropertyValue(JaxWsHandlerSubjectProperty.class);
 
   private final Handler<CONTEXT> m_handler;
 

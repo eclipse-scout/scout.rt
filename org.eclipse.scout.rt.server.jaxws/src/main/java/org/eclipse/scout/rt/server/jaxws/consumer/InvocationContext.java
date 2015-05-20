@@ -46,8 +46,8 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
 /**
  * This context represents a webservice Port to interact with a webservice endpoint, and is associated with a dedicated
  * Port, meaning that it can be used concurrently among other Ports. Request properties are inherited from
- * {@link JaxWsClient}, and can be overwritten for the scope of this context. That is useful if having a port with
- * some operations require some different properties set, e.g. another read-timeout to transfer big data. Also, if
+ * {@link AbstractJaxWsClient}, and can be overwritten for the scope of this context. That is useful if having a port
+ * with some operations require some different properties set, e.g. another read-timeout to transfer big data. Also, if
  * associated with a transaction, respective commit or rollback listeners are called upon leaving the transaction
  * boundary, e.g. to implement a <code>2-phase-commit-protocol (2PC)</code> for the webservice operations invoked.
  *
