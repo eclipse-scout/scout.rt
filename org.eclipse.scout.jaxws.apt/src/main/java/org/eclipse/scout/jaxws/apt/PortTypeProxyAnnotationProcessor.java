@@ -48,7 +48,7 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.jaxws.apt.internal.HandlerArtefactProcessor;
+import org.eclipse.scout.jaxws.apt.internal.HandlerArtifactProcessor;
 import org.eclipse.scout.jaxws.apt.internal.PortTypeProxyDescriptor;
 import org.eclipse.scout.jaxws.apt.internal.PortTypeProxyDescriptor.HandlerDescriptor;
 import org.eclipse.scout.jaxws.apt.internal.codemodel.JConditionalEx;
@@ -83,7 +83,7 @@ import com.sun.codemodel.JVar;
 
 /**
  * Annotation processor to generate a proxy for each webservice endpoint, so that webservice requests are run on behalf
- * of a {@link RunContext}. Based on the existence of an associated {@link JaxWsPortTypeDecorator}, other artefacts like
+ * of a {@link RunContext}. Based on the existence of an associated {@link JaxWsPortTypeDecorator}, other artifacts like
  * authentication handler, proxies for handlers and handler-chain XML file are generated.
  *
  * @since 5.1
@@ -412,7 +412,7 @@ public class PortTypeProxyAnnotationProcessor extends AbstractProcessor {
       // Add handler chain annotation.
       final HandlerChain _handlerChainAnnotation = _portTypeInterface.getAnnotation(HandlerChain.class);
       if (_handlerChainAnnotation == null) {
-        portTypeProxy.annotate(HandlerChain.class).param("file", new HandlerArtefactProcessor().generateHandlerArtefacts(portTypeProxy, descriptor, processingEnv, m_logger));
+        portTypeProxy.annotate(HandlerChain.class).param("file", new HandlerArtifactProcessor().generateHandlerArtifacts(portTypeProxy, descriptor, processingEnv, m_logger));
       }
       else {
         m_logger.logInfo("Handler file not generated because provided as binding file [file=%s]", _handlerChainAnnotation.file());
@@ -491,7 +491,7 @@ public class PortTypeProxyAnnotationProcessor extends AbstractProcessor {
     out.println("<ul>");
     out.println("<li>To disable proxy generation, set Maven property 'jaxws.porttypeproxy.enabled' to <code>false</code>, or disable APT.</li>");
     out.println("<li>To rebuild stub and proxy, run 'mvn clean compile', or update the Maven Project in Eclipse IDE (Ctrl+F5 with 'clean projects' checked).</li>");
-    out.println("<li>If not cleaning 'target' folder, stub and proxy is only re-generated if either WSDL, schema or binding files change, or '/target/jaxws/wsartefact-hash' is deleted manually.</li>");
+    out.println("<li>If not cleaning 'target' folder, stub and proxy is only re-generated if either WSDL, schema or binding files change, or '/target/jaxws/wsartifact-hash' is deleted manually.</li>");
     out.printf("<li>Provide an interface annotated with {@link %s} to customize proxy and artifact generation, e.g. to configure authentication, install handlers, or to contribute additional annotations like {@link %s}.</li>", JaxWsPortTypeDecorator.class.getSimpleName(), MTOM.class.getSimpleName()).println();
     out.printf("<li>Any annotation declared on interface annotated with {@link %s} is contributed to the PortTypeProxy.</li>", JaxWsPortTypeDecorator.class.getSimpleName()).println();
     out.printf("<li>By contributing a {@link %s} annotation on proxy decorator, webservice configuration can be overwritten.</li>", WebService.class.getSimpleName()).println();
