@@ -45,8 +45,14 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function() {
     menuClone = menu.clone();
     menuClone.render(this.$body); // FIXME AWE: (menus) items nicht mehr in der vertikalen mitte
     menuClone.$container
-      .on('click', '', this.closePopup.bind(this))
-      .one(scout.menus.CLOSING_EVENTS, $.suppressEvent);
+      .on('click', '', this.closePopup.bind(this));
+
+    var oldSendDoAction = menuClone.sendDoAction;
+    var that = this;
+    menuClone.sendDoAction = function(){
+      oldSendDoAction.call(this);
+      that.closePopup();
+    };
 
   }.bind(this));
 };

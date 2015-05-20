@@ -45,6 +45,7 @@ scout.MenuControlKeyStrokes.prototype._changeSelection = function($oldItem, $new
     return;
   } else {
     $newItem.addClass('selected');
+    $newItem.focus();
   }
 
   if ($oldItem.length > 0) {

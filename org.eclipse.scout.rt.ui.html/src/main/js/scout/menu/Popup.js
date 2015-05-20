@@ -32,6 +32,7 @@ scout.Popup.prototype.remove = function() {
   scout.Popup.parent.prototype.remove.call(this);
   // remove all clean-up handlers
   this._detachCloseHandler();
+  this.rendered=false;
 };
 
 scout.Popup.prototype._render = function($parent) {
