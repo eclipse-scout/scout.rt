@@ -59,7 +59,7 @@ scout.MenuBar.prototype.updateItems = function(menuItems, force) {
 
   // Add tabindex 0 to first valid MenuItem so that it can be focused. All other items
   // are not tabbable. They can be selected with the arrow keys.
-  this.menuItems.forEach(function(item) {
+  this.menuItems.some(function(item) {
     if (item.enabled && item.visible && (item instanceof scout.Button || isNotSeparator(item))) {
       var $target = (item instanceof scout.Button ? item.$field : item.$container);
       $target.attr('tabindex', 0);
