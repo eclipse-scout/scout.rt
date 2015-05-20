@@ -26,11 +26,7 @@ scout.HtmlField.prototype._renderDisplayText = function() {
     return;
   }
   this.$field.html(this.displayText);
-  this.$field.find('.app-link').on('click', this._onAppLinkAction.bind(this))
-  //prevent focus validation on other field
-  .on('mousedown', function(event) {
-    event.preventDefault();
-  });
+  this.$field.find('.app-link').on('click', this._onAppLinkAction.bind(this)).attr('tabindex', "0");
 };
 
 scout.HtmlField.prototype._renderScrollBarsEnabled = function(scrollBarsEnabled) {
