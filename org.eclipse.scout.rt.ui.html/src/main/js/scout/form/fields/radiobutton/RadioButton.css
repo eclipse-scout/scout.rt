@@ -14,7 +14,7 @@
   }
 
   & label::before {
-    content: "";
+    content: " ";
     display: inline-block;
     width: 19px;
     height: 19px;
@@ -22,13 +22,16 @@
     position: absolute;
     left: 0;
     top: 5px;
+    border: 2px solid @palette-gray-4;
+    border-radius: 50%;
+
   }
 
   & input[type=radio] {
     /* no visiblity and display change to be focusable */
     position: absolute;
-    width: 22px;
-    height: 22px;
+    width: 23px;
+    height: 23px;
     overflow: hidden;
     margin: 0;
     padding: 0;
@@ -37,27 +40,24 @@
     opacity: 0;
   }
 
-  & input[type=radio]:checked + label::before {
-    .font-icon;
-    content: @icon-circle;
-    color: @palette-black;
-    font-size: 8px;
-    text-align: center;
-    line-height: 15px;
+  & input[type=radio]:checked + label::after {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    left: 6px;
+    top: 11px;
+    width: 7px;
+    height: 7px;
+    background-color: @palette-gray-8;
+    border: 2px solid @palette-gray-8;
+    border-radius: 100%;
   }
 
   & input[type=radio]:focus + label::before {
     border-color: @focus-border-color;
-    outline: none;
-  }
-
-  & label::before {
-    border: 2px solid @border-color;
-    border-radius: 10px;
   }
 
   & input[type=radio]:disabled + label::before {
-    color: @palette-gray-5;
     background-color: @control-disabled-background-color;
   }
 
