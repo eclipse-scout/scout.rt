@@ -11,16 +11,6 @@ describe("FormToolButton", function() {
     };
   });
 
-  function createModel() {
-    var model = createSimpleModel('FormToolButton');
-    $.extend({
-      "enabled": true,
-      "visible": true
-    });
-
-    return model;
-  }
-
   var formMock = {
     render: function() {},
     htmlComp: {
@@ -47,7 +37,7 @@ describe("FormToolButton", function() {
     describe("selected", function() {
 
       it("opens and closes the tool container", function() {
-        var action = createAction(createModel());
+        var action = createAction(createSimpleModel('FormToolButton'));
         action.render(session.$entryPoint);
         expect(findToolContainer()).not.toExist();
 

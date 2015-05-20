@@ -24,9 +24,9 @@ TableSpecHelper.prototype.createModel = function(columns, rows) {
 
 TableSpecHelper.prototype.createModelRow = function(id, cells) {
   return {
-    "id": id,
-    "cells": cells,
-    "enabled": true
+    id: id || scout.createUniqueId(),
+    cells: cells,
+    enabled: true
   };
 };
 
@@ -55,7 +55,6 @@ TableSpecHelper.prototype.createModelRowByTexts = function(id, texts, withoutCel
 */
 TableSpecHelper.prototype.createModelRowByValues = function(id, values) {
  values = scout.arrays.ensure(values);
-
  var cells = [];
  for (var i = 0; i < values.length; i++) {
    cells[i] = this.createModelCell(values[i], values[i]);
@@ -65,10 +64,10 @@ TableSpecHelper.prototype.createModelRowByValues = function(id, values) {
 
 TableSpecHelper.prototype.createModelColumn = function(id, text, type) {
   var column = {
-    "id": id,
-    "text": text,
-    "type": type,
-    "objectType": "Column"
+    id: id || scout.createUniqueId(),
+    text: text,
+    type: type,
+    objectType: 'Column'
   };
   scout.defaultValues.applyTo(column, 'Column');
   return column;
@@ -100,7 +99,7 @@ TableSpecHelper.prototype.createModelColumns = function(count, columnType) {
 
   var columns = [];
   for (var i = 0; i < count; i++) {
-    columns[i] = this.createModelColumn(createUniqueId(), 'col' + i, columnType);
+    columns[i] = this.createModelColumn(null, 'col' + i, columnType);
     columns[i].index = i;
   }
   return columns;
@@ -121,7 +120,7 @@ TableSpecHelper.prototype.createModelRows = function(colCount, rowCount) {
 
   var rows = [];
   for (var i = 0; i < rowCount; i++) {
-    rows[i] = this.createModelRow(createUniqueId(), this.createModelCells(colCount));
+    rows[i] = this.createModelRow(null, this.createModelCells(colCount));
   }
   return rows;
 };
@@ -129,7 +128,7 @@ TableSpecHelper.prototype.createModelRows = function(colCount, rowCount) {
 TableSpecHelper.prototype.createModelSingleColumnByTexts = function(texts) {
   var rows = [];
   for (var i=0; i < texts.length; i++) {
-    rows.push(this.createModelRowByTexts(createUniqueId(), texts[i]));
+    rows.push(this.createModelRowByTexts(null, texts[i]));
   }
   return this.createModel(this.createModelColumns(1), rows);
 };
@@ -137,7 +136,7 @@ TableSpecHelper.prototype.createModelSingleColumnByTexts = function(texts) {
 TableSpecHelper.prototype.createModelSingleColumnByValues = function(values, columnType) {
   var rows = [];
   for (var i=0; i < values.length; i++) {
-    rows.push(this.createModelRowByValues(createUniqueId(), values[i]));
+    rows.push(this.createModelRowByValues(null, values[i]));
   }
   return this.createModel(this.createModelColumns(1, columnType), rows);
 };

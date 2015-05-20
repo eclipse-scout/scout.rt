@@ -11,7 +11,7 @@ scout._uniqueIdSeqNo = 0;
  *
  */
 scout.createUniqueId = function() {
-  return ++scout._uniqueIdSeqNo;
+  return (++scout._uniqueIdSeqNo).toString();
 };
 
 scout.init = function(options) {

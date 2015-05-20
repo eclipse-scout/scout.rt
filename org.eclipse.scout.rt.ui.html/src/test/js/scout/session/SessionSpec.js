@@ -254,11 +254,11 @@ describe("Session", function() {
   describe("createUiObject", function() {
 
     it("sets the '_registered' and 'id' property correctly", function() {
-      var currentSeqNo = scout._uniqueIdSeqNo,
+      var expectedSeqNo = scout._uniqueIdSeqNo + 1,
         menu = createSession().createUiObject({objectType: 'Menu'});
       expect(menu._registered).toBe(false);
-      expect(menu.id).toBe(currentSeqNo + 1);
-      expect(menu.id).toBe(scout._uniqueIdSeqNo);
+      expect(menu.id).toBe(expectedSeqNo.toString());
+      expect(scout._uniqueIdSeqNo).toBe(expectedSeqNo);
     });
 
   });

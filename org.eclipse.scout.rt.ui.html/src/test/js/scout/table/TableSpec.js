@@ -615,8 +615,8 @@ describe("Table", function() {
     var $colHeaders, $header0, $header1;
 
     function prepareTable() {
-      columns = [helper.createModelColumn(createUniqueId(), 'col1'),
-                 helper.createModelColumn(createUniqueId(), 'col2', 'number')];
+      columns = [helper.createModelColumn(null, 'col1'),
+                 helper.createModelColumn(null, 'col2', 'number')];
       columns[0].index = 0;
       columns[1].index = 1;
       rows = helper.createModelRows(2, 3);
@@ -1179,8 +1179,8 @@ describe("Table", function() {
         expect(table.rows.length).toBe(3);
 
         var newRows = [
-          helper.createModelRow(createUniqueId(), helper.createModelCells(2)),
-          helper.createModelRow(createUniqueId(), helper.createModelCells(2))
+          helper.createModelRow(null, helper.createModelCells(2)),
+          helper.createModelRow(null, helper.createModelCells(2))
         ];
 
         //Insert new rows and switch rows 0 and 1

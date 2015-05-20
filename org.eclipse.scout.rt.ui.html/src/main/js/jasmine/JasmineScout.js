@@ -20,16 +20,9 @@ function sandboxDesktop() {
   return $sandbox;
 }
 
-var _uniqueSeq = 0;
-
-function createUniqueId() {
-  _uniqueSeq++;
-  return _uniqueSeq + '';
-}
-
 function createSimpleModel(objectType, id) {
   if (id === undefined) {
-    id = createUniqueId();
+    id = scout.createUniqueId();
   }
   return {
     id: id,
